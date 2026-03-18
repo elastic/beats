@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-elasticsearch.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Elasticsearch module [metricbeat-module-elasticsearch]
 
@@ -23,7 +27,6 @@ The `elasticsearch` module collects metrics about {{es}}.
 ## Compatibility [_compatibility_18]
 
 The `elasticsearch` module works with {{es}} 6.7.0 and later.
-
 
 ## Usage for {{stack}} Monitoring [_usage_for_stack_monitoring_2]
 
@@ -53,8 +56,15 @@ Like other Metricbeat modules, the `elasticsearch` module accepts a `hosts` conf
 * If `scope` is set to `node` (default), each entry in the `hosts` list indicates a distinct node in an {{es}} cluster.
 * If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct {{es}} cluster (for example, a load-balancing proxy fronting the cluster).
 
+Also like some other modules, the `elasticsearch` module accepts either a `username`/`password` pair of settings or a single `api_key` setting. You cannot specify the `username`/`password` settings _and_ `api_key` at the same time.
 
-## Example configuration [_example_configuration_20]
+When used, the `api_key`  configuration can be specified as:
+
+* {applies_to}`stack: ga 9.1.4` The unencoded `id:api_key` format (`api_key: "foo:bar"`) or the Base64-encoded `id:api_key` format (`api_key: "Zm9vOmJhcgo="`).
+* All earlier releases can only use the unencoded `id:api_key` format (`api_key: "foo:bar"`).
+
+
+## Example configuration [_example_configuration]
 
 The Elasticsearch module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -86,7 +96,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_26]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -96,22 +106,9 @@ The following metricsets are available:
 * [index](/reference/metricbeat/metricbeat-metricset-elasticsearch-index.md)
 * [index_recovery](/reference/metricbeat/metricbeat-metricset-elasticsearch-index_recovery.md)
 * [index_summary](/reference/metricbeat/metricbeat-metricset-elasticsearch-index_summary.md)
-* [ingest_pipeline](/reference/metricbeat/metricbeat-metricset-elasticsearch-ingest_pipeline.md)
+* [ingest_pipeline](/reference/metricbeat/metricbeat-metricset-elasticsearch-ingest_pipeline.md)  {applies_to}`stack: beta`
 * [ml_job](/reference/metricbeat/metricbeat-metricset-elasticsearch-ml_job.md)
 * [node](/reference/metricbeat/metricbeat-metricset-elasticsearch-node.md)
 * [node_stats](/reference/metricbeat/metricbeat-metricset-elasticsearch-node_stats.md)
 * [pending_tasks](/reference/metricbeat/metricbeat-metricset-elasticsearch-pending_tasks.md)
 * [shard](/reference/metricbeat/metricbeat-metricset-elasticsearch-shard.md)
-
-
-
-
-
-
-
-
-
-
-
-
-

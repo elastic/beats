@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-munin.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -12,12 +14,12 @@ Munin node metrics exporter
 **`munin.metrics.*`**
 :   Metrics exposed by a plugin of a munin node agent.
 
-type: object
+    type: object
 
 
 **`munin.plugin.name`**
 :   Name of the plugin collecting these metrics.
 
-type: keyword
+    type: keyword
 
 

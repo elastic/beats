@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-prometheus.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -12,25 +14,25 @@ Stats scraped from a Prometheus endpoint.
 **`metrics_count`**
 :   Number of metrics per Elasticsearch document.
 
-type: long
+    type: long
 
 
 **`prometheus.labels.*`**
 :   Prometheus metric labels
 
-type: object
+    type: object
 
 
 **`prometheus.metrics.*`**
 :   Prometheus metric
 
-type: object
+    type: object
 
 
 **`prometheus.query.*`**
 :   Prometheus value resulted from PromQL
 
-type: object
+    type: object
 
 
 ## query [_query]

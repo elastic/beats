@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/dev-faq.html
+applies_to:
+  stack: ga
 ---
 
 # Metricbeat Developer FAQ [dev-faq]

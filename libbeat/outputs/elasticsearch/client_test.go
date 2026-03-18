@@ -95,7 +95,7 @@ func TestPublish(t *testing.T) {
 		reg := monitoring.NewRegistry()
 		client, err := NewClient(
 			clientSettings{
-				observer:      outputs.NewStats(reg),
+				observer:      outputs.NewStats(reg, logp.NewNopLogger()),
 				connection:    eslegclient.ConnectionSettings{URL: url},
 				indexSelector: testIndexSelector{},
 			},
@@ -109,7 +109,7 @@ func TestPublish(t *testing.T) {
 		reg := monitoring.NewRegistry()
 		client, err := NewClient(
 			clientSettings{
-				observer: outputs.NewStats(reg),
+				observer: outputs.NewStats(reg, logp.NewNopLogger()),
 				connection: eslegclient.ConnectionSettings{
 					URL:              url,
 					CompressionLevel: compressionLevel,

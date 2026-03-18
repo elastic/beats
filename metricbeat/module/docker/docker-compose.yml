@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   # Dummy container for docker tests, so there is a container with
   # healthcheck generating events

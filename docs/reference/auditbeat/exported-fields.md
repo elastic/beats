@@ -1,10 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
-                 
+
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Auditbeat. They are grouped in the following categories:

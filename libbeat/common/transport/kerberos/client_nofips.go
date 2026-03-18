@@ -23,13 +23,13 @@ import (
 	"fmt"
 	"net/http"
 
-	krbclient "github.com/jcmturner/gokrb5/v8/client"
-	krbconfig "github.com/jcmturner/gokrb5/v8/config"
-	"github.com/jcmturner/gokrb5/v8/keytab"
-	"github.com/jcmturner/gokrb5/v8/spnego"
+	krbclient "github.com/elastic/gokrb5/v8/client"
+	krbconfig "github.com/elastic/gokrb5/v8/config"
+	"github.com/elastic/gokrb5/v8/keytab"
+	"github.com/elastic/gokrb5/v8/spnego"
 )
 
-func NewClient(config *Config, httpClient *http.Client, esurl string) (Client, error) {
+func NewClient(config *Config, httpClient *http.Client) (Client, error) {
 	var krbClient *krbclient.Client
 	krbConf, err := krbconfig.Load(config.ConfigPath)
 	if err != nil {

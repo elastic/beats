@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-activemq.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # ActiveMQ module [metricbeat-module-activemq]
 
@@ -46,14 +50,10 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_2]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [broker](/reference/metricbeat/metricbeat-metricset-activemq-broker.md)
 * [queue](/reference/metricbeat/metricbeat-metricset-activemq-queue.md)
 * [topic](/reference/metricbeat/metricbeat-metricset-activemq-topic.md)
-
-
-
-

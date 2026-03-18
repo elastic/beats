@@ -70,7 +70,7 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 	// that isn't at the top-level.
 	reg = findInputRegistryWithID(parentRegistry, inputID)
 	if reg == nil {
-		reg = parentRegistry.NewRegistry(registryID)
+		reg = parentRegistry.GetOrCreateRegistry(registryID)
 	} else {
 		log.Warnw(fmt.Sprintf(
 			"parent metrics registry already contains a %q registry, reusing it",
@@ -143,7 +143,15 @@ func NewMetricsRegistry(
 	registryID := sanitizeID(inputID)
 	reg := parent.GetRegistry(registryID)
 	if reg == nil {
-		reg = parent.NewRegistry(registryID)
+		// Technically this is a race: the previous GetRegistry is not atomic with
+		// this GetOrCreateRegistry, so if someone else is adding the same id at this
+		// exact moment we might take this branch inappropriately. However, the
+		// consequences in that case are metrics for two inputs with the same id
+		// being inappropriately reported under the same registry, whereas the
+		// consequences if we called NewRegistry here are a panic.
+		// (We should also never have two inputs with the same id in the first
+		// place, but it's worth being cautious.)
+		reg = parent.GetOrCreateRegistry(registryID)
 	} else {
 		// Null route metrics for duplicated ID.
 		reg = monitoring.NewRegistry()

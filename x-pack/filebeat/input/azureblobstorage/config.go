@@ -42,7 +42,7 @@ type config struct {
 	BatchSize int `config:"batch_size"`
 	// MaxWorkers defines the maximum number of concurrent workers for processing blobs.
 	// It can be set globally or overridden at the container level.
-	MaxWorkers *int `config:"max_workers" validate:"max=5000"`
+	MaxWorkers int `config:"max_workers" validate:"max=5000"`
 	// Poll enables or disables polling for new blobs in the storage account.
 	// It can be set globally or overridden at the container level.
 	Poll *bool `config:"poll"`
@@ -62,6 +62,8 @@ type config struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists.
 	// It can be set globally or overridden at the container level.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
+	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
+	PathPrefix string `config:"path_prefix"`
 }
 
 // container contains the config for each specific blob storage container in the root account.
@@ -91,6 +93,8 @@ type container struct {
 	// ExpandEventListFromField specifies a field from which to expand event lists for this specific container.
 	// This value overrides the global ExpandEventListFromField setting.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
+	// PathPrefix is the prefix for blob paths, useful for filtering blobs in a specific directory structure.
+	PathPrefix string `config:"path_prefix"`
 }
 
 // fileSelectorConfig helps filter out Azure blobs based on a regex pattern.

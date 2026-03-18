@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-zoom.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Zoom module [filebeat-module-zoom]
 
@@ -79,7 +83,6 @@ Example config:
 **`var.ssl`**
 :   Configuration options for SSL parameters like the SSL certificate and CA to use for the HTTP(s) listener See [SSL](/reference/filebeat/configuration-ssl.md) for more information.
 
-
-## Fields [_fields_57]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-zoom.md) section.

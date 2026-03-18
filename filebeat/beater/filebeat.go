@@ -129,25 +129,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		}
 	}
 
-	if b.Manager != nil {
-		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
-			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
-				if err != nil {
-					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
-					return []byte(err.Error())
-				}
-				return data
-			})
-
-		b.Manager.RegisterDiagnosticHook(
-			"registry",
-			"Filebeat's registry",
-			"registry.tar.gz",
-			"application/octet-stream",
-			gzipRegistry)
-	}
-
 	// Add inputs created by the modules
 	config.Inputs = append(config.Inputs, moduleInputs...)
 
@@ -243,7 +224,9 @@ func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	if b.Config.Output.Name() != "elasticsearch" {
-		fb.logger.Warn(pipelinesWarning)
+		if !b.Manager.Enabled() {
+			fb.logger.Warn(pipelinesWarning)
+		}
 		return nil
 	}
 
@@ -266,6 +249,25 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 func (fb *Filebeat) Run(b *beat.Beat) error {
 	var err error
 	config := fb.config
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
+				if err != nil {
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry)
+	}
 
 	if !fb.moduleRegistry.Empty() {
 		err = fb.loadModulesPipelines(b)
@@ -403,7 +405,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
 	} else {
-		fb.logger.Warn(pipelinesWarning)
+		if !b.Manager.Enabled() {
+			fb.logger.Warn(pipelinesWarning)
+		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger)

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-system.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/docs_collector.py
@@ -114,6 +116,7 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with sample dashboards. For example:
 
+% TO DO: Use `:class: screenshot`
 ![kibana system](images/kibana-system.png)
 
 ## Fields [_fields]

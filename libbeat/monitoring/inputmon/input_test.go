@@ -105,7 +105,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewInt(reg, "events_pipeline_total").Set(10)
 
 	// simulate a duplicated ID in the local and global namespace.
-	reg = globalRegistry().NewRegistry(inputID)
+	reg = globalRegistry().GetOrCreateRegistry(inputID)
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set(inputType)
 	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
@@ -139,12 +139,12 @@ func TestMetricSnapshotJSON(t *testing.T) {
 
 	// ==== registries in the global registries which aren't input metrics ===
 	// unrelated registry in the global namespace, should be ignored.
-	reg = globalRegistry().NewRegistry("another-registry")
+	reg = globalRegistry().GetOrCreateRegistry("another-registry")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("another-registry")
 
 	// another input registry missing required information.
-	reg = globalRegistry().NewRegistry("yet-another-registry")
+	reg = globalRegistry().GetOrCreateRegistry("yet-another-registry")
 	monitoring.NewString(reg, "id").Set("some-id")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
@@ -261,6 +261,25 @@ func TestSnapshotWithNestedInputs(t *testing.T) {
 	assert.Equal(t, want, got, "Reported input metrics didn't match expected value")
 }
 
+func TestFindInputRegistryWithID(t *testing.T) {
+	logger := logp.NewNopLogger()
+	root := monitoring.NewRegistry()
+	regA := NewMetricsRegistry("input-a", InputNested, root, logger)
+	NewMetricsRegistry("input-b", "winlog", regA, logger)
+	NewMetricsRegistry("input.c", "winlog", regA, logger)
+	NewMetricsRegistry("input-a::input-d", "winlog", regA, logger)
+	NewMetricsRegistry("input-e", "winlog", root, logger)
+
+	// findInputRegistryWithID should succeed on all id parameters above,
+	// whether they are at top level, nested, or contain other inputs nested
+	// inside them, and whether or not they have periods (which are not allowed
+	// in registry keys).
+	expectedIDs := []string{"input-a", "input-b", "input.c", "input-a::input-d", "input-e"}
+	for _, id := range expectedIDs {
+		assert.NotNil(t, findInputRegistryWithID(root, id), "findInputRegistryWithID should return a non-nil registry for id "+id)
+	}
+}
+
 func TestNewMetricsRegistry(t *testing.T) {
 	parent := monitoring.NewRegistry()
 	inputID := "input-inputID"
@@ -297,7 +316,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 	assert.Equal(t, parent.GetRegistry(inputID), got)
 	// register a metric to the registry
 	monitoring.NewInt(got, metricName)
-	adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+	adapter.NewGoMetrics(got, goMetricsRegistryName, logp.NewNopLogger(), adapter.Accept)
 
 	// 2nd call, return an unregistered registry
 	got = NewMetricsRegistry(
@@ -311,7 +330,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 	assert.NotPanics(t, func() {
 		// register the same metric again
 		monitoring.NewInt(got, metricName)
-		adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+		adapter.NewGoMetrics(got, goMetricsRegistryName, logp.NewNopLogger(), adapter.Accept)
 	}, "the registry should be a new and empty registry")
 }
 
@@ -320,7 +339,7 @@ func TestCancelMetricsRegistry(t *testing.T) {
 	inputID := "input-ID"
 	inputType := "input-type"
 
-	_ = parent.NewRegistry(inputID)
+	_ = parent.GetOrCreateRegistry(inputID)
 	got := parent.GetRegistry(inputID)
 	require.NotNil(t, got, "metrics registry not found on parent")
 

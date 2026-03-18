@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mongodb.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # MongoDB module [metricbeat-module-mongodb]
 
@@ -110,7 +114,7 @@ db.grantRolesToUser("user", ["clusterMonitor"])
 ```
 
 
-## Example configuration [_example_configuration_43]
+## Example configuration [_example_configuration]
 
 The MongoDB module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -118,7 +122,7 @@ The MongoDB module supports the standard configuration options that are describe
 metricbeat.modules:
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
-  period: 10s
+  period: 60s
   enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:
@@ -153,7 +157,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md).
 
 
-## Metricsets [_metricsets_49]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -162,9 +166,3 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-mongodb-metrics.md)
 * [replstatus](/reference/metricbeat/metricbeat-metricset-mongodb-replstatus.md)
 * [status](/reference/metricbeat/metricbeat-metricset-mongodb-status.md)
-
-
-
-
-
-

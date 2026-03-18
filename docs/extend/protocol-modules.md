@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/protocol-modules.html
+applies_to:
+  stack: ga
 ---
 
 # Protocol Modules [protocol-modules]

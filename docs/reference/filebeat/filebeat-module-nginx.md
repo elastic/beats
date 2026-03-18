@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-nginx.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # Nginx module [filebeat-module-nginx]
 
@@ -125,7 +129,6 @@ This module comes with sample dashboards. For example:
 % TO DO: Use `:class: screenshot`
 ![kibana nginx](images/kibana-nginx.png)
 
-
-## Fields [_fields_37]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-nginx.md) section.

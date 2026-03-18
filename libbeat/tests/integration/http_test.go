@@ -56,7 +56,7 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-E", "http.enabled=true")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	mockbeat.WaitLogsContains("Starting stats endpoint", 60*time.Second)
 	time.Sleep(time.Second)
 
 	r, err := http.Get("http://localhost:5066") //nolint:noctx // fine for tests
@@ -89,7 +89,7 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-E", "http.enabled=true")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	mockbeat.WaitLogsContains("Starting stats endpoint", 60*time.Second)
 
 	r, err := http.Get("http://localhost:5066/stats") //nolint:noctx // fine for tests
 	require.NoError(t, err)
@@ -123,7 +123,7 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-E", "http.enabled=true")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	mockbeat.WaitLogsContains("Starting stats endpoint", 60*time.Second)
 
 	r, err := http.Get("http://localhost:5066/not-exist") //nolint:noctx // fine for tests
 	require.NoError(t, err)
@@ -146,7 +146,7 @@ output.console:
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test", "-E", "http.enabled=true")
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
-	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	mockbeat.WaitLogsContains("Starting stats endpoint", 60*time.Second)
 
 	r, err := http.Get("http://localhost:5066/debug/pprof/") //nolint:noctx // fine for tests
 	require.NoError(t, err)

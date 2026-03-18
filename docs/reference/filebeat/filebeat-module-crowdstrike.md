@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-crowdstrike.html
+applies_to:
+  stack: beta
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # CrowdStrike module [filebeat-module-crowdstrike]
 
@@ -87,7 +91,6 @@ For alerts, go to Detections → External alerts.
 
 And for all over event CrowdStrike Falcon event types, go to Host → Events.
 
-
-## Fields [_fields_13]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-crowdstrike.md) section.

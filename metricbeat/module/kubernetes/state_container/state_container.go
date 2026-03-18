@@ -68,6 +68,7 @@ var (
 			"kube_pod_container_status_waiting_reason":            p.LabelMetric("status.reason", "reason"),
 			"kube_pod_container_status_last_terminated_reason":    p.LabelMetric("status.last_terminated_reason", "reason"),
 			"kube_pod_container_status_last_terminated_timestamp": p.Metric("status.last_terminated_timestamp"),
+			"kube_pod_container_status_last_terminated_exitcode":  p.Metric("status.last_terminated_exitcode"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -147,7 +148,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// empty string
 			cID, ok := (containerID).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerID: %s", ok)
+				m.Logger().Debugf("Error while casting containerID, got %T", containerID)
 			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
@@ -162,7 +163,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage, ok := (containerImage).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+				m.Logger().Debugf("Error while casting containerImage, got %T", containerImage)
 			}
 
 			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())

@@ -52,7 +52,7 @@ func TestSimpleInputConfig(t *testing.T) {
 				Type: "mock",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"Is":        "this",
 						"required?": "Yes!",
 					}),
@@ -69,7 +69,8 @@ func TestSimpleInputConfig(t *testing.T) {
 				Type: "filestream",
 				// All fields get repeated here, including ID.
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
+						"type": "filestream",
 						"paths": []any{
 							"/tmp/logfile.log",
 						},
@@ -91,7 +92,7 @@ func TestSimpleInputConfig(t *testing.T) {
 				Type: "filestream",
 				Name: "mock",
 				Source: integration.RequireNewStruct(t,
-					map[string]interface{}{
+					map[string]any{
 						"this":     "is",
 						"required": true,
 					}),
@@ -117,6 +118,7 @@ func TestSimpleInputConfig(t *testing.T) {
 			if DoesStateMatch(observed, desiredState, 0) {
 				stateReached.Store(true)
 			}
+
 			return &proto.CheckinExpected{
 				Units: units,
 			}

@@ -8,16 +8,18 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/go-resty/resty/v2"
 	sdk "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
-func getDeviceVPNStatuses(client *sdk.Client, organizationID string, devices map[Serial]*Device) error {
+func getDeviceVPNStatuses(client *sdk.Client, organizationID string, devices map[Serial]*Device, logger *logp.Logger) error {
 	params := &sdk.GetOrganizationApplianceVpnStatusesQueryParams{}
 	setStart := func(s string) { params.StartingAfter = s }
 
 	doRequest := func() (*sdk.ResponseApplianceGetOrganizationApplianceVpnStatuses, *resty.Response, error) {
+		logger.Debugf("calling GetOrganizationApplianceVpnStatuses with params: %+v", params)
 		return client.Appliance.GetOrganizationApplianceVpnStatuses(organizationID, params)
 	}
 

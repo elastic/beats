@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"

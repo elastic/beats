@@ -30,11 +30,13 @@ import (
 )
 
 type managedInput struct {
-	userID           string
+	// id is the input ID, it is defined by setting 'id'
+	// in the input configuration
+	id               string
 	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
-	sourceIdentifier *sourceIdentifier
+	sourceIdentifier *SourceIdentifier
 	prospector       Prospector
 	harvester        Harvester
 	cleanTimeout     time.Duration
@@ -58,13 +60,15 @@ func (inp *managedInput) Run(
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
+	ctx.Logger = ctx.Logger.With("filestream_id", inp.id)
+
 	// Setup cancellation using a custom cancel context. All workers will be
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(ctx.MetricsRegistry)
+	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
@@ -80,6 +84,7 @@ func (inp *managedInput) Run(
 			ctx.Logger,
 			"harvester:"),
 		metrics: metrics,
+		inputID: inp.id,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
@@ -94,7 +99,7 @@ func (inp *managedInput) Run(
 
 	// Notify the manager the input has stopped, currently that is used to
 	// keep track of duplicated IDs
-	inp.manager.StopInput(inp.userID)
+	inp.manager.StopInput(inp.id)
 
 	return nil
 }

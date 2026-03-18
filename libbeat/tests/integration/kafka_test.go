@@ -82,7 +82,7 @@ func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
 
 	// Wait for mockbeat to log that it successfully published a batch to Kafka.
 	// This ensures that mockbeat received the expected produce response configured above.
-	mockbeat.WaitForLogs(
+	mockbeat.WaitLogsContains(
 		`finished kafka batch`,
 		10*time.Second,
 		"did not find finished batch log")
@@ -120,7 +120,7 @@ func TestAuthorisationErrors(t *testing.T) {
 	// Wait for mockbeat to log each of the errors.
 	for _, err := range authErrors {
 		t.Log("waiting for:", err)
-		mockbeat.WaitForLogs(
+		mockbeat.WaitLogsContains(
 			fmt.Sprintf("Kafka (topic=test_topic): authorisation error: %s", err),
 			10*time.Second,
 			"did not find error log: %s", err)

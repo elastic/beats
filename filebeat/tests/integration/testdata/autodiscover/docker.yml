@@ -1,0 +1,12 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+output.discard:
+  enabled: true
+
+logging:
+  level: debug
+  selectors:
+    - "*"

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-tls.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -13,20 +15,16 @@ None
 
 TLS layer related fields.
 
-**`tls.certificate_not_valid_before`**
+**`tls.certificate_not_valid_before`** {applies_to}`stack: deprecated 7.8.0`
 :   Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
 
-{applies_to}`product: deprecated 7.8.0`
-
-type: date
+    type: date
 
 
-**`tls.certificate_not_valid_after`**
+**`tls.certificate_not_valid_after`** {applies_to}`stack: deprecated 7.8.0`
 :   Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection's certificates are valid.
 
-{applies_to}`product: deprecated 7.8.0`
-
-type: date
+    type: date
 
 
 ## rtt [_rtt]
@@ -40,7 +38,7 @@ Time required to finish TLS handshake based on already available network connect
 **`tls.rtt.handshake.us`**
 :   Duration in microseconds
 
-type: long
+    type: long
 
 
 ## server [_server]
@@ -50,8 +48,8 @@ Detailed x509 certificate metadata
 **`tls.server.version_number`**
 :   Version of x509 format.
 
-type: keyword
+    type: keyword
 
-example: 3
+    example: 3
 
 

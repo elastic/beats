@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-socket_summary.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # System socket_summary metricset [metricbeat-metricset-system-socket_summary]
 
@@ -23,8 +27,7 @@ There are no configuration options for this metricset.
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
-## Fields [_fields_247]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-system.md) section.
-
 

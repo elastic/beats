@@ -44,7 +44,7 @@ func addrs(addr string, log *logp.Logger) (addr4, addr6 []string, err error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get address for %s: %w", addr, err)
 	}
-	pn, err := strconv.ParseInt(port, 10, 16)
+	pn, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to get port for %s: %w", addr, err)
 	}

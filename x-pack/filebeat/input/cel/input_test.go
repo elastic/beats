@@ -2145,7 +2145,6 @@ func TestInput(t *testing.T) {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
 
-	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
@@ -2210,7 +2209,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}

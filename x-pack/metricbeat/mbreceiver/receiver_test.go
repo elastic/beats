@@ -21,7 +21,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -65,9 +65,10 @@ func TestNewReceiver(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -86,6 +87,8 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field in to be 'metricbeat'")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -198,9 +201,12 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(c, func() bool {
+			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r1")
+			assert.Equal(c, "metricbeat", logs["r2"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r2")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
@@ -240,6 +246,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
@@ -409,4 +416,37 @@ func TestReceiverDegraded(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
+				"modules": []map[string]any{
+					{
+						"module":     "benchmark",
+						"enabled":    true,
+						"period":     "1s",
+						"metricsets": []string{"info"},
+					},
+				},
+			},
+			"management.otel.enabled": true,
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+
+	// For metricbeatreceiver, we expect 2 hooks to be registered:
+	// 	one for beat metrics and one for input metrics.
+	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 2)
 }

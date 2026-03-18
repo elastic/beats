@@ -1,9 +1,13 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-santa.html
+applies_to:
+  stack: ga
 ---
 
-# Santa module [filebeat-module-santa]
+% This file is generated! See scripts/docs_collector.py
+
+# Google Santa module [filebeat-module-santa]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/santa/index.md).
@@ -81,7 +85,6 @@ This module comes with a sample dashboard showing and overview of the processes 
 % TO DO: Use `:class: screenshot`
 ![kibana santa log overview](images/kibana-santa-log-overview.png)
 
-
-## Fields [_fields_48]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-santa.md) section.

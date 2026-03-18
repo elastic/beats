@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   stan:
     image: docker.elastic.co/integrations-ci/beats-stan:${STAN_VERSION:-0.15.1}-1

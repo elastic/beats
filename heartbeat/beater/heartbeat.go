@@ -79,7 +79,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		if err == nil {
 			trace = sockTrace
 		} else {
-			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %v", stConfig.Path, stConfig.Wait, err)
 		}
 	}
 
@@ -94,7 +94,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 				trace.Abort()
 				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
 			} else {
-				logp.L().Warnf("skipping monitor state management: %w", err)
+				logp.L().Warnf("skipping monitor state management: %v", err)
 			}
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom))
@@ -277,7 +277,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		// Backoff panics with 0 duration, set to smallest unit
 		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
-			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
+			logp.L().Warnf("skipping monitor state management during managed reload: %v", err)
 		} else {
 			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}

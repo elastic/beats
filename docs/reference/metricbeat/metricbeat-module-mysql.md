@@ -1,7 +1,11 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mysql.html
+applies_to:
+  stack: ga
 ---
+
+% This file is generated! See scripts/docs_collector.py
 
 # MySQL module [metricbeat-module-mysql]
 
@@ -53,7 +57,7 @@ The mysql module comes with a predefined dashboard. For example:
 ![metricbeat mysql](images/metricbeat-mysql.png)
 
 
-## Example configuration [_example_configuration_46]
+## Example configuration [_example_configuration]
 
 The MySQL module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -97,17 +101,11 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_53]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md)
-* [performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md)
-* [query](/reference/metricbeat/metricbeat-metricset-mysql-query.md)
+* [galera_status](/reference/metricbeat/metricbeat-metricset-mysql-galera_status.md)  {applies_to}`stack: beta`
+* [performance](/reference/metricbeat/metricbeat-metricset-mysql-performance.md)  {applies_to}`stack: beta`
+* [query](/reference/metricbeat/metricbeat-metricset-mysql-query.md)  {applies_to}`stack: beta`
 * [status](/reference/metricbeat/metricbeat-metricset-mysql-status.md)
-
-
-
-
-
-

@@ -24,15 +24,15 @@ This guide describes how to get started quickly with Windows log monitoring. You
 
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+::::::{applies-item} ess: ga
 :sync: hosted
 To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
@@ -72,6 +72,18 @@ If script execution is disabled on your system, you need to set the execution po
 To use a local non-Administrator account to run Winlogbeat, follow [these additional steps](#local-user-account-setup).
 :::
 
+:::{important}
+:applies_to: stack: ga 9.0.6+!
+
+The base folder has changed from `C:\ProgramData\` to `C:\Program Files\`
+because the latter has stricter permissions. The home path (base for
+state and logs) is now `C:\Program Files\Winlogbeat-Data`.
+
+The install script (`install-service-winlogbeat.ps1`) will check whether
+`C:\ProgramData\Winlogbeat` exits and move it to `C:\Program Files\Winlogbeat-Data`.
+For more details on the installation script refer to: [install script](/reference/winlogbeat/winlogbeat-installation-script.md).
+
+:::
 
 
 ## Step 2: Connect to the {{stack}} [set-connection]
@@ -80,10 +92,10 @@ Connections to {{es}} and {{kib}} are required to set up Winlogbeat.
 
 Set the connection information in `winlogbeat.yml`. To locate this configuration file, see [Directory layout](/reference/winlogbeat/directory-layout.md).
 
-:::::::{tab-set}
+:::::::{applies-switch}
 :group: deployment
 
-::::::{tab-item} {{ech}}
+::::::{applies-item} ess: ga
 :sync: hosted
 Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/winlogbeat/configure-cloud-id.md) to a user who is authorized to set up Winlogbeat. For example:
 
@@ -95,7 +107,7 @@ cloud.auth: "winlogbeat_setup:YOUR_PASSWORD" <1>
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/winlogbeat/keystore.md).
 ::::::
 
-::::::{tab-item} Self-managed
+::::::{applies-item} self: ga
 :sync: self
 1. Set the host and port where Winlogbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Winlogbeat. For example:
 
@@ -154,6 +166,12 @@ In `winlogbeat.yml`, configure the event logs that you want to monitor.
     logging.level: info
     ```
 
+By default Windows log files are stored in `C:\Program Files\Winlogbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\winlogbeat\logs`.
+:::
+
 3. After you save your configuration file, test it with the following command.
 
     ```shell
@@ -205,6 +223,12 @@ PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 
 Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\Program Files\winlogbeat-Data\Logs\winlogbeat`.
 
+By default Windows log files are stored in `C:\Program Files\Winlogbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\winlogbeat\logs`.
+:::
+
 You can view the status of the service and control it from the Services management console in Windows. To launch the management console, run this command:
 
 ```shell
@@ -229,14 +253,14 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    :::::::{tab-set}
+    :::::::{applies-switch}
     :group: deployment
-    ::::::{tab-item} {{ech}}
+    ::::::{applies-item} ess: ga
     :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
-    ::::::{tab-item} Self-managed
+    ::::::{applies-item} self: ga
     :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::

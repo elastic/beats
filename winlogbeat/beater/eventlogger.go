@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -144,7 +145,8 @@ func (e *eventLogger) run(
 		client:     client,
 		eventACKer: eventACKer,
 	}
-	if err := eventlog.Run(noopReporter{}, ctx, api, state, publisher, e.log); err != nil {
+	reg, _ := inputmon.NewInputRegistry("winlog", api.Name(), nil)
+	if err := eventlog.Run(noopReporter{}, ctx, reg, api, state, publisher, e.log); err != nil {
 		e.log.Error(err)
 	}
 }

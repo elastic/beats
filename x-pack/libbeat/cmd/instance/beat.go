@@ -7,6 +7,7 @@ package instance
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"go.opentelemetry.io/collector/consumer"
@@ -24,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -32,8 +34,25 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// This is the timeout for the beat's internal publishing pipeline to close when shutting down the receiver. Closing
+// requires flushing the event queue, and if this doesn't happen within the timeout, data may be lost depending on
+// input type.
+const receiverPublisherCloseTimeout = 5 * time.Second
+
+var fqdnOnce = sync.OnceValues(func() (string, error) {
+	h, err := sysinfo.Host()
+	if err != nil {
+		return "", fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	return h.FQDNWithContext(ctx)
+})
+
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, useDefaultProcessors bool, consumer consumer.Logs, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -43,6 +62,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, err
 	}
 
+	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
 
 	// begin code similar to configure
@@ -163,15 +183,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get host information: %w", err)
-	}
-
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+	fqdn, err := fqdnOnce()
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
@@ -181,8 +193,12 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		b.Info.FQDN = fqdn
 	}
 
+	// register NewOtelManager
+	management.SetManagerFactory(otelmanager.NewOtelManager)
+
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, b.Registry)
+	oCfg, _ := cfg.Child("management.otel", -1)
+	m, err := management.NewManager(oCfg, b.Registry)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new manager: %w", err)
 	}
@@ -223,7 +239,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
 
-	b.Info.UseDefaultProcessors = useDefaultProcessors
 	processingFactory := settings.Processing
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
@@ -260,6 +275,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
+		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
+		WaitClose:      receiverPublisherCloseTimeout,
 	}
 	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
 	if err != nil {

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cloud.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
@@ -12,48 +14,48 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 **`cloud.image.id`**
 :   Image ID for the cloud instance.
 
-example: ami-abcd1234
+    example: ami-abcd1234
 
 
 **`meta.cloud.provider`**
 :   type: alias
 
-alias to: cloud.provider
+    alias to: cloud.provider
 
 
 **`meta.cloud.instance_id`**
 :   type: alias
 
-alias to: cloud.instance.id
+    alias to: cloud.instance.id
 
 
 **`meta.cloud.instance_name`**
 :   type: alias
 
-alias to: cloud.instance.name
+    alias to: cloud.instance.name
 
 
 **`meta.cloud.machine_type`**
 :   type: alias
 
-alias to: cloud.machine.type
+    alias to: cloud.machine.type
 
 
 **`meta.cloud.availability_zone`**
 :   type: alias
 
-alias to: cloud.availability_zone
+    alias to: cloud.availability_zone
 
 
 **`meta.cloud.project_id`**
 :   type: alias
 
-alias to: cloud.project.id
+    alias to: cloud.project.id
 
 
 **`meta.cloud.region`**
 :   type: alias
 
-alias to: cloud.region
+    alias to: cloud.region
 
 

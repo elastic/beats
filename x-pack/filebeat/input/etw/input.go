@@ -325,11 +325,12 @@ func newInputMetrics(session, id string) *inputMetrics {
 		processingTime: metrics.NewUniformSample(1024),
 	}
 	out.name.Set(session)
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+	logger := logp.NewLogger("")
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	return out

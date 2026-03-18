@@ -127,14 +127,15 @@ $$$supported-attributes$$$
 5. [storage_url](#attrib-storage-url)
 6. [containers](#attrib-containers)
 7. [name](#attrib-container-name)
-8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0`
+8. [batch_size](#attrib-batch_size-abs) {applies_to}`stack: ga 9.1.0+`
 9. [max_workers](#attrib-max_workers)
 10. [poll](#attrib-poll)
 11. [poll_interval](#attrib-poll_interval)
 12. [file_selectors](#attrib-file_selectors)
 13. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 14. [timestamp_epoch](#attrib-timestamp_epoch)
-15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0`
+15. [path_prefix](#attrib-path_prefix) {applies_to}`stack: ga 9.1.4+`
+16. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.1.0+`
 
 ## `account_name` [attrib-account-name]
 
@@ -343,6 +344,30 @@ filebeat.inputs:
 ```
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
+
+## `path_prefix` [attrib-path_prefix]
+
+```{applies_to}
+stack: ga 9.1.4
+```
+
+This attribute can be used to filter out files or blobs that have a prefix string that is different from the specified value. This allows you to efficiently retrieve a subset of blobs that are organized in a virtual folder-like structure. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority over the root level values if both are specified.
+
+### Example configuration
+
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    path_prefix: "cloudTrail/"
+```
+
+The example configuration above will fetch blobs present in specified container from the virtual `cloudTrail` directory. This operation occurs via the SDK in the blob-storage server so the impact on memory is negligible.
 
 ## Custom properties [attrib-custom-properties]
 ```{applies_to}

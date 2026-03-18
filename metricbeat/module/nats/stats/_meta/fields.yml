@@ -8,10 +8,14 @@
       type: keyword
       description: >
         The name of the NATS server
+      version:
+        ga: 9.1.0
     - name: version
       type: keyword
       description: >
         The version of the NATS server
+      version:
+        ga: 9.1.0
     - name: uptime
       type: long
       format: duration
@@ -110,23 +114,35 @@
                   type: long
                   description: >
                     The number of hits on jsz monitoring uri
+                  version:
+                    ga: 9.1.0
                 - name: accountz
                   type: long
                   description: >
                     The number of hits on accountz monitoring uri
+                  version:
+                    ga: 9.1.0
                 - name: accstatz
                   type: long
                   description: >
                     The number of hits on accstatz monitoring uri
+                  version:
+                    ga: 9.1.0
                 - name: gatewayz
                   type: long
                   description: >
                     The number of hits on gatewayz monitoring uri
+                  version:
+                    ga: 9.1.0
                 - name: healthz
                   type: long
                   description: >
                     The number of hits on healthz monitoring uri
+                  version:
+                    ga: 9.1.0
                 - name: leafz
                   type: long
                   description: >
                     The number of hits on leafz monitoring uri
+                  version:
+                    ga: 9.1.0

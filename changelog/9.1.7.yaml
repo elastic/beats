@@ -1,0 +1,108 @@
+version: 9.1.7
+entries:
+    - kind: bug-fix
+      summary: Add pagination support to the device health metricset in the meraki module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/46938
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760358970
+      file:
+        name: 1760358970-add-meraki-device-health-pagination-support.yaml
+        checksum: 084baa64adb51a365aa3470896a85524b2323368
+    - kind: enhancement
+      summary: Enhance GCP Billing metricset with additional fields.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47059
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760362260
+      file:
+        name: 1760362260-enhance-gcp-billing-with-additional-fields.yaml
+        checksum: 46369c05e0666cfc3b1177696c816b6a286437e2
+    - kind: other
+      summary: bump Golang version to 1.24.9
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47051
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760423464
+      file:
+        name: 1760423464-bump-Golang-version-to-1.24.9.yaml
+        checksum: 201826a845b8769280a9fef9ef9b59fe19c5e57b
+    - kind: other
+      summary: upgrade node to LTS v22.20.0
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47091
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1760453484
+      file:
+        name: 1760453484-dependency-upgrade-node-to-LTS-v22.20.0.yaml
+        checksum: b59b2611aa9b5683954e0dea65c0f14271a719eb
+    - kind: bug-fix
+      summary: add close to conditional processors if underlying processors have close method
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/46653
+      issue:
+        - https://github.com/elastic/beats/issues/46575
+      impact: ""
+      action: ""
+      timestamp: 1760991225
+      file:
+        name: 1760991225-add-close-to-conditional-processors.yaml
+        checksum: d9fec15e7a2fe108554b452972fef8af2f0eeb9a
+    - kind: feature
+      summary: Add data stream identification to Fleet health status updates.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47229
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1761027396
+      file:
+        name: 1761027396-cel_data_stream_identities.yaml
+        checksum: 6da805f8f9f64c8ce8e81c8c5098ce61c68e0731
+    - kind: bug-fix
+      summary: Fix potential Filebeat panic during memory queue shutdown
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47248
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1761334594
+      file:
+        name: 1761334594-memory-queue-shutdown-fix.yaml
+        checksum: 52c611082a317dc19a8321d04dca1c6eb1e23c66
+    - kind: bug-fix
+      summary: fixes a bug where kerberos authentication could be disabled when server supports multiple authentication types.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/47443
+      issue:
+        - https://github.com/elastic/beats/issues/47110
+      impact: ""
+      action: ""
+      timestamp: 1762237494
+      file:
+        name: 1762237494-fix-bug-kerberos-headers.yaml
+        checksum: c360fac4571c37dddcd13d3dd14461fa6324ee50

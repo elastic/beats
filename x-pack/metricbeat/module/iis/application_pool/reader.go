@@ -132,7 +132,7 @@ func (r *Reader) initAppPools() error {
 					logp.Namespace("application pool"), "query", value,
 				)
 			} else {
-				r.log.Errorf(`failed to expand counter path (query= "%v"): %w`, value, err)
+				r.log.Errorf(`failed to expand counter path (query= "%v"): %v`, value, err)
 			}
 			continue
 		}

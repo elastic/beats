@@ -1,11 +1,13 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-mssql.html
+applies_to:
+  stack: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py
 
-# mssql fields [exported-fields-mssql]
+# MSSQL fields [exported-fields-mssql]
 
 MS SQL Filebeat Module
 
@@ -20,6 +22,6 @@ Common log fields
 **`mssql.log.origin`**
 :   Origin of the message, usually the server but it can also be a recovery process
 
-type: keyword
+    type: keyword
 
 

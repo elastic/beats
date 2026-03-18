@@ -8,6 +8,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -38,7 +39,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		messagesReceivedTotal: monitoring.NewUint(reg, "messages_received_total"),
 		batchProcessingTime:   metrics.NewUniformSample(1024),
 	}
-	adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "batch_processing_time", logp.NewLogger(""), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out

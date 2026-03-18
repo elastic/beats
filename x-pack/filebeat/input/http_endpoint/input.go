@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package http_endpoint
 
 import (
@@ -51,6 +53,7 @@ type httpEndpoint struct {
 	config    config
 	addr      string
 	tlsConfig *tls.Config
+	logger    *logp.Logger
 }
 
 func Plugin() v2.Plugin {
@@ -68,10 +71,10 @@ func configure(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newHTTPEndpoint(conf)
+	return newHTTPEndpoint(conf, logp.NewNopLogger())
 }
 
-func newHTTPEndpoint(config config) (*httpEndpoint, error) {
+func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -79,7 +82,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 	addr := net.JoinHostPort(config.ListenAddress, config.ListenPort)
 
 	var tlsConfig *tls.Config
-	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS)
+	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +94,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		config:    config,
 		tlsConfig: tlsConfig,
 		addr:      addr,
+		logger:    logger,
 	}, nil
 }
 
@@ -198,7 +202,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -214,7 +218,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
-	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
+	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
@@ -485,13 +489,14 @@ func newInputMetrics(id string) *inputMetrics {
 		batchProcessingTime: metrics.NewUniformSample(1024),
 		batchACKTime:        metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(reg, "size", adapter.Accept).
+	logger := logp.NewLogger("")
+	_ = adapter.NewGoMetrics(reg, "size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.contentLength))
-	_ = adapter.NewGoMetrics(reg, "batch_size", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_size", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
-	_ = adapter.NewGoMetrics(reg, "batch_ack_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "batch_ack_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchACKTime))
 
 	return out

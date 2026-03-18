@@ -22,6 +22,8 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	svc := sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
 		if fips_enabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			// Disable checksum validation temporarily till https://github.com/golang/go/issues/74630#issuecomment-3228203391 is implemented
+			o.DisableMessageChecksumValidation = true
 		}
 
 	})

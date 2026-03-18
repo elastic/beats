@@ -78,7 +78,11 @@ func SplitHandlerFactory(family inputsource.Family, logger *logp.Logger, metadat
 					return fmt.Errorf(string(family)+" split_client error: %w", err)
 				}
 				r.Reset()
-				callback(scanner.Bytes(), metadata)
+
+				// Deep copy the data to avoid mutating the underlying scanner buffer.
+				buf := make([]byte, len(scanner.Bytes()))
+				_ = copy(buf, scanner.Bytes())
+				callback(buf, metadata)
 			}
 
 			// We are out of the scanner, either we reached EOF or another fatal error occurred.

@@ -1,5 +1,5 @@
 - key: threatintel
-  title: threatintel
+  title: Threat Intel
   release: ga
   description: >
     Threat intelligence Filebeat Module.
