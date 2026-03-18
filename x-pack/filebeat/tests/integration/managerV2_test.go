@@ -793,8 +793,12 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		"-E", "management.restart_on_output_change=true",
 	)
 
+	// With deferred store creation for ES-backed inputs, openStore is called
+	// from Create() which may run before or after the ES store is configured
+	// (depending on input vs output unit processing order). Check openStore
+	// first since it always appears at the start of Create(), then the read
+	// counts which have a guaranteed order.
 	for _, contains := range []string{
-		"Configuring ES store",
 		"input-cursor::openStore: prefix: httpjson inputID: " + inputID,
 		"input-cursor store read 0 keys", // first, no previous data exists
 		"input-cursor store read 1 keys", // after the restart, previous key is read

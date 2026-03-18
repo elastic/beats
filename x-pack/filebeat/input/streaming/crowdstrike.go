@@ -42,6 +42,38 @@ type falconHoseStream struct {
 	time func() time.Time
 }
 
+// refreshSessionWait returns the delay between session refresh attempts.
+//
+// It targets 90% of the requested interval to provide a buffer for network
+// delays and retries. For invalid or extremely short intervals, it enforces a
+// minimum delay to prevent tight refresh loops.
+func refreshSessionWait(refreshAfter time.Duration) time.Duration {
+	// Use a 90% refresh interval (similar to the official gofalcon SDK).
+	wait := refreshAfter * 9 / 10
+
+	// Enforce a minimum safety delay to prevent spinning on zero/short intervals.
+	if wait < 15*time.Second {
+		return 15 * time.Second
+	}
+	return wait
+}
+
+// runRefreshLoopWithAfter runs periodic refresh attempts until the context is
+// canceled or refresh returns an error. The after callback is injectable to
+// allow deterministic tests without sleeping.
+func runRefreshLoopWithAfter(ctx context.Context, wait time.Duration, after func(time.Duration) <-chan time.Time, refresh func() error) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-after(wait):
+			if err := refresh(); err != nil {
+				return
+			}
+		}
+	}
+}
+
 // NewFalconHoseFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a Crowdstrike
 // FalconHose stream follower.
@@ -235,36 +267,31 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}
 		refreshAfter := time.Duration(r.RefreshAfter) * time.Second
 		go func() {
-			const grace = 5 * time.Minute
-			for {
-				select {
-				case <-ctx.Done():
-					return
-				case <-time.After(refreshAfter - grace):
-					s.log.Debugw("session refresh", "url", r.RefreshURL)
-					req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
-					if err != nil {
-						s.metrics.errorsTotal.Inc()
-						s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
-						s.log.Errorw("failed to prepare refresh stream request", "error", err)
-						return
-					}
-					req.Header.Set("Content-Type", "application/json")
-					resp, err := cli.Do(req)
-					if err != nil {
-						s.metrics.errorsTotal.Inc()
-						s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
-						s.log.Errorw("failed to refresh stream connection", "error", err)
-						return
-					}
-					err = resp.Body.Close()
-					if err != nil {
-						s.metrics.errorsTotal.Inc()
-						s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
-						s.log.Warnw("failed to close refresh response body", "error", err)
-					}
+			runRefreshLoopWithAfter(ctx, refreshSessionWait(refreshAfter), time.After, func() error {
+				s.log.Debugw("session refresh", "url", r.RefreshURL)
+				req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
+					s.log.Errorw("failed to prepare refresh stream request", "error", err)
+					return err
 				}
-			}
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := cli.Do(req)
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.status.UpdateStatus(status.Failed, "failed to refresh stream connection: "+err.Error())
+					s.log.Errorw("failed to refresh stream connection", "error", err)
+					return err
+				}
+				err = resp.Body.Close()
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.status.UpdateStatus(status.Failed, "failed to close refresh response body: "+err.Error())
+					s.log.Warnw("failed to close refresh response body", "error", err)
+				}
+				return nil
+			})
 		}()
 
 		if offset > 0 {
@@ -296,6 +323,13 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}
 		defer resp.Body.Close()
 
+		if resp.StatusCode != http.StatusOK {
+			var buf bytes.Buffer
+			io.Copy(&buf, resp.Body)
+			s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
+			return state, fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
+		}
+
 		// Prepare state to understand which feed is being processed.
 		// This is cleared by the deferred delete above the loop.
 		state["feed"] = feedName
@@ -313,6 +347,11 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 				return state, fmt.Errorf("error decoding event: %w", err)
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
+			if len(msg) == 0 || msg[0] != '{' {
+				s.metrics.errorsTotal.Inc()
+				s.log.Warnw("skipping non-object message from firehose", logp.Namespace(s.ns), "msg", debugMsg(msg))
+				continue
+			}
 			state["response"] = []byte(msg)
 			s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
