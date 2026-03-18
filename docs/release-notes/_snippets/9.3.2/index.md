@@ -7,11 +7,11 @@
 
 **Elastic agent**
 
-* Fix a bug that could report stopped inputs as still running. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Fix a bug that could report stopped inputs as still running. [#49285](https://github.com/elastic/beats/pull/49285) [#47769](https://github.com/elastic/beats/issues/47769)
 
 **Filebeat**
 
-* Add optional token_url support for JWT Bearer Flow in Salesforce input. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#43963](https://github.com/elastic/beats/issues/43963)
+* Add optional token_url support for JWT Bearer Flow in Salesforce input. [#43933](https://github.com/elastic/beats/pull/43933) [#43963](https://github.com/elastic/beats/issues/43963)
 
   The Salesforce input now supports a separate `token_url` configuration for JWT Bearer Flow
   authentication. This allows users with custom Salesforce domains or restrictions on default
@@ -19,28 +19,28 @@
   URL while keeping the audience URL separate. If token_url is not provided, the existing
   behavior of using the audience URL as the token endpoint is maintained.
   
-* Empty files are excluded from processing in filestream as early as possible. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Empty files are excluded from processing in filestream as early as possible. [#49196](https://github.com/elastic/beats/pull/49196) [#48891](https://github.com/elastic/beats/issues/48891)
 
 **Metricbeat**
 
-* Add zswap compressed swap cache metrics to system memory metricset. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Addition of Elasticsearch index mode and codec settings in Metricbeat index stats module. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Add cgroupv2 CPU metrics to system.process dataset. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Add swap field to system.process.memory metric set in metricbeat. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Tbs-monitoring. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Add zswap compressed swap cache metrics to system memory metricset. [#49098](https://github.com/elastic/beats/pull/49098) [#47605](https://github.com/elastic/beats/issues/47605)
+* Addition of Elasticsearch index mode and codec settings in Metricbeat index stats module. [#49237](https://github.com/elastic/beats/pull/49237)
+* Add cgroupv2 CPU metrics to system.process dataset. [#49098](https://github.com/elastic/beats/pull/49098) [#47708](https://github.com/elastic/beats/issues/47708)
+* Add swap field to system.process.memory metric set in metricbeat. [#48334](https://github.com/elastic/beats/pull/48334)
+* Tbs-monitoring. [#48432](https://github.com/elastic/beats/pull/48432)
 
   Add new TBS metrics to monitor mappings
-* Add a config to improve wildcard handling to report actual object names. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Read Kibana status response body on 503 so monitoring captures the reason for outage. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Add a config to improve wildcard handling to report actual object names. [#48644](https://github.com/elastic/beats/pull/48644) [#48502](https://github.com/elastic/beats/issues/48502)
+* Read Kibana status response body on 503 so monitoring captures the reason for outage. [#48913](https://github.com/elastic/beats/pull/48913)
 
 **Packetbeat**
 
 * Improves resiliency of the AMQP parser against invalid or corrupt data frames. [#48033](https://github.com/elastic/beats/pull/48033) 
-* Bump bundled Windows Npcap OEM installer to v1.87. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Bump bundled Windows Npcap OEM installer to v1.87. [#49167](https://github.com/elastic/beats/pull/49167)
 
 **Winlogbeat**
 
-* Move winlog filtering to Go-side evaluation and harden recovery paths. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Move winlog filtering to Go-side evaluation and harden recovery paths. [#49257](https://github.com/elastic/beats/pull/49257)
 
   Winlogbeat and Filebeat winlog input now subscribe with unfiltered queries for non-custom configurations
   and apply ignore_older, provider, event_id, and level filtering in code. This avoids unreliable Windows
@@ -55,9 +55,9 @@
 
 **All**
 
-* Update elastic-agent-system-metrics to v0.14.0. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Update elastic-agent-autodiscover to v0.10.2. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Update elastic-agent-libs to v0.32.2. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Update elastic-agent-system-metrics to v0.14.0. [#48816](https://github.com/elastic/beats/pull/48816)
+* Update elastic-agent-autodiscover to v0.10.2. [#48817](https://github.com/elastic/beats/pull/48817)
+* Update elastic-agent-libs to v0.32.2. [#48857](https://github.com/elastic/beats/pull/48857)
 * Update OpenTelemetry SDK to version v1.40.0. [#49126](https://github.com/elastic/beats/pull/49126) 
 * Improve append processor behavior when merging values and removing duplicates. [#49021](https://github.com/elastic/beats/pull/49021) [#49020](https://github.com/elastic/beats/issues/49020)
 
@@ -73,12 +73,12 @@
 
 **Filebeat**
 
-* Improve in-flight byte accounting in the HTTP Endpoint input. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#48456](https://github.com/elastic/beats/issues/48456)
-* Honor non-fingerprint file_identity defaults in filestream. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Fix handling of Crowdstrike streaming input state in retryable errors. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Fix incremental group updates in Active Directory entity analytics provider. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Demote missing user/device state lookup to debug log in Azure entity analytics provider. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
-* Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#49158](https://github.com/elastic/beats/issues/49158)
+* Improve in-flight byte accounting in the HTTP Endpoint input. [#48571](https://github.com/elastic/beats/pull/48571) [#48456](https://github.com/elastic/beats/issues/48456)
+* Honor non-fingerprint file_identity defaults in filestream. [#48579](https://github.com/elastic/beats/pull/48579)
+* Fix handling of Crowdstrike streaming input state in retryable errors. [#49077](https://github.com/elastic/beats/pull/49077) [#49076](https://github.com/elastic/beats/issues/49076)
+* Fix incremental group updates in Active Directory entity analytics provider. [#49089](https://github.com/elastic/beats/pull/49089) [#49053](https://github.com/elastic/beats/issues/49053)
+* Demote missing user/device state lookup to debug log in Azure entity analytics provider. [#49127](https://github.com/elastic/beats/pull/49127) [#36447](https://github.com/elastic/beats/issues/36447)
+* Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops. [#49175](https://github.com/elastic/beats/pull/49175) [#49158](https://github.com/elastic/beats/issues/49158)
 
 **Metricbeat**
 
@@ -86,11 +86,11 @@
 
 **Osquerybeat**
 
-* Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#2418](https://github.com/elastic/beats/issues/2418) [#47511](https://github.com/elastic/beats/issues/47511) [#48152](https://github.com/elastic/beats/issues/48152)
+* Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57. [#49280](https://github.com/elastic/beats/pull/49280)
 
 **Winlogbeat**
 
-* Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner. [#49476](https://github.com/elastic/beats/pull/49476) [#48880](https://github.com/elastic/beats/pull/48880) [#49521](https://github.com/elastic/beats/pull/49521) [#49326](https://github.com/elastic/beats/pull/49326) [#49445](https://github.com/elastic/beats/pull/49445) [#48979](https://github.com/elastic/beats/issues/48979)
+* Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner. [#48999](https://github.com/elastic/beats/pull/48999) [#48979](https://github.com/elastic/beats/issues/48979)
 
   Reintroduces channel-not-found retry log suppression that was lost during the eventlog runner refactor.
   The first channel-not-found open error is logged at WARN, subsequent retries are logged at DEBUG, and
