@@ -256,6 +256,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -293,6 +294,7 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -330,6 +332,7 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
