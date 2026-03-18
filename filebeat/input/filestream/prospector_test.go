@@ -1524,7 +1524,7 @@ func TestOnFSEvent_GrowingFingerprintMaxLen(t *testing.T) {
 		assert.Len(t, store.table, 1, "it should have exactly one entry")
 	})
 
-	t.Run("at max: fingerprint reached max, no migration", func(t *testing.T) {
+	t.Run("at max: fingerprint reached max, migration still happens", func(t *testing.T) {
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = fileMeta{
 			Source:         currentPath,
@@ -1535,6 +1535,27 @@ func TestOnFSEvent_GrowingFingerprintMaxLen(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: len(newFingerprint),
+		}
+
+		hg := newTestHarvesterGroup()
+		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+
+		assert.False(t, store.has(oldKey), "old key should have been removed by migration")
+		assert.True(t, store.has(newKey), "new key should exist after migration")
+		assert.Len(t, store.table, 1, "it should have exactly one entry")
+	})
+
+	t.Run("above max: no migration attempted", func(t *testing.T) {
+		store := newMockMetadataUpdater()
+		store.table[oldKey] = fileMeta{
+			Source:         currentPath,
+			IdentifierName: growingFingerprintName,
+		}
+
+		p := &fileProspector{
+			logger:                   logp.L(),
+			identifier:               identifier,
+			maxEncodedFingerprintLen: len(newFingerprint) - 1,
 		}
 
 		hg := newTestHarvesterGroup()

@@ -73,16 +73,16 @@ func init() {
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	logger                *logp.Logger
-	filewatcher           loginp.FSWatcher
-	identifier            fileIdentifier
-	ignoreOlder           time.Duration
-	ignoreInactiveSince   ignoreInactiveType
-	cleanRemoved          bool
-	stateChangeCloser     stateChangeCloserConfig
-	takeOver              loginp.TakeOverConfig
-	filestreamIdentifiers map[string]fileIdentifier
-	logIdentifiers        map[string]file.StateIdentifier
+	logger                   *logp.Logger
+	filewatcher              loginp.FSWatcher
+	identifier               fileIdentifier
+	ignoreOlder              time.Duration
+	ignoreInactiveSince      ignoreInactiveType
+	cleanRemoved             bool
+	stateChangeCloser        stateChangeCloserConfig
+	takeOver                 loginp.TakeOverConfig
+	filestreamIdentifiers    map[string]fileIdentifier
+	logIdentifiers           map[string]file.StateIdentifier
 	maxEncodedFingerprintLen int
 }
 
@@ -358,7 +358,9 @@ func (p *fileProspector) onFSEvent(
 
 	// For growing_fingerprint, handle prefix matching and migration
 	if p.identifier.Name() == growingFingerprintName &&
-		len(event.Descriptor.Fingerprint) < p.maxEncodedFingerprintLen {
+		// the stored fingerprint might still be smaller that max len, thus,
+		// it needs to update the growingFingerprint when it's len is the max.
+		len(event.Descriptor.Fingerprint) <= p.maxEncodedFingerprintLen {
 		src = p.handleGrowingFingerprintLookup(log, event, src, updater)
 	}
 
@@ -668,6 +670,8 @@ func (p *fileProspector) migrateGrowingFingerprint(
 		return fmt.Errorf("failed to migrate growing fingerprint from %s to %s: %w", oldKey, newKey, err)
 	}
 
+	// TODO(AndersonQ): this log is too expensive, printing the fingerprint can
+	// be almost 4k. Remove it and find a better integration test for it
 	p.logger.Infof("migrated growing fingerprint entry: %s -> %s", oldKey, newKey)
 	return nil
 }

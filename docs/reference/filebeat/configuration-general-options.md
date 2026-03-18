@@ -98,6 +98,17 @@ filebeat.registry.backend: memlog
 When set to `bbolt`, the database files are stored under the directory specified by `registry.path`. The bbolt-specific settings are configured under `registry.bbolt`.
 
 
+### `registry.memlog.checkpoint_size` [_registry_memlog_checkpoint_size]
+
+The registry file size threshold, in bytes, that triggers a checkpoint. When the registry file reaches this size, Filebeat writes a full snapshot of the registry state and resets the file. Larger values mean fewer checkpoints, but a larger registry file. Default: `10485760` (10 MB).
+
+This setting only applies when `registry.backend` is set to `memlog` (the default). Increasing this value can improve performance when tracking a large number of files, especially with file identities that produce long registry keys (such as `growing_fingerprint`).
+
+```yaml
+filebeat.registry.memlog.checkpoint_size: 10485760
+```
+
+
 ### `registry.bbolt.timeout` [_registry_bbolt_timeout]
 
 The amount of time to wait to obtain a file lock on the bbolt database file. Default: `1s`.
