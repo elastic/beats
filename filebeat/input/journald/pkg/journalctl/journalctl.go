@@ -43,6 +43,11 @@ type journalctl struct {
 	logger   *logp.Logger
 	canceler input.Canceler
 	waitDone sync.WaitGroup
+
+	// Stop chan and StopOnce are used to ensure the stdout reader goroutine
+	// can stop even if nobody is reading from the dataChan.
+	stopCh   chan struct{}
+	stopOnce sync.Once
 }
 
 // NewFactory returns a function that instantiates [journalctl].
@@ -69,6 +74,7 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 			cmd:      cmd,
 			dataChan: make(chan []byte),
 			logger:   logger,
+			stopCh:   make(chan struct{}),
 		}
 
 		var err error
@@ -146,6 +152,8 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 				select {
 				case <-jctl.canceler.Done():
 					return
+				case <-jctl.stopCh:
+					return
 				case jctl.dataChan <- data:
 				}
 			}
@@ -174,11 +182,20 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 // the process-wait goroutine) have exited.
 func (j *journalctl) Kill() error {
 	j.logger.Debug("sending SIGKILL to journalctl")
+
+	// Signal the stdout reader goroutine to exit, this ensures
+	// j.waitDone.Wait() won't block if the stdout reader goroutine
+	// is trying to send data and nobody is reading from its channel.
+	j.stopOnce.Do(func() {
+		close(j.stopCh)
+	})
+
 	err := j.cmd.Process.Kill()
 	j.waitDone.Wait()
 	if errors.Is(err, os.ErrProcessDone) {
 		return nil
 	}
+
 	return err
 }
 

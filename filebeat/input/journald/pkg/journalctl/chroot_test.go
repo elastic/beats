@@ -30,6 +30,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -135,6 +136,8 @@ func TestNewFactoryChroot(t *testing.T) {
 		}
 	case err := <-waitErrChan:
 		t.Fatalf("error waiting for container to finish: %s", err)
+	case <-time.After(30 * time.Second):
+		t.Fatal("Container is stuck, stopping the test. Look at the container logs for more information.")
 	}
 }
 
