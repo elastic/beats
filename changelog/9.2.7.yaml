@@ -1,19 +1,12 @@
 version: 9.2.7
 entries:
     - kind: other
-      summary: Update Go to 1.25.8
+      summary: Update Go version to 1.25.8.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/446793
+      issue: []
       impact: ""
       action: ""
       timestamp: 1760385532
@@ -30,11 +23,7 @@ entries:
         behavior of using the audience URL as the token endpoint is maintained.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/43933
       issue:
         - https://github.com/elastic/beats/issues/43963
       impact: ""
@@ -48,15 +37,9 @@ entries:
       description: Add memory PSI metrics to system.process.cgroup, complementing existing CPU and IO pressure metrics for cgroupv2
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/48054
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/47604
       impact: ""
       action: ""
       timestamp: 1765878935
@@ -81,15 +64,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48334
+      issue: []
       impact: ""
       action: ""
       timestamp: 1767864511
@@ -101,15 +77,8 @@ entries:
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48414
+      issue: []
       impact: ""
       action: ""
       timestamp: 1768328474
@@ -127,15 +96,8 @@ entries:
         user accounts do not.
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48444
+      issue: []
       impact: ""
       action: ""
       timestamp: 1768560871
@@ -147,15 +109,8 @@ entries:
       description: Add new TBS metrics to monitor mappings
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48432
+      issue: []
       impact: ""
       action: ""
       timestamp: 1769485799
@@ -167,11 +122,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/48571
       issue:
         - https://github.com/elastic/beats/issues/48456
       impact: ""
@@ -185,48 +136,22 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48579
+      issue: []
       impact: ""
       action: ""
       timestamp: 1770044793
       file:
         name: 1770044793-filebeat-honor-non-fingerprint-file_identity-defaults.yaml
         checksum: bd5bd59aebd8f135d3ebf4e282376ea23cb05880
-    - kind: other
-      summary: Bump golang version to 1.24.13.
-      description: ""
-      component: all
-      pr:
-        - https://github.com/elastic/beats/pull/48467
-      issue: []
-      impact: ""
-      action: ""
-      timestamp: 1770134229
-      file:
-        name: 1770134229-bump-golang-12412.yaml
-        checksum: 7f1c54ebd0c256e63cb78aa33bf27d759dff2d05
     - kind: bug-fix
       summary: Fix a bug that could report an invalid number of active "otelconsumer" events
       description: ""
       component: elastic-agent
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/48720
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/12515
       impact: ""
       action: ""
       timestamp: 1770328496
@@ -238,15 +163,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48787
+      issue: []
       impact: ""
       action: ""
       timestamp: 1770757201
@@ -254,19 +172,12 @@ entries:
         name: 1770757201-filebeat-hints-kubernetes-secret-resolver.yaml
         checksum: 33bffd4d97c6542a586e9a5e9ff8d5c3563afdc0
     - kind: security
-      summary: Update elastic-agent-system-metrics to v0.14.0.
+      summary: Update elastic-agent-system-metrics version to v0.14.0.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48816
+      issue: []
       impact: ""
       action: ""
       timestamp: 1770852460
@@ -282,15 +193,8 @@ entries:
         also tries LDAP. For each host, LDAPS is tried before LDAP to prefer TLS.
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48818
+      issue: []
       impact: ""
       action: ""
       timestamp: 1770852725
@@ -298,19 +202,12 @@ entries:
         name: 1770852725-translate-ldap-discovery-try-ldap-and-ldaps.yaml
         checksum: 66f5d986f162cf66d5cad9abb69935ae3b70891f
     - kind: security
-      summary: Update elastic-agent-autodiscover to v0.10.2.
+      summary: Update elastic-agent-autodiscover version to v0.10.2.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48817
+      issue: []
       impact: ""
       action: ""
       timestamp: 1770853396
@@ -318,19 +215,12 @@ entries:
         name: 1770853396-bump-elastic-agent-autodiscover-to-v0.10.2.yaml
         checksum: 6a8a92fcf7d510c121e8eb8e3674f0852a8189c5
     - kind: security
-      summary: Update elastic-agent-libs to v0.32.2.
+      summary: Update elastic-agent-libs version to v0.32.2.
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48857
+      issue: []
       impact: ""
       action: ""
       timestamp: 1771014600
@@ -342,15 +232,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/48913
+      issue: []
       impact: ""
       action: ""
       timestamp: 1771393230
@@ -366,11 +249,7 @@ entries:
         when a configured channel is missing.
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/48999
       issue:
         - https://github.com/elastic/beats/issues/48979
       impact: ""
@@ -380,7 +259,7 @@ entries:
         name: 1771519200-winlogbeat-channel-not-found-log-suppression.yaml
         checksum: 6a498c9d4dc303bd9f434875dad113e997c948f2
     - kind: security
-      summary: Update transient dependency filippo.io/edwards25519 to v1.1.1
+      summary: Update transient dependency filippo.io/edwards25519 version to v1.1.1
       description: ""
       component: metricbeat
       pr:
@@ -397,15 +276,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49077
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/49076
       impact: ""
       action: ""
       timestamp: 1771967614
@@ -417,15 +290,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49089
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/49053
       impact: ""
       action: ""
       timestamp: 1771981300
@@ -437,15 +304,9 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49098
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/47605
       impact: ""
       action: ""
       timestamp: 1772011445
@@ -457,15 +318,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49114
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/48496
       impact: ""
       action: ""
       timestamp: 1772031306
@@ -507,15 +362,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49127
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/36447
       impact: ""
       action: ""
       timestamp: 1772100585
@@ -523,19 +372,12 @@ entries:
         name: 1772100585-36447-invalid-error-ea-azure.yaml
         checksum: 81b3697a7caa2e42c0b1284b76fd3e257395f80b
     - kind: enhancement
-      summary: Bump bundled Windows Npcap OEM installer to v1.87.
+      summary: Bump bundled Windows Npcap OEM installer version to v1.87.
       description: ""
       component: packetbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/49167
+      issue: []
       impact: ""
       action: ""
       timestamp: 1772188176
@@ -547,11 +389,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49175
       issue:
         - https://github.com/elastic/beats/issues/49158
       impact: ""
@@ -565,15 +403,9 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49196
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/48891
       impact: ""
       action: ""
       timestamp: 1772466645
@@ -590,15 +422,8 @@ entries:
         retry circuit-breaker for persistent render failures without partial events.
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/49257
+      issue: []
       impact: ""
       action: ""
       timestamp: 1772629661
@@ -610,15 +435,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/49237
+      issue: []
       impact: ""
       action: ""
       timestamp: 1772635870
@@ -630,15 +448,9 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49098
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/47708
       impact: ""
       action: ""
       timestamp: 1772636540
@@ -646,19 +458,12 @@ entries:
         name: 1772636540-zswap-metrics.yaml
         checksum: e7310ec3a2c6b46deaacf6138025f731564a9993
     - kind: security
-      summary: Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57.
+      summary: Update osquery-go dependency version to v0.0.0-20260226222546-0cc22f415e57.
       description: ""
       component: osquerybeat
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
-      issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/pull/49280
+      issue: []
       impact: ""
       action: ""
       timestamp: 1772638556
@@ -670,15 +475,9 @@ entries:
       description: ""
       component: elastic-agent
       pr:
-        - https://github.com/elastic/beats/pull/49348
-        - https://github.com/elastic/beats/pull/49476
-        - https://github.com/elastic/beats/pull/48880
-        - https://github.com/elastic/beats/pull/49326
-        - https://github.com/elastic/beats/pull/49445
+        - https://github.com/elastic/beats/pull/49285
       issue:
-        - https://github.com/elastic/beats/issues/2418
-        - https://github.com/elastic/beats/issues/47511
-        - https://github.com/elastic/beats/issues/48152
+        - https://github.com/elastic/beats/issues/47769
       impact: ""
       action: ""
       timestamp: 1772665071
