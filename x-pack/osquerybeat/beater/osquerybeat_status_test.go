@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -112,6 +113,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -134,6 +136,7 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -228,6 +231,21 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	// Last status should be Stopped
 	lastEvent := events[eventCount-1]
 	assert.Equal(t, status.Stopped, lastEvent.Status, "last status should be Stopped")
+}
+
+func newTestBeatPaths(t *testing.T) *paths.Path {
+	t.Helper()
+	root := t.TempDir()
+	p := paths.New()
+	if err := p.InitPaths(&paths.Path{
+		Home:   root,
+		Config: root,
+		Data:   root,
+		Logs:   root,
+	}); err != nil {
+		t.Fatalf("failed to init beat paths: %v", err)
+	}
+	return p
 }
 
 // TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd check fails.
