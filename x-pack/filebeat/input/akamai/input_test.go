@@ -828,9 +828,9 @@ func TestAkamaiInputRun(t *testing.T) {
 			"config_ids": "1",
 			"auth": map[string]interface{}{
 				"edgegrid": map[string]interface{}{
-					"client_token":  "ct",
-					"client_secret": "cs",
-					"access_token":  "at",
+					"client_token":  "test-client-token",
+					"client_secret": "test-client-secret",
+					"access_token":  "test-access-token",
 				},
 			},
 			"interval":         "1s",
@@ -907,9 +907,9 @@ func TestAkamaiInputRun(t *testing.T) {
 			"config_ids": "1",
 			"auth": map[string]interface{}{
 				"edgegrid": map[string]interface{}{
-					"client_token":  "ct",
-					"client_secret": "cs",
-					"access_token":  "at",
+				"client_token":  "test-client-token",
+				"client_secret": "test-client-secret",
+				"access_token":  "test-access-token",
 				},
 			},
 			"interval":         "1s",
