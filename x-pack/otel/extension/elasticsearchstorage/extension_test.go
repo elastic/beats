@@ -16,10 +16,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component/componenttest"
-	"go.uber.org/zap/zaptest"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -31,7 +31,7 @@ func uniqueIndex(t *testing.T) string {
 	return "test-elasticstorage-" + safe.Replace(strings.ToLower(t.Name()))
 }
 
-func newTestStore(t *testing.T, storeName string) *store {
+func newTestStore(t *testing.T, storeName string) *es.BaseStore {
 	t.Helper()
 
 	integration.EnsureESIsRunning(t)
@@ -49,8 +49,7 @@ func newTestStore(t *testing.T, storeName string) *store {
 	require.NoError(t, conn.Connect(t.Context()))
 	t.Cleanup(func() { _ = conn.Close() })
 
-	s, err := openStore(conn, storeName)
-	require.NoError(t, err)
+	s := es.NewBaseStore(t.Context(), logptest.NewTestingLogger(t, ""), conn, storeName)
 	t.Cleanup(func() { _ = s.Close() })
 
 	return s
@@ -82,7 +81,7 @@ func TestStore_Get_UnknownKey(t *testing.T) {
 
 	var v interface{}
 	err := s.Get("nonexistent", &v)
-	assert.ErrorIs(t, err, ErrKeyUnknown)
+	assert.ErrorIs(t, err, es.ErrKeyUnknown)
 }
 
 func TestStore_Has_ExistingKey(t *testing.T) {
@@ -175,41 +174,6 @@ func TestStore_Each_PropagatesError(t *testing.T) {
 	assert.ErrorIs(t, err, wantErr)
 }
 
-func TestStore_SetID(t *testing.T) {
-	integration.EnsureESIsRunning(t)
-	esURL := integration.GetESURL(t, "http")
-	user := esURL.User.Username()
-	pass, _ := esURL.User.Password()
-
-	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:      fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host),
-		Username: user,
-		Password: pass,
-	}, logptest.NewTestingLogger(t, ""))
-	require.NoError(t, err)
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-	require.NoError(t, conn.Connect(ctx))
-	t.Cleanup(func() { _ = conn.Close() })
-
-	s, err := openStore(conn, "original")
-	require.NoError(t, err)
-
-	assert.Equal(t, renderIndexName("original"), s.index)
-
-	s.SetID("new-id")
-	assert.Equal(t, renderIndexName("new-id"), s.index)
-
-	// Empty ID must be ignored.
-	s.SetID("")
-	assert.Equal(t, renderIndexName("new-id"), s.index)
-}
-
-func TestRenderIndexName(t *testing.T) {
-	assert.Equal(t, "agentless-state-mystore", renderIndexName("mystore"))
-	assert.Equal(t, "agentless-state-", renderIndexName(""))
-}
-
 func TestElasticStorage_Lifecycle(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	esURL := integration.GetESURL(t, "http")
@@ -224,7 +188,7 @@ func TestElasticStorage_Lifecycle(t *testing.T) {
 		},
 	}
 
-	ext := &elasticStorage{cfg: cfg, logger: zaptest.NewLogger(t)}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 
 	require.NoError(t, ext.Start(context.Background(), componenttest.NewNopHost()))
 	assert.NotNil(t, ext.client)
@@ -254,7 +218,7 @@ func TestElasticStorage_Start_BadCredentials(t *testing.T) {
 			"password": "wrongpassword",
 		},
 	}
-	ext := &elasticStorage{cfg: cfg, logger: zaptest.NewLogger(t)}
+	ext := &elasticStorage{cfg: cfg, logger: logptest.NewTestingLogger(t, "")}
 	err := ext.Start(context.Background(), componenttest.NewNopHost())
 	// NewConnectedClient performs a ping that will receive a 401; it should err.
 	require.Error(t, err)

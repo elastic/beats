@@ -50,7 +50,7 @@ func (e *elasticStorage) Shutdown(ctx context.Context) error {
 }
 
 func (e *elasticStorage) Access(name string) (backend.Store, error) {
-	return es.NewBaseStore(e.ctx, e.logger, e.client, "Filebeat"), nil
+	return es.NewBaseStore(e.ctx, e.logger, e.client, name), nil
 }
 
 func (e *elasticStorage) Close() error {

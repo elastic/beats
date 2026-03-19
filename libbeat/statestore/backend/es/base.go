@@ -83,7 +83,7 @@ func (b *BaseStore) get(key string, to interface{}) error {
 
 func (b *BaseStore) Has(key string) (bool, error) {
 	var v interface{}
-	err := b.get(key, v)
+	err := b.get(key, &v)
 	if err != nil {
 		if errors.Is(err, ErrKeyUnknown) {
 			return false, nil
