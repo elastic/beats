@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -18,10 +17,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fetch"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/zip"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifactformat"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/bundled"
 )
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build
@@ -138,13 +135,6 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 	return false, errors.New("osquery distro hash mismatch")
 }
 
-const (
-	suffixTarGz = ".tar.gz"
-	suffixPkg   = ".pkg"
-	suffixMsi   = ".msi"
-	suffixZip   = ".zip"
-)
-
 func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 	dir := distro.GetDataInstallDir(osarch)
 	if err := os.MkdirAll(dir, 0750); err != nil {
@@ -161,8 +151,9 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		return devtools.Copy(src, dst)
 	}
 
-	if !strings.HasSuffix(src, suffixTarGz) && !strings.HasSuffix(src, suffixPkg) && !strings.HasSuffix(src, suffixMsi) && !strings.HasSuffix(src, suffixZip) {
-		return fmt.Errorf("unsupported file: %s", src)
+	format, err := artifactformat.Detect(src)
+	if err != nil {
+		return err
 	}
 	tmpdir, err := os.MkdirTemp(distro.DataDir, "")
 	if err != nil {
@@ -170,94 +161,15 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 	}
 	defer os.RemoveAll(tmpdir)
 
-	var (
-		osdp  string
-		osdcp string
-		distp string
+	log.Printf("Extract %s from %v", format, src)
 
-		osdlp string
-	)
-	// Extract osqueryd
-	if strings.HasSuffix(src, suffixTarGz) {
-		log.Printf("Extract .tar.gz from %v", src)
-
-		osdp = distro.OsquerydLinuxDistroPath()
-		osdcp = distro.OsquerydCertsLinuxDistroPath()
-		distp = distro.OsquerydPath(dir)
-
-		osdlp = distro.OsquerydLensesLinuxDistroDir()
-
-		// Untar
-		if err := tar.ExtractFile(src, tmpdir, osdp, osdcp, osdlp); err != nil {
-			return err
-		}
-	}
-	if strings.HasSuffix(src, suffixPkg) {
-		log.Printf("Extract .pkg from %v", src)
-
-		osdp = distro.OsquerydDarwinDistroPath()
-		osdcp = distro.OsquerydCertsDarwinDistroPath()
-		distp = filepath.Join(dir, distro.OsquerydDarwinApp())
-
-		osdlp = distro.OsquerydLensesDarwinDistroDir()
-
-		// Pkgutil expand full
-		err = pkgutil.Expand(src, tmpdir)
-		if err != nil {
-			return err
-		}
-	}
-	if strings.HasSuffix(src, suffixMsi) {
-		log.Printf("Extract .msi from %v", src)
-
-		osdp = filepath.Join("osquery", "osqueryd", "osqueryd.exe")
-		osdcp = distro.OsquerydCertsWindowsDistroPath()
-		distp = distro.OsquerydPathForOS(osarch.OS, dir)
-
-		// Msiutil expand full
-		err = msiutil.Expand(src, tmpdir)
-		if err != nil {
-			return err
-		}
-	}
-	if strings.HasSuffix(src, suffixZip) {
-		log.Printf("Extract .zip from %v", src)
-
-		osdp = distro.OsquerydWindowsZipPath()
-		osdcp = distro.OsquerydCertsWindowsZipDistroPath()
-		distp = distro.OsquerydPathForOS(osarch.OS, dir)
-
-		// Unzip
-		err = zip.UnzipFile(src, tmpdir, osdp, osdcp)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Copy over certs directory
-	certsDir := filepath.Dir(distro.OsquerydCertsPath(dir))
-	err = os.MkdirAll(certsDir, 0750)
+	plan, err := bundled.BuildPlan(osarch, format, dir)
 	if err != nil {
 		return err
 	}
-	err = devtools.Copy(filepath.Join(tmpdir, osdcp), distro.OsquerydCertsPath(dir))
-	if err != nil {
+	if err := bundled.ExtractToTemp(format, src, tmpdir, &plan); err != nil {
 		return err
 	}
 
-	// Copy over lenses directory
-	if osdlp != "" {
-		lensesDir := distro.OsquerydLensesDir(dir)
-		err = os.MkdirAll(lensesDir, 0750)
-		if err != nil {
-			return err
-		}
-		err = devtools.Copy(filepath.Join(tmpdir, osdlp), lensesDir)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Copy over the osqueryd binary or osquery.app dir
-	return devtools.Copy(filepath.Join(tmpdir, osdp), distp)
+	return bundled.InstallFromTemp(tmpdir, dir, plan, devtools.Copy)
 }

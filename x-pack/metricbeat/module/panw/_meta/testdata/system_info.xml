@@ -1,0 +1,30 @@
+<response status="success"><result><system><hostname>PA-FIREWALL-01</hostname><ip-address>192.168.1.1</ip-address><public-ip-address>unknown</public-ip-address><netmask>255.255.255.0</netmask><default-gateway>192.168.1.254</default-gateway><is-dhcp>no</is-dhcp><ipv6-address>unknown</ipv6-address><ipv6-link-local-address>fe80::1:2:3:4/64</ipv6-link-local-address><mac-address>00:11:22:33:44:55</mac-address><time>Thu Jan 29 16:35:59 2026
+</time>
+<uptime>115 days, 3:08:17</uptime>
+<devicename>PA-FIREWALL-01</devicename>
+<family>400</family><model>PA-440</model><serial>012345678901</serial><cloud-mode>non-cloud</cloud-mode>
+<sw-version>10.1.12</sw-version>
+<global-protect-client-package-version>0.0.0</global-protect-client-package-version>
+<device-dictionary-version>209-682</device-dictionary-version>
+<device-dictionary-release-date>2026/01/27 14:46:15 UTC</device-dictionary-release-date>
+<app-version>9061-9857</app-version>
+<app-release-date>2026/01/27 03:00:57 UTC</app-release-date>
+<av-version>5447-5974</av-version>
+<av-release-date>2026/01/29 12:03:03 UTC</av-release-date>
+<threat-version>9061-9857</threat-version>
+<threat-release-date>2026/01/27 03:00:57 UTC</threat-release-date>
+<wf-private-version>0</wf-private-version>
+<wf-private-release-date>unknown</wf-private-release-date>
+<url-db>paloaltonetworks</url-db>
+<wildfire-version>1052689-1056966</wildfire-version>
+<wildfire-release-date>2026/01/29 15:56:49 UTC</wildfire-release-date>
+<wildfire-rt>Enabled</wildfire-rt>
+<url-filtering-version>0000.00.00.000</url-filtering-version>
+<global-protect-datafile-version>unknown</global-protect-datafile-version>
+<global-protect-datafile-release-date>unknown</global-protect-datafile-release-date><global-protect-clientless-vpn-version>0</global-protect-clientless-vpn-version>
+<logdb-version>10.1.2</logdb-version>
+<plugin_versions><entry name='dlp' version='1.0.4'><pkginfo>dlp-1.0.4</pkginfo></entry></plugin_versions><platform-family>400</platform-family>
+<vpn-disable-mode>off</vpn-disable-mode>
+<multi-vsys>off</multi-vsys>
+<ZTP>Disabled</ZTP><ZTP>Disabled</ZTP><operational-mode>normal</operational-mode>
+<device-certificate-status>Valid</device-certificate-status></system></result></response>
