@@ -52,7 +52,7 @@ type store struct {
 	mx     sync.Mutex
 	cliErr error
 
-	base *BaseStore
+	base *baseStore
 }
 
 func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier) (*store, error) {
@@ -211,7 +211,7 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err
 	} else {
-		s.base = NewBaseStore(ctx, s.log, cli, s.name)
+		s.base = NewStore(ctx, s.log, cli, s.name)
 	}
 
 	// Signal store is ready

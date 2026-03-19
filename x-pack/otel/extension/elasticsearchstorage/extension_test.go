@@ -31,7 +31,7 @@ func uniqueIndex(t *testing.T) string {
 	return "test-elasticstorage-" + safe.Replace(strings.ToLower(t.Name()))
 }
 
-func newTestStore(t *testing.T, storeName string) *es.BaseStore {
+func newTestStore(t *testing.T, storeName string) backend.Store {
 	t.Helper()
 
 	integration.EnsureESIsRunning(t)
@@ -49,7 +49,7 @@ func newTestStore(t *testing.T, storeName string) *es.BaseStore {
 	require.NoError(t, conn.Connect(t.Context()))
 	t.Cleanup(func() { _ = conn.Close() })
 
-	s := es.NewBaseStore(t.Context(), logptest.NewTestingLogger(t, ""), conn, storeName)
+	s := es.NewStore(t.Context(), logptest.NewTestingLogger(t, ""), conn, storeName)
 	t.Cleanup(func() { _ = s.Close() })
 
 	return s

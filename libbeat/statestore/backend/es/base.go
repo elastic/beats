@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type BaseStore struct {
+type baseStore struct {
 	cli   *eslegclient.Connection
 	name  string
 	index string
@@ -44,8 +44,8 @@ func renderIndexName(name string) string {
 	return "agentless-state-" + name
 }
 
-func NewBaseStore(ctx context.Context, log *logp.Logger, cli *eslegclient.Connection, name string) *BaseStore {
-	return &BaseStore{
+func NewStore(ctx context.Context, log *logp.Logger, cli *eslegclient.Connection, name string) *baseStore {
+	return &baseStore{
 		cli:   cli,
 		name:  name,
 		index: renderIndexName(name),
@@ -54,11 +54,11 @@ func NewBaseStore(ctx context.Context, log *logp.Logger, cli *eslegclient.Connec
 	}
 }
 
-func (b *BaseStore) Get(key string, to interface{}) error {
+func (b *baseStore) Get(key string, to interface{}) error {
 	return b.get(key, to)
 }
 
-func (b *BaseStore) get(key string, to interface{}) error {
+func (b *baseStore) get(key string, to interface{}) error {
 	status, data, err := b.cli.Request("GET", fmt.Sprintf("/%s/%s/%s", b.index, docType, url.QueryEscape(key)), "", nil, nil)
 
 	if err != nil {
@@ -81,7 +81,7 @@ func (b *BaseStore) get(key string, to interface{}) error {
 	return nil
 }
 
-func (b *BaseStore) Has(key string) (bool, error) {
+func (b *baseStore) Has(key string) (bool, error) {
 	var v interface{}
 	err := b.get(key, &v)
 	if err != nil {
@@ -93,7 +93,7 @@ func (b *BaseStore) Has(key string) (bool, error) {
 	return true, nil
 }
 
-func (b *BaseStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
+func (b *baseStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
 	// Do nothing for now if the store was not initialized
 	if b.cli == nil {
 		return nil
@@ -141,7 +141,7 @@ func (b *BaseStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) er
 	return nil
 }
 
-func (b *BaseStore) Set(key string, value interface{}) error {
+func (b *baseStore) Set(key string, value interface{}) error {
 	doc := renderRequest(value)
 	_, _, err := b.cli.Request("PUT", fmt.Sprintf("/%s/%s/%s", b.index, docType, url.QueryEscape(key)), "", nil, doc)
 	if err != nil {
@@ -150,7 +150,7 @@ func (b *BaseStore) Set(key string, value interface{}) error {
 	return nil
 }
 
-func (b *BaseStore) Remove(key string) error {
+func (b *baseStore) Remove(key string) error {
 	_, _, err := b.cli.Delete(b.index, docType, url.QueryEscape(key), nil)
 	if err != nil {
 		return err
@@ -158,7 +158,7 @@ func (b *BaseStore) Remove(key string) error {
 	return nil
 }
 
-func (b *BaseStore) Close() error {
+func (b *baseStore) Close() error {
 	if b.cli != nil {
 		err := b.cli.Close()
 		b.cli = nil
@@ -167,7 +167,7 @@ func (b *BaseStore) Close() error {
 	return nil
 }
 
-func (b *BaseStore) SetID(id string) {
+func (b *baseStore) SetID(id string) {
 	if id == "" {
 		return
 	}

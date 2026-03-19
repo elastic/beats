@@ -25,7 +25,6 @@ type elasticStorage struct {
 	ctx    context.Context
 	logger *logp.Logger
 	client *eslegclient.Connection
-	base   *es.BaseStore
 }
 
 func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
@@ -50,7 +49,7 @@ func (e *elasticStorage) Shutdown(ctx context.Context) error {
 }
 
 func (e *elasticStorage) Access(name string) (backend.Store, error) {
-	return es.NewBaseStore(e.ctx, e.logger, e.client, name), nil
+	return es.NewStore(e.ctx, e.logger, e.client, name), nil
 }
 
 func (e *elasticStorage) Close() error {
