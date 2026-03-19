@@ -1,0 +1,39 @@
+# REQUIRED
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user's deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: breaking-change
+
+# REQUIRED for all kinds
+# Change summary; a 80ish characters long description of the change.
+summary: Beat receiver NewFactory renamed to NewFactoryWithSettings for OTel Builder compatibility
+
+# REQUIRED for breaking-change, deprecation, known-issue
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: |
+  The Filebeat and Metricbeat receiver factories now expose two functions:
+  - NewFactory() - parameterless, for OpenTelemetry Collector Builder compatibility
+  - NewFactoryWithSettings(Settings) - for callers that need custom home/data paths
+
+  The previous NewFactory(Settings) has been renamed to NewFactoryWithSettings(Settings).
+
+# REQUIRED for breaking-change, deprecation, known-issue
+impact: |
+  Code that called NewFactory(Settings{...}) must be updated to call NewFactoryWithSettings(Settings{...}) instead.
+
+# REQUIRED for breaking-change, deprecation, known-issue
+action: |
+  Replace NewFactory(Settings{Home: ..., Data: ...}) with NewFactoryWithSettings(Settings{Home: ..., Data: ...}).
+  If you were passing empty settings, you can instead use NewFactory() with no arguments.
+
+# REQUIRED for all kinds
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: filebeat, metricbeat
