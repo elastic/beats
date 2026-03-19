@@ -874,7 +874,9 @@ func TestAkamaiInputRun(t *testing.T) {
 		require.NoError(t, err)
 		defer func() { _ = storeObj.Close() }()
 
+		//nolint:errcheck // It's a test, we can force the type cast
 		stateKey := stateKeyFromConfig(inp.(*akamaiInput).cfg)
+
 		var persisted cursor
 		err = storeObj.Get(stateKey, &persisted)
 		require.NoError(t, err, "cursor should be persisted after ACK")
@@ -936,6 +938,7 @@ func TestAkamaiInputRun(t *testing.T) {
 			done <- inp.Run(inputCtx, pipeline)
 		}()
 
+		//nolint:errcheck // It's a test, we can force the type cast
 		stateKey := stateKeyFromConfig(inp.(*akamaiInput).cfg)
 
 		require.Eventually(t, func() bool {
