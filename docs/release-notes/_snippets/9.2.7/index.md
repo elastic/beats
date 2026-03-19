@@ -28,11 +28,10 @@
 * Add cgroupv2 CPU metrics to system.process dataset. [#49098](https://github.com/elastic/beats/pull/49098) [#47708](https://github.com/elastic/beats/issues/47708)
 * Report memory pressure stall information (PSI) for cgroup v2. [#48054](https://github.com/elastic/beats/pull/48054) [#47604](https://github.com/elastic/beats/issues/47604)
 
-  Add memory PSI metrics to system.process.cgroup, complementing existing CPU and IO pressure metrics for cgroupv2
-* Add swap field to system.process.memory metric set in metricbeat. [#48334](https://github.com/elastic/beats/pull/48334)
-* Tbs-monitoring. [#48432](https://github.com/elastic/beats/pull/48432)
+  Add memory PSI metrics to `system.process.cgroup`, complementing existing CPU and IO pressure metrics for cgroupv2
+* Add swap field to `system.process.memory` metric set in metricbeat. [#48334](https://github.com/elastic/beats/pull/48334)
+*   Add new TBS metrics to monitor mappings. [#48432](https://github.com/elastic/beats/pull/48432)
 
-  Add new TBS metrics to monitor mappings
 * Read Kibana status response body on 503 so monitoring captures the reason for outage. [#48913](https://github.com/elastic/beats/pull/48913)
 
 **Packetbeat**
@@ -45,7 +44,7 @@
 * Move winlog filtering to Go-side evaluation and harden recovery paths. [#49257](https://github.com/elastic/beats/pull/49257)
 
   Winlogbeat and Filebeat winlog input now subscribe with unfiltered queries for non-custom configurations
-  and apply ignore_older, provider, event_id, and level filtering in code. This avoids unreliable Windows
+  and apply `ignore_older`, `provider`, `event_id`, and `level` filtering in code. This avoids unreliable Windows
   query-filter behavior in affected environments while preserving custom xml_query passthrough. The change
   also improves read/iterator recovery behavior, keeps final-batch publish semantics on EOF, and adds a
   retry circuit-breaker for persistent render failures without partial events.
@@ -57,33 +56,33 @@
 
 **All**
 
-* Update elastic-agent-system-metrics to v0.14.0. [#48816](https://github.com/elastic/beats/pull/48816)
-* Update elastic-agent-autodiscover to v0.10.2. [#48817](https://github.com/elastic/beats/pull/48817)
-* Update elastic-agent-libs to v0.32.2. [#48857](https://github.com/elastic/beats/pull/48857)
+* Update `elastic-agent-system-metrics` to v0.14.0. [#48816](https://github.com/elastic/beats/pull/48816)
+* Update `elastic-agent-autodiscover` to v0.10.2. [#48817](https://github.com/elastic/beats/pull/48817)
+* Update `elastic-agent-libs` to v0.32.2. [#48857](https://github.com/elastic/beats/pull/48857)
 * Update OpenTelemetry SDK to version v1.40.0. [#49126](https://github.com/elastic/beats/pull/49126) 
-* Translate_ldap_attribute discovery tries both LDAP and LDAPS per host, LDAPS first. [#48818](https://github.com/elastic/beats/pull/48818)
+* `Translate_ldap_attribute` discovery tries both LDAP and LDAPS per host, LDAPS first. [#48818](https://github.com/elastic/beats/pull/48818)
 
-  When the translate_ldap_attribute processor discovers LDAP servers (via DNS SRV
+  When the translate_ldap_attribute processor discovers LDAP servers (using DNS SRV
   or LOGONSERVER), it now adds the alternate scheme for each discovered address:
   if LDAP is found it also tries LDAPS for that host, and if LDAPS is found it
   also tries LDAP. For each host, LDAPS is tried before LDAP to prefer TLS.
   
-* Improve append processor behavior when merging values and removing duplicates. [#49021](https://github.com/elastic/beats/pull/49021) [#49020](https://github.com/elastic/beats/issues/49020)
+* Improve `append` processor behavior when merging values and removing duplicates. [#49021](https://github.com/elastic/beats/pull/49021) [#49020](https://github.com/elastic/beats/issues/49020)
 
-  The append processor now appends values more consistently, avoiding nested
+  The `append` processor now appends values more consistently, avoiding nested
   entries in the target field. Duplicate removal is also more reliable, reducing
   processing errors and keeping output stable.
   
-* Kafka client will avoid having more than a single metadata request to each broker in-flight at any given time. [#49307](https://github.com/elastic/beats/pull/49307) [#49210](https://github.com/elastic/beats/issues/49210)
+* Kafka client allows only a single metadata request to each broker in-flight at any given time. [#49307](https://github.com/elastic/beats/pull/49307) [#49210](https://github.com/elastic/beats/issues/49210)
 
 **Elastic agent**
 
-* Fix a bug that could report an invalid number of active &#34;otelconsumer&#34; events. [#48720](https://github.com/elastic/beats/pull/48720) [#12515](https://github.com/elastic/beats/issues/12515)
+* Fix a bug that could report an invalid number of active `otelconsumer` events. [#48720](https://github.com/elastic/beats/pull/48720) [#12515](https://github.com/elastic/beats/issues/12515)
 
 **Filebeat**
 
 * Improve in-flight byte accounting in the HTTP Endpoint input. [#48571](https://github.com/elastic/beats/pull/48571) [#48456](https://github.com/elastic/beats/issues/48456)
-* Honor non-fingerprint file_identity defaults in filestream. [#48579](https://github.com/elastic/beats/pull/48579)
+* Honor non-fingerprint `file_identity` defaults in filestream. [#48579](https://github.com/elastic/beats/pull/48579)
 * Fix handling of Crowdstrike streaming input state in retryable errors. [#49077](https://github.com/elastic/beats/pull/49077) [#49076](https://github.com/elastic/beats/issues/49076)
 * Fix incremental group updates in Active Directory entity analytics provider. [#49089](https://github.com/elastic/beats/pull/49089) [#49053](https://github.com/elastic/beats/issues/49053)
 * Demote missing user/device state lookup to debug log in Azure entity analytics provider. [#49127](https://github.com/elastic/beats/pull/49127) [#36447](https://github.com/elastic/beats/issues/36447)
@@ -91,9 +90,9 @@
 
 **Libbeat**
 
-* Add SSPI bind timeout and document Windows account requirements for translate_ldap_attribute processor. [#48444](https://github.com/elastic/beats/pull/48444)
+* Add SSPI bind timeout and document Windows account requirements for `translate_ldap_attribute` processor. [#48444](https://github.com/elastic/beats/pull/48444)
 
-  The translate_ldap_attribute processor SSPI bind could hang indefinitely when
+  The `translate_ldap_attribute` processor SSPI bind could hang indefinitely when
   running under a local user account (which cannot obtain Kerberos credentials).
   This fix adds a 10-second timeout to prevent the hang and updates documentation
   to clearly explain which Windows account types support SSPI authentication:
@@ -107,15 +106,15 @@
 
 **Osquerybeat**
 
-* Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57. [#49280](https://github.com/elastic/beats/pull/49280)
+* Update `osquery-go` dependency to v0.0.0-20260226222546-0cc22f415e57. [#49280](https://github.com/elastic/beats/pull/49280)
 
 **Packetbeat**
 
-* Refactor dhcpv4 parsers, fix numerous parsing bugs. The DHCP &#34;router&#34; field is now a list, as is specified in RFC2132. [#48414](https://github.com/elastic/beats/pull/48414)
+* Refactor dhcpv4 parsers, fix numerous parsing bugs. The DHCP `router` field is now a list, as is specified in RFC2132. [#48414](https://github.com/elastic/beats/pull/48414)
 
 **Winlogbeat**
 
-* Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner. [#48999](https://github.com/elastic/beats/pull/48999) [#48979](https://github.com/elastic/beats/issues/48979)
+* Restore suppression of repeated channel-not-found open errors in Winlogbeat eventlog runner. [#48999](https://github.com/elastic/beats/pull/48999) [#48979](https://github.com/elastic/beats/issues/48979)
 
   Reintroduces channel-not-found retry log suppression that was lost during the eventlog runner refactor.
   The first channel-not-found open error is logged at WARN, subsequent retries are logged at DEBUG, and
