@@ -178,13 +178,6 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-<<<<<<< HEAD
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/**/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-=======
           - "filebeat/build/input-test/**"
           - "filebeat/build/integration-tests/**"
         plugins:
@@ -193,7 +186,6 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
->>>>>>> 8b5e28d49 (Fix the globs for collecting artifacts from failed tests (#49529))
         notify:
           - github_commit_status:
               context: "filebeat: Go Integration Tests / Ubuntu x86_64"
@@ -216,16 +208,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-<<<<<<< HEAD
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/**/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-=======
           - "filebeat/build/input-test/**"
           - "filebeat/build/integration-tests/**"
->>>>>>> 8b5e28d49 (Fix the globs for collecting artifacts from failed tests (#49529))
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -250,16 +234,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-<<<<<<< HEAD
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/**/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-=======
           - "filebeat/build/input-test/**"
           - "filebeat/build/integration-tests/**"
->>>>>>> 8b5e28d49 (Fix the globs for collecting artifacts from failed tests (#49529))
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
