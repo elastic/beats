@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
@@ -23,6 +22,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // NomadEventKey is the key under which custom metadata is going
