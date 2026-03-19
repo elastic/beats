@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
+	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
@@ -46,7 +47,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 	configDir := tb.TempDir()
 	configFile := filepath.Join(configDir, "otel.yaml")
-	err := os.WriteFile(configFile, []byte(configYAML), 0644)
+	err := os.WriteFile(configFile, []byte(configYAML), 0o644)
 	require.NoError(tb, err)
 
 	if err != nil {
@@ -101,8 +102,8 @@ func (c *Collector) Shutdown() {
 
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
-		fbreceiver.NewFactory(),
-		mbreceiver.NewFactory(),
+		fbreceiver.NewFactory(fbreceiver.Settings{}),
+		mbreceiver.NewFactory(mbreceiver.Settings{}),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
@@ -110,6 +111,7 @@ func getComponent() (otelcol.Factories, error) {
 
 	extensions, err := otelcol.MakeFactoryMap(
 		beatsauthextension.NewFactory(),
+		elasticsearchstorage.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
@@ -138,7 +140,6 @@ func getComponent() (otelcol.Factories, error) {
 		Extensions: extensions,
 		Telemetry:  otelconftelemetry.NewFactory(),
 	}, nil
-
 }
 
 func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorSettings {

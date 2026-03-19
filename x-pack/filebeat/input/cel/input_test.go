@@ -1507,7 +1507,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  false,
+			"resource.tracer.enabled":  true,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
 			"state":                    map[string]interface{}{},
 			"program":                  "{}",
@@ -2376,7 +2376,19 @@ func TestInput(t *testing.T) {
 
 			var tempDir string
 			if conf.Resource.Tracer != nil {
-				tempDir = t.TempDir()
+				err := os.MkdirAll("cel", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("cel", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
@@ -2936,6 +2948,68 @@ var redactorTests = []struct {
 		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"other":"data"},{"other":"data"}],"other":"data"}`,
+	},
+	{
+		name: "secret_flat_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_flat_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: true,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data"}`,
+	},
+	{
+		name: "secret_nested_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"auth": mapstr.M{
+					"user":     "admin",
+					"password": "p@ss",
+				},
+				"token": "bearer_xyz",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"auth":{"password":"p@ss","user":"admin"},"token":"bearer_xyz"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_absent_no_op",
+		state: mapstr.M{
+			"other":   "data",
+			"another": "value",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"another":"value","other":"data"}`,
+		wantRedact: `{"another":"value","other":"data"}`,
 	},
 }
 

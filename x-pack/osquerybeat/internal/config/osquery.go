@@ -8,9 +8,26 @@ import (
 	"encoding/json"
 )
 
+// ElasticOptions contains Beat-specific options that are not part of
+// osquery's native config schema.
+type ElasticOptions struct {
+	Install *InstallConfig `config:"install" json:"-"`
+}
+
 type Query struct {
-	Query       string `config:"query" json:"query"`
-	Interval    int    `config:"interval" json:"interval"`
+	Query string `config:"query" json:"query"`
+	// Native schedule fields.
+	Interval int `config:"interval" json:"interval"`
+	// ScheduleID is the policy-defined schedule identifier for this scheduled query.
+	// Stored in the policy and used in result/response documents for correlation.
+	// If empty, the query name is used as the schedule_id when publishing.
+	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"`
+	// StartDate is the optional start date for native (interval-based) schedules (RFC3339).
+	// Used as the reference for schedule_execution_count.
+	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"`
+	// SpaceID is the optional policy space identifier for this scheduled query.
+	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
+
 	Platform    string `config:"platform" json:"platform,omitempty"`
 	Version     string `config:"version" json:"version,omitempty"`
 	Shard       int    `config:"shard" json:"shard,omitempty"`
@@ -29,6 +46,9 @@ type Query struct {
 }
 
 type Pack struct {
+	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
+	// If empty, the pack map key (pack name) is used when publishing.
+	PackID    string           `config:"pack_id,omitempty" json:"pack_id,omitempty"`
 	Discovery []string         `config:"discovery" json:"discovery,omitempty"`
 	Platform  string           `config:"platform" json:"platform,omitempty"`
 	Version   string           `config:"version" json:"version,omitempty"`
@@ -65,6 +85,7 @@ type Events struct {
 
 type OsqueryConfig struct {
 	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
 	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
 	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
 	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
@@ -75,6 +96,7 @@ type OsqueryConfig struct {
 	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
+// Render serializes the OsqueryConfig to JSON for osqueryd configuration.
 func (c OsqueryConfig) Render() ([]byte, error) {
 	return json.MarshalIndent(c, "", "    ")
 }

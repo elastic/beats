@@ -1,0 +1,15 @@
+kind: enhancement
+summary: Add elastic_jumplists spec integration and harden osquerybeat generation workflow
+
+description: |
+  - Added elastic_jumplists table spec and shared types, generated table/docs wiring, and
+    migrated jumplists glue to generated RegisterGenerateFunc/GetGenerateFunc flow.
+  - Extended generated table registry/getter signatures to pass ResilientClient and wired it
+    through osquery-extension table registration.
+  - Added generated osquery-extension README support in gentables to keep tables/views docs in sync.
+  - Added osquerybeat mage Generate target and made Check depend on it for generation consistency.
+  - Updated jumplists generator to use local cached source files by default, with on-demand refresh
+    via `-refresh-sources` (and `JUMPLISTS_REFRESH_SOURCES=true mage generate`), plus enforced
+    gofmt/goimports formatting of generated jumplists files.
+
+component: osquerybeat

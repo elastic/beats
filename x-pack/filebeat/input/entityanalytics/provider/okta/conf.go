@@ -308,7 +308,7 @@ func (c *conf) Validate() error {
 		return errors.New("either oauth2 configuration or okta_token must be provided")
 	}
 
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
