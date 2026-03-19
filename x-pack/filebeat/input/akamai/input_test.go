@@ -872,7 +872,7 @@ func TestAkamaiInputRun(t *testing.T) {
 
 		storeObj, err := store.StoreFor("")
 		require.NoError(t, err)
-		defer storeObj.Close()
+		defer func() { _ = storeObj.Close() }()
 
 		stateKey := stateKeyFromConfig(inp.(*akamaiInput).cfg)
 		var persisted cursor
