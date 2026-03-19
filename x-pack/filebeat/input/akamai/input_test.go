@@ -22,6 +22,10 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -690,3 +694,266 @@ type nopReadCloser struct {
 
 func (n nopReadCloser) Read(p []byte) (int, error) { return n.r.Read(p) }
 func (n nopReadCloser) Close() error               { return nil }
+
+// --- akamaiInput.Run integration tests ---
+//
+// These tests exercise the full Run method: InputManager → pipeline → store →
+// ACK → cursor persistence wiring.
+
+// testInputStore is an in-memory statestore.States implementation.
+type testInputStore struct {
+	registry *statestore.Registry
+}
+
+func openTestStatestore() *testInputStore {
+	return &testInputStore{
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+	}
+}
+
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
+	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) CleanupInterval() time.Duration {
+	return 24 * time.Hour
+}
+
+// mockPipelineClient is a beat.Client that records published events and
+// immediately ACKs them through the configured EventListener.
+type mockPipelineClient struct {
+	mu         sync.Mutex
+	events     []beat.Event
+	ackHandler beat.EventListener
+}
+
+func (c *mockPipelineClient) Publish(e beat.Event) {
+	c.PublishAll([]beat.Event{e})
+}
+
+func (c *mockPipelineClient) PublishAll(events []beat.Event) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for _, e := range events {
+		c.ackHandler.AddEvent(e, true)
+	}
+	c.ackHandler.ACKEvents(len(events))
+	c.events = append(c.events, events...)
+}
+
+func (c *mockPipelineClient) Close() error { return nil }
+
+func (c *mockPipelineClient) getEvents() []beat.Event {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	out := make([]beat.Event, len(c.events))
+	copy(out, c.events)
+	return out
+}
+
+// mockPipelineConnector implements beat.PipelineConnector and returns a
+// mockPipelineClient that auto-ACKs.
+type mockPipelineConnector struct {
+	mu      sync.Mutex
+	clients []*mockPipelineClient
+}
+
+func (pc *mockPipelineConnector) Connect() (beat.Client, error) {
+	return pc.ConnectWith(beat.ClientConfig{})
+}
+
+func (pc *mockPipelineConnector) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
+	c := &mockPipelineClient{
+		ackHandler: cfg.EventListener,
+	}
+	pc.clients = append(pc.clients, c)
+	return c, nil
+}
+
+func (pc *mockPipelineConnector) getAllEvents() []beat.Event {
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
+	var all []beat.Event
+	for _, c := range pc.clients {
+		all = append(all, c.getEvents()...)
+	}
+	return all
+}
+
+// mockStatusReporter records UpdateStatus calls for assertions.
+type mockStatusReporter struct {
+	mu      sync.Mutex
+	updates []statusUpdate
+}
+
+type statusUpdate struct {
+	state status.Status
+	msg   string
+}
+
+func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {
+	m.mu.Lock()
+	m.updates = append(m.updates, statusUpdate{s, msg})
+	m.mu.Unlock()
+}
+
+func (m *mockStatusReporter) getUpdates() []statusUpdate {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return append([]statusUpdate{}, m.updates...)
+}
+
+func TestAkamaiInputRun(t *testing.T) {
+	t.Run("publishes events and persists cursor", func(t *testing.T) {
+		serverState := &mockInputServer{}
+		srv := httptest.NewServer(http.HandlerFunc(serverState.handler))
+		defer srv.Close()
+
+		serverState.setScenario([]mockResponseStep{
+			{body: ndjson(
+				`{"event":"a"}`,
+				`{"event":"b"}`,
+				`{"total":2,"offset":"off-1","limit":3}`,
+			)},
+		})
+
+		store := openTestStatestore()
+
+		manager := NewInputManager(logp.NewNopLogger(), store)
+
+		cfgMap := map[string]interface{}{
+			"resource":   map[string]interface{}{"url": srv.URL},
+			"config_ids": "1",
+			"auth": map[string]interface{}{
+				"edgegrid": map[string]interface{}{
+					"client_token":  "ct",
+					"client_secret": "cs",
+					"access_token":  "at",
+				},
+			},
+			"interval":         "1s",
+			"initial_interval": "1h",
+			"event_limit":      3,
+			"batch_size":       10,
+		}
+		c := conf.MustNewConfigFrom(cfgMap)
+		inp, err := manager.Create(c)
+		require.NoError(t, err)
+
+		pipeline := &mockPipelineConnector{}
+		reporter := &mockStatusReporter{}
+
+		ctx, cancel := context.WithCancel(context.Background())
+
+		inputCtx := v2.Context{
+			Logger:          logp.NewNopLogger(),
+			Cancelation:     ctx,
+			MetricsRegistry: monitoring.NewRegistry(),
+		}
+		inputCtx = inputCtx.WithStatusReporter(reporter)
+
+		done := make(chan error, 1)
+		go func() {
+			done <- inp.Run(inputCtx, pipeline)
+		}()
+
+		require.Eventually(t, func() bool {
+			return len(pipeline.getAllEvents()) >= 2
+		}, 5*time.Second, 50*time.Millisecond, "expected 2 events")
+
+		cancel()
+		runErr := <-done
+		assert.NoError(t, runErr)
+
+		events := pipeline.getAllEvents()
+		assert.GreaterOrEqual(t, len(events), 2)
+
+		storeObj, err := store.StoreFor("")
+		require.NoError(t, err)
+		defer storeObj.Close()
+
+		stateKey := stateKeyFromConfig(inp.(*akamaiInput).cfg)
+		var persisted cursor
+		err = storeObj.Get(stateKey, &persisted)
+		require.NoError(t, err, "cursor should be persisted after ACK")
+		assert.Equal(t, "off-1", persisted.LastOffset)
+		assert.True(t, persisted.CaughtUp, "2 events < event_limit=3 means drained")
+		assert.NotZero(t, persisted.ChainFrom)
+		assert.NotZero(t, persisted.ChainTo)
+
+		updates := reporter.getUpdates()
+		require.NotEmpty(t, updates)
+		assert.Equal(t, status.Starting, updates[0].state)
+	})
+
+	t.Run("persists cursor on empty page", func(t *testing.T) {
+		serverState := &mockInputServer{}
+		srv := httptest.NewServer(http.HandlerFunc(serverState.handler))
+		defer srv.Close()
+
+		serverState.setScenario([]mockResponseStep{
+			{body: ""},
+		})
+
+		store := openTestStatestore()
+		manager := NewInputManager(logp.NewNopLogger(), store)
+
+		cfgMap := map[string]interface{}{
+			"resource":   map[string]interface{}{"url": srv.URL},
+			"config_ids": "1",
+			"auth": map[string]interface{}{
+				"edgegrid": map[string]interface{}{
+					"client_token":  "ct",
+					"client_secret": "cs",
+					"access_token":  "at",
+				},
+			},
+			"interval":         "1s",
+			"initial_interval": "1h",
+			"event_limit":      3,
+			"batch_size":       10,
+		}
+		c := conf.MustNewConfigFrom(cfgMap)
+		inp, err := manager.Create(c)
+		require.NoError(t, err)
+
+		pipeline := &mockPipelineConnector{}
+		reporter := &mockStatusReporter{}
+
+		ctx, cancel := context.WithCancel(context.Background())
+
+		inputCtx := v2.Context{
+			Logger:          logp.NewNopLogger(),
+			Cancelation:     ctx,
+			MetricsRegistry: monitoring.NewRegistry(),
+		}
+		inputCtx = inputCtx.WithStatusReporter(reporter)
+
+		done := make(chan error, 1)
+		go func() {
+			done <- inp.Run(inputCtx, pipeline)
+		}()
+
+		stateKey := stateKeyFromConfig(inp.(*akamaiInput).cfg)
+
+		require.Eventually(t, func() bool {
+			storeObj, sErr := store.StoreFor("")
+			if sErr != nil {
+				return false
+			}
+			defer storeObj.Close()
+			var cur cursor
+			return storeObj.Get(stateKey, &cur) == nil && cur.CaughtUp
+		}, 5*time.Second, 50*time.Millisecond, "cursor should be persisted with CaughtUp=true")
+
+		cancel()
+		runErr := <-done
+		assert.NoError(t, runErr)
+
+		updates := reporter.getUpdates()
+		require.NotEmpty(t, updates)
+		assert.Equal(t, status.Starting, updates[0].state)
+	})
+}
