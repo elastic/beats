@@ -907,9 +907,9 @@ func TestAkamaiInputRun(t *testing.T) {
 			"config_ids": "1",
 			"auth": map[string]interface{}{
 				"edgegrid": map[string]interface{}{
-				"client_token":  "test-client-token",
-				"client_secret": "test-client-secret",
-				"access_token":  "test-access-token",
+					"client_token":  "test-client-token",
+					"client_secret": "test-client-secret",
+					"access_token":  "test-access-token",
 				},
 			},
 			"interval":         "1s",
