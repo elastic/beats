@@ -458,7 +458,7 @@ filebeat.inputs:
 ### `secret_state` [secret-state-cel]
 
 ```{applies_to}
-stack: ga 9.4.0
+stack: ga 9.2+
 ```
 
 `secret_state` is an optional object holding secret key-value pairs. When configured in a Fleet integration package with `secret: true`, the values are stored encrypted by Fleet and decrypted before being passed to the input.
