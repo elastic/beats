@@ -158,11 +158,7 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case RawEncoding:
 		_, err = b.buf.Write(v.Encoding)
-		// If the pre-encoded bytes already end with a newline (as produced
-		// by Marshal/AddRaw), skip the trailing WriteByte('\n') below to
-		// avoid a double newline in the NDJSON bulk body. An empty line
-		// between bulk items causes non-Elasticsearch endpoints (Axiom,
-		// OpenSearch) to reject the request.
+		// Skip trailing newline if already present to avoid an empty line in NDJSON bulk body.
 		if err == nil && len(v.Encoding) > 0 && v.Encoding[len(v.Encoding)-1] == '\n' {
 			return nil
 		}

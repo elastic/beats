@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
@@ -67,12 +66,7 @@ func TestJSONEncoderMarshalMonitoringEvent(t *testing.T) {
 		"Unexpected marshaled format of report.Event")
 }
 
-// TestRawEncodingNoDoubleNewline verifies that writing a RawEncoding whose
-// bytes already end with '\n' does not produce a double newline in the output
-// buffer. A double newline in an NDJSON bulk body creates an empty line that
-// Elasticsearch-compatible endpoints (Axiom, OpenSearch, etc.) reject.
 func TestRawEncodingNoDoubleNewline(t *testing.T) {
-	// Pre-encode an event via Marshal, which appends a trailing '\n'.
 	encoder := NewJSONEncoder(nil, false)
 	event := beat.Event{
 		Timestamp: time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC),
@@ -82,42 +76,16 @@ func TestRawEncodingNoDoubleNewline(t *testing.T) {
 	require.NoError(t, err)
 	preEncoded := make([]byte, encoder.buf.Len())
 	copy(preEncoded, encoder.buf.Bytes())
+	require.Equal(t, byte('\n'), preEncoded[len(preEncoded)-1], "pre-encoded event should end with newline")
 
-	// Verify the pre-encoded bytes end with exactly one newline.
-	require.True(t, len(preEncoded) > 0 && preEncoded[len(preEncoded)-1] == '\n',
-		"pre-encoded event should end with newline")
-
-	// Now simulate a bulk body: meta line + RawEncoding document.
+	// Simulate a bulk body: meta + pre-encoded document.
 	encoder.Reset()
-	meta := map[string]interface{}{
-		"index": map[string]interface{}{"_index": "test"},
-	}
-	err = encoder.AddRaw(meta)
-	require.NoError(t, err)
-	err = encoder.AddRaw(RawEncoding{Encoding: preEncoded})
-	require.NoError(t, err)
+	meta := map[string]any{"index": map[string]any{"_index": "test"}}
+	require.NoError(t, encoder.AddRaw(meta))
+	require.NoError(t, encoder.AddRaw(RawEncoding{Encoding: preEncoded}))
 
 	body := encoder.buf.String()
-
-	// The body must not contain "\n\n" (double newline / empty line).
-	assert.NotContains(t, body, "\n\n",
-		"bulk body must not contain an empty line from double newline; got:\n%s", body)
-
-	// The body should be exactly: meta\ndocument\n
-	lines := splitNDJSON(body)
-	assert.Equal(t, 2, len(lines),
-		"bulk body should have exactly 2 NDJSON lines (meta + document); got %d:\n%s", len(lines), body)
-}
-
-// splitNDJSON splits an NDJSON string into non-empty lines.
-func splitNDJSON(s string) []string {
-	var lines []string
-	for _, line := range strings.Split(s, "\n") {
-		if line != "" {
-			lines = append(lines, line)
-		}
-	}
-	return lines
+	assert.NotContains(t, body, "\n\n", "bulk body must not contain empty lines; got:\n%s", body)
 }
 
 func TestEncoderHeaders(t *testing.T) {

@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Fix double newline in NDJSON bulk body when using pre-encoded events (RawEncoding)
+
+component: libbeat
+
+pr: https://github.com/elastic/beats/pull/49557
