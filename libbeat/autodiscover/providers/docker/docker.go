@@ -386,7 +386,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints)
+		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints) //nolint:errcheck // preserve existing behaviour
 		// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
 		for _, value := range incorrecthints {
 			d.logger.Debugf("provided hint: %s/%s is not in the supported list", d.config.Prefix, value)

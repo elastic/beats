@@ -245,9 +245,9 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	rawMeta, ok := event["meta"]
 	if ok {
-		meta = rawMeta.(mapstr.M)
+		meta = rawMeta.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 		if nomadMeta, ok := meta["nomad"]; ok {
-			meta = nomadMeta.(mapstr.M)
+			meta = nomadMeta.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 		}
 
 		// The builder base config can configure any of the field values of nomad if need be.
