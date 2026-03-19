@@ -5,7 +5,7 @@
 ### Features and enhancements [beats-9.3.2-features-enhancements]
 
 
-**Elastic agent**
+**Elastic Agent**
 
 * Fix a bug that could report stopped inputs as still running. [#49285](https://github.com/elastic/beats/pull/49285) [#47769](https://github.com/elastic/beats/issues/47769)
 
