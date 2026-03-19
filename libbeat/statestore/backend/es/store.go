@@ -20,10 +20,6 @@ package es
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
-	"net/http"
-	"net/url"
 	"sync"
 	"time"
 
@@ -48,18 +44,16 @@ type store struct {
 	cn       context.CancelFunc
 	log      *logp.Logger
 	name     string
-	index    string
 	notifier *Notifier
 
 	chReady chan struct{}
 	once    sync.Once
 
 	mx     sync.Mutex
-	cli    *eslegclient.Connection
 	cliErr error
-}
 
-const docType = "_doc"
+	base *BaseStore
+}
 
 func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier) (*store, error) {
 	ctx, cn := context.WithCancel(ctx)
@@ -68,7 +62,6 @@ func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Not
 		cn:       cn,
 		log:      log.With("name", name).With("backend", "elasticsearch"),
 		name:     name,
-		index:    renderIndexName(name),
 		notifier: notifier,
 		chReady:  make(chan struct{}),
 	}
@@ -87,10 +80,6 @@ func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Not
 	return s, nil
 }
 
-func renderIndexName(name string) string {
-	return "agentless-state-" + name
-}
-
 func (s *store) waitReady() error {
 	select {
 	case <-s.ctx.Done():
@@ -101,13 +90,13 @@ func (s *store) waitReady() error {
 }
 
 func (s *store) SetID(id string) {
+	if err := s.waitReady(); err != nil {
+		return
+	}
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	if id == "" {
-		return
-	}
-	s.index = renderIndexName(id)
+	s.base.SetID(id)
 }
 
 func (s *store) Close() error {
@@ -117,11 +106,8 @@ func (s *store) Close() error {
 	if s.cn != nil {
 		s.cn()
 	}
-
-	if s.cli != nil {
-		err := s.cli.Close()
-		s.cli = nil
-		return err
+	if s.base != nil {
+		s.base.Close()
 	}
 	return nil
 }
@@ -133,15 +119,7 @@ func (s *store) Has(key string) (bool, error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	var v interface{}
-	err := s.get(key, v)
-	if err != nil {
-		if errors.Is(err, ErrKeyUnknown) {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
+	return s.base.Has(key)
 }
 
 func (s *store) Get(key string, to interface{}) error {
@@ -151,30 +129,7 @@ func (s *store) Get(key string, to interface{}) error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	return s.get(key, to)
-}
-
-func (s *store) get(key string, to interface{}) error {
-	status, data, err := s.cli.Request("GET", fmt.Sprintf("/%s/%s/%s", s.index, docType, url.QueryEscape(key)), "", nil, nil)
-
-	if err != nil {
-		if status == http.StatusNotFound {
-			return ErrKeyUnknown
-		}
-		return err
-	}
-
-	var qr queryResult
-	err = json.Unmarshal(data, &qr)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(qr.Source.Value, to)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.base.Get(key, to)
 }
 
 type queryResult struct {
@@ -211,26 +166,15 @@ func (s *store) Set(key string, value interface{}) error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	doc := renderRequest(value)
-	_, _, err := s.cli.Request("PUT", fmt.Sprintf("/%s/%s/%s", s.index, docType, url.QueryEscape(key)), "", nil, doc)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.base.Set(key, value)
 }
 
 func (s *store) Remove(key string) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}
-	s.mx.Lock()
-	defer s.mx.Unlock()
 
-	_, _, err := s.cli.Delete(s.index, docType, url.QueryEscape(key), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.base.Remove(key)
 }
 
 type searchResult struct {
@@ -248,51 +192,7 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	// Do nothing for now if the store was not initialized
-	if s.cli == nil {
-		return nil
-	}
-
-	status, result, err := s.cli.SearchURIWithBody(s.index, "", nil, map[string]any{
-		"query": map[string]any{
-			"match_all": map[string]any{},
-		},
-		"size": 1000, // TODO: we might have to do scroll if there are more than 1000 keys
-	})
-
-	if err != nil && status != http.StatusNotFound {
-		return err
-	}
-
-	if result == nil || len(result.Hits.Hits) == 0 {
-		return nil
-	}
-
-	for _, hit := range result.Hits.Hits {
-		var sres searchResult
-		err = json.Unmarshal(hit, &sres)
-		if err != nil {
-			return err
-		}
-
-		var e entry
-		err = json.Unmarshal(sres.Source.Value, &e.value)
-		if err != nil {
-			return err
-		}
-
-		key, err := url.QueryUnescape(sres.ID)
-		if err != nil {
-			return err
-		}
-
-		cont, err := fn(key, e)
-		if !cont || err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return s.base.Each(fn)
 }
 
 func (s *store) configure(ctx context.Context, c *conf.C) {
@@ -300,9 +200,9 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	if s.cli != nil {
-		_ = s.cli.Close()
-		s.cli = nil
+	if s.base != nil {
+		_ = s.base.Close()
+		s.base = nil
 	}
 	s.cliErr = nil
 
@@ -311,7 +211,7 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err
 	} else {
-		s.cli = cli
+		s.base = NewBaseStore(ctx, s.log, cli, s.name)
 	}
 
 	// Signal store is ready
