@@ -24,12 +24,11 @@
 **Metricbeat**
 
 * Add zswap compressed swap cache metrics to system memory metricset. [#49098](https://github.com/elastic/beats/pull/49098) [#47605](https://github.com/elastic/beats/issues/47605)
-* Addition of Elasticsearch index mode and codec settings in Metricbeat index stats module. [#49237](https://github.com/elastic/beats/pull/49237)
-* Add cgroupv2 CPU metrics to system.process dataset. [#49098](https://github.com/elastic/beats/pull/49098) [#47708](https://github.com/elastic/beats/issues/47708)
-* Add swap field to system.process.memory metric set in metricbeat. [#48334](https://github.com/elastic/beats/pull/48334)
-* Tbs-monitoring. [#48432](https://github.com/elastic/beats/pull/48432)
+* Add Elasticsearch index mode and codec settings in Metricbeat index stats module. [#49237](https://github.com/elastic/beats/pull/49237)
+* Add cgroupv2 CPU metrics to `system.process` dataset. [#49098](https://github.com/elastic/beats/pull/49098) [#47708](https://github.com/elastic/beats/issues/47708)
+* Add swap field to `system.process.memory` metric set in Metricbeat. [#48334](https://github.com/elastic/beats/pull/48334)
+* Add new TBS metrics to monitor mappings. [#48432](https://github.com/elastic/beats/pull/48432)
 
-  Add new TBS metrics to monitor mappings
 * Add a config to improve wildcard handling to report actual object names. [#48644](https://github.com/elastic/beats/pull/48644) [#48502](https://github.com/elastic/beats/issues/48502)
 * Read Kibana status response body on 503 so monitoring captures the reason for outage. [#48913](https://github.com/elastic/beats/pull/48913)
 
@@ -43,7 +42,7 @@
 * Move winlog filtering to Go-side evaluation and harden recovery paths. [#49257](https://github.com/elastic/beats/pull/49257)
 
   Winlogbeat and Filebeat winlog input now subscribe with unfiltered queries for non-custom configurations
-  and apply ignore_older, provider, event_id, and level filtering in code. This avoids unreliable Windows
+  and apply `ignore_older`, `provider`, `event_id`, and `level` filtering in code. This avoids unreliable Windows
   query-filter behavior in affected environments while preserving custom xml_query passthrough. The change
   also improves read/iterator recovery behavior, keeps final-batch publish semantics on EOF, and adds a
   retry circuit-breaker for persistent render failures without partial events.
@@ -55,13 +54,13 @@
 
 **All**
 
-* Update elastic-agent-system-metrics to v0.14.0. [#48816](https://github.com/elastic/beats/pull/48816)
-* Update elastic-agent-autodiscover to v0.10.2. [#48817](https://github.com/elastic/beats/pull/48817)
-* Update elastic-agent-libs to v0.32.2. [#48857](https://github.com/elastic/beats/pull/48857)
-* Update OpenTelemetry SDK to version v1.40.0. [#49126](https://github.com/elastic/beats/pull/49126) 
-* Improve append processor behavior when merging values and removing duplicates. [#49021](https://github.com/elastic/beats/pull/49021) [#49020](https://github.com/elastic/beats/issues/49020)
+* Update `elastic-agent-system-metrics` to v0.14.0. [#48816](https://github.com/elastic/beats/pull/48816)
+* Update `elastic-agent-autodiscover` to v0.10.2. [#48817](https://github.com/elastic/beats/pull/48817)
+* Update `elastic-agent-libs` to v0.32.2. [#48857](https://github.com/elastic/beats/pull/48857)
+* Update OpenTelemetry SDK to v1.40.0. [#49126](https://github.com/elastic/beats/pull/49126) 
+* Improve `append` processor behavior when merging values and removing duplicates. [#49021](https://github.com/elastic/beats/pull/49021) [#49020](https://github.com/elastic/beats/issues/49020)
 
-  The append processor now appends values more consistently, avoiding nested
+  The `append` processor now appends values more consistently, avoiding nested
   entries in the target field. Duplicate removal is also more reliable, reducing
   processing errors and keeping output stable.
   
@@ -86,11 +85,11 @@
 
 **Osquerybeat**
 
-* Update osquery-go dependency to v0.0.0-20260226222546-0cc22f415e57. [#49280](https://github.com/elastic/beats/pull/49280)
+* Update `osquery-go` dependency to v0.0.0-20260226222546-0cc22f415e57. [#49280](https://github.com/elastic/beats/pull/49280)
 
 **Winlogbeat**
 
-* Restore suppression of repeated channel-not-found open errors in winlogbeat eventlog runner. [#48999](https://github.com/elastic/beats/pull/48999) [#48979](https://github.com/elastic/beats/issues/48979)
+* Restore suppression of repeated channel-not-found open errors in Winlogbeat eventlog runner. [#48999](https://github.com/elastic/beats/pull/48999) [#48979](https://github.com/elastic/beats/issues/48979)
 
   Reintroduces channel-not-found retry log suppression that was lost during the eventlog runner refactor.
   The first channel-not-found open error is logged at WARN, subsequent retries are logged at DEBUG, and
