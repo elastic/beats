@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Update gosigar to v0.14.4.
+summary: Fix unnecessary Windows filesystem metricset errors from non-existent volumes.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
