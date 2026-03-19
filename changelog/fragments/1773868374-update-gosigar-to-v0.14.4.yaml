@@ -18,7 +18,7 @@ summary: Fix unnecessary Windows filesystem metricset errors from non-existent v
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: gosigar v0.14.4 includes a fix to allow the filesystem metricset of the metricbeat system module to skip volumes that don't exist on Windows.
+description: Fixes an issue where filesystem metric collection on Windows could report errors for volumes that are no longer present. Updated to gosigar v0.14.4.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
