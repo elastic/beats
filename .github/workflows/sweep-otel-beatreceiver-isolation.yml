@@ -75,6 +75,16 @@ jobs:
         For double-registration panics, write a test that constructs a receiver twice sequentially
         and asserts the second construction does not panic.
 
+        ## The bar for filing
+
+        Only report findings relevant to a real OTel Collector deployment that uses multiple
+        beat receivers, or that restarts receivers (e.g. on config reload). A global variable
+        that is written once during process startup and never again is not a problem — that is
+        normal Go initialization. The bug must be triggerable by constructing two receivers
+        concurrently or sequentially in the same process, which is exactly what the OTel
+        Collector does. If concurrent construction is safe but the behavior is merely surprising
+        or inconsistent, that is worth noting but not necessarily worth filing as a bug.
+
         ## Output
 
         File a single issue containing:

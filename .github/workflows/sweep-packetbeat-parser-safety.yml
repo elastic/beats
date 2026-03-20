@@ -73,6 +73,15 @@ jobs:
         Be thorough. Check every parser, not just the ones that seem obvious. The same mistake
         appears independently in multiple protocols because each parser was written separately.
 
+        ## The bar for filing
+
+        Only report findings that a real user could actually encounter. For this sweeper that
+        means: the malformed packet could plausibly arrive from a network peer (a misbehaving
+        client, a fuzzer, a buggy server, or an attacker). If the only way to trigger the bug
+        is to modify the test binary or inject data that could never appear on the wire, skip it.
+        If you cannot write a test that panics using a byte slice that looks like a real (if
+        malformed) protocol message, the finding is not worth filing.
+
         ## Output
 
         File a single issue containing:

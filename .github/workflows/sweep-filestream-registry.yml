@@ -78,6 +78,16 @@ jobs:
         relevant state, trigger the problematic transition, and assert that the cursor is
         preserved. Run `go test ./filebeat/input/filestream/...` to confirm the failure.
 
+        ## The bar for filing
+
+        Only report findings that a real user could encounter with a realistic Filestream
+        configuration. The bug must be triggerable through normal user actions: starting and
+        stopping Filebeat, rotating log files, changing config, hitting harvester limits, or
+        running on a filesystem that performs renames. Do not file findings that require
+        manually corrupting the registry store or calling internal functions in an order that
+        the real code path never produces. If you cannot describe a concrete sequence of
+        user-observable events that leads to the bug, it is not worth filing.
+
         ## Output
 
         File a single issue containing:

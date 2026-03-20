@@ -79,6 +79,16 @@ jobs:
         a short timeout. For panics, use `require.NotPanics`. Run with `-race` where applicable:
         `go test -race ./libbeat/publisher/...`
 
+        ## The bar for filing
+
+        Only report findings that a real deployment could hit. Shutdown races need to be
+        triggerable under normal operating conditions (e.g. sending SIGTERM while the output
+        is processing events), not only under artificially timed test scenarios that can't
+        occur in practice. For goroutine leaks and hangs, confirm that the problematic code
+        path is reachable from the normal pipeline lifecycle — not just from unit test helpers
+        that bypass the real startup sequence. If the finding requires a precondition that no
+        production deployment would have, skip it.
+
         ## Output
 
         File a single issue containing:

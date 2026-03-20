@@ -87,6 +87,17 @@ jobs:
         For tight loops, assert the input makes no more than N retries in a given time window.
         For state corruption panics, use `require.NotPanics`.
 
+        ## The bar for filing
+
+        Only report findings that a real user with a real remote endpoint could encounter.
+        The failure condition must be something that can happen in a production environment:
+        a server that closes connections, returns HTTP errors, sends malformed JSON, or has
+        a slow OAuth2 endpoint. Do not file findings that require the test to inject failures
+        at a level of precision (e.g. corrupting a specific byte mid-read) that cannot occur
+        with a real remote service. If you cannot simulate the failure using a mock HTTP or
+        WebSocket server that behaves the way a real (if misbehaving) server would, the
+        finding is probably not worth filing.
+
         ## Output
 
         File a single issue containing:
