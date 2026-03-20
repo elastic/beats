@@ -1,8 +1,0 @@
-kind: bug-fix
-summary: Improve append processor behavior when merging values and removing duplicates
-description: |
-  The append processor now appends values more consistently, avoiding nested
-  entries in the target field. Duplicate removal is also more reliable, reducing
-  processing errors and keeping output stable.
-component: all
-pr: https://github.com/elastic/beats/pull/49021
