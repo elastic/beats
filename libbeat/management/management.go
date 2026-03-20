@@ -47,14 +47,12 @@ type Manager interface {
 
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
 	// will be propagated to the handlers and will not try to configure any reloadable parts.
-	// When the manager is stop the callback will be called to signal that the system can terminate.
-	// If the wait parameter is true, Stop will wait for the stop callback to finish and all Manager
-	// goroutines to terminate before returning.
+	// When the manager is stopped the callback will be called to signal that the system can terminate.
 	//
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
 	//
 	// Note: Stop will not call 'UnregisterAction()' automatically.
-	Stop(wait bool)
+	Stop()
 
 	// AgentInfo returns the information of the agent to which the manager is connected.
 	AgentInfo() AgentInfo

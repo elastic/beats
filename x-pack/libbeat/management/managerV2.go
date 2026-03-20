@@ -300,19 +300,12 @@ func (cm *BeatV2Manager) Start() error {
 }
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
-// If wait is true, it waits for the manager's goroutines to terminate before returning.
-func (cm *BeatV2Manager) Stop(wait bool) {
-	cm.stop()
-	if wait {
-		cm.stopWaitGroup.Wait()
-	}
-}
-
-// stop asynchronously signals the manager goroutine to shut down.
-func (cm *BeatV2Manager) stop() {
+// It waits for the manager goroutines to terminate before returning.
+func (cm *BeatV2Manager) Stop() {
 	cm.stopOnce.Do(func() {
 		close(cm.stopChan)
 	})
+	cm.stopWaitGroup.Wait()
 }
 
 // CheckRawConfig is currently not implemented for V1.

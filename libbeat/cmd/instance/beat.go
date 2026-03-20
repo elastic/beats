@@ -530,7 +530,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Besides a manager-initiated shutdown from Agent config state,
 	// we stop the manager explicitly on SIGINT / SIGHUP / etc.
-	svc.HandleSignals(func() { b.Manager.Stop(false) }, cancelDashboards)
+	svc.HandleSignals(b.Manager.Stop, cancelDashboards)
 
 	err = b.loadDashboards(ctxDashboards, false)
 	if err != nil {
@@ -1258,7 +1258,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 					files, b.Info.Beat)
 
 				b.shouldReexec = true
-				b.Manager.Stop(false)
+				b.Manager.Stop()
 
 				// we're done, finish the goroutine just for the sake of it
 				return
