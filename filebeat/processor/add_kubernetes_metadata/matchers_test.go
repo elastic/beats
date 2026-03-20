@@ -205,3 +205,26 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 	output := logMatcher.MetadataIndex(input)
 	assert.Equal(t, expectedResult, output)
 }
+
+func TestLogsPathMatcher_EmptyResult(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+
+	testConfig := conf.NewConfig()
+	testConfig.SetString("logs_path", -1, cfgLogsPath)
+	testConfig.SetString("resource_type", -1, cfgResourceType)
+
+	logMatcher, err := newLogsPathMatcher(*testConfig, logptest.NewTestingLogger(t, ""))
+	assert.NoError(t, err)
+
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
+				"path": "/some/unrelated/path/file.log",
+			},
+		},
+	}
+	output := logMatcher.MetadataIndex(input)
+	// lint violation: should use assert.Empty instead of assert.Equal(t, "", ...)
+	assert.Equal(t, "", output)
+}
