@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -142,7 +143,7 @@ func TestLogsPathMatcher_NonStringLogPath(t *testing.T) {
 	}
 	output := logMatcher.MetadataIndex(input)
 
-	assert.Equal(t, "", output)
+	assert.Empty(t, output)
 	assert.Len(t, observedLogs.FilterMessageSnippet("log.file.path is not a string: int").TakeAll(), 1)
 }
 
@@ -190,8 +191,8 @@ func TestLogsPathMatcher_InvalidVarLogPodIDFormat_LogsPodUIDError(t *testing.T) 
 	source := fmt.Sprintf("/var/log/pods/%s/container/0.log", puid)
 
 	testConfig := conf.NewConfig()
-	testConfig.SetString("logs_path", -1, cfgLogsPath)
-	testConfig.SetString("resource_type", -1, cfgResourceType)
+	require.NoError(t, testConfig.SetString("logs_path", -1, cfgLogsPath))
+	require.NoError(t, testConfig.SetString("resource_type", -1, cfgResourceType))
 
 	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	logMatcher, err := newLogsPathMatcher(*testConfig, logger)
@@ -206,7 +207,7 @@ func TestLogsPathMatcher_InvalidVarLogPodIDFormat_LogsPodUIDError(t *testing.T) 
 	}
 	output := logMatcher.MetadataIndex(input)
 
-	assert.Equal(t, "", output)
+	assert.Empty(t, output)
 	assert.Len(t, observedLogs.FilterMessageSnippet("Error extracting pod UID - source value does not contain matcher's logs_path").TakeAll(), 1)
 }
 
