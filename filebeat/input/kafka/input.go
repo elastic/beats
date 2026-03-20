@@ -23,6 +23,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -141,7 +143,39 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		8*input.config.ConnectBackoff,
 	)
 
+	sarClient, err := sarama.NewClient(input.config.Hosts, input.saramaConfig)
+	if err != nil {
+		return err
+	}
+	var topics []string
+	filters := make([]*regexp.Regexp, len(input.config.Topics))
+	for i, topic := range input.config.Topics {
+		reg, err := regexp.Compile(topic)
+		if err != nil {
+			log.Errorw("Cannot parse regexp", "error", err, "regexp", topic)
+			continue
+		}
+		filters[i] = reg
+	}
+
+	topics = filterKafkaTopics(sarClient, log, filters)
 	for goContext.Err() == nil {
+		newCtx, cancel := context.WithCancel(goContext)
+
+		go func() {
+			for {
+				select {
+				case <-newCtx.Done():
+					return
+				case <-time.Tick(input.config.ResyncTopicsTime):
+					tpcs := filterKafkaTopics(sarClient, log, filters)
+					if tpcs != nil && !slices.Equal(tpcs, topics) {
+						topics = tpcs
+						cancel()
+					}
+				}
+			}
+		}()
 		// Connect to Kafka with a new consumer group.
 		consumerGroup, err := sarama.NewConsumerGroup(
 			input.config.Hosts,
@@ -161,7 +195,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		// In an ideal run, this function never returns until shutdown; if it
 		// does, it means the errors have been logged and the consumer group
 		// has been closed, so we try creating a new one in the next iteration.
-		input.runConsumerGroup(log, client, goContext, consumerGroup)
+		input.runConsumerGroup(log, client, newCtx, consumerGroup, topics)
 	}
 
 	if errors.Is(ctx.Cancelation.Err(), context.Canceled) {
@@ -169,6 +203,26 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	} else {
 		return ctx.Cancelation.Err()
 	}
+}
+
+// Filters kafka topics with provided regex list and returns a new list with topics or nil if not able to get topics
+func filterKafkaTopics(sarClient sarama.Client, log *logp.Logger, filters []*regexp.Regexp) []string {
+	allTopics, err := sarClient.Topics()
+	if err != nil {
+		log.Errorw("Error getting topics from kafka", "error", err)
+		return nil
+	}
+	topics := []string{}
+	for _, t := range allTopics {
+		for _, f := range filters {
+			if f.MatchString(t) {
+				topics = append(topics, t)
+				continue
+			}
+		}
+	}
+	slices.Sort(topics)
+	return topics
 }
 
 // Stop doesn't need to do anything because the kafka consumer group and the
@@ -188,7 +242,7 @@ func (input *kafkaInput) Wait() {
 	input.saramaWaitGroup.Wait()
 }
 
-func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, context context.Context, consumerGroup sarama.ConsumerGroup) {
+func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, context context.Context, consumerGroup sarama.ConsumerGroup, topics []string) {
 	handler := &groupHandler{
 		version: input.config.Version,
 		client:  client,
@@ -210,8 +264,7 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 			log.Errorw("Error reading from kafka", "error", err)
 		}
 	}()
-
-	err := consumerGroup.Consume(context, input.config.Topics, handler)
+	err := consumerGroup.Consume(context, topics, handler)
 	if err != nil {
 		log.Errorw("Kafka consume error", "error", err)
 	}
