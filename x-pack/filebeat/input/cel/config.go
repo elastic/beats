@@ -51,6 +51,12 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
+	// SecretState holds secret key-value pairs that are
+	// stored encrypted by Fleet (via secret: true) and
+	// placed at state.secret before CEL program execution.
+	// The state.secret key is unconditionally redacted in
+	// debug logs.
+	SecretState map[string]interface{} `config:"secret_state"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
@@ -102,6 +108,9 @@ func (c config) Validate() error {
 	}
 	if c.MaxExecutions != nil && *c.MaxExecutions <= 0 {
 		return fmt.Errorf("invalid maximum number of executions: %d <= 0", *c.MaxExecutions)
+	}
+	if _, exists := c.State["secret"]; exists {
+		return errors.New(`state must not contain a "secret" key: values intended to be secret cannot be guaranteed to be encrypted in the stored configuration; use secret_state instead`)
 	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
