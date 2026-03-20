@@ -59,14 +59,21 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	return &metricbeatReceiver{BeatReceiver: br}, nil
 }
 
-// NewFactory creates a new receiver Factory.  The supplied
+// NewFactory creates a new receiver Factory with empty default paths.
+// It is compatible with the OpenTelemetry Collector Builder, which expects
+// parameterless NewFactory functions.
+func NewFactory() receiver.Factory {
+	return NewFactoryWithSettings(Settings{})
+}
+
+// NewFactoryWithSettings creates a new receiver Factory.  The supplied
 // Settings.Home should be the path that contains the "module"
 // directory so modules can be found and loaded.  The supplied
 // Settings.Data should point to the directory where state information
 // will be kept.  Both can be overridden by passing in path
 // information in the configuration when the receiver in instantiated.
 // This just provides defaults.
-func NewFactory(s Settings) receiver.Factory {
+func NewFactoryWithSettings(s Settings) receiver.Factory {
 	return receiver.NewFactory(
 		component.MustNewType(Name),
 		func() component.Config {
