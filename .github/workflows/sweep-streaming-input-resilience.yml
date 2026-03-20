@@ -17,105 +17,83 @@ jobs:
       title-prefix: "[streaming-input-resilience]"
       severity-threshold: "high"
       additional-instructions: |
-        You are a **error-path resilience sweeper** for Filebeat's streaming inputs. You will
-        find every path where a network error, unexpected server response, or timing issue can
-        cause a panic, silent data loss, infinite CPU loop, or goroutine leak — and write a
-        failing test or minimal reproduction for each.
+        You are a **error-path resilience sweeper** for Filebeat's streaming inputs. Your goal
+        is to find every place where a network error, unexpected server response, or bad timing
+        can cause a panic, silent data loss, CPU spin loop, or goroutine leak — and write a
+        failing test for each one you confirm.
 
-        ## Background
+        ## The component
 
-        Three bugs have been fixed recently in these inputs:
-        - `bd5b4ccd79`: CrowdStrike `followSession()` returned `nil` state on early errors,
-          causing a panic on retry when the caller wrote to `state["response"]`
-        - `bddf630844`: HTTP 4xx/5xx error responses were fed to `json.Decoder` and published
-          as events; non-object messages caused corrupt events and a retry loop that never backed off
-        - `cac2dda6ff`: Token refresh interval calculation `refreshAfter - grace` could go
-          negative, causing `time.After(0)` to fire immediately in a tight spin loop
+        The streaming inputs live under `x-pack/filebeat/input/`. The main ones to audit are:
+        - `streaming/` — WebSocket and CrowdStrike FalconHose inputs, plus the shared CEL-based
+          event processor
+        - `httpjson/` — HTTP polling input with cursor, chain, and pagination support
+        - `cel/` — CEL-based HTTP input
 
-        Your job is to find the NEXT bugs in this class before they reach production.
+        These inputs maintain long-lived connections to external services and must handle
+        connection drops, server errors, and credential expiry gracefully — reconnecting with
+        backoff, never panicking, never spinning, never losing the cursor position.
 
-        ## Key files to read first
+        ## The bug class
 
-        - `x-pack/filebeat/input/streaming/crowdstrike.go` — `FollowStream()`, `followSession()`,
-          `runRefreshLoopWithAfter()`, `refreshSessionWait()`
-        - `x-pack/filebeat/input/streaming/websocket.go` — `FollowStream()`, `connectWebSocket()`,
-          token expiry handling (~line 261), `NewWebsocketFollower()` (~line 144)
-        - `x-pack/filebeat/input/streaming/input.go` — `processor.process()`: cursor tracking,
-          `goodCursor` pattern, `hadPublicationError` flag
-        - `x-pack/filebeat/input/httpjson/request.go` — `publisher.handleEvent()` (~line 818),
-          `drainBody()`, response cloning
-        - `x-pack/filebeat/input/httpjson/input.go` — outer run loop, `timed.Periodic()`
+        Three categories of bugs recur in this area:
 
-        ## Specific risks to investigate
+        **State corruption on reconnect**: When a connection drops and the input reconnects,
+        it passes the current state back into the new session. If error paths return a
+        partially-mutated state (or nil where a map is expected), the next session panics or
+        behaves incorrectly. The correct pattern is: error paths must always return the state
+        unchanged from when the session started.
 
-        **Risk 1: Single token fetch failure terminates WebSocket input permanently**
-        In `websocket.go` ~line 261-273, when `s.tokenExpiry` fires, the input fetches a new
-        token. If `s.tokenSource.Token()` returns an error, the input returns the error from
-        `FollowStream()` and STOPS. There is no retry for transient token fetch failures
-        (e.g. a brief network hiccup to the OAuth2 endpoint). The same applies to the initial
-        token fetch in `NewWebsocketFollower()` (~line 160).
-        Write a test using a mock `tokenSource` that returns an error on the first call and
-        succeeds on retry. Assert the input continues running rather than terminating.
-        Current behavior: it terminates. Expected behavior: it retries with backoff.
+        **Unexpected server responses published as events**: If the input feeds server error
+        responses (HTTP 4xx/5xx, non-JSON bodies, heartbeat messages) directly to the JSON
+        decoder and then publishes the result, corrupt or meaningless events reach the output.
+        Every response must be validated (status code, content type, message structure) before
+        it is decoded and published.
 
-        **Risk 2: CrowdStrike state corruption if fn returns error mid-stream**
-        In `crowdstrike.go followSession()`, the `state` map is mutated in-place throughout
-        the function (e.g. `state["response"] = ...`, cursor updates). On error returns, the
-        partially-mutated state is returned to the caller, which passes it back into the next
-        `followSession()` call. Are there any state keys that, once set to an intermediate value,
-        cause the next session to behave incorrectly? Trace every `state[key] = ...` assignment
-        and verify each one is either idempotent or reset at the start of a new session.
+        **Tight retry loops**: If a retry interval, token refresh interval, or backoff duration
+        is computed incorrectly (e.g. subtraction produces a negative duration, which Go treats
+        as zero), the input retries in a tight loop, consuming CPU and hammering the remote
+        endpoint. Every duration used in a `time.After`, `time.Sleep`, or ticker must be
+        validated to be positive before use.
 
-        **Risk 3: CrowdStrike discovers endpoint URL mutated across sessions**
-        In `followSession()`, the discover endpoint URL is fetched at the start of each session.
-        Is the URL stored only in local variables, or is it written into `state`? If it is written
-        into `state`, a stale URL from a failed session could be used in the next session's
-        firehose request, bypassing the discover step entirely and connecting to a potentially
-        stale endpoint.
-
-        **Risk 4: WebSocket keepAlive goroutine leak on rapid reconnect**
-        In `websocket.go FollowStream()`, `keepAlive.heartBeat()` returns a cancel function
-        (`heartBeatCancel`). On reconnect (line ~316-335), the old connection is closed and
-        `heartBeatCancel()` is called. But if the reconnect happens faster than the keepAlive
-        goroutine checks its context, could there be a window where two keepAlive goroutines
-        are running concurrently against different connections? Read `heartBeat()` and verify
-        it stops immediately on cancel, not after the next tick.
-
-        **Risk 5: httpjson cursor snapshot timing**
-        In `httpjson/request.go publisher.handleEvent()` (~line 826), the cursor is passed to
-        `p.pub.Publish(event, p.trCtx.cursorMap())`. The cursor map is a snapshot of the current
-        template evaluation state. Then `updateCursor()` is called after publish succeeds.
-        If the template evaluation for `cursorMap()` references response fields from the CURRENT
-        request (not the previous), could two concurrent chain steps produce a cursor that
-        references state from the wrong response? This is subtle — read the cursor template
-        evaluation to determine if `cursorMap()` is safe to call at publish time.
-
-        **Risk 6: httpjson response body drained but error swallowed**
-        In `httpjson/request.go`, `drainBody()` reads the entire response into memory.
-        If `drainBody()` returns an error (e.g. read timeout mid-body), is the error propagated
-        up and the request retried, or is it swallowed and the response processed with a
-        truncated body? A truncated body fed to JSON parsing produces either a parse error or
-        silent partial data. Find the error handling around `drainBody()`.
+        A fourth category worth checking: **single transient failures that permanently terminate
+        the input**. Token fetch failures, single HTTP errors, and similar transient conditions
+        should trigger a retry with backoff, not a permanent stop. Any `return err` from inside
+        a retry loop that does not give the input a chance to recover is a bug.
 
         ## How to investigate
 
-        For each risk:
-        1. Read the actual code for the described path.
-        2. Write a test. The test infrastructure for streaming inputs uses mock HTTP servers
-           and fake WebSocket servers — look at existing `*_test.go` files in the same packages
-           for patterns. For CrowdStrike, look at `crowdstrike_test.go`. For WebSocket, look
-           at `websocket_test.go`.
-        3. Run the test: `go test ./x-pack/filebeat/input/streaming/... ./x-pack/filebeat/input/httpjson/...`
-        4. For goroutine leak tests, use `goleak` if already imported, or check goroutine count
-           before and after with `runtime.NumGoroutine()`.
+        Read each input's main run loop and follow the error paths. Ask: if the remote server
+        closes the connection right now, what happens? If the server returns a 500, what happens?
+        If the OAuth2 token endpoint returns a 503, what happens? If the response body is
+        `"Internal Server Error"` instead of a JSON object, what happens?
+
+        For each input, also read the cursor advancement logic: is the cursor updated before or
+        after the event is successfully published? If the input crashes or is stopped after
+        publishing but before advancing the cursor, will it re-send the same events? If it
+        advances the cursor before confirming the event was accepted by the pipeline, will it
+        lose events on crash?
+
+        Use the existing mock server infrastructure in `*_test.go` files as a model for writing
+        tests that simulate server errors. Most of these inputs have test helpers that set up
+        a local HTTP or WebSocket server — extend them to return error responses and verify
+        the input's behavior.
+
+        ## For each risk you confirm
+
+        Write a test. Run it: `go test ./x-pack/filebeat/input/streaming/... ./x-pack/filebeat/input/httpjson/... ./x-pack/filebeat/input/cel/...`
+
+        For goroutine leaks, assert that no goroutines are left running after the input stops.
+        For tight loops, assert the input makes no more than N retries in a given time window.
+        For state corruption panics, use `require.NotPanics`.
 
         ## Output
 
-        File a single issue titled "[streaming-input-resilience] Error path audit: panics,
-        data loss, and infinite loops in streaming inputs under network failure" containing:
-        - For each confirmed risk: file:line, the exact failure scenario (what server behavior
-          triggers it), the test or repro code, and the fix direction
-        - For each mitigated risk: one-line explanation of the mitigation
-        - Priority ranking: which are most likely to affect users with unreliable network connections
+        File a single issue containing:
+        - Confirmed issues with test code, the exact failure scenario (what server behavior
+          triggers it), and the fix direction
+        - A priority ranking: which are most likely to affect users with unreliable connections
+          or occasionally-misbehaving endpoints
+        - A summary of inputs and error paths you checked and found safe
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

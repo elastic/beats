@@ -17,83 +17,75 @@ jobs:
       title-prefix: "[filestream-registry]"
       severity-threshold: "high"
       additional-instructions: |
-        You are a **re-ingestion and data-loss sweeper** for the Filestream input. You will find
-        every code path that can cause files to be re-read from the beginning or events to be
-        silently dropped, and write a test or reproduction scenario for each one.
+        You are a **re-ingestion and data-loss sweeper** for the Filestream input. Your goal is
+        to find every code path that can cause a file to be re-read from the beginning or events
+        to be silently dropped — and write a test or reproduction scenario for each one.
 
-        ## Key files to read first
+        ## The component
 
-        - `filebeat/input/filestream/internal/input-logfile/store.go` — registry store: `resource`,
-          `state`, `writeState()`, `UpdateTTL()`, `copyWithNewKey()`, `TakeOver()`
-        - `filebeat/input/filestream/internal/input-logfile/harvester.go` — `Continue()` (line ~326),
-          `startHarvester()`, semaphore/`harvester_limit` logic
-        - `filebeat/input/filestream/internal/input-logfile/publish.go` — `createUpdateOp()`,
-          `Execute()` (the ACK handler)
-        - `filebeat/input/filestream/internal/input-logfile/clean.go` — `checkCleanResource()`,
-          `gcClean()`
-        - `filebeat/input/filestream/prospector.go` — `OpTruncate` handler, `StateMetadataUpdater`
-        - `filebeat/input/filestream/copytruncate_prospector.go` — copy-truncate rotation handling
-        - `filebeat/input/filestream/identifier_fingerprint.go` — fingerprint-based file identity
-        - `filebeat/input/filestream/identifier_inode_deviceid.go` — inode-based identity
+        The Filestream input lives under `filebeat/input/filestream/`. Its registry (which tracks
+        how far each file has been read) is implemented under
+        `filebeat/input/filestream/internal/input-logfile/`. The registry is the heart of
+        Filestream's correctness guarantee: if it loses a file's offset, that file will be
+        re-ingested from the beginning, producing duplicate data in the output.
 
-        ## Specific risks to investigate
+        ## The bug class
 
-        **Risk 1: Silent cursor discard in the ACK handler**
-        In `publish.go Execute()`, when a resource's `lockedVersion != op.resource.version`
-        the update is silently discarded (no log, no error). This happens when `UpdateTTL(r, 0)`
-        increments `resource.version` between the time an update op is created and when it is
-        ACKed. Trace: can this race happen in practice? If `clean_inactive` fires while events
-        are in-flight from the same file, will the cursor be lost?
+        There are two failure modes that have produced bugs repeatedly in this component:
 
-        **Risk 2: writeState() caller discipline**
-        `writeState()` has an explicit comment: "WARNING! it does not lock the store or the
-        resource." Audit every caller of `writeState()` and verify each one holds `stateMutex`
-        before calling it. Any caller that does not hold the lock is a data race.
+        **Re-ingestion**: A file's offset is lost or reset to zero. This happens when a registry
+        entry is prematurely cleaned, when a file is matched to the wrong registry entry (identity
+        mismatch), when a cursor update is silently discarded, or when a migration path
+        (take_over, identifier type change) fails to preserve the offset.
 
-        **Risk 3: harvester_limit + file rotation window**
-        In `startHarvester()` (harvester.go ~line 209), there is an early `readers.reserve(srcID)`
-        check to prevent duplicate harvesters. But when `harvester_limit` is active, goroutines
-        block on `g.sem.Acquire()` BEFORE the reserve check in `task.Group.Go()`. Read the
-        current code carefully: is the reserve check done before or after the semaphore acquire?
-        If a file rotates while a goroutine is waiting on the semaphore, could the goroutine wake
-        up and harvest from the wrong file identity?
-
-        **Risk 4: TakeOver source key transformation errors**
-        In `store.go TakeOver()`, the migration function `fn(v)` returns `(newKey, any)`. The fix
-        in commit b2790a6407 added `if len(newKey) > 0` before removal. But what if `fn` returns
-        a non-empty key that maps to an EXISTING registry entry? Would the existing entry's cursor
-        be overwritten by the migrated (potentially stale) cursor?
-
-        **Risk 5: fingerprint vs inode identifier switching**
-        If a filestream input is reconfigured to switch from inode-based to fingerprint-based
-        identity (or vice versa), the registry key prefix changes (`native::` vs `fingerprint::`).
-        The old registry entries are never cleaned up and the files are re-harvested from the
-        start. Is there any code that detects and migrates across identifier type changes?
-
-        **Risk 6: clean_inactive race with active harvester**
-        `checkCleanResource()` checks `resource.Finished()` before cleaning. But is `Finished()`
-        atomic? Read its implementation. Could a harvester that just finished (decremented pending)
-        race with the cleaner checking Finished() and then calling `gcClean()` before the cursor
-        is fully written?
+        **Silent data loss**: Events are published to the pipeline but the cursor is never
+        advanced. This happens when an ACK callback is discarded due to a version mismatch,
+        when a resource is cleaned while events are still in-flight, or when an error path
+        exits without calling the event's done/ACK callback.
 
         ## How to investigate
 
-        For each risk:
-        1. Read the actual code for the path described above.
-        2. Determine if the risk is real (exploitable) or mitigated by existing code.
-        3. If real: write a unit test in the appropriate `_test.go` file that reproduces the
-           scenario. Use the existing test infrastructure — look at `store_test.go` and
-           `harvester_test.go` for patterns. Tests should use `storetest.NewStore()` or similar
-           test helpers. Run `go test ./filebeat/input/filestream/...` to confirm.
-        4. If already mitigated: briefly note why and move on.
+        Read the registry store, the harvester lifecycle, and the ACK/publish path end-to-end.
+        Understand how a file's state flows from "new file discovered" through "harvesting"
+        through "ACK received" to "registry updated on disk". Then ask: at each transition,
+        what can go wrong?
+
+        Key areas to focus on:
+
+        **Identity and matching**: How does the input decide which registry entry belongs to a
+        given file? There are two identity modes (inode-based and fingerprint-based). What
+        happens when files are rotated, renamed, or when the identity mode is changed in config?
+        Can a file end up matched to the wrong entry?
+
+        **Cursor update lifecycle**: When an event is ACKed, how does the cursor get written
+        to the persistent registry? Are there conditions (version mismatch, resource marked
+        deleted, concurrent cleanup) where a valid ACK silently discards the cursor update?
+        If so, the input will re-read from the last successfully persisted offset on next start.
+
+        **Cleanup timing**: The `clean_inactive` and `clean_removed` settings delete registry
+        entries after some time. What is the earliest moment an entry can be cleaned? Is it
+        possible for an entry to be cleaned while a harvester for that file is still running
+        or while events from that file are in-flight in the pipeline?
+
+        **Migration paths**: When filestream takes over from another input type, or when
+        `harvester_limit` causes files to be queued, are there windows where the state for a
+        file can be lost or reset?
+
+        ## For each risk you confirm
+
+        Write a unit test using the existing test infrastructure in the package (look at existing
+        `*_test.go` files for helper patterns). The test should set up the registry in the
+        relevant state, trigger the problematic transition, and assert that the cursor is
+        preserved. Run `go test ./filebeat/input/filestream/...` to confirm the failure.
 
         ## Output
 
-        File a single issue titled "[filestream-registry] Registry correctness audit: cursor loss
-        and re-ingestion risk paths" containing:
-        - For each confirmed risk: file:line of the dangerous code, the exact scenario that
-          triggers it, the test you wrote (or a description of a repro script), and the fix direction
-        - For each mitigated risk: a one-line note explaining the mitigation
-        - A priority ranking (which risks are most likely to affect users in production)
+        File a single issue containing:
+        - Confirmed risks with test code or reproduction steps, the exact code path, and the
+          fix direction
+        - A description of any scenarios you investigated and found safe, so reviewers know
+          the coverage
+        - A priority ranking: which risks are most likely to affect users in production vs
+          only in edge-case configurations
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

@@ -17,88 +17,74 @@ jobs:
       title-prefix: "[libbeat-pipeline-lifecycle]"
       severity-threshold: "high"
       additional-instructions: |
-        You are a **pipeline shutdown and queue lifecycle sweeper** for libbeat. You will find
-        every path where events can be silently dropped, goroutines leaked, or panics triggered
-        during startup, shutdown, or output reconnection — and write a failing test for each one.
+        You are a **pipeline lifecycle sweeper** for libbeat. Your goal is to find every path
+        where events can be silently dropped, goroutines can leak, or panics can be triggered
+        during startup, shutdown, output reconnection, or backpressure — and write a failing
+        test for each confirmed issue.
 
-        ## Key files to read first
+        ## The component
 
-        - `libbeat/publisher/pipeline/pipeline.go` — `Pipeline.Close()`, shutdown entry point
-        - `libbeat/publisher/pipeline/controller.go` — `WaitClose()`: the 5-stage shutdown sequence
-          (closeQueue → consumer.close → close(workerChan) → workers.Close). ORDER IS CRITICAL.
-        - `libbeat/publisher/pipeline/consumer.go` — `eventConsumer`, uses custom `c.done` channel
-          (not context). `close(c.done)` must happen BEFORE `close(workerChan)`.
-        - `libbeat/publisher/queue/memqueue/produce.go` — response channel pool; see commit
-          72877fa6f1 for a prior bug where channels were pooled while still owned by broker.
-        - `libbeat/publisher/queue/memqueue/ackloop.go` — ACK callbacks run in this goroutine;
-          slow callbacks block shutdown. Uses `ctx.Done()` for cancellation.
-        - `libbeat/publisher/queue/diskqueue/` — uses `sync.Once` for close safety.
-        - `libbeat/outputs/backoff.go` — `backoffClient`: closes `b.done` on `Close()`;
-          `WaitOnError` must not block forever after `b.done` is closed.
-        - `x-pack/libbeat/management/managerV2.go` — commit 76a4b4a99f changed `stopChan` from
-          buffered send to `close()` with `sync.Once` to broadcast to multiple listeners.
+        The libbeat publisher pipeline connects inputs to outputs. It lives under
+        `libbeat/publisher/pipeline/` (the pipeline orchestrator and consumer),
+        `libbeat/publisher/queue/` (memqueue and diskqueue implementations), and
+        `libbeat/outputs/` (elasticsearch, logstash, kafka, and others). The pipeline has a
+        carefully ordered shutdown sequence that, if violated, produces panics (send on closed
+        channel) or hangs (goroutines blocked waiting for signals that never come).
 
-        ## Specific risks to investigate
+        ## The bug class
 
-        **Risk 1: Response channel pool race in memqueue**
-        In `produce.go`, `openState.publish()` sends to `st.events` and then calls
-        `handlePendingResponse()`. Commit 72877fa6f1 fixed a bug where the channel was returned
-        to the pool even when the broker might still send to it. Read the CURRENT code carefully:
-        is there any remaining path in `publish()` or `handlePendingResponse()` where a channel
-        is returned to `putRespChan()` while the broker goroutine (`runLoop` in `broker.go`) could
-        still have a reference to it and attempt a send?
+        Three categories of bugs recur here:
 
-        **Risk 2: Slow ACK callbacks blocking shutdown**
-        In `ackloop.go`, ACK callbacks (producer's `ACK func(count int)`) are called synchronously
-        in the ackLoop goroutine AFTER signaling the broker to delete events. If a callback blocks
-        (e.g. a slow input that does filesystem work on ACK), the ackLoop goroutine hangs, and
-        `queue.Done()` never fires, causing `WaitClose()` to block forever. Is there any timeout
-        or goroutine isolation for these callbacks? If not, this is a latent hang-on-shutdown bug.
+        **Shutdown ordering**: The pipeline shuts down in stages — queue, then consumer, then
+        output workers. If any stage closes a channel or signals done before the upstream stage
+        has finished sending to it, the result is either a "send on closed channel" panic or
+        a goroutine that blocks forever. Look for channels that are closed by one goroutine
+        while another goroutine may still be sending to them.
 
-        **Risk 3: Buffered send vs close broadcast pattern**
-        Grep for `chan struct{}` fields in pipeline, queue, and management types. For each one,
-        determine if it is used as a one-to-one signal (buffered send is fine) or one-to-many
-        broadcast (requires `close()`). Any buffered send channel used as a broadcast is the same
-        bug fixed in managerV2 by commit 76a4b4a99f. Run:
-        ```bash
-        grep -rn 'make(chan struct{}, 1)' libbeat/publisher/ x-pack/libbeat/management/
-        grep -rn 'stopChan\|doneChan\|closeChan' libbeat/publisher/ x-pack/libbeat/management/
-        ```
-        For each hit, check how many goroutines select on it.
+        **Signal broadcasting**: Go channels deliver a message to exactly ONE receiver. When
+        multiple goroutines need to observe a shutdown signal, the correct pattern is
+        `close(ch)` (with `sync.Once` to prevent double-close), not `ch <- struct{}{}`.
+        Any buffered-send channel used as a signal to multiple goroutines is a latent bug —
+        only one goroutine will wake up, the others hang forever.
 
-        **Risk 4: backoffClient.WaitOnError after Close**
-        In `outputs/backoff.go`, `WaitOnError()` sleeps the backoff duration. If `Close()` is
-        called while a Publish is in the middle of `WaitOnError()`, does `b.done` being closed
-        cause `WaitOnError()` to return immediately? Read `WaitOnError`'s implementation and
-        verify it selects on `b.done`. If it uses a plain `time.Sleep`, it will block shutdown.
-
-        **Risk 5: Disk queue segment write without rollback**
-        In `diskqueue/`, find the write path for new segments. If a write fails partway through
-        (e.g. disk full), is the partial segment truncated or left on disk? On next startup, does
-        the disk queue correctly skip or repair a partially-written segment, or will it panic/loop
-        trying to read corrupt data? Look for error handling after `f.Write()` calls in the
-        segment writer.
+        **ACK callback blocking**: When events are ACKed, the queue calls user-provided callbacks
+        synchronously. If a callback does slow work (filesystem I/O, network), it blocks the
+        ACK loop, which blocks the queue's shutdown drain, which blocks the pipeline's
+        `WaitClose()`. This manifests as a hang on graceful shutdown. Look for ACK callbacks
+        that do more than increment a counter.
 
         ## How to investigate
 
-        For each risk:
-        1. Read the actual implementation code for the described path.
-        2. If the risk is real: write a Go test using `testing.T` that exercises the race or
-           failure path. Use goroutines and channels to create the concurrent scenario. Run with
-           `-race` flag: `go test -race ./libbeat/publisher/...`.
-        3. If already mitigated: briefly explain why and move on.
+        Read the pipeline shutdown sequence end-to-end. Understand what each component closes,
+        in what order, and what it is waiting for before considering itself done. Then look at
+        each channel in the system and ask: who sends to this channel, who receives from it,
+        and what happens when the pipeline is being torn down while a send or receive is in
+        progress?
 
-        The test for Risk 2 could look like: create a pipeline, publish events, register a slow
-        ACK callback (sleeps 10s), call `pipeline.Close()`, and assert it returns within 5s —
-        documenting that it currently DOES NOT if the bug exists.
+        Also read the queue implementations (memqueue and diskqueue) for:
+        - Response channels returned to object pools — if a channel is pooled while another
+          goroutine still holds a reference to it, the next user of the channel will receive
+          a stale message
+        - Error paths in the disk queue's write path — if a write fails midway, is the partial
+          state cleaned up, or will the next startup encounter corrupt data?
+
+        For outputs, read the backoff client wrapper. If `Close()` is called while a Publish
+        is sleeping in a backoff wait, does the sleep abort immediately (correct) or block
+        until the full backoff duration elapses (incorrect, causes slow shutdown)?
+
+        ## For each risk you confirm
+
+        Write a Go test. Use goroutines, channels, and short timeouts to create the concurrent
+        scenario. For shutdown hangs, the test should call `Close()` and assert it returns within
+        a short timeout. For panics, use `require.NotPanics`. Run with `-race` where applicable:
+        `go test -race ./libbeat/publisher/...`
 
         ## Output
 
-        File a single issue titled "[libbeat-pipeline-lifecycle] Pipeline shutdown audit: hangs,
-        data loss, and panics in queue and output lifecycle" containing:
-        - For each confirmed risk: file:line, the exact failure scenario, test code or repro steps,
-          and the fix direction
-        - For each mitigated risk: one-line explanation
-        - A note on which risks are detectable only under `-race` vs reproducible deterministically
+        File a single issue containing:
+        - Confirmed issues with test code or reproduction steps, the specific code path, and
+          the fix direction
+        - A note on which issues are only detectable under `-race` vs reproducible deterministically
+        - Any components you audited and found clean
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
