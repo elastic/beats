@@ -506,12 +506,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	crawler.Stop()
 	cancelPipelineFactoryCtx()
 
-	timeout := fb.config.ShutdownTimeout
 	// On a standard run the pipeline has already waited for acknowledgments
 	// and shut down at this point, so all events that will be acknowledged
 	// already have been. However for the "once" option supported by the
 	// log input, events may still be active.
 	if *once {
+		timeout := fb.config.ShutdownTimeout
 		// Wait for all events to be processed or timeout
 		waitEvents := newSignalWait()
 		defer waitEvents.Wait()
@@ -519,7 +519,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitEvents.Add(withLog(wgEvents.Wait,
 			"Continue shutdown: All enqueued events being published.", fb.logger))
 		// Wait for either timeout or explicit shutdown.
-		if fb.config.ShutdownTimeout > 0 {
+		if timeout > 0 {
 			fb.logger.Info("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
 				"Continue shutdown: Time out waiting for events being published.", fb.logger))

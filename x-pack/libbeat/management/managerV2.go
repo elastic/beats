@@ -9,9 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 
 	"go.uber.org/zap/zapcore"
@@ -64,9 +62,6 @@ type BeatV2Manager struct {
 	client   client.V2
 
 	logger *logp.Logger
-
-	// handles client errors
-	errCanceller context.CancelFunc
 
 	// track individual units given to us by the V2 API
 	mx          sync.Mutex
@@ -283,23 +278,16 @@ func (cm *BeatV2Manager) Start() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
-	if cm.errCanceller != nil {
-		cm.errCanceller()
-		cm.errCanceller = nil
-	}
 
 	ctx := context.Background()
 	err := cm.client.Start(ctx)
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
-	ctx, canceller := context.WithCancel(ctx)
-	cm.errCanceller = canceller
 
-	cm.stopWaitGroup.Go(func() {
-		cm.watchErrChan(ctx)
-	})
+	cm.stopWaitGroup.Go(cm.watchErrChan)
 	cm.stopWaitGroup.Go(cm.unitListen)
+
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
 		"the rendered config used by the beat",
@@ -481,11 +469,10 @@ func (cm *BeatV2Manager) softDeleteUnit(unit *client.Unit) {
 // Private V2 implementation
 // ================================
 
-func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+func (cm *BeatV2Manager) watchErrChan() {
 	for {
 		select {
-		case <-ctx.Done():
-			return
+		case <-cm.stopChan:
 		case err := <-cm.client.Errors():
 			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
 			if !errors.Is(err, context.Canceled) {
@@ -496,10 +483,6 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 }
 
 func (cm *BeatV2Manager) unitListen() {
-	// register signal handler
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-
 	// timer is used to provide debounce on unit changes
 	// this allows multiple changes to come in and only a single reload be performed
 	t := time.NewTimer(cm.changeDebounce)
@@ -512,15 +495,6 @@ func (cm *BeatV2Manager) unitListen() {
 		case <-cm.stopChan:
 			cm.stopBeat()
 			return
-		case sig := <-sigc:
-			switch sig {
-			case syscall.SIGINT, syscall.SIGTERM:
-				cm.logger.Debug("Received sigterm/sigint, stopping")
-			case syscall.SIGHUP:
-				cm.logger.Debug("Received sighup, stopping")
-			}
-			cm.UpdateStatus(status.Stopping, "Stopping")
-			cm.stop()
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
 				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
@@ -588,10 +562,6 @@ func (cm *BeatV2Manager) stopBeat() {
 	}
 	cm.client.Stop()
 	cm.UpdateStatus(status.Stopped, "Stopped")
-	if cm.errCanceller != nil {
-		cm.errCanceller()
-		cm.errCanceller = nil
-	}
 }
 
 func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
