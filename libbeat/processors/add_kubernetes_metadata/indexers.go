@@ -19,6 +19,8 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"net"
+	"strconv"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
@@ -247,7 +249,7 @@ func (h *IPPortIndexer) GetMetadata(pod *kubernetes.Pod) []MetadataIndex {
 			if port.ContainerPort != 0 {
 
 				m = append(m, MetadataIndex{
-					Index: fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort),
+					Index: net.JoinHostPort(pod.Status.PodIP, strconv.Itoa(int(port.ContainerPort))),
 					Data: h.metaGen.Generate(
 						pod,
 						metadata.WithFields("container.name", container.Name),
@@ -279,7 +281,7 @@ func (h *IPPortIndexer) GetIndexes(pod *kubernetes.Pod) []string {
 
 		for _, port := range ports {
 			if port.ContainerPort != 0 {
-				hostPorts = append(hostPorts, fmt.Sprintf("%s:%d", pod.Status.PodIP, port.ContainerPort))
+				hostPorts = append(hostPorts, net.JoinHostPort(pod.Status.PodIP, strconv.Itoa(int(port.ContainerPort))))
 			}
 		}
 	}

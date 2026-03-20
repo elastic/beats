@@ -29,6 +29,7 @@ import (
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // diskQueueSegments encapsulates segment-related queue metadata.
@@ -228,8 +229,8 @@ func (segment *queueSegment) headerSize() uint64 {
 // compression much less effective.  getReader should only be called
 // from the reader loop. If successful, returns an open segmentReader
 // positioned at the beginning of the segment's data region.
-func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, error) {
-	path := queueSettings.segmentPath(segment.id)
+func (segment *queueSegment) getReader(queueSettings Settings, paths *paths.Path) (*segmentReader, error) {
+	path := queueSettings.segmentPath(segment.id, paths)
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -264,9 +265,9 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 // getWriter sets up the segmentWriter.
 // getWriter should only be called.
 // from the writer loop.
-func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
+func (segment *queueSegment) getWriter(queueSettings Settings, paths *paths.Path) (*segmentWriter, error) {
 	var options uint32
-	path := queueSettings.segmentPath(segment.id)
+	path := queueSettings.segmentPath(segment.id, paths)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return nil, err
@@ -295,17 +296,17 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 // retry callback returns true. This is used for timed retries when
 // creating a queue segment from the writer loop.
 func (segment *queueSegment) getWriterWithRetry(
-	queueSettings Settings, retry func(err error, firstTime bool) bool,
+	queueSettings Settings, paths *paths.Path, retry func(err error, firstTime bool) bool,
 ) (*segmentWriter, error) {
 	firstTime := true
-	file, err := segment.getWriter(queueSettings)
+	file, err := segment.getWriter(queueSettings, paths)
 	for err != nil && retry(err, firstTime) {
 		// Set firstTime to false so the retry callback can perform backoff
 		// etc if needed.
 		firstTime = false
 
 		// Try again
-		file, err = segment.getWriter(queueSettings)
+		file, err = segment.getWriter(queueSettings, paths)
 	}
 	return file, err
 }

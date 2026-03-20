@@ -129,7 +129,7 @@ func formatBGPEvents(m *MetricSet, entries []BGPEntry) []mb.Event {
 				"bgp.nexthop_thirdparty":     booleanFields["bgp.nexthop_thirdparty"],
 				"bgp.nexthop_peer":           booleanFields["bgp.nexthop_peer"],
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)

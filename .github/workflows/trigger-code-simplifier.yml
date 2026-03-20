@@ -1,10 +1,11 @@
 name: Code Simplifier
 on:
   schedule:
-    - cron: "0 13 * * 1-5"
+    - cron: "0 13 * * 3"
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: write
   issues: write
   pull-requests: write
@@ -15,6 +16,7 @@ jobs:
     with:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
         make mage
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

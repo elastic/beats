@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Azure module [metricbeat-module-azure]
 
@@ -265,6 +265,11 @@ metricbeat.modules:
   enabled: true
   period: 300s
   application_id: ''
+  # auth_type: "api_key" (default) or "client_secret"
+  #auth_type: "api_key"
+  #client_id: '${AZURE_CLIENT_ID:""}'
+  #client_secret: '${AZURE_CLIENT_SECRET:""}'
+  #tenant_id: '${AZURE_TENANT_ID:""}'
   api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]

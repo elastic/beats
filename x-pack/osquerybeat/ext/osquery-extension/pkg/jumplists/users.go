@@ -32,7 +32,7 @@ func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error)
 	if err != nil {
 		return nil, err
 	}
-	files := make([]string, len(fileEntries))
+	files := []string{}
 	for _, entry := range fileEntries {
 		if entry.IsDir() {
 			continue
@@ -42,13 +42,13 @@ func getFilesInDirectory(directory string, log *logger.Logger) ([]string, error)
 	return files, nil
 }
 
-// getJumplists returns a list of constructedjumplists for a given user profile and jumplist type.
-func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
-	var jumplists []*Jumplist
+// getJumplists returns a list of constructed jumplists for a given user profile.
+func (u *UserProfile) getJumplists(log *logger.Logger) []*jumplist {
+	var jumplists []*jumplist
 
-	jumplistDirectories := map[JumplistType]string{
-		JumplistTypeCustom: filepath.Join(u.recentDir, "CustomDestinations"),
-		// Follow on PR will add support for automatic jumplists
+	jumplistDirectories := map[jumplistType]string{
+		jumplistTypeCustom:    filepath.Join(u.recentDir, "CustomDestinations"),
+		jumplistTypeAutomatic: filepath.Join(u.recentDir, "AutomaticDestinations"),
 	}
 
 	// Collect and parse all jumplist files for each jumplist type
@@ -61,14 +61,23 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*Jumplist {
 
 		// Parse the jumplist files for the given jumplist type
 		switch jumplistType {
-		case JumplistTypeCustom:
+		case jumplistTypeCustom:
 			for _, file := range files {
 				if !strings.HasSuffix(file, ".customDestinations-ms") {
 					continue
 				}
 				jumpList, err := parseCustomJumplistFile(file, u, log)
 				if err != nil {
-					log.Errorf("failed to parse custom jump list file %s: %v", file, err)
+					log.Errorf("%s", err)
+					continue
+				}
+				jumplists = append(jumplists, jumpList)
+			}
+		case jumplistTypeAutomatic:
+			for _, file := range files {
+				jumpList, err := parseAutomaticJumpListFile(file, u, log)
+				if err != nil {
+					log.Errorf("%s", err)
 					continue
 				}
 				jumplists = append(jumplists, jumpList)
