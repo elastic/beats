@@ -1106,19 +1106,19 @@ service:
 
 				m = m.Flatten()
 
-				assert.Equal(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], "expected total events published to pipeline to match")
+				assert.InDelta(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], 0, "expected total events published to pipeline to match")
 
 				// For non-retryable errors like 400, events are dropped by the exporter
 				if tt.requestLevelFailure && tt.requestStatusCode == "400" {
-					assert.Equal(ct, float64(0), m["libbeat.output.events.acked"], "expected no events to be acked (400 errors drop events)")
+					assert.InDelta(ct, float64(0), m["libbeat.output.events.acked"], 0, "expected no events to be acked (400 errors drop events)")
 				} else {
 					// For retryable errors or successful cases, events are eventually acked
 					// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
 					// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
 					// events.total can be larger than the acknowledged event count because it includes retrys.
 					assert.GreaterOrEqual(ct, m["libbeat.output.events.total"], float64(numTestEvents), "expected total events sent to output include all events")
-					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
-					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
+					assert.InDelta(ct, float64(numTestEvents), m["libbeat.output.events.acked"], 0, "expected total events acked to match")
+					assert.InDelta(ct, float64(0), m["libbeat.output.events.dropped"], 0, "expected total events dropped to match")
 				}
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
@@ -1537,7 +1537,8 @@ service:
 	// wait for 8888 port to be free (an indication that previous collector has exited)
 	require.Eventually(t,
 		func() bool {
-			ln, err := net.Listen("tcp", "localhost:8888")
+			var lc net.ListenConfig
+			ln, err := lc.Listen(context.Background(), "tcp", "localhost:8888")
 			if err != nil {
 				return false
 			}
@@ -1722,7 +1723,8 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 			),
 		)
 
-		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", serverPort))
+		var lc net.ListenConfig
+		l, err := lc.Listen(context.Background(), "tcp", fmt.Sprintf("localhost:%d", serverPort))
 		require.NoError(t, err)
 		mockServer.Listener = l
 		mockServer.Start()
