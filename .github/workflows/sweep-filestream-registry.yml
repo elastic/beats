@@ -1,0 +1,99 @@
+name: "Sweeper: Filestream Registry and State Machine"
+on:
+  schedule:
+    - cron: "0 9 * * 2"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[filestream-registry]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **re-ingestion and data-loss sweeper** for the Filestream input. You will find
+        every code path that can cause files to be re-read from the beginning or events to be
+        silently dropped, and write a test or reproduction scenario for each one.
+
+        ## Key files to read first
+
+        - `filebeat/input/filestream/internal/input-logfile/store.go` — registry store: `resource`,
+          `state`, `writeState()`, `UpdateTTL()`, `copyWithNewKey()`, `TakeOver()`
+        - `filebeat/input/filestream/internal/input-logfile/harvester.go` — `Continue()` (line ~326),
+          `startHarvester()`, semaphore/`harvester_limit` logic
+        - `filebeat/input/filestream/internal/input-logfile/publish.go` — `createUpdateOp()`,
+          `Execute()` (the ACK handler)
+        - `filebeat/input/filestream/internal/input-logfile/clean.go` — `checkCleanResource()`,
+          `gcClean()`
+        - `filebeat/input/filestream/prospector.go` — `OpTruncate` handler, `StateMetadataUpdater`
+        - `filebeat/input/filestream/copytruncate_prospector.go` — copy-truncate rotation handling
+        - `filebeat/input/filestream/identifier_fingerprint.go` — fingerprint-based file identity
+        - `filebeat/input/filestream/identifier_inode_deviceid.go` — inode-based identity
+
+        ## Specific risks to investigate
+
+        **Risk 1: Silent cursor discard in the ACK handler**
+        In `publish.go Execute()`, when a resource's `lockedVersion != op.resource.version`
+        the update is silently discarded (no log, no error). This happens when `UpdateTTL(r, 0)`
+        increments `resource.version` between the time an update op is created and when it is
+        ACKed. Trace: can this race happen in practice? If `clean_inactive` fires while events
+        are in-flight from the same file, will the cursor be lost?
+
+        **Risk 2: writeState() caller discipline**
+        `writeState()` has an explicit comment: "WARNING! it does not lock the store or the
+        resource." Audit every caller of `writeState()` and verify each one holds `stateMutex`
+        before calling it. Any caller that does not hold the lock is a data race.
+
+        **Risk 3: harvester_limit + file rotation window**
+        In `startHarvester()` (harvester.go ~line 209), there is an early `readers.reserve(srcID)`
+        check to prevent duplicate harvesters. But when `harvester_limit` is active, goroutines
+        block on `g.sem.Acquire()` BEFORE the reserve check in `task.Group.Go()`. Read the
+        current code carefully: is the reserve check done before or after the semaphore acquire?
+        If a file rotates while a goroutine is waiting on the semaphore, could the goroutine wake
+        up and harvest from the wrong file identity?
+
+        **Risk 4: TakeOver source key transformation errors**
+        In `store.go TakeOver()`, the migration function `fn(v)` returns `(newKey, any)`. The fix
+        in commit b2790a6407 added `if len(newKey) > 0` before removal. But what if `fn` returns
+        a non-empty key that maps to an EXISTING registry entry? Would the existing entry's cursor
+        be overwritten by the migrated (potentially stale) cursor?
+
+        **Risk 5: fingerprint vs inode identifier switching**
+        If a filestream input is reconfigured to switch from inode-based to fingerprint-based
+        identity (or vice versa), the registry key prefix changes (`native::` vs `fingerprint::`).
+        The old registry entries are never cleaned up and the files are re-harvested from the
+        start. Is there any code that detects and migrates across identifier type changes?
+
+        **Risk 6: clean_inactive race with active harvester**
+        `checkCleanResource()` checks `resource.Finished()` before cleaning. But is `Finished()`
+        atomic? Read its implementation. Could a harvester that just finished (decremented pending)
+        race with the cleaner checking Finished() and then calling `gcClean()` before the cursor
+        is fully written?
+
+        ## How to investigate
+
+        For each risk:
+        1. Read the actual code for the path described above.
+        2. Determine if the risk is real (exploitable) or mitigated by existing code.
+        3. If real: write a unit test in the appropriate `_test.go` file that reproduces the
+           scenario. Use the existing test infrastructure — look at `store_test.go` and
+           `harvester_test.go` for patterns. Tests should use `storetest.NewStore()` or similar
+           test helpers. Run `go test ./filebeat/input/filestream/...` to confirm.
+        4. If already mitigated: briefly note why and move on.
+
+        ## Output
+
+        File a single issue titled "[filestream-registry] Registry correctness audit: cursor loss
+        and re-ingestion risk paths" containing:
+        - For each confirmed risk: file:line of the dangerous code, the exact scenario that
+          triggers it, the test you wrote (or a description of a repro script), and the fix direction
+        - For each mitigated risk: a one-line note explaining the mitigation
+        - A priority ranking (which risks are most likely to affect users in production)
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

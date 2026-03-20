@@ -1,0 +1,101 @@
+name: "Sweeper: OTel BeatReceiver Global State Isolation"
+on:
+  schedule:
+    - cron: "0 9 * * 4"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[otel-beatreceiver-isolation]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **global state isolation sweeper** for the OTel BeatReceiver integration.
+        You will find every remaining package-level mutation that occurs during receiver
+        construction and write a concurrent test that exposes the race or corruption.
+
+        ## Background
+
+        When beats run as OTel receivers, multiple receiver instances are created concurrently
+        in the same process. A long-running series of bugs ("BeatReceiver:MakeItRight") stem
+        from global singletons mutated during construction. Commit 339e8faf0e fixed the most
+        critical one (diskqueue using global `paths.Resolve()` instead of per-beat paths) by
+        threading `*paths.Path` through the entire pipeline. But the fix was not complete.
+
+        ## Key files to read first
+
+        - `x-pack/libbeat/cmd/instance/beat.go` — `NewBeatForReceiver()`: the construction entry
+          point. Read every line. Note every package-level call.
+        - `x-pack/filebeat/fbreceiver/factory.go` and `receiver.go` — `createReceiver()`
+        - `x-pack/metricbeat/mbreceiver/factory.go` and `receiver.go` — `createReceiver()`
+        - `libbeat/management/management.go` — `SetManagerFactory()`, `managerFactory` global
+        - `libbeat/version/helper.go` — `SetPackageVersion()`, `packageVersion` global
+        - `libbeat/plugin/cli.go` — `Initialize()`, plugin registry mutation
+
+        ## Specific mutations to audit in NewBeatForReceiver()
+
+        Read `x-pack/libbeat/cmd/instance/beat.go` and trace every side effect in
+        `NewBeatForReceiver()`. For each of the following, determine if it is still present
+        and whether it is safe for concurrent calls:
+
+        **Mutation 1: `instance.InitPaths(cfg)` / `b.Paths = paths.Paths`**
+        Lines ~119-122. Non-filebeat beats still use the global `paths.Paths` singleton.
+        `InitPaths()` writes to the global `paths.Paths` variable, then the code reads it back.
+        Two concurrent calls will interleave their writes and reads. Is this still present?
+        If so: write a test that calls `NewBeatForReceiver()` concurrently from two goroutines
+        with different path configs and assert that each receiver gets its own isolated paths.
+        Run with `-race` to confirm the data race.
+
+        **Mutation 2: `management.SetManagerFactory(otelmanager.NewOtelManager)`**
+        Line ~207. Called on every receiver construction. Protected by `managerFactoryLock`.
+        The mutex is correct, but is the function idempotent? If two receivers with different
+        manager factories are constructed (could this happen in tests?), does the second
+        silently overwrite the first?
+
+        **Mutation 3: `version.SetPackageVersion(b.Info.Version)`**
+        Line ~228. Uses `atomic.Value.Store()` — thread-safe but not idempotent. If two receivers
+        of different beats (filebeat + metricbeat) initialize concurrently, one's version
+        overwrites the other's. Could this cause incorrect version reporting in metrics or logs?
+
+        **Mutation 4: `plugin.Initialize()`**
+        Line ~69. Loads plugins from disk and calls `RegisterPlugin()` on each. `RegisterPlugin()`
+        panics if the same plugin name is registered twice (line ~56 in processors/registry.go:
+        `panic(err)` on duplicate registration). If two receivers initialize concurrently and
+        both call `plugin.Initialize()`, could they both attempt to register the same plugin?
+        Is there a guard (sync.Once, check-before-register)?
+
+        ## How to investigate
+
+        For each mutation:
+        1. Read the current code to confirm it is still present.
+        2. Write a test in the receiver's `*_test.go` or a new file that constructs two receivers
+           concurrently. Look at existing tests in `fbreceiver/` for construction patterns.
+           Run with `go test -race ./x-pack/filebeat/fbreceiver/... ./x-pack/metricbeat/mbreceiver/...`
+        3. For plugin double-registration: check if `Initialize()` is guarded by sync.Once
+           anywhere in the call chain. If not, write a test that calls `NewBeatForReceiver()`
+           twice sequentially and confirm it does not panic on the second call.
+        4. Check `x-pack/libbeat/cmd/instance/beat.go` for any NEW global mutations added since
+           commit 339e8faf0e by running:
+           ```bash
+           git log --oneline 339e8faf0e..HEAD -- x-pack/libbeat/cmd/instance/beat.go
+           ```
+           Read the diffs for any new global variable writes introduced.
+
+        ## Output
+
+        File a single issue titled "[otel-beatreceiver-isolation] Global state audit: remaining
+        mutations that break concurrent BeatReceiver construction" containing:
+        - For each confirmed mutation: file:line, the global variable written, whether it is
+          idempotent/thread-safe, the test or repro that confirms the race or corruption,
+          and the fix direction (sync.Once guard, per-instance state, idempotency check)
+        - For each mutation that is already safe: one-line explanation
+        - A note on which are `go test -race` detectable vs only observable through incorrect behavior
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

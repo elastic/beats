@@ -1,0 +1,104 @@
+name: "Sweeper: Libbeat Pipeline Shutdown and Queue Lifecycle"
+on:
+  schedule:
+    - cron: "0 9 * * 3"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[libbeat-pipeline-lifecycle]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **pipeline shutdown and queue lifecycle sweeper** for libbeat. You will find
+        every path where events can be silently dropped, goroutines leaked, or panics triggered
+        during startup, shutdown, or output reconnection — and write a failing test for each one.
+
+        ## Key files to read first
+
+        - `libbeat/publisher/pipeline/pipeline.go` — `Pipeline.Close()`, shutdown entry point
+        - `libbeat/publisher/pipeline/controller.go` — `WaitClose()`: the 5-stage shutdown sequence
+          (closeQueue → consumer.close → close(workerChan) → workers.Close). ORDER IS CRITICAL.
+        - `libbeat/publisher/pipeline/consumer.go` — `eventConsumer`, uses custom `c.done` channel
+          (not context). `close(c.done)` must happen BEFORE `close(workerChan)`.
+        - `libbeat/publisher/queue/memqueue/produce.go` — response channel pool; see commit
+          72877fa6f1 for a prior bug where channels were pooled while still owned by broker.
+        - `libbeat/publisher/queue/memqueue/ackloop.go` — ACK callbacks run in this goroutine;
+          slow callbacks block shutdown. Uses `ctx.Done()` for cancellation.
+        - `libbeat/publisher/queue/diskqueue/` — uses `sync.Once` for close safety.
+        - `libbeat/outputs/backoff.go` — `backoffClient`: closes `b.done` on `Close()`;
+          `WaitOnError` must not block forever after `b.done` is closed.
+        - `x-pack/libbeat/management/managerV2.go` — commit 76a4b4a99f changed `stopChan` from
+          buffered send to `close()` with `sync.Once` to broadcast to multiple listeners.
+
+        ## Specific risks to investigate
+
+        **Risk 1: Response channel pool race in memqueue**
+        In `produce.go`, `openState.publish()` sends to `st.events` and then calls
+        `handlePendingResponse()`. Commit 72877fa6f1 fixed a bug where the channel was returned
+        to the pool even when the broker might still send to it. Read the CURRENT code carefully:
+        is there any remaining path in `publish()` or `handlePendingResponse()` where a channel
+        is returned to `putRespChan()` while the broker goroutine (`runLoop` in `broker.go`) could
+        still have a reference to it and attempt a send?
+
+        **Risk 2: Slow ACK callbacks blocking shutdown**
+        In `ackloop.go`, ACK callbacks (producer's `ACK func(count int)`) are called synchronously
+        in the ackLoop goroutine AFTER signaling the broker to delete events. If a callback blocks
+        (e.g. a slow input that does filesystem work on ACK), the ackLoop goroutine hangs, and
+        `queue.Done()` never fires, causing `WaitClose()` to block forever. Is there any timeout
+        or goroutine isolation for these callbacks? If not, this is a latent hang-on-shutdown bug.
+
+        **Risk 3: Buffered send vs close broadcast pattern**
+        Grep for `chan struct{}` fields in pipeline, queue, and management types. For each one,
+        determine if it is used as a one-to-one signal (buffered send is fine) or one-to-many
+        broadcast (requires `close()`). Any buffered send channel used as a broadcast is the same
+        bug fixed in managerV2 by commit 76a4b4a99f. Run:
+        ```bash
+        grep -rn 'make(chan struct{}, 1)' libbeat/publisher/ x-pack/libbeat/management/
+        grep -rn 'stopChan\|doneChan\|closeChan' libbeat/publisher/ x-pack/libbeat/management/
+        ```
+        For each hit, check how many goroutines select on it.
+
+        **Risk 4: backoffClient.WaitOnError after Close**
+        In `outputs/backoff.go`, `WaitOnError()` sleeps the backoff duration. If `Close()` is
+        called while a Publish is in the middle of `WaitOnError()`, does `b.done` being closed
+        cause `WaitOnError()` to return immediately? Read `WaitOnError`'s implementation and
+        verify it selects on `b.done`. If it uses a plain `time.Sleep`, it will block shutdown.
+
+        **Risk 5: Disk queue segment write without rollback**
+        In `diskqueue/`, find the write path for new segments. If a write fails partway through
+        (e.g. disk full), is the partial segment truncated or left on disk? On next startup, does
+        the disk queue correctly skip or repair a partially-written segment, or will it panic/loop
+        trying to read corrupt data? Look for error handling after `f.Write()` calls in the
+        segment writer.
+
+        ## How to investigate
+
+        For each risk:
+        1. Read the actual implementation code for the described path.
+        2. If the risk is real: write a Go test using `testing.T` that exercises the race or
+           failure path. Use goroutines and channels to create the concurrent scenario. Run with
+           `-race` flag: `go test -race ./libbeat/publisher/...`.
+        3. If already mitigated: briefly explain why and move on.
+
+        The test for Risk 2 could look like: create a pipeline, publish events, register a slow
+        ACK callback (sleeps 10s), call `pipeline.Close()`, and assert it returns within 5s —
+        documenting that it currently DOES NOT if the bug exists.
+
+        ## Output
+
+        File a single issue titled "[libbeat-pipeline-lifecycle] Pipeline shutdown audit: hangs,
+        data loss, and panics in queue and output lifecycle" containing:
+        - For each confirmed risk: file:line, the exact failure scenario, test code or repro steps,
+          and the fix direction
+        - For each mitigated risk: one-line explanation
+        - A note on which risks are detectable only under `-race` vs reproducible deterministically
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

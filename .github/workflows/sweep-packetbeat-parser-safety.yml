@@ -1,0 +1,126 @@
+name: "Sweeper: Packetbeat Parser Bounds Safety"
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[packetbeat-parser-safety]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **bounds-safety sweeper** for Packetbeat's protocol parsers. You will find
+        every remaining unsafe byte-access pattern and write a failing Go test for each one.
+
+        ## Background
+
+        Between December 2025 and January 2026, a wave of bounds-check bugs were fixed across
+        multiple parsers (commits 306d2f48b1, 8bec36fa7c, aec03ccc22, b710eab09a, dec1b31111).
+        All followed the same pattern: a length or count value read from untrusted packet data
+        was used directly as a slice index or loop bound without validation. Your job is to find
+        every remaining instance of this class before it reaches production.
+
+        ## Where to look
+
+        All parsers are under `packetbeat/protos/`. The highest-risk files based on recent fix
+        history are:
+        - `amqp/amqp_parser.go` — `data[frame.size+7]` and `data[7:frame.size+7]` around line 98-107:
+          `frame.size` comes from a 4-byte field in the packet. There is NO check that
+          `frame.size+7 < len(data)` before these accesses. This is a remotely triggerable panic.
+        - `mongodb/mongodb_parser.go` — `readCStr()` accesses `d.in[end]` (the null terminator)
+          after a loop; verify `end < len(d.in)` is checked before the dereference.
+        - `http/http_parser.go` — `s.data[0] != '\r' || s.data[1] != '\n'` in chunk parsing;
+          verify `len(s.data) >= 2` is checked first.
+        - `mysql/mysql.go` — prepared statement packet parsing around lines 410-420 accesses
+          `Uint32`/`Uint16` on `s.data[m.start+N:]`; verify all are guarded.
+        - Also check: `memcache/binary.go`, `sip/`, `dns/`, `nfs/`, `pgsql/`, `thrift/thrift.go`,
+          `cassandra/`, `redis/`
+
+        ## Exact patterns to grep for
+
+        Run these searches to find candidates, then read each one to determine if it's guarded:
+
+        ```bash
+        # Unguarded slice arithmetic from packet fields
+        grep -n 'data\[.*\+' packetbeat/protos/amqp/amqp_parser.go
+        grep -rn 'binary\..*Uint\(.*\[' packetbeat/protos/
+        grep -rn '\bUint16\b\|\bUint32\b\|\bUint64\b' packetbeat/protos/ | grep -v '_test.go' | grep -v 'vendor'
+        # Loops that could be infinite on zero-advance
+        grep -rn 'for.*parseOffset\|for.*offset.*<\|for.*i.*<' packetbeat/protos/ | grep -v '_test.go'
+        ```
+
+        ## What a safe check looks like (use as reference)
+
+        The MongoDB decoder's `readBytes()` is the canonical safe pattern:
+        ```go
+        func (d *decoder) readBytes(length int32) ([]byte, error) {
+            if length < 0 {
+                return nil, errors.New("invalid negative length")
+            }
+            start := d.i
+            d.i += int(length)
+            if d.i > len(d.in) {
+                return nil, errors.New("no byte to read")
+            }
+            return d.in[start : start+int(length)], nil
+        }
+        ```
+        And the MySQL multi-field guard:
+        ```go
+        if (m.start + 13) >= len(s.data) {
+            logp.Warn("MySql Error code is the wrong size. Ignoring.")
+            return false, false
+        }
+        // Now safe to access s.data[m.start+5], s.data[m.start+8:m.start+13], etc.
+        ```
+
+        ## For each unsafe location you find
+
+        1. **Write a Go test** in the relevant `*_test.go` file that passes a crafted byte slice
+           designed to trigger the panic. The test should call the parser's entry-point function
+           (e.g. `mongodbMessageParser`, `mysqlMessageParser`) with the crafted input and assert
+           that it returns `(false, false)` or an error — NOT that it panics. Run the test with
+           `go test ./packetbeat/protos/<parser>/... -run TestFuzz` to confirm it panics today.
+           Example for AMQP:
+           ```go
+           func TestAMQPFrameSizeOverflow(t *testing.T) {
+               // frame.size = 0xFFFFFF (16MB), actual data is 20 bytes
+               // accessing data[frame.size+7] should not panic
+               data := []byte{
+                   'A', 'M', 'Q', 'P', // magic
+                   1,                   // frame type = METHOD
+                   0, 0,                // channel
+                   0xFF, 0xFF, 0xFF, 0, // frame size = huge
+                   0, 0, 0, 0,          // class+method
+                   0xCE,                // frame end
+               }
+               // Should not panic:
+               require.NotPanics(t, func() {
+                   parseAMQPFrame(data)
+               })
+           }
+           ```
+        2. Note the exact file:line, the unsafe expression, and the packet field controlling it.
+        3. Describe the one-line fix (e.g. "add `if int(frame.size)+7 >= len(data)` guard before line 98").
+
+        ## Output
+
+        First, run the tests you write to confirm which ones actually panic today. Then file a
+        single issue titled "[packetbeat-parser-safety] Bounds-safety audit: remotely-triggerable
+        panics in protocol parsers" containing:
+        - A summary of confirmed panics (tests that fail with `index out of range` or similar)
+        - A checklist of every unsafe location, grouped by parser, with: file:line, the unsafe
+          expression, the packet field controlling it, and the one-line fix
+        - The test code for each confirmed panic, so an engineer can paste it in and verify the fix
+
+        Be exhaustive. Do not stop after finding 2-3 instances. Check every parser.
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
