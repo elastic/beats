@@ -41,7 +41,6 @@ jobs:
     if: needs.wait-for-buildkite-failure.outputs.failure-detected == 'true'
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-estc-pr-buildkite-detective.lock.yml@v0
     with:
-      buildkite-org: "elastic"
       setup-commands: |
         python3 - << 'PYEOF'
         import json, os, re, subprocess, sys, urllib.request
