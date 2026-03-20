@@ -308,7 +308,7 @@ func startHarvester(
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 
-		ctx.Logger.Debug("Starting harvester for file. offset %v", resource.cursor)
+		ctx.Logger.Debugf("Starting harvester for file. offset %v", resource.cursor)
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)

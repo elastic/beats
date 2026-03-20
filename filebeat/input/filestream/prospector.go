@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -620,12 +621,13 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 			return true // continue iteration
 		}
 
-		// IMPORTANT: Only match if the file path is the same.
-		// This prevents migrating entries that belong to different files
-		// (which can happen with collisions where multiple files have the
-		// same fingerprint initially).
+		// Only allow cross-path prefix match if the file at the stored
+		// path no longer exists. If it still exists, the entry belongs to
+		// that file and must not be stolen (collision scenario).
 		if fm.Source != currentPath {
-			return true // continue iteration - different file
+			if _, err := os.Stat(fm.Source); err == nil {
+				return true // continue iteration - stored file still exists
+			}
 		}
 
 		// There is at most one registry entry per path (migration replaces
