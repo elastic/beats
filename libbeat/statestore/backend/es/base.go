@@ -31,11 +31,11 @@ import (
 )
 
 type baseStore struct {
+	ctx   context.Context
 	cli   *eslegclient.Connection
 	name  string
 	index string
 	log   *logp.Logger
-	ctx   context.Context
 }
 
 const docType = "_doc"
@@ -55,6 +55,10 @@ func NewStore(ctx context.Context, log *logp.Logger, cli *eslegclient.Connection
 }
 
 func (b *baseStore) Get(key string, to interface{}) error {
+	if b == nil {
+		return nil
+	}
+
 	return b.get(key, to)
 }
 
@@ -82,6 +86,11 @@ func (b *baseStore) get(key string, to interface{}) error {
 }
 
 func (b *baseStore) Has(key string) (bool, error) {
+	// Do nothing for now if the store was not initialized
+	if b == nil {
+		return false, nil
+	}
+
 	var v interface{}
 	err := b.get(key, &v)
 	if err != nil {
@@ -95,7 +104,7 @@ func (b *baseStore) Has(key string) (bool, error) {
 
 func (b *baseStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
 	// Do nothing for now if the store was not initialized
-	if b.cli == nil {
+	if b == nil {
 		return nil
 	}
 
@@ -142,6 +151,10 @@ func (b *baseStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) er
 }
 
 func (b *baseStore) Set(key string, value interface{}) error {
+	if b == nil {
+		return nil
+	}
+
 	doc := renderRequest(value)
 	_, _, err := b.cli.Request("PUT", fmt.Sprintf("/%s/%s/%s", b.index, docType, url.QueryEscape(key)), "", nil, doc)
 	if err != nil {
@@ -151,6 +164,10 @@ func (b *baseStore) Set(key string, value interface{}) error {
 }
 
 func (b *baseStore) Remove(key string) error {
+	if b == nil {
+		return nil
+	}
+
 	_, _, err := b.cli.Delete(b.index, docType, url.QueryEscape(key), nil)
 	if err != nil {
 		return err
@@ -159,15 +176,14 @@ func (b *baseStore) Remove(key string) error {
 }
 
 func (b *baseStore) Close() error {
-	if b.cli != nil {
-		err := b.cli.Close()
-		b.cli = nil
-		return err
-	}
 	return nil
 }
 
 func (b *baseStore) SetID(id string) {
+	if b == nil {
+		return
+	}
+
 	if id == "" {
 		return
 	}

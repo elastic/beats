@@ -50,7 +50,9 @@ type store struct {
 	once    sync.Once
 
 	mx     sync.Mutex
+	cli    *eslegclient.Connection
 	cliErr error
+	id     string
 
 	base *baseStore
 }
@@ -90,13 +92,17 @@ func (s *store) waitReady() error {
 }
 
 func (s *store) SetID(id string) {
+	s.mx.Lock()
+	s.id = id
+	s.mx.Unlock()
+
 	if err := s.waitReady(); err != nil {
 		return
 	}
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	s.base.SetID(id)
+	s.base.SetID(s.id)
 }
 
 func (s *store) Close() error {
@@ -106,8 +112,10 @@ func (s *store) Close() error {
 	if s.cn != nil {
 		s.cn()
 	}
-	if s.base != nil {
-		s.base.Close()
+	if s.cli != nil {
+		err := s.cli.Close()
+		s.cli = nil
+		return err
 	}
 	return nil
 }
@@ -173,6 +181,8 @@ func (s *store) Remove(key string) error {
 	if err := s.waitReady(); err != nil {
 		return err
 	}
+	s.mx.Lock()
+	defer s.mx.Unlock()
 
 	return s.base.Remove(key)
 }
@@ -200,9 +210,9 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	if s.base != nil {
-		_ = s.base.Close()
-		s.base = nil
+	if s.cli != nil {
+		_ = s.cli.Close()
+		s.cli = nil
 	}
 	s.cliErr = nil
 
@@ -212,6 +222,10 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 		s.cliErr = err
 	} else {
 		s.base = NewStore(ctx, s.log, cli, s.name)
+		if s.id != "" {
+			s.base.SetID(s.id)
+		}
+		s.cli = cli
 	}
 
 	// Signal store is ready

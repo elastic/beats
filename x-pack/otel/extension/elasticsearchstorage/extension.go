@@ -53,8 +53,6 @@ func (e *elasticStorage) Access(name string) (backend.Store, error) {
 }
 
 func (e *elasticStorage) Close() error {
-	if e.client == nil {
-		return nil
-	}
-	return e.client.Close()
+	// no-op. Client will be close in Shutdown
+	return nil
 }
