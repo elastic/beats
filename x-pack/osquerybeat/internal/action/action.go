@@ -24,6 +24,7 @@ type Action struct {
 	// The optional action timeout
 	Timeout    time.Duration
 	ECSMapping ecs.Mapping
+	Profile    bool
 }
 
 func FromMap(m map[string]interface{}) (a Action, err error) {
@@ -41,7 +42,10 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		}
 	}
 
-	var ecsm ecs.Mapping
+	var (
+		ecsm    ecs.Mapping
+		profile bool
+	)
 	if v, ok := m["data"]; ok {
 		var data map[string]interface{}
 		if data, ok = v.(map[string]interface{}); !ok {
@@ -64,6 +68,12 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 				return a, err
 			}
 		}
+		if profileRaw, ok := data["profile"]; ok {
+			profile, ok = profileRaw.(bool)
+			if !ok {
+				return a, fmt.Errorf("invalid profile: %w", ErrActionRequest)
+			}
+		}
 	}
 
 	id = strings.TrimSpace(id)
@@ -80,6 +90,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		Query:      query,
 		ID:         id,
 		ECSMapping: ecsm,
+		Profile:    profile,
 	}
 
 	if v, ok := m["timeout"]; ok {
