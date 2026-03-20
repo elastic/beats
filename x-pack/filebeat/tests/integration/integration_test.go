@@ -30,5 +30,9 @@ func TestMain(m *testing.M) {
 		fmt.Fprintf(os.Stderr, "failed to build filebeat test binary: %s\n", err)
 		os.Exit(1)
 	}
-	os.Exit(m.Run())
+
+	rc := m.Run()
+
+	_ = os.Remove(binPath)
+	os.Exit(rc)
 }
