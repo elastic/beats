@@ -1,3 +1,6 @@
+# This file is generated! See ext/osquery-extension/cmd/gentables.
+<!-- DO NOT EDIT MANUALLY. Update specs/templates and re-run gentables. -->
+
 # Osquery Extension for Elastic
 
 This osquery extension provides additional custom tables that enhance osquery's capabilities with Elastic-specific functionality. The extension is designed to work seamlessly with Osquerybeat and provides deep system insights across Linux, macOS, and Windows platforms.
@@ -8,50 +11,51 @@ The extension adds several custom tables to osquery that provide:
 - Browser history analysis across multiple browsers
 - Host system information access from containers (groups, users, processes)
 - Deep file analysis and security auditing on macOS
+- Windows Amcache inventory and normalized application view
+- Windows Jump List parsing for recent and pinned entries
 
 ## Supported Platforms
 
-| Table | Linux | macOS | Windows |
-|-------|-------|-------|---------|
-| `elastic_browser_history` | ✅ | ✅ | ✅ |
-| `elastic_host_groups` | ✅ | ✅ | ❌ |
-| `host_groups` (view) | ✅ | ✅ | ❌ |
-| `elastic_host_users` | ✅ | ✅ | ❌ |
-| `host_users` (view) | ✅ | ✅ | ❌ |
-| `elastic_host_processes` | ✅ | ❌ | ❌ |
-| `host_processes` (view) | ✅ | ❌ | ❌ |
-| `elastic_file_analysis` | ❌ | ✅ | ❌ |
+| Name | Type | Linux | macOS | Windows |
+|------|------|-------|-------|---------|
+| `elastic_amcache_application` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_application_file` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_application_shortcut` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_applications_view` | view | ❌ | ❌ | ✅ |
+| `elastic_amcache_device_pnp` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_driver_binary` | table | ❌ | ❌ | ✅ |
+| `elastic_amcache_driver_package` | table | ❌ | ❌ | ✅ |
+| `elastic_browser_history` | table | ✅ | ✅ | ✅ |
+| `elastic_file_analysis` | table | ❌ | ✅ | ❌ |
+| `elastic_host_groups` | table | ✅ | ✅ | ❌ |
+| `elastic_host_processes` | table | ✅ | ❌ | ❌ |
+| `elastic_host_users` | table | ✅ | ✅ | ❌ |
+| `elastic_jumplists` | table | ❌ | ❌ | ✅ |
+| `host_groups` | view | ✅ | ✅ | ❌ |
+| `host_processes` | view | ✅ | ❌ | ❌ |
+| `host_users` | view | ✅ | ✅ | ❌ |
 
 ---
 
 ## Tables
+- [elastic_amcache_application](docs/tables/elastic_amcache_application.md)
+- [elastic_amcache_application_file](docs/tables/elastic_amcache_application_file.md)
+- [elastic_amcache_application_shortcut](docs/tables/elastic_amcache_application_shortcut.md)
+- [elastic_amcache_device_pnp](docs/tables/elastic_amcache_device_pnp.md)
+- [elastic_amcache_driver_binary](docs/tables/elastic_amcache_driver_binary.md)
+- [elastic_amcache_driver_package](docs/tables/elastic_amcache_driver_package.md)
+- [elastic_browser_history](docs/tables/elastic_browser_history.md)
+- [elastic_file_analysis](docs/tables/elastic_file_analysis.md)
+- [elastic_host_groups](docs/tables/elastic_host_groups.md)
+- [elastic_host_processes](docs/tables/elastic_host_processes.md)
+- [elastic_host_users](docs/tables/elastic_host_users.md)
+- [elastic_jumplists](docs/tables/elastic_jumplists.md)
 
-Each table has detailed documentation in its own file:
-
-### 1. [elastic_browser_history](docs/tables/elastic_browser_history.md)
-Query browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema and advanced filtering capabilities.
-
-**Platforms**: Linux, macOS, Windows
-
-### 2. [elastic_host_groups](docs/tables/elastic_host_groups.md)
-Query host system group information from the host's `/etc/group` (e.g. when running in a container with hostfs mounted). The [host_groups](docs/views/host_groups.md) view provides backward compatibility.
-
-**Platforms**: Linux, macOS
-
-### 3. [elastic_host_users](docs/tables/elastic_host_users.md)
-Query host system user accounts from the host's `/etc/passwd` (e.g. when running in a container with hostfs mounted). The [host_users](docs/views/host_users.md) view provides backward compatibility.
-
-**Platforms**: Linux, macOS
-
-### 4. [elastic_host_processes](docs/tables/elastic_host_processes.md)
-Query running process information from the host's `/proc` when running in a container (Linux only). The [host_processes](docs/views/host_processes.md) view provides backward compatibility.
-
-**Platforms**: Linux
-
-### 5. [elastic_file_analysis](docs/tables/elastic_file_analysis.md)
-Comprehensive security analysis of executable files on macOS (file type, code signing, dependencies, symbols, strings). Query with a path constraint; uses `file`, `codesign`, `otool`, `nm`, and `strings`.
-
-**Platforms**: macOS
+## Views
+- [elastic_amcache_applications_view](docs/views/elastic_amcache_applications_view.md)
+- [host_groups](docs/views/host_groups.md)
+- [host_processes](docs/views/host_processes.md)
+- [host_users](docs/views/host_users.md)
 
 ---
 
@@ -67,7 +71,7 @@ mage buildext
 
 # The extension binary will be created at:
 # Linux: ext/osquery-extension/build/linux/osquery-extension
-# macOS: ext/osquery-extension/build/darwin/osquery-extension  
+# macOS: ext/osquery-extension/build/darwin/osquery-extension
 # Windows: ext/osquery-extension/build/windows/osquery-extension.ext
 ```
 

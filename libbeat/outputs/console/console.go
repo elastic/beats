@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type console struct {
@@ -51,6 +52,7 @@ func makeConsole(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	config := defaultConfig
 	err := cfg.Unpack(&config)
@@ -86,7 +88,7 @@ func makeConsole(
 		}
 	}
 
-	return outputs.Success(config.Queue, config.BatchSize, 0, nil, beat.Logger, c)
+	return outputs.Success(config.Queue, config.BatchSize, 0, nil, beat.Logger, beatPaths, c)
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec, logger *logp.Logger) (*console, error) {
