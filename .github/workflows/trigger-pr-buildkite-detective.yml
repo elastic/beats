@@ -1,7 +1,7 @@
 name: PR Buildkite Detective
 on:
-  pull_request:
-    types: [opened, synchronize]
+  check_run:
+    types: [completed]
 
 permissions:
   actions: read
@@ -10,35 +10,11 @@ permissions:
   pull-requests: write  # required by gh-aw compiler for add-comment
 
 jobs:
-  wait-for-buildkite-failure:
-    runs-on: ubuntu-latest
-    outputs:
-      failure-detected: ${{ steps.wait.outputs.failure-detected }}
-    steps:
-      - name: Wait for Buildkite failure
-        id: wait
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          echo "Polling PR #$PR_NUMBER for Buildkite failures (up to 15 minutes)..."
-          for i in $(seq 1 30); do
-            STATUS=$(gh pr checks "$PR_NUMBER" --repo ${{ github.repository }} 2>&1 || true)
-            if echo "$STATUS" | grep -iE "fail" | grep -vE "^\s*$"; then
-              echo "failure-detected=true" >> "$GITHUB_OUTPUT"
-              echo "Failure found on attempt $i"
-              echo "$STATUS" | grep -iE "fail"
-              exit 0
-            fi
-            echo "Attempt $i/30: no failure yet, waiting 30s..."
-            sleep 30
-          done
-          echo "failure-detected=false" >> "$GITHUB_OUTPUT"
-          echo "No failure detected after 15 minutes"
-
-  detect:
-    needs: wait-for-buildkite-failure
-    if: needs.wait-for-buildkite-failure.outputs.failure-detected == 'true'
+  run:
+    if: >-
+      github.event.check_run.conclusion == 'failure' &&
+      github.event.check_run.app.slug == 'buildkite' &&
+      toJSON(github.event.check_run.pull_requests) != '[]'
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-estc-pr-buildkite-detective.lock.yml@v0
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
