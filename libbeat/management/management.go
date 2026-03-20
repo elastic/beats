@@ -143,7 +143,7 @@ func (n *FallbackManager) SetStopCallback(f func()) {
 	n.lock.Unlock()
 }
 
-func (n *FallbackManager) Stop(wait bool) {
+func (n *FallbackManager) Stop() {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.stopFunc != nil {
@@ -151,11 +151,7 @@ func (n *FallbackManager) Stop(wait bool) {
 		// because different Beats can have different requirements
 		// for their stop function, it's better to make sure it will
 		// only be called once.
-		if wait {
-			n.stopOnce.Do(n.stopFunc)
-		} else {
-			go n.stopOnce.Do(n.stopFunc)
-		}
+		n.stopOnce.Do(n.stopFunc)
 	}
 }
 

@@ -528,7 +528,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.mx.Unlock()
 
 			if len(cm.units) == 0 && cm.stopOnEmptyUnits {
-				cm.Stop(false)
+				cm.Stop()
 			}
 
 			cm.reload(units)

@@ -260,7 +260,7 @@ func TestManagerV2(t *testing.T) {
 
 	err = m.Start()
 	require.NoError(t, err)
-	defer m.Stop(true)
+	defer m.Stop()
 
 	require.Eventually(t, func() bool {
 		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
@@ -394,7 +394,7 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 
 	err = m.Start()
 	require.NoError(t, err)
-	defer m.Stop(true)
+	defer m.Stop()
 
 	<-inputConfigUpdated
 	assert.Equal(t, 1, output.reloadCount) // initial load
@@ -523,7 +523,7 @@ func TestOutputError(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop(true)
+	defer m.Stop()
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
@@ -683,7 +683,7 @@ func TestErrorPerUnit(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop(true)
+	defer m.Stop()
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()

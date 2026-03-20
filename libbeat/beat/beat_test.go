@@ -38,7 +38,7 @@ type testManager struct {
 func (tm testManager) UpdateStatus(_ status.Status, _ string) {}
 func (tm testManager) Enabled() bool                          { return tm.isEnabled }
 func (tm testManager) Start() error                           { return nil }
-func (tm testManager) Stop(_ bool)                            {}
+func (tm testManager) Stop()                                  {}
 func (tm testManager) AgentInfo() management.AgentInfo {
 	return management.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
 }
