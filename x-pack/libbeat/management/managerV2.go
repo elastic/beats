@@ -787,7 +787,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.Stop(false)
+		cm.Stop()
 		return true, nil
 	}
 
