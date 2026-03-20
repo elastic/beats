@@ -1283,6 +1283,31 @@ func (b *BeatProc) RemoveOutputFile() {
 	}
 }
 
+// BuildSystemTestBinary builds a beat test binary using "go test -c".
+// It respects the same environment variables as the mage build:
+//   - DEV=true: disables optimizations for debugging (-gcflags=all=-N -l)
+//   - TEST_COVERAGE=true: enables coverage instrumentation (-coverpkg ./...)
+//
+// binPath is the output path for the binary (e.g., "../../filebeat.test").
+// packagePath is the Go package to build (e.g., "../../").
+func BuildSystemTestBinary(binPath, packagePath string) error {
+	args := []string{"test", "-c", "-o", binPath}
+
+	if devBuild, _ := strconv.ParseBool(os.Getenv("DEV")); devBuild {
+		args = append(args, `-gcflags=all=-N -l`)
+	}
+	if testCoverage, _ := strconv.ParseBool(os.Getenv("TEST_COVERAGE")); testCoverage {
+		args = append(args, "-coverpkg", "./...")
+	}
+
+	args = append(args, packagePath)
+
+	cmd := exec.Command("go", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
 // then it reads up to n events. It assumes the filename
 // for the output is 'output' and 'path' is set to the TempDir.

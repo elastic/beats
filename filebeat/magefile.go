@@ -55,11 +55,6 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
-func BuildSystemTestBinary() error {
-	return devtools.BuildSystemTestBinary()
-}
-
 // GolangCrossBuild builds the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -196,14 +191,11 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
-
 	// We pre-cache go module dependencies before running the unit tests with
 	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
 	// will try to download the dependencies and could fail because the TLS
