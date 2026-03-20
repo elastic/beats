@@ -1,7 +1,7 @@
 name: PR Buildkite Detective
 on:
   pull_request:
-    types: [synchronize]
+    types: [opened, synchronize]
 
 permissions:
   actions: read
