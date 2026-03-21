@@ -7,9 +7,10 @@ package management
 import (
 	"testing"
 
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 )
@@ -442,8 +443,14 @@ func TestSuppressFlipRecomputesHealth(t *testing.T) {
 	}
 
 	// Per-stream payload should still show Degraded
-	streams := cu.reportedPayload["streams"].(map[string]interface{})
-	streamStatus := streams["stream-a"].(map[string]interface{})
+	streams, ok := cu.reportedPayload["streams"].(map[string]interface{})
+	if !ok {
+		t.Fatal("expected streams payload")
+	}
+	streamStatus, ok := streams["stream-a"].(map[string]interface{})
+	if !ok {
+		t.Fatal("expected stream-a payload")
+	}
 	if streamStatus["status"] != client.UnitStateDegraded.String() {
 		t.Errorf("expected per-stream Degraded after flip, got %q", streamStatus["status"])
 	}

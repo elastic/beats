@@ -15,8 +15,8 @@ import (
 
 // unitState is the current state of a unit
 type unitState struct {
-	state    status.Status
-	msg      string
+	state                     status.Status
+	msg                       string
 	suppressHealthDegradation bool // when true, this stream's degraded/failed states do not affect the unit's aggregate health
 }
 
@@ -113,8 +113,8 @@ func getStreamStates(expected client.Expected) (map[string]unitState, []string) 
 		}
 
 		streamState := unitState{
-			state:    status.Unknown,
-			msg:      "",
+			state:                     status.Unknown,
+			msg:                       "",
 			suppressHealthDegradation: suppressHealth,
 		}
 
@@ -325,8 +325,8 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 	}
 
 	u.streamStates[streamID] = unitState{
-		state:    state,
-		msg:      msg,
+		state:                     state,
+		msg:                       msg,
 		suppressHealthDegradation: u.streamStates[streamID].suppressHealthDegradation,
 	}
 

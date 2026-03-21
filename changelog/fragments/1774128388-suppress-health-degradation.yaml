@@ -1,0 +1,7 @@
+kind: feature
+
+summary: Add suppress_health_degradation stream config to prevent optional streams from degrading agent health
+
+component: libbeat
+
+pr: https://github.com/elastic/beats/pull/49511
