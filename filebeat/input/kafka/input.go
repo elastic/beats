@@ -163,6 +163,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		newCtx, cancel := context.WithCancel(goContext)
 
 		go func() {
+			defer cancel()
 			for {
 				select {
 				case <-newCtx.Done():
@@ -171,7 +172,8 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 					tpcs := filterKafkaTopics(sarClient, log, filters)
 					if tpcs != nil && !slices.Equal(tpcs, topics) {
 						topics = tpcs
-						cancel()
+						log.Infow("detected new topics, updating kafka consumer group", logp.Int("topicSize", len(topics)))
+						return
 					}
 				}
 			}
