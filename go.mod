@@ -11,15 +11,9 @@ require (
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	github.com/Azure/azure-event-hubs-go/v3 v3.6.1
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
-<<<<<<< HEAD
-	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
-	github.com/Azure/go-autorest/autorest v0.11.29
-	github.com/Azure/go-autorest/autorest/date v0.3.0
-=======
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Azure/go-autorest/autorest v0.11.30
 	github.com/Azure/go-autorest/autorest/date v0.3.1
->>>>>>> 09c864469 (Bump otel collector dependencies to 0.148.0 (#49578))
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/PaesslerAG/gval v1.2.2
@@ -436,14 +430,8 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-<<<<<<< HEAD
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.147.0 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.147.0 // indirect
-=======
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.148.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.148.0 // indirect
->>>>>>> 09c864469 (Bump otel collector dependencies to 0.148.0 (#49578))
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
