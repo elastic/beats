@@ -479,6 +479,36 @@ func TestTest(t *testing.T) {
 	}
 }
 
+func TestKafkaTopicFilters(t *testing.T) {
+	config := sarama.NewConfig()
+	config.Version = sarama.V1_0_0_0
+	hosts := []string{getTestKafkaHost()}
+	client, err := sarama.NewClient(hosts, config)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, client.Close())
+	})
+
+	topics := []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c", "Filebeat-TestRegex-d"}
+	for top := range topics {
+		ensureKafkaTopicReadyForWrites(t, top)
+	}
+
+	filters := map[string][]string{
+		"Filebeat-TestRegex-(.*)": []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c", "Filebeat-TestRegex-d"},
+		"Filebeat-TestRegex-(a|b)": []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b"},
+		"Filebeat-TestRegex-(!c)": []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-d"}
+		"Filebeat-TestRegex-d": []string{"Filebeat-TestRegex-d"}
+	}
+	logger := logptest.NewTestingLogger(t, "kafka_regex_test")
+	for fil, exp := range filters {
+		output := filterKafkaTopics(client, logger, []string{fil})
+		if !slice.Equal(output, exp) {
+			t.Errorf("Slices for regex %s not equal, got: %w | expected: %w", fil, output, exp)
+		}
+	}
+}
+
 func createReadyTestTopic(t *testing.T) string {
 	t.Helper()
 
