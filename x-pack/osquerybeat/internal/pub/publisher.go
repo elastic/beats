@@ -33,6 +33,10 @@ type Publisher struct {
 
 	// client for osquery_manager.action.responses
 	actionResponsesClient beat.Client
+
+	// client for osquery_manager.query_profile
+	queryProfileClient    beat.Client
+	profileDropWarnLogged bool
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
@@ -109,6 +113,43 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 			p.actionResponsesClient = nil
 		}
 	}
+
+	// Attach optional query profiling stream if present, identified by dataset.
+	// For query profile events to be published, the integration (e.g. Fleet policy) must include
+	// an input stream with dataset osquery_manager.query_profile. Otherwise profile events are dropped.
+	var profileInput *config.InputConfig
+	for i := range inputs {
+		if inputs[i].Datastream.Dataset == config.DefaultQueryProfileDataset {
+			profileInput = &inputs[i]
+			break
+		}
+	}
+	if profileInput != nil {
+		processors, err := p.processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset)
+		if err != nil {
+			return err
+		}
+		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultQueryProfileDataset, len(processors.All()))
+		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			Processing: beat.ProcessingConfig{
+				Processor: processors,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		oldClient := p.queryProfileClient
+		p.queryProfileClient = client
+		p.profileDropWarnLogged = false
+		if oldClient != nil {
+			oldClient.Close()
+		}
+	} else {
+		if p.queryProfileClient != nil {
+			p.queryProfileClient.Close()
+			p.queryProfileClient = nil
+		}
+	}
 	return nil
 }
 
@@ -130,6 +171,14 @@ func (p *Publisher) Close() {
 	if p.client != nil {
 		p.client.Close()
 		p.client = nil
+	}
+	if p.actionResponsesClient != nil {
+		p.actionResponsesClient.Close()
+		p.actionResponsesClient = nil
+	}
+	if p.queryProfileClient != nil {
+		p.queryProfileClient.Close()
+		p.queryProfileClient = nil
 	}
 }
 
@@ -194,6 +243,53 @@ func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, ti
 	p.actionResponsesClient.Publish(event)
 }
 
+func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+
+	if p.queryProfileClient == nil {
+		if !p.profileDropWarnLogged {
+			p.log.Info("Query profile stream is not configured. Query profile events will be dropped.")
+			p.profileDropWarnLogged = true
+		}
+		return
+	}
+
+	fields := mapstr.M{
+		"type": "osquery_profile",
+		"event": map[string]interface{}{
+			"module": eventModule,
+		},
+		"osquery_profile": profile,
+	}
+	if queryName != "" {
+		fields["query"] = map[string]interface{}{
+			"name": queryName,
+		}
+	}
+	if actionID != "" {
+		fields["action_id"] = actionID
+	}
+	if responseID != "" {
+		fields["response_id"] = responseID
+	}
+	if reqData != nil {
+		fields["action_data"] = reqData
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    fields,
+	}
+	if index != "" {
+		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
+	}
+
+	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
+
+	p.queryProfileClient.Publish(event)
+}
+
 func actionResultToEvent(req, res map[string]interface{}) map[string]interface{} {
 	m := make(map[string]interface{}, 8)
 
@@ -233,7 +329,9 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDataset string) (procs *processors.Processors, err error) {
 	procs = processors.NewList(p.log)
 
-	// Use only first input processor
+	// Use only first input processor.
+	// When Processors is empty, the data_stream processor is not added; Fleet-managed inputs
+	// typically supply processors so the data stream is set correctly.
 	// Every input will have a processor that adds the elastic_agent info, we need only one
 	// Not expecting other processors at the moment and this needs to work for 7.13
 	if len(inCfg.Processors) > 0 {
