@@ -146,6 +146,20 @@ func TestModuleConfigDefaults(t *testing.T) {
 	assert.Empty(t, mc.Hosts)
 }
 
+// TestNewModuleRejectsNilPaths verifies that NewModule returns ErrPathsRequired
+// when paths is nil.
+func TestNewModuleRejectsNilPaths(t *testing.T) {
+	r := newTestRegistry(t)
+
+	c := newConfig(t, map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{metricSetName},
+	})
+
+	_, _, err := NewModule(c, r, nil, logptest.NewTestingLogger(t, ""))
+	assert.ErrorIs(t, err, ErrPathsRequired)
+}
+
 // TestNewModulesDuplicateHosts verifies that an error is returned by
 // NewModules if any module configuration contains duplicate hosts.
 func TestNewModulesDuplicateHosts(t *testing.T) {
