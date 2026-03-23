@@ -102,6 +102,93 @@ func TestHintsKubernetes(t *testing.T) {
 		"Filestream did not start for the test container")
 }
 
+func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
+	containerID := startFlogDocker(t)
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	setupConfig := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: container-logs
+    take_over:
+      enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    parsers:
+      - ndjson:
+          message_key: log
+          keys_under_root: true
+          overwrite_keys: true
+    paths:
+      - /var/lib/docker/containers/%s/*.log
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+  metrics:
+    enabled: false
+`, containerID, workDir)
+	filebeat.WriteConfigFile(setupConfig)
+	filebeat.Start()
+	require.Eventually(
+		t,
+		func() bool { return filebeat.CountFileLines(outputFile) >= 10 },
+		30*time.Second,
+		200*time.Millisecond,
+		"did not ingest the initial events")
+
+	filebeat.Stop()
+	initialEvents := filebeat.CountFileLines(outputFile)
+
+	cfgYAML := getConfig(
+		t,
+		map[string]any{
+			"containerID": containerID,
+			"homePath":    workDir,
+		},
+		"autodiscover",
+		"docker-take-over.yml",
+	)
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf(
+			`"message":"Input 'filestream' starting","service.name":"filebeat","id":"%s-logs"`,
+			containerID,
+		),
+		30*time.Second,
+		"Filestream did not start for the test container using autodiscover")
+
+	time.Sleep(5 * time.Second)
+
+	eventsAfterTakeOver := filebeat.CountFileLines(outputFile)
+	newEvents := eventsAfterTakeOver - initialEvents
+	require.LessOrEqual(
+		t,
+		newEvents,
+		8,
+		"autodiscover filestream takeover re-ingested old events",
+	)
+}
+
 func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) {
 	uid := uuid.Must(uuid.NewV4()).String()
 
