@@ -18,7 +18,6 @@ Review important information about the  8.19.13 release.
 * Update `elastic-agent-libs` to v0.32.2. https://github.com/elastic/beats/pull/48857[#48857] 
 * Update OpenTelemetry SDK to v1.40.0. https://github.com/elastic/beats/pull/49126[#49126] 
 
-
 **Osquerybeat**
 
 * Update `osquery-go` dependency to v0.0.0-20260226222546-0cc22f415e57. https://github.com/elastic/beats/pull/49280[#49280] 
@@ -54,7 +53,9 @@ The 8.19.13 release adds the following new and notable features.
 [[enhancements-8.19.13]]
 === Enhancements
 
+**All**
 
+* Update OTel Collector libraries to v0.147.0/v1.53.0 https://github.com/elastic/beats/pull/49348[#49348]
 
 
 **Filebeat**
@@ -87,7 +88,8 @@ The 8.19.13 release adds the following new and notable features.
 
 **All**
 
-* Improve `append` processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021] 
+* Improve `append` processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021]
+* Kafka client will avoid having more than a single metadata request to each broker in-flight at any given time. https://github.com/elastic/beats/pull/49307[#49307]
 
 
 **Filebeat**
