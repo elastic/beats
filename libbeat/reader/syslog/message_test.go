@@ -536,6 +536,31 @@ func TestParseStructuredData(t *testing.T) {
 				},
 			},
 		},
+		"escape-backslash": {
+			in: `[agentInfo@3401 tenantId="1" tenantNodePath="1\\2"]`,
+			want: map[string]interface{}{
+				"agentInfo@3401": map[string]interface{}{
+					"tenantId":       "1",
+					"tenantNodePath": `1\2`,
+				},
+			},
+		},
+		"escape-quote": {
+			in: `[info@1 key="val\"ue"]`,
+			want: map[string]interface{}{
+				"info@1": map[string]interface{}{
+					"key": `val"ue`,
+				},
+			},
+		},
+		"escape-all-three": {
+			in: `[info@1 key="a\]b\"c\\d"]`,
+			want: map[string]interface{}{
+				"info@1": map[string]interface{}{
+					"key": `a]b"c\d`,
+				},
+			},
+		},
 		"repeated-id": {
 			in: `[exampleSDID@32473 iut="3"][exampleSDID@32473 class="high"]`,
 			want: map[string]interface{}{
