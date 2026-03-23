@@ -219,7 +219,7 @@ func filterKafkaTopics(sarClient sarama.Client, log *logp.Logger, filters []*reg
 		for _, f := range filters {
 			if f.MatchString(t) {
 				topics = append(topics, t)
-				continue
+				break
 			}
 		}
 	}
