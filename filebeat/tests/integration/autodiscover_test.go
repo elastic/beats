@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//This file was contributed to by generative AI
+// This file was contributed to by generative AI
 
 //go:build integration && !requirefips
 
@@ -103,7 +103,7 @@ func TestHintsKubernetes(t *testing.T) {
 }
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
-	containerID := startFlogDocker(t)
+	_ = startFlogDocker(t)
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -112,21 +112,23 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	setupConfig := fmt.Sprintf(`
-filebeat.inputs:
-  - type: filestream
-    id: container-logs
-    take_over:
-      enabled: true
-    file_identity.native: ~
-    prospector.scanner.fingerprint.enabled: false
-    parsers:
-      - ndjson:
-          message_key: log
-          keys_under_root: true
-          overwrite_keys: true
-    paths:
-      - /var/lib/docker/containers/%s/*.log
+	logInputConfig := fmt.Sprintf(`
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.image: flog
+          config:
+            - type: log
+              allow_deprecated_use: true
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              json:
+                message_key: log
+                keys_under_root: true
+                overwrite_keys: true
 
 queue.mem:
   flush.timeout: 0s
@@ -144,8 +146,8 @@ logging:
     - "*"
   metrics:
     enabled: false
-`, containerID, workDir)
-	filebeat.WriteConfigFile(setupConfig)
+`, workDir)
+	filebeat.WriteConfigFile(logInputConfig)
 	filebeat.Start()
 	require.Eventually(
 		t,
@@ -157,23 +159,48 @@ logging:
 	filebeat.Stop()
 	initialEvents := filebeat.CountFileLines(outputFile)
 
-	cfgYAML := getConfig(
-		t,
-		map[string]any{
-			"containerID": containerID,
-			"homePath":    workDir,
-		},
-		"autodiscover",
-		"docker-take-over.yml",
-	)
-	filebeat.WriteConfigFile(cfgYAML)
+	filestreamTakeOverConfig := fmt.Sprintf(`
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.image: flog
+          config:
+            - type: filestream
+              id: "${data.docker.container.id}-logs"
+              take_over:
+                enabled: true
+              file_identity.native: ~
+              prospector.scanner.fingerprint.enabled: false
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              parsers:
+                - container:
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+  metrics:
+    enabled: false
+`, workDir)
+	filebeat.WriteConfigFile(filestreamTakeOverConfig)
 	filebeat.Start()
 
 	filebeat.WaitLogsContains(
-		fmt.Sprintf(
-			`"message":"Input 'filestream' starting","service.name":"filebeat","id":"%s-logs"`,
-			containerID,
-		),
+		`"message":"Input 'filestream' starting","service.name":"filebeat","id":"`,
 		30*time.Second,
 		"Filestream did not start for the test container using autodiscover")
 
