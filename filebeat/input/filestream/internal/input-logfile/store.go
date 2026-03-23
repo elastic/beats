@@ -276,10 +276,9 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 	return nil
 }
 
-// KeyExists returns true if a non-deleted entry exists for the given Source.
+// KeyExists returns true if a non-deleted entry exists for the given key.
 // Unlike FindCursorMeta, this performs no Retain/Release and no deserialization.
-func (s *sourceStore) KeyExists(src Source) bool {
-	key := s.identifier.ID(src)
+func (s *sourceStore) KeyExists(key string) bool {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 	if res := s.store.ephemeralStore.table[key]; res != nil {

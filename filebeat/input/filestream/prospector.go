@@ -209,15 +209,15 @@ func (p *fileProspector) Init(
 
 	identifierName := p.identifier.Name()
 
-	// If the file identity has changed to fingerprint, update the registry
-	// keys so we can keep the state. This is only supported from file
-	// identities that do not require configuration:
+	// If the file identity has changed to fingerprint or growing_fingerprint,
+	// update the registry keys so we can keep the state. This is only
+	// supported from file identities that do not require configuration:
 	//  - native (inode + device ID)
 	//  - path
-	if identifierName != fingerprintName {
+	if identifierName != fingerprintName && identifierName != growingFingerprintName {
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 	} else {
-		p.logger.Debug("trying to migrate file identity to fingerprint")
+		p.logger.Debugf("trying to migrate file identity to %s", identifierName)
 		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
@@ -358,10 +358,7 @@ func (p *fileProspector) onFSEvent(
 	log = log.With("source_file", event.SrcID)
 
 	// For growing_fingerprint, handle prefix matching and migration
-	if p.identifier.Name() == growingFingerprintName &&
-		// the stored fingerprint might still be smaller that max len, thus,
-		// it needs to update the growingFingerprint when it's len is the max.
-		len(event.Descriptor.Fingerprint) <= p.maxEncodedFingerprintLen {
+	if p.identifier.Name() == growingFingerprintName {
 		src = p.handleGrowingFingerprintLookup(log, event, src, updater)
 	}
 
@@ -567,7 +564,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 
 	// Fast path: if the current fingerprint key already exists, no migration
 	// needed.
-	if updater.KeyExists(src) {
+	if updater.KeyExists(event.SrcID) {
 		return src
 	}
 
@@ -722,9 +719,7 @@ func (p *fileProspector) migrateGrowingFingerprint(
 		return fmt.Errorf("failed to migrate growing fingerprint from %s to %s: %w", oldKey, newKey, err)
 	}
 
-	// TODO(AndersonQ): this log is too expensive, printing the fingerprint can
-	// be almost 4k. Remove it and find a better integration test for it
-	p.logger.Infof("migrated growing fingerprint entry: %s -> %s", oldKey, newKey)
+	p.logger.Debugf("migrated growing fingerprint entry (key len %d -> %d)", len(oldKey), len(newKey))
 	return nil
 }
 

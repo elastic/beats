@@ -110,24 +110,16 @@ func (fd FileDescriptor) FileID() string {
 // fingerprint has grown - checks if one fingerprint is a prefix of the other
 // and verifies it's the same physical file via OS state (inode/device).
 func SameFile(log *logp.Logger, prev, current *FileDescriptor) bool {
-	// return prev.FileID() == current.FileID()
-
 	// Fast path: exact match
 	if prev.FileID() == current.FileID() {
 		return true
 	}
 
-	// For growing fingerprint: check if one fingerprint is a prefix of the other
-	// This happens when a file grows and its fingerprint expands
+	// For growing fingerprint: check if one fingerprint is a prefix of the other.
+	// This happens when a file grows and its fingerprint expands.
 	if prev.Fingerprint != "" && current.Fingerprint != "" {
-
-		// If shorter is a prefix of longer, verify it's the same physical file
-		same := strings.HasPrefix(current.Fingerprint, prev.Fingerprint) &&
+		return strings.HasPrefix(current.Fingerprint, prev.Fingerprint) &&
 			prev.Filename == current.Filename
-
-		log.Infof("SameFile: %t: prev=%s, current=%s. prevPath: %s, currPath: %s",
-			same, "growing-fingerprint", "growing-fingerprint", prev.Filename, current.Filename)
-		return same
 	}
 
 	return false

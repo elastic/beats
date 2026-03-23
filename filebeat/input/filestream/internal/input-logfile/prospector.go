@@ -61,9 +61,9 @@ type StateMetadataUpdater interface {
 	// a file's fingerprint grows.
 	UpdateKey(oldKey, newKey string, meta interface{}) error
 
-	// KeyExists returns true if the given Source already has an entry in the
+	// KeyExists returns true if the given key already has an entry in the
 	// store. This is a fast O(1) lookup with no side effects (no Retain/Release).
-	KeyExists(src Source) bool
+	KeyExists(key string) bool
 }
 
 // StoreUpdater allows manipulation of the state store
