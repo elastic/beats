@@ -25,12 +25,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-<<<<<<< HEAD
-=======
 	"os"
 	"path/filepath"
 	"slices"
->>>>>>> f6662a962 (Fix journald input for journalctl versions < 242 by omitting `--boot all` (#49445))
 	"sync/atomic"
 	"testing"
 	"time"
@@ -99,15 +96,10 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	factoryCalls := atomic.Uint32{}
-<<<<<<< HEAD
-	factory := func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
-=======
-	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+	factory := func(canceller input.Canceler, logger *logp.Logger, _ string, args ...string) (Jctl, error) {
 		if slices.Contains(args, "--version") {
 			return &versionMock, nil
 		}
-
->>>>>>> f6662a962 (Fix journald input for journalctl versions < 242 by omitting `--boot all` (#49445))
 		factoryCalls.Add(1)
 		// Add a log to make debugging easier and better mimic the behaviour of the real factory/journalctl
 		logger.Debugf("starting new mock journalclt ID: %d", factoryCalls.Load())
@@ -126,24 +118,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-<<<<<<< HEAD
 	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", factory)
-=======
-	reader, err := New(
-		logger,
-		ctx,
-		nil,
-		nil,
-		nil,
-		journalfield.IncludeMatches{},
-		[]int{},
-		SeekHead,
-		"",
-		0,
-		"",
-		false,
-		factory)
->>>>>>> f6662a962 (Fix journald input for journalctl versions < 242 by omitting `--boot all` (#49445))
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -209,46 +184,6 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		}
 	}
 }
-<<<<<<< HEAD
-=======
-
-func TestNewUsesMergeFlag(t *testing.T) {
-	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
-		return &JctlMock{
-			NextFunc: func(canceler input.Canceler) ([]byte, error) {
-				ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
-				return []byte(ret), nil
-			},
-			KillFunc: func() error { return nil },
-		}, nil
-	}
-	r, err := New(
-		logp.NewNopLogger(),
-		t.Context(),
-		nil,
-		nil,
-		nil,
-		journalfield.IncludeMatches{},
-		nil,
-		SeekHead,
-		"",
-		0,
-		"",
-		true,
-		f)
-
-	if err != nil {
-		t.Fatalf("did not expect an error when calling New: %s", err)
-	}
-
-	if r == nil {
-		t.Fatal("the returned reader cannot be nil")
-	}
-
-	if !slices.Contains(r.args, "--merge") {
-		t.Fatalf("did not find '--merge' in the arguments to journalctl. Args: %s", r.args)
-	}
-}
 
 // fakeJournalctl writes a tiny shell script that prints a fake journalctl
 // version line and returns the path to that script.
@@ -286,7 +221,10 @@ func TestJournalctlSupportsBootAll(t *testing.T) {
 			}
 
 			logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "..", "..", "build"))
-			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
+			factory := func(canceller input.Canceler, logger *logp.Logger, _ string, args ...string) (Jctl, error) {
+				return Factory(canceller, logger, path, args...)
+			}
+			got := journalctlSupportsBootAll(logger.Logger, factory)
 			if got != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
 			}
@@ -356,4 +294,3 @@ func TestHandleSeekAndCursor(t *testing.T) {
 		})
 	}
 }
->>>>>>> f6662a962 (Fix journald input for journalctl versions < 242 by omitting `--boot all` (#49445))
