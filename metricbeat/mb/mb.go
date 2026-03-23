@@ -327,6 +327,15 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 	return b.registration
 }
 
+<<<<<<< HEAD
+=======
+// GetPath returns the paths associated with this MetricSet.
+// Paths must be set during construction via NewModule.
+func (b *BaseMetricSet) GetPath() *paths.Path {
+	return b.paths
+}
+
+>>>>>>> 4666186b7 (Metricbeat: Remove global path reference (#49502))
 // Configuration types
 
 // ModuleConfig is the base configuration data for all Modules.
