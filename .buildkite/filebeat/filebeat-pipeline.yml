@@ -96,7 +96,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -123,7 +124,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -150,7 +152,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -175,10 +178,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -207,10 +208,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -235,10 +234,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -354,7 +351,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
