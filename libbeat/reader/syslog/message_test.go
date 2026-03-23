@@ -202,7 +202,7 @@ func TestMessage_SetPriority(t *testing.T) {
 
 			if tc.wantErr != "" {
 				assert.ErrorContains(t, gotErr, tc.wantErr)
-				assert.Equal(t, m.priority, -1)
+				assert.Equal(t, -1, m.priority)
 				assert.Zero(t, m.facility)
 				assert.Zero(t, m.severity)
 			} else {
