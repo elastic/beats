@@ -174,12 +174,6 @@ steps:
           - "x-pack/filebeat/build/*.json"
           - "x-pack/filebeat/build/input-test/**"
           - "x-pack/filebeat/build/integration-tests/**"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Go Integration Tests"
@@ -271,12 +265,6 @@ steps:
           - "x-pack/filebeat/build/*.json"
           - "x-pack/filebeat/build/input-test/**"
           - "x-pack/filebeat/build/integration-tests/**"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"

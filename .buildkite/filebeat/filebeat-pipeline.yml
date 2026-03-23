@@ -180,12 +180,6 @@ steps:
           - "filebeat/build/*.json"
           - "filebeat/build/input-test/**"
           - "filebeat/build/integration-tests/**"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "filebeat: Go Integration Tests / Ubuntu x86_64"
