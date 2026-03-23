@@ -1,0 +1,3 @@
+kind: feature
+summary: Add Snappy decompression support for S3, GCS, and Azure Blob Storage inputs
+component: filebeat

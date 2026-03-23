@@ -119,7 +119,7 @@ Alternatively, you can remove the `_id` field using an Elasticsearch Ingest Node
 
 ## Handling Compressed Objects [_handling_compressed_objects]
 
-S3 objects that use the gzip format ([RFC 1952](https://rfc-editor.org/rfc/rfc1952.html)) with the DEFLATE compression algorithm are automatically decompressed during processing. This is achieved by checking for the gzip file magic header.
+S3 objects compressed as gzip ([RFC 1952](https://rfc-editor.org/rfc/rfc1952.html)) or Snappy framed streams ([framing format](https://github.com/google/snappy/blob/main/framing_format.txt)) are automatically decompressed during processing. The compression format is detected by checking for magic bytes at the start of the stream. Raw Snappy blocks are not supported.
 
 
 ## Configuration [_configuration]
