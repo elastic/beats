@@ -241,7 +241,6 @@ func GoIntegTest(ctx context.Context) error {
 	}
 
 	if !devtools.IsInIntegTestEnv() {
-		devtools.BuildSystemTestBinary()
 		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search
