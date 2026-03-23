@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -37,6 +38,7 @@ import (
 // - reload
 type outputController struct {
 	beat     beat.Info
+	logger   *logp.Logger
 	monitors Monitors
 
 	// The queue is not created until the outputController is assigned a
@@ -91,6 +93,7 @@ func newOutputController(
 ) (*outputController, error) {
 	controller := &outputController{
 		beat:           beat,
+		logger:         beat.Logger.Named("outputController"),
 		monitors:       monitors,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
@@ -193,10 +196,13 @@ func (c *outputController) closeQueue(timeout time.Duration, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
+		c.logger.Infof("Shutdown output timer started. Waiting for max %v.", timeout)
 		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
+			c.logger.Infof("Continue shutdown: All enqueued events have been published.")
 		case <-time.After(timeout):
+			c.logger.Infof("Continue shutdown: Time out waiting for events to be published.")
 			if force {
 				c.queue.Close(force)
 				<-c.queue.Done()
