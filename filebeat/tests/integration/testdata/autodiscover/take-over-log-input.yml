@@ -1,0 +1,33 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.id: {{ .ContainerID }}
+          config:
+            - type: log
+              allow_deprecated_use: true
+              paths:
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
+              json:
+                message_key: log
+                keys_under_root: true
+                overwrite_keys: true
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: "{{ .HomeFolder }}"
+
+output.file:
+  path: ${path.home}
+  filename: "output"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+  metrics:
+    enabled: false

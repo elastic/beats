@@ -22,6 +22,7 @@
 package integration
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -35,6 +36,7 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -103,116 +105,82 @@ func TestHintsKubernetes(t *testing.T) {
 }
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
-	_ = startFlogDocker(t)
+	containerID := startFlogDocker(t)
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
 		"../../filebeat.test",
 	)
 	workDir := filebeat.TempDir()
-	outputFile := filepath.Join(workDir, "output-file*")
+	outputFile := filepath.Join(workDir, "output*")
 
-	logInputConfig := fmt.Sprintf(`
-filebeat.autodiscover:
-  providers:
-    - type: docker
-      templates:
-        - condition:
-            contains:
-              docker.container.image: flog
-          config:
-            - type: log
-              allow_deprecated_use: true
-              paths:
-                - /var/lib/docker/containers/${data.docker.container.id}/*.log
-              json:
-                message_key: log
-                keys_under_root: true
-                overwrite_keys: true
+	tmplVars := map[string]any{
+		"HomeFolder":  workDir,
+		"ContainerID": containerID,
+	}
 
-queue.mem:
-  flush.timeout: 0s
-
-path.home: %s
-
-output.file:
-  path: ${path.home}
-  filename: "output-file"
-  rotate_on_startup: false
-
-logging:
-  level: debug
-  selectors:
-    - "*"
-  metrics:
-    enabled: false
-`, workDir)
-	filebeat.WriteConfigFile(logInputConfig)
+	filebeat.WriteConfigFile(
+		getConfig(t, tmplVars, "autodiscover", "take-over-log-input.yml"),
+	)
 	filebeat.Start()
+
+	// Wait until at least 5 events are ingested
 	require.Eventually(
 		t,
-		func() bool { return filebeat.CountFileLines(outputFile) >= 10 },
+		func() bool { return filebeat.CountFileLines(outputFile) >= 5 },
 		30*time.Second,
 		200*time.Millisecond,
 		"did not ingest the initial events")
 
 	filebeat.Stop()
-	initialEvents := filebeat.CountFileLines(outputFile)
+	logInputIngested := filebeat.CountFileLines(outputFile)
 
-	filestreamTakeOverConfig := fmt.Sprintf(`
-filebeat.autodiscover:
-  providers:
-    - type: docker
-      templates:
-        - condition:
-            contains:
-              docker.container.image: flog
-          config:
-            - type: filestream
-              id: "${data.docker.container.id}-logs"
-              take_over:
-                enabled: true
-              file_identity.native: ~
-              prospector.scanner.fingerprint.enabled: false
-              paths:
-                - /var/lib/docker/containers/${data.docker.container.id}/*.log
-              parsers:
-                - container:
-
-queue.mem:
-  flush.timeout: 0s
-
-path.home: %s
-
-output.file:
-  path: ${path.home}
-  filename: "output-file"
-  rotate_on_startup: false
-
-logging:
-  level: debug
-  selectors:
-    - "*"
-  metrics:
-    enabled: false
-`, workDir)
-	filebeat.WriteConfigFile(filestreamTakeOverConfig)
+	// Re-Start Filebeat with Filestream and take_over enabled
+	filebeat.WriteConfigFile(
+		getConfig(t, tmplVars, "autodiscover", "take-over-filestream-input.yml"),
+	)
 	filebeat.Start()
 
-	filebeat.WaitLogsContains(
-		`"message":"Input 'filestream' starting","service.name":"filebeat","id":"`,
-		30*time.Second,
-		"Filestream did not start for the test container using autodiscover")
-
-	time.Sleep(5 * time.Second)
-
-	eventsAfterTakeOver := filebeat.CountFileLines(outputFile)
-	newEvents := eventsAfterTakeOver - initialEvents
-	require.LessOrEqual(
+	// Wait for at least two extra event to be ingested
+	require.EventuallyWithT(
 		t,
-		newEvents,
-		8,
-		"autodiscover filestream takeover re-ingested old events",
+		func(collect *assert.CollectT) {
+			lines := filebeat.CountFileLines(outputFile)
+			if lines <= logInputIngested+2 {
+				collect.Errorf(
+					"Expecting more lines in the output than the %d from the first run",
+					logInputIngested,
+				)
+			}
+		},
+		10*time.Second,
+		time.Second,
+		"No new events ingested")
+
+	// Stop the container and get the total number of events generated
+	stopContainer(t, containerID)
+	generatedEvents := countContainerLogLines(t, containerID)
+
+	// Wait for Filebeat to fully ingest the file, we do it by waiting the file
+	// to be closed due to inactivity.
+	filebeat.WaitLogsContains(
+		"File is inactive. Closing.",
+		20*time.Second,
+		"Filebeat did not close the log file due to inactivity")
+
+	totalEventsIngested := filebeat.CountFileLines(outputFile)
+
+	require.EqualValuesf(
+		t,
+		generatedEvents,
+		totalEventsIngested,
+		"file re-ingestion has occured\n"+
+			"Generated Events: %d\n"+
+			"Events ingested by the Log input: %d\n"+
+			"Total number of events ingested: %d",
+		generatedEvents,
+		logInputIngested,
+		totalEventsIngested,
 	)
 }
 
@@ -380,4 +348,47 @@ func startFlogDocker(t *testing.T) string {
 		}
 	})
 	return resp.ID
+}
+
+func countContainerLogLines(t *testing.T, containerID string) int {
+	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
+	if err != nil {
+		t.Fatalf("cannot create Docker client: %s", err)
+	}
+
+	logsReader, err := cli.ContainerLogs(t.Context(), containerID, container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: false,
+		Tail:       "all",
+	})
+	if err != nil {
+		t.Fatalf("cannot get stdout logs for container %q: %s", containerID, err)
+	}
+	defer logsReader.Close()
+
+	lineCount := 0
+	scanner := bufio.NewScanner(logsReader)
+	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	for scanner.Scan() {
+		lineCount++
+	}
+
+	if err := scanner.Err(); err != nil {
+		t.Fatalf("cannot scan stdout logs for container %q: %s", containerID, err)
+	}
+
+	return lineCount
+}
+
+func stopContainer(t *testing.T, containerID string) {
+	t.Helper()
+
+	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
+	if err != nil {
+		t.Fatalf("cannot create Docker client: %s", err)
+	}
+
+	if err := cli.ContainerStop(t.Context(), containerID, container.StopOptions{}); err != nil {
+		t.Fatalf("cannot stop container %q: %s", containerID, err)
+	}
 }

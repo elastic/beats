@@ -1,36 +1,31 @@
 filebeat.autodiscover:
   providers:
     - type: docker
-      host: "unix:///run/docker.sock"
       templates:
         - condition:
-            equals:
-              docker.container.id: {{.containerID}}
+            contains:
+              docker.container.id: {{ .ContainerID }}
           config:
             - type: filestream
-              id: "{{.containerID}}-logs"
+              id: "${data.docker.container.id}-logs"
               take_over:
                 enabled: true
-                from_ids:
-                  - "container-logs"
               file_identity.native: ~
               prospector.scanner.fingerprint.enabled: false
+              close.on_state_change.inactive: 2s
               paths:
-                - /var/lib/docker/containers/{{.containerID}}/*.log
+                - /var/lib/docker/containers/${data.docker.container.id}/*.log
               parsers:
-                - ndjson:
-                    message_key: log
-                    keys_under_root: true
-                    overwrite_keys: true
+                - container: ~
 
 queue.mem:
   flush.timeout: 0s
 
-path.home: {{.homePath}}
+path.home: "{{ .HomeFolder }}"
 
 output.file:
   path: ${path.home}
-  filename: "output-file"
+  filename: "output"
   rotate_on_startup: false
 
 logging:
