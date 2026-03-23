@@ -508,7 +508,7 @@ func (m mockManager) SetPayload(payload map[string]any)             {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
-func (m mockManager) Stop(_ bool)                                   {}
+func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action management.Action)     {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
 
