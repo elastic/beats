@@ -11,6 +11,7 @@ linters:
     - durationcheck
     - errcheck
     - errorlint
+    - exhaustruct
     - forbidigo
     - gomoddirectives
     - gomodguard
@@ -57,6 +58,10 @@ linters:
       errorf: true
       asserts: true
       comparison: true
+    exhaustruct:
+      include:
+        # BaseMetricSet must be created via NewModule to ensure paths are set.
+        - 'github\.com/elastic/beats/v7/metricbeat/mb\.BaseMetricSet'
     forbidigo:
       forbid:
         - pattern: fmt.Print.*
