@@ -502,11 +502,12 @@ func TestKafkaTopicFilters(t *testing.T) {
 		"Filebeat-TestRegex-[^c]":    []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-d"},
 		"Filebeat-TestRegex-d":       []string{"Filebeat-TestRegex-d"},
 		"Filebeat-TestRegex-e":       []string{},
-		"Filebeat-TestRegex-$":       []string{},
 		"Filebeat-TestRegex-[a-c]":   []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c"},
 		"Filebeat-TestRegex-(a|b|c)": []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c"},
 		"Filebeat-TestRegex-.*":      []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c", "Filebeat-TestRegex-d"},
-		"^Filebeat-TestRegex-a$":     []string{"Filebeat-TestRegex-a"},
+		"^Filebeat-TestRegex-a":      []string{"Filebeat-TestRegex-a"},
+		"Filebeat-TestRegex-":        []string{},
+		"Filebeat-TestRegex-a$":      []string{"Filebeat-TestRegex-a"},
 	}
 
 	logger := logptest.NewTestingLogger(t, "kafka_regex_test")

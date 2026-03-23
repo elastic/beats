@@ -149,8 +149,23 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	}
 	var topics []string
 	filters := make([]*regexp.Regexp, len(input.config.Topics))
+	strBuild := strings.Builder{}
+	regOpts := regexp.MustCompile(`^\(\?[misU]{1,4}\)`)
 	for i, topic := range input.config.Topics {
-		reg, err := regexp.Compile(topic)
+		strBuild.Reset()
+		if idx := regOpts.FindStringIndex(topic); idx != nil && idx[0] == 0 {
+			strBuild.WriteString(topic[:idx[1]])
+			topic = topic[idx[1]:]
+		}
+		if !strings.HasPrefix(topic, "^") {
+			strBuild.WriteString("^")
+		}
+		strBuild.WriteString(topic)
+		if !strings.HasSuffix(topic, "$") {
+			strBuild.WriteString("$")
+		}
+
+		reg, err := regexp.Compile(strBuild.String())
 		if err != nil {
 			log.Errorw("Cannot parse regexp", "error", err, "regexp", topic)
 			continue
