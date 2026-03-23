@@ -130,6 +130,39 @@ var syslogCases = map[string]struct {
 		},
 		wantTime: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
 	},
+	"rfc-5424-sd-with-escaped-backslash": {
+		cfg: conf.MustNewConfigFrom(mapstr.M{}),
+		in: mapstr.M{
+			"message": `<29>1 2026-03-18T20:12:53.0Z host app - mid [agentInfo@3401 tenantId="1" tenantNodePath="1\\2"] payload`,
+		},
+		want: mapstr.M{
+			"log": mapstr.M{
+				"syslog": mapstr.M{
+					"priority": 29,
+					"facility": mapstr.M{
+						"code": 3,
+						"name": "system",
+					},
+					"severity": mapstr.M{
+						"code": 5,
+						"name": "Notice",
+					},
+					"hostname": "host",
+					"appname":  "app",
+					"msgid":    "mid",
+					"version":  "1",
+					"structured_data": map[string]interface{}{
+						"agentInfo@3401": map[string]interface{}{
+							"tenantId":       "1",
+							"tenantNodePath": `1\2`,
+						},
+					},
+				},
+			},
+			"message": "payload",
+		},
+		wantTime: mustParseTime(time.RFC3339Nano, "2026-03-18T20:12:53.0Z", nil),
+	},
 }
 
 func TestSyslog(t *testing.T) {
