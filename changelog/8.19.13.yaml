@@ -331,3 +331,30 @@ entries:
       file:
         name: 1772665071-filebeat-input-report-stopped.yaml
         checksum: 0da853639b00e4293a5fa56d3b76e23e94d7ad15
+    - kind: bug-fix
+      summary: Kafka client will avoid having more than a single metadata request to each broker in-flight at any given time
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49307
+      issue:
+        - https://github.com/elastic/beats/issues/49210
+      impact: ""
+      action: ""
+      timestamp: 1773045970
+      file:
+        name: 1773045970-kafka-Metadata.SingleFlight-is-set.yaml
+        checksum: 69f8676e40409630a0bcddecab04edf1508a4ac7
+    - kind: enhancement
+      summary: Update OTel Collector components to v0.148.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49348
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773943383
+      file:
+        name: 1773943383-bump-otel-148.yaml
+        checksum: 2ffd84b282caacaf48cf45caf17f2b3a805b88e1
