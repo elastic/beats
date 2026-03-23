@@ -57,7 +57,7 @@ Instead of sending a white list of headers to Elasticsearch, you can send all he
 
 ### `redact_headers` [_redact_headers]
 
-A list of headers to redact if present in the HTTP request. This will keep the header field present, but will redact it’s value to show the header’s presence.
+A list of headers to redact if present in the HTTP request. This will keep the header field present, but will redact its value to show the header’s presence.
 
 
 ### `include_body_for` [_include_body_for]
