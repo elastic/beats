@@ -37,7 +37,62 @@ func (m InputManager) Redirect(cfg *conf.C) (string, *conf.C, error) {
 	if err != nil {
 		return "", nil, err
 	}
+	m.migrateCursor(cfg, newCfg)
 	return "cel", newCfg, nil
+}
+
+// migrateCursor reads the httpjson cursor from the persistent store and
+// injects it into the translated cel config's state.cursor so that the
+// cel input continues from where httpjson left off. If the httpjson input
+// was stateless or the store is unavailable, this is a no-op.
+func (m InputManager) migrateCursor(src, dst *conf.C) {
+	id, _ := src.String("id", -1) // Missing id is fine; cursorKey handles empty.
+	url, err := src.String("request.url", -1)
+	if err != nil {
+		return
+	}
+	store, err := m.cursor.StateStore.StoreFor("httpjson")
+	if err != nil {
+		m.cursor.Logger.Warnw("cursor migration: cannot open store", "error", err)
+		return
+	}
+	defer store.Close()
+
+	key := cursorKey("httpjson", id, url)
+	var entry map[string]interface{}
+	if err := store.Get(key, &entry); err != nil {
+		return
+	}
+	cursor, ok := entry["cursor"]
+	if !ok || cursor == nil {
+		return
+	}
+	cursorCfg, err := conf.NewConfigFrom(cursor)
+	if err != nil {
+		m.cursor.Logger.Warnw("cursor migration: cannot create config from cursor", "error", err)
+		return
+	}
+
+	// Ensure the state sub-config exists before injecting.
+	has, err := dst.Has("state", -1)
+	if err != nil {
+		return
+	}
+	if !has {
+		if err := dst.SetChild("state", -1, conf.NewConfig()); err != nil {
+			return
+		}
+	}
+	if err := dst.SetChild("state.cursor", -1, cursorCfg); err != nil {
+		m.cursor.Logger.Warnw("cursor migration: cannot inject cursor into config", "error", err)
+	}
+}
+
+func cursorKey(typ, id, url string) string {
+	if id != "" {
+		return fmt.Sprintf("%s::%s::%s", typ, id, url)
+	}
+	return fmt.Sprintf("%s::%s", typ, url)
 }
 
 // convertHttpjsonToCel builds a cel input config from an httpjson config

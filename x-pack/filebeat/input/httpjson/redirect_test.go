@@ -568,6 +568,162 @@ state.url.with({
 	})
 }
 
+func TestMigrateCursor(t *testing.T) {
+	t.Run("injects_stored_cursor", func(t *testing.T) {
+		store := newTestStore()
+		s, err := store.StoreFor("httpjson")
+		require.NoError(t, err)
+		err = s.Set("httpjson::my-input::https://api.example.com/events", map[string]interface{}{
+			"ttl":     0,
+			"updated": time.Now(),
+			"cursor":  map[string]interface{}{"timestamp": "2025-06-15T10:30:00Z"},
+		})
+		require.NoError(t, err)
+		s.Close()
+
+		mgr := NewInputManager(logp.NewNopLogger(), store)
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"type":        "httpjson",
+			"id":          "my-input",
+			"interval":    "60s",
+			"run_as_cel":  true,
+			"request.url": "https://api.example.com/events",
+			"cel.program": `true`,
+			"cel.state":   map[string]interface{}{"cursor": map[string]interface{}{"timestamp": ""}},
+		})
+
+		_, newCfg, err := mgr.Redirect(cfg)
+		require.NoError(t, err)
+
+		v, err := newCfg.String("state.cursor.timestamp", -1)
+		require.NoError(t, err)
+		require.Equal(t, "2025-06-15T10:30:00Z", v)
+	})
+
+	t.Run("no_entry", func(t *testing.T) {
+		store := newTestStore()
+		mgr := NewInputManager(logp.NewNopLogger(), store)
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"type":        "httpjson",
+			"id":          "my-input",
+			"interval":    "60s",
+			"run_as_cel":  true,
+			"request.url": "https://api.example.com/events",
+			"cel.program": `true`,
+			"cel.state":   map[string]interface{}{"cursor": map[string]interface{}{"timestamp": "default"}},
+		})
+
+		_, newCfg, err := mgr.Redirect(cfg)
+		require.NoError(t, err)
+
+		v, err := newCfg.String("state.cursor.timestamp", -1)
+		require.NoError(t, err)
+		require.Equal(t, "default", v)
+	})
+
+	t.Run("no_id", func(t *testing.T) {
+		store := newTestStore()
+		s, err := store.StoreFor("httpjson")
+		require.NoError(t, err)
+		err = s.Set("httpjson::https://api.example.com/events", map[string]interface{}{
+			"ttl":     0,
+			"updated": time.Now(),
+			"cursor":  map[string]interface{}{"page": "42"},
+		})
+		require.NoError(t, err)
+		s.Close()
+
+		mgr := NewInputManager(logp.NewNopLogger(), store)
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"type":        "httpjson",
+			"interval":    "60s",
+			"run_as_cel":  true,
+			"request.url": "https://api.example.com/events",
+			"cel.program": `true`,
+			"cel.state":   map[string]interface{}{},
+		})
+
+		_, newCfg, err := mgr.Redirect(cfg)
+		require.NoError(t, err)
+
+		v, err := newCfg.String("state.cursor.page", -1)
+		require.NoError(t, err)
+		require.Equal(t, "42", v)
+	})
+
+	t.Run("no_state_in_config", func(t *testing.T) {
+		store := newTestStore()
+		s, err := store.StoreFor("httpjson")
+		require.NoError(t, err)
+		err = s.Set("httpjson::no-state::https://api.example.com/events", map[string]interface{}{
+			"ttl":     0,
+			"updated": time.Now(),
+			"cursor":  map[string]interface{}{"offset": "100"},
+		})
+		require.NoError(t, err)
+		s.Close()
+
+		mgr := NewInputManager(logp.NewNopLogger(), store)
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"type":        "httpjson",
+			"id":          "no-state",
+			"interval":    "60s",
+			"run_as_cel":  true,
+			"request.url": "https://api.example.com/events",
+			"cel.program": `true`,
+		})
+
+		_, newCfg, err := mgr.Redirect(cfg)
+		require.NoError(t, err)
+
+		v, err := newCfg.String("state.cursor.offset", -1)
+		require.NoError(t, err)
+		require.Equal(t, "100", v)
+	})
+
+	t.Run("idempotent", func(t *testing.T) {
+		store := newTestStore()
+		s, err := store.StoreFor("httpjson")
+		require.NoError(t, err)
+		err = s.Set("httpjson::idem::https://api.example.com/events", map[string]interface{}{
+			"ttl":     0,
+			"updated": time.Now(),
+			"cursor":  map[string]interface{}{"seq": "99"},
+		})
+		require.NoError(t, err)
+		s.Close()
+
+		mgr := NewInputManager(logp.NewNopLogger(), store)
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"type":        "httpjson",
+			"id":          "idem",
+			"interval":    "60s",
+			"run_as_cel":  true,
+			"request.url": "https://api.example.com/events",
+			"cel.program": `true`,
+			"cel.state":   map[string]interface{}{},
+		})
+
+		_, first, err := mgr.Redirect(cfg)
+		require.NoError(t, err)
+
+		_, second, err := mgr.Redirect(cfg)
+		require.NoError(t, err)
+
+		v1, err := first.String("state.cursor.seq", -1)
+		require.NoError(t, err)
+		v2, err := second.String("state.cursor.seq", -1)
+		require.NoError(t, err)
+		require.Equal(t, v1, v2)
+	})
+}
+
+func TestCursorKey(t *testing.T) {
+	require.Equal(t, "httpjson::my-id::https://example.com", cursorKey("httpjson", "my-id", "https://example.com"))
+	require.Equal(t, "cel::https://example.com", cursorKey("cel", "", "https://example.com"))
+	require.Equal(t, "httpjson::https://example.com/path", cursorKey("httpjson", "", "https://example.com/path"))
+}
+
 var _ statestore.States = (*testStore)(nil)
 
 type testStore struct {
