@@ -242,7 +242,7 @@ func parsePatternTo(b *builder, pattern string) error {
 			}
 
 		default:
-			return fmt.Errorf("unsupport format '%c'", tok)
+			return fmt.Errorf("unsupported format '%c'", tok)
 
 		}
 	}

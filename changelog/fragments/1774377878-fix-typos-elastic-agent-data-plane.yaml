@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix typos in libbeat runtime errors, filebeat/metricbeat configs, templates, README files, and field descriptions
+component: all
