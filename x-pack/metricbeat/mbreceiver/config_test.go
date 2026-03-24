@@ -8,7 +8,72 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/confmap"
 )
+
+func TestUnmarshal(t *testing.T) {
+	t.Run("partial path override preserves defaults", func(t *testing.T) {
+		cfg := &Config{
+			Beatconfig: map[string]any{
+				"path": map[string]any{
+					"home": "/default/home",
+					"data": "/default/data",
+				},
+			},
+		}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"path.home":  "/custom/home",
+			"metricbeat": map[string]any{"modules": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		pathMap, ok := cfg.Beatconfig["path"].(map[string]any)
+		require.True(t, ok, "path should be a map")
+		assert.Equal(t, "/custom/home", pathMap["home"], "user override should win")
+		assert.Equal(t, "/default/data", pathMap["data"], "unspecified default should be preserved")
+		assert.Contains(t, cfg.Beatconfig, "metricbeat")
+	})
+
+	t.Run("no defaults does not error", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"metricbeat": map[string]any{"modules": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+		assert.Contains(t, cfg.Beatconfig, "metricbeat")
+	})
+
+	t.Run("full path override replaces both", func(t *testing.T) {
+		cfg := &Config{
+			Beatconfig: map[string]any{
+				"path": map[string]any{
+					"home": "/default/home",
+					"data": "/default/data",
+				},
+			},
+		}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"path": map[string]any{
+				"home": "/custom/home",
+				"data": "/custom/data",
+			},
+			"metricbeat": map[string]any{"modules": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		pathMap, ok := cfg.Beatconfig["path"].(map[string]any)
+		require.True(t, ok)
+		assert.Equal(t, "/custom/home", pathMap["home"])
+		assert.Equal(t, "/custom/data", pathMap["data"])
+	})
+}
 
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
@@ -19,12 +84,12 @@ func TestValidate(t *testing.T) {
 		"Empty config": {
 			c:           &Config{Beatconfig: map[string]interface{}{}},
 			hasError:    true,
-			errorString: "Configuration is required",
+			errorString: "configuration is required",
 		},
 		"No metricbeat section": {
 			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
 			hasError:    true,
-			errorString: "Configuration key 'metricbeat' is required",
+			errorString: "configuration key 'metricbeat' is required",
 		},
 		"Valid config": {
 			c:           &Config{Beatconfig: map[string]interface{}{"metricbeat": map[string]interface{}{}}},
@@ -35,10 +100,10 @@ func TestValidate(t *testing.T) {
 	for name, tc := range tests {
 		err := tc.c.Validate()
 		if tc.hasError {
-			assert.NotNilf(t, err, "%s failed, should have had error", name)
+			assert.Errorf(t, err, "%s failed, should have had error", name)
 			assert.Equalf(t, err.Error(), tc.errorString, "%s failed, error not equal", name)
 		} else {
-			assert.Nilf(t, err, "%s failed, should not have error", name)
+			assert.NoErrorf(t, err, "%s failed, should not have error", name)
 		}
 	}
 }

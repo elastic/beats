@@ -60,11 +60,19 @@ func requireEventuallyWithT(t *testing.T, condition func(c *assert.CollectT), ms
 	require.EventuallyWithT(t, condition, eventuallyTimeout, eventuallyInterval, msgAndArgs...)
 }
 
+// hasID is only used in tests to check if a source is registered in the reader group.
+func (r *readerGroup) hasID(id string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	return r.table[id] != nil
+}
+
 func TestReaderGroup(t *testing.T) {
 	requireGroupSuccess := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
 		require.NotNil(t, ctx)
 		require.NotNil(t, cf)
-		require.Nil(t, err)
+		require.NoError(t, err)
 	}
 
 	requireGroupError := func(t *testing.T, ctx context.Context, cf context.CancelFunc, err error) {
@@ -75,42 +83,66 @@ func TestReaderGroup(t *testing.T) {
 
 	t.Run("assert new group is empty", func(t *testing.T) {
 		rg := newReaderGroup()
-		require.Equal(t, 0, len(rg.table))
+		require.Empty(t, rg.table)
 	})
 
 	t.Run("assert non existent key can be removed", func(t *testing.T) {
 		rg := newReaderGroup()
-		require.Equal(t, 0, len(rg.table))
+		require.Empty(t, rg.table)
 		rg.remove("no such id")
-		require.Equal(t, 0, len(rg.table))
+		require.Empty(t, rg.table)
 	})
 
 	t.Run("assert inserting existing key returns error", func(t *testing.T) {
 		rg := newReaderGroup()
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
-		require.Equal(t, 1, len(rg.table))
+		require.Len(t, rg.table, 1)
 
 		newCtx, newCf, err := rg.newContext("test-id", context.Background())
 		requireGroupError(t, newCtx, newCf, err)
+	})
+
+	t.Run("assert reserve allows newContext to upgrade the reservation", func(t *testing.T) {
+		rg := newReaderGroup()
+
+		assert.True(t, rg.reserve("test-id"), "first reserve should succeed")
+
+		ctx, cf, err := rg.newContext("test-id", context.Background())
+		requireGroupSuccess(t, ctx, cf, err)
+
+		// A second newContext should fail since a real harvester is now registered.
+		newCtx, newCf, err := rg.newContext("test-id", context.Background())
+		requireGroupError(t, newCtx, newCf, err)
+	})
+
+	t.Run("assert remove on a reserved entry and allows re-reserve", func(t *testing.T) {
+		rg := newReaderGroup()
+
+		assert.True(t, rg.reserve("test-id"), "first reserve should succeed")
+		assert.False(t, rg.reserve("test-id"), "second reserve for same id should fail")
+		rg.remove("test-id")
+		assert.Empty(t, rg.table)
+
+		assert.True(t, rg.reserve("test-id"), "reserve should succeed after remove")
 	})
 
 	t.Run("assert new key is added, can be removed and its context is cancelled", func(t *testing.T) {
 		rg := newReaderGroup()
 		ctx, cf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, ctx, cf, err)
-		require.Equal(t, 1, len(rg.table))
+		require.Len(t, rg.table, 1)
 
-		require.Nil(t, ctx.Err())
+		require.NoError(t, ctx.Err())
 		rg.remove("test-id")
 
-		require.Equal(t, 0, len(rg.table))
-		require.Error(t, ctx.Err(), context.Canceled)
+		require.Empty(t, rg.table)
+		require.ErrorIs(t, ctx.Err(), context.Canceled)
 
 		newCtx, newCf, err := rg.newContext("test-id", context.Background())
 		requireGroupSuccess(t, newCtx, newCf, err)
-		require.Equal(t, 1, len(rg.table))
-		require.Nil(t, newCtx.Err())
+		require.Len(t, rg.table, 1)
+		require.NoError(t, newCtx.Err())
 	})
 }
 
@@ -142,7 +174,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
 			"source should be removed from bookkeeper")
 		// stopped source can be stopped
-		require.Nil(t, hg.StopHarvesters())
+		require.NoError(t, hg.StopHarvesters())
 	})
 
 	t.Run("assert a harvester is only started if harvester limit haven't been reached", func(t *testing.T) {
@@ -229,7 +261,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			"sources should be removed from bookkeeper")
 
 		// stopped source can be stopped
-		require.Nil(t, hg.StopHarvesters())
+		require.NoError(t, hg.StopHarvesters())
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
@@ -340,7 +372,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
 			"source should be removed from bookkeeper after panic")
 
-		require.Nil(t, hg.StopHarvesters())
+		require.NoError(t, hg.StopHarvesters())
 	})
 
 	t.Run("assert a harvester error is handled", func(t *testing.T) {
@@ -392,7 +424,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		// wait until goroutine that started `harvester.Run` is finished
 		goroutinesChecker.WaitUntilOriginalCount()
 		require.Equal(t, 1, mockHarvester.getRunCount())
-		require.Nil(t, hg.StopHarvesters())
+		require.NoError(t, hg.StopHarvesters())
 	})
 
 	t.Run("assert already locked resource has no problem when harvestergroup is cancelled", func(t *testing.T) {
