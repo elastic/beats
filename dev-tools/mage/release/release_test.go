@@ -244,3 +244,43 @@ func TestCheckRequirements(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateTestEnvNoChanges(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create test env directory
+	testEnvDir := filepath.Join(tmpDir, "testing/environments")
+	err := os.MkdirAll(testEnvDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create test env dir: %v", err)
+	}
+
+	// Create latest.yml with a version that won't match
+	latestYml := filepath.Join(testEnvDir, "latest.yml")
+	latestContent := `services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.0
+`
+	err = os.WriteFile(latestYml, []byte(latestContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create latest.yml: %v", err)
+	}
+
+	// Change to temp directory
+	origDir, _ := os.Getwd()
+	defer os.Chdir(origDir)
+	os.Chdir(tmpDir)
+
+	// Test updating test env with non-matching version
+	// This should complete without error even though no changes are made
+	err = UpdateTestEnv("9.2.0", "9.3.0")
+	if err != nil {
+		t.Fatalf("UpdateTestEnv should not fail when no matches found: %v", err)
+	}
+
+	// Verify file was NOT updated (version should still be 9.1.0)
+	content, _ := os.ReadFile(latestYml)
+	if !strings.Contains(string(content), "docker.elastic.co/elasticsearch/elasticsearch:9.1.0") {
+		t.Errorf("Test env file should not be updated when version doesn't match. Got:\n%s", string(content))
+	}
+}
