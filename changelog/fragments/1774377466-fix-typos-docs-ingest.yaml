@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix grammar errors in user-facing reference docs (dashboard agreement, pipelines spelling, settings agreement, configuring usage)
+component: all
