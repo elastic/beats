@@ -358,44 +358,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 					return true, err
 				}
 
-				// That is a workaround for the problems with the
-				// Log input Registrar (`filebeat/registrar`) and the way it
-				// handles states.
-				// There are two problems:
-				//  - 1. The Log input store/registrar does not have an API for
-				//       removing states
-				//  - 2. When `registrar.Registrar` starts, it copies all states
-				//       belonging to the Log input from the disk store into
-				//       memory and when the Registrar is shutting down, it
-				//       writes all states to the disk. This all happens even
-				//       if no Log input was ever started.
-				// This means that no matter what we do here, the states from
-				// the Log input are always re-written to disk.
-				// See: filebeat/registrar/registrar.go, deferred statement on
-				// `Registrar.Run`.
-				//
-				// However, there is a "reset state" code, that runs
-				// during the Registrar initialisation and sets the
-				// TTL to -2, once the Log input havesting that file starts
-				// the TTL is set to -1 (never expires) or the configured
-				// value.
-				// See: filebeat/registrar/registrar.go (readStatesFrom) and
-				// filebeat/beater/filebeat.go (registrar.Start())
-				//
-				// This means that while the Log input is running and the file
-				// has been active at any moment during the Filebeat's execution
-				// the TTL is never going to be -2 during the shutdown.
-				//
-				// So, if TTL == -2, then in the previous run of Filebeat, there
-				// was no Log input using this state, which likely means, it is
-				// a state that has already been migrated to Filestream.
-				//
-				// The worst case that can happen is that we re-ingest the file
-				// once, which is still better than copying an old state with
-				// an incorrect offset every time Filebeat starts.
-				if logSt.TTL == -2 {
-					return true, nil
-				}
 				st.Key = key
 				fromLogInput[key] = st
 			}
@@ -474,7 +436,15 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	for k, v := range fromLogInput {
 		newKey, updatedMeta := fn(v)
 		if len(newKey) > 0 {
-			// Find or create a resource. It should always create a new one.
+			// If the new key already exists in the store, the file has already
+			// been taken over. Skip it to avoid overwriting a valid Filestream
+			// state with a potentially stale Log input state.
+			if existing := s.store.ephemeralStore.unsafeFind(newKey, false); existing != nil {
+				existing.Release()
+				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", k, newKey)
+				continue
+			}
+
 			res := s.store.ephemeralStore.unsafeFind(newKey, true)
 			res.cursorMeta = updatedMeta
 			// Convert the offset to the correct type
@@ -490,13 +460,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			// Update in-memory store
 			s.store.ephemeralStore.table[newKey] = res
 
-			// "remove" from the disk store.
-			// It will add a remove entry in the log file for this key, however
-			// the Registrar used by the Log input will write to disk all states
-			// it read when Filebeat was starting, thus "overriding" this delete.
-			// We keep it here because when we remove the Log input we will ensure
-			// the entry is actually remove from the disk store.
-			_ = s.store.persistentStore.Remove(k)
 			res.Release()
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
 		}
