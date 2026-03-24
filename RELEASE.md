@@ -14,10 +14,11 @@ Quick reference guide for Beats release automation using mage.
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `CURRENT_RELEASE` | Yes | - | Version to release (e.g., "9.3.0") |
-| `LATEST_RELEASE` | No | - | Previous release version |
+| `LATEST_RELEASE` | No | Auto-inferred | Previous release version (auto-inferred as patch - 1) |
+| `NEXT_RELEASE` | No | Auto-inferred | Next release version (auto-inferred as patch + 1) |
+| `RELEASE_BRANCH` | No | Auto-inferred | Release branch name (auto-inferred as major.minor, e.g., "9.3") |
 | `GITHUB_TOKEN` | Yes* | - | GitHub API token (*not required in DRY_RUN mode) |
 | `BASE_BRANCH` | No | "main" | Base branch for PRs |
-| `RELEASE_BRANCH` | No | Auto-derived | Release branch name (e.g., "9.3") |
 | `PROJECT_OWNER` | No | "elastic" | GitHub repository owner |
 | `PROJECT_REPO` | No | "beats" | GitHub repository name |
 | `PROJECT_REVIEWERS` | No | "elastic/elastic-agent-release" | Comma-separated reviewers |
@@ -25,6 +26,22 @@ Quick reference guide for Beats release automation using mage.
 | `GIT_AUTHOR_NAME` | No | "github-actions[bot]" | Git commit author name |
 | `GIT_AUTHOR_EMAIL` | No | "github-actions[bot]@users.noreply.github.com" | Git commit author email |
 | `CHANGELOG_TO_COMMIT` | No | "HEAD" | Commit to generate changelog to |
+
+## Auto-Inference
+
+The following values are automatically inferred from `CURRENT_RELEASE` and can be overridden by setting the corresponding environment variable:
+
+- **LATEST_RELEASE**: Calculated as `CURRENT_RELEASE` with patch version decremented by 1
+  - Example: `9.3.4` → `9.3.3`
+  - Note: Fails if patch version is 0 (use explicit env var for first patch release)
+
+- **NEXT_RELEASE**: Calculated as `CURRENT_RELEASE` with patch version incremented by 1
+  - Example: `9.3.4` → `9.3.5`
+
+- **RELEASE_BRANCH**: Extracted major.minor from `CURRENT_RELEASE`
+  - Example: `9.3.4` → `9.3`
+
+These values are inferred to reduce manual configuration. You can always override them by setting the environment variable explicitly.
 
 ## Quick Start
 
@@ -58,9 +75,12 @@ git checkout 9.2
 git pull
 
 export CURRENT_RELEASE="9.2.1"
-export LATEST_RELEASE="9.2.0"
 export BASE_BRANCH="9.2"
 export GITHUB_TOKEN="ghp_your_token"
+
+# LATEST_RELEASE and RELEASE_BRANCH are auto-inferred from CURRENT_RELEASE
+# LATEST_RELEASE will be 9.2.0 (patch - 1)
+# RELEASE_BRANCH will be 9.2 (major.minor)
 
 mage release:runPatch
 ```
@@ -70,10 +90,12 @@ mage release:runPatch
 Generates changelog and creates 1 PR:
 
 ```bash
-export CURRENT_RELEASE="9.3.0"
-export LATEST_RELEASE="9.2.0"
-export RELEASE_BRANCH="9.3"
+export CURRENT_RELEASE="9.3.1"
 export GITHUB_TOKEN="ghp_your_token"
+
+# LATEST_RELEASE and RELEASE_BRANCH are auto-inferred
+# LATEST_RELEASE will be 9.3.0 (patch - 1)
+# RELEASE_BRANCH will be 9.3 (major.minor)
 
 mage release:runChangelog
 ```

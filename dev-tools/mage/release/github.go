@@ -113,6 +113,7 @@ type PRConfig struct {
 	Title      string
 	Body       string
 	Labels     []string
+	Base       string // Optional: if empty, uses cfg.BaseBranch or cfg.ReleaseBranch
 }
 
 // CreateMultiplePRs creates multiple PRs in sequence
@@ -122,12 +123,22 @@ func CreateMultiplePRs(cfg *ReleaseConfig, prConfigs []PRConfig) ([]*github.Pull
 
 	var prs []*github.PullRequest
 	for i, prCfg := range prConfigs {
+		// Determine base branch: use PRConfig.Base if set, otherwise use ReleaseBranch if set, otherwise BaseBranch
+		baseBranch := prCfg.Base
+		if baseBranch == "" {
+			if cfg.ReleaseBranch != "" {
+				baseBranch = cfg.ReleaseBranch
+			} else {
+				baseBranch = cfg.BaseBranch
+			}
+		}
+
 		opts := PROptions{
 			Owner:     cfg.ProjectOwner,
 			Repo:      cfg.ProjectRepo,
 			Title:     prCfg.Title,
 			Head:      prCfg.BranchName,
-			Base:      cfg.BaseBranch,
+			Base:      baseBranch,
 			Body:      prCfg.Body,
 			Draft:     false,
 			Reviewers: cfg.ProjectReviewers,

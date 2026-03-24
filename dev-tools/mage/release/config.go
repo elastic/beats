@@ -20,6 +20,7 @@ package release
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -53,12 +54,43 @@ type ReleaseConfig struct {
 
 // LoadConfigFromEnv loads release configuration from environment variables
 func LoadConfigFromEnv() (*ReleaseConfig, error) {
+	currentRelease := os.Getenv("CURRENT_RELEASE")
+
+	// Validate required fields
+	if currentRelease == "" {
+		return nil, fmt.Errorf("CURRENT_RELEASE environment variable is required")
+	}
+
+	// Infer LatestRelease, NextRelease, and ReleaseBranch from CurrentRelease
+	latestRelease, err := inferLatestRelease(currentRelease)
+	if err != nil {
+		return nil, fmt.Errorf("failed to infer LatestRelease: %w", err)
+	}
+
+	nextRelease, err := inferNextRelease(currentRelease)
+	if err != nil {
+		return nil, fmt.Errorf("failed to infer NextRelease: %w", err)
+	}
+
+	releaseBranch := inferReleaseBranch(currentRelease)
+
+	// Allow environment variables to override inferred values
+	if envLatest := os.Getenv("LATEST_RELEASE"); envLatest != "" {
+		latestRelease = envLatest
+	}
+	if envNext := os.Getenv("NEXT_RELEASE"); envNext != "" {
+		nextRelease = envNext
+	}
+	if envBranch := os.Getenv("RELEASE_BRANCH"); envBranch != "" {
+		releaseBranch = envBranch
+	}
+
 	cfg := &ReleaseConfig{
-		CurrentRelease:    os.Getenv("CURRENT_RELEASE"),
-		LatestRelease:     os.Getenv("LATEST_RELEASE"),
-		NextRelease:       os.Getenv("NEXT_RELEASE"),
+		CurrentRelease:    currentRelease,
+		LatestRelease:     latestRelease,
+		NextRelease:       nextRelease,
 		BaseBranch:        getEnvOrDefault("BASE_BRANCH", "main"),
-		ReleaseBranch:     os.Getenv("RELEASE_BRANCH"),
+		ReleaseBranch:     releaseBranch,
 		ProjectOwner:      getEnvOrDefault("PROJECT_OWNER", "elastic"),
 		ProjectRepo:       getEnvOrDefault("PROJECT_REPO", "beats"),
 		GitHubToken:       os.Getenv("GITHUB_TOKEN"),
@@ -72,19 +104,6 @@ func LoadConfigFromEnv() (*ReleaseConfig, error) {
 	reviewers := getEnvOrDefault("PROJECT_REVIEWERS", "elastic/elastic-agent-release")
 	cfg.ProjectReviewers = strings.Split(reviewers, ",")
 
-	// Validate required fields
-	if cfg.CurrentRelease == "" {
-		return nil, fmt.Errorf("CURRENT_RELEASE environment variable is required")
-	}
-
-	// Derive release branch if not provided
-	if cfg.ReleaseBranch == "" {
-		parts := strings.Split(cfg.CurrentRelease, ".")
-		if len(parts) >= 2 {
-			cfg.ReleaseBranch = parts[0] + "." + parts[1]
-		}
-	}
-
 	return cfg, nil
 }
 
@@ -94,6 +113,49 @@ func getEnvOrDefault(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// inferLatestRelease calculates the previous release version (patch - 1)
+func inferLatestRelease(currentRelease string) (string, error) {
+	parts := strings.Split(currentRelease, ".")
+	if len(parts) < 3 {
+		return "", fmt.Errorf("invalid version format: %s (expected major.minor.patch)", currentRelease)
+	}
+
+	patch, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return "", fmt.Errorf("invalid patch version: %s", parts[2])
+	}
+
+	if patch == 0 {
+		return "", fmt.Errorf("cannot infer latest release from patch version 0")
+	}
+
+	return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], patch-1), nil
+}
+
+// inferNextRelease calculates the next release version (patch + 1)
+func inferNextRelease(currentRelease string) (string, error) {
+	parts := strings.Split(currentRelease, ".")
+	if len(parts) < 3 {
+		return "", fmt.Errorf("invalid version format: %s (expected major.minor.patch)", currentRelease)
+	}
+
+	patch, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return "", fmt.Errorf("invalid patch version: %s", parts[2])
+	}
+
+	return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], patch+1), nil
+}
+
+// inferReleaseBranch extracts the major.minor version
+func inferReleaseBranch(currentRelease string) string {
+	parts := strings.Split(currentRelease, ".")
+	if len(parts) >= 2 {
+		return parts[0] + "." + parts[1]
+	}
+	return ""
 }
 
 // Validate checks if the configuration is valid
