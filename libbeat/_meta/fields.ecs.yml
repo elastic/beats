@@ -450,15 +450,15 @@
       in the cloud, the field contains cloud data from the machine the service is
       running on.
 
-      The cloud fields may be self-nested under cloud.origin.* and cloud.target.*  to
-      describe origin or target service''s cloud information in the context of  incoming
-      or outgoing requests, respectively. However, the fieldsets  cloud.origin.* and
-      cloud.target.* must not be confused with the root cloud  fieldset that is used
-      to describe the cloud context of the actual service  under observation. The
-      fieldset cloud.origin.* may only be used in the  context of incoming requests
-      or events to provide the originating service''s  cloud information. The fieldset
-      cloud.target.* may only be used in the  context of outgoing requests or events
-      to describe the target service''s  cloud information.'
+      The cloud fields may be self-nested under cloud.origin.* and cloud.target.* to
+      describe origin or target service''s cloud information in the context of incoming
+      or outgoing requests, respectively. However, the fieldsets cloud.origin.* and
+      cloud.target.* must not be confused with the root cloud fieldset that is used
+      to describe the cloud context of the actual service under observation. The
+      fieldset cloud.origin.* may only be used in the context of incoming requests
+      or events to provide the originating service''s cloud information. The fieldset
+      cloud.target.* may only be used in the context of outgoing requests or events
+      to describe the target service''s cloud information.'
     type: group
     default_field: true
     fields:
@@ -5838,14 +5838,14 @@
       was collected.
 
       These fields help you find and correlate logs for a specific service and version.'
-    footnote: The service fields may be self-nested under service.origin.* and service.target.*  to
-      describe origin or target services in the context of incoming or outgoing requests,  respectively.
+    footnote: The service fields may be self-nested under service.origin.* and service.target.* to
+      describe origin or target services in the context of incoming or outgoing requests, respectively.
       However, the fieldsets service.origin.* and service.target.* must not be confused
-      with  the root service fieldset that is used to describe the actual service
+      with the root service fieldset that is used to describe the actual service
       under observation. The fieldset service.origin.* may only be used in the context
-      of incoming requests or  events to describe the originating service of the request.
-      The fieldset service.target.*  may only be used in the context of outgoing requests
-      or events to describe the target  service of the request.
+      of incoming requests or events to describe the originating service of the request.
+      The fieldset service.target.* may only be used in the context of outgoing requests
+      or events to describe the target service of the request.
     type: group
     default_field: true
     fields:
