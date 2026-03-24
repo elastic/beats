@@ -246,19 +246,20 @@ This PR updates test environment configurations for the %s patch release.
 		return err
 	}
 
-	// PR 2: Test environment
-	fmt.Println("\n--- Creating PR 2: Test Environment ---")
-	if err := repo.CheckoutBranch(cfg.BaseBranch); err != nil {
-		return err
-	}
-	if err := repo.CreateBranch(prConfigs[1].BranchName); err != nil {
-		return err
-	}
-	if err := repo.CheckoutBranch(prConfigs[1].BranchName); err != nil {
-		return err
-	}
-
+	// PR 2: Test environment (only if LATEST_RELEASE is set)
+	testEnvHasChanges := false
 	if cfg.LatestRelease != "" {
+		fmt.Println("\n--- Creating PR 2: Test Environment ---")
+		if err := repo.CheckoutBranch(cfg.BaseBranch); err != nil {
+			return err
+		}
+		if err := repo.CreateBranch(prConfigs[1].BranchName); err != nil {
+			return err
+		}
+		if err := repo.CheckoutBranch(prConfigs[1].BranchName); err != nil {
+			return err
+		}
+
 		if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
 			return err
 		}
@@ -272,23 +273,33 @@ This PR updates test environment configurations for the %s patch release.
 			if err := repo.CommitAll(fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
 				return err
 			}
+			testEnvHasChanges = true
 		} else {
 			fmt.Println("No test environment changes to commit")
 		}
 	} else {
-		fmt.Println("Skipping test environment updates (LATEST_RELEASE not set)")
+		fmt.Println("\nSkipping test environment PR (LATEST_RELEASE not set)")
+	}
+
+	// Determine which branches to push and which PRs to create
+	branchesToPush := []string{prConfigs[0].BranchName}
+	prsToCreate := []PRConfig{prConfigs[0]}
+
+	if testEnvHasChanges {
+		branchesToPush = append(branchesToPush, prConfigs[1].BranchName)
+		prsToCreate = append(prsToCreate, prConfigs[1])
 	}
 
 	// Push and create PRs (skip in dry-run mode)
 	if cfg.DryRun {
 		fmt.Println("\nDRY RUN: Skipping push and PR creation")
-		fmt.Printf("Branches created: %s, %s\n", prConfigs[0].BranchName, prConfigs[1].BranchName)
+		fmt.Printf("Branches created: %v\n", branchesToPush)
 		return nil
 	}
 
-	// Push both branches
-	for _, prCfg := range prConfigs {
-		if err := repo.CheckoutBranch(prCfg.BranchName); err != nil {
+	// Push branches
+	for _, branchName := range branchesToPush {
+		if err := repo.CheckoutBranch(branchName); err != nil {
 			return err
 		}
 		if err := repo.Push("origin"); err != nil {
@@ -297,7 +308,7 @@ This PR updates test environment configurations for the %s patch release.
 	}
 
 	// Create PRs
-	prs, err := CreateMultiplePRs(cfg, prConfigs)
+	prs, err := CreateMultiplePRs(cfg, prsToCreate)
 	if err != nil {
 		return err
 	}
