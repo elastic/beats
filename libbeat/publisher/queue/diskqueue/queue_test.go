@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var seed int64
@@ -78,7 +79,7 @@ func makeTestQueue() queuetest.QueueFactory {
 		settings := DefaultSettings()
 		settings.Path = dir
 		logger := logptest.NewTestingLogger(t, "")
-		queue, _ := NewQueue(logger, nil, settings, nil)
+		queue, _ := NewQueue(logger, nil, settings, nil, &paths.Path{})
 		return testQueue{
 			diskQueue: queue,
 		}

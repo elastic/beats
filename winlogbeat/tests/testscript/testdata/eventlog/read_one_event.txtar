@@ -1,0 +1,36 @@
+[!windows] skip 'requires Windows'
+
+write-event 'Hello world!'
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'Hello world!'
+check-event-field output 0 winlog.event_id '10'
+check-event-field output 0 log.level 'information'
+check-event-field output 0 winlog.channel $PROVIDER
+check-event-field output 0 winlog.provider_name $APP_SOURCE
+check-event-field-exists output 0 winlog.record_id
+check-event-field-exists output 0 winlog.computer_name
+check-event-field output 0 event.code '10'
+check-event-field output 0 winlog.event_data.param1 'Hello world!'
+check-event-field output 0 winlog.user.identifier $USER_SID
+check-event-field-exists output 0 winlog.user.name
+check-event-field output 0 winlog.user.type 'User'
+check-event-field-exists output 0 winlog.user.domain
+check-event-field-contains output 0 winlog.keywords 'Classic'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

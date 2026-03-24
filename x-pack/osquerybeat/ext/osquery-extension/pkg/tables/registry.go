@@ -7,12 +7,13 @@ package tables
 import (
 	"github.com/osquery/osquery-go"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This is the stable entry point that wraps the generated registry.
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
-	generated.RegisterTables(server, log)
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, client *client.ResilientClient) {
+	generated.RegisterTables(server, log, client)
 }

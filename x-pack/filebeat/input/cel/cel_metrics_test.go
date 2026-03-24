@@ -69,7 +69,7 @@ func TestOTELCELMetrics(t *testing.T) {
 		t.Fatalf("failed to create exporter: %v", err)
 	}
 
-	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter)
+	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter, nil)
 	if err != nil {
 		t.Fatalf("failed to create otelCELMetrics: %v", err)
 	}

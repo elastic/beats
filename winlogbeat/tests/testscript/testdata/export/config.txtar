@@ -1,0 +1,8 @@
+exec winlogbeat export config -c winlogbeat.yml
+stdout 'winlogbeat'
+
+-- winlogbeat.yml --
+output.file:
+  path: ./output
+  filename: winlogbeat
+  rotate_every_kb: 1000
