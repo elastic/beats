@@ -50,7 +50,7 @@ func TestNewExporterCfgFromEnv_DisableWorksForCel(t *testing.T) {
 }
 
 func TestNewExporterCfgFromEnv_ExporterDefaultsToNone(t *testing.T) {
-	// unset BEATS_OTEL_TRACES_DISABLE
+	// With BEATS_OTEL_TRACES_DISABLE not set.
 	cfg, err := newExporterCfgFromEnv("cel")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -178,7 +178,7 @@ func TestNewExporterCfgFromEnv_EndpointURLAppendsPathWithoutDoubleSlash(t *testi
 
 func TestNewExporterCfgFromEnv_NotInsecureByDefault(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "otlp-receiver.example.com:4317")
-	// unset OTEL_EXPORTER_OTLP_INSECURE
+	// With OTEL_EXPORTER_OTLP_INSECURE not set.
 	cfg, err := newExporterCfgFromEnv("cel")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -190,7 +190,7 @@ func TestNewExporterCfgFromEnv_NotInsecureByDefault(t *testing.T) {
 
 func TestNewExporterCfgFromEnv_SetsInsecureIfUnsetButUsingSchemeOfHTTP(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otlp-receiver.example.com:4317")
-	// unset OTEL_EXPORTER_OTLP_INSECURE
+	// With OTEL_EXPORTER_OTLP_INSECURE not set.
 	cfg, err := newExporterCfgFromEnv("cel")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
