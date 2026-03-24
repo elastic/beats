@@ -121,8 +121,17 @@ func (g *GitRepo) Push(remoteName string) error {
 		return fmt.Errorf("GITHUB_TOKEN environment variable is required for pushing")
 	}
 
-	err := g.repo.Push(&git.PushOptions{
+	// Get current branch to push only this branch
+	currentBranch, err := g.GetCurrentBranch()
+	if err != nil {
+		return err
+	}
+
+	refSpec := config.RefSpec(fmt.Sprintf("refs/heads/%s:refs/heads/%s", currentBranch, currentBranch))
+
+	err = g.repo.Push(&git.PushOptions{
 		RemoteName: remoteName,
+		RefSpecs:   []config.RefSpec{refSpec},
 		Auth: &http.BasicAuth{
 			Username: "git",
 			Password: token,
@@ -132,7 +141,7 @@ func (g *GitRepo) Push(remoteName string) error {
 		return fmt.Errorf("failed to push: %w", err)
 	}
 
-	fmt.Printf("Pushed to remote: %s\n", remoteName)
+	fmt.Printf("Pushed branch %s to remote: %s\n", currentBranch, remoteName)
 	return nil
 }
 
