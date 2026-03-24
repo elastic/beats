@@ -42,10 +42,6 @@ https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
 [[enhancements-8.19.13]]
 ==== Enhancements
 
-**All**
-
-* Update OTel Collector libraries to v0.147.0/v1.53.0 https://github.com/elastic/beats/pull/49348[#49348]
-
 **Filebeat**
 
 * Add optional `token_url` support for JWT Bearer Flow in Salesforce input. https://github.com/elastic/beats/pull/43933[#43933] https://github.com/elastic/beats/issues/43963[#43963]
