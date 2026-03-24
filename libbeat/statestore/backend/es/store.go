@@ -19,11 +19,8 @@ package es
 
 import (
 	"context"
-	"encoding/json"
 	"sync"
-	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -140,33 +137,6 @@ func (s *store) Get(key string, to interface{}) error {
 	return s.base.Get(key, to)
 }
 
-type queryResult struct {
-	Found  bool `json:"found"`
-	Source struct {
-		Value json.RawMessage `json:"v"`
-	} `json:"_source"`
-}
-
-type doc struct {
-	Value     any `struct:"v"`
-	UpdatedAt any `struct:"updated_at"`
-}
-
-type entry struct {
-	value interface{}
-}
-
-func (e entry) Decode(to interface{}) error {
-	return typeconv.Convert(to, e.value)
-}
-
-func renderRequest(val interface{}) doc {
-	return doc{
-		Value:     val,
-		UpdatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
-	}
-}
-
 func (s *store) Set(key string, value interface{}) error {
 	if err := s.waitReady(); err != nil {
 		return err
@@ -185,13 +155,6 @@ func (s *store) Remove(key string) error {
 	defer s.mx.Unlock()
 
 	return s.base.Remove(key)
-}
-
-type searchResult struct {
-	ID     string `json:"_id"`
-	Source struct {
-		Value json.RawMessage `json:"v"`
-	} `json:"_source"`
 }
 
 func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
