@@ -36,28 +36,28 @@ const (
 )
 
 // jumplistMeta is metadata shared by every entry from one jump list file.
-type jumplistMeta struct {
+type Meta struct {
 	*jumpliststypes.ApplicationID
 	*jumpliststypes.UserProfile
 	*jumpliststypes.JumplistMeta
 }
 
-// jumplistEntry is a single entry in a jump list.
-type jumplistEntry struct {
+// Entry is a single entry in a jump list.
+type Entry struct {
 	*DestListEntry
 	*Lnk
 }
 
 // jumplist holds entries from one jump list source file.
 type jumplist struct {
-	*jumplistMeta
-	entries []*jumplistEntry
+	*Meta
+	entries []*Entry
 }
 
 // jumplistRow is one emitted row.
 type jumplistRow struct {
-	*jumplistMeta
-	*jumplistEntry
+	*Meta
+	*Entry
 }
 
 // toRows converts a jump list to row objects.
@@ -65,15 +65,15 @@ func (j *jumplist) toRows() []jumplistRow {
 	var rows []jumplistRow
 	for _, entry := range j.entries {
 		rows = append(rows, jumplistRow{
-			jumplistMeta:  j.jumplistMeta,
-			jumplistEntry: entry,
+			Meta:  j.Meta,
+			Entry: entry,
 		})
 	}
 	return rows
 }
 
 // matchesFilters is a helper function that checks if a row matches the given filters.
-func matchesFilters(row jumplistRow, filters []filters.Filter) bool {
+func matchesFilters(row jumplistRow, filters []filters.Filter, log *logger.Logger) bool {
 	for _, filter := range filters {
 		if !filter.Matches(row) {
 			return false
@@ -115,7 +115,7 @@ func getResults(_ context.Context, queryContext table.QueryContext, log *logger.
 	constraintFilters := filters.GetConstraintFilters(queryContext)
 	for _, jumpList := range jumplists {
 		for _, row := range jumpList.toRows() {
-			if matchesFilters(row, constraintFilters) {
+			if matchesFilters(row, constraintFilters, log) {
 				results = append(results, jumplistRowToResult(row))
 			}
 		}
@@ -161,9 +161,6 @@ func jumplistRowToResult(row jumplistRow) elasticjumplists.Result {
 			HotKey:                 row.Lnk.HotKey,
 			IconIndex:              row.Lnk.IconIndex,
 			ShowWindow:             row.Lnk.ShowWindow,
-			IconLocation:           row.Lnk.IconLocation,
-			CommandLineArguments:   row.Lnk.CommandLineArguments,
-			TargetModificationTime: row.Lnk.TargetModificationDate,
 			TargetLastAccessedTime: row.Lnk.TargetLastAccessedDate,
 			TargetCreationTime:     row.Lnk.TargetCreationDate,
 			VolumeSerialNumber:     row.Lnk.VolumeSerialNumber,

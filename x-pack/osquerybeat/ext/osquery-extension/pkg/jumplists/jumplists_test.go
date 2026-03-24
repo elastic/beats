@@ -9,11 +9,14 @@ package jumplists
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	osquerygen "github.com/osquery/osquery-go/gen/osquery"
+	"github.com/osquery/osquery-go/plugin/table"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticjumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/elastic_jumplists"
 )
@@ -226,7 +229,7 @@ func TestAutomaticJumpList(t *testing.T) {
 	}
 	log := logger.New(os.Stdout, true)
 	for _, test := range tests {
-		automaticJumpList, err := parseAutomaticJumpListFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
+		automaticJumpList, err := parseAutomaticJumplistFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
 		if err != nil {
 			t.Fatalf("%s %s parseAutomaticJumpListFile() returned error: %v", test.filePath, test.name, err)
 		}
@@ -252,6 +255,79 @@ func TestAutomaticJumpList(t *testing.T) {
 				assert.NotNil(t, row.DestListEntry, "expected non-nil DestListEntry when parsing Automatic Jump List")
 			}
 		}
+	}
+}
+
+func TestJumplistFilters(t *testing.T) {
+	type testCase struct {
+		name               string
+		filePath           string
+		filter             filters.Filter
+		expectedMatchCount int
+	}
+	tests := []testCase{
+		{
+			name:               "application_name equals filter",
+			filePath:           "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
+			filter:             filters.Filter{ColumnName: "application_name", Operator: table.OperatorEquals, Expression: "Windows Explorer Windows 8.1"},
+			expectedMatchCount: 44,
+		},
+		{
+			name:               "is_pinned equals filter",
+			filePath:           "./testdata/automatic/f01b4d95cf55d32a.automaticDestinations-ms",
+			filter:             filters.Filter{ColumnName: "is_pinned", Operator: table.OperatorEquals, Expression: "1"},
+			expectedMatchCount: 4,
+		},
+		{
+			name:               "file_size greater than filter",
+			filePath:           "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			filter:             filters.Filter{ColumnName: "file_size", Operator: table.OperatorGreaterThan, Expression: "10000"},
+			expectedMatchCount: 3,
+		},
+		{
+			name:               "file_size less than filter",
+			filePath:           "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			filter:             filters.Filter{ColumnName: "file_size", Operator: table.OperatorLessThan, Expression: "10000"},
+			expectedMatchCount: 0,
+		},
+		{
+			name:               "icon_location like filter",
+			filePath:           "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			filter:             filters.Filter{ColumnName: "icon_location", Operator: table.OperatorLike, Expression: "%OktaVerify.exe"},
+			expectedMatchCount: 3,
+		},
+		{
+			name:               "command_line_arguments equals filter",
+			filePath:           "./testdata/custom/f4ed0c515fdbcbc.customDestinations-ms",
+			filter:             filters.Filter{ColumnName: "command_line_arguments", Operator: table.OperatorEquals, Expression: "--ShowSettings"},
+			expectedMatchCount: 1,
+		},
+	}
+	log := logger.New(os.Stdout, true)
+	for _, test := range tests {
+		var rows []jumplistRow
+		if strings.Contains(test.filePath, "automatic") {
+			jumplist, err := parseAutomaticJumplistFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
+			assert.NoError(t, err, "expected no error when parsing Jumplist")
+			assert.NotNil(t, jumplist, "expected non-nil Jumplist when parsing Jumplist")
+			rows = jumplist.toRows()
+		} else if strings.Contains(test.filePath, "custom") {
+			jumplist, err := parseCustomJumplistFile(test.filePath, &UserProfile{Username: "test", Sid: "test"}, log)
+			assert.NoError(t, err, "expected no error when parsing Jumplist")
+			assert.NotNil(t, jumplist, "expected non-nil Jumplist when parsing Jumplist")
+			rows = jumplist.toRows()
+		} else {
+			t.Fatalf("invalid test file path: %s", test.filePath)
+		}
+
+		assert.Greater(t, len(rows), 0, "expected at least 1 row in the Jumplist")
+		matchCount := 0
+		for _, row := range rows {
+			if test.filter.Matches(row) {
+				matchCount++
+			}
+		}
+		assert.Equal(t, test.expectedMatchCount, matchCount, "expected %d matching rows for filter %v", test.expectedMatchCount, test.filter)
 	}
 }
 
