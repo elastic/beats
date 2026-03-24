@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/mage/release"
 )
 
 var (
@@ -276,4 +277,57 @@ func runOnEveryBeat(beatDirs []string, mageTarget string) error {
 	}
 
 	return nil
+}
+
+// Release is the namespace for release automation tasks
+type Release mg.Namespace
+
+// UpdateVersion updates the version in libbeat/version/version.go
+func (Release) UpdateVersion(version string) error {
+	return release.UpdateVersion(version)
+}
+
+// UpdateDocs updates version references in documentation and K8s manifests
+func (Release) UpdateDocs(version string) error {
+	return release.UpdateDocs(version)
+}
+
+// UpdateTestEnv updates docker-compose.yml files with new versions
+func (Release) UpdateTestEnv(latest, current string) error {
+	return release.UpdateTestEnv(latest, current)
+}
+
+// UpdateMergify updates .mergify.yml backport configuration
+func (Release) UpdateMergify(version string) error {
+	return release.UpdateMergify(version)
+}
+
+// RunMajorMinor executes the complete major/minor release workflow
+// This creates 1 PR with all version updates
+func (Release) RunMajorMinor() error {
+	cfg, err := release.LoadConfigFromEnv()
+	if err != nil {
+		return err
+	}
+	return release.RunMajorMinorRelease(cfg)
+}
+
+// RunPatch executes the complete patch release workflow
+// This creates 2 PRs (docs+version, test-env)
+func (Release) RunPatch() error {
+	cfg, err := release.LoadConfigFromEnv()
+	if err != nil {
+		return err
+	}
+	return release.RunPatchRelease(cfg)
+}
+
+// RunChangelog executes the complete changelog workflow
+// This generates changelog and creates 1 PR
+func (Release) RunChangelog() error {
+	cfg, err := release.LoadConfigFromEnv()
+	if err != nil {
+		return err
+	}
+	return release.RunChangelog(cfg)
 }
