@@ -97,7 +97,7 @@ func pullBusyboxImage(t *testing.T) {
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
+	reader, err := c.ImagePull(t.Context(), "busybox", image.PullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
