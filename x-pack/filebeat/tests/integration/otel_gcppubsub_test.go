@@ -54,11 +54,12 @@ func TestGCPInputOTelE2E(t *testing.T) {
 	fbIndex := "logs-integration-" + fbNameSpace
 
 	type options struct {
-		Namespace    string
-		ESURL        string
-		Username     string
-		Password     string
-		Subscription string
+		Namespace       string
+		ESURL           string
+		Username        string
+		Password        string
+		Subscription    string
+		CredentialsFile string
 	}
 
 	gcpFilebeatConfig := `filebeat.inputs:
@@ -66,7 +67,7 @@ func TestGCPInputOTelE2E(t *testing.T) {
   project_id: test-project-id
   topic: test-topic-foo
   subscription.name:  {{ .Subscription }}
-  credentials_file: "testdata/gcp_pubsub_fake_credentials.json"
+  credentials_file: "{{ .CredentialsFile }}"
 
 output:
   elasticsearch:
@@ -125,7 +126,7 @@ receivers:
     filebeatreceiver:
         filebeat:
             inputs:
-                - credentials_file: "testdata/fake.json"
+                - credentials_file: "{{ .CredentialsFile }}"
                   project_id: test-project-id
                   subscription:
                     name: {{ .Subscription }}
@@ -155,9 +156,10 @@ service:
 `
 
 	optionsValue := options{
-		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username: user,
-		Password: password,
+		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:        user,
+		Password:        password,
+		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
 	}
 
 	var configBuffer bytes.Buffer
