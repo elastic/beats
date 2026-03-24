@@ -438,16 +438,17 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	for k, v := range fromLogInput {
 		newKey, updatedMeta := fn(v)
 		if len(newKey) > 0 {
+			res := s.store.ephemeralStore.unsafeFind(newKey, true)
+
 			// If the new key already exists in the store, the file has already
 			// been taken over. Skip it to avoid overwriting a valid Filestream
 			// state with a potentially stale Log input state.
-			if existing := s.store.ephemeralStore.unsafeFind(newKey, false); existing != nil {
-				existing.Release()
+			if !res.IsNew() {
+				res.Release()
 				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", k, newKey)
 				continue
 			}
 
-			res := s.store.ephemeralStore.unsafeFind(newKey, true)
 			res.cursorMeta = updatedMeta
 			// Convert the offset to the correct type
 			res.cursor = struct {
