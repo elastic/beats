@@ -262,10 +262,21 @@ This PR updates test environment configurations for the %s patch release.
 		if err := UpdateTestEnv(cfg.LatestRelease, cfg.CurrentRelease); err != nil {
 			return err
 		}
-	}
 
-	if err := repo.CommitAll(fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
-		return err
+		// Only commit if there are changes
+		clean, err := repo.IsClean()
+		if err != nil {
+			return err
+		}
+		if !clean {
+			if err := repo.CommitAll(fmt.Sprintf("Update testing environment for %s", cfg.CurrentRelease), cfg.GitAuthorName, cfg.GitAuthorEmail); err != nil {
+				return err
+			}
+		} else {
+			fmt.Println("No test environment changes to commit")
+		}
+	} else {
+		fmt.Println("Skipping test environment updates (LATEST_RELEASE not set)")
 	}
 
 	// Push and create PRs (skip in dry-run mode)
