@@ -303,6 +303,10 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 //     the in-memory and disk store.
 //   - If it was from a Log input, it is left untouched.
 func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
+	// Lock the ephemeral store so we can migrate the states in one go
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
 	matchPreviousFilestreamIDs := func(key string) bool {
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
@@ -360,10 +364,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			return true, nil
 		})
 	}
-
-	// Lock the ephemeral store so we can migrate the states in one go
-	s.store.ephemeralStore.mu.Lock()
-	defer s.store.ephemeralStore.mu.Unlock()
 
 	// Migrate all states from the Filestream input
 	for k := range fromFilestreamInput {
