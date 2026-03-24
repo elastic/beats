@@ -12,10 +12,11 @@ permissions:
 
 jobs:
   run:
+    # Access control is enforced by the upstream reusable workflow pre_activation
+    # check (required roles: admin, maintainer, write).
     if: >-
       github.event.issue.pull_request == null &&
-      (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude')) &&
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
+      (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude'))
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-issue.lock.yml@v0
     with:
       setup-commands: |

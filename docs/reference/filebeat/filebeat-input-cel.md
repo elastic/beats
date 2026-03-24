@@ -458,7 +458,7 @@ filebeat.inputs:
 ### `secret_state` [secret-state-cel]
 
 ```{applies_to}
-stack: ga 9.4.0
+stack: ga 9.2+
 ```
 
 `secret_state` is an optional object holding secret key-value pairs. When configured in a Fleet integration package with `secret: true`, the values are stored encrypted by Fleet and decrypted before being passed to the input.
@@ -1002,6 +1002,25 @@ stack: ga 9.3.0
 
 Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
 
+### `otel.trace` [_otel_trace]
+
+```{applies_to}
+stack: beta 9.4.0
+```
+
+OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
+
+By default, the value of an HTTP header or query string parameter will be redacted in span attributes if its name contains a word that suggests sensitive data and its full name isn't in a list of known-safe names.
+
+The following settings can override the default behavior for specific full names.
+
+### `otel.trace.redacted` [_otel_trace_redacted]
+
+A list of headers and query string parameters that should have their values redacted in OpenTelemetry tracing span attributes. Not case sensitive.
+
+### `otel.trace.unredacted` [_otel_trace_unredacted]
+
+A list of headers and query string parameters that should not have their values redacted in OpenTelemetry tracing span attributes. Not case sensitive.
 
 ### `resource.url` [resource-parameters]
 
@@ -1368,5 +1387,4 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 #### `publisher_pipeline.disable_host` [_publisher_pipeline_disable_host_4]
 
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
-
 

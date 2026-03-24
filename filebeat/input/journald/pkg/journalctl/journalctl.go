@@ -55,6 +55,7 @@ type journalctl struct {
 // The returned type is an interface to allow mocking for testing
 func NewFactory(chroot, journalctlPath string) JctlFactory {
 	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+		//nolint:noctx // we use the canceller to correctly stop the process
 		cmd := exec.Command(journalctlPath, args...)
 
 		if chroot != "" {
@@ -80,10 +81,36 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 			return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
 		}
 
+		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
+
+		logger.Infow(
+			"Journalctl command. Paths relative to chroot (if set)",
+			"process.command_line", processCmdLine,
+			"process.chroot", chroot,
+		)
+
+		// Start the process before trying to read from the pipes
+		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
+		if err := cmd.Start(); err != nil {
+			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
+		}
+
+		jctl.logger = jctl.logger.With(
+			"process.pid", cmd.Process.Pid,
+		)
+
+		jctl.logger.Info("journalctl started")
+
+		// readersWG tracks when the stdout/stderr reader goroutines are done.
+		// cmd.Wait must not be called until all reads from StdoutPipe and
+		// StderrPipe have completed (per the os/exec docs), so the wait
+		// goroutine below uses this to gate the cmd.Wait call.
+		var readersWG sync.WaitGroup
+
 		// This gorroutune reads the stderr from the journalctl process, if the
 		// process exits for any reason, then its stderr is closed, this goroutine
 		// gets an EOF error and exits
-		go func() {
+		readersWG.Go(func() {
 			defer jctl.logger.Debug("stderr reader goroutine done")
 			reader := bufio.NewReader(jctl.stderr)
 			for {
@@ -97,13 +124,13 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 
 				logger.Errorf("Journalctl wrote to stderr: %s", line)
 			}
-		}()
+		})
 
 		// This goroutine reads the stdout from the journalctl process and makes
 		// the data available via the `Next()` method.
 		// If the journalctl process exits for any reason, then its stdout is closed
 		// this goroutine gets an EOF error and exits.
-		go func() {
+		readersWG.Go(func() {
 			defer jctl.logger.Debug("stdout reader goroutine done")
 			defer close(jctl.dataChan)
 			reader := bufio.NewReader(jctl.stdout)
@@ -146,38 +173,21 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 				case jctl.dataChan <- data:
 				}
 			}
-		}()
-
-		processCmdLine := strings.Join(append([]string{journalctlPath}, args...), " ")
-
-		logger.Infow(
-			"Journalctl command. Paths relative to chroot (if set)",
-			"process.command_line", processCmdLine,
-			"process.chroot", chroot,
-		)
-
-		if err := cmd.Start(); err != nil {
-			return &journalctl{}, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
-		}
-
-		logger.Infow(
-			"journalctl started",
-			"process.pid", cmd.Process.Pid,
-		)
-		jctl.logger = jctl.logger.With(
-			"process.pid", cmd.Process.Pid,
-		)
+		})
 
 		// Whenever the journalctl process exits, the `Wait` call returns,
 		// if there was an error it is logged and this goroutine exits.
-		jctl.waitDone.Add(1)
-		go func() {
-			defer jctl.waitDone.Done()
+		// We must wait for the reader goroutines to finish before calling
+		// cmd.Wait, because Wait closes the pipes obtained via StdoutPipe
+		// and StderrPipe. Calling Wait prematurely causes readers to see
+		// "file already closed" instead of the process output.
+		jctl.waitDone.Go(func() {
+			readersWG.Wait()
 			if err := cmd.Wait(); err != nil {
 				jctl.logger.Errorf("journalctl exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
 			}
 			jctl.logger.Debugf("journalctl exit code: %d", cmd.ProcessState.ExitCode())
-		}()
+		})
 
 		return &jctl, nil
 	}

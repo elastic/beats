@@ -323,6 +323,13 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}
 		defer resp.Body.Close()
 
+		if resp.StatusCode != http.StatusOK {
+			var buf bytes.Buffer
+			io.Copy(&buf, resp.Body)
+			s.log.Errorw("unsuccessful firehose request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
+			return state, fmt.Errorf("unsuccessful firehose request: %s: %s", resp.Status, &buf)
+		}
+
 		// Prepare state to understand which feed is being processed.
 		// This is cleared by the deferred delete above the loop.
 		state["feed"] = feedName
@@ -340,6 +347,11 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 				return state, fmt.Errorf("error decoding event: %w", err)
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
+			if len(msg) == 0 || msg[0] != '{' {
+				s.metrics.errorsTotal.Inc()
+				s.log.Warnw("skipping non-object message from firehose", logp.Namespace(s.ns), "msg", debugMsg(msg))
+				continue
+			}
 			state["response"] = []byte(msg)
 			s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
