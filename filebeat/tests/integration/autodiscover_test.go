@@ -28,6 +28,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -105,6 +106,10 @@ func TestHintsKubernetes(t *testing.T) {
 }
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("This test needs access to log files from Docker, it can only run on Linux")
+	}
+	canReadContainerLogs(t)
 	containerID := startFlogDocker(t)
 	filebeat := integration.NewBeat(
 		t,
@@ -386,5 +391,13 @@ func stopContainer(t *testing.T, containerID string) {
 
 	if err := cli.ContainerStop(t.Context(), containerID, container.StopOptions{}); err != nil {
 		t.Fatalf("cannot stop container %q: %s", containerID, err)
+	}
+}
+
+func canReadContainerLogs(t *testing.T) {
+	_, err := os.Stat("/var/lib/docker/containers")
+	if err != nil {
+		t.Fatalf("Cannot read '/var/lib/docker/containers', this test usually"+
+			" needs to be run as root. Error: %s", err)
 	}
 }
