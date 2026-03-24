@@ -64,7 +64,9 @@ https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
 
 **All**
 
-* Improve `append` processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021] 
+* Improve `append` processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021]
+* Kafka client will avoid having more than a single metadata request to each broker in-flight at any given time. https://github.com/elastic/beats/pull/49307[#49307]
+
 
 **Filebeat**
 
