@@ -38,11 +38,13 @@ import (
 )
 
 func TestData(t *testing.T) {
+	pullBusyboxImage(t)
+
 	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2WithContext(10*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2WithContext(30*time.Second, 1, ms)
 		close(done)
 	}()
 
@@ -77,13 +79,6 @@ func createEvent(t *testing.T) {
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	io.Copy(os.Stdout, reader)
-	reader.Close()
-
 	resp, err := c.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
 		Cmd:   []string{"echo", "foo"},
@@ -93,6 +88,21 @@ func createEvent(t *testing.T) {
 	}
 
 	c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+}
+
+func pullBusyboxImage(t *testing.T) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	io.Copy(os.Stdout, reader)
+	reader.Close()
 }
 
 func getConfig() map[string]interface{} {
