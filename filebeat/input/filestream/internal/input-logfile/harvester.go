@@ -38,6 +38,18 @@ var (
 	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
 )
 
+type permanentHarvesterError struct {
+	err error
+}
+
+func (e permanentHarvesterError) Error() string {
+	return e.err.Error()
+}
+
+func (e permanentHarvesterError) Unwrap() error {
+	return e.err
+}
+
 // Harvester is the reader which collects the lines from
 // the configured source.
 type Harvester interface {
@@ -232,8 +244,8 @@ func startHarvester(
 				hg.readers.remove(srcID)
 			}
 
-			// Report any harvester error as a degraded state for the input
-			if err != nil {
+			// Report permanent harvester errors as a degraded state for the input.
+			if err != nil && isPermanentHarvesterError(err) {
 				ctx.UpdateStatus(
 					status.Degraded,
 					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
@@ -280,7 +292,9 @@ func startHarvester(
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
-			return fmt.Errorf("error while connecting to output with pipeline: %w", err)
+			return permanentHarvesterError{
+				err: fmt.Errorf("error while connecting to output with pipeline: %w", err),
+			}
 		}
 		defer client.Close()
 
@@ -404,4 +418,9 @@ func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Cancele
 func releaseResource(resource *resource) {
 	resource.lock.Unlock()
 	resource.Release()
+}
+
+func isPermanentHarvesterError(err error) bool {
+	var permanentErr permanentHarvesterError
+	return errors.As(err, &permanentErr)
 }
