@@ -1,7 +1,6 @@
 name: PR Buildkite Detective
 on:
-  check_run:
-    types: [completed]
+  status:
 
 permissions:
   actions: read
@@ -12,9 +11,8 @@ permissions:
 jobs:
   run:
     if: >-
-      github.event.check_run.conclusion == 'failure' &&
-      github.event.check_run.app.slug == 'buildkite' &&
-      toJSON(github.event.check_run.pull_requests) != '[]'
+      github.event.state == 'failure' &&
+      contains(github.event.context, 'buildkite')
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-estc-pr-buildkite-detective.lock.yml@v0
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
