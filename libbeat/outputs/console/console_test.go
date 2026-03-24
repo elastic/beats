@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -141,4 +142,68 @@ func run(codec codec.Codec, logger *logp.Logger, batches ...publisher.Batch) (st
 
 func event(k, v string) mapstr.M {
 	return mapstr.M{k: v}
+}
+
+func TestMakeConsoleWithFormatCodec(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg := config.MustNewConfigFrom(mapstr.M{
+		"codec": mapstr.M{
+			"format": mapstr.M{
+				"string": "%{[message]}",
+			},
+		},
+	})
+
+	batch := outest.NewBatch(beat.Event{Fields: event("message", "hello")})
+	lines, err := withStdout(func() {
+		outputGroup, makeErr := makeConsole(nil, beat.Info{Beat: "test", Logger: logger}, outputs.NewNilObserver(), cfg, nil)
+		assert.NoError(t, makeErr)
+		if !assert.Len(t, outputGroup.Clients, 1) {
+			return
+		}
+		assert.NoError(t, outputGroup.Clients[0].Publish(context.Background(), batch))
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "hello\n", lines)
+	if !assert.Len(t, batch.Signals, 1) {
+		return
+	}
+	assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+}
+
+func TestMakeConsoleCodecConfigErrors(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	tests := []struct {
+		name   string
+		config mapstr.M
+		errMsg string
+	}{
+		{
+			name: "unknown codec",
+			config: mapstr.M{
+				"codec": mapstr.M{
+					"unknown": mapstr.M{},
+				},
+			},
+			errMsg: "'unknown' output codec is not available",
+		},
+		{
+			name: "format codec missing string",
+			config: mapstr.M{
+				"codec": mapstr.M{
+					"format": mapstr.M{},
+				},
+			},
+			errMsg: "missing required field accessing 'codec.format.string'",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(tc.config)
+			_, err := makeConsole(nil, beat.Info{Beat: "test", Logger: logger}, outputs.NewNilObserver(), cfg, nil)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), tc.errMsg)
+		})
+	}
 }
