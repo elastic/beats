@@ -116,6 +116,7 @@ func getEnvOrDefault(key, defaultValue string) string {
 }
 
 // inferLatestRelease calculates the previous release version (patch - 1)
+// For minor releases (patch == 0), returns empty string - user must set LATEST_RELEASE explicitly
 func inferLatestRelease(currentRelease string) (string, error) {
 	parts := strings.Split(currentRelease, ".")
 	if len(parts) < 3 {
@@ -127,8 +128,10 @@ func inferLatestRelease(currentRelease string) (string, error) {
 		return "", fmt.Errorf("invalid patch version: %s", parts[2])
 	}
 
+	// For minor releases (e.g., 9.5.0), we cannot infer the previous release
+	// User must provide LATEST_RELEASE explicitly via environment variable
 	if patch == 0 {
-		return "", fmt.Errorf("cannot infer latest release from patch version 0")
+		return "", nil
 	}
 
 	return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], patch-1), nil

@@ -35,7 +35,8 @@ func PrepareChangelog(fromVersion, toCommit string) error {
 
 	// Run beats-changelog split command
 	// Example: beats-changelog split --from v9.2.0 --to <commit>
-	cmd := exec.Command("beats-changelog", "split",
+	ctx := context.Background()
+	cmd := exec.CommandContext(ctx, "beats-changelog", "split",
 		"--from", "v"+fromVersion,
 		"--to", toCommit,
 	)
@@ -88,6 +89,10 @@ func RunChangelog(cfg *ReleaseConfig) error {
 	// Generate changelog
 	fromVersion := cfg.LatestRelease
 	if fromVersion == "" {
+		// For minor releases (e.g., 9.5.0), user must explicitly set LATEST_RELEASE
+		// to the last patch of the previous minor version (e.g., 9.4.3)
+		fmt.Println("WARNING: LATEST_RELEASE not set. For minor releases, please set LATEST_RELEASE explicitly.")
+		fmt.Printf("WARNING: Using current release %s as starting point for changelog.\n", cfg.CurrentRelease)
 		fromVersion = cfg.CurrentRelease
 	}
 
