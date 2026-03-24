@@ -126,6 +126,18 @@ func RunMajorMinorRelease(cfg *ReleaseConfig) error {
 		return nil
 	}
 
+	// Push release branch first
+	if err := repo.CheckoutBranch(releaseBranch); err != nil {
+		return err
+	}
+	if err := repo.Push("origin"); err != nil {
+		return err
+	}
+
+	// Push update branch
+	if err := repo.CheckoutBranch(updateBranch); err != nil {
+		return err
+	}
 	if err := repo.Push("origin"); err != nil {
 		return err
 	}
