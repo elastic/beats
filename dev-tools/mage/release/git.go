@@ -19,12 +19,14 @@ package release
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
 // GitRepo wraps go-git Repository with helper methods
@@ -114,8 +116,17 @@ func (g *GitRepo) CommitAll(message, authorName, authorEmail string) error {
 
 // Push pushes the current branch to the remote
 func (g *GitRepo) Push(remoteName string) error {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token == "" {
+		return fmt.Errorf("GITHUB_TOKEN environment variable is required for pushing")
+	}
+
 	err := g.repo.Push(&git.PushOptions{
 		RemoteName: remoteName,
+		Auth: &http.BasicAuth{
+			Username: "git",
+			Password: token,
+		},
 	})
 	if err != nil && err != git.NoErrAlreadyUpToDate {
 		return fmt.Errorf("failed to push: %w", err)
