@@ -1,0 +1,13 @@
+[!windows] skip 'requires Windows'
+
+! exec winlogbeat test config -c winlogbeat.yml
+stderr 'invalid level'
+
+-- winlogbeat.yml --
+winlogbeat.event_logs:
+  - name: Application
+    level: errors
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 1000

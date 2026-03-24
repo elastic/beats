@@ -2419,7 +2419,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
+			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
@@ -2948,6 +2948,68 @@ var redactorTests = []struct {
 		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"other":"data"},{"other":"data"}],"other":"data"}`,
+	},
+	{
+		name: "secret_flat_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_flat_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: true,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data"}`,
+	},
+	{
+		name: "secret_nested_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"auth": mapstr.M{
+					"user":     "admin",
+					"password": "p@ss",
+				},
+				"token": "bearer_xyz",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"auth":{"password":"p@ss","user":"admin"},"token":"bearer_xyz"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_absent_no_op",
+		state: mapstr.M{
+			"other":   "data",
+			"another": "value",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"another":"value","other":"data"}`,
+		wantRedact: `{"another":"value","other":"data"}`,
 	},
 }
 

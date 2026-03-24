@@ -2,13 +2,12 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build windows
-
 package main
 
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -17,13 +16,19 @@ import (
 )
 
 const appIdSourceUrl = "https://raw.githubusercontent.com/EricZimmerman/JumpList/refs/heads/master/JumpList/Resources/AppIDs.txt"
+const appIdCachePath = "generate/sources/AppIDs.txt"
 
 // scrapeJumplistAppIDs pulls the app ids from appSourceUrl and returns a map of app ids to app names.
 // the app ids are in the format of a hex string, and the app names are in the format of a string.
-func scrapeJumplistAppIDs(log *logger.Logger) (map[string]string, error) {
+func scrapeJumplistAppIDs(opts generatorOptions, log *logger.Logger) (map[string]string, error) {
 	appIDs := make(map[string]string)
 	valueRegex := regexp.MustCompile(`.*"(.*)"`)
-	bodyString, err := downloadPage(appIdSourceUrl)
+	bodyString, err := loadSourceText(
+		filepath.Join(opts.workingDir, appIdCachePath),
+		appIdSourceUrl,
+		opts.refreshSources,
+		log,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +72,8 @@ func scrapeJumplistAppIDs(log *logger.Logger) (map[string]string, error) {
 
 // writeAppIdGeneratedFile writes the app ids to a generated source file
 // that can be used to lookup app ids by name.
-func writeAppIdGeneratedFile(outputFile string, log *logger.Logger) error {
-	appIDs, err := scrapeJumplistAppIDs(log)
+func writeAppIdGeneratedFile(outputFile string, opts generatorOptions, log *logger.Logger) error {
+	appIDs, err := scrapeJumplistAppIDs(opts, log)
 	if err != nil {
 		return err
 	}

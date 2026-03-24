@@ -629,7 +629,7 @@ func TestGenerateHints(t *testing.T) {
 		for _, cfg := range cfgs {
 			config := mapstr.M{}
 			err := cfg.Unpack(&config)
-			ok := assert.Nil(t, err, test.message)
+			ok := assert.NoError(t, err, test.message)
 			if !ok {
 				break
 			}
@@ -707,7 +707,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 		if len(cfgs) != 0 {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.message)
+			assert.NoError(t, err, test.message)
 
 			// metricsets order is random, order it for tests
 			if v, err := config.GetValue("metricsets"); err == nil {
