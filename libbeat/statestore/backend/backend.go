@@ -73,3 +73,7 @@ type Store interface {
 	// This is needed in order to support Elasticsearch state store naming convention based on the input ID.
 	SetID(id string)
 }
+
+type WithESStateStoreExtension interface {
+	WithESStateStoreExtension(esStoreExtension Registry)
+}

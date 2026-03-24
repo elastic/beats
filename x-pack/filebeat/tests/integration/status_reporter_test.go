@@ -131,7 +131,7 @@ func TestLogStatusReporter(t *testing.T) {
 			}
 			// always ensure that output is healthy
 			outputState := extractState(observed.GetUnits(), unitOutID)
-			require.Equal(t, outputState, proto.State_HEALTHY)
+			require.Equal(t, proto.State_HEALTHY, outputState)
 
 			timer.Reset(2 * time.Minute)
 			id++
