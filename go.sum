@@ -414,10 +414,17 @@ github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102 h1:HBjzmhV2CkYn0
 github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102/go.mod h1:xoTq5saXNyokdlvOhMz+JQGU+RTzTtYzqo1Bc86q3Fs=
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6 h1:VgOx6omXIMKozR+R4HhQRT9q1Irm/h13DLtSkejoAJY=
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
+<<<<<<< HEAD
 github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
 github.com/elastic/mito v1.22.1 h1:O0odsa+UXVKep93IudibdMMuezMvr3TaWIvVKTje+1Q=
 github.com/elastic/mito v1.22.1/go.mod h1:h1V+8B62+DXsu0TstJkjsTh5ewJIDJlwzxPkP3HBM9s=
+=======
+github.com/elastic/gosigar v0.14.4 h1:7NRnWJDFjEKpOjnHhtzrPGZWr9EMrYFsLjF4q0Czosk=
+github.com/elastic/gosigar v0.14.4/go.mod h1:tx91Eb3YgFk6y++h88fRAnxic3Si1ZDHooqnJU/hqo8=
+github.com/elastic/mito v1.24.1 h1:sx7TlL1OSKvIAWouRgCeuSd66V40pYl5s5vfcTqjHUo=
+github.com/elastic/mito v1.24.1/go.mod h1:h1V+8B62+DXsu0TstJkjsTh5ewJIDJlwzxPkP3HBM9s=
+>>>>>>> b49ecb871 (update gosigar to v0.14.4 (#49553))
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6 h1:JVNuBrmOoqLJgp9o68YBMnOrXCzQI3mCppW+suwRSlw=
 github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
 github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603 h1:QFDM5JuLch52FxjHizLP2tiuzfhulUdyOsUe/JuPhrQ=
@@ -1331,9 +1338,14 @@ golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJ
 golang.org/x/sync v0.0.0-20210220032951-036812b2e83c/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+<<<<<<< HEAD
 golang.org/x/sync v0.19.0 h1:vV+1eWNmZ5geRlYjzm2adRgW2/mcpevXNg50YZtPCE4=
 golang.org/x/sync v0.19.0/go.mod h1:9KTHXmSnoGruLpwFjVSX0lNNA75CykiMECbovNTZqGI=
 golang.org/x/sys v0.0.0-20180810173357-98c5dad5d1a0/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+=======
+golang.org/x/sync v0.20.0 h1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=
+golang.org/x/sync v0.20.0/go.mod h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=
+>>>>>>> b49ecb871 (update gosigar to v0.14.4 (#49553))
 golang.org/x/sys v0.0.0-20180830151530-49385e6e1522/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20180905080454-ebe1bf3edb33/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
