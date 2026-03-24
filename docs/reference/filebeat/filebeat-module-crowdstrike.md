@@ -65,7 +65,7 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 ### `falcon` fileset settings [_falcon_fileset_settings]
 
-The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
+The fileset is by default configured to collect JSON formatted event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
 
 ```yaml
 var:
