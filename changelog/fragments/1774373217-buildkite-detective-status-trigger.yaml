@@ -1,0 +1,5 @@
+kind: other
+
+summary: Switch PR Buildkite Detective workflow trigger from check_run to status event
+
+component: ci
