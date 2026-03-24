@@ -216,6 +216,8 @@ Microsoft-Windows-Eventlog
 Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`, `ignore_older`, `level`, and `provider` options. These options should be included in the XML query directly. Furthermore, an `id` must be provided. Custom XML queries provide more flexibility and advanced options than the simpler query options in Filebeat. **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
+Query filters provided through custom XML queries are not always reliable across all Windows versions and forwarding scenarios. If possible, prefer non-custom queries so Filebeat can subscribe unfiltered and apply filtering in code.
+
 Here is a configuration which will collect DHCP server events from multiple channels:
 
 ```yaml

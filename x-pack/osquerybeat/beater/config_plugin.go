@@ -19,6 +19,7 @@ import (
 const (
 	configName                  = "osq_config"
 	defaultScheduleSplayPercent = 10
+	defaultScheduleMaxDrift     = 60 // seconds; osquery's default for splay drift compensation
 	maxECSMappingDepth          = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
 
 	keyField = "field"
@@ -33,6 +34,17 @@ var (
 type QueryInfo struct {
 	Query      string
 	ECSMapping ecs.Mapping
+	// ScheduleID is the policy-defined schedule id for this query (optional)
+	ScheduleID string
+	// StartDate is the start date for native schedules (RFC3339); required for schedule_execution_count
+	StartDate string
+	// SpaceID is the optional policy space identifier for this query.
+	SpaceID string
+	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
+	Interval int
+	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
+	PackID  string
+	Profile bool // whether to collect and publish profile for this query
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -108,6 +120,21 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 	return ns, ok
 }
 
+func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	// Prefer pending config (newQueryInfoMap) so profile flag is up to date immediately after Set().
+	if p.newQueryInfoMap != nil {
+		if qi, ok := p.newQueryInfoMap[name]; ok {
+			return qi.Profile
+		}
+	}
+	if qi, ok := p.queryInfoMap[name]; ok {
+		return qi.Profile
+	}
+	return false
+}
+
 func (p *ConfigPlugin) GetNamespace() string {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
@@ -145,9 +172,14 @@ func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig
 	if osqueryConfig.Options == nil {
 		osqueryConfig.Options = make(map[string]interface{})
 	}
+	// Apply native schedule defaults only when not explicitly set.
 	const scheduleSplayPercentKey = "schedule_splay_percent"
 	if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
 		osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
+	}
+	const scheduleMaxDriftKey = "schedule_max_drift"
+	if _, ok := osqueryConfig.Options[scheduleMaxDriftKey]; !ok {
+		osqueryConfig.Options[scheduleMaxDriftKey] = defaultScheduleMaxDrift
 	}
 	return osqueryConfig
 }
@@ -203,7 +235,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	}
 
 	// Common code to register query with lookup maps, enforce snapshot and increment queries count
-	registerQuery := func(name, ns string, qi config.Query) (config.Query, error) {
+	registerQuery := func(name, ns string, qi config.Query, packID string) (config.Query, error) {
 		var ecsm ecs.Mapping
 		ecsm, err = flattenECSMapping(qi.ECSMapping)
 		if err != nil {
@@ -213,6 +245,12 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		newQueryInfoMap[name] = QueryInfo{
 			Query:      qi.Query,
 			ECSMapping: ecsm,
+			ScheduleID: qi.ScheduleID,
+			StartDate:  qi.StartDate,
+			SpaceID:    qi.SpaceID,
+			Interval:   qi.Interval,
+			PackID:     packID,
+			Profile:    qi.Profile,
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -227,7 +265,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
-		qi, err = registerQuery(name, p.namespace, qi)
+		qi, err = registerQuery(name, p.namespace, qi, "")
 		if err != nil {
 			return err
 		}
@@ -236,8 +274,12 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
 	for packName, pack := range osqueryConfig.Packs {
+		packID := pack.PackID
+		if packID == "" {
+			packID = packName
+		}
 		for name, qi := range pack.Queries {
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi)
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
 			if err != nil {
 				return err
 			}
@@ -260,9 +302,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Platform:   stream.Platform,
 				Version:    stream.Version,
 				ECSMapping: stream.ECSMapping,
+				Profile:    stream.Profile,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
 			if err != nil {
 				return err
 			}

@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Elasticsearch fields [exported-fields-elasticsearch]
 
@@ -1367,6 +1367,14 @@ index
 
 
 **`elasticsearch.index.version`**
+:   type: keyword
+
+
+**`elasticsearch.index.mode`**
+:   type: keyword
+
+
+**`elasticsearch.index.codec`**
 :   type: keyword
 
 

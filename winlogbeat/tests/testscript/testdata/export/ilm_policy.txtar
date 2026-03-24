@@ -1,0 +1,8 @@
+exec winlogbeat export ilm-policy -c winlogbeat.yml
+stdout '"policy"'
+
+-- winlogbeat.yml --
+output.file:
+  path: ./output
+  filename: winlogbeat
+  rotate_every_kb: 1000

@@ -1,0 +1,124 @@
+type: shared_types
+group: jumplists
+
+types:
+  - name: ApplicationID
+    description: Application ID metadata for a Jump List
+    pointer: true
+    columns:
+      - name: application_id
+        type: TEXT
+        description: Jump List application identifier from the source filename
+      - name: application_name
+        type: TEXT
+        description: Resolved application name for the application_id when known
+
+  - name: UserProfile
+    description: User profile information for the Jump List owner
+    pointer: true
+    columns:
+      - name: username
+        type: TEXT
+        description: Username that owns the Jump List file
+      - name: sid
+        type: TEXT
+        description: Windows SID for the user profile
+
+  - name: JumplistMeta
+    description: Jump List source metadata
+    pointer: true
+    columns:
+      - name: jumplist_type
+        type: TEXT
+        description: Jump List type (custom or automatic)
+      - name: source_file_path
+        type: TEXT
+        description: Path to the .customDestinations-ms or .automaticDestinations-ms source file
+
+  - name: DestListEntry
+    description: Automatic destination list entry metadata
+    pointer: true
+    columns:
+      - name: hostname
+        type: TEXT
+        description: Hostname parsed from the automatic DestList entry metadata
+      - name: entry_number
+        type: INTEGER
+        description: DestList entry number for automatic Jump Lists
+      - name: last_modified_time
+        type: TEXT
+        description: DestList entry last modified time
+        go_type: time.Time
+      - name: is_pinned
+        type: INTEGER
+        description: Whether the destination entry is pinned (1) or not pinned (0)
+        go_type: bool
+      - name: interaction_count
+        type: INTEGER
+        description: Interaction count from the DestList entry
+      - name: dest_entry_path
+        type: TEXT
+        description: Raw destination path stored in the DestList entry
+      - name: dest_entry_path_resolved
+        type: TEXT
+        description: Resolved destination path with known-folder GUIDs translated when possible
+      - name: mac_address
+        type: TEXT
+        description: MAC address derived from DestList metadata
+      - name: creation_time
+        type: TEXT
+        description: Destination creation time derived from DestList metadata
+        go_type: time.Time
+
+  - name: LnkMetadata
+    description: Embedded LNK metadata from each Jump List entry
+    pointer: true
+    columns:
+      - name: local_path
+        type: TEXT
+        description: Local target path from embedded LNK metadata
+      - name: file_size
+        type: INTEGER
+        description: Target file size from embedded LNK metadata
+      - name: hot_key
+        type: TEXT
+        description: Hotkey configured for the shortcut target, if any
+      - name: icon_index
+        type: INTEGER
+        description: Icon index referenced by the shortcut
+      - name: show_window
+        type: TEXT
+        description: Window display mode from the shortcut metadata
+      - name: icon_location
+        type: TEXT
+        description: Icon location path from the shortcut metadata
+      - name: command_line_arguments
+        type: TEXT
+        description: Command-line arguments stored in the shortcut
+      - name: target_modification_time
+        type: TEXT
+        description: Shortcut target modification time from LNK metadata
+        go_type: time.Time
+      - name: target_last_accessed_time
+        type: TEXT
+        description: Shortcut target last accessed time from LNK metadata
+        go_type: time.Time
+      - name: target_creation_time
+        type: TEXT
+        description: Shortcut target creation time from LNK metadata
+        go_type: time.Time
+      - name: volume_serial_number
+        type: TEXT
+        description: Volume serial number associated with the shortcut target
+      - name: volume_type
+        type: TEXT
+        description: Drive type associated with the shortcut target volume
+      - name: volume_label
+        type: TEXT
+        description: Volume label associated with the shortcut target
+      - name: volume_label_offset
+        type: INTEGER
+        description: Volume label offset in LinkInfo volume data
+      - name: name
+        type: TEXT
+        description: Name string from LNK metadata
