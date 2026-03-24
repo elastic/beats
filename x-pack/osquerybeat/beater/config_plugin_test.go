@@ -423,6 +423,41 @@ func TestSet(t *testing.T) {
 	}
 }
 
+func TestSetScheduledQueryProfileFlag(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "custom",
+			},
+			Osquery: &config.OsqueryConfig{
+				Schedule: map[string]config.Query{
+					"scheduled_users": {
+						Query:    "select * from users limit 1",
+						Interval: 60,
+						Profile:  true,
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := cfgp.GenerateConfig(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	if !cfgp.LookupQueryProfile("scheduled_users") {
+		t.Fatal("expected scheduled query profile flag to be enabled")
+	}
+}
+
 func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
 	logger := logp.NewLogger("config_test")
 	cfgp := NewConfigPlugin(logger)
@@ -503,10 +538,10 @@ func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
 	cfgp := NewConfigPlugin(logger)
 
 	const (
-		packName   = "my-pack"
-		packID     = "pack-uuid-123"
-		queryName  = "uptime_query"
-		querySQL   = "select * from uptime"
+		packName    = "my-pack"
+		packID      = "pack-uuid-123"
+		queryName   = "uptime_query"
+		querySQL    = "select * from uptime"
 		queryPeriod = 60
 	)
 
