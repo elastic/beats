@@ -18,6 +18,7 @@
 package release
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -137,7 +138,7 @@ func (g *GitRepo) Push(remoteName string) error {
 			Password: token,
 		},
 	})
-	if err != nil && err != git.NoErrAlreadyUpToDate {
+	if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) {
 		return fmt.Errorf("failed to push: %w", err)
 	}
 

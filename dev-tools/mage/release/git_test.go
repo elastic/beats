@@ -18,6 +18,7 @@
 package release
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -58,29 +59,38 @@ func TestIsClean(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create temporary directory
 			tmpDir := t.TempDir()
+			ctx := context.Background()
 
 			// Initialize git repo
-			cmd := exec.Command("git", "init")
+			cmd := exec.CommandContext(ctx, "git", "init")
 			cmd.Dir = tmpDir
 			if err := cmd.Run(); err != nil {
 				t.Skipf("git not available: %v", err)
 			}
 
 			// Configure git for testing
-			cmd = exec.Command("git", "config", "user.name", "Test User")
+			cmd = exec.CommandContext(ctx, "git", "config", "user.name", "Test User")
 			cmd.Dir = tmpDir
-			cmd.Run()
-			cmd = exec.Command("git", "config", "user.email", "test@example.com")
+			if err := cmd.Run(); err != nil {
+				t.Skipf("Failed to configure git user.name: %v", err)
+			}
+			cmd = exec.CommandContext(ctx, "git", "config", "user.email", "test@example.com")
 			cmd.Dir = tmpDir
-			cmd.Run()
+			if err := cmd.Run(); err != nil {
+				t.Skipf("Failed to configure git user.email: %v", err)
+			}
 
 			// Create initial file and commit
 			testFile := filepath.Join(tmpDir, "testfile.txt")
-			os.WriteFile(testFile, []byte("initial"), 0644)
-			cmd = exec.Command("git", "add", ".")
+			if err := os.WriteFile(testFile, []byte("initial"), 0644); err != nil {
+				t.Fatalf("Failed to write initial file: %v", err)
+			}
+			cmd = exec.CommandContext(ctx, "git", "add", ".")
 			cmd.Dir = tmpDir
-			cmd.Run()
-			cmd = exec.Command("git", "commit", "-m", "initial commit")
+			if err := cmd.Run(); err != nil {
+				t.Skipf("Failed to add files: %v", err)
+			}
+			cmd = exec.CommandContext(ctx, "git", "commit", "-m", "initial commit")
 			cmd.Dir = tmpDir
 			if err := cmd.Run(); err != nil {
 				t.Skipf("Failed to create initial commit: %v", err)
@@ -112,29 +122,38 @@ func TestIsClean(t *testing.T) {
 // TestGetCurrentBranch tests the GetCurrentBranch function
 func TestGetCurrentBranch(t *testing.T) {
 	tmpDir := t.TempDir()
+	ctx := context.Background()
 
 	// Initialize git repo
-	cmd := exec.Command("git", "init")
+	cmd := exec.CommandContext(ctx, "git", "init")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("git not available: %v", err)
 	}
 
 	// Configure git
-	cmd = exec.Command("git", "config", "user.name", "Test User")
+	cmd = exec.CommandContext(ctx, "git", "config", "user.name", "Test User")
 	cmd.Dir = tmpDir
-	cmd.Run()
-	cmd = exec.Command("git", "config", "user.email", "test@example.com")
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.name: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "config", "user.email", "test@example.com")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.email: %v", err)
+	}
 
 	// Create initial commit
 	testFile := filepath.Join(tmpDir, "test.txt")
-	os.WriteFile(testFile, []byte("test"), 0644)
-	cmd = exec.Command("git", "add", ".")
+	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
+		t.Fatalf("Failed to write test file: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "add", ".")
 	cmd.Dir = tmpDir
-	cmd.Run()
-	cmd = exec.Command("git", "commit", "-m", "initial")
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to add files: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "commit", "-m", "initial")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("Failed to create initial commit: %v", err)
@@ -178,29 +197,38 @@ func TestGetCurrentBranch(t *testing.T) {
 // TestPushRequiresToken tests that Push requires GITHUB_TOKEN
 func TestPushRequiresToken(t *testing.T) {
 	tmpDir := t.TempDir()
+	ctx := context.Background()
 
 	// Initialize git repo
-	cmd := exec.Command("git", "init")
+	cmd := exec.CommandContext(ctx, "git", "init")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("git not available: %v", err)
 	}
 
 	// Configure git
-	cmd = exec.Command("git", "config", "user.name", "Test User")
+	cmd = exec.CommandContext(ctx, "git", "config", "user.name", "Test User")
 	cmd.Dir = tmpDir
-	cmd.Run()
-	cmd = exec.Command("git", "config", "user.email", "test@example.com")
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.name: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "config", "user.email", "test@example.com")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.email: %v", err)
+	}
 
 	// Create initial commit
 	testFile := filepath.Join(tmpDir, "test.txt")
-	os.WriteFile(testFile, []byte("test"), 0644)
-	cmd = exec.Command("git", "add", ".")
+	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
+		t.Fatalf("Failed to write test file: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "add", ".")
 	cmd.Dir = tmpDir
-	cmd.Run()
-	cmd = exec.Command("git", "commit", "-m", "initial")
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to add files: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "commit", "-m", "initial")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("Failed to create initial commit: %v", err)
@@ -233,29 +261,38 @@ func TestPushRequiresToken(t *testing.T) {
 // TestCreateAndCheckoutBranch tests branch creation and checkout
 func TestCreateAndCheckoutBranch(t *testing.T) {
 	tmpDir := t.TempDir()
+	ctx := context.Background()
 
 	// Initialize git repo
-	cmd := exec.Command("git", "init")
+	cmd := exec.CommandContext(ctx, "git", "init")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("git not available: %v", err)
 	}
 
 	// Configure git
-	cmd = exec.Command("git", "config", "user.name", "Test User")
+	cmd = exec.CommandContext(ctx, "git", "config", "user.name", "Test User")
 	cmd.Dir = tmpDir
-	cmd.Run()
-	cmd = exec.Command("git", "config", "user.email", "test@example.com")
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.name: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "config", "user.email", "test@example.com")
 	cmd.Dir = tmpDir
-	cmd.Run()
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.email: %v", err)
+	}
 
 	// Create initial commit
 	testFile := filepath.Join(tmpDir, "test.txt")
-	os.WriteFile(testFile, []byte("test"), 0644)
-	cmd = exec.Command("git", "add", ".")
+	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
+		t.Fatalf("Failed to write test file: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "add", ".")
 	cmd.Dir = tmpDir
-	cmd.Run()
-	cmd = exec.Command("git", "commit", "-m", "initial")
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to add files: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "commit", "-m", "initial")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("Failed to create initial commit: %v", err)
@@ -291,23 +328,42 @@ func TestCreateAndCheckoutBranch(t *testing.T) {
 // TestCommitAll tests the CommitAll function
 func TestCommitAll(t *testing.T) {
 	tmpDir := t.TempDir()
+	ctx := context.Background()
 
 	// Initialize git repo
-	cmd := exec.Command("git", "init")
+	cmd := exec.CommandContext(ctx, "git", "init")
 	cmd.Dir = tmpDir
 	if err := cmd.Run(); err != nil {
 		t.Skipf("git not available: %v", err)
 	}
 
 	// Configure git
-	exec.Command("git", "config", "user.name", "Test User").Dir = tmpDir
-	exec.Command("git", "config", "user.email", "test@example.com").Dir = tmpDir
+	cmd = exec.CommandContext(ctx, "git", "config", "user.name", "Test User")
+	cmd.Dir = tmpDir
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.name: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "config", "user.email", "test@example.com")
+	cmd.Dir = tmpDir
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to configure git user.email: %v", err)
+	}
 
 	// Create initial commit
 	testFile := filepath.Join(tmpDir, "test.txt")
-	os.WriteFile(testFile, []byte("initial"), 0644)
-	exec.Command("git", "add", ".").Dir = tmpDir
-	exec.Command("git", "commit", "-m", "initial").Dir = tmpDir
+	if err := os.WriteFile(testFile, []byte("initial"), 0644); err != nil {
+		t.Fatalf("Failed to write initial file: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "add", ".")
+	cmd.Dir = tmpDir
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to add files: %v", err)
+	}
+	cmd = exec.CommandContext(ctx, "git", "commit", "-m", "initial")
+	cmd.Dir = tmpDir
+	if err := cmd.Run(); err != nil {
+		t.Skipf("Failed to create initial commit: %v", err)
+	}
 
 	repo, err := OpenRepo(tmpDir)
 	if err != nil {
@@ -315,7 +371,9 @@ func TestCommitAll(t *testing.T) {
 	}
 
 	// Make a change
-	os.WriteFile(testFile, []byte("modified"), 0644)
+	if err := os.WriteFile(testFile, []byte("modified"), 0644); err != nil {
+		t.Fatalf("Failed to write modified file: %v", err)
+	}
 
 	// Commit the change
 	err = repo.CommitAll("test commit", "Test User", "test@example.com")
