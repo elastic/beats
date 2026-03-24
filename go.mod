@@ -57,7 +57,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/elastic/elastic-agent-client/v7 v7.18.0
+	github.com/elastic/elastic-agent-client/v7 v7.18.1
 	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
@@ -132,7 +132,7 @@ require (
 	golang.org/x/tools v0.41.0
 	google.golang.org/api v0.257.0
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
-	google.golang.org/grpc v1.79.1
+	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
