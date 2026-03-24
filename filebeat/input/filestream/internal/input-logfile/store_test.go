@@ -28,8 +28,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 
@@ -452,7 +452,7 @@ func TestSourceStoreTakeOver(t *testing.T) {
 
 func TestSourceStoreTakeOverFromLogInput(t *testing.T) {
 	const (
-		logKey          = "filebeat::logs::native::inode:device"
+		logKey           = "filebeat::logs::native::inode:device"
 		filestreamNewKey = "filestream::input-id::native::inode:device"
 	)
 
@@ -494,7 +494,7 @@ func TestSourceStoreTakeOverFromLogInput(t *testing.T) {
 
 		backend := createSampleStore(t, map[string]state{
 			filestreamNewKey: {
-				TTL: 60 * time.Second,
+				TTL:    60 * time.Second,
 				Cursor: map[string]any{"offset": existingOffset},
 			},
 		})

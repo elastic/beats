@@ -170,11 +170,11 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 
 	totalEventsIngested := filebeat.CountFileLines(outputFile)
 
-	require.EqualValuesf(
+	require.Equalf(
 		t,
 		generatedEvents,
 		totalEventsIngested,
-		"file re-ingestion has occured\n"+
+		"file re-ingestion has occurred\n"+
 			"Generated Events: %d\n"+
 			"Events ingested by the Log input: %d\n"+
 			"Total number of events ingested: %d",
@@ -215,11 +215,7 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 	var kubeConfig string
 	require.Eventually(t, func() bool {
 		kubeConfig, err = provider.KubeConfig(clusterName, false)
-		if err != nil {
-			return false
-		}
-
-		return true
+		return err == nil
 	}, 30*time.Second, 100*time.Millisecond, "could not get kube config")
 
 	kubeConfigPath := filepath.Join(tempDir, "kube-config")
