@@ -66,7 +66,7 @@ func TestGCPInputOTelE2E(t *testing.T) {
   project_id: test-project-id
   topic: test-topic-foo
   subscription.name:  {{ .Subscription }}
-  credentials_file: "testdata/fake.json"
+  credentials_file: "testdata/gcp_pubsub_fake_credentials.json"
 
 output:
   elasticsearch:
