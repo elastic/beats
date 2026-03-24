@@ -298,15 +298,10 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 // Filestream inputs or the Log input. fn should return the new registry ID
 // and new CursorMeta. If fn returns an empty string, the entry is skipped.
 //
-// When fn returns a valid ID, the old resource is removed from both,
-// the in-memory and persistent store. The operations are synchronous.
-//
-// If the resource migrated was from the Log input, `TakeOver` will
-// remove it from the persistent store, however the Log input reigstrar
-// will write it back when Filebeat is shutting down. However,
-// there is a mechanism in place to detect this situation and avoid
-// migrating the same state over and over again.
-// See the comments on this method for more details.
+// When fn returns a valid ID:
+//   - If the old resource was from a Filestream input, it is removed from both
+//     the in-memory and disk store.
+//   - If it was from a Log input, it is left untouched.
 func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 	matchPreviousFilestreamIDs := func(key string) bool {
 		for _, identifier := range s.identifiersToTakeOver {
@@ -385,11 +380,19 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			continue
 		}
 
+		// cleanup must be called on any "exit point" from this loop iteration.
+		// It is responsible for correctly releasing the locked resource.
+		cleanup := func() {
+			res.Release()
+			res.lock.Unlock()
+		}
+
 		st, err := newTakeOverState(inpFile.State{}, res)
 		if err != nil {
 			// This should never happen. newTakeOverState can only fail if
 			// Filestream state format has changed
 			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+			cleanup()
 			continue
 		}
 		newKey, updatedMeta := fn(st)
@@ -398,7 +401,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			// Unlock the resource and return
 			if res := s.store.ephemeralStore.unsafeFind(newKey, false); res != nil {
 				res.Release()
-				res.lock.Unlock()
+				cleanup()
 				continue
 			}
 
@@ -428,8 +431,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
 
-		res.Release()
-		res.lock.Unlock()
+		cleanup()
 	}
 
 	// Migrate all states from the Log input
