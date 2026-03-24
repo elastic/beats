@@ -40,7 +40,7 @@ var ctxPool = &sync.Pool{
 }
 
 func newCtx() *ctx {
-	return ctxPool.Get().(*ctx)
+	return ctxPool.Get().(*ctx) //nolint:errcheck // Pool.New always returns *ctx
 }
 
 func newCtxWithSize(sz int) *ctx {

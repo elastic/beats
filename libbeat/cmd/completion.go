@@ -39,9 +39,15 @@ func genCompletionCmd(_ instance.Settings, rootCmd *BeatsRootCmd) *cobra.Command
 
 			switch args[0] {
 			case "bash":
-				rootCmd.GenBashCompletion(os.Stdout)
+				if err := rootCmd.GenBashCompletion(os.Stdout); err != nil {
+					cmd.PrintErrf("Error generating bash completion: %s\n", err)
+					os.Exit(1)
+				}
 			case "zsh":
-				rootCmd.GenZshCompletion(os.Stdout)
+				if err := rootCmd.GenZshCompletion(os.Stdout); err != nil {
+					cmd.PrintErrf("Error generating zsh completion: %s\n", err)
+					os.Exit(1)
+				}
 			default:
 				cmd.PrintErrf("Unknown shell %s, only bash and zsh are available\n", args[0])
 				os.Exit(1)

@@ -88,7 +88,10 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 		return ""
 	}
 
-	source := value.(string)
+	source, ok := value.(string)
+	if !ok {
+		return ""
+	}
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
 
 	if !strings.Contains(source, f.LogsPath) {
