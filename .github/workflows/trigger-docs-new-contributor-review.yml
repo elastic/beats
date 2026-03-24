@@ -5,16 +5,18 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   issues: write
   pull-requests: read
 
 jobs:
   run:
-    uses: elastic/ai-github-actions/.github/workflows/gh-aw-docs-new-contributor-review.lock.yml@v0
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-newbie-contributor-patrol.lock.yml@v0
     with:
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
         make mage
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

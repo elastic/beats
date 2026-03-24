@@ -230,8 +230,9 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 
 	wantUsers := p.cfg.wantUsers()
 	wantDevices := p.cfg.wantDevices()
-	if wantUsers || wantDevices {
-		var users, devices []*User
+	wantEmptyGroups := p.cfg.wantEmptyGroups()
+	if wantUsers || wantDevices || wantEmptyGroups {
+		var users, devices, groups []*User
 		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 		p.logger.Debugf("Starting fetch...")
 		if wantUsers {
@@ -246,6 +247,12 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 				return time.Time{}, err
 			}
 		}
+		if wantEmptyGroups {
+			groups, err = p.doFetchEmptyGroups(ctx, state, true)
+			if err != nil {
+				return time.Time{}, err
+			}
+		}
 
 		tracker := kvstore.NewTxTracker(ctx)
 		start := time.Now()
@@ -256,6 +263,9 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		}
 		for _, d := range p.unifyState(ctx, state.devices, devices) {
 			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		}
+		for _, g := range p.unifyState(ctx, state.groups, groups) {
+			p.publishGroup(g, inputCtx.ID, client, tracker)
 		}
 
 		end := time.Now()
@@ -344,7 +354,7 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		}
 	}()
 
-	var updatedUsers, updatedDevices []*User
+	var updatedUsers, updatedDevices, updatedGroups []*User
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	if p.cfg.wantUsers() {
 		updatedUsers, err = p.doFetchUsers(ctx, state, false)
@@ -358,14 +368,23 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 			return last, err
 		}
 	}
+	if p.cfg.wantEmptyGroups() {
+		updatedGroups, err = p.doFetchEmptyGroups(ctx, state, false)
+		if err != nil {
+			return last, err
+		}
+	}
 
-	if len(updatedUsers) != 0 || len(updatedDevices) != 0 {
+	if len(updatedUsers) != 0 || len(updatedDevices) != 0 || len(updatedGroups) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 		for _, u := range updatedUsers {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
 		}
 		for _, d := range updatedDevices {
 			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		}
+		for _, g := range updatedGroups {
+			p.publishGroup(g, inputCtx.ID, client, tracker)
 		}
 		tracker.Wait()
 	}
@@ -448,6 +467,62 @@ func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSyn
 	}
 	p.logger.Debugf("processed %d devices from API", len(devices))
 	return devices, nil
+}
+
+// doFetchEmptyGroups handles fetching groups with no direct members from
+// Active Directory. If fullSync is true, then any existing whenChanged will
+// be ignored, forcing a full synchronization. The whenChanged time of state
+// is modified to be the time stamp of the latest WhenChanged value.
+func (p *adInput) doFetchEmptyGroups(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	var since time.Time
+	if !fullSync {
+		since = state.whenChanged
+	}
+
+	entries, err := activedirectory.GetEmptyGroups(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	p.logger.Debugf("received %d empty groups from API", len(entries))
+	if err != nil {
+		return nil, err
+	}
+
+	groups := make([]*User, 0, len(entries))
+	for _, g := range entries {
+		groups = append(groups, state.storeGroup(g))
+		if g.WhenChanged.After(state.whenChanged) {
+			state.whenChanged = g.WhenChanged
+		}
+	}
+	p.logger.Debugf("processed %d empty groups from API", len(groups))
+	return groups, nil
+}
+
+// publishGroup will publish an empty-group document using the given beat.Client.
+func (p *adInput) publishGroup(g *User, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+	doc := mapstr.M{}
+
+	_, _ = doc.Put("activedirectory", g.Entry)
+	_, _ = doc.Put("labels.identity_source", inputID)
+	_, _ = doc.Put("group.id", g.ID)
+
+	switch g.State {
+	case Deleted:
+		_, _ = doc.Put("event.action", "group-deleted")
+	case Discovered:
+		_, _ = doc.Put("event.action", "group-discovered")
+	case Modified:
+		_, _ = doc.Put("event.action", "group-modified")
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    doc,
+		Private:   tracker,
+	}
+	tracker.Add()
+
+	p.logger.Debugf("Publishing group %q", g.ID)
+
+	client.Publish(event)
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.

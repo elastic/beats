@@ -10,11 +10,15 @@ applies_to:
 # AWS CloudWatch input [filebeat-input-aws-cloudwatch]
 
 
-`aws-cloudwatch` input can be used to retrieve all logs from all log streams in a specific log group. `filterLogEvents` AWS API is used to list log events from the specified log group. Amazon CloudWatch Logs can be used to store log files from Amazon Elastic Compute Cloud(EC2), AWS CloudTrail, Route53, and other sources.
+The `aws-cloudwatch` input can be used to retrieve all logs from all log streams in a specific log group. The `FilterLogEvents` AWS API is used to list log events from the specified log group. Amazon CloudWatch Logs can be used to store log files from Amazon Elastic Compute Cloud(EC2), AWS CloudTrail, Route53, and other sources.
 
 A log group is a group of log streams that share the same retention, monitoring, and access control settings. You can define log groups and specify which streams to put into each group. There is no limit on the number of log streams that can belong to one log group.
 
 A log stream is a sequence of log events that share the same source. Each separate source of logs in CloudWatch Logs makes up a separate log stream.
+
+:::{important}
+This input uses the AWS `FilterLogEvents` API, which is only supported for log groups that use the **Standard** log class. Log groups that use the **Infrequent Access** log class are not supported. For more information about CloudWatch Logs log classes, refer to the [AWS documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatch_Logs_Log_Classes.html).
+:::
 
 ```yaml
 filebeat.inputs:

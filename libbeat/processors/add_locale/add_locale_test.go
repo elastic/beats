@@ -18,7 +18,6 @@
 package add_locale
 
 import (
-	"regexp"
 	"testing"
 	"time"
 
@@ -68,7 +67,7 @@ func TestTimezoneFormat(t *testing.T) {
 
 	posVal := posAddLocal.Format(posZone, posOffset)
 
-	assert.Regexp(t, regexp.MustCompile(`\+[\d]{2}\:[\d]{2}`), posVal)
+	assert.Regexp(t, `\+[\d]{2}\:[\d]{2}`, posVal)
 
 	// Test negative format
 
@@ -83,7 +82,7 @@ func TestTimezoneFormat(t *testing.T) {
 
 	negVal := negAddLocal.Format(negZone, negOffset)
 
-	assert.Regexp(t, regexp.MustCompile(`\-[\d]{2}\:[\d]{2}`), negVal)
+	assert.Regexp(t, `\-[\d]{2}\:[\d]{2}`, negVal)
 }
 
 func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {

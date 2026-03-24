@@ -15,22 +15,22 @@ import (
 	"github.com/richardlehane/mscfb"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	jumpliststypes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists"
 )
 
 const (
 	sliceLimit = 1 * 1024 * 1024 * 1024 // 1 GB, arbitrary limit to prevent OOM from malformed files
 )
 
-func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*Jumplist, error) {
+func parseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *logger.Logger) (*jumplist, error) {
 	// Create a minimal JumpList object to return if there is an error.
-	automaticJumpList := &Jumplist{
-		JumplistMeta: &JumplistMeta{
-			UserProfile:   userProfile,
+	automaticJumpList := &jumplist{
+		jumplistMeta: &jumplistMeta{
+			UserProfile:   &jumpliststypes.UserProfile{Username: userProfile.Username, Sid: userProfile.Sid},
 			ApplicationID: getAppIdFromFileName(filePath),
-			JumplistType:  JumplistTypeAutomatic,
-			Path:          filePath,
+			JumplistMeta:  &jumpliststypes.JumplistMeta{JumplistType: string(jumplistTypeAutomatic), SourceFilePath: filePath},
 		},
-		entries: []*JumplistEntry{},
+		entries: []*jumplistEntry{},
 	}
 
 	// Open the jumplist file
@@ -134,10 +134,10 @@ func ParseAutomaticJumpListFile(filePath string, userProfile *UserProfile, log *
 
 	// We have a parsed DestList object and a map of Lnk objects.
 	// Now we need to associate the Lnk objects with the DestList entries.
-	entries := make([]*JumplistEntry, 0, len(destList.Entries))
+	entries := make([]*jumplistEntry, 0, len(destList.Entries))
 	for _, entry := range destList.Entries {
 		// Create a minimal JumpListEntry object to return if there is an error.
-		jumpListEntry := &JumplistEntry{
+		jumpListEntry := &jumplistEntry{
 			DestListEntry: entry,
 			Lnk:           &Lnk{},
 		}
