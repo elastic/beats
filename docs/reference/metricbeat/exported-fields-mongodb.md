@@ -188,7 +188,7 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.nindexes`**
-:   The number of indexes on the collection. All collections have at least one index on the _id field. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
+:   The number of indexes in the collection. All collections have at least one index in the `_id` field. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
 
     type: long
 
