@@ -68,7 +68,7 @@ $$$ilm-policy-subcommand$$$
 $$$pipeline-subcommand$$$
 
 **`pipeline`**
-:   Exports the ingest piplines.  You must specify the `--es.version` to specify which version of {{es}} the pipelines should be compatible with. You can optionally specify `--dir` to control where the pipelines are written.
+:   Exports the ingest pipelines.  You must specify the `--es.version` to specify which version of {{es}} the pipelines should be compatible with. You can optionally specify `--dir` to control where the pipelines are written.
 
 **FLAGS**
 
