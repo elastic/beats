@@ -90,6 +90,7 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 
 	source, ok := value.(string)
 	if !ok {
+		f.logger.Debugf("Error extracting log.file.path from the event: value is not a string.")
 		return ""
 	}
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
