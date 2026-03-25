@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	eventHubConnector        = ";EntityPath="
 	expandEventListFromField = "records"
 	inputName                = "azure-eventhub"
 	processorV1              = "v1"
