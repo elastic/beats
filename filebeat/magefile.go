@@ -22,7 +22,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -198,10 +197,15 @@ func IntegTest() {
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
-	os.Setenv("PACKAGES", "docker")
-	os.Setenv("PLATFORMS", "linux/amd64")
-	mg.Deps(Package)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
+}
+
+// GoIntegK8sTest runs TestAutodiscoverFilestreamTakeOverDoesNotReingest.
+// TODO (Tiago): Improve it
+func GoIntegK8sTest(ctx context.Context) error {
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
+	args.ExtraFlags = append(args.ExtraFlags, "-run=TestAutodiscoverFilestreamTakeOverDoesNotReingest")
+	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
