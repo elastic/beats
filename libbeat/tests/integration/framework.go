@@ -1303,6 +1303,7 @@ func BuildSystemTestBinary(binPath, packagePath string) error {
 	args = append(args, packagePath)
 
 	cmd := exec.Command("go", args...)
+	cmd.Dir = packagePath
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
