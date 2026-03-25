@@ -18,6 +18,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
@@ -33,7 +34,7 @@ func genCompletionCmd(_ instance.Settings, rootCmd *BeatsRootCmd) *cobra.Command
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) != 1 {
-				cmd.PrintErrln("Expected one argument with the desired shell")
+				fmt.Println("Expected one argument with the desired shell") //nolint:forbidigo // preserving existing stdout behavior
 				os.Exit(1)
 			}
 
@@ -43,7 +44,7 @@ func genCompletionCmd(_ instance.Settings, rootCmd *BeatsRootCmd) *cobra.Command
 			case "zsh":
 				_ = rootCmd.GenZshCompletion(os.Stdout)
 			default:
-				cmd.PrintErrf("Unknown shell %s, only bash and zsh are available\n", args[0])
+				fmt.Printf("Unknown shell %s, only bash and zsh are available\n", args[0]) //nolint:forbidigo // preserving existing stdout behavior
 				os.Exit(1)
 			}
 		},
