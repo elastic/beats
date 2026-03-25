@@ -120,7 +120,8 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	grantClusterAdminToDefaultServiceAccount(t, kubeConfigPath)
 
 	filebeatPodName := "filebeat-pod-" + uuid.Must(uuid.NewV4()).String()
-	filebeatConfigPath := filepath.Join(workDir, "filebeat.yml")
+	logInputConfigPath := filepath.Join(workDir, "filebeat-log.yml")
+	filestreamInputConfigPath := filepath.Join(workDir, "filebeat-filestream.yml")
 
 	esURL := integration.GetESAdminURL(t, "http")
 	esHost := fmt.Sprintf("%s://%s", esURL.Scheme, esURL.Host)
@@ -133,22 +134,22 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	index := fmt.Sprintf("test-autodiscover-take-over-%s", uuid.Must(uuid.NewV4()).String())
 
 	tmplVars := map[string]any{
-		"homeFolder": "/usr/share/filebeat",
-		"kubeConfig": kubeConfigPath,
-		"nodeName":   nodeName,
-		"podName":    podName,
-		"esHost":     esHost,
-		"esUser":     esUser,
-		"esPass":     esPass,
-		"index":      index,
+		"nodeName": nodeName,
+		"podName":  podName,
+		"esHost":   esHost,
+		"esUser":   esUser,
+		"esPass":   esPass,
+		"index":    index,
 	}
 
-	writeFile(t, filebeatConfigPath,
+	writeFile(
+		t,
+		logInputConfigPath,
 		getConfig(t, tmplVars, "autodiscover", "take-over-log-input-k8s.yml"),
 	)
 
 	t.Logf("Elasticsearch index %q", index)
-	t.Logf("Wrote Filebeat configuration file at %s", filebeatConfigPath)
+	t.Logf("Wrote Filebeat configuration file at %s", logInputConfigPath)
 
 	startFilebeatPodForTakeOver(
 		t,
@@ -157,7 +158,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		filebeatPodName,
 		filebeatImage,
 		workDir,
-		filebeatConfigPath,
+		logInputConfigPath,
 	)
 
 	t.Logf("Filebeat pod %q created", filebeatPodName)
@@ -177,7 +178,9 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	logInputIngested := countEventsInES(t, index, 1000)
 
 	// Re-Start Filebeat with Filestream and take_over enabled
-	writeFile(t, filebeatConfigPath,
+	writeFile(
+		t,
+		filestreamInputConfigPath,
 		getConfig(t, tmplVars, "autodiscover", "take-over-filestream-input-k8s.yml"),
 	)
 
@@ -190,7 +193,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		filebeatPodName,
 		filebeatImage,
 		workDir,
-		filebeatConfigPath,
+		filestreamInputConfigPath,
 	)
 
 	t.Log("Filebeat pod started again")
@@ -265,18 +268,18 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 	)
 
 	clusterName := fmt.Sprintf("test-cluster-%s", uid)
-	err := provider.Create(clusterName, cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{}))
+	err := provider.Create(
+		clusterName,
+		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{}),
+		cluster.CreateWithWaitForReady(30*time.Second))
 	if err != nil {
 		t.Fatalf("could not create cluster: %s", err)
 	}
-
 	t.Cleanup(func() {
 		if err := provider.Delete(clusterName, ""); err != nil {
 			t.Logf("could not delete K8s cluster: %s", err)
 		}
 	})
-
-	time.Sleep(30 * time.Second)
 
 	var kubeConfig string
 	require.Eventually(t, func() bool {
@@ -434,30 +437,31 @@ func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPat
 	}
 
 	clusterName = fmt.Sprintf("test-cluster-%s", uid)
-	err := provider.Create(clusterName, cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
-		Nodes: []v1alpha4.Node{
-			{
-				Role: v1alpha4.ControlPlaneRole,
-				ExtraMounts: []v1alpha4.Mount{
-					{
-						HostPath:      workDir,
-						ContainerPath: workDir,
+	err := provider.Create(
+		clusterName,
+		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
+			Nodes: []v1alpha4.Node{
+				{
+					Role: v1alpha4.ControlPlaneRole,
+					ExtraMounts: []v1alpha4.Mount{
+						{
+							HostPath:      workDir,
+							ContainerPath: workDir,
+						},
 					},
 				},
 			},
-		},
-	}))
+		}),
+		cluster.CreateWithWaitForReady(30*time.Second),
+	)
 	if err != nil {
 		t.Fatalf("could not create cluster: %s", err)
 	}
-
 	t.Cleanup(func() {
 		if err := provider.Delete(clusterName, ""); err != nil {
 			t.Logf("could not delete K8s cluster: %s", err)
 		}
 	})
-
-	time.Sleep(30 * time.Second)
 
 	var kubeConfig string
 	require.Eventually(t, func() bool {
