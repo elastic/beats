@@ -49,6 +49,7 @@ import (
 	"sigs.k8s.io/kind/pkg/cluster/nodeutils"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/testing/fs"
@@ -109,9 +110,8 @@ func TestHintsKubernetes(t *testing.T) {
 }
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
-	const filebeatImage = "docker.elastic.co/beats/filebeat-oss-wolfi:9.4.0-SNAPSHOT"
-
 	integration.EnsureESIsRunning(t)
+	filebeatImage := findPackagedFilebeatImageName(t)
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
 
@@ -842,7 +842,6 @@ func countEventsInES(t *testing.T, index string, size int) int {
 }
 
 func countReaderLines(t *testing.T, r io.Reader) int {
-	t.Helper()
 	s := bufio.NewScanner(r)
 	s.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 	n := 0
@@ -853,4 +852,76 @@ func countReaderLines(t *testing.T, r io.Reader) int {
 		t.Fatalf("cannot scan logs: %s", err)
 	}
 	return n
+}
+
+const (
+	filebeatOSSImageRepo      = "docker.elastic.co/beats/filebeat-oss"
+	filebeatOSSWolfiImageRepo = "docker.elastic.co/beats/filebeat-oss-wolfi"
+)
+
+// findPackagedFilebeatImageName returns the most suitable locally-built
+// Filebeat OSS image tag for integration tests.
+func findPackagedFilebeatImageName(t *testing.T) string {
+	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
+	if err != nil {
+		t.Fatalf("cannot create Docker client: %s", err)
+	}
+
+	images, err := cli.ImageList(t.Context(), image.ListOptions{})
+	if err != nil {
+		t.Fatalf("cannot list local docker images: %s", err)
+	}
+
+	versionPrefix := version.GetDefaultVersion()
+	bestTag := ""
+	bestScore := 0
+	var bestCreated int64
+
+	for _, img := range images {
+		for _, repoTag := range img.RepoTags {
+			score := packagedFilebeatImageScore(repoTag, versionPrefix)
+			if score == 0 {
+				continue
+			}
+
+			if score > bestScore || (score == bestScore && img.Created > bestCreated) {
+				bestTag = repoTag
+				bestScore = score
+				bestCreated = img.Created
+			}
+		}
+	}
+
+	if bestTag == "" {
+		t.Fatalf(
+			"could not find a locally packaged filebeat docker image. " +
+				"Run `DEV=true SNAPSHOT=true PLATFORMS=docker mage -v package` in `filebeat` first",
+		)
+	}
+
+	return bestTag
+}
+
+func packagedFilebeatImageScore(repoTag, versionPrefix string) int {
+	switch {
+	case strings.HasPrefix(repoTag, filebeatOSSImageRepo+":"):
+		return imageScore(repoTag, versionPrefix, 300)
+	case strings.HasPrefix(repoTag, filebeatOSSWolfiImageRepo+":"):
+		return imageScore(repoTag, versionPrefix, 100)
+	default:
+		return 0
+	}
+}
+
+func imageScore(repoTag, versionPrefix string, base int) int {
+	score := base
+
+	if strings.Contains(repoTag, ":"+versionPrefix) {
+		score += 20
+	}
+	if strings.HasSuffix(repoTag, "-SNAPSHOT") {
+		score += 10
+	}
+
+	return score
 }
