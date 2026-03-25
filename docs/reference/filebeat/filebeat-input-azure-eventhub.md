@@ -9,35 +9,15 @@ applies_to:
 
 # Azure eventhub input [filebeat-input-azure-eventhub]
 
-Use the `azure-eventhub` input to read messages from an Azure EventHub. The azure-eventhub input implementation is based on the event processor host. EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here [https://github.com/Azure/azure-event-hubs-go#event-processor-host](https://github.com/Azure/azure-event-hubs-go#event-processor-host), [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host). 
+Use the `azure-eventhub` input to read messages from an Azure Event Hub. The input uses the [Azure Event Hubs SDK for Go](https://github.com/Azure/azure-sdk-for-go/tree/main/sdk/messaging/azeventhubs) to consume events with load-balanced partition processing across multiple instances.
 
 State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, you must create or use an existing storage account.
 
-Enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
-
 ## Example configurations
 
-### Connection string authentication (processor v1)
+### Connection string authentication
 
-**Note:** Processor v1 only supports connection string authentication.
-
-Example configuration using connection string authentication with processor v1:
-
-```yaml
-filebeat.inputs:
-- type: azure-eventhub
-  eventhub: "insights-operational-logs"
-  consumer_group: "$Default"
-  connection_string: "Endpoint=sb://your-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=your-shared-access-key"
-  storage_account: "your-storage-account"
-  storage_account_key: "your-storage-account-key"
-  storage_account_container: "your-storage-container"
-  processor_version: "v1"
-```
-
-### Connection string authentication (processor v2)
-
-Example configuration using connection string authentication with processor v2:
+Example configuration using connection string authentication:
 
 ```yaml
 filebeat.inputs:
@@ -51,13 +31,13 @@ filebeat.inputs:
   storage_account_container: "your-storage-container"
 ```
 
-### Client secret authentication (processor v2)
+### Client secret authentication
 
 ```{applies_to}
 stack: ga 9.3.0+
 ```
 
-Example configuration using Azure Active Directory service principal authentication with processor v2:
+Example configuration using Azure Active Directory service principal authentication:
 
 ```yaml
 filebeat.inputs:
@@ -77,13 +57,13 @@ filebeat.inputs:
 When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See [Required permissions](#_required_permissions) for details.
 :::
 
-### Managed identity authentication (processor v2)
+### Managed identity authentication
 
 ```{applies_to}
 stack: ga 9.2.6+
 ```
 
-Example configuration using Azure Managed Identity authentication with processor v2. This is ideal for workloads running on Azure VMs, Azure Container Apps, Azure Kubernetes Service (AKS), or other Azure services that support managed identities.
+Example configuration using Azure Managed Identity authentication. This is ideal for workloads running on Azure VMs, Azure Container Apps, Azure Kubernetes Service (AKS), or other Azure services that support managed identities.
 
 :::{important}
 Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
@@ -261,7 +241,7 @@ The name of the storage account. Required.
 
 ### `storage_account_key` [_storage_account_key]
 
-The storage account key, this key will be used to authorize access to data in your storage account, option is required.
+The storage account key. When using `connection_string` authentication, you can provide either `storage_account_connection_string` (recommended) or `storage_account_key` together with `storage_account` to auto-construct the connection string. Not required when using `client_secret` or `managed_identity` authentication.
 
 ### `storage_account_container` [_storage_account_container]
 
