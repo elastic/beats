@@ -582,8 +582,6 @@ func loadDockerImageIntoKind(t *testing.T, clusterName, imageName string) {
 }
 
 func kindNodeGatewayIP(t *testing.T, nodeName string) string {
-	t.Helper()
-
 	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
 	if err != nil {
 		t.Fatalf("cannot create Docker client: %s", err)
@@ -607,7 +605,6 @@ func kindNodeGatewayIP(t *testing.T, nodeName string) string {
 }
 
 func grantClusterAdminToDefaultServiceAccount(t *testing.T, kubeConfigPath string) {
-	t.Helper()
 	cs := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
 
 	bindingName := "filebeat-autodiscover-admin-" + uuid.Must(uuid.NewV4()).String()
@@ -642,11 +639,15 @@ func writeFile(t *testing.T, path, content string) {
 
 func startFilebeatPodForTakeOver(
 	t *testing.T,
-	kubeConfigPath, nodeName, podName, imageName, workDir, configPath string,
+	kubeConfigPath,
+	nodeName,
+	podName,
+	imageName,
+	workDir,
+	configPath string,
 ) {
 
 	cs := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
-	runAsUser := int64(0)
 	hostPathDir := corev1.HostPathDirectory
 
 	pod := &corev1.Pod{
@@ -667,9 +668,6 @@ func startFilebeatPodForTakeOver(
 						"--strict.perms=false",
 						"-c", configPath,
 						"-E", fmt.Sprintf("path.data=%s", workDir),
-					},
-					SecurityContext: &corev1.SecurityContext{
-						RunAsUser: &runAsUser,
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
