@@ -46,6 +46,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/kind/pkg/apis/config/v1alpha4"
 	"sigs.k8s.io/kind/pkg/cluster"
+	"sigs.k8s.io/kind/pkg/cluster/nodeutils"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
@@ -114,7 +115,8 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
 
-	kubeConfigPath, nodeName, podName := startFlogKubernetesForTakeOver(t, workDir)
+	kubeConfigPath, clusterName, nodeName, podName := startFlogKubernetesForTakeOver(t, workDir)
+	loadDockerImageIntoKind(t, clusterName, filebeatImage)
 	grantClusterAdminToDefaultServiceAccount(t, kubeConfigPath)
 
 	filebeatPodName := "filebeat-pod-" + uuid.Must(uuid.NewV4()).String()
@@ -414,7 +416,7 @@ func startFlogDocker(t *testing.T) string {
 
 // startFlogKubernetesForTakeOver creates a Kind cluster and starts a flog pod
 // that writes one log line per second to stdout.
-func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPath, nodeName, podName string) {
+func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPath, clusterName, nodeName, podName string) {
 	uid := uuid.Must(uuid.NewV4()).String()
 
 	defer func() {
@@ -433,7 +435,7 @@ func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPat
 		t.Fatalf("cannot create test work directory: %s", err)
 	}
 
-	clusterName := fmt.Sprintf("test-cluster-%s", uid)
+	clusterName = fmt.Sprintf("test-cluster-%s", uid)
 	err := provider.Create(clusterName, cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
 		Nodes: []v1alpha4.Node{
 			{
@@ -532,6 +534,53 @@ func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPat
 	return
 }
 
+func loadDockerImageIntoKind(t *testing.T, clusterName, imageName string) {
+	provider := cluster.NewProvider()
+	nodes, err := provider.ListInternalNodes(clusterName)
+	if err != nil {
+		t.Fatalf(
+			"cannot list nodes for kind cluster %q: %s",
+			clusterName,
+			err,
+		)
+	}
+	if len(nodes) == 0 {
+		t.Fatalf("no nodes found for kind cluster %q", clusterName)
+	}
+
+	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
+	if err != nil {
+		t.Fatalf("cannot create Docker client: %s", err)
+	}
+
+	for _, node := range nodes {
+		// TODO: Check if I can use the files we built
+		imageReader, err := cli.ImageSave(t.Context(), []string{imageName})
+		if err != nil {
+			t.Fatalf("cannot save image %q from local docker daemon: %s", imageName, err)
+		}
+
+		if err := nodeutils.LoadImageArchive(node, imageReader); err != nil {
+			_ = imageReader.Close()
+			t.Fatalf(
+				"cannot load image %q into kind node %q: %s",
+				imageName,
+				node.String(),
+				err,
+			)
+		}
+
+		if err := imageReader.Close(); err != nil {
+			t.Fatalf(
+				"cannot close image stream for image %q on node %q: %s",
+				imageName,
+				node.String(),
+				err,
+			)
+		}
+	}
+}
+
 func kindNodeGatewayIP(t *testing.T, nodeName string) string {
 	t.Helper()
 
@@ -610,8 +659,9 @@ func startFilebeatPodForTakeOver(
 			RestartPolicy: corev1.RestartPolicyNever,
 			Containers: []corev1.Container{
 				{
-					Name:  "filebeat",
-					Image: imageName,
+					Name:            "filebeat",
+					Image:           imageName,
+					ImagePullPolicy: corev1.PullNever,
 					Args: []string{
 						"-e",
 						"--strict.perms=false",
