@@ -905,9 +905,9 @@ func findPackagedFilebeatImageName(t *testing.T) string {
 func packagedFilebeatImageScore(repoTag, versionPrefix string) int {
 	switch {
 	case strings.HasPrefix(repoTag, filebeatOSSImageRepo+":"):
-		return imageScore(repoTag, versionPrefix, 300)
-	case strings.HasPrefix(repoTag, filebeatOSSWolfiImageRepo+":"):
 		return imageScore(repoTag, versionPrefix, 100)
+	case strings.HasPrefix(repoTag, filebeatOSSWolfiImageRepo+":"):
+		return imageScore(repoTag, versionPrefix, 300)
 	default:
 		return 0
 	}
