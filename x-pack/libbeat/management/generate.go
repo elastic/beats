@@ -188,7 +188,7 @@ func createStreamRulesForReceiver(raw *proto.UnitExpectedConfig, streamSource ma
 	}
 
 	dsType, dataset, namespace := metadataFromDatastreamValues(defaultDataStreamType, raw, stream)
-	proc := GenerateAgentMetadataProcessor(
+	proc := generateAgentMetadataProcessor(
 		agentInfo,
 		raw.GetId(),
 		stream.GetId(),
@@ -386,7 +386,7 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 	}
 }
 
-func GenerateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string) mapstr.M {
+func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string) mapstr.M {
 	cfg := mapstr.M{
 		"data_stream": mapstr.M{
 			"dataset":   dataset,
