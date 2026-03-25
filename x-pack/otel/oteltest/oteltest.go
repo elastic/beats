@@ -179,12 +179,17 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
+<<<<<<< HEAD
 			require.NotNil(ct, host.Evt, "expected not nil, got nil")
+=======
+			evt := host.getEvent()
+			require.NotNil(ct, evt, "expected not nil, got nil")
+>>>>>>> f7081653e (x-pack/oteltest: use CollectT for receiver status assertions (#49621))
 
 			if params.Status != nil {
-				assert.Equal(t, params.Status.Status(), host.Evt.Status())
-				assert.Equal(t, params.Status.Err(), host.Evt.Err())
-				assert.Equal(t, params.Status.Attributes().AsRaw(), host.Evt.Attributes().AsRaw())
+				assert.Equal(ct, params.Status.Status(), evt.Status())
+				assert.Equal(ct, params.Status.Err(), evt.Err())
+				assert.Equal(ct, params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw())
 			}
 
 			if params.AssertFunc != nil {
