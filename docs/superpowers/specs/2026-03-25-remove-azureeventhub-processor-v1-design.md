@@ -95,6 +95,12 @@ No changes needed. The 8 Azure module manifests already default to `"v2"` and th
 - Remove/update the config example showing `processor_version: "v1"` (line ~284)
 - Update the migration path reference from `v1 > v2` (line ~379)
 
+**Update `docs/reference/filebeat/filebeat-input-azure-eventhub.md`:**
+- Remove the "Connection string authentication (processor v1)" example section (lines 20-36) — this shows a `processor_version: "v1"` config
+- Remove "(processor v2)" suffixes from remaining example section headings since there's only one processor now
+- Update the intro paragraph (line 12) which references the legacy Event Processor Host and links to the deprecated `azure-event-hubs-go` repo
+- Update `storage_account_key` description (line 264) — currently says "option is required" which was true for v1 but not for v2 with connection string or credential auth
+
 ## Future work (planned for 9.4)
 
 - Remove the `processor_version` config field entirely
@@ -117,4 +123,5 @@ No changes needed. The 8 Azure module manifests already default to `"v2"` and th
 | `x-pack/filebeat/input/azureeventhub/metrics_test.go` | Modify — rewrite to use v2 types instead of `eventHubInputV1` |
 | `x-pack/filebeat/input/azureeventhub/client_secret.go` | Modify — clean up v1 comment |
 | `x-pack/filebeat/input/azureeventhub/README.md` | Modify — update v1 references |
+| `docs/reference/filebeat/filebeat-input-azure-eventhub.md` | Modify — remove v1 example, update descriptions |
 | `go.mod` / `go.sum` | Modify — `go mod tidy` |
