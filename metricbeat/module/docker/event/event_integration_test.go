@@ -87,7 +87,10 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+	err = c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func pullBusyboxImage(t *testing.T) {
@@ -101,7 +104,10 @@ func pullBusyboxImage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	io.Copy(os.Stdout, reader)
+	_, err = io.Copy(os.Stdout, reader)
+	if err != nil {
+		t.Fatal(err)
+	}
 	reader.Close()
 }
 
