@@ -31,10 +31,10 @@ import (
 )
 
 type Config struct {
-	InputID      string             `config:"input_id"`
-	StreamID     string             `config:"stream_id"`
-	DataStream   DataStreamConfig   `config:"data_stream" validate:"required"`
-	ElasticAgent ElasticAgentConfig `config:"elastic_agent" validate:"required"`
+	InputID      string              `config:"input_id"`
+	StreamID     string              `config:"stream_id"`
+	DataStream   *DataStreamConfig   `config:"data_stream" validate:"required"`
+	ElasticAgent *ElasticAgentConfig `config:"elastic_agent" validate:"required"`
 }
 
 type DataStreamConfig struct {
@@ -68,28 +68,44 @@ func (p *addAgentMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if event == nil {
 		return nil, nil
 	}
-	event.DeepUpdate(mapstr.M{
-		"@metadata": mapstr.M{
-			"input_id":  p.cfg.InputID,
-			"stream_id": p.cfg.StreamID,
-		},
-		"data_stream": mapstr.M{
+
+	updateMap := make(mapstr.M)
+	if p.cfg.DataStream != nil {
+		updateMap["data_stream"] = mapstr.M{
 			"dataset":   p.cfg.DataStream.Dataset,
 			"namespace": p.cfg.DataStream.Namespace,
 			"type":      p.cfg.DataStream.Type,
-		},
-		"event": mapstr.M{
+		}
+		updateMap["event"] = mapstr.M{
 			"dataset": p.cfg.DataStream.Dataset,
-		},
-		"elastic_agent": mapstr.M{
+		}
+	}
+	if p.cfg.ElasticAgent != nil {
+		updateMap["elastic_agent"] = mapstr.M{
 			"id":       p.cfg.ElasticAgent.ID,
 			"snapshot": p.cfg.ElasticAgent.Snapshot,
 			"version":  p.cfg.ElasticAgent.Version,
-		},
-		"agent": mapstr.M{
+		}
+		updateMap["agent"] = mapstr.M{
 			"id": p.cfg.ElasticAgent.ID, // mirrors elastic_agent.id for convenience
-		},
-	})
+		}
+	}
+
+	inputStreamMap := make(mapstr.M)
+	if p.cfg.InputID != "" {
+		inputStreamMap["input_id"] = p.cfg.InputID
+	}
+	if p.cfg.StreamID != "" {
+		inputStreamMap["stream_id"] = p.cfg.StreamID
+	}
+
+	// add input_id and stream_id only if either of them are set
+	if len(inputStreamMap) > 0 {
+		updateMap["@metadata"] = inputStreamMap
+	}
+
+	// insert the metadata and update the event
+	event.DeepUpdate(updateMap)
 	return event, nil
 }
 

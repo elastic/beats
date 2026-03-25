@@ -35,12 +35,12 @@ import (
 var testCfg = Config{
 	InputID:  "unique-system-metrics-input",
 	StreamID: "stream-abc-123",
-	DataStream: DataStreamConfig{
+	DataStream: &DataStreamConfig{
 		Dataset:   "system.cpu",
 		Namespace: "default",
 		Type:      "metrics",
 	},
-	ElasticAgent: ElasticAgentConfig{
+	ElasticAgent: &ElasticAgentConfig{
 		ID:       "db87c002-3ed1-4929-9edd-98cb6f76b2b1",
 		Snapshot: true,
 		Version:  "9.3.0",
@@ -114,28 +114,54 @@ func TestAddAgentMetadata_NilFieldsAndMeta(t *testing.T) {
 }
 
 func TestAddAgentMetadata_OptionalFields(t *testing.T) {
-	cfg := Config{
-		DataStream: DataStreamConfig{
-			Dataset:   "system.cpu",
-			Namespace: "default",
-			Type:      "metrics",
-		},
-		ElasticAgent: ElasticAgentConfig{
-			ID:      "agent-id",
-			Version: "9.3.0",
-		},
-	}
-	p := New(cfg)
-	event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}}
+	t.Run("no elastic_agent", func(t *testing.T) {
+		cfg := Config{
+			DataStream: &DataStreamConfig{
+				Dataset:   "system.cpu",
+				Namespace: "default",
+				Type:      "metrics",
+			},
+		}
+		p := New(cfg)
+		event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}}
 
-	result, err := p.Run(event)
-	require.NoError(t, err)
+		result, err := p.Run(event)
+		require.NoError(t, err)
 
-	// input_id and stream_id should not be set when empty
-	_, hasInputID := result.Meta["input_id"]
-	assert.False(t, hasInputID)
-	_, hasStreamID := result.Meta["stream_id"]
-	assert.False(t, hasStreamID)
+		// input_id and stream_id should not be set when empty
+		_, hasInputID := result.Meta["input_id"]
+		assert.False(t, hasInputID)
+		_, hasStreamID := result.Meta["stream_id"]
+		assert.False(t, hasStreamID)
+		_, hasElasticAgent := result.Fields["elastic_agent"]
+		assert.False(t, hasElasticAgent)
+		_, hasDS := result.Fields["data_stream"]
+		assert.True(t, hasDS)
+	})
+
+	t.Run("no data_stream", func(t *testing.T) {
+		cfg := Config{
+			ElasticAgent: &ElasticAgentConfig{
+				ID:      "agent-id",
+				Version: "9.3.0",
+			},
+		}
+		p := New(cfg)
+		event := &beat.Event{Timestamp: time.Now(), Fields: mapstr.M{}}
+
+		result, err := p.Run(event)
+		require.NoError(t, err)
+
+		// input_id and stream_id should not be set when empty
+		_, hasInputID := result.Meta["input_id"]
+		assert.False(t, hasInputID)
+		_, hasStreamID := result.Meta["stream_id"]
+		assert.False(t, hasStreamID)
+		_, hasDS := result.Fields["data_stream"]
+		assert.False(t, hasDS)
+		_, hasElasticAgent := result.Fields["elastic_agent"]
+		assert.True(t, hasElasticAgent)
+	})
 }
 
 func TestAddAgentMetadata_PreservesExistingSubMaps(t *testing.T) {
@@ -272,89 +298,4 @@ func TestEquivalence(t *testing.T) {
 
 	assert.Equal(t, resultSeparate.Meta, resultCombined.Meta, "Meta should be equivalent")
 	assert.Equal(t, resultSeparate.Fields, resultCombined.Fields, "Fields should be equivalent")
-}
-
-func newBenchmarkEvent() *beat.Event {
-	return &beat.Event{
-		Timestamp: time.Now(),
-		Meta:      mapstr.M{},
-		Fields: mapstr.M{
-			"host": mapstr.M{
-				"name":         "test-host",
-				"hostname":     "test-host.example.com",
-				"architecture": "x86_64",
-				"os": mapstr.M{
-					"platform": "linux",
-					"version":  "5.15.0",
-				},
-			},
-			"system": mapstr.M{
-				"cpu": mapstr.M{
-					"total": mapstr.M{"pct": 0.42},
-					"user":  mapstr.M{"pct": 0.28},
-				},
-			},
-			"metricset": mapstr.M{
-				"name":   "cpu",
-				"period": 10000,
-			},
-			"service": mapstr.M{
-				"type": "system",
-			},
-		},
-	}
-}
-
-// BenchmarkAddAgentMetadata_Combined benchmarks the single combined processor.
-func BenchmarkAddAgentMetadata_Combined(b *testing.B) {
-	p := New(testCfg)
-	event := newBenchmarkEvent()
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = p.Run(event)
-	}
-}
-
-// BenchmarkAddAgentMetadata_SeparateAddFields benchmarks the equivalent chain
-// of individual add_fields processors (the current approach).
-func BenchmarkAddAgentMetadata_SeparateAddFields(b *testing.B) {
-	procs := equivalentAddFieldsProcessors(testCfg)
-	event := newBenchmarkEvent()
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_, _ = procs.Run(event)
-	}
-}
-
-// BenchmarkAddAgentMetadata_Combined_WithClone benchmarks the combined
-// processor with event cloning to simulate realistic pipeline behavior where
-// each event is unique.
-func BenchmarkAddAgentMetadata_Combined_WithClone(b *testing.B) {
-	p := New(testCfg)
-	event := newBenchmarkEvent()
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		clone := event.Clone()
-		_, _ = p.Run(clone)
-	}
-}
-
-// BenchmarkAddAgentMetadata_SeparateAddFields_WithClone benchmarks the
-// equivalent chain of add_fields processors with event cloning.
-func BenchmarkAddAgentMetadata_SeparateAddFields_WithClone(b *testing.B) {
-	procs := equivalentAddFieldsProcessors(testCfg)
-	event := newBenchmarkEvent()
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		clone := event.Clone()
-		_, _ = procs.Run(clone)
-	}
 }
