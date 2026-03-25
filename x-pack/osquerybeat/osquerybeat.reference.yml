@@ -7,6 +7,11 @@ osquerybeat:
 #    - type: osquery
 #      osquery:
 #        elastic_options:
+#          query_profile_storage:
+#            # Enable local storage of live query profiles.
+#            #enabled: true
+#            # Maximum number of profiles kept (latest per query).
+#            #max_profiles: 64
 #          install:
 #            # Optional per-platform and per-architecture custom osquery artifacts.
 #            # If the current platform/arch is unset, bundled osquery is used.

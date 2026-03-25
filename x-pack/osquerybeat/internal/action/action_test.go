@@ -65,6 +65,27 @@ func TestActionFromMap(t *testing.T) {
 			},
 		},
 		{
+			Name: "valid profile flag",
+			Map: map[string]interface{}{
+				"id": "123456789",
+				"data": map[string]interface{}{
+					"query":   "select * from foo",
+					"profile": true,
+				},
+			},
+		},
+		{
+			Name: "invalid profile flag type",
+			Map: map[string]interface{}{
+				"id": "123456789",
+				"data": map[string]interface{}{
+					"query":   "select * from foo",
+					"profile": "true",
+				},
+			},
+			Err: ErrActionRequest,
+		},
+		{
 			Name: "empty id",
 			Map: map[string]interface{}{
 				"id": "",
@@ -120,7 +141,11 @@ func TestActionFromMap(t *testing.T) {
 				}
 			}
 
-			_ = a
+			if tc.Name == "valid profile flag" {
+				if !a.Profile {
+					t.Errorf("expected Profile to be true, got false")
+				}
+			}
 		})
 	}
 }
