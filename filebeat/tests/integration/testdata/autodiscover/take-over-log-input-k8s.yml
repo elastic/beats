@@ -17,8 +17,6 @@ filebeat.autodiscover:
 queue.mem:
   flush.timeout: 0s
 
-path.home: "{{.homeFolder}}"
-
 output.elasticsearch:
   hosts:
     - "{{.esHost}}"
@@ -29,6 +27,8 @@ output.elasticsearch:
 
 logging:
   level: debug
+  files:
+    rotateonstartup: false
   selectors:
     - "*"
   metrics:

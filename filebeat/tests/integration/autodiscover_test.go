@@ -218,9 +218,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	// to be closed due to inactivity.
 	waitPodLogsContains(
 		t,
-		kubeConfigPath,
-		filebeatPodName,
-		"filebeat",
+		workDir,
 		"File is inactive. Closing.",
 		20*time.Second,
 	)
@@ -664,10 +662,9 @@ func startFilebeatPodForTakeOver(
 					Image:           imageName,
 					ImagePullPolicy: corev1.PullNever,
 					Args: []string{
-						"-e",
 						"--strict.perms=false",
 						"-c", configPath,
-						"-E", fmt.Sprintf("path.data=%s", workDir),
+						"-E", fmt.Sprintf("path.home=%s", workDir),
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
@@ -742,39 +739,26 @@ func startFilebeatPodForTakeOver(
 	)
 }
 
-func waitPodLogsContains(
-	t *testing.T,
-	kubeConfigPath, podName, containerName, msg string,
-	timeout time.Duration,
-) {
+func waitPodLogsContains(t *testing.T, workDir, msg string, timeout time.Duration) {
 	t.Helper()
-	cs := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
-	require.Eventuallyf(
-		t,
-		func() bool {
-			logs, err := podLogs(cs, podName, containerName)
-			return err == nil && strings.Contains(logs, msg)
-		},
-		timeout,
-		200*time.Millisecond,
-		"pod %q logs did not contain %q", podName, msg,
-	)
-}
-
-func podLogs(cs *kubernetes.Clientset, podName, containerName string) (string, error) {
-	logsReader, err := cs.CoreV1().Pods("default").GetLogs(podName, &corev1.PodLogOptions{
-		Container: containerName,
-	}).Stream(context.Background())
+	// Glob to match the date, it will stop working in about 1000 years
+	paths, err := filepath.Glob(filepath.Join(workDir, "logs", "filebeat-2*.ndjson"))
 	if err != nil {
-		return "", err
+		t.Fatalf("cannot resolve glob for log files: %s", err)
 	}
-	defer logsReader.Close()
 
-	data, err := io.ReadAll(logsReader)
-	if err != nil {
-		return "", err
+	if len(paths) != 1 {
+		t.Fatalf("There must be a single log file for Filebat, found %d", len(paths))
 	}
-	return string(data), nil
+
+	f, err := os.Open(paths[0])
+	if err != nil {
+		t.Fatalf("cannot open Filebeat log file: %s", err)
+	}
+
+	logFile := fs.LogFile{File: f}
+
+	logFile.WaitLogsContains(t, msg, timeout, "Filebeat logs did not contain '%s'", msg)
 }
 
 func deletePodK8s(t *testing.T, kubeConfigPath, podName string) {
