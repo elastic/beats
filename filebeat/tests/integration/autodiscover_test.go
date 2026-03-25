@@ -111,7 +111,7 @@ func TestHintsKubernetes(t *testing.T) {
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	integration.EnsureESIsRunning(t)
-	filebeatImage := findPackagedFilebeatImageName(t)
+	filebeatImage := findPackagedFilebeatImageName()
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
 
@@ -854,74 +854,8 @@ func countReaderLines(t *testing.T, r io.Reader) int {
 	return n
 }
 
-const (
-	filebeatOSSImageRepo      = "docker.elastic.co/beats/filebeat-oss"
-	filebeatOSSWolfiImageRepo = "docker.elastic.co/beats/filebeat-oss-wolfi"
-)
-
-// findPackagedFilebeatImageName returns the most suitable locally-built
-// Filebeat OSS image tag for integration tests.
-func findPackagedFilebeatImageName(t *testing.T) string {
-	cli, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logp.NewNopLogger())
-	if err != nil {
-		t.Fatalf("cannot create Docker client: %s", err)
-	}
-
-	images, err := cli.ImageList(t.Context(), image.ListOptions{})
-	if err != nil {
-		t.Fatalf("cannot list local docker images: %s", err)
-	}
-
-	versionPrefix := version.GetDefaultVersion()
-	bestTag := ""
-	bestScore := 0
-	var bestCreated int64
-
-	for _, img := range images {
-		for _, repoTag := range img.RepoTags {
-			score := packagedFilebeatImageScore(repoTag, versionPrefix)
-			if score == 0 {
-				continue
-			}
-
-			if score > bestScore || (score == bestScore && img.Created > bestCreated) {
-				bestTag = repoTag
-				bestScore = score
-				bestCreated = img.Created
-			}
-		}
-	}
-
-	if bestTag == "" {
-		t.Fatalf(
-			"could not find a locally packaged filebeat docker image. " +
-				"Run `DEV=true SNAPSHOT=true PLATFORMS=docker mage -v package` in `filebeat` first",
-		)
-	}
-
-	return bestTag
-}
-
-func packagedFilebeatImageScore(repoTag, versionPrefix string) int {
-	switch {
-	case strings.HasPrefix(repoTag, filebeatOSSImageRepo+":"):
-		return imageScore(repoTag, versionPrefix, 100)
-	case strings.HasPrefix(repoTag, filebeatOSSWolfiImageRepo+":"):
-		return imageScore(repoTag, versionPrefix, 300)
-	default:
-		return 0
-	}
-}
-
-func imageScore(repoTag, versionPrefix string, base int) int {
-	score := base
-
-	if strings.Contains(repoTag, ":"+versionPrefix) {
-		score += 20
-	}
-	if strings.HasSuffix(repoTag, "-SNAPSHOT") {
-		score += 10
-	}
-
-	return score
+// findPackagedFilebeatImageName returns the expected wolfi image name produced
+// by `DEV=true SNAPSHOT=true PLATFORMS=docker mage -v package`.
+func findPackagedFilebeatImageName() string {
+	return "docker.elastic.co/beats/filebeat-oss-wolfi" + ":" + version.GetDefaultVersion() + "-SNAPSHOT"
 }
