@@ -2,7 +2,6 @@ filebeat.autodiscover:
   providers:
     - type: kubernetes
       node: {{.nodeName}}
-      kube_config: {{.kubeConfig}}
       templates:
         - condition:
             equals:
