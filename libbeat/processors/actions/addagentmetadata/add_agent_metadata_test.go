@@ -109,7 +109,7 @@ func TestAddAgentMetadata_NilFieldsAndMeta(t *testing.T) {
 	assert.NotNil(t, result.Fields)
 
 	assert.Equal(t, "unique-system-metrics-input", result.Meta["input_id"])
-	ds := result.Fields["data_stream"].(mapstr.M)
+	ds := result.Fields["data_stream"].(mapstr.M) //nolint:errcheck //it's a test
 	assert.Equal(t, "system.cpu", ds["dataset"])
 }
 
@@ -182,12 +182,12 @@ func TestAddAgentMetadata_PreservesExistingSubMaps(t *testing.T) {
 	assert.Equal(t, "preserved", result.Meta["existing_meta"])
 
 	// Existing agent fields preserved alongside new ones
-	ag := result.Fields["agent"].(mapstr.M)
+	ag := result.Fields["agent"].(mapstr.M) //nolint:errcheck //it's a test
 	assert.Equal(t, "my-host", ag["name"])
 	assert.Equal(t, testCfg.ElasticAgent.ID, ag["id"])
 
 	// Existing event fields preserved alongside new ones
-	ev := result.Fields["event"].(mapstr.M)
+	ev := result.Fields["event"].(mapstr.M) //nolint:errcheck //it's a test
 	assert.Equal(t, "system", ev["module"])
 	assert.Equal(t, testCfg.DataStream.Dataset, ev["dataset"])
 }
