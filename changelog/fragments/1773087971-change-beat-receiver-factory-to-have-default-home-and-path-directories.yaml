@@ -13,18 +13,7 @@ kind: feature
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Change beat receiver factory to require default home and path directory
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# Long description; in case the summary is not enough to describe the change
-# this field accommodate a description without length limits.
-# description:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# impact:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# action:
+summary: Add NewFactoryWithSettings for Beat receivers to provide default home and path directories
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.

@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix incremental group updates in Active Directory entity analytics provider.
-component: filebeat
