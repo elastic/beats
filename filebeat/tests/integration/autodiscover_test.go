@@ -85,7 +85,8 @@ func TestHintsKubernetes(t *testing.T) {
 		"../../filebeat.test",
 	)
 
-	kubeConfigPath, noneName, containerID := startFlogKubernetes(t, filebeat.TempDir())
+	kubeConfigPath, _, _ := createKindCluster(t, filebeat.TempDir())
+	noneName, _, containerID := startFlogKubernetes(t, kubeConfigPath)
 
 	cfgYAML := getConfig(
 		t,
@@ -115,7 +116,23 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
 
-	kubeConfigPath, clusterName, nodeName, podName := startFlogKubernetesForTakeOver(t, workDir)
+	kubeConfigPath, _, clusterName := createKindCluster(t, workDir,
+		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
+			Nodes: []v1alpha4.Node{
+				{
+					Role: v1alpha4.ControlPlaneRole,
+					ExtraMounts: []v1alpha4.Mount{
+						{
+							HostPath:      workDir,
+							ContainerPath: workDir,
+						},
+					},
+				},
+			},
+		}))
+	nodeName, podName, _ := startFlogKubernetes(t, kubeConfigPath)
+	// kubeConfigPath, clusterName, nodeName, podName := startFlogKubernetesForTakeOver(t, workDir)
+
 	loadDockerImageIntoKind(t, clusterName, filebeatImage)
 	grantClusterAdminToDefaultServiceAccount(t, kubeConfigPath)
 
@@ -253,7 +270,12 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	)
 }
 
-func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) {
+func createKindCluster(
+	t *testing.T,
+	workDir string,
+	options ...cluster.CreateOption,
+) (kubeConfigPath, kubeConfig, clusterName string) {
+
 	uid := uuid.Must(uuid.NewV4()).String()
 
 	defer func() {
@@ -261,17 +283,20 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 			t.Log("To see the Kind logs search for 'cluster.ProviderWithLogger' and uncomment it.")
 		}
 	}()
+
 	provider := cluster.NewProvider(
 	// Uncomment the next line to have Kind logs written to stderr.
 	// You will also have to import "sigs.k8s.io/kind/pkg/cmd"
 	// cluster.ProviderWithLogger(cmd.NewLogger()),
 	)
 
-	clusterName := fmt.Sprintf("test-cluster-%s", uid)
+	clusterName = fmt.Sprintf("test-cluster-%s", uid)
 	err := provider.Create(
 		clusterName,
-		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{}),
-		cluster.CreateWithWaitForReady(30*time.Second))
+		append(
+			[]cluster.CreateOption{cluster.CreateWithWaitForReady(30 * time.Second)},
+			options...)...,
+	)
 	if err != nil {
 		t.Fatalf("could not create cluster: %s", err)
 	}
@@ -281,30 +306,26 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 		}
 	})
 
-	var kubeConfig string
 	require.Eventually(t, func() bool {
 		kubeConfig, err = provider.KubeConfig(clusterName, false)
 		return err == nil
 	}, 30*time.Second, 100*time.Millisecond, "could not get kube config")
 
-	kubeConfigPath := filepath.Join(tempDir, "kube-config")
-	if err := os.WriteFile(kubeConfigPath, []byte(kubeConfig), 0666); err != nil {
+	kubeConfigPath = filepath.Join(workDir, "kube-config")
+	if err = os.WriteFile(kubeConfigPath, []byte(kubeConfig), 0666); err != nil {
 		t.Fatalf("cannot write kube config file: %s", err)
 	}
 
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kubeConfig))
-	if err != nil {
-		t.Fatal(err)
-	}
+	return
+}
 
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		t.Fatal(err)
-	}
+func startFlogKubernetes(t *testing.T, kubeConfigPath string) (nodeName, podName, containerID string) {
+	clientset := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
 
+	podName = "flog-pod-" + uuid.Must(uuid.NewV4()).String()
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "flog-pod-" + uid,
+			Name:      podName,
 			Namespace: "default",
 		},
 		Spec: corev1.PodSpec{
@@ -318,7 +339,7 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 		},
 	}
 
-	pod, err = clientset.CoreV1().Pods("default").Create(t.Context(), pod, metav1.CreateOptions{})
+	pod, err := clientset.CoreV1().Pods("default").Create(t.Context(), pod, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("could not create pod: %s", err)
 	}
@@ -331,8 +352,6 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 		}
 	})
 
-	var containerID string
-	var podNodeName string
 	require.Eventually(
 		t,
 		func() bool {
@@ -344,7 +363,7 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 			if pod.Status.Phase == corev1.PodRunning && len(pod.Status.ContainerStatuses) > 0 {
 				containerID = pod.Status.ContainerStatuses[0].ContainerID
 				if containerID != "" {
-					podNodeName = pod.Spec.NodeName
+					nodeName = pod.Spec.NodeName
 					// Remove the runtime prefix (e.g., "containerd://")
 					if idx := strings.Index(containerID, "://"); idx != -1 {
 						containerID = containerID[idx+3:]
@@ -361,7 +380,7 @@ func startFlogKubernetes(t *testing.T, tempDir string) (string, string, string) 
 		"pod did not start within timeout",
 	)
 
-	return kubeConfigPath, podNodeName, containerID
+	return nodeName, podName, containerID
 }
 
 // startFlogDocker starts a `mingrammer/flog` that logs one line every
@@ -417,28 +436,12 @@ func startFlogDocker(t *testing.T) string {
 
 // startFlogKubernetesForTakeOver creates a Kind cluster and starts a flog pod
 // that writes one log line per second to stdout.
-func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPath, clusterName, nodeName, podName string) {
-	uid := uuid.Must(uuid.NewV4()).String()
+func startFlogKubernetesForTakeOver(
+	t *testing.T,
+	workDir string,
+) (kubeConfigPath, clusterName, nodeName, podName string) {
 
-	defer func() {
-		if t.Failed() {
-			t.Log("To see the Kind logs search for 'cluster.ProviderWithLogger' and uncomment it.")
-		}
-	}()
-
-	provider := cluster.NewProvider(
-	// Uncomment the next line to have Kind logs written to stderr.
-	// You will also have to import "sigs.k8s.io/kind/pkg/cmd"
-	// cluster.ProviderWithLogger(cmd.NewLogger()),
-	)
-
-	if err := os.MkdirAll(workDir, 0o755); err != nil {
-		t.Fatalf("cannot create test work directory: %s", err)
-	}
-
-	clusterName = fmt.Sprintf("test-cluster-%s", uid)
-	err := provider.Create(
-		clusterName,
+	kubeConfigPath, kubeConfig, clusterName := createKindCluster(t, workDir,
 		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
 			Nodes: []v1alpha4.Node{
 				{
@@ -451,28 +454,7 @@ func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPat
 					},
 				},
 			},
-		}),
-		cluster.CreateWithWaitForReady(30*time.Second),
-	)
-	if err != nil {
-		t.Fatalf("could not create cluster: %s", err)
-	}
-	t.Cleanup(func() {
-		if err := provider.Delete(clusterName, ""); err != nil {
-			t.Logf("could not delete K8s cluster: %s", err)
-		}
-	})
-
-	var kubeConfig string
-	require.Eventually(t, func() bool {
-		kubeConfig, err = provider.KubeConfig(clusterName, false)
-		return err == nil
-	}, 30*time.Second, 100*time.Millisecond, "could not get kube config")
-
-	kubeConfigPath = filepath.Join(workDir, "kube-config")
-	if err = os.WriteFile(kubeConfigPath, []byte(kubeConfig), 0666); err != nil {
-		t.Fatalf("cannot write kube config file: %s", err)
-	}
+		}))
 
 	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kubeConfig))
 	if err != nil {
@@ -484,7 +466,7 @@ func startFlogKubernetesForTakeOver(t *testing.T, workDir string) (kubeConfigPat
 		t.Fatal(err)
 	}
 
-	podName = "flog-pod-" + uid
+	podName = "flog-pod-" + uuid.Must(uuid.NewV4()).String()
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
