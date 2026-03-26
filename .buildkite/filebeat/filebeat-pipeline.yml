@@ -166,6 +166,7 @@ steps:
 
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
+          source .buildkite/scripts/docker.sh
           cd filebeat
           SNAPSHOT=true PACKAGES="docker" PLATFORMS="linux/amd64" mage -v package
           mage goIntegTest
