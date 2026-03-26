@@ -38,6 +38,7 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // test_close_renamed from test_harvester.py
@@ -1201,6 +1202,11 @@ func TestFilestreamDecodeError(t *testing.T) {
 // test_debug_reader from test_harvester.py
 func TestFilestreamDebugReader(t *testing.T) {
 	env := newInputTestingEnvironment(t)
+	l, err := logp.ConfigureWithCoreLocal(logp.Config{Level: logp.DebugLevel, Selectors: []string{"*"}}, env.testLogger.Core())
+	if err != nil {
+		t.Fatalf("failed to configure logger: %+v", err)
+	}
+	env.testLogger.Logger = l
 
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
