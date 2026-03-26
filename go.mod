@@ -57,7 +57,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	github.com/elastic/elastic-agent-client/v7 v7.18.0
+	github.com/elastic/elastic-agent-client/v7 v7.18.1
 	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
@@ -68,7 +68,7 @@ require (
 	github.com/elastic/go-structform v0.0.12
 	github.com/elastic/go-sysinfo v1.15.3
 	github.com/elastic/go-ucfg v0.8.8
-	github.com/elastic/gosigar v0.14.3
+	github.com/elastic/gosigar v0.14.4
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
