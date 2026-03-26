@@ -71,6 +71,10 @@ type Jctl interface {
 	// If cancel is cancelled, Next returns a zero value JournalEntry
 	// and ErrCancelled.
 	Next(input.Canceler) (data []byte, err error)
+
+	// Kill terminates the journalctl process and blocks until all
+	// background goroutines (stdout/stderr readers and the process-wait
+	// goroutine) have exited.
 	Kill() error
 }
 
@@ -295,9 +299,9 @@ func (r *Reader) newJctl(extraArgs ...string) error {
 	return err
 }
 
-// Close stops the `journalctl` process and waits for all
-// goroutines to return, the canceller passed to `New` should
-// be cancelled before `Close` is called
+// Close stops the `journalctl` process and waits for all goroutines to
+// return. The canceller passed to `New` should be cancelled before `Close`
+// is called so that the reader goroutines can drain.
 func (r *Reader) Close() error {
 	r.logger.Infof("shutting down journalctl, waiting up to: %s", time.Minute)
 

@@ -24,7 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -42,6 +42,11 @@ type journalctl struct {
 	logger   *logp.Logger
 	canceler input.Canceler
 	waitDone sync.WaitGroup
+
+	// Stop chan and StopOnce are used to ensure the stdout reader goroutine
+	// can stop even if nobody is reading from the dataChan.
+	stopCh   chan struct{}
+	stopOnce sync.Once
 }
 
 // Factory returns an instance of journalctl ready to use.
@@ -60,6 +65,7 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		logger:   logger,
 	}
 
+<<<<<<< HEAD
 	var err error
 	jctl.stdout, err = cmd.StdoutPipe()
 	if err != nil {
@@ -71,6 +77,25 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 	}
 
 	logger.Infof("Journalctl command: %s %s", binary, strings.Join(args, " "))
+=======
+		jctl := journalctl{
+			canceler: canceller,
+			cmd:      cmd,
+			dataChan: make(chan []byte),
+			logger:   logger,
+			stopCh:   make(chan struct{}),
+		}
+
+		var err error
+		jctl.stdout, err = cmd.StdoutPipe()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get stdout pipe: %w", err)
+		}
+		jctl.stderr, err = cmd.StderrPipe()
+		if err != nil {
+			return nil, fmt.Errorf("cannot get stderr pipe: %w", err)
+		}
+>>>>>>> e0d13d181 (Fix journalctl process lifecycle and cleanup bugs (#49528))
 
 	// Start the process before trying to read from the pipes.
 	// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
@@ -80,10 +105,18 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 
 	logger.Infof("journalctl started with PID %d", cmd.Process.Pid)
 
+<<<<<<< HEAD
 	// readersWG tracks when stdout/stderr reader goroutines are done.
 	// cmd.Wait must not be called until reads from StdoutPipe and StderrPipe
 	// have completed (per the os/exec docs), so waitDone waits on readersWG.
 	var readersWG sync.WaitGroup
+=======
+		// Start the process before trying to read from the pipes
+		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
+		if err := cmd.Start(); err != nil {
+			return nil, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
+		}
+>>>>>>> e0d13d181 (Fix journalctl process lifecycle and cleanup bugs (#49528))
 
 	// This gorroutune reads the stderr from the journalctl process, if the
 	// process exits for any reason, then its stderr is closed, this goroutine
@@ -102,6 +135,7 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 				return
 			}
 
+<<<<<<< HEAD
 			logger.Errorf("Journalctl wrote to stderr: %s", line)
 		}
 	}()
@@ -145,6 +179,31 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 					if logError {
 						logger.Errorf("cannot read from journalctl stdout: '%s'", err)
 					}
+=======
+		// This goroutine reads the stdout from the journalctl process and makes
+		// the data available via the `Next()` method.
+		// If the journalctl process exits for any reason, then its stdout is closed
+		// this goroutine gets an EOF error and exits.
+		readersWG.Go(func() {
+			defer jctl.logger.Debug("stdout reader goroutine done")
+			defer close(jctl.dataChan)
+			reader := bufio.NewReader(jctl.stdout)
+			for {
+				data, err := reader.ReadBytes('\n')
+				if err != nil {
+					if !errors.Is(err, io.EOF) {
+						logger.Errorf("cannot read from journalctl stdout: '%s'", err)
+					}
+					return
+				}
+
+				select {
+				case <-jctl.canceler.Done():
+					return
+				case <-jctl.stopCh:
+					return
+				case jctl.dataChan <- data:
+>>>>>>> e0d13d181 (Fix journalctl process lifecycle and cleanup bugs (#49528))
 				}
 				return
 			}
@@ -176,10 +235,26 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 	return &jctl, nil
 }
 
-// Kill Terminates the journalctl process using a SIGKILL.
+// Kill terminates the journalctl process by sending SIGKILL, then it
+// blocks until all background goroutines (stdout/stderr readers and
+// the process-wait goroutine) have exited.
 func (j *journalctl) Kill() error {
 	j.logger.Debug("sending SIGKILL to journalctl")
-	return j.cmd.Process.Kill()
+
+	// Signal the stdout reader goroutine to exit, this ensures
+	// j.waitDone.Wait() won't block if the stdout reader goroutine
+	// is trying to send data and nobody is reading from its channel.
+	j.stopOnce.Do(func() {
+		close(j.stopCh)
+	})
+
+	err := j.cmd.Process.Kill()
+	j.waitDone.Wait()
+	if errors.Is(err, os.ErrProcessDone) {
+		return nil
+	}
+
+	return err
 }
 
 // Next returns the next journal entry (as JSON). If `finished` is true, then
