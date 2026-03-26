@@ -47,6 +47,7 @@ import (
 	"sigs.k8s.io/kind/pkg/apis/config/v1alpha4"
 	"sigs.k8s.io/kind/pkg/cluster"
 	"sigs.k8s.io/kind/pkg/cluster/nodeutils"
+	"sigs.k8s.io/kind/pkg/cmd"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -115,6 +116,18 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	filebeatImage := "docker.elastic.co/beats/filebeat-oss-wolfi" + ":" + version.GetDefaultVersion() + "-SNAPSHOT"
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
+	foldersToFix := []string{
+		filepath.Join("..", ".."),
+		filepath.Join("..", "..", "build"),
+		filepath.Join("..", "..", "build", "integration-tests"),
+		workDir,
+	}
+
+	for _, d := range foldersToFix {
+		if err := os.Chmod(d, os.ModePerm); err != nil {
+			t.Fatalf("cannot set permissions from %q: %q", d, err)
+		}
+	}
 
 	kubeConfigPath, clusterName := createKindCluster(t, workDir,
 		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
@@ -309,7 +322,7 @@ func createKindCluster(
 		t.Fatalf("cannot write kube config file: %s", err)
 	}
 
-	return
+	return kubeConfigPath, clusterName
 }
 
 func startFlogKubernetes(t *testing.T, kubeConfigPath string) (nodeName, podName, containerID string) {
