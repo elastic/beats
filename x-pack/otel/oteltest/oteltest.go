@@ -44,6 +44,12 @@ func (h *MockHost) Report(evt *componentstatus.Event) {
 	h.Evt = evt
 }
 
+func (h *MockHost) getEvent() *componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.Evt
+}
+
 type ReceiverConfig struct {
 	// Name is the unique identifier for the component
 	Name string
@@ -179,12 +185,13 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
-			require.NotNil(ct, host.Evt, "expected not nil, got nil")
+			evt := host.getEvent()
+			require.NotNil(ct, evt, "expected not nil, got nil")
 
 			if params.Status != nil {
-				assert.Equal(t, params.Status.Status(), host.Evt.Status())
-				assert.Equal(t, params.Status.Err(), host.Evt.Err())
-				assert.Equal(t, params.Status.Attributes().AsRaw(), host.Evt.Attributes().AsRaw())
+				assert.Equal(ct, params.Status.Status(), evt.Status())
+				assert.Equal(ct, params.Status.Err(), evt.Err())
+				assert.Equal(ct, params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw())
 			}
 
 			if params.AssertFunc != nil {
