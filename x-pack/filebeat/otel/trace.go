@@ -188,7 +188,7 @@ func newExporterCfgFromEnv(inputName string) (*ExporterCfg, error) {
 	if cfg.EndpointURL != "" {
 		u, err := urlParsePossiblySchemaless(cfg.EndpointURL)
 		if err != nil {
-			return nil, fmt.Errorf("can't parse OLTP endpoint URL: %w", err)
+			return nil, fmt.Errorf("can't parse OTLP endpoint URL: %w", err)
 		}
 		if cfg.Protocol != "grpc" {
 			if u.Path == "" {
