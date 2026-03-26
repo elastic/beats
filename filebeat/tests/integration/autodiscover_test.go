@@ -27,7 +27,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -559,6 +561,16 @@ func startFilebeatPodForTakeOver(
 	cs := newK8sClientsetFromKubeConfigPath(t, kubeConfigPath)
 	hostPathDir := corev1.HostPathDirectory
 
+	user, err := user.Current()
+	if err != nil {
+		t.Fatal(err)
+	}
+	udi, err := strconv.Atoi(user.Uid)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	foo := int64(udi)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
@@ -576,6 +588,9 @@ func startFilebeatPodForTakeOver(
 						"--strict.perms=false",
 						"-c", configPath,
 						"-E", fmt.Sprintf("path.home=%s", workDir),
+					},
+					SecurityContext: &corev1.SecurityContext{
+						RunAsUser: &foo,
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
