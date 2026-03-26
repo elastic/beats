@@ -174,7 +174,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
-	if cfg.Resource.Tracer != nil {
+	if cfg.Resource.Tracer.enabled() {
 		id := sanitizeFileName(env.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
