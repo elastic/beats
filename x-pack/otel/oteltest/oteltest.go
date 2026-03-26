@@ -44,6 +44,12 @@ func (h *MockHost) Report(evt *componentstatus.Event) {
 	h.Evt = evt
 }
 
+func (h *MockHost) getEvent() *componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.Evt
+}
+
 type ReceiverConfig struct {
 	// Name is the unique identifier for the component
 	Name string
@@ -179,12 +185,8 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
-<<<<<<< HEAD
-			require.NotNil(ct, host.Evt, "expected not nil, got nil")
-=======
 			evt := host.getEvent()
 			require.NotNil(ct, evt, "expected not nil, got nil")
->>>>>>> f7081653e (x-pack/oteltest: use CollectT for receiver status assertions (#49621))
 
 			if params.Status != nil {
 				assert.Equal(ct, params.Status.Status(), evt.Status())
