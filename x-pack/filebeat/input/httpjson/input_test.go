@@ -446,6 +446,46 @@ var testCases = []struct {
 		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'request'`, inputName),
 	},
 	{
+		name: "tracer_disabled_escaping_logs",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			timeNow = func() time.Time {
+				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+				return t
+			}
+
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+			t.Cleanup(func() { timeNow = time.Now })
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"request.transforms": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":  "url.params.$filter",
+						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+					},
+				},
+			},
+			"cursor": map[string]interface{}{
+				"timestamp": map[string]interface{}{
+					"value": `[[index .last_response.body "@timestamp"]]`,
+				},
+			},
+			"request.tracer.enabled":  false,
+			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+		},
+		handler: dateCursorHandler(),
+		expected: []string{
+			`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+		},
+	},
+	{
 		name: "pagination",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)
@@ -1467,7 +1507,7 @@ func TestInput(t *testing.T) {
 			}
 
 			var tempDir string
-			if conf.Request.Tracer != nil {
+			if conf.Request.Tracer.enabled() {
 				err := os.MkdirAll("httpjson", 0o700)
 				if err != nil {
 					t.Fatalf("failed to create root logging destination: %v", err)
