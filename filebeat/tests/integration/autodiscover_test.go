@@ -85,7 +85,7 @@ func TestHintsKubernetes(t *testing.T) {
 		"../../filebeat.test",
 	)
 
-	kubeConfigPath, _, _ := createKindCluster(t, filebeat.TempDir())
+	kubeConfigPath, _ := createKindCluster(t, filebeat.TempDir())
 	noneName, _, containerID := startFlogKubernetes(t, kubeConfigPath)
 
 	cfgYAML := getConfig(
@@ -112,11 +112,11 @@ func TestHintsKubernetes(t *testing.T) {
 
 func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	integration.EnsureESIsRunning(t)
-	filebeatImage := findPackagedFilebeatImageName()
+	filebeatImage := "docker.elastic.co/beats/filebeat-oss-wolfi" + ":" + version.GetDefaultVersion() + "-SNAPSHOT"
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
 
-	kubeConfigPath, _, clusterName := createKindCluster(t, workDir,
+	kubeConfigPath, clusterName := createKindCluster(t, workDir,
 		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
 			Nodes: []v1alpha4.Node{
 				{
@@ -131,7 +131,6 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 			},
 		}))
 	nodeName, podName, _ := startFlogKubernetes(t, kubeConfigPath)
-	// kubeConfigPath, clusterName, nodeName, podName := startFlogKubernetesForTakeOver(t, workDir)
 
 	loadDockerImageIntoKind(t, clusterName, filebeatImage)
 	grantClusterAdminToDefaultServiceAccount(t, kubeConfigPath)
@@ -236,7 +235,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 
 	// Wait for Filebeat to fully ingest the file, we do it by waiting the file
 	// to be closed due to inactivity.
-	waitFilebeatContains(
+	waitFilebeatLogContains(
 		t,
 		workDir,
 		"File is inactive. Closing.",
@@ -274,7 +273,7 @@ func createKindCluster(
 	t *testing.T,
 	workDir string,
 	options ...cluster.CreateOption,
-) (kubeConfigPath, kubeConfig, clusterName string) {
+) (kubeConfigPath, clusterName string) {
 
 	uid := uuid.Must(uuid.NewV4()).String()
 
@@ -306,6 +305,7 @@ func createKindCluster(
 		}
 	})
 
+	var kubeConfig string
 	require.Eventually(t, func() bool {
 		kubeConfig, err = provider.KubeConfig(clusterName, false)
 		return err == nil
@@ -434,90 +434,6 @@ func startFlogDocker(t *testing.T) string {
 	return resp.ID
 }
 
-// startFlogKubernetesForTakeOver creates a Kind cluster and starts a flog pod
-// that writes one log line per second to stdout.
-func startFlogKubernetesForTakeOver(
-	t *testing.T,
-	workDir string,
-) (kubeConfigPath, clusterName, nodeName, podName string) {
-
-	kubeConfigPath, kubeConfig, clusterName := createKindCluster(t, workDir,
-		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
-			Nodes: []v1alpha4.Node{
-				{
-					Role: v1alpha4.ControlPlaneRole,
-					ExtraMounts: []v1alpha4.Mount{
-						{
-							HostPath:      workDir,
-							ContainerPath: workDir,
-						},
-					},
-				},
-			},
-		}))
-
-	config, err := clientcmd.RESTConfigFromKubeConfig([]byte(kubeConfig))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	podName = "flog-pod-" + uuid.Must(uuid.NewV4()).String()
-	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      podName,
-			Namespace: "default",
-		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:  "flog",
-					Image: "mingrammer/flog",
-					Args:  []string{"-s", "1", "-d", "1", "-l"},
-				},
-			},
-		},
-	}
-
-	pod, err = clientset.CoreV1().Pods("default").Create(t.Context(), pod, metav1.CreateOptions{})
-	if err != nil {
-		t.Fatalf("could not create pod: %s", err)
-	}
-
-	t.Cleanup(func() {
-		ctx := context.Background()
-		if err := clientset.CoreV1().Pods("default").Delete(ctx, pod.Name, metav1.DeleteOptions{}); err != nil {
-			t.Logf("could not remove pod: %s", err)
-		}
-	})
-
-	require.Eventually(
-		t,
-		func() bool {
-			pod, err = clientset.CoreV1().Pods("default").Get(t.Context(), pod.Name, metav1.GetOptions{})
-			if err != nil {
-				return false
-			}
-			if pod.Status.Phase == corev1.PodRunning &&
-				len(pod.Status.ContainerStatuses) > 0 &&
-				pod.Spec.NodeName != "" {
-				nodeName = pod.Spec.NodeName
-				return true
-			}
-			return false
-		},
-		60*time.Second,
-		100*time.Millisecond,
-		"pod did not start within timeout",
-	)
-
-	return
-}
-
 func loadDockerImageIntoKind(t *testing.T, clusterName, imageName string) {
 	provider := cluster.NewProvider()
 	nodes, err := provider.ListInternalNodes(clusterName)
@@ -614,7 +530,6 @@ func grantClusterAdminToDefaultServiceAccount(t *testing.T, kubeConfigPath strin
 }
 
 func writeFile(t *testing.T, path, content string) {
-	t.Helper()
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatalf("cannot write file %q: %s", path, err)
 	}
@@ -653,7 +568,7 @@ func startFilebeatPodForTakeOver(
 					},
 					VolumeMounts: []corev1.VolumeMount{
 						{
-							Name:      "test-folder",
+							Name:      "home-folder",
 							MountPath: workDir,
 						},
 						{
@@ -671,7 +586,7 @@ func startFilebeatPodForTakeOver(
 			},
 			Volumes: []corev1.Volume{
 				{
-					Name: "test-folder",
+					Name: "home-folder",
 					VolumeSource: corev1.VolumeSource{
 						HostPath: &corev1.HostPathVolumeSource{
 							Path: workDir,
@@ -724,7 +639,7 @@ func startFilebeatPodForTakeOver(
 	)
 }
 
-func waitFilebeatContains(t *testing.T, workDir, msg string, timeout time.Duration) {
+func waitFilebeatLogContains(t *testing.T, workDir, msg string, timeout time.Duration) {
 	t.Helper()
 	// Glob to match the date, it will stop working in about 1000 years
 	paths, err := filepath.Glob(filepath.Join(workDir, "logs", "filebeat-2*.ndjson"))
@@ -789,7 +704,6 @@ func stopPodK8sAndCountLogs(t *testing.T, kubeConfigPath, podName string) int {
 }
 
 func newK8sClientsetFromKubeConfigPath(t *testing.T, kubeConfigPath string) *kubernetes.Clientset {
-	t.Helper()
 	data, err := os.ReadFile(kubeConfigPath)
 	if err != nil {
 		t.Fatalf("cannot read kube config: %s", err)
@@ -820,10 +734,4 @@ func countReaderLines(t *testing.T, r io.Reader) int {
 		t.Fatalf("cannot scan logs: %s", err)
 	}
 	return n
-}
-
-// findPackagedFilebeatImageName returns the expected wolfi image name produced
-// by `DEV=true SNAPSHOT=true PLATFORMS=docker mage -v package`.
-func findPackagedFilebeatImageName() string {
-	return "docker.elastic.co/beats/filebeat-oss-wolfi" + ":" + version.GetDefaultVersion() + "-SNAPSHOT"
 }
