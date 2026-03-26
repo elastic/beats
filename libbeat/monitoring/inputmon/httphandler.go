@@ -18,10 +18,12 @@
 package inputmon
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/gorilla/handlers"
 
@@ -223,8 +225,60 @@ func (h queryParamHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func validationHandler(method string, queryParams []string, h http.HandlerFunc) http.Handler {
 	var next http.Handler = h
-	next = handlers.CompressHandler(next)
+	next = pooledGzipHandler(next)
 	next = newQueryParamHandler(queryParams, next)
 	next = handlers.MethodHandler{method: next}
 	return next
+}
+
+// gzipWriterPool reuses gzip.Writer instances across HTTP responses.
+// Each gzip.Writer allocates ~256 KB of internal hash and deflate state;
+// pooling avoids re-allocating that on every monitoring scrape.
+var gzipWriterPool = sync.Pool{
+	New: func() interface{} {
+		// The writer is initialised with a nil destination; Reset is called
+		// with the real http.ResponseWriter before each use.
+		w, _ := gzip.NewWriterLevel(nil, gzip.DefaultCompression)
+		return w
+	},
+}
+
+// pooledGzipHandler is a drop-in replacement for handlers.CompressHandler
+// that reuses gzip.Writer instances via sync.Pool.
+func pooledGzipHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		gz := gzipWriterPool.Get().(*gzip.Writer) //nolint:errcheck // pool only contains *gzip.Writer
+		gz.Reset(w)
+
+		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Add("Vary", "Accept-Encoding")
+		w.Header().Del("Content-Length")
+
+		gzw := &pooledGzipResponseWriter{ResponseWriter: w, gz: gz}
+		next.ServeHTTP(gzw, r)
+
+		gz.Close()
+		gzipWriterPool.Put(gz)
+	})
+}
+
+type pooledGzipResponseWriter struct {
+	http.ResponseWriter
+	gz *gzip.Writer
+}
+
+func (w *pooledGzipResponseWriter) Write(b []byte) (int, error) {
+	return w.gz.Write(b)
+}
+
+func (w *pooledGzipResponseWriter) Flush() {
+	w.gz.Flush()
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
 }

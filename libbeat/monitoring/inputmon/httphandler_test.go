@@ -110,6 +110,37 @@ func TestHandler(t *testing.T) {
 	}
 }
 
+func TestPooledGzipHandler(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	reg := NewMetricsRegistry(
+		"gzip-test", "foo", parent, logptest.NewTestingLogger(t, ""))
+	monitoring.NewInt(reg, "gauge").Set(42)
+
+	r := http.NewServeMux()
+	s := httptest.NewServer(r)
+	defer s.Close()
+	err := AttachHandler(r, parent)
+	assert.NoError(t, err)
+
+	// Make multiple gzip requests to exercise pooling.
+	for i := 0; i < 5; i++ {
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, s.URL+"/inputs/", nil)
+		assert.NoError(t, err)
+		req.Header.Set("Accept-Encoding", "gzip")
+
+		resp, err := http.DefaultClient.Do(req)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Equal(t, "gzip", resp.Header.Get("Content-Encoding"))
+
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		assert.NoError(t, err)
+		assert.NotEmpty(t, body, "gzip response body should not be empty")
+	}
+}
+
 func BenchmarkHandlers(b *testing.B) {
 	reg := monitoring.NewRegistry()
 	log := logptest.NewTestingLogger(b, "")
