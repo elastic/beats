@@ -199,6 +199,48 @@ func TestConfigGeoEnabled(t *testing.T) {
 	assert.Len(t, eventGeoField, len(config))
 }
 
+func TestGeoFieldsAreNotMutatedAcrossEvents(t *testing.T) {
+	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
+		"geo.name": "yerevan-am",
+	})
+	require.NoError(t, err)
+
+	factory := func() (hostInfo, error) {
+		return &mockHostInfo{
+			Hostname: hostName,
+		}, nil
+	}
+	p, err := newWithHostInfoFactory(testConfig, logptest.NewTestingLogger(t, ""), factory)
+	require.NoError(t, err)
+
+	firstEvent := &beat.Event{
+		Fields:    mapstr.M{},
+		Timestamp: time.Now(),
+	}
+
+	firstEvent, err = p.Run(firstEvent)
+	require.NoError(t, err)
+
+	_, err = firstEvent.PutValue("host.geo.city_name", "Yerevan")
+	require.NoError(t, err)
+
+	secondEvent := &beat.Event{
+		Fields:    mapstr.M{},
+		Timestamp: time.Now(),
+	}
+
+	secondEvent, err = p.Run(secondEvent)
+	require.NoError(t, err)
+
+	secondGeo, err := secondEvent.GetValue("host.geo")
+	require.NoError(t, err)
+
+	geoMap, ok := secondGeo.(mapstr.M)
+	require.True(t, ok)
+	_, hasCityName := geoMap["city_name"]
+	assert.False(t, hasCityName, "host.geo from previous event leaked into subsequent events")
+}
+
 func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    mapstr.M{},
