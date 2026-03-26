@@ -1,0 +1,12 @@
+kind: bug-fix
+summary: Skip request tracer path validation when tracing is disabled to prevent input startup failures.
+description: |
+  The startup path validation in cel, httpjson, http_endpoint, and entity
+  analytics inputs checked whether the tracer config struct was non-nil rather
+  than whether tracing was enabled. Integration package templates always include
+  a tracer block (with enabled defaulting to false), so the struct is never nil.
+  Under the agentless/otel runtime the relative tracer path resolves outside the
+  permitted directory, causing all affected inputs to fail immediately even though
+  tracing was disabled. The config-level Validate methods already used the correct
+  enabled() guard; the startup paths now do the same.
+component: filebeat
