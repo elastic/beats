@@ -1,0 +1,78 @@
+dist:
+  module: github.com/elastic/beats/v7/x-pack/otel/distributions/beats-otel-collector
+  name: beats-otel-collector
+  description: OpenTelemetry Collector distribution with Beats components
+  version: 0.0.1
+  output_path: ./_build
+  cgo_enabled: true
+
+extensions:
+  - gomod: go.opentelemetry.io/collector/extension/memorylimiterextension v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.148.0 
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.148.0
+  - gomod: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension v0.0.0
+  - gomod: github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage v0.0.0
+
+connectors:
+
+converters:
+
+receivers:
+  - gomod: go.opentelemetry.io/collector/receiver/nopreceiver v0.148.0
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/jaegerreceiver v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheckreceiver v0.148.0
+  - gomod: github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver v0.0.0
+  - gomod: github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver v0.0.0
+
+processors:
+  - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.148.0
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.148.0
+  - gomod: github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor v0.0.0
+
+exporters:
+  - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.148.0
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.148.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.148.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.148.0
+  - gomod: github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter v0.0.0
+
+providers:
+  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.54.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.54.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpprovider v1.54.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.54.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.54.0
+
+replaces:
+  - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
+  - github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
+  - github.com/dop251/goja => github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20
+  - github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
+  - github.com/fsnotify/fsnotify => github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3
+  - github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
+  - github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
+  - github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver => ../../../../filebeat/fbreceiver
+  - github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver => ../../../../metricbeat/mbreceiver
+  - github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension => ../../../extension/beatsauthextension
+  - github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage => ../../../extension/elasticsearchstorage
+  - github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor => ../../../processor/beatprocessor
+  - github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter => ../../../exporter/logstashexporter
+  - github.com/elastic/beats/v7/x-pack/otel/oteltestcol => ../../../oteltestcol
+  - github.com/elastic/beats/v7 => ../../../../../
