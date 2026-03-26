@@ -33,19 +33,19 @@ import (
 type Config struct {
 	InputID      string              `config:"input_id"`
 	StreamID     string              `config:"stream_id"`
-	DataStream   *DataStreamConfig   `config:"data_stream" validate:"required"`
-	ElasticAgent *ElasticAgentConfig `config:"elastic_agent" validate:"required"`
+	DataStream   *DataStreamConfig   `config:"data_stream"`
+	ElasticAgent *ElasticAgentConfig `config:"elastic_agent"`
 }
 
 type DataStreamConfig struct {
-	Dataset   string `config:"dataset" validate:"required"`
-	Namespace string `config:"namespace" validate:"required"`
-	Type      string `config:"type" validate:"required"`
+	Dataset   string `config:"dataset"`
+	Namespace string `config:"namespace"`
+	Type      string `config:"type"`
 }
 type ElasticAgentConfig struct {
-	ID       string `config:"id" validate:"required"`
+	ID       string `config:"id"`
 	Snapshot bool   `config:"snapshot"`
-	Version  string `config:"version" validate:"required"`
+	Version  string `config:"version"`
 }
 
 type addAgentMetadata struct {
