@@ -219,7 +219,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 
 	// Wait for Filebeat to fully ingest the file, we do it by waiting the file
 	// to be closed due to inactivity.
-	waitPodLogsContains(
+	waitFilebeatContains(
 		t,
 		workDir,
 		"File is inactive. Closing.",
@@ -556,7 +556,6 @@ func loadDockerImageIntoKind(t *testing.T, clusterName, imageName string) {
 	}
 
 	for _, node := range nodes {
-		// TODO: Check if I can use the files we built
 		imageReader, err := cli.ImageSave(t.Context(), []string{imageName})
 		if err != nil {
 			t.Fatalf("cannot save image %q from local docker daemon: %s", imageName, err)
@@ -743,7 +742,7 @@ func startFilebeatPodForTakeOver(
 	)
 }
 
-func waitPodLogsContains(t *testing.T, workDir, msg string, timeout time.Duration) {
+func waitFilebeatContains(t *testing.T, workDir, msg string, timeout time.Duration) {
 	t.Helper()
 	// Glob to match the date, it will stop working in about 1000 years
 	paths, err := filepath.Glob(filepath.Join(workDir, "logs", "filebeat-2*.ndjson"))
@@ -761,7 +760,6 @@ func waitPodLogsContains(t *testing.T, workDir, msg string, timeout time.Duratio
 	}
 
 	logFile := fs.LogFile{File: f}
-
 	logFile.WaitLogsContains(t, msg, timeout, "Filebeat logs did not contain '%s'", msg)
 }
 
