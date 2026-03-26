@@ -115,7 +115,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
 
-	if e.config.Tracer != nil {
+	if e.config.Tracer.enabled() {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
