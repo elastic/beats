@@ -49,15 +49,6 @@ type journalctl struct {
 	stopOnce sync.Once
 }
 
-// Factory returns an instance of journalctl ready to use.
-// The caller is responsible for calling Kill to ensure the
-// journalctl process created is correctly terminated.
-//
-// The returned type is an interface to allow mocking for testing
-func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
-	return newJournalctl(canceller, logger, binary, "", args...)
-}
-
 // NewFactory returns a function that instantiates [journalctl].
 //
 // If chroot is non-empty, then journalctlPath must be non-empty and be

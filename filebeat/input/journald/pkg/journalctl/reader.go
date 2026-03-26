@@ -59,7 +59,7 @@ type JournalEntry struct {
 
 // JctlFactory is a function that returns an instance of journalctl ready to use.
 // It exists to allow testing
-type JctlFactory func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error)
+type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error)
 
 // Jctl abstracts the call to journalctl, it exists only for testing purposes
 //
@@ -298,7 +298,7 @@ func New(
 func (r *Reader) newJctl(extraArgs ...string) error {
 	args := append(r.args, extraArgs...)
 
-	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, "journalctl", args...)
+	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, args...)
 	r.jctl = jctl
 
 	return err
