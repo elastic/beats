@@ -55,6 +55,20 @@ type journalctl struct {
 //
 // The returned type is an interface to allow mocking for testing
 func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
+	return newJournalctl(canceller, logger, binary, "", args...)
+}
+
+// NewFactory returns a function that instantiates [journalctl].
+//
+// If chroot is non-empty, then journalctlPath must be non-empty and be
+// the absolute path to the journalctl binary inside the chroot.
+func NewFactory(chroot, journalctlPath string) func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+	return func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+		return newJournalctl(canceller, logger, journalctlPath, chroot, args...)
+	}
+}
+
+func newJournalctl(canceller input.Canceler, logger *logp.Logger, binary, chroot string, args ...string) (Jctl, error) {
 	//nolint:noctx // we use the canceller to correctly stop the process
 	cmd := exec.Command(binary, args...)
 
@@ -63,60 +77,36 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		cmd:      cmd,
 		dataChan: make(chan []byte),
 		logger:   logger,
+		stopCh:   make(chan struct{}),
 	}
 
-<<<<<<< HEAD
 	var err error
 	jctl.stdout, err = cmd.StdoutPipe()
 	if err != nil {
-		return &journalctl{}, fmt.Errorf("cannot get stdout pipe: %w", err)
+		return nil, fmt.Errorf("cannot get stdout pipe: %w", err)
 	}
 	jctl.stderr, err = cmd.StderrPipe()
 	if err != nil {
-		return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
+		return nil, fmt.Errorf("cannot get stderr pipe: %w", err)
 	}
 
 	logger.Infof("Journalctl command: %s %s", binary, strings.Join(args, " "))
-=======
-		jctl := journalctl{
-			canceler: canceller,
-			cmd:      cmd,
-			dataChan: make(chan []byte),
-			logger:   logger,
-			stopCh:   make(chan struct{}),
-		}
-
-		var err error
-		jctl.stdout, err = cmd.StdoutPipe()
-		if err != nil {
-			return nil, fmt.Errorf("cannot get stdout pipe: %w", err)
-		}
-		jctl.stderr, err = cmd.StderrPipe()
-		if err != nil {
-			return nil, fmt.Errorf("cannot get stderr pipe: %w", err)
-		}
->>>>>>> e0d13d181 (Fix journalctl process lifecycle and cleanup bugs (#49528))
+	if chroot != "" {
+		logger.Infof("Journalctl chroot: %s", chroot)
+	}
 
 	// Start the process before trying to read from the pipes.
 	// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
 	if err := cmd.Start(); err != nil {
-		return &journalctl{}, fmt.Errorf("cannot start journalctl: %w", err)
+		return nil, fmt.Errorf("cannot start journalctl: %w", err)
 	}
 
 	logger.Infof("journalctl started with PID %d", cmd.Process.Pid)
 
-<<<<<<< HEAD
 	// readersWG tracks when stdout/stderr reader goroutines are done.
 	// cmd.Wait must not be called until reads from StdoutPipe and StderrPipe
 	// have completed (per the os/exec docs), so waitDone waits on readersWG.
 	var readersWG sync.WaitGroup
-=======
-		// Start the process before trying to read from the pipes
-		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
-		if err := cmd.Start(); err != nil {
-			return nil, fmt.Errorf("cannot start journalctl: %w. Chroot: %s", err, chroot)
-		}
->>>>>>> e0d13d181 (Fix journalctl process lifecycle and cleanup bugs (#49528))
 
 	// This gorroutune reads the stderr from the journalctl process, if the
 	// process exits for any reason, then its stderr is closed, this goroutine
@@ -133,7 +123,6 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 				return
 			}
 
-<<<<<<< HEAD
 			logger.Errorf("Journalctl wrote to stderr: %s", line)
 		}
 	})
@@ -150,62 +139,15 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 			data, err := reader.ReadBytes('\n')
 			if err != nil {
 				if !errors.Is(err, io.EOF) {
-					var logError = false
-					var pathError *fs.PathError
-					if errors.As(err, &pathError) {
-						// Because we're reading from the stdout from a process that will
-						// eventually exit, it can happen that when reading we get the
-						// fs.PathError below instead of an io.EOF. This is expected,
-						// it only means the process has exited, its stdout has been
-						// closed and there is nothing else for us to read.
-						// This is expected and does not cause any data loss.
-						// So we log at level debug to have it in our logs if ever needed
-						// while avoiding adding error level logs on user's deployments
-						// for situations that are well handled.
-						if pathError.Op == "read" &&
-							pathError.Path == "|0" &&
-							pathError.Err.Error() == "file already closed" {
-							logger.Debugf("cannot read from journalctl stdout: '%s'", err)
-						} else {
-							logError = true
-						}
-					} else {
-						logError = true
-					}
-					if logError {
-						logger.Errorf("cannot read from journalctl stdout: '%s'", err)
-					}
-=======
-		// This goroutine reads the stdout from the journalctl process and makes
-		// the data available via the `Next()` method.
-		// If the journalctl process exits for any reason, then its stdout is closed
-		// this goroutine gets an EOF error and exits.
-		readersWG.Go(func() {
-			defer jctl.logger.Debug("stdout reader goroutine done")
-			defer close(jctl.dataChan)
-			reader := bufio.NewReader(jctl.stdout)
-			for {
-				data, err := reader.ReadBytes('\n')
-				if err != nil {
-					if !errors.Is(err, io.EOF) {
-						logger.Errorf("cannot read from journalctl stdout: '%s'", err)
-					}
-					return
-				}
-
-				select {
-				case <-jctl.canceler.Done():
-					return
-				case <-jctl.stopCh:
-					return
-				case jctl.dataChan <- data:
->>>>>>> e0d13d181 (Fix journalctl process lifecycle and cleanup bugs (#49528))
+					logger.Errorf("cannot read from journalctl stdout: '%s'", err)
 				}
 				return
 			}
 
 			select {
 			case <-jctl.canceler.Done():
+				return
+			case <-jctl.stopCh:
 				return
 			case jctl.dataChan <- data:
 			}
