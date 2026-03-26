@@ -217,7 +217,7 @@ func TestAddAgentMetadata_FromConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "test-input", result.Meta["input_id"])
-	ds := result.Fields["data_stream"].(mapstr.M)
+	ds := result.Fields["data_stream"].(mapstr.M) //nolint:errcheck //it's a test
 	assert.Equal(t, "system.cpu", ds["dataset"])
 }
 

@@ -184,6 +184,10 @@ func createStreamRulesForReceiver(raw *proto.UnitExpectedConfig, streamSource ma
 	// Replace injectAgentInfoRule + injectStreamProcessors with a single
 	// add_agent_metadata processor.
 	if agentInfo == nil {
+		streamSource, err := injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, nil)
+		if err != nil {
+			return nil, fmt.Errorf("error injecting stream processors: %w", err)
+		}
 		return streamSource, nil
 	}
 
