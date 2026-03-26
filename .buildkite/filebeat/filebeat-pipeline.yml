@@ -196,6 +196,7 @@ steps:
           PACKAGES: "docker"
           PLATFORMS: "linux/amd64"
         command: |
+          source .buildkite/scripts/docker.sh
           cd filebeat
           mage package
           mage GoIntegK8sTest
