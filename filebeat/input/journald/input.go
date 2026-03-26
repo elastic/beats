@@ -140,7 +140,6 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		"",
 		inp.Since,
 		src.Name(),
-		false,
 		journalctl.NewFactory("", "journalctl"),
 	)
 	if err != nil {
@@ -176,7 +175,6 @@ func (inp *journald) Run(
 		pos,
 		inp.Since,
 		src.Name(),
-		false,
 		journalctl.NewFactory("", "journalctl"),
 	)
 	if err != nil {

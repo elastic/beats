@@ -77,9 +77,6 @@ func NewFactory(chroot, journalctlPath string) JctlFactory {
 		}
 
 		logger.Infof("Journalctl command: %s %s", journalctlPath, strings.Join(args, " "))
-		if chroot != "" {
-			logger.Infof("Journalctl chroot: %s", chroot)
-		}
 
 		// Start the process before trying to read from the pipes.
 		// See: https://pkg.go.dev/os/exec#example-Cmd.StdoutPipe
