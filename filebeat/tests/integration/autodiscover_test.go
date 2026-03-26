@@ -148,6 +148,11 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	esPass, _ := esURL.User.Password()
 
 	index := fmt.Sprintf("test-autodiscover-take-over-%s", uuid.Must(uuid.NewV4()).String())
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Elasticsearch index used: %q", index)
+		}
+	})
 
 	tmplVars := map[string]any{
 		"nodeName": nodeName,
@@ -164,9 +169,6 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		getConfig(t, tmplVars, "autodiscover", "take-over-log-input-k8s.yml"),
 	)
 
-	t.Logf("Elasticsearch index %q", index)
-	t.Logf("Wrote Filebeat configuration file at %s", logInputConfigPath)
-
 	startFilebeatPodForTakeOver(
 		t,
 		kubeConfigPath,
@@ -177,8 +179,6 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		logInputConfigPath,
 	)
 
-	t.Logf("Filebeat pod %q created", filebeatPodName)
-
 	// Wait until at least 5 events are ingested
 	require.Eventually(
 		t,
@@ -187,10 +187,7 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		200*time.Millisecond,
 		"did not ingest the initial events")
 
-	t.Log("More than 5 events published")
 	deletePodK8s(t, kubeConfigPath, filebeatPodName)
-	t.Log("Filebeat pod deleted")
-
 	logInputIngested := countEventsInES(t, index, 1000)
 
 	// Re-Start Filebeat with Filestream and take_over enabled
@@ -199,8 +196,6 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		filestreamInputConfigPath,
 		getConfig(t, tmplVars, "autodiscover", "take-over-filestream-input-k8s.yml"),
 	)
-
-	t.Log("Filestream configuration written")
 
 	startFilebeatPodForTakeOver(
 		t,
@@ -211,8 +206,6 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 		workDir,
 		filestreamInputConfigPath,
 	)
-
-	t.Log("Filebeat pod started again")
 
 	// Wait for at least two extra events to be ingested
 	require.EventuallyWithT(
@@ -339,14 +332,20 @@ func startFlogKubernetes(t *testing.T, kubeConfigPath string) (nodeName, podName
 		},
 	}
 
-	pod, err := clientset.CoreV1().Pods("default").Create(t.Context(), pod, metav1.CreateOptions{})
+	pod, err := clientset.CoreV1().Pods("default").Create(context.Background(), pod, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatalf("could not create pod: %s", err)
 	}
 
 	t.Cleanup(func() {
+		_, err := clientset.CoreV1().Pods("default").Get(context.Background(), pod.Name, metav1.GetOptions{})
+		if apierrors.IsNotFound(err) {
+			// The pod has already been removed, return
+			return
+		}
+
 		// by the time Cleanup runs, t.Context has been cancelled, so we need a new context here
-		err := clientset.CoreV1().Pods("default").Delete(context.Background(), pod.Name, metav1.DeleteOptions{})
+		err = clientset.CoreV1().Pods("default").Delete(context.Background(), pod.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Logf("could not remove pod: %s", err)
 		}
@@ -688,7 +687,7 @@ func stopPodK8sAndCountLogs(t *testing.T, kubeConfigPath, podName string) int {
 	logsReader, err := cs.CoreV1().Pods("default").GetLogs(podName, &corev1.PodLogOptions{
 		Container: "flog",
 		Follow:    true,
-	}).Stream(context.Background())
+	}).Stream(t.Context())
 	if err != nil {
 		t.Fatalf("cannot get logs for pod %q: %s", podName, err)
 	}
