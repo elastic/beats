@@ -38,7 +38,6 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // test_close_renamed from test_harvester.py
@@ -313,7 +312,7 @@ func TestFilestreamExceedBuffer(t *testing.T) {
 		"file_identity.native":                   map[string]any{},
 	})
 
-	ctx, cancelInput := context.WithCancel(context.Background())
+	ctx, cancelInput := context.WithCancel(t.Context())
 	env.startInput(ctx, id, inp)
 
 	message := "This exceeds the buffer"
@@ -892,7 +891,7 @@ func TestFilestreamIgnoreSymlink(t *testing.T) {
 	env.mustWriteToFile(testlogName, line)
 	env.mustSymlink(testlogName, symlinkName)
 
-	ctx, cancelInput := context.WithCancel(context.Background())
+	ctx, cancelInput := context.WithCancel(t.Context())
 	env.startInput(ctx, id, inp)
 
 	env.WaitLogsContains("is a symlink and they're disabled", 5*time.Second)
@@ -1058,7 +1057,7 @@ func TestFilestreamSymlinkAndFile(t *testing.T) {
 	env.mustWriteToFile(testlogName, line)
 	env.mustSymlink(testlogName, symlinkName)
 
-	ctx, cancelInput := context.WithCancel(context.Background())
+	ctx, cancelInput := context.WithCancel(t.Context())
 	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
@@ -1186,7 +1185,7 @@ func TestFilestreamDecodeError(t *testing.T) {
 
 	env.mustWriteToFile(testlogName, buf.Bytes())
 
-	ctx, cancelInput := context.WithCancel(context.Background())
+	ctx, cancelInput := context.WithCancel(t.Context())
 	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
@@ -1201,8 +1200,6 @@ func TestFilestreamDecodeError(t *testing.T) {
 
 // test_debug_reader from test_harvester.py
 func TestFilestreamDebugReader(t *testing.T) {
-	require.NoError(t, logp.TestingSetup(logp.WithSelectors("*")))
-
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -1232,7 +1229,7 @@ func TestFilestreamDebugReader(t *testing.T) {
 	}
 	env.mustWriteToFile(testlogName, fileContents)
 
-	ctx, cancelInput := context.WithCancel(context.Background())
+	ctx, cancelInput := context.WithCancel(t.Context())
 	env.startInput(ctx, id, inp)
 
 	env.WaitLogsContains("Matching null byte found at offset", 10*time.Second)
