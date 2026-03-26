@@ -22,6 +22,7 @@
 package addagentmetadata
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -110,6 +111,6 @@ func (p *addAgentMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *addAgentMetadata) String() string {
-	return fmt.Sprintf("add_agent_metadata=[input_id=%s, elastic_agent.id=%s, data_stream.dataset=%s]",
-		p.cfg.InputID, p.cfg.ElasticAgent.ID, p.cfg.DataStream.Dataset)
+	s, _ := json.Marshal(p.cfg)
+	return fmt.Sprintf("add_agent_metadata=%s", s)
 }
