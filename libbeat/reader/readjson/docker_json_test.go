@@ -395,7 +395,7 @@ func TestDockerJSONMaxBytes(t *testing.T) {
 	message, err := json.Next()
 
 	assert.NoError(t, err)
-	assert.Equal(t, maxBytes, len(message.Content), "content should be capped at maxBytes")
+	assert.Len(t, message.Content, maxBytes, "content should be capped at maxBytes")
 
 	flags, err := message.Fields.GetValue("log.flags")
 	assert.NoError(t, err, "'log.flags' not present in event")

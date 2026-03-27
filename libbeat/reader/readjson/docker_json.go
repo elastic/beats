@@ -259,7 +259,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
 				remaining := p.maxBytes - len(message.Content)
 				message.Content = append(message.Content, next.Content[:remaining]...)
-				message.AddFlagsWithKey("log.flags", "truncated")
+				_ = message.AddFlagsWithKey("log.flags", "truncated")
 				break
 			} else {
 				message.Content = append(message.Content, next.Content...)
