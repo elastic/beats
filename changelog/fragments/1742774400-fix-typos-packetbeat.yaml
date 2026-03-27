@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix possessive "its" and "currnet" typos in packetbeat configuration and field descriptions
+component: packetbeat

@@ -22,7 +22,7 @@ make start ENV=es17-ls15-kb41.yml
 
 This will start the environment and log you into the debian machine. This machine is intended for manual testing of the beats. Download the beats package or snapshot you want to test. Elasticsearch can be reached under the host `elasticsearch`, logstash under `logstash`. Make sure to update the configuration file of the beat with the specific host.
 
-To stop an clean up the environment afterwards, make sure to run:
+To stop and clean up the environment afterwards, make sure to run:
 
 ```
 make stop ENV=es17-ls15-kb41.yml
@@ -49,7 +49,7 @@ Often the default address is `localhost`.
 
 
 ## Cleanup
-In case your environment is messed up because of multiple instances still running and conflicting with each other, use the following commands to clean up. Please be aware that this will stop ALL docker containers ony our docker-machine.
+In case your environment is messed up because of multiple instances still running and conflicting with each other, use the following commands to clean up. Please be aware that this will stop ALL docker containers on your docker-machine.
 
 ```
 make clean
@@ -58,7 +58,7 @@ make clean
 
 ## Notes
 
-Every container has a name corresponding with the service. This requires to shut down an environment and clean it up before starting an other environment. This is intentional to prevent conflicts.
+Every container has a name corresponding with the service. This requires to shut down an environment and clean it up before starting another environment. This is intentional to prevent conflicts.
 
 
 # Automated Testing
