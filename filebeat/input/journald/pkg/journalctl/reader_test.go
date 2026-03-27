@@ -96,7 +96,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	factoryCalls := atomic.Uint32{}
-	factory := func(canceller input.Canceler, logger *logp.Logger, _ string, args ...string) (Jctl, error) {
+	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
 		if slices.Contains(args, "--version") {
 			return &versionMock, nil
 		}
@@ -118,7 +118,19 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logger, ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", factory)
+	reader, err := New(
+		logger,
+		ctx,
+		nil,
+		nil,
+		nil,
+		journalfield.IncludeMatches{},
+		[]int{},
+		SeekHead,
+		"",
+		0,
+		"",
+		factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -221,10 +233,7 @@ func TestJournalctlSupportsBootAll(t *testing.T) {
 			}
 
 			logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "..", "..", "build"))
-			factory := func(canceller input.Canceler, logger *logp.Logger, _ string, args ...string) (Jctl, error) {
-				return Factory(canceller, logger, path, args...)
-			}
-			got := journalctlSupportsBootAll(logger.Logger, factory)
+			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
 			if got != tc.wantBootAll {
 				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
 			}
