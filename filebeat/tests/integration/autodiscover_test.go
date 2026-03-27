@@ -670,6 +670,7 @@ func waitFilebeatLogContains(t *testing.T, workDir, msg string, timeout time.Dur
 	if err != nil {
 		t.Fatalf("cannot open Filebeat log file: %s", err)
 	}
+	defer f.Close()
 
 	logFile := fs.LogFile{File: f}
 	logFile.WaitLogsContains(t, msg, timeout, "Filebeat logs did not contain '%s'", msg)
