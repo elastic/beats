@@ -663,7 +663,7 @@ func waitFilebeatLogContains(t *testing.T, workDir, msg string, timeout time.Dur
 	}
 
 	if len(paths) != 1 {
-		t.Fatalf("There must be a single log file for Filebat, found %d", len(paths))
+		t.Fatalf("There must be a single log file for Filebeat, found %d", len(paths))
 	}
 
 	f, err := os.Open(paths[0])
