@@ -238,6 +238,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		}
 
 		// Handle multiline messages, join partial lines
+		truncated := false
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
 
@@ -255,14 +256,19 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			}
 
 			// Enforce max_bytes during partial line reassembly to prevent unbounded
-			// memory growth.
+			// memory growth. Once the limit is reached, drain remaining partial
+			// chunks (updating the byte counter only) so the reader stays aligned
+			// to logical line boundaries for the next Next() call.
+			if truncated {
+				continue
+			}
 			if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
 				remaining := p.maxBytes - len(message.Content)
 				if remaining > 0 {
 					message.Content = append(message.Content, next.Content[:remaining]...)
 				}
 				_ = message.AddFlagsWithKey("log.flags", "truncated")
-				break
+				truncated = true
 			} else {
 				message.Content = append(message.Content, next.Content...)
 			}

@@ -400,6 +400,11 @@ func TestDockerJSONMaxBytes(t *testing.T) {
 	flags, err := message.Fields.GetValue("log.flags")
 	assert.NoError(t, err, "'log.flags' not present in event")
 	assert.Contains(t, flags, "truncated", "truncated flag should be set")
+
+	// All partial chunks up to and including the final F line must have been
+	// consumed by this single Next() call. If any remain, subsequent calls
+	// would emit orphaned partial chunks as separate events, breaking alignment.
+	assert.Empty(t, r.messages, "all partial chunks must be drained before returning")
 }
 
 type mockReader struct {
