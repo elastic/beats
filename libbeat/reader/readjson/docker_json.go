@@ -43,7 +43,9 @@ type DockerJSONReader struct {
 	// parse CRI flags
 	criflags bool
 
-	// maximum number of bytes to return per message; 0 means no limit
+	// maximum number of bytes to use when reassembling partial CRI/docker log lines;
+	// limits growth while joining fragments but does not cap the size of the initial chunk.
+	// A value of 0 means no limit is applied during reassembly.
 	maxBytes int
 
 	parseLine func(message *reader.Message, msg *logLine) error
