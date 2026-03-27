@@ -115,18 +115,6 @@ func TestAutodiscoverFilestreamTakeOverDoesNotReingest(t *testing.T) {
 	filebeatImage := "docker.elastic.co/beats/filebeat-oss-wolfi" + ":" + version.GetDefaultVersion() + "-SNAPSHOT"
 
 	workDir := fs.TempDir(t, "..", "..", "build", "integration-tests")
-	foldersToFix := []string{
-		filepath.Join("..", ".."),
-		filepath.Join("..", "..", "build"),
-		filepath.Join("..", "..", "build", "integration-tests"),
-		workDir,
-	}
-
-	for _, d := range foldersToFix {
-		if err := os.Chmod(d, os.ModePerm); err != nil {
-			t.Fatalf("cannot set permissions from %q: %q", d, err)
-		}
-	}
 
 	kubeConfigPath, clusterName := createKindCluster(t, workDir,
 		cluster.CreateWithV1Alpha4Config(&v1alpha4.Cluster{
