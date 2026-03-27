@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fixed a bug where escaped characters in syslog structured data caused an EOF error.
+component: libbeat
+issue: https://github.com/elastic/beats/issues/43944
