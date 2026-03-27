@@ -246,12 +246,11 @@ func equivalentAddFieldsProcessors(cfg Config) *processors.Processors {
 			"dataset":   cfg.DataStream.Dataset,
 			"namespace": cfg.DataStream.Namespace,
 			"type":      cfg.DataStream.Type,
-		}, true))
-
-	procs.List = append(procs.List,
+		}, true),
 		addfields.MakeFieldsProcessor("event", mapstr.M{
 			"dataset": cfg.DataStream.Dataset,
-		}, true))
+		}, true),
+	)
 
 	if cfg.StreamID != "" {
 		procs.List = append(procs.List,
@@ -263,9 +262,7 @@ func equivalentAddFieldsProcessors(cfg Config) *processors.Processors {
 			"id":       cfg.ElasticAgent.ID,
 			"snapshot": cfg.ElasticAgent.Snapshot,
 			"version":  cfg.ElasticAgent.Version,
-		}, true))
-
-	procs.List = append(procs.List,
+		}, true),
 		addfields.MakeFieldsProcessor("agent", mapstr.M{
 			"id": cfg.ElasticAgent.ID,
 		}, true))

@@ -15,10 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package addagentmetadata provides a single processor that injects all
-// Elastic Agent metadata fields into a beat.Event. It replaces the chain of
-// individual add_fields processors that the agent normally prepends to every
-// input, avoiding per-event map cloning and deep-update overhead.
 package addagentmetadata
 
 import (
@@ -72,23 +68,42 @@ func (p *addAgentMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	updateMap := make(mapstr.M)
 	if p.cfg.DataStream != nil {
-		updateMap["data_stream"] = mapstr.M{
-			"dataset":   p.cfg.DataStream.Dataset,
-			"namespace": p.cfg.DataStream.Namespace,
-			"type":      p.cfg.DataStream.Type,
+		dsMap := make(mapstr.M)
+		if p.cfg.DataStream.Dataset != "" {
+			dsMap["dataset"] = p.cfg.DataStream.Dataset
+			updateMap["event"] = mapstr.M{
+				"dataset": p.cfg.DataStream.Dataset,
+			}
 		}
-		updateMap["event"] = mapstr.M{
-			"dataset": p.cfg.DataStream.Dataset,
+		if p.cfg.DataStream.Namespace != "" {
+			dsMap["namespace"] = p.cfg.DataStream.Namespace
+		}
+		if p.cfg.DataStream.Type != "" {
+			dsMap["type"] = p.cfg.DataStream.Type
+		}
+
+		// only upadte the event if any of the datastream fields are set
+		if len(dsMap) > 0 {
+			updateMap["data_stream"] = dsMap
 		}
 	}
+
 	if p.cfg.ElasticAgent != nil {
-		updateMap["elastic_agent"] = mapstr.M{
-			"id":       p.cfg.ElasticAgent.ID,
-			"snapshot": p.cfg.ElasticAgent.Snapshot,
-			"version":  p.cfg.ElasticAgent.Version,
+		elasticAgentMap := make(mapstr.M)
+		if p.cfg.ElasticAgent.ID != "" {
+			elasticAgentMap["id"] = p.cfg.ElasticAgent.ID
+			updateMap["agent"] = mapstr.M{
+				"id": p.cfg.ElasticAgent.ID, // mirrors elastic_agent.id for convenience
+			}
 		}
-		updateMap["agent"] = mapstr.M{
-			"id": p.cfg.ElasticAgent.ID, // mirrors elastic_agent.id for convenience
+		elasticAgentMap["snapshot"] = p.cfg.ElasticAgent.Snapshot
+		if p.cfg.ElasticAgent.Version != "" {
+			elasticAgentMap["version"] = p.cfg.ElasticAgent.Version
+		}
+
+		// only update the event if any of the elastic_agent fields are set
+		if len(elasticAgentMap) > 0 {
+			updateMap["elastic_agent"] = elasticAgentMap
 		}
 	}
 
