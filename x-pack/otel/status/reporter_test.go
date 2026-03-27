@@ -26,7 +26,7 @@ func TestGroupStatus(t *testing.T) {
 	subReporter3.UpdateStatus(status.Running, "")
 
 	require.Equalf(t, componentstatus.StatusOK, m.Evt.Status(), "expected StatusOK, got %v", m.Evt.Status())
-	require.NoErrorf(t, m.Evt.Err(), "expected nil, got %v")
+	require.NoErrorf(t, m.Evt.Err(), "expected nil, got %v", m.Evt.Err())
 
 	subReporter1.UpdateStatus(status.Degraded, "Degrade Runner1")
 	require.Equalf(t, componentstatus.StatusRecoverableError, m.Evt.Status(), "expected StatusDegraded, got %v", m.Evt.Status())
