@@ -183,7 +183,7 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 
 			var waitTime time.Duration
 			if s.cfg.Retry != nil {
-				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt, s.cfg.Retry.MaxAttempts)
+				waitTime = calculateWaitTime(s.cfg.Retry.WaitMin, s.cfg.Retry.WaitMax, attempt)
 			} else {
 				s.log.Warnw("no retry configured: using linear back-off")
 				waitTime = min(time.Duration(attempt)*time.Second, 30*time.Second)
