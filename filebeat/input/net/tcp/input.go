@@ -120,11 +120,13 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m 
 			func(data []byte, metadata inputsource.NetworkMetadata) {
 				now := time.Now()
 				m.EventReceived(len(data), now)
-				ctx.Logger.Debugw(
-					"Data received",
-					"bytes", len(data),
-					"remote_address", metadata.RemoteAddr.String(),
-					"truncated", metadata.Truncated)
+				if ctx.Logger.IsDebug() {
+					ctx.Logger.Debugw(
+						"Data received",
+						"bytes", len(data),
+						"remote_address", metadata.RemoteAddr.String(),
+						"truncated", metadata.Truncated)
+				}
 
 				evtChan <- netinput.DataMetadata{
 					Data:      data,
