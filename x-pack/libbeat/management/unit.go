@@ -8,16 +8,26 @@ import (
 	"fmt"
 	"sync"
 
+	"google.golang.org/protobuf/types/known/structpb"
+
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// streamStatusReporting controls which health states a stream contributes
+// to the unit's aggregate health. Both fields default to true so that
+// existing behaviour is preserved when the config block is absent.
+type streamStatusReporting struct {
+	reportDegraded bool
+	reportFailed   bool
+}
+
 // unitState is the current state of a unit
 type unitState struct {
-	state                     status.Status
-	msg                       string
-	suppressHealthDegradation bool // when true, this stream's degraded/failed states do not affect the unit's aggregate health
+	state           status.Status
+	msg             string
+	statusReporting streamStatusReporting
 }
 
 type clientUnit interface {
@@ -69,7 +79,7 @@ func getUnitState(s status.Status) client.UnitState {
 	}
 }
 
-// getUnitState converts status.Status to client.UnitState
+// getStatus converts client.UnitState to status.Status
 func getStatus(s client.UnitState) status.Status {
 	switch s {
 	case client.UnitStateStarting:
@@ -91,6 +101,30 @@ func getStatus(s client.UnitState) status.Status {
 	}
 }
 
+// parseStatusReporting extracts status_reporting from a protobuf Struct source,
+// using fallback as the default when fields are absent.
+func parseStatusReporting(src *structpb.Struct, fallback streamStatusReporting) streamStatusReporting {
+	if src == nil {
+		return fallback
+	}
+	srVal, ok := src.GetFields()["status_reporting"]
+	if !ok {
+		return fallback
+	}
+	srMap := srVal.GetStructValue()
+	if srMap == nil {
+		return fallback
+	}
+	sr := fallback
+	if v, ok := srMap.GetFields()["report_degraded"]; ok {
+		sr.reportDegraded = v.GetBoolValue()
+	}
+	if v, ok := srMap.GetFields()["report_failed"]; ok {
+		sr.reportFailed = v.GetBoolValue()
+	}
+	return sr
+}
+
 func getStreamStates(expected client.Expected) (map[string]unitState, []string) {
 	expectedCfg := expected.Config
 
@@ -98,24 +132,23 @@ func getStreamStates(expected client.Expected) (map[string]unitState, []string) 
 		return nil, nil
 	}
 
+	// Read input-level status_reporting as a default for all streams.
+	inputDefault := parseStatusReporting(
+		expectedCfg.GetSource(),
+		streamStatusReporting{reportDegraded: true, reportFailed: true},
+	)
+
 	streamStates := make(map[string]unitState, len(expectedCfg.Streams))
 	streamIDs := make([]string, len(expectedCfg.Streams))
 
 	for idx, stream := range expectedCfg.Streams {
-		// Check if stream is marked as suppressHealthDegradation in its source config.
-		// Optional streams still collect data and report per-stream status,
-		// but their degraded/failed states do not drag the overall unit health down.
-		suppressHealth := false
-		if src := stream.GetSource(); src != nil {
-			if v, ok := src.GetFields()["suppress_health_degradation"]; ok {
-				suppressHealth = v.GetBoolValue()
-			}
-		}
+		// Stream-level status_reporting overrides the input-level default.
+		sr := parseStatusReporting(stream.GetSource(), inputDefault)
 
 		streamState := unitState{
-			state:                     status.Unknown,
-			msg:                       "",
-			suppressHealthDegradation: suppressHealth,
+			state:           status.Unknown,
+			msg:             "",
+			statusReporting: sr,
 		}
 
 		if id := stream.GetId(); id != "" {
@@ -229,22 +262,24 @@ func (u *agentUnit) calcState() (status.Status, string) {
 	}
 
 	// inputLevelState state is marked as running, check the stream states.
-	// Streams marked as suppressHealthDegradation are excluded from the aggregate health
-	// calculation — they still report per-stream status but do not cause
-	// the unit to be reported as degraded or failed.
+	// Streams with status_reporting.report_degraded or report_failed set to
+	// false are excluded from the aggregate health for those specific states.
 	reportedStatus := status.Running
 	reportedMsg := "Healthy"
 	for _, streamState := range u.streamStates {
-		if streamState.suppressHealthDegradation {
-			continue
-		}
 		switch streamState.state {
 		case status.Degraded:
+			if !streamState.statusReporting.reportDegraded {
+				continue
+			}
 			if reportedStatus != status.Degraded {
 				reportedStatus = status.Degraded
 				reportedMsg = streamState.msg
 			}
 		case status.Failed:
+			if !streamState.statusReporting.reportFailed {
+				continue
+			}
 			// return the first failed stream
 			return streamState.state, streamState.msg
 		}
@@ -325,9 +360,9 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 	}
 
 	u.streamStates[streamID] = unitState{
-		state:                     state,
-		msg:                       msg,
-		suppressHealthDegradation: u.streamStates[streamID].suppressHealthDegradation,
+		state:           state,
+		msg:             msg,
+		statusReporting: u.streamStates[streamID].statusReporting,
 	}
 
 	state, msg = u.calcState()
@@ -366,15 +401,15 @@ func (u *agentUnit) update(cu *client.Unit) {
 
 	newStreamStates, newStreamIDs := getStreamStates(cu.Expected())
 
-	suppressionChanged := false
+	reportingChanged := false
 	for key, state := range newStreamStates {
 		if existing, exists := u.streamStates[key]; exists {
-			// Preserve current health state but update the suppressHealthDegradation flag
+			// Preserve current health state but update the status_reporting flags
 			// in case the stream config changed.
-			if existing.suppressHealthDegradation != state.suppressHealthDegradation {
-				suppressionChanged = true
+			if existing.statusReporting != state.statusReporting {
+				reportingChanged = true
 			}
-			existing.suppressHealthDegradation = state.suppressHealthDegradation
+			existing.statusReporting = state.statusReporting
 			u.streamStates[key] = existing
 			continue
 		}
@@ -400,10 +435,9 @@ func (u *agentUnit) update(cu *client.Unit) {
 		}
 	}
 
-	// If any stream's suppression flag changed, recompute and publish the
-	// aggregate unit health so that a flip from suppress=false→true (or
-	// vice versa) takes effect immediately.
-	if suppressionChanged {
+	// If any stream's status_reporting config changed, recompute and publish
+	// the aggregate unit health so the change takes effect immediately.
+	if reportingChanged {
 		state, msg := u.calcState()
 		streamsPayload := make(map[string]interface{}, len(u.streamStates))
 		for id, streamState := range u.streamStates {
