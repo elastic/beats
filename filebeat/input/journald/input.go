@@ -143,7 +143,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		journalctl.Factory,
+		journalctl.NewFactory("", "journalctl"),
 	)
 	if err != nil {
 		return err
@@ -179,7 +179,7 @@ func (inp *journald) Run(
 		inp.Since,
 		src.Name(),
 		inp.Merge,
-		journalctl.Factory,
+		journalctl.NewFactory("", "journalctl"),
 	)
 	if err != nil {
 		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)
