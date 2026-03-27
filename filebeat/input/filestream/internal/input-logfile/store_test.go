@@ -464,6 +464,28 @@ func TestSourceStoreTakeOverFromLogInput(t *testing.T) {
 		return "", nil
 	}
 
+	t.Run("log input state is left untouched", func(t *testing.T) {
+		backend := createSampleStore(t, nil)
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -1,
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		assert.NotNil(t, s.Get(filestreamNewKey), "Log input state must have been migrated to Filestream")
+		assert.NotNil(t, s.Get(logKey), "Log input state must left untouched")
+	})
+
 	t.Run("state with TTL=-2 is migrated", func(t *testing.T) {
 		backend := createSampleStore(t, nil)
 		require.NoError(t, backend.Store.Set(logKey, inpFile.State{

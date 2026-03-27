@@ -326,7 +326,7 @@ func startFlogKubernetes(t *testing.T, kubeConfigPath string) (nodeName, podName
 				{
 					Name:  "flog",
 					Image: "mingrammer/flog",
-					Args:  []string{"-s", "1", "-d", "1", "-l"},
+					Args:  []string{"-s", "0.2", "-d", "0.2", "-l"},
 				},
 			},
 		},

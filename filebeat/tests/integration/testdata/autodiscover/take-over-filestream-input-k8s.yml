@@ -12,8 +12,6 @@ filebeat.autodiscover:
               index: "{{.index}}"
               take_over:
                 enabled: true
-              file_identity.native: ~
-              prospector.scanner.fingerprint.enabled: false
               prospector.scanner.symlinks: true
               close.on_state_change.inactive: 2s
               paths:
