@@ -18,6 +18,7 @@
 package readjson
 
 import (
+	"fmt"
 	"io"
 	"testing"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -351,7 +353,7 @@ func TestDockerJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial, test.format, test.criflags, logger)
+			json := New(r, test.stream, test.partial, test.format, test.criflags, 0, logger)
 			message, err := json.Next()
 
 			if test.expectedError != nil {
@@ -368,6 +370,36 @@ func TestDockerJSON(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDockerJSONMaxBytes(t *testing.T) {
+	// Simulate many CRI partial chunks that would exceed max_bytes in aggregate.
+	// The reader must truncate the assembled message and drain remaining partials
+	// without allocating unbounded memory.
+	chunkContent := "abcdefghij" // 10 bytes per chunk
+	numChunks := 5
+	maxBytes := 25 // limit is less than 5*10 = 50 bytes
+
+	var inputs [][]byte
+	for i := range numChunks {
+		flag := "P"
+		if i == numChunks-1 {
+			flag = "F"
+		}
+		line := fmt.Sprintf("2017-10-12T13:32:21.232861448Z stdout %s %s", flag, chunkContent)
+		inputs = append(inputs, []byte(line))
+	}
+
+	r := &mockReader{messages: inputs}
+	json := New(r, "stdout", true, "cri", true, maxBytes, logp.NewNopLogger())
+	message, err := json.Next()
+
+	assert.NoError(t, err)
+	assert.Equal(t, maxBytes, len(message.Content), "content should be capped at maxBytes")
+
+	flags, err := message.Fields.GetValue("log.flags")
+	assert.NoError(t, err, "'log.flags' not present in event")
+	assert.Contains(t, flags, "truncated", "truncated flag should be set")
 }
 
 type mockReader struct {

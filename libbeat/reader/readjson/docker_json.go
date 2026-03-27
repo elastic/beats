@@ -43,6 +43,9 @@ type DockerJSONReader struct {
 	// parse CRI flags
 	criflags bool
 
+	// maximum number of bytes to return per message; 0 means no limit
+	maxBytes int
+
 	parseLine func(message *reader.Message, msg *logLine) error
 
 	stripNewLine func(msg *reader.Message)
@@ -60,12 +63,13 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, logger *logp.Logger) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, maxBytes int, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
+		maxBytes: maxBytes,
 		logger:   logger.Named("reader_docker_json"),
 	}
 
@@ -87,12 +91,13 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 	return &reader
 }
 
-func NewContainerParser(r reader.Reader, config *ContainerJSONConfig, logger *logp.Logger) *DockerJSONReader {
+func NewContainerParser(r reader.Reader, config *ContainerJSONConfig, maxBytes int, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   config.Stream.String(),
 		partial:  true,
 		reader:   r,
 		criflags: true,
+		maxBytes: maxBytes,
 		logger:   logger.Named("parser_container"),
 	}
 
@@ -248,7 +253,17 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 				p.logger.Errorf("Parse line error: %v", err)
 				continue
 			}
-			message.Content = append(message.Content, next.Content...)
+
+			// Enforce max_bytes during partial line reassembly to prevent unbounded
+			// memory growth.
+			if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
+				remaining := p.maxBytes - len(message.Content)
+				message.Content = append(message.Content, next.Content[:remaining]...)
+				message.AddFlagsWithKey("log.flags", "truncated")
+				break
+			} else {
+				message.Content = append(message.Content, next.Content...)
+			}
 		}
 
 		if p.stream != "all" && p.stream != logLine.Stream {
