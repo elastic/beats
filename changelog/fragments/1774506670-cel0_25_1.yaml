@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Update mito CEL library to v1.25.1 and cel-go runtime to v0.27.0.
+component: filebeat
