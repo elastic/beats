@@ -132,42 +132,50 @@ func jumplistRowToResult(row jumplistRow) elasticjumplists.Result {
 
 	if row.DestListEntry != nil {
 		result.DestListEntry = &jumpliststypes.DestListEntry{
-			Hostname:              row.DestListEntry.Hostname,
-			EntryNumber:           row.DestListEntry.EntryNumber,
-			LastModifiedTime:      row.DestListEntry.LastModifiedTime,
-			IsPinned:              row.DestListEntry.PinStatus,
-			InteractionCount:      row.DestListEntry.InteractionCount,
-			DestEntryPath:         row.DestListEntry.Path,
-			DestEntryPathResolved: row.DestListEntry.ResolvedPath,
-			MacAddress:            row.DestListEntry.MacAddress,
-			CreationTime:          row.DestListEntry.CreationTime,
+			Hostname:              row.Hostname,
+			EntryNumber:           row.EntryNumber,
+			LastModifiedTime:      row.LastModifiedTime,
+			IsPinned:              row.PinStatus,
+			InteractionCount:      row.InteractionCount,
+			DestEntryPath:         row.Path,
+			DestEntryPathResolved: row.ResolvedPath,
+			MacAddress:            row.MacAddress,
+			CreationTime:          row.CreationTime,
 		}
 	}
 
 	if row.Lnk != nil {
-		fileSize := int32(row.Lnk.FileSize)
+		var fileSize int32
+		var volumeLabelOffset int32
+
 		if row.Lnk.FileSize > math.MaxInt32 {
 			fileSize = math.MaxInt32
+		} else {
+			fileSize = int32(row.Lnk.FileSize)
 		}
 
-		volumeLabelOffset := int32(row.Lnk.VolumeLabelOffset)
 		if row.Lnk.VolumeLabelOffset > math.MaxInt32 {
 			volumeLabelOffset = math.MaxInt32
+		} else {
+			volumeLabelOffset = int32(row.Lnk.VolumeLabelOffset)
 		}
 
 		result.LnkMetadata = &jumpliststypes.LnkMetadata{
-			LocalPath:              row.Lnk.LocalPath,
+			LocalPath:              row.LocalPath,
 			FileSize:               fileSize,
-			HotKey:                 row.Lnk.HotKey,
-			IconIndex:              row.Lnk.IconIndex,
-			ShowWindow:             row.Lnk.ShowWindow,
-			TargetLastAccessedTime: row.Lnk.TargetLastAccessedDate,
-			TargetCreationTime:     row.Lnk.TargetCreationDate,
-			VolumeSerialNumber:     row.Lnk.VolumeSerialNumber,
-			VolumeType:             row.Lnk.VolumeType,
-			VolumeLabel:            row.Lnk.VolumeLabel,
+			HotKey:                 row.HotKey,
+			IconIndex:              row.IconIndex,
+			ShowWindow:             row.ShowWindow,
+			IconLocation:           row.IconLocation,
+			CommandLineArguments:   row.CommandLineArguments,
+			TargetModificationTime: row.TargetModificationDate,
+			TargetLastAccessedTime: row.TargetLastAccessedDate,
+			TargetCreationTime:     row.TargetCreationDate,
+			VolumeSerialNumber:     row.VolumeSerialNumber,
+			VolumeType:             row.VolumeType,
+			VolumeLabel:            row.VolumeLabel,
 			VolumeLabelOffset:      volumeLabelOffset,
-			Name:                   row.Lnk.Name,
+			Name:                   row.Name,
 		}
 	}
 

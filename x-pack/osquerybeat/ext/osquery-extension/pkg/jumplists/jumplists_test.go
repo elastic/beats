@@ -73,7 +73,7 @@ func TestCustomJumplists(t *testing.T) {
 			assert.NoError(t, err, "expected no error when parsing custom jumplist")
 			assert.NotNil(t, jumplist, "expected non-nil jumplist when parsing custom jumplist")
 			rows := jumplist.toRows()
-			assert.Equal(t, test.expectedRows, len(rows), "expected %d rows in the jumplist", test.expectedRows)
+			assert.Len(t, rows, test.expectedRows, "expected %d rows in the jumplist", test.expectedRows)
 		})
 	}
 }
@@ -81,7 +81,7 @@ func TestCustomJumplists(t *testing.T) {
 func TestGeneratedColumns(t *testing.T) {
 	columns := elasticjumplists.Columns()
 	assert.NotNil(t, columns, "expected non-nil columns")
-	assert.Greater(t, len(columns), 0, "expected at least 1 column")
+	assert.NotEmpty(t, columns, "expected at least 1 column")
 }
 
 func TestLnk(t *testing.T) {
@@ -241,7 +241,7 @@ func TestAutomaticJumpList(t *testing.T) {
 		assert.NoError(t, err, "expected no error when parsing Automatic Jump List")
 		assert.NotNil(t, automaticJumpList, "expected non-nil Automatic Jump List when parsing Automatic Jump List")
 		rows := automaticJumpList.toRows()
-		assert.Greater(t, len(rows), 0, "expected at least 1 row in the Automatic Jump List")
+		assert.NotEmpty(t, rows, "expected at least 1 row in the Automatic Jump List")
 
 		// If an automatic jumplist has only one row, it could mean that the jumplist is empty.
 		// or it could mean that the jumplist has only one entry.  If the jumplist is empty,
@@ -320,7 +320,7 @@ func TestJumplistFilters(t *testing.T) {
 			t.Fatalf("invalid test file path: %s", test.filePath)
 		}
 
-		assert.Greater(t, len(rows), 0, "expected at least 1 row in the Jumplist")
+		assert.NotEmpty(t, rows, "expected at least 1 row in the Jumplist")
 		matchCount := 0
 		for _, row := range rows {
 			if test.filter.Matches(row) {
