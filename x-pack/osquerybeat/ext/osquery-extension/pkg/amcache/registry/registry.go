@@ -10,38 +10,79 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 
-	"github.com/forensicanalysis/fslib"
-	"github.com/forensicanalysis/fslib/systemfs"
 	"www.velocidex.com/golang/regparser"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+    "www.velocidex.com/golang/go-ntfs/parser"
 )
 
-// getFileContents reads the contents of a file and returns it as a byte slice.
-// If the file is not readable, it will attempt to read it using a low level read
-// using fslib.
 func getFileContents(filePath string, log *logger.Logger) ([]byte, error) {
 	content, err := os.ReadFile(filePath)
 	if err == nil {
 		return content, nil
 	}
 	log.Infof("failed to read %s, falling back to low level read", filePath)
+	return readFileViaNTFS(filePath)
+}
 
-	// fallback to a low level read using fslib
-	sourceFS, err := systemfs.New()
-	if err != nil {
-		log.Errorf("failed to open file %s: %s", filePath, err.Error())
-		return nil, err
+// This function was written with help from Claude Code, and is based on the code
+// found in the fslib library for doing low level NTFS reads.  fslib kept us pinned
+// to an older version of go-ntfs, but this functionality was all we needed from that library,
+// which already used go-ntfs under the hood.  By implementing it ourselves we were able 
+// to update to the latest version of go-ntfs
+func readFileViaNTFS(filePath string) ([]byte, error) {
+	if len(filePath) < 3 || filePath[1] != ':' {
+		return nil, fmt.Errorf("unsupported path format: %s", filePath)
 	}
-	fsPath, err := fslib.ToFSPath(filePath)
+
+	driveLetter := filePath[0]
+	ntfsPath := "/" + filepath.ToSlash(filePath[3:]) // C:\Windows\foo.txt → /Windows/foo.txt
+
+	volume, err := os.Open(fmt.Sprintf(`\\.\%c:`, driveLetter))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open volume: %w", err)
 	}
-	return fs.ReadFile(sourceFS, fsPath)
+	defer volume.Close()
+
+	reader, err := parser.NewPagedReader(volume, 1024*1024, 100*1024*1024)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create paged reader: %w", err)
+	}
+
+	ntfsCtx, err := parser.GetNTFSContext(reader, 0)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse NTFS: %w", err)
+	}
+
+	root, err := ntfsCtx.GetMFT(5)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get MFT root: %w", err)
+	}
+
+	entry, err := root.Open(ntfsCtx, ntfsPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open %s via NTFS: %w", ntfsPath, err)
+	}
+
+	attr, err := entry.GetAttribute(ntfsCtx, 128, -1, "") // 128 = $DATA
+	if err != nil {
+		return nil, fmt.Errorf("failed to get data attribute: %w", err)
+	}
+
+	infos, err := parser.ModelMFTEntry(ntfsCtx, entry)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file size: %w", err)
+	}
+
+	data := make([]byte, infos.Size)
+	_, err = attr.Data(ntfsCtx).ReadAt(data, 0)
+	if err != nil && err != io.EOF {
+		return nil, fmt.Errorf("failed to read file data: %w", err)
+	}
+	return data, nil
 }
 
 // loadExistingRegistry loads the registry from the given file path.  Without any transaction logs.
