@@ -39,6 +39,7 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	groupReporter       otelstatus.RunnerReporter
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -114,12 +115,13 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 	}, nil
 }
 
-// BeatReceiver.Start() starts the beat receiver.
-func (br *BeatReceiver) Start(host component.Host) error {
-	var groupReporter otelstatus.RunnerReporter
+// Setup initialises the beat receiver against the given host. It must be called before Run.
+// Any configuration errors (e.g. missing storage extensions) are returned here so that the
+// OTel collector can surface them as a hard startup failure instead of silently swallowing them.
+func (br *BeatReceiver) Setup(host component.Host) error {
 	if w, ok := br.beater.(cfgfile.WithOtelFactoryWrapper); ok {
-		groupReporter = otelstatus.NewGroupStatusReporter(host)
-		w.WithOtelFactoryWrapper(otelstatus.StatusReporterFactory(groupReporter))
+		br.groupReporter = otelstatus.NewGroupStatusReporter(host)
+		w.WithOtelFactoryWrapper(otelstatus.StatusReporterFactory(br.groupReporter))
 	}
 
 	// We go through all extensions to find any that implement the DiagnosticExtension interface.
@@ -182,12 +184,15 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	})
 
+	return nil
+}
+
+// Run starts the beat's main loop. Setup must be called before Run.
+func (br *BeatReceiver) Run() error {
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
-		// set beatreceiver status
-		groupReporter.UpdateStatus(status.Failed, err.Error())
+		br.groupReporter.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
-
 	return nil
 }
 
