@@ -190,7 +190,9 @@ func (br *BeatReceiver) Setup(host component.Host) error {
 // Run starts the beat's main loop. Setup must be called before Run.
 func (br *BeatReceiver) Run() error {
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
-		br.groupReporter.UpdateStatus(status.Failed, err.Error())
+		if br.groupReporter != nil {
+			br.groupReporter.UpdateStatus(status.Failed, err.Error())
+		}
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
 	return nil
