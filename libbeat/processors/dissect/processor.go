@@ -105,18 +105,24 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	backup := event.Clone()
+	// Clone for rollback is only needed when OverwriteKeys is false, since
+	// mapper can only fail when it encounters an existing key it cannot
+	// overwrite. When OverwriteKeys is true, mapper always succeeds.
+	var backup *beat.Event
+	if !p.config.OverwriteKeys {
+		backup = event.Clone()
+	}
 
 	if convertDataType {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
 		event, err = p.mapper(event, mapToMapStr(m))
 	}
-	if err != nil {
+	if err != nil && backup != nil {
 		return backup, err
 	}
 
-	return event, nil
+	return event, err
 }
 
 func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
