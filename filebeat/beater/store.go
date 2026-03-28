@@ -61,16 +61,20 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
-func storeKey(resolvedPath, backendName string) string {
+func storeKey(resolvedPath, backendName string, esExt backend.Registry) string {
 	if backendName == "" {
 		backendName = "memlog"
 	}
-	return backendName + "://" + resolvedPath
+	key := backendName + "://" + resolvedPath
+	if esExt != nil {
+		key = fmt.Sprintf("%s|esext:%p", key, esExt)
+	}
+	return key
 }
 
 func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
 	resolvedPath := beatPaths.Resolve(paths.Data, cfg.Path)
-	key := storeKey(resolvedPath, cfg.Backend)
+	key := storeKey(resolvedPath, cfg.Backend, cfg.ESStorageExtension)
 
 	globalMu.Lock()
 	defer globalMu.Unlock()
