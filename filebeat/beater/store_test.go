@@ -26,7 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/filebeat/features"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -153,4 +155,51 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 	_, exists := globalStores[resolvedKey]
 	globalMu.Unlock()
 	assert.False(t, exists, "entry should be cleaned up after all stores are closed")
+}
+
+func TestOpenStateStore_DifferentESExtensionsShouldNotShare(t *testing.T) {
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "dummy")
+	features.ReinitForTest()
+	t.Cleanup(func() {
+		t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "")
+		features.ReinitForTest()
+	})
+
+	beatPaths := paths.New()
+	beatPaths.Data = t.TempDir()
+
+	cfgWithExt := func(ext *storetest.MemoryStore) config.Registry {
+		return config.Registry{
+			Path:               "",
+			Permissions:        0600,
+			CleanInterval:      time.Second,
+			ESStorageExtension: ext,
+		}
+	}
+
+	extA := storetest.NewMemoryStoreBackend()
+	extB := storetest.NewMemoryStoreBackend()
+
+	s1, err := openStateStore(t.Context(), beat.Info{Beat: "testbeat"}, logp.NewNopLogger(), cfgWithExt(extA), beatPaths)
+	require.NoError(t, err)
+	t.Cleanup(s1.Close)
+
+	s2, err := openStateStore(t.Context(), beat.Info{Beat: "testbeat"}, logp.NewNopLogger(), cfgWithExt(extB), beatPaths)
+	require.NoError(t, err)
+	t.Cleanup(s2.Close)
+
+	storeA, err := s1.StoreFor("dummy")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = storeA.Close() })
+
+	storeB, err := s2.StoreFor("dummy")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = storeB.Close() })
+
+	require.NoError(t, storeA.Set("k", map[string]string{"v": "from-a"}))
+
+	var got map[string]string
+	err = storeB.Get("k", &got)
+	assert.Error(t, err, "expected independent storage extensions for stores with different ESStorageExtension instances")
+	assert.Nil(t, got, "no state should leak between stores with different ESStorageExtension instances")
 }
