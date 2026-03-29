@@ -16,7 +16,7 @@ import (
 	"www.velocidex.com/golang/regparser"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-    "www.velocidex.com/golang/go-ntfs/parser"
+	"www.velocidex.com/golang/go-ntfs/parser"
 )
 
 func getFileContents(filePath string, log *logger.Logger) ([]byte, error) {
@@ -31,7 +31,7 @@ func getFileContents(filePath string, log *logger.Logger) ([]byte, error) {
 // This function was written with help from Claude Code, and is based on the code
 // found in the fslib library for doing low level NTFS reads.  fslib kept us pinned
 // to an older version of go-ntfs, but this functionality was all we needed from that library,
-// which already used go-ntfs under the hood.  By implementing it ourselves we were able 
+// which already used go-ntfs under the hood.  By implementing it ourselves we were able
 // to update to the latest version of go-ntfs
 func readFileViaNTFS(filePath string) ([]byte, error) {
 	if len(filePath) < 3 || filePath[1] != ':' {

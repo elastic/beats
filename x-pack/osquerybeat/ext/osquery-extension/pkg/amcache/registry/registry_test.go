@@ -61,7 +61,7 @@ func Test_readFileViaNTFS(t *testing.T) {
 	amcachePath := "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
 
 	// Read the file using
-	data, err := readFileViaNTFS(amcachePath, log)
+	data, err := readFileViaNTFS(amcachePath)
 	assert.NoError(t, err, "readFileViaNTFS() failed: %v", err)
 	assert.NotEmpty(t, data, "readFileViaNTFS() returned empty data")
 
