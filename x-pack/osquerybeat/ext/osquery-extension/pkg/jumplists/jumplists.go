@@ -151,13 +151,13 @@ func jumplistRowToResult(row jumplistRow) elasticjumplists.Result {
 		if row.FileSize > uint32(math.MaxInt32) {
 			fileSize = math.MaxInt32
 		} else {
-			fileSize = int32(row.FileSize)
+			fileSize = int32(row.FileSize) //nolint:gosec,G115 // This is already safety checked in the code above
 		}
 
 		if row.VolumeLabelOffset > uint32(math.MaxInt32) {
 			volumeLabelOffset = math.MaxInt32
 		} else {
-			volumeLabelOffset = int32(row.VolumeLabelOffset)
+			volumeLabelOffset = int32(row.VolumeLabelOffset) //nolint:gosec,G115 // This is already safety checked in the code above
 		}
 
 		result.LnkMetadata = &jumpliststypes.LnkMetadata{
