@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"slices"
@@ -463,18 +464,30 @@ func TestServerPool(t *testing.T) {
 					}
 				}()
 			}
-			time.Sleep(time.Second)
-
-			select {
-			case err := <-fails:
-				if test.wantErr == nil {
-					t.Errorf("unexpected error calling serve: %#q", err)
-				} else if !errors.Is(err, test.wantErr) {
-					t.Errorf("unexpected error calling serve: got=%#q, want=%#q", err, test.wantErr)
+			if test.wantErr == nil {
+				seen := make(map[string]bool)
+				for _, cfg := range test.cfgs {
+					if !seen[cfg.addr] {
+						seen[cfg.addr] = true
+						waitForServer(t, cfg.addr, 5*time.Second)
+					}
 				}
-			default:
-				if test.wantErr != nil {
+			}
+
+			if test.wantErr != nil {
+				select {
+				case err := <-fails:
+					if !errors.Is(err, test.wantErr) {
+						t.Errorf("unexpected error calling serve: got=%#q, want=%#q", err, test.wantErr)
+					}
+				case <-time.After(5 * time.Second):
 					t.Errorf("expected error calling serve")
+				}
+			} else {
+				select {
+				case err := <-fails:
+					t.Errorf("unexpected error calling serve: %#q", err)
+				default:
 				}
 			}
 			for i, e := range test.events {
@@ -578,7 +591,7 @@ func TestConcurrentExceedMaxInFlight(t *testing.T) {
 			t.Errorf("unexpected serve error: %v", err)
 		}
 	}()
-	time.Sleep(500 * time.Millisecond) // Wait for server to start.
+	waitForServer(t, "127.0.0.1:9010", 5*time.Second)
 
 	var reqWg sync.WaitGroup
 
@@ -732,7 +745,7 @@ func TestMux(t *testing.T) {
 		})
 		m.add("/a/", short)
 		m.add("/a/b/", long)
-		rec := newRecorder()
+		rec := httptest.NewRecorder()
 		m.ServeHTTP(rec, httptest.NewRequest("GET", "/a/b/c", nil))
 		if rec.Code != http.StatusAccepted {
 			t.Errorf("got status %d, want %d", rec.Code, http.StatusAccepted)
@@ -748,7 +761,7 @@ func TestMux(t *testing.T) {
 		})
 		m.add("/a/", prefix)
 		m.add("/a/b", exact)
-		rec := newRecorder()
+		rec := httptest.NewRecorder()
 		m.ServeHTTP(rec, httptest.NewRequest("GET", "/a/b", nil))
 		if rec.Code != http.StatusAccepted {
 			t.Errorf("got status %d, want %d", rec.Code, http.StatusAccepted)
@@ -789,16 +802,52 @@ func TestMux(t *testing.T) {
 	t.Run("not_found", func(t *testing.T) {
 		m := &mux{exact: make(map[string]http.Handler)}
 		m.add("/foo", ok)
-		rec := newRecorder()
+		rec := httptest.NewRecorder()
 		m.ServeHTTP(rec, httptest.NewRequest("GET", "/bar", nil))
 		if rec.Code != http.StatusNotFound {
 			t.Errorf("got status %d, want %d", rec.Code, http.StatusNotFound)
 		}
 	})
-}
+	t.Run("path_clean_conformance", func(t *testing.T) {
+		patterns := []string{"/a/b", "/a/", "/x/y/z/"}
 
-func newRecorder() *httptest.ResponseRecorder {
-	return httptest.NewRecorder()
+		sm := http.NewServeMux()
+		m := &mux{exact: make(map[string]http.Handler)}
+		for _, p := range patterns {
+			sm.Handle(p, ok)
+			m.add(p, ok)
+		}
+
+		paths := []string{
+			"/a/b",
+			"/a//b",
+			"/a/b/",
+			"/a/",
+			"/a/b/../",
+			"/a/./b",
+			"/x///y/z/",
+			"/x/y/z/../z/",
+			"/x/y/../y/z/",
+			"/clean",
+		}
+		for _, p := range paths {
+			req := httptest.NewRequest("GET", p, nil)
+
+			smRec := httptest.NewRecorder()
+			sm.ServeHTTP(smRec, req)
+
+			mRec := httptest.NewRecorder()
+			m.ServeHTTP(mRec, req)
+
+			if mRec.Code != smRec.Code {
+				t.Errorf("path %q: status mux=%d, http.ServeMux=%d", p, mRec.Code, smRec.Code)
+			}
+			if mRec.Header().Get("Location") != smRec.Header().Get("Location") {
+				t.Errorf("path %q: Location mux=%q, http.ServeMux=%q",
+					p, mRec.Header().Get("Location"), smRec.Header().Get("Location"))
+			}
+		}
+	})
 }
 
 func TestJoinerDeregisterKeepsServer(t *testing.T) {
@@ -847,7 +896,7 @@ func TestJoinerDeregisterKeepsServer(t *testing.T) {
 		defer wg.Done()
 		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
 	}()
-	time.Sleep(500 * time.Millisecond)
+	waitForServer(t, "127.0.0.1:9021", 5*time.Second)
 
 	// Stop B (joiner). A's server should stay alive.
 	cancelB()
@@ -939,7 +988,7 @@ func TestCreatorDeregisterKeepsServer(t *testing.T) {
 		defer wg.Done()
 		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
 	}()
-	time.Sleep(500 * time.Millisecond)
+	waitForServer(t, "127.0.0.1:9022", 5*time.Second)
 
 	// Stop A (creator). B's server should stay alive.
 	cancelA()
@@ -1012,7 +1061,7 @@ func TestPatternReregistration(t *testing.T) {
 		defer wg.Done()
 		err1 <- servers.serve(ctx1, cfg, pub.Publish, metrics)
 	}()
-	time.Sleep(500 * time.Millisecond)
+	waitForServer(t, "127.0.0.1:9023", 5*time.Second)
 
 	resp, err := doRequest("", "http://127.0.0.1:9023/a/", "application/json", strings.NewReader(`{"x":1}`))
 	if err != nil {
@@ -1043,7 +1092,7 @@ func TestPatternReregistration(t *testing.T) {
 		defer wg.Done()
 		err2 <- servers.serve(ctx2, cfg, pub.Publish, metrics)
 	}()
-	time.Sleep(500 * time.Millisecond)
+	waitForServer(t, "127.0.0.1:9023", 5*time.Second)
 
 	resp, err = doRequest("", "http://127.0.0.1:9023/a/", "application/json", strings.NewReader(`{"x":2}`))
 	if err != nil {
@@ -1112,7 +1161,7 @@ func TestSimultaneousShutdown(t *testing.T) {
 		defer wg.Done()
 		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
 	}()
-	time.Sleep(500 * time.Millisecond)
+	waitForServer(t, "127.0.0.1:9024", 5*time.Second)
 
 	// Cancel both at once.
 	cancelA()
@@ -1129,4 +1178,23 @@ func TestSimultaneousShutdown(t *testing.T) {
 		}
 	}
 	wg.Wait()
+}
+
+// waitForServer polls addr until a TCP connection succeeds or the
+// timeout expires.
+func waitForServer(t *testing.T, addr string, timeout time.Duration) {
+	t.Helper()
+	deadline := time.After(timeout)
+	for {
+		c, err := net.DialTimeout("tcp", addr, 50*time.Millisecond)
+		if err == nil {
+			c.Close()
+			return
+		}
+		select {
+		case <-deadline:
+			t.Fatalf("server %s not ready after %s", addr, timeout)
+		case <-time.After(10 * time.Millisecond):
+		}
+	}
 }

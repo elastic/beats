@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -214,12 +215,10 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		}
 
 		if old, ok := s.idOf[pattern]; ok {
-			err = fmt.Errorf("pattern already exists for %s: %s old=%s new=%s",
-				e.addr, pattern, old, ctx.ID)
-			s.setErr(err)
-			s.cancel()
 			p.mu.Unlock()
 			handlerCancel()
+			err = fmt.Errorf("pattern already exists for %s: %s old=%s new=%s",
+				e.addr, pattern, old, ctx.ID)
 			ctx.UpdateStatus(status.Failed, err.Error())
 			return err
 		}
@@ -250,11 +249,18 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
 		}
 		go func() {
-			var listenErr error
+			defaultAddr := ":http"
 			if e.tlsConfig != nil {
-				listenErr = listenAndServeTLS(s.srv, "", "", metrics)
-			} else {
-				listenErr = listenAndServe(s.srv, metrics)
+				defaultAddr = ":https"
+			}
+			ln, listenErr := listen(s.srv, defaultAddr)
+			if listenErr == nil {
+				metrics.bindAddr.Set(ln.Addr().String())
+				if e.tlsConfig != nil {
+					listenErr = s.srv.ServeTLS(ln, "", "")
+				} else {
+					listenErr = s.srv.Serve(ln)
+				}
 			}
 			s.setErr(listenErr)
 			p.mu.Lock()
@@ -275,6 +281,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		// closed it). Wait for the listener goroutine to finish so
 		// s.err is set before we read it.
 		<-s.done
+		handlerCancel()
 		err := s.getErr()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			ctx.UpdateStatus(status.Failed, "server exited unexpectedly: "+err.Error())
@@ -304,34 +311,12 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 	return nil
 }
 
-func listenAndServeTLS(srv *http.Server, certFile, keyFile string, metrics *inputMetrics) error {
+func listen(srv *http.Server, defaultAddr string) (net.Listener, error) {
 	addr := srv.Addr
 	if addr == "" {
-		addr = ":https"
+		addr = defaultAddr
 	}
-
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		return err
-	}
-	metrics.bindAddr.Set(ln.Addr().String())
-
-	defer ln.Close()
-
-	return srv.ServeTLS(ln, certFile, keyFile)
-}
-
-func listenAndServe(srv *http.Server, metrics *inputMetrics) error {
-	addr := srv.Addr
-	if addr == "" {
-		addr = ":http"
-	}
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		return err
-	}
-	metrics.bindAddr.Set(ln.Addr().String())
-	return srv.Serve(ln)
+	return net.Listen("tcp", addr)
 }
 
 func checkTLSConsistency(addr string, old, new *tlscommon.ServerConfig) error {
@@ -436,6 +421,11 @@ func (s *server) getErr() error {
 //
 //   - If no pattern matches, the request gets a 404.
 //
+//   - Request paths are cleaned with [path.Clean] before matching.
+//     Requests with unclean paths (containing "..", "//", etc.) receive
+//     a 301 redirect to the cleaned path, matching [http.ServeMux]
+//     behaviour.
+//
 // Unlike [http.ServeMux], mux does not support host-specific patterns,
 // method routing, or Go 1.22 wildcard segments. Handlers can be removed
 // at runtime via remove; this is the reason it exists instead of
@@ -485,14 +475,37 @@ func (m *mux) remove(pattern string) bool {
 }
 
 func (m *mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	clean := cleanPath(r.URL.Path)
+	if clean != r.URL.Path {
+		url := *r.URL
+		url.Path = clean
+		http.Redirect(w, r, url.String(), http.StatusMovedPermanently)
+		return
+	}
 	m.mu.RLock()
-	h := m.match(r.URL.Path)
+	h := m.match(clean)
 	m.mu.RUnlock()
 	if h == nil {
 		http.NotFound(w, r)
 		return
 	}
 	h.ServeHTTP(w, r)
+}
+
+// cleanPath returns the canonical path for p, eliminating . and .. elements.
+// A trailing slash is preserved, matching [http.ServeMux] behaviour.
+func cleanPath(p string) string {
+	if p == "" {
+		return "/"
+	}
+	if p[0] != '/' {
+		p = "/" + p
+	}
+	np := path.Clean(p)
+	if p[len(p)-1] == '/' && np != "/" {
+		np += "/"
+	}
+	return np
 }
 
 // match returns the best handler for path. Caller must hold at least a
