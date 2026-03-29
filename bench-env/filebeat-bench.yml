@@ -1,0 +1,93 @@
+# Filebeat benchmark configuration
+# Uses the benchmark input to generate events at max throughput through a
+# realistic agent processor pipeline, with pprof enabled for profiling.
+
+filebeat.inputs:
+  - type: benchmark
+    enabled: true
+    message: "2025-03-07T11:06:39.123456789Z INFO  [application] app/server.go:142 Request processed successfully method=GET path=/api/v1/health status=200 duration_ms=3.42 request_id=req-a1b2c3d4 user_id=usr-5678 ip=10.0.0.42"
+    threads: 1
+    # No count or eps = full speed
+
+# Processor chain matching a typical Elastic Agent deployment
+processors:
+  # Agent identity (6 add_fields, as injected by elastic-agent)
+  - add_fields:
+      target: "agent"
+      fields:
+        id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        name: "my-agent-host"
+        version: "8.17.0"
+        type: "filebeat"
+        hostname: "my-agent-host"
+
+  - add_fields:
+      target: ""
+      fields:
+        input.type: "filestream"
+        log.file.path: "/var/log/app/app.log"
+        log.offset: 42
+
+  - add_fields:
+      target: ""
+      fields:
+        ecs.version: "8.0.0"
+        data_stream.type: "logs"
+        data_stream.dataset: "generic"
+        data_stream.namespace: "default"
+
+  - add_fields:
+      target: "elastic_agent"
+      fields:
+        id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        version: "8.17.0"
+        snapshot: false
+
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+
+  - add_cloud_metadata: ~
+
+  # Dissect the structured log message
+  - dissect:
+      tokenizer: "%{timestamp} %{log_level}  [%{logger}] %{source} %{message}"
+      field: "message"
+      target_prefix: "dissect"
+      overwrite_keys: true
+
+  # Parse timestamp from dissected field
+  - timestamp:
+      field: "dissect.timestamp"
+      layouts:
+        - '2006-01-02T15:04:05.999999999Z'
+        - '2006-01-02T15:04:05Z'
+      ignore_failure: true
+
+# File output — lightweight, no ES dependency
+output.file:
+  path: "/tmp/filebeat-bench"
+  filename: "bench-output"
+  rotate_every_kb: 102400
+  number_of_files: 3
+  codec.json:
+    pretty: false
+
+# Enable pprof
+http.enabled: true
+http.host: "localhost"
+http.port: 5066
+http.pprof.enabled: true
+
+# Minimize logging noise
+logging.level: warning
+logging.to_files: true
+logging.files:
+  path: /tmp/filebeat-bench
+  name: filebeat-bench.log
+  keepfiles: 2
+
+# Queue tuning for throughput
+queue.mem:
+  events: 8192
+  flush.min_events: 2048
+  flush.timeout: 1s

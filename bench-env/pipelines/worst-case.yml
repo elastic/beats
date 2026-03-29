@@ -1,0 +1,126 @@
+# Worst case: full agent pipeline with all enrichment
+# cloud + k8s + docker + host + dissect + timestamp + 6 add_fields
+#
+# docker/k8s/cloud processors need live services, so we simulate their
+# output with add_fields(shared=true). This produces the same Clone+DeepUpdate
+# allocation pattern as the real processors with shared metadata.
+
+filebeat.inputs:
+  - type: benchmark
+    enabled: true
+    message: "2025-03-07T11:06:39.123456789Z INFO  [application] app/server.go:142 Request processed successfully method=GET path=/api/v1/health status=200 duration_ms=3.42 request_id=req-a1b2c3d4 user_id=usr-5678 ip=10.0.0.42"
+    threads: 1
+
+processors:
+  # --- Agent identity (injected by elastic-agent) ---
+  - add_fields:
+      target: "agent"
+      fields:
+        id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        name: "gke-node-abc123"
+        version: "8.17.0"
+        type: "filebeat"
+        hostname: "gke-node-abc123"
+
+  - add_fields:
+      target: ""
+      fields:
+        input.type: "filestream"
+        log.file.path: "/var/log/containers/myapp-abc123_default_mycontainer-def456.log"
+        log.offset: 42
+
+  - add_fields:
+      target: ""
+      fields:
+        ecs.version: "8.0.0"
+        data_stream.type: "logs"
+        data_stream.dataset: "generic"
+        data_stream.namespace: "default"
+
+  - add_fields:
+      target: "elastic_agent"
+      fields:
+        id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        version: "8.17.0"
+        snapshot: false
+
+  # --- Host metadata (real processor) ---
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+
+  # --- Cloud metadata (simulated — GCP) ---
+  - add_fields:
+      target: "cloud"
+      fields:
+        provider: "gcp"
+        availability_zone: "us-central1-a"
+        region: "us-central1"
+        instance.id: "1234567890123456789"
+        instance.name: "gke-cluster-default-pool-abc123"
+        machine.type: "e2-standard-4"
+        project.id: "my-project-123456"
+        account.id: "my-project-123456"
+
+  # --- Docker metadata (simulated) ---
+  - add_fields:
+      target: "container"
+      fields:
+        id: "def456789abc"
+        image.name: "myrepo/myimage:latest"
+        name: "mycontainer"
+        labels.app: "myapp"
+        labels.version: "v1.2.3"
+        labels.env: "production"
+
+  # --- Kubernetes metadata (simulated) ---
+  - add_fields:
+      target: "kubernetes"
+      fields:
+        pod.name: "myapp-deployment-7b9c5d8f6-x2k4m"
+        pod.uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        pod.namespace: "default"
+        pod.labels.app: "myapp"
+        pod.labels.version: "v1.2.3"
+        pod.labels.env: "production"
+        pod.annotations.deployment_kubernetes_io/revision: "3"
+        node.name: "gke-cluster-default-pool-abc123"
+        namespace: "default"
+        container.name: "mycontainer"
+
+  # --- Dissect (real processor, overwrite_keys=true) ---
+  - dissect:
+      tokenizer: "%{timestamp} %{log_level}  [%{logger}] %{source} %{message}"
+      field: "message"
+      target_prefix: "dissect"
+      overwrite_keys: true
+
+  # --- Timestamp (real processor) ---
+  - timestamp:
+      field: "dissect.timestamp"
+      layouts:
+        - '2006-01-02T15:04:05.999999999Z'
+        - '2006-01-02T15:04:05Z'
+      ignore_failure: true
+
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  preset: balanced
+  protocol: "http"
+  allow_older_versions: true
+
+http.enabled: true
+http.host: "localhost"
+http.port: 5066
+http.pprof.enabled: true
+
+logging.level: warning
+logging.to_files: true
+logging.files:
+  path: /tmp/filebeat-bench
+  name: filebeat-bench.log
+  keepfiles: 2
+
+queue.mem:
+  events: 8192
+  flush.min_events: 2048
+  flush.timeout: 1s

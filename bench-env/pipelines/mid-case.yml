@@ -1,0 +1,101 @@
+# Mid case: k8s deployment without cloud metadata
+# k8s + docker + host + dissect + timestamp + 4 add_fields
+
+filebeat.inputs:
+  - type: benchmark
+    enabled: true
+    message: "2025-03-07T11:06:39.123456789Z INFO  [application] app/server.go:142 Request processed successfully method=GET path=/api/v1/health status=200 duration_ms=3.42 request_id=req-a1b2c3d4 user_id=usr-5678 ip=10.0.0.42"
+    threads: 1
+
+processors:
+  - add_fields:
+      target: "agent"
+      fields:
+        id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        name: "k8s-node-01"
+        version: "8.17.0"
+        type: "filebeat"
+        hostname: "k8s-node-01"
+
+  - add_fields:
+      target: ""
+      fields:
+        input.type: "filestream"
+        log.file.path: "/var/log/containers/myapp-abc123_default_mycontainer-def456.log"
+        log.offset: 42
+
+  - add_fields:
+      target: ""
+      fields:
+        ecs.version: "8.0.0"
+        data_stream.type: "logs"
+        data_stream.dataset: "generic"
+        data_stream.namespace: "default"
+
+  - add_fields:
+      target: "elastic_agent"
+      fields:
+        id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        version: "8.17.0"
+        snapshot: false
+
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+
+  # Docker metadata (simulated)
+  - add_fields:
+      target: "container"
+      fields:
+        id: "def456789abc"
+        image.name: "myrepo/myimage:latest"
+        name: "mycontainer"
+        labels.app: "myapp"
+        labels.version: "v1.2.3"
+
+  # Kubernetes metadata (simulated)
+  - add_fields:
+      target: "kubernetes"
+      fields:
+        pod.name: "myapp-deployment-7b9c5d8f6-x2k4m"
+        pod.uid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        pod.namespace: "default"
+        pod.labels.app: "myapp"
+        node.name: "k8s-node-01"
+        namespace: "default"
+        container.name: "mycontainer"
+
+  - dissect:
+      tokenizer: "%{timestamp} %{log_level}  [%{logger}] %{source} %{message}"
+      field: "message"
+      target_prefix: "dissect"
+      overwrite_keys: true
+
+  - timestamp:
+      field: "dissect.timestamp"
+      layouts:
+        - '2006-01-02T15:04:05.999999999Z'
+        - '2006-01-02T15:04:05Z'
+      ignore_failure: true
+
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  preset: balanced
+  protocol: "http"
+  allow_older_versions: true
+
+http.enabled: true
+http.host: "localhost"
+http.port: 5066
+http.pprof.enabled: true
+
+logging.level: warning
+logging.to_files: true
+logging.files:
+  path: /tmp/filebeat-bench
+  name: filebeat-bench.log
+  keepfiles: 2
+
+queue.mem:
+  events: 8192
+  flush.min_events: 2048
+  flush.timeout: 1s
