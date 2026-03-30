@@ -94,6 +94,9 @@ type BeatV2Manager struct {
 
 	isRunning bool
 
+	// Set to true when the Beat is ready to start inputs/output
+	beatIsReady bool
+
 	// set with the last applied output config
 	// allows tracking if the configuration actually changed and if the
 	// beat needs to restart if stopOnOutputReload is set
@@ -278,8 +281,11 @@ func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
 	cm.stopFunc = stopFunc
 }
 
-// Start the config manager.
-func (cm *BeatV2Manager) Start() error {
+// Starts the unitListen loop, so the manager can already
+// check-in with Elastic Agent, but no input/output will be
+// started yet. Call [PostStart] to enable starting/stopping
+// inputs/output.
+func (cm *BeatV2Manager) PreStart() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
@@ -304,8 +310,34 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
+	cm.UpdateStatus(status.Starting, "Starting")
+
 	go cm.unitListen()
 	cm.isRunning = true
+	return nil
+}
+
+// PostStart allows the manager to start/stop inputs/output.
+func (cm *BeatV2Manager) PostStart() {
+	cm.UpdateStatus(status.Running, "Running")
+
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	cm.beatIsReady = true
+}
+
+// Start the config manager.
+//
+// Deprecated: Use [PreStart] and [PostStart] instead
+//
+// For backwards compatibility, [Start] calls [PreStart] then [PostStart].
+func (cm *BeatV2Manager) Start() error {
+	if err := cm.PreStart(); err != nil {
+		return err
+	}
+
+	cm.PostStart()
 	return nil
 }
 
@@ -540,10 +572,17 @@ func (cm *BeatV2Manager) unitListen() {
 				cm.softDeleteUnit(change.Unit)
 			}
 		case <-t.C:
+			cm.mx.Lock()
+
+			// If the Beat is not ready to accept configuration, do nothing.
+			if !cm.beatIsReady {
+				cm.logger.Debug("Debounce timer fired, but Beat is not ready yet.")
+				continue
+			}
+
 			// a copy of the units is used for reload to prevent the holding of the `cm.mx`.
 			// it could be possible that sending the configuration to reload could cause the `UpdateStatus`
 			// to be called on the manager causing it to try and grab the `cm.mx` lock, causing a deadlock.
-			cm.mx.Lock()
 			units := make(map[unitKey]*agentUnit, len(cm.units))
 			for k, u := range cm.units {
 				if u.softDeleted {

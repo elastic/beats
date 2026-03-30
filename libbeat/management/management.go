@@ -37,12 +37,25 @@ type Manager interface {
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
 
-	// Start needs to invoked when the system is ready to receive an external configuration and
+	// Starts the unitListen loop, so the manager can already
+	// check-in with Elastic Agent, but no input/output will be
+	// started yet. Call [PostStart] to enable starting/stopping
+	// inputs/output.
+	PreStart() error
+
+	// PostStart needs to be invoked when the system is ready to receive an external configuration and
 	// also ready to start ingesting new events. The manager expects that all the reloadable and
 	// reloadable list are fixed for the whole lifetime of the manager.
 	//
 	// Notes: Adding dynamically new reloadable hooks at runtime can lead to inconsistency in the
 	// execution.
+	PostStart()
+
+	// Start the config manager.
+	//
+	// Deprecated: Use [PreStart] and [PostStart] instead
+	//
+	// For backwards compatibility, [Start] calls [PreStart] then [PostStart].
 	Start() error
 
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
