@@ -132,7 +132,7 @@ func Compile(in string, vc VariableCompiler) (StringFormatter, error) {
 }
 
 func compile(ctx *compileCtx, in string) (StringFormatter, error) {
-	lexer := makeLexer(in)
+	lexer := MakeLexer(in)
 	defer lexer.Finish()
 
 	// parse format string
@@ -442,7 +442,7 @@ func parseVariableToken(lex lexer) (string, error) {
 	return "", errMissingClose
 }
 
-func makeLexer(in string) lexer {
+func MakeLexer(in string) lexer {
 	lex := make(chan token, 1)
 
 	go func() {

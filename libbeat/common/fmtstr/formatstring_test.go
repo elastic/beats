@@ -219,7 +219,7 @@ func TestParseRawTokens(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
-			lexer := makeLexer(test.input)
+			lexer := MakeLexer(test.input)
 			defer lexer.Finish()
 			got, err := ParseRawTokens(lexer)
 			require.NoError(t, err)
