@@ -335,40 +335,8 @@ func parseVariable(lex lexer) (formatElement, error) {
 
 type VariableToken string
 
-func optimizeData(tokens []any) []any {
-
-	out := tokens[:0]
-	isActive := false
-	var activeString string
-
-	for _, token := range tokens {
-		data, isString := token.(string)
-		if !isString {
-			if isActive {
-				out = append(out, activeString)
-				isActive = false
-			}
-
-			out = append(out, token)
-			continue
-		}
-
-		if !isActive {
-			activeString = data
-			isActive = true
-			continue
-		}
-		activeString += data
-	}
-
-	if isActive {
-		out = append(out, activeString)
-	}
-
-	return out
-}
-
-// parseRawTokens will return a list of static and variable tokens as they occur in the input string
+// ParseRawTokens walks the lexer output and returns a slice in order: plain
+// strings for literal segments and VariableToken for each %{...} block.
 func ParseRawTokens(lex lexer) ([]any, error) {
 	var elems []any
 
@@ -396,9 +364,11 @@ func ParseRawTokens(lex lexer) ([]any, error) {
 	return elems, nil
 }
 
-// parseVariableToken parses the value inside %{...}
+// parseVariableToken consumes lexer tokens until '}' and returns the full inner
+// expression as one string (field segments plus ':' operators), e.g.
+// "unknown:default". Callers that need structured ops must parse that string.
 func parseVariableToken(lex lexer) (string, error) {
-	// finalValue stores both string+operator as they occur
+	// finalValue appends each string chunk and operator as they appear.
 	var finalValue string
 	var strings []string
 	var ops []string

@@ -201,11 +201,6 @@ func TestParseRawTokens(t *testing.T) {
 			expectedList: []any{"pre ", VariableToken("k"), " post"},
 		},
 		{
-			name:         "simple lookup middle of string",
-			input:        "pre %{k} post",
-			expectedList: []any{"pre ", VariableToken("k"), " post"},
-		},
-		{
 			name:         "compile lookup default",
 			input:        "%{unknown:default}",
 			expectedList: []any{VariableToken("unknown:default")},
