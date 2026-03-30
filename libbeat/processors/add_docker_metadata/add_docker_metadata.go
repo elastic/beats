@@ -218,7 +218,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		_, _ = meta.Put("container.id", container.ID)
 		_, _ = meta.Put("container.image.name", container.Image)
 		_, _ = meta.Put("container.name", container.Name)
-		event.Fields.DeepUpdate(meta.Clone())
+		event.Fields.DeepUpdate(meta)
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
 	}
