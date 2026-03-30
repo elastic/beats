@@ -136,7 +136,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			metrics.sentEvents.Add(uint64(len(records)))
 
 			// Verify published events
-			if ok := assert.Equal(t, len(tc.expectedRecords), len(client.publishedEvents)); ok {
+			if ok := assert.Len(t, client.publishedEvents, len(tc.expectedRecords)); ok {
 				for i, e := range client.publishedEvents {
 					msg, err := e.Fields.GetValue("message")
 					if err != nil {
