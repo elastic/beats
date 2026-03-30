@@ -48,6 +48,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"golang.org/x/sys/execabs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -1283,14 +1284,41 @@ func (b *BeatProc) RemoveOutputFile() {
 	}
 }
 
-// BuildSystemTestBinary builds a beat test binary using "go test -c".
+// TestMainWithBuild is a TestMain helper that builds the beat test binary,
+// runs all tests, cleans up and exits. It resolves paths relative to the
+// working directory (the test package directory), so "../../" reaches the
+// beat root from <beat>/tests/integration/.
+//
+//	func TestMain(m *testing.M) {
+//	    integration.TestMainWithBuild(m, "filebeat")
+//	}
+func TestMainWithBuild(m *testing.M, beatName string) {
+	binPath, err := filepath.Abs("../../" + beatName + ".test")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to resolve binary path: %s\n", err)
+		os.Exit(1)
+	}
+	packagePath, err := filepath.Abs("../../")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to resolve package path: %s\n", err)
+		os.Exit(1)
+	}
+	if err := buildSystemTestBinary(binPath, packagePath); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
+		os.Exit(1)
+	}
+
+	rc := m.Run()
+
+	_ = os.Remove(binPath)
+	os.Exit(rc)
+}
+
+// buildSystemTestBinary builds a beat test binary using "go test -c".
 // It respects the same environment variables as the mage build:
 //   - DEV=true: disables optimizations for debugging (-gcflags=all=-N -l)
 //   - TEST_COVERAGE=true: enables coverage instrumentation (-coverpkg ./...)
-//
-// binPath is the output path for the binary (e.g., "../../filebeat.test").
-// packagePath is the Go package to build (e.g., "../../").
-func BuildSystemTestBinary(binPath, packagePath string) error {
+func buildSystemTestBinary(binPath, packagePath string) error {
 	args := []string{"test", "-c", "-o", binPath}
 
 	if devBuild, _ := strconv.ParseBool(os.Getenv("DEV")); devBuild {
@@ -1302,7 +1330,7 @@ func BuildSystemTestBinary(binPath, packagePath string) error {
 
 	args = append(args, packagePath)
 
-	cmd := exec.Command("go", args...)
+	cmd := execabs.Command("go", args...)
 	cmd.Dir = packagePath
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
