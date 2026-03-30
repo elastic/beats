@@ -62,7 +62,6 @@ func (m *eventHubInputManager) Init(unison.Group) error {
 
 // Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
-
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)

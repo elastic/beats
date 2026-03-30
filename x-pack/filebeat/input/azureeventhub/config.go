@@ -410,9 +410,7 @@ func (conf *azureInputConfig) validateStorageAccountConfig(logger *logp.Logger) 
 					conf.SAKey,
 					storageEndpointSuffix,
 				)
-				logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
-					"The connection string has been constructed from the storage account and key. " +
-					"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
+				logger.Warn("Using auto-generated connection string. Please switch to storage_account_connection_string directly, as storage_account_key is deprecated in processor v2.")
 				conf.SAKey = ""
 			} else {
 				// No connection string and no key, so we can't proceed.
