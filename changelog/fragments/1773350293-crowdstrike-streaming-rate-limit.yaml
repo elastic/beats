@@ -1,0 +1,10 @@
+kind: bug-fix
+summary: Add rate-limit backoff to CrowdStrike streaming input oauth2 transport.
+description: |
+  Wrap the oauth2 HTTP transport used by the CrowdStrike falcon streaming input
+  with a rate-limit-aware transport that intercepts 429 responses, reads the
+  Retry-After header, and backs off before retrying. This prevents the oauth2
+  token refresh from generating a burst of unauthorized requests that triggers
+  CrowdStrike's 15-per-minute rate limit. The discover endpoint also returns a
+  retry-after hint to the session-level retry loop as a minimum wait floor.
+component: filebeat
