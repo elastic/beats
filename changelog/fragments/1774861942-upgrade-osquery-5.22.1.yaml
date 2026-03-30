@@ -1,0 +1,5 @@
+kind: feature
+
+summary: upgrade osquery version to 5.22.1
+
+component: osquerybeat
