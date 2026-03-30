@@ -115,12 +115,12 @@ func isEmpty(v reflect.Value) bool {
 }
 
 func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	iValue, err := event.GetValue(f.config.Field)
+	iValue, err := event.GetValue(f.Field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+		if f.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return event, nil
 		}
-		return event, fmt.Errorf("could not fetch value for field %s: %w", f.config.Field, err)
+		return event, fmt.Errorf("could not fetch value for field %s: %w", f.Field, err)
 	}
 
 	array := reflect.ValueOf(iValue)
@@ -132,7 +132,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	saved := event
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.mappings) > 1 {
 		saved = event.Clone()
 	}
 

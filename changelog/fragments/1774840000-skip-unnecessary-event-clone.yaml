@@ -1,0 +1,5 @@
+kind: enhancement
+summary: Skip unnecessary event.Clone() in 11 processors for single-field operations
+component: libbeat
+pr:
+  - https://github.com/elastic/beats/pull/49777

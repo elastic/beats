@@ -105,18 +105,13 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	backup := event.Clone()
-
 	if convertDataType {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
 		event, err = p.mapper(event, mapToMapStr(m))
 	}
-	if err != nil {
-		return backup, err
-	}
 
-	return event, nil
+	return event, err
 }
 
 func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
@@ -124,18 +119,24 @@ func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 	if p.config.TargetPrefix != "" {
 		prefix = p.config.TargetPrefix + "."
 	}
-	var prefixKey string
-	for k, v := range m {
-		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
-			_, _ = event.PutValue(prefixKey, v)
-		} else {
-			// When the target key exists but is a string instead of a map.
-			if err != nil {
+
+	// Check all keys first so we never need to clone the event for rollback.
+	if !p.config.OverwriteKeys {
+		for k := range m {
+			prefixKey := prefix + k
+			found, err := event.HasKey(prefixKey)
+			if found {
+				return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
+			}
+			if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+				// Path traverses a non-map value — treat as conflict.
 				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
-			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}
+	}
+
+	for k, v := range m {
+		_, _ = event.PutValue(prefix+k, v)
 	}
 
 	return event, nil
