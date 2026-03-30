@@ -77,7 +77,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 		checkedCloudConnectedMode = true
 
 		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
-			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
+			return nil, fmt.Errorf("failed to register Cloud Connected cluster: %w", err)
 		}
 	}
 
@@ -93,7 +93,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 	metricSetName := m.Name()
 
-	m.Logger().Infof("fetching %v metricset", metricSetName)
+	m.Logger().Debugf("fetching %v metricset", metricSetName)
 
 	// because Fetch() is part ReporterV2 interface, we're purposely not returning an error
 	// we do not want to the metricset Error() method to be called, so we are returning nil to avoid duplicate errors sent and logger
@@ -128,7 +128,7 @@ func (m *AutoOpsMetricSet[T]) Fetch(r mb.ReporterV2) error {
 		return nil //nolint: nilerr // The error is reported by the mapper
 	}
 
-	m.Logger().Infof("completed fetching %v metricset", metricSetName)
+	m.Logger().Debugf("completed fetching %v metricset", metricSetName)
 	return nil
 }
 

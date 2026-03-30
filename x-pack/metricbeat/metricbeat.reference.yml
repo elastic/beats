@@ -407,6 +407,11 @@ metricbeat.modules:
   enabled: true
   period: 300s
   application_id: ''
+  # auth_type: "api_key" (default) or "client_secret"
+  #auth_type: "api_key"
+  #client_id: '${AZURE_CLIENT_ID:""}'
+  #client_secret: '${AZURE_CLIENT_SECRET:""}'
+  #tenant_id: '${AZURE_TENANT_ID:""}'
   api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]
@@ -1192,7 +1197,8 @@ metricbeat.modules:
   enabled: true
   period: 300s
   apiKey: "Meraki dashboard API key"
-  organizations: ["Meraki organization ID"]  
+  organizations: ["Meraki organization ID"]
+  switchport_statuses: ["connected"]
 
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
@@ -1340,42 +1346,6 @@ metricbeat.modules:
 
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
-
-#-------------------------------- Openai Module --------------------------------
-- module: openai
-  metricsets: ["usage"]
-  enabled: false
-  period: 1h
-
-  # # Project API Keys - Multiple API keys can be specified for different projects
-  # api_keys:
-  # - key: "api_key1"
-  # - key: "api_key2"
-
-  # # API Configuration
-  # ## Base URL for the OpenAI usage API endpoint
-  # api_url: "https://api.openai.com/v1/usage"
-  # ## Custom headers to be included in API requests
-  # headers:
-  # - "k1: v1"
-  # - "k2: v2"
-  ## Rate Limiting Configuration
-  # rate_limit:
-  #   limit: 12 # seconds between requests
-  #   burst: 1  # max concurrent requests
-  # ## Request Timeout Duration
-  # timeout: 30s
-
-  # # Data Collection Configuration
-  # collection:
-  #   ## Number of days to look back when collecting usage data
-  #   lookback_days: 30
-  #   ## Whether to collect usage data in realtime. Defaults to false as how
-  #   # OpenAI usage data is collected will end up adding duplicate data to ES
-  #   # and also making it harder to do analytics. Best approach is to avoid
-  #   # realtime collection and collect only upto last day (in UTC). So, there's
-  #   # at most 24h delay.
-  #   realtime: false
 
 #----------------------------- Openmetrics Module -----------------------------
 - module: openmetrics
@@ -1689,6 +1659,18 @@ metricbeat.modules:
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
+
+  # Cursor-based incremental data fetching. When enabled, the cursor tracks the
+  # last fetched row value and uses it to retrieve only new data on subsequent
+  # collection cycles. Requires sql_response_format: table and a single sql_query
+  # with exactly one :cursor placeholder.
+  #cursor:
+  #  enabled: true
+  #  column: id
+  #  type: integer
+  #  #state_id: payments-prod  # optional: stable identity across DSN changes
+  #  default: "0"
+  #  #direction: asc
 
   # List of root certificates for SSL/TLS server verification
   # ssl.certificate_authorities: ["/path/to/ca.pem"]
@@ -2653,7 +2635,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 

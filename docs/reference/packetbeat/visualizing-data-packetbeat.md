@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/visualizing-data-packetbeat.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Visualize Packetbeat data in Kibana [visualizing-data-packetbeat]

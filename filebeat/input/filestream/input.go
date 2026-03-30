@@ -61,14 +61,17 @@ type fileMeta struct {
 // filestream is the input for reading from files which
 // are actively written by other applications.
 type filestream struct {
-	readerConfig         readerConfig
-	encodingFactory      encoding.EncodingFactory
-	closerConfig         closerConfig
-	deleterConfig        deleterConfig
-	parsers              parser.Config
-	takeOver             loginp.TakeOverConfig
-	scannerCheckInterval time.Duration
-	gzipExperimental     bool
+	readerConfig              readerConfig
+	encodingFactory           encoding.EncodingFactory
+	closerConfig              closerConfig
+	deleterConfig             deleterConfig
+	parsers                   parser.Config
+	takeOver                  loginp.TakeOverConfig
+	scannerCheckInterval      time.Duration
+	compression               string
+	includeFileOwnerName      bool
+	includeFileOwnerGroupName bool
+	hasLineFilter             bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -102,9 +105,17 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvester, error) {
+func configure(
+	cfg *conf.C,
+	log *logp.Logger,
+	src *loginp.SourceIdentifier) (loginp.Prospector, loginp.Harvester, error) {
+
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
+		return nil, nil, err
+	}
+
+	if err := normalizeConfig(cfg, &c); err != nil {
 		return nil, nil, err
 	}
 
@@ -121,7 +132,7 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 
 	c.TakeOver.LogWarnings(log)
 
-	prospector, err := newProspector(c, log)
+	prospector, err := newProspector(c, log, src)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
@@ -132,17 +143,20 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	}
 
 	filestream := &filestream{
-		readerConfig:      c.Reader,
-		encodingFactory:   encodingFactory,
-		closerConfig:      c.Close,
-		parsers:           c.Reader.Parsers,
-		takeOver:          c.TakeOver,
-		gzipExperimental:  c.GZIPExperimental,
-		deleterConfig:     c.Delete,
-		waitGracePeriodFn: waitGracePeriod,
-		tickFn:            time.Tick,
-		removeFn:          os.Remove,
-		statFn:            os.Stat,
+		readerConfig:              c.Reader,
+		encodingFactory:           encodingFactory,
+		closerConfig:              c.Close,
+		parsers:                   c.Reader.Parsers,
+		takeOver:                  c.TakeOver,
+		compression:               c.Compression,
+		includeFileOwnerName:      c.IncludeFileOwnerName,
+		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
+		deleterConfig:             c.Delete,
+		waitGracePeriodFn:         waitGracePeriod,
+		tickFn:                    time.Tick,
+		removeFn:                  os.Remove,
+		statFn:                    os.Stat,
 	}
 
 	// Read the scan interval from the prospector so we can use during the
@@ -150,6 +164,30 @@ func configure(cfg *conf.C, log *logp.Logger) (loginp.Prospector, loginp.Harvest
 	filestream.scannerCheckInterval = c.FileWatcher.Interval
 
 	return prospector, filestream, nil
+}
+
+// normalizeConfig reconciles filestream defaults with file_identity semantics.
+// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
+// identities should turn it off unless the user explicitly sets it.
+func normalizeConfig(cfg *conf.C, c *config) error {
+	if c.FileIdentity == nil {
+		return nil
+	}
+
+	name := c.FileIdentity.Name()
+	if name == fingerprintName {
+		return nil
+	}
+
+	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+	}
+	if !hasScannerFingerprint {
+		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	}
+
+	return nil
 }
 
 func (inp *filestream) Name() string { return pluginName }
@@ -481,7 +519,7 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 
@@ -580,36 +618,48 @@ func (inp *filestream) openFile(
 
 // newFile wraps the given os.File into an appropriate File interface implementation.
 //
-// If the 'gzip_experimental' flag is false, it returns a plain file reader
-// (plainFile).
-//
-// If the 'gzip_experimental' flag is true, it attempts to detect if the
-// underlying file is GZIP compressed. If it is, it returns a GZIP-aware file
-// reader (gzipSeekerReader). If the file is not GZIP compressed, it returns a
-// plain file reader (plainFile).
+// The behavior depends on the compression setting:
+//   - "" (none): returns a plain file reader (plainFile)
+//   - "gzip": always creates a gzipSeekerReader (errors if file is not gzip)
+//   - "auto": auto-detects gzip files; returns gzipSeekerReader for gzip files,
+//     plainFile otherwise
 //
 // It returns an error if any happens.
 func (inp *filestream) newFile(rawFile *os.File) (File, error) {
-	if !inp.gzipExperimental {
+	switch inp.compression {
+	case CompressionNone:
 		return newPlainFile(rawFile), nil
-	}
 
-	isGZIP, err := IsGZIP(rawFile)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"gzip detection error on %s: %w", rawFile.Name(), err)
-	}
+	case CompressionGZIP:
+		f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create gzip reader for %s: %w", rawFile.Name(), err)
+		}
+		return f, nil
 
-	if !isGZIP {
-		return newPlainFile(rawFile), nil
-	}
+	case CompressionAuto:
+		isGZIP, err := IsGZIP(rawFile)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"gzip detection error on %s: %w", rawFile.Name(), err)
+		}
 
-	f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed create gzip seeker reader %s: %w", rawFile.Name(), err)
+		if !isGZIP {
+			return newPlainFile(rawFile), nil
+		}
+
+		f, err := newGzipSeekerReader(rawFile, inp.readerConfig.BufferSize)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to create gzip reader for %s: %w", rawFile.Name(), err)
+		}
+		return f, nil
+
+	default:
+		// This should not happen as validation catches invalid values
+		return nil, fmt.Errorf("invalid compression mode: %q", inp.compression)
 	}
-	return f, nil
 }
 
 func checkFileBeforeOpening(fi os.FileInfo) error {
@@ -706,13 +756,14 @@ func (inp *filestream) readFromSource(
 		if isGZIP {
 			metrics.MessagesGZIPRead.Inc()
 		}
-		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
+		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
 			continue
 		}
 
 		//nolint:gosec // message.Bytes is always positive
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 		if isGZIP {
+			//nolint:gosec // message.Bytes is always positive, no risk of overflow here
 			metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
 		}
 
@@ -721,8 +772,10 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
-		if isGZIP && message.Private == io.EOF {
-			s.EOF = true
+		if isGZIP {
+			if err, ok := (message.Private).(error); ok && errors.Is(err, io.EOF) {
+				s.EOF = true
+			}
 		}
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()
@@ -744,16 +797,16 @@ func (inp *filestream) readFromSource(
 
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
-func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
+func (inp *filestream) isDroppedLine(log *logp.Logger, line []byte) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
-			log.Debug("Drop line as it does not match any of the include patterns %s", line)
+			log.Debugf("Drop line as it does not match any of the include patterns %s", line)
 			return true
 		}
 	}
 	if len(inp.readerConfig.ExcludeLines) > 0 {
 		if matchAny(inp.readerConfig.ExcludeLines, line) {
-			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
+			log.Debugf("Drop line as it does match one of the exclude patterns %s", line)
 			return true
 		}
 	}
@@ -761,9 +814,9 @@ func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
 	return false
 }
 
-func matchAny(matchers []match.Matcher, text string) bool {
+func matchAny(matchers []match.Matcher, text []byte) bool {
 	for _, m := range matchers {
-		if m.MatchString(text) {
+		if m.Match(text) {
 			return true
 		}
 	}

@@ -251,7 +251,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -346,7 +346,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -447,6 +447,10 @@ filebeat.inputs:
   # a fingerprint is generated using the first 1024 bytes of the file,
   # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
+
+  # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
+  #include_file_owner_name: false
+  #include_file_owner_group_name: false
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -816,6 +820,17 @@ filebeat.inputs:
   # Glob based paths.
   #paths:
     #- /var/log/custom.journal
+
+  # Specify a folder to be used as chroot when calling the journalctl binary
+  #chroot:
+
+  # The path for the `journalctl` binary. If not set, Filebeat will look for
+  # `journalctl` in PATH (defaults to `journalctl`). When using `chroot`, if
+  # `journalctl_path` is not explicitly set, it automatically defaults to
+  # `/usr/bin/journalctl`. If `journalctl_path` is explicitly set when `chroot`
+  # is configured, it must be an absolute path from within the chroot directory.
+  #journalctl_path:
+
 
   # When enabled, log entries will be ingested interleaved from all
   # available journals, including remote ones.

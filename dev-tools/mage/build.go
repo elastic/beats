@@ -172,9 +172,6 @@ func GolangCrossBuild(params BuildArgs) error {
 			"only be executed within the golang-crossbuild docker environment.")
 	}
 
-	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
-	defer DockerChown(filepath.Join(params.OutputDir))
-
 	mountPoint, err := ElasticBeatsDir()
 	if err != nil {
 		return err
@@ -195,13 +192,15 @@ func GolangCrossBuild(params BuildArgs) error {
 		return err
 	}
 
-	return Build(params)
-}
+	defer DockerChown(filepath.Join(params.OutputDir))
+	// Build() calls os.MkdirAll for OutputDir, which may create parent
+	// directories as root inside the container. Chown the topmost newly
+	// created directory so the entire tree is owned by the invoking user.
+	if newTop := topmostNonexistentDir(params.OutputDir); newTop != "" {
+		defer DockerChown(newTop)
+	}
 
-func BuildOTel() error {
-	args := DefaultBuildArgs()
-	args.ExtraFlags = append(args.ExtraFlags, "-tags", "otelbeat")
-	return Build(args)
+	return Build(params)
 }
 
 // Build invokes "go build" to produce a binary.
@@ -266,6 +265,22 @@ func Build(params BuildArgs) error {
 
 	log.Println("Adding build environment vars:", env)
 	return sh.RunWith(env, "go", args...)
+}
+
+// topmostNonexistentDir returns the topmost path component that does not yet exist
+// and would be created by os.MkdirAll. DockerChown walks recursively, so
+// chowning this single root is enough to cover every newly created directory.
+// Returns "" if every component already exists.
+func topmostNonexistentDir(path string) string {
+	var top string
+	for p := filepath.Clean(path); p != "." && p != string(filepath.Separator); p = filepath.Dir(p) {
+		if _, err := os.Stat(p); os.IsNotExist(err) {
+			top = p
+		} else {
+			break
+		}
+	}
+	return top
 }
 
 // MakeWindowsSysoFile generates a .syso file containing metadata about the

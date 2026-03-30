@@ -1,0 +1,51 @@
+---
+title: Open Telemetry Metrics Collection
+---
+flowchart TD
+ B["CEL Input Process Started"] --> C["Wait for interval timer"]
+subgraph PERIODIC["Periodic Loop"]
+    direction TB
+    C --> StartPeriodicRun
+       subgraph INNER ["Cel Input Program"]
+           direction TB
+           StartPeriodicRun["StartPeriodicRun"]
+           ProgramLoop["Run In Loop until no more events or error"]
+           CEL["Run CEL<br/>Process Batches<br/>Generate Events"]
+           PublishEvents["Publish Events"]
+           ErrorCheck{"Error or Done?"}
+           RunStartMetric["Records: <br/>input.cel.periodic.run"]
+           ProgramStartMetric["Records: <br/>input.cel.periodic.program.run.started"]
+           HTTPMetrics["Records from HTTP Client Transport: <br/>http.client.request.duration <br/>http.client.request.body.size"]
+           CELMetrics["Records: <br/>input.cel.periodic.cel.duration <br/>input.cel.program.run.duration<br/> input.cel.periodic.batch.received<br/> input.cel.program.batch.received<br/> input.cel.periodic.event.received<br/>  input.cel.program.event.received"]
+           PublishMetrics["Records: <br/>input.cel.periodic.event.publish.duration <br/>input.cel.program.run.duration <br/>input.cel.periodic.batch.published<br/> input.cel.periodic.event.published <br/>input.cel.program.event.published <br/>input.cel.program.batch.published"]
+           ProgramDurationMetrics["Records: <br/>input.cel.program.run.duration"]
+           SuccessMetrics["Records: <br/>input.cel.periodic.program.run.success"]
+           EndLoopMetrics["Records: <br/>input.cel.periodic.run.duration"]
+           CollectMetrics["Export Metrics"]
+           StartPeriodicRun --> RunStartMetric
+           RunStartMetric --> ProgramLoop
+           ProgramLoop --> ProgramStartMetric
+           ProgramStartMetric --> CEL
+           CEL --> CELMetrics
+           CEL --> HTTPMetrics
+           CELMetrics --> PublishEvents
+           PublishEvents --> PublishMetrics
+           PublishMetrics --> ProgramDurationMetrics
+           ProgramDurationMetrics --> ErrorCheck
+           ErrorCheck -->|No| SuccessMetrics
+           SuccessMetrics --> ProgramLoop
+           ErrorCheck -->|Yes| EndLoopMetrics
+           EndLoopMetrics --> CollectMetrics
+           CollectMetrics --> ExitLoop["Return to wait timer"]
+       end
+  end
+
+
+    style PERIODIC fill:#56B4E9,stroke:#3d6a8f,color:#fff
+    style CELMetrics fill:#009E73,stroke:#4a3728,color:#fff
+    style SuccessMetrics fill:#009E73,stroke:#4a3728,color:#fff
+    style ProgramDurationMetrics fill:#009E73,stroke:#4a3728,color:#fff
+    style PublishMetrics fill:#009E73,stroke:#4a3728,color:#fff
+    style EndLoopMetrics fill:#009E73,stroke:#4a3728,color:#fff
+    style HTTPMetrics fill:#3d6a8f,stroke:#1e3a5f,color:#fff
+

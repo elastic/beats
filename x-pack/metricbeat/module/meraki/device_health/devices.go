@@ -162,18 +162,6 @@ func getDevicePerformanceScores(logger *logp.Logger, client *sdk.Client, devices
 	}
 }
 
-type NetworkHealthService interface {
-	GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *sdk.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*sdk.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error)
-}
-
-type NetworkHealthServiceWrapper struct {
-	service *sdk.NetworksService
-}
-
-func (w *NetworkHealthServiceWrapper) GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *sdk.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*sdk.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
-	return w.service.GetNetworkNetworkHealthChannelUtilization(networkID, getNetworkNetworkHealthChannelUtilizationQueryParams)
-}
-
 type DeviceService interface {
 	GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *sdk.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error)
 }
@@ -336,11 +324,20 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 
 		if device.bandUtilization != nil {
 			for band, v := range device.bandUtilization {
+				if v == nil {
+					continue
+				}
 				// Avoid nested object mappings
 				metricBand := strings.ReplaceAll(band, ".", "_")
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi.Percentage
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi.Percentage
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total.Percentage
+				if v.Wifi != nil {
+					metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi.Percentage
+				}
+				if v.NonWifi != nil {
+					metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi.Percentage
+				}
+				if v.Total != nil {
+					metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total.Percentage
+				}
 			}
 		}
 

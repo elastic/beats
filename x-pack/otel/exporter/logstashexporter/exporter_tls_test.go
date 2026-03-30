@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
@@ -206,7 +206,7 @@ func testWithLumberjackServer(t *testing.T, hostname string, tlsConfig *tls.Conf
 		batch.ACK()
 
 		events := batch.Events
-		assert.Equal(t, 1, len(events))
+		assert.Len(t, events, 1)
 		msg, ok := events[0].(map[string]interface{})
 		assert.True(t, ok)
 		assert.Equal(t, "test log message", msg["value"])

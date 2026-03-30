@@ -13,18 +13,16 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -47,21 +45,7 @@ const (
 
 var (
 	defaultDisabledTables = []string{"carves", "curl"}
-
-	// osquery uses Google glog format: I0314 15:24:36.123456 12345 file.cpp:123] message
-	// Level (I/W/E) + MMDD + HH:MM:SS.microseconds + thread_id + file:line] message
-	osqueryLogPattern = regexp.MustCompile(`^([IWE])(\d{4})\s+(\d{2}:\d{2}:\d{2}\.\d{6})\s+(\d+)\s+([^:]+):(\d+)\]\s*(.*)$`)
 )
-
-// osqueryLogEntry represents a parsed osquery log entry
-type osqueryLogEntry struct {
-	level      string    // I, W, E
-	timestamp  time.Time // parsed timestamp
-	threadID   int       // thread ID
-	sourceFile string    // source file name
-	sourceLine int       // source line number
-	message    string    // log message
-}
 
 type Runner interface {
 	Check(ctx context.Context) error
@@ -75,6 +59,7 @@ type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
 type OSQueryD struct {
 	socketPath string
 	binPath    string
+	extPath    string
 	dataPath   string
 	certsPath  string
 	lensesPath string
@@ -99,6 +84,12 @@ func WithExtensionsTimeout(to int) Option {
 func WithBinaryPath(binPath string) Option {
 	return func(q *OSQueryD) {
 		q.binPath = binPath
+	}
+}
+
+func WithExtensionPath(extPath string) Option {
+	return func(q *OSQueryD) {
+		q.extPath = extPath
 	}
 }
 
@@ -193,7 +184,8 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 	}
 
 	//nolint:gosec // works as expected
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		osquerydPath(q.binPath),
 		"--S",
 		"--version",
@@ -215,7 +207,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	}
 	defer cleanup()
 
-	cmd := q.createCommand(flags)
+	cmd := q.createCommand(ctx, flags)
 
 	q.log.Debugf("start osqueryd process: args: %v", cmd.Args)
 
@@ -314,7 +306,10 @@ func (q *OSQueryD) prepare() (func(), error) {
 	}
 
 	// Prepare autoload osquery-extension
-	extensionPath := osqueryExtensionPath(q.binPath)
+	extensionPath := q.extPath
+	if extensionPath == "" {
+		extensionPath = osqueryExtensionPath(q.binPath)
+	}
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("extension path does not exist: %s, %w", extensionPath, err)
@@ -565,9 +560,9 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	return normalize(enabledTables), normalize(disabledTables)
 }
 
-func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+func (q *OSQueryD) createCommand(ctx context.Context, userFlags Flags) *exec.Cmd {
 	//nolint:gosec // works as expected
-	return exec.Command(
+	return exec.CommandContext(ctx,
 		osquerydPath(q.binPath), q.args(userFlags)...)
 }
 
@@ -576,11 +571,11 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	return QsquerydPathForPlatform(runtime.GOOS, dir)
+	return OsquerydPathForPlatform(runtime.GOOS, dir)
 }
 
-// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
-func QsquerydPathForPlatform(platform, dir string) string {
+// OsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func OsquerydPathForPlatform(platform, dir string) string {
 	if platform == "darwin" {
 		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
 
@@ -599,6 +594,18 @@ func osqueryExtensionPath(dir string) string {
 	return filepath.Join(dir, extensionName)
 }
 
+// OsqueryExtensionPathForPlatform returns the full path to osquery extension binary for platform.
+func OsqueryExtensionPathForPlatform(platform, dir string) string {
+	return filepath.Join(dir, osqueryExtensionFilename(platform))
+}
+
+func osqueryExtensionFilename(platform string) string {
+	if platform == "windows" {
+		return "osquery-extension.exe"
+	}
+	return "osquery-extension.ext"
+}
+
 func (q *OSQueryD) resolveDataPath(filename string) string {
 	return filepath.Join(q.dataPath, filename)
 }
@@ -607,79 +614,9 @@ func (q *OSQueryD) resolveCertsPath(filename string) string {
 	return filepath.Join(q.certsPath, filename)
 }
 
-// parseOsqueryLog parses an osquery log line in glog format
-// Format: I0314 15:24:36.123456 12345 file.cpp:123] message
-func parseOsqueryLog(line string, currentYear int) (*osqueryLogEntry, error) {
-	matches := osqueryLogPattern.FindStringSubmatch(line)
-	if matches == nil || len(matches) != 8 {
-		return nil, fmt.Errorf("line does not match osquery log format")
-	}
-
-	entry := &osqueryLogEntry{
-		level:      matches[1],
-		sourceFile: matches[5],
-		message:    matches[7],
-	}
-
-	// Parse thread ID
-	threadID, err := strconv.Atoi(matches[4])
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse thread ID: %w", err)
-	}
-	entry.threadID = threadID
-
-	// Parse source line
-	sourceLine, err := strconv.Atoi(matches[6])
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse source line: %w", err)
-	}
-	entry.sourceLine = sourceLine
-
-	// Parse timestamp
-	// MMDD format for date
-	monthDay := matches[2]
-	if len(monthDay) != 4 {
-		return nil, fmt.Errorf("invalid month-day format")
-	}
-	month, err := strconv.Atoi(monthDay[:2])
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse month: %w", err)
-	}
-	day, err := strconv.Atoi(monthDay[2:4])
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse day: %w", err)
-	}
-
-	// Parse time: HH:MM:SS.microseconds
-	timeStr := matches[3]
-	t, err := time.Parse("15:04:05.999999", timeStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse time: %w", err)
-	}
-
-	// Construct full timestamp with current year in UTC.
-	// We set the --log_utc_time=true flag in protectedFlags (args.go) to ensure
-	// osqueryd outputs timestamps in UTC rather than local time. This provides
-	// consistent timezone handling across all deployments.
-	entry.timestamp = time.Date(
-		currentYear,
-		time.Month(month),
-		day,
-		t.Hour(),
-		t.Minute(),
-		t.Second(),
-		t.Nanosecond(),
-		time.UTC,
-	)
-
-	return entry, nil
-}
-
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
 	scanner := bufio.NewScanner(r)
 	scanner.Buffer(make([]byte, 2048), 64*1024) // 64KB max line size
-
-	currentYear := time.Now().Year()
 
 	log := q.log.With("ctx", "osqueryd")
 
@@ -696,33 +633,19 @@ func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error 
 		}
 
 		// Try to parse structured osquery log format
-		var level, message string
-		entry, err := parseOsqueryLog(line, currentYear)
+		entry, err := osqlog.ParseGlogLine(line)
 		if err != nil {
+			// Failed to parse, log the raw line
+			var level osqlog.Level
 			if len(line) > 0 {
-				level = string(line[0])
+				level = osqlog.Level(line[0])
+			} else {
+				level = osqlog.LevelInfo
 			}
-			message = line
+			osqlog.LogWithLevel(log, level, line)
 		} else {
-			level = entry.level
-			message = entry.message
-			log = log.With(
-				"osquery.timestamp", entry.timestamp,
-				"osquery.thread_id", entry.threadID,
-				"osquery.source.file", entry.sourceFile,
-				"osquery.source.line", entry.sourceLine,
-			)
-		}
-
-		switch level {
-		case "E":
-			log.Error(message)
-		case "W":
-			log.Warn(message)
-		case "I":
-			log.Info(message)
-		default:
-			log.Debug(message)
+			// Successfully parsed, log with structured fields
+			entry.Log(log)
 		}
 	}
 

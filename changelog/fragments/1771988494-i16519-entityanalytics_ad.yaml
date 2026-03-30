@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add capacity to collect empty Active Directory groups to entity analytics input.
+component: filebeat

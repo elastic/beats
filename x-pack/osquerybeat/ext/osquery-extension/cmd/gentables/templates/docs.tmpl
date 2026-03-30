@@ -1,0 +1,75 @@
+% This file is generated! See ext/osquery-extension/cmd/gentables.
+
+# {{.Name}}
+
+{{.Description}}
+
+## Platforms
+{{range .PlatformLines}}
+- {{.}}
+{{- end}}
+{{if .LongDescription}}
+## Description
+
+{{.LongDescription}}
+{{end}}
+## Schema
+
+| Column | Type | Description |
+|--------|------|-------------|
+{{- range .SchemaRows}}
+| {{$.CodeQuote}}{{.Name}}{{$.CodeQuote}} | {{$.CodeQuote}}{{.Type}}{{$.CodeQuote}} | {{.Description}} |
+{{- end}}
+{{- if and .IsView (gt (len .RequiredTables) 0)}}
+
+## Required Tables
+
+This view requires the following tables to be available:
+
+{{- range .RequiredTables}}
+- {{$.CodeQuote}}{{.}}{{$.CodeQuote}}
+{{- end}}
+
+
+{{- end}}
+{{- if .IsView}}
+
+## View Definition
+
+{{.CodeFence}}sql
+{{.ViewDefinition}}
+{{.CodeFence}}
+
+{{- end}}
+{{- if gt (len .Examples) 0}}
+
+## Examples
+{{- range .Examples}}
+### {{.Title}}
+
+{{$.CodeFence}}sql
+{{.Query}}
+{{$.CodeFence}}
+
+{{- end}}
+
+{{- end}}
+{{- if gt (len .Notes) 0}}
+
+## Notes
+
+{{- range .Notes}}
+- {{.}}
+{{- end}}
+
+
+{{- end}}
+{{- if gt (len .RelatedTables) 0}}
+
+## Related Tables
+
+{{- range .RelatedTables}}
+- {{$.CodeQuote}}{{.}}{{$.CodeQuote}}
+{{- end}}
+
+{{- end}}

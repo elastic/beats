@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 //go:build !aix
 
 package azureeventhub
@@ -10,10 +12,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/coder/websocket"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -45,6 +48,10 @@ const (
 	// processorRestartMaxBackoff is the maximum backoff time before
 	// restarting the processor.
 	processorRestartMaxBackoff = 120 * time.Second
+	// AMQP transport for Event Hub connection.
+	transportAmqp = "amqp"
+	// WebSocket transport for Event Hub connection.
+	transportWebsocket = "websocket"
 )
 
 // azureInputConfig the Azure Event Hub input v2,
@@ -89,7 +96,7 @@ func (in *eventHubInputV2) Run(
 	var err error
 
 	// Setting up the status reporter helper
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+	in.status = statusreporterhelper.New(inputContext, in.log, "Azure Event Hub")
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
@@ -146,15 +153,15 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		sanitizers: sanitizers,
 	}
 
-	containerClient, err := container.NewClientFromConnectionString(
-		in.config.SAConnectionString,
-		in.config.SAContainer,
-		&container.ClientOptions{
-			ClientOptions: azcore.ClientOptions{
-				Cloud: cloud.AzurePublic,
-			},
-		},
-	)
+	// Create the event hub consumer client
+	consumerClient, err := CreateEventHubConsumerClient(&in.config, in.log)
+	if err != nil {
+		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating consumer client: %s", err.Error()))
+		return fmt.Errorf("failed to create consumer client: %w", err)
+	}
+
+	// Create the container client
+	containerClient, err := CreateStorageAccountContainerClient(&in.config, in.log)
 	if err != nil {
 		in.status.UpdateStatus(status.Failed, fmt.Sprintf("Setup failed on creating blob container client: %s", err.Error()))
 		return fmt.Errorf("failed to create blob container client: %w", err)
@@ -187,43 +194,6 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		return fmt.Errorf("failed to create checkpoint store: %w", err)
 	}
 	in.checkpointStore = checkpointStore
-
-	// There is a mismatch between how the azure-eventhub input and the new
-	// Event Hub SDK expect the event hub name in the connection string.
-	//
-	// The azure-eventhub input was designed to work with the old Event Hub SDK,
-	// which worked using the event hub name in the connection string.
-	//
-	// The new Event Hub SDK expects clients to pass the event hub name as a
-	// parameter, or in the connection string as the entity path.
-	//
-	// We need to handle both cases.
-	eventHubName := in.config.EventHubName
-
-	connectionStringProperties, err := parseConnectionString(in.config.ConnectionString)
-	if err != nil {
-		return fmt.Errorf("failed to parse connection string: %w", err)
-	}
-	if connectionStringProperties.EntityPath != nil {
-		// If the connection string contains an entity path, we need to
-		// set the event hub name to an empty string.
-		//
-		// This is a requirement of the new Event Hub SDK.
-		//
-		// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
-		eventHubName = ""
-	}
-
-	// Create the event hub consumerClient to receive events.
-	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
-		in.config.ConnectionString,
-		eventHubName,
-		in.config.ConsumerGroup,
-		nil,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create consumer client: %w", err)
-	}
 	in.consumerClient = consumerClient
 
 	// Manage the migration of the checkpoint information
@@ -261,7 +231,6 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 		// Check if we need to migrate the checkpoint store.
 		err := in.migrationAssistant.checkAndMigrate(
 			ctx,
-			in.config.ConnectionString,
 			in.config.ConsumerGroup,
 		)
 		if err != nil {
@@ -658,4 +627,27 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	// Closing the pipeline since we're done
 	// processing events for this partition.
 	defer pipelineClient.Close()
+}
+
+// newWebSocketConn creates a WebSocket connection for AMQP-over-WebSocket transport.
+//
+// This function is used when the transport configuration is set to "websocket".
+// It enables connectivity through HTTP proxies and firewalls that block the
+// standard AMQP port (5671) but allow HTTPS traffic on port 443.
+//
+// HTTP proxy configuration is automatically detected from environment variables:
+// - HTTP_PROXY / http_proxy
+// - HTTPS_PROXY / https_proxy
+// - NO_PROXY / no_proxy
+func newWebSocketConn(ctx context.Context, args azeventhubs.WebSocketConnParams) (net.Conn, error) {
+	opts := &websocket.DialOptions{
+		Subprotocols: []string{"amqp"},
+	}
+
+	wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return websocket.NetConn(ctx, wssConn, websocket.MessageBinary), nil
 }

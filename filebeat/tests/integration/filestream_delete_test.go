@@ -236,8 +236,16 @@ func testGracePeriod(
 			filebeat.WaitLogsContains(changedMsg, time.Second, "filestream did detect the file change")
 
 			// Make sure the harvester is closed
-			filebeat.WaitLogsContains("Stopped harvester for file", time.Second, "harvester was not closed")
-			filebeat.WaitLogsContains("Closing reader of filestream", time.Second, "reader was not closed")
+			// These two messages are logged at essentially the same time, so
+			// their order in the log file is non-deterministic. Use
+			// WaitLogsContainsAnyOrder to check for both without relying on order.
+			filebeat.WaitLogsContainsAnyOrder(
+				[]string{
+					"Closing reader of filestream",
+					"Stopped harvester for file",
+				},
+				5*time.Second,
+				"harvester/reader was not closed")
 		})
 	}
 

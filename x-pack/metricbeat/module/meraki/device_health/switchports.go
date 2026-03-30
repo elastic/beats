@@ -7,6 +7,7 @@ package device_health
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -24,7 +25,28 @@ type switchport struct {
 	portStatus *sdk.ResponseItemSwitchGetDeviceSwitchPortsStatuses
 }
 
-func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, logger *logp.Logger) error {
+// filterSwitchportsByStatus filters switchports by their status, comparing against the allowed statuses.
+// The comparison is case insensitive. Switchports with nil portStatus are excluded.
+func filterSwitchportsByStatus(switchports []*switchport, statusesToReport []string) []*switchport {
+	// Pre-compute lowercase allowed statuses for efficient lookup
+	allowedStatuses := make(map[string]struct{}, len(statusesToReport))
+	for _, status := range statusesToReport {
+		allowedStatuses[strings.ToLower(status)] = struct{}{}
+	}
+
+	var filtered []*switchport
+	for _, sp := range switchports {
+		if sp.portStatus == nil {
+			continue
+		}
+		if _, ok := allowedStatuses[strings.ToLower(sp.portStatus.Status)]; ok {
+			filtered = append(filtered, sp)
+		}
+	}
+	return filtered
+}
+
+func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map[Serial]*Device, period time.Duration, statusesToReport []string, logger *logp.Logger) error {
 	params := &sdk.GetOrganizationSwitchPortsBySwitchQueryParams{}
 	setStart := func(s string) { params.StartingAfter = s }
 
@@ -44,7 +66,6 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 		if switches == nil {
 			return errors.New("GetOrganizationSwitchPortsBySwitch returned nil")
 		}
-
 		for _, device := range *switches {
 			if device.Ports == nil {
 				continue
@@ -76,7 +97,11 @@ func getDeviceSwitchports(client *sdk.Client, organizationID string, devices map
 				}
 			}
 
-			devices[Serial(device.Serial)].switchports = switchports
+			filteredSwitchports := filterSwitchportsByStatus(switchports, statusesToReport)
+
+			if d, ok := devices[Serial(device.Serial)]; ok && d != nil {
+				d.switchports = filteredSwitchports
+			}
 		}
 
 		return nil

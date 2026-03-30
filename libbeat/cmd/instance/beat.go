@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
@@ -156,7 +157,7 @@ type certReloadConfig struct {
 
 func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
-		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
+		return errors.New("'restart_on_cert_change.period' must be equal or greater than 1s")
 	}
 
 	if c.Reload.Enabled && runtime.GOOS == "windows" {
@@ -389,6 +390,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
+		Paths:          b.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -450,11 +452,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP,
-			b.Monitoring.InfoRegistry(),
-			b.Monitoring.StateRegistry(),
-			b.Monitoring.StatsRegistry(),
-			b.Monitoring.InputsRegistry())
+		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP, b.Monitoring)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -493,7 +491,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
-		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
+		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging, b.Monitoring)
 		if err != nil {
 			return err
 		}
@@ -763,7 +761,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
-	b.Monitoring = beat.NewGlobalMonitoring()
+	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
 	if err := InitPaths(cfg); err != nil {
 		return err
@@ -1004,7 +1002,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("beat meta file failed to encode vaules: %w", encodeErr)
+		return fmt.Errorf("beat meta file failed to encode values: %w", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -1279,7 +1277,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
-	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), b.Paths)
 }
 
 func (b *Beat) registerClusterUUIDFetching() {

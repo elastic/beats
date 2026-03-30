@@ -18,7 +18,6 @@
 package autodiscover
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -31,8 +30,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -241,8 +238,8 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 1)
 	runners := adapter.Runners()
-	require.Equal(t, len(runners), 1)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.Len(t, runners, 1)
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 	require.True(t, runners[0].started)
 	require.False(t, runners[0].stopped)
 
@@ -261,8 +258,8 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
-	require.Equal(t, len(runners), 1)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.Len(t, runners, 1)
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 	require.True(t, runners[0].started)
 	require.False(t, runners[0].stopped)
 
@@ -293,8 +290,8 @@ func TestAutodiscover(t *testing.T) {
 
 	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
-	require.Equal(t, len(runners), 2)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.Len(t, runners, 2)
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 	require.True(t, runners[0].stopped)
 	require.True(t, runners[1].started)
 	require.False(t, runners[1].stopped)
@@ -322,8 +319,8 @@ func TestAutodiscover(t *testing.T) {
 		"adapter.Runners()[1] has not stopped")
 
 	runners = adapter.Runners()
-	require.Equal(t, len(runners), 2)
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
+	require.Len(t, runners, 2)
+	require.Empty(t, autodiscover.configs["mock:foo"])
 	require.False(t, runners[1].started)
 	require.True(t, runners[1].stopped)
 }
@@ -389,8 +386,8 @@ func TestAutodiscoverHash(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
 	runners := adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.Len(t, runners, 2)
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	assert.True(t, runners[0].started)
 	assert.False(t, runners[0].stopped)
 	assert.True(t, runners[1].started)
@@ -523,7 +520,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 
 	// As only the second config is valid, total runners will be 1
 	wait(t, func() bool { return len(adapter.Runners()) == 1 })
-	assert.Equal(t, 1, len(autodiscover.configs["mock:foo"]))
+	assert.Len(t, autodiscover.configs["mock:foo"], 1)
 }
 
 func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
@@ -591,8 +588,8 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
 	runners := adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.Len(t, runners, 2)
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 	// Test start event with changed configurations
@@ -616,8 +613,8 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	runners = adapter.Runners()
 	// Ensure the first config is the same as before
 	t.Log(runners)
-	assert.Equal(t, len(runners), 3)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
+	assert.Len(t, runners, 3)
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 
 	// Ensure that the runner for the stale config is stopped
@@ -842,15 +839,13 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
-	logger := logptest.NewTestingLogger(t, "")
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	logger, logsBuffer := newBufferLogger()
-	autodiscover.logger = logger
 	// set the debounce period to something small in order to
 	// speed up the tests. This seems to be the sweet stop
 	// for the fastest test run
@@ -879,10 +874,13 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 	require.Eventually(
 		t,
 		func() bool {
-			return strings.Contains(
-				logsBuffer.String(),
-				`all new inputs failed to start with a non-retriable error","error":"Error creating runner from config: ErrNonReloadable: a non reloadable error`,
-			)
+			logs := observedLogs.TakeAll()
+			for _, log := range logs {
+				if log.Message == "all new inputs failed to start with a non-retriable error" && log.ContextMap()["error"] == "Error creating runner from config: ErrNonReloadable: a non reloadable error" {
+					return true
+				}
+			}
+			return false
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -891,21 +889,10 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 	// Ensure nothing is running
 	requireRunningRunners(t, autodiscover, 0)
 	runners := adapter.Runners()
-	require.Equal(t, len(runners), 0)
+	require.Empty(t, runners)
 
 	// Ensure the autodiscover got the config
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-}
-
-func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
-	buf := &bytes.Buffer{}
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
-		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
-	}))
-	return log, buf
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
 }
 
 // TestAutodiscoverMetadataCleanup tests that the worker properly cleans up metadata
@@ -964,9 +951,9 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
 	// check that configs and metadata exist
-	assert.Equal(t, 2, len(autodiscover.configs["mock:foo"]))
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
 	metaKeys := autodiscover.meta.Keys()
-	assert.Equal(t, 2, len(metaKeys), "Should have 2 metadata entries for id foo")
+	assert.Len(t, metaKeys, 2, "Should have 2 metadata entries for id foo")
 
 	// create another service "bar" with 2 configs
 	barConfig1, _ := conf.NewConfigFrom(map[string]string{
@@ -987,10 +974,10 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	})
 	// Wait for configs to be processed
 	wait(t, func() bool { return len(adapter.Runners()) == 4 })
-	assert.Equal(t, 2, len(autodiscover.configs["mock:foo"]))
-	assert.Equal(t, 2, len(autodiscover.configs["mock:bar"]))
+	assert.Len(t, autodiscover.configs["mock:foo"], 2)
+	assert.Len(t, autodiscover.configs["mock:bar"], 2)
 	metaKeys = autodiscover.meta.Keys()
-	assert.Equal(t, 4, len(metaKeys), "Should have 4 metadata entries total")
+	assert.Len(t, metaKeys, 4, "Should have 4 metadata entries total")
 
 	// Stop first config
 	eventBus.Publish(bus.Event{
@@ -1010,7 +997,7 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 
 	// Metadata should still exist right after stopping the config
 	metaKeys = autodiscover.meta.Keys()
-	assert.Equal(t, 4, len(metaKeys), "Should still have 4 metadata entries before cleanup")
+	assert.Len(t, metaKeys, 4, "Should still have 4 metadata entries before cleanup")
 
 	// Wait for debounce period so the worker can run the metadata GC
 	wait(t, func() bool {

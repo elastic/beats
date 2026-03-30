@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -36,6 +37,18 @@ var (
 	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
 	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
 )
+
+type permanentHarvesterError struct {
+	err error
+}
+
+func (e permanentHarvesterError) Error() string {
+	return e.err.Error()
+}
+
+func (e permanentHarvesterError) Unwrap() error {
+	return e.err
+}
 
 // Harvester is the reader which collects the lines from
 // the configured source.
@@ -70,7 +83,7 @@ func (r *readerGroup) newContext(id string, cancelation inputv2.Canceler) (conte
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.table[id]; ok {
+	if existing := r.table[id]; existing != nil {
 		return nil, nil, ErrHarvesterAlreadyRunning
 	}
 
@@ -84,21 +97,24 @@ func (r *readerGroup) remove(id string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	cancel, ok := r.table[id]
-	if !ok {
-		return
+	cancel := r.table[id]
+	if cancel != nil {
+		cancel()
 	}
 
-	cancel()
 	delete(r.table, id)
 }
 
-func (r *readerGroup) hasID(id string) bool {
+func (r *readerGroup) reserve(id string) bool {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	_, ok := r.table[id]
-	return ok
+	if ok {
+		return false
+	}
+	r.table[id] = nil
+	return true
 }
 
 // HarvesterGroup is responsible for running the
@@ -114,6 +130,8 @@ type HarvesterGroup interface {
 	Stop(Source)
 	// StopHarvesters cancels all running Harvesters.
 	StopHarvesters() error
+	// SetObserver sets the observer to get notified when a harvester closes
+	SetObserver(c chan HarvesterStatus)
 }
 
 type defaultHarvesterGroup struct {
@@ -123,9 +141,32 @@ type defaultHarvesterGroup struct {
 	cleanTimeout time.Duration
 	store        *store
 	ackCH        *updateChan
-	identifier   *sourceIdentifier
+	identifier   *SourceIdentifier
 	tg           *task.Group
 	metrics      *Metrics
+	notifyChan   chan HarvesterStatus
+	inputID      string
+}
+
+// HarvesterStatus is used to notify an observer that the harvester for the ID
+// has closed and the amount of data ingested from the file.
+type HarvesterStatus struct {
+	// ID is the ID of the harvester
+	ID string
+	// Size is the amount of data ingested, in other words the size of the file
+	// when the harvester closed.
+	Size int64
+}
+
+func (hg *defaultHarvesterGroup) notifyObserver(srcID string, size int64) {
+	if hg.notifyChan != nil {
+		hg.notifyChan <- HarvesterStatus{srcID, size}
+	}
+}
+
+// SetObserver sets the observer to get notifications when a harvester closes
+func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
+	hg.notifyChan = c
 }
 
 // Start starts the Harvester for a Source if no Harvester is running for the
@@ -136,7 +177,11 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	sourceName := hg.identifier.ID(src)
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
+	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
+	if fn == nil {
+		return
+	}
+	if err := hg.tg.Go(fn); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
 			ctx.ID)
@@ -153,7 +198,7 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
 			"input %s tried to restart harvester with task group already closed",
 			ctx.ID)
@@ -170,8 +215,19 @@ func startHarvester(
 	src Source,
 	restart bool,
 	metrics *Metrics,
+	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
+	if !restart && !hg.readers.reserve(srcID) {
+		// A harvester is already running for this source, no need to start another.
+		// This check must happen here, before task.Group.Go spawns a goroutine.
+		// When harvester_limit is set, the spawned goroutine blocks on a semaphore
+		// until a slot is available. Without this early check, repeated file events
+		// would spawn goroutines that wait on the semaphore only to discover (after
+		// acquiring it) that a harvester is already running, causing a goroutine leak.
+		ctx.Logger.Debug("Harvester already running")
+		return nil
+	}
 
 	return func(canceler context.Context) (err error) {
 		defer func() {
@@ -179,6 +235,14 @@ func startHarvester(
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
 				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 				hg.readers.remove(srcID)
+			}
+
+			// Report permanent harvester errors as a degraded state for the input.
+			if err != nil && isPermanentHarvesterError(err) {
+				ctx.UpdateStatus(
+					status.Degraded,
+					fmt.Sprintf("Harvester for Filestream input %q failed: %s", inputID, err),
+				)
 			}
 		}()
 
@@ -190,7 +254,7 @@ func startHarvester(
 		harvesterCtx, cancelHarvester, err := hg.readers.newContext(srcID, canceler)
 		if err != nil {
 			// The only possible returned error is ErrHarvesterAlreadyRunning, which is a normal
-			// behaviour of the Filestream input, it's not really an error, it's just an situation.
+			// behaviour of the Filestream input, it's not really an error, it's just a situation.
 			// If the harvester is already running we don't need to start a new one.
 			// At the moment of writing even the returned error is ignored. So the
 			// only real effect of this branch is to not start a second harvester.
@@ -228,13 +292,33 @@ func startHarvester(
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
-			return fmt.Errorf("error while connecting to output with pipeline: %w", err)
+			return permanentHarvesterError{
+				err: fmt.Errorf("error while connecting to output with pipeline: %w", err),
+			}
 		}
 		defer client.Close()
 
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		defer func() {
+			// The cursor struct used by Filestream, it is defined on:
+			// filebeat/input/filestream/input.go
+			st := struct {
+				Offset int64 `json:"offset" struct:"offset"`
+			}{}
+			if err := cursor.Unpack(&st); err != nil {
+				// Unpack should never fail, if it fails either the cursor
+				// structure had a breaking change or our registry is corrupted.
+				// Either way, it is better to not notify the observer.
+				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
+				return
+			}
+
+			hg.notifyObserver(srcID, st.Offset)
+			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
+		}()
 
 		ctx.Logger.Debug("Starting harvester for file")
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
@@ -335,4 +419,9 @@ func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Cancele
 func releaseResource(resource *resource) {
 	resource.lock.Unlock()
 	resource.Release()
+}
+
+func isPermanentHarvesterError(err error) bool {
+	var permanentErr permanentHarvesterError
+	return errors.As(err, &permanentErr)
 }

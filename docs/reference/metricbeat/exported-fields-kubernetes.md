@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-kubernetes.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Kubernetes fields [exported-fields-kubernetes]
 
@@ -1539,6 +1540,12 @@ kubernetes container metrics
 :   Last terminated time (epoch) of the container
 
     type: double
+
+
+**`kubernetes.container.status.last_terminated_exitcode`**
+:   The exit code for the last container in terminated state.
+
+    type: integer
 
 
 **`kubernetes.container.cpu.limit.cores`**

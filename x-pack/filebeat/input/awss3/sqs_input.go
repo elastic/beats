@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package awss3
 
 import (
@@ -75,7 +77,7 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, inputContext.Logger, "S3 via SQS")
+	in.status = statusreporterhelper.New(inputContext, inputContext.Logger, "S3 via SQS")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	// Initialize everything for this run
@@ -129,7 +131,7 @@ func (in *sqsReaderInput) setup(
 		longPollWaitTime:  in.config.SQSWaitTime,
 	}
 
-	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
+	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier), in.log)
 
 	in.metrics = newInputMetrics(inputContext.MetricsRegistry, in.config.NumberOfWorkers, logp.NewNopLogger())
 

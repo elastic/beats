@@ -15,7 +15,9 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var _ historyParser = &safariParser{}
@@ -54,13 +56,14 @@ func inferSafariBrowserName(path string) string {
 	return "safari_custom"
 }
 
-func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryContext, filters []filter) ([]*visit, error) {
+func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]elasticbrowserhistory.Result, error) {
 	var (
 		merr   error
-		visits []*visit
+		visits []elasticbrowserhistory.Result
 	)
 	for _, profile := range parser.profiles {
-		if !matchesProfileFilters(profile, filters) {
+		// Check if profile matches the filters
+		if !matchesProfile(profile, allFilters) {
 			continue
 		}
 		vs, err := parser.parseProfile(ctx, queryContext, profile)
@@ -73,8 +76,8 @@ func (parser *safariParser) parse(ctx context.Context, queryContext table.QueryC
 	return visits, merr
 }
 
-func (parser *safariParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
+func (parser *safariParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]elasticbrowserhistory.Result, error) {
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.HistoryPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		parser.log.Errorf("failed to open database: %v", err)
@@ -107,7 +110,7 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 	}
 	defer rows.Close()
 
-	var entries []*visit
+	var entries []elasticbrowserhistory.Result
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -136,12 +139,12 @@ func (parser *safariParser) parseProfile(ctx context.Context, queryContext table
 			continue
 		}
 
-		entry := newVisit("safari", profile, safariTimeToUnix(visitTime.Float64))
-		entry.URL = url.String
+		entry := newResult("safari", profile, safariTimeToUnix(visitTime.Float64))
+		entry.Url = url.String
 		entry.Title = title.String
-		entry.Scheme, entry.Domain = extractSchemeAndDomain(url.String)
-		entry.VisitID = visitID.Int64
-		entry.UrlID = itemID.Int64
+		entry.Scheme, entry.Hostname, entry.Domain = extractSchemeHostAndTLDPPlusOne(url.String)
+		entry.VisitId = visitID.Int64
+		entry.UrlId = itemID.Int64
 		entry.SfDomainExpansion = domainExpansion.String
 		entry.SfLoadSuccessful = loadSuccessful.Bool
 
@@ -165,15 +168,15 @@ func getSafariProfiles(ctx context.Context, location searchLocation, log *logger
 		log.Infof("detected safari History.db file: %s", historyPath)
 
 		profile := &profile{
-			name:        profileName,
-			user:        user,
-			browser:     location.browser,
-			profilePath: profilePath,
-			historyPath: historyPath,
+			Name:        profileName,
+			User:        user,
+			Browser:     location.browser,
+			ProfilePath: profilePath,
+			HistoryPath: historyPath,
 		}
 		if location.isCustom {
-			profile.browser = inferSafariBrowserName(profile.profilePath)
-			profile.customDataDir = location.path
+			profile.Browser = inferSafariBrowserName(profile.ProfilePath)
+			profile.CustomDataDir = location.path
 		}
 		profiles = append(profiles, profile)
 	}

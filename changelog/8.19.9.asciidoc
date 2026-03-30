@@ -1,0 +1,85 @@
+// begin 8.19.9 relnotes
+
+[[release-notes-8.19.9]]
+==  8.19.9
+
+Review important information about the  8.19.9 release.
+
+
+
+[discrete]
+[[breaking-changes-8.19.9]]
+=== Breaking changes
+
+Breaking changes can prevent your application from optimal operation and
+performance. Before you upgrade, review the breaking changes, then mitigate the
+impact to your application.
+
+// TODO: add details and impact
+
+
+
+**All**
+
+[discrete]
+[[breaking-https://github.com/elastic/beats/pull/47729]]
+.Remove otel.component.id and otel.component.kind from beat receiver events. https://github.com/elastic/beats/pull/47729[#47729] https://github.com/elastic/beats/issues/47600[#47600]
+[%collapsible]
+====
+
+====
+
+
+
+
+
+[discrete]
+[[new-features-8.19.9]]
+=== New features
+
+The 8.19.9 release adds the following new and notable features.
+
+
+
+
+**All**
+
+* Make beats receivers emit status for their subcomponents. https://github.com/elastic/beats/pull/48015[#48015]
+
+
+**Metricbeat**
+
+* Update Kubernetes CPU and memory metrics to use allocatable values instead of capacity values. https://github.com/elastic/beats/pull/47815[#47815]
+
+
+**Packetbeat**
+
+* Rework IP fragmentation and make it bound. https://github.com/elastic/beats/pull/47970[#47970]
+
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.9]]
+=== Bug fixes
+
+
+
+
+**Filebeat**
+
+* [Filestream] Ensure harvester always restarts if the file has not been fully ingested. https://github.com/elastic/beats/pull/47107[#47107] https://github.com/elastic/beats/issues/46923[#46923]
+* Prevent panic during startup if dissect processor has invalid field name in tokenizer. https://github.com/elastic/beats/pull/47839[#47839]
+
+**Metricbeat**
+
+* Improve defensive checks to prevent panics in Meraki module. https://github.com/elastic/beats/pull/47950[#47950]
+
+
+**Packetbeat**
+
+* Add bounds checking and ignore malformed RPC fragments. https://github.com/elastic/beats/pull/47803[#47803]
+* Verify and cap memcache UDP fragment counts. https://github.com/elastic/beats/pull/47874[#47874]
+
+// end 8.19.9 relnotes

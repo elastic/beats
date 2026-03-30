@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	fbroot "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
@@ -88,17 +89,18 @@ func TestFilebeat(t *testing.T) {
 
 	// Wait until we've read from all log sources
 	t.Logf("waiting for events...")
-	for {
-		time.Sleep(time.Second)
-		//t.Logf("checking for stop condition in %s", outputFilesPath)
-		events := tests.ReadLogLines(t, outPath)
-		if events >= 90 {
-			t.Logf("stopping filebeat after %d events", events)
-			server.Client.Stop()
-			server.Srv.Stop()
-			break
-		}
-	}
+	require.EventuallyWithT(
+		t,
+		func(c *assert.CollectT) {
+			events := tests.ReadLogLines(t, outPath)
+			require.GreaterOrEqualf(c, events, 90, "expecting at least 90 events, got %d", events)
+		},
+		15*time.Second,
+		100*time.Millisecond)
+
+	t.Logf("stopping filebeat after %d events", tests.ReadLogLines(t, outPath))
+	server.Client.Stop()
+	server.Srv.Stop()
 
 	t.Logf("Reading events...")
 	events := tests.ReadEvents(t, outPath)

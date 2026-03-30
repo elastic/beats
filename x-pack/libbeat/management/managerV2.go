@@ -90,6 +90,7 @@ type BeatV2Manager struct {
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
 	stopChan chan struct{}
+	stopOnce sync.Once
 
 	isRunning bool
 
@@ -210,7 +211,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		units:              make(map[unitKey]*agentUnit),
 		status:             status.Running,
 		message:            "Healthy",
-		stopChan:           make(chan struct{}, 1),
+		stopChan:           make(chan struct{}),
 		changeDebounce:     time.Second,
 		// forceReloadDebounce is greater than changeDebounce because it is only
 		// used when an input has not reached its finished state, this means some events
@@ -232,17 +233,25 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // Beats central management interface implementation
 // ================================
 
-func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+func (cm *BeatV2Manager) AgentInfo() lbmanagement.AgentInfo {
 	if cm.client.AgentInfo() == nil {
-		return client.AgentInfo{}
+		return lbmanagement.AgentInfo{}
 	}
 
-	return *cm.client.AgentInfo()
+	info := *cm.client.AgentInfo()
+
+	return lbmanagement.AgentInfo{
+		ID:           info.ID,
+		Version:      info.Version,
+		Snapshot:     info.Snapshot,
+		ManagedMode:  lbmanagement.AgentManagedMode(info.ManagedMode),
+		Unprivileged: info.Unprivileged,
+	}
 }
 
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
-func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
-	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, hook)
+func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook lbmanagement.DiagnosticHook) {
+	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, client.DiagnosticHook(hook))
 }
 
 // UpdateStatus updates the manager with the current status for the beat.
@@ -302,7 +311,9 @@ func (cm *BeatV2Manager) Start() error {
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *BeatV2Manager) Stop() {
-	cm.stopChan <- struct{}{}
+	cm.stopOnce.Do(func() {
+		close(cm.stopChan)
+	})
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -312,7 +323,7 @@ func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 }
 
 // RegisterAction adds a V2 client action
-func (cm *BeatV2Manager) RegisterAction(action client.Action) {
+func (cm *BeatV2Manager) RegisterAction(action lbmanagement.Action) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -327,7 +338,7 @@ func (cm *BeatV2Manager) RegisterAction(action client.Action) {
 }
 
 // UnregisterAction removes a V2 client action
-func (cm *BeatV2Manager) UnregisterAction(action client.Action) {
+func (cm *BeatV2Manager) UnregisterAction(action lbmanagement.Action) {
 	cm.mx.Lock()
 	defer cm.mx.Unlock()
 
@@ -469,7 +480,6 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 			if !errors.Is(err, context.Canceled) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
-
 		}
 	}
 }
@@ -490,6 +500,7 @@ func (cm *BeatV2Manager) unitListen() {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
+			return
 		case sig := <-sigc:
 			// we can't duplicate the same logic used by stopChan here.
 			// A beat will also watch for sigint and shut down, if we call the stopFunc
@@ -606,7 +617,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		}
 		if expected.Features != nil {
 			// unit is expected to update its feature flags
-			featuresCfg, err := features.NewConfigFromProto(expected.Features)
+			featuresCfg, err := NewConfigFromProto(expected.Features)
 			if err != nil {
 				unitErrors[unit.ID()] = append(unitErrors[unit.ID()], err)
 			}
@@ -809,7 +820,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.Stop()
+		cm.stopBeat()
 		return true, nil
 	}
 

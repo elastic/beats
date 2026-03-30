@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -42,6 +43,7 @@ func makeDiscard(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	out := &discardOutput{
 		log:      beat.Logger.Named("discard"),
@@ -56,7 +58,7 @@ func makeDiscard(
 	// disable bulk support in publisher pipeline
 	_ = cfg.SetInt("bulk_max_size", -1, -1)
 	out.log.Infof("Initialized discard output")
-	return outputs.Success(doConfig.Queue, -1, 0, nil, beat.Logger, out)
+	return outputs.Success(doConfig.Queue, -1, 0, nil, beat.Logger, beatPaths, out)
 }
 
 // Implement Outputer

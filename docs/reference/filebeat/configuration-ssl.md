@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-ssl.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure SSL [configuration-ssl]
@@ -265,7 +266,7 @@ Controls the verification of server certificates. Valid values are:
 
 ### `ca_trusted_fingerprint` [ca_trusted_fingerprint]
 
-A HEX encoded SHA-256 of a CA certificate. If this certificate is present in the chain during the handshake, it will be added to the `certificate_authorities` list and the handshake will continue normaly.
+A HEX encoded SHA-256 of a CA certificate. If this certificate is present in the chain during the handshake, it will be added to the `certificate_authorities` list and the handshake will continue normally.
 
 To get the fingerprint from a CA certificate on a Unix-like system, you can use the following command, where `ca.crt` is the certificate.
 

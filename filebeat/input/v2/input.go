@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package v2
 
 import (
@@ -99,23 +101,39 @@ type Context struct {
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shut down.
+	//
+	// An input started with a Context parameter, ctx, must shut down when
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// returns a non-nil error. If an input is started with a specific Context
+	// it should only shut down in response to that Context's Cancelation.
 	Cancelation Canceler
 
-	// StatusReporter provides a method to update the status of the underlying unit
+	// statusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
-	StatusReporter status.StatusReporter
+	// Context implements the status.StatusReporter interface using this
+	// statusReporter.
+	statusReporter status.StatusReporter
 
 	// MetricsRegistry is the registry collecting metrics for the input using
 	// this context.
 	MetricsRegistry *monitoring.Registry
 }
 
-func (c *Context) UpdateStatus(status status.Status, msg string) {
-	if c.StatusReporter != nil {
+// UpdateStatus Updates the status of this unit. This method is safe to use
+// without a StatusReporter set.
+func (c Context) UpdateStatus(status status.Status, msg string) {
+	if c.statusReporter != nil {
 		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
-		c.StatusReporter.UpdateStatus(status, msg)
+		c.statusReporter.UpdateStatus(status, msg)
 	}
+}
+
+// WithStatusReporter returns a copy of this context with the StatusReporter set
+// to reporter.
+func (c Context) WithStatusReporter(reporter status.StatusReporter) Context {
+	c.statusReporter = reporter
+	return c
 }
 
 // MetricsRegistryOverrideID sets the "id" variable in the Context's
@@ -221,6 +239,11 @@ type TestContext struct {
 	Agent beat.Info
 
 	// Cancelation is used by Beats to signal the input to shut down.
+	//
+	// An input started with a Context parameter, ctx, must shut down when
+	// <-ctx.Cancelation.Done() does not block or when ctx.Cancelation.Error()
+	// returns a non-nil error. If an input is started with a specific Context
+	// it should only shut down in response to that Context's Cancelation.
 	Cancelation Canceler
 }
 

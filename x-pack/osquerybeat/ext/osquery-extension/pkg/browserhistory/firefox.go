@@ -17,7 +17,9 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var _ historyParser = &firefoxParser{}
@@ -76,13 +78,14 @@ func inferFirefoxBrowserName(path string) string {
 	return "firefox_custom"
 }
 
-func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, filters []filter) ([]*visit, error) {
+func (parser *firefoxParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]elasticbrowserhistory.Result, error) {
 	var (
 		merr   error
-		visits []*visit
+		visits []elasticbrowserhistory.Result
 	)
 	for _, profile := range parser.profiles {
-		if !matchesProfileFilters(profile, filters) {
+		// Check if profile matches the filters
+		if !matchesProfile(profile, allFilters) {
 			continue
 		}
 		vs, err := parser.parseProfile(ctx, queryContext, profile)
@@ -95,8 +98,8 @@ func (parser *firefoxParser) parse(ctx context.Context, queryContext table.Query
 	return visits, merr
 }
 
-func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
-	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.historyPath)
+func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]elasticbrowserhistory.Result, error) {
+	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.HistoryPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		parser.log.Errorf("failed to open database: %v", err)
@@ -136,7 +139,7 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 	}
 	defer rows.Close()
 
-	var entries []*visit
+	var entries []elasticbrowserhistory.Result
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -175,19 +178,19 @@ func (parser *firefoxParser) parseProfile(ctx context.Context, queryContext tabl
 			continue
 		}
 
-		entry := newVisit("firefox", profile, firefoxTimeToUnix(visitTime.Int64))
-		entry.URL = url.String
+		entry := newResult("firefox", profile, firefoxTimeToUnix(visitTime.Int64))
+		entry.Url = url.String
 		entry.Title = title.String
-		entry.Scheme, entry.Domain = extractSchemeAndDomain(url.String)
+		entry.Scheme, entry.Hostname, entry.Domain = extractSchemeHostAndTLDPPlusOne(url.String)
 		entry.TransitionType = mapFirefoxTransitionType(transition)
-		entry.ReferringURL = referringURL.String
-		entry.VisitID = visitID.Int64
-		entry.FromVisitID = fromVisitID.Int64
+		entry.ReferringUrl = referringURL.String
+		entry.VisitId = visitID.Int64
+		entry.FromVisitId = fromVisitID.Int64
 		entry.VisitSource = mapFirefoxVisitSource(visitSource)
 		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
-		entry.UrlID = urlID.Int64
-		entry.FfSessionID = int(ffSessionID.Int64)
-		entry.FfFrecency = int(ffFrecency.Int64)
+		entry.UrlId = urlID.Int64
+		entry.FfSessionId = int32(ffSessionID.Int64)
+		entry.FfFrecency = int32(ffFrecency.Int64)
 
 		entries = append(entries, entry)
 	}
@@ -206,29 +209,29 @@ func getFirefoxProfiles(file io.Reader, basePath string, location searchLocation
 			parts := strings.SplitN(line, "=", 2)
 			switch parts[0] {
 			case "Name":
-				currentProfile.name = parts[1]
+				currentProfile.Name = parts[1]
 			case "Path":
-				currentProfile.profilePath = parts[1]
-				if !filepath.IsAbs(currentProfile.profilePath) {
-					currentProfile.profilePath = filepath.Join(basePath, currentProfile.profilePath)
+				currentProfile.ProfilePath = parts[1]
+				if !filepath.IsAbs(currentProfile.ProfilePath) {
+					currentProfile.ProfilePath = filepath.Join(basePath, currentProfile.ProfilePath)
 				}
 			}
-			if currentProfile.name != "" && currentProfile.profilePath != "" {
-				historyPath := filepath.Join(currentProfile.profilePath, "places.sqlite")
+			if currentProfile.Name != "" && currentProfile.ProfilePath != "" {
+				historyPath := filepath.Join(currentProfile.ProfilePath, "places.sqlite")
 				if _, err := os.Stat(historyPath); err != nil {
 					continue
 				}
 				log.Infof("detected firefox places.sqlite file: %s", historyPath)
 				profile := &profile{
-					name:        currentProfile.name,
-					user:        extractUserFromPath(basePath, log),
-					browser:     location.browser,
-					profilePath: currentProfile.profilePath,
-					historyPath: historyPath,
+					Name:        currentProfile.Name,
+					User:        extractUserFromPath(basePath, log),
+					Browser:     location.browser,
+					ProfilePath: currentProfile.ProfilePath,
+					HistoryPath: historyPath,
 				}
 				if location.isCustom {
-					profile.browser = inferFirefoxBrowserName(profile.profilePath)
-					profile.customDataDir = location.path
+					profile.Browser = inferFirefoxBrowserName(profile.ProfilePath)
+					profile.CustomDataDir = location.path
 				}
 				profiles = append(profiles, profile)
 				currentProfile = nil
@@ -256,15 +259,15 @@ func getFirefoxProfilesFallback(location searchLocation, log *logger.Logger) []*
 		log.Infof("detected firefox places.sqlite file in fallback: %s", placesPath)
 
 		profile := &profile{
-			name:        profileName,
-			user:        user,
-			browser:     location.browser,
-			profilePath: profilePath,
-			historyPath: placesPath,
+			Name:        profileName,
+			User:        user,
+			Browser:     location.browser,
+			ProfilePath: profilePath,
+			HistoryPath: placesPath,
 		}
 		if location.isCustom {
-			profile.browser = inferFirefoxBrowserName(profile.profilePath)
-			profile.customDataDir = location.path
+			profile.Browser = inferFirefoxBrowserName(profile.ProfilePath)
+			profile.CustomDataDir = location.path
 		}
 		profiles = append(profiles, profile)
 	}

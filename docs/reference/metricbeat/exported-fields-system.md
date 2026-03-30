@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-system.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # System fields [exported-fields-system]
 
@@ -178,31 +179,31 @@ Process metrics.
 
 
 **`system.core.model_number`**
-:   CPU model number. Only availabe on Linux
+:   CPU model number. Only available on Linux
 
     type: keyword
 
 
 **`system.core.model_name`**
-:   CPU model name. Only availabe on Linux
+:   CPU model name. Only available on Linux
 
     type: keyword
 
 
 **`system.core.mhz`**
-:   CPU core current clock. Only availabe on Linux
+:   CPU core current clock. Only available on Linux
 
     type: float
 
 
 **`system.core.core_id`**
-:   CPU physical core ID. One core might might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
+:   CPU physical core ID. One core might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only available on Linux
 
     type: keyword
 
 
 **`system.core.physical_id`**
-:   CPU core physical ID. Only availabe on Linux
+:   CPU core physical ID. Only available on Linux
 
     type: keyword
 
@@ -468,7 +469,7 @@ Process metrics.
 
 
 **`system.diskio.io.time`**
-:   The total number of of milliseconds spent doing I/Os.
+:   The total number of milliseconds spent doing I/Os.
 
     type: long
 
@@ -724,7 +725,7 @@ Actual memory used and free.
 
 
 **`system.memory.actual.free`**
-:   Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo,  or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
+:   Actual free memory in bytes. It is calculated based on the OS. On Linux this value will be MemAvailable from /proc/meminfo, or calculated from free memory plus caches and buffers if /proc/meminfo is not available. On OSX it is a sum of free memory and the inactive memory. On Windows, it is equal to `system.memory.free`.
 
     type: long
 
@@ -773,6 +774,98 @@ This group contains statistics related to the swap memory usage on the system.
     type: scaled_float
 
     format: percent
+
+
+## zswap [_zswap]
+
+Metrics for the zswap compressed swap cache. Available on Linux when zswap is enabled.
+
+**`system.memory.zswap.compressed`**
+:   Current compressed size of data stored in zswap.
+
+    type: long
+
+    format: bytes
+
+
+**`system.memory.zswap.uncompressed`**
+:   Original uncompressed size of data stored in zswap.
+
+    type: long
+
+    format: bytes
+
+
+## debug [_debug]
+
+Detailed zswap statistics from /sys/kernel/debug/zswap. Requires debugfs to be mounted and accessible.
+
+**`system.memory.zswap.debug.decompress_fail`**
+:   Number of load or writeback attempts that failed due to decompression failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.pool_limit_hit`**
+:   Number of times the zswap pool limit was hit, as configured by the zswap.max_pool_percent kernel parameter.
+
+    type: long
+
+
+**`system.memory.zswap.debug.pool_total_size`**
+:   Total size of the zswap pool in bytes.
+
+    type: long
+
+    format: bytes
+
+
+**`system.memory.zswap.debug.reject_alloc_fail`**
+:   Number of store attempts that failed because the underlying allocator could not get memory.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_compress_fail`**
+:   Number of store attempts that failed due to compression algorithm failure.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_compress_poor`**
+:   Number of store attempts rejected because the compressed page was too big for the allocator to optimally store.
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_kmemcache_fail`**
+:   Number of store attempts that failed because the entry metadata could not be allocated (rare).
+
+    type: long
+
+
+**`system.memory.zswap.debug.reject_reclaim_fail`**
+:   Number of store attempts that failed due to a reclaim failure after pool limit was reached.
+
+    type: long
+
+
+**`system.memory.zswap.debug.stored_incompressible_pages`**
+:   Number of incompressible pages currently stored in zswap.
+
+    type: long
+
+
+**`system.memory.zswap.debug.stored_pages`**
+:   Number of pages currently stored in zswap.
+
+    type: long
+
+
+**`system.memory.zswap.debug.written_back_pages`**
+:   Number of pages written back from zswap to swap when pool limit was reached.
+
+    type: long
 
 
 ## network [_network]
@@ -1047,6 +1140,14 @@ Memory-specific statistics per process.
     format: bytes
 
 
+**`system.process.memory.swap`** {applies_to}`stack: ga 8.19.11`
+:   The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
+
+    type: long
+
+    format: bytes
+
+
 ## io [_io]
 
 Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
@@ -1225,6 +1326,12 @@ cgroupv2 stats
 
 **`system.process.cgroup.cpu.cfs.shares`**
 :   An integer value that specifies a relative share of CPU time available to the tasks in a cgroup. The value specified in the cpu.shares file must be 2 or higher.
+
+    type: long
+
+
+**`system.process.cgroup.cpu.cfs.weight`**
+:   CPU weight for the cgroup (cgroupv2). Used by the CFS scheduler to determine the share of CPU time available to the cgroup. Valid values range from 1 to 10000. The default value is 100.
 
     type: long
 
@@ -1462,7 +1569,7 @@ Memory limits and metrics.
 
 
 **`system.process.cgroup.memory.mem.low.bytes`**
-:   memory low threshhold
+:   memory low threshold
 
     type: long
 
@@ -1470,7 +1577,7 @@ Memory limits and metrics.
 
 
 **`system.process.cgroup.memory.mem.high.bytes`**
-:   memory high threshhold
+:   memory high threshold
 
     type: long
 
@@ -1478,7 +1585,7 @@ Memory limits and metrics.
 
 
 **`system.process.cgroup.memory.mem.max.bytes`**
-:   memory max threshhold
+:   memory max threshold
 
     type: long
 
@@ -1550,7 +1657,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.memsw.low.bytes`**
-:   memory low threshhold
+:   memory low threshold
 
     type: long
 
@@ -1558,7 +1665,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.memsw.high.bytes`**
-:   memory high threshhold
+:   memory high threshold
 
     type: long
 
@@ -1566,7 +1673,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.memsw.max.bytes`**
-:   memory max threshhold
+:   memory max threshold
 
     type: long
 
@@ -1809,6 +1916,90 @@ number of times the controller tripped a given usage level
     type: long
 
     format: bytes
+
+
+## pressure [_pressure]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Pressure (resource contention) stats.
+
+## some [_some]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Share of time in which at least some tasks are stalled on a given resource
+
+**`system.process.cgroup.memory.pressure.some.10.pct`**
+:   Pressure over 10 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.some.60.pct`**
+:   Pressure over 60 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.some.300.pct`**
+:   Pressure over 300 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.some.total`**
+:   total Some pressure time
+
+    type: long
+
+
+## full [_full]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Share of time in which all non-idle tasks are stalled on a given resource simultaneously
+
+**`system.process.cgroup.memory.pressure.full.10.pct`**
+:   Pressure over 10 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.full.60.pct`**
+:   Pressure over 60 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.full.300.pct`**
+:   Pressure over 300 seconds
+
+    type: float
+
+    format: percent
+
+
+**`system.process.cgroup.memory.pressure.full.total`**
+:   total Full pressure time
+
+    type: long
 
 
 ## blkio [_blkio]

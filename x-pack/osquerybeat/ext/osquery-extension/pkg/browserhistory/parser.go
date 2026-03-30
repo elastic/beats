@@ -12,7 +12,9 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var (
@@ -21,16 +23,16 @@ var (
 )
 
 type profile struct {
-	name          string
-	user          string
-	browser       string
-	profilePath   string
-	historyPath   string
-	customDataDir string
+	Name          string `osquery:"profile_name"`
+	User          string `osquery:"user"`
+	Browser       string `osquery:"browser"`
+	ProfilePath   string
+	HistoryPath   string
+	CustomDataDir string
 }
 
 type historyParser interface {
-	parse(ctx context.Context, queryContext table.QueryContext, filters []filter) ([]*visit, error)
+	parse(ctx context.Context, queryContext table.QueryContext, filters []filters.Filter) ([]elasticbrowserhistory.Result, error)
 }
 
 func initParsers() {

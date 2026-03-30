@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	CatShardsMetricSet = "cat_shards"
-	CatShardsPath      = "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json"
-	ResolveIndexPath   = "/_resolve/index/*?expand_wildcards=all&filter_path=indices"
+	catShardsMetricSet = "cat_shards"
+	catShardsPath      = "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json"
+	resolveIndexPath   = "/_resolve/index/*?expand_wildcards=all&filter_path=indices"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -19,5 +19,5 @@ const (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	metricset.AddNestedAutoOpsMetricSet(CatShardsMetricSet, CatShardsPath, eventsMapping)
+	metricset.AddNestedAutoOpsMetricSet(catShardsMetricSet, catShardsPath, eventsMapping)
 }

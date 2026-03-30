@@ -50,6 +50,7 @@ type Metricbeat struct {
 	stopOnce                 sync.Once     // wraps the Stop() method
 	config                   Config
 	registry                 *mb.Register
+	paths                    *paths.Path
 	autodiscover             *autodiscover.Autodiscover
 	dynamicCfgEnabled        bool
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
@@ -74,7 +75,7 @@ func WithModuleOptions(options ...module.Option) Option {
 // WithLightModules enables light modules support
 func WithLightModules() Option {
 	return func(m *Metricbeat) {
-		path := paths.Resolve(paths.Home, "module")
+		path := m.paths.Resolve(paths.Home, "module")
 		mb.Registry.SetSecondarySource(mb.NewLightModulesSource(m.logger, path))
 	}
 }
@@ -156,6 +157,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		done:              make(chan struct{}),
 		config:            config,
 		registry:          registry,
+		paths:             b.Paths,
 		logger:            b.Info.Logger,
 		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
@@ -202,7 +204,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
 		bt.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
+	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.paths, moduleOptions...)
 
 	if bt.otelStatusFactoryWrapper != nil {
 		factory = bt.otelStatusFactoryWrapper(factory)
@@ -268,7 +270,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.paths, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
@@ -333,5 +335,5 @@ func (bt *Metricbeat) Stop() {
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.logger)
+	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.paths, bt.logger)
 }

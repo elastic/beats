@@ -1,3 +1,4 @@
+import setuptools
 import json
 import os
 import stat
@@ -48,9 +49,12 @@ class BaseTest(TestCase):
         self.wait_until(reg.exists)
 
         def parse_entry(entry):
-            extra, sec = entry["timestamp"]
+            key = "timestamp"
+            if log_as_filestream():
+                key = "updated"
+            extra, sec = entry[key]
             nsec = extra & 0xFFFFFFFF
-            entry["timestamp"] = sec + (nsec / 1000000000)
+            entry[key] = sec + (nsec / 1000000000)
             return entry
 
         entries = [parse_entry(entry) for entry in reg.load(filter=filter)]
@@ -214,3 +218,14 @@ class LogState:
 
     def check(self, msg, ignore_case=False, count=1):
         return lambda: self.contains(msg, ignore_case, count)
+
+
+def log_as_filestream():
+    return setuptools.distutils.util.strtobool(os.getenv("RUN_AS_FILESTREAM", "False"))
+
+
+def remove_filestream_fields(events):
+    for evt in events:
+        file_info = evt.get("log", {}).get("file", {})
+        for field in ("inode", "device_id"):
+            file_info.pop(field, None)

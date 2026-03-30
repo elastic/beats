@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-http_endpoint.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # HTTP Endpoint input [filebeat-input-http_endpoint]
@@ -28,7 +29,7 @@ These are the possible response codes from the server.
 | 406 | Not Acceptable | Returned if the POST request does not contain a body. |
 | 415 | Unsupported Media Type | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip. |
 | 500 | Internal Server Error | Returned if an I/O error occurs reading the request. |
-| 503 | Service Unavailable | Returned if the length of the request body would take the total number of in-flight bytes above the configured `max_in_flight_bytes` value. |
+| 503 | Service Unavailable | Returned if the hard limit `max_in_flight_bytes` is exceeded during body reading, or if the total in-flight bytes are above the `high_water_in_flight_bytes` threshold. The response includes a `Retry-After` header. |
 | 504 | Gateway Timeout | Returned if a request publication cannot be ACKed within the required timeout. |
 
 The endpoint will enforce end-to-end ACK when a URL query parameter `wait_for_completion_timeout` with a duration is provided. For example `http://localhost:8080/?wait_for_completion_timeout=1m` will wait up to 1 minute for the event to be published to the cluster and then return the user-defined response message. In the case that the publication does not complete within the timeout duration, the HTTP response will have a 504 Gateway Timeout status code. The syntax for durations is a number followed by units which may be h, m and s. No other HTTP query is accepted. If another query parameter is provided or duration syntax is incorrect, the request will fail with an HTTP 400 "Bad Request" status.
@@ -220,6 +221,22 @@ This example would allow handling of a JSON body that is an object containing mo
 }
 ```
 
+In-flight byte limiting example:
+
+```yaml
+filebeat.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  max_in_flight_bytes: 10485760       # 10MB hard limit
+  high_water_in_flight_bytes: 5242880 # 5MB - reject new requests above this
+  low_water_in_flight_bytes: 4194304  # 4MB - accept requests again below this
+  retry_after: 5
+```
+
+This configuration limits memory usage by tracking in-flight request bytes. When total in-flight bytes exceed 5MB, new requests receive a 503 response with a `Retry-After: 5` header. Once in-flight bytes drop below 4MB, new requests are accepted again. If a single request causes in-flight bytes to exceed the 10MB hard limit during reading, that request is terminated with a 503 Service Unavailable response and a `Retry-After` header.
+
 ## Configuration options [_configuration_options_10]
 
 The `http_endpoint` input supports the following configuration options plus the [Common options](#filebeat-input-http_endpoint-common-options) described later.
@@ -277,12 +294,43 @@ By default the input expects the incoming POST to include a Content-Type of `app
 
 ### `max_in_flight_bytes` [_max_in_flight_bytes]
 
-The total sum of request body lengths that are allowed at any given time. If non-zero, the input will compare this value to the sum of in-flight request body lengths from requests that include a `wait_for_completion_timeout` request query and will return a 503 HTTP status code, along with a Retry-After header configured with the `retry_after` option. The default value for this option is zero, no limit.
+The hard limit on the total sum of request body bytes that are allowed to be in-flight at any given time. If this limit is exceeded during body reading, the request is terminated with a 503 Service Unavailable response and a `Retry-After` header. This serves as a safety valve to prevent memory exhaustion. The default value is zero, meaning no limit.
 
+In-flight bytes are tracked from the moment they are read from the request body until the event is acknowledged by the output (for requests with `wait_for_completion_timeout`) or until the request completes (for requests without the timeout parameter).
+
+Note that in-flight byte tracking uses the raw request body size as a heuristic proxy for memory consumption. For requests without `wait_for_completion_timeout`, the byte count is released when the HTTP request completes, even though published events may still be queued in the output pipeline. This means the in-flight count can underestimate actual memory use under sustained load from non-ACK requests. Using `wait_for_completion_timeout` provides tighter accounting because the byte count is held until the output acknowledges the events.
+
+This option works together with `high_water_in_flight_bytes` and `low_water_in_flight_bytes` to implement hysteresis-based admission control. See those options for details.
+
+
+### `high_water_in_flight_bytes` [_high_water_in_flight_bytes]
+
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` The soft limit threshold for in-flight bytes. When in-flight bytes exceed this value, new requests are rejected with a 503 Service Unavailable response (with a `Retry-After` header). Once in-flight bytes drop below `low_water_in_flight_bytes`, new requests are accepted again.
+
+This hysteresis mechanism prevents rapid oscillation between accepting and rejecting requests when the system is near capacity.
+
+If not specified and `max_in_flight_bytes` is set, this defaults to 50% of `max_in_flight_bytes`.
+
+
+### `low_water_in_flight_bytes` [_low_water_in_flight_bytes]
+
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` The threshold below which new requests are accepted again after being rejected due to exceeding `high_water_in_flight_bytes`. This creates a hysteresis band that prevents rapid state transitions.
+
+If not specified and `max_in_flight_bytes` is set, this defaults to the lesser of 80% of `high_water_in_flight_bytes` or `high_water_in_flight_bytes` minus 64kB.
+
+The relationship between the three limits must be: `low_water_in_flight_bytes` < `high_water_in_flight_bytes` < `max_in_flight_bytes`.
+
+### `max_body_bytes` [_max_body_bytes]
+
+The maximum body length allowed for a single request. If present, the input will truncate request bodies at the configured limit. The default value for this option is unset, no limit.
+
+:::{note}
+In Filebeat versions prior to 9.4.0, `max_body_bytes` was only enforced for HMAC-authenticated requests. In Filebeat 9.4.0 and later, the limit applies to all HTTP endpoint requests regardless of the authentication method.
+:::
 
 ### `retry_after` [_retry_after]
 
-If a request has exceeded the `max_in_flight_bytes` limit, the response to the client will include a Retry-After header specifying how many seconds the client should wait to retry again. The default value for this option is 10 seconds.
+{applies_to}`stack: ga 9.2+` {applies_to}`stack: ga 8.19+` When a request is rejected due to exceeding `high_water_in_flight_bytes` or `max_in_flight_bytes`, the response includes a `Retry-After` header specifying how many seconds the client should wait before retrying. For `high_water_in_flight_bytes` rejection the configured value is used directly; for `max_in_flight_bytes` rejection 2x the configured value is used. The default value is 10 seconds.
 
 
 ### `program` [_program]
@@ -366,7 +414,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename_4]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the http_endpoint directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `tracer.maxsize` [_tracer_maxsize_2]

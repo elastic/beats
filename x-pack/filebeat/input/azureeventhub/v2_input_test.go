@@ -40,9 +40,9 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 	inputTestCtx := inputv2.Context{
 		Logger:          logp.NewLogger(inputName),
 		Cancelation:     ctx,
-		StatusReporter:  statusReporter,
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
+	inputTestCtx = inputTestCtx.WithStatusReporter(statusReporter)
 
 	// The Run function is expected to return the error from the mock setup function.
 	err = eventHubInputV2.Run(inputTestCtx, nil)

@@ -24,7 +24,7 @@ Beat  | Description
 [Metricbeat](https://github.com/elastic/beats/tree/main/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/main/packetbeat) | Monitors the network and applications by sniffing packets
 [Winlogbeat](https://github.com/elastic/beats/tree/main/winlogbeat) | Fetches and ships Windows Event logs
-[Osquerybeat](https://github.com/elastic/beats/tree/main/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
+[Osquerybeat](https://github.com/elastic/beats/tree/main/x-pack/osquerybeat) | Runs Osquery and manages interaction with it.
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
@@ -87,7 +87,7 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 
 * [beats CI pipeline](https://buildkite.com/elastic/beats)
   * `/test` will kick off a default build.
-* [docs CI pipeline]([https://buildkite.com/elastic/beats](https://buildkite.com/elastic/docs-build-pr))
+* [docs CI pipeline](https://buildkite.com/elastic/docs-build-pr)
   * `run docs-build` will kick off a docs build.
 
 ### PR Labels

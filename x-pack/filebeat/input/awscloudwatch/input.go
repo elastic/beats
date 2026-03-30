@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package awscloudwatch
 
 import (
@@ -95,7 +97,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	log := inputContext.Logger
 
 	// setup status reporter
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, log, "CloudWatch")
+	in.status = statusreporterhelper.New(inputContext, log, "CloudWatch")
 	in.status.UpdateStatus(status.Starting, "Input starting")
 
 	handler, err := newStateHandler(log, in.config, in.store)

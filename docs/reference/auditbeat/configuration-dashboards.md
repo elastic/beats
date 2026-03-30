@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/configuration-dashboards.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure Kibana dashboard loading [configuration-dashboards]
@@ -41,7 +42,7 @@ When dashboard loading is enabled, Auditbeat overwrites any existing dashboards 
 ::::
 
 
-If no other options are set, the dashboard are loaded from the local `kibana` directory in the home path of the Auditbeat installation. To load dashboards from a different location, you can configure one of the following options: [`setup.dashboards.directory`](#directory-option), [`setup.dashboards.url`](#url-option), or [`setup.dashboards.file`](#file-option).
+If no other options are set, the dashboards are loaded from the local `kibana` directory in the home path of the Auditbeat installation. To load dashboards from a different location, you can configure one of the following options: [`setup.dashboards.directory`](#directory-option), [`setup.dashboards.url`](#url-option), or [`setup.dashboards.file`](#file-option).
 
 
 ### `setup.dashboards.directory` [directory-option]

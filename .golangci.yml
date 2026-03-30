@@ -11,6 +11,7 @@ linters:
     - durationcheck
     - errcheck
     - errorlint
+    - exhaustruct
     - forbidigo
     - gomoddirectives
     - gomodguard
@@ -24,6 +25,7 @@ linters:
     - noctx
     - nolintlint
     - staticcheck
+    - testifylint
     - unconvert
     - unused
     - wastedassign
@@ -37,6 +39,8 @@ linters:
           deny:
             - pkg: github.com/elastic/beats/v7/x-pack
               desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
+            - pkg: github.com/elastic/elastic-agent-client
+              desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (elastic-agent-client).
         main:
           list-mode: lax
           deny:
@@ -58,6 +62,10 @@ linters:
       errorf: true
       asserts: true
       comparison: true
+    exhaustruct:
+      include:
+        # BaseMetricSet must be created via NewModule to ensure paths are set.
+        - 'github\.com/elastic/beats/v7/metricbeat/mb\.BaseMetricSet'
     forbidigo:
       forbid:
         - pattern: fmt.Print.*
@@ -114,6 +122,10 @@ linters:
       checks:
         - -ST1005
         - all
+    testifylint:
+      disable:
+        - go-require # Disabled: too many false positives, can be used to exit a goroutine
+        - require-error # Disabled: using assert for error checks lets the test continue, maximizing context on failure
   exclusions:
     generated: lax
     presets:

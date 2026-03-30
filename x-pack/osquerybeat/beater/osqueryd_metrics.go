@@ -6,8 +6,8 @@ package beater
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -25,98 +25,110 @@ const (
 )
 
 // osquerydMetrics holds monitoring metrics for osqueryd process
-// Follows beat monitoring naming conventions with _gauge suffix for gauges
+// Follows beat monitoring naming conventions
 type osquerydMetrics struct {
-	pid            *monitoring.Uint   // pid_gauge - Process ID (gauge, can change on restart)
-	memoryResident *monitoring.Uint   // memory.rss_gauge - Resident Set Size in bytes (gauge)
-	memoryVirtual  *monitoring.Uint   // memory.vms_gauge - Virtual Memory Size in bytes (gauge)
-	cpuUser        *monitoring.Uint   // cpu.user_total - Cumulative CPU time in user space (milliseconds, counter)
-	cpuSystem      *monitoring.Uint   // cpu.system_total - Cumulative CPU time in kernel space (milliseconds, counter)
-	threads        *monitoring.Uint   // threads_gauge - Number of threads (gauge)
+	pid            *monitoring.Uint   // pid - Process ID (gauge, can change on restart)
+	memoryResident *monitoring.Uint   // memory.rss.bytes - Resident Set Size in bytes (gauge)
+	memoryVirtual  *monitoring.Uint   // memory.virtual.bytes - Virtual Memory Size in bytes (gauge)
+	cpuUserTime    *monitoring.Uint   // cpu.user.time.ms - Cumulative CPU time in user space in milliseconds (counter)
+	cpuSystemTime  *monitoring.Uint   // cpu.system.time.ms - Cumulative CPU time in kernel space in milliseconds (counter)
+	threads        *monitoring.Uint   // threads - Number of threads (gauge)
 	state          *monitoring.String // state - Process state (R, S, D, Z, etc.)
-	startTime      *monitoring.Uint   // start_time - Unix timestamp when process started
+	startTime      uint64             // internal: Unix timestamp when process started (not exposed)
 	diskReadBytes  *monitoring.Uint   // disk.read_bytes_total - Cumulative bytes read from disk (counter)
 	diskWriteBytes *monitoring.Uint   // disk.write_bytes_total - Cumulative bytes written to disk (counter)
-	uptime         *monitoring.Uint   // uptime_seconds - Seconds the process has been running (gauge)
+	uptime         *monitoring.Uint   // uptime.ms - Milliseconds the process has been running (gauge)
 	version        *monitoring.String // version - osqueryd version string
 
 	log *logp.Logger
 }
 
-// processMetrics represents osqueryd process metrics from osquery
-type processMetrics struct {
-	PID              int64  `json:"pid,string"`
-	ResidentSize     int64  `json:"resident_size,string"`
-	TotalSize        int64  `json:"total_size,string"`
-	UserTime         int64  `json:"user_time,string"`
-	SystemTime       int64  `json:"system_time,string"`
-	Threads          int64  `json:"threads,string"`
-	State            string `json:"state"`
-	StartTime        int64  `json:"start_time,string"`
-	DiskBytesRead    int64  `json:"disk_bytes_read,string"`
-	DiskBytesWritten int64  `json:"disk_bytes_written,string"`
-	Version          string `json:"version"`
+// getUint64 extracts an int64 from map[string]any, handling both string and numeric values
+func getUint64(m map[string]any, key string) uint64 {
+	val, ok := m[key]
+	if !ok {
+		return 0
+	}
+
+	switch v := val.(type) {
+	case int64:
+		return uint64(v)
+	case float64:
+		return uint64(v)
+	case int:
+		return uint64(v)
+	case string:
+		num, err := strconv.ParseUint(v, 10, 64)
+		if err != nil {
+			return 0
+		}
+		return num
+	}
+	return 0
+}
+
+// getString extracts a string from map[string]any
+func getString(m map[string]any, key string) string {
+	val, ok := m[key]
+	if !ok {
+		return ""
+	}
+	str, _ := val.(string)
+	return str
 }
 
 // newOsquerydMetrics creates and registers osqueryd health metrics
-// Follows beat conventions: _gauge suffix for gauges, _total for cumulative counters
+// Follows beat conventions: _total suffix for cumulative counters
 func newOsquerydMetrics(registry *monitoring.Registry, log *logp.Logger) *osquerydMetrics {
 	// Create a sub-registry for osqueryd metrics
 	osqdReg := registry.GetOrCreateRegistry("osqueryd")
 
 	return &osquerydMetrics{
-		pid:            monitoring.NewUint(osqdReg, "pid_gauge"),
-		memoryResident: monitoring.NewUint(osqdReg, "memory.rss_gauge"),
-		memoryVirtual:  monitoring.NewUint(osqdReg, "memory.vms_gauge"),
-		cpuUser:        monitoring.NewUint(osqdReg, "cpu.user_total"),
-		cpuSystem:      monitoring.NewUint(osqdReg, "cpu.system_total"),
-		threads:        monitoring.NewUint(osqdReg, "threads_gauge"),
+		pid:            monitoring.NewUint(osqdReg, "pid"),
+		memoryResident: monitoring.NewUint(osqdReg, "memory.rss.bytes"),
+		memoryVirtual:  monitoring.NewUint(osqdReg, "memory.virtual.bytes"),
+		cpuUserTime:    monitoring.NewUint(osqdReg, "cpu.user.time.ms"),
+		cpuSystemTime:  monitoring.NewUint(osqdReg, "cpu.system.time.ms"),
+		threads:        monitoring.NewUint(osqdReg, "threads"),
 		state:          monitoring.NewString(osqdReg, "state"),
-		startTime:      monitoring.NewUint(osqdReg, "start_time"),
 		diskReadBytes:  monitoring.NewUint(osqdReg, "disk.read_bytes_total"),
 		diskWriteBytes: monitoring.NewUint(osqdReg, "disk.write_bytes_total"),
-		uptime:         monitoring.NewUint(osqdReg, "uptime_seconds"),
+		uptime:         monitoring.NewUint(osqdReg, "uptime.ms"),
 		version:        monitoring.NewString(osqdReg, "version"),
 		log:            log,
 	}
 }
 
 // update queries osqueryd process metrics and updates the monitoring registry
-func (m *osquerydMetrics) update(ctx context.Context, socketPath string) error {
-	metrics, err := m.queryOsquerydMetrics(ctx, socketPath)
+func (m *osquerydMetrics) update(ctx context.Context, client *osqdcli.Client) error {
+	metrics, err := m.queryOsquerydMetrics(ctx, client)
 	if err != nil {
 		return fmt.Errorf("failed to query osqueryd metrics: %w", err)
 	}
 
-	// Update monitoring metrics
-	m.pid.Set(uint64(metrics.PID))
-	m.memoryResident.Set(uint64(metrics.ResidentSize))
-	m.memoryVirtual.Set(uint64(metrics.TotalSize))
-	m.cpuUser.Set(uint64(metrics.UserTime))
-	m.cpuSystem.Set(uint64(metrics.SystemTime))
-	m.threads.Set(uint64(metrics.Threads))
-	m.state.Set(metrics.State)
-	m.startTime.Set(uint64(metrics.StartTime))
-	m.diskReadBytes.Set(uint64(metrics.DiskBytesRead))
-	m.diskWriteBytes.Set(uint64(metrics.DiskBytesWritten))
-	m.version.Set(metrics.Version)
+	m.pid.Set(getUint64(metrics, "pid"))
+	m.memoryResident.Set(getUint64(metrics, "resident_size"))
+	m.memoryVirtual.Set(getUint64(metrics, "total_size"))
+	m.cpuUserTime.Set(getUint64(metrics, "user_time"))
+	m.cpuSystemTime.Set(getUint64(metrics, "system_time"))
+	m.threads.Set(getUint64(metrics, "threads"))
+	m.state.Set(getString(metrics, "state"))
+	m.startTime = getUint64(metrics, "start_time")
+	m.diskReadBytes.Set(getUint64(metrics, "disk_bytes_read"))
+	m.diskWriteBytes.Set(getUint64(metrics, "disk_bytes_written"))
+	m.version.Set(getString(metrics, "version"))
 
-	// Calculate and set uptime if start_time is available
-	if metrics.StartTime > 0 {
-		uptime := time.Now().Unix() - metrics.StartTime
+	if m.startTime > 0 {
+		uptime := time.Now().Unix() - int64(m.startTime)
 		if uptime > 0 {
-			m.uptime.Set(uint64(uptime))
+			m.uptime.Set(uint64(uptime * 1000))
 		}
 	}
-
-	m.log.Debugf("Updated osqueryd metrics: pid=%d, memory=%d bytes, state=%s",
-		metrics.PID, metrics.ResidentSize, metrics.State)
-
 	return nil
 }
 
 // queryOsquerydMetrics queries osqueryd process metrics using osquery
-func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, socketPath string) (*processMetrics, error) {
+func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, client *osqdcli.Client) (map[string]any, error) {
 	// Query for osqueryd process metrics by joining with osquery_info
 	// to get the current osqueryd process PID and version
 	query := `SELECT 
@@ -134,10 +146,6 @@ func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, socketPath s
 	FROM processes p
 	JOIN osquery_info o ON p.pid = o.pid`
 
-	// Create osquery client using the socket path
-	client := osqdcli.New(socketPath)
-	defer client.Close()
-
 	// Execute query with timeout
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -151,18 +159,10 @@ func (m *osquerydMetrics) queryOsquerydMetrics(ctx context.Context, socketPath s
 		return nil, fmt.Errorf("no osqueryd process found in processes table")
 	}
 
-	// Parse the response
-	var metrics processMetrics
-	data, err := json.Marshal(resp[0])
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal response: %w", err)
+	if len(resp) > 1 {
+		m.log.Warnf("Expected 1 row for osqueryd metrics but got %d, using first row", len(resp))
 	}
-
-	if err := json.Unmarshal(data, &metrics); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal process metrics: %w", err)
-	}
-
-	return &metrics, nil
+	return resp[0], nil
 }
 
 // checkHealth examines the metrics and returns warnings about potential health issues
@@ -183,8 +183,8 @@ func (m *osquerydMetrics) checkHealth() []string {
 	}
 
 	// Check if process is very young (possible crash/restart loop)
-	if m.startTime.Get() > 0 {
-		uptime := time.Now().Unix() - int64(m.startTime.Get())
+	if m.startTime > 0 {
+		uptime := time.Now().Unix() - int64(m.startTime)
 		if uptime < 60 { // Less than 1 minute uptime
 			warnings = append(warnings, fmt.Sprintf("process recently started (uptime: %ds)", uptime))
 		}
@@ -194,7 +194,7 @@ func (m *osquerydMetrics) checkHealth() []string {
 }
 
 // monitorOsquerydHealth periodically collects osqueryd metrics and reports issues
-func monitorOsquerydHealth(ctx context.Context, socketPath string, metrics *osquerydMetrics, log *logp.Logger) {
+func monitorOsquerydHealth(ctx context.Context, client *osqdcli.Client, metrics *osquerydMetrics, log *logp.Logger) {
 	ticker := time.NewTicker(osquerydHealthCheckInterval)
 	defer ticker.Stop()
 
@@ -206,7 +206,7 @@ func monitorOsquerydHealth(ctx context.Context, socketPath string, metrics *osqu
 			log.Info("Stopping osqueryd health monitoring")
 			return
 		case <-ticker.C:
-			if err := metrics.update(ctx, socketPath); err != nil {
+			if err := metrics.update(ctx, client); err != nil {
 				log.Warnf("Failed to update osqueryd metrics: %v", err)
 				continue
 			}

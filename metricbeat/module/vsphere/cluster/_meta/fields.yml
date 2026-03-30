@@ -61,3 +61,11 @@
       object_type: keyword
       description: >
         List of all the triggered alarms.
+    - name: resourcepool
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: ID of resource pool associated with the cluster.
+          version:
+            ga: 9.1.10

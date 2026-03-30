@@ -23,10 +23,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -40,7 +40,6 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
-	prospectorDebugKey               = "file_prospector"
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
@@ -74,14 +73,96 @@ func init() {
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	logger              *logp.Logger
-	filewatcher         loginp.FSWatcher
-	identifier          fileIdentifier
-	ignoreOlder         time.Duration
-	ignoreInactiveSince ignoreInactiveType
-	cleanRemoved        bool
-	stateChangeCloser   stateChangeCloserConfig
-	takeOver            loginp.TakeOverConfig
+	logger                *logp.Logger
+	filewatcher           loginp.FSWatcher
+	identifier            fileIdentifier
+	ignoreOlder           time.Duration
+	ignoreInactiveSince   ignoreInactiveType
+	cleanRemoved          bool
+	stateChangeCloser     stateChangeCloserConfig
+	takeOver              loginp.TakeOverConfig
+	filestreamIdentifiers map[string]fileIdentifier
+	logIdentifiers        map[string]file.StateIdentifier
+}
+
+func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
+	if p.takeOver.FromFilestream() {
+		fsEvent := loginp.FSEvent{
+			NewPath:    v.Source,
+			Descriptor: fd,
+		}
+
+		return p.filestreamIdentifiers[name].GetSource(fsEvent).Name()
+	}
+
+	state := file.State{
+		FileStateOS: v.FileStateOS,
+		Source:      v.Source,
+	}
+
+	// The stream field is used when generating the ID, so if takeOver has
+	// a stream set, we use it, so the ID matches the input we're taking over.
+	if p.takeOver.Stream == "stdout" || p.takeOver.Stream == "stderr" {
+		state.Meta = map[string]string{
+			"stream": p.takeOver.Stream,
+		}
+	}
+
+	id, _ := p.logIdentifiers[name].GenerateID(state)
+	return id
+}
+
+func (p *fileProspector) takeOverFn(
+	v loginp.TakeOverState,
+	files map[string]loginp.FileDescriptor,
+	newID func(loginp.Source) string,
+) (string, any) {
+	fm := fileMeta{
+		Source:         v.Source,
+		IdentifierName: v.IdentifierName,
+	}
+
+	fd, ok := files[fm.Source]
+	if !ok {
+		return "", fm
+	}
+
+	// Return early (do nothing) if:
+	//  - The old identifier is neither native, path or fingerprint
+	oldIdentifierName := fm.IdentifierName
+	if oldIdentifierName != nativeName &&
+		oldIdentifierName != pathName &&
+		oldIdentifierName != fingerprintName {
+		return "", nil
+	}
+
+	// Our current file (source) is in the registry, now we need to ensure
+	// this registry entry (resource) actually refers to our file. Sources
+	// are identified by path, however as log files rotate the same path
+	// can point to different files.
+	//
+	// So to ensure we're dealing with the resource from our current file,
+	// we use the old identifier to generate a registry key for the current
+	// file we're trying to migrate, if this key matches with the key in the
+	// registry, then we proceed to update the registry.
+	split := strings.Split(v.Key, "::")
+	if len(split) != 4 {
+		// This should never happen.
+		p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key)
+		return "", fm
+	}
+
+	idFromRegistry := strings.Join(split[2:], "::")
+	idFromPreviousIdentity := p.previousID(oldIdentifierName, fd, v)
+
+	if idFromPreviousIdentity != idFromRegistry {
+		return "", fm
+	}
+
+	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+	fm.IdentifierName = p.identifier.Name()
+	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
+	return newKey, fm
 }
 
 func (p *fileProspector) Init(
@@ -208,71 +289,8 @@ func (p *fileProspector) Init(
 	}
 
 	// Take over states from other Filestream inputs or the log input
-	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {
-		var fm fileMeta
-		err := v.UnpackCursorMeta(&fm)
-		if err != nil {
-			return "", nil
-		}
-
-		fd, ok := files[fm.Source]
-		if !ok {
-			return "", fm
-		}
-
-		// Return early (do nothing) if:
-		//  - The old identifier is neither native, path or fingerprint
-		oldIdentifierName := fm.IdentifierName
-		if oldIdentifierName != nativeName &&
-			oldIdentifierName != pathName &&
-			oldIdentifierName != fingerprintName {
-			return "", nil
-		}
-
-		// Our current file (source) is in the registry, now we need to ensure
-		// this registry entry (resource) actually refers to our file. Sources
-		// are identified by path, however as log files rotate the same path
-		// can point to different files.
-		//
-		// So to ensure we're dealing with the resource from our current file,
-		// we use the old identifier to generate a registry key for the current
-		// file we're trying to migrate, if this key matches with the key in the
-		// registry, then we proceed to update the registry.
-		oldIdentifier, ok := identifiersMap[oldIdentifierName]
-		if !ok {
-			// This should never happen, but just in case we properly handle it.
-			// If we cannot find the identifier, move on to the next entry
-			// some identifiers cannot be migrated
-			p.logger.Errorf(
-				"old file identity '%s' not found while taking over old states, "+
-					"new file identity '%s'. If the file still exists, it will be re-ingested",
-				oldIdentifierName,
-				identifierName,
-			)
-			return "", nil
-		}
-
-		fsEvent := loginp.FSEvent{
-			NewPath:    fm.Source,
-			Descriptor: fd,
-		}
-		split := strings.Split(v.Key(), "::")
-		if len(split) != 4 {
-			// This should never happen.
-			p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
-			return "", fm
-		}
-
-		idFromRegistry := strings.Join(split[2:], "::")
-		idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
-		if idFromPreviousIdentity != idFromRegistry {
-			return "", fm
-		}
-
-		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
-		fm.IdentifierName = identifierName
-		p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
-		return newKey, fm
+	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {
+		return p.takeOverFn(v, files, newID)
 	})
 
 	return nil
@@ -282,13 +300,19 @@ func (p *fileProspector) Init(
 //
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
-	log := ctx.Logger.With("prospector", prospectorDebugKey)
-	log.Debug("Starting prospector")
-	defer log.Debug("Prospector has stopped")
+	p.logger.Debug("Starting prospector")
+	defer p.logger.Debug("Prospector has stopped")
 
-	defer p.stopHarvesterGroup(log, hg)
+	// ctx.Logger has its 'log.logger' set to 'input.filestream'.
+	// Because the harvester is not really part of the prospector,
+	// we use this logger instead of the prospector logger.
+	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
 	var tg unison.MultiErrGroup
+
+	// The harvester needs to notify the FileWatcher
+	// when it closes
+	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
@@ -306,17 +330,19 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Errorf("running prospector failed: %v", errors.Join(errs...))
+		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
+// onFSEvent uses 'log' instead of the [fileProspector] logger
+// because 'log' has been enriched with event information
 func (p *fileProspector) onFSEvent(
 	log *logp.Logger,
 	ctx input.Context,
@@ -326,6 +352,8 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
+
+	log = log.With("source_file", event.SrcID)
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {

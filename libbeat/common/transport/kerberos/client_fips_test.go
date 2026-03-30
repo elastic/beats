@@ -33,7 +33,7 @@ func TestNewClient(t *testing.T) {
 	c, err := NewClient(&Config{
 		AuthType:   authPassword,
 		ConfigPath: cfg.Name(),
-	}, http.DefaultClient, "")
+	}, http.DefaultClient)
 	require.Nil(t, c)
 	require.EqualError(t, err, "kerberos is not supported in fips mode")
 }

@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-okta.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Okta fields [exported-fields-okta]
 
@@ -88,19 +89,19 @@ Fields that let you store information about the client of the actor.
 Fields about the user agent information of the client.
 
 **`okta.client.user_agent.raw_user_agent`**
-:   The raw informaton of the user agent.
+:   The raw information of the user agent.
 
     type: keyword
 
 
 **`okta.client.user_agent.os`**
-:   The OS informaton.
+:   The OS information.
 
     type: keyword
 
 
 **`okta.client.user_agent.browser`**
-:   The browser informaton of the client.
+:   The browser information of the client.
 
     type: keyword
 
@@ -294,7 +295,7 @@ The suspicious activity fields from the debug data.
 
 
 **`okta.debug_context.debug_data.suspicious_activity.os`**
-:   The OS of the system from where the suspicious activity occured.
+:   The OS of the system from where the suspicious activity occurred.
 
     type: keyword
 
@@ -340,7 +341,7 @@ Fields that let you store information about authentication context.
 
 
 **`okta.authentication_context.external_session_id`**
-:   The session identifer of the external session if any.
+:   The session identifier of the external session if any.
 
     type: keyword
 
