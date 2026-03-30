@@ -213,6 +213,7 @@ func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID fun
 	}
 
 	files := p.filewatcher.GetFiles()
+	identifierName := p.identifier.Name()
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {

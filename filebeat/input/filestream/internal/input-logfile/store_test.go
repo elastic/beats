@@ -464,8 +464,8 @@ func TestSourceStoreTakeOverFromLogInput(t *testing.T) {
 	)
 
 	// fn simulates what takeOverFn does: map the log key to a new Filestream key.
-	takeover := func(v TakeOverState) (string, any) {
-		if v.Key == logKey {
+	takeover := func(v Value) (string, any) {
+		if v.Key() == logKey {
 			return filestreamNewKey, testMeta{IdentifierName: "native"}
 		}
 		return "", nil

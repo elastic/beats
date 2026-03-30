@@ -297,28 +297,14 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 // Filestream inputs or the Log input. fn should return the new registry ID
 // and new CursorMeta. If fn returns an empty string, the entry is skipped.
 //
-<<<<<<< HEAD
-// When fn returns a valid ID, the old resource is removed from both,
-// the in-memory and persistent store. The operations are synchronous.
-//
-// If the resource migrated was from the Log input, `TakeOver` will
-// remove it from the persistent store, however the Log input reigstrar
-// will write it back when Filebeat is shutting down. However,
-// there is a mechanism in place to detect this situation and avoid
-// migrating the same state over and over again.
-// See the comments on this method for more details.
-func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
-=======
 // When fn returns a valid ID:
 //   - If the old resource was from a Filestream input, it is removed from both
 //     the in-memory and disk store.
 //   - If it was from a Log input, it is left untouched.
-func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
+func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// Lock the ephemeral store so we can migrate the states in one go
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
-
->>>>>>> 8a648cf55 (Fix check config and take over interaction (#49632))
 	matchPreviousFilestreamIDs := func(key string) bool {
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
@@ -365,50 +351,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 					s.store.log.Errorf("cannot read Log input state: %s", err)
 					return true, nil
 				}
-<<<<<<< HEAD
-				// That is a workaround for the problems with the
-				// Log input Registrar (`filebeat/registrar`) and the way it
-				// handles states.
-				// There are two problems:
-				//  - 1. The Log input store/registrar does not have an API for
-				//       removing states
-				//  - 2. When `registrar.Registrar` starts, it copies all states
-				//       belonging to the Log input from the disk store into
-				//       memory and when the Registrar is shutting down, it
-				//       writes all states to the disk. This all happens even
-				//       if no Log input was ever started.
-				// This means that no matter what we do here, the states from
-				// the Log input are always re-written to disk.
-				// See: filebeat/registrar/registrar.go, deferred statement on
-				// `Registrar.Run`.
-				//
-				// However, there is a "reset state" code, that runs
-				// during the Registrar initialisation and sets the
-				// TTL to -2, once the Log input havesting that file starts
-				// the TTL is set to -1 (never expires) or the configured
-				// value.
-				// See: filebeat/registrar/registrar.go (readStatesFrom) and
-				// filebeat/beater/filebeat.go (registrar.Start())
-				//
-				// This means that while the Log input is running and the file
-				// has been active at any moment during the Filebeat's execution
-				// the TTL is never going to be -2 during the shutdown.
-				//
-				// So, if TTL == -2, then in the previous run of Filebeat, there
-				// was no Log input using this state, which likely means, it is
-				// a state that has already been migrated to Filestream.
-				//
-				// The worst case that can happen is that we re-ingest the file
-				// once, which is still better than copying an old state with
-				// an incorrect offset every time Filebeat starts.
-				if st.TTL == -2 {
-					return true, nil
-				}
 				st.key = key
-=======
-
-				st.Key = key
->>>>>>> 8a648cf55 (Fix check config and take over interaction (#49632))
 				fromLogInput[key] = st
 			}
 
@@ -431,9 +374,6 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			continue
 		}
 
-<<<<<<< HEAD
-		newKey, updatedMeta := fn(res)
-=======
 		// cleanup must be called on any "exit point" from this loop iteration.
 		// It is responsible for correctly releasing the locked resource.
 		cleanup := func() {
@@ -441,16 +381,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			res.lock.Unlock()
 		}
 
-		st, err := newTakeOverState(inpFile.State{}, res)
-		if err != nil {
-			// This should never happen. newTakeOverState can only fail if
-			// Filestream state format has changed
-			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
-			cleanup()
-			continue
-		}
-		newKey, updatedMeta := fn(st)
->>>>>>> 8a648cf55 (Fix check config and take over interaction (#49632))
+		newKey, updatedMeta := fn(res)
 		if len(newKey) > 0 {
 			// If the new key already exists in the store, do nothing.
 			// Unlock the resource and return
