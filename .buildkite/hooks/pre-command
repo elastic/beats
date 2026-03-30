@@ -28,6 +28,11 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   export BUILDKITE_ANALYTICS_TOKEN
 fi
 
+# Ensure the required mage version is installed (the CI agent image may not have it)
+if [[ -n "${ASDF_MAGE_VERSION:-}" ]] && command -v asdf &>/dev/null; then
+    asdf install mage "$ASDF_MAGE_VERSION"
+fi
+
 CPU_ARCH=$(uname -m)
 PLATFORM_TYPE=$(uname)
 
