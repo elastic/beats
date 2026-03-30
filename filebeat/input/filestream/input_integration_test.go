@@ -61,6 +61,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 		"prospector.scanner.check_interval":      "10ms",
 		"close.on_state_change.check_interval":   "1ms",
 		"close.on_state_change.renamed":          "true",
+		"clean_removed":                          false,
 		"prospector.scanner.fingerprint.enabled": false,
 		"file_identity.native":                   map[string]any{},
 	})
