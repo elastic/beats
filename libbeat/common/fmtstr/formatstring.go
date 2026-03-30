@@ -333,6 +333,115 @@ func parseVariable(lex lexer) (formatElement, error) {
 	return nil, errMissingClose
 }
 
+type VariableToken string
+
+func optimizeData(tokens []any) []any {
+
+	out := tokens[:0]
+	isActive := false
+	var activeString string
+
+	for _, token := range tokens {
+		data, isString := token.(string)
+		if !isString {
+			if isActive {
+				out = append(out, activeString)
+				isActive = false
+			}
+
+			out = append(out, token)
+			continue
+		}
+
+		if !isActive {
+			activeString = data
+			isActive = true
+			continue
+		}
+		activeString += data
+	}
+
+	if isActive {
+		out = append(out, activeString)
+	}
+
+	return out
+}
+
+// parseRawTokens will return a list of static and variable tokens as they occur in the input string
+func ParseRawTokens(lex lexer) ([]any, error) {
+	var elems []any
+
+	for token := range lex.Tokens() {
+		switch token.typ {
+		case tokErr:
+			return nil, errors.New(token.val)
+
+		case tokString:
+			elems = append(elems, token.val)
+
+		case tokOpen:
+			elem, err := parseVariableToken(lex)
+			if err != nil {
+				return nil, err
+			}
+			elems = append(elems, VariableToken(elem))
+
+		case tokClose, tokOperator:
+			// should not happen, but let's return error just in case
+			return nil, fmt.Errorf("Token '%v'(%v) not allowed", token.val, token.typ)
+		}
+	}
+
+	return elems, nil
+}
+
+// parseVariableToken parses the value inside %{...}
+func parseVariableToken(lex lexer) (string, error) {
+	// finalValue stores both string+operator as they occur
+	var finalValue string
+	var strings []string
+	var ops []string
+
+	for token := range lex.Tokens() {
+		switch token.typ {
+		case tokErr:
+			return "", errors.New(token.val)
+
+		case tokOpen:
+			return "", errNestedVar
+
+		case tokClose:
+			if len(strings) == 0 {
+				return "", errEmptyFormat
+			}
+			return finalValue, nil
+
+		case tokString:
+			if len(strings) != len(ops) {
+				return "", fmt.Errorf("Unexpected string token %v, expected operator", token.val)
+			}
+			strings = append(strings, token.val)
+			finalValue += token.val
+
+		case tokOperator:
+			if len(strings) == 0 {
+				return "", errUnexpectedOperator
+			}
+			ops = append(ops, token.val)
+			if len(ops) > len(strings) {
+				return "", fmt.Errorf("Consecutive operator tokens '%v'", token.val)
+			}
+			finalValue += token.val
+
+		default:
+			return "", fmt.Errorf("Unexpected token '%v' (%v)", token.val, token.typ)
+		}
+	}
+
+	return "", errMissingClose
+}
+
 func makeLexer(in string) lexer {
 	lex := make(chan token, 1)
 

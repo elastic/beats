@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFormatString(t *testing.T) {
@@ -169,5 +170,60 @@ func TestFormatStringErrors(t *testing.T) {
 
 		_, err := Compile(test.format, nil)
 		assert.Error(t, err)
+	}
+}
+
+func TestParseRawTokens(t *testing.T) {
+
+	testCases := []struct {
+		name         string
+		input        string
+		expectedList []any
+	}{
+		{
+			name:         "simple lookup standalone",
+			input:        "%{k}",
+			expectedList: []any{VariableToken("k")},
+		},
+		{
+			name:         "simple lookup start of string",
+			input:        "%{k} test",
+			expectedList: []any{VariableToken("k"), " test"},
+		},
+		{
+			name:         "simple lookup end of string",
+			input:        "test %{k}",
+			expectedList: []any{"test ", VariableToken("k")},
+		},
+		{
+			name:         "simple lookup middle of string",
+			input:        "pre %{k} post",
+			expectedList: []any{"pre ", VariableToken("k"), " post"},
+		},
+		{
+			name:         "simple lookup middle of string",
+			input:        "pre %{k} post",
+			expectedList: []any{"pre ", VariableToken("k"), " post"},
+		},
+		{
+			name:         "compile lookup default",
+			input:        "%{unknown:default}",
+			expectedList: []any{VariableToken("unknown:default")},
+		},
+		{
+			name:         "with escaped % symbol",
+			input:        `\%{abc}`,
+			expectedList: []any{`%{abc}`},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			lexer := makeLexer(test.input)
+			defer lexer.Finish()
+			got, err := ParseRawTokens(lexer)
+			require.NoError(t, err)
+			require.Equal(t, test.expectedList, got)
+		})
 	}
 }
