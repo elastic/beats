@@ -201,10 +201,18 @@ func (p *fileProspector) Init(
 		})
 	}
 
-	// Last, but not least, take over states if needed/enabled.
+	return nil
+}
+
+// TakeOver migrates states from other inputs (Log input or other Filestream
+// inputs with different IDs) to this input. It must be called after Init and
+// before Run so that it is not triggered during CheckConfig validation.
+func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID func(loginp.Source) string) error {
 	if !p.takeOver.Enabled {
 		return nil
 	}
+
+	files := p.filewatcher.GetFiles()
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {
