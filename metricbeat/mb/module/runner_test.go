@@ -51,11 +51,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,11 +79,7 @@ func TestCPUDiagnostics(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}

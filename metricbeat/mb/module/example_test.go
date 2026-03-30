@@ -55,11 +55,7 @@ func ExampleWrapper() {
 		return
 	}
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logger, beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logger, beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
+	m, err := module.NewWrapper(config, mb.Registry, logger, beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -143,11 +139,7 @@ func ExampleRunner() {
 	}
 
 	// Create a new Wrapper based on the configuration.
-<<<<<<< HEAD
-	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beatmonitoring.NewMonitoring(), module.WithMetricSetInfo())
-=======
-	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
->>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
+	m, err := module.NewWrapper(config, mb.Registry, logp.NewNopLogger(), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	if err != nil {
 		return
 	}

@@ -45,11 +45,7 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
-<<<<<<< HEAD
-func NewFactory(beatInfo beat.Info, monitoring beatmonitoring.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
-=======
-func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, paths *paths.Path, options ...Option) cfgfile.RunnerFactory {
->>>>>>> efa88f4c7 ([beatreceiver] Remove global paths from auditbeat (#47935))
+func NewFactory(beatInfo beat.Info, monitoring beatmonitoring.Monitoring, registry *mb.Register, paths *paths.Path, options ...Option) cfgfile.RunnerFactory {
 	return &Factory{
 		beatInfo:   beatInfo,
 		monitoring: monitoring,
