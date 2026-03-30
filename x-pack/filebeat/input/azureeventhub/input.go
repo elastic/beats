@@ -70,9 +70,5 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	config.checkUnsupportedParams(m.log)
 
-	if config.ProcessorVersion == processorV1 {
-		m.log.Warn("processor v1 is no longer available, using v2. The processor_version option will be removed in a future release.")
-	}
-
 	return newEventHubInputV2(config, m.log)
 }
