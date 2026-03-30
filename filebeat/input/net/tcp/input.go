@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"time"
@@ -88,14 +89,14 @@ func newServer(config config) (*server, error) {
 func (s *server) Name() string { return "tcp" }
 
 func (s *server) Test(_ input.TestContext) error {
-	l, err := net.Listen("tcp", s.Host)
+	l, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", s.Host)
 	if err != nil {
 		return err
 	}
 	return l.Close()
 }
 
-// InitMetrics initalises and returns an netmetrics.TCP
+// InitMetrics initialises and returns a netmetrics.TCP
 func (s *server) InitMetrics(id string, reg *monitoring.Registry, logger *logp.Logger) netinput.Metrics {
 	s.metrics = netmetrics.NewTCP(reg, s.Host, time.Minute, logger)
 	return s.metrics
@@ -139,7 +140,7 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, m 
 		ctx.Logger,
 	)
 	if err != nil {
-		return fmt.Errorf("Failed to start TCP server: %w", err)
+		return fmt.Errorf("failed to start TCP server: %w", err)
 	}
 
 	ctx.Logger.Debug("tcp input initialized")
