@@ -490,6 +490,12 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 	const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
+	// permsCache avoids redundant API calls for permissions: custom role definitions
+	// are org-wide, so if multiple users share the same role, permissions are fetched
+	// once and reused. The cache is scoped to this run so that changes between syncs
+	// are picked up on the next run.
+	permsCache := make(map[string][]okta.Permission)
+
 	var (
 		n           int
 		lastUpdated time.Time
@@ -504,14 +510,14 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				publish(p.addUserMetadata(ctx, u, state))
+				publish(p.addUserMetadata(ctx, u, state, permsCache))
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
 			}
 		} else {
 			for _, u := range batch {
-				su := p.addUserMetadata(ctx, u, state)
+				su := p.addUserMetadata(ctx, u, state, permsCache)
 				publish(su)
 				n++
 				if u.LastUpdated.After(lastUpdated) {
@@ -544,7 +550,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 	return nil
 }
 
-func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore) *User {
+func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore, permsCache map[string][]okta.Permission) *User {
 	su := state.storeUser(u)
 	switch len(p.cfg.EnrichWith) {
 	case 1:
@@ -583,12 +589,19 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 						// standard built-in roles have no associated permissions endpoint.
 						continue
 					}
-					perms, _, err := okta.GetRolePermissions(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), role.ID, p.lim, p.logger)
-					if err != nil {
-						p.logger.Warnf("failed to get permissions for role %s: %v", role.ID, err)
-					} else {
-						roles[i].Permissions = perms
+					// Use the role definition ID as cache key. Multiple users can share
+					// the same custom role definition, so we fetch permissions once per
+					// run and reuse them to avoid O(users * custom_roles) API calls.
+					perms, cached := permsCache[role.RoleID]
+					if !cached {
+						perms, _, err = okta.GetRolePermissions(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), role.RoleID, p.lim, p.logger)
+						if err != nil {
+							p.logger.Warnf("failed to get permissions for role %s: %v", role.RoleID, err)
+							continue
+						}
+						permsCache[role.RoleID] = perms
 					}
+					roles[i].Permissions = perms
 				}
 			}
 			su.Roles = roles

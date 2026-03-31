@@ -100,6 +100,7 @@ type Permission struct {
 // and https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
 type Role struct {
 	ID             string       `json:"id"`
+	RoleID         string       `json:"role,omitempty"` // role definition ID; present for CUSTOM roles
 	Label          string       `json:"label"`
 	Type           string       `json:"type"`
 	Status         string       `json:"status"`
