@@ -253,7 +253,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 		// The builder base config can configure any of the field values of nomad if need be.
 		e["nomad"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
-			tags = rawAnn.(mapstr.M)
+			tags = rawAnn.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 
 			e["tags"] = tags
 		}
@@ -266,7 +266,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
 	// metadata about the runtime driver.
 	if rawCont, ok := meta["container"]; ok {
-		container = rawCont.(mapstr.M)
+		container = rawCont.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 		e["container"] = container
 	}
 
