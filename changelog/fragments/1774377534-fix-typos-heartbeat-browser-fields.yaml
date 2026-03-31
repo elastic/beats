@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix "realtive" → "relative" typo in heartbeat browser field description
+component: heartbeat
