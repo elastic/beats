@@ -130,7 +130,7 @@ For RFC 5424-formatted logs, if the structured data cannot be parsed according t
 
 ## Metrics [_metrics_19]
 
-Internal metrics are available to assist with debugging efforts. The metrics are served from the metrics HTTP endpoint (for example: `http://localhost:5066/stats`) and are found under `processor.syslog.[instance ID]` or `processor.syslog.[tag]-[instance ID]` if a **tag** is provided. See [HTTP endpoint](/reference/filebeat/http-endpoint.md) for more information on configuration the metrics HTTP endpoint.
+Internal metrics are available to assist with debugging efforts. The metrics are served from the metrics HTTP endpoint (for example: `http://localhost:5066/stats`) and are found under `processor.syslog.[instance ID]` or `processor.syslog.[tag]-[instance ID]` if a **tag** is provided. See [HTTP endpoint](/reference/filebeat/http-endpoint.md) for more information on configuring the metrics HTTP endpoint.
 
 For example, here are metrics from a processor with a **tag** of `log-input` and an **instance ID** of `1`:
 
