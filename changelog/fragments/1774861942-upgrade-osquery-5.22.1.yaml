@@ -1,5 +1,7 @@
-kind: feature
+kind: upgrade
 
 summary: upgrade osquery version to 5.22.1
+
+description: osquery 5.22.1 changes escapeNonPrintableBytes to be UTF-8 aware, which can alter some query results that previously returned raw unicode bytes.
 
 component: osquerybeat
