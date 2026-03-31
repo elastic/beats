@@ -290,7 +290,7 @@ func parseFormatTokens[T any](
 
 		case tokClose, tokOperator:
 			// should not happen, but let's return error just in case
-			return nil, fmt.Errorf("Token '%v'(%v) not allowed", token.val, token.typ)
+			return nil, fmt.Errorf("token '%v'(%v) not allowed", token.val, token.typ)
 		}
 	}
 
@@ -323,7 +323,7 @@ func parseVariable(lex lexer) (formatElement, error) {
 
 		case tokString:
 			if len(strings) != len(ops) {
-				return nil, fmt.Errorf("Unexpected string token %v, expected operator", token.val)
+				return nil, fmt.Errorf("unexpected string token %v, expected operator", token.val)
 			}
 			strings = append(strings, token.val)
 
@@ -333,11 +333,11 @@ func parseVariable(lex lexer) (formatElement, error) {
 			}
 			ops = append(ops, token.val)
 			if len(ops) > len(strings) {
-				return nil, fmt.Errorf("Consecutive operator tokens '%v'", token.val)
+				return nil, fmt.Errorf("consecutive operator tokens '%v'", token.val)
 			}
 
 		default:
-			return nil, fmt.Errorf("Unexpected token '%v' (%v)", token.val, token.typ)
+			return nil, fmt.Errorf("unexpected token '%v' (%v)", token.val, token.typ)
 		}
 	}
 
@@ -385,7 +385,7 @@ func parseVariableToken(lex lexer) (string, error) {
 
 		case tokString:
 			if len(strings) != len(ops) {
-				return "", fmt.Errorf("Unexpected string token %v, expected operator", token.val)
+				return "", fmt.Errorf("unexpected string token %v, expected operator", token.val)
 			}
 			strings = append(strings, token.val)
 			finalValue += token.val
@@ -396,12 +396,12 @@ func parseVariableToken(lex lexer) (string, error) {
 			}
 			ops = append(ops, token.val)
 			if len(ops) > len(strings) {
-				return "", fmt.Errorf("Consecutive operator tokens '%v'", token.val)
+				return "", fmt.Errorf("consecutive operator tokens '%v'", token.val)
 			}
 			finalValue += token.val
 
 		default:
-			return "", fmt.Errorf("Unexpected token '%v' (%v)", token.val, token.typ)
+			return "", fmt.Errorf("unexpected token '%v' (%v)", token.val, token.typ)
 		}
 	}
 

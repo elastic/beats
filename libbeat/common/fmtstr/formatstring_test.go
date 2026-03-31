@@ -288,7 +288,7 @@ func FuzzParseRawTokens(f *testing.F) {
 			case VariableToken:
 				finalOutput += "%{" + string(tok) + "}"
 			default:
-				assert.Failf(t, "unexpected type %T", tok)
+				assert.Fail(t, fmt.Sprintf("unexpected type %T", tok))
 			}
 		}
 
