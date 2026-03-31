@@ -20,6 +20,7 @@ package conditions
 import (
 	"fmt"
 	"net"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -168,11 +169,14 @@ func (c *Network) Check(event ValuesMap) bool {
 				return false
 			}
 		case []net.IP:
-			if len(v) == 0 || !containsAny(v, network.Contains) {
+			if !slices.ContainsFunc(v, network.Contains) {
 				return false
 			}
 		case []string:
-			if len(v) == 0 || !containsAnyStr(v, network.Contains) {
+			if !slices.ContainsFunc(v, func(s string) bool {
+				ip := net.ParseIP(s)
+				return ip != nil && network.Contains(ip)
+			}) {
 				return false
 			}
 		default:
@@ -184,25 +188,7 @@ func (c *Network) Check(event ValuesMap) bool {
 	return true
 }
 
-// containsAny returns true if any IP in the list satisfies the match function.
-func containsAny(ips []net.IP, match func(net.IP) bool) bool {
-	for _, ip := range ips {
-		if match(ip) {
-			return true
-		}
-	}
-	return false
-}
 
-// containsAnyStr parses each string as an IP and returns true if any satisfies the match function.
-func containsAnyStr(strs []string, match func(net.IP) bool) bool {
-	for _, s := range strs {
-		if ip := net.ParseIP(s); ip != nil && match(ip) {
-			return true
-		}
-	}
-	return false
-}
 
 // String returns a string representation of the Network condition.
 func (c *Network) String() string {
