@@ -23,7 +23,7 @@ jobs:
           github-label: "flaky-test"
           github-repo: ${{ github.repository }}
           github-token: ${{ steps.fetch-token.outputs.token }}
-          max-issues: '5'
+          max-issues: '3'
           org: 'elastic'
           test-suite-id: 'beats'
           token: ${{ secrets.BUILDKITE_TEST_ENGINE_TOKEN }}
