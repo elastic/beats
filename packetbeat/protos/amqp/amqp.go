@@ -18,6 +18,7 @@
 package amqp
 
 import (
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -99,6 +100,10 @@ func (amqp *amqpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 	amqp.results = results
 	amqp.watcher = watcher
 	return nil
+}
+
+func (amqp *amqpPlugin) Close() {
+	amqp.transactions.StopJanitor()
 }
 
 func (amqp *amqpPlugin) initMethodMap() {
@@ -374,7 +379,7 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 	// message itself
 	trans.bytesIn = client.bodySize
 
-	if client.bodySize > uint64(amqp.maxBodyLength) {
+	if amqp.maxBodyLength >= 0 && client.bodySize > uint64(amqp.maxBodyLength) {
 		trans.body = client.body[:amqp.maxBodyLength]
 	} else {
 		trans.body = client.body
@@ -408,7 +413,7 @@ func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 	// message itself
 	trans.bytesOut = server.bodySize
 
-	if server.bodySize > uint64(amqp.maxBodyLength) {
+	if amqp.maxBodyLength >= 0 && server.bodySize > uint64(amqp.maxBodyLength) {
 		trans.body = server.body[:amqp.maxBodyLength]
 	} else {
 		trans.body = server.body
@@ -435,8 +440,16 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 	evt, pbf := pb.NewBeatEvent(t.ts)
 	pbf.SetSource(&t.src)
 	pbf.SetDestination(&t.dst)
-	pbf.Source.Bytes = int64(t.bytesIn)
-	pbf.Destination.Bytes = int64(t.bytesOut)
+	if t.bytesIn > math.MaxInt64 {
+		pbf.Source.Bytes = math.MaxInt64
+	} else {
+		pbf.Source.Bytes = int64(t.bytesIn)
+	}
+	if t.bytesOut > math.MaxInt64 {
+		pbf.Destination.Bytes = math.MaxInt64
+	} else {
+		pbf.Destination.Bytes = int64(t.bytesOut)
+	}
 	pbf.Event.Start = t.ts
 	pbf.Event.End = t.endTime
 	pbf.Event.Dataset = "amqp"
@@ -542,7 +555,9 @@ func isStringable(m *amqpMessage) bool {
 func (amqp *amqpPlugin) getTransaction(k common.HashableTCPTuple) *amqpTransaction {
 	v := amqp.transactions.Get(k)
 	if v != nil {
-		return v.(*amqpTransaction)
+		if trans, ok := v.(*amqpTransaction); ok {
+			return trans
+		}
 	}
 	return nil
 }
