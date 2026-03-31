@@ -299,7 +299,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Ensure that we only call b.Manager.Stop out of order
-	// if Run has failed early/before b.Manager.PostStart() was called.
+	// if Run has failed early/before b.Manager.PostInit() was called.
 	managerEarlyStop := b.Manager.Stop
 	defer func() {
 		if managerEarlyStop != nil {
