@@ -258,6 +258,7 @@ func TestManagerV2(t *testing.T) {
 	}, r, client, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
+	//nolint:staticcheck // We want to ensure Start still has the same behaviour
 	err = m.Start()
 	require.NoError(t, err)
 	defer stopManagerAndWait(t, m)

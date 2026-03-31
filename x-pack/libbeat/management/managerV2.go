@@ -584,7 +584,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.logger.Infof(
 				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
 				change.Unit.ID(),
-				change.Type, int64(change.Triggers), change.Type, change.Triggers)
+				change.Type, int64(change.Triggers), change.Type, change.Triggers) //nolint:gosec // It's just logging
 
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure if there is a difference between

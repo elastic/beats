@@ -159,7 +159,7 @@ func getInputStream(id string, path string, stateIdx int) proto.UnitExpected {
 	return proto.UnitExpected{
 		Id:             id,
 		Type:           proto.UnitType_INPUT,
-		ConfigStateIdx: uint64(stateIdx),
+		ConfigStateIdx: uint64(stateIdx), //nolint:gosec stateIdx is always positive
 		State:          proto.State_HEALTHY,
 		Config: &proto.UnitExpectedConfig{
 			Streams: []*proto.Stream{{

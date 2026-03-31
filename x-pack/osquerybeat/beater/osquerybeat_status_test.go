@@ -402,6 +402,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 
 	count, ok := payload["count"].(float64)
 	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(1), count)
 
 	profiles, ok := payload["osquery_schedule"].([]interface{})
@@ -414,11 +415,12 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 
 	liveCount, ok := payload["live_query_profiles_count"].(float64)
 	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(0), liveCount)
 
 	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
 	require.True(t, ok)
-	assert.Len(t, liveProfiles, 0)
+	assert.Empty(t, liveProfiles)
 }
 
 // TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
