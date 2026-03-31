@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: fix jumplist table to ensure embedded fields are exported
+component: osquerybeat
