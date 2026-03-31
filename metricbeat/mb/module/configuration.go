@@ -25,10 +25,11 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
-func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option, logger *logp.Logger) ([]*Wrapper, error) {
+func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option, p *paths.Path, logger *logp.Logger) ([]*Wrapper, error) {
 	var modules []*Wrapper //nolint:prealloc //can't be preallocated
 
 	// Pass in placeholder monitoring for the module wrappers since this
@@ -36,7 +37,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 	mon := beat.NewMonitoring()
 
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, registry, logger, mon, moduleOptions...)
+		module, err := NewWrapper(moduleCfg, registry, logger, mon, p, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}
@@ -61,7 +62,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 				return nil, fmt.Errorf("error loading config files: %w", err)
 			}
 			for _, conf := range confs {
-				m, err := NewWrapper(conf, registry, logger, mon, moduleOptions...)
+				m, err := NewWrapper(conf, registry, logger, mon, p, moduleOptions...)
 				if err != nil {
 					return nil, fmt.Errorf("module initialization error: %w", err)
 				}
