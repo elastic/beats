@@ -39,6 +39,7 @@ func TestOktaDoFetch(t *testing.T) {
 		{dataset: "all", enrichWith: []string{"groups"}, wantUsers: true, wantDevices: true},
 		{dataset: "users", enrichWith: []string{"groups", "roles", "factors"}, wantUsers: true, wantDevices: false},
 		{dataset: "devices", enrichWith: []string{"groups"}, wantUsers: false, wantDevices: true},
+		{dataset: "users", enrichWith: []string{"perms"}, wantUsers: true, wantDevices: false},
 	}
 
 	for _, test := range tests {
@@ -54,21 +55,23 @@ func TestOktaDoFetch(t *testing.T) {
 			})
 
 			const (
-				window  = time.Minute
-				key     = "token"
-				users   = `[{"id":"USERID","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/USERID"}}}]`
-				roles   = `[{"id":"IFIFAX2BIRGUSTQ","label":"Application administrator","type":"APP_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"JBCUYUC7IRCVGS27IFCE2SKO","label":"Help Desk administrator","type":"HELP_DESK_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"ra125eqBFpETrMwu80g4","label":"Organization administrator","type":"ORG_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"gra25fapn1prGTBKV0g4","label":"API Access Management administrator","type":"API_ACCESS_MANAGEMENT_ADMIN","status":"ACTIVE","created\"":"2019-02-06T16:20:57.000Z","lastUpdated\"":"2019-02-06T16:20:57.000Z","assignmentType\"":"GROUP"}]`
-				groups  = `[{"id":"USERID","profile":{"description":"All users in your organization","name":"Everyone"}}]`
-				factors = `[{"id":"ufs2bysphxKODSZKWVCT","factorType":"question","provider":"OKTA","vendorName":"OKTA","status":"ACTIVE","created":"2014-04-15T18:10:06.000Z","lastUpdated":"2014-04-15T18:10:06.000Z","profile":{"question":"favorite_art_piece","questionText":"What is your favorite piece of art?"}},{"id":"ostf2gsyictRQDSGTDZE","factorType":"token:software:totp","provider":"OKTA","status":"PENDING_ACTIVATION","created":"2014-06-27T20:27:33.000Z","lastUpdated":"2014-06-27T20:27:33.000Z","profile":{"credentialId":"dade.murphy@example.com"}},{"id":"sms2gt8gzgEBPUWBIFHN","factorType":"sms","provider":"OKTA","status":"ACTIVE","created":"2014-06-27T20:27:26.000Z","lastUpdated":"2014-06-27T20:27:26.000Z","profile":{"phoneNumber":"+1-555-415-1337"}}]`
-				devices = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
+				window      = time.Minute
+				key         = "token"
+				users       = `[{"id":"USERID","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/USERID"}}}]`
+				roles       = `[{"id":"IFIFAX2BIRGUSTQ","label":"Application administrator","type":"APP_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"JBCUYUC7IRCVGS27IFCE2SKO","label":"Help Desk administrator","type":"HELP_DESK_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"ra125eqBFpETrMwu80g4","label":"Organization administrator","type":"ORG_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"gra25fapn1prGTBKV0g4","label":"API Access Management administrator","type":"API_ACCESS_MANAGEMENT_ADMIN","status":"ACTIVE","created\"":"2019-02-06T16:20:57.000Z","lastUpdated\"":"2019-02-06T16:20:57.000Z","assignmentType\"":"GROUP"},{"id":"cr0Yq6IJxGIr0ouum0g3","label":"Custom role","type":"CUSTOM","status":"ACTIVE","created":"2019-02-06T16:20:57.000Z","lastUpdated":"2019-02-06T16:20:57.000Z","assignmentType":"USER"}]`
+				groups      = `[{"id":"USERID","profile":{"description":"All users in your organization","name":"Everyone"}}]`
+				factors     = `[{"id":"ufs2bysphxKODSZKWVCT","factorType":"question","provider":"OKTA","vendorName":"OKTA","status":"ACTIVE","created":"2014-04-15T18:10:06.000Z","lastUpdated":"2014-04-15T18:10:06.000Z","profile":{"question":"favorite_art_piece","questionText":"What is your favorite piece of art?"}},{"id":"ostf2gsyictRQDSGTDZE","factorType":"token:software:totp","provider":"OKTA","status":"PENDING_ACTIVATION","created":"2014-06-27T20:27:33.000Z","lastUpdated":"2014-06-27T20:27:33.000Z","profile":{"credentialId":"dade.murphy@example.com"}},{"id":"sms2gt8gzgEBPUWBIFHN","factorType":"sms","provider":"OKTA","status":"ACTIVE","created":"2014-06-27T20:27:26.000Z","lastUpdated":"2014-06-27T20:27:26.000Z","profile":{"phoneNumber":"+1-555-415-1337"}}]`
+				devices     = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
+				permissions = `{"permissions":[{"label":"okta.users.read","created":"2021-02-06T16:17:40.000Z","lastUpdated":"2021-02-06T16:17:40.000Z"},{"label":"okta.apps.read","created":"2021-02-06T16:17:40.000Z","lastUpdated":"2021-02-06T16:17:40.000Z"}]}`
 			)
 
 			data := map[string]string{
-				"users":   users,
-				"roles":   roles,
-				"groups":  groups,
-				"devices": devices,
-				"factors": factors,
+				"users":       users,
+				"roles":       roles,
+				"groups":      groups,
+				"devices":     devices,
+				"factors":     factors,
+				"permissions": permissions,
 			}
 
 			var wantUsers []User
@@ -101,11 +104,22 @@ func TestOktaDoFetch(t *testing.T) {
 				}
 			}
 			var wantRoles []okta.Role
-			if slices.Contains(test.enrichWith, "roles") {
+			if slices.Contains(test.enrichWith, "roles") || slices.Contains(test.enrichWith, "perms") {
 				err := json.Unmarshal([]byte(roles), &wantRoles)
 				if err != nil {
 					t.Fatalf("failed to unmarshal role data: %v", err)
 				}
+			}
+			var wantPerms []okta.Permission
+			if slices.Contains(test.enrichWith, "perms") {
+				var result struct {
+					Permissions []okta.Permission `json:"permissions"`
+				}
+				err := json.Unmarshal([]byte(permissions), &result)
+				if err != nil {
+					t.Fatalf("failed to unmarshal permissions data: %v", err)
+				}
+				wantPerms = result.Permissions
 			}
 
 			wantStates := make(map[string]State)
@@ -130,6 +144,10 @@ func TestOktaDoFetch(t *testing.T) {
 				// Give the groups if this is a get user groups request.
 				userid := r.PathValue("userid")
 				fmt.Fprintln(w, strings.ReplaceAll(data[attr], "USERID", userid))
+			}))
+			mux.Handle("/api/v1/iam/roles/{roleId}/permissions", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				setHeaders(w)
+				fmt.Fprintln(w, data["permissions"])
 			}))
 			mux.Handle("/api/v1/devices/{deviceid}/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				setHeaders(w)
@@ -235,6 +253,17 @@ func TestOktaDoFetch(t *testing.T) {
 					}
 					if len(g.Roles) != len(wantRoles) {
 						t.Errorf("number of roles for user %d: got:%d want:%d", i, len(g.Roles), len(wantRoles))
+					}
+					if slices.Contains(test.enrichWith, "perms") {
+						for j, role := range g.Roles {
+							want := 0
+							if role.Type == "CUSTOM" {
+								want = len(wantPerms)
+							}
+							if len(role.Permissions) != want {
+								t.Errorf("number of permissions for role %d (type %s) of user %d: got:%d want:%d", j, role.Type, i, len(role.Permissions), want)
+							}
+						}
 					}
 					for j, gg := range g.Groups {
 						if gg.ID != wantID {

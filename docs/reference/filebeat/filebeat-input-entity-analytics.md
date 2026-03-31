@@ -1231,7 +1231,9 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 #### `enrich_with` [_enrich_with]
 
-The metadata to enrich users with. This is an array of values that may contain "groups", "roles" and "factors", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "perms", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+
+Including "perms" causes role permissions to be fetched for each assigned role and stored under `roles[].permissions` in the published event. Because permissions depend on roles, adding "perms" implicitly enables role enrichment even if "roles" is not listed explicitly. This option requires the `okta.roles.read` OAuth2 scope and results in one additional API call per role per user, so it should be enabled with care on large tenants due to Okta API rate limits.
 
 
 #### `sync_interval` [_sync_interval_4]

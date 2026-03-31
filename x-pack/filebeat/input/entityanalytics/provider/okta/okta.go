@@ -571,11 +571,26 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Factors = factors
 		}
 	}
-	if slices.Contains(p.cfg.EnrichWith, "roles") {
+	if slices.Contains(p.cfg.EnrichWith, "roles") || slices.Contains(p.cfg.EnrichWith, "perms") {
 		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
+			if slices.Contains(p.cfg.EnrichWith, "perms") {
+				for i, role := range roles {
+					if role.Type != "CUSTOM" {
+						// The permissions API only supports custom roles;
+						// standard built-in roles have no associated permissions endpoint.
+						continue
+					}
+					perms, _, err := okta.GetRolePermissions(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), role.ID, p.lim, p.logger)
+					if err != nil {
+						p.logger.Warnf("failed to get permissions for role %s: %v", role.ID, err)
+					} else {
+						roles[i].Permissions = perms
+					}
+				}
+			}
 			su.Roles = roles
 		}
 	}
