@@ -576,10 +576,12 @@ func (cm *BeatV2Manager) unitListen() {
 		case <-t.C:
 			cm.mx.Lock()
 
-			// If the Beat is not ready to accept configuration, do nothing.
+			// If the Beat is not ready to accept configuration, do nothing
+			// and ensure the timer will fire again.
 			if !cm.beatIsReady {
 				cm.logger.Debug("Debounce timer fired, but Beat is not ready yet.")
 				cm.mx.Unlock()
+				t.Reset(cm.forceReloadDebounce)
 				continue
 			}
 
