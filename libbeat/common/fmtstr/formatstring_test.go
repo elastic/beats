@@ -20,6 +20,7 @@ package fmtstr
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -204,8 +205,13 @@ func TestParseRawTokens(t *testing.T) {
 		},
 		{
 			name:  `when input is %{}`,
-			input: `%\{}`,
+			input: `%{}`,
 			err:   fmt.Errorf("empty format expansion"),
+		},
+		{
+			name:         `when input is %{key}\\`,
+			input:        `%{key}\\`,
+			expectedList: []any{VariableToken("key"), `\`},
 		},
 		{
 			name:         `when input is %{a:b:c}`,
@@ -250,11 +256,43 @@ func TestParseRawTokens(t *testing.T) {
 			defer lexer.Finish()
 			got, err := ParseRawTokens(lexer)
 			if test.err != nil {
-				require.Error(t, test.err, err)
+				require.Equal(t, test.err, err)
 				return
 			}
 			require.NoError(t, err)
 			require.Equal(t, test.expectedList, got)
 		})
 	}
+}
+
+func FuzzParseRawTokens(f *testing.F) {
+	f.Add("%{k} test")
+	f.Add(`pre %{k} post`)
+	f.Add("%{unknown:default}")
+
+	f.Fuzz(func(t *testing.T, a string) {
+		lex := MakeLexer(a)
+		defer lex.Finish()
+		output, err := ParseRawTokens(lex)
+		if err != nil {
+			fmt.Println(a)
+			return // invalid input
+		}
+
+		if strings.Contains(a, `\`) {
+			return // we cannot rebuild the input if it contains escape character
+		}
+		// stringify output and match it with original input
+		var finalOutput string
+		for _, out := range output {
+			switch t := out.(type) {
+			case string:
+				finalOutput += t
+			case VariableToken:
+				finalOutput += "%{" + string(t) + "}"
+			}
+		}
+
+		require.Equal(t, a, finalOutput)
+	})
 }

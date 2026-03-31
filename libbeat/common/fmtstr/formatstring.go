@@ -346,8 +346,8 @@ func parseVariable(lex lexer) (formatElement, error) {
 
 type VariableToken string
 
-// ParseRawTokens walks the lexer output and returns a slice in order: plain
-// strings for literal segments and VariableToken for each %{...} block.
+// ParseRawTokens returns a slice of tokens as they occur.
+// variable tokens are stored as typed value
 func ParseRawTokens(lex lexer) ([]any, error) {
 	return parseFormatTokens(lex, func(elems *[]any, s string) {
 		*elems = append(*elems, s)
@@ -360,9 +360,9 @@ func ParseRawTokens(lex lexer) ([]any, error) {
 	})
 }
 
-// parseVariableToken consumes lexer tokens until '}' and returns the full inner
-// expression as one string (field segments plus ':' operators), e.g.
-// "unknown:default". Callers that need structured ops must parse that string.
+// parseVariableToken consumes lexer tokens inside %{...} and returns the full inner
+// expression as one string  e.g. "unknown:default".
+// Callers must parse operators if needed
 func parseVariableToken(lex lexer) (string, error) {
 	// finalValue appends each string chunk and operator as they appear.
 	var finalValue string
@@ -434,6 +434,9 @@ func MakeLexer(in string) lexer {
 
 		varcount := 0
 		for len(content) > 0 {
+			if off > len(content) {
+				return
+			}
 			idx := -1
 			if varcount == 0 {
 				idx = strings.IndexAny(content[off:], `%\`)
@@ -462,7 +465,8 @@ func MakeLexer(in string) lexer {
 				op := ":"
 				if strings.ContainsRune("!@#&*=+<>?", rune(content[off])) {
 					off++
-					op = content[idx : off+1]
+					// Two-byte op e.g. ":!"
+					op = content[idx:off]
 				}
 				lex <- opToken(op)
 
