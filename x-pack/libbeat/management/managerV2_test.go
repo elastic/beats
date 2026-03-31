@@ -47,7 +47,8 @@ func TestManagerV2(t *testing.T) {
 	fqdnEnabled := atomic.Bool{}
 	allStopped := atomic.Bool{}
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
-		if currentIdx == 1 {
+		switch currentIdx {
+		case 1:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -55,7 +56,7 @@ func TestManagerV2(t *testing.T) {
 				configsSet.Store(true)
 				t.Log("output, inputs, and APM configuration set")
 			}
-		} else if currentIdx == 2 {
+		case 2:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -64,7 +65,7 @@ func TestManagerV2(t *testing.T) {
 				configsSet.Store(false)
 				t.Log("output, inputs, and APM configuration cleared (should not happen)")
 			}
-		} else {
+		default:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()

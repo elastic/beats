@@ -510,11 +510,14 @@ func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
 func (m mockManager) PreInit() error                                { return nil }
 func (m mockManager) PostInit()                                     {}
-func (m mockManager) WaitForStop(_ time.Duration) bool              { return true }
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
 func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action management.Action)     {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
+func (m mockManager) WaitForStop(_ time.Duration) bool {
+	m.Stop()
+	return true
+}
 
 func TestManager(t *testing.T) {
 	// set the mockManger factory.

@@ -63,7 +63,6 @@ func (n *OtelManager) AgentInfo() management.AgentInfo           { return manage
 func (n *OtelManager) PreInit() error                            { return nil }
 func (n *OtelManager) PostInit()                                 {}
 func (n *OtelManager) Start() error                              { return nil }
-func (n *OtelManager) WaitForStop(_ time.Duration) bool          { return true }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
 func (n *OtelManager) RegisterAction(action management.Action)   {}
 func (n *OtelManager) UnregisterAction(action management.Action) {}
@@ -76,4 +75,8 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
 	n.receiverName = receiverName
+}
+func (n *OtelManager) WaitForStop(_ time.Duration) bool {
+	n.Stop()
+	return true
 }
