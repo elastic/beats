@@ -39,6 +39,7 @@ func TestOktaDoFetch(t *testing.T) {
 		{dataset: "all", enrichWith: []string{"groups"}, wantUsers: true, wantDevices: true},
 		{dataset: "users", enrichWith: []string{"groups", "roles", "factors"}, wantUsers: true, wantDevices: false},
 		{dataset: "devices", enrichWith: []string{"groups"}, wantUsers: false, wantDevices: true},
+		{dataset: "users", enrichWith: []string{"groups", "enrolled_devices"}, wantUsers: true, wantDevices: false},
 	}
 
 	for _, test := range tests {
@@ -61,14 +62,17 @@ func TestOktaDoFetch(t *testing.T) {
 				groups  = `[{"id":"USERID","profile":{"description":"All users in your organization","name":"Everyone"}}]`
 				factors = `[{"id":"ufs2bysphxKODSZKWVCT","factorType":"question","provider":"OKTA","vendorName":"OKTA","status":"ACTIVE","created":"2014-04-15T18:10:06.000Z","lastUpdated":"2014-04-15T18:10:06.000Z","profile":{"question":"favorite_art_piece","questionText":"What is your favorite piece of art?"}},{"id":"ostf2gsyictRQDSGTDZE","factorType":"token:software:totp","provider":"OKTA","status":"PENDING_ACTIVATION","created":"2014-06-27T20:27:33.000Z","lastUpdated":"2014-06-27T20:27:33.000Z","profile":{"credentialId":"dade.murphy@example.com"}},{"id":"sms2gt8gzgEBPUWBIFHN","factorType":"sms","provider":"OKTA","status":"ACTIVE","created":"2014-06-27T20:27:26.000Z","lastUpdated":"2014-06-27T20:27:26.000Z","profile":{"phoneNumber":"+1-555-415-1337"}}]`
 				devices = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
+				// userDevices is sample data from https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userresources/other/listuserdevices
+				userDevices = `[{"id":"guo4a5uyerdpvAiJT0h7","status":"ACTIVE","created":"2022-05-14T13:37:20.000Z","lastUpdated":"2022-05-14T13:37:20.000Z","profile":{"displayName":"DESKTOP-XXXX","platform":"WINDOWS","manufacturer":"LENOVO","model":"20BH002DUS","osVersion":"10.0.19043","serialNumber":"1XXXX0X0X","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"DESKTOP-XXXX","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5uyerdpvAiJT0h7","_links":{"activate":{"href":"https://localhost/api/v1/devices/guo4a5uyerdpvAiJT0h7/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/guo4a5uyerdpvAiJT0h7","hints":{"allow":["GET","PATCH","PUT"]}}}}]`
 			)
 
 			data := map[string]string{
-				"users":   users,
-				"roles":   roles,
-				"groups":  groups,
-				"devices": devices,
-				"factors": factors,
+				"users":        users,
+				"roles":        roles,
+				"groups":       groups,
+				"devices":      devices,
+				"factors":      factors,
+				"user_devices": userDevices,
 			}
 
 			var wantUsers []User
@@ -107,6 +111,13 @@ func TestOktaDoFetch(t *testing.T) {
 					t.Fatalf("failed to unmarshal role data: %v", err)
 				}
 			}
+			var wantUserDevices []okta.Device
+			if slices.Contains(test.enrichWith, "enrolled_devices") {
+				err := json.Unmarshal([]byte(userDevices), &wantUserDevices)
+				if err != nil {
+					t.Fatalf("failed to unmarshal user device data: %v", err)
+				}
+			}
 
 			wantStates := make(map[string]State)
 
@@ -123,13 +134,17 @@ func TestOktaDoFetch(t *testing.T) {
 			mux.Handle("/api/v1/users/{userid}/{metadata}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				setHeaders(w)
 				attr := r.PathValue("metadata")
-				if attr != "groups" {
+				switch attr {
+				case "groups":
+					// Replace USERID placeholder with the actual user ID.
+					userid := r.PathValue("userid")
+					fmt.Fprintln(w, strings.ReplaceAll(data[attr], "USERID", userid))
+				case "devices":
+					// User-enrolled devices are served from a separate data key.
+					fmt.Fprintln(w, data["user_devices"])
+				default:
 					fmt.Fprintln(w, data[attr])
-					return
 				}
-				// Give the groups if this is a get user groups request.
-				userid := r.PathValue("userid")
-				fmt.Fprintln(w, strings.ReplaceAll(data[attr], "USERID", userid))
 			}))
 			mux.Handle("/api/v1/devices/{deviceid}/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				setHeaders(w)
@@ -235,6 +250,9 @@ func TestOktaDoFetch(t *testing.T) {
 					}
 					if len(g.Roles) != len(wantRoles) {
 						t.Errorf("number of roles for user %d: got:%d want:%d", i, len(g.Roles), len(wantRoles))
+					}
+					if len(g.Devices) != len(wantUserDevices) {
+						t.Errorf("number of enrolled devices for user %d: got:%d want:%d", i, len(g.Devices), len(wantUserDevices))
 					}
 					for j, gg := range g.Groups {
 						if gg.ID != wantID {

@@ -1231,7 +1231,9 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 #### `enrich_with` [_enrich_with]
 
-The metadata to enrich users with. This is an array of values that may contain "groups", "roles" and "factors", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors" and "enrolled_devices", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+
+When "enrolled_devices" is included, each user is enriched with the list of devices enrolled for that user by calling the [List User Devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userresources/other/listuserdevices) API. This requires one additional API request per user, so it is disabled by default to avoid hitting Okta rate limits.
 
 
 #### `sync_interval` [_sync_interval_4]

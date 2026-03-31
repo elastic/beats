@@ -579,6 +579,14 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Roles = roles
 		}
 	}
+	if slices.Contains(p.cfg.EnrichWith, "enrolled_devices") {
+		devices, _, err := okta.GetUserDevices(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
+		if err != nil {
+			p.logger.Warnf("failed to get enrolled devices for user %s: %v", u.ID, err)
+		} else {
+			su.Devices = devices
+		}
+	}
 	return su
 }
 
@@ -770,6 +778,7 @@ func (p *oktaInput) publishUser(u *User, state *stateStore, inputID string, clie
 	_, _ = userDoc.Put("groups", u.Groups)
 	_, _ = userDoc.Put("roles", u.Roles)
 	_, _ = userDoc.Put("factors", u.Factors)
+	_, _ = userDoc.Put("devices", u.Devices)
 
 	switch u.State {
 	case Deleted:
