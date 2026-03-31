@@ -26,4 +26,4 @@ jobs:
           max-issues: '5'
           org: 'elastic'
           test-suite-id: 'beats'
-          token: ${{ secrets.BUILDKITE_TEST_SUITE_TOKEN }}
+          token: ${{ secrets.BUILDKITE_TEST_ENGINE_TOKEN }}
