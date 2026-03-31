@@ -579,6 +579,14 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Roles = roles
 		}
 	}
+	if slices.Contains(p.cfg.EnrichWith, "supervises") {
+		supervised, _, err := okta.GetUserSupervises(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
+		if err != nil {
+			p.logger.Warnf("failed to get supervised users for %s: %v", u.ID, err)
+		} else {
+			su.Supervises = supervised
+		}
+	}
 	return su
 }
 
@@ -770,6 +778,7 @@ func (p *oktaInput) publishUser(u *User, state *stateStore, inputID string, clie
 	_, _ = userDoc.Put("groups", u.Groups)
 	_, _ = userDoc.Put("roles", u.Roles)
 	_, _ = userDoc.Put("factors", u.Factors)
+	_, _ = userDoc.Put("supervises", u.Supervises)
 
 	switch u.State {
 	case Deleted:

@@ -1231,7 +1231,9 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 #### `enrich_with` [_enrich_with]
 
-The metadata to enrich users with. This is an array of values that may contain "groups", "roles" and "factors", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "supervises", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+
+The "supervises" option populates the `supervises` field with a list of user IDs managed by each user. It works by searching for users whose `profile.managerId` matches the manager's user ID. Because this requires one additional API call per user, it is disabled by default to avoid hitting Okta rate limits.
 
 
 #### `sync_interval` [_sync_interval_4]

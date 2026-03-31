@@ -62,7 +62,10 @@ type conf struct {
 	Dataset string `config:"dataset"`
 	// EnrichWith specifies the additional data that
 	// will be used to enrich user data. It can include
-	// "groups", "roles" and "factors".
+	// "groups", "roles", "factors" and "supervises".
+	// The "supervises" option requires one additional API
+	// call per user and is disabled by default due to
+	// Okta rate limit concerns.
 	// If it is a single element with "none", no
 	// enrichment is performed.
 	EnrichWith []string `config:"enrich_with"`

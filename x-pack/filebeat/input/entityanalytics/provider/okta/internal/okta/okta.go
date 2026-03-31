@@ -276,6 +276,38 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 	return getDetails[Group](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
+// GetUserSupervises returns users managed by the specified user, by searching for
+// users whose profile.managerId matches the given user ID. Only id, profile.email,
+// and profile.login are requested via the fields query parameter to minimise payload size.
+// host is the Okta user domain and key is the API token to use for the query. userID must not be empty.
+//
+// userID must be the Okta user ID (e.g. "00u1a2b3c4D5E6F7G8h9"), not the login/username.
+// The search filter uses profile.managerId which stores the manager's user ID on subordinate
+// user records — passing a login value here would produce no results.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/reference/user-query/ for search syntax details.
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/other/listusers#other/listusers/t=request&in=query&path=fields for the fields parameter details.
+func GetUserSupervises(ctx context.Context, cli *http.Client, host, key, userID string, lim *RateLimiter, log *logp.Logger) ([]SupervisedUser, http.Header, error) {
+	if userID == "" {
+		return nil, nil, errors.New("no user ID specified")
+	}
+
+	const endpoint = "/api/v1/users"
+	query := url.Values{}
+	query.Set("search", fmt.Sprintf(`profile.managerId eq "%s"`, userID))
+	query.Set("fields", "id,profile:(email,login)")
+
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     host,
+		Path:     endpoint,
+		RawQuery: query.Encode(),
+	}
+	return getDetails[SupervisedUser](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
+}
+
 // GetGroupRoles returns Okta group roles using the groups API endpoint. host is the
 // Okta user domain and key is the API token to use for the query. group must not be empty.
 //
@@ -358,9 +390,28 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 	return users, h, nil
 }
 
+// SupervisedUser holds the subset of Okta user fields returned for the supervises enrichment.
+// Only the fields requested via the fields query parameter are populated.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tags/user/other/getuser for details.
+type SupervisedUser struct {
+	ID      string            `json:"id"`
+	Profile SupervisedProfile `json:"profile"`
+}
+
+// SupervisedProfile holds the profile fields for a supervised user.
+type SupervisedProfile struct {
+	// Email is the primary email address of the user.
+	Email string `json:"email"`
+	// Login is the Okta username for the user. In Okta, the login field in the user profile
+	// serves as the unique identifier used for authentication — equivalent to a username.
+	// See https://developer.okta.com/docs/reference/api/users/#default-profile-properties for details.
+	Login string `json:"login"`
+}
+
 // entity is an Okta entity analytics entity.
 type entity interface {
-	User | Group | Role | Factor | Device | devUser
+	User | Group | Role | Factor | Device | devUser | SupervisedUser
 }
 
 type devUser struct {

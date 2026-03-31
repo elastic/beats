@@ -39,6 +39,7 @@ func TestOktaDoFetch(t *testing.T) {
 		{dataset: "all", enrichWith: []string{"groups"}, wantUsers: true, wantDevices: true},
 		{dataset: "users", enrichWith: []string{"groups", "roles", "factors"}, wantUsers: true, wantDevices: false},
 		{dataset: "devices", enrichWith: []string{"groups"}, wantUsers: false, wantDevices: true},
+		{dataset: "users", enrichWith: []string{"supervises"}, wantUsers: true, wantDevices: false},
 	}
 
 	for _, test := range tests {
@@ -60,15 +61,17 @@ func TestOktaDoFetch(t *testing.T) {
 				roles   = `[{"id":"IFIFAX2BIRGUSTQ","label":"Application administrator","type":"APP_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"JBCUYUC7IRCVGS27IFCE2SKO","label":"Help Desk administrator","type":"HELP_DESK_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"ra125eqBFpETrMwu80g4","label":"Organization administrator","type":"ORG_ADMIN","status":"ACTIVE","created":"2019-02-06T16:17:40.000Z","lastUpdated":"2019-02-06T16:17:40.000Z","assignmentType":"USER"},{"id":"gra25fapn1prGTBKV0g4","label":"API Access Management administrator","type":"API_ACCESS_MANAGEMENT_ADMIN","status":"ACTIVE","created\"":"2019-02-06T16:20:57.000Z","lastUpdated\"":"2019-02-06T16:20:57.000Z","assignmentType\"":"GROUP"}]`
 				groups  = `[{"id":"USERID","profile":{"description":"All users in your organization","name":"Everyone"}}]`
 				factors = `[{"id":"ufs2bysphxKODSZKWVCT","factorType":"question","provider":"OKTA","vendorName":"OKTA","status":"ACTIVE","created":"2014-04-15T18:10:06.000Z","lastUpdated":"2014-04-15T18:10:06.000Z","profile":{"question":"favorite_art_piece","questionText":"What is your favorite piece of art?"}},{"id":"ostf2gsyictRQDSGTDZE","factorType":"token:software:totp","provider":"OKTA","status":"PENDING_ACTIVATION","created":"2014-06-27T20:27:33.000Z","lastUpdated":"2014-06-27T20:27:33.000Z","profile":{"credentialId":"dade.murphy@example.com"}},{"id":"sms2gt8gzgEBPUWBIFHN","factorType":"sms","provider":"OKTA","status":"ACTIVE","created":"2014-06-27T20:27:26.000Z","lastUpdated":"2014-06-27T20:27:26.000Z","profile":{"phoneNumber":"+1-555-415-1337"}}]`
-				devices = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
+				devices         = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
+				supervisedUsers = `[{"id":"SUPERVISED_ID","profile":{"email":"supervised@example.com","login":"supervised@example.com"}}]`
 			)
 
 			data := map[string]string{
-				"users":   users,
-				"roles":   roles,
-				"groups":  groups,
-				"devices": devices,
-				"factors": factors,
+				"users":      users,
+				"roles":      roles,
+				"groups":     groups,
+				"devices":    devices,
+				"factors":    factors,
+				"supervises": supervisedUsers,
 			}
 
 			var wantUsers []User
@@ -107,6 +110,13 @@ func TestOktaDoFetch(t *testing.T) {
 					t.Fatalf("failed to unmarshal role data: %v", err)
 				}
 			}
+			var wantSupervises []okta.SupervisedUser
+			if slices.Contains(test.enrichWith, "supervises") {
+				err := json.Unmarshal([]byte(supervisedUsers), &wantSupervises)
+				if err != nil {
+					t.Fatalf("failed to unmarshal supervised users data: %v", err)
+				}
+			}
 
 			wantStates := make(map[string]State)
 
@@ -139,6 +149,12 @@ func TestOktaDoFetch(t *testing.T) {
 				setHeaders(w)
 
 				base := path.Base(r.URL.Path)
+
+				// Handle supervises queries (profile.managerId search) without affecting pagination counter.
+				if base == "users" && strings.Contains(r.URL.Query().Get("search"), "managerId") {
+					fmt.Fprintln(w, data["supervises"])
+					return
+				}
 
 				// Set next link if we can still repeat.
 				n++
@@ -235,6 +251,21 @@ func TestOktaDoFetch(t *testing.T) {
 					}
 					if len(g.Roles) != len(wantRoles) {
 						t.Errorf("number of roles for user %d: got:%d want:%d", i, len(g.Roles), len(wantRoles))
+					}
+					if len(g.Supervises) != len(wantSupervises) {
+						t.Errorf("number of supervised users for user %d: got:%d want:%d", i, len(g.Supervises), len(wantSupervises))
+					}
+					for j, su := range g.Supervises {
+						w := wantSupervises[j]
+						if su.ID != w.ID {
+							t.Errorf("unexpected supervised user ID %d for user %d: got:%s want:%s", j, i, su.ID, w.ID)
+						}
+						if su.Profile.Email != w.Profile.Email {
+							t.Errorf("unexpected supervised user email %d for user %d: got:%s want:%s", j, i, su.Profile.Email, w.Profile.Email)
+						}
+						if su.Profile.Login != w.Profile.Login {
+							t.Errorf("unexpected supervised user login %d for user %d: got:%s want:%s", j, i, su.Profile.Login, w.Profile.Login)
+						}
 					}
 					for j, gg := range g.Groups {
 						if gg.ID != wantID {
