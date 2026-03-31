@@ -21,6 +21,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -41,6 +42,7 @@ func (tm testManager) Start() error                           { return nil }
 func (tm testManager) PreInit() error                         { return nil }
 func (tm testManager) PostInit()                              {}
 func (tm testManager) Stop()                                  {}
+func (tm testManager) WaitForStop(_ time.Duration) bool      { return true }
 func (tm testManager) AgentInfo() management.AgentInfo {
 	return management.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
 }

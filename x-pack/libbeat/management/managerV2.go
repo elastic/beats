@@ -91,6 +91,8 @@ type BeatV2Manager struct {
 	// either the agent or the beat
 	stopChan chan struct{}
 	stopOnce sync.Once
+	// waits for manager goroutines started in PreInit() to exit
+	stopWait sync.WaitGroup
 
 	isRunning bool
 
@@ -303,7 +305,9 @@ func (cm *BeatV2Manager) PreInit() error {
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 
-	go cm.watchErrChan(ctx)
+	cm.stopWait.Go(func() {
+		cm.watchErrChan(ctx)
+	})
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
 		"the rendered config used by the beat",
@@ -313,7 +317,7 @@ func (cm *BeatV2Manager) PreInit() error {
 
 	cm.UpdateStatus(status.Starting, "Starting")
 
-	go cm.unitListen()
+	cm.stopWait.Go(cm.unitListen)
 	cm.isRunning = true
 	return nil
 }
@@ -348,6 +352,33 @@ func (cm *BeatV2Manager) Stop() {
 	cm.stopOnce.Do(func() {
 		close(cm.stopChan)
 	})
+}
+
+// WaitForStop call [Stop], then waits until all manager goroutines have exited,
+// or until timeout elapses.
+// If false is returned, not all gorotunes have exited and timeout as reached.
+// A non-positive timeout waits indefinitely.
+func (cm *BeatV2Manager) WaitForStop(timeout time.Duration) bool {
+	cm.Stop()
+	done := make(chan struct{})
+	go func() {
+		cm.stopWait.Wait()
+		close(done)
+	}()
+
+	if timeout <= 0 {
+		<-done
+		return true
+	}
+
+	t := time.NewTimer(timeout)
+
+	select {
+	case <-done:
+		return true
+	case <-t.C:
+		return false
+	}
 }
 
 // CheckRawConfig is currently not implemented for V1.

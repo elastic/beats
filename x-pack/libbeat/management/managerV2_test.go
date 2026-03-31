@@ -260,7 +260,7 @@ func TestManagerV2(t *testing.T) {
 
 	err = m.Start()
 	require.NoError(t, err)
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	require.Eventually(t, func() bool {
 		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
@@ -394,7 +394,7 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 
 	err = m.Start()
 	require.NoError(t, err)
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	<-inputConfigUpdated
 	assert.Equal(t, 1, output.reloadCount) // initial load
@@ -495,7 +495,7 @@ func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
 		logp.NewNopLogger(),
 	)
 	require.NoError(t, err)
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	mm, ok := m.(*BeatV2Manager)
 	require.True(t, ok)
@@ -647,7 +647,7 @@ func TestOutputError(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
@@ -807,7 +807,7 @@ func TestErrorPerUnit(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
@@ -902,4 +902,13 @@ func (m *mockReloadable) Configs() []*reload.ConfigWithMeta {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	return m.ConfigsFn()
+}
+
+type stopAndWait interface {
+	WaitForStop(time.Duration) bool
+}
+
+func stopManagerAndWait(t *testing.T, m stopAndWait) {
+	t.Helper()
+	require.True(t, m.WaitForStop(5*time.Second), "timed out waiting for manager shutdown")
 }
