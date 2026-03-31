@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add input redirection support through a new Redirector mechanism.
+component: filebeat
