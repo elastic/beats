@@ -179,11 +179,43 @@ func TestParseRawTokens(t *testing.T) {
 		name         string
 		input        string
 		expectedList []any
+		err          error
 	}{
+
 		{
-			name:         "simple lookup standalone",
-			input:        "%{k}",
-			expectedList: []any{VariableToken("k")},
+			name:         "empty string",
+			input:        "",
+			expectedList: nil,
+		},
+		{
+			name:         `when two %%`,
+			input:        `%%`,
+			expectedList: []any{"%%"},
+		},
+		{
+			name:  `when input is %%{}`,
+			input: `%%{}`,
+			err:   fmt.Errorf("empty format expansion"),
+		},
+		{
+			name:         `when input is %\{}`,
+			input:        `%\{}`,
+			expectedList: []any{"%{}"},
+		},
+		{
+			name:  `when input is %{}`,
+			input: `%\{}`,
+			err:   fmt.Errorf("empty format expansion"),
+		},
+		{
+			name:         `when input is %{a:b:c}`,
+			input:        `%{a:b:c}`,
+			expectedList: []any{VariableToken("a:b:c")},
+		},
+		{
+			name:  `when input is %{a`,
+			input: `%{a`,
+			err:   fmt.Errorf(`missing closing '}'`),
 		},
 		{
 			name:         "simple lookup start of string",
@@ -217,6 +249,10 @@ func TestParseRawTokens(t *testing.T) {
 			lexer := MakeLexer(test.input)
 			defer lexer.Finish()
 			got, err := ParseRawTokens(lexer)
+			if test.err != nil {
+				require.Error(t, test.err, err)
+				return
+			}
 			require.NoError(t, err)
 			require.Equal(t, test.expectedList, got)
 		})
