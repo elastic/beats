@@ -466,6 +466,7 @@ func (cm *BeatV2Manager) watchErrChan() {
 	for {
 		select {
 		case <-cm.stopChan:
+			return
 		case err := <-cm.client.Errors():
 			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
 			if !errors.Is(err, context.Canceled) {
