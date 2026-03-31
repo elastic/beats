@@ -402,6 +402,130 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 	assert.Equal(t, 0, apm.reloadCount)    // no apm tracing config applied
 }
 
+func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
+	r := reload.NewRegistry()
+
+	beatReady := atomic.Bool{}
+
+	output := &reloadable{}
+	r.MustRegisterOutput(output)
+	inputs := &reloadableList{}
+	r.MustRegisterInput(inputs)
+
+	agentInfo := &proto.AgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  version.GetDefaultVersion(),
+		Snapshot: true,
+	}
+	units := []*proto.UnitExpected{
+		{
+			Id:             "output-unit",
+			Type:           proto.UnitType_OUTPUT,
+			ConfigStateIdx: 1,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "elasticsearch",
+				Name: "elasticsearch",
+			},
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+		},
+		{
+			Id:             "input-unit-1",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "system/metrics-system-default-system-1",
+				Type: "system/metrics",
+				Name: "system-1",
+				Streams: []*proto.Stream{
+					{
+						Id: "system/metrics-system.filesystem-default-system-1",
+						Source: integration.RequireNewStruct(t, map[string]interface{}{
+							"metricsets": []interface{}{"filesystem"},
+							"period":     "1m",
+						}),
+					},
+				},
+			},
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+		},
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if !beatReady.Load() {
+				for _, u := range observed.Units {
+					if u.State != proto.State_STARTING {
+						t.Errorf(
+							"Unit %q is not in %q state, got %q",
+							u.GetId(), proto.State_STARTING,
+							u.GetState().String())
+					}
+				}
+			}
+
+			return &proto.CheckinExpected{
+				AgentInfo:   agentInfo,
+				Units:       units,
+				Features:    nil,
+				FeaturesIdx: 1,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+	require.NoError(t, server.Start())
+	defer server.Stop()
+
+	client := client.NewV2(
+		fmt.Sprintf(":%d", server.Port),
+		"",
+		client.VersionInfo{},
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{
+			Enabled: true,
+		},
+		r,
+		client,
+		// If t.Log is used as logger output this test might panic.
+		// See https://github.com/elastic/beats/issues/49807
+		logp.NewNopLogger(),
+	)
+	require.NoError(t, err)
+	defer m.Stop()
+
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok)
+
+	mm.changeDebounce = 10 * time.Millisecond
+	mm.forceReloadDebounce = 20 * time.Millisecond
+
+	require.NoError(t, m.PreInit())
+
+	// Ensure unit changes are received while the beat is not ready.
+	require.Eventually(t, func() bool {
+		mm.mx.Lock()
+		defer mm.mx.Unlock()
+		return len(mm.units) == len(units)
+	}, 5*time.Second, 10*time.Millisecond, "expected manager to receive units before PostInit")
+
+	// Wait for debounce windows to pass while not ready; nothing should be reloaded.
+	time.Sleep(mm.changeDebounce + 2*mm.forceReloadDebounce)
+	assert.Nil(t, output.Config(), "output should not be reloaded before PostInit")
+	assert.Empty(t, inputs.Configs(), "inputs should not be reloaded before PostInit")
+
+	// Once ready, previously buffered unit state should eventually be applied.
+	m.PostInit()
+	beatReady.Store(true)
+	require.Eventually(t, func() bool {
+		return output.Config() != nil && len(inputs.Configs()) > 0
+	}, 5*time.Second, 10*time.Millisecond,
+		"expected buffered units to be applied after PostInit without requiring new unit changes")
+}
+
 func TestOutputError(t *testing.T) {
 	// Uncomment the line below to see the debug logs for this test
 	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
