@@ -233,6 +233,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 
 	logp.Debug("main", "Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
+	var closers []func()
 	for i, iface := range interfaces {
 		protocols := protos.NewProtocols()
 		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
@@ -240,13 +241,18 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
 		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
 		}
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
+<<<<<<< HEAD
 	return sniffer.New(id, false, "", decoders, interfaces)
+=======
+	return sniffer.New(id, false, "", decoders, interfaces, reporter, closers...)
+>>>>>>> 70b37f21a (Fix packetbeat cache janitor goroutine leak (#48836))
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
