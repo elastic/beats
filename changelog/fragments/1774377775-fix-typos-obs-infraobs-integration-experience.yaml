@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix typos in metricbeat modules (iis, oracle, etcd, sql, http) and filebeat decode_cef/netflow processors
-component: metricbeat
