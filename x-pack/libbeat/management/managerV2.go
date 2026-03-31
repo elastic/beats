@@ -283,7 +283,7 @@ func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
 	cm.stopFunc = stopFunc
 }
 
-// PreInit the unitListen loop, so the manager can already
+// PreInit starts the unitListen loop, so the manager can already
 // check-in with Elastic Agent, but no input/output will be
 // started yet. Call [PostInit] to enable starting/stopping
 // inputs/output.
@@ -333,7 +333,7 @@ func (cm *BeatV2Manager) PostInit() {
 	cm.logger.Debug("Manager ready to accept units.")
 }
 
-// Start the config manager.
+// Start starts the manager.
 //
 // Deprecated: Use [PreInit] and [PostInit] instead
 //
@@ -354,10 +354,9 @@ func (cm *BeatV2Manager) Stop() {
 	})
 }
 
-// WaitForStop call [Stop], then waits until all manager goroutines have exited,
-// or until timeout elapses.
-// If false is returned, not all gorotunes have exited and timeout as reached.
-// A non-positive timeout waits indefinitely.
+// WaitForStop blocks until the manager has fully stopped, or timeout elapses.
+// It returns true if the manager stopped before timeout, false otherwise.
+// A non-positive timeout means wait indefinitely.
 func (cm *BeatV2Manager) WaitForStop(timeout time.Duration) bool {
 	cm.Stop()
 	done := make(chan struct{})

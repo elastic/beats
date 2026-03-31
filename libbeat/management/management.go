@@ -52,7 +52,7 @@ type Manager interface {
 	// execution.
 	PostInit()
 
-	// Start the config manager.
+	// Start starts the manager.
 	//
 	// Deprecated: Use [PreInit] and [PostInit] instead
 	//

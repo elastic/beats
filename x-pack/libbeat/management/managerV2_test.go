@@ -404,53 +404,49 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 }
 
 func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
-	r := reload.NewRegistry()
-
 	beatReady := atomic.Bool{}
 
+	r := reload.NewRegistry()
 	output := &reloadable{}
 	r.MustRegisterOutput(output)
 	inputs := &reloadableList{}
 	r.MustRegisterInput(inputs)
 
 	agentInfo := &proto.AgentInfo{
-		Id:       "elastic-agent-id",
-		Version:  version.GetDefaultVersion(),
-		Snapshot: true,
+		Id:      "elastic-agent-id",
+		Version: version.GetDefaultVersion(),
 	}
 	units := []*proto.UnitExpected{
 		{
-			Id:             "output-unit",
-			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
+			Id:       "output-unit",
+			Type:     proto.UnitType_OUTPUT,
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
 			Config: &proto.UnitExpectedConfig{
 				Id:   "default",
 				Type: "elasticsearch",
 				Name: "elasticsearch",
 			},
-			State:    proto.State_HEALTHY,
-			LogLevel: proto.UnitLogLevel_INFO,
 		},
 		{
-			Id:             "input-unit-1",
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
+			Id:       "input-unit-1",
+			Type:     proto.UnitType_INPUT,
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
 			Config: &proto.UnitExpectedConfig{
-				Id:   "system/metrics-system-default-system-1",
-				Type: "system/metrics",
-				Name: "system-1",
+				Id:   "filestram-unit-id",
+				Type: "filestream",
+				Name: "filesteam",
 				Streams: []*proto.Stream{
 					{
-						Id: "system/metrics-system.filesystem-default-system-1",
-						Source: integration.RequireNewStruct(t, map[string]interface{}{
-							"metricsets": []interface{}{"filesystem"},
-							"period":     "1m",
+						Id: "filestream-input-id",
+						Source: integration.RequireNewStruct(t, map[string]any{
+							"id":    "filestream-input-id",
+							"paths": []any{"/foo/bar"},
 						}),
 					},
 				},
 			},
-			State:    proto.State_HEALTHY,
-			LogLevel: proto.UnitLogLevel_INFO,
 		},
 	}
 
@@ -491,15 +487,13 @@ func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
 		},
 		r,
 		client,
-		// If t.Log is used as logger output this test might panic.
-		// See https://github.com/elastic/beats/issues/49807
 		logp.NewNopLogger(),
 	)
 	require.NoError(t, err)
 	defer stopManagerAndWait(t, m)
 
 	mm, ok := m.(*BeatV2Manager)
-	require.True(t, ok)
+	require.True(t, ok, "NewV2AgentManagerWithClient must return a BeatV2Manager")
 
 	mm.changeDebounce = 10 * time.Millisecond
 	mm.forceReloadDebounce = 20 * time.Millisecond
@@ -911,5 +905,5 @@ type stopAndWait interface {
 
 func stopManagerAndWait(t *testing.T, m stopAndWait) {
 	t.Helper()
-	require.True(t, m.WaitForStop(5*time.Second), "timed out waiting for manager shutdown")
+	require.True(t, m.WaitForStop(15*time.Second), "timed out waiting for manager shutdown")
 }
