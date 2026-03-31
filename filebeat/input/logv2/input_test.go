@@ -94,7 +94,6 @@ func TestRunAsFilestream(t *testing.T) {
 
 func TestManagerRedirect(t *testing.T) {
 	setUnderAgent := func(t *testing.T, v bool) {
-		t.Helper()
 		prev := management.UnderAgent()
 		t.Cleanup(func() { management.SetUnderAgent(prev) })
 		management.SetUnderAgent(v)
