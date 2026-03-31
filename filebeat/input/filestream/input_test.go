@@ -126,6 +126,68 @@ paths:
 			}
 		})
 	})
+
+	b.Run("line filter", func(b *testing.B) {
+		lineCount := 10000
+		filename := generateFile(b, b.TempDir(), lineCount)
+		b.ResetTimer()
+
+		b.Run("no filter", func(b *testing.B) {
+			cfg := `
+type: filestream
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
+paths:
+    - ` + filename + `
+`
+			for i := 0; i < b.N; i++ {
+				runFilestreamBenchmark(b, fmt.Sprintf("no-filter-%d", i), cfg, lineCount)
+			}
+		})
+
+		b.Run("with include_lines", func(b *testing.B) {
+			cfg := `
+type: filestream
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
+include_lines: ['^rather']
+paths:
+    - ` + filename + `
+`
+			for i := 0; i < b.N; i++ {
+				runFilestreamBenchmark(b, fmt.Sprintf("include-lines-%d", i), cfg, lineCount)
+			}
+		})
+
+		b.Run("with exclude_lines", func(b *testing.B) {
+			cfg := `
+type: filestream
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
+exclude_lines: ['^NOMATCH']
+paths:
+    - ` + filename + `
+`
+			for i := 0; i < b.N; i++ {
+				runFilestreamBenchmark(b, fmt.Sprintf("exclude-lines-%d", i), cfg, lineCount)
+			}
+		})
+
+		b.Run("with include_and_exclude_lines", func(b *testing.B) {
+			cfg := `
+type: filestream
+prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
+include_lines: ['^rather']
+exclude_lines: ['^NOMATCH']
+paths:
+    - ` + filename + `
+`
+			for i := 0; i < b.N; i++ {
+				runFilestreamBenchmark(b, fmt.Sprintf("include-exclude-lines-%d", i), cfg, lineCount)
+			}
+		})
+	})
 }
 
 func TestTakeOverTags(t *testing.T) {
