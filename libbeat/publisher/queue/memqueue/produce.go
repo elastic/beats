@@ -24,28 +24,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var respChanPool = sync.Pool{
-	New: func() interface{} {
-		return make(chan queue.EntryID, 1)
-	},
-}
-
-func getRespChan() chan queue.EntryID {
-	if ch, ok := respChanPool.Get().(chan queue.EntryID); ok {
-		return ch
-	}
-	return make(chan queue.EntryID, 1)
-}
-
-func putRespChan(ch chan queue.EntryID) {
-	// Drain any stale response before returning to the pool.
-	select {
-	case <-ch:
-	default:
-	}
-	respChanPool.Put(ch)
-}
-
 type forgetfulProducer struct {
 	broker    *broker
 	openState openState
@@ -79,6 +57,12 @@ type produceState struct {
 
 type ackHandler func(count int)
 
+var respChanPool = sync.Pool{
+	New: func() interface{} {
+		return make(chan queue.EntryID, 1)
+	},
+}
+
 func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer {
 	openState := openState{
 		log:          b.logger,
@@ -99,7 +83,7 @@ func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer
 func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
 	return pushRequest{
 		event: event,
-		resp:  getRespChan()}
+		resp:  respChanPool.Get().(chan queue.EntryID)}
 }
 
 func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
@@ -121,7 +105,7 @@ func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
-		resp:       getRespChan()}
+		resp:       respChanPool.Get().(chan queue.EntryID)}
 }
 
 func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
@@ -154,22 +138,18 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	if st.encoder != nil {
 		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
 	}
+	// handlePendingResponse fully drains the channel before returning,
+	// so it is always safe to recycle after this function completes.
+	if req.resp != nil {
+		defer respChanPool.Put(req.resp)
+	}
 	select {
 	case st.events <- req:
-		id, ok := st.handlePendingResponse(req.resp)
-		// We can only recycle the channel if we have definitely consumed the
-		// response. If the queue is closing and ownership is ambiguous, avoid
-		// pooling to prevent a stale send into a reused channel.
-		if ok {
-			putRespChan(req.resp)
-		}
-		return id, ok
+		return st.handlePendingResponse(req.resp)
 	case <-st.done:
-		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	case <-st.queueClosing:
-		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	}
@@ -181,19 +161,16 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	if st.encoder != nil {
 		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
 	}
+	if req.resp != nil {
+		defer respChanPool.Put(req.resp)
+	}
 	select {
 	case st.events <- req:
-		id, ok := st.handlePendingResponse(req.resp)
-		if ok {
-			putRespChan(req.resp)
-		}
-		return id, ok
+		return st.handlePendingResponse(req.resp)
 	case <-st.done:
-		putRespChan(req.resp)
 		st.events = nil
 		return 0, false
 	default:
-		putRespChan(req.resp)
 		st.log.Debugf("Dropping event, queue is blocked")
 		return 0, false
 	}
