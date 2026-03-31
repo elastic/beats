@@ -176,6 +176,8 @@ func (n *FallbackManager) Stop() {
 // hence it will always return false.
 func (n *FallbackManager) Enabled() bool                      { return false }
 func (n *FallbackManager) AgentInfo() AgentInfo               { return AgentInfo{} }
+func (n *FallbackManager) PreStart() error                    { return nil }
+func (n *FallbackManager) PostStart()                         {}
 func (n *FallbackManager) Start() error                       { return nil }
 func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *FallbackManager) RegisterAction(action Action)       {}

@@ -294,6 +294,7 @@ func (cm *BeatV2Manager) PreStart() error {
 		cm.errCanceller = nil
 	}
 
+	cm.logger.Debug("Manager starting")
 	ctx := context.Background()
 	err := cm.client.Start(ctx)
 	if err != nil {
@@ -325,6 +326,7 @@ func (cm *BeatV2Manager) PostStart() {
 	defer cm.mx.Unlock()
 
 	cm.beatIsReady = true
+	cm.logger.Debug("Manager ready to accept units.")
 }
 
 // Start the config manager.
@@ -577,6 +579,7 @@ func (cm *BeatV2Manager) unitListen() {
 			// If the Beat is not ready to accept configuration, do nothing.
 			if !cm.beatIsReady {
 				cm.logger.Debug("Debounce timer fired, but Beat is not ready yet.")
+				cm.mx.Unlock()
 				continue
 			}
 
