@@ -74,6 +74,30 @@ func (f *fakeInput) Run(ctx Context, pipeline beat.PipelineConnector) error {
 	return nil
 }
 
+type fakeRedirectManager struct {
+	fakeInputManager
+	OnRedirect func(*conf.C) (string, *conf.C, error)
+}
+
+func (m *fakeRedirectManager) Redirect(cfg *conf.C) (string, *conf.C, error) {
+	if m.OnRedirect != nil {
+		return m.OnRedirect(cfg)
+	}
+	return "", nil, nil
+}
+
+type fakeDeleteManager struct {
+	fakeInputManager
+	OnDelete func(*conf.C) error
+}
+
+func (m *fakeDeleteManager) Delete(cfg *conf.C) error {
+	if m.OnDelete != nil {
+		return m.OnDelete(cfg)
+	}
+	return nil
+}
+
 func expectError(t *testing.T, err error) {
 	if err == nil {
 		t.Errorf("expected error")
