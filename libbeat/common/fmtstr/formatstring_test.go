@@ -279,20 +279,24 @@ func FuzzParseRawTokens(f *testing.F) {
 			return // invalid input
 		}
 
-		if strings.Contains(a, `\`) {
-			return // we cannot rebuild the input if it contains escape character
-		}
 		// stringify output and match it with original input
 		var finalOutput string
 		for _, out := range output {
-			switch t := out.(type) {
+			switch tok := out.(type) {
 			case string:
-				finalOutput += t
+				finalOutput += tok
 			case VariableToken:
-				finalOutput += "%{" + string(t) + "}"
+				finalOutput += "%{" + string(tok) + "}"
+			default:
+				assert.Failf(t, "unexpected type %T", tok)
 			}
 		}
 
-		require.Equal(t, a, finalOutput)
+		// We cannot accurately reconstruct with escaped characters, so we remove them before comparing.
+		assert.Equalf(t, removeEscapes(a), removeEscapes(finalOutput), "unexpected output: %s != %s", a, finalOutput)
 	})
+}
+
+func removeEscapes(str string) string {
+	return strings.ReplaceAll(str, `\`, "")
 }
