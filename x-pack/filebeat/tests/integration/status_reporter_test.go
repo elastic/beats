@@ -103,7 +103,7 @@ func TestLogStatusReporter(t *testing.T) {
 		},
 		{
 			proto.State_DEGRADED,
-			&inputStream,
+			&inputStreamIrregular,
 		},
 		{
 			proto.State_HEALTHY,
@@ -116,7 +116,7 @@ func TestLogStatusReporter(t *testing.T) {
 		},
 	}
 
-	timer := time.NewTimer(2 * time.Minute)
+	timer := time.NewTimer(time.Minute)
 	id := 0
 	for id < len(scenarios) {
 		select {
@@ -133,7 +133,7 @@ func TestLogStatusReporter(t *testing.T) {
 			outputState := extractState(observed.GetUnits(), unitOutID)
 			require.Equal(t, proto.State_HEALTHY, outputState)
 
-			timer.Reset(2 * time.Minute)
+			timer.Reset(time.Minute)
 			id++
 		case <-timer.C:
 			t.Fatal("timeout waiting for checkin")
