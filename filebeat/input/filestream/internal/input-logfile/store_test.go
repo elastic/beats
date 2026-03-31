@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -454,6 +455,106 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	s.ephemeralStore.mu.Unlock()
 
 	checkEqualStoreState(t, want, backend.snapshot())
+}
+
+func TestSourceStoreTakeOverFromLogInput(t *testing.T) {
+	const (
+		logKey           = "filebeat::logs::native::inode:device"
+		filestreamNewKey = "filestream::input-id::native::inode:device"
+	)
+
+	// fn simulates what takeOverFn does: map the log key to a new Filestream key.
+	takeover := func(v Value) (string, any) {
+		if v.Key() == logKey {
+			return filestreamNewKey, testMeta{IdentifierName: "native"}
+		}
+		return "", nil
+	}
+
+	t.Run("log input state is left untouched", func(t *testing.T) {
+		backend := createSampleStore(t, nil)
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -1,
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		assert.NotNil(t, s.Get(filestreamNewKey), "Log input state must have been migrated to Filestream")
+		assert.NotNil(t, s.Get(logKey), "Log input state must left untouched")
+	})
+
+	t.Run("state with TTL=-2 is migrated", func(t *testing.T) {
+		backend := createSampleStore(t, nil)
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -2, // previously this caused the state to be skipped
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		s.ephemeralStore.mu.Lock()
+		_, migrated := s.ephemeralStore.table[filestreamNewKey]
+		s.ephemeralStore.mu.Unlock()
+
+		assert.True(t, migrated, "state with TTL=-2 must be migrated to Filestream")
+	})
+
+	t.Run("state is skipped when Filestream key already exists", func(t *testing.T) {
+		const existingOffset = int64(9999)
+
+		backend := createSampleStore(t, map[string]state{
+			filestreamNewKey: {
+				TTL:    60 * time.Second,
+				Cursor: map[string]any{"offset": existingOffset},
+			},
+		})
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -1,
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		// The pre-existing Filestream state must be unchanged.
+		s.ephemeralStore.mu.Lock()
+		res, exists := s.ephemeralStore.table[filestreamNewKey]
+		s.ephemeralStore.mu.Unlock()
+
+		require.True(t, exists, "Filestream key must still exist after TakeOver")
+		var cur struct {
+			Offset int64 `json:"offset"`
+		}
+		require.NoError(t, res.UnpackCursor(&cur), "unpacking cursor")
+		assert.Equal(t, existingOffset, cur.Offset, "existing Filestream cursor must not be overwritten by Log input state")
+	})
 }
 
 //nolint:dupl // Test code won't be refactored on this commit
