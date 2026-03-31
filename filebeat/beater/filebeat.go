@@ -294,7 +294,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
 	// but it won't start any inputs/output
-	if err := b.Manager.PreStart(); err != nil {
+	if err := b.Manager.PreInit(); err != nil {
 		return err
 	}
 
@@ -506,7 +506,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
-	b.Manager.PostStart()
+	b.Manager.PostInit()
 	managerEarlyStop = nil
 
 	// Add done channel to wait for shutdown signal

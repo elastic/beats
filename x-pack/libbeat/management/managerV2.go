@@ -281,11 +281,11 @@ func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
 	cm.stopFunc = stopFunc
 }
 
-// Starts the unitListen loop, so the manager can already
+// PreInit the unitListen loop, so the manager can already
 // check-in with Elastic Agent, but no input/output will be
-// started yet. Call [PostStart] to enable starting/stopping
+// started yet. Call [PostInit] to enable starting/stopping
 // inputs/output.
-func (cm *BeatV2Manager) PreStart() error {
+func (cm *BeatV2Manager) PreInit() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
@@ -318,8 +318,8 @@ func (cm *BeatV2Manager) PreStart() error {
 	return nil
 }
 
-// PostStart allows the manager to start/stop inputs/output.
-func (cm *BeatV2Manager) PostStart() {
+// PostInit allows the manager to start/stop inputs/output.
+func (cm *BeatV2Manager) PostInit() {
 	cm.UpdateStatus(status.Running, "Running")
 
 	cm.mx.Lock()
@@ -331,15 +331,15 @@ func (cm *BeatV2Manager) PostStart() {
 
 // Start the config manager.
 //
-// Deprecated: Use [PreStart] and [PostStart] instead
+// Deprecated: Use [PreInit] and [PostInit] instead
 //
-// For backwards compatibility, [Start] calls [PreStart] then [PostStart].
+// For backwards compatibility, [Start] calls [PreInit] then [PostInit].
 func (cm *BeatV2Manager) Start() error {
-	if err := cm.PreStart(); err != nil {
+	if err := cm.PreInit(); err != nil {
 		return err
 	}
 
-	cm.PostStart()
+	cm.PostInit()
 	return nil
 }
 
