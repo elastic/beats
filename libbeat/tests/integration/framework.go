@@ -48,11 +48,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"golang.org/x/sys/execabs"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
@@ -1293,17 +1293,13 @@ func (b *BeatProc) RemoveOutputFile() {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
 func TestMainWithBuild(m *testing.M, beatName string) {
-	binPath, err := filepath.Abs("../../" + beatName + ".test")
+	beatRoot, err := filepath.Abs("../../")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to resolve binary path: %s\n", err)
+		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
 		os.Exit(1)
 	}
-	packagePath, err := filepath.Abs("../../")
+	binPath, err := testbin.Build(beatName, beatRoot)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to resolve package path: %s\n", err)
-		os.Exit(1)
-	}
-	if err := buildSystemTestBinary(binPath, packagePath); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
 		os.Exit(1)
 	}
@@ -1312,29 +1308,6 @@ func TestMainWithBuild(m *testing.M, beatName string) {
 
 	_ = os.Remove(binPath)
 	os.Exit(rc)
-}
-
-// buildSystemTestBinary builds a beat test binary using "go test -c".
-// It respects the same environment variables as the mage build:
-//   - DEV=true: disables optimizations for debugging (-gcflags=all=-N -l)
-//   - TEST_COVERAGE=true: enables coverage instrumentation (-coverpkg ./...)
-func buildSystemTestBinary(binPath, packagePath string) error {
-	args := []string{"test", "-c", "-o", binPath}
-
-	if devBuild, _ := strconv.ParseBool(os.Getenv("DEV")); devBuild {
-		args = append(args, `-gcflags=all=-N -l`)
-	}
-	if testCoverage, _ := strconv.ParseBool(os.Getenv("TEST_COVERAGE")); testCoverage {
-		args = append(args, "-coverpkg", "./...")
-	}
-
-	args = append(args, packagePath)
-
-	cmd := execabs.Command("go", args...)
-	cmd.Dir = packagePath
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
