@@ -85,12 +85,9 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 		}
 
 		cleanup := func() {
-			// Stop cache janitor goroutines in protocol plugins.
-			protocols.Close()
 			if icmpCloser != nil {
 				icmpCloser.Close()
 			}
-			// Close metric collection.
 			tcp.Close()
 			udp.Close()
 		}

@@ -46,6 +46,7 @@ import (
 // to a Worker.
 type Sniffer struct {
 	sniffers []sniffer
+	closers  []func()
 	cancel   func()
 	log      *logp.Logger
 }
@@ -94,9 +95,10 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter) (*Sniffer, error) {
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter, closers ...func()) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
+		closers:  closers,
 		log:      logp.NewLogger("sniffer"),
 	}
 
@@ -230,7 +232,11 @@ func (s *Sniffer) Run() error {
 			return c.sniffDynamic(ctx, defaultRoute, refresh)
 		})
 	}
-	return g.Wait()
+	err := g.Wait()
+	for _, closer := range s.closers {
+		closer()
+	}
+	return err
 }
 
 // pollDefaultRoute repeatedly polls the default route's device at intervals

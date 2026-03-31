@@ -32,7 +32,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func TestDecodersCleanupStopsProtocolJanitors(t *testing.T) {
+func TestDecoderAndProtocolCleanupStopsAllGoroutines(t *testing.T) {
 	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 
 	protocols := protos.NewProtocols()
@@ -58,4 +58,5 @@ func TestDecodersCleanupStopsProtocolJanitors(t *testing.T) {
 	require.NotNil(t, cleanup)
 
 	cleanup()
+	protocols.Close()
 }
