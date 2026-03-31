@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Skip record ID gap detection for forwarded Windows events.
+
+component: winlogbeat
