@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Fix Filestream take_over causing file re-ingestion when used with autodiscover.
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/49579
