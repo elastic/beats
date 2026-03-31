@@ -275,7 +275,7 @@ func FuzzParseRawTokens(f *testing.F) {
 		defer lex.Finish()
 		output, err := ParseRawTokens(lex)
 		if err != nil {
-			fmt.Println(a)
+			t.Logf("skipping input %s with error: %v", a, err)
 			return // invalid input
 		}
 
