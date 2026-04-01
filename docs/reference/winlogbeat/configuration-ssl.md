@@ -138,10 +138,10 @@ This check is not a replacement for the normal SSL validation, but it adds addit
 
 ## Client configuration options [ssl-client-config]
 
-You can specify the following options in the `ssl` section of each subsystem that supports SSL.
+Use these settings when `winlogbeat` acts as a **client** connecting to a remote service (for example, Elasticsearch, Logstash, or Kibana). These options control how `winlogbeat` verifies the server it connects to and, optionally, presents a client certificate. You can specify the following options in the `ssl` section of each subsystem that supports SSL.
 
 
-### `certificate_authorities` [client-certificate-authorities]
+### `certificate_authorities` (client) [client-certificate-authorities]
 
 The list of root certificates for verifications is required. If `certificate_authorities` is empty or not set, the system keystore is used. If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 
@@ -277,10 +277,10 @@ openssl x509 -fingerprint -sha256 -noout -in ./ca.crt | awk --field-separator="=
 
 ## Server configuration options [ssl-server-config]
 
-You can specify the following options in the `ssl` section of each subsystem that supports SSL.
+Use these settings when `winlogbeat` acts as a **server** accepting incoming connections. These options control the certificate `winlogbeat` presents to connecting clients and, optionally, how it verifies client certificates. You can specify the following options in the `ssl` section of each subsystem that supports SSL.
 
 
-### `certificate_authorities` [server-certificate-authorities]
+### `certificate_authorities` (server) [server-certificate-authorities]
 
 The list of root certificates for client verifications is only required if `client_authentication` is configured. If `certificate_authorities` is empty or not set, and `client_authentication` is configured, the system keystore is used.
 
