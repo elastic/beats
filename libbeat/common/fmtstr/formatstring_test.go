@@ -266,7 +266,7 @@ func TestParseRawTokens(t *testing.T) {
 }
 
 func FuzzParseRawTokens(f *testing.F) {
-    var cases = []string{
+	var cases = []string{
 		"",
 		"%{k} test",
 		"pre %{k} post",
