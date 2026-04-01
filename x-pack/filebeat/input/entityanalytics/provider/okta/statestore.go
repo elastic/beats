@@ -37,11 +37,11 @@ const (
 
 type User struct {
 	okta.User  `json:"properties"`
-	Groups     []okta.Group         `json:"groups"`
-	Roles      []okta.Role          `json:"roles"`
-	Factors    []okta.Factor        `json:"factors"`
+	Groups     []okta.Group          `json:"groups"`
+	Roles      []okta.Role           `json:"roles"`
+	Factors    []okta.Factor         `json:"factors"`
 	Supervises []okta.SupervisedUser `json:"supervises"`
-	State      State                `json:"state"`
+	State      State                 `json:"state"`
 }
 
 type Device struct {
