@@ -22,6 +22,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -82,7 +83,7 @@ func AssembleDarwinUniversal() error {
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
-func Package() {
+func Package() error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
@@ -92,7 +93,10 @@ func Package() {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild)
-	mg.SerialDeps(devtools.Package, TestPackages)
+	if err := devtools.Package(); err != nil {
+		return err
+	}
+	return TestPackages()
 }
 
 // Package packages the Beat for IronBank distribution.
@@ -194,9 +198,45 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
+func packageDockerImageForGoIntegTest() error {
+	var dockerPlatform string
+	switch runtime.GOARCH {
+	case "amd64", "arm64":
+		dockerPlatform = fmt.Sprintf("linux/%s", runtime.GOARCH)
+	default:
+		return fmt.Errorf(
+			"goIntegTest docker packaging requires GOARCH=amd64 or GOARCH=arm64 (got %q)",
+			runtime.GOARCH,
+		)
+	}
+
+	return devtools.WithPackageBuildSelection(devtools.PackageBuildSelection{
+		Platforms:    devtools.NewPlatformList(dockerPlatform),
+		PackageTypes: []devtools.PackageType{devtools.Docker},
+	}, func() error {
+		// Create a backup of the original variables
+		snapshot := devtools.Snapshot
+		packages := append([]devtools.OSPackageArgs(nil), devtools.Packages...)
+
+		devtools.Snapshot = true
+		devtools.Packages = nil
+
+		// Restore the variables
+		defer func() {
+			devtools.Snapshot = snapshot
+			devtools.Packages = packages
+		}()
+
+		return Package()
+	})
+}
+
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
+	if err := packageDockerImageForGoIntegTest(); err != nil {
+		return err
+	}
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 

@@ -18,11 +18,13 @@
 package mage
 
 import (
+	"errors"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
@@ -117,4 +119,93 @@ func TestLoadSpecs(t *testing.T) {
 			t.Log("Packaging flavor:", flavor, "\n", string(out))
 		}
 	}
+}
+
+func TestParsePackageTypes(t *testing.T) {
+	parsed := ParsePackageTypes("docker, tgz,invalid,tar.gz")
+	assert.Equal(
+		t,
+		[]PackageType{Docker, TarGz, TarGz},
+		parsed,
+		"expected parser to keep only valid package types in order",
+	)
+}
+
+func TestWithPackageBuildSelection(t *testing.T) {
+	originalPlatforms := append(BuildPlatformList(nil), Platforms...)
+	originalPackageTypes := append([]PackageType(nil), SelectedPackageTypes...)
+	t.Cleanup(func() {
+		SetBuildPlatforms(originalPlatforms)
+		SetSelectedPackageTypes(originalPackageTypes)
+	})
+
+	SetBuildPlatforms(NewPlatformList("linux/amd64"))
+	SetSelectedPackageTypes([]PackageType{Docker})
+
+	err := WithPackageBuildSelection(PackageBuildSelection{
+		Platforms:    NewPlatformList("linux/arm64"),
+		PackageTypes: []PackageType{TarGz},
+	}, func() error {
+		assert.Equal(
+			t,
+			NewPlatformList("linux/arm64"),
+			Platforms,
+			"expected platforms override to be active inside callback",
+		)
+		assert.Equal(
+			t,
+			[]PackageType{TarGz},
+			SelectedPackageTypes,
+			"expected package type override to be active inside callback",
+		)
+		return nil
+	})
+	require.NoError(t, err, "expected callback without error to succeed")
+
+	assert.Equal(
+		t,
+		NewPlatformList("linux/amd64"),
+		Platforms,
+		"expected platforms to be restored after callback",
+	)
+	assert.Equal(
+		t,
+		[]PackageType{Docker},
+		SelectedPackageTypes,
+		"expected package types to be restored after callback",
+	)
+}
+
+func TestWithPackageBuildSelectionRestoresOnError(t *testing.T) {
+	originalPlatforms := append(BuildPlatformList(nil), Platforms...)
+	originalPackageTypes := append([]PackageType(nil), SelectedPackageTypes...)
+	t.Cleanup(func() {
+		SetBuildPlatforms(originalPlatforms)
+		SetSelectedPackageTypes(originalPackageTypes)
+	})
+
+	SetBuildPlatforms(NewPlatformList("linux/amd64"))
+	SetSelectedPackageTypes([]PackageType{Docker})
+
+	wantErr := errors.New("boom")
+	err := WithPackageBuildSelection(PackageBuildSelection{
+		Platforms:    NewPlatformList("linux/arm64"),
+		PackageTypes: []PackageType{TarGz},
+	}, func() error {
+		return wantErr
+	})
+	require.ErrorIs(t, err, wantErr, "expected callback error to be returned")
+
+	assert.Equal(
+		t,
+		NewPlatformList("linux/amd64"),
+		Platforms,
+		"expected platforms to be restored when callback returns an error",
+	)
+	assert.Equal(
+		t,
+		[]PackageType{Docker},
+		SelectedPackageTypes,
+		"expected package types to be restored when callback returns an error",
+	)
 }
