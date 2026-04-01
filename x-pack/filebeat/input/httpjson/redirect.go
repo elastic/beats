@@ -7,6 +7,7 @@ package httpjson
 import (
 	"errors"
 	"fmt"
+	"net/url"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -47,7 +48,12 @@ func (m InputManager) Redirect(cfg *conf.C) (string, *conf.C, error) {
 // was stateless or the store is unavailable, this is a no-op.
 func (m InputManager) migrateCursor(src, dst *conf.C) {
 	id, _ := src.String("id", -1) // Missing id is fine; cursorKey handles empty.
-	url, err := src.String("request.url", -1)
+	rawURL, err := src.String("request.url", -1)
+	if err != nil {
+		return
+	}
+	// Parse and re-serialize to match source.Name() normalization.
+	u, err := url.Parse(rawURL)
 	if err != nil {
 		return
 	}
@@ -58,7 +64,7 @@ func (m InputManager) migrateCursor(src, dst *conf.C) {
 	}
 	defer store.Close()
 
-	key := cursorKey("httpjson", id, url)
+	key := cursorKey("httpjson", id, u.String())
 	var entry map[string]interface{}
 	if err := store.Get(key, &entry); err != nil {
 		return

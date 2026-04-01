@@ -45,6 +45,7 @@ func TestRedirect_EndToEnd(t *testing.T) {
 	input, err := loader.Configure(cfg)
 	require.NoError(t, err)
 	require.NotNil(t, input)
+	require.Equal(t, "cel", input.Name())
 }
 
 func TestRedirect_NoRedirectWhenFlagAbsent(t *testing.T) {
