@@ -579,7 +579,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Roles = roles
 		}
 	}
-	if slices.Contains(p.cfg.EnrichWith, "enrolled_devices") {
+	if slices.Contains(p.cfg.EnrichWith, "devices") {
 		devices, _, err := okta.GetUserDevices(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get enrolled devices for user %s: %v", u.ID, err)

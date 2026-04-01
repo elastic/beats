@@ -39,7 +39,7 @@ func TestOktaDoFetch(t *testing.T) {
 		{dataset: "all", enrichWith: []string{"groups"}, wantUsers: true, wantDevices: true},
 		{dataset: "users", enrichWith: []string{"groups", "roles", "factors"}, wantUsers: true, wantDevices: false},
 		{dataset: "devices", enrichWith: []string{"groups"}, wantUsers: false, wantDevices: true},
-		{dataset: "users", enrichWith: []string{"groups", "enrolled_devices"}, wantUsers: true, wantDevices: false},
+		{dataset: "users", enrichWith: []string{"groups", "devices"}, wantUsers: true, wantDevices: false},
 	}
 
 	for _, test := range tests {
@@ -112,7 +112,7 @@ func TestOktaDoFetch(t *testing.T) {
 				}
 			}
 			var wantUserDevices []okta.Device
-			if slices.Contains(test.enrichWith, "enrolled_devices") {
+			if slices.Contains(test.enrichWith, "devices") {
 				err := json.Unmarshal([]byte(userDevices), &wantUserDevices)
 				if err != nil {
 					t.Fatalf("failed to unmarshal user device data: %v", err)

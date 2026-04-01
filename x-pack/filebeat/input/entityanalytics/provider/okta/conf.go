@@ -62,7 +62,7 @@ type conf struct {
 	Dataset string `config:"dataset"`
 	// EnrichWith specifies the additional data that
 	// will be used to enrich user data. It can include
-	// "groups", "roles", "factors" and "enrolled_devices".
+	// "groups", "roles", "factors" and "devices".
 	// If it is a single element with "none", no
 	// enrichment is performed.
 	EnrichWith []string `config:"enrich_with"`
