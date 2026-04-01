@@ -266,9 +266,24 @@ func TestParseRawTokens(t *testing.T) {
 }
 
 func FuzzParseRawTokens(f *testing.F) {
-	f.Add("%{k} test")
-	f.Add(`pre %{k} post`)
-	f.Add("%{unknown:default}")
+    var cases = []string{
+		"",
+		"%{k} test",
+		"pre %{k} post",
+		"%{unknown:default}",
+		"100% literal",
+		"%%",
+		"%%{}",
+		"%\\{}",
+		"%{}",
+		"%{a:b:c}",
+		"%{a:b:?c}",
+		"%{a",
+	}
+
+	for _, c := range cases {
+		f.Add(c)
+	}
 
 	f.Fuzz(func(t *testing.T, a string) {
 		lex := MakeLexer(a)
