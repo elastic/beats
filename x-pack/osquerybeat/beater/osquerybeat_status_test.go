@@ -75,7 +75,10 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
+func (m *testManager) PreInit() error                      { return nil }
+func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
+func (m *testManager) WaitForStop(_ time.Duration) bool    { return true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
@@ -301,3 +304,97 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager start failure")
 	assert.Contains(t, lastEvent.Message, "Failed to start manager")
 }
+<<<<<<< HEAD
+=======
+
+func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
+	mgr := &testManager{}
+	b := &beat.Beat{Manager: mgr}
+	ob := &osquerybeat{
+		qp: newQueryProfiler(logp.NewLogger("test")),
+	}
+	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
+		rows: []map[string]interface{}{
+			{
+				"name":              "pack_test_query",
+				"query":             "select * from users limit 1",
+				"executions":        int64(3),
+				"last_executed":     int64(1730000000),
+				"output_size":       int64(900),
+				"wall_time_ms":      int64(120),
+				"last_wall_time_ms": int64(40),
+				"user_time":         int64(30),
+				"last_user_time":    int64(10),
+				"system_time":       int64(6),
+				"last_system_time":  int64(2),
+				"average_memory":    int64(5000),
+				"last_memory":       int64(6000),
+			},
+		},
+	})
+
+	ob.registerDiagnosticHooks(b)
+
+	hook, ok := mgr.diagHook["scheduled_query_profiles"]
+	require.True(t, ok, "expected scheduled profiles diagnostics hook")
+
+	var payload map[string]interface{}
+	err := json.Unmarshal(hook(), &payload)
+	require.NoError(t, err)
+
+	count, ok := payload["count"].(float64)
+	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
+	assert.Equal(t, float64(1), count)
+
+	profiles, ok := payload["osquery_schedule"].([]interface{})
+	require.True(t, ok)
+	require.Len(t, profiles, 1)
+
+	p0, ok := profiles[0].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, "select * from users limit 1", p0["query"])
+
+	liveCount, ok := payload["live_query_profiles_count"].(float64)
+	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
+	assert.Equal(t, float64(0), liveCount)
+
+	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
+	require.True(t, ok)
+	assert.Empty(t, liveProfiles)
+}
+
+// TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
+// when custom osquery runtime resolution fails before osqueryd runner creation.
+func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		platformCfg := &config.InstallPlatformConfig{
+			AMD64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+			ARM64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+		}
+		ob.osqueryInstallConfig = config.InstallConfig{
+			Linux:   platformCfg,
+			Darwin:  platformCfg,
+			Windows: platformCfg,
+		}
+	})
+
+	err := ob.Run(b)
+	require.Error(t, err)
+
+	mgr.mx.Lock()
+	defer mgr.mx.Unlock()
+
+	require.GreaterOrEqual(t, len(mgr.events), 1, "should have at least one status event")
+	lastEvent := mgr.events[len(mgr.events)-1]
+	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on runtime resolution failure")
+	assert.Contains(t, lastEvent.Message, "Failed to resolve osquery runtime")
+}
+>>>>>>> 034546fe9 (Split `BeatV2Manager` `Start` into two methods, so Beats can reply to check-in in parallel to its initialisation (#49796))
