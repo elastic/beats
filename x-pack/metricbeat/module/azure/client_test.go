@@ -41,7 +41,7 @@ var (
 					},
 				}}},
 	}
-	countUnit = armmonitor.MetricUnit("Count")
+	countUnit = armmonitor.Unit("Count")
 )
 
 func mockMapResourceMetrics(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
