@@ -84,16 +84,6 @@ type Factor struct {
 	Embedded    map[string]any `json:"_embedded,omitempty"`
 }
 
-// Permission is an Okta role permission.
-//
-// See https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission.
-type Permission struct {
-	Label       string    `json:"label"`
-	Created     time.Time `json:"created"`
-	LastUpdated time.Time `json:"lastUpdated"`
-	Links       HAL       `json:"_links,omitempty"`
-}
-
 // Role is an Okta user role description.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentAUser/#tag/RoleAssignmentAUser/operation/listAssignedRolesForUser
@@ -109,6 +99,16 @@ type Role struct {
 	AssignmentType string       `json:"assignmentType"`
 	Links          HAL          `json:"_links"`
 	Permissions    []Permission `json:"permissions,omitempty"`
+}
+
+// Permission is an Okta role permission.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission.
+type Permission struct {
+	Label       string    `json:"label"`
+	Created     time.Time `json:"created"`
+	LastUpdated time.Time `json:"lastUpdated"`
+	Links       HAL       `json:"_links,omitempty"`
 }
 
 // Device is an Okta device's details.
