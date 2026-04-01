@@ -83,18 +83,18 @@ type apiMFAResponse struct {
 
 // mfaDetails matches the format of a single userRegistrationDetails entry from the API.
 type mfaDetails struct {
-	ID                                           string   `json:"id"`
-	IsMFACapable                                 bool     `json:"isMfaCapable"`
-	IsMFARegistered                              bool     `json:"isMfaRegistered"`
-	IsPasswordlessCapable                        bool     `json:"isPasswordlessCapable"`
-	IsSsprCapable                                bool     `json:"isSsprCapable"`
-	IsSsprEnabled                                bool     `json:"isSsprEnabled"`
-	IsSsprRegistered                             bool     `json:"isSsprRegistered"`
-	IsSystemPreferredAuthenticationMethodEnabled bool     `json:"isSystemPreferredAuthenticationMethodEnabled"`
-	MethodsRegistered                            []string `json:"methodsRegistered"`
-	SystemPreferredAuthenticationMethods         []string `json:"systemPreferredAuthenticationMethods"`
+	ID                                            string   `json:"id"`
+	IsMFACapable                                  bool     `json:"isMfaCapable"`
+	IsMFARegistered                               bool     `json:"isMfaRegistered"`
+	IsPasswordlessCapable                         bool     `json:"isPasswordlessCapable"`
+	IsSsprCapable                                 bool     `json:"isSsprCapable"`
+	IsSsprEnabled                                 bool     `json:"isSsprEnabled"`
+	IsSsprRegistered                              bool     `json:"isSsprRegistered"`
+	IsSystemPreferredAuthenticationMethodEnabled  bool     `json:"isSystemPreferredAuthenticationMethodEnabled"`
+	MethodsRegistered                             []string `json:"methodsRegistered"`
+	SystemPreferredAuthenticationMethods          []string `json:"systemPreferredAuthenticationMethods"`
 	UserPreferredMethodForSecondaryAuthentication string   `json:"userPreferredMethodForSecondaryAuthentication"`
-	UserType                                     string   `json:"userType"`
+	UserType                                      string   `json:"userType"`
 }
 
 // userAPI matches the format of user data from the API.
@@ -408,17 +408,17 @@ func (f *graph) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFAR
 				continue
 			}
 			result[id] = &fetcher.MFARegistrationDetails{
-				IsMFACapable:                                 d.IsMFACapable,
-				IsMFARegistered:                              d.IsMFARegistered,
-				IsPasswordlessCapable:                        d.IsPasswordlessCapable,
-				IsSsprCapable:                                d.IsSsprCapable,
-				IsSsprEnabled:                                d.IsSsprEnabled,
-				IsSsprRegistered:                             d.IsSsprRegistered,
+				IsMFACapable:          d.IsMFACapable,
+				IsMFARegistered:       d.IsMFARegistered,
+				IsPasswordlessCapable: d.IsPasswordlessCapable,
+				IsSsprCapable:         d.IsSsprCapable,
+				IsSsprEnabled:         d.IsSsprEnabled,
+				IsSsprRegistered:      d.IsSsprRegistered,
 				IsSystemPreferredAuthenticationMethodEnabled: d.IsSystemPreferredAuthenticationMethodEnabled,
-				MethodsRegistered:                            d.MethodsRegistered,
-				SystemPreferredAuthenticationMethods:         d.SystemPreferredAuthenticationMethods,
+				MethodsRegistered:                             d.MethodsRegistered,
+				SystemPreferredAuthenticationMethods:          d.SystemPreferredAuthenticationMethods,
 				UserPreferredMethodForSecondaryAuthentication: d.UserPreferredMethodForSecondaryAuthentication,
-				UserType:                                     d.UserType,
+				UserType: d.UserType,
 			}
 			f.logger.Debugf("Got MFA registration details for user %q from API", id)
 		}
