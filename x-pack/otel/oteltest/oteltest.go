@@ -218,9 +218,6 @@ func VerifyNoLeaks(t *testing.T) {
 		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
 		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
-		// On Windows, dialParallel goroutines may outlive the test when the monitoring
-		// HTTP server is shutting down.
-		goleak.IgnoreAnyFunction("net.(*sysDialer).dialParallel"),
 	}
 
 	goleak.VerifyNone(t, skipped...)
