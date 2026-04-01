@@ -252,6 +252,7 @@ func TestCreatingNewLoggerWithDifferentOutput(t *testing.T) {
 	firstLoggerMessage := "not the message we want"
 
 	logger := L().Named(firstLoggerName)
+	assert.Equal(t, firstLoggerName, logger.Name(), "Unexpected logger name.")
 	logger.Info(firstLoggerMessage)
 	if err := logger.Sync(); err != nil {
 		t.Fatalf("could not sync log file from fist logger: %s", err)

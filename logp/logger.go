@@ -167,6 +167,12 @@ func (l *Logger) With(args ...interface{}) *Logger {
 	return &Logger{sugar.Desugar(), sugar, l.selectors}
 }
 
+// Name returns the Logger's underlying name, or an empty string if the
+// logger is unnamed.
+func (l *Logger) Name() string {
+	return l.logger.Name()
+}
+
 // Named adds a new path segment to the logger's name. Segments are joined by
 // periods.
 func (l *Logger) Named(name string) *Logger {
