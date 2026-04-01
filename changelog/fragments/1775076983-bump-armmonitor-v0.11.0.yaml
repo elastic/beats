@@ -21,7 +21,7 @@ component: metricbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
-# pr: https://github.com/elastic/beats/pull/49866
+pr: https://github.dev/elastic/beats/pull/49866
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
