@@ -75,7 +75,10 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
+func (m *testManager) PreInit() error                      { return nil }
+func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
+func (m *testManager) WaitForStop(_ time.Duration) bool    { return true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
