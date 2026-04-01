@@ -1,0 +1,50 @@
+[
+  {
+    "@timestamp": "2019-09-06T13:36:37.0000000Z",
+    "event": {
+      "action": "User Account Management",
+      "code": "4738",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A user account was changed.",
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR",
+      "event_data": {
+        "NewUacValue": "-\"",
+        "OldUacValue": "0x210",
+        "UserAccountControl": "-",
+        "SubjectUserName": "Administrator",
+        "SubjectDomainName": "WIN-41OB2LO92CR",
+        "SubjectLogonId": "0x264b2",
+        "SubjectUserSid": "S-1-5-21-101361758-2486510592-3018839910-500",
+        "TargetUserName": "badvalue_test",
+        "TargetDomainName": "WIN-41OB2LO92CR",
+        "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1007"
+      },
+      "event_id": "4738",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 780,
+        "thread": {
+          "id": 999
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 9999,
+      "task": "User Account Management"
+    }
+  }
+]
