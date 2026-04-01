@@ -76,6 +76,13 @@ func validatePorts(ports []int) error {
 	return nil
 }
 
+// PluginCloser is an optional interface that protocol plugins can implement
+// to release resources (e.g. stop cache janitor goroutines) when the
+// protocol is no longer needed.
+type PluginCloser interface {
+	Close()
+}
+
 type Protocols interface {
 	BpfFilter(withVlans bool, withICMP bool) string
 	GetTCP(proto Protocol) TCPPlugin
@@ -267,21 +274,30 @@ func (s ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
 	return s.udp
 }
 
+// Close releases resources held by all registered protocol plugins.
+// Plugins that implement PluginCloser will have their Close method called.
+func (s ProtocolsStruct) Close() {
+	for _, inst := range s.all {
+		if closer, ok := inst.plugin.(PluginCloser); ok {
+			closer.Close()
+		}
+	}
+}
+
 // BpfFilter returns a Berkeley Packer Filter (BFP) expression that
 // will match against packets for the registered protocols. If with_vlans is
 // true the filter will match against both IEEE 802.1Q VLAN encapsulated
 // and unencapsulated packets
 func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	// Sort the protocol IDs so that the return value is consistent.
-	protos := make([]int, 0, len(s.all))
+	protos := make([]Protocol, 0, len(s.all))
 	for proto := range s.all {
-		protos = append(protos, int(proto))
+		protos = append(protos, proto)
 	}
-	sort.Ints(protos)
+	sort.Slice(protos, func(i, j int) bool { return protos[i] < protos[j] })
 
 	var expressions []string
-	for _, key := range protos {
-		proto := Protocol(key)
+	for _, proto := range protos {
 		plugin := s.all[proto].plugin
 		for _, port := range plugin.GetPorts() {
 			hasTCP := false

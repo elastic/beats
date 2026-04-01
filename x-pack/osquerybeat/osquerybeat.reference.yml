@@ -5,6 +5,48 @@
 osquerybeat:
 #  inputs:
 #    - type: osquery
+#      osquery:
+#        elastic_options:
+#          query_profile_storage:
+#            # Enable local storage of live query profiles.
+#            #enabled: true
+#            # Maximum number of profiles kept (latest per query).
+#            #max_profiles: 64
+#          install:
+#            # Optional per-platform and per-architecture custom osquery artifacts.
+#            # If the current platform/arch is unset, bundled osquery is used.
+#            linux:
+#              amd64:
+#                artifact_url: "https://example.org/osquery-5.22.1.linux_x86_64.tar.gz"
+#                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              arm64:
+#                artifact_url: "https://example.org/osquery-5.22.1.linux_aarch64.tar.gz"
+#                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              # Optional platform-level SSL fallback (used if amd64/arm64 ssl is unset).
+#              #ssl.verification_mode: full
+#            darwin:
+#              amd64:
+#                artifact_url: "https://example.org/osquery-5.22.1.darwin.pkg"
+#                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              arm64:
+#                artifact_url: "https://example.org/osquery-5.22.1.darwin.pkg"
+#                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#            windows:
+#              amd64:
+#                artifact_url: "https://example.org/osquery-5.22.1.windows.msi"
+#                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#              arm64:
+#                artifact_url: "https://example.org/osquery-5.22.1.windows_arm64.zip"
+#                sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+#            # Allow non-HTTPS artifact URLs (not recommended).
+#            #allow_insecure_url: false
+#            # Optional TLS settings for HTTPS artifact download.
+#            #ssl.verification_mode: full
+#            #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+#            #ssl.certificate: "/etc/pki/client/cert.pem"
+#            #ssl.key: "/etc/pki/client/cert.key"
+#            # NOTE: custom osquery is installed in the bundled osquery directory.
+#            # NOTE: if custom artifact install/validation fails, osquerybeat startup fails.
 #      streams:
 #        - id: "CFDE1EAA-0C6C-4D19-9EEC-45802B2A8C01"
 #          query: "select * from processes"
