@@ -22,6 +22,7 @@ package pipeline
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -70,6 +71,9 @@ type Pipeline struct {
 	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
 	// elapses.
 	forceCloseQueue bool
+
+	// Close _shouldn't_ be called multiple times, but handle it gracefully if it does.
+	closeOnce sync.Once
 
 	processors processing.Supporter
 
@@ -183,16 +187,19 @@ func New(
 // Close stops the pipeline, outputs and queue.
 // If WaitClose with WaitOnPipelineClose mode is configured, Close will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients must be closed before calling Close.
+// Note: clients will no longer accept new Publish calls once Close is started,
+// and will no longer receive event acknowledgments once Close returns.
 func (p *Pipeline) Close() error {
-	log := p.monitors.Logger
+	p.closeOnce.Do(func() {
+		log := p.monitors.Logger
 
-	log.Debug("close pipeline")
+		log.Debug("close pipeline")
 
-	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
+		// Note: active clients are not closed / disconnected.
+		p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
 
-	p.observer.cleanup()
+		p.observer.cleanup()
+	})
 	return nil
 }
 
