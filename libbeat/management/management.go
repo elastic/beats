@@ -19,6 +19,7 @@ package management
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -37,12 +38,25 @@ type Manager interface {
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
 
-	// Start needs to invoked when the system is ready to receive an external configuration and
+	// Starts the unitListen loop, so the manager can already
+	// check-in with Elastic Agent, but no input/output will be
+	// started yet. Call [PostInit] to enable starting/stopping
+	// inputs/output.
+	PreInit() error
+
+	// PostInit needs to be invoked when the system is ready to receive an external configuration and
 	// also ready to start ingesting new events. The manager expects that all the reloadable and
 	// reloadable list are fixed for the whole lifetime of the manager.
 	//
 	// Notes: Adding dynamically new reloadable hooks at runtime can lead to inconsistency in the
 	// execution.
+	PostInit()
+
+	// Start starts the manager.
+	//
+	// Deprecated: Use [PreInit] and [PostInit] instead
+	//
+	// For backwards compatibility, [Start] calls [PreInit] then [PostInit].
 	Start() error
 
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
@@ -53,6 +67,11 @@ type Manager interface {
 	//
 	// Note: Stop will not call 'UnregisterAction()' automatically.
 	Stop()
+
+	// WaitForStop blocks until the manager has fully stopped, or timeout elapses.
+	// It returns true if the manager stopped before timeout, false otherwise.
+	// A non-positive timeout means wait indefinitely.
+	WaitForStop(timeout time.Duration) bool
 
 	// AgentInfo returns the information of the agent to which the manager is connected.
 	AgentInfo() AgentInfo
@@ -161,7 +180,10 @@ func (n *FallbackManager) Stop() {
 // hence it will always return false.
 func (n *FallbackManager) Enabled() bool                      { return false }
 func (n *FallbackManager) AgentInfo() AgentInfo               { return AgentInfo{} }
+func (n *FallbackManager) PreInit() error                     { return nil }
+func (n *FallbackManager) PostInit()                          {}
 func (n *FallbackManager) Start() error                       { return nil }
+func (n *FallbackManager) WaitForStop(_ time.Duration) bool   { return true }
 func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *FallbackManager) RegisterAction(action Action)       {}
 func (n *FallbackManager) UnregisterAction(action Action)     {}
