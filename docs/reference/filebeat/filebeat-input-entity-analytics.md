@@ -892,6 +892,10 @@ The provider periodically retrieves changes to user/device metadata from the Okt
 * [/api/v1/users](https://developer.okta.com/docs/reference/api/users/#list-users)
 * [/api/v1/devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices)
 
+It also read roles permissions, only when the `perms` enrichment is enabled. In that case, the following API is also targeted:
+
+* [/api/v1/iam/roles](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission)
+
 Updates are tracked by the provider by retaining a record of the time of the last noted update in the returned user list. During provider updates the Okta provider makes use of the Okta API’s query filtering to only request records updated at or since the provider’s recorded last update.
 
 
@@ -1181,6 +1185,7 @@ stack: ga 9.2.0
 List of OAuth2 scopes required for the application. Common scopes include:
 - `okta.users.read`: Read user information
 - `okta.devices.read`: Read devices information (if collecting devices information is enabled in `dataset` option)
+- `okta.roles.read`: Read role permissions (required when `perms` enrichment is enabled)
 
 ##### `oauth2.token_url`
 
