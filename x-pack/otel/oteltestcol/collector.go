@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
@@ -102,6 +103,7 @@ func (c *Collector) Shutdown() {
 
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
+		abreceiver.NewFactory(),
 		fbreceiver.NewFactory(),
 		mbreceiver.NewFactory(),
 	)
