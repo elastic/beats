@@ -32,9 +32,10 @@ import (
 
 	"github.com/alexbrainman/sspi"
 	"github.com/alexbrainman/sspi/kerberos"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/go-ldap/ldap/v3/gssapi"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Windows LDAP channel binding application data:
