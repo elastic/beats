@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
@@ -104,6 +105,7 @@ func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
 		mbreceiver.NewFactory(),
+		osqreceiver.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error

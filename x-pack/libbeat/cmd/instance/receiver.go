@@ -201,6 +201,12 @@ func (br *BeatReceiver) Shutdown() error {
 	}
 	br.beater.Stop()
 
+	// Trigger the stop callback to close the publisher pipeline. Some beaters
+	// (e.g. metricbeat) call Manager.Stop() in their Run() method, but others
+	// (e.g. osquerybeat) do not. The OtelManager.stopOnce ensures the
+	// callback runs exactly once regardless.
+	br.beat.Manager.Stop()
+
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()
 	if err := proc.Close(); err != nil {
