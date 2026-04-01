@@ -520,7 +520,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Continue shutdown: All enqueued events being published.", fb.logger))
 		// Wait for either timeout or explicit shutdown.
 		if timeout > 0 {
-			fb.logger.Info("Shutdown output timer started. Waiting for max %v.", timeout)
+			fb.logger.Infof("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
 				"Continue shutdown: Time out waiting for events being published.", fb.logger))
 		} else {
