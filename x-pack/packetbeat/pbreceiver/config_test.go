@@ -24,8 +24,8 @@ func TestUnmarshal(t *testing.T) {
 		}
 
 		userConf := confmap.NewFromStringMap(map[string]any{
-			"path.home":   "/custom/home",
-			"packetbeat":  map[string]any{"interfaces": map[string]any{}},
+			"path.home":  "/custom/home",
+			"packetbeat": map[string]any{"interfaces": map[string]any{}},
 		})
 
 		require.NoError(t, cfg.Unmarshal(userConf))
