@@ -90,12 +90,9 @@ type BeatV2Manager struct {
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
 	stopChan chan struct{}
-<<<<<<< HEAD
-=======
 	stopOnce sync.Once
 	// waits for manager goroutines started in PreInit() to exit
 	stopWait sync.WaitGroup
->>>>>>> 034546fe9 (Split `BeatV2Manager` `Start` into two methods, so Beats can reply to check-in in parallel to its initialisation (#49796))
 
 	isRunning bool
 
