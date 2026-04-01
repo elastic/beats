@@ -316,10 +316,14 @@ func (cm *BeatV2Manager) Start() error {
 // Stop stops the current Manager and close the connection to Elastic Agent.
 // It waits for the manager goroutines to terminate before returning.
 func (cm *BeatV2Manager) Stop() {
+	cm.stop()
+	cm.stopWaitGroup.Wait()
+}
+
+func (cm *BeatV2Manager) stop() {
 	cm.stopOnce.Do(func() {
 		close(cm.stopChan)
 	})
-	cm.stopWaitGroup.Wait()
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -546,7 +550,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.mx.Unlock()
 
 			if len(cm.units) == 0 && cm.stopOnEmptyUnits {
-				cm.Stop()
+				cm.stop()
 			}
 
 			cm.reload(units)
@@ -804,7 +808,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.Stop()
+		cm.stop()
 		return true, nil
 	}
 
