@@ -1,0 +1,29 @@
+name: Buildkite Test Flaky
+on:
+  schedule:
+    - cron: "0 11 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: elastic/oblt-actions/github/create-token@v1
+        id: fetch-token
+
+      - uses: elastic/oblt-actions/buildkite/flaky-report@v1
+        with:
+          days: '1'
+          github-issue-title-prefix: "[Flaky Test]"
+          github-label: "flaky-test"
+          github-repo: ${{ github.repository }}
+          github-token: ${{ steps.fetch-token.outputs.token }}
+          max-issues: '3'
+          org: 'elastic'
+          test-suite-id: 'beats'
+          token: ${{ secrets.BUILDKITE_TEST_ENGINE_TOKEN }}
