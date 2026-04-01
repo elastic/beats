@@ -40,7 +40,7 @@ type mockClient struct {
 	closed atomic.Bool
 }
 
-func (c *mockClient) Publish(_ beat.Event)    {}
+func (c *mockClient) Publish(_ beat.Event)      {}
 func (c *mockClient) PublishAll(_ []beat.Event) {}
 func (c *mockClient) Close() error {
 	c.closed.Store(true)
