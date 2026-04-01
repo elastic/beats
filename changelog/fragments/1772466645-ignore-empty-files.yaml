@@ -1,5 +1,0 @@
-kind: enhancement
-
-# Change summary; a 80ish characters long description of the change.
-summary: Empty files are excluded from processing in filestream as early as possible.
-component: "filebeat"

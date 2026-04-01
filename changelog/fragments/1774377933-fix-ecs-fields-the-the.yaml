@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix duplicated word "the the" in ECS field descriptions (7 occurrences in fields.ecs.yml)
+component: all
