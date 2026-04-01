@@ -7,7 +7,6 @@ package instance
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -204,24 +203,14 @@ func (br *BeatReceiver) Shutdown() error {
 	}
 	br.beater.Stop()
 
-	// Trigger the stop callback to close the publisher pipeline. Some beaters
-	// (e.g. metricbeat) call Manager.Stop() in their Run() method, but others
-	// (e.g. packetbeat in static mode) do not. The OtelManager.stopOnce
-	// ensures the callback runs exactly once regardless.
-	br.beat.Manager.Stop()
-
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()
 	if err := proc.Close(); err != nil {
 		br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
 	}
 
-	// Always stop the reporter and monitoring server, collecting errors
-	// rather than returning early, to avoid leaking goroutines.
-	var errs []error
-
 	if err := br.stopMonitoring(); err != nil {
-		errs = append(errs, fmt.Errorf("error stopping monitoring server: %w", err))
+		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
 
 	if br.reporter != nil {
@@ -229,9 +218,9 @@ func (br *BeatReceiver) Shutdown() error {
 	}
 
 	if err := br.beat.Info.Logger.Close(); err != nil {
-		errs = append(errs, fmt.Errorf("error closing beat receiver logging: %w", err))
+		return fmt.Errorf("error closing beat receiver logging: %w", err)
 	}
-	return errors.Join(errs...)
+	return nil
 }
 
 func (br *BeatReceiver) stopMonitoring() error {
