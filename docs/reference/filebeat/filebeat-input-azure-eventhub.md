@@ -241,9 +241,13 @@ The name of the storage account. Required.
 
 ### `storage_account_key` [_storage_account_key]
 
-::::{deprecated} 9.0.0
+```{applies_to}
+stack: deprecated 9.0.0
+```
+
+:::{note}
 Use [`storage_account_connection_string`](#_storage_account_connection_string) instead. When `storage_account_key` is set together with `storage_account`, the input auto-constructs a connection string for backward compatibility, but this behavior will be removed in a future release.
-::::
+:::
 
 The storage account key. When using `connection_string` authentication, you can provide either `storage_account_connection_string` (recommended) or `storage_account_key` together with `storage_account` to auto-construct the connection string. Not required when using `client_secret` or `managed_identity` authentication.
 
@@ -257,17 +261,25 @@ Optional, the name of the storage account container you would like to store the 
 
 ### `resource_manager_endpoint` [_resource_manager_endpoint]
 
-::::{deprecated} 9.0.0
+```{applies_to}
+stack: deprecated 9.0.0
+```
+
+:::{note}
 Use [`authority_host`](#_authority_host) instead to control the cloud environment. The `resource_manager_endpoint` option will be removed in a future release.
-::::
+:::
 
 Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager endpoint in order to use a different azure environment. Ex: [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for azure ChinaCloud [https://management.microsoftazure.de/](https://management.microsoftazure.de/) for azure GermanCloud [https://management.azure.com/](https://management.azure.com/) for azure PublicCloud [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for azure USGovernmentCloud Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
 
 ### `sanitize_options` [_sanitize_options]
 
-::::{deprecated} 9.0.0
+```{applies_to}
+stack: deprecated 9.0.0
+```
+
+:::{note}
 Use [`sanitizers`](#_sanitizers) instead. The `sanitize_options` option will be removed in a future release.
-::::
+:::
 
 Optional. A list of legacy sanitization options to apply to messages that contain invalid JSON. Supported values: `NEW_LINES`, `SINGLE_QUOTES`.
 
