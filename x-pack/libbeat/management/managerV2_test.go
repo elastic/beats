@@ -435,9 +435,9 @@ func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
 			State:    proto.State_HEALTHY,
 			LogLevel: proto.UnitLogLevel_INFO,
 			Config: &proto.UnitExpectedConfig{
-				Id:   "filestram-unit-id",
+				Id:   "filestream-unit-id",
 				Type: "filestream",
-				Name: "filesteam",
+				Name: "filestream",
 				Streams: []*proto.Stream{
 					{
 						Id: "filestream-input-id",
