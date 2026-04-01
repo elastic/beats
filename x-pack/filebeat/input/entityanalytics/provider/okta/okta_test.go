@@ -133,6 +133,8 @@ func TestOktaDoFetch(t *testing.T) {
 				w.Header().Add("x-rate-limit-remaining", "49")
 				w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
 			}
+			permCalls := map[string]int{}
+
 			mux := http.NewServeMux()
 			mux.Handle("/api/v1/users/{userid}/{metadata}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				setHeaders(w)
@@ -147,6 +149,12 @@ func TestOktaDoFetch(t *testing.T) {
 			}))
 			mux.Handle("/api/v1/iam/roles/{roleId}/permissions", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				setHeaders(w)
+				roleID := r.PathValue("roleId")
+				permCalls[roleID]++
+				if roleID != "cr0Yq6IJxGIr0ouum0g3" {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
 				fmt.Fprintln(w, data["permissions"])
 			}))
 			mux.Handle("/api/v1/devices/{deviceid}/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -272,6 +280,16 @@ func TestOktaDoFetch(t *testing.T) {
 					}
 					if g.State != wantStates[g.ID] {
 						t.Errorf("unexpected user state for user %s: got:%s want:%s", g.ID, g.State, wantStates[g.ID])
+					}
+				}
+				if slices.Contains(test.enrichWith, "perms") {
+					// The cache must deduplicate calls: one custom role definition across
+					// repeats users means exactly one permissions API call.
+					if permCalls["cr0Yq6IJxGIr0ouum0g3"] != 1 {
+						t.Errorf("permissions endpoint call count for custom role: got:%d want:1", permCalls["cr0Yq6IJxGIr0ouum0g3"])
+					}
+					if len(permCalls) != 1 {
+						t.Errorf("permissions endpoint called for unexpected role IDs: %v", permCalls)
 					}
 				}
 			})
