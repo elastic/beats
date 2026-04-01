@@ -47,9 +47,9 @@ func TestNewReceiver(t *testing.T) {
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{
-						"module":     "file_integrity",
-						"enabled":    true,
-						"paths":      []string{t.TempDir()},
+						"module":        "file_integrity",
+						"enabled":       true,
+						"paths":         []string{t.TempDir()},
 						"scan_at_start": false,
 					},
 				},
