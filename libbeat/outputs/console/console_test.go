@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -119,14 +120,14 @@ func TestConsoleOutput(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			batch := outest.NewBatch(test.events...)
 			lines, err := run(test.codec, logger, batch)
-			assert.NoError(t, err)
-			assert.Equal(t, test.expected, lines)
+			assert.NoError(t, err, "run should not return an error")
+			assert.Equal(t, test.expected, lines, "console output should match expected lines")
 
 			// check batch correctly signalled
-			if !assert.Len(t, batch.Signals, 1) {
+			if !assert.Len(t, batch.Signals, 1, "batch should emit exactly one signal") {
 				return
 			}
-			assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+			assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag, "batch signal should be ACK")
 		})
 	}
 }
@@ -157,18 +158,16 @@ func TestMakeConsoleWithFormatCodec(t *testing.T) {
 	batch := outest.NewBatch(beat.Event{Fields: event("message", "hello")})
 	lines, err := withStdout(func() {
 		outputGroup, makeErr := makeConsole(nil, beat.Info{Beat: "test", Logger: logger}, outputs.NewNilObserver(), cfg, nil)
-		assert.NoError(t, makeErr)
-		if !assert.Len(t, outputGroup.Clients, 1) {
-			return
-		}
-		assert.NoError(t, outputGroup.Clients[0].Publish(context.Background(), batch))
+		require.NoError(t, makeErr, "makeConsole should initialize without errors")
+		require.Len(t, outputGroup.Clients, 1, "makeConsole should return exactly one client")
+		assert.NoError(t, outputGroup.Clients[0].Publish(context.Background(), batch), "publishing event should succeed")
 	})
-	assert.NoError(t, err)
-	assert.Equal(t, "hello\n", lines)
-	if !assert.Len(t, batch.Signals, 1) {
+	assert.NoError(t, err, "capturing stdout should not fail")
+	assert.Equal(t, "hello\n", lines, "format codec should render the configured output")
+	if !assert.Len(t, batch.Signals, 1, "batch should emit exactly one signal") {
 		return
 	}
-	assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag, "batch signal should be ACK")
 }
 
 func TestMakeConsoleCodecConfigErrors(t *testing.T) {
@@ -202,8 +201,8 @@ func TestMakeConsoleCodecConfigErrors(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := config.MustNewConfigFrom(tc.config)
 			_, err := makeConsole(nil, beat.Info{Beat: "test", Logger: logger}, outputs.NewNilObserver(), cfg, nil)
-			assert.Error(t, err)
-			assert.Contains(t, err.Error(), tc.errMsg)
+			require.Error(t, err, "makeConsole should fail for invalid codec config")
+			assert.Contains(t, err.Error(), tc.errMsg, "error should include the expected validation message")
 		})
 	}
 }
