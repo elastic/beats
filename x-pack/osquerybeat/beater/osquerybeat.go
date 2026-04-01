@@ -91,8 +91,9 @@ type osquerybeat struct {
 	diagMx        sync.RWMutex
 	diagQueryExec queryExecutor
 
-	// parent process watcher
-	watcher *Watcher
+	// parent process watcher (disabled when running as an OTel receiver)
+	watcher        *Watcher
+	disableWatcher bool
 
 	osquerydFactory osqd.RunnerFactory
 	executablePath  func() (string, error)
@@ -147,6 +148,18 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	return bt, nil
 }
 
+// NewReceiver creates an instance of osquerybeat for use as an OTel receiver.
+// It disables orphan detection since the receiver lifecycle is managed by the
+// OTel collector, not a parent process.
+func NewReceiver(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
+	bt, err := New(b, cfg)
+	if err != nil {
+		return nil, err
+	}
+	bt.(*osquerybeat).disableWatcher = true
+	return bt, nil
+}
+
 func (bt *osquerybeat) init() (context.Context, error) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
@@ -156,10 +169,12 @@ func (bt *osquerybeat) init() (context.Context, error) {
 	var ctx context.Context
 	ctx, bt.cancel = context.WithCancel(context.Background())
 
-	if bt.watcher != nil {
-		bt.watcher.Close()
+	if !bt.disableWatcher {
+		if bt.watcher != nil {
+			bt.watcher.Close()
+		}
+		bt.watcher = NewWatcher(bt.log)
 	}
-	bt.watcher = NewWatcher(bt.log)
 	return ctx, nil
 }
 

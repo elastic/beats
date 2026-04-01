@@ -207,12 +207,6 @@ func CheckReceivers(params CheckReceiversParams) {
 
 // VerifyNoLeaks fails the test if any goroutines are leaked during the test.
 func VerifyNoLeaks(t *testing.T) {
-	VerifyNoLeaksWithOptions(t)
-}
-
-// VerifyNoLeaksWithOptions fails the test if any goroutines are leaked,
-// accepting additional goleak options for beat-specific ignores.
-func VerifyNoLeaksWithOptions(t *testing.T, extra ...goleak.Option) {
 	skipped := []goleak.Option{
 		// See https://github.com/microsoft/go-winio/issues/272
 		goleak.IgnoreAnyFunction("github.com/Microsoft/go-winio.getQueuedCompletionStatus"),
@@ -225,7 +219,6 @@ func VerifyNoLeaksWithOptions(t *testing.T, extra ...goleak.Option) {
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
 		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
 	}
-	skipped = append(skipped, extra...)
 
 	goleak.VerifyNone(t, skipped...)
 }

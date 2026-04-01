@@ -17,7 +17,6 @@ import (
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
-	"go.uber.org/goleak"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -56,12 +55,12 @@ func TestLeak(t *testing.T) {
 	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 
 	t.Run("healthy consumer", func(t *testing.T) {
-		defer verifyNoLeaks(t)
+		defer oteltest.VerifyNoLeaks(t)
 		var consumeLogs oteltest.DummyConsumer
 		startAndStopReceiver(t, factory, &consumeLogs, &config)
 	})
 	t.Run("unhealthy consumer", func(t *testing.T) {
-		defer verifyNoLeaks(t)
+		defer oteltest.VerifyNoLeaks(t)
 		consumeLogs := oteltest.DummyConsumer{ConsumeError: errors.New("cannot publish data")}
 		startAndStopReceiver(t, factory, &consumeLogs, &config)
 	})
@@ -107,13 +106,4 @@ func startAndStopReceiver(t *testing.T, factory receiver.Factory, consumer consu
 		}
 		t.Fatalf("receiver didn't stop, see logs above")
 	}
-}
-
-// verifyNoLeaks wraps oteltest.VerifyNoLeaks with an additional ignore for
-// the osquerybeat parent-process watcher goroutine. The watcher is started
-// unconditionally by osquerybeat.close() and runs forever by design.
-func verifyNoLeaks(t *testing.T) {
-	oteltest.VerifyNoLeaksWithOptions(t,
-		goleak.IgnoreAnyFunction("github.com/elastic/beats/v7/x-pack/osquerybeat/beater.(*Watcher).Run"),
-	)
 }
