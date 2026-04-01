@@ -437,7 +437,7 @@ func MakeLexer(in string) lexer {
 			if off > len(content) {
 				return
 			}
-			idx := -1
+			var idx int
 			if varcount == 0 {
 				idx = strings.IndexAny(content[off:], `%\`)
 			} else {
