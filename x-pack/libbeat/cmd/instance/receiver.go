@@ -7,6 +7,7 @@ package instance
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -35,6 +36,7 @@ import (
 type BeatReceiver struct {
 	beat                *instance.Beat
 	beater              beat.Beater
+	reporter            *log.Reporter
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
@@ -166,11 +168,11 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		if err != nil {
 			return fmt.Errorf("error creating metric reporter: %w", err)
 		}
-		// Stop the reporter when Start returns (i.e. when beater.Run finishes).
-		// This ensures cleanup even if Shutdown races with Start, since Start
-		// runs in a goroutine and Shutdown may execute before the reporter is
-		// assigned to br.reporter.
-		defer r.Stop()
+		rep, ok := r.(*log.Reporter)
+		if !ok {
+			return fmt.Errorf("error creating metric log reporter")
+		}
+		br.reporter = rep
 	}
 
 	br.beat.Manager.SetStopCallback(func() {
@@ -214,14 +216,22 @@ func (br *BeatReceiver) Shutdown() error {
 		br.beat.Info.Logger.Warnf("failed to close global processing: %s", err)
 	}
 
+	// Always stop the reporter and monitoring server, collecting errors
+	// rather than returning early, to avoid leaking goroutines.
+	var errs []error
+
 	if err := br.stopMonitoring(); err != nil {
-		return fmt.Errorf("error stopping monitoring server: %w", err)
+		errs = append(errs, fmt.Errorf("error stopping monitoring server: %w", err))
+	}
+
+	if br.reporter != nil {
+		br.reporter.Stop()
 	}
 
 	if err := br.beat.Info.Logger.Close(); err != nil {
-		return fmt.Errorf("error closing beat receiver logging: %w", err)
+		errs = append(errs, fmt.Errorf("error closing beat receiver logging: %w", err))
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
 func (br *BeatReceiver) stopMonitoring() error {
