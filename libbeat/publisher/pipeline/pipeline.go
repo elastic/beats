@@ -77,9 +77,6 @@ type Pipeline struct {
 	closeOnce sync.Once
 
 	processors processing.Supporter
-
-	// paths contains the paths configuration for processor initialization.
-	paths *paths.Path
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -94,9 +91,6 @@ type Settings struct {
 	Processors processing.Supporter
 
 	InputQueueSize int
-
-	// Paths contains the paths configuration used for processor initialization.
-	Paths *paths.Path
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -163,7 +157,6 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
-		paths:            settings.Paths,
 	}
 
 	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
@@ -179,7 +172,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +200,6 @@ func NewForReceiver(
 		observer:         newMetricsObserver(monitors.Metrics),
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
-		paths:            settings.Paths,
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
@@ -217,7 +209,7 @@ func NewForReceiver(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +337,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish, p.paths)
+	return p.processors.Create(cfg, noPublish)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline

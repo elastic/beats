@@ -71,7 +71,6 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		WaitClose:     time.Second * 10,
 		WaitCloseMode: pipeline.WaitOnPipelineClose,
 		Processors:    processing,
-		Paths:         beatPaths,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
