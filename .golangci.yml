@@ -69,6 +69,16 @@ linters:
     forbidigo:
       forbid:
         - pattern: fmt.Print.*
+        - pattern: ^paths\.Resolve$
+          msg: "use a per-beat *paths.Path instance instead of the global paths.Resolve"
+        - pattern: ^paths\.InitPaths$
+          msg: "use a per-beat *paths.Path instance instead of the global paths.InitPaths"
+        - pattern: ^paths\.Paths$
+          msg: "use a per-beat *paths.Path instance instead of the global paths.Paths"
+        - pattern: ^logp\.NewLogger$
+          msg: "accept a *logp.Logger as a parameter instead of creating one with logp.NewLogger"
+        - pattern: ^logp\.L$
+          msg: "accept a *logp.Logger as a parameter instead of using the global logp.L()"
     gomoddirectives:
       replace-allow-list:
         - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
