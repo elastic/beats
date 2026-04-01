@@ -87,6 +87,13 @@ type BeatV2Manager struct {
 	stopChan chan struct{}
 	stopOnce sync.Once
 
+	// We need a separate channel to notify when the Agent client has actually
+	// stopped: watchErrChan needs to keep running for a while after the
+	// manager shutdown signal, because if the error channel is not drained it
+	// can deadlock the client.Close() call. This channel is closed after
+	// client.Close() has completed, so the error handler can also shutdown.
+	clientStoppedChan chan struct{}
+
 	isRunning bool
 
 	// set with the last applied output config
@@ -207,6 +214,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		status:             status.Running,
 		message:            "Healthy",
 		stopChan:           make(chan struct{}),
+		clientStoppedChan:  make(chan struct{}),
 		changeDebounce:     time.Second,
 		// forceReloadDebounce is greater than changeDebounce because it is only
 		// used when an input has not reached its finished state, this means some events
@@ -271,6 +279,12 @@ func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
 	cm.stopMut.Lock()
 	defer cm.stopMut.Unlock()
 	cm.stopFunc = stopFunc
+}
+
+func (cm *BeatV2Manager) getStopCallback() func() {
+	cm.stopMut.Lock()
+	defer cm.stopMut.Unlock()
+	return cm.stopFunc
 }
 
 // Start the config manager.
@@ -465,7 +479,10 @@ func (cm *BeatV2Manager) softDeleteUnit(unit *client.Unit) {
 func (cm *BeatV2Manager) watchErrChan() {
 	for {
 		select {
-		case <-cm.stopChan:
+		case <-cm.clientStoppedChan:
+			// We can't end this loop until the associated client has fully
+			// stopped, otherwise we might deadlock its shutdown, so we
+			// wait on clientStoppedChan instead of just stopChan.
 			return
 		case err := <-cm.client.Errors():
 			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
@@ -549,12 +566,11 @@ func (cm *BeatV2Manager) stopBeat() {
 	cm.logger.Debugf("Stopping beat")
 	cm.UpdateStatus(status.Stopping, "Stopping")
 
-	cm.stopMut.Lock()
-	defer cm.stopMut.Unlock()
-	if cm.stopFunc != nil {
-		cm.stopFunc()
+	if stopFunc := cm.getStopCallback(); stopFunc != nil {
+		stopFunc()
 	}
 	cm.client.Stop()
+	close(cm.clientStoppedChan)
 	cm.UpdateStatus(status.Stopped, "Stopped")
 }
 
