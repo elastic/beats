@@ -477,6 +477,10 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 			return nil, nil, err
 		}
 
+		if resp.StatusCode != http.StatusOK {
+			return nil, resp.Header, recoverError(body.Bytes())
+		}
+
 		if all {
 			// List all entities.
 			var e []E
