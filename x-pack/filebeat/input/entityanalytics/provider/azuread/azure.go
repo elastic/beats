@@ -456,6 +456,28 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		})
 	}
 
+	// Clear any MFA enrichment data from a previous cycle so each cycle
+	// reflects current state from the API.
+	if wantUsers {
+		for _, u := range state.users {
+			u.MFA = nil
+		}
+	}
+
+	// Enrich users with MFA registration details if requested.
+	if wantUsers && p.conf.wantMFA() {
+		mfaDetails, err := p.fetcher.UserMFADetails(ctx)
+		if err != nil {
+			p.logger.Warnf("Failed to fetch MFA registration details, skipping MFA enrichment: %v", err)
+		} else {
+			for userID, details := range mfaDetails {
+				if u, ok := state.users[userID]; ok {
+					u.MFA = details
+				}
+			}
+		}
+	}
+
 	// Expand device group memberships.
 	if wantDevices {
 		updatedDevices.ForEach(func(devID uuid.UUID) {
@@ -536,6 +558,10 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	})
 	if len(groups) != 0 {
 		_, _ = userDoc.Put("user.group", groups)
+	}
+
+	if u.MFA != nil {
+		_, _ = userDoc.Put("azure_ad.mfa", u.MFA)
 	}
 
 	event := beat.Event{
