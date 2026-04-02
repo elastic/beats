@@ -87,13 +87,25 @@ func Package() error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
+	args := devtools.DefaultPackageArgsFromEnv()
+	return runPackage(devtools.PackageWithArgs(args), args)
+}
+
+func runPackage(packageFn func() error, args devtools.PackageArgs) error {
+	snapshot, dev := args.Snapshot, args.Dev
+	previousSnapshot, previousDev := devtools.Snapshot, devtools.DevBuild
+	devtools.Snapshot, devtools.DevBuild = snapshot, dev
+	defer func() {
+		devtools.Snapshot, devtools.DevBuild = previousSnapshot, previousDev
+	}()
+
 	devtools.UseElasticBeatOSSPackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild)
-	if err := devtools.Package(); err != nil {
+	if err := packageFn(); err != nil {
 		return err
 	}
 	return TestPackages()
@@ -210,25 +222,22 @@ func packageDockerImageForGoIntegTest() error {
 		)
 	}
 
-	return devtools.WithPackageBuildSelection(devtools.PackageBuildSelection{
-		Platforms:    devtools.NewPlatformList(dockerPlatform),
-		PackageTypes: []devtools.PackageType{devtools.Docker},
-	}, func() error {
-		// Create a backup of the original variables
-		snapshot := devtools.Snapshot
+	packageArgs := devtools.DefaultPackageArgsFromEnv()
+	packageArgs.Platforms = devtools.NewPlatformList(dockerPlatform)
+	packageArgs.PackageTypes = []devtools.PackageType{devtools.Docker}
+	packageArgs.Snapshot = true
+
+	return func() error {
 		packages := append([]devtools.OSPackageArgs(nil), devtools.Packages...)
 
-		devtools.Snapshot = true
 		devtools.Packages = nil
 
-		// Restore the variables
 		defer func() {
-			devtools.Snapshot = snapshot
 			devtools.Packages = packages
 		}()
 
-		return Package()
-	})
+		return runPackage(devtools.PackageWithArgs(packageArgs), packageArgs)
+	}()
 }
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.

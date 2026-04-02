@@ -18,13 +18,11 @@
 package mage
 
 import (
-	"errors"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
@@ -131,81 +129,53 @@ func TestParsePackageTypes(t *testing.T) {
 	)
 }
 
-func TestWithPackageBuildSelection(t *testing.T) {
+func TestDefaultPackageArgsFromEnv(t *testing.T) {
 	originalPlatforms := append(BuildPlatformList(nil), Platforms...)
-	originalPackageTypes := append([]PackageType(nil), SelectedPackageTypes...)
+	originalSnapshot := Snapshot
+	originalDevBuild := DevBuild
 	t.Cleanup(func() {
-		SetBuildPlatforms(originalPlatforms)
-		SetSelectedPackageTypes(originalPackageTypes)
+		Platforms = originalPlatforms
+		Snapshot = originalSnapshot
+		DevBuild = originalDevBuild
 	})
 
-	SetBuildPlatforms(NewPlatformList("linux/amd64"))
-	SetSelectedPackageTypes([]PackageType{Docker})
+	Platforms = NewPlatformList("linux/amd64")
+	Snapshot = false
+	DevBuild = false
 
-	err := WithPackageBuildSelection(PackageBuildSelection{
-		Platforms:    NewPlatformList("linux/arm64"),
-		PackageTypes: []PackageType{TarGz},
-	}, func() error {
-		assert.Equal(
-			t,
-			NewPlatformList("linux/arm64"),
-			Platforms,
-			"expected platforms override to be active inside callback",
-		)
-		assert.Equal(
-			t,
-			[]PackageType{TarGz},
-			SelectedPackageTypes,
-			"expected package type override to be active inside callback",
-		)
-		return nil
-	})
-	require.NoError(t, err, "expected callback without error to succeed")
+	t.Setenv("PLATFORMS", "")
+	t.Setenv("PACKAGES", "")
+	t.Setenv("SNAPSHOT", "")
+	t.Setenv("DEV", "")
+	args := DefaultPackageArgsFromEnv()
 
 	assert.Equal(
 		t,
 		NewPlatformList("linux/amd64"),
-		Platforms,
-		"expected platforms to be restored after callback",
+		args.Platforms,
+		"expected default args to include current platforms when env is empty",
+	)
+	assert.Empty(t, args.PackageTypes, "expected all package types to be selected when PACKAGES is empty")
+	assert.False(t, args.Snapshot, "expected snapshot to default to current global value")
+	assert.False(t, args.Dev, "expected DEV to default to current global value")
+
+	t.Setenv("PLATFORMS", "linux/arm64")
+	t.Setenv("PACKAGES", "tgz")
+	t.Setenv("SNAPSHOT", "true")
+	t.Setenv("DEV", "true")
+	args = DefaultPackageArgsFromEnv()
+	assert.Equal(
+		t,
+		NewPlatformList("linux/arm64"),
+		args.Platforms,
+		"expected PLATFORMS env var to override default package platforms",
 	)
 	assert.Equal(
 		t,
-		[]PackageType{Docker},
-		SelectedPackageTypes,
-		"expected package types to be restored after callback",
+		[]PackageType{TarGz},
+		args.PackageTypes,
+		"expected PACKAGES env var to override default package types",
 	)
-}
-
-func TestWithPackageBuildSelectionRestoresOnError(t *testing.T) {
-	originalPlatforms := append(BuildPlatformList(nil), Platforms...)
-	originalPackageTypes := append([]PackageType(nil), SelectedPackageTypes...)
-	t.Cleanup(func() {
-		SetBuildPlatforms(originalPlatforms)
-		SetSelectedPackageTypes(originalPackageTypes)
-	})
-
-	SetBuildPlatforms(NewPlatformList("linux/amd64"))
-	SetSelectedPackageTypes([]PackageType{Docker})
-
-	wantErr := errors.New("boom")
-	err := WithPackageBuildSelection(PackageBuildSelection{
-		Platforms:    NewPlatformList("linux/arm64"),
-		PackageTypes: []PackageType{TarGz},
-	}, func() error {
-		return wantErr
-	})
-	require.ErrorIs(t, err, wantErr, "expected callback error to be returned")
-
-	assert.Equal(
-		t,
-		NewPlatformList("linux/amd64"),
-		Platforms,
-		"expected platforms to be restored when callback returns an error",
-	)
-	assert.Equal(
-		t,
-		[]PackageType{Docker},
-		SelectedPackageTypes,
-		"expected package types to be restored when callback returns an error",
-	)
+	assert.True(t, args.Snapshot, "expected SNAPSHOT env var to override default snapshot value")
+	assert.True(t, args.Dev, "expected DEV env var to override default DEV value")
 }

@@ -32,10 +32,75 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+// PackageArgs defines runtime configuration for package builds.
+type PackageArgs struct {
+	Platforms    BuildPlatformList
+	PackageTypes []PackageType
+	Snapshot     bool
+	Dev          bool
+}
+
+// DefaultPackageArgsFromEnv returns package args based on current globals and
+// runtime env var overrides (PLATFORMS, PACKAGES, SNAPSHOT, DEV).
+func DefaultPackageArgsFromEnv() PackageArgs {
+	snapshot := parseBoolEnvOverride("SNAPSHOT", Snapshot)
+	dev := parseBoolEnvOverride("DEV", DevBuild)
+
+	args := PackageArgs{
+		Platforms: append(BuildPlatformList(nil), Platforms...),
+		Snapshot:  snapshot,
+		Dev:       dev,
+	}
+
+	if expression := os.Getenv("PLATFORMS"); len(expression) > 0 {
+		args.Platforms = NewPlatformList(expression)
+	}
+	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
+		args.PackageTypes = ParsePackageTypes(packageTypes)
+	}
+
+	return args
+}
+
+func parseBoolEnvOverride(name string, fallback bool) bool {
+	value, found := os.LookupEnv(name)
+	if !found || value == "" {
+		return fallback
+	}
+
+	parsed, err := strconv.ParseBool(value)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse %s env value: %w", name, err))
+	}
+	return parsed
+}
+
+// PackageWithArgs returns a package build function configured with args.
+func PackageWithArgs(args PackageArgs) func() error {
+	return func() error {
+		return packageWithArgs(args)
+	}
+}
+
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
-	if len(Platforms) == 0 {
+	return PackageWithArgs(DefaultPackageArgsFromEnv())()
+}
+
+func packageWithArgs(args PackageArgs) error {
+	platforms := args.Platforms
+	packageTypes := args.PackageTypes
+	snapshot := args.Snapshot
+	dev := args.Dev
+
+	previousSnapshot, previousDev := Snapshot, DevBuild
+	Snapshot, DevBuild = snapshot, dev
+	defer func() {
+		Snapshot, DevBuild = previousSnapshot, previousDev
+	}()
+
+	if len(platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
 		return nil
 	}
@@ -44,9 +109,6 @@ func Package() error {
 		return errors.New("no package specs are registered. Call " +
 			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
 	}
-
-	// platforms := updateWithDarwinUniversal(Platforms)
-	platforms := Platforms
 
 	var tasks []interface{}
 	for _, target := range platforms {
@@ -61,7 +123,7 @@ func Package() error {
 			}
 
 			for _, pkgType := range pkg.Types {
-				if !isPackageTypeSelected(pkgType) {
+				if !isPackageTypeSelected(pkgType, packageTypes) {
 					log.Printf("Skipping %s package type because it is not selected", pkgType)
 					continue
 				}
@@ -105,7 +167,7 @@ func Package() error {
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
-				spec.Snapshot = Snapshot
+				spec.Snapshot = snapshot
 				spec.evalContext = map[string]interface{}{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
@@ -247,14 +309,14 @@ func saveIronbank() error {
 	return nil
 }
 
-// isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
-// pkgType is present on SelectedPackageTypes. It returns false otherwise.
-func isPackageTypeSelected(pkgType PackageType) bool {
-	if len(SelectedPackageTypes) == 0 {
+// isPackageTypeSelected returns true if selected is empty or if pkgType is
+// present on selected. It returns false otherwise.
+func isPackageTypeSelected(pkgType PackageType, selected []PackageType) bool {
+	if len(selected) == 0 {
 		return true
 	}
 
-	for _, t := range SelectedPackageTypes {
+	for _, t := range selected {
 		if t == pkgType {
 			return true
 		}

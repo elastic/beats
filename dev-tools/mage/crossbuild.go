@@ -44,28 +44,6 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// SelectedPackageTypes is the list of package types. If empty, all packages types
-// are considered to be selected (see isPackageTypeSelected).
-var SelectedPackageTypes []PackageType
-
-// PackageBuildSelection defines package build options that can be temporarily
-// overridden when invoking packaging logic from another target.
-type PackageBuildSelection struct {
-	Platforms    BuildPlatformList
-	PackageTypes []PackageType
-}
-
-// SetBuildPlatforms sets the platforms used by cross-build and package
-// targets. A nil list clears the current selection.
-func SetBuildPlatforms(platforms BuildPlatformList) {
-	Platforms = append(BuildPlatformList(nil), platforms...)
-}
-
-// SetBuildPlatformsFromExpression parses expr and sets the active platforms.
-func SetBuildPlatformsFromExpression(expr string) {
-	SetBuildPlatforms(NewPlatformList(expr))
-}
-
 // ParsePackageTypes parses a comma-separated list of package types. Invalid
 // values are ignored.
 func ParsePackageTypes(packageTypes string) []PackageType {
@@ -85,48 +63,12 @@ func ParsePackageTypes(packageTypes string) []PackageType {
 	return parsed
 }
 
-// SetSelectedPackageTypes sets the package types to build. A nil slice means
-// all package types are selected.
-func SetSelectedPackageTypes(packageTypes []PackageType) {
-	SelectedPackageTypes = append([]PackageType(nil), packageTypes...)
-}
-
-// SetSelectedPackageTypesFromString parses and sets selected package types.
-func SetSelectedPackageTypesFromString(packageTypes string) {
-	SetSelectedPackageTypes(ParsePackageTypes(packageTypes))
-}
-
-// WithPackageBuildSelection temporarily overrides platforms and package types
-// while fn executes. Any nil field in selection keeps the current value.
-func WithPackageBuildSelection(selection PackageBuildSelection, fn func() error) error {
-	originalPlatforms := append(BuildPlatformList(nil), Platforms...)
-	originalPackageTypes := append([]PackageType(nil), SelectedPackageTypes...)
-
-	if selection.Platforms != nil {
-		SetBuildPlatforms(selection.Platforms)
-	}
-	if selection.PackageTypes != nil {
-		SetSelectedPackageTypes(selection.PackageTypes)
-	}
-
-	defer func() {
-		SetBuildPlatforms(originalPlatforms)
-		SetSelectedPackageTypes(originalPackageTypes)
-	}()
-
-	return fn()
-}
-
 func init() {
 	// Allow overriding via PLATFORMS.
 	if expression := os.Getenv("PLATFORMS"); len(expression) > 0 {
-		SetBuildPlatformsFromExpression(expression)
+		Platforms = NewPlatformList(expression)
 	}
 
-	// Allow overriding via PACKAGES.
-	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
-		SetSelectedPackageTypesFromString(packageTypes)
-	}
 }
 
 // CrossBuildOption defines an option to the CrossBuild target.
