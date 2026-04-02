@@ -456,10 +456,9 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		processingTime: metrics.NewUniformSample(1024),
 	}
 
-	//TODO: use local logger here
-	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.NewLogger(""), adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.L(), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
+	_ = adapter.NewGoMetrics(reg, "processing_time", logp.L(), adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.processingTime))
 
 	out.device.Set(device)
