@@ -361,32 +361,6 @@ func (cm *BeatV2Manager) stop() {
 	})
 }
 
-// WaitForStop blocks until the manager has fully stopped, or timeout elapses.
-// It returns true if the manager stopped before timeout, false otherwise.
-// A non-positive timeout means wait indefinitely.
-func (cm *BeatV2Manager) WaitForStop(timeout time.Duration) bool {
-	cm.Stop()
-	done := make(chan struct{})
-	go func() {
-		cm.stopWait.Wait()
-		close(done)
-	}()
-
-	if timeout <= 0 {
-		<-done
-		return true
-	}
-
-	t := time.NewTimer(timeout)
-
-	select {
-	case <-done:
-		return true
-	case <-t.C:
-		return false
-	}
-}
-
 // CheckRawConfig is currently not implemented for V1.
 func (cm *BeatV2Manager) CheckRawConfig(_ *conf.C) error {
 	// This does not do anything on V1 or V2, but here we are

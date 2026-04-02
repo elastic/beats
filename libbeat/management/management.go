@@ -19,7 +19,6 @@ package management
 
 import (
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -62,16 +61,12 @@ type Manager interface {
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
 	// will be propagated to the handlers and will not try to configure any reloadable parts.
 	// When the manager is stopped the callback will be called to signal that the system can terminate.
+	// This method waits for manager goroutines to finish before returning.
 	//
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
 	//
 	// Note: Stop will not call 'UnregisterAction()' automatically.
 	Stop()
-
-	// WaitForStop blocks until the manager has fully stopped, or timeout elapses.
-	// It returns true if the manager stopped before timeout, false otherwise.
-	// A non-positive timeout means wait indefinitely.
-	WaitForStop(timeout time.Duration) bool
 
 	// AgentInfo returns the information of the agent to which the manager is connected.
 	AgentInfo() AgentInfo
@@ -183,7 +178,6 @@ func (n *FallbackManager) AgentInfo() AgentInfo               { return AgentInfo
 func (n *FallbackManager) PreInit() error                     { return nil }
 func (n *FallbackManager) PostInit()                          {}
 func (n *FallbackManager) Start() error                       { return nil }
-func (n *FallbackManager) WaitForStop(_ time.Duration) bool   { return true }
 func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *FallbackManager) RegisterAction(action Action)       {}
 func (n *FallbackManager) UnregisterAction(action Action)     {}
