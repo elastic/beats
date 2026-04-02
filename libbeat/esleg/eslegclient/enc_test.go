@@ -18,9 +18,12 @@
 package eslegclient
 
 import (
+	"compress/gzip"
 	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -66,30 +69,98 @@ func TestJSONEncoderMarshalMonitoringEvent(t *testing.T) {
 		"Unexpected marshaled format of report.Event")
 }
 
+// TestRawEncodingNoDoubleNewline verifies that writing a RawEncoding
+// whose bytes already end with '\n' does not produce a double newline
+// in the bulk body.  It also verifies that RawEncoding bytes without
+// a trailing newline still receive one.
 func TestRawEncodingNoDoubleNewline(t *testing.T) {
-	encoder := NewJSONEncoder(nil, false)
-	event := beat.Event{
+	// Pre-encode an event via Marshal, which appends a trailing '\n'.
+	jsonEnc := NewJSONEncoder(nil, false)
+	ev := beat.Event{
 		Timestamp: time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC),
 		Fields:    mapstr.M{"message": "test"},
 	}
-	err := encoder.Marshal(event)
-	require.NoError(t, err)
-	preEncoded := make([]byte, encoder.buf.Len())
-	copy(preEncoded, encoder.buf.Bytes())
+	require.NoError(t, jsonEnc.Marshal(ev))
+	preEncoded := make([]byte, jsonEnc.buf.Len())
+	copy(preEncoded, jsonEnc.buf.Bytes())
 	require.Equal(t, byte('\n'), preEncoded[len(preEncoded)-1], "pre-encoded event should end with newline")
 
-	// Simulate a bulk body: meta + pre-encoded document.
-	encoder.Reset()
 	meta := map[string]any{"index": map[string]any{"_index": "test"}}
-	require.NoError(t, encoder.AddRaw(meta))
-	require.NoError(t, encoder.AddRaw(RawEncoding{Encoding: preEncoded}))
 
-	body := encoder.buf.String()
-	assert.NotContains(t, body, "\n\n", "bulk body must not contain empty lines; got:\n%s", body)
+	type encoderCase struct {
+		name     string
+		newEnc   func(t *testing.T) BodyEncoder
+		bodyText func(t *testing.T, enc BodyEncoder) string
+	}
+	encoders := []encoderCase{
+		{
+			name:   "JSON encoder",
+			newEnc: func(t *testing.T) BodyEncoder { return NewJSONEncoder(nil, false) },
+			bodyText: func(t *testing.T, enc BodyEncoder) string {
+				body, err := io.ReadAll(enc.Reader())
+				require.NoError(t, err)
+				return string(body)
+			},
+		},
+		{
+			name: "gzip encoder",
+			newEnc: func(t *testing.T) BodyEncoder {
+				g, err := NewGzipEncoder(5, nil, false)
+				require.NoError(t, err)
+				return g
+			},
+			bodyText: func(t *testing.T, enc BodyEncoder) string {
+				r, err := gzip.NewReader(enc.Reader())
+				require.NoError(t, err)
+				defer r.Close()
+				body, err := io.ReadAll(r)
+				require.NoError(t, err)
+				return string(body)
+			},
+		},
+	}
+
+	tests := []struct {
+		name     string
+		encoding []byte
+	}{
+		// RawEncoding already has a trailing newline — must not produce "\n\n".
+		{"with trailing newline", preEncoded},
+		// RawEncoding without a trailing newline — encoder must append one.
+		{"without trailing newline", preEncoded[:len(preEncoded)-1]},
+	}
+
+	for _, ec := range encoders {
+		for _, tc := range tests {
+			t.Run(ec.name+"/"+tc.name, func(t *testing.T) {
+				enc := ec.newEnc(t)
+				require.NoError(t, enc.AddRaw(meta))
+				require.NoError(t, enc.AddRaw(RawEncoding{Encoding: tc.encoding}))
+
+				body := ec.bodyText(t, enc)
+				assert.NotContains(t, body, "\n\n",
+					"bulk body must not contain empty lines; got:\n%s", body)
+				lines := splitNDJSON(body)
+				assert.Equal(t, 2, len(lines),
+					"bulk body should have exactly 2 NDJSON lines (meta + document); got %d:\n%s", len(lines), body)
+			})
+		}
+	}
+}
+
+// splitNDJSON splits an NDJSON string into non-empty lines.
+func splitNDJSON(s string) []string {
+	var lines []string
+	for line := range strings.SplitSeq(s, "\n") {
+		if line != "" {
+			lines = append(lines, line)
+		}
+	}
+	return lines
 }
 
 func TestEncoderHeaders(t *testing.T) {
-	metadata := map[string]interface{}{
+	metadata := map[string]any{
 		"something": "important",
 	}
 	metadataRaw, err := json.Marshal(metadata)
