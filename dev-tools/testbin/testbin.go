@@ -23,8 +23,8 @@
 //   - DEV=true: disables optimizations for debugging (-gcflags=all=-N -l)
 //   - TEST_COVERAGE=true: enables coverage instrumentation (-coverpkg ./...)
 //
-// On Windows 386, DWARF is stripped (-ldflags=-w) and coverage is disabled
-// to avoid out-of-memory failures.
+// Platform-specific flags (e.g. stripping DWARF on Windows 386) should be
+// passed by the caller via BuildOptions.ExtraFlags.
 package testbin
 
 import (
@@ -32,7 +32,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -40,11 +39,35 @@ import (
 	"golang.org/x/sys/execabs"
 )
 
+// buildOptions holds the resolved build configuration.
+type buildOptions struct {
+	extraFlags []string
+	inputFiles []string
+}
+
+// Option configures a Build invocation. Options are applied in order,
+// so later options override earlier ones.
+type Option func(*buildOptions)
+
+// WithExtraFlags appends additional flags passed to 'go test'.
+func WithExtraFlags(flags ...string) Option {
+	return func(o *buildOptions) {
+		o.extraFlags = append(o.extraFlags, flags...)
+	}
+}
+
+// WithInputFiles appends specific files/packages after all flags.
+func WithInputFiles(files ...string) Option {
+	return func(o *buildOptions) {
+		o.inputFiles = append(o.inputFiles, files...)
+	}
+}
+
 // Build compiles a test binary for the given beat using "go test -c".
 // dir is the beat root directory where "go test -c" runs and where the
 // resulting binary is written. It returns the absolute path of the built
 // binary.
-func Build(beatName, dir string) (string, error) {
+func Build(beatName, dir string, opts ...Option) (string, error) {
 	if !strings.HasSuffix(beatName, ".test") {
 		beatName += ".test"
 	}
@@ -59,14 +82,16 @@ func Build(beatName, dir string) (string, error) {
 		args = append(args, `-gcflags=all=-N -l`)
 	}
 
-	// On Windows 386 we run out of memory if we enable coverage and DWARF.
-	win386 := runtime.GOOS == "windows" && runtime.GOARCH == "386"
-	if win386 {
-		args = append(args, "-ldflags=-w")
-	}
-	if testCoverage, _ := strconv.ParseBool(os.Getenv("TEST_COVERAGE")); testCoverage && !win386 {
+	if testCoverage, _ := strconv.ParseBool(os.Getenv("TEST_COVERAGE")); testCoverage {
 		args = append(args, "-coverpkg", "./...")
 	}
+
+	var o buildOptions
+	for _, fn := range opts {
+		fn(&o)
+	}
+	args = append(args, o.extraFlags...)
+	args = append(args, o.inputFiles...)
 
 	cmd := execabs.Command("go", args...)
 	cmd.Dir = dir

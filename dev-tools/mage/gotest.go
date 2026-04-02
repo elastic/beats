@@ -520,7 +520,10 @@ func BuildSystemTestBinary() error {
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
 func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
-	_, err := testbin.Build(binArgs.Name, ".")
+	_, err := testbin.Build(binArgs.Name, ".",
+		testbin.WithExtraFlags(binArgs.ExtraFlags...),
+		testbin.WithInputFiles(binArgs.InputFiles...),
+	)
 	return err
 }
 

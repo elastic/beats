@@ -1234,7 +1234,7 @@ func StartMockES(
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint:errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
@@ -1292,13 +1292,13 @@ func (b *BeatProc) RemoveOutputFile() {
 //	func TestMain(m *testing.M) {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
-func TestMainWithBuild(m *testing.M, beatName string) {
+func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
 	beatRoot, err := filepath.Abs("../../")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
 		os.Exit(1)
 	}
-	binPath, err := testbin.Build(beatName, beatRoot)
+	binPath, err := testbin.Build(beatName, beatRoot, opts...)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
 		os.Exit(1)

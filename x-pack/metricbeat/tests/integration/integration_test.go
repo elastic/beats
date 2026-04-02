@@ -7,11 +7,18 @@
 package integration
 
 import (
+	"runtime"
 	"testing"
 
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 func TestMain(m *testing.M) {
-	integration.TestMainWithBuild(m, "metricbeat")
+	var opts []testbin.Option
+	// On Windows 7 32-bit we run out of memory if we enable DWARF.
+	if runtime.GOOS == "windows" && runtime.GOARCH == "386" {
+		opts = append(opts, testbin.WithExtraFlags("-ldflags=-w"))
+	}
+	integration.TestMainWithBuild(m, "metricbeat", opts...)
 }

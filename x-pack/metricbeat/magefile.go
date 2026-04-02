@@ -111,7 +111,12 @@ func PythonUnitTest() error {
 
 // BuildSystemTestBinary build a system test binary depending on the runner.
 func BuildSystemTestBinary() error {
-	_, err := testbin.Build(devtools.BeatName, ".")
+	var opts []testbin.Option
+	// On Windows 7 32-bit we run out of memory if we enable DWARF.
+	if isWindows32bitRunner() {
+		opts = append(opts, testbin.WithExtraFlags("-ldflags=-w"))
+	}
+	_, err := testbin.Build(devtools.BeatName, ".", opts...)
 	return err
 }
 
