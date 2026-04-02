@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 env:
-  SETUP_MAGE_VERSION: '1.14.0'
+  SETUP_MAGE_VERSION: '1.16.0'
   SETUP_GVM_VERSION: 'v0.6.0'
 
 steps:

@@ -35,7 +35,7 @@ func TestGet(t *testing.T) {
 
 func TestStringMarshalingS(t *testing.T) {
 	s := NewSecureString(secret)
-	v := fmt.Sprintf("%s", s) //nolint: gosimple // the goal of the test is to check if the string is not printed
+	v := fmt.Sprintf("%s", s) //nolint: staticcheck // the goal of the test is to check if the string is not printed
 
 	assert.Equal(t, v, "<SecureString>")
 }
