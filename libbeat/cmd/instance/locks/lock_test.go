@@ -37,12 +37,6 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
-	origDataPath := paths.Paths.Data
-	defer func() {
-		paths.Paths.Data = origDataPath
-	}()
-	paths.Paths.Data = tmp
-
 	exit := m.Run()
 	// cleanup tmpdir after run, but let the tests set the exit code
 	err = os.RemoveAll(tmp)
@@ -61,7 +55,6 @@ func TestLocker(t *testing.T) {
 	tmpPaths.Home = tmpDir
 	err := tmpPaths.InitPaths(tmpPaths)
 	require.NoError(t, err, "error initializaing paths")
-	fmt.Fprintf(os.Stderr, "paths was %s", tmpPaths)
 
 	logger := logptest.NewTestingLogger(t, "")
 
