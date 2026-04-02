@@ -124,8 +124,19 @@ OSS code (Apache 2.0) **cannot** import from `x-pack/` or `elastic-agent-client`
 ## Code Rules
 
 - Logging: accept `*logp.Logger` as a parameter. For tests prefer `logptest`
-- Use `github.com/stretchr/testify` in tests — always add a message explaining the failure. Use `assert` by default, `require`, only when you actually need to interrupt the test.
+- Use `github.com/stretchr/testify` in tests — always add a message explaining the failure. Use `assert` by default, `require` only when you actually need to interrupt the test
 - Use `github.com/gofrs/uuid/v5`
+- Write unit tests for new functionality. Use table-driven tests when appropriate
+- Document exported functions and types
+- Keep comments concise, focused on "why" not "what"
+- Update documentation when changing behavior
+
+## Code References
+
+When referencing code, always use exact locations and names:
+- Format: `filepath:line_number` or `filepath:start-end`
+- Use specific element names (functions, methods, variables)
+- Quote exact text from code and logs — zero paraphrasing
 
 ## Changelog
 
