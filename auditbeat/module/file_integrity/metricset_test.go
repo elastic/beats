@@ -472,7 +472,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 	for _, ev := range e {
 		ev.validate(t, ms)
 	}
@@ -745,7 +745,7 @@ func TestEventDelete(t *testing.T) {
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 
 	baseTime := time.Now()
 	sha := Digest("22222222222222222222")

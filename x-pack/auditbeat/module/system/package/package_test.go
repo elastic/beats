@@ -147,7 +147,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		if !assert.IsType(t, uint64(0), size) {
 			t.Fatal("uint64 expected")
 		}
-		got[name.(string)] = size.(uint64)
+		got[name.(string)] = size.(uint64) //nolint:errcheck // types checked above
 	}
 	assert.Equal(t, expected, got)
 }
@@ -277,7 +277,7 @@ func copyFile(old, new string) error {
 // prevents test side effects. The tests should be refactored to support
 // true isolation with different data stores in different temp dirs.
 func deleteBucket(t *testing.T, metricSet mb.ReportingMetricSetV2) {
-	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil {
+	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil { //nolint:errcheck // unchecked type assertion
 		t.Fatal(err)
 	}
 }

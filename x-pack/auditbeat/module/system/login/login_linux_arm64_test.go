@@ -30,7 +30,6 @@ func TestData(t *testing.T) {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
 
-
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = "./testdata/wtmp.arm"
 	config["login.btmp_file_pattern"] = ""
@@ -57,7 +56,6 @@ func TestWtmp(t *testing.T) {
 	if byteOrder != binary.LittleEndian {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
-
 
 	dir := setupTestDir(t)
 	defer os.RemoveAll(dir)
@@ -196,7 +194,6 @@ func TestBtmp(t *testing.T) {
 	if byteOrder != binary.LittleEndian {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
-
 
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = ""

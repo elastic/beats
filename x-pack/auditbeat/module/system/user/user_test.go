@@ -23,9 +23,9 @@ func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
-	f.(*MetricSet).lastState = time.Now()
+	f.(*MetricSet).lastState = time.Now() //nolint:errcheck // unchecked type assertion
 	u := testUser()
-	f.(*MetricSet).cache.DiffAndUpdateCache([]*User{u})
+	f.(*MetricSet).cache.DiffAndUpdateCache([]*User{u}) //nolint:errcheck // unchecked type assertion
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
