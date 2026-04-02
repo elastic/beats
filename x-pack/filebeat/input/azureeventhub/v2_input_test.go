@@ -19,12 +19,13 @@ import (
 
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
-	input, err := newEventHubInputV2(azureInputConfig{}, logp.L())
+	logger := logptest.NewTestingLogger(t, inputName)
+	input, err := newEventHubInputV2(azureInputConfig{}, logger)
 	require.NoError(t, err)
 
 	eventHubInputV2, ok := input.(*eventHubInputV2)
@@ -40,7 +41,7 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 
 	statusReporter := newMockStatusReporter()
 	inputTestCtx := inputv2.Context{
-		Logger:          logp.L(),
+		Logger:          logger,
 		Cancelation:     ctx,
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
@@ -68,20 +69,20 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 		ConsumerGroup: "test-consumer-group",
 	}
 
-	log := logp.L()
-	metrics := newInputMetrics(monitoring.NewRegistry(), log)
+	logger := logptest.NewTestingLogger(t, inputName)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logger)
 
 	sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.LegacySanitizeOptions)
 	require.NoError(t, err)
 
 	input := &eventHubInputV2{
 		config:  inputConfig,
-		log:     log,
+		log:     logger,
 		metrics: metrics,
 		messageDecoder: messageDecoder{
 			config:     inputConfig,
 			metrics:    metrics,
-			log:        log,
+			log:        logger,
 			sanitizers: sanitizers,
 		},
 	}
