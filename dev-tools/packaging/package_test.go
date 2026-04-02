@@ -35,6 +35,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -462,20 +463,25 @@ func checkDocker(t *testing.T, file string) {
 	switch imageType {
 	case dockerImageTypeLegacy:
 		p, info, err = readDocker(file)
+		if err != nil {
+			t.Errorf("error reading file %v: %v", file, err)
+			return
+		}
 	case dockerImageTypeOCI:
 		p, info, err = readDockerOCI(file)
 		if err != nil && errors.Is(err, errDockerArchiveEntryNotFound) {
 			t.Logf("OCI archive is sparse, hydrating checks from daemon image: %v", err)
 			p, info, daemonImageRef, err = readDockerOCIFromDaemon(t, file)
 		}
+		if err != nil {
+			t.Errorf("error reading file %v: %v", file, err)
+			return
+		}
 	default:
 		t.Errorf("unsupported docker image format %q for %s", imageType, file)
 		return
 	}
-	if err != nil {
-		t.Errorf("error reading file %v: %v", file, err)
-		return
-	}
+
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
@@ -693,8 +699,7 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 		}
 
 		entrypoint := info.Config.Entrypoint[0]
-		if strings.HasPrefix(entrypoint, "/") {
-			entrypoint := strings.TrimPrefix(entrypoint, "/")
+		if entrypoint, ok := strings.CutPrefix(entrypoint, "/"); ok {
 			entry, found := p.Contents[entrypoint]
 			if !found {
 				t.Fatalf("%s entrypoint not found in docker", entrypoint)
@@ -880,12 +885,11 @@ func loadDockerImageFromArchive(ctx context.Context, dockerClient *client.Client
 
 func parseLoadedImageRef(loadResponse string) (string, error) {
 	for _, prefix := range []string{"Loaded image: ", "Loaded image ID: "} {
-		index := strings.Index(loadResponse, prefix)
-		if index == -1 {
+		_, after, ok := strings.Cut(loadResponse, prefix)
+		if !ok {
 			continue
 		}
 
-		after := loadResponse[index+len(prefix):]
 		end := len(after)
 		for i, r := range after {
 			if r == '\n' || r == '\r' || r == '"' || r == '\\' {
@@ -932,9 +936,7 @@ func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *do
 	info.Config.User = inspectResp.Config.User
 	info.Config.WorkingDir = inspectResp.Config.WorkingDir
 	info.Config.Labels = make(map[string]string, len(inspectResp.Config.Labels))
-	for key, value := range inspectResp.Config.Labels {
-		info.Config.Labels[key] = value
-	}
+	maps.Copy(info.Config.Labels, inspectResp.Config.Labels)
 
 	createResp, err := dockerClient.ContainerCreate(ctx, &container.Config{Image: imageRef}, nil, nil, nil, "")
 	if err != nil {
@@ -1414,8 +1416,8 @@ func readDockerOCI(dockerFile string) (*packageFile, *dockerInfo, error) {
 	var info *dockerInfo
 	err = walkDockerArchive(dockerFile, func(header *tar.Header, r io.Reader) error {
 		entryName := normalizeDockerArchivePath(header.Name)
-		switch {
-		case entryName == configPath:
+		switch entryName {
+		case configPath:
 			info, err = readDockerInfo(r)
 			if err != nil {
 				return fmt.Errorf("failed to read OCI docker config %q: %w", entryName, err)
