@@ -32,15 +32,12 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	go func() {
@@ -68,8 +65,6 @@ func TestActions(t *testing.T) {
 	skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
-
-	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
@@ -172,8 +167,6 @@ func TestExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
 	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
@@ -223,8 +216,6 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
-
-	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
@@ -288,8 +279,6 @@ func TestErrorReporting(t *testing.T) {
 		// in UNIX/Linux OS.
 		t.Skip("This test can't be run as root")
 	}
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
