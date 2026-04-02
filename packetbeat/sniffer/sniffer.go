@@ -91,11 +91,7 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-<<<<<<< HEAD
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
-=======
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, reporter status.StatusReporter, closers ...func()) (*Sniffer, error) {
->>>>>>> 70b37f21a (Fix packetbeat cache janitor goroutine leak (#48836))
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, closers ...func()) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,

@@ -248,11 +248,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-<<<<<<< HEAD
-	return sniffer.New(id, false, "", decoders, interfaces)
-=======
-	return sniffer.New(id, false, "", decoders, interfaces, reporter, closers...)
->>>>>>> 70b37f21a (Fix packetbeat cache janitor goroutine leak (#48836))
+	return sniffer.New(id, false, "", decoders, interfaces, closers...)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
