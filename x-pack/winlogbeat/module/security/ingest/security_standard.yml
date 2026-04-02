@@ -889,7 +889,7 @@ processors:
         try {
           newUacValue = Long.decode(ctx.winlog.event_data.NewUacValue.trim());
         } catch (Exception e) {
-          return null;
+          return;
         }
         ArrayList uacResult = new ArrayList();
         for (entry in params.entrySet()) {
