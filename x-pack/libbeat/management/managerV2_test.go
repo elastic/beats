@@ -899,7 +899,3 @@ func (m *mockReloadable) Configs() []*reload.ConfigWithMeta {
 	defer m.mutex.Unlock()
 	return m.ConfigsFn()
 }
-
-type stopAndWait interface {
-	WaitForStop(time.Duration) bool
-}
