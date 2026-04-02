@@ -5,6 +5,8 @@
 package beater
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -17,6 +19,10 @@ func NewReceiver(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
-	bt.(*osquerybeat).disableWatcher = true
-	return bt, nil
+	ob, ok := bt.(*osquerybeat)
+	if !ok {
+		return nil, fmt.Errorf("unexpected beater type %T", bt)
+	}
+	ob.disableWatcher = true
+	return ob, nil
 }
