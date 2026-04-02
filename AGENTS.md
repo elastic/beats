@@ -32,24 +32,42 @@ For `mage package`, set `PLATFORMS` to match the current OS/architecture. Check 
 # Run a single test or package tests
 cd filebeat  # or any beat directory
 go test -v -race -run TestName ./path/to/package/...
-go test -v -race -run TestName -tags integration ./path/to/package/...  # integration tests
 
-# Before running integration tests, build the system test binary if the beat defines it
+# Stress test to find flaky tests (runs a test repeatedly with x/tools/cmd/stress)
+script/stresstest.sh [--tags integration] [--race] ./path/to/package ^TestName$ -p 32
+```
+
+### Integration Tests
+
+Integration tests require to build the test binary and some need external dependencies,
+like Elasticsearch. **Always ask the user before starting or stopping containers.**
+
+```bash
+# Build the system test binary if the beat defines it
 mage buildSystemTestBinary
+
+# Start the test dependencies (from the beat directory) - not always required
+mage docker:composeUp    # Start containers, wait until healthy
+mage docker:composeDown  # Stop containers
+
+# Run integration tests for a specific package
+go test -v -race -run TestName -tags integration ./path/to/package/...
 ```
 
 ### Running a Beat
 
 ```bash
 # Option 1: go run (from the beat directory)
-go run . -e --strict.perms=false -c filebeat.yml
+go run . -e --strict.perms=false -c filebeat.yml -path.home=<temp_dir>
 
 # Option 2: build then run
 mage build
-./filebeat -e --strict.perms=false -c filebeat.yml
+./filebeat -e --strict.perms=false -c filebeat.yml -path.home=<temp_dir>
 ```
 
-Always pass `--strict.perms=false` during development — it disables strict config file permission checks.
+Always pass `--strict.perms=false` during development — it disables strict config
+file permission checks. Set `-path.home` to a temporary directory to avoid
+writing data/logs into the source tree.
 
 ### Pre-Push Check
 
@@ -144,6 +162,6 @@ component: filebeat    # the affected beat/component
 
 ## Commits and PRs
 
-When writing commit messages, explain WHAT changed and WHY — the rationale and motivation, not just a description of the diff.
+When writing commit messages, explain WHAT changed and WHY — the rationale and motivation, not just a description of the diff. The commit title is used as the squash-merge message. Add a trailer line `Assisted-By: <tool name>` for each AI tool used.
 
 When creating PRs, follow the template in `.github/PULL_REQUEST_TEMPLATE.md`
