@@ -26,7 +26,7 @@ For `mage package`, set `PLATFORMS` to match the current OS/architecture. Check 
 
 ### Running Tests
 
-**NEVER run all unit or integration tests** (e.g. `mage unitTest` from root). They take too long and require too many dependencies. Always run tests scoped to the package you're working on:
+**Do not run all unit or integration tests** (e.g. `mage unitTest` from root) unless explicitly requested. They take too long and require too many dependencies. Always run tests scoped to the package you're working on:
 
 ```bash
 # Run a single test or package tests
@@ -57,11 +57,7 @@ go test -v -race -run TestName -tags integration ./path/to/package/...
 ### Running a Beat
 
 ```bash
-# Option 1: go run (from the beat directory)
-go run . -e --strict.perms=false -c filebeat.yml -path.home=<temp_dir>
-
-# Option 2: build then run
-mage build
+DEV=true mage build
 ./filebeat -e --strict.perms=false -c filebeat.yml -path.home=<temp_dir>
 ```
 
@@ -83,9 +79,8 @@ make check                   # Full check suite (lint, headers, go mod, python)
 ### Linting
 
 ```bash
-# golangci-lint v2 is configured via .golangci.yml
-golangci-lint run ./...              # from any beat directory
-mage linter:all                      # lint all
+# Running golangci-lint for the whole codebase is slow, prefer running only on changed files by default
+golangci-lint run --max-issues-per-linter 0 --max-same-issues 0 --whole-files --new-from-merge-base upstream/main
 ```
 
 ## Architecture
@@ -129,21 +124,8 @@ OSS code (Apache 2.0) **cannot** import from `x-pack/` or `elastic-agent-client`
 ## Code Rules
 
 - Logging: accept `*logp.Logger` as a parameter. For tests prefer `logptest`
-- Use `github.com/stretchr/testify` in tests — always add a message explaining the failure
+- Use `github.com/stretchr/testify` in tests — always add a message explaining the failure. Use `assert` by default, `require`, only when you actually need to interrupt the test.
 - Use `github.com/gofrs/uuid/v5`
-- **Don't call `paths.Resolve` / `paths.InitPaths`** — use a per-beat `*paths.Path` instance
-- **Don't use `math/rand`** — use `math/rand/v2`
-- **goimports** uses local prefix `github.com/elastic` (imports grouped: stdlib, external, elastic)
-
-## Code Formatting
-
-```bash
-mage fmt  # from root: runs goimports + python autopep8 + license headers
-```
-
-- Go: goimports with `github.com/elastic` local prefix
-- Python: autopep8, max line length 120
-- License headers: ASL2 for OSS code, Elastic for x-pack (applied by `go-licenser`)
 
 ## Changelog
 
