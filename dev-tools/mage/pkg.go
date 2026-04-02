@@ -42,9 +42,18 @@ type PackageArgs struct {
 
 // DefaultPackageArgsFromEnv returns package args based on current globals and
 // runtime env var overrides (PLATFORMS, PACKAGES, SNAPSHOT, DEV).
-func DefaultPackageArgsFromEnv() PackageArgs {
-	snapshot := parseBoolEnvOverride("SNAPSHOT", Snapshot)
-	dev := parseBoolEnvOverride("DEV", DevBuild)
+func DefaultPackageArgsFromEnv() (PackageArgs, error) {
+	snapshot, err := parseBoolEnvOverride("SNAPSHOT", Snapshot)
+	if err != nil {
+		return PackageArgs{}, fmt.Errorf("cannot parse env var 'SNAPSHOT=%' as boolean: %s", err)
+
+	}
+
+	dev, err := parseBoolEnvOverride("DEV", DevBuild)
+	if err != nil {
+		return PackageArgs{}, fmt.Errorf("cannot parse env var 'DEV=%' as boolean: %s", err)
+
+	}
 
 	args := PackageArgs{
 		Platforms: append(BuildPlatformList(nil), Platforms...),
@@ -59,20 +68,20 @@ func DefaultPackageArgsFromEnv() PackageArgs {
 		args.PackageTypes = ParsePackageTypes(packageTypes)
 	}
 
-	return args
+	return args, nil
 }
 
-func parseBoolEnvOverride(name string, fallback bool) bool {
+func parseBoolEnvOverride(name string, fallback bool) (bool, error) {
 	value, found := os.LookupEnv(name)
 	if !found || value == "" {
-		return fallback
+		return fallback, nil
 	}
 
 	parsed, err := strconv.ParseBool(value)
 	if err != nil {
-		panic(fmt.Errorf("failed to parse %s env value: %w", name, err))
+		return fallback, fmt.Errorf("failed to parse %s env value: %w", name, err)
 	}
-	return parsed
+	return parsed, nil
 }
 
 // PackageWithArgs returns a package build function configured with args.
@@ -85,7 +94,11 @@ func PackageWithArgs(args PackageArgs) func() error {
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
-	return packageWithArgs(DefaultPackageArgsFromEnv())
+	args, err := DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	return packageWithArgs(args)
 }
 
 func packageWithArgs(args PackageArgs) error {

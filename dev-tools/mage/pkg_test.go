@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
@@ -147,7 +148,8 @@ func TestDefaultPackageArgsFromEnv(t *testing.T) {
 	t.Setenv("PACKAGES", "")
 	t.Setenv("SNAPSHOT", "")
 	t.Setenv("DEV", "")
-	args := DefaultPackageArgsFromEnv()
+	args, err := DefaultPackageArgsFromEnv()
+	require.NoError(t, err, "DefaultPackageArgsFromEnv must not fail")
 
 	assert.Equal(
 		t,
@@ -163,7 +165,8 @@ func TestDefaultPackageArgsFromEnv(t *testing.T) {
 	t.Setenv("PACKAGES", "tgz")
 	t.Setenv("SNAPSHOT", "true")
 	t.Setenv("DEV", "true")
-	args = DefaultPackageArgsFromEnv()
+	args, err = DefaultPackageArgsFromEnv()
+	require.NoError(t, err, "DefaultPackageArgsFromEnv must not fail")
 	assert.Equal(
 		t,
 		NewPlatformList("linux/arm64"),

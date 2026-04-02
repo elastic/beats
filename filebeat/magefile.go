@@ -83,8 +83,13 @@ func AssembleDarwinUniversal() error {
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
-func Package() {
-	packageWithArgs(devtools.DefaultPackageArgsFromEnv())
+func Package() error {
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	packageWithArgs(args)
+	return nil
 }
 
 func packageWithArgs(args devtools.PackageArgs) {

@@ -43,7 +43,11 @@ func golangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return crossBuildWithArgs(devtools.DefaultPackageArgsFromEnv())
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	return crossBuildWithArgs(args)
 }
 
 // CrossBuildWithArgs cross-builds the beat using the provided package args.
