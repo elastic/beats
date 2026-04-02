@@ -28,7 +28,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
@@ -46,7 +45,7 @@ func TestData(t *testing.T) {
 }
 
 func TestDpkg(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // TODO: replace with logptest.NewTestingLogger once MetricSet accepts an injected logger
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
@@ -103,7 +102,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"python2.7-minimal": 0,
 	}
 
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck // TODO: replace with logptest.NewTestingLogger once MetricSet accepts an injected logger
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
