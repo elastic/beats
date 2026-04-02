@@ -84,13 +84,13 @@ func AssembleDarwinUniversal() error {
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
 func Package() error {
-	start := time.Now()
-	defer func() { fmt.Println("package ran for", time.Since(start)) }()
-
 	return packageWithArgs(devtools.DefaultPackageArgsFromEnv())
 }
 
 func packageWithArgs(args devtools.PackageArgs) error {
+	start := time.Now()
+	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+
 	previousSnapshot, previousDev := devtools.Snapshot, devtools.DevBuild
 	devtools.Snapshot, devtools.DevBuild = args.Snapshot, args.Dev
 	defer func() {
@@ -220,10 +220,11 @@ func packageDockerImageForGoIntegTest() error {
 		)
 	}
 
-	packageArgs := devtools.DefaultPackageArgsFromEnv()
-	packageArgs.Platforms = devtools.NewPlatformList(dockerPlatform)
-	packageArgs.PackageTypes = []devtools.PackageType{devtools.Docker}
-	packageArgs.Snapshot = true
+	packageArgs := devtools.PackageArgs{
+		Platforms:    devtools.NewPlatformList(dockerPlatform),
+		PackageTypes: []devtools.PackageType{devtools.Docker},
+		Snapshot:     true,
+	}
 
 	return packageWithArgs(packageArgs)
 }
