@@ -87,14 +87,12 @@ func Package() error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	args := devtools.DefaultPackageArgsFromEnv()
-	return runPackage(devtools.PackageWithArgs(args), args)
+	return packageWithArgs(devtools.DefaultPackageArgsFromEnv())
 }
 
-func runPackage(packageFn func() error, args devtools.PackageArgs) error {
-	snapshot, dev := args.Snapshot, args.Dev
+func packageWithArgs(args devtools.PackageArgs) error {
 	previousSnapshot, previousDev := devtools.Snapshot, devtools.DevBuild
-	devtools.Snapshot, devtools.DevBuild = snapshot, dev
+	devtools.Snapshot, devtools.DevBuild = args.Snapshot, args.Dev
 	defer func() {
 		devtools.Snapshot, devtools.DevBuild = previousSnapshot, previousDev
 	}()
@@ -105,7 +103,7 @@ func runPackage(packageFn func() error, args devtools.PackageArgs) error {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild)
-	if err := packageFn(); err != nil {
+	if err := devtools.PackageWithArgs(args)(); err != nil {
 		return err
 	}
 	return TestPackages()
@@ -227,17 +225,7 @@ func packageDockerImageForGoIntegTest() error {
 	packageArgs.PackageTypes = []devtools.PackageType{devtools.Docker}
 	packageArgs.Snapshot = true
 
-	return func() error {
-		packages := append([]devtools.OSPackageArgs(nil), devtools.Packages...)
-
-		devtools.Packages = nil
-
-		defer func() {
-			devtools.Packages = packages
-		}()
-
-		return runPackage(devtools.PackageWithArgs(packageArgs), packageArgs)
-	}()
+	return packageWithArgs(packageArgs)
 }
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
