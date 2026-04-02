@@ -83,11 +83,11 @@ func AssembleDarwinUniversal() error {
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
-func Package() error {
-	return packageWithArgs(devtools.DefaultPackageArgsFromEnv())
+func Package() {
+	packageWithArgs(devtools.DefaultPackageArgsFromEnv())
 }
 
-func packageWithArgs(args devtools.PackageArgs) error {
+func packageWithArgs(args devtools.PackageArgs) {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
@@ -95,13 +95,12 @@ func packageWithArgs(args devtools.PackageArgs) error {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 
-	mg.Deps(Update)
-	mg.Deps(func() error {
-		return filebeat.CrossBuildWithArgs(args)
-	})
-	mg.SerialDeps(devtools.PackageWithArgs(args), TestPackages())
-
-	return TestPackages()
+	mg.SerialDeps(
+		Update,
+		filebeat.CrossBuildWithArgs(args),
+		devtools.PackageWithArgs(args),
+		TestPackages,
+	)
 }
 
 // Package packages the Beat for IronBank distribution.

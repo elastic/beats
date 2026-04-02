@@ -85,7 +85,7 @@ func PackageWithArgs(args PackageArgs) func() error {
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
-	return PackageWithArgs(DefaultPackageArgsFromEnv())()
+	return packageWithArgs(DefaultPackageArgsFromEnv())
 }
 
 func packageWithArgs(args PackageArgs) error {
