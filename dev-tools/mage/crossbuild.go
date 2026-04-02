@@ -84,6 +84,13 @@ func ForPlatforms(expr string) func(params *crossBuildParams) {
 	}
 }
 
+// WithPlatforms sets the exact platforms list to use for cross-building.
+func WithPlatforms(platforms BuildPlatformList) func(params *crossBuildParams) {
+	return func(params *crossBuildParams) {
+		params.Platforms = append(BuildPlatformList(nil), platforms...)
+	}
+}
+
 // WithTarget specifies the mage target to execute inside the golang-crossbuild
 // container.
 func WithTarget(target string) func(params *crossBuildParams) {

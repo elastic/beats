@@ -69,7 +69,7 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return filebeat.CrossBuild()
+	return filebeat.CrossBuildWithArgs(devtools.DefaultPackageArgsFromEnv())
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -91,21 +91,16 @@ func packageWithArgs(args devtools.PackageArgs) error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	previousSnapshot, previousDev := devtools.Snapshot, devtools.DevBuild
-	devtools.Snapshot, devtools.DevBuild = args.Snapshot, args.Dev
-	defer func() {
-		devtools.Snapshot, devtools.DevBuild = previousSnapshot, previousDev
-	}()
-
 	devtools.UseElasticBeatOSSPackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild)
-	if err := devtools.PackageWithArgs(args)(); err != nil {
-		return err
-	}
+	mg.Deps(func() error {
+		return filebeat.CrossBuildWithArgs(args)
+	})
+	mg.SerialDeps(devtools.PackageWithArgs(args), TestPackages())
+
 	return TestPackages()
 }
 
@@ -220,11 +215,10 @@ func packageDockerImageForGoIntegTest() error {
 		)
 	}
 
-	packageArgs := devtools.PackageArgs{
-		Platforms:    devtools.NewPlatformList(dockerPlatform),
-		PackageTypes: []devtools.PackageType{devtools.Docker},
-		Snapshot:     true,
-	}
+	packageArgs := devtools.DefaultPackageArgsFromEnv()
+	packageArgs.Platforms = devtools.NewPlatformList(dockerPlatform)
+	packageArgs.PackageTypes = []devtools.PackageType{devtools.Docker}
+	packageArgs.Snapshot = true
 
 	return packageWithArgs(packageArgs)
 }
