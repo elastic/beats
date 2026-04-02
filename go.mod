@@ -14,7 +14,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Azure/go-autorest/autorest v0.11.30
 	github.com/Azure/go-autorest/autorest/date v0.3.1
-	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/Masterminds/semver v1.5.0
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
