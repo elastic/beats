@@ -20,7 +20,6 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,7 +30,6 @@ func TestData(t *testing.T) {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
 
-	defer abtest.SetupDataDir(t)()
 
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = "./testdata/wtmp.arm"
@@ -60,7 +58,6 @@ func TestWtmp(t *testing.T) {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
 
-	defer abtest.SetupDataDir(t)()
 
 	dir := setupTestDir(t)
 	defer os.RemoveAll(dir)
@@ -200,7 +197,6 @@ func TestBtmp(t *testing.T) {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
 
-	defer abtest.SetupDataDir(t)()
 
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = ""

@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -29,7 +28,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
 
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
@@ -50,7 +48,6 @@ func TestData(t *testing.T) {
 func TestDpkg(t *testing.T) {
 	logp.TestingSetup()
 
-	defer abtest.SetupDataDir(t)()
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
@@ -109,7 +106,6 @@ func TestDpkgInstalledSize(t *testing.T) {
 
 	logp.TestingSetup()
 
-	defer abtest.SetupDataDir(t)()
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
