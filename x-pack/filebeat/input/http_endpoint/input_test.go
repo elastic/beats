@@ -465,12 +465,15 @@ func TestServerPool(t *testing.T) {
 				}()
 			}
 			if test.wantErr == nil {
-				seen := make(map[string]bool)
+				addrCount := make(map[string]int)
 				for _, cfg := range test.cfgs {
-					if !seen[cfg.addr] {
-						seen[cfg.addr] = true
-						waitForServer(t, cfg.addr, 5*time.Second)
-					}
+					addrCount[cfg.addr]++
+				}
+				for addr := range addrCount {
+					waitForServer(t, addr, 5*time.Second)
+				}
+				for addr, n := range addrCount {
+					servers.waitForHandlers(t, addr, n, 5*time.Second)
 				}
 			}
 
@@ -897,6 +900,7 @@ func TestJoinerDeregisterKeepsServer(t *testing.T) {
 		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
 	}()
 	waitForServer(t, "127.0.0.1:9021", 5*time.Second)
+	servers.waitForHandlers(t, "127.0.0.1:9021", 2, 5*time.Second)
 
 	// Stop B (joiner). A's server should stay alive.
 	cancelB()
@@ -989,6 +993,7 @@ func TestCreatorDeregisterKeepsServer(t *testing.T) {
 		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
 	}()
 	waitForServer(t, "127.0.0.1:9022", 5*time.Second)
+	servers.waitForHandlers(t, "127.0.0.1:9022", 2, 5*time.Second)
 
 	// Stop A (creator). B's server should stay alive.
 	cancelA()
@@ -1162,6 +1167,7 @@ func TestSimultaneousShutdown(t *testing.T) {
 		errB <- servers.serve(ctxB, cfgB, pub.Publish, metrics)
 	}()
 	waitForServer(t, "127.0.0.1:9024", 5*time.Second)
+	servers.waitForHandlers(t, "127.0.0.1:9024", 2, 5*time.Second)
 
 	// Cancel both at once.
 	cancelA()
@@ -1194,6 +1200,31 @@ func waitForServer(t *testing.T, addr string, timeout time.Duration) {
 		select {
 		case <-deadline:
 			t.Fatalf("server %s not ready after %s", addr, timeout)
+		case <-time.After(10 * time.Millisecond):
+		}
+	}
+}
+
+// waitForHandlers polls until at least n handlers are registered for
+// addr. Use after waitForServer in multi-handler tests to ensure all
+// joiner registrations have completed before sending requests.
+func (p *pool) waitForHandlers(t *testing.T, addr string, n int, timeout time.Duration) {
+	t.Helper()
+	deadline := time.After(timeout)
+	for {
+		p.mu.Lock()
+		s, ok := p.servers[addr]
+		count := 0
+		if ok {
+			count = len(s.idOf)
+		}
+		p.mu.Unlock()
+		if count >= n {
+			return
+		}
+		select {
+		case <-deadline:
+			t.Fatalf("server %s: wanted %d handlers, got %d after %s", addr, n, count, timeout)
 		case <-time.After(10 * time.Millisecond):
 		}
 	}
