@@ -72,8 +72,8 @@ Please start by reading our [CONTRIBUTING](CONTRIBUTING.md) file.
 ## AI Coding Agents
 
 Repository instructions for AI coding agents are in [AGENTS.md](AGENTS.md). 
-To use it, copy it to the agent-specific filename: CLAUDE.md, GEMINI.md, 
-they are gitignored.
+To use it, copy it to the agent-specific filename: CLAUDE.md, GEMINI.md,
+and similar files, which are ignored by Git.
 
 ## Building Beats from the Source
 
