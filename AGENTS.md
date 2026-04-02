@@ -18,6 +18,8 @@ mage update             # Regenerate fields, configs, dashboards, includes
 mage fields             # Regenerate fields.yml and fields.go
 mage config             # Regenerate config files
 mage check              # Run checks (lint, headers, go mod)
+mage docker:composeUp   # Start integration test containers, wait until healthy
+mage docker:composeDown # Stop integration test containers
 mage crossBuild         # Cross-compile for all platforms
 SNAPSHOT=true DEV=true PLATFORMS=$GOOS/$GOARCH PACKAGES=tar.gz mage package  # Build and package the beat
 ```
@@ -39,16 +41,12 @@ script/stresstest.sh [--tags integration] [--race] ./path/to/package ^TestName$ 
 
 ### Integration Tests
 
-Integration tests require to build the test binary and some need external dependencies,
-like Elasticsearch. **Always ask the user before starting or stopping containers.**
+Integration tests require building the test binary and some need external dependencies
+that can be started with mage or manually.
 
 ```bash
 # Build the system test binary if the beat defines it
 mage buildSystemTestBinary
-
-# Start the test dependencies (from the beat directory) - not always required
-mage docker:composeUp    # Start containers, wait until healthy
-mage docker:composeDown  # Stop containers
 
 # Run integration tests for a specific package
 go test -v -race -run TestName -tags integration ./path/to/package/...
