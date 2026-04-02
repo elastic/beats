@@ -219,12 +219,15 @@ func packageDockerImageForGoIntegTest() error {
 		)
 	}
 
-	packageArgs := devtools.DefaultPackageArgsFromEnv()
-	packageArgs.Platforms = devtools.NewPlatformList(dockerPlatform)
-	packageArgs.PackageTypes = []devtools.PackageType{devtools.Docker}
-	packageArgs.Snapshot = true
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	args.Platforms = devtools.NewPlatformList(dockerPlatform)
+	args.PackageTypes = []devtools.PackageType{devtools.Docker}
+	args.Snapshot = true
 
-	packageWithArgs(packageArgs)
+	packageWithArgs(args)
 
 	return nil
 }

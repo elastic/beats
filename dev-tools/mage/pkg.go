@@ -45,14 +45,13 @@ type PackageArgs struct {
 func DefaultPackageArgsFromEnv() (PackageArgs, error) {
 	snapshot, err := parseBoolEnvOverride("SNAPSHOT", Snapshot)
 	if err != nil {
-		return PackageArgs{}, fmt.Errorf("cannot parse env var 'SNAPSHOT=%' as boolean: %s", err)
-
+		return PackageArgs{},
+			fmt.Errorf("cannot parse env var SNAPSHOT as boolean: %w", err)
 	}
 
 	dev, err := parseBoolEnvOverride("DEV", DevBuild)
 	if err != nil {
-		return PackageArgs{}, fmt.Errorf("cannot parse env var 'DEV=%' as boolean: %s", err)
-
+		return PackageArgs{}, fmt.Errorf("cannot parse env var DEV boolean: %w", err)
 	}
 
 	args := PackageArgs{
