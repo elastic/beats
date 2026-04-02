@@ -48,7 +48,6 @@ func TestData(t *testing.T) {
 func TestDpkg(t *testing.T) {
 	logp.TestingSetup()
 
-
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
 	dpkgPathOld := dpkgPath
@@ -105,7 +104,6 @@ func TestDpkgInstalledSize(t *testing.T) {
 	}
 
 	logp.TestingSetup()
-
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath

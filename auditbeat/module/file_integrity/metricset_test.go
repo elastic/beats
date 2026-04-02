@@ -140,7 +140,7 @@ func TestActions(t *testing.T) {
 			// depending on whether the scanner or the platform-dependent
 			// filesystem event listener reported it. The subset of actions we test
 			// for here should be consistent across all cases though.
-			switch path.(string) {
+			switch path.(string) { //nolint:errcheck // err already checked above
 			case newDir:
 				assert.Contains(t, actions, "initial_scan")
 			case dir:
@@ -203,7 +203,7 @@ func TestExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err) {
-			_, ok := wanted[path.(string)]
+			_, ok := wanted[path.(string)] //nolint:errcheck // err already checked above
 			assert.True(t, ok)
 		}
 	}
@@ -261,7 +261,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err, "Failed to read file.path field") {
-			got[path.(string)] = true
+			got[path.(string)] = true //nolint:errcheck // err already checked above
 		}
 	}
 	assert.Equal(t, wanted, got)
