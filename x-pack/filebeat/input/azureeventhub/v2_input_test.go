@@ -24,7 +24,7 @@ import (
 )
 
 func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
-	input, err := newEventHubInputV2(azureInputConfig{}, logp.NewLogger(inputName))
+	input, err := newEventHubInputV2(azureInputConfig{}, logp.L())
 	require.NoError(t, err)
 
 	eventHubInputV2, ok := input.(*eventHubInputV2)
@@ -40,7 +40,7 @@ func TestRunUpdatesStatusToStartingAndFailed(t *testing.T) {
 
 	statusReporter := newMockStatusReporter()
 	inputTestCtx := inputv2.Context{
-		Logger:          logp.NewLogger(inputName),
+		Logger:          logp.L(),
 		Cancelation:     ctx,
 		MetricsRegistry: monitoring.NewRegistry(),
 	}
@@ -68,7 +68,7 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 		ConsumerGroup: "test-consumer-group",
 	}
 
-	log := logp.NewLogger(inputName)
+	log := logp.L()
 	metrics := newInputMetrics(monitoring.NewRegistry(), log)
 
 	sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.LegacySanitizeOptions)
