@@ -69,7 +69,7 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return filebeat.CrossBuildWithArgs(devtools.DefaultPackageArgsFromEnv())
+	return filebeat.CrossBuild()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -219,7 +219,9 @@ func packageDockerImageForGoIntegTest() error {
 	packageArgs.PackageTypes = []devtools.PackageType{devtools.Docker}
 	packageArgs.Snapshot = true
 
-	return packageWithArgs(packageArgs)
+	packageWithArgs(packageArgs)
+
+	return nil
 }
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
