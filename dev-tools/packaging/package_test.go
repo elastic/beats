@@ -27,6 +27,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
 	"debug/buildinfo"
 	"debug/elf"
 	"encoding/json"
@@ -82,6 +83,16 @@ var (
 	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
 )
 
+type dockerImageType string
+
+const (
+	dockerImageTypeLegacy dockerImageType = "legacy"
+	dockerImageTypeOCI    dockerImageType = "oci"
+)
+
+var errDockerArchiveWalkDone = errors.New("docker archive walk done")
+var errDockerArchiveEntryNotFound = errors.New("docker archive entry not found")
+
 func TestRPM(t *testing.T) {
 	rpms := getFiles(t, regexp.MustCompile(`\.rpm$`))
 	for _, rpm := range rpms {
@@ -123,6 +134,157 @@ func TestDocker(t *testing.T) {
 		t.Log(docker)
 		checkDocker(t, docker)
 	}
+}
+
+func TestDetectDockerImageType(t *testing.T) {
+	t.Run("legacy archive", func(t *testing.T) {
+		dockerFile := createTestDockerArchive(t, []testTarEntry{
+			{name: "manifest.json", mode: 0o644, data: []byte("[]")},
+		})
+
+		imageType, err := detectDockerImageType(dockerFile)
+		require.NoError(t, err, "legacy docker image format detection should not return an error")
+		require.Equal(t, dockerImageTypeLegacy, imageType, "expected legacy docker archive type")
+	})
+
+	t.Run("oci archive", func(t *testing.T) {
+		dockerFile := createTestDockerArchive(t, []testTarEntry{
+			{name: "manifest.json", mode: 0o644, data: []byte("[]")},
+			{name: "index.json", mode: 0o644, data: []byte(`{"manifests":[]}`)},
+			{name: "oci-layout", mode: 0o644, data: []byte(`{"imageLayoutVersion":"1.0.0"}`)},
+		})
+
+		imageType, err := detectDockerImageType(dockerFile)
+		require.NoError(t, err, "OCI docker image format detection should not return an error")
+		require.Equal(t, dockerImageTypeOCI, imageType, "expected OCI docker archive type when OCI markers are present")
+	})
+}
+
+func TestReadDockerOCI(t *testing.T) {
+	configData := []byte(`{"config":{"Entrypoint":["/docker-entrypoint"],"Labels":{"org.label-schema.vendor":"Elastic"},"User":"root","WorkingDir":"/usr/share/testbeat"}}`)
+
+	layerTar := createTestTarData(t, []testTarEntry{
+		{name: "docker-entrypoint", mode: 0o755, data: []byte("#!/bin/sh\n")},
+		{name: "usr/share/testbeat/testbeat.yml", mode: 0o644, data: []byte("name: testbeat\n")},
+		{name: "usr/share/testbeat/LICENSE.txt", mode: 0o644, data: []byte("license\n")},
+		{name: "etc/passwd", mode: 0o644, data: []byte("x\n")},
+	})
+	layerData := gzipTestData(t, layerTar)
+
+	configDigest := sha256Digest(configData)
+	layerDigest := sha256Digest(layerData)
+
+	manifest := dockerOCIManifest{
+		SchemaVersion: 2,
+		MediaType:     dockerOCIManifestMediaType,
+		Config: dockerOCIManifestDescriptor{
+			MediaType: "application/vnd.oci.image.config.v1+json",
+			Digest:    configDigest,
+			Size:      int64(len(configData)),
+		},
+		Layers: []dockerOCIManifestDescriptor{
+			{
+				MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
+				Digest:    layerDigest,
+				Size:      int64(len(layerData)),
+			},
+		},
+	}
+	manifestData, err := json.Marshal(manifest)
+	require.NoError(t, err, "OCI manifest marshaling should not fail")
+
+	manifestDigest := sha256Digest(manifestData)
+	index := dockerOCIIndex{
+		SchemaVersion: 2,
+		Manifests: []dockerOCIManifestDescriptor{
+			{
+				MediaType: dockerOCIManifestMediaType,
+				Digest:    manifestDigest,
+				Size:      int64(len(manifestData)),
+			},
+		},
+	}
+	indexData, err := json.Marshal(index)
+	require.NoError(t, err, "OCI index marshaling should not fail")
+
+	manifestPath, err := ociBlobPathFromDigest(manifestDigest)
+	require.NoError(t, err, "manifest digest should produce a valid OCI blob path")
+	configPath, err := ociBlobPathFromDigest(configDigest)
+	require.NoError(t, err, "config digest should produce a valid OCI blob path")
+	layerPath, err := ociBlobPathFromDigest(layerDigest)
+	require.NoError(t, err, "layer digest should produce a valid OCI blob path")
+
+	dockerFile := createTestDockerArchive(t, []testTarEntry{
+		{name: "oci-layout", mode: 0o644, data: []byte(`{"imageLayoutVersion":"1.0.0"}`)},
+		{name: "index.json", mode: 0o644, data: indexData},
+		{name: manifestPath, mode: 0o644, data: manifestData},
+		{name: configPath, mode: 0o644, data: configData},
+		{name: layerPath, mode: 0o644, data: layerData},
+	})
+
+	pkg, info, err := readDockerOCI(dockerFile)
+	require.NoError(t, err, "reading OCI docker archive should not fail")
+	require.NotNil(t, pkg, "parsed package data should not be nil")
+	require.NotNil(t, info, "parsed docker info should not be nil")
+	require.Equal(t, []string{"/docker-entrypoint"}, info.Config.Entrypoint, "docker entrypoint should match config")
+	require.Equal(t, "/usr/share/testbeat", info.Config.WorkingDir, "docker working directory should match config")
+
+	_, found := pkg.Contents["docker-entrypoint"]
+	require.True(t, found, "entrypoint file should be present in extracted docker package contents")
+	_, found = pkg.Contents["usr/share/testbeat/testbeat.yml"]
+	require.True(t, found, "working directory files should be present in extracted docker package contents")
+	_, found = pkg.Contents["usr/share/testbeat/LICENSE.txt"]
+	require.True(t, found, "license files should be present in extracted docker package contents")
+	_, found = pkg.Contents["etc/passwd"]
+	require.False(t, found, "files outside working directory should not be included")
+}
+
+func TestReadDockerOCIMissingBlob(t *testing.T) {
+	manifest := dockerOCIManifest{
+		SchemaVersion: 2,
+		MediaType:     dockerOCIManifestMediaType,
+		Config: dockerOCIManifestDescriptor{
+			MediaType: "application/vnd.oci.image.config.v1+json",
+			Digest:    "sha256:5117abc6232b4c468263b488fa7cd5a5e07893a6dedad6b4de6ccfb2cafd0a45",
+			Size:      1,
+		},
+		Layers: []dockerOCIManifestDescriptor{
+			{
+				MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
+				Digest:    "sha256:75bed6ef625ff772ca48f63f12693f16f2b44649aa07030a7c4bc6b85225d5dd",
+				Size:      1,
+			},
+		},
+	}
+	manifestData, err := json.Marshal(manifest)
+	require.NoError(t, err, "OCI manifest marshaling should not fail")
+
+	manifestDigest := sha256Digest(manifestData)
+	index := dockerOCIIndex{
+		SchemaVersion: 2,
+		Manifests: []dockerOCIManifestDescriptor{
+			{
+				MediaType: dockerOCIManifestMediaType,
+				Digest:    manifestDigest,
+				Size:      int64(len(manifestData)),
+			},
+		},
+	}
+	indexData, err := json.Marshal(index)
+	require.NoError(t, err, "OCI index marshaling should not fail")
+
+	manifestPath, err := ociBlobPathFromDigest(manifestDigest)
+	require.NoError(t, err, "manifest digest should produce a valid OCI blob path")
+
+	dockerFile := createTestDockerArchive(t, []testTarEntry{
+		{name: "oci-layout", mode: 0o644, data: []byte(`{"imageLayoutVersion":"1.0.0"}`)},
+		{name: "index.json", mode: 0o644, data: indexData},
+		{name: manifestPath, mode: 0o644, data: manifestData},
+	})
+
+	_, _, err = readDockerOCI(dockerFile)
+	require.Error(t, err, "reading sparse OCI docker archive should fail")
+	require.ErrorIs(t, err, errDockerArchiveEntryNotFound, "sparse OCI archive should report missing blob references")
 }
 
 // Sub-tests
@@ -287,7 +449,29 @@ func checkNpcapNotices(pkg, file string, contents io.Reader) error {
 }
 
 func checkDocker(t *testing.T, file string) {
-	p, info, err := readDocker(file)
+	imageType, err := detectDockerImageType(file)
+	if err != nil {
+		t.Errorf("error detecting docker image format for %v: %v", file, err)
+		return
+	}
+	t.Logf("docker image format: %s", imageType)
+
+	var p *packageFile
+	var info *dockerInfo
+	var daemonImageRef string
+	switch imageType {
+	case dockerImageTypeLegacy:
+		p, info, err = readDocker(file)
+	case dockerImageTypeOCI:
+		p, info, err = readDockerOCI(file)
+		if err != nil && errors.Is(err, errDockerArchiveEntryNotFound) {
+			t.Logf("OCI archive is sparse, hydrating checks from daemon image: %v", err)
+			p, info, daemonImageRef, err = readDockerOCIFromDaemon(t, file)
+		}
+	default:
+		t.Errorf("unsupported docker image format %q for %s", imageType, file)
+		return
+	}
 	if err != nil {
 		t.Errorf("error reading file %v: %v", file, err)
 		return
@@ -300,7 +484,7 @@ func checkDocker(t *testing.T, file string) {
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkLicensesPresent(t, "licenses/", p)
-	checkDockerImageRun(t, p, file)
+	checkDockerImageRun(t, p, file, daemonImageRef)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -569,53 +753,37 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	})
 }
 
-func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
+func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef string) {
 	t.Run(fmt.Sprintf("%s check docker images runs", p.Name), func(t *testing.T) {
-		var ctx context.Context
-		dl, ok := t.Deadline()
-		if !ok {
-			ctx = context.Background()
-		} else {
-			c, cancel := context.WithDeadline(context.Background(), dl)
-			ctx = c
-			defer cancel()
-		}
-		f, err := os.Open(imagePath)
-		if err != nil {
-			t.Fatalf("failed to open docker image %q: %s", imagePath, err)
-		}
-		defer f.Close()
+		ctx, cancel := dockerTestContext(t)
+		defer cancel()
 
-		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
-		if err != nil {
-			t.Fatalf("error loading docker image: %s", err)
+		imageID := imageRef
+		if imageID == "" {
+			imageID, err = loadDockerImageFromArchive(ctx, dockerClient, imagePath)
+			if err != nil {
+				t.Fatalf("error loading docker image: %s", err)
+			}
+		} else {
+			_, err = dockerClient.ImageInspect(ctx, imageID)
+			if err != nil {
+				t.Fatalf("error inspecting docker image %q from daemon: %s", imageID, err)
+			}
 		}
-
-		loadRespBody, err := io.ReadAll(loadResp.Body)
-		if err != nil {
-			t.Fatalf("failed to read image load response: %s", err)
-		}
-		loadResp.Body.Close()
-
-		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
-		if !found {
-			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
-		}
-		imageId := strings.TrimRight(after, "\\n\"}\r\n")
 
 		var caps strslice.StrSlice
-		if strings.Contains(imageId, "packetbeat") {
+		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
 
-		createResp, err := c.ContainerCreate(ctx,
+		createResp, err := dockerClient.ContainerCreate(ctx,
 			&container.Config{
-				Image: imageId,
+				Image: imageID,
 			},
 			&container.HostConfig{
 				CapAdd: caps,
@@ -627,18 +795,18 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			t.Fatalf("error creating container from image: %s", err)
 		}
 		defer func() {
-			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			err := dockerClient.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
 			if err != nil {
 				t.Errorf("error removing container: %s", err)
 			}
 		}()
 
-		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		err = dockerClient.ContainerStart(ctx, createResp.ID, container.StartOptions{})
 		if err != nil {
 			t.Fatalf("failed to start container: %s", err)
 		}
 		defer func() {
-			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			err := dockerClient.ContainerStop(ctx, createResp.ID, container.StopOptions{})
 			if err != nil {
 				t.Errorf("error stopping container: %s", err)
 			}
@@ -657,7 +825,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
 				return
 			case <-ticker.C:
-				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
 				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}
@@ -672,6 +840,141 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			}
 		}
 	})
+}
+
+func dockerTestContext(t *testing.T) (context.Context, context.CancelFunc) {
+	t.Helper()
+
+	deadline, ok := t.Deadline()
+	if !ok {
+		return context.Background(), func() {}
+	}
+
+	return context.WithDeadline(context.Background(), deadline)
+}
+
+func loadDockerImageFromArchive(ctx context.Context, dockerClient *client.Client, imagePath string) (string, error) {
+	f, err := os.Open(imagePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open docker image %q: %w", imagePath, err)
+	}
+	defer f.Close()
+
+	loadResp, err := dockerClient.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
+	if err != nil {
+		return "", err
+	}
+	defer loadResp.Body.Close()
+
+	loadRespBody, err := io.ReadAll(loadResp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read image load response: %w", err)
+	}
+
+	imageID, err := parseLoadedImageRef(string(loadRespBody))
+	if err != nil {
+		return "", err
+	}
+	return imageID, nil
+}
+
+func parseLoadedImageRef(loadResponse string) (string, error) {
+	for _, prefix := range []string{"Loaded image: ", "Loaded image ID: "} {
+		index := strings.Index(loadResponse, prefix)
+		if index == -1 {
+			continue
+		}
+
+		after := loadResponse[index+len(prefix):]
+		end := len(after)
+		for i, r := range after {
+			if r == '\n' || r == '\r' || r == '"' || r == '\\' {
+				end = i
+				break
+			}
+		}
+
+		imageID := strings.TrimSpace(after[:end])
+		if imageID != "" {
+			return imageID, nil
+		}
+	}
+
+	return "", fmt.Errorf("image load response was unexpected: %s", loadResponse)
+}
+
+func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *dockerInfo, string, error) {
+	t.Helper()
+
+	imageRef, err := dockerImageRefFromArchive(dockerFile)
+	if err != nil {
+		return nil, nil, "", err
+	}
+
+	ctx, cancel := dockerTestContext(t)
+	defer cancel()
+
+	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return nil, nil, "", fmt.Errorf("failed to get a Docker client: %w", err)
+	}
+
+	inspectResp, err := dockerClient.ImageInspect(ctx, imageRef)
+	if err != nil {
+		return nil, nil, "", fmt.Errorf("failed inspecting docker image %q from daemon: %w", imageRef, err)
+	}
+	if inspectResp.Config == nil {
+		return nil, nil, "", fmt.Errorf("docker image %q from daemon has no config", imageRef)
+	}
+
+	info := &dockerInfo{}
+	info.Config.Entrypoint = append(info.Config.Entrypoint, inspectResp.Config.Entrypoint...)
+	info.Config.User = inspectResp.Config.User
+	info.Config.WorkingDir = inspectResp.Config.WorkingDir
+	info.Config.Labels = make(map[string]string, len(inspectResp.Config.Labels))
+	for key, value := range inspectResp.Config.Labels {
+		info.Config.Labels[key] = value
+	}
+
+	createResp, err := dockerClient.ContainerCreate(ctx, &container.Config{Image: imageRef}, nil, nil, nil, "")
+	if err != nil {
+		return nil, nil, "", fmt.Errorf("failed creating container from image %q: %w", imageRef, err)
+	}
+	defer func() {
+		_ = dockerClient.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+	}()
+
+	exportedFilesystem, err := dockerClient.ContainerExport(ctx, createResp.ID)
+	if err != nil {
+		return nil, nil, "", fmt.Errorf("failed exporting filesystem from image %q: %w", imageRef, err)
+	}
+	defer exportedFilesystem.Close()
+
+	rootFS, err := readTarContents(filepath.Base(dockerFile), exportedFilesystem)
+	if err != nil {
+		return nil, nil, "", fmt.Errorf("failed reading exported docker filesystem for %q: %w", imageRef, err)
+	}
+
+	pkg, err := buildDockerPackageFile(dockerFile, info, []*packageFile{rootFS})
+	if err != nil {
+		return nil, nil, "", err
+	}
+
+	return pkg, info, imageRef, nil
+}
+
+func dockerImageRefFromArchive(dockerFile string) (string, error) {
+	manifest, err := readManifest(dockerFile)
+	if err != nil {
+		return "", fmt.Errorf("failed reading docker manifest for image reference: %w", err)
+	}
+	for _, repoTag := range manifest.RepoTags {
+		if repoTag != "" {
+			return repoTag, nil
+		}
+	}
+
+	return "", fmt.Errorf("manifest.json has no repo tags for %s", dockerFile)
 }
 
 // ensureNoBuildIDLinks checks for regressions related to
@@ -910,25 +1213,20 @@ func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFil
 	return p, nil
 }
 
-func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
-	var manifest *dockerManifest
-	var info *dockerInfo
-	layers := make(map[string]*packageFile)
+func normalizeDockerArchivePath(name string) string {
+	return strings.TrimPrefix(name, "./")
+}
 
-	manifest, err := readManifest(dockerFile)
-	if err != nil {
-		return nil, nil, err
-	}
-
+func walkDockerArchive(dockerFile string, onEntry func(header *tar.Header, r io.Reader) error) error {
 	file, err := os.Open(dockerFile)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 	defer file.Close()
 
 	gzipReader, err := gzip.NewReader(file)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 	defer gzipReader.Close()
 
@@ -937,45 +1235,267 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 		header, err := tarReader.Next()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
-				break
+				return nil
 			}
-			return nil, nil, err
+			return err
 		}
 
+		err = onEntry(header, tarReader)
+		if err != nil {
+			if errors.Is(err, errDockerArchiveWalkDone) {
+				return nil
+			}
+			return err
+		}
+	}
+}
+
+func detectDockerImageType(dockerFile string) (dockerImageType, error) {
+	var legacyFormat bool
+	var ociFormat bool
+
+	err := walkDockerArchive(dockerFile, func(header *tar.Header, _ io.Reader) error {
+		entryName := normalizeDockerArchivePath(header.Name)
+		switch entryName {
+		case "manifest.json":
+			legacyFormat = true
+		case "index.json", "oci-layout":
+			ociFormat = true
+			return errDockerArchiveWalkDone
+		}
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	switch {
+	case ociFormat:
+		return dockerImageTypeOCI, nil
+	case legacyFormat:
+		return dockerImageTypeLegacy, nil
+	default:
+		return "", fmt.Errorf("unable to determine docker archive format for %s", dockerFile)
+	}
+}
+
+func readDockerArchiveEntry(dockerFile, entryName string) ([]byte, error) {
+	target := normalizeDockerArchivePath(entryName)
+	var data []byte
+	var found bool
+
+	err := walkDockerArchive(dockerFile, func(header *tar.Header, r io.Reader) error {
+		if normalizeDockerArchivePath(header.Name) != target {
+			return nil
+		}
+
+		var err error
+		data, err = io.ReadAll(r)
+		if err != nil {
+			return fmt.Errorf("failed reading docker archive entry %q: %w", target, err)
+		}
+		found = true
+		return errDockerArchiveWalkDone
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, fmt.Errorf("%w: %q", errDockerArchiveEntryNotFound, target)
+	}
+
+	return data, nil
+}
+
+func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
+	manifest, err := readManifest(dockerFile)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	layerNames := make([]string, 0, len(manifest.Layers))
+	for _, layer := range manifest.Layers {
+		layerNames = append(layerNames, normalizeDockerArchivePath(layer))
+	}
+
+	configName := normalizeDockerArchivePath(manifest.Config)
+	layers := make(map[string]*packageFile, len(layerNames))
+	var info *dockerInfo
+
+	err = walkDockerArchive(dockerFile, func(header *tar.Header, r io.Reader) error {
+		entryName := normalizeDockerArchivePath(header.Name)
 		switch {
-		case header.Name == manifest.Config:
-			info, err = readDockerInfo(tarReader)
+		case entryName == configName:
+			info, err = readDockerInfo(r)
 			if err != nil {
-				return nil, nil, err
+				return fmt.Errorf("failed to read docker config %q: %w", entryName, err)
 			}
-		case slices.Contains(manifest.Layers, header.Name):
-			layer, err := readTarContents(header.Name, tarReader)
+		case slices.Contains(layerNames, entryName):
+			layer, err := readTarContents(entryName, r)
 			if err != nil {
-				return nil, nil, err
+				return fmt.Errorf("failed to read docker layer %q: %w", entryName, err)
 			}
-			layers[header.Name] = layer
+			layers[entryName] = layer
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if info == nil {
+		return nil, nil, fmt.Errorf("docker config %q not found", configName)
+	}
+
+	orderedLayers := make([]*packageFile, 0, len(layerNames))
+	for _, layerName := range layerNames {
+		layer, found := layers[layerName]
+		if !found {
+			return nil, nil, fmt.Errorf("docker layer %q not found", layerName)
+		}
+		orderedLayers = append(orderedLayers, layer)
+	}
+
+	p, err := buildDockerPackageFile(dockerFile, info, orderedLayers)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return p, info, nil
+}
+
+func readDockerOCI(dockerFile string) (*packageFile, *dockerInfo, error) {
+	indexData, err := readDockerArchiveEntry(dockerFile, "index.json")
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read OCI index: %w", err)
+	}
+
+	index, err := readDockerOCIIndex(bytes.NewReader(indexData))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	manifestDescriptor, err := selectDockerOCIManifest(index)
+	if err != nil {
+		return nil, nil, err
+	}
+	manifestPath, err := ociBlobPathFromDigest(manifestDescriptor.Digest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid OCI manifest digest %q: %w", manifestDescriptor.Digest, err)
+	}
+
+	manifestData, err := readDockerArchiveEntry(dockerFile, manifestPath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read OCI manifest %q: %w", manifestPath, err)
+	}
+	manifest, err := readDockerOCIManifest(bytes.NewReader(manifestData))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	configPath, err := ociBlobPathFromDigest(manifest.Config.Digest)
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid OCI config digest %q: %w", manifest.Config.Digest, err)
+	}
+
+	layerPaths := make([]string, len(manifest.Layers))
+	layerIndexes := make(map[string]int, len(manifest.Layers))
+	for i, layer := range manifest.Layers {
+		layerPath, err := ociBlobPathFromDigest(layer.Digest)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid OCI layer digest %q: %w", layer.Digest, err)
+		}
+		layerPaths[i] = layerPath
+		layerIndexes[layerPath] = i
+	}
+
+	layers := make([]*packageFile, len(manifest.Layers))
+	var info *dockerInfo
+	err = walkDockerArchive(dockerFile, func(header *tar.Header, r io.Reader) error {
+		entryName := normalizeDockerArchivePath(header.Name)
+		switch {
+		case entryName == configPath:
+			info, err = readDockerInfo(r)
+			if err != nil {
+				return fmt.Errorf("failed to read OCI docker config %q: %w", entryName, err)
+			}
+		default:
+			index, found := layerIndexes[entryName]
+			if !found {
+				return nil
+			}
+
+			layer, err := readDockerLayerContents(entryName, manifest.Layers[index], r)
+			if err != nil {
+				return err
+			}
+			layers[index] = layer
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if info == nil {
+		return nil, nil, fmt.Errorf("%w: %q", errDockerArchiveEntryNotFound, configPath)
+	}
+	for i, layer := range layers {
+		if layer == nil {
+			return nil, nil, fmt.Errorf("%w: %q", errDockerArchiveEntryNotFound, layerPaths[i])
 		}
 	}
 
+	p, err := buildDockerPackageFile(dockerFile, info, layers)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return p, info, nil
+}
+
+func readDockerLayerContents(layerName string, descriptor dockerOCIManifestDescriptor, r io.Reader) (*packageFile, error) {
+	layerData := r
+	if strings.Contains(strings.ToLower(descriptor.MediaType), "gzip") {
+		gzipLayer, err := gzip.NewReader(r)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open gzip docker layer %q: %w", layerName, err)
+		}
+		defer gzipLayer.Close()
+		layerData = gzipLayer
+	}
+
+	layer, err := readTarContents(layerName, layerData)
+	if err != nil {
+		return nil, fmt.Errorf("failed reading docker layer %q: %w", layerName, err)
+	}
+	return layer, nil
+}
+
+func buildDockerPackageFile(dockerFile string, info *dockerInfo, layers []*packageFile) (*packageFile, error) {
+	if info == nil {
+		return nil, errors.New("docker info cannot be nil")
+	}
 	if len(info.Config.Entrypoint) == 0 {
-		return nil, nil, fmt.Errorf("no entrypoint")
+		return nil, fmt.Errorf("no entrypoint")
 	}
 
 	workingDir := info.Config.WorkingDir
 	entrypoint := info.Config.Entrypoint[0]
 
-	// Read layers in order and for each file keep only the entry seen in the later layer
+	// Read layers in order and for each file keep only the entry seen in the later layer.
 	p := &packageFile{Name: filepath.Base(dockerFile), Contents: map[string]packageEntry{}}
 	for _, layerFile := range layers {
 		for name, entry := range layerFile.Contents {
-			// Check only files in working dir and entrypoint
+			// Check only files in working dir and entrypoint.
 			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
 				p.Contents[name] = entry
 			}
 			if excludedPathsPattern.MatchString(name) {
 				continue
 			}
-			// Add also licenses
+			// Add licenses regardless of path.
 			for _, licenseFile := range licenseFiles {
 				if strings.Contains(name, licenseFile) {
 					p.Contents[name] = entry
@@ -985,46 +1505,33 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	}
 
 	if len(p.Contents) == 0 {
-		return nil, nil, fmt.Errorf("no files found in docker working directory (%s)", info.Config.WorkingDir)
+		return nil, fmt.Errorf("no files found in docker working directory (%s)", info.Config.WorkingDir)
 	}
 
-	return p, info, nil
+	return p, nil
 }
 
 func readManifest(dockerFile string) (*dockerManifest, error) {
 	var manifest *dockerManifest
+	err := walkDockerArchive(dockerFile, func(header *tar.Header, r io.Reader) error {
+		if normalizeDockerArchivePath(header.Name) != "manifest.json" {
+			return nil
+		}
 
-	file, err := os.Open(dockerFile)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	gzipReader, err := gzip.NewReader(file)
-	if err != nil {
-		return nil, err
-	}
-	defer gzipReader.Close()
-
-	tarReader := tar.NewReader(gzipReader)
-	for {
-		header, err := tarReader.Next()
+		var err error
+		manifest, err = readDockerManifest(r)
 		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, err
+			return err
 		}
-
-		if header.Name == "manifest.json" {
-			manifest, err = readDockerManifest(tarReader)
-			if err != nil {
-				return nil, err
-			}
-			break
-		}
+		return errDockerArchiveWalkDone
+	})
+	if err != nil {
+		return nil, err
 	}
-	return manifest, err
+	if manifest == nil {
+		return nil, fmt.Errorf("manifest.json not found in docker archive %s", dockerFile)
+	}
+	return manifest, nil
 }
 
 type dockerManifest struct {
@@ -1052,6 +1559,100 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 	return manifests[0], nil
 }
 
+const (
+	dockerOCIManifestMediaType            = "application/vnd.oci.image.manifest.v1+json"
+	dockerDistributionV2ManifestMediaType = "application/vnd.docker.distribution.manifest.v2+json"
+)
+
+type dockerOCIIndex struct {
+	SchemaVersion int                           `json:"schemaVersion"`
+	Manifests     []dockerOCIManifestDescriptor `json:"manifests"`
+}
+
+type dockerOCIManifest struct {
+	SchemaVersion int                           `json:"schemaVersion"`
+	MediaType     string                        `json:"mediaType,omitempty"`
+	Config        dockerOCIManifestDescriptor   `json:"config"`
+	Layers        []dockerOCIManifestDescriptor `json:"layers"`
+}
+
+type dockerOCIManifestDescriptor struct {
+	MediaType string `json:"mediaType,omitempty"`
+	Digest    string `json:"digest"`
+	Size      int64  `json:"size,omitempty"`
+}
+
+func readDockerOCIIndex(r io.Reader) (*dockerOCIIndex, error) {
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var index dockerOCIIndex
+	err = json.Unmarshal(data, &index)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode OCI index: %w", err)
+	}
+	if len(index.Manifests) == 0 {
+		return nil, fmt.Errorf("no manifests found in OCI index")
+	}
+
+	return &index, nil
+}
+
+func readDockerOCIManifest(r io.Reader) (*dockerOCIManifest, error) {
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	var manifest dockerOCIManifest
+	err = json.Unmarshal(data, &manifest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode OCI manifest: %w", err)
+	}
+	if manifest.Config.Digest == "" {
+		return nil, fmt.Errorf("OCI manifest is missing config digest")
+	}
+	if len(manifest.Layers) == 0 {
+		return nil, fmt.Errorf("OCI manifest has no layers")
+	}
+
+	return &manifest, nil
+}
+
+func selectDockerOCIManifest(index *dockerOCIIndex) (dockerOCIManifestDescriptor, error) {
+	var fallback dockerOCIManifestDescriptor
+	for _, descriptor := range index.Manifests {
+		if descriptor.Digest == "" {
+			continue
+		}
+		switch descriptor.MediaType {
+		case "", dockerOCIManifestMediaType, dockerDistributionV2ManifestMediaType:
+			return descriptor, nil
+		default:
+			if fallback.Digest == "" {
+				fallback = descriptor
+			}
+		}
+	}
+
+	if fallback.Digest != "" {
+		return fallback, nil
+	}
+
+	return dockerOCIManifestDescriptor{}, fmt.Errorf("OCI index does not contain a valid manifest descriptor")
+}
+
+func ociBlobPathFromDigest(digest string) (string, error) {
+	algorithm, encodedDigest, found := strings.Cut(digest, ":")
+	if !found || algorithm == "" || encodedDigest == "" {
+		return "", fmt.Errorf("invalid OCI digest %q", digest)
+	}
+
+	return fmt.Sprintf("blobs/%s/%s", algorithm, encodedDigest), nil
+}
+
 type dockerInfo struct {
 	Config struct {
 		Entrypoint []string
@@ -1074,4 +1675,71 @@ func readDockerInfo(r io.Reader) (*dockerInfo, error) {
 	}
 
 	return &info, nil
+}
+
+type testTarEntry struct {
+	name string
+	mode int64
+	data []byte
+}
+
+func createTestDockerArchive(t *testing.T, entries []testTarEntry) string {
+	t.Helper()
+
+	dockerFile := filepath.Join(t.TempDir(), "test.docker.tar.gz")
+	file, err := os.Create(dockerFile)
+	require.NoError(t, err, "creating test docker archive should not fail")
+
+	gzipWriter := gzip.NewWriter(file)
+	tarWriter := tar.NewWriter(gzipWriter)
+	writeTestTarEntries(t, tarWriter, entries)
+
+	require.NoError(t, tarWriter.Close(), "closing test docker archive tar writer should not fail")
+	require.NoError(t, gzipWriter.Close(), "closing test docker archive gzip writer should not fail")
+	require.NoError(t, file.Close(), "closing test docker archive file should not fail")
+
+	return dockerFile
+}
+
+func createTestTarData(t *testing.T, entries []testTarEntry) []byte {
+	t.Helper()
+
+	var buffer bytes.Buffer
+	tarWriter := tar.NewWriter(&buffer)
+	writeTestTarEntries(t, tarWriter, entries)
+	require.NoError(t, tarWriter.Close(), "closing test layer tar writer should not fail")
+
+	return buffer.Bytes()
+}
+
+func writeTestTarEntries(t *testing.T, tarWriter *tar.Writer, entries []testTarEntry) {
+	t.Helper()
+
+	for _, entry := range entries {
+		header := &tar.Header{
+			Name: entry.name,
+			Mode: entry.mode,
+			Size: int64(len(entry.data)),
+		}
+		require.NoErrorf(t, tarWriter.WriteHeader(header), "writing tar header for %s should not fail", entry.name)
+		_, err := tarWriter.Write(entry.data)
+		require.NoErrorf(t, err, "writing tar contents for %s should not fail", entry.name)
+	}
+}
+
+func gzipTestData(t *testing.T, data []byte) []byte {
+	t.Helper()
+
+	var buffer bytes.Buffer
+	gzipWriter := gzip.NewWriter(&buffer)
+	_, err := gzipWriter.Write(data)
+	require.NoError(t, err, "writing gzip test data should not fail")
+	require.NoError(t, gzipWriter.Close(), "closing gzip test data writer should not fail")
+
+	return buffer.Bytes()
+}
+
+func sha256Digest(data []byte) string {
+	sum := sha256.Sum256(data)
+	return fmt.Sprintf("sha256:%x", sum)
 }
