@@ -454,15 +454,15 @@
             - name: mem.low.bytes
               type: long
               format: bytes
-              description: memory low threshhold
+              description: memory low threshold
             - name: mem.high.bytes
               type: long
               format: bytes
-              description: memory high threshhold
+              description: memory high threshold
             - name: mem.max.bytes
               type: long
               format: bytes
-              description: memory max threshhold
+              description: memory max threshold
 
             - name: mem.events
               type: group
@@ -512,15 +512,15 @@
             - name: memsw.low.bytes
               type: long
               format: bytes
-              description: memory low threshhold
+              description: memory low threshold
             - name: memsw.high.bytes
               type: long
               format: bytes
-              description: memory high threshhold
+              description: memory high threshold
             - name: memsw.max.bytes
               type: long
               format: bytes
-              description: memory max threshhold
+              description: memory max threshold
 
             - name: memsw.failures
               type: long
