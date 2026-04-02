@@ -91,7 +91,7 @@ type osquerybeat struct {
 	diagMx        sync.RWMutex
 	diagQueryExec queryExecutor
 
-	// parent process watcher (disabled when running as an OTel receiver)
+	// parent process watcher (disabled via disableWatcher when running as an OTel receiver)
 	watcher        *Watcher
 	disableWatcher bool
 
@@ -110,7 +110,7 @@ var _ osquerybeatPublisher = (*pub.Publisher)(nil)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
-	log := logp.NewLogger("osquerybeat")
+	log := b.Info.Logger.Named("osquerybeat")
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
@@ -145,18 +145,6 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		}
 	}
 
-	return bt, nil
-}
-
-// NewReceiver creates an instance of osquerybeat for use as an OTel receiver.
-// It disables orphan detection since the receiver lifecycle is managed by the
-// OTel collector, not a parent process.
-func NewReceiver(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
-	bt, err := New(b, cfg)
-	if err != nil {
-		return nil, err
-	}
-	bt.(*osquerybeat).disableWatcher = true
 	return bt, nil
 }
 
@@ -291,7 +279,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Ensure that all the hooks and actions are ready before starting the Manager
 	// to receive configuration.
 	bt.registerDiagnosticHooks(b)
-	if err := b.Manager.Start(); err != nil {
+	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
 	}
@@ -400,12 +388,6 @@ func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
 	bt.diagMx.Lock()
 	defer bt.diagMx.Unlock()
 	bt.diagQueryExec = qe
-}
-
-func (bt *osquerybeat) getDiagnosticsQueryExecutor() queryExecutor {
-	bt.diagMx.RLock()
-	defer bt.diagMx.RUnlock()
-	return bt.diagQueryExec
 }
 
 func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
