@@ -415,7 +415,7 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "-v")
 	}
 
-	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"))
+	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/..."))
 
 	if params.HasModules {
 		args = append(args, "--modules")
