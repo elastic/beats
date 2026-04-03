@@ -60,8 +60,12 @@ type TCP struct {
 }
 
 // Creates and returns a new Tcp.
-func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
+func NewTCP(p protos.Protocols, id, device string, idx int, loggers ...*logp.Logger) (*TCP, error) {
 	isDebug = logp.IsDebug("tcp")
+	var logger *logp.Logger
+	if len(loggers) > 0 {
+		logger = loggers[0]
+	}
 
 	portMap, err := buildPortsMap(p.GetAllTCP())
 	if err != nil {
@@ -71,7 +75,7 @@ func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
 	tcp := &TCP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap),
+		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap, logger),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -426,7 +430,7 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the TCP processor. If id or
 // device is empty a nil inputMetric is returned.
-func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *inputMetrics {
+func newInputMetrics(id, device string, ports map[uint16]protos.Protocol, logger *logp.Logger) *inputMetrics {
 	if id == "" || device == "" {
 		// An empty id signals to not record metrics,
 		// while an empty device means we are reading
@@ -456,11 +460,12 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		processingTime: metrics.NewUniformSample(1024),
 	}
 
-	//TODO: use local logger here
-	_ = adapter.NewGoMetrics(reg, "arrival_period", logp.NewLogger(""), adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
-	_ = adapter.NewGoMetrics(reg, "processing_time", logp.NewLogger(""), adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.processingTime))
+	if logger != nil {
+		_ = adapter.NewGoMetrics(reg, "arrival_period", logger, adapter.Accept).
+			Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+		_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
+			Register("histogram", metrics.NewHistogram(out.processingTime))
+	}
 
 	out.device.Set(device)
 

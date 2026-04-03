@@ -98,13 +98,25 @@ type ProtocolsStruct struct {
 	all map[Protocol]protocolInstance
 	tcp map[Protocol]TCPPlugin
 	udp map[Protocol]UDPPlugin
+
+	logger *logp.Logger
 }
 
-func NewProtocols() *ProtocolsStruct {
+type loggerAwarePlugin interface {
+	SetLogger(*logp.Logger)
+}
+
+func NewProtocols(loggers ...*logp.Logger) *ProtocolsStruct {
+	var logger *logp.Logger
+	if len(loggers) > 0 {
+		logger = loggers[0]
+	}
+
 	return &ProtocolsStruct{
-		all: map[Protocol]protocolInstance{},
-		tcp: map[Protocol]TCPPlugin{},
-		udp: map[Protocol]UDPPlugin{},
+		all:    map[Protocol]protocolInstance{},
+		tcp:    map[Protocol]TCPPlugin{},
+		udp:    map[Protocol]UDPPlugin{},
+		logger: logger,
 	}
 }
 
@@ -122,9 +134,9 @@ func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.Proce
 }
 
 func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
-	if len(cfgs) != 0 {
+	if len(cfgs) != 0 && s.logger != nil {
 		// TODO: https://github.com/elastic/ingest-dev/issues/6000
-		logp.NewLogger("").Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
+		s.logger.Warn(cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration."))
 	}
 
 	for proto := range protocolSyms {
@@ -200,6 +212,9 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 	if err != nil {
 		logp.Err("Failed to register protocol plugin: %v", err)
 		return err
+	}
+	if loggerAware, ok := inst.(loggerAwarePlugin); ok && s.logger != nil {
+		loggerAware.SetLogger(s.logger.Named(name))
 	}
 
 	s.register(proto, client, inst)

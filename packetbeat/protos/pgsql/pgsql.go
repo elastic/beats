@@ -144,6 +144,7 @@ func New(
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
+	p.SetLogger(logp.NewNopLogger())
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -157,13 +158,16 @@ func New(
 	return p, nil
 }
 
+func (pgsql *pgsqlPlugin) SetLogger(logger *logp.Logger) {
+	pgsql.log = logger
+	pgsql.debug = logger.WithOptions(zap.AddCallerSkip(1))
+	pgsql.detail = logger.Named("detailed").WithOptions(zap.AddCallerSkip(1))
+	pgsql.isDebug = logp.IsDebug("pgsql")
+	pgsql.isDetail = logp.IsDebug("pgsqldetailed")
+}
+
 func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
-
-	pgsql.log = logp.NewLogger("pgsql")
-	pgsql.debug = logp.NewLogger("pgsql", zap.AddCallerSkip(1))
-	pgsql.detail = logp.NewLogger("pgsqldetailed", zap.AddCallerSkip(1))
-	pgsql.isDebug, pgsql.isDetail = logp.IsDebug("pgsql"), logp.IsDebug("pgsqldetailed")
 
 	pgsql.transactions = common.NewCache(
 		pgsql.transactionTimeout,

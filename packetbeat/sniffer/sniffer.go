@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"runtime"
 	"strings"
@@ -91,11 +92,15 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, closers ...func()) (*Sniffer, error) {
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, logger *logp.Logger, closers ...func()) (*Sniffer, error) {
+	if logger == nil {
+		logger = logp.NewNopLogger()
+	}
+
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		closers:  closers,
-		log:      logp.NewLogger("sniffer"),
+		log:      logger.Named("sniffer"),
 	}
 
 	for i, iface := range interfaces {
@@ -159,7 +164,7 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			}
 		}
 
-		err := validateConfig(iface.BpfFilter, &iface) //nolint:gosec // Bad linter! validateConfig completes before the next iteration.
+		err := validateConfig(iface.BpfFilter, &iface)
 		if err != nil {
 			cfg, _ := json.Marshal(iface)
 			return nil, fmt.Errorf("validate: %w: %s", err, cfg)
@@ -417,7 +422,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 		if s.config.OneAtATime {
 			fmt.Fprintln(os.Stdout, "Press enter to read packet")
-			fmt.Scanln()
+			_, _ = fmt.Scanln()
 		}
 
 		data, ci, err := handle.ReadPacketData()
@@ -513,6 +518,9 @@ func (s *Sniffer) Stop() {
 }
 
 func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+	if cfg.Snaplen < 0 || cfg.Snaplen > math.MaxInt32 {
+		return nil, fmt.Errorf("snaplen %d out of range [0, %d]", cfg.Snaplen, math.MaxInt32)
+	}
 	snaplen := int32(cfg.Snaplen)
 	timeout := 500 * time.Millisecond
 	h, err := pcap.OpenLive(device, snaplen, true, timeout)
