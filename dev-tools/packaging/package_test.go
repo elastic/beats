@@ -1378,20 +1378,7 @@ func readDockerOCI(dockerFile string) (*packageFile, *dockerInfo, error) {
 		return nil, nil, err
 	}
 
-	manifestDescriptor, err := selectDockerOCIManifest(index)
-	if err != nil {
-		return nil, nil, err
-	}
-	manifestPath, err := ociBlobPathFromDigest(manifestDescriptor.Digest)
-	if err != nil {
-		return nil, nil, fmt.Errorf("invalid OCI manifest digest %q: %w", manifestDescriptor.Digest, err)
-	}
-
-	manifestData, err := readDockerArchiveEntry(dockerFile, manifestPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read OCI manifest %q: %w", manifestPath, err)
-	}
-	manifest, err := readDockerOCIManifest(bytes.NewReader(manifestData))
+	manifest, err := resolveDockerOCIManifestFromIndex(dockerFile, index, map[string]struct{}{})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1562,12 +1549,16 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 }
 
 const (
-	dockerOCIManifestMediaType            = "application/vnd.oci.image.manifest.v1+json"
-	dockerDistributionV2ManifestMediaType = "application/vnd.docker.distribution.manifest.v2+json"
+	dockerOCIManifestMediaType                = "application/vnd.oci.image.manifest.v1+json"
+	dockerOCIIndexMediaType                   = "application/vnd.oci.image.index.v1+json"
+	dockerDistributionV2ManifestMediaType     = "application/vnd.docker.distribution.manifest.v2+json"
+	dockerDistributionV2ManifestListMediaType = "application/vnd.docker.distribution.manifest.list.v2+json"
+	dockerOCIAttestationManifestType          = "attestation-manifest"
 )
 
 type dockerOCIIndex struct {
 	SchemaVersion int                           `json:"schemaVersion"`
+	MediaType     string                        `json:"mediaType,omitempty"`
 	Manifests     []dockerOCIManifestDescriptor `json:"manifests"`
 }
 
@@ -1579,9 +1570,16 @@ type dockerOCIManifest struct {
 }
 
 type dockerOCIManifestDescriptor struct {
-	MediaType string `json:"mediaType,omitempty"`
-	Digest    string `json:"digest"`
-	Size      int64  `json:"size,omitempty"`
+	MediaType   string             `json:"mediaType,omitempty"`
+	Digest      string             `json:"digest"`
+	Size        int64              `json:"size,omitempty"`
+	Annotations map[string]string  `json:"annotations,omitempty"`
+	Platform    *dockerOCIPlatform `json:"platform,omitempty"`
+}
+
+type dockerOCIPlatform struct {
+	Architecture string `json:"architecture,omitempty"`
+	OS           string `json:"os,omitempty"`
 }
 
 func readDockerOCIIndex(r io.Reader) (*dockerOCIIndex, error) {
@@ -1623,27 +1621,92 @@ func readDockerOCIManifest(r io.Reader) (*dockerOCIManifest, error) {
 	return &manifest, nil
 }
 
-func selectDockerOCIManifest(index *dockerOCIIndex) (dockerOCIManifestDescriptor, error) {
-	var fallback dockerOCIManifestDescriptor
+var errDockerOCIDescriptorSkipped = errors.New("docker OCI descriptor skipped")
+
+func resolveDockerOCIManifestFromIndex(dockerFile string, index *dockerOCIIndex, visited map[string]struct{}) (*dockerOCIManifest, error) {
 	for _, descriptor := range index.Manifests {
-		if descriptor.Digest == "" {
+		manifest, err := resolveDockerOCIManifestFromDescriptor(dockerFile, descriptor, visited)
+		if err == nil {
+			return manifest, nil
+		}
+		if errors.Is(err, errDockerOCIDescriptorSkipped) {
 			continue
 		}
-		switch descriptor.MediaType {
-		case "", dockerOCIManifestMediaType, dockerDistributionV2ManifestMediaType:
-			return descriptor, nil
-		default:
-			if fallback.Digest == "" {
-				fallback = descriptor
-			}
+		return nil, err
+	}
+
+	return nil, fmt.Errorf("OCI index does not contain a runnable manifest descriptor")
+}
+
+func resolveDockerOCIManifestFromDescriptor(dockerFile string, descriptor dockerOCIManifestDescriptor, visited map[string]struct{}) (*dockerOCIManifest, error) {
+	if descriptor.Digest == "" {
+		return nil, fmt.Errorf("%w: descriptor is missing digest", errDockerOCIDescriptorSkipped)
+	}
+	if isDockerOCIAttestationDescriptor(descriptor) {
+		return nil, fmt.Errorf("%w: descriptor %q is an attestation manifest", errDockerOCIDescriptorSkipped, descriptor.Digest)
+	}
+	if _, found := visited[descriptor.Digest]; found {
+		return nil, fmt.Errorf("OCI descriptor recursion detected at %q", descriptor.Digest)
+	}
+
+	visited[descriptor.Digest] = struct{}{}
+	defer delete(visited, descriptor.Digest)
+
+	descriptorPath, err := ociBlobPathFromDigest(descriptor.Digest)
+	if err != nil {
+		return nil, fmt.Errorf("invalid OCI descriptor digest %q: %w", descriptor.Digest, err)
+	}
+
+	descriptorData, err := readDockerArchiveEntry(dockerFile, descriptorPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read OCI descriptor %q: %w", descriptorPath, err)
+	}
+
+	switch descriptor.MediaType {
+	case dockerOCIIndexMediaType, dockerDistributionV2ManifestListMediaType:
+		nestedIndex, err := readDockerOCIIndex(bytes.NewReader(descriptorData))
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode OCI index %q: %w", descriptorPath, err)
 		}
+		return resolveDockerOCIManifestFromIndex(dockerFile, nestedIndex, visited)
+	case "", dockerOCIManifestMediaType, dockerDistributionV2ManifestMediaType:
+		manifest, err := readDockerOCIManifest(bytes.NewReader(descriptorData))
+		if err == nil {
+			return manifest, nil
+		}
+		if descriptor.MediaType != "" {
+			return nil, err
+		}
+
+		nestedIndex, nestedErr := readDockerOCIIndex(bytes.NewReader(descriptorData))
+		if nestedErr == nil {
+			return resolveDockerOCIManifestFromIndex(dockerFile, nestedIndex, visited)
+		}
+
+		return nil, fmt.Errorf("%w: descriptor %q could not be decoded as OCI manifest or OCI index", errDockerOCIDescriptorSkipped, descriptor.Digest)
+	default:
+		manifest, err := readDockerOCIManifest(bytes.NewReader(descriptorData))
+		if err == nil {
+			return manifest, nil
+		}
+		nestedIndex, nestedErr := readDockerOCIIndex(bytes.NewReader(descriptorData))
+		if nestedErr == nil {
+			return resolveDockerOCIManifestFromIndex(dockerFile, nestedIndex, visited)
+		}
+
+		return nil, fmt.Errorf("%w: unsupported OCI descriptor media type %q", errDockerOCIDescriptorSkipped, descriptor.MediaType)
+	}
+}
+
+func isDockerOCIAttestationDescriptor(descriptor dockerOCIManifestDescriptor) bool {
+	if descriptor.Annotations["vnd.docker.reference.type"] == dockerOCIAttestationManifestType {
+		return true
+	}
+	if descriptor.Platform == nil {
+		return false
 	}
 
-	if fallback.Digest != "" {
-		return fallback, nil
-	}
-
-	return dockerOCIManifestDescriptor{}, fmt.Errorf("OCI index does not contain a valid manifest descriptor")
+	return descriptor.Platform.Architecture == "unknown" && descriptor.Platform.OS == "unknown"
 }
 
 func ociBlobPathFromDigest(digest string) (string, error) {
