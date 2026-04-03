@@ -104,13 +104,6 @@ func packageWithArgs(args PackageArgs) error {
 	platforms := args.Platforms
 	packageTypes := args.PackageTypes
 	snapshot := args.Snapshot
-	dev := args.Dev
-
-	previousSnapshot, previousDev := Snapshot, DevBuild
-	Snapshot, DevBuild = snapshot, dev
-	defer func() {
-		Snapshot, DevBuild = previousSnapshot, previousDev
-	}()
 
 	if len(platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
@@ -119,7 +112,7 @@ func packageWithArgs(args PackageArgs) error {
 
 	if len(Packages) == 0 {
 		return errors.New("no package specs are registered. Call " +
-			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
+			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first")
 	}
 
 	var tasks []interface{}

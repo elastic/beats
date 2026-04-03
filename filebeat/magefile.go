@@ -234,10 +234,7 @@ func packageDockerImageForGoIntegTest() error {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
-	if err := packageDockerImageForGoIntegTest(); err != nil {
-		return err
-	}
+	mg.Deps(BuildSystemTestBinary, packageDockerImageForGoIntegTest())
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
