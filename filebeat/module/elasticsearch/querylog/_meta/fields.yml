@@ -1,0 +1,85 @@
+# Query log events from Elasticsearch (DSL, ES|QL, SQL, EQL).
+- name: querylog
+  description: "Query log events from Elasticsearch"
+  type: group
+  fields:
+  - name: indices
+    description: "Indices involved (DSL, ES|QL when response present, EQL). Not emitted by SqlLogProducer."
+    example: "query_log_test_index"
+    type: keyword
+  - name: query
+    description: "Query text (DSL JSON, ES|QL, SQL, or EQL)"
+    example: "{\"size\":10,\"query\":{\"match_all\":{\"boost\":1.0}}}"
+    type: keyword
+  - name: result_count
+    description: "Number of rows or hits returned (clamped to int where applicable)"
+    example: 3
+    type: long
+  - name: took
+    description: "Duration in nanoseconds"
+    example: 1000000
+    type: long
+  - name: took_millis
+    description: "Duration in milliseconds"
+    example: 1
+    type: long
+  - name: type
+    description: "Query kind: dsl, esql, sql, or eql"
+    example: "dsl"
+    type: keyword
+  - name: timed_out
+    description: "True when the request timed out (e.g. DSL SearchResponse, EQL timeout)"
+    type: boolean
+  - name: shards.successful
+    description: "Successful shard count when shardInfo() is present"
+    example: 1
+    type: long
+  - name: shards.skipped
+    description: "Skipped shards (only emitted if count > 0)"
+    type: long
+  - name: shards.failed
+    description: "Failed shards (only emitted if count > 0)"
+    type: long
+  - name: dsl.total_count
+    description: "Total hits from TotalHits (DSL only, SearchLogProducer)"
+    example: 3
+    type: long
+  - name: dsl.total_count_partial
+    description: "True when total hit relation is not EQUAL_TO"
+    type: boolean
+  - name: has_aggregations
+    description: "True if the search response has aggregations (DSL)"
+    type: boolean
+  - name: is_system
+    description: "True if all resolved indices match the system-index predicate (QueryLogger); omitted when SQL has no indices"
+    type: boolean
+  - name: is_remote
+    description: "True when SearchRequest#getLocalClusterAlias() is set (DSL remote-cluster request)"
+    type: boolean
+  - name: clusters.remotes
+    description: "Remote cluster aliases when remotes exist (DSL/ES|QL/EQL); JSON array of keyword strings, not a delimited string"
+    type: keyword
+  - name: clusters.remote_count
+    description: "Number of remote clusters or distinct remote aliases"
+    type: long
+  - name: clusters.total
+    description: "Total cluster entries in the map (DSL and ES|QL only; not EQL). Additional keys use lowercase status strings (failed, partial, running, skipped, successful) with long counts."
+    type: long
+  - name: esql.profile.analysis.took
+    description: "ES|QL profile phase duration in nanoseconds (phase name from TimeSpanMarker)"
+    type: long
+  - name: esql.profile.planning.took
+    description: "ES|QL profile phase duration in nanoseconds"
+    type: long
+  - name: esql.profile.parsing.took
+    description: "ES|QL profile phase duration in nanoseconds"
+    type: long
+  - name: esql.profile.preanalysis.took
+    description: "ES|QL profile phase duration in nanoseconds"
+    type: long
+  - name: esql.profile.query.took
+    description: "ES|QL profile phase duration in nanoseconds"
+    type: long
+  - name: esql.profile.dependency_resolution.took
+    description: "ES|QL profile phase duration in nanoseconds"
+    type: long
