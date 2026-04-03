@@ -490,6 +490,20 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 	const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
+	// When supervises enrichment is enabled, buffer all users before publishing.
+	// Supervises relationships are derived from the profile.managerId field already
+	// present in the bulk fetch response, so no additional API calls are needed.
+	// Buffering ensures state.users is fully populated before we build the map.
+	wantSupervises := slices.Contains(p.cfg.EnrichWith, "supervises")
+	var supervisesBuffer []*User
+
+	doPublish := publish
+	if wantSupervises {
+		doPublish = func(u *User) {
+			supervisesBuffer = append(supervisesBuffer, u)
+		}
+	}
+
 	var (
 		n           int
 		lastUpdated time.Time
@@ -504,7 +518,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				publish(p.addUserMetadata(ctx, u, state))
+				doPublish(p.addUserMetadata(ctx, u, state))
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -512,7 +526,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		} else {
 			for _, u := range batch {
 				su := p.addUserMetadata(ctx, u, state)
-				publish(su)
+				doPublish(su)
 				n++
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
@@ -529,6 +543,13 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 			return err
 		}
 		query = next
+	}
+
+	if wantSupervises {
+		p.assignSupervises(state)
+		for _, u := range supervisesBuffer {
+			publish(u)
+		}
 	}
 
 	// Prepare query for next update. This is any record that was updated
@@ -579,15 +600,31 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Roles = roles
 		}
 	}
-	if slices.Contains(p.cfg.EnrichWith, "supervises") {
-		supervised, _, err := okta.GetUserSupervises(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
-		if err != nil {
-			p.logger.Warnf("failed to get supervised users for %s: %v", u.ID, err)
-		} else {
-			su.Supervises = supervised
-		}
-	}
 	return su
+}
+
+// assignSupervises derives the supervises relationship for every user in state
+// by examining the profile.managerId field that Okta includes in the standard
+// user profile. No additional API calls are made: the relationship is computed
+// in a single pass over the already-fetched user set.
+func (p *oktaInput) assignSupervises(state *stateStore) {
+	managerMap := make(map[string][]okta.SupervisedUser)
+	for _, u := range state.users {
+		managerID, _ := u.Profile["managerId"].(string)
+		if managerID == "" {
+			continue
+		}
+		email, _ := u.Profile["email"].(string)
+		login, _ := u.Profile["login"].(string)
+		managerMap[managerID] = append(managerMap[managerID], okta.SupervisedUser{
+			ID:       u.ID,
+			Email:    email,
+			Username: login,
+		})
+	}
+	for id, u := range state.users {
+		u.Supervises = managerMap[id]
+	}
 }
 
 // doFetchDevices handles fetching device and associated user identities from Okta.
