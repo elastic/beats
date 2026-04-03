@@ -526,6 +526,12 @@ Query log events from Elasticsearch
     type: long
 
 
+**`elasticsearch.querylog.clusters.skipped`**
+:   Number of skipped remote clusters when present in cluster statistics
+
+    type: long
+
+
 **`elasticsearch.querylog.clusters.total`**
 :   Total cluster entries in the map (DSL and ES|QL only; not EQL). Additional keys use lowercase status strings (failed, partial, running, skipped, successful) with long counts.
 

@@ -62,6 +62,9 @@
   - name: clusters.remote_count
     description: "Number of remote clusters or distinct remote aliases"
     type: long
+  - name: clusters.skipped
+    description: "Number of skipped remote clusters when present in cluster statistics"
+    type: long
   - name: clusters.total
     description: "Total cluster entries in the map (DSL and ES|QL only; not EQL). Additional keys use lowercase status strings (failed, partial, running, skipped, successful) with long counts."
     type: long
