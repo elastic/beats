@@ -105,7 +105,7 @@ func TestEnsureDecoderLifecycle(t *testing.T) {
 	var secondCleanupCalls int
 
 	s := sniffer{
-		log: logp.NewLogger("sniffer_test"),
+		log: logp.NewNopLogger(),
 		decoders: func(_ layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
 			created++
 			switch created {
@@ -158,7 +158,7 @@ func TestEnsureDecoderReplaceErrorKeepsCurrentCleanup(t *testing.T) {
 	var cleanupCalls int
 
 	s := sniffer{
-		log: logp.NewLogger("sniffer_test"),
+		log: logp.NewNopLogger(),
 		decoders: func(_ layers.LinkType, _ string, _ int) (*decoder.Decoder, func(), error) {
 			created++
 			if created == 1 {

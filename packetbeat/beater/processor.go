@@ -169,7 +169,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(id, config, publisher, &watch, flows)
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, p.beat.Info.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg confi
 	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
 }
 
-func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows) (*sniffer.Sniffer, error) {
+func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows, logger *logp.Logger) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -234,13 +234,18 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 	logp.Debug("main", "Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
 	var closers []func()
+	var protocolLogger, tcpLogger *logp.Logger
+	if logger != nil {
+		protocolLogger = logger.Named("protos")
+		tcpLogger = logger.Named("tcp")
+	}
 	for i, iface := range interfaces {
-		protocols := protos.NewProtocols()
+		protocols := protos.NewProtocols(protocolLogger)
 		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
-		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg, tcpLogger)
 		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
@@ -248,7 +253,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, interfaces, closers...)
+	return sniffer.New(id, false, "", decoders, interfaces, logger, closers...)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based

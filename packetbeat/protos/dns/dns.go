@@ -25,6 +25,7 @@ package dns
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 	"sort"
 	"strconv"
@@ -155,17 +156,17 @@ func (t dnsTuple) reverse() dnsTuple {
 
 func (t *dnsTuple) computeHashables() {
 	copy(t.raw[0:16], t.SrcIP)
-	copy(t.raw[16:18], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
+	binary.BigEndian.PutUint16(t.raw[16:18], t.SrcPort)
 	copy(t.raw[18:34], t.DstIP)
-	copy(t.raw[34:36], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
-	copy(t.raw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
+	binary.BigEndian.PutUint16(t.raw[34:36], t.DstPort)
+	binary.BigEndian.PutUint16(t.raw[36:38], t.id)
 	t.raw[38] = byte(t.transport)
 
 	copy(t.revRaw[0:16], t.DstIP)
-	copy(t.revRaw[16:18], []byte{byte(t.DstPort >> 8), byte(t.DstPort)})
+	binary.BigEndian.PutUint16(t.revRaw[16:18], t.DstPort)
 	copy(t.revRaw[18:34], t.SrcIP)
-	copy(t.revRaw[34:36], []byte{byte(t.SrcPort >> 8), byte(t.SrcPort)})
-	copy(t.revRaw[36:38], []byte{byte(t.id >> 8), byte(t.id)})
+	binary.BigEndian.PutUint16(t.revRaw[34:36], t.SrcPort)
+	binary.BigEndian.PutUint16(t.revRaw[36:38], t.id)
 	t.revRaw[38] = byte(t.transport)
 }
 
@@ -225,7 +226,7 @@ func init() {
 }
 
 func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (protos.Plugin, error) {
-	p := &dnsPlugin{logger: logp.NewLogger("dns")}
+	p := &dnsPlugin{logger: logp.NewNopLogger()}
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -237,6 +238,10 @@ func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher
 		return nil, err
 	}
 	return p, nil
+}
+
+func (dns *dnsPlugin) SetLogger(logger *logp.Logger) {
+	dns.logger = logger
 }
 
 func (dns *dnsPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *dnsConfig) error {
