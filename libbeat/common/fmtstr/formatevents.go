@@ -315,7 +315,7 @@ func (e *eventFieldCompiler) compileEventField(
 		defaultValue = op.param
 	}
 
-	path, err := parseEventPath(field)
+	path, err := ParseEventPath(field)
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +382,7 @@ func (e *eventTimestampEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 	return err
 }
 
-func parseEventPath(field string) (string, error) {
+func ParseEventPath(field string) (string, error) {
 	field = strings.Trim(field, " \n\r\t")
 	fields := []string{}
 
