@@ -1,6 +1,5 @@
 type: filestream
 id: elasticsearch-querylog
-index: logs-elasticsearch.querylog-default
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
