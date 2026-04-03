@@ -240,6 +240,155 @@ func TestReadDockerOCI(t *testing.T) {
 	require.False(t, found, "files outside working directory should not be included")
 }
 
+func TestReadDockerOCINestedIndexWithAttestation(t *testing.T) {
+	configData := []byte(`{"config":{"Entrypoint":["/docker-entrypoint"],"Labels":{"org.label-schema.vendor":"Elastic"},"User":"root","WorkingDir":"/usr/share/testbeat"}}`)
+
+	layerTar := createTestTarData(t, []testTarEntry{
+		{name: "docker-entrypoint", mode: 0o755, data: []byte("#!/bin/sh\n")},
+		{name: "usr/share/testbeat/testbeat.yml", mode: 0o644, data: []byte("name: testbeat\n")},
+		{name: "usr/share/testbeat/LICENSE.txt", mode: 0o644, data: []byte("license\n")},
+	})
+	layerData := gzipTestData(t, layerTar)
+
+	configDigest := sha256Digest(configData)
+	layerDigest := sha256Digest(layerData)
+
+	manifest := dockerOCIManifest{
+		SchemaVersion: 2,
+		MediaType:     dockerOCIManifestMediaType,
+		Config: dockerOCIManifestDescriptor{
+			MediaType: "application/vnd.oci.image.config.v1+json",
+			Digest:    configDigest,
+			Size:      int64(len(configData)),
+		},
+		Layers: []dockerOCIManifestDescriptor{
+			{
+				MediaType: "application/vnd.oci.image.layer.v1.tar+gzip",
+				Digest:    layerDigest,
+				Size:      int64(len(layerData)),
+			},
+		},
+	}
+	manifestData, err := json.Marshal(manifest)
+	require.NoError(t, err, "OCI manifest marshaling should not fail")
+
+	manifestDigest := sha256Digest(manifestData)
+	attestationConfigData := []byte(`{"architecture":"unknown","os":"unknown","config":{},"rootfs":{"type":"layers","diff_ids":["sha256:133ae3f9bcc385295b66c2d83b28c25a9f294ce20954d5cf922dda860429734a"]}}`)
+	attestationLayerData := []byte(`{"_type":"https://in-toto.io/Statement/v0.1","predicateType":"https://slsa.dev/provenance/v1","subject":[],"predicate":{}}`)
+	attestationConfigDigest := sha256Digest(attestationConfigData)
+	attestationLayerDigest := sha256Digest(attestationLayerData)
+
+	attestationManifest := dockerOCIManifest{
+		SchemaVersion: 2,
+		MediaType:     dockerOCIManifestMediaType,
+		Config: dockerOCIManifestDescriptor{
+			MediaType: "application/vnd.oci.image.config.v1+json",
+			Digest:    attestationConfigDigest,
+			Size:      int64(len(attestationConfigData)),
+		},
+		Layers: []dockerOCIManifestDescriptor{
+			{
+				MediaType: "application/vnd.in-toto+json",
+				Digest:    attestationLayerDigest,
+				Size:      int64(len(attestationLayerData)),
+			},
+		},
+	}
+	attestationManifestData, err := json.Marshal(attestationManifest)
+	require.NoError(t, err, "attestation manifest marshaling should not fail")
+
+	attestationManifestDigest := sha256Digest(attestationManifestData)
+	nestedIndex := dockerOCIIndex{
+		SchemaVersion: 2,
+		MediaType:     dockerOCIIndexMediaType,
+		Manifests: []dockerOCIManifestDescriptor{
+			{
+				MediaType: dockerOCIManifestMediaType,
+				Digest:    attestationManifestDigest,
+				Size:      int64(len(attestationManifestData)),
+				Annotations: map[string]string{
+					"vnd.docker.reference.digest": manifestDigest,
+					"vnd.docker.reference.type":   dockerOCIAttestationManifestType,
+				},
+				Platform: &dockerOCIPlatform{
+					Architecture: "unknown",
+					OS:           "unknown",
+				},
+			},
+			{
+				MediaType: dockerOCIManifestMediaType,
+				Digest:    manifestDigest,
+				Size:      int64(len(manifestData)),
+				Platform: &dockerOCIPlatform{
+					Architecture: "amd64",
+					OS:           "linux",
+				},
+			},
+		},
+	}
+	nestedIndexData, err := json.Marshal(nestedIndex)
+	require.NoError(t, err, "nested OCI index marshaling should not fail")
+
+	nestedIndexDigest := sha256Digest(nestedIndexData)
+	index := dockerOCIIndex{
+		SchemaVersion: 2,
+		MediaType:     dockerOCIIndexMediaType,
+		Manifests: []dockerOCIManifestDescriptor{
+			{
+				MediaType: dockerOCIIndexMediaType,
+				Digest:    nestedIndexDigest,
+				Size:      int64(len(nestedIndexData)),
+				Annotations: map[string]string{
+					"org.opencontainers.image.ref.name": "9.4.0-SNAPSHOT",
+				},
+			},
+		},
+	}
+	indexData, err := json.Marshal(index)
+	require.NoError(t, err, "top-level OCI index marshaling should not fail")
+
+	nestedIndexPath, err := ociBlobPathFromDigest(nestedIndexDigest)
+	require.NoError(t, err, "nested index digest should produce a valid OCI blob path")
+	manifestPath, err := ociBlobPathFromDigest(manifestDigest)
+	require.NoError(t, err, "manifest digest should produce a valid OCI blob path")
+	configPath, err := ociBlobPathFromDigest(configDigest)
+	require.NoError(t, err, "config digest should produce a valid OCI blob path")
+	layerPath, err := ociBlobPathFromDigest(layerDigest)
+	require.NoError(t, err, "layer digest should produce a valid OCI blob path")
+	attestationManifestPath, err := ociBlobPathFromDigest(attestationManifestDigest)
+	require.NoError(t, err, "attestation manifest digest should produce a valid OCI blob path")
+	attestationConfigPath, err := ociBlobPathFromDigest(attestationConfigDigest)
+	require.NoError(t, err, "attestation config digest should produce a valid OCI blob path")
+	attestationLayerPath, err := ociBlobPathFromDigest(attestationLayerDigest)
+	require.NoError(t, err, "attestation layer digest should produce a valid OCI blob path")
+
+	dockerFile := createTestDockerArchive(t, []testTarEntry{
+		{name: "oci-layout", mode: 0o644, data: []byte(`{"imageLayoutVersion":"1.0.0"}`)},
+		{name: "index.json", mode: 0o644, data: indexData},
+		{name: nestedIndexPath, mode: 0o644, data: nestedIndexData},
+		{name: manifestPath, mode: 0o644, data: manifestData},
+		{name: configPath, mode: 0o644, data: configData},
+		{name: layerPath, mode: 0o644, data: layerData},
+		{name: attestationManifestPath, mode: 0o644, data: attestationManifestData},
+		{name: attestationConfigPath, mode: 0o644, data: attestationConfigData},
+		{name: attestationLayerPath, mode: 0o644, data: attestationLayerData},
+	})
+
+	pkg, info, err := readDockerOCI(dockerFile)
+	require.NoError(t, err, "reading OCI docker archive with nested index and attestation should not fail")
+	require.NotNil(t, pkg, "parsed package data should not be nil")
+	require.NotNil(t, info, "parsed docker info should not be nil")
+	require.Equal(t, []string{"/docker-entrypoint"}, info.Config.Entrypoint, "docker entrypoint should match config")
+	require.Equal(t, "/usr/share/testbeat", info.Config.WorkingDir, "docker working directory should match config")
+
+	_, found := pkg.Contents["docker-entrypoint"]
+	require.True(t, found, "entrypoint file should be present in extracted docker package contents")
+	_, found = pkg.Contents["usr/share/testbeat/testbeat.yml"]
+	require.True(t, found, "working directory files should be present in extracted docker package contents")
+	_, found = pkg.Contents["usr/share/testbeat/LICENSE.txt"]
+	require.True(t, found, "license files should be present in extracted docker package contents")
+}
+
 func TestReadDockerOCIMissingBlob(t *testing.T) {
 	manifest := dockerOCIManifest{
 		SchemaVersion: 2,
