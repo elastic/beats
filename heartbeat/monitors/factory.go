@@ -41,6 +41,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
+// HBRunnerFactory is used for validating generated configurations and creating
+// of new Runners
+type HBRunnerFactory interface {
+	cfgfile.RunnerFactory
+	GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error)
+}
+
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
@@ -112,8 +119,28 @@ func (NoopRunner) Start() {
 func (NoopRunner) Stop() {
 }
 
+func (NoopRunner) Update(c *conf.C) error {
+	return nil
+}
+
+func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
+	sf, err := stdfields.ConfigToStdMonitorFields(c)
+	if err != nil {
+		return nil, fmt.Errorf("could not load stdfields in factory: %w", err)
+	}
+
+	pluginFactory, found := f.pluginsReg.Get(sf.Type)
+	if !found {
+		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", sf.Type, f.pluginsReg.MonitorNames())
+	}
+
+	f.logger.Debugf("returning plugin custom hash function")
+	return pluginFactory.HashConfig, nil
+}
+
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
+	// Only for backwards-compatible monitors.d loading
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err

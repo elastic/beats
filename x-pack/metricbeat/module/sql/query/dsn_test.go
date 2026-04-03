@@ -28,9 +28,9 @@ const (
 )
 
 func prepare(t *testing.T) {
-	require.NoError(t, os.WriteFile(caPath, []byte(mockCA), 0644))
-	require.NoError(t, os.WriteFile(keyPath, []byte(mockKey), 0600))
-	require.NoError(t, os.WriteFile(certPath, []byte(mockCert), 0644))
+	require.NoError(t, os.WriteFile(caPath, []byte(mockCA), 0o644))
+	require.NoError(t, os.WriteFile(keyPath, []byte(mockKey), 0o600))
+	require.NoError(t, os.WriteFile(certPath, []byte(mockCert), 0o644))
 }
 
 func cleanup(t *testing.T) {

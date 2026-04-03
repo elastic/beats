@@ -12,7 +12,7 @@ env:
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
   IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1772337686"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-1772337686"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1772337686"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1775016079"
   IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
   IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
   IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
@@ -178,9 +178,8 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
-          - "x-pack/filebeat/build/integration-tests/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+          - "x-pack/filebeat/build/input-test/**"
+          - "x-pack/filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -205,9 +204,8 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
-          - "x-pack/filebeat/build/integration-tests/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+          - "x-pack/filebeat/build/input-test/**"
+          - "x-pack/filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -237,9 +235,8 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
-          - "x-pack/filebeat/build/integration-tests/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+          - "x-pack/filebeat/build/input-test/**"
+          - "x-pack/filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -269,9 +266,8 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
-          - "x-pack/filebeat/build/integration-tests/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+          - "x-pack/filebeat/build/input-test/**"
+          - "x-pack/filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -296,9 +292,8 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
-          - "x-pack/filebeat/build/integration-tests/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/*"
-          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+          - "x-pack/filebeat/build/input-test/**"
+          - "x-pack/filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"

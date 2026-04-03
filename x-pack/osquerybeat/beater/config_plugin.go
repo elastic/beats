@@ -43,7 +43,8 @@ type QueryInfo struct {
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
 	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
-	PackID string
+	PackID  string
+	Profile bool // whether to collect and publish profile for this query
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -117,6 +118,21 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 	defer p.mx.RUnlock()
 	ns, ok = p.namespaces[name]
 	return ns, ok
+}
+
+func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	// Prefer pending config (newQueryInfoMap) so profile flag is up to date immediately after Set().
+	if p.newQueryInfoMap != nil {
+		if qi, ok := p.newQueryInfoMap[name]; ok {
+			return qi.Profile
+		}
+	}
+	if qi, ok := p.queryInfoMap[name]; ok {
+		return qi.Profile
+	}
+	return false
 }
 
 func (p *ConfigPlugin) GetNamespace() string {
@@ -234,6 +250,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
 			PackID:     packID,
+			Profile:    qi.Profile,
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -285,6 +302,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				Platform:   stream.Platform,
 				Version:    stream.Version,
 				ECSMapping: stream.ECSMapping,
+				Profile:    stream.Profile,
 			}
 
 			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)

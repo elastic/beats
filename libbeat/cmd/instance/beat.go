@@ -157,7 +157,7 @@ type certReloadConfig struct {
 
 func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
-		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
+		return errors.New("'restart_on_cert_change.period' must be equal or greater than 1s")
 	}
 
 	if c.Reload.Enabled && runtime.GOOS == "windows" {
@@ -1002,7 +1002,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("beat meta file failed to encode vaules: %w", encodeErr)
+		return fmt.Errorf("beat meta file failed to encode values: %w", encodeErr)
 	}
 
 	// move temporary file into final location

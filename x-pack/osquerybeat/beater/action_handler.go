@@ -33,9 +33,23 @@ type scheduledResponsePublisher interface {
 	PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64)
 }
 
+type queryProfilePublisher interface {
+	PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{})
+}
+
+type liveProfileRecorder interface {
+	RecordLiveProfile(query string, profile map[string]interface{})
+}
+
 type scheduledQueryPublisher interface {
 	queryResultPublisher
 	scheduledResponsePublisher
+	queryProfilePublisher
+}
+
+type actionQueryPublisher interface {
+	queryResultPublisher
+	queryProfilePublisher
 }
 
 type queryExecutor interface {
@@ -49,9 +63,10 @@ type namespaceProvider interface {
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
-	publisher queryResultPublisher
+	publisher actionQueryPublisher
 	queryExec queryExecutor
 	np        namespaceProvider
+	profiles  liveProfileRecorder
 }
 
 func (a *actionHandler) Name() string {
@@ -84,15 +99,16 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
 	}
 
-	var namespace string
-	if a.np != nil {
-		namespace = a.np.GetNamespace()
-	}
-	if namespace == "" {
-		namespace = config.DefaultNamespace
-	}
+	return a.executeQuery(ctx, config.Datastream(a.namespace()), ac, "", req)
+}
 
-	return a.executeQuery(ctx, config.Datastream(namespace), ac, "", req)
+func (a *actionHandler) namespace() string {
+	if a.np != nil {
+		if ns := a.np.GetNamespace(); ns != "" {
+			return ns
+		}
+	}
+	return config.DefaultNamespace
 }
 
 func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {
@@ -106,16 +122,51 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Execute query: %s", ac.Query)
 
+	var before runtimeSnapshot
+	beforeReady := false
+	shouldCollect := ac.Profile || a.profiles != nil
+	if shouldCollect {
+		snapshot, err := collectRuntimeSnapshot(ctx, a.queryExec)
+		if err != nil {
+			a.log.Debugf("failed to collect pre-query profile snapshot: %v", err)
+		} else {
+			before = snapshot
+			beforeReady = true
+		}
+	}
+
 	start := time.Now()
 
 	hits, err := a.queryExec.Query(ctx, ac.Query, ac.Timeout)
+	duration := time.Since(start)
+
+	if shouldCollect && beforeReady {
+		after, snapErr := collectRuntimeSnapshot(ctx, a.queryExec)
+		if snapErr != nil {
+			a.log.Debugf("failed to collect post-query profile snapshot: %v", snapErr)
+		} else {
+			profile := buildLiveQueryProfile(ac.Query, before, after, duration, err)
+			if a.profiles != nil {
+				a.profiles.RecordLiveProfile(ac.Query, profile)
+			}
+			if ac.Profile {
+				a.publisher.PublishQueryProfile(config.QueryProfileDatastream(a.namespace()), "", ac.ID, responseID, profile, req["data"])
+			}
+		}
+	} else if shouldCollect && !beforeReady {
+		if ac.Profile {
+			a.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
+		} else {
+			a.log.Debug("profile storage skipped: pre-query snapshot was not collected")
+		}
+	}
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
 		return 0, err
 	}
 
-	a.log.Debugf("Completed query in: %v", time.Since(start))
+	a.log.Debugf("Completed query in: %v", duration)
 
 	a.publisher.Publish(index, ac.ID, "action_id", responseID, "", "", nil, hits, ac.ECSMapping, req["data"])
 
