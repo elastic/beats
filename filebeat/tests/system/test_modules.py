@@ -120,6 +120,11 @@ def load_fileset_test_cases():
     return test_cases
 
 
+def module_uses_filestream_input(module, fileset):
+    """Filesets that only define filestream inputs need the same flags as RUN_AS_FILESTREAM."""
+    return module == "elasticsearch" and fileset == "querylog"
+
+
 class Test(BaseTest):
 
     def init(self):
@@ -191,7 +196,7 @@ class Test(BaseTest):
         # if the test file contains '.journal', later it will try to remove
         # the '--once' flag and the journald input will be used,
         # so there is nothing to do here.
-        if log_as_filestream() and ".journal" not in test_file:
+        if (log_as_filestream() or module_uses_filestream_input(module, fileset)) and ".journal" not in test_file:
             cmd.append("-E")
             cmd.append("features.log_input_run_as_filestream.enabled=true")
             cmd.append("-M")
@@ -299,7 +304,7 @@ class Test(BaseTest):
                 pass
             else:
                 # Remove some fields if running the Filestream input
-                if log_as_filestream():
+                if log_as_filestream() or module_uses_filestream_input(module, fileset):
                     remove_filestream_fields(objects)
                 self.assert_fields_are_documented(obj)
 
@@ -378,8 +383,9 @@ def clean_keys(obj):
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
-    if log_as_filestream() and "tags" in obj:
-        obj["tags"].remove("take_over")
+    if (log_as_filestream() or obj.get("event.dataset") == "elasticsearch.querylog") and "tags" in obj:
+        if "take_over" in obj["tags"]:
+            obj["tags"].remove("take_over")
         if len(obj["tags"]) == 0:
             delete_key(obj, "tags")
 
