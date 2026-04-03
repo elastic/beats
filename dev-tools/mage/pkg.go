@@ -37,7 +37,6 @@ type PackageArgs struct {
 	Platforms    BuildPlatformList
 	PackageTypes []PackageType
 	Snapshot     bool
-	Dev          bool
 }
 
 // DefaultPackageArgsFromEnv returns package args based on current globals and
@@ -49,15 +48,9 @@ func DefaultPackageArgsFromEnv() (PackageArgs, error) {
 			fmt.Errorf("cannot parse env var SNAPSHOT as boolean: %w", err)
 	}
 
-	dev, err := parseBoolEnvOverride("DEV", DevBuild)
-	if err != nil {
-		return PackageArgs{}, fmt.Errorf("cannot parse env var DEV boolean: %w", err)
-	}
-
 	args := PackageArgs{
 		Platforms: append(BuildPlatformList(nil), Platforms...),
 		Snapshot:  snapshot,
-		Dev:       dev,
 	}
 
 	if expression := os.Getenv("PLATFORMS"); len(expression) > 0 {

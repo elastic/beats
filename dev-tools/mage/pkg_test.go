@@ -159,7 +159,6 @@ func TestDefaultPackageArgsFromEnv(t *testing.T) {
 	)
 	assert.Empty(t, args.PackageTypes, "expected all package types to be selected when PACKAGES is empty")
 	assert.False(t, args.Snapshot, "expected snapshot to default to current global value")
-	assert.False(t, args.Dev, "expected DEV to default to current global value")
 
 	t.Setenv("PLATFORMS", "linux/arm64")
 	t.Setenv("PACKAGES", "tgz")
@@ -180,5 +179,4 @@ func TestDefaultPackageArgsFromEnv(t *testing.T) {
 		"expected PACKAGES env var to override default package types",
 	)
 	assert.True(t, args.Snapshot, "expected SNAPSHOT env var to override default snapshot value")
-	assert.True(t, args.Dev, "expected DEV env var to override default DEV value")
 }
