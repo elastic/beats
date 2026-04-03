@@ -176,3 +176,22 @@
           description: >
             An array of Kafka header strings for this message, in the form
             "<key>: <value>".
+
+- key: elasticsearch-querylog
+  title: Elasticsearch query log
+  description: >
+    Root-level fields from Elasticsearch query log JSON lines when ingested with the
+    filestream NDJSON parser and expand_keys.
+  fields:
+    - name: http.request.headers.x_opaque_id
+      type: keyword
+      description: >
+        Value of the X-Opaque-Id HTTP header when nested under http.request.headers in ECS-style logs.
+    - name: user.realm
+      type: keyword
+      description: >
+        Authentication realm for the user in Elasticsearch structured logging.
+    - name: auth.type
+      type: keyword
+      description: >
+        Authentication mechanism (TOKEN, REALM, API_KEY, etc.) from Elasticsearch structured logging.
