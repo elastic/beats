@@ -72,28 +72,28 @@ func TestOutputReload(t *testing.T) {
 				}
 
 				logger := logptest.NewTestingLogger(t, "")
-				pipeline, err := New(
+
+				queueFactory, err := queueFactoryForUserConfig(queueConfig.Name(), queueConfig.Config(), nil)
+				require.NoError(t, err)
+				outputController, err := newProcessOutputController(
 					beat.Info{Logger: logger},
 					Monitors{Logger: logger},
-					queueConfig,
-					outputs.Group{},
-					Settings{},
+					&emptyObserver{},
+					queueFactory,
+					0,
 				)
 				require.NoError(t, err)
-				defer pipeline.Close()
-
 				var wg sync.WaitGroup
 				wg.Add(1)
 				go func() {
-					// Our initial pipeline has no outputs set, so we need
+					// Our initial controller has no outputs set, so we need
 					// to create the client in a goroutine since any
-					// Connect calls will block until the pipeline has an
+					// queueProducer calls will block until the pipeline has an
 					// output.
-					pipelineClient, err := pipeline.Connect()
-					require.NoError(t, err)
-					defer pipelineClient.Close()
+					queueProducer := outputController.queueProducer(queue.ProducerConfig{})
+					defer queueProducer.Close()
 					for i := uint(0); i < numEventsToPublish; i++ {
-						pipelineClient.Publish(beat.Event{})
+						queueProducer.Publish(beat.Event{})
 					}
 					wg.Done()
 				}()
@@ -103,7 +103,7 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					pipeline.outputController.Set(out)
+					outputController.Set(out)
 				}
 
 				wg.Wait()
@@ -124,7 +124,7 @@ func TestOutputReload(t *testing.T) {
 func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 	// Just fill out enough to confirm what's sent to the event consumer,
 	// we don't want to start up real helper routines.
-	controller := outputController{
+	controller := processOutputController{
 		beat: beat.Info{
 			Logger: logptest.NewTestingLogger(t, ""),
 		},
@@ -147,7 +147,7 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 
 func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
+	controller := processOutputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
 		queueFactory: memqueue.FactoryForSettings(
@@ -179,7 +179,7 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
-	controller := outputController{
+	controller := processOutputController{
 		queueFactory: memqueue.FactoryForSettings(
 			memqueue.Settings{Events: 1},
 		),
@@ -207,7 +207,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
+	controller := processOutputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
@@ -229,7 +229,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
+	controller := processOutputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
@@ -275,7 +275,7 @@ func TestQueueMetrics(t *testing.T) {
 	// monitoring namespace.
 	reg := monitoring.NewRegistry()
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
+	controller := processOutputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
