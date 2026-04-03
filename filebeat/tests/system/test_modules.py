@@ -295,10 +295,8 @@ class Test(BaseTest):
             # the event was ingested to Elasticsearch
             assert "ingested" in obj["event"], "missing event.ingested timestamp"
 
-            # elasticsearch.querylog fixtures include failed queries; source lines carry ECS error.*.
-            if not (module == "elasticsearch" and fileset == "querylog"):
-                assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
-                    obj, obj["error"].get("message"))
+            assert "error" not in obj, "not error expected but got: {}.\n The related error message is: {}".format(
+                obj, obj["error"].get("message"))
 
             if (module == "auditd" and fileset == "log") \
                     or (module == "osquery" and fileset == "result"):
