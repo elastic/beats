@@ -1,0 +1,289 @@
+version: 8.19.14
+entries:
+    - kind: feature
+      summary: Add retry back-off logic to streaming input CrowdStrike follower.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769459211
+      file:
+        name: 1769459211-46072-streaming.yaml
+        checksum: cd27d0f69811a5d9d8d285e515080c93f7bb9504
+    - kind: enhancement
+      summary: tbs-monitoring
+      description: Add new TBS metrics to monitor mappings
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769485799
+      file:
+        name: 1769485799-tbs-monitoring.yaml
+        checksum: d8012fa373e4d3031ef0f53dfd719104957def53
+    - kind: feature
+      summary: Add client secret authentication support to Azure App Insights module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771338300
+      file:
+        name: 1771338300-app_insights_oauth2.yaml
+        checksum: 557fe880424eb18132ad13cb26662b5b0298dbad
+    - kind: feature
+      summary: Add secret_state config to CEL input for encrypted storage of secrets accessible as state.secret.
+      description: |
+        Add a secret_state configuration field to the CEL input. When configured in a
+        Fleet integration package with secret: true, the values are stored encrypted by
+        Fleet. At runtime, the contents are placed at state.secret and unconditionally
+        redacted in debug logs. The key "secret" in the plain-text state configuration
+        is reserved and rejected by validation to prevent accidental unencrypted storage
+        of values intended to be secret.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1772518423
+      file:
+        name: 1772518423-cel-secret-state.yaml
+        checksum: c9a5aa25293105b6179110a465c79469cfc34ea6
+    - kind: bug-fix
+      summary: Fix compatibility of the Journald input with journald/systemd versions < 242.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1772726727
+      file:
+        name: 1772726727-fix-journald-args.yaml
+        checksum: 42da1da7de918242c04279e10c156af5fa642e1e
+    - kind: enhancement
+      summary: Allow string and number arrays in httpjson chained configurations.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue:
+        - https://github.com/elastic/integrations/pull/16662
+      impact: ""
+      action: ""
+      timestamp: 1773196999
+      file:
+        name: 1773196999-allow-string-number-array-in-httpjson-chain.yaml
+        checksum: 6facbcbd3a399e9994ae712a7d6f35501ef4bcd1
+    - kind: bug-fix
+      summary: Fix an issue that could delay reporting shutdown of Agent components
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773263871
+      file:
+        name: 1773263871-beats-manager-shutdown.yaml
+        checksum: ce03f266ea8feba8ba256ca93ab4b42e98422b41
+    - kind: bug-fix
+      summary: Add rate-limit backoff to CrowdStrike streaming input oauth2 transport.
+      description: |
+        Wrap the oauth2 HTTP transport used by the CrowdStrike falcon streaming input
+        with a rate-limit-aware transport that intercepts 429 responses, reads the
+        Retry-After header, and backs off before retrying. This prevents the oauth2
+        token refresh from generating a burst of unauthorized requests that triggers
+        CrowdStrike's 15-per-minute rate limit. The discover endpoint also returns a
+        retry-after hint to the session-level retry loop as a minimum wait floor.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773350293
+      file:
+        name: 1773350293-crowdstrike-streaming-rate-limit.yaml
+        checksum: 192fd919deed2507eee194da678b2ad1c6248a34
+    - kind: bug-fix
+      summary: Fix unnecessary Windows filesystem metricset errors from non-existent volumes.
+      description: Fixes an issue where filesystem metric collection on Windows could report errors for volumes that are no longer present. Updated to gosigar v0.14.4.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49553
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773868374
+      file:
+        name: 1773868374-update-gosigar-to-v0.14.4.yaml
+        checksum: 96b5d86dd4f2c2211bbb3e7129b5e195b583a78d
+    - kind: enhancement
+      summary: Update OTel Collector components to v0.148.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773943383
+      file:
+        name: 1773943383-bump-otel-148.yaml
+        checksum: 2ffd84b282caacaf48cf45caf17f2b3a805b88e1
+    - kind: bug-fix
+      summary: Fixed a bug where escaped characters in syslog structured data caused an EOF error.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue:
+        - https://github.com/elastic/beats/issues/43944
+      impact: ""
+      action: ""
+      timestamp: 1774398300
+      file:
+        name: 1774398300-fixed-bug-where-escaped-characters-in-syslog-structured-data-caused-an-eof-error.yaml
+        checksum: 4dd199cc4efd8a8b8af7b4acb265bd6c4e0b27c6
+    - kind: enhancement
+      summary: Add support for URL and URL query parsing and formatting in the Streaming input CEL environment.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774403004
+      file:
+        name: 1774403004-i17875-proofpoint_on_demand.yaml
+        checksum: 5e4f39451f2a1f5421ad299d6ecb4db08b9fcf63
+    - kind: bug-fix
+      summary: Skip request tracer path validation when tracing is disabled to prevent input startup failures.
+      description: |
+        The startup path validation in cel, httpjson, http_endpoint, and entity
+        analytics inputs checked whether the tracer config struct was non-nil rather
+        than whether tracing was enabled. Integration package templates always include
+        a tracer block (with enabled defaulting to false), so the struct is never nil.
+        Under the agentless/otel runtime the relative tracer path resolves outside the
+        permitted directory, causing all affected inputs to fail immediately even though
+        tracing was disabled. The config-level Validate methods already used the correct
+        enabled() guard; the startup paths now do the same.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774437109
+      file:
+        name: 1774437109-fix-tracer-path-disabled.yaml
+        checksum: 1291fa5be0b49c860fb7db169a156b64ec9514fd
+    - kind: other
+      summary: upgrade nodejs to v22.22.2
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774969420
+      file:
+        name: 1774969420-dependency-upgrade-nodejs-v22.22.2.yaml
+        checksum: 615f5399d69e72410168d02039f0f48c0b100a47
+    - kind: bug-fix
+      summary: Fix Filebeat crash loop when running under Elastic Agent and taking too long to initialise
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49768
+        - https://github.com/elastic/beats/pull/49896
+        - https://github.com/elastic/beats/pull/49898
+        - https://github.com/elastic/beats/pull/49899
+        - https://github.com/elastic/beats/pull/49920
+        - https://github.com/elastic/beats/pull/49923
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774984035
+      file:
+        name: 1774984035-move-manager-start.yaml
+        checksum: 587e23bafca6e29ff4ab0b72c8973968a9854ff6
