@@ -18,7 +18,7 @@
 package dev_tools
 
 // This file contains tests that can be run on the generated packages.
-// To run these tests use `go test package_test.go`.
+// To run these tests from this directory use `go test ./dev-tools/packaging`.
 
 import (
 	"archive/tar"
@@ -305,7 +305,7 @@ func checkDocker(t *testing.T, file string) {
 	case dockerImageTypeOCI:
 		p, info, err = readDockerOCI(file)
 		if err != nil && errors.Is(err, errDockerArchiveEntryNotFound) {
-			t.Logf("OCI archive is sparse, hydrating checks from daemon image: %v", err)
+			t.Logf("OCI archive is missing blob data; falling back to an already-loaded daemon image discovered via manifest.json/RepoTags: %v", err)
 			p, info, daemonImageRef, err = readDockerOCIFromDaemon(t, file)
 		}
 		if err != nil {
@@ -451,7 +451,7 @@ func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
 				return
 			}
 		}
-		t.Errorf("no systemd unit file found matching %v", configFilePattern)
+		t.Errorf("no systemd unit file found matching %v", systemdUnitFilePattern)
 	})
 }
 

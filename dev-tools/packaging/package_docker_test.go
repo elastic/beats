@@ -36,6 +36,10 @@ import (
 	"github.com/docker/docker/client"
 )
 
+// This file contains Docker archive parsing helpers used by the package tests.
+// It understands the legacy `docker save` layout and the OCI image layout that
+// current Docker/BuildKit exports use for Beats packaging tests.
+
 type dockerImageType string
 
 const (
@@ -47,12 +51,15 @@ var errDockerArchiveWalkDone = errors.New("docker archive walk done")
 var errDockerArchiveEntryNotFound = errors.New("docker archive entry not found")
 var errDockerOCIDescriptorSkipped = errors.New("docker OCI descriptor skipped")
 
+// readDockerOCIFromDaemon hydrates package checks from an already-loaded daemon
+// image when the OCI archive is missing blobs. The current fallback relies on
+// the compatibility `manifest.json` file to discover the image ref.
 func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *dockerInfo, string, error) {
 	t.Helper()
 
 	imageRef, err := dockerImageRefFromArchive(dockerFile)
 	if err != nil {
-		return nil, nil, "", err
+		return nil, nil, "", fmt.Errorf("daemon fallback requires manifest.json with a repo tag in %q: %w", filepath.Base(dockerFile), err)
 	}
 
 	ctx, cancel := dockerTestContext(t)
@@ -65,7 +72,7 @@ func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *do
 
 	inspectResp, err := dockerClient.ImageInspect(ctx, imageRef)
 	if err != nil {
-		return nil, nil, "", fmt.Errorf("failed inspecting docker image %q from daemon: %w", imageRef, err)
+		return nil, nil, "", fmt.Errorf("daemon fallback requires Docker image %q to already be loaded: %w", imageRef, err)
 	}
 	if inspectResp.Config == nil {
 		return nil, nil, "", fmt.Errorf("docker image %q from daemon has no config", imageRef)
@@ -105,6 +112,8 @@ func readDockerOCIFromDaemon(t *testing.T, dockerFile string) (*packageFile, *do
 	return pkg, info, imageRef, nil
 }
 
+// dockerImageRefFromArchive extracts the image reference from the compatibility
+// `manifest.json` file bundled in the current Docker/BuildKit exports.
 func dockerImageRefFromArchive(dockerFile string) (string, error) {
 	manifest, err := readManifest(dockerFile)
 	if err != nil {
@@ -119,10 +128,14 @@ func dockerImageRefFromArchive(dockerFile string) (string, error) {
 	return "", fmt.Errorf("manifest.json has no repo tags for %s", dockerFile)
 }
 
+// normalizeDockerArchivePath strips the optional `./` prefix used by some tar
+// writers so entry matching is stable across archive producers.
 func normalizeDockerArchivePath(name string) string {
 	return strings.TrimPrefix(name, "./")
 }
 
+// walkDockerArchive iterates the top-level entries in a `.docker.tar.gz`
+// archive and lets callers stop the walk early with errDockerArchiveWalkDone.
 func walkDockerArchive(dockerFile string, onEntry func(header *tar.Header, r io.Reader) error) error {
 	file, err := os.Open(dockerFile)
 	if err != nil {
@@ -156,6 +169,8 @@ func walkDockerArchive(dockerFile string, onEntry func(header *tar.Header, r io.
 	}
 }
 
+// detectDockerImageType distinguishes the legacy `docker save` layout from the
+// OCI image layout by looking for their marker files in the outer archive.
 func detectDockerImageType(dockerFile string) (dockerImageType, error) {
 	var legacyFormat bool
 	var ociFormat bool
@@ -185,6 +200,8 @@ func detectDockerImageType(dockerFile string) (dockerImageType, error) {
 	}
 }
 
+// readDockerArchiveEntry reads a single file from the outer `.docker.tar.gz`
+// archive without unpacking the rest of the image.
 func readDockerArchiveEntry(dockerFile, entryName string) ([]byte, error) {
 	target := normalizeDockerArchivePath(entryName)
 	var data []byte
@@ -213,6 +230,8 @@ func readDockerArchiveEntry(dockerFile, entryName string) ([]byte, error) {
 	return data, nil
 }
 
+// readDocker parses the legacy `docker save` archive layout described by
+// `manifest.json`.
 func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	manifest, err := readManifest(dockerFile)
 	if err != nil {
@@ -271,6 +290,8 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	return p, info, nil
 }
 
+// readDockerOCI parses the OCI image layout exported by current Docker/BuildKit
+// tooling and returns only the subset of files needed by the package checks.
 func readDockerOCI(dockerFile string) (*packageFile, *dockerInfo, error) {
 	indexData, err := readDockerArchiveEntry(dockerFile, "index.json")
 	if err != nil {
@@ -348,6 +369,8 @@ func readDockerOCI(dockerFile string) (*packageFile, *dockerInfo, error) {
 	return p, info, nil
 }
 
+// readDockerLayerContents opens a single OCI layer and transparently ungzips it
+// when the descriptor media type declares gzip compression.
 func readDockerLayerContents(layerName string, descriptor dockerOCIManifestDescriptor, r io.Reader) (*packageFile, error) {
 	layerData := r
 	if strings.Contains(strings.ToLower(descriptor.MediaType), "gzip") {
@@ -366,6 +389,9 @@ func readDockerLayerContents(layerName string, descriptor dockerOCIManifestDescr
 	return layer, nil
 }
 
+// buildDockerPackageFile merges layers in order and keeps only the files that
+// the package assertions care about: the image entrypoint, the working
+// directory, and bundled license files.
 func buildDockerPackageFile(dockerFile string, info *dockerInfo, layers []*packageFile) (*packageFile, error) {
 	if info == nil {
 		return nil, errors.New("docker info cannot be nil")
@@ -404,6 +430,8 @@ func buildDockerPackageFile(dockerFile string, info *dockerInfo, layers []*packa
 	return p, nil
 }
 
+// readManifest loads the compatibility `manifest.json` file used by legacy
+// `docker save` archives and by current OCI exports that still include it.
 func readManifest(dockerFile string) (*dockerManifest, error) {
 	var manifest *dockerManifest
 	err := walkDockerArchive(dockerFile, func(header *tar.Header, r io.Reader) error {
@@ -433,6 +461,8 @@ type dockerManifest struct {
 	Layers   []string
 }
 
+// readDockerManifest decodes the compatibility `manifest.json` format and
+// expects the archive to contain exactly one image manifest entry.
 func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -452,6 +482,8 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 	return manifests[0], nil
 }
 
+// Media types used while traversing OCI indexes, image manifests, and Docker's
+// attestation descriptors.
 const (
 	dockerOCIManifestMediaType                = "application/vnd.oci.image.manifest.v1+json"
 	dockerOCIIndexMediaType                   = "application/vnd.oci.image.index.v1+json"
@@ -486,6 +518,7 @@ type dockerOCIPlatform struct {
 	OS           string `json:"os,omitempty"`
 }
 
+// readDockerOCIIndex decodes an OCI index or Docker manifest list blob.
 func readDockerOCIIndex(r io.Reader) (*dockerOCIIndex, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -504,6 +537,8 @@ func readDockerOCIIndex(r io.Reader) (*dockerOCIIndex, error) {
 	return &index, nil
 }
 
+// readDockerOCIManifest decodes a runnable OCI image manifest and rejects
+// descriptors that do not carry image config or layer references.
 func readDockerOCIManifest(r io.Reader) (*dockerOCIManifest, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -525,6 +560,9 @@ func readDockerOCIManifest(r io.Reader) (*dockerOCIManifest, error) {
 	return &manifest, nil
 }
 
+// resolveDockerOCIManifestFromIndex walks the descriptors in an OCI index until
+// it finds a runnable image manifest. Descriptors marked as skippable are
+// ignored so attestation entries do not fail the package checks.
 func resolveDockerOCIManifestFromIndex(dockerFile string, index *dockerOCIIndex, visited map[string]struct{}) (*dockerOCIManifest, error) {
 	for _, descriptor := range index.Manifests {
 		manifest, err := resolveDockerOCIManifestFromDescriptor(dockerFile, descriptor, visited)
@@ -540,6 +578,9 @@ func resolveDockerOCIManifestFromIndex(dockerFile string, index *dockerOCIIndex,
 	return nil, fmt.Errorf("OCI index does not contain a runnable manifest descriptor")
 }
 
+// resolveDockerOCIManifestFromDescriptor recursively resolves a descriptor to a
+// runnable image manifest. It understands nested OCI indexes and skips
+// descriptors that represent attestations or other non-runnable artifacts.
 func resolveDockerOCIManifestFromDescriptor(dockerFile string, descriptor dockerOCIManifestDescriptor, visited map[string]struct{}) (*dockerOCIManifest, error) {
 	if descriptor.Digest == "" {
 		return nil, fmt.Errorf("%w: descriptor is missing digest", errDockerOCIDescriptorSkipped)
@@ -600,6 +641,8 @@ func resolveDockerOCIManifestFromDescriptor(dockerFile string, descriptor docker
 	}
 }
 
+// isDockerOCIAttestationDescriptor identifies the BuildKit attestation
+// descriptors that should be ignored when choosing the runnable image manifest.
 func isDockerOCIAttestationDescriptor(descriptor dockerOCIManifestDescriptor) bool {
 	if descriptor.Annotations["vnd.docker.reference.type"] == dockerOCIAttestationManifestType {
 		return true
@@ -611,6 +654,8 @@ func isDockerOCIAttestationDescriptor(descriptor dockerOCIManifestDescriptor) bo
 	return descriptor.Platform.Architecture == "unknown" && descriptor.Platform.OS == "unknown"
 }
 
+// ociBlobPathFromDigest converts an OCI digest into its on-disk blob path
+// inside the archive layout.
 func ociBlobPathFromDigest(digest string) (string, error) {
 	algorithm, encodedDigest, found := strings.Cut(digest, ":")
 	if !found || algorithm == "" || encodedDigest == "" {
@@ -629,6 +674,8 @@ type dockerInfo struct {
 	} `json:"config"`
 }
 
+// readDockerInfo decodes the subset of image config fields used by the package
+// checks.
 func readDockerInfo(r io.Reader) (*dockerInfo, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
