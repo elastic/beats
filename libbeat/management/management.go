@@ -180,12 +180,15 @@ func (n *FallbackManager) Stop() {
 // the nilManager is still used for shutdown on some cases,
 // but that does not mean the Beat is being managed externally,
 // hence it will always return false.
-func (n *FallbackManager) Enabled() bool                      { return false }
-func (n *FallbackManager) AgentInfo() AgentInfo               { return AgentInfo{} }
-func (n *FallbackManager) PreInit() error                     { return nil }
-func (n *FallbackManager) PostInit()                          {}
-func (n *FallbackManager) Start() error                       { return nil }
-func (n *FallbackManager) WaitForStop(_ time.Duration) bool   { return true }
+func (n *FallbackManager) Enabled() bool        { return false }
+func (n *FallbackManager) AgentInfo() AgentInfo { return AgentInfo{} }
+func (n *FallbackManager) PreInit() error       { return nil }
+func (n *FallbackManager) PostInit()            {}
+func (n *FallbackManager) Start() error         { return nil }
+func (n *FallbackManager) WaitForStop(_ time.Duration) bool {
+	n.Stop()
+	return true
+}
 func (n *FallbackManager) CheckRawConfig(cfg *config.C) error { return nil }
 func (n *FallbackManager) RegisterAction(action Action)       {}
 func (n *FallbackManager) UnregisterAction(action Action)     {}
