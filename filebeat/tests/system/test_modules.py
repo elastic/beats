@@ -346,8 +346,10 @@ class Test(BaseTest):
             ev = expected[idx]
             obj = objects[idx]
 
-            # Flatten objects for easier comparing
+            # Flatten objects for easier comparing (clean_keys expects dot notation;
+            # goldens may be nested JSON or pre-flattened like apache/access).
             obj = self.flatten_object(obj, {}, "")
+            ev = self.flatten_object(ev, {}, "")
             clean_keys(obj)
             clean_keys(ev)
 
