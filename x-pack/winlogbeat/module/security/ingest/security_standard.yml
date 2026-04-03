@@ -893,12 +893,7 @@ processors:
         }
         ArrayList uacResult = new ArrayList();
         for (entry in params.entrySet()) {
-          Long flag;
-          try {
-            flag = Long.decode(entry.getKey());
-          } catch (Exception e) {
-            continue;
-          }
+          Long flag = Long.decode(entry.getKey());
           if ((newUacValue.longValue() & flag.longValue()) == flag.longValue()) {
             uacResult.add(entry.getValue());
           }
