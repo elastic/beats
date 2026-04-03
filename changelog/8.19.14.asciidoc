@@ -1,0 +1,98 @@
+// begin 8.19.14 relnotes
+
+[[release-notes-8.19.14]]
+==  8.19.14
+
+Review important information about the  8.19.14 release.
+
+
+
+
+
+
+
+
+
+[discrete]
+[[new-features-8.19.14]]
+=== New features
+
+The 8.19.14 release adds the following new and notable features.
+
+
+
+
+**Filebeat**
+
+* Add retry back-off logic to streaming input CrowdStrike follower. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+* Add secret_state config to CEL input for encrypted storage of secrets accessible as state.secret. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
++
+Add a secret_state configuration field to the CEL input. When configured in a
+Fleet integration package with secret: true, the values are stored encrypted by
+Fleet. At runtime, the contents are placed at state.secret and unconditionally
+redacted in debug logs. The key &#34;secret&#34; in the plain-text state configuration
+is reserved and rejected by validation to prevent accidental unencrypted storage
+of values intended to be secret.
+
+
+
+**Metricbeat**
+
+* Add client secret authentication support to Azure App Insights module. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+
+
+[discrete]
+[[enhancements-8.19.14]]
+=== Enhancements
+
+
+
+
+**All**
+
+* Update OTel Collector components to v0.148.0. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+
+
+**Filebeat**
+
+* Allow string and number arrays in httpjson chained configurations. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] https://github.com/elastic/integrations/pull/16662[#16662]
+* Add support for URL and URL query parsing and formatting in the Streaming input CEL environment. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+
+
+**Metricbeat**
+
+* Tbs-monitoring. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.14]]
+=== Bug fixes
+
+
+
+
+**Elastic agent**
+
+* Fix an issue that could delay reporting shutdown of Agent components. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+
+
+**Filebeat**
+
+* Fix compatibility of the Journald input with journald/systemd versions &lt; 242. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+* Add rate-limit backoff to CrowdStrike streaming input oauth2 transport. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+* Skip request tracer path validation when tracing is disabled to prevent input startup failures. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+* Fix Filebeat crash loop when running under Elastic Agent and taking too long to initialise. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] 
+
+
+**Libbeat**
+
+* Fixed a bug where escaped characters in syslog structured data caused an EOF error. https://github.com/elastic/beats/pull/49768[#49768] https://github.com/elastic/beats/pull/49896[#49896] https://github.com/elastic/beats/pull/49898[#49898] https://github.com/elastic/beats/pull/49899[#49899] https://github.com/elastic/beats/pull/49920[#49920] https://github.com/elastic/beats/issues/43944[#43944]
+
+
+**Metricbeat**
+
+* Fix unnecessary Windows filesystem metricset errors from non-existent volumes. https://github.com/elastic/beats/pull/49553[#49553] 
+
+// end 8.19.14 relnotes
