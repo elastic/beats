@@ -473,8 +473,11 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 
 		var body bytes.Buffer
 		n, err := io.Copy(&body, resp.Body)
-		if n == 0 || err != nil {
+		if err != nil {
 			return nil, nil, err
+		}
+		if n == 0 {
+			return nil, nil, errors.New("empty response body")
 		}
 
 		if resp.StatusCode != http.StatusOK {
