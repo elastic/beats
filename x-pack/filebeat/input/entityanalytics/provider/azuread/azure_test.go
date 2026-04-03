@@ -87,6 +87,13 @@ func TestAzure_DoFetch_MFAEnrichment(t *testing.T) {
 	t.Cleanup(func() {
 		testCleanupStore(store, dbFilename)
 	})
+	// The mock fetcher returns shared *fetcher.User pointers. Reset any MFA
+	// data set by this test so it doesn't bleed into subsequent tests.
+	t.Cleanup(func() {
+		for _, u := range mockfetcher.UserResponse {
+			u.MFA = nil
+		}
+	})
 
 	a := azure{
 		conf:    conf{Dataset: "users", EnrichWith: []string{"mfa"}},

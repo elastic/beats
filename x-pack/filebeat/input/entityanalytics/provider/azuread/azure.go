@@ -456,16 +456,18 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		})
 	}
 
-	// Clear any MFA enrichment data from a previous cycle so each cycle
-	// reflects current state from the API.
-	if wantUsers {
+	// Enrich users with MFA registration details if requested. MFA enrichment
+	// is best-effort: changes to MFA state alone do not independently trigger
+	// incremental user updates. MFA data is only refreshed when at least one
+	// user identity delta has occurred (or during a full sync), so published
+	// user documents will reflect the latest MFA state at the time of the
+	// triggering delta, not necessarily at the moment the MFA state changed.
+	// Skip the MFA API call on no-op incremental updates since no user
+	// documents will be published anyway.
+	if wantUsers && p.conf.wantMFA() && (fullSync || updatedUsers.Len() != 0) {
 		for _, u := range state.users {
 			u.MFA = nil
 		}
-	}
-
-	// Enrich users with MFA registration details if requested.
-	if wantUsers && p.conf.wantMFA() {
 		mfaDetails, err := p.fetcher.UserMFADetails(ctx)
 		if err != nil {
 			p.logger.Warnf("Failed to fetch MFA registration details, skipping MFA enrichment: %v", err)

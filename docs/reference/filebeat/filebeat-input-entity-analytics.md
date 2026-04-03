@@ -429,6 +429,8 @@ When the `enrich_with: ["mfa"]` option is set, an additional call is made each s
 
 This endpoint returns MFA registration state for all users and does not support delta queries, so the full list is fetched on every cycle. The result is merged into each user document under the `azure_ad.mfa` field.
 
+Note that MFA enrichment is **best-effort**: a change to a user's MFA registration state alone will not trigger an incremental user update. Updated MFA data is only included in a published user event when that user is already being published due to an identity delta (a change to the user record, group membership, or device). A full synchronization will always include the latest MFA state for all users.
+
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch_2]
 
