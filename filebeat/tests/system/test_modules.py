@@ -24,6 +24,7 @@ remove_timestamp = {
     "cisco.nexus",
     "citrix.netscaler",
     "cylance.protect",
+    "elasticsearch.querylog",
     "f5.bigipafm",
     "fortinet.clientendpoint",
     "haproxy.log",
