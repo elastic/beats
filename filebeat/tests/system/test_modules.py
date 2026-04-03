@@ -220,6 +220,18 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file))
 
+        # elasticsearch/querylog sets a data stream index on the input; override
+        # so events land in the test index (same as output.elasticsearch.index).
+        if module == "elasticsearch" and fileset == "querylog":
+            cmd.extend(
+                [
+                    "-M",
+                    "{module}.{fileset}.input.index={index_name}".format(
+                        module=module, fileset=fileset, index_name=self.index_name
+                    ),
+                ]
+            )
+
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
