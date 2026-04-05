@@ -228,15 +228,35 @@ func (l *runLoop) handleDelete(count int) {
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {
-	l.insert(req, l.nextEntryID)
-	// Send back the new event id.
-	req.resp <- l.nextEntryID
+	l.insertEvent(req)
 
-	l.nextEntryID++
-	l.eventCount++
+	// Drain additional buffered events without returning to the select loop.
+	// This amortizes the cost of goroutine scheduling when multiple producers
+	// are sending concurrently: instead of one select wakeup per event, we
+	// handle up to maxDrainPerWakeup already-buffered events in a tight loop.
+	// The cap prevents starvation of Get, Ack, and Close operations.
+	const maxDrainPerWakeup = 64
+drain:
+	for i := 0; i < maxDrainPerWakeup && l.eventCount < len(l.broker.buf); i++ {
+		select {
+		case req := <-l.broker.pushChan:
+			l.insertEvent(&req)
+		default:
+			break drain
+		}
+	}
 
 	// See if this gave us enough for a new batch
 	l.maybeUnblockGetRequest()
+}
+
+// insertEvent inserts a single event into the ring buffer, sends the
+// assigned entry ID back to the producer, and updates runLoop counters.
+func (l *runLoop) insertEvent(req *pushRequest) {
+	l.insert(req, l.nextEntryID)
+	req.resp <- l.nextEntryID
+	l.nextEntryID++
+	l.eventCount++
 }
 
 // Checks if we can handle pendingGetRequest yet, and handles it if so
