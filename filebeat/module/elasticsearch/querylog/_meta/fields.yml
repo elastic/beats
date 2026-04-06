@@ -28,7 +28,7 @@
     example: "dsl"
     type: keyword
   - name: timed_out
-    description: "True when the request timed out (e.g. DSL SearchResponse, EQL timeout)"
+    description: "True when the request timed out (for example, DSL SearchResponse, EQL timeout)"
     type: boolean
   - name: shards.successful
     description: "Successful shard count when shardInfo() is present"
