@@ -457,7 +457,7 @@ Query log events from Elasticsearch
 
 
 **`elasticsearch.querylog.timed_out`**
-:   True when the request timed out (e.g. DSL SearchResponse, EQL timeout)
+:   True when the request timed out (for example, DSL SearchResponse, EQL timeout)
 
     type: boolean
 

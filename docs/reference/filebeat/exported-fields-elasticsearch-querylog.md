@@ -25,7 +25,7 @@ Root-level fields from Elasticsearch query log JSON lines when ingested with the
 
 
 **`auth.type`**
-:   Authentication mechanism (TOKEN, REALM, API_KEY, etc.) from Elasticsearch structured logging.
+:   Authentication mechanism (TOKEN, REALM, API_KEY, and so on) from Elasticsearch structured logging.
 
     type: keyword
 
