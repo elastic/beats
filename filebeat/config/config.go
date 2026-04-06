@@ -22,6 +22,8 @@ import (
 	"sort"
 	"time"
 
+	"go.opentelemetry.io/collector/extension/xextension/storage"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	bboltst "github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
@@ -54,6 +56,7 @@ type Registry struct {
 	Backend            string           `config:"backend"`
 	Bbolt              bboltst.Config   `config:"bbolt"`
 	ESStorageExtension backend.Registry `config:"-"`
+	OtelFileStorage    storage.Client   `config:"-"`
 }
 
 var DefaultConfig = Config{

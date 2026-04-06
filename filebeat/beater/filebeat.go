@@ -24,6 +24,8 @@ import (
 	"strings"
 	"sync"
 
+	"go.opentelemetry.io/collector/extension/xextension/storage"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -81,6 +83,7 @@ type Filebeat struct {
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
 
 var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
+var _ backend.WithFileStoreExtension = (*Filebeat)(nil)
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -222,6 +225,10 @@ func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 
 func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Registry) {
 	fb.config.Registry.ESStorageExtension = esStateStoreExtension
+}
+
+func (fb *Filebeat) WithFileStoreExtension(client storage.Client) {
+	fb.config.Registry.OtelFileStorage = client
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial

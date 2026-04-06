@@ -17,6 +17,8 @@
 
 package backend
 
+import "go.opentelemetry.io/collector/extension/xextension/storage"
+
 // Registry provides access to stores managed by the backend storage.
 type Registry interface {
 	// Access opens a store. The store will be closed by the frontend, once all
@@ -76,4 +78,8 @@ type Store interface {
 
 type WithESStateStoreExtension interface {
 	WithESStateStoreExtension(esStoreExtension Registry)
+}
+
+type WithFileStoreExtension interface {
+	WithFileStoreExtension(client storage.Client)
 }
