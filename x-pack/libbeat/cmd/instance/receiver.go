@@ -181,6 +181,11 @@ func (br *BeatReceiver) Start(host component.Host) error {
 					return fmt.Errorf("cannot get storage extension client: %w", err)
 				}
 				w.WithFileStoreExtension(c)
+				defer func() {
+					if err := c.Close(context.TODO()); err != nil {
+						br.Logger.Errorf("storage extension returned error when closing: %s", err)
+					}
+				}()
 				br.Logger.Info("==================== Otel File Storage Extension enabled")
 			}
 		}
