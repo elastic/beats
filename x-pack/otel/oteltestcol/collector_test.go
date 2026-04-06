@@ -5,6 +5,7 @@
 package oteltestcol
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -48,4 +49,43 @@ service:
 			FilterMessageSnippet("Publish event").
 			FilterMessageSnippet(`"message": "test message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected debug log with test message not found")
+}
+
+func TestAuditbeatReceiver(t *testing.T) {
+	tmpDir := t.TempDir()
+	cfg := fmt.Sprintf(`receivers:
+  auditbeatreceiver:
+    auditbeat:
+      modules:
+        - module: file_integrity
+          enabled: true
+          paths:
+            - %s
+          scan_at_start: false
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - auditbeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`, tmpDir)
+	col := New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Starting metrics logging every 30s").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected auditbeat receiver to start and log metrics")
 }
