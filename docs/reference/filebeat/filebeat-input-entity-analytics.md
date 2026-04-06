@@ -892,6 +892,10 @@ The provider periodically retrieves changes to user/device metadata from the Okt
 * [/api/v1/users](https://developer.okta.com/docs/reference/api/users/#list-users)
 * [/api/v1/devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices)
 
+It also read roles permissions, only when the `perms` enrichment is enabled. In that case, the following API is also targeted:
+
+* [/api/v1/iam/roles](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission)
+
 Updates are tracked by the provider by retaining a record of the time of the last noted update in the returned user list. During provider updates the Okta provider makes use of the Okta API’s query filtering to only request records updated at or since the provider’s recorded last update.
 
 
@@ -1181,6 +1185,7 @@ stack: ga 9.2.0
 List of OAuth2 scopes required for the application. Common scopes include:
 - `okta.users.read`: Read user information
 - `okta.devices.read`: Read devices information (if collecting devices information is enabled in `dataset` option)
+- `okta.roles.read`: Read role permissions (required when `perms` enrichment is enabled)
 
 ##### `oauth2.token_url`
 
@@ -1231,7 +1236,11 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 #### `enrich_with` [_enrich_with]
 
-The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "supervises", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "perms", "devices", "supervises", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+
+Including "perms" causes role permissions to be fetched for each assigned role and stored under `roles[].permissions` in the published event. Because permissions depend on roles, adding "perms" implicitly enables role enrichment even if "roles" is not listed explicitly. This option requires the `okta.roles.read` OAuth2 scope and results in one additional API call per role per user, so it should be enabled with care on large tenants due to Okta API rate limits.
+
+When "devices" is included, each user is enriched with the list of devices enrolled for that user by calling the [List User Devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userresources/other/listuserdevices) API. This requires one additional API request per user, it is disabled by default to help mitigate Okta rate-limit pressure.
 
 The "supervises" option populates the `supervises` field on each user with the list of users they manage. Each entry contains the managed user's `id`, `email`, and `username`. The relationship is derived from the `profile.managerId` field already present in the bulk user fetch, so no additional API calls are required. This option is disabled by default.
 

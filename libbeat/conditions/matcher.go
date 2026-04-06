@@ -44,7 +44,6 @@ func NewMatcherCondition(
 	logger *logp.Logger,
 ) (condition Matcher, err error) {
 	condition.name = name
-	condition.raw = fields
 	condition.matchers = matcherMap{}
 	condition.raw = rawMap{}
 	condition.logger = logger

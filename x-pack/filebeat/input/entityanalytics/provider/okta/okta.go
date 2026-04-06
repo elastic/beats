@@ -504,6 +504,12 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		}
 	}
 
+	// permsCache avoids redundant API calls for permissions: custom role definitions
+	// are org-wide, so if multiple users share the same role, permissions are fetched
+	// once and reused. The cache is scoped to this run so that changes between syncs
+	// are picked up on the next run.
+	permsCache := make(map[string][]okta.Permission)
+
 	var (
 		n           int
 		lastUpdated time.Time
@@ -518,14 +524,14 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				doPublish(p.addUserMetadata(ctx, u, state))
+				doPublish(p.addUserMetadata(ctx, u, state, permsCache))
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
 			}
 		} else {
 			for _, u := range batch {
-				su := p.addUserMetadata(ctx, u, state)
+				su := p.addUserMetadata(ctx, u, state, permsCache)
 				doPublish(su)
 				n++
 				if u.LastUpdated.After(lastUpdated) {
@@ -591,7 +597,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 	return nil
 }
 
-func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore) *User {
+func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore, permsCache map[string][]okta.Permission) *User {
 	su := state.storeUser(u)
 	switch len(p.cfg.EnrichWith) {
 	case 1:
@@ -618,12 +624,42 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Factors = factors
 		}
 	}
-	if slices.Contains(p.cfg.EnrichWith, "roles") {
+	if slices.Contains(p.cfg.EnrichWith, "roles") || slices.Contains(p.cfg.EnrichWith, "perms") {
 		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
+			if slices.Contains(p.cfg.EnrichWith, "perms") {
+				for i, role := range roles {
+					if role.Type != "CUSTOM" {
+						// The permissions API only supports custom roles;
+						// standard built-in roles have no associated permissions endpoint.
+						continue
+					}
+					// Use the role definition ID as cache key. Multiple users can share
+					// the same custom role definition, so we fetch permissions once per
+					// run and reuse them to avoid O(users * custom_roles) API calls.
+					perms, cached := permsCache[role.RoleID]
+					if !cached {
+						perms, _, err = okta.GetRolePermissions(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), role.RoleID, p.lim, p.logger)
+						if err != nil {
+							p.logger.Warnf("failed to get permissions for role %s: %v", role.RoleID, err)
+							continue
+						}
+						permsCache[role.RoleID] = perms
+					}
+					roles[i].Permissions = perms
+				}
+			}
 			su.Roles = roles
+		}
+	}
+	if slices.Contains(p.cfg.EnrichWith, "devices") {
+		devices, _, err := okta.GetUserDevices(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
+		if err != nil {
+			p.logger.Warnf("failed to get enrolled devices for user %s: %v", u.ID, err)
+		} else {
+			su.Devices = devices
 		}
 	}
 	return su
@@ -854,6 +890,7 @@ func (p *oktaInput) publishUser(u *User, state *stateStore, inputID string, clie
 	_, _ = userDoc.Put("groups", u.Groups)
 	_, _ = userDoc.Put("roles", u.Roles)
 	_, _ = userDoc.Put("factors", u.Factors)
+	_, _ = userDoc.Put("devices", u.Devices)
 	_, _ = userDoc.Put("supervises", u.Supervises)
 
 	switch u.State {

@@ -116,7 +116,9 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
-	if err := installCfg.NormalizeAndValidate(); err != nil {
+	var err error
+	installCfg, err = installCfg.NormalizeAndValidate()
+	if err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
 
