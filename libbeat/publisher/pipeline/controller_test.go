@@ -60,11 +60,6 @@ func TestOutputReload(t *testing.T) {
 				numEventsToPublish := 15000 + (q % 5000) // 15000 to 19999
 				numOutputReloads := 350 + (q % 150)      // 350 to 499
 
-				queueConfig := conf.Namespace{}
-				conf, _ := conf.NewConfigFrom(
-					fmt.Sprintf("mem.events: %v", numEventsToPublish))
-				_ = queueConfig.Unpack(conf)
-
 				var publishedCount atomic.Uint64
 				countingPublishFn := func(batch publisher.Batch) error {
 					publishedCount.Add(uint64(len(batch.Events())))
@@ -73,7 +68,10 @@ func TestOutputReload(t *testing.T) {
 
 				logger := logptest.NewTestingLogger(t, "")
 
-				queueFactory, err := queueFactoryForUserConfig(queueConfig.Name(), queueConfig.Config(), nil)
+				queueFactory, err := queueFactoryForUserConfig(
+					"mem",
+					conf.MustNewConfigFrom(fmt.Sprintf("events: %v", numEventsToPublish)),
+					nil)
 				require.NoError(t, err)
 				outputController, err := newProcessOutputController(
 					beat.Info{Logger: logger},
@@ -93,7 +91,7 @@ func TestOutputReload(t *testing.T) {
 					queueProducer := outputController.queueProducer(queue.ProducerConfig{})
 					defer queueProducer.Close()
 					for i := uint(0); i < numEventsToPublish; i++ {
-						queueProducer.Publish(beat.Event{})
+						queueProducer.Publish(publisher.Event{})
 					}
 					wg.Done()
 				}()
