@@ -168,7 +168,7 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 		if strings.HasPrefix(storageID, "file_storage") {
 			type withFileStorageExtension interface {
-				WithFileStoreExtension(storage.Client)
+				WithFileStoreExtension(backend.BackupStore)
 			}
 			if w, ok := br.beater.(withFileStorageExtension); ok {
 				ext, err := br.getFileStoreExtension(host, storageID)

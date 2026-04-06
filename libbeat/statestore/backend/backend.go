@@ -17,6 +17,12 @@
 
 package backend
 
+import "context"
+
+// Version is the registry version, it increases by one every time there
+// is a breaking change in the registry data storage/format
+const Version = 1
+
 // Registry provides access to stores managed by the backend storage.
 type Registry interface {
 	// Access opens a store. The store will be closed by the frontend, once all
@@ -76,4 +82,16 @@ type Store interface {
 
 type WithESStateStoreExtension interface {
 	WithESStateStoreExtension(esStoreExtension Registry)
+}
+
+// BackupStore provides raw key/value storage for backup metadata and payload.
+type BackupStore interface {
+	// Get retrieves the raw value associated with key. It returns nil, nil if not found.
+	Get(ctx context.Context, key string) ([]byte, error)
+
+	// Set persists the raw value associated with key.
+	Set(ctx context.Context, key string, value []byte) error
+
+	// Delete removes any raw value associated with key.
+	Delete(ctx context.Context, key string) error
 }

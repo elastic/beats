@@ -25,7 +25,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/config"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
@@ -76,7 +75,7 @@ type Filebeat struct {
 	stopOnce                 sync.Once // wraps the Stop() method
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
-	otelFileStorageExtension Storage
+	otelFileStorageExtension backend.BackupStore
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
@@ -226,7 +225,7 @@ func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Regi
 	fb.config.Registry.ESStorageExtension = esStateStoreExtension
 }
 
-func (fb *Filebeat) WithFileStoreExtension(client Storage) {
+func (fb *Filebeat) WithFileStoreExtension(client backend.BackupStore) {
 	fb.otelFileStorageExtension = client
 }
 
@@ -327,6 +326,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}()
 
 	handleBackup(
+		ctx,
 		b.Info.Logger,
 		fb.otelFileStorageExtension,
 		config.Registry,
@@ -587,30 +587,4 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
-}
-
-type Storage interface {
-	// Get will retrieve data from storage that corresponds to the
-	// specified key. It should return (nil, nil) if not found
-	Get(ctx context.Context, key string) ([]byte, error)
-
-	// Set will store data. The data can be retrieved by the same
-	// component after a process restart, using the same key
-	Set(ctx context.Context, key string, value []byte) error
-
-	// Delete will delete data associated with the specified key
-	Delete(ctx context.Context, key string) error
-
-	// Batch handles specified operations in batch. Get operation results are put in-place
-	// Batch(ctx context.Context, ops ...*Operation) error
-
-	// Close will release any resources held by the client
-	// Close(ctx context.Context) error
-}
-
-func handleBackup(logger *logp.Logger, store Storage, reg config.Registry, beatsPaths *paths.Path) error {
-	resolvedPath := beatsPaths.Resolve(paths.Data, reg.Path)
-
-	logger.Infof("================================================== Store path: %q", resolvedPath)
-	return nil
 }
