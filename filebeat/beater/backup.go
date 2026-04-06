@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -41,6 +42,7 @@ const (
 	registryBackupSchemaV1    = 1
 	defaultRegistryBackend    = "memlog"
 	backupDirName             = "registry_backups"
+	backupStoreFileName       = "backup-store.db"
 )
 
 type filebeatStateRecord struct {
@@ -72,6 +74,11 @@ type backupFiles struct {
 
 var featureFlags = []string{"LogInputRunFilestream"}
 
+type backupStoreCloser interface {
+	backend.BackupStore
+	Close() error
+}
+
 func handleBackup(ctx context.Context, logger *logp.Logger, store backend.BackupStore, reg config.Registry, beatsPaths *paths.Path) error {
 	if store == nil {
 		logger.Debug("backup storage is not configured, skipping backup metadata persistence")
@@ -86,8 +93,10 @@ func handleBackup(ctx context.Context, logger *logp.Logger, store backend.Backup
 	}
 
 	previousState := filebeatStateRecord{}
-	if json.Unmarshal(previousStateRaw, &previousState); err != nil {
-		return fmt.Errorf("cannot decode Filebeat backup state: %w", err)
+	if len(previousStateRaw) > 0 {
+		if err := json.Unmarshal(previousStateRaw, &previousState); err != nil {
+			return fmt.Errorf("cannot decode Filebeat backup state: %w", err)
+		}
 	}
 
 	if backupNeeded(previousState, currentState) {
@@ -107,6 +116,15 @@ func handleBackup(ctx context.Context, logger *logp.Logger, store backend.Backup
 	}
 
 	return nil
+}
+
+func openFallbackBackupStore(
+	logger *logp.Logger,
+	reg config.Registry,
+	beatPaths *paths.Path,
+) (backupStoreCloser, error) {
+	path := beatPaths.Resolve(paths.Data, filepath.Join(backupDirName, backupStoreFileName))
+	return bbolt.NewBackupStore(logger, path, reg.Permissions, reg.Bbolt)
 }
 
 func backupNeeded(prev, curr filebeatStateRecord) bool {

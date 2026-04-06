@@ -325,13 +325,31 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	handleBackup(
+	backupStore := fb.otelFileStorageExtension
+	if backupStore == nil {
+		fallbackBackupStore, err := openFallbackBackupStore(fb.logger.Named("backup"), config.Registry, b.Paths)
+		if err != nil {
+			return fmt.Errorf("failed to open fallback backup store: %w", err)
+		}
+
+		// TODO: try to close it after use
+		defer func() {
+			if err := fallbackBackupStore.Close(); err != nil {
+				fb.logger.Errorf("error closing fallback backup store: %v", err)
+			}
+		}()
+		backupStore = fallbackBackupStore
+	}
+
+	if err := handleBackup(
 		ctx,
 		b.Info.Logger,
-		fb.otelFileStorageExtension,
+		backupStore,
 		config.Registry,
 		b.Paths,
-	)
+	); err != nil {
+		return err
+	}
 
 	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
 	if err != nil {
