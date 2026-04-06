@@ -20,6 +20,8 @@ package beater
 import (
 	"context"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,10 +29,12 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
 type testStorage struct {
@@ -78,9 +82,13 @@ func TestHandleBackupStoresStateAndMetadataRecords(t *testing.T) {
 
 	store := &testStorage{}
 	beatPaths := paths.New()
-	beatPaths.Data = t.TempDir()
+	beatPaths.Data = fs.TempDir(t, "../", "build")
 
-	err = handleBackup(logp.NewNopLogger(), store, config.Registry{Path: "registry"}, beatPaths)
+	registryDir := filepath.Join(beatPaths.Data, "registry", "filebeat")
+	require.NoError(t, os.MkdirAll(registryDir, 0o700), "failed to create registry fixture")
+	require.NoError(t, os.WriteFile(filepath.Join(registryDir, "meta.json"), []byte(`{"version":"1"}`), 0o600), "failed to write registry fixture")
+
+	err = handleBackup(t.Context(), logp.NewNopLogger(), store, config.Registry{Path: "registry", Backend: defaultRegistryBackend}, beatPaths)
 	require.NoError(t, err, "handleBackup should persist the backup metadata records")
 
 	statePayload, ok := store.values[filebeatStateKey]
@@ -89,8 +97,8 @@ func TestHandleBackupStoresStateAndMetadataRecords(t *testing.T) {
 	var stateRecord filebeatStateRecord
 	require.NoError(t, json.Unmarshal(statePayload, &stateRecord), "state record must be valid JSON")
 	assert.Equal(t, registryBackupSchemaV1, stateRecord.SchemaVersion, "state record must use the current schema version")
-	assert.Equal(t, uint64(2), stateRecord.RegistryVersion, "state record must store the derived compatibility version")
-	assert.Equal(t, defaultRegistryBackend, stateRecord.RegistryBackend, "state record must normalize the default registry backend")
+	assert.Equal(t, uint64(backend.Version), stateRecord.RegistryVersion, "state record must store the current registry version")
+	assert.Equal(t, defaultRegistryBackend, stateRecord.RegistryBackend, "state record must store the configured registry backend")
 	assert.Equal(t, version.GetDefaultVersion(), stateRecord.FilebeatVersion, "state record must store the current Filebeat version")
 	assert.Equal(t, map[string]bool{"LogInputRunFilestream": true}, stateRecord.Features, "state record must store the relevant feature flags")
 
@@ -104,12 +112,16 @@ func TestHandleBackupStoresStateAndMetadataRecords(t *testing.T) {
 	assert.False(t, backupRecord.CreatedAt.IsZero(), "backup record must contain a creation timestamp")
 	assert.Equal(t, stateRecord, backupRecord.Source, "backup record must embed the source compatibility state")
 	assert.Equal(t, "registry", backupRecord.Registry.RelativePath, "backup record must store the registry-relative path")
+	require.Len(t, backupRecord.Registry.Files, 1, "backup record must contain the generated tar archive path")
+	assert.Equal(t, filepath.ToSlash(filepath.Join(backupDirName, "registry-backup-"+backupRecord.BackupID+".tar")), backupRecord.Registry.Files[0].Path, "backup record must reference the generated archive")
+	_, err = os.Stat(filepath.Join(beatPaths.Data, backupRecord.Registry.Files[0].Path))
+	require.NoError(t, err, "backup archive must be written to disk")
 }
 
 func TestHandleBackupSkipsWhenStorageIsNil(t *testing.T) {
 	beatPaths := paths.New()
 	beatPaths.Data = t.TempDir()
 
-	err := handleBackup(logp.NewNopLogger(), nil, config.Registry{Path: "registry"}, beatPaths)
+	err := handleBackup(t.Context(), logp.NewNopLogger(), nil, config.Registry{Path: "registry"}, beatPaths)
 	require.NoError(t, err, "handleBackup should no-op when no backup storage is configured")
 }
