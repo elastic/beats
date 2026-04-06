@@ -194,4 +194,4 @@
     - name: auth.type
       type: keyword
       description: >
-        Authentication mechanism (TOKEN, REALM, API_KEY, etc.) from Elasticsearch structured logging.
+        Authentication mechanism (TOKEN, REALM, API_KEY, and so on) from Elasticsearch structured logging.
