@@ -89,14 +89,26 @@ type Factor struct {
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentAUser/#tag/RoleAssignmentAUser/operation/listAssignedRolesForUser
 // and https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
 type Role struct {
-	ID             string    `json:"id"`
-	Label          string    `json:"label"`
-	Type           string    `json:"type"`
-	Status         string    `json:"status"`
-	Created        time.Time `json:"created"`
-	LastUpdated    time.Time `json:"lastUpdated"`
-	AssignmentType string    `json:"assignmentType"`
-	Links          HAL       `json:"_links"`
+	ID             string       `json:"id"`
+	RoleID         string       `json:"role,omitempty"` // role definition ID; present for CUSTOM roles
+	Label          string       `json:"label"`
+	Type           string       `json:"type"`
+	Status         string       `json:"status"`
+	Created        time.Time    `json:"created"`
+	LastUpdated    time.Time    `json:"lastUpdated"`
+	AssignmentType string       `json:"assignmentType"`
+	Links          HAL          `json:"_links"`
+	Permissions    []Permission `json:"permissions,omitempty"`
+}
+
+// Permission is an Okta role permission.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission.
+type Permission struct {
+	Label       string    `json:"label"`
+	Created     time.Time `json:"created"`
+	LastUpdated time.Time `json:"lastUpdated"`
+	Links       HAL       `json:"_links,omitempty"`
 }
 
 // Device is an Okta device's details.
@@ -298,6 +310,35 @@ func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group strin
 	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
+// GetRolePermissions returns the permissions for an Okta role using the IAM roles API endpoint.
+// host is the Okta user domain and key is the API token to use for the query. roleID must not be empty.
+//
+// This call requires the okta.roles.read OAuth2 scope and only applies to custom roles (type CUSTOM).
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission.
+func GetRolePermissions(ctx context.Context, cli *http.Client, host, key, roleID string, lim *RateLimiter, log *logp.Logger) ([]Permission, http.Header, error) {
+	if roleID == "" {
+		return nil, nil, errors.New("no role ID specified")
+	}
+
+	const endpoint = "/api/v1/iam/roles/{roleId}/permissions"
+	path := strings.Replace(endpoint, "{roleId}", roleID, 1)
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path,
+	}
+	// The permissions endpoint returns {"permissions":[...]} not a plain JSON array,
+	// so we use permissionsWrapper with all=false to let getDetails unmarshal it as a
+	// single object, then unwrap the slice.
+	result, h, err := getDetails[permissionsWrapper](ctx, cli, u, endpoint, key, false, OmitNone, lim, log)
+	if err != nil || len(result) == 0 {
+		return nil, h, err
+	}
+	return result[0].Permissions, h, nil
+}
+
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
 // Okta user domain and key is the API token to use for the query. If device is not empty,
 // details for the specific device are returned, otherwise a list of all devices is returned.
@@ -360,7 +401,13 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 
 // entity is an Okta entity analytics entity.
 type entity interface {
-	User | Group | Role | Factor | Device | devUser
+	User | Group | Role | Factor | Device | devUser | permissionsWrapper
+}
+
+// permissionsWrapper is used to deserialise the /api/v1/iam/roles/{roleId}/permissions
+// response, which returns {"permissions":[...]} rather than a plain JSON array.
+type permissionsWrapper struct {
+	Permissions []Permission `json:"permissions"`
 }
 
 type devUser struct {
@@ -426,8 +473,15 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 
 		var body bytes.Buffer
 		n, err := io.Copy(&body, resp.Body)
-		if n == 0 || err != nil {
+		if err != nil {
 			return nil, nil, err
+		}
+		if n == 0 {
+			return nil, nil, errors.New("empty response body")
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, resp.Header, recoverError(body.Bytes())
 		}
 
 		if all {
