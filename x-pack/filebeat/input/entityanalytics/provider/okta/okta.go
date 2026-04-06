@@ -546,9 +546,35 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 	}
 
 	if wantSupervises {
+		// Snapshot current supervises before recomputing so we can detect
+		// managers that changed but are not in this batch (incremental update).
+		oldSupervises := make(map[string][]okta.SupervisedUser, len(state.users))
+		for id, u := range state.users {
+			oldSupervises[id] = u.Supervises
+		}
+
+		bufferedIDs := make(map[string]struct{}, len(supervisesBuffer))
+		for _, u := range supervisesBuffer {
+			bufferedIDs[u.ID] = struct{}{}
+		}
+
 		p.assignSupervises(state)
+
 		for _, u := range supervisesBuffer {
 			publish(u)
+		}
+
+		// On incremental updates, a manager may not be in the current batch
+		// but its Supervises may have changed (e.g. a subordinate changed
+		// managerId). Publish any such manager so the stored document stays
+		// current without waiting for the next full sync.
+		for id, u := range state.users {
+			if _, inBatch := bufferedIDs[id]; inBatch {
+				continue
+			}
+			if !supervisesEqual(oldSupervises[id], u.Supervises) {
+				publish(u)
+			}
 		}
 	}
 
@@ -625,6 +651,19 @@ func (p *oktaInput) assignSupervises(state *stateStore) {
 	for id, u := range state.users {
 		u.Supervises = managerMap[id]
 	}
+}
+
+// supervisesEqual reports whether two SupervisedUser slices are equal by ID.
+func supervisesEqual(a, b []okta.SupervisedUser) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // doFetchDevices handles fetching device and associated user identities from Okta.

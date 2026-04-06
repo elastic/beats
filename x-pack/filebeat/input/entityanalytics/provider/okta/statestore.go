@@ -141,10 +141,10 @@ func (s *stateStore) storeUser(u okta.User) *User {
 	if existing, ok := s.users[u.ID]; ok {
 		su.State = Modified
 		*existing = su
-	} else {
-		su.State = Discovered
-		s.users[u.ID] = &su
+		return existing
 	}
+	su.State = Discovered
+	s.users[u.ID] = &su
 	return &su
 }
 

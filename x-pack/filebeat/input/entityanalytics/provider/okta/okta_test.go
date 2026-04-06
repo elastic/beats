@@ -501,3 +501,63 @@ func TestAssignSupervises(t *testing.T) {
 		}
 	}
 }
+
+// TestStoreUserExistingPointer proves that storeUser returns the pointer that
+// lives in state.users for an existing user. This is required so that
+// assignSupervises (which iterates state.users) and the published *User pointer
+// are the same object — otherwise Supervises set via state.users would never
+// reach the published document or the persisted store.
+func TestStoreUserExistingPointer(t *testing.T) {
+	logp.TestingSetup()
+
+	dbFilename := "TestStoreUserExistingPointer.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() { testCleanupStore(store, dbFilename) })
+
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error making state store: %v", err)
+	}
+
+	u := okta.User{ID: "user-1", Profile: map[string]any{"email": "a@example.com"}}
+
+	// First store: user is new (Discovered).
+	ptr1 := ss.storeUser(u)
+	if ptr1 != ss.users["user-1"] {
+		t.Fatal("first storeUser: returned pointer not the same as state.users entry")
+	}
+
+	// Second store: user already exists (Modified). The returned pointer must
+	// still be the same object that lives in state.users so that any subsequent
+	// mutation (e.g. setting Supervises) is visible in the map and will be
+	// persisted on close.
+	ptr2 := ss.storeUser(u)
+	if ptr2 != ss.users["user-1"] {
+		t.Fatal("second storeUser: returned pointer not the same as state.users entry for existing user")
+	}
+
+	// Mutating via the returned pointer must be visible through state.users.
+	ptr2.Supervises = []okta.SupervisedUser{{ID: "sub-1", Email: "sub@example.com", Username: "sub@example.com"}}
+	if len(ss.users["user-1"].Supervises) != 1 {
+		t.Fatal("mutation via returned pointer not visible through state.users")
+	}
+
+	// Commit and reopen; Supervises must survive the round-trip.
+	if err := ss.close(true); err != nil {
+		t.Fatalf("close with commit failed: %v", err)
+	}
+
+	ss2, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error reopening state store: %v", err)
+	}
+	defer ss2.close(false)
+
+	reloaded, ok := ss2.users["user-1"]
+	if !ok {
+		t.Fatal("user-1 not found after reopen")
+	}
+	if len(reloaded.Supervises) != 1 || reloaded.Supervises[0].ID != "sub-1" {
+		t.Errorf("Supervises not persisted: got %+v", reloaded.Supervises)
+	}
+}

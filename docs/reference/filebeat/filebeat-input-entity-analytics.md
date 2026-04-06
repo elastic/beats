@@ -1233,7 +1233,7 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "supervises", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
 
-The "supervises" option populates the `supervises` field on each user with the list of users they manage. Each entry contains the managed user's `id`, `email`, and `username`. The relationship is derived from the `profile.managerId` field already present in the bulk user fetch, so no additional API calls are required. The option is disabled by default to help mitigate Okta rate-limit pressure.
+The "supervises" option populates the `supervises` field on each user with the list of users they manage. Each entry contains the managed user's `id`, `email`, and `username`. The relationship is derived from the `profile.managerId` field already present in the bulk user fetch, so no additional API calls are required. This option is disabled by default.
 
 
 #### `sync_interval` [_sync_interval_4]
