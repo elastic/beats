@@ -18,14 +18,12 @@
 package pipeline
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 func TestBatchSplitRetry(t *testing.T) {
@@ -129,8 +127,8 @@ func (b *mockQueueBatch) Count() int {
 func (b *mockQueueBatch) Done() {
 }
 
-func (b *mockQueueBatch) Entry(i int) queue.Entry {
-	return fmt.Sprintf("event %v", i)
+func (b *mockQueueBatch) Entry(i int) publisher.Event {
+	return publisher.Event{}
 }
 
 func (b *mockQueueBatch) FreeEntries() {
