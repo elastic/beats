@@ -24,8 +24,6 @@ import (
 	"strings"
 	"sync"
 
-	"go.opentelemetry.io/collector/extension/xextension/storage"
-
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -77,13 +75,13 @@ type Filebeat struct {
 	stopOnce                 sync.Once // wraps the Stop() method
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
+	otelFileStorageExtension Storage
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
 
 var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
-var _ backend.WithFileStoreExtension = (*Filebeat)(nil)
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -227,8 +225,8 @@ func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Regi
 	fb.config.Registry.ESStorageExtension = esStateStoreExtension
 }
 
-func (fb *Filebeat) WithFileStoreExtension(client storage.Client) {
-	fb.config.Registry.OtelFileStorage = client
+func (fb *Filebeat) WithFileStoreExtension(client Storage) {
+	fb.otelFileStorageExtension = client
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial
@@ -326,6 +324,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		<-fb.done
 		cn()
 	}()
+
+	// HERE: handle backup before opening store
 
 	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
 	if err != nil {
@@ -581,4 +581,24 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
+}
+
+type Storage interface {
+
+	// Get will retrieve data from storage that corresponds to the
+	// specified key. It should return (nil, nil) if not found
+	Get(ctx context.Context, key string) ([]byte, error)
+
+	// Set will store data. The data can be retrieved by the same
+	// component after a process restart, using the same key
+	Set(ctx context.Context, key string, value []byte) error
+
+	// Delete will delete data associated with the specified key
+	Delete(ctx context.Context, key string) error
+
+	// Batch handles specified operations in batch. Get operation results are put in-place
+	// Batch(ctx context.Context, ops ...*Operation) error
+
+	// Close will release any resources held by the client
+	Close(ctx context.Context) error
 }

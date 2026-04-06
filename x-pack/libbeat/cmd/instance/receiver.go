@@ -156,33 +156,31 @@ func (br *BeatReceiver) Start(host component.Host) error {
 			return fmt.Errorf("error reading storage extension from config: %w", err)
 		}
 
-		switch w := br.beater.(type) {
-		case backend.WithESStateStoreExtension:
-			// Instantiate a ESStateStore
-			if strings.HasPrefix(storageID, "elasticsearch_storage") {
+		if strings.HasPrefix(storageID, "elasticsearch_storage") {
+			if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
 				esStorageExtension, err := br.getESStateStoreExtension(host, storageID)
 				if err != nil {
 					return fmt.Errorf("error getting ES state store extension: %w", err)
 				}
 				w.WithESStateStoreExtension(esStorageExtension)
 			}
+		}
 
-		case backend.WithFileStoreExtension:
-			// Instantiate a normal storage extension
-			if strings.HasPrefix(storageID, "file_storage") {
+		if strings.HasPrefix(storageID, "file_storage") {
+			type withFileStorageExtension interface {
+				WithFileStoreExtension(storage.Client)
+			}
+			if w, ok := br.beater.(withFileStorageExtension); ok {
 				ext, err := br.getFileStoreExtension(host, storageID)
 				if err != nil {
 					return fmt.Errorf("cannot get file storage extension: %w", err)
 				}
-				storageClient, err := ext.GetClient(
-					context.TODO(),
-					component.KindReceiver,
-					br.id,
-					"storage_name")
+
+				c, err := ext.GetClient(context.TODO(), component.KindReceiver, br.id, "backup-store")
 				if err != nil {
-					return fmt.Errorf("cannot get storage client: %w", err)
+					return fmt.Errorf("cannot get storage extension client: %w", err)
 				}
-				w.WithFileStoreExtension(storageClient)
+				w.WithFileStoreExtension(c)
 				br.Logger.Info("==================== Otel File Storage Extension enabled")
 			}
 		}
