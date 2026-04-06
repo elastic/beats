@@ -100,7 +100,8 @@ func handleBackup(ctx context.Context, logger *logp.Logger, store backend.Backup
 	}
 
 	if backupNeeded(previousState, currentState) {
-		logger.Info("==================== BACKUP NEEDED")
+		logger.Info("Registry backup needed, starting.")
+		defer logger.Info("Registry backup needed done.")
 		registryPath := beatsPaths.Resolve(paths.Data, reg.Path)
 		if err := writeBackup(logger, store, currentState, reg, registryPath); err != nil {
 			return fmt.Errorf("cannot write backup: %w", err)
@@ -175,6 +176,7 @@ func writeBackup(
 	tmpBackupPath := filepath.Join(backupDir, backupFileName+".tmp")
 	backupPath := filepath.Join(backupDir, backupFileName)
 
+	logger.Infof("Creating store backup. File: %q, tmp file: %q", backupPath, tmpBackupPath)
 	f, err := os.Create(tmpBackupPath)
 	if err != nil {
 		return fmt.Errorf("cannot create backup archive %q: %w", tmpBackupPath, err)
@@ -248,8 +250,6 @@ func writeBackup(
 		return fmt.Errorf("cannot compute backup archive path relative to data directory: %w", err)
 	}
 
-	logger.Infof("================================================== Store path: %q", registryPath)
-
 	backupRecord := newBackupMetadataRecord(currentState, reg, createdAt, backupID, filepath.ToSlash(backupRelativePath))
 	backupPayload, err := json.Marshal(backupRecord)
 	if err != nil {
@@ -259,6 +259,7 @@ func writeBackup(
 		return fmt.Errorf("failed to store backup metadata record: %w", err)
 	}
 
+	logger.Infof("Backup successfully created")
 	return nil
 }
 

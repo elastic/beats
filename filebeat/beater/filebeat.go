@@ -332,7 +332,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			return fmt.Errorf("failed to open fallback backup store: %w", err)
 		}
 
-		// TODO: try to close it after use
 		defer func() {
 			if err := fallbackBackupStore.Close(); err != nil {
 				fb.logger.Errorf("error closing fallback backup store: %v", err)
