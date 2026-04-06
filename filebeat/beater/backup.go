@@ -73,7 +73,6 @@ func handleBackup(ctx context.Context, logger *logp.Logger, store backend.Backup
 		return nil
 	}
 
-	resolvedPath := beatsPaths.Resolve(paths.Data, reg.Path)
 	currentState := newFilebeatStateRecord(reg)
 
 	previousStateRaw, err := store.Get(ctx, filebeatStateKey)
@@ -88,12 +87,11 @@ func handleBackup(ctx context.Context, logger *logp.Logger, store backend.Backup
 
 	if backupNeeded(previousState, currentState) {
 		logger.Info("==================== BACKUP NEEDED")
-		if err := writeBackup(store, currentState, reg); err != nil {
+		registryPath := beatsPaths.Resolve(paths.Data, reg.Path)
+		if err := writeBackup(logger, store, currentState, reg, registryPath); err != nil {
 			return fmt.Errorf("cannot write backup: %w", err)
 		}
 	}
-
-	logger.Infof("================================================== Store path: %q", resolvedPath)
 
 	statePayload, err := json.Marshal(currentState)
 	if err != nil {
@@ -120,7 +118,16 @@ func backupNeeded(prev, curr filebeatStateRecord) bool {
 	return false
 }
 
-func writeBackup(store backend.BackupStore, currentState filebeatStateRecord, reg config.Registry) error {
+func writeBackup(
+	logger *logp.Logger,
+	store backend.BackupStore,
+	currentState filebeatStateRecord,
+	reg config.Registry,
+	registryPath string,
+) error {
+
+	logger.Infof("================================================== Store path: %q", registryPath)
+
 	backupRecord := newBackupMetadataRecord(currentState, reg)
 	backupPayload, err := json.Marshal(backupRecord)
 	if err != nil {
