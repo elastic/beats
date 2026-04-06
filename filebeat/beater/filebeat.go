@@ -25,6 +25,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/config"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
@@ -325,7 +326,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	// HERE: handle backup before opening store
+	handleBackup(
+		b.Info.Logger,
+		fb.otelFileStorageExtension,
+		config.Registry,
+		b.Paths,
+	)
 
 	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
 	if err != nil {
@@ -584,7 +590,6 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *log
 }
 
 type Storage interface {
-
 	// Get will retrieve data from storage that corresponds to the
 	// specified key. It should return (nil, nil) if not found
 	Get(ctx context.Context, key string) ([]byte, error)
@@ -600,5 +605,12 @@ type Storage interface {
 	// Batch(ctx context.Context, ops ...*Operation) error
 
 	// Close will release any resources held by the client
-	Close(ctx context.Context) error
+	// Close(ctx context.Context) error
+}
+
+func handleBackup(logger *logp.Logger, store Storage, reg config.Registry, beatsPaths *paths.Path) error {
+	resolvedPath := beatsPaths.Resolve(paths.Data, reg.Path)
+
+	logger.Infof("================================================== Store path: %q", resolvedPath)
+	return nil
 }
