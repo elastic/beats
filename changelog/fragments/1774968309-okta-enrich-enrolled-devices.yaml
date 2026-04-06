@@ -13,13 +13,13 @@ kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Add enrolled_devices enrichment option to Okta entity analytics provider.
+summary: Add devices enrichment option to Okta entity analytics provider.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  Adds enrolled_devices as a new optional value for the enrich_with configuration
+  Adds devices as a new optional value for the enrich_with configuration
   option in the Okta entity analytics provider. When enabled, each user is enriched
   with the list of devices enrolled for that user via the List User Devices Okta API
   endpoint. The enrichment is opt-in and excluded from the default configuration to
