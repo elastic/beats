@@ -1,0 +1,93 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  pprof:
+    endpoint: 0.0.0.0:1777
+  beatsauth:
+  elasticsearch_storage:
+    hosts:
+      - http://localhost:9200
+
+receivers:
+  # Beats receivers
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "test message"
+          count: 1
+      # Filebeat receiver configuration
+  
+  metricbeatreceiver:
+    metricbeat:
+      modules:
+       - module: system
+      # Metricbeat receiver configuration
+  
+  # Standard OTEL receivers
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  
+  # Placeholder for testing
+  nop:
+
+processors:
+  # Beats processor
+  beat:
+    # Beat-specific processing configuration
+  
+  # Standard processors  
+  batch:
+  
+  memory_limiter:
+    limit_mib: 256
+    check_interval: 5s
+  
+  resource:
+    attributes:
+      - key: service.name
+        value: beats-otel-collector
+        action: upsert
+
+exporters:
+  # Beats exporters
+  logstash:
+    hosts: ["localhost:5044"]
+    # Logstash export configuration
+  
+  # Standard exporters
+  debug:
+    verbosity: detailed
+  
+  elasticsearch:
+    endpoint: http://localhost:9200
+    # Elasticsearch export configuration
+  
+  # Placeholder for testing  
+  nop:
+
+connectors:
+
+service:
+  extensions: [health_check, pprof, beatsauth, elasticsearch_storage]
+  
+  pipelines:
+    logs:
+      receivers: [filebeatreceiver, metricbeatreceiver, otlp, nop]
+      processors: [memory_limiter, beat, resource, batch]
+      exporters: [logstash, elasticsearch, debug, nop]
+    
+    metrics:
+      receivers: [otlp, nop]
+      processors: [memory_limiter, resource, batch]
+      exporters: [elasticsearch, debug, nop]
+    
+    traces:
+      receivers: [otlp, nop]
+      processors: [memory_limiter, resource, batch]
+      exporters: [debug, nop]
