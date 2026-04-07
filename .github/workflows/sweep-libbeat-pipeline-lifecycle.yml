@@ -1,0 +1,100 @@
+name: "Sweeper: Libbeat Pipeline Shutdown and Queue Lifecycle"
+on:
+  schedule:
+    - cron: "0 9 * * 3"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[libbeat-pipeline-lifecycle]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **pipeline lifecycle sweeper** for libbeat. Your goal is to find every path
+        where events can be silently dropped, goroutines can leak, or panics can be triggered
+        during startup, shutdown, output reconnection, or backpressure — and write a failing
+        test for each confirmed issue.
+
+        ## The component
+
+        The libbeat publisher pipeline connects inputs to outputs. It lives under
+        `libbeat/publisher/pipeline/` (the pipeline orchestrator and consumer),
+        `libbeat/publisher/queue/` (memqueue and diskqueue implementations), and
+        `libbeat/outputs/` (elasticsearch, logstash, kafka, and others). The pipeline has a
+        carefully ordered shutdown sequence that, if violated, produces panics (send on closed
+        channel) or hangs (goroutines blocked waiting for signals that never come).
+
+        ## The bug class
+
+        Three categories of bugs recur here:
+
+        **Shutdown ordering**: The pipeline shuts down in stages — queue, then consumer, then
+        output workers. If any stage closes a channel or signals done before the upstream stage
+        has finished sending to it, the result is either a "send on closed channel" panic or
+        a goroutine that blocks forever. Look for channels that are closed by one goroutine
+        while another goroutine may still be sending to them.
+
+        **Signal broadcasting**: Go channels deliver a message to exactly ONE receiver. When
+        multiple goroutines need to observe a shutdown signal, the correct pattern is
+        `close(ch)` (with `sync.Once` to prevent double-close), not `ch <- struct{}{}`.
+        Any buffered-send channel used as a signal to multiple goroutines is a latent bug —
+        only one goroutine will wake up, the others hang forever.
+
+        **ACK callback blocking**: When events are ACKed, the queue calls user-provided callbacks
+        synchronously. If a callback does slow work (filesystem I/O, network), it blocks the
+        ACK loop, which blocks the queue's shutdown drain, which blocks the pipeline's
+        `WaitClose()`. This manifests as a hang on graceful shutdown. Look for ACK callbacks
+        that do more than increment a counter.
+
+        ## How to investigate
+
+        Read the pipeline shutdown sequence end-to-end. Understand what each component closes,
+        in what order, and what it is waiting for before considering itself done. Then look at
+        each channel in the system and ask: who sends to this channel, who receives from it,
+        and what happens when the pipeline is being torn down while a send or receive is in
+        progress?
+
+        Also read the queue implementations (memqueue and diskqueue) for:
+        - Response channels returned to object pools — if a channel is pooled while another
+          goroutine still holds a reference to it, the next user of the channel will receive
+          a stale message
+        - Error paths in the disk queue's write path — if a write fails midway, is the partial
+          state cleaned up, or will the next startup encounter corrupt data?
+
+        For outputs, read the backoff client wrapper. If `Close()` is called while a Publish
+        is sleeping in a backoff wait, does the sleep abort immediately (correct) or block
+        until the full backoff duration elapses (incorrect, causes slow shutdown)?
+
+        ## For each risk you confirm
+
+        Write a Go test. Use goroutines, channels, and short timeouts to create the concurrent
+        scenario. For shutdown hangs, the test should call `Close()` and assert it returns within
+        a short timeout. For panics, use `require.NotPanics`. Run with `-race` where applicable:
+        `go test -race ./libbeat/publisher/...`
+
+        ## The bar for filing
+
+        Only report findings that a real deployment could hit. Shutdown races need to be
+        triggerable under normal operating conditions (e.g. sending SIGTERM while the output
+        is processing events), not only under artificially timed test scenarios that can't
+        occur in practice. For goroutine leaks and hangs, confirm that the problematic code
+        path is reachable from the normal pipeline lifecycle — not just from unit test helpers
+        that bypass the real startup sequence. If the finding requires a precondition that no
+        production deployment would have, skip it.
+
+        ## Output
+
+        File a single issue containing:
+        - Confirmed issues with test code or reproduction steps, the specific code path, and
+          the fix direction
+        - A note on which issues are only detectable under `-race` vs reproducible deterministically
+        - Any components you audited and found clean
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
