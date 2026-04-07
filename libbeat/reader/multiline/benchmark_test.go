@@ -33,8 +33,8 @@ import (
 )
 
 // BenchmarkPatternReaderRabbitMQLike benchmarks the multiline reader.
-// This benchmark was added to access the cost of adding a mutex to protect
-// the multiline readers state field. The results:
+// This benchmark was added to assess the cost of adding a mutex to protect
+// the multiline reader's state field. The results:
 //
 // goos: linux
 // goarch: amd64
