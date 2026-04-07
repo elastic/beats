@@ -381,8 +381,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
+		fileLogger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, fileLogger.Logger, paths, cfgStr)
 
 		go fw.Run(ctx)
 
@@ -427,8 +427,9 @@ scanner:
 			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
 
-		require.NotContainsf(t, buff.String(), "WARN",
-			"must be no warning messages")
+		warnFound, err := fileLogger.FindInLogs("WARN")
+		require.NoError(t, err, "cannot read log file")
+		require.False(t, warnFound, "must be no warning messages")
 	})
 }
 
