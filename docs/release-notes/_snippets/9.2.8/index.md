@@ -8,12 +8,12 @@
 **Filebeat**
 
 * Add retry back-off logic to streaming input CrowdStrike follower. [#48542](https://github.com/elastic/beats/pull/48542) 
-* Add secret_state config to CEL input for encrypted storage of secrets accessible as state.secret. [#49207](https://github.com/elastic/beats/pull/49207) 
+* Add `secret_state` config to CEL input for encrypted storage of secrets accessible as `state.secret`. [#49207](https://github.com/elastic/beats/pull/49207) 
 
-  Add a secret_state configuration field to the CEL input. When configured in a
-  Fleet integration package with secret: true, the values are stored encrypted by
-  Fleet. At runtime, the contents are placed at state.secret and unconditionally
-  redacted in debug logs. The key &#34;secret&#34; in the plain-text state configuration
+  Add a `secret_state` configuration field to the CEL input. When configured in a
+  Fleet integration package with `secret: true`, the values are stored encrypted by
+  Fleet. At runtime, the contents are placed at `state.secret` and unconditionally
+  redacted in debug logs. The key `secret` in the plain-text state configuration
   is reserved and rejected by validation to prevent accidental unencrypted storage
   of values intended to be secret.
   
@@ -28,14 +28,14 @@
 ### Fixes [beats-9.2.8-fixes]
 
 
-**Elastic agent**
+**Elastic Agent**
 
 * Fix an issue that could delay reporting shutdown of Agent components. [#49414](https://github.com/elastic/beats/pull/49414) 
-* Reduce AutoOps logging from info to debug for polling. [#49507](https://github.com/elastic/beats/pull/49507) 
+* Reduce AutoOps logging from `info` to `debug` for polling. [#49507](https://github.com/elastic/beats/pull/49507) 
 
 **Filebeat**
 
-* Fix Filestream take_over causing file re-ingestion when used with autodiscover. [#49632](https://github.com/elastic/beats/pull/49632) [#49579](https://github.com/elastic/beats/issues/49579)
+* Fix Filestream `take_over` causing file re-ingestion when used with autodiscover. [#49632](https://github.com/elastic/beats/pull/49632) [#49579](https://github.com/elastic/beats/issues/49579)
 * Fix compatibility of the Journald input with journald/systemd versions &lt; 242. [#49445](https://github.com/elastic/beats/pull/49445) 
 * Add rate-limit backoff to CrowdStrike streaming input oauth2 transport. [#49453](https://github.com/elastic/beats/pull/49453) 
 
@@ -61,13 +61,13 @@
 
 **Libbeat**
 
-* Fixed a bug where escaped characters in syslog structured data caused an EOF error. [#49392](https://github.com/elastic/beats/pull/49392) [#43944](https://github.com/elastic/beats/issues/43944)
+* Fix a bug where escaped characters in syslog structured data caused an EOF error. [#49392](https://github.com/elastic/beats/pull/49392) [#43944](https://github.com/elastic/beats/issues/43944)
 
 **Metricbeat**
 
 * Fix unnecessary Windows filesystem metricset errors from non-existent volumes. [#49553](https://github.com/elastic/beats/pull/49553) 
 
-  Fixes an issue where filesystem metric collection on Windows could report errors for volumes that are no longer present. Updated to gosigar v0.14.4.
+  Fix an issue where filesystem metric collection on Windows could report errors for volumes that are no longer present. Update to gosigar v0.14.4.
 
 **Winlogbeat**
 
