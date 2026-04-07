@@ -421,6 +421,7 @@ toc:
           - file: filebeat/exported-fields-docker-processor.md
           - file: filebeat/exported-fields-ecs.md
           - file: filebeat/exported-fields-elasticsearch.md
+          - file: filebeat/exported-fields-elasticsearch-querylog.md
           - file: filebeat/exported-fields-envoyproxy.md
           - file: filebeat/exported-fields-fortinet.md
           - file: filebeat/exported-fields-gcp.md

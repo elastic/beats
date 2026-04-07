@@ -40,6 +40,7 @@ type User struct {
 	Groups    []okta.Group  `json:"groups"`
 	Roles     []okta.Role   `json:"roles"`
 	Factors   []okta.Factor `json:"factors"`
+	Devices   []okta.Device `json:"devices"`
 	State     State         `json:"state"`
 }
 
