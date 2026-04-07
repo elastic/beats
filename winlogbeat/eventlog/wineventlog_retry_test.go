@@ -67,3 +67,39 @@ func TestRenderNoEventRetryKey(t *testing.T) {
 		assert.Contains(t, err.RetryKey(), "no-bookmark:")
 	})
 }
+
+func TestShouldDetectGap(t *testing.T) {
+	prevRecordID := uint64(100)
+	currentRecordID := uint64(105)
+
+	t.Run("no previous record", func(t *testing.T) {
+		l := &winEventLog{config: config{Name: "Security"}}
+		assert.False(t, l.shouldDetectGap(0, currentRecordID))
+	})
+
+	t.Run("no gap", func(t *testing.T) {
+		l := &winEventLog{config: config{Name: "Security"}}
+		assert.False(t, l.shouldDetectGap(prevRecordID, prevRecordID+1))
+	})
+
+	t.Run("regular channel detects gap", func(t *testing.T) {
+		l := &winEventLog{config: config{Name: "Security"}}
+		assert.True(t, l.shouldDetectGap(prevRecordID, currentRecordID))
+	})
+
+	t.Run("file input skips gap detection", func(t *testing.T) {
+		l := &winEventLog{file: true, config: config{Name: "Security"}}
+		assert.False(t, l.shouldDetectGap(prevRecordID, currentRecordID))
+	})
+
+	t.Run("forwarded channel skips gap detection", func(t *testing.T) {
+		l := &winEventLog{config: config{Name: "ForwardedEvents"}}
+		assert.False(t, l.shouldDetectGap(prevRecordID, currentRecordID))
+	})
+
+	t.Run("forwarded flag skips gap detection", func(t *testing.T) {
+		forwarded := true
+		l := &winEventLog{config: config{Name: "Security", Forwarded: &forwarded}}
+		assert.False(t, l.shouldDetectGap(prevRecordID, currentRecordID))
+	})
+}

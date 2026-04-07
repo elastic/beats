@@ -285,6 +285,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
+	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
+	// but it won't start any inputs/output
+	if err := b.Manager.PreInit(); err != nil {
+		return err
+	}
+
+	// Ensure that we only call b.Manager.Stop out of order
+	// if Run has failed early/before b.Manager.PostInit() was called.
+	managerEarlyStop := b.Manager.Stop
+	defer func() {
+		if managerEarlyStop != nil {
+			managerEarlyStop()
+		}
+	}()
+
 	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
@@ -484,10 +499,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
-	// We start the manager when all the subsystem are initialized and ready to received events.
-	if err := b.Manager.Start(); err != nil {
-		return err
-	}
+	b.Manager.PostInit()
+	managerEarlyStop = nil
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
