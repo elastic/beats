@@ -334,7 +334,11 @@ func (n noopReloader) Reload(
 	_ func(outputs.Observer, conf.Namespace) (outputs.Group, error),
 ) error {
 	// This function should never be called, but if it is, return an error we can troubleshoot.
-	return fmt.Errorf("unsupported reload triggered by unit '%v'", cfg.InputUnitID)
+	var unitID string
+	if cfg != nil {
+		unitID = cfg.InputUnitID
+	}
+	return fmt.Errorf("unsupported reload triggered by unit '%v'", unitID)
 }
 
 type noopClientListener struct{}
