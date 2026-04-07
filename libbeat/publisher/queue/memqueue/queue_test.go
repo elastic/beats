@@ -288,10 +288,10 @@ func TestBatchFreeEntries(t *testing.T) {
 	// 4. Make sure only events 6-10 are nil
 	// 5. Call FreeEntries on the first batch
 	// 6. Make sure all events are nil
-	testQueue := NewQueue[int](logp.NewNopLogger(), nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
+	testQueue := NewQueue[*int](logp.NewNopLogger(), nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
 	producer := testQueue.Producer(queue.ProducerConfig{})
-	for i := 0; i < queueSize; i++ {
-		_, ok := producer.Publish(i)
+	for i := range queueSize {
+		_, ok := producer.Publish(&i)
 		require.True(t, ok, "Queue publish must succeed")
 	}
 	batch1, err := testQueue.Get(batchSize)

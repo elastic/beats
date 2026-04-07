@@ -71,11 +71,6 @@ func (l *ackLoop[T]) handleBatchSig() int {
 		l.processACK(ackedBatches, count)
 	}
 
-	for !ackedBatches.empty() {
-		// Release finished batch structs into the shared memory pool
-		releaseBatch(ackedBatches.pop())
-	}
-
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
 

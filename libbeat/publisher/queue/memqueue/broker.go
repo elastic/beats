@@ -94,10 +94,6 @@ type broker[T any] struct {
 
 	// The goroutine that manages ack notifications and callbacks
 	ackLoop *ackLoop[T]
-
-	///////////////////////////////
-	// object caching
-	batchPool sync.Pool
 }
 
 type Settings struct {
@@ -233,15 +229,6 @@ func newQueue[T any](
 		consumedChan: make(chan batchList[T]),
 		deleteChan:   make(chan int),
 		closingChan:  make(chan struct{}),
-
-		// reuse pool for batch objects
-		batchPool: sync.Pool{
-			New: func() interface{} {
-				return &batch[T]{
-					doneChan: make(chan batchDoneMsg, 1),
-				}
-			},
-		},
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
@@ -302,17 +289,12 @@ func (b *broker[T]) Get(count int) (queue.Batch[T], error) {
 }
 
 func newBatch[T any](queue *broker[T], start, count int) *batch[T] {
-	batch := queue.batchPool.Get().(*batch[T]) //nolint:errcheck //safe to ignore type check
-	batch.next = nil
-	batch.queue = queue
-	batch.start = start
-	batch.count = count
-	return batch
-}
-
-func releaseBatch[T any](b *batch[T]) {
-	b.next = nil
-	b.queue.batchPool.Put(b)
+	return &batch[T]{
+		queue:    queue,
+		start:    start,
+		count:    count,
+		doneChan: make(chan batchDoneMsg, 1),
+	}
 }
 
 func (l *batchList[T]) prepend(b *batch[T]) {

@@ -555,13 +555,13 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(event))
+	batch := encodeBatch(t.encoder, outest.NewBatch(event))
 	t.Publish(context.Background(), batch) //nolint:errcheck //This is a test file
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 	ok := false
-	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(events...))
+	batch := encodeBatch(t.encoder, outest.NewBatch(events...))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
