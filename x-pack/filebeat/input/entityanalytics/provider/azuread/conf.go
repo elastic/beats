@@ -6,6 +6,7 @@ package azuread
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -23,6 +24,7 @@ type conf struct {
 	SyncInterval   time.Duration `config:"sync_interval"`
 	UpdateInterval time.Duration `config:"update_interval"`
 	Dataset        string        `config:"dataset"`
+	EnrichWith     []string      `config:"enrich_with"`
 }
 
 // Validate runs validation against the config.
@@ -40,6 +42,14 @@ func (c *conf) Validate() error {
 	case "", "all", "users", "devices":
 	default:
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
+	}
+
+	for _, v := range c.EnrichWith {
+		switch strings.ToLower(v) {
+		case "mfa", "none":
+		default:
+			return fmt.Errorf("enrich_with value %q is not supported; valid values are 'mfa' and 'none'", v)
+		}
 	}
 
 	return nil
@@ -69,4 +79,13 @@ func (c *conf) wantDevices() bool {
 	default:
 		return false
 	}
+}
+
+func (c *conf) wantMFA() bool {
+	for _, v := range c.EnrichWith {
+		if strings.ToLower(v) == "mfa" {
+			return true
+		}
+	}
+	return false
 }
