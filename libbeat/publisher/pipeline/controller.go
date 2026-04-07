@@ -201,7 +201,7 @@ func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
-		c.logger.Infof("Shutdown output timer started. Waiting for max %v.", timeout)
+		c.logger.Infof("Output shutdown started. Waiting for enqueued events to be published.")
 		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
