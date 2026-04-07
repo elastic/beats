@@ -701,6 +701,7 @@ func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 }
 
 type mockMetadataUpdater struct {
+	mutex sync.Mutex
 	table map[string]interface{}
 }
 
@@ -713,11 +714,17 @@ func newMockMetadataUpdater() *mockMetadataUpdater {
 func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
 
 func (mu *mockMetadataUpdater) has(id string) bool {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
+
 	_, ok := mu.table[id]
 	return ok
 }
 
 func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
+
 	c, ok := mu.table[id]
 	if !ok {
 		return false
@@ -730,6 +737,9 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
+
 	meta, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id [%q]", s.Name())
@@ -738,16 +748,25 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 }
 
 func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
+
 	mu.table[s.Name()] = cur
 	return nil
 }
 
 func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
+
 	mu.table[s.Name()] = v
 	return nil
 }
 
 func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
+
 	delete(mu.table, s.Name())
 	return nil
 }
