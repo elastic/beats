@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -44,6 +45,7 @@ type patternReader struct {
 	reader       reader.Reader
 	pred         matcher
 	flushMatcher *match.Matcher
+	stateMu      sync.Mutex
 	state        func(*patternReader) (reader.Message, error)
 	logger       *logp.Logger
 	msgBuffer    *messageBuffer
@@ -128,7 +130,13 @@ func setupPatternMatcher(config *Config) (matcher, error) {
 
 // Next returns next multi-line event.
 func (pr *patternReader) Next() (reader.Message, error) {
-	return pr.state(pr)
+	return pr.loadState()(pr)
+}
+
+func (pr *patternReader) loadState() func(*patternReader) (reader.Message, error) {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
+	return pr.state
 }
 
 func (pr *patternReader) readFirst() (reader.Message, error) {
@@ -253,6 +261,8 @@ func (pr *patternReader) resetState() {
 
 // setState sets state to the given function
 func (pr *patternReader) setState(next func(pr *patternReader) (reader.Message, error)) {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
 	pr.state = next
 }
 
