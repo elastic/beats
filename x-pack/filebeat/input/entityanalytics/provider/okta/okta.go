@@ -490,6 +490,26 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 	const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
+	// When supervises enrichment is enabled, buffer all users before publishing.
+	// Supervises relationships are derived from the profile.managerId field already
+	// present in the bulk fetch response, so no additional API calls are needed.
+	// Buffering ensures state.users is fully populated before we build the map.
+	wantSupervises := slices.Contains(p.cfg.EnrichWith, "supervises")
+	var supervisesBuffer []*User
+
+	doPublish := publish
+	if wantSupervises {
+		doPublish = func(u *User) {
+			supervisesBuffer = append(supervisesBuffer, u)
+		}
+	}
+
+	// permsCache avoids redundant API calls for permissions: custom role definitions
+	// are org-wide, so if multiple users share the same role, permissions are fetched
+	// once and reused. The cache is scoped to this run so that changes between syncs
+	// are picked up on the next run.
+	permsCache := make(map[string][]okta.Permission)
+
 	var (
 		n           int
 		lastUpdated time.Time
@@ -504,15 +524,15 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				publish(p.addUserMetadata(ctx, u, state))
+				doPublish(p.addUserMetadata(ctx, u, state, permsCache))
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
 			}
 		} else {
 			for _, u := range batch {
-				su := p.addUserMetadata(ctx, u, state)
-				publish(su)
+				su := p.addUserMetadata(ctx, u, state, permsCache)
+				doPublish(su)
 				n++
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
@@ -531,6 +551,39 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		query = next
 	}
 
+	if wantSupervises {
+		// Snapshot current supervises before recomputing so we can detect
+		// managers that changed but are not in this batch (incremental update).
+		oldSupervises := make(map[string][]okta.SupervisedUser, len(state.users))
+		for id, u := range state.users {
+			oldSupervises[id] = u.Supervises
+		}
+
+		bufferedIDs := make(map[string]struct{}, len(supervisesBuffer))
+		for _, u := range supervisesBuffer {
+			bufferedIDs[u.ID] = struct{}{}
+		}
+
+		p.assignSupervises(state)
+
+		for _, u := range supervisesBuffer {
+			publish(u)
+		}
+
+		// On incremental updates, a manager may not be in the current batch
+		// but its Supervises may have changed (e.g. a subordinate changed
+		// managerId). Publish any such manager so the stored document stays
+		// current without waiting for the next full sync.
+		for id, u := range state.users {
+			if _, inBatch := bufferedIDs[id]; inBatch {
+				continue
+			}
+			if !supervisesEqual(oldSupervises[id], u.Supervises) {
+				publish(u)
+			}
+		}
+	}
+
 	// Prepare query for next update. This is any record that was updated
 	// at or after the last updated record we saw this round. Use this rather
 	// than time.Now() since we may have received stale records. Use ge
@@ -544,7 +597,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 	return nil
 }
 
-func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore) *User {
+func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore, permsCache map[string][]okta.Permission) *User {
 	su := state.storeUser(u)
 	switch len(p.cfg.EnrichWith) {
 	case 1:
@@ -571,15 +624,82 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 			su.Factors = factors
 		}
 	}
-	if slices.Contains(p.cfg.EnrichWith, "roles") {
+	if slices.Contains(p.cfg.EnrichWith, "roles") || slices.Contains(p.cfg.EnrichWith, "perms") {
 		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
+			if slices.Contains(p.cfg.EnrichWith, "perms") {
+				for i, role := range roles {
+					if role.Type != "CUSTOM" {
+						// The permissions API only supports custom roles;
+						// standard built-in roles have no associated permissions endpoint.
+						continue
+					}
+					// Use the role definition ID as cache key. Multiple users can share
+					// the same custom role definition, so we fetch permissions once per
+					// run and reuse them to avoid O(users * custom_roles) API calls.
+					perms, cached := permsCache[role.RoleID]
+					if !cached {
+						perms, _, err = okta.GetRolePermissions(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), role.RoleID, p.lim, p.logger)
+						if err != nil {
+							p.logger.Warnf("failed to get permissions for role %s: %v", role.RoleID, err)
+							continue
+						}
+						permsCache[role.RoleID] = perms
+					}
+					roles[i].Permissions = perms
+				}
+			}
 			su.Roles = roles
 		}
 	}
+	if slices.Contains(p.cfg.EnrichWith, "devices") {
+		devices, _, err := okta.GetUserDevices(ctx, p.client, p.cfg.OktaDomain, p.getAuthToken(), u.ID, p.lim, p.logger)
+		if err != nil {
+			p.logger.Warnf("failed to get enrolled devices for user %s: %v", u.ID, err)
+		} else {
+			su.Devices = devices
+		}
+	}
 	return su
+}
+
+// assignSupervises derives the supervises relationship for every user in state
+// by examining the profile.managerId field that Okta includes in the standard
+// user profile. No additional API calls are made: the relationship is computed
+// in a single pass over the already-fetched user set.
+func (p *oktaInput) assignSupervises(state *stateStore) {
+	managerMap := make(map[string][]okta.SupervisedUser)
+	for _, u := range state.users {
+		managerID, _ := u.Profile["managerId"].(string)
+		if managerID == "" {
+			continue
+		}
+		email, _ := u.Profile["email"].(string)
+		login, _ := u.Profile["login"].(string)
+		managerMap[managerID] = append(managerMap[managerID], okta.SupervisedUser{
+			ID:       u.ID,
+			Email:    email,
+			Username: login,
+		})
+	}
+	for id, u := range state.users {
+		u.Supervises = managerMap[id]
+	}
+}
+
+// supervisesEqual reports whether two SupervisedUser slices are equal by ID.
+func supervisesEqual(a, b []okta.SupervisedUser) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // doFetchDevices handles fetching device and associated user identities from Okta.
@@ -770,6 +890,8 @@ func (p *oktaInput) publishUser(u *User, state *stateStore, inputID string, clie
 	_, _ = userDoc.Put("groups", u.Groups)
 	_, _ = userDoc.Put("roles", u.Roles)
 	_, _ = userDoc.Put("factors", u.Factors)
+	_, _ = userDoc.Put("devices", u.Devices)
+	_, _ = userDoc.Put("supervises", u.Supervises)
 
 	switch u.State {
 	case Deleted:
