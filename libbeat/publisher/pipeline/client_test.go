@@ -257,12 +257,16 @@ func TestClientWaitClose(t *testing.T) {
 		defer output.Close()
 
 		reloader := pipeline.OutputReloader()
-		reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+		err = reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
 			return outputs.Group{Clients: []outputs.Client{output}}, nil
 		})
-		defer reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
-			return outputs.Group{}, nil
-		})
+		require.NoError(t, err, "Reload of output group should succeed")
+		defer func() {
+			err := reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+				return outputs.Group{}, nil
+			})
+			assert.NoError(t, err, "Reload to empty output group should succeed")
+		}()
 
 		client.Publish(beat.Event{})
 
