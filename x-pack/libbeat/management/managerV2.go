@@ -76,18 +76,17 @@ type BeatV2Manager struct {
 	payload map[string]interface{}
 
 	// stop callback must be registered by libbeat, as with the V1 callback
-	stopFunc           func()
+	stopFunc    func()
+	stopFuncMut sync.Mutex
+
 	stopOnOutputReload bool
 	stopOnEmptyUnits   bool
-	stopMut            sync.Mutex
-	stopWaitGroup      sync.WaitGroup
 
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
-	stopChan chan struct{}
-	stopOnce sync.Once
-	// waits for manager goroutines started in PreInit() to exit
-	stopWait sync.WaitGroup
+	stopChan      chan struct{}
+	stopOnce      sync.Once
+	stopWaitGroup sync.WaitGroup
 
 	// We need a separate channel to notify when the Agent client has actually
 	// stopped: watchErrChan needs to keep running for a while after the
@@ -281,14 +280,14 @@ func (cm *BeatV2Manager) Enabled() bool {
 
 // SetStopCallback sets the callback to run when the manager want to shut down the beats gracefully.
 func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
-	cm.stopMut.Lock()
-	defer cm.stopMut.Unlock()
+	cm.stopFuncMut.Lock()
+	defer cm.stopFuncMut.Unlock()
 	cm.stopFunc = stopFunc
 }
 
 func (cm *BeatV2Manager) getStopCallback() func() {
-	cm.stopMut.Lock()
-	defer cm.stopMut.Unlock()
+	cm.stopFuncMut.Lock()
+	defer cm.stopFuncMut.Unlock()
 	return cm.stopFunc
 }
 
