@@ -685,7 +685,11 @@ func (p *oktaInput) assignSupervises(state *stateStore) {
 		})
 	}
 	for id, u := range state.users {
-		u.Supervises = managerMap[id]
+		s := managerMap[id]
+		slices.SortFunc(s, func(a, b okta.SupervisedUser) int {
+			return strings.Compare(a.ID, b.ID)
+		})
+		u.Supervises = s
 	}
 }
 
