@@ -668,7 +668,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 // assignSupervises derives the supervises relationship for every user in state
 // by examining the profile.managerId field that Okta includes in the standard
 // user profile. No additional API calls are made: the relationship is computed
-// in a single pass over the already-fetched user set.
+// from the already-fetched user set.
 func (p *oktaInput) assignSupervises(state *stateStore) {
 	managerMap := make(map[string][]okta.SupervisedUser)
 	for _, u := range state.users {
@@ -684,12 +684,13 @@ func (p *oktaInput) assignSupervises(state *stateStore) {
 			Username: login,
 		})
 	}
-	for id, u := range state.users {
-		s := managerMap[id]
-		slices.SortFunc(s, func(a, b okta.SupervisedUser) int {
+	for id := range managerMap {
+		slices.SortFunc(managerMap[id], func(a, b okta.SupervisedUser) int {
 			return strings.Compare(a.ID, b.ID)
 		})
-		u.Supervises = s
+	}
+	for id, u := range state.users {
+		u.Supervises = managerMap[id]
 	}
 }
 
