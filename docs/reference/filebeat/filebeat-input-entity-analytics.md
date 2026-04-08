@@ -383,6 +383,12 @@ The necessary API permissions need to be granted in Azure in order for the provi
 | User.Read.All | Application |
 | Device.Read.All | Application |
 
+When using the `enrich_with: ["mfa"]` option, an additional permission is required:
+
+| Permission | Type |
+| --- | --- |
+| AuditLog.Read.All | Application |
+
 For a full guide on how to set up the necessary App Registration, permission granting, and secret configuration, follow this [guide](https://learn.microsoft.com/en-us/graph/auth-v2-service).
 
 
@@ -416,6 +422,14 @@ The `/delta` endpoint will provide changes that have occurred since the last cal
 * If a `@odata.deltaLink` is returned, then there are currently no more results, and the value of this field (a URL) should be saved for the next time updates need to be fetched (the delta token).
 
 The group metadata will be used to enrich users and devices with group membership information. Direct memberships, along with transitive memberships, will be provided for users and devices.
+
+When the `enrich_with: ["mfa"]` option is set, an additional call is made each sync/update cycle to:
+
+* [/reports/authenticationMethods/userRegistrationDetails](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http)
+
+This endpoint returns MFA registration state for all users and does not support delta queries, so the full list is fetched on every cycle. The result is merged into each user document under the `azure_ad.mfa` field.
+
+Note that MFA enrichment is **best-effort**: a change to a user's MFA registration state alone will not trigger an incremental user update. Updated MFA data is only included in a published user event when that user is already being published due to an identity delta (a change to the user record, group membership, or device). A full synchronization will always include the latest MFA state for all users.
 
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch_2]
@@ -465,6 +479,52 @@ Example user document:
             {
                 "id": "d140978f-d641-4f01-802f-4ecc1acf8935",
                 "name": "group2"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+```
+
+When the `enrich_with: ["mfa"]` option is set, user documents will also include an `azure_ad.mfa` field with MFA registration details:
+
+```json
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"],
+        "mfa": {
+            "isMfaCapable": true,
+            "isMfaRegistered": true,
+            "isPasswordlessCapable": false,
+            "isSsprCapable": false,
+            "isSsprEnabled": false,
+            "isSsprRegistered": false,
+            "isSystemPreferredAuthenticationMethodEnabled": false,
+            "methodsRegistered": ["microsoftAuthenticatorPush", "softwareOneTimePasscode"],
+            "systemPreferredAuthenticationMethods": [],
+            "userPreferredMethodForSecondaryAuthentication": "push",
+            "userType": "member"
+        }
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
             }
         ]
     },
@@ -654,6 +714,19 @@ stack: preview 9.1.0
 ```
 
 Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
+
+
+#### `enrich_with` [_enrich_with_azuread]
+
+Additional data to fetch and merge into user documents. This is an array of enrichment types. Currently only `"mfa"` is supported. If not set, no additional enrichment is performed.
+
+When `"mfa"` is included, the provider calls the [`/reports/authenticationMethods/userRegistrationDetails`](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http) endpoint on each sync/update cycle and merges the result into each matching user document under the `azure_ad.mfa` field. This requires the `AuditLog.Read.All` application permission.
+
+Example:
+
+```yaml
+enrich_with: ["mfa"]
+```
 
 
 ### `tracer.enabled` [_tracer_enabled]
@@ -891,6 +964,10 @@ The provider periodically retrieves changes to user/device metadata from the Okt
 
 * [/api/v1/users](https://developer.okta.com/docs/reference/api/users/#list-users)
 * [/api/v1/devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices)
+
+It also read roles permissions, only when the `perms` enrichment is enabled. In that case, the following API is also targeted:
+
+* [/api/v1/iam/roles](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission)
 
 Updates are tracked by the provider by retaining a record of the time of the last noted update in the returned user list. During provider updates the Okta provider makes use of the Okta API’s query filtering to only request records updated at or since the provider’s recorded last update.
 
@@ -1181,6 +1258,7 @@ stack: ga 9.2.0
 List of OAuth2 scopes required for the application. Common scopes include:
 - `okta.users.read`: Read user information
 - `okta.devices.read`: Read devices information (if collecting devices information is enabled in `dataset` option)
+- `okta.roles.read`: Read role permissions (required when `perms` enrichment is enabled)
 
 ##### `oauth2.token_url`
 
@@ -1231,7 +1309,13 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 #### `enrich_with` [_enrich_with]
 
-The metadata to enrich users with. This is an array of values that may contain "groups", "roles" and "factors", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "perms", "devices", "supervises", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+
+Including "perms" causes role permissions to be fetched for each assigned role and stored under `roles[].permissions` in the published event. Because permissions depend on roles, adding "perms" implicitly enables role enrichment even if "roles" is not listed explicitly. This option requires the `okta.roles.read` OAuth2 scope and results in one additional API call per role per user, so it should be enabled with care on large tenants due to Okta API rate limits.
+
+When "devices" is included, each user is enriched with the list of devices enrolled for that user by calling the [List User Devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userresources/other/listuserdevices) API. This requires one additional API request per user, it is disabled by default to help mitigate Okta rate-limit pressure.
+
+The "supervises" option populates the `supervises` field on each user with the list of users they manage. Each entry contains the managed user's `id`, `email`, and `username`. The relationship is derived from the `profile.managerId` field already present in the bulk user fetch, so no additional API calls are required. This option is disabled by default.
 
 
 #### `sync_interval` [_sync_interval_4]

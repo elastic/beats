@@ -20,9 +20,11 @@ package fmtstr
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFormatString(t *testing.T) {
@@ -170,4 +172,146 @@ func TestFormatStringErrors(t *testing.T) {
 		_, err := Compile(test.format, nil)
 		assert.Error(t, err)
 	}
+}
+
+func TestParseRawTokens(t *testing.T) {
+
+	testCases := []struct {
+		name         string
+		input        string
+		expectedList []any
+		err          error
+	}{
+
+		{
+			name:         "empty string",
+			input:        "",
+			expectedList: nil,
+		},
+		{
+			name:         `when two %%`,
+			input:        `%%`,
+			expectedList: []any{"%%"},
+		},
+		{
+			name:  `when input is %%{}`,
+			input: `%%{}`,
+			err:   fmt.Errorf("empty format expansion"),
+		},
+		{
+			name:         `when input is %\{}`,
+			input:        `%\{}`,
+			expectedList: []any{"%{}"},
+		},
+		{
+			name:  `when input is %{}`,
+			input: `%{}`,
+			err:   fmt.Errorf("empty format expansion"),
+		},
+		{
+			name:         `when input is %{key}\\`,
+			input:        `%{key}\\`,
+			expectedList: []any{VariableToken("key"), `\`},
+		},
+		{
+			name:         `when input is %{a:b:c}`,
+			input:        `%{a:b:c}`,
+			expectedList: []any{VariableToken("a:b:c")},
+		},
+		{
+			name:  `when input is %{a`,
+			input: `%{a`,
+			err:   fmt.Errorf(`missing closing '}'`),
+		},
+		{
+			name:         "simple lookup start of string",
+			input:        "%{k} test",
+			expectedList: []any{VariableToken("k"), " test"},
+		},
+		{
+			name:         "simple lookup end of string",
+			input:        "test %{k}",
+			expectedList: []any{"test ", VariableToken("k")},
+		},
+		{
+			name:         "simple lookup middle of string",
+			input:        "pre %{k} post",
+			expectedList: []any{"pre ", VariableToken("k"), " post"},
+		},
+		{
+			name:         "compile lookup default",
+			input:        "%{unknown:default}",
+			expectedList: []any{VariableToken("unknown:default")},
+		},
+		{
+			name:         "with escaped % symbol",
+			input:        `\%{abc}`,
+			expectedList: []any{`%{abc}`},
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			lexer := MakeLexer(test.input)
+			defer lexer.Finish()
+			got, err := ParseRawTokens(lexer)
+			if test.err != nil {
+				require.Equal(t, test.err, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, test.expectedList, got)
+		})
+	}
+}
+
+func FuzzParseRawTokens(f *testing.F) {
+	var cases = []string{
+		"",
+		"%{k} test",
+		"pre %{k} post",
+		"%{unknown:default}",
+		"100% literal",
+		"%%",
+		"%%{}",
+		"%\\{}",
+		"%{}",
+		"%{a:b:c}",
+		"%{a:b:?c}",
+		"%{a",
+	}
+
+	for _, c := range cases {
+		f.Add(c)
+	}
+
+	f.Fuzz(func(t *testing.T, a string) {
+		lex := MakeLexer(a)
+		defer lex.Finish()
+		output, err := ParseRawTokens(lex)
+		if err != nil {
+			t.Logf("skipping input %s with error: %v", a, err)
+			return // invalid input
+		}
+
+		// stringify output and match it with original input
+		var finalOutput string
+		for _, out := range output {
+			switch tok := out.(type) {
+			case string:
+				finalOutput += tok
+			case VariableToken:
+				finalOutput += "%{" + string(tok) + "}"
+			default:
+				assert.Fail(t, fmt.Sprintf("unexpected type %T", tok))
+			}
+		}
+
+		// We cannot accurately reconstruct with escaped characters, so we remove them before comparing.
+		assert.Equalf(t, removeEscapes(a), removeEscapes(finalOutput), "unexpected output: %s != %s", a, finalOutput)
+	})
+}
+
+func removeEscapes(str string) string {
+	return strings.ReplaceAll(str, `\`, "")
 }

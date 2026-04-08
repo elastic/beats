@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -39,7 +40,7 @@ func setupFiles(testdataBaseDir string, files []string) (string, error) {
 			if strings.HasSuffix(base, ".exe") {
 				content = []byte("fake windows binary")
 			} else {
-				content = []byte("#!/bin/sh\necho \"osqueryd version 5.19.0\"\n")
+				content = []byte("#!/bin/sh\necho \"osqueryd version " + distro.OsquerydVersion() + "\"\n")
 			}
 		}
 

@@ -28,6 +28,15 @@
           description: "Name of the node"
           example: "vWNJsZ3"
           type: keyword
+        - name: task.id
+          description: "Task id for the query task (query log)"
+          type: keyword
+        - name: parent.task.id
+          description: "Parent task id when the task has a parent (query log)"
+          type: keyword
+        - name: parent.node.id
+          description: "Parent node id, present together with parent task id (query log)"
+          type: keyword
         - name: index.name
           description: "Index name"
           example: "filebeat-test-input"
