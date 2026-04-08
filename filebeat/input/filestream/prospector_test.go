@@ -91,7 +91,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
-				logger:       logp.L(),
+				logger:       logp.NewNopLogger(),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
@@ -162,7 +162,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
-				logger:      logp.L(),
+				logger:      logp.NewNopLogger(),
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
@@ -262,7 +262,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 			}
 
 			p := fileProspector{
-				logger:      logp.L(),
+				logger:      logp.NewNopLogger(),
 				identifier:  tc.newIdentifier,
 				filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
 			}
@@ -379,12 +379,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:      logp.L(),
+				logger:      logp.NewNopLogger(),
 				filewatcher: newMockFileWatcher(test.events, len(test.events)),
 				identifier:  mustPathIdentifier(false),
 				ignoreOlder: test.ignoreOlder,
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)
@@ -417,12 +417,12 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 
 	filewatcher := newMockFileWatcher([]loginp.FSEvent{eventCreate}, 2)
 	p := fileProspector{
-		logger:      logp.L(),
+		logger:      logp.NewNopLogger(),
 		filewatcher: filewatcher,
 		identifier:  mustPathIdentifier(false),
 		ignoreOlder: 10 * time.Second,
 	}
-	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+	ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
@@ -482,12 +482,12 @@ func TestProspectorDeletedFile(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:       logp.L(),
+				logger:       logp.NewNopLogger(),
 				filewatcher:  newMockFileWatcher(test.events, len(test.events)),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: test.cleanRemoved,
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
@@ -560,16 +560,14 @@ func TestProspectorRenamedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:            logp.L(),
+				logger:            logp.NewNopLogger(),
 				filewatcher:       newMockFileWatcher(test.events, len(test.events)),
 				identifier:        mustPathIdentifier(test.trackRename),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: test.closeRenamed},
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/old/path/to/file")

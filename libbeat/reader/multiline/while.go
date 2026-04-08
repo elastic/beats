@@ -64,7 +64,7 @@ func newMultilineWhilePatternReader(
 	}
 
 	if tout > 0 {
-		r = readfile.NewTimeoutReader(r, sigMultilineTimeout, tout)
+		r = readfile.NewTimeoutReader(r, errSigMultilineTimeout, tout)
 	}
 
 	matcherFunc := lineMatcher(*config.Pattern)
@@ -98,7 +98,7 @@ func (pr *whilePatternReader) readFirst() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// no lines buffered -> ignore timeout
-			if err == sigMultilineTimeout {
+			if err == errSigMultilineTimeout {
 				continue
 			}
 
@@ -129,7 +129,7 @@ func (pr *whilePatternReader) readNext() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// handle multiline timeout signal
-			if err == sigMultilineTimeout {
+			if err == errSigMultilineTimeout {
 				// no lines buffered -> ignore timeout
 				if pr.msgBuffer.isEmpty() {
 					continue
