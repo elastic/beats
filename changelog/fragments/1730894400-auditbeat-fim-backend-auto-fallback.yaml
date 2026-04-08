@@ -6,19 +6,19 @@
 # - enhancement: extends functionality but does not break or fix existing behavior
 # - feature: new functionality
 # - known-issue: problems that we are aware of in a given version
-# - security: impacts on the security of a product or a user’s deployment.
+# - security: impacts on the security of a product or a user's deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix unnecessary Windows filesystem metricset errors from non-existent volumes.
+summary: Auditbeat file_integrity module now defaults to auto backend with intelligent fallback
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: Fixes an issue where filesystem metric collection on Windows could report errors for volumes that are no longer present. Updated to gosigar v0.14.4.
+# description:
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -28,7 +28,7 @@ description: Fixes an issue where filesystem metric collection on Windows could 
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: metricbeat
+component: auditbeat
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
@@ -36,10 +36,10 @@ component: metricbeat
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/pull/49553
+# pr: https://github.com/elastic/beats/pull/XXXXX
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-# issue: https://github.com/owner/repo/1234
+issue: https://github.com/elastic/beats/issues/46690
