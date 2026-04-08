@@ -1,5 +1,0 @@
-kind: enhancement
-summary: Remove unnecessary allocations in hot-path processors (docker metadata, kubernetes metadata, dissect, timestamp)
-component: libbeat
-pr:
-  - https://github.com/elastic/beats/pull/49761
