@@ -60,7 +60,7 @@ class Test(BaseTest):
 
         self.get_log()
         self.wait_log_contains(
-            "Shutdown output timer started.",
+            "Output shutdown started.",
             max_timeout=15)
 
         self.wait_log_contains(
@@ -107,7 +107,7 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         self.wait_until(
-            lambda: self.log_contains("Shutdown output timer started."),
+            lambda: self.log_contains("Output shutdown started."),
             max_timeout=15)
 
         self.wait_log_contains(
