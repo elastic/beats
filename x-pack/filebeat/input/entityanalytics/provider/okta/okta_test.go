@@ -41,6 +41,7 @@ func TestOktaDoFetch(t *testing.T) {
 		{dataset: "devices", enrichWith: []string{"groups"}, wantUsers: false, wantDevices: true},
 		{dataset: "users", enrichWith: []string{"perms"}, wantUsers: true, wantDevices: false},
 		{dataset: "users", enrichWith: []string{"groups", "devices"}, wantUsers: true, wantDevices: false},
+		{dataset: "users", enrichWith: []string{"supervises"}, wantUsers: true, wantDevices: false},
 	}
 
 	for _, test := range tests {
@@ -132,6 +133,10 @@ func TestOktaDoFetch(t *testing.T) {
 					t.Fatalf("failed to unmarshal user device data: %v", err)
 				}
 			}
+			// supervises is computed from profile.managerId in state — test users
+			// have no managerId, so the expected list is always empty.
+			var wantSupervises []okta.SupervisedUser
+
 			wantStates := make(map[string]State)
 
 			// Set the number of repeats.
@@ -290,6 +295,21 @@ func TestOktaDoFetch(t *testing.T) {
 							}
 						}
 					}
+					if len(g.Supervises) != len(wantSupervises) {
+						t.Errorf("number of supervised users for user %d: got:%d want:%d", i, len(g.Supervises), len(wantSupervises))
+					}
+					for j, su := range g.Supervises {
+						w := wantSupervises[j]
+						if su.ID != w.ID {
+							t.Errorf("unexpected supervised user ID %d for user %d: got:%s want:%s", j, i, su.ID, w.ID)
+						}
+						if su.Email != w.Email {
+							t.Errorf("unexpected supervised user email %d for user %d: got:%s want:%s", j, i, su.Email, w.Email)
+						}
+						if su.Username != w.Username {
+							t.Errorf("unexpected supervised user username %d for user %d: got:%s want:%s", j, i, su.Username, w.Username)
+						}
+					}
 					for j, gg := range g.Groups {
 						if gg.ID != wantID {
 							t.Errorf("unexpected used ID for user group %d in %d: got:%s want:%s", j, i, gg.ID, wantID)
@@ -356,4 +376,253 @@ func wantCount(n int, want bool) int {
 		return 0
 	}
 	return n
+}
+
+// TestOktaDoFetchSupervisesEnrichment exercises the full doFetchUsers path when
+// supervises enrichment is enabled. It verifies that supervises relationships are
+// correctly derived from profile.managerId without any additional API calls.
+func TestOktaDoFetchSupervisesEnrichment(t *testing.T) {
+	logp.TestingSetup()
+
+	dbFilename := "TestOktaDoFetchSupervisesEnrichment.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() { testCleanupStore(store, dbFilename) })
+
+	const (
+		window = time.Minute
+		key    = "token"
+		// manager has no managerId; sub1 and sub2 report to manager.
+		manager = `{"id":"manager-id","status":"ACTIVE","created":"2023-05-14T13:37:20.000Z","activated":"2023-05-14T13:37:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","type":{},"profile":{"email":"manager@example.com","login":"manager@example.com"}}`
+		sub1    = `{"id":"sub1-id","status":"ACTIVE","created":"2023-05-14T13:37:20.000Z","activated":"2023-05-14T13:37:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","type":{},"profile":{"email":"sub1@example.com","login":"sub1@example.com","managerId":"manager-id"}}`
+		sub2    = `{"id":"sub2-id","status":"ACTIVE","created":"2023-05-14T13:37:20.000Z","activated":"2023-05-14T13:37:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","type":{},"profile":{"email":"sub2@example.com","login":"sub2@example.com","managerId":"manager-id"}}`
+	)
+
+	allUsers := "[" + manager + "," + sub1 + "," + sub2 + "]"
+
+	setHeaders := func(w http.ResponseWriter) {
+		w.Header().Add("x-rate-limit-limit", "50")
+		w.Header().Add("x-rate-limit-remaining", "49")
+		w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
+	}
+	mux := http.NewServeMux()
+	mux.Handle("/api/v1/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		setHeaders(w)
+		fmt.Fprintln(w, allUsers)
+	}))
+	ts := httptest.NewTLSServer(mux)
+	defer ts.Close()
+
+	u, err := url.Parse(ts.URL)
+	if err != nil {
+		t.Fatalf("unexpected error parsing server URL: %v", err)
+	}
+
+	a := oktaInput{
+		cfg: conf{
+			OktaDomain: u.Host,
+			OktaToken:  key,
+			Dataset:    "users",
+			EnrichWith: []string{"supervises"},
+		},
+		client: ts.Client(),
+		lim:    okta.NewRateLimiter(window, nil),
+		logger: logp.L(),
+	}
+
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error making state store: %v", err)
+	}
+	defer ss.close(false)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	var got []*User
+	err = a.doFetchUsers(ctx, ss, true, func(u *User) {
+		got = append(got, u)
+	})
+	if err != nil {
+		t.Fatalf("unexpected error from doFetchUsers: %v", err)
+	}
+
+	if len(got) != 3 {
+		t.Fatalf("expected 3 users, got %d", len(got))
+	}
+
+	gotByID := make(map[string]*User, len(got))
+	for _, u := range got {
+		gotByID[u.ID] = u
+	}
+
+	// Manager must have both subordinates in Supervises.
+	managerUser, ok := gotByID["manager-id"]
+	if !ok {
+		t.Fatal("manager user not found in published results")
+	}
+	if len(managerUser.Supervises) != 2 {
+		t.Fatalf("expected 2 supervised users for manager, got %d: %v", len(managerUser.Supervises), managerUser.Supervises)
+	}
+	supervisesByID := make(map[string]okta.SupervisedUser, len(managerUser.Supervises))
+	for _, su := range managerUser.Supervises {
+		supervisesByID[su.ID] = su
+	}
+	for _, want := range []okta.SupervisedUser{
+		{ID: "sub1-id", Email: "sub1@example.com", Username: "sub1@example.com"},
+		{ID: "sub2-id", Email: "sub2@example.com", Username: "sub2@example.com"},
+	} {
+		got, ok := supervisesByID[want.ID]
+		if !ok {
+			t.Errorf("supervised user %s not found in manager's Supervises", want.ID)
+			continue
+		}
+		if got != want {
+			t.Errorf("supervised user %s: got %+v, want %+v", want.ID, got, want)
+		}
+	}
+
+	// Subordinates must not supervise anyone.
+	for _, id := range []string{"sub1-id", "sub2-id"} {
+		u, ok := gotByID[id]
+		if !ok {
+			t.Errorf("user %s not found in published results", id)
+			continue
+		}
+		if len(u.Supervises) != 0 {
+			t.Errorf("expected no supervised users for %s, got %d", id, len(u.Supervises))
+		}
+	}
+}
+
+func TestAssignSupervises(t *testing.T) {
+	logp.TestingSetup()
+
+	dbFilename := "TestAssignSupervises.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() { testCleanupStore(store, dbFilename) })
+
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error making state store: %v", err)
+	}
+	defer ss.close(false)
+
+	// Populate state with a manager and two subordinates. The subordinates
+	// carry profile.managerId pointing to the manager's ID, matching what
+	// Okta returns in the standard user profile.
+	ss.storeUser(okta.User{
+		ID: "manager-id",
+		Profile: map[string]any{
+			"email": "manager@example.com",
+			"login": "manager@example.com",
+		},
+	})
+	ss.storeUser(okta.User{
+		ID: "sub1-id",
+		Profile: map[string]any{
+			"email":     "sub1@example.com",
+			"login":     "sub1@example.com",
+			"managerId": "manager-id",
+		},
+	})
+	ss.storeUser(okta.User{
+		ID: "sub2-id",
+		Profile: map[string]any{
+			"email":     "sub2@example.com",
+			"login":     "sub2@example.com",
+			"managerId": "manager-id",
+		},
+	})
+
+	a := oktaInput{logger: logp.L()}
+	a.assignSupervises(ss)
+
+	manager := ss.users["manager-id"]
+	if len(manager.Supervises) != 2 {
+		t.Fatalf("expected 2 supervised users for manager, got %d", len(manager.Supervises))
+	}
+	gotIDs := map[string]okta.SupervisedUser{}
+	for _, su := range manager.Supervises {
+		gotIDs[su.ID] = su
+	}
+	for _, want := range []okta.SupervisedUser{
+		{ID: "sub1-id", Email: "sub1@example.com", Username: "sub1@example.com"},
+		{ID: "sub2-id", Email: "sub2@example.com", Username: "sub2@example.com"},
+	} {
+		got, ok := gotIDs[want.ID]
+		if !ok {
+			t.Errorf("supervised user %s not found", want.ID)
+			continue
+		}
+		if got != want {
+			t.Errorf("supervised user %s: got %+v want %+v", want.ID, got, want)
+		}
+	}
+
+	// Subordinates should not supervise anyone.
+	for _, id := range []string{"sub1-id", "sub2-id"} {
+		if len(ss.users[id].Supervises) != 0 {
+			t.Errorf("expected no supervised users for %s, got %d", id, len(ss.users[id].Supervises))
+		}
+	}
+}
+
+// TestStoreUserExistingPointer proves that storeUser returns the pointer that
+// lives in state.users for an existing user. This is required so that
+// assignSupervises (which iterates state.users) and the published *User pointer
+// are the same object — otherwise Supervises set via state.users would never
+// reach the published document or the persisted store.
+func TestStoreUserExistingPointer(t *testing.T) {
+	logp.TestingSetup()
+
+	dbFilename := "TestStoreUserExistingPointer.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() { testCleanupStore(store, dbFilename) })
+
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error making state store: %v", err)
+	}
+
+	u := okta.User{ID: "user-1", Profile: map[string]any{"email": "a@example.com"}}
+
+	// First store: user is new (Discovered).
+	ptr1 := ss.storeUser(u)
+	if ptr1 != ss.users["user-1"] {
+		t.Fatal("first storeUser: returned pointer not the same as state.users entry")
+	}
+
+	// Second store: user already exists (Modified). The returned pointer must
+	// still be the same object that lives in state.users so that any subsequent
+	// mutation (e.g. setting Supervises) is visible in the map and will be
+	// persisted on close.
+	ptr2 := ss.storeUser(u)
+	if ptr2 != ss.users["user-1"] {
+		t.Fatal("second storeUser: returned pointer not the same as state.users entry for existing user")
+	}
+
+	// Mutating via the returned pointer must be visible through state.users.
+	ptr2.Supervises = []okta.SupervisedUser{{ID: "sub-1", Email: "sub@example.com", Username: "sub@example.com"}}
+	if len(ss.users["user-1"].Supervises) != 1 {
+		t.Fatal("mutation via returned pointer not visible through state.users")
+	}
+
+	// Commit and reopen; Supervises must survive the round-trip.
+	if err := ss.close(true); err != nil {
+		t.Fatalf("close with commit failed: %v", err)
+	}
+
+	ss2, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error reopening state store: %v", err)
+	}
+	defer ss2.close(false)
+
+	reloaded, ok := ss2.users["user-1"]
+	if !ok {
+		t.Fatal("user-1 not found after reopen")
+	}
+	if len(reloaded.Supervises) != 1 || reloaded.Supervises[0].ID != "sub-1" {
+		t.Errorf("Supervises not persisted: got %+v", reloaded.Supervises)
+	}
 }

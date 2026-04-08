@@ -21,6 +21,7 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -59,7 +60,7 @@ type Pipeline struct {
 
 	monitors Monitors
 
-	outputController *outputController
+	outputController outputController
 
 	observer observer
 
@@ -170,12 +171,12 @@ func New(
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	outputController, err := newProcessOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
-	p.outputController = output
-	p.outputController.Set(out)
+	outputController.Set(out)
+	p.outputController = outputController
 
 	return p, nil
 }
@@ -190,7 +191,9 @@ func (p *Pipeline) Close() error {
 	log.Debug("close pipeline")
 
 	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
+	defer cancel()
+	p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
 
 	p.observer.cleanup()
 	return nil
@@ -295,7 +298,10 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
-	return p.outputController
+	if r, ok := p.outputController.(OutputReloader); ok {
+		return r
+	}
+	return noopReloader{}
 }
 
 // Parses the given config and returns a QueueFactory based on it.
@@ -319,6 +325,20 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *path
 	default:
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
+}
+
+type noopReloader struct{}
+
+func (n noopReloader) Reload(
+	cfg *reload.ConfigWithMeta,
+	_ func(outputs.Observer, conf.Namespace) (outputs.Group, error),
+) error {
+	// This function should never be called, but if it is, return an error we can troubleshoot.
+	var unitID string
+	if cfg != nil {
+		unitID = cfg.InputUnitID
+	}
+	return fmt.Errorf("unsupported reload triggered by unit '%v'", unitID)
 }
 
 type noopClientListener struct{}

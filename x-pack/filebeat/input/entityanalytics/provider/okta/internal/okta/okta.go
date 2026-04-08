@@ -422,6 +422,16 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 	return users, h, nil
 }
 
+// SupervisedUser holds the subset of Okta user fields used for the supervises enrichment.
+type SupervisedUser struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+	// Username is the Okta login field from the user profile, which serves as the unique
+	// identifier used for authentication — equivalent to a username.
+	// See https://developer.okta.com/docs/reference/api/users/#default-profile-properties for details.
+	Username string `json:"username"`
+}
+
 // entity is an Okta entity analytics entity.
 type entity interface {
 	User | Group | Role | Factor | Device | devUser | permissionsWrapper
