@@ -16,7 +16,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/entcollect"
 )
@@ -93,7 +93,7 @@ func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 	tmpDir := t.TempDir()
 	dbFile := filepath.Join(tmpDir, "test.db")
 
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, "test")
 	store, err := kvstore.NewStore(log, dbFile, 0600)
 	if err != nil {
 		t.Fatalf("NewStore: %v", err)
@@ -175,7 +175,7 @@ func TestMinimalInput_RunSync_ErrorDiscardsBuffer(t *testing.T) {
 	tmpDir := t.TempDir()
 	dbFile := filepath.Join(tmpDir, "test-err.db")
 
-	log := logp.L()
+	log := logptest.NewTestingLogger(t, "test")
 	store, err := kvstore.NewStore(log, dbFile, 0600)
 	if err != nil {
 		t.Fatalf("NewStore: %v", err)
@@ -248,7 +248,7 @@ func TestMinimalInput_RunCancelation(t *testing.T) {
 		providerName:     "testprov",
 		fullSyncInterval: time.Hour,
 		incrSyncInterval: time.Hour,
-		logger:           logp.L(),
+		logger:           logptest.NewTestingLogger(t, "test"),
 		path:             &paths.Path{Data: tmpDir},
 	}
 
@@ -261,7 +261,7 @@ func TestMinimalInput_RunCancelation(t *testing.T) {
 	go func() {
 		done <- mi.Run(
 			v2.Context{
-				Logger:      logp.L(),
+				Logger:      logptest.NewTestingLogger(t, "test"),
 				ID:          "test-cancel",
 				Cancelation: v2.GoContextFromCanceler(ctx),
 			},
