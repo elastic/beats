@@ -44,5 +44,12 @@ x-pack/dockerlogbeat/temproot.tar
 *.terraform
 *.tfstate*
 
+# AI agent config (copy AGENTS.md to your agent-specific instructions file)
+/.claude
+/.cursor
+/.gemini
+CLAUDE.md
+GEMINI.md
+
 # Files generated with the bump version automations
 *.bck
