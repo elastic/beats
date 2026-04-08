@@ -11,6 +11,7 @@
 *beat/logs
 *beat/data
 **/ironbank/build/
+x-pack/otel/distributions/beats-otel-collector/_build
 
 # Files
 .DS_Store
