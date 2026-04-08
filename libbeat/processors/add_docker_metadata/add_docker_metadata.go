@@ -50,7 +50,10 @@ const (
 // initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
 var initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-	return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+		RootfsMountpoint:  rootfsMountpoint,
+		IgnoreRootCgroups: ignoreRootCgroups,
+	})
 }
 
 func init() {
@@ -266,7 +269,12 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 		if d.cgroups != nil {
 			if cid := d.cgroups.Get(pid); cid != nil {
 				d.log.Debugf("Using cached cgroups for pid=%v", pid)
-				return cid.(string), nil
+				cidStr, ok := cid.(string)
+				if !ok {
+					d.log.Debugf("cached cgroup value for pid=%v is not a string (type=%T)", pid, cid)
+					continue
+				}
+				return cidStr, nil
 			}
 		}
 
