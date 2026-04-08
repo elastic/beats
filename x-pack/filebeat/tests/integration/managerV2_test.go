@@ -283,7 +283,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 			Id:             "input-unit",
 			Type:           proto.UnitType_INPUT,
 			ConfigStateIdx: 1,
-			State:          proto.State_STARTING,
+			State:          proto.State_HEALTHY,
 			LogLevel:       proto.UnitLogLevel_DEBUG,
 			Config: &proto.UnitExpectedConfig{
 				Id:   "log-input",
@@ -331,7 +331,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return finalStateReached.Load()
-	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy or input did not report health")
 
 	t.Cleanup(server.Stop)
 }
