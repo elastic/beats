@@ -46,6 +46,7 @@ import (
 )
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
+	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
 	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
@@ -54,8 +55,10 @@ func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Even
 		settings,
 	)
 	require.NoError(t, err)
-	// Inject a test queue so the outputController doesn't create one
-	p.outputController.queue = qu
+	if outputController, ok := p.outputController.(*processOutputController); ok {
+		// Inject a test queue so the outputController doesn't create one
+		outputController.queue = qu
+	}
 
 	return p
 }
@@ -195,24 +198,8 @@ func TestClient(t *testing.T) {
 
 func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	makePipeline := func(settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
-		p, err := New(beat.Info{Logger: logger},
-			Monitors{},
-			conf.Namespace{},
-			outputs.Group{},
-			settings,
-		)
-		if err != nil {
-			panic(err)
-		}
-		// Inject a test queue so the outputController doesn't create one
-		p.outputController.queue = qu
-
-		return p
-	}
-
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
-	pipeline := makePipeline(Settings{}, q)
+	pipeline := makePipeline(t, Settings{}, q)
 	defer pipeline.Close()
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
@@ -266,8 +253,18 @@ func TestClientWaitClose(t *testing.T) {
 			return nil
 		})
 		defer output.Close()
-		pipeline.outputController.Set(outputs.Group{Clients: []outputs.Client{output}})
-		defer pipeline.outputController.Set(outputs.Group{})
+
+		reloader := pipeline.OutputReloader()
+		err = reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+			return outputs.Group{Clients: []outputs.Client{output}}, nil
+		})
+		require.NoError(t, err, "Reload of output group should succeed")
+		defer func() {
+			err := reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+				return outputs.Group{}, nil
+			})
+			assert.NoError(t, err, "Reload to empty output group should succeed")
+		}()
 
 		client.Publish(beat.Event{})
 
