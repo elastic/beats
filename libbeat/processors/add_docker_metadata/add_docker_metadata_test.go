@@ -76,7 +76,10 @@ func init() {
 func TestDefaultProcessorStartup(t *testing.T) {
 	// set initCgroupPaths to system non-test defaults
 	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
-		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+		return cgroup.NewReaderOptions(cgroup.ReaderOptions{
+			RootfsMountpoint:  rootfsMountpoint,
+			IgnoreRootCgroups: ignoreRootCgroups,
+		})
 	}
 
 	defer func() {
