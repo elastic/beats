@@ -709,8 +709,12 @@ func newMockMetadataUpdater() *mockMetadataUpdater {
 	}
 }
 
-func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
+func (mu *mockMetadataUpdater) set(id string) {
+	mu.mutex.Lock()
+	defer mu.mutex.Unlock()
 
+	mu.table[id] = struct{}{}
+}
 func (mu *mockMetadataUpdater) has(id string) bool {
 	mu.mutex.Lock()
 	defer mu.mutex.Unlock()
