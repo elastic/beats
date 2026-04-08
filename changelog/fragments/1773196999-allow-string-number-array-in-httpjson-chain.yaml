@@ -1,4 +1,0 @@
-kind: enhancement
-summary: Allow string and number arrays in httpjson chained configurations.
-component: filebeat
-issue: https://github.com/elastic/integrations/pull/16662
