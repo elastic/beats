@@ -12,7 +12,7 @@ At startup this module performs an initial scan of the configured files and dire
 The operating system features that power this feature are as follows.
 
 * **Linux**: Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`.
-  * `auto`: {applies_to}`stack: ga 9.4.0` Automatically selects the best available backend. The module tries `ebpf` first, falls back to `kprobes` if eBPF is not supported, and finally falls back to `fsnotify` if neither eBPF nor kprobes are available.
+  * `auto`: {applies_to}`stack: ga 9.4.0+` Automatically selects the best available backend. The module tries `ebpf` first, falls back to `kprobes` if eBPF is not supported, and finally falls back to `fsnotify` if neither eBPF nor kprobes are available.
   * `fsnotify`: Uses inotify (merged into Linux kernel 2.6.13) but doesn't have the ability to associate user data to file events.
   * `kprobes`: Uses tracefs and supports 3.10+ kernels.
   * `ebpf`: Uses modern eBPF features and supports 5.10.16+ kernels.
@@ -100,7 +100,7 @@ This module also supports the [standard configuration options](#module-standard-
 
     * **Linux:** `auto`, `fsnotify`, `kprobes`, `ebpf`.
       The default varies by version:
-      * {applies_to}`stack: preview 9.4.0+` `auto`
+      * {applies_to}`stack: ga 9.4.0+` `auto`
       * {applies_to}`stack: ga 9.0.0-9.3` `fsnotify`
     * **Windows:** `auto`, `fsnotify`, `etw`.
       The default varies by version:
