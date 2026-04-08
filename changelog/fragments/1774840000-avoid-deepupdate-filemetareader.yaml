@@ -1,0 +1,5 @@
+kind: enhancement
+summary: Avoid DeepUpdate and dotted-key parsing in FileMetaReader
+component: libbeat
+pr:
+  - https://github.com/elastic/beats/pull/50017
