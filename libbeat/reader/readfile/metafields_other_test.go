@@ -42,23 +42,17 @@ func createTestFileInfo() file.ExtendedFileInfo {
 func checkFields(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
-	dev, err := actual.GetValue(deviceIDKey)
-	require.NoError(t, err)
-	require.Equal(t, "17", dev)
-	err = actual.Delete(deviceIDKey)
-	require.NoError(t, err)
+	fileMap := actual["log"].(mapstr.M)["file"].(mapstr.M)
 
-	inode, err := actual.GetValue(inodeKey)
-	require.NoError(t, err)
-	require.Equal(t, "999", inode)
-	err = actual.Delete(inodeKey)
-	require.NoError(t, err)
+	require.Equal(t, "17", fileMap[deviceIDKey])
+	delete(fileMap, deviceIDKey)
+	require.Equal(t, "999", fileMap[inodeKey])
+	delete(fileMap, inodeKey)
 
-	_, err = actual.GetValue(ownerKey)
-	require.Error(t, err)
-
-	_, err = actual.GetValue(groupKey)
-	require.Error(t, err)
+	_, hasOwner := fileMap[ownerKey]
+	require.False(t, hasOwner)
+	_, hasGroup := fileMap[groupKey]
+	require.False(t, hasGroup)
 
 	require.Equal(t, expected, actual)
 }
@@ -66,29 +60,16 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 func checkFieldsWithOwnerGroup(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
-	dev, err := actual.GetValue(deviceIDKey)
-	require.NoError(t, err)
-	require.Equal(t, "17", dev)
-	err = actual.Delete(deviceIDKey)
-	require.NoError(t, err)
+	fileMap := actual["log"].(mapstr.M)["file"].(mapstr.M)
 
-	inode, err := actual.GetValue(inodeKey)
-	require.NoError(t, err)
-	require.Equal(t, "999", inode)
-	err = actual.Delete(inodeKey)
-	require.NoError(t, err)
-
-	o, err := actual.GetValue(ownerKey)
-	require.NoError(t, err)
-	require.Equal(t, "root", o)
-	err = actual.Delete(ownerKey)
-	require.NoError(t, err)
-
-	g, err := actual.GetValue(groupKey)
-	require.NoError(t, err)
-	require.Equal(t, "root", g)
-	err = actual.Delete(groupKey)
-	require.NoError(t, err)
+	require.Equal(t, "17", fileMap[deviceIDKey])
+	delete(fileMap, deviceIDKey)
+	require.Equal(t, "999", fileMap[inodeKey])
+	delete(fileMap, inodeKey)
+	require.Equal(t, "root", fileMap[ownerKey])
+	delete(fileMap, ownerKey)
+	require.Equal(t, "root", fileMap[groupKey])
+	delete(fileMap, groupKey)
 
 	require.Equal(t, expected, actual)
 }

@@ -50,23 +50,14 @@ func createTestFileInfo() file.ExtendedFileInfo {
 func checkFields(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
-	idxhi, err := actual.GetValue(idxhiKey)
-	require.NoError(t, err)
-	require.Equal(t, "100", idxhi)
-	err = actual.Delete(idxhiKey)
-	require.NoError(t, err)
+	fileMap := actual["log"].(mapstr.M)["file"].(mapstr.M)
 
-	idxlo, err := actual.GetValue(idxloKey)
-	require.NoError(t, err)
-	require.Equal(t, "200", idxlo)
-	err = actual.Delete(idxloKey)
-	require.NoError(t, err)
-
-	vol, err := actual.GetValue(volKey)
-	require.NoError(t, err)
-	require.Equal(t, "300", vol)
-	err = actual.Delete(volKey)
-	require.NoError(t, err)
+	require.Equal(t, "100", fileMap[idxhiKey])
+	delete(fileMap, idxhiKey)
+	require.Equal(t, "200", fileMap[idxloKey])
+	delete(fileMap, idxloKey)
+	require.Equal(t, "300", fileMap[volKey])
+	delete(fileMap, volKey)
 
 	require.Equal(t, expected, actual)
 }

@@ -54,25 +54,22 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
-	message.Fields.DeepUpdate(mapstr.M{
-		"log": mapstr.M{
-			"offset": r.offset,
-			"file": mapstr.M{
-				"path": r.path,
-			},
-		},
-	})
+	// Build the file sub-map directly to avoid DeepUpdate overhead and dotted-key parsing.
+	// Capacity 4 covers path + platform OS fields (2 on Linux, 3 on Windows) without growth.
+	fileMap := make(mapstr.M, 4)
+	fileMap["path"] = r.path
+	message.Fields["log"] = mapstr.M{
+		"offset": r.offset,
+		"file":   fileMap,
+	}
 
-	err = setFileSystemMetadata(r.fi, message.Fields, r.includeOwner, r.includeGroup)
+	err = setFileSystemMetadata(r.fi, fileMap, r.includeOwner, r.includeGroup)
 	if err != nil {
 		return message, fmt.Errorf("failed to set file system metadata: %w", err)
 	}
 
 	if r.fingerprint != "" {
-		_, err = message.Fields.Put("log.file.fingerprint", r.fingerprint)
-		if err != nil {
-			return message, fmt.Errorf("failed to set fingerprint: %w", err)
-		}
+		fileMap["fingerprint"] = r.fingerprint
 	}
 	r.offset += int64(message.Bytes)
 
