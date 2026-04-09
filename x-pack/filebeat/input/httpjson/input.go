@@ -106,7 +106,7 @@ type redact struct {
 func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	v, err := private.Redact(r.value, "", r.fields)
 	if err != nil {
-		return fmt.Errorf("could not redact value: %v", err)
+		return fmt.Errorf("could not redact value: %w", err)
 	}
 	return v.MarshalLogObject(enc)
 }
@@ -164,7 +164,7 @@ func test(url *url.URL) error {
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second) //nolint:noctx
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable", url)
 	}
@@ -192,7 +192,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName)) //nolint:forbidigo
 		}
 		cfg.Request.Tracer.Filename = resolved
 
@@ -460,7 +460,7 @@ type socketDialer struct {
 }
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
-	return net.Dial("unix", d.path)
+	return net.Dial("unix", d.path) //nolint:noctx
 }
 
 func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {

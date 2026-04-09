@@ -177,7 +177,7 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 		var creds *google.Credentials
 		var err error
 		if len(o.GoogleCredentialsJSON) != 0 {
-			creds, err = google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
+			creds, err = google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...) //nolint:staticcheck
 			if err != nil {
 				return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
 			}

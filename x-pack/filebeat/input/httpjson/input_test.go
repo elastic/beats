@@ -1547,9 +1547,9 @@ var testCases = []struct {
   </item>
 </order>
 `
-				io.ReadAll(r.Body)
+				_, _ = io.ReadAll(r.Body)
 				r.Body.Close()
-				w.Write([]byte(text))
+				_, _ = w.Write([]byte(text))
 			})
 			server := httptest.NewServer(r)
 			config["request.url"] = server.URL
@@ -1622,7 +1622,7 @@ var testCases = []struct {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:staticcheck
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -1702,7 +1702,7 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, test.expected[receivedCount], val.(string))
+					assert.JSONEq(t, test.expected[receivedCount], val.(string)) //nolint:errcheck
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
 						cancel()
@@ -1868,7 +1868,7 @@ func newChainPaginationTestServer(
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:          logp.NewLogger("httpjson_test"),
+		Logger:          logp.NewLogger("httpjson_test"), //nolint:forbidigo
 		ID:              id,
 		IDWithoutName:   id,
 		Cancelation:     ctx,
