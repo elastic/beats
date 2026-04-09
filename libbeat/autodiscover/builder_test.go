@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -35,7 +36,7 @@ func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	return []*conf.C{conf.NewConfig()}
 }
 
-func newFakeBuilder(_ *conf.C, logger *logp.Logger) (Builder, error) {
+func newFakeBuilder(_ *conf.C, logger *logp.Logger, _ *paths.Path) (Builder, error) {
 	return &fakeBuilder{}, nil
 }
 
@@ -59,7 +60,7 @@ func TestBuilderRegistry(t *testing.T) {
 	// Make sure that config building doesn't fail
 	assert.NoError(t, err)
 
-	builder, err := reg.BuildBuilder(cfg)
+	builder, err := reg.BuildBuilder(cfg, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, builder)
 

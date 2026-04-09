@@ -59,17 +59,21 @@ type logHints struct {
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	_ = autodiscover.Registry.AddBuilder("hints", newLogHints)
 }
 
-// NewLogHints builds a log hints builder
-func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
+// newLogHints builds a log hints builder
+func newLogHints(cfg *conf.C, logger *logp.Logger, paths *paths.Path) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
+<<<<<<< HEAD
 	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger, Paths: paths.Paths}, false, fileset.FilesetOverrides{})
+=======
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths)
+>>>>>>> 31d1c309a (Autodiscover: pass paths through builders instead of global paths (#49537))
 	if err != nil {
 		return nil, err
 	}
