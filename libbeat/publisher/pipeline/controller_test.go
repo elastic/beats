@@ -150,7 +150,7 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 	controller := outputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
-		queueFactory: memqueue.FactoryForSettings(
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](
 			memqueue.Settings{Events: 1},
 		),
 		consumer: &eventConsumer{
@@ -179,8 +179,13 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
+<<<<<<< HEAD
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(
+=======
+	controller := processOutputController{
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](
+>>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 			memqueue.Settings{Events: 1},
 		),
 		consumer: &eventConsumer{
@@ -193,7 +198,7 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 	}
 	controller.Set(outputs.Group{
 		Clients:      []outputs.Client{newMockClient(nil)},
-		QueueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 2}),
+		QueueFactory: memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 2}),
 	})
 
 	// The pipeline queue settings has max events 1, the output has
@@ -203,7 +208,7 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 
 func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
-	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
+	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory[publisher.Event]) (queue.Queue[publisher.Event], error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
 	logger := logptest.NewTestingLogger(t, "")
@@ -229,8 +234,13 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
+<<<<<<< HEAD
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
+=======
+	controller := processOutputController{
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1}),
+>>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
@@ -275,8 +285,13 @@ func TestQueueMetrics(t *testing.T) {
 	// monitoring namespace.
 	reg := monitoring.NewRegistry()
 	logger := logptest.NewTestingLogger(t, "")
+<<<<<<< HEAD
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
+=======
+	controller := processOutputController{
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1000}),
+>>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,

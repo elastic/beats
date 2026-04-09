@@ -43,7 +43,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+<<<<<<< HEAD
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
+=======
+func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
+	t.Helper()
+>>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 	logger := logptest.NewTestingLogger(t, "")
 	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
@@ -89,7 +94,7 @@ func TestClient(t *testing.T) {
 		l := logptest.NewTestingLogger(t, "")
 
 		// a small in-memory queue with a very short flush interval
-		q := memqueue.NewQueue(l, nil, memqueue.Settings{
+		q := memqueue.NewQueue[publisher.Event](l, nil, memqueue.Settings{
 			Events:        5,
 			MaxGetRequest: 1,
 			FlushTimeout:  time.Millisecond,
@@ -131,8 +136,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
-					//nolint:errcheck // it always succeeds
-					e := batch.Entry(i).(publisher.Event)
+					e := batch.Entry(i)
 					received = append(received, e.Content)
 				}
 				batch.Done()
@@ -194,6 +198,7 @@ func TestClient(t *testing.T) {
 
 func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
+<<<<<<< HEAD
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{Logger: logger},
 			Monitors{},
@@ -212,6 +217,10 @@ func TestClientWaitClose(t *testing.T) {
 
 	q := memqueue.NewQueue(logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(Settings{}, q)
+=======
+	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
+	pipeline := makePipeline(t, Settings{}, q)
+>>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 	defer pipeline.Close()
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
@@ -404,7 +413,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	cc, ok := c.(*client)
 	require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
-	cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+	cc.producer = &testProducer{publish: func(try bool, event publisher.Event) (queue.EntryID, bool) {
 		return queue.EntryID(1), true
 	}}
 
