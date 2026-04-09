@@ -29,9 +29,9 @@ type azureInputConfig struct {
 	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
 	SAName string `config:"storage_account" validate:"required"`
-	// SAKey is used to connect to the storage account (processor v1 only)
+	// SAKey is the storage account key. Deprecated: use SAConnectionString instead.
 	SAKey string `config:"storage_account_key"`
-	// SAConnectionString is used to connect to the storage account (processor v2 only)
+	// SAConnectionString is used to connect to the storage account.
 	SAConnectionString string `config:"storage_account_connection_string"`
 	// SAContainer is the name of the storage account container to store
 
@@ -108,8 +108,9 @@ type azureInputConfig struct {
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
 	// migration from v1 to v2 (processor v2 only). Default is true.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
-	// ProcessorVersion controls the processor version to use.
-	// Possible values are v1 and v2 (processor v2 only). The default is v2.
+	// ProcessorVersion controls the processor version to use. The default is v2.
+	// Note: v1 is no longer available. If set to "v1", the input silently upgrades to v2.
+	// This option will be removed in a future release.
 	ProcessorVersion string `config:"processor_version" default:"v2"`
 	// ProcessorUpdateInterval controls how often attempt to claim
 	// partitions (processor v2 only). The default value is 10 seconds.
@@ -177,7 +178,7 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	// Validate the processor version first to ensure it's valid
-	if err := conf.validateProcessorVersion(); err != nil {
+	if err := conf.validateProcessorVersion(logger); err != nil {
 		return err
 	}
 
@@ -224,12 +225,21 @@ func (conf *azureInputConfig) validateEventHubTransport() error {
 }
 
 // validateProcessorVersion validates that the processor version is valid.
-func (conf *azureInputConfig) validateProcessorVersion() error {
-	if conf.ProcessorVersion != processorV1 && conf.ProcessorVersion != processorV2 {
+//
+// For backward compatibility, "v1" is accepted but silently upgraded to "v2"
+// since processor v1 has been removed.
+func (conf *azureInputConfig) validateProcessorVersion(logger *logp.Logger) error {
+	switch conf.ProcessorVersion {
+	case processorV1:
+		// v1 is no longer available; upgrade to v2 for backward compatibility.
+		logger.Warn("processor_version v1 is no longer available, upgrading to v2. Please update your configuration to use processor_version: v2.")
+		conf.ProcessorVersion = processorV2
+	case processorV2:
+		// valid, nothing to do
+	default:
 		return fmt.Errorf(
-			"invalid processor_version: %s (available versions: %s, %s)",
+			"invalid processor_version: %s (available version: %s)",
 			conf.ProcessorVersion,
-			processorV1,
 			processorV2,
 		)
 	}
@@ -270,22 +280,7 @@ func (conf *azureInputConfig) validateConnectionStringAuth() error {
 		)
 	}
 
-	// Validate Storage Account authentication for connection_string auth type
-	return conf.validateStorageAccountAuthForConnectionString()
-}
-
-// validateStorageAccountAuthForConnectionString validates storage account authentication for connection_string auth type.
-func (conf *azureInputConfig) validateStorageAccountAuthForConnectionString() error {
-	switch conf.ProcessorVersion {
-	case processorV1:
-		// Processor v1 requires storage account key
-		if conf.SAKey == "" {
-			return errors.New("storage_account_key is required when using connection_string authentication with processor v1")
-		}
-	case processorV2:
-		// Processor v2 requires storage account connection string, but it can be auto-constructed
-		// from SAName and SAKey later in validation. We don't validate it here.
-	}
+	// Storage account validation is handled by validateStorageAccountConfigV2().
 	return nil
 }
 
@@ -305,23 +300,8 @@ func (conf *azureInputConfig) validateClientSecretAuth() error {
 		return errors.New("client_secret is required when using client_secret authentication")
 	}
 
-	// Validate Storage Account authentication for client_secret auth type
-	return conf.validateStorageAccountAuthForClientSecret()
-}
-
-// validateStorageAccountAuthForClientSecret validates storage account authentication for client_secret auth type.
-func (conf *azureInputConfig) validateStorageAccountAuthForClientSecret() error {
-	switch conf.ProcessorVersion {
-	case processorV1:
-		// Processor v1 requires storage account key
-		if conf.SAKey == "" {
-			return errors.New("storage_account_key is required when using client_secret authentication with processor v1")
-		}
-	case processorV2:
-		// Processor v2 with client_secret auth type: Storage Account uses the same client_secret credentials as Event Hub
-		// The client_secret credentials are already validated above for Event Hub
-		// The storage account will use the same TenantID, ClientID, and ClientSecret as Event Hub
-	}
+	// Storage account uses the same TenantID, ClientID, and ClientSecret.
+	// Validation is handled by validateStorageAccountConfigV2().
 	return nil
 }
 
@@ -403,28 +383,8 @@ func (conf *azureInputConfig) validateProcessorSettings() error {
 	return nil
 }
 
-// validateStorageAccountConfig validates storage account configuration based on processor version.
+// validateStorageAccountConfig validates storage account configuration.
 func (conf *azureInputConfig) validateStorageAccountConfig(logger *logp.Logger) error {
-	switch conf.ProcessorVersion {
-	case processorV1:
-		if conf.SAKey == "" {
-			return errors.New("no storage account key configured (config: storage_account_key)")
-		}
-	case processorV2:
-		return conf.validateStorageAccountConfigV2(logger)
-	default:
-		return fmt.Errorf(
-			"invalid processor_version: %s (available versions: %s, %s)",
-			conf.ProcessorVersion,
-			processorV1,
-			processorV2,
-		)
-	}
-	return nil
-}
-
-// validateStorageAccountConfigV2 validates storage account configuration for processor v2.
-func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger) error {
 	// For processor v2, storage account authentication depends on auth_type:
 	// - connection_string: needs SAConnectionString (can be auto-constructed from SAName+SAKey)
 	// - client_secret: uses the same credentials as Event Hub, no connection string needed
@@ -450,9 +410,7 @@ func (conf *azureInputConfig) validateStorageAccountConfigV2(logger *logp.Logger
 					conf.SAKey,
 					storageEndpointSuffix,
 				)
-				logger.Warn("storage_account_connection_string is not configured, but storage_account and storage_account_key are configured. " +
-					"The connection string has been constructed from the storage account and key. " +
-					"Please configure storage_account_connection_string directly as storage_account_key is deprecated in processor v2.")
+				logger.Warn("Using auto-generated connection string. Please switch to storage_account_connection_string directly, as storage_account_key is deprecated in processor v2.")
 				conf.SAKey = ""
 			} else {
 				// No connection string and no key, so we can't proceed.
@@ -499,10 +457,8 @@ func (conf *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 			logger.Warnf("%s: %v", opt, err)
 		}
 	}
-	if conf.ProcessorVersion == processorV2 {
-		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
-		}
+	if conf.SAKey != "" {
+		logger.Warnf("storage_account_key is deprecated, please use storage_account_connection_string instead (config: storage_account_key)")
 	}
 }
 

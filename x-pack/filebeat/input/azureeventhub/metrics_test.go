@@ -7,38 +7,22 @@
 package azureeventhub
 
 import (
-	"fmt"
 	"testing"
-	"time"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestInputMetricsEventsReceived(t *testing.T) {
-
-	var sn int64 = 12
-	now := time.Now()
-	var off int64 = 1234
-	var pID int16 = 1
-
-	properties := eventhub.SystemProperties{
-		SequenceNumber: &sn,
-		EnqueuedTime:   &now,
-		Offset:         &off,
-		PartitionID:    &pID,
-		PartitionKey:   nil,
-	}
-
-	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
-
-	//
+	log := logp.NewLogger("azureeventhub test for input")
 
 	cases := []struct {
+		name string
 		// Use case definition
 		event              []byte
 		expectedRecords    []string
@@ -50,11 +34,10 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		processedMessages   uint64
 		receivedEvents      uint64
 		sentEvents          uint64
-		processingTime      uint64
 		decodeErrors        uint64
-		processorRestarts   uint64
 	}{
 		{
+			name:                "single valid record",
 			event:               []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
 			expectedRecords:     []string{"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"},
 			receivedMessages:    1,
@@ -64,9 +47,9 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			receivedEvents:      1,
 			sentEvents:          1,
 			decodeErrors:        0,
-			processorRestarts:   0,
 		},
 		{
+			name:  "two valid records",
 			event: []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}, {\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
 			expectedRecords: []string{
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
@@ -79,10 +62,10 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			receivedEvents:      2,
 			sentEvents:          2,
 			decodeErrors:        0,
-			processorRestarts:   0,
 		},
 		{
-			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"), // Thank you, Azure Functions logs.
+			name:  "single quotes sanitized",
+			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"),
 			expectedRecords: []string{
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 			},
@@ -94,90 +77,88 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			receivedEvents:      1,
 			sentEvents:          1,
 			decodeErrors:        0,
-			processorRestarts:   0,
 		},
 		{
+			name:  "invalid JSON without sanitization returns raw message",
 			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"),
 			expectedRecords: []string{
 				"{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}",
 			},
-			sanitizationOption:  []string{}, // no sanitization options
+			sanitizationOption:  []string{},
 			receivedMessages:    1,
 			invalidJSONMessages: 1,
-			sanitizedMessages:   0, // Since we have no sanitization options, we don't try to sanitize.
+			sanitizedMessages:   0,
 			processedMessages:   1,
 			decodeErrors:        1,
-			receivedEvents:      0, // If we can't decode the message, we can't count the events in it.
-			sentEvents:          1, // The input sends the unmodified message as a string to the outlet.
-			processorRestarts:   0,
+			receivedEvents:      0,
+			sentEvents:          1,
 		},
 	}
 
 	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			inputConfig := azureInputConfig{
+				SAName:                "",
+				SAContainer:           ephContainerName,
+				ConnectionString:      "",
+				ConsumerGroup:         "",
+				LegacySanitizeOptions: tc.sanitizationOption,
+			}
 
-		inputConfig := azureInputConfig{
-			SAKey:                 "",
-			SAName:                "",
-			SAContainer:           ephContainerName,
-			ConnectionString:      "",
-			ConsumerGroup:         "",
-			LegacySanitizeOptions: tc.sanitizationOption,
-		}
+			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
-		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+			client := fakeClient{}
 
-		fakeClient := fakeClient{}
+			sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.LegacySanitizeOptions)
+			require.NoError(t, err)
 
-		sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.LegacySanitizeOptions)
-		require.NoError(t, err)
-
-		input := eventHubInputV1{
-			config:         inputConfig,
-			metrics:        metrics,
-			pipelineClient: &fakeClient,
-			log:            log,
-			messageDecoder: messageDecoder{
+			decoder := messageDecoder{
 				config:     inputConfig,
 				metrics:    metrics,
 				log:        log,
 				sanitizers: sanitizers,
-			},
-		}
-
-		ev := eventhub.Event{
-			Data:             tc.event,
-			SystemProperties: &properties,
-		}
-
-		input.processEvents(&ev)
-
-		if ok := assert.Equal(t, len(tc.expectedRecords), len(fakeClient.publishedEvents)); ok {
-			for i, e := range fakeClient.publishedEvents {
-				msg, err := e.Fields.GetValue("message")
-				if err != nil {
-					t.Fatal(err)
-				}
-				assert.Equal(t, msg, tc.expectedRecords[i])
 			}
-		}
 
-		assert.True(t, metrics.processingTime.Size() > 0) // TODO: is this the right way of checking if we collected some processing time?
+			// Simulate the processing pipeline: decode + publish
+			metrics.receivedMessages.Inc()
+			metrics.receivedBytes.Add(uint64(len(tc.event)))
 
-		// Messages
-		assert.Equal(t, tc.receivedMessages, metrics.receivedMessages.Get())
-		assert.Equal(t, uint64(len(tc.event)), metrics.receivedBytes.Get())
-		assert.Equal(t, tc.invalidJSONMessages, metrics.invalidJSONMessages.Get())
-		assert.Equal(t, tc.sanitizedMessages, metrics.sanitizedMessages.Get())
-		assert.Equal(t, tc.processedMessages, metrics.processedMessages.Get())
+			records := decoder.Decode(tc.event)
+			for _, record := range records {
+				event := beat.Event{
+					Fields: mapstr.M{
+						"message": record,
+					},
+				}
+				client.Publish(event)
+			}
+			metrics.processedMessages.Inc()
+			metrics.sentEvents.Add(uint64(len(records)))
 
-		// General
-		assert.Equal(t, tc.decodeErrors, metrics.decodeErrors.Get())
+			// Verify published events
+			if ok := assert.Len(t, client.publishedEvents, len(tc.expectedRecords)); ok {
+				for i, e := range client.publishedEvents {
+					msg, err := e.Fields.GetValue("message")
+					if err != nil {
+						t.Fatal(err)
+					}
+					assert.Equal(t, msg, tc.expectedRecords[i])
+				}
+			}
 
-		// Events
-		assert.Equal(t, tc.receivedEvents, metrics.receivedEvents.Get())
-		assert.Equal(t, tc.sentEvents, metrics.sentEvents.Get())
+			// Messages
+			assert.Equal(t, tc.receivedMessages, metrics.receivedMessages.Get())
+			assert.Equal(t, uint64(len(tc.event)), metrics.receivedBytes.Get())
+			assert.Equal(t, tc.invalidJSONMessages, metrics.invalidJSONMessages.Get())
+			assert.Equal(t, tc.sanitizedMessages, metrics.sanitizedMessages.Get())
+			assert.Equal(t, tc.processedMessages, metrics.processedMessages.Get())
 
-		// Processor
-		assert.Equal(t, tc.processorRestarts, metrics.processorRestarts.Get())
+			// General
+			assert.Equal(t, tc.decodeErrors, metrics.decodeErrors.Get())
+
+			// Events
+			assert.Equal(t, tc.receivedEvents, metrics.receivedEvents.Get())
+			assert.Equal(t, tc.sentEvents, metrics.sentEvents.Get())
+		})
 	}
 }

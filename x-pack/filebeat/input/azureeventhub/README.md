@@ -247,6 +247,8 @@ Test event:
 
 ### Scenario 001: Migration
 
+> **Note:** Processor v1 has been removed. This section is kept for historical reference only, to document the v1→v2 checkpoint migration path. If `processor_version: "v1"` is set, the input silently upgrades to v2 and logs a deprecation warning.
+
 - Setup
 - start with v1
 - process 10 events
@@ -281,7 +283,7 @@ Using the following configuration:
       storage_account_container: "filebeat-activitylogs-zmoog-0005"
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>"
-      processor_version: "v1"
+      processor_version: "v1"  # NOTE: v1 is removed; if set, silently upgrades to v2
       migrate_checkpoint: true
       start_position: "earliest"
 ```
@@ -376,7 +378,7 @@ Stop Filebeat and update the config with the following changes:
       storage_account_container: "filebeat-activitylogs-zmoog-0005"
       storage_account_key: "<redacted>"
       storage_account_connection_string: "<redacted>" # NOTE: make sure this is set
-      processor_version: "v2" # CHANGE: v1 > v2
+      # processor_version: "v2" # NOTE: v2 is now the only processor. This option can be removed from your config.
       migrate_checkpoint: true
       start_position: "earliest"
 ```

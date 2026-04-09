@@ -38,11 +38,10 @@ func TestStorageContainerValidate(t *testing.T) {
 func TestValidate(t *testing.T) {
 	t.Run("Sanitize storage account containers with underscores", func(t *testing.T) {
 		config := defaultConfig()
-		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
 		config.EventHubName = "event_hub_00"
 		config.SAName = "teststorageaccount"
-		config.SAKey = "secret"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
 		require.NoError(t, config.Validate())
@@ -56,15 +55,14 @@ func TestValidate(t *testing.T) {
 	})
 }
 
-func TestValidateConnectionStringV1(t *testing.T) {
+func TestValidateConnectionString(t *testing.T) {
 	t.Run("Connection string contains entity path", func(t *testing.T) {
 		// Check the Validate() function
 		config := defaultConfig()
-		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
 		config.EventHubName = "my-event-hub"
 		config.SAName = "teststorageaccount"
-		config.SAKey = "my-secret"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 		require.NoError(t, config.Validate())
 
@@ -78,11 +76,10 @@ func TestValidateConnectionStringV1(t *testing.T) {
 	t.Run("Connection string does not contain entity path", func(t *testing.T) {
 		// Check the Validate() function
 		config := defaultConfig()
-		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret"
 		config.EventHubName = "my-event-hub"
 		config.SAName = "teststorageaccount"
-		config.SAKey = "my-secret"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 		require.NoError(t, config.Validate())
 
@@ -94,11 +91,10 @@ func TestValidateConnectionStringV1(t *testing.T) {
 
 	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
 		config := defaultConfig()
-		config.ProcessorVersion = "v1"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub"
 		config.EventHubName = "not-my-event-hub"
 		config.SAName = "teststorageaccount"
-		config.SAKey = "my-secret"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
 		err := config.Validate()
@@ -171,6 +167,76 @@ func TestValidateConnectionStringV2(t *testing.T) {
 
 		err := config.Validate()
 		assert.ErrorContains(t, err, "invalid config: the entity path (my-event-hub) in the connection string does not match event hub name (not-my-event-hub)")
+	})
+}
+
+func TestV1ConfigBackwardCompatibility(t *testing.T) {
+	t.Run("processor_version v1 is accepted and upgraded to v2", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=secret;EndpointSuffix=core.windows.net"
+
+		require.NoError(t, config.Validate())
+		assert.Equal(t, "v2", config.ProcessorVersion, "v1 should be silently upgraded to v2")
+	})
+
+	t.Run("v1 config with storage_account_key builds connection string", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAKey = "my-sa-key"
+
+		require.NoError(t, config.Validate())
+		assert.Equal(t, "v2", config.ProcessorVersion)
+		assert.Equal(t,
+			"DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-sa-key;EndpointSuffix=core.windows.net",
+			config.SAConnectionString,
+			"storage account connection string should be auto-constructed from storage_account and storage_account_key",
+		)
+		assert.Empty(t, config.SAKey, "storage_account_key should be cleared after building connection string")
+	})
+
+	t.Run("v1 config with default consumer group", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=secret;EndpointSuffix=core.windows.net"
+
+		require.NoError(t, config.Validate())
+		assert.Equal(t, "v2", config.ProcessorVersion)
+	})
+
+	t.Run("v1 config with resource_manager_endpoint still validates", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=secret;EndpointSuffix=core.windows.net"
+		config.OverrideEnvironment = "https://management.usgovcloudapi.net/"
+
+		require.NoError(t, config.Validate())
+		assert.Equal(t, "v2", config.ProcessorVersion)
+	})
+
+	t.Run("v1 config with sanitize_options still validates", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=secret;EndpointSuffix=core.windows.net"
+		config.LegacySanitizeOptions = []string{"NEW_LINES", "SINGLE_QUOTES"}
+
+		require.NoError(t, config.Validate())
+		assert.Equal(t, "v2", config.ProcessorVersion)
 	})
 }
 
@@ -262,40 +328,6 @@ func TestClientSecretConfigValidation(t *testing.T) {
 			errorMsg:    "client_secret is required when using client_secret authentication",
 		},
 		{
-			name: "valid client_secret config with processor v1",
-			config: func() azureInputConfig {
-				c := defaultConfig()
-				c.EventHubName = "test-hub"
-				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
-				c.TenantID = "test-tenant-id"
-				c.ClientID = "test-client-id"
-				c.ClientSecret = "test-client-secret"
-				c.SAName = "test-storage"
-				c.SAKey = "test-storage-key"
-				c.ProcessorVersion = "v1"
-				c.AuthType = "client_secret"
-				return c
-			}(),
-			expectError: false,
-		},
-		{
-			name: "client_secret config with processor v1 missing storage account key",
-			config: func() azureInputConfig {
-				c := defaultConfig()
-				c.EventHubName = "test-hub"
-				c.EventHubNamespace = "test-namespace.servicebus.windows.net"
-				c.TenantID = "test-tenant-id"
-				c.ClientID = "test-client-id"
-				c.ClientSecret = "test-client-secret"
-				c.SAName = "test-storage"
-				c.ProcessorVersion = "v1"
-				c.AuthType = "client_secret"
-				return c
-			}(),
-			expectError: true,
-			errorMsg:    "storage_account_key is required when using client_secret authentication with processor v1",
-		},
-		{
 			name: "client_secret config with processor v2 uses same credentials for storage account",
 			config: func() azureInputConfig {
 				c := defaultConfig()
@@ -369,20 +401,6 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name: "valid connection_string config with processor v1",
-			config: func() azureInputConfig {
-				c := defaultConfig()
-				c.EventHubName = "test-hub"
-				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
-				c.SAName = "test-storage"
-				c.SAKey = "test-storage-key"
-				c.ProcessorVersion = "v1"
-				c.AuthType = "connection_string"
-				return c
-			}(),
-			expectError: false,
-		},
-		{
 			name: "connection_string config missing connection_string",
 			config: func() azureInputConfig {
 				c := defaultConfig()
@@ -395,20 +413,6 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 			}(),
 			expectError: true,
 			errorMsg:    "connection_string is required when auth_type is empty or set to connection_string",
-		},
-		{
-			name: "connection_string config with processor v1 missing storage account key",
-			config: func() azureInputConfig {
-				c := defaultConfig()
-				c.EventHubName = "test-hub"
-				c.ConnectionString = "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test"
-				c.SAName = "test-storage"
-				c.ProcessorVersion = "v1"
-				c.AuthType = "connection_string"
-				return c
-			}(),
-			expectError: true,
-			errorMsg:    "storage_account_key is required when using connection_string authentication with processor v1",
 		},
 		{
 			name: "connection_string config with processor v2 missing storage account connection string",
@@ -450,7 +454,7 @@ func TestConnectionStringConfigValidation(t *testing.T) {
 				return c
 			}(),
 			expectError: true,
-			errorMsg:    "invalid processor_version: v3 (available versions: v1, v2)",
+			errorMsg:    "invalid processor_version: v3 (available version: v2)",
 		},
 	}
 

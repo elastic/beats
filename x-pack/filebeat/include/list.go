@@ -16,7 +16,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/cometd"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/etw"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub"

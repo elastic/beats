@@ -78,7 +78,7 @@ func getAzureCloud(authorityHost string) cloud.Configuration {
 
 // getStorageEndpointSuffix returns the storage endpoint suffix for the given authority host.
 // This is used for processor v2 to construct storage account URLs without depending on
-// the deprecated go-autorest package. For processor v1, use getAzureEnvironment() instead.
+// the deprecated go-autorest package.
 func getStorageEndpointSuffix(authorityHost string) string {
 	switch authorityHost {
 	case "https://login.microsoftonline.us":
