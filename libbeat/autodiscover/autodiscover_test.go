@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type mockRunner struct {
@@ -170,7 +171,7 @@ func TestAutodiscover(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
 	err := Registry.AddProvider("mock",
-		func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+		func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 			// intercept bus to mock events
 			busChan <- b
 
@@ -198,7 +199,7 @@ func TestAutodiscover(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
 	logger := logptest.NewTestingLogger(t, "")
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -322,7 +323,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -353,7 +354,7 @@ func TestAutodiscoverHash(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -391,7 +392,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -418,7 +419,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -456,7 +457,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -487,7 +488,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -519,7 +520,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -547,7 +548,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -642,7 +643,7 @@ func TestAutodiscoverDebounce(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
@@ -663,7 +664,7 @@ func TestAutodiscoverDebounce(t *testing.T) {
 	adapter := mockAdapter{}
 	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -788,6 +789,106 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }
 
+<<<<<<< HEAD
+=======
+func TestErrNonReloadableIsNotRetried(t *testing.T) {
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+	Registry = NewRegistry()
+	err := Registry.AddProvider(
+		"mock",
+		func(beatName string,
+			b bus.Bus,
+			uuid uuid.UUID,
+			c *conf.C,
+			k keystore.Keystore,
+			l *logp.Logger,
+			p *paths.Path) (Provider, error) {
+
+			// intercept bus to mock events
+			busChan <- b
+
+			return &mockProvider{}, nil
+		})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
+
+	// Create a mock adapter, 'err_non_reloadable' will make its Create method
+	// to return a common.ErrNonReloadable.
+	adapter := mockAdapter{
+		configs: []*conf.C{
+			conf.MustNewConfigFrom(map[string]any{
+				"err_non_reloadable": true,
+			}),
+		},
+	}
+
+	// and settings:
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*conf.C{providerConfig},
+	}
+	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// set the debounce period to something small in order to
+	// speed up the tests. This seems to be the sweet stop
+	// for the fastest test run
+	autodiscover.debouncePeriod = time.Millisecond
+
+	// Start it
+	autodiscover.Start()
+	defer autodiscover.Stop()
+	eventBus := <-busChan
+
+	// Send an event to the bus, the event itself is not important
+	// because the mockAdapter will return the same configs regardless
+	// of the event
+	eventBus.Publish(bus.Event{
+		// That's used in the last assertion, the config key is
+		// <provider name>:<id>
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"test_name": t.Name(),
+		},
+	})
+
+	// Ensure we logged the error about not retrying reloading input
+	require.Eventually(
+		t,
+		func() bool {
+			logs := observedLogs.TakeAll()
+			for _, log := range logs {
+				if log.Message == "all new inputs failed to start with a non-retriable error" && log.ContextMap()["error"] == "Error creating runner from config: ErrNonReloadable: a non reloadable error" {
+					return true
+				}
+			}
+			return false
+		},
+		time.Second*10,
+		time.Millisecond*10,
+		"foo error")
+
+	// Ensure nothing is running
+	requireRunningRunners(t, autodiscover, 0)
+	runners := adapter.Runners()
+	require.Empty(t, runners)
+
+	// Ensure the autodiscover got the config
+	require.Len(t, autodiscover.configs["mock:foo"], 1)
+}
+
+>>>>>>> 31d1c309a (Autodiscover: pass paths through builders instead of global paths (#49537))
 // TestAutodiscoverMetadataCleanup tests that the worker properly cleans up metadata
 // for configurations that are no longer active.
 func TestAutodiscoverMetadataCleanup(t *testing.T) {
@@ -796,7 +897,7 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore, l *logp.Logger, p *paths.Path) (Provider, error) {
 		busChan <- b
 		return &mockProvider{}, nil
 	})
@@ -812,7 +913,7 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 	logger := logptest.NewTestingLogger(t, "")
 
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger, nil)
 	require.NoError(t, err)
 
 	autodiscover.debouncePeriod = 50 * time.Millisecond
