@@ -18,6 +18,7 @@
 package add_host_metadata
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"runtime"
@@ -28,7 +29,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -60,7 +60,7 @@ func TestConfigDefault(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -107,7 +107,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -275,7 +275,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
@@ -355,7 +355,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	case "windows", "darwin", "linux", "solaris":
 		assert.NoError(t, err)
 	default:
-		assert.IsType(t, types.ErrNotImplemented, err)
+		assert.ErrorIs(t, err, types.ErrNotImplemented)
 		return
 	}
 
