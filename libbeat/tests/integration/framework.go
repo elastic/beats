@@ -1298,16 +1298,13 @@ func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
 		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
 		os.Exit(1)
 	}
-	binPath, err := testbin.Build(beatName, beatRoot, opts...)
+	_, err = testbin.Build(beatName, beatRoot, opts...)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
 		os.Exit(1)
 	}
 
-	rc := m.Run()
-
-	_ = os.Remove(binPath)
-	os.Exit(rc)
+	os.Exit(m.Run())
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
