@@ -391,3 +391,11 @@ pull_request_rules:
       backport:
         branches:
           - "9.3"
+  - name: backport patches to 9.4 branch
+    conditions:
+      - merged
+      - label=backport-9.4
+    actions:
+      backport:
+        branches:
+          - "9.4"
