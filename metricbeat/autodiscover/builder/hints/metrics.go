@@ -27,6 +27,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/utils"
@@ -70,7 +71,7 @@ func InitializeModule() {
 }
 
 // NewMetricHints builds a new metrics builder based on hints
-func NewMetricHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
+func NewMetricHints(cfg *conf.C, logger *logp.Logger, _ *paths.Path) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
