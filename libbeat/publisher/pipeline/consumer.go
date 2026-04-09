@@ -58,7 +58,7 @@ type eventConsumer struct {
 // consumerTarget specifies the queue to read from, the parameters needed
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
-	queue      queue.Queue
+	queue      queue.Queue[publisher.Event]
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
