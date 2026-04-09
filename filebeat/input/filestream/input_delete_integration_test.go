@@ -274,9 +274,13 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		}()
 
 		tickChan <- time.Now()
-		if count.Load() != 2 {
-			t.Fatalf("removeFn must have been called twice, but it was called %d", count.Load())
-		}
+		require.Eventually(t,
+			func() bool {
+				return count.Load() == 2
+			},
+			time.Second,
+			time.Millisecond,
+			"removeFn must have been called twice, but it was called %d", count.Load())
 
 		if deleteDone.Load() {
 			t.Fatal("deleteFile must still be running")
