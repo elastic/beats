@@ -280,7 +280,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
 	}
-	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)

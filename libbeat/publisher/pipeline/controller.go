@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -42,6 +43,7 @@ type outputController interface {
 // - reload
 type processOutputController struct {
 	beat     beat.Info
+	logger   *logp.Logger
 	monitors Monitors
 
 	// The queue is not created until the outputController is assigned a
@@ -96,6 +98,7 @@ func newProcessOutputController(
 ) (*processOutputController, error) {
 	controller := &processOutputController{
 		beat:           beat,
+		logger:         beat.Logger.Named("outputController"),
 		monitors:       monitors,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
@@ -198,10 +201,13 @@ func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
+		c.logger.Infof("Output shutdown started. Waiting for enqueued events to be published.")
 		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
+			c.logger.Infof("Continue shutdown: All enqueued events have been published.")
 		case <-ctx.Done():
+			c.logger.Infof("Continue shutdown: Time out waiting for events to be published.")
 			if force {
 				c.queue.Close(force)
 				<-c.queue.Done()
