@@ -165,7 +165,7 @@ func (c *Network) Check(event ValuesMap) bool {
 				return false
 			}
 		case net.IP:
-			if !network.Contains(v) {
+			if v == nil || !network.Contains(v) {
 				return false
 			}
 		case []net.IP:
@@ -187,8 +187,6 @@ func (c *Network) Check(event ValuesMap) bool {
 
 	return true
 }
-
-
 
 // String returns a string representation of the Network condition.
 func (c *Network) String() string {
