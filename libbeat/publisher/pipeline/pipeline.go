@@ -23,6 +23,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -71,6 +72,9 @@ type Pipeline struct {
 	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
 	// elapses.
 	forceCloseQueue bool
+
+	// Close _shouldn't_ be called multiple times, but handle it gracefully if it does.
+	closeOnce sync.Once
 
 	processors processing.Supporter
 
@@ -184,18 +188,21 @@ func New(
 // Close stops the pipeline, outputs and queue.
 // If WaitClose with WaitOnPipelineClose mode is configured, Close will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients must be closed before calling Close.
+// Note: clients will no longer accept new Publish calls once Close is started,
+// and will no longer receive event acknowledgments once Close returns.
 func (p *Pipeline) Close() error {
-	log := p.monitors.Logger
+	p.closeOnce.Do(func() {
+		log := p.monitors.Logger
 
-	log.Debug("close pipeline")
+		log.Debug("close pipeline")
 
-	// Note: active clients are not closed / disconnected.
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
-	defer cancel()
-	p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
+		// Note: active clients are not closed / disconnected.
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
+		defer cancel()
+		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
 
-	p.observer.cleanup()
+		p.observer.cleanup()
+	})
 	return nil
 }
 
@@ -308,14 +315,14 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory, error) {
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
 			return nil, err
 		}
-		return memqueue.FactoryForSettings(settings), nil
+		return memqueue.FactoryForSettings[publisher.Event](settings), nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {

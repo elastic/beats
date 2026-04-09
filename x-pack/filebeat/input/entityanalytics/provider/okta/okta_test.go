@@ -567,6 +567,66 @@ func TestAssignSupervises(t *testing.T) {
 	}
 }
 
+// TestAssignSupervisesOrdering proves that assignSupervises always produces a
+// Supervises slice sorted by subordinate ID, regardless of map iteration order.
+// Without sorting, Go's non-deterministic map iteration would produce a
+// different ordering on each call, causing supervisesEqual to treat identical
+// membership as a change and trigger spurious republishes on every incremental sync.
+func TestAssignSupervisesOrdering(t *testing.T) {
+	logp.TestingSetup()
+
+	dbFilename := "TestAssignSupervisesOrdering.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() { testCleanupStore(store, dbFilename) })
+
+	ss, err := newStateStore(store)
+	if err != nil {
+		t.Fatalf("unexpected error making state store: %v", err)
+	}
+	defer ss.close(false)
+
+	// Store a manager and three subordinates with IDs chosen so that insertion
+	// order differs from lexicographic order, maximising the chance of catching
+	// an unsorted result.
+	ss.storeUser(okta.User{ID: "mgr", Profile: map[string]any{"email": "mgr@example.com", "login": "mgr@example.com"}})
+	for _, sub := range []struct{ id, email string }{
+		{"zzz-sub", "zzz@example.com"},
+		{"aaa-sub", "aaa@example.com"},
+		{"mmm-sub", "mmm@example.com"},
+	} {
+		ss.storeUser(okta.User{
+			ID: sub.id,
+			Profile: map[string]any{
+				"email":     sub.email,
+				"login":     sub.email,
+				"managerId": "mgr",
+			},
+		})
+	}
+
+	a := oktaInput{logger: logp.L()}
+
+	// Call assignSupervises multiple times. If the slice were unsorted, the
+	// ordering would vary across calls due to map iteration randomness.
+	want := []okta.SupervisedUser{
+		{ID: "aaa-sub", Email: "aaa@example.com", Username: "aaa@example.com"},
+		{ID: "mmm-sub", Email: "mmm@example.com", Username: "mmm@example.com"},
+		{ID: "zzz-sub", Email: "zzz@example.com", Username: "zzz@example.com"},
+	}
+	for i := range 10 {
+		a.assignSupervises(ss)
+		got := ss.users["mgr"].Supervises
+		if len(got) != len(want) {
+			t.Fatalf("iteration %d: expected %d supervised users, got %d", i, len(want), len(got))
+		}
+		for j := range want {
+			if got[j] != want[j] {
+				t.Errorf("iteration %d: position %d: got %+v, want %+v", i, j, got[j], want[j])
+			}
+		}
+	}
+}
+
 // TestStoreUserExistingPointer proves that storeUser returns the pointer that
 // lives in state.users for an existing user. This is required so that
 // assignSupervises (which iterates state.users) and the published *User pointer
