@@ -164,7 +164,7 @@ func test(url *url.URL) error {
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second) //nolint:noctx
+	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second) //nolint:noctx // test-only helper; timeout is explicit and context is not needed
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable", url)
 	}
@@ -192,7 +192,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName)) //nolint:forbidigo
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName)) //nolint:forbidigo // no per-beat path instance available here
 		}
 		cfg.Request.Tracer.Filename = resolved
 
@@ -461,7 +461,7 @@ type socketDialer struct {
 }
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
-	return net.Dial("unix", d.path) //nolint:noctx
+	return net.Dial("unix", d.path) //nolint:noctx // unix socket dial; no context propagation needed
 }
 
 func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {

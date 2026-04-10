@@ -1622,7 +1622,7 @@ var testCases = []struct {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup() //nolint:staticcheck
+	logp.TestingSetup() //nolint:staticcheck // deprecated but logptest.NewTestingLogger is not yet used here
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
@@ -1702,7 +1702,7 @@ func TestInput(t *testing.T) {
 				case got := <-chanClient.Channel:
 					val, err := got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.JSONEq(t, test.expected[receivedCount], val.(string)) //nolint:errcheck
+					assert.JSONEq(t, test.expected[receivedCount], val.(string)) //nolint:errcheck // type assertion on known string value
 					receivedCount += 1
 					if receivedCount == len(test.expected) {
 						cancel()
@@ -1868,7 +1868,7 @@ func newChainPaginationTestServer(
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:          logp.NewLogger("httpjson_test"), //nolint:forbidigo
+		Logger:          logp.NewLogger("httpjson_test"), //nolint:forbidigo // test helper; no logp.Logger parameter available
 		ID:              id,
 		IDWithoutName:   id,
 		Cancelation:     ctx,
