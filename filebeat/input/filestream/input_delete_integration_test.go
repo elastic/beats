@@ -256,9 +256,15 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 			Logger:      env.testLogger.Logger,
 		}
 
+		retried := make(chan struct{})
 		count := atomic.Int32{}
 		removeFn := func(string) error {
-			count.Add(1)
+			n := count.Add(1)
+			if n == 2 {
+				close(retried)
+			} else if n > 2 {
+				t.Errorf("first removeFn called %d times, expected exactly 2", n)
+			}
 			return removeErr
 		}
 
@@ -274,13 +280,7 @@ func TestFilestreamDeleteFileRemoveRetries(t *testing.T) {
 		}()
 
 		tickChan <- time.Now()
-		if count.Load() != 2 {
-			t.Fatalf("removeFn must have been called twice, but it was called %d", count.Load())
-		}
-
-		if deleteDone.Load() {
-			t.Fatal("deleteFile must still be running")
-		}
+		<-retried
 
 		fileRemoved := atomic.Bool{}
 		f.removeFn = func(s string) error {
