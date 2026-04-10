@@ -1106,33 +1106,18 @@ func TestGenerateHints(t *testing.T) {
 	}
 
 	for _, test := range tests {
-<<<<<<< HEAD
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		require.NoError(t, paths.InitPaths(&paths.Path{
+		p := paths.New()
+		require.NoError(t, p.InitPaths(&paths.Path{
 			Home: abs,
 		}))
 
 		logger := logptest.NewTestingLogger(t, "")
-		l, err := NewLogHints(test.config, logger)
+		l, err := newLogHints(test.config, logger, p)
 		if err != nil {
 			t.Fatal(err)
 		}
-=======
-		t.Run(test.msg, func(t *testing.T) {
-			// Configure path for modules access
-			abs, _ := filepath.Abs("../../..")
-			p := paths.New()
-			require.NoError(t, p.InitPaths(&paths.Path{
-				Home: abs,
-			}))
-
-			logger := logptest.NewTestingLogger(t, "")
-			l, err := newLogHints(test.config, logger, p)
-			if err != nil {
-				t.Fatal(err)
-			}
->>>>>>> 31d1c309a (Autodiscover: pass paths through builders instead of global paths (#49537))
 
 		cfgs := l.CreateConfig(test.event)
 		assert.Len(t, cfgs, test.len, test.msg)
