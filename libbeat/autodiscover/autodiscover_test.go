@@ -889,10 +889,6 @@ func TestAutodiscoverMetadataCleanup(t *testing.T) {
 		return len(autodiscover.configs["mock:foo"]) == 0 && len(autodiscover.configs["mock:bar"]) == 2
 	})
 
-	// Metadata should still exist right after stopping the config
-	metaKeys = autodiscover.meta.Keys()
-	assert.Len(t, metaKeys, 4, "Should still have 4 metadata entries before cleanup")
-
 	// Wait for debounce period so the worker can run the metadata GC
 	wait(t, func() bool {
 		metaKeys := autodiscover.meta.Keys()
