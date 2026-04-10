@@ -29,22 +29,22 @@ import (
 func genCompletionCmd(_ instance.Settings, rootCmd *BeatsRootCmd) *cobra.Command {
 	completionCmd := cobra.Command{
 		Use:   "completion SHELL",
-		Short: "Output shell completion code for the specified shell (bash and zsh only by the moment)",
+		Short: "Output shell completion code for the specified shell (bash and zsh only for now)",
 		// We don't want to expose this one in help:
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) != 1 {
-				fmt.Println("Expected one argument with the desired shell")
+				fmt.Println("Expected one argument with the desired shell") //nolint:forbidigo // preserving existing stdout behavior
 				os.Exit(1)
 			}
 
 			switch args[0] {
 			case "bash":
-				rootCmd.GenBashCompletion(os.Stdout)
+				_ = rootCmd.GenBashCompletion(os.Stdout)
 			case "zsh":
-				rootCmd.GenZshCompletion(os.Stdout)
+				_ = rootCmd.GenZshCompletion(os.Stdout)
 			default:
-				fmt.Printf("Unknown shell %s, only bash and zsh are available\n", args[0])
+				fmt.Printf("Unknown shell %s, only bash and zsh are available\n", args[0]) //nolint:forbidigo // preserving existing stdout behavior
 				os.Exit(1)
 			}
 		},
