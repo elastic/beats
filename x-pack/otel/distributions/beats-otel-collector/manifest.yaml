@@ -13,6 +13,7 @@ extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.148.0 
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.148.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.148.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/encoding/azureencodingextension v0.148.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha

@@ -38,6 +38,7 @@
 - **otlphttp** - OTLP HTTP exporter
 
 ### Extensions
+- **azure_encoding** - Azure encoding extension
 - **beatsauth** - Beats authentication extension
 - **elasticsearch_storage** - Elasticsearch storage extension
 - **basicauth** - Basic auth extension
