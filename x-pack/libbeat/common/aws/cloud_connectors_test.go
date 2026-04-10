@@ -94,9 +94,8 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
 						assert.Equal(t, "7200", q.Get("DurationSeconds"))
-						assert.Equal(t, config.ExternalID, q.Get("ExternalId"))
+						assert.Equal(t, cloudConnectorsExternalID(cloudConnectorsConfig.CloudResourceID, config.ExternalID), q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
-						assert.Equal(t, "abcd1234", q.Get("SourceIdentity"))
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleOutput{
 								Credentials: &types.Credentials{
@@ -133,6 +132,12 @@ func TestAddCloudConnectorsCredentials(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, crd)
 	require.Equal(t, 2, receivedCalls)
+}
+
+func TestCloudConnectorsExternalID(t *testing.T) {
+	assert.Equal(t, "resource1-ext-id", cloudConnectorsExternalID("resource1", "ext-id"))
+	assert.Equal(t, "abc123-external-id-456", cloudConnectorsExternalID("abc123", "external-id-456"))
+	assert.Equal(t, "single-", cloudConnectorsExternalID("single", "")) // format is always "resourceID-externalIDPart"
 }
 
 func TestParseCloudConnectorsConfigFromEnv(t *testing.T) {

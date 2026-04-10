@@ -55,3 +55,19 @@ func TestConfValidate(t *testing.T) {
 		})
 	}
 }
+
+func TestWantEmptyGroups(t *testing.T) {
+	t.Run("default_off", func(t *testing.T) {
+		c := defaultConfig()
+		if c.wantEmptyGroups() {
+			t.Error("expected wantEmptyGroups to be false by default")
+		}
+	})
+	t.Run("enabled", func(t *testing.T) {
+		c := defaultConfig()
+		c.IncludeEmptyGroups = true
+		if !c.wantEmptyGroups() {
+			t.Error("expected wantEmptyGroups to be true when IncludeEmptyGroups is set")
+		}
+	})
+}

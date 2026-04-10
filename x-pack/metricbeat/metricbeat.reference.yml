@@ -407,6 +407,11 @@ metricbeat.modules:
   enabled: true
   period: 300s
   application_id: ''
+  # auth_type: "api_key" (default) or "client_secret"
+  #auth_type: "api_key"
+  #client_id: '${AZURE_CLIENT_ID:""}'
+  #client_secret: '${AZURE_CLIENT_SECRET:""}'
+  #tenant_id: '${AZURE_TENANT_ID:""}'
   api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]
@@ -1655,6 +1660,18 @@ metricbeat.modules:
   sql_query: "select now()"
   sql_response_format: table
 
+  # Cursor-based incremental data fetching. When enabled, the cursor tracks the
+  # last fetched row value and uses it to retrieve only new data on subsequent
+  # collection cycles. Requires sql_response_format: table and a single sql_query
+  # with exactly one :cursor placeholder.
+  #cursor:
+  #  enabled: true
+  #  column: id
+  #  type: integer
+  #  #state_id: payments-prod  # optional: stable identity across DSN changes
+  #  default: "0"
+  #  #direction: asc
+
   # List of root certificates for SSL/TLS server verification
   # ssl.certificate_authorities: ["/path/to/ca.pem"]
 
@@ -2618,7 +2635,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 

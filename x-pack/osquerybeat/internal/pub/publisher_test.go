@@ -37,7 +37,7 @@ func TestHitToEvent(t *testing.T) {
 		}
 		if mask>>4&1 > 0 {
 			p.idValue = "uptime"
-			p.idFieldKey = "schedule_id"
+			p.idFieldKey = "action_id"
 		}
 		if mask>>3&1 > 0 {
 			p.responseID = uuid.Must(uuid.NewV4()).String()
@@ -64,7 +64,7 @@ func TestHitToEvent(t *testing.T) {
 
 	for i := 0; i < maxMask; i++ {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, p.meta, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])
@@ -87,8 +87,8 @@ func TestHitToEvent(t *testing.T) {
 			if diff != "" {
 				t.Error(diff)
 			}
-		} else if ev.Fields[p.idFieldKey] != nil {
-			t.Errorf("expected no id field when key is empty, got: %#v", ev.Fields[p.idFieldKey])
+		} else if ev.Fields["action_id"] != nil || ev.Fields["schedule_id"] != nil {
+			t.Error("expected no id field when key is empty")
 		}
 
 		if p.responseID != "" {
@@ -196,6 +196,48 @@ func TestActionResultToEvent(t *testing.T) {
 				t.Error(diff)
 			}
 		})
+	}
+}
+
+func TestHitToEvent_SpaceID(t *testing.T) {
+	spaceID := "space-abc"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		spaceID,
+		"",
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(spaceID, ev.Fields["space_id"]); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestHitToEvent_PackID(t *testing.T) {
+	packID := "pack-xyz"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		packID,
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(packID, ev.Fields["pack_id"]); diff != "" {
+		t.Error(diff)
 	}
 }
 

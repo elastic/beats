@@ -94,18 +94,48 @@ func (c *RRuleScheduleConfig) IsEnabled() bool {
 	return c != nil && c.RRule != ""
 }
 
+// ElasticOptions contains Beat-specific options that are not part of
+// osquery's native config schema.
+type ElasticOptions struct {
+	Install             *InstallConfig             `config:"install" json:"-"`
+	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
+}
+
+// QueryProfileStorageConfig controls local storage of live query profiles.
+type QueryProfileStorageConfig struct {
+	Enabled     *bool `config:"enabled" json:"-"`
+	MaxProfiles int   `config:"max_profiles" json:"-"`
+}
+
+func (c QueryProfileStorageConfig) EnabledOrDefault() bool {
+	if c.Enabled == nil {
+		return true
+	}
+	return *c.Enabled
+}
+
+func (c QueryProfileStorageConfig) MaxProfilesOrDefault() int {
+	if c.MaxProfiles <= 0 {
+		return DefaultQueryProfileMaxProfiles
+	}
+	return c.MaxProfiles
+}
+
 // NativeSchedule holds interval and policy fields for native (interval-based) schedules.
 // Embedded in Query so these appear at the same level in config (query, interval, schedule_id, start_date).
 type NativeSchedule struct {
 	Interval   int    `config:"interval" json:"interval"`
 	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"` // from Kibana; used in scheduled result/response docs
-	StartDate  string `config:"start_date,omitempty" json:"start_date,omitempty"`  // RFC3339; for schedule_execution_count
+	StartDate  string `config:"start_date,omitempty" json:"start_date,omitempty"`     // RFC3339; for schedule_execution_count
 }
 
 type Query struct {
 	Query          string `config:"query" json:"query"`
 	NativeSchedule `config:",inline"` // interval, schedule_id, start_date (flat in config)
-	Platform       string `config:"platform" json:"platform,omitempty"`
+	// SpaceID is the optional policy space identifier for this scheduled query.
+	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
+
+	Platform    string `config:"platform" json:"platform,omitempty"`
 	Version     string `config:"version" json:"version,omitempty"`
 	Shard       int    `config:"shard" json:"shard,omitempty"`
 	Description int    `config:"description" json:"description,omitempty"`
@@ -121,6 +151,10 @@ type Query struct {
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 
+	// Optional internal flag to emit per-query profiling for this scheduled query.
+	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
+	Profile bool `config:"profile" json:"-"`
+
 	// RRuleSchedule provides RRULE-based scheduling as an alternative to interval
 	// When set, queries are scheduled by osquerybeat instead of osqueryd's native scheduler
 	// If both interval and rrule_schedule are set, rrule_schedule takes precedence
@@ -128,6 +162,9 @@ type Query struct {
 }
 
 type Pack struct {
+	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
+	// If empty, the pack map key (pack name) is used when publishing.
+	PackID    string           `config:"pack_id,omitempty" json:"pack_id,omitempty"`
 	Discovery []string         `config:"discovery" json:"discovery,omitempty"`
 	Platform  string           `config:"platform" json:"platform,omitempty"`
 	Version   string           `config:"version" json:"version,omitempty"`
@@ -164,6 +201,7 @@ type Events struct {
 
 type OsqueryConfig struct {
 	Options               map[string]interface{} `config:"options" json:"options,omitempty"`
+	ElasticOptions        *ElasticOptions        `config:"elastic_options" json:"-"`
 	Schedule              map[string]Query       `config:"schedule" json:"schedule,omitempty"`
 	Packs                 map[string]Pack        `config:"packs" json:"packs,omitempty"`
 	Filepaths             map[string][]string    `config:"file_paths" json:"file_paths,omitempty"`
@@ -174,7 +212,7 @@ type OsqueryConfig struct {
 	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
-// Render returns the full config as JSON (includes policy-only fields for osquerybeat).
+// Render serializes the OsqueryConfig to JSON for osqueryd configuration.
 func (c OsqueryConfig) Render() ([]byte, error) {
 	return json.MarshalIndent(c, "", "    ")
 }

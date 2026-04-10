@@ -6,8 +6,12 @@ package beater
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"time"
 
@@ -19,12 +23,15 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
+	installartifact "github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install/artifact"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
@@ -55,14 +62,25 @@ const (
 	extManagerServerName = "osqextman"
 	configPluginName     = "osq_config"
 	loggerPluginName     = "osq_logger"
+
+	// scheduledQueryProfilesDiagTimeout is the timeout for the scheduled_query_profiles diagnostic hook.
+	// Large schedules may need a longer timeout; increase if the diagnostic returns incomplete data.
+	scheduledQueryProfilesDiagTimeout = 20 * time.Second
 )
 
 // osquerybeat configuration.
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
+	// osquery install settings are sourced from inputs[0].osquery.elastic_options.install.
+	osqueryInstallConfig config.InstallConfig
+	// runtime-selected osquery metadata.
+	osqueryVersion string
+	osquerySource  string
 
-	pub *pub.Publisher
+	pub          osquerybeatPublisher
+	qp           *queryProfiler
+	liveProfiles *liveProfileStore
 
 	log *logp.Logger
 
@@ -70,11 +88,24 @@ type osquerybeat struct {
 	cancel context.CancelFunc
 	mx     sync.Mutex
 
+	diagMx        sync.RWMutex
+	diagQueryExec queryExecutor
+
 	// parent process watcher
 	watcher *Watcher
 
 	osquerydFactory osqd.RunnerFactory
+	executablePath  func() (string, error)
 }
+
+type osquerybeatPublisher interface {
+	scheduledQueryPublisher
+	actionResultPublisher
+	Configure(inputs []config.InputConfig) error
+	Close()
+}
+
+var _ osquerybeatPublisher = (*pub.Publisher)(nil)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
@@ -84,13 +115,33 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
+	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
+	var err error
+	installCfg, err = installCfg.NormalizeAndValidate()
+	if err != nil {
+		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
+	}
 
 	bt := &osquerybeat{
-		b:               b,
-		config:          c,
-		log:             log,
-		pub:             pub.New(b, log),
-		osquerydFactory: osqd.New,
+		b:                    b,
+		config:               c,
+		osqueryInstallConfig: installCfg,
+		log:                  log,
+		pub:                  pub.New(b, log),
+		qp:                   newQueryProfiler(log),
+		osquerydFactory:      osqd.New,
+		executablePath:       os.Executable,
+	}
+
+	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
+	if profileCfg.EnabledOrDefault() {
+		profileDir := b.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
+		store, err := newLiveProfileStore(log, profileDir, profileCfg.MaxProfilesOrDefault())
+		if err != nil {
+			log.Warnw("failed to initialize live query profile storage", "error", err)
+		} else {
+			bt.liveProfiles = store
+		}
 	}
 
 	return bt, nil
@@ -156,13 +207,32 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 	defer cleanupFn()
 
-	// Create osqueryd runner using factory
-	osq, err := bt.osquerydFactory(
-		socketPath,
+	osqueryRuntime, err := bt.resolveOsqueryRuntime(ctx)
+	if err != nil {
+		b.Manager.UpdateStatus(status.Failed, "Failed to resolve osquery runtime: "+err.Error())
+		return err
+	}
+	bt.osqueryVersion = osqueryRuntime.Version
+	bt.osquerySource = osqueryRuntime.Source
+	bt.log.Infof("using osquery runtime source=%s version=%s", bt.osquerySource, bt.osqueryVersion)
+
+	opts := []osqd.Option{
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+	}
+	if osqueryRuntime.BinDir != "" {
+		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
+	}
+	if osqueryRuntime.ExtensionPath != "" {
+		opts = append(opts, osqd.WithExtensionPath(osqueryRuntime.ExtensionPath))
+	}
+
+	// Create osqueryd runner using factory
+	osq, err := bt.osquerydFactory(
+		socketPath,
+		opts...,
 	)
 
 	if err != nil {
@@ -205,11 +275,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Ensure that all the hooks and actions are ready before starting the Manager
 	// to receive configuration.
+	bt.registerDiagnosticHooks(b)
 	if err := b.Manager.Start(); err != nil {
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
 	}
-	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -263,6 +333,66 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		bt.log.Debugf("osquerybeat Run exited")
 	}
 	return err
+}
+
+func (bt *osquerybeat) registerDiagnosticHooks(b *beat.Beat) {
+	if b == nil || b.Manager == nil {
+		return
+	}
+
+	b.Manager.RegisterDiagnosticHook(
+		"scheduled_query_profiles",
+		"Recent scheduled query profiles collected from osquery_schedule.",
+		"scheduled_query_profiles.json",
+		"application/json",
+		func() []byte {
+			ctx, cancel := context.WithTimeout(context.Background(), scheduledQueryProfilesDiagTimeout)
+			defer cancel()
+
+			payload := map[string]interface{}{
+				"generated_at": time.Now().UTC().Format(time.RFC3339Nano),
+			}
+
+			bt.diagMx.RLock()
+			scheduledPayload, err := bt.qp.scheduledProfilesDiagnosticsPayload(ctx, bt.diagQueryExec)
+			bt.diagMx.RUnlock()
+			if err != nil {
+				payload["error"] = err.Error()
+			} else {
+				for key, value := range scheduledPayload {
+					payload[key] = value
+				}
+			}
+
+			liveProfiles := []map[string]interface{}{}
+			if bt.liveProfiles != nil {
+				liveProfiles = bt.liveProfiles.List()
+			}
+			payload["live_query_profiles"] = liveProfiles
+			payload["live_query_profiles_count"] = len(liveProfiles)
+
+			data, err := json.MarshalIndent(payload, "", "  ")
+			if err != nil {
+				if bt.log != nil {
+					bt.log.Warnw("Failed to collect query profiles diagnostics.", "error", err)
+				}
+				return diagnosticsErrorJSON(err.Error())
+			}
+			return data
+		},
+	)
+}
+
+func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
+	bt.diagMx.Lock()
+	defer bt.diagMx.Unlock()
+	bt.diagQueryExec = qe
+}
+
+func (bt *osquerybeat) getDiagnosticsQueryExecutor() queryExecutor {
+	bt.diagMx.RLock()
+	defer bt.diagMx.RUnlock()
+	return bt.diagQueryExec
 }
 
 func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
@@ -322,7 +452,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		if err != nil {
 			return err
 		}
+		bt.setDiagnosticsQueryExecutor(cli)
 		defer cli.Close()
+		defer bt.setDiagnosticsQueryExecutor(nil)
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
 		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub)
@@ -375,7 +507,6 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		} else {
 			bt.log.Errorf("runOsquery exited with error: %v", err)
 		}
-		bt.log.Errorf("runOsquery exited with error: %v", err)
 	} else {
 		bt.log.Debugf("runOsquery exited")
 	}
@@ -462,7 +593,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		return
 	}
 
-	// Use policy schedule_id when set, otherwise query name
+	// Use policy schedule_id when set, otherwise query name.
 	scheduleID := qi.ScheduleID
 	if scheduleID == "" {
 		scheduleID = res.Name
@@ -470,14 +601,16 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 	// Schedule execution count from start_date + interval (same across agents)
 	scheduleExecutionCount := nativeScheduleExecutionCount(qi.StartDate, qi.Interval, res.UnixTime)
 
-	var (
-		hits      []map[string]interface{}
-		totalHits int
-	)
+	var totalHits int
 
 	responseID := uuid.Must(uuid.NewV4()).String()
 	runTime := time.Unix(res.UnixTime, 0)
 	plannedScheduleTime := nativePlannedScheduleTime(qi.StartDate, qi.Interval, res.UnixTime)
+	publishResolved := func(resultType, action string, hits []map[string]interface{}) {
+		totalHits += len(hits)
+		meta := queryResultMeta(resultType, action, res, scheduleExecutionCount, plannedScheduleTime)
+		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, qi.SpaceID, qi.PackID, meta, hits, qi.ECSMapping, nil)
+	}
 
 	if res.Action == "snapshot" {
 		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
@@ -485,10 +618,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
 			return
 		}
-		hits = append(hits, snapshot...)
-		totalHits = len(hits)
-		meta := queryResultMeta("snapshot", "", res, scheduleExecutionCount, plannedScheduleTime)
-		bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, qi.ECSMapping, nil)
+		publishResolved("snapshot", "", snapshot)
 	} else {
 		if len(res.DiffResults.Added) > 0 {
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
@@ -496,9 +626,7 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
 				return
 			}
-			hits = append(hits, added...)
-			meta := queryResultMeta("diff", "added", res, scheduleExecutionCount, plannedScheduleTime)
-			bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, qi.ECSMapping, nil)
+			publishResolved("diff", "added", added)
 		}
 		if len(res.DiffResults.Removed) > 0 {
 			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
@@ -506,14 +634,20 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
 				return
 			}
-			hits = append(hits, removed...)
-			meta := queryResultMeta("diff", "removed", res, scheduleExecutionCount, plannedScheduleTime)
-			bt.pub.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, meta, hits, qi.ECSMapping, nil)
+			publishResolved("diff", "removed", removed)
 		}
-		totalHits = len(hits)
 	}
 
-	bt.pub.PublishScheduledResponse(scheduleID, responseID, runTime, runTime, plannedScheduleTime, totalHits, int64(scheduleExecutionCount))
+	if configPlugin.LookupQueryProfile(res.Name) {
+		profile, err := bt.qp.profileScheduledQuery(ctx, cli, res.Name)
+		if err != nil {
+			bt.log.Debugf("failed to collect scheduled query profile for %s: %v", res.Name, err)
+		} else {
+			bt.pub.PublishQueryProfile(config.QueryProfileDatastream(ns), res.Name, "", responseID, profile, nil)
+		}
+	}
+
+	bt.pub.PublishScheduledResponse(scheduleID, qi.PackID, qi.SpaceID, responseID, runTime, runTime, plannedScheduleTime, totalHits, scheduleExecutionCount)
 }
 
 func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount int64, plannedScheduleTime time.Time) map[string]interface{} {
@@ -536,9 +670,64 @@ func queryResultMeta(typ, action string, res QueryResult, scheduleExecutionCount
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 	if b.Manager != nil {
 		b.Manager.SetPayload(map[string]interface{}{
-			"osquery_version": distro.OsquerydVersion(),
+			"osquery_version": bt.osqueryVersion,
+			"osquery_source":  bt.osquerySource,
 		})
 	}
+}
+
+type osqueryRuntimeSelection struct {
+	BinDir        string
+	ExtensionPath string
+	Version       string
+	Source        string
+}
+
+func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntimeSelection, error) {
+	execPathFn := bt.executablePath
+	if execPathFn == nil {
+		execPathFn = os.Executable
+	}
+	exePath, err := execPathFn()
+	if err != nil {
+		return osqueryRuntimeSelection{}, err
+	}
+	bundledDir := filepath.Dir(exePath)
+
+	bundledVersion, err := install.VerifyOsqueryBinary(runtime.GOOS, bundledDir, bt.log)
+	if err != nil {
+		bt.log.Warnf("failed to validate bundled osquery binary, fallback to distro version metadata: %v", err)
+		bundledVersion = distro.OsquerydVersion()
+	}
+	result := osqueryRuntimeSelection{
+		Version: bundledVersion,
+		Source:  "bundled",
+	}
+
+	installDir := bundledDir
+	installCfg := bt.osqueryInstallConfig
+	if !installCfg.EnabledForPlatform(runtime.GOOS, runtime.GOARCH) {
+		if err := installartifact.RemoveInstalled(installDir); err != nil {
+			bt.log.Warnf("failed to cleanup previous custom osquery install, continue with bundled osquery: %v", err)
+		}
+		return result, nil
+	}
+
+	installed, err := installartifact.Ensure(ctx, installCfg, installDir, bt.log)
+	if err != nil {
+		return osqueryRuntimeSelection{}, err
+	}
+	bundledExtPath := osqd.OsqueryExtensionPathForPlatform(runtime.GOOS, bundledDir)
+	if _, err := os.Stat(bundledExtPath); err != nil {
+		return osqueryRuntimeSelection{}, fmt.Errorf("bundled osquery extension is required for custom runtime: %w", err)
+	}
+
+	return osqueryRuntimeSelection{
+		BinDir:        installed.BinDir,
+		ExtensionPath: bundledExtPath,
+		Version:       installed.Version,
+		Source:        "custom_artifact",
+	}, nil
 }
 
 // Stop stops osquerybeat.
@@ -557,6 +746,7 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 		publisher: bt.pub,
 		queryExec: cli,
 		np:        configPlugin,
+		profiles:  bt.liveProfiles,
 	}
 	rah.Attach(ah)
 	b.Manager.RegisterAction(rah)

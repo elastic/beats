@@ -265,6 +265,14 @@
                 available to the tasks in a cgroup. The value specified in the
                 cpu.shares file must be 2 or higher.
 
+            - name: cfs.weight
+              type: long
+              description: >
+                CPU weight for the cgroup (cgroupv2). Used by the CFS
+                scheduler to determine the share of CPU time available
+                to the cgroup. Valid values range from 1 to 10000. The
+                default value is 100.
+
             - name: rt.period.us
               type: long
               description: >
@@ -446,15 +454,15 @@
             - name: mem.low.bytes
               type: long
               format: bytes
-              description: memory low threshhold
+              description: memory low threshold
             - name: mem.high.bytes
               type: long
               format: bytes
-              description: memory high threshhold
+              description: memory high threshold
             - name: mem.max.bytes
               type: long
               format: bytes
-              description: memory max threshhold
+              description: memory max threshold
 
             - name: mem.events
               type: group
@@ -504,15 +512,15 @@
             - name: memsw.low.bytes
               type: long
               format: bytes
-              description: memory low threshhold
+              description: memory low threshold
             - name: memsw.high.bytes
               type: long
               format: bytes
-              description: memory high threshhold
+              description: memory high threshold
             - name: memsw.max.bytes
               type: long
               format: bytes
-              description: memory max threshhold
+              description: memory max threshold
 
             - name: memsw.failures
               type: long

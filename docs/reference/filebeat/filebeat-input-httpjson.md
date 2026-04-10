@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]
@@ -11,7 +12,7 @@ applies_to:
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-If you are starting development of a new custom HTTP API input, we recommend that you use the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md) which provides greater flexibility and an improved developer experience.
+If you are starting development of a new custom HTTP API input, we recommend that you use the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md) which provides greater flexibility and an improved developer experience. Existing `httpjson` inputs can be migrated to CEL using the [`run_as_cel`](#run-as-cel) option.
 
 This input supports:
 
@@ -1498,16 +1499,17 @@ Example:
     }
     ```
 
-    This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+    This behavior of targeted fixed pattern replacement in the url helps solve various use cases.
 
 
 **Some useful points to remember:**
 
 1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a **single *.* (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one *.* (dot) as prefix) or `replace_with:'$.exportId,first_response.body.exportId'` (no *.* dot as prefix)
 2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be extrated becomes `"" (an empty string)`, which has no definition within any context variable.
+3. All but the last response in a chain may be an array of strings or numbers, where each element is an identifier used to construct subsequent requests. The replace expression to access the identifiers is `replace: $[:]`.
 
 ::::{note}
-Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object can only store flat JSON structures (no support for NDJSON or Gzipped JSON), except for chained configurations where an array of strings or numbers is allowed. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 ::::
 
 
@@ -1725,6 +1727,123 @@ filebeat.inputs:
         fields: ["message"]
         target: "json"
 ```
+
+
+### `run_as_cel` [run-as-cel]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+When set to `true`, the input is transparently redirected to the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md). This allows an existing `httpjson` configuration to run under the CEL engine without changing the input `type`. A `cel.program` must be provided when this option is enabled.
+
+Shared configuration fields are automatically translated to their CEL equivalents:
+
+| httpjson field | CEL field |
+| --- | --- |
+| `interval` | `interval` |
+| `id` | `id` |
+| `request.url` | `resource.url` |
+| `request.timeout` | `resource.timeout` |
+| `request.ssl` | `resource.ssl` |
+| `request.proxy_url` | `resource.proxy_url` |
+| `request.proxy_headers` | `resource.proxy_headers` |
+| `request.proxy_disable` | `resource.proxy_disable` |
+| `request.idle_connection_timeout` | `resource.idle_connection_timeout` |
+| `request.keep_alive` | `resource.keep_alive` |
+| `request.retry` | `resource.retry` |
+| `request.redirect` | `resource.redirect` |
+| `request.tracer` | `resource.tracer` |
+| `auth` | `auth` |
+
+Fields that are specific to httpjson (such as `request.transforms`, `response.transforms`, `response.split`, `response.pagination`, and `chain`) are not transferred and have no effect when `run_as_cel` is enabled. The CEL program is responsible for equivalent logic.
+
+If the httpjson input has existing cursor state, it is automatically carried over to the CEL input on the first run. After that first run the CEL input writes its own cursor, and all subsequent runs, whether the next interval or after a restart, read from the CEL cursor. The original httpjson cursor is not modified, so removing `run_as_cel` restores the original httpjson behavior with its last cursor intact.
+
+Default: `false`.
+
+
+### `cel.program` [cel-program]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+The CEL program to execute when [`run_as_cel`](#run-as-cel) is enabled. This is the same program format used by the [CEL input's `program` field](/reference/filebeat/filebeat-input-cel.md). Required when `run_as_cel` is `true`.
+
+
+### `cel.state` [cel-state]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Initial state for the CEL program, equivalent to the [CEL input's `state` field](/reference/filebeat/filebeat-input-cel.md). May include an initial `cursor` object that is used as the bootstrap value on the first execution when no stored cursor exists.
+
+
+### `cel.max_executions` [cel-max-executions]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+The maximum number of CEL program executions per interval. Equivalent to the [CEL input's `max_executions` field](/reference/filebeat/filebeat-input-cel.md). Default: `1000`.
+
+
+### `cel.regexp` [cel-regexp]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+A map of named regular expression patterns available to the CEL program. Equivalent to the [CEL input's `regexp` field](/reference/filebeat/filebeat-input-cel.md).
+
+
+### `cel.xsd` [cel-xsd]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+A map of named XSD schemas for XML decoding in the CEL program. Equivalent to the [CEL input's `xsd` field](/reference/filebeat/filebeat-input-cel.md).
+
+
+### `cel.redact` [cel-redact]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Redaction configuration for the CEL program. Equivalent to the [CEL input's `redact` field](/reference/filebeat/filebeat-input-cel.md).
+
+::::{admonition} Example: migrating an httpjson input to CEL
+```yaml
+filebeat.inputs:
+- type: httpjson
+  id: my-api-input
+  interval: 60s
+  run_as_cel: true
+  request.url: https://api.example.com/events
+  auth.oauth2:
+    client.id: my-client-id
+    client.secret: my-client-secret
+    token_url: https://auth.example.com/oauth2/token
+  request.ssl.verification_mode: full
+  request.timeout: 30s
+  cel.program: |
+    state.url.with({
+        "Header": {"Accept": ["application/json"]},
+    }).as(req, request("GET", req).as(resp,
+        bytes(resp.Body).decode_json().as(body, {
+            "events": body.items.map(e, {"message": e.encode_json()}),
+            "cursor": {"since": body.items[body.items.size()-1].updated_at},
+        })
+    ))
+  cel.state:
+    cursor:
+      since: "2024-01-01T00:00:00Z"
+```
+::::
 
 
 ## Request life cycle [_request_life_cycle]

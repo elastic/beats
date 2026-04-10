@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-ssl.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure SSL [configuration-ssl]
@@ -137,10 +138,10 @@ This check is not a replacement for the normal SSL validation, but it adds addit
 
 ## Client configuration options [ssl-client-config]
 
-You can specify the following options in the `ssl` section of each subsystem that supports SSL.
+Use these settings when `winlogbeat` acts as a **client** connecting to a remote service (for example, Elasticsearch, Logstash, or Kibana). These options control how `winlogbeat` verifies the server it connects to and, optionally, presents a client certificate. You can specify the following options in the `ssl` section of each subsystem that supports SSL.
 
 
-### `certificate_authorities` [client-certificate-authorities]
+### `certificate_authorities` (client) [client-certificate-authorities]
 
 The list of root certificates for verifications is required. If `certificate_authorities` is empty or not set, the system keystore is used. If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 
@@ -265,7 +266,7 @@ Controls the verification of server certificates. Valid values are:
 
 ### `ca_trusted_fingerprint` [ca_trusted_fingerprint]
 
-A HEX encoded SHA-256 of a CA certificate. If this certificate is present in the chain during the handshake, it will be added to the `certificate_authorities` list and the handshake will continue normaly.
+A HEX encoded SHA-256 of a CA certificate. If this certificate is present in the chain during the handshake, it will be added to the `certificate_authorities` list and the handshake will continue normally.
 
 To get the fingerprint from a CA certificate on a Unix-like system, you can use the following command, where `ca.crt` is the certificate.
 
@@ -276,10 +277,10 @@ openssl x509 -fingerprint -sha256 -noout -in ./ca.crt | awk --field-separator="=
 
 ## Server configuration options [ssl-server-config]
 
-You can specify the following options in the `ssl` section of each subsystem that supports SSL.
+Use these settings when `winlogbeat` acts as a **server** accepting incoming connections. These options control the certificate `winlogbeat` presents to connecting clients and, optionally, how it verifies client certificates. You can specify the following options in the `ssl` section of each subsystem that supports SSL.
 
 
-### `certificate_authorities` [server-certificate-authorities]
+### `certificate_authorities` (server) [server-certificate-authorities]
 
 The list of root certificates for client verifications is only required if `client_authentication` is configured. If `certificate_authorities` is empty or not set, and `client_authentication` is configured, the system keystore is used.
 

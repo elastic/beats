@@ -32,22 +32,29 @@ func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) 
 
 type mockPublisher struct {
 	index      string
-	actionID   string
+	idValue    string
+	idFieldKey string
 	responseID string
 	meta       map[string]interface{}
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
 	reqData    interface{}
+	profile    map[string]interface{}
 }
 
-func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
-	p.actionID = idValue
+	p.idValue = idValue
+	p.idFieldKey = idFieldKey
 	p.responseID = responseID
 	p.meta = meta
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData
+}
+
+func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+	p.profile = profile
 }
 
 func TestActionHandlerExecute(t *testing.T) {
@@ -68,7 +75,7 @@ func TestActionHandlerExecute(t *testing.T) {
 	tests := []struct {
 		Name          string
 		QueryExecutor queryExecutor
-		Publisher     queryResultPublisher
+		Publisher     actionQueryPublisher
 
 		Request map[string]interface{}
 		Err     error
@@ -135,12 +142,17 @@ func TestActionHandlerExecute(t *testing.T) {
 						t.Error(diff)
 					}
 
-					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).actionID)
+					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).idValue)
 					if diff != "" {
 						t.Error(diff)
 					}
-				if tc.Publisher.(*mockPublisher).responseID == "" {
-					t.Error("expected non-empty responseID")
+					diff = cmp.Diff("action_id", tc.Publisher.(*mockPublisher).idFieldKey)
+					if diff != "" {
+						t.Error(diff)
+					}
+					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).responseID)
+					if diff != "" {
+						t.Error(diff)
 					}
 				}
 			} else {
@@ -157,7 +169,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-			_ = res
 		})
 	}
 }

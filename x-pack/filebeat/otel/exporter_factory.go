@@ -102,6 +102,14 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 	}
 }
 
+// SetGlobalMetricsExporter sets the global metrics exporter.
+// This is used for testing.
+func (ef *MetricsExporterFactory) SetGlobalMetricsExporter(exporter sdkmetric.Exporter) {
+	ef.lock.Lock()
+	ef.globalMetricsExporter = exporter
+	ef.lock.Unlock()
+}
+
 // GetExporter returns a metrics exporter based on the current environment
 // configuration.
 //
@@ -187,30 +195,30 @@ func GetExporterTypeFromEnv() ExporterType {
 			http/json to use OTLP/HTTP + JSON (not available in golang)
 	*/
 
-	// this is the expected setup for agentless
-	exporter, ok := os.LookupEnv("OTEL_METRICS_EXPORTER")
-	if ok && exporter == "console" {
+	switch os.Getenv("OTEL_METRICS_EXPORTER") {
+	case "console":
 		return console
-	}
-	if ok && exporter == "none" {
-		return None
-	}
-	if ok && exporter == "prometheus" {
-		return None
-	}
+	case "otlp":
+		endpoint := os.Getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT")
+		if endpoint == "" {
+			endpoint = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+		}
+		if endpoint == "" {
+			return None
+		}
 
-	_, ok = os.LookupEnv("OTEL_EXPORTER_OTLP_ENDPOINT")
-	if ok {
-		protocol, ok := os.LookupEnv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")
-		if !ok {
+		switch strings.ToLower(os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL")) {
+		case "", string(GRPC):
+			// default to gRPC if protocol is unset
 			return GRPC
-		}
-		if strings.Contains(strings.ToLower(protocol), string(GRPC)) {
-			return GRPC
-		}
-		if strings.ToLower(protocol) == "http/protobuf" {
+		case "http/protobuf":
 			return HTTP
+		default:
+			// unknown protocol
+			return None
 		}
+	default:
+		// exporter is none, prometheus, (unknown), (unset)
+		return None
 	}
-	return None
 }

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-kafka.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Kafka input [filebeat-input-kafka]
@@ -43,7 +44,7 @@ For more details on the mapping between Kafka and Event Hubs configuration param
 
 ## Compatibility [kafka-input-compatibility]
 
-This input works with all Kafka versions in between 0.11 and 2.8.0. Older versions might work as well, but are not supported.
+This input works with all Kafka versions between 0.11 and 4.1.0. Earlier versions might work as well, but are not supported.
 
 
 ## Configuration options [filebeat-input-kafka-options]

@@ -1,13 +1,13 @@
 # Testing environments
 
-These environments are intended for manual and automated testing. The docker-compose files can be combined to create the different environment.
+These environments are intended for manual and automated testing. The docker compose files can be combined to create the different environment.
 
 
 # Manual testing
 
 The different environments can be started with the following commands for manual testing. These environments expose ports of Elasticsearch, Logstash and Kibana on the Docker-Machine ip.
 
-Running the environment chains the following docker-compose files together
+Running the environment chains the following docker compose files together
 
 * local.yml: Definition of ports which have to be exposed for local testing including kibana
 * latest.yml: Latest version of elasticsearch, logstash, kibana
@@ -22,7 +22,7 @@ make start ENV=es17-ls15-kb41.yml
 
 This will start the environment and log you into the debian machine. This machine is intended for manual testing of the beats. Download the beats package or snapshot you want to test. Elasticsearch can be reached under the host `elasticsearch`, logstash under `logstash`. Make sure to update the configuration file of the beat with the specific host.
 
-To stop an clean up the environment afterwards, make sure to run:
+To stop and clean up the environment afterwards, make sure to run:
 
 ```
 make stop ENV=es17-ls15-kb41.yml
@@ -49,7 +49,7 @@ Often the default address is `localhost`.
 
 
 ## Cleanup
-In case your environment is messed up because of multiple instances still running and conflicting with each other, use the following commands to clean up. Please be aware that this will stop ALL docker containers ony our docker-machine.
+In case your environment is messed up because of multiple instances still running and conflicting with each other, use the following commands to clean up. Please be aware that this will stop ALL docker containers on your docker-machine.
 
 ```
 make clean
@@ -58,7 +58,7 @@ make clean
 
 ## Notes
 
-Every container has a name corresponding with the service. This requires to shut down an environment and clean it up before starting an other environment. This is intentional to prevent conflicts.
+Every container has a name corresponding with the service. This requires to shut down an environment and clean it up before starting another environment. This is intentional to prevent conflicts.
 
 
 # Automated Testing
@@ -74,10 +74,10 @@ This will run the full testsuite but with latest environments instead of snapsho
 
 ## Defaults
 
-By default, elasticsearch, logstash and kibana are started. These are available at all time that these environments are used. Running the environment, chains the following docker-compose flies together:
+By default, elasticsearch, logstash and kibana are started. These are available at all time that these environments are used. Running the environment, chains the following docker compose files together:
 
 * snapshot.yml: Snapshot version of elasticsearch, logstash, kibana
-* docker-compose.yml: Local beat docker-compose file
+* docker-compose.yml: Local beat docker compose file
 
 
 ## Updating environments

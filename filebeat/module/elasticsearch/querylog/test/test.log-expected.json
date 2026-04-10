@@ -1,0 +1,911 @@
+[
+    {
+        "@timestamp": "2026-03-31T19:36:14.805Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "dsl": {
+                    "total_count": 3
+                },
+                "indices": [
+                    "query_log_test_index"
+                ],
+                "query": "{\"size\":10,\"query\":{\"match_all\":{\"boost\":1.0}}}",
+                "result_count": 3,
+                "shards": {
+                    "successful": 1
+                },
+                "took": 1577209,
+                "took_millis": 1,
+                "type": "dsl"
+            },
+            "task": {
+                "id": 16285
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:14.805Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 1577209,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 0
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][search][T#18]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:14.913Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "parent": {
+                "node": {
+                    "id": "juurGSfgRYGwTP2ttZbtOQ"
+                },
+                "task": {
+                    "id": 16288
+                }
+            },
+            "querylog": {
+                "indices": [
+                    "query_log_test_index"
+                ],
+                "query": "{\"size\":10,\"timeout\":\"30s\",\"_source\":{\"includes\":[],\"excludes\":[]},\"sort\":[{\"@timestamp\":{\"order\":\"desc\",\"missing\":\"_last\",\"unmapped_type\":\"date\"}}],\"track_total_hits\":-1}",
+                "result_count": 3,
+                "shards": {
+                    "successful": 1
+                },
+                "took": 1329417,
+                "took_millis": 1,
+                "type": "dsl"
+            },
+            "task": {
+                "id": 16291
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:14.913Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 1329417,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 1075
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][search][T#3]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:14.916Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "indices": [
+                    "query_log_test_index"
+                ],
+                "query": "anywheretrue",
+                "result_count": 3,
+                "took": 1000000,
+                "took_millis": 1,
+                "type": "eql"
+            },
+            "task": {
+                "id": 16288
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:14.916Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 1000000,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 2345
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][search][T#3]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:15.023Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "parent": {
+                "node": {
+                    "id": "juurGSfgRYGwTP2ttZbtOQ"
+                },
+                "task": {
+                    "id": 16293
+                }
+            },
+            "querylog": {
+                "indices": [
+                    "query_log_test_index"
+                ],
+                "query": "{\"size\":10,\"timeout\":\"90s\",\"_source\":false,\"fields\":[{\"field\":\"@timestamp\",\"format\":\"strict_date_optional_time_nanos\"},{\"field\":\"event.category\"},{\"field\":\"event_type\"},{\"field\":\"host\"},{\"field\":\"message\"}],\"sort\":[{\"_doc\":{\"order\":\"asc\"}}],\"track_total_hits\":-1,\"pit\":{\"id\":\"2OG5BAEUcXVlcnlfbG9nX3Rlc3RfaW5kZXgWdjBVTklZTUZRRW1UcUNtSkpfZ0JwQQABFmp1dXJHU2ZnUllHd1RQMnR0WmJ0T1EAAQAAAAAAAAS5Fk1yMy1YejFBUnpPTjIwbEd0ZW5obncAARZ2MFVOSVlNRlFFbVRxQ21KSl9nQnBBAAA=\"}}",
+                "result_count": 3,
+                "shards": {
+                    "successful": 1
+                },
+                "took": 2118291,
+                "took_millis": 2,
+                "type": "dsl"
+            },
+            "task": {
+                "id": 16297
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:15.023Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 2118291,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 3288
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][search][T#5]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:15.026Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "query": "SELECT*FROM\"query_log_test_index\"LIMIT10",
+                "result_count": 3,
+                "took": 75637208,
+                "took_millis": 75,
+                "type": "sql"
+            },
+            "task": {
+                "id": 16293
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:15.026Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 75637208,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 4866
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][generic][T#3]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:15.445Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "esql": {
+                    "profile": {
+                        "analysis": {
+                            "took": 19838833
+                        },
+                        "dependency_resolution": {
+                            "took": 8105209
+                        },
+                        "parsing": {
+                            "took": 39275625
+                        },
+                        "planning": {
+                            "took": 113539084
+                        },
+                        "preanalysis": {
+                            "took": 628584
+                        },
+                        "query": {
+                            "took": 393445000
+                        }
+                    }
+                },
+                "indices": [
+                    "query_log_test_index"
+                ],
+                "query": "FROMquery_log_test_index|LIMIT10",
+                "result_count": 3,
+                "shards": {
+                    "successful": 1
+                },
+                "took": 393445000,
+                "took_millis": 393,
+                "type": "esql"
+            },
+            "task": {
+                "id": 16301
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:15.445Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 393445000,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 5785
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][esql_worker][T#4]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:15.459Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "clusters": {
+                    "remote_count": 1,
+                    "remotes": [
+                        "remote1"
+                    ],
+                    "skipped": 1,
+                    "total": 1
+                },
+                "dsl": {
+                    "total_count": 0
+                },
+                "indices": [
+                    "remote1:query_log_test_index"
+                ],
+                "query": "{\"size\":10,\"query\":{\"match_all\":{\"boost\":1.0}}}",
+                "result_count": 0,
+                "shards": {
+                    "successful": 0
+                },
+                "took": 4245875,
+                "took_millis": 4,
+                "type": "dsl"
+            },
+            "task": {
+                "id": 16313
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:15.459Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 4245875,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 7182
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][transport_worker][T#11]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:15.477Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "clusters": {
+                    "remote_count": 1,
+                    "remotes": [
+                        "remote1"
+                    ],
+                    "skipped": 1,
+                    "total": 1
+                },
+                "esql": {
+                    "profile": {
+                        "dependency_resolution": {
+                            "took": 1520375
+                        },
+                        "parsing": {
+                            "took": 1306084
+                        },
+                        "planning": {
+                            "took": 3253209
+                        },
+                        "preanalysis": {
+                            "took": 24917
+                        },
+                        "query": {
+                            "took": 3289916
+                        }
+                    }
+                },
+                "indices": [
+                    "remote1:query_log_test_index"
+                ],
+                "query": "FROMremote1:query_log_test_index|LIMIT10",
+                "result_count": 0,
+                "shards": {
+                    "successful": 0
+                },
+                "took": 3289916,
+                "took_millis": 3,
+                "type": "esql"
+            },
+            "task": {
+                "id": 16317
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:15.477Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 3289916,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 8464
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][search_coordination][T#2]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    },
+    {
+        "@timestamp": "2026-03-31T19:36:15.483Z",
+        "agent": {
+            "ephemeral_id": "e2c0b824-df21-42eb-aa7f-382aa6768dae",
+            "id": "090cf732-f7a0-4916-8fa6-32839cda4625",
+            "name": "iMac-de-Adminstrateur.local",
+            "type": "filebeat",
+            "version": "9.4.0"
+        },
+        "auth": {
+            "type": "REALM"
+        },
+        "ecs": {
+            "version": "1.12.0"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "name": "querying",
+                "uuid": "gjYgb-uQQAuLmDoKlQInZw"
+            },
+            "node": {
+                "id": "juurGSfgRYGwTP2ttZbtOQ",
+                "name": "node-1"
+            },
+            "querylog": {
+                "clusters": {
+                    "remote_count": 1,
+                    "remotes": [
+                        "remote2"
+                    ],
+                    "skipped": 1,
+                    "total": 1
+                },
+                "dsl": {
+                    "total_count": 0
+                },
+                "indices": [
+                    "remote2:query_log_test_index"
+                ],
+                "query": "{\"size\":10,\"query\":{\"match_all\":{\"boost\":1.0}}}",
+                "result_count": 0,
+                "shards": {
+                    "successful": 0
+                },
+                "took": 692459,
+                "took_millis": 0,
+                "type": "dsl"
+            },
+            "task": {
+                "id": 16319
+            }
+        },
+        "event": {
+            "created": "2026-03-31T19:36:15.483Z",
+            "dataset": "elasticsearch.querylog",
+            "duration": 692459,
+            "ingested": "2026-04-03T07:25:24.768Z",
+            "module": "elasticsearch",
+            "outcome": "success"
+        },
+        "fileset": {
+            "name": "querylog"
+        },
+        "host": {
+            "name": "iMac-de-Adminstrateur.local"
+        },
+        "http": {
+            "request": {
+                "headers": {
+                    "x_opaque_id": "riddle-me-this-batman-1774985774"
+                }
+            }
+        },
+        "input": {
+            "type": "filestream"
+        },
+        "log": {
+            "file": {
+                "device_id": "16777220",
+                "inode": "969772489",
+                "path": "/Users/consulthys/workspaces/beats/filebeat/module/elasticsearch/querylog/test/test.log"
+            },
+            "level": "INFO",
+            "logger": "elasticsearch.querylog",
+            "offset": 10001
+        },
+        "process": {
+            "thread": {
+                "name": "elasticsearch[node-1][transport_worker][T#9]"
+            }
+        },
+        "service": {
+            "name": "ES_ECS",
+            "type": "elasticsearch"
+        },
+        "trace": {
+            "id": "0af7651916cd43dd8448eb211c80319c"
+        },
+        "user": {
+            "name": "elastic",
+            "realm": "reserved"
+        }
+    }
+]

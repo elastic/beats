@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # filestream input [filebeat-input-filestream]
@@ -949,7 +950,7 @@ Valid encodings:
 * `ebcdic-1040`: IBM CodePage 1140
 * `ebcdic-1047`: IBM CodePage 1047
 * `koi8r`: KOI8-R, Russian (Cyrillic)
-* `koi8u`: KOI8-U, Ukranian (Cyrillic)
+* `koi8u`: KOI8-U, Ukrainian (Cyrillic)
 * `macintosh`: Macintosh encoding
 * `macintosh-cyrillic`: Macintosh Cyrillic encoding
 * `windows1250`: Windows1250, Central and Eastern European

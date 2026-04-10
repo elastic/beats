@@ -37,11 +37,71 @@ import (
 	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
+var errRecordIDGap = errors.New("record ID gap detected")
+var errRenderNoEvent = errors.New("rendering error without partial event")
+
+const renderNoEventRetryLimit = 3
+const recordIDGapRetryLimit = 3
+
+type gapDetectedError struct {
+	channel  string
+	previous uint64
+	current  uint64
+	bookmark string
+}
+
+func (e *gapDetectedError) Error() string {
+	return fmt.Sprintf("%v in channel %q (previous=%d current=%d)",
+		errRecordIDGap, e.channel, e.previous, e.current)
+}
+
+func (e *gapDetectedError) Unwrap() error { return errRecordIDGap }
+func (e *gapDetectedError) Bookmark() string {
+	return e.bookmark
+}
+
+func (e *gapDetectedError) RetryKey() string {
+	return fmt.Sprintf("%s:%d:%d", e.channel, e.previous, e.current)
+}
+
+type renderNoEventError struct {
+	cause    error
+	bookmark string
+}
+
+func (e *renderNoEventError) Error() string {
+	if e.cause == nil {
+		return errRenderNoEvent.Error()
+	}
+	return fmt.Sprintf("%v: %v", errRenderNoEvent, e.cause)
+}
+
+func (e *renderNoEventError) Unwrap() error { return errRenderNoEvent }
+func (e *renderNoEventError) Bookmark() string {
+	return e.bookmark
+}
+
+func (e *renderNoEventError) RetryKey() string {
+	if e.bookmark != "" {
+		return e.bookmark
+	}
+	return fmt.Sprintf("no-bookmark:%v", e.cause)
+}
+
+func (l *winEventLog) newRenderNoEventError(handle win.EvtHandle, cause error) *renderNoEventError {
+	bookmark, bookmarkErr := l.createBookmarkFromEvent(handle)
+	return &renderNoEventError{
+		cause:    errors.Join(cause, bookmarkErr),
+		bookmark: bookmark,
+	}
+}
+
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
 type winEventLog struct {
 	config      config
 	query       string
+	filter      *recordFilter
 	id          string                   // Identifier of this event log.
 	channelName string                   // Name of the channel from which to read.
 	file        bool                     // Reading from file rather than channel.
@@ -53,6 +113,11 @@ type winEventLog struct {
 	renderer win.EventRenderer
 
 	metrics *inputMetrics
+
+	renderNoEventKey   string
+	renderNoEventCount int
+	gapRetryKey        string
+	gapRetryCount      int
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
@@ -79,42 +144,28 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	}
 
 	if c.XMLQuery != "" {
-		if l.skipQueryFilters() {
-			l.log.Warn("you are using a custom XML query with Windows Server 2025 and forwarded events, " +
-				"this is not recommended due to a known issue with that can crash the Event Log service if using" +
-				" query filters. Please use a custom query without filters or use the default query")
+		if l.hasWin2025ForwardedBugRisk() {
+			l.log.Warn("using a custom XML query with Windows Server 2025 forwarded events can hit a known Event Log API issue")
 		}
 		l.query = c.XMLQuery
 	} else {
 		l.log = l.log.With("channel", c.Name)
-		queryLog := c.Name
 		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
 			path, err := filepath.Abs(c.Name)
 			if err != nil {
 				return nil, err
 			}
 			l.file = true
-			queryLog = "file://" + path
+			l.channelName = path
 		}
 
-		winQuery := win.Query{
-			Log: queryLog,
-		}
-
-		if !l.skipQueryFilters() {
-			winQuery.IgnoreOlder = c.SimpleQuery.IgnoreOlder
-			winQuery.Level = c.SimpleQuery.Level
-			winQuery.EventID = c.SimpleQuery.EventID
-			winQuery.Provider = c.SimpleQuery.Provider
-		} else {
-			l.log.Warn("skipping query filters for Windows Server 2025 due to known issue" +
-				" with Event Log API and forwarded events")
-		}
-
-		l.query, err = winQuery.Build()
+		l.filter, err = newRecordFilter(c.SimpleQuery)
 		if err != nil {
 			return nil, err
 		}
+
+		// Always use an unfiltered query and apply configured filters in Go.
+		l.query = "*"
 	}
 
 	switch c.IncludeXML || l.isForwarded() {
@@ -138,6 +189,25 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 func (l *winEventLog) isForwarded() bool {
 	c := l.config
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
+}
+
+func (l *winEventLog) shouldDetectGap(prevRecordID, currentRecordID uint64) bool {
+	if l.file || l.isForwarded() || prevRecordID == 0 {
+		return false
+	}
+	return currentRecordID > prevRecordID+1
+}
+
+func (l *winEventLog) hasWin2025ForwardedBugRisk() bool {
+	if !l.isForwarded() {
+		return false
+	}
+	osinfo, err := wininfo.OperatingSystem()
+	if err != nil {
+		l.log.Warnf("failed to get OS info while checking known issue conditions: %v", err)
+		return false
+	}
+	return strings.Contains(osinfo.Name, "2025")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -253,24 +323,32 @@ func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) 
 	}
 
 	l.log.Debugw("Using subscription query.", "winlog.query", l.query)
+	channelPath := ""
+	if l.config.XMLQuery == "" {
+		channelPath = l.channelName
+	}
 	h, err := win.Subscribe(
 		0, // Session - nil for localhost
 		signalEvent,
-		"",                      // Channel - empty b/c channel is in the query
+		channelPath,
 		l.query,                 // Query - nil means all events
 		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
 
-	switch err { //nolint:errorlint // This is an errno or nil.
-	case nil:
+	if err == nil {
 		return h, nil
-	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
+	}
+	if errors.Is(err, win.ERROR_NOT_FOUND) ||
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE) ||
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION) {
 		// The bookmarked event was not found, we retry the subscription from the start.
 		incrementMetric(readErrors, err)
-		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
-	default:
-		return 0, err
+		// Clear persisted checkpoint fields before restarting at oldest so stale
+		// state does not produce synthetic gap checks on the next records.
+		l.resetLastRead()
+		return win.Subscribe(0, signalEvent, channelPath, l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	}
+	return 0, err
 }
 
 func (l *winEventLog) Read() ([]Record, error) {
@@ -283,10 +361,15 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
 		record, err := l.processHandle(h)
 		if err != nil {
-			l.metrics.logError(err)
-			l.log.Warnw("Dropping event due to rendering error.", "error", err)
-			l.metrics.logDropped(err)
-			incrementMetric(dropReasons, err)
+			if returnErr := l.handleProcessError(err); returnErr != nil {
+				return records, returnErr
+			}
+			continue
+		}
+		l.resetRenderNoEventRetry()
+		// Any successfully processed event breaks a previous gap retry streak.
+		l.resetGapRetry()
+		if l.filter != nil && !l.filter.match(record) {
 			continue
 		}
 		records = append(records, *record)
@@ -311,13 +394,93 @@ func (l *winEventLog) Read() ([]Record, error) {
 	return records, nil
 }
 
+func (l *winEventLog) handleProcessError(err error) error {
+	var renderErr *renderNoEventError
+	if errors.As(err, &renderErr) {
+		// Render-no-event and gap retries are independent counters; reset gap
+		// state while handling render failures to avoid cross-error pollution.
+		l.resetGapRetry()
+		l.metrics.logError(err)
+		retryCount := l.incrementRenderNoEventRetry(renderErr.RetryKey())
+		if retryCount <= renderNoEventRetryLimit {
+			return err
+		}
+
+		l.log.Errorw("Dropping poison event after repeated render failures.",
+			"channel", l.channelName,
+			"retry_count", retryCount,
+			"retry_limit", renderNoEventRetryLimit)
+		l.metrics.logDropped(err)
+		incrementMetric(dropReasons, errRenderNoEvent.Error())
+		if bookmark := renderErr.Bookmark(); bookmark != "" {
+			l.lastRead.Bookmark = bookmark
+		} else {
+			l.log.Errorw("Dropping poison event without bookmark after repeated render failures.",
+				"channel", l.channelName,
+				"retry_count", retryCount,
+				"retry_limit", renderNoEventRetryLimit)
+			l.resetRenderNoEventRetry()
+			return nil
+		}
+		// We advanced by bookmark only; clear record number so gap detection
+		// does not compare against stale numeric state.
+		l.lastRead.RecordNumber = 0
+		l.resetRenderNoEventRetry()
+		return nil
+	}
+
+	l.resetRenderNoEventRetry()
+	var gapErr *gapDetectedError
+	if errors.As(err, &gapErr) {
+		// Gap errors are retried first (runner reset + backoff) because in-flight
+		// events can arrive and fill the gap shortly after detection.
+		l.metrics.logError(err)
+		retryCount := l.incrementGapRetry(gapErr.RetryKey())
+		if retryCount <= recordIDGapRetryLimit {
+			return err
+		}
+
+		// After repeated retries on the same gap boundary, accept the gap and
+		// advance state to avoid an infinite reset loop.
+		l.log.Errorw("Accepting record ID gap after repeated retries.",
+			"channel", l.channelName,
+			"retry_count", retryCount,
+			"retry_limit", recordIDGapRetryLimit,
+			"previous_record_id", gapErr.previous,
+			"current_record_id", gapErr.current,
+			"missing", gapErr.current-gapErr.previous-1)
+		l.metrics.logDropped(err)
+		incrementMetric(dropReasons, errRecordIDGap.Error())
+		if bookmark := gapErr.Bookmark(); bookmark != "" {
+			l.lastRead.Bookmark = bookmark
+		}
+		l.lastRead.RecordNumber = gapErr.current
+		// Gap was handled (accepted/dropped), so clear retry state for the next boundary.
+		l.resetGapRetry()
+		return nil
+	}
+
+	// Different/non-gap error path; discard any stale gap retry context.
+	l.resetGapRetry()
+	if errors.Is(err, errRecordIDGap) || errors.Is(err, errRenderNoEvent) {
+		l.metrics.logError(err)
+		return err
+	}
+
+	l.metrics.logError(err)
+	l.log.Warnw("Dropping event due to rendering error.", "error", err)
+	l.metrics.logDropped(err)
+	incrementMetric(dropReasons, err)
+	return nil
+}
+
 func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	defer h.Close()
 
 	// NOTE: Render can return an error and a partial event.
 	evt, xml, err := l.renderer.Render(h)
 	if evt == nil {
-		return nil, err
+		return nil, l.newRenderNoEventError(h, err)
 	}
 	if err != nil {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
@@ -335,6 +498,19 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 		r.File = l.id
 	}
 
+	prevRecordID := l.lastRead.RecordNumber
+	if l.shouldDetectGap(prevRecordID, r.RecordID) {
+		// Gap detection is channel-only. File reads can legitimately contain
+		// non-contiguous record IDs and should not trigger recovery. Forwarded
+		// events can also be non-contiguous.
+		l.log.Warnw("Record ID gap detected, resetting subscription.",
+			"channel", l.channelName,
+			"previous_record_id", prevRecordID,
+			"current_record_id", r.RecordID,
+			"missing", r.RecordID-prevRecordID-1)
+		return nil, l.newGapDetectedError(h, prevRecordID, r.RecordID)
+	}
+
 	r.Offset = checkpoint.EventLogState{
 		Name:         l.id,
 		RecordNumber: r.RecordID,
@@ -346,6 +522,23 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	}
 	l.lastRead = r.Offset
 	return r, nil
+}
+
+func (l *winEventLog) newGapDetectedError(handle win.EvtHandle, previousRecordID, currentRecordID uint64) *gapDetectedError {
+	// Capture the current event bookmark so the gap circuit-breaker can skip
+	// this boundary if retries are exhausted.
+	bookmark, err := l.createBookmarkFromEvent(handle)
+	if err != nil {
+		l.metrics.logError(err)
+		l.log.Warnw("Failed creating bookmark for record ID gap recovery.", "error", err)
+	}
+
+	return &gapDetectedError{
+		channel:  l.channelName,
+		previous: previousRecordID,
+		current:  currentRecordID,
+		bookmark: bookmark,
+	}
 }
 
 func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
@@ -388,18 +581,40 @@ func (l *winEventLog) close() error {
 	)
 }
 
-// FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
-// the Event Log Service to crash when using some combinations of filters with
-// forwarded events. This is a workaround to skip the query filters for
-// Windows Server 2025 in such scenarios.
-func (l *winEventLog) skipQueryFilters() bool {
-	if l.config.Bypass2025Workaround {
-		return false
+func (l *winEventLog) incrementRenderNoEventRetry(bookmark string) int {
+	if bookmark == l.renderNoEventKey && l.renderNoEventCount > 0 {
+		l.renderNoEventCount++
+		return l.renderNoEventCount
 	}
-	osinfo, err := wininfo.OperatingSystem()
-	if err != nil {
-		l.log.Warnf("failed to get OS info: %v", err)
-		return false
+
+	l.renderNoEventKey = bookmark
+	l.renderNoEventCount = 1
+	return l.renderNoEventCount
+}
+
+func (l *winEventLog) resetRenderNoEventRetry() {
+	l.renderNoEventKey = ""
+	l.renderNoEventCount = 0
+}
+
+func (l *winEventLog) incrementGapRetry(key string) int {
+	if key == l.gapRetryKey && l.gapRetryCount > 0 {
+		l.gapRetryCount++
+		return l.gapRetryCount
 	}
-	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
+
+	l.gapRetryKey = key
+	l.gapRetryCount = 1
+	return l.gapRetryCount
+}
+
+func (l *winEventLog) resetGapRetry() {
+	l.gapRetryKey = ""
+	l.gapRetryCount = 0
+}
+
+func (l *winEventLog) resetLastRead() {
+	// Keep this scoped to fields used by resubscribe/gap logic.
+	l.lastRead.Bookmark = ""
+	l.lastRead.RecordNumber = 0
 }

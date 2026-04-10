@@ -3,19 +3,19 @@ name: "beats-filebeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1768449671"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1772337686"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1768449671"
-  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1768449671"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1768449671"
-  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1768449671"
-  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1768449671"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1768449671"
-  IMAGE_WIN_2025: "platform-ingest-beats-windows-2025-1768449671"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1772337686"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1775016079"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
+  IMAGE_WIN_2025: "platform-ingest-beats-windows-2025-1772337686"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -96,7 +96,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -123,7 +124,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -150,7 +152,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -163,7 +166,9 @@ steps:
 
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
+          source .buildkite/scripts/docker.sh
           cd filebeat
+          SNAPSHOT=true PACKAGES="docker" PLATFORMS="linux/amd64" mage -v package
           mage goIntegTest
         retry:
           automatic:
@@ -175,10 +180,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -207,10 +210,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -235,10 +236,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -381,7 +380,8 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/input-test/**/*"
+          - "filebeat/build/input-test/**"
+          - "filebeat/build/integration-tests/**"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"

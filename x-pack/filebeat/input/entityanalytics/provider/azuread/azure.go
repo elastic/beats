@@ -440,7 +440,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		updatedUsers.ForEach(func(userID uuid.UUID) {
 			u, ok := state.users[userID]
 			if !ok {
-				p.logger.Errorf("Unable to find user %q in state", userID)
+				p.logger.Debugf("Unable to find user %q in state", userID)
 				return
 			}
 			u.Modified = true
@@ -456,12 +456,36 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		})
 	}
 
+	// Enrich users with MFA registration details if requested. MFA enrichment
+	// is best-effort: changes to MFA state alone do not independently trigger
+	// incremental user updates. MFA data is only refreshed when at least one
+	// user identity delta has occurred (or during a full sync), so published
+	// user documents will reflect the latest MFA state at the time of the
+	// triggering delta, not necessarily at the moment the MFA state changed.
+	// Skip the MFA API call on no-op incremental updates since no user
+	// documents will be published anyway.
+	if wantUsers && p.conf.wantMFA() && (fullSync || updatedUsers.Len() != 0) {
+		for _, u := range state.users {
+			u.MFA = nil
+		}
+		mfaDetails, err := p.fetcher.UserMFADetails(ctx)
+		if err != nil {
+			p.logger.Warnf("Failed to fetch MFA registration details, skipping MFA enrichment: %v", err)
+		} else {
+			for userID, details := range mfaDetails {
+				if u, ok := state.users[userID]; ok {
+					u.MFA = details
+				}
+			}
+		}
+	}
+
 	// Expand device group memberships.
 	if wantDevices {
 		updatedDevices.ForEach(func(devID uuid.UUID) {
 			d, ok := state.devices[devID]
 			if !ok {
-				p.logger.Errorf("Unable to find device %q in state", devID)
+				p.logger.Debugf("Unable to find device %q in state", devID)
 				return
 			}
 			d.Modified = true
@@ -536,6 +560,10 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	})
 	if len(groups) != 0 {
 		_, _ = userDoc.Put("user.group", groups)
+	}
+
+	if u.MFA != nil {
+		_, _ = userDoc.Put("azure_ad.mfa", u.MFA)
 	}
 
 	event := beat.Event{

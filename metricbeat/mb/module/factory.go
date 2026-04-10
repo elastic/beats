@@ -19,6 +19,7 @@ package module
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -29,7 +30,7 @@ import (
 // It is used to register and reload modules.
 type Factory struct {
 	beatInfo   beat.Info
-	monitoring beat.Monitoring
+	monitoring beatmonitoring.Monitoring
 	options    []Option
 	registry   *mb.Register
 	paths      *paths.Path
@@ -44,7 +45,7 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, paths *paths.Path, options ...Option) cfgfile.RunnerFactory {
+func NewFactory(beatInfo beat.Info, monitoring beatmonitoring.Monitoring, registry *mb.Register, paths *paths.Path, options ...Option) cfgfile.RunnerFactory {
 	return &Factory{
 		beatInfo:   beatInfo,
 		monitoring: monitoring,

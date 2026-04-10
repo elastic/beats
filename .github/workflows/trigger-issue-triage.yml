@@ -1,0 +1,24 @@
+name: Issue Triage
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: read
+  discussions: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  run:
+    # Access control is enforced by the upstream reusable workflow pre_activation
+    # check (required roles: admin, maintainer, write).
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-issue-triage.lock.yml@v0
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
+        make mage
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

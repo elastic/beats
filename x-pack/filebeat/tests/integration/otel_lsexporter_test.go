@@ -264,7 +264,7 @@ service:
 	otelEvents, err := readAllEvents(otelFilePath)
 
 	require.NoError(t, err, "failed to read otel events")
-	require.Equal(t, numEvents, len(otelEvents),
+	require.Len(t, otelEvents, numEvents,
 		"different number of events: sent=%d, get=%d", numEvents, len(otelEvents))
 }
 
@@ -360,7 +360,7 @@ func compareOutputFiles(t *testing.T, fbFilePath, otelFilePath string, ignoredFi
 	otelEvents, err := readAllEvents(otelFilePath)
 	require.NoError(t, err, "failed to read otel events")
 
-	require.Equal(t, len(fbEvents), len(otelEvents),
+	require.Len(t, otelEvents, len(fbEvents),
 		"different number of events: filebeat=%d, otel=%d", len(fbEvents), len(otelEvents))
 
 	sortEventsByID(fbEvents)
@@ -463,7 +463,7 @@ func checkURLHasContent(ct *assert.CollectT, url string) {
 		return
 	}
 
-	if !assert.Greater(ct, len(body), 0, "URL %s should have content", url) {
+	if !assert.NotEmpty(ct, body, "URL %s should have content", url) {
 		return
 	}
 }

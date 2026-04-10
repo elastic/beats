@@ -1,0 +1,29 @@
+name: Mention in PR
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  actions: read
+  contents: write
+  discussions: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  run:
+    # Access control is enforced by the upstream reusable workflow pre_activation
+    # check (required roles: admin, maintainer, write).
+    if: >-
+      (startsWith(github.event.comment.body, '/ai') || contains(github.event.comment.body, '@claude')) &&
+      (github.event.issue.pull_request != null || github.event_name == 'pull_request_review_comment')
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-mention-in-pr.lock.yml@v0
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
+        make mage
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

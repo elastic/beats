@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 	"testing"
 	"time"
@@ -14,11 +15,15 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 )
 
@@ -62,7 +67,17 @@ type testManager struct {
 	started  bool
 	stopped  bool
 	startErr error
+	diagHook map[string]management.DiagnosticHook
 	mx       sync.Mutex
+}
+
+type diagnosticsQueryExecutor struct {
+	rows []map[string]interface{}
+	err  error
+}
+
+func (e *diagnosticsQueryExecutor) Query(context.Context, string, time.Duration) ([]map[string]interface{}, error) {
+	return e.rows, e.err
 }
 
 func (m *testManager) UpdateStatus(s status.Status, msg string) {
@@ -74,6 +89,8 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
+func (m *testManager) PreInit() error                      { return nil }
+func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
@@ -82,7 +99,34 @@ func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
 func (m *testManager) RegisterAction(management.Action)    {}
 func (m *testManager) UnregisterAction(management.Action)  {}
-func (m *testManager) RegisterDiagnosticHook(string, string, string, string, management.DiagnosticHook) {
+func (m *testManager) RegisterDiagnosticHook(name, _ string, _ string, _ string, hook management.DiagnosticHook) {
+	if m.diagHook == nil {
+		m.diagHook = make(map[string]management.DiagnosticHook)
+	}
+	m.diagHook[name] = hook
+}
+
+func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquerybeat, *beat.Beat, *testManager) {
+	t.Helper()
+
+	mgr := &testManager{}
+	b := &beat.Beat{
+		Manager:    mgr,
+		Registry:   reload.NewRegistry(),
+		Monitoring: beatmonitoring.NewMonitoring(),
+	}
+	b.Paths = newTestBeatPaths(t)
+
+	cfg := agentconfig.NewConfig()
+	beater, err := New(b, cfg)
+	require.NoError(t, err)
+
+	ob, ok := beater.(*osquerybeat)
+	require.True(t, ok)
+	for _, override := range overrides {
+		override(ob)
+	}
+	return ob, b, mgr
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -92,8 +136,9 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -190,14 +235,30 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	assert.Equal(t, status.Stopped, lastEvent.Status, "last status should be Stopped")
 }
 
+func newTestBeatPaths(t *testing.T) *paths.Path {
+	t.Helper()
+	root := t.TempDir()
+	p := paths.New()
+	if err := p.InitPaths(&paths.Path{
+		Home:   root,
+		Config: root,
+		Data:   root,
+		Logs:   root,
+	}); err != nil {
+		t.Fatalf("failed to init beat paths: %v", err)
+	}
+	return p
+}
+
 // TestOsquerybeatStatusReporting_CheckFailure tests status reporting when osqueryd check fails.
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -233,8 +294,9 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -270,8 +332,9 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
+	b.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -299,4 +362,95 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	lastEvent := mgr.events[len(mgr.events)-1]
 	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on manager start failure")
 	assert.Contains(t, lastEvent.Message, "Failed to start manager")
+}
+
+func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
+	mgr := &testManager{}
+	b := &beat.Beat{Manager: mgr}
+	ob := &osquerybeat{
+		qp: newQueryProfiler(logp.NewLogger("test")),
+	}
+	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
+		rows: []map[string]interface{}{
+			{
+				"name":              "pack_test_query",
+				"query":             "select * from users limit 1",
+				"executions":        int64(3),
+				"last_executed":     int64(1730000000),
+				"output_size":       int64(900),
+				"wall_time_ms":      int64(120),
+				"last_wall_time_ms": int64(40),
+				"user_time":         int64(30),
+				"last_user_time":    int64(10),
+				"system_time":       int64(6),
+				"last_system_time":  int64(2),
+				"average_memory":    int64(5000),
+				"last_memory":       int64(6000),
+			},
+		},
+	})
+
+	ob.registerDiagnosticHooks(b)
+
+	hook, ok := mgr.diagHook["scheduled_query_profiles"]
+	require.True(t, ok, "expected scheduled profiles diagnostics hook")
+
+	var payload map[string]interface{}
+	err := json.Unmarshal(hook(), &payload)
+	require.NoError(t, err)
+
+	count, ok := payload["count"].(float64)
+	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
+	assert.Equal(t, float64(1), count)
+
+	profiles, ok := payload["osquery_schedule"].([]interface{})
+	require.True(t, ok)
+	require.Len(t, profiles, 1)
+
+	p0, ok := profiles[0].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, "select * from users limit 1", p0["query"])
+
+	liveCount, ok := payload["live_query_profiles_count"].(float64)
+	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
+	assert.Equal(t, float64(0), liveCount)
+
+	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
+	require.True(t, ok)
+	assert.Empty(t, liveProfiles)
+}
+
+// TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
+// when custom osquery runtime resolution fails before osqueryd runner creation.
+func TestOsquerybeatStatusReporting_RuntimeResolutionFailure(t *testing.T) {
+	ob, b, mgr := newStatusTestBeater(t, func(ob *osquerybeat) {
+		platformCfg := &config.InstallPlatformConfig{
+			AMD64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+			ARM64: &config.InstallArtifactConfig{
+				ArtifactURL: "https://example.org/osquery.tar.gz",
+				SHA256:      "bad",
+			},
+		}
+		ob.osqueryInstallConfig = config.InstallConfig{
+			Linux:   platformCfg,
+			Darwin:  platformCfg,
+			Windows: platformCfg,
+		}
+	})
+
+	err := ob.Run(b)
+	require.Error(t, err)
+
+	mgr.mx.Lock()
+	defer mgr.mx.Unlock()
+
+	require.GreaterOrEqual(t, len(mgr.events), 1, "should have at least one status event")
+	lastEvent := mgr.events[len(mgr.events)-1]
+	assert.Equal(t, status.Failed, lastEvent.Status, "should report Failed status on runtime resolution failure")
+	assert.Contains(t, lastEvent.Message, "Failed to resolve osquery runtime")
 }

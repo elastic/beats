@@ -62,7 +62,10 @@ type conf struct {
 	Dataset string `config:"dataset"`
 	// EnrichWith specifies the additional data that
 	// will be used to enrich user data. It can include
-	// "groups", "roles" and "factors".
+	// "groups", "roles", "factors", "perms", "devices", and "supervises".
+	// If "perms" is included, role permissions are fetched
+	// for each user role (implying "roles"). The "perms"
+	// option requires the okta.roles.read OAuth2 scope.
 	// If it is a single element with "none", no
 	// enrichment is performed.
 	EnrichWith []string `config:"enrich_with"`
@@ -308,7 +311,7 @@ func (c *conf) Validate() error {
 		return errors.New("either oauth2 configuration or okta_token must be provided")
 	}
 
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {

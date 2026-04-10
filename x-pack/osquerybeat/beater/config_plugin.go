@@ -43,8 +43,14 @@ type QueryInfo struct {
 	ScheduleID string
 	// StartDate is the start date for native schedules (RFC3339); required for schedule_execution_count
 	StartDate string
+	// SpaceID is the optional policy space identifier for this query.
+	SpaceID string
 	// Interval is the schedule interval in seconds for native schedules; used to compute schedule_execution_count
 	Interval int
+	// PackID is the policy-defined pack identifier for pack queries; empty for top-level schedule queries.
+	PackID string
+	// Profile is whether to collect and publish profile for this query.
+	Profile bool
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -118,6 +124,21 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 	defer p.mx.RUnlock()
 	ns, ok = p.namespaces[name]
 	return ns, ok
+}
+
+func (p *ConfigPlugin) LookupQueryProfile(name string) bool {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	// Prefer pending config (newQueryInfoMap) so profile flag is up to date immediately after Set().
+	if p.newQueryInfoMap != nil {
+		if qi, ok := p.newQueryInfoMap[name]; ok {
+			return qi.Profile
+		}
+	}
+	if qi, ok := p.queryInfoMap[name]; ok {
+		return qi.Profile
+	}
+	return false
 }
 
 func (p *ConfigPlugin) GetNamespace() string {
@@ -217,7 +238,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	}
 
 	// Common code to register query with lookup maps, enforce snapshot and increment queries count
-	registerQuery := func(name, ns string, qi config.Query) (config.Query, error) {
+	registerQuery := func(name, ns string, qi config.Query, packID string) (config.Query, error) {
 		var ecsm ecs.Mapping
 		ecsm, err = flattenECSMapping(qi.ECSMapping)
 		if err != nil {
@@ -229,7 +250,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			ECSMapping: ecsm,
 			ScheduleID: qi.ScheduleID,
 			StartDate:  qi.StartDate,
+			SpaceID:    qi.SpaceID,
 			Interval:   qi.Interval,
+			PackID:     packID,
+			Profile:    qi.Profile,
 		}
 		namespaces[name] = ns
 		queriesCount++
@@ -244,7 +268,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
-		qi, err = registerQuery(name, p.namespace, qi)
+		qi, err = registerQuery(name, p.namespace, qi, "")
 		if err != nil {
 			return err
 		}
@@ -253,8 +277,12 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
 	for packName, pack := range osqueryConfig.Packs {
+		packID := pack.PackID
+		if packID == "" {
+			packID = packName
+		}
 		for name, qi := range pack.Queries {
-			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi)
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
 			if err != nil {
 				return err
 			}
@@ -272,14 +300,17 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		}
 		for _, stream := range input.Streams {
 			qi := config.Query{
-				Query:          stream.Query,
-				NativeSchedule: config.NativeSchedule{Interval: stream.Interval},
-				Platform:       stream.Platform,
-				Version:        stream.Version,
-				ECSMapping:     stream.ECSMapping,
+				Query: stream.Query,
+				NativeSchedule: config.NativeSchedule{
+					Interval: stream.Interval,
+				},
+				Platform:   stream.Platform,
+				Version:    stream.Version,
+				ECSMapping: stream.ECSMapping,
+				Profile:    stream.Profile,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi, input.Name)
 			if err != nil {
 				return err
 			}

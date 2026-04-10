@@ -25,11 +25,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/go-ucfg"
 )
 
 func TestMain(m *testing.M) {
@@ -1202,23 +1205,24 @@ func TestGenerateHints(t *testing.T) {
 		t.Run(test.msg, func(t *testing.T) {
 			// Configure path for modules access
 			abs, _ := filepath.Abs("../../..")
-			require.NoError(t, paths.InitPaths(&paths.Path{
+			p := paths.New()
+			require.NoError(t, p.InitPaths(&paths.Path{
 				Home: abs,
 			}))
 
 			logger := logptest.NewTestingLogger(t, "")
-			l, err := NewLogHints(test.config, logger)
+			l, err := newLogHints(test.config, logger, p)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			cfgs := l.CreateConfig(test.event)
-			assert.Equal(t, test.len, len(cfgs), test.msg)
+			assert.Len(t, cfgs, test.len, test.msg)
 			configs := make([]mapstr.M, 0)
 			for _, cfg := range cfgs {
 				config := mapstr.M{}
 				err := cfg.Unpack(&config)
-				ok := assert.Nil(t, err, test.msg)
+				ok := assert.NoError(t, err, test.msg)
 				if !ok {
 					break
 				}
@@ -1439,24 +1443,69 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		require.NoError(t, paths.InitPaths(&paths.Path{
+		p := paths.New()
+		require.NoError(t, p.InitPaths(&paths.Path{
 			Home: abs,
 		}))
 		logger := logptest.NewTestingLogger(t, "")
-		l, err := NewLogHints(cfg, logger)
+		l, err := newLogHints(cfg, logger, p)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		require.Equal(t, test.len, len(cfgs), test.msg)
+		require.Len(t, cfgs, test.len, test.msg)
 		if test.len != 0 {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
-			assert.Nil(t, err, test.msg)
+			assert.NoError(t, err, test.msg)
 
 			assert.Equal(t, test.result, config, test.msg)
 		}
 
 	}
+}
+
+// TestCreateConfigResolvesVariablesFromOptions checks that variables in raw hint
+// configs are resolved using the options passed to CreateConfig (e.g. keystore resolver
+// from the Kubernetes autodiscover provider so ${kubernetes.namespace.secret.key} works).
+func TestCreateConfigResolvesVariablesFromOptions(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "keystore implementation does not use NewGCMWithRandomNonce.")
+
+	path := filepath.Join(t.TempDir(), "keystore")
+	opts := []ucfg.Option{ucfg.Resolve(keystore.ResolverWrap(logsTestKeystore(t, path, "secret")))}
+
+	cfg := conf.MustNewConfigFrom(map[string]any{
+		"default_config": map[string]any{
+			"type":          "docker",
+			"containers":    map[string]any{"ids": []string{"${data.container.id}"}},
+			"close_timeout": "true",
+		},
+	})
+	event := bus.Event{
+		"host":       "1.2.3.4",
+		"kubernetes": mapstr.M{"container": mapstr.M{"name": "foobar", "id": "abc"}},
+		"container":  mapstr.M{"name": "foobar", "id": "abc"},
+		"hints":      mapstr.M{"logs": mapstr.M{"raw": `[{"type":"docker","containers":{"ids":["${data.container.id}"]},"password":"${PASSWORD}"}]`}},
+	}
+
+	l, err := newLogHints(cfg, logptest.NewTestingLogger(t, ""), paths.New())
+	require.NoError(t, err)
+	cfgs := l.CreateConfig(event, opts...)
+	require.Len(t, cfgs, 1)
+
+	var out mapstr.M
+	require.NoError(t, cfgs[0].Unpack(&out))
+	assert.Equal(t, "secret", out["password"])
+}
+
+func logsTestKeystore(t *testing.T, path, secret string) keystore.Keystore {
+	t.Helper()
+	ks, err := keystore.NewFileKeystore(path)
+	require.NoError(t, err)
+	w, err := keystore.AsWritableKeystore(ks)
+	require.NoError(t, err)
+	require.NoError(t, w.Store("PASSWORD", []byte(secret)))
+	require.NoError(t, w.Save())
+	return ks
 }
