@@ -362,7 +362,7 @@ func (client *Client) handleBulkResultError(
 // successfully added to the list of bulk items and the list of bulk items.
 func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
-	bulkItems := []interface{}{}
+	bulkItems := make([]interface{}, 0, len(data)*2)
 	for i := range data {
 		if data[i].EncodedEvent == nil {
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
