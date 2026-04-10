@@ -111,11 +111,21 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 // given, default profile will be used.
 // If role_arn is given, assume the IAM role either with access keys or default profile.
 func getAWSCredentials(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
+	logger.Infow("resolving AWS credentials",
+		"has_access_key_id", beatsConfig.AccessKeyID != "",
+		"has_secret_access_key", beatsConfig.SecretAccessKey != "",
+		"has_session_token", beatsConfig.SessionToken != "",
+		"has_profile_name", beatsConfig.ProfileName != "",
+		"default_region", beatsConfig.DefaultRegion,
+		"use_cloud_connectors", beatsConfig.UseCloudConnectors,
+	)
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if beatsConfig.AccessKeyID != "" || beatsConfig.SecretAccessKey != "" || beatsConfig.SessionToken != "" {
+		logger.Info("using static credentials from config (access_key_id/secret_access_key)")
 		return getConfigForKeys(beatsConfig), nil
 	}
 
+	logger.Info("no static credentials found — falling back to shared credential profile / default credential chain")
 	return getConfigSharedCredentialProfile(beatsConfig, logger)
 }
 
