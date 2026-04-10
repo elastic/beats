@@ -75,10 +75,10 @@ func TestPrefixWithIndirectField(t *testing.T) {
 // with the dissector already constructed (the real hot path).
 func BenchmarkDissectProcessor(b *testing.B) {
 	tests := []struct {
-		name    string
-		tok     string
-		msg     string
-		prefix  string
+		name   string
+		tok    string
+		msg    string
+		prefix string
 	}{
 		{
 			name:   "6_fields_default_prefix",
