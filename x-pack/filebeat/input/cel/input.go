@@ -248,6 +248,24 @@ func getPublishCursorForEvent(index int, eventCount int, cursors []interface{}, 
 	return result, nil
 }
 
+func checkPublishContext(ctx context.Context, log *logp.Logger, health status.StatusReporter, unpublished int) (breakLoop bool, markDegraded bool) {
+	switch err := ctx.Err(); {
+	case err == nil:
+		return false, false
+	case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+		log.Infow("context cancelled with unpublished events", "unpublished", unpublished)
+		// Don't update status, since we are about to pass
+		// through the Running state and then fall through
+		// to the input exit with a change to Stopped.
+		return true, false
+	default:
+		// This should never happen.
+		log.Warnw("failed with unpublished events", "error", err, "unpublished", unpublished)
+		health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
+		return true, true
+	}
+}
+
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -692,19 +710,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				// cursor.Publisher interface does not document the behaviour
 				// related to context cancellation and the context is not
 				// explicitly passed in, so favour this explicit clarity.
-				switch err := pubCtx.Err(); {
-				case err == nil:
-				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-					pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
-					// Don't update status, since we are about to pass
-					// through the Running state and then fall through
-					// to the input exit with a change to Stopped.
-					break loop
-				default:
-					// This should never happen.
-					pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
-					health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
+				breakLoop, markDegraded := checkPublishContext(pubCtx, pubLog, health, len(events)-i)
+				if markDegraded {
 					isDegraded = true
+				}
+				if breakLoop {
 					break loop
 				}
 				err = pub.Publish(beat.Event{
