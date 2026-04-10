@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: AutoOps ES module: update to use UUID v7 without dashes for transaction ids to reduce payloads
+summary: AutoOps ES module update to use UUID v7 without dashes to reduce payloads
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
