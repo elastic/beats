@@ -2,64 +2,6 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
-				"image": {
-					"name": "docker.io/library/busybox:1.36"
-				},
-				"runtime": "containerd"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "default",
-			"node": {
-				"name": "kind-control-plane"
-			},
-			"pod": {
-				"name": "basic-sts-0"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"limit": {
-					"cores": 0.2
-				},
-				"request": {
-					"cores": 0.1
-				}
-			},
-			"id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
-			"memory": {
-				"limit": {
-					"bytes": 67108864
-				},
-				"request": {
-					"bytes": 33554432
-				}
-			},
-			"name": "init-config",
-			"status": {
-				"last_terminated_reason": "Completed",
-				"phase": "terminated",
-				"ready": false,
-				"reason": "Completed",
-				"restarts": 0
-			},
-			"type": "init"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
 				"id": "4cde3638748a436bec96f8cd149a0b47156c8548c229e4c2939f3391b9f789ee",
 				"image": {
 					"name": "registry.k8s.io/etcd:3.5.16-0"
@@ -304,6 +246,65 @@
 				"restarts": 1
 			},
 			"type": "container"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+				"image": {
+					"name": "docker.io/library/busybox:1.36"
+				},
+				"runtime": "containerd"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "default",
+			"node": {
+				"name": "kind-control-plane"
+			},
+			"pod": {
+				"name": "basic-sts-0"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"limit": {
+					"cores": 0.2
+				},
+				"request": {
+					"cores": 0.1
+				}
+			},
+			"id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+			"memory": {
+				"limit": {
+					"bytes": 67108864
+				},
+				"request": {
+					"bytes": 33554432
+				}
+			},
+			"name": "init-config",
+			"status": {
+				"last_terminated_exitcode": 0,
+				"last_terminated_reason": "Completed",
+				"phase": "terminated",
+				"ready": false,
+				"reason": "Completed",
+				"restarts": 0
+			},
+			"type": "init"
 		},
 		"Index": "",
 		"ID": "",

@@ -731,6 +731,9 @@ kube_pod_init_container_resource_requests{namespace="default",pod="web-0",uid="3
 # HELP kube_pod_init_container_status_last_terminated_reason Describes the last reason the init container was in terminated state.
 # TYPE kube_pod_init_container_status_last_terminated_reason gauge
 kube_pod_init_container_status_last_terminated_reason{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",container="init-config",reason="Completed"} 1
+# HELP kube_pod_init_container_status_last_terminated_exitcode Describes the exit code for the last container in terminated state.
+# TYPE kube_pod_init_container_status_last_terminated_exitcode gauge
+kube_pod_init_container_status_last_terminated_exitcode{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",container="init-config"} 0
 # HELP kube_pod_init_container_status_ready [STABLE] Describes whether the init containers readiness check succeeded.
 # TYPE kube_pod_init_container_status_ready gauge
 kube_pod_init_container_status_ready{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",container="init-config"} 0

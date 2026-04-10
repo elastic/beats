@@ -724,6 +724,7 @@
 			},
 			"name": "init-config",
 			"status": {
+				"last_terminated_exitcode": 0,
 				"last_terminated_reason": "Completed",
 				"phase": "terminated",
 				"ready": false,

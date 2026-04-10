@@ -450,65 +450,6 @@
     },
     {
         "container": {
-            "id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
-            "image": {
-                "name": "docker.io/library/busybox:1.36"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "limit": {
-                        "cores": 0.2
-                    },
-                    "request": {
-                        "cores": 0.1
-                    }
-                },
-                "id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
-                "memory": {
-                    "limit": {
-                        "bytes": 67108864
-                    },
-                    "request": {
-                        "bytes": 33554432
-                    }
-                },
-                "name": "init-config",
-                "status": {
-                    "last_terminated_reason": "Completed",
-                    "phase": "terminated",
-                    "ready": false,
-                    "reason": "Completed",
-                    "restarts": 0
-                },
-                "type": "init"
-            },
-            "namespace": "default",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "web-0"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
             "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
             "image": {
                 "name": "registry.k8s.io/kube-scheduler-amd64:v1.29.1"
@@ -778,6 +719,66 @@
             },
             "pod": {
                 "name": "coredns-76f75df574-v8skx"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+            "image": {
+                "name": "docker.io/library/busybox:1.36"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "limit": {
+                        "cores": 0.2
+                    },
+                    "request": {
+                        "cores": 0.1
+                    }
+                },
+                "id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+                "memory": {
+                    "limit": {
+                        "bytes": 67108864
+                    },
+                    "request": {
+                        "bytes": 33554432
+                    }
+                },
+                "name": "init-config",
+                "status": {
+                    "last_terminated_exitcode": 0,
+                    "last_terminated_reason": "Completed",
+                    "phase": "terminated",
+                    "ready": false,
+                    "reason": "Completed",
+                    "restarts": 0
+                },
+                "type": "init"
+            },
+            "namespace": "default",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "web-0"
             }
         },
         "metricset": {

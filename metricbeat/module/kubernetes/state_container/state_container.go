@@ -91,7 +91,8 @@ var (
 			"kube_pod_init_container_status_waiting":                p.KeywordMetric("status.phase", "waiting"),
 			"kube_pod_init_container_status_terminated_reason":      p.LabelMetric("status.reason", "reason"),
 			"kube_pod_init_container_status_waiting_reason":         p.LabelMetric("status.reason", "reason"),
-			"kube_pod_init_container_status_last_terminated_reason": p.LabelMetric("status.last_terminated_reason", "reason"),
+			"kube_pod_init_container_status_last_terminated_reason":   p.LabelMetric("status.last_terminated_reason", "reason"),
+			"kube_pod_init_container_status_last_terminated_exitcode": p.Metric("status.last_terminated_exitcode"),
 		},
 
 		Labels: map[string]p.LabelMap{
