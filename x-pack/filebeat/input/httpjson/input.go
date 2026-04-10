@@ -209,30 +209,6 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 
 	metrics := newInputMetrics(reg, ctx.Logger)
 
-	// Debug: log auth config state to diagnose missing Authorization header (403 issues)
-	if cfg.Auth == nil {
-		log.Warn("auth config is nil — no authentication will be configured")
-	} else {
-		log.Infow("auth config parsed",
-			"aws_configured", cfg.Auth.AWS != nil,
-			"aws_enabled", cfg.Auth.AWS.IsEnabled(),
-			"oauth2_configured", cfg.Auth.OAuth2 != nil,
-			"oauth2_enabled", cfg.Auth.OAuth2.isEnabled(),
-			"basic_configured", cfg.Auth.Basic != nil,
-			"basic_enabled", cfg.Auth.Basic.isEnabled(),
-		)
-		if cfg.Auth.AWS != nil {
-			log.Infow("auth.aws config details",
-				"has_access_key_id", cfg.Auth.AWS.AccessKeyID != "",
-				"has_secret_access_key", cfg.Auth.AWS.SecretAccessKey != "",
-				"has_session_token", cfg.Auth.AWS.SessionToken != "",
-				"default_region", cfg.Auth.AWS.DefaultRegion,
-				"service_name", cfg.Auth.AWS.ServiceName,
-				"enabled_field_set", cfg.Auth.AWS.Enabled != nil,
-			)
-		}
-	}
-
 	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil)
 	if err != nil {
 		ctx.UpdateStatus(status.Failed, "failed to create HTTP client: "+err.Error())
@@ -330,11 +306,6 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 		client *http.Client
 		err    error
 	)
-	log.Infow("selecting http client auth method",
-		"aws_enabled", authCfg.AWS.IsEnabled(),
-		"oauth2_enabled", authCfg.OAuth2.isEnabled(),
-		"basic_enabled", authCfg.Basic.isEnabled(),
-	)
 	switch {
 	case authCfg.AWS.IsEnabled():
 		client, err = newNetHTTPClient(ctx, requestCfg, log, reg)
@@ -343,13 +314,12 @@ func newHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *request
 			return nil, err
 		}
 
-		log.Infow("creating AWS SigV4 signer transport", "region", authCfg.AWS.DefaultRegion, "service", authCfg.AWS.ServiceName)
+		log.Debugw("creating signer", "region", authCfg.AWS.DefaultRegion, "service", authCfg.AWS.ServiceName)
 		tr, err := aws.InitializeSignerTransport(*authCfg.AWS, log, client.Transport)
 		if err != nil {
 			log.Errorw("failed to initialize aws config failed for signer", "error", err)
 			return nil, err
 		}
-		log.Info("AWS SigV4 signer transport initialized successfully — all requests will be signed")
 		client.Transport = tr
 	case authCfg.OAuth2.isEnabled():
 		client = authCfg.OAuth2.prepared

@@ -88,34 +88,17 @@ func initializeSignerTransport(logger *logp.Logger, defaultServiceName string, d
 }
 
 func (st *SignerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	st.logger.Infow("AWS SigV4 RoundTrip: signing request",
-		"method", req.Method,
-		"url", req.URL.String(),
-	)
-
 	// resolve service name and region (if they are not configured)
 	serviceName, region, err := st.getServiceAndRegion(req)
 	if err != nil {
 		return nil, fmt.Errorf("error while getting service name and region: %w", err)
 	}
 
-	st.logger.Infow("AWS SigV4 resolved service and region",
-		"service", serviceName,
-		"region", region,
-	)
-
 	// retrieve credentials
 	creds, err := st.credentials.Retrieve(req.Context())
 	if err != nil {
-		st.logger.Errorw("AWS SigV4 failed to retrieve credentials", "error", err)
 		return nil, fmt.Errorf("error while retrieving credentials: %w", err)
 	}
-	st.logger.Infow("AWS SigV4 credentials retrieved",
-		"has_access_key_id", creds.AccessKeyID != "",
-		"has_secret_access_key", creds.SecretAccessKey != "",
-		"has_session_token", creds.SessionToken != "",
-		"provider", creds.Source,
-	)
 
 	// body hash
 	payloadHash, err := st.bodySHA256Hash(req)
@@ -128,9 +111,6 @@ func (st *SignerTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	if err != nil {
 		return nil, fmt.Errorf("error while signing the request: %w", err)
 	}
-	st.logger.Infow("AWS SigV4 request signed successfully",
-		"has_authorization_header", req.Header.Get("Authorization") != "",
-	)
 
 	// next transport
 	return st.next.RoundTrip(req)
