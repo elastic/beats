@@ -32,7 +32,7 @@ func TestMarshalSecChannelBindingsLayout(t *testing.T) {
 	app := []byte{1, 2, 3, 4}
 	b := marshalSecChannelBindings(app)
 	require.Len(t, b, secChannelBindingsHeaderSize+len(app))
-	require.Equal(t, uint32(len(app)), leUint32(b[24:28]))
+	require.Equal(t, len(app), int(leUint32(b[24:28])))
 	require.Equal(t, uint32(secChannelBindingsHeaderSize), leUint32(b[28:32]))
 	require.Equal(t, app, b[secChannelBindingsHeaderSize:])
 }
@@ -43,14 +43,14 @@ func leUint32(b []byte) uint32 {
 
 func TestTLSServerEndpointChannelBindingData(t *testing.T) {
 	validPEM := `-----BEGIN CERTIFICATE-----
-MIIBhTCCASugAwIBAgIQIRi6ePLBZuQ/gBDQTEJfcTAKBggqhkjOPQQDAjASMRAw
-DgYDVQQKEwdBY21lIENvMB4XDTIwMDExMDAwMDAwMFoXDTIxMDExMDAwMDAwMFow
-EjEQMA4GA1UEChMHQWNtZSBDbzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABFy
-xLoLAKQA34McPWWFhjIl6cJ3ItZWF8Ku86CzBOct8z92vDn3t5We+TE1hf0Nope6
-tZPW2VPoWfn4+5QTjKqjUzBRMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggr
-BgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQ4+0cL9f6cR6SKjbNf
-piACtGdR9DAKBggqhkjOPQQDAgNIADBFAiEAxxsxn4MJB8GdVs+lGIGUZTEzi2qNZ
-89uiFZTI0xZCEwCIFcSSOXlCSA0rhzBiUcp7Aswcm4BOxdkHz8LBQbIO5e0
+MIIBfDCCASOgAwIBAgIUU6HN0SV3o0+B+FwmfuD+4zxLrz8wCgYIKoZIzj0EAwIw
+FDESMBAGA1UEAwwJdGVzdC1hY21lMB4XDTI2MDQxMDA4MTQxMFoXDTM2MDQwNzA4
+MTQxMFowFDESMBAGA1UEAwwJdGVzdC1hY21lMFkwEwYHKoZIzj0CAQYIKoZIzj0D
+AQcDQgAEP0oqECwQPypK+qZaIPLZM1d3BMtEVZUSaoEi/vKNcUMApr7/Q8vqdzPL
+/hJ72LVZRuYFC0N0kGoW2sgO+5yTyKNTMFEwHQYDVR0OBBYEFIIZW3XXKNkrnlrv
+XwjdhzZwwDO7MB8GA1UdIwQYMBaAFIIZW3XXKNkrnlrvXwjdhzZwwDO7MA8GA1Ud
+EwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDRwAwRAIgMUxGBqCRV1nOi6CzGwnMgX2n
+4HLjUA2T0vWFblBrmvACIB6umi5R1Snt+d+r6m3OmB+Dl8ktQadxbQfx2HueAQeA
 -----END CERTIFICATE-----`
 	block, _ := pem.Decode([]byte(validPEM))
 	require.NotNil(t, block)
@@ -62,7 +62,7 @@ piACtGdR9DAKBggqhkjOPQQDAgNIADBFAiEAxxsxn4MJB8GdVs+lGIGUZTEzi2qNZ
 	}
 	data, err := tlsServerEndpointChannelBindingData(&cs)
 	require.NoError(t, err)
-	require.True(t, len(data) > len(tlsServerEndPointPrefix))
+	require.Greater(t, len(data), len(tlsServerEndPointPrefix))
 	require.Equal(t, tlsServerEndPointPrefix, string(data[:len(tlsServerEndPointPrefix)]))
 	hash := data[len(tlsServerEndPointPrefix):]
 	expected, err := tlsServerEndpointHash(cert.Raw, cert.SignatureAlgorithm)

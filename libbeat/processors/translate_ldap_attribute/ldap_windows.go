@@ -54,7 +54,11 @@ func (client *ldapClient) bindPlatformSpecific(conn *ldap.Conn, spn string) erro
 			resultCh <- fmt.Errorf("failed to create SSPI client: %w", err)
 			return
 		}
-		defer sspiClient.DeleteSecContext()
+		defer func() {
+			if delErr := sspiClient.DeleteSecContext(); delErr != nil {
+				client.log.Debugw("SSPI DeleteSecContext", "error", delErr)
+			}
+		}()
 
 		client.log.Debug("SSPI client created, performing GSSAPIBind")
 		err = conn.GSSAPIBind(sspiClient, spn, "")

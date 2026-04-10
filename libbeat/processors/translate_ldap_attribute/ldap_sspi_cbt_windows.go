@@ -28,6 +28,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"math"
 	"syscall"
 
 	"github.com/alexbrainman/sspi"
@@ -104,11 +105,15 @@ func tlsServerEndpointHash(certDER []byte, alg x509.SignatureAlgorithm) ([]byte,
 // marshalSecChannelBindings packs application data into the SEC_CHANNEL_BINDINGS layout
 // expected by SSPI when passed as SECBUFFER_CHANNEL_BINDINGS.
 func marshalSecChannelBindings(applicationData []byte) []byte {
-	total := secChannelBindingsHeaderSize + len(applicationData)
+	appLen := len(applicationData)
+	if uint64(appLen) > math.MaxUint32 {
+		return nil
+	}
+	total := secChannelBindingsHeaderSize + appLen
 	b := make([]byte, total)
 	// Initiator / acceptor address fields are unused for TLS endpoint binding.
 	// Offsets 24 and 28 map to cbApplicationDataLength and dwApplicationDataOffset.
-	binary.LittleEndian.PutUint32(b[24:28], uint32(len(applicationData)))
+	binary.LittleEndian.PutUint32(b[24:28], uint32(appLen)) //nolint:gosec // G115: appLen bounded by check above
 	binary.LittleEndian.PutUint32(b[28:32], secChannelBindingsHeaderSize)
 	copy(b[secChannelBindingsHeaderSize:], applicationData)
 	return b
@@ -248,7 +253,7 @@ func sspiDecryptMessage(c *sspi.Context, msg []byte, seqno uint32) (uint32, []by
 }
 
 func handshakePayload(secLayer byte, maxSize uint32, authzid []byte) []byte {
-	var selectedSecurity byte = secLayer
+	selectedSecurity := secLayer
 	var truncatedSize uint32
 	if selectedSecurity != 0 {
 		// Only 3 bytes available for max size, set to 0x00FFFFFF per RFC 4752.
@@ -300,7 +305,7 @@ func (c *ldapGSSAPIClientCBT) InitSecContext(target string, token []byte) ([]byt
 			return nil, false, err
 		}
 		if err := c.ctx.VerifyFlags(); err != nil {
-			return nil, false, fmt.Errorf("error verifying flags: %v", err)
+			return nil, false, fmt.Errorf("error verifying flags: %w", err)
 		}
 		return output, !completed, nil
 	}
@@ -387,7 +392,12 @@ func newGSSAPIClientForConn(log *logp.Logger, conn *ldap.Conn) (ldap.GSSAPIClien
 		log.Debugw("using SSPI client with LDAP TLS channel binding (tls-server-end-point)",
 			"cbt_app_data_len", len(app),
 			"cbt_hash_len", len(app)-len(tlsServerEndPointPrefix))
-		return newLDAPGSSAPIClientWithCBT(marshalSecChannelBindings(app))
+		bindings := marshalSecChannelBindings(app)
+		if bindings == nil {
+			log.Warnw("LDAP TLS channel binding data too large for SEC_CHANNEL_BINDINGS, attempting SSPI bind without CBT (may fail if the DC requires channel binding)")
+			return gssapi.NewSSPIClient()
+		}
+		return newLDAPGSSAPIClientWithCBT(bindings)
 	}
 	return gssapi.NewSSPIClient()
 }
