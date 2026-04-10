@@ -159,6 +159,12 @@ type publishCursors struct {
 	degraded     bool
 }
 
+type publishCursorState struct {
+	pubCursor  interface{}
+	cursor     map[string]interface{}
+	goodCursor map[string]interface{}
+}
+
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	switch {
 	case r.name != "" && msg != "":
@@ -204,6 +210,42 @@ func getPublishCursors(state map[string]interface{}, events []interface{}, log *
 	result.cursors = []interface{}{c}
 	result.singleCursor = true
 	return result
+}
+
+func getPublishCursorForEvent(index int, eventCount int, cursors []interface{}, singleCursor bool, cursor map[string]interface{}, goodCursor map[string]interface{}) (publishCursorState, error) {
+	result := publishCursorState{
+		cursor:     cursor,
+		goodCursor: goodCursor,
+	}
+	if cursors == nil {
+		return result, nil
+	}
+
+	if singleCursor {
+		// Only set the cursor for publication at the last event
+		// when a single cursor object has been provided.
+		if index != eventCount-1 {
+			return result, nil
+		}
+
+		result.goodCursor = cursor
+		nextCursor, ok := cursors[0].(map[string]interface{})
+		if !ok {
+			return result, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+		}
+		result.cursor = nextCursor
+		result.pubCursor = nextCursor
+		return result, nil
+	}
+
+	result.goodCursor = cursor
+	nextCursor, ok := cursors[index].(map[string]interface{})
+	if !ok {
+		return result, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[index])
+	}
+	result.cursor = nextCursor
+	result.pubCursor = nextCursor
+	return result, nil
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -637,34 +679,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 					return err
 				}
-				var pubCursor interface{}
-				if cursors != nil {
-					if singleCursor {
-						// Only set the cursor for publication at the last event
-						// when a single cursor object has been provided.
-						if i == len(events)-1 {
-							goodCursor = cursor
-							cursor, ok = cursors[0].(map[string]interface{})
-							if !ok {
-								err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
-								metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-								errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-								return err
-							}
-							pubCursor = cursor
-						}
-					} else {
-						goodCursor = cursor
-						cursor, ok = cursors[i].(map[string]interface{})
-						if !ok {
-							err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
-							metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-							errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-							return err
-						}
-						pubCursor = cursor
-					}
+				cursorState, err := getPublishCursorForEvent(i, len(events), cursors, singleCursor, cursor, goodCursor)
+				goodCursor = cursorState.goodCursor
+				if err != nil {
+					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+					return err
 				}
+				pubCursor := cursorState.pubCursor
+				cursor = cursorState.cursor
 				// This is checked prior to the publish attempt since the
 				// cursor.Publisher interface does not document the behaviour
 				// related to context cancellation and the context is not
