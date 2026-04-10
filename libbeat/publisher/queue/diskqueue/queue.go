@@ -23,6 +23,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -97,13 +98,13 @@ type diskQueue struct {
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
 // Settings object can be wrapped in a queue-agnostic interface for
 // later use by the pipeline.
-func FactoryForSettings(settings Settings, paths *paths.Path) queue.QueueFactory {
+func FactoryForSettings(settings Settings, paths *paths.Path) queue.QueueFactory[publisher.Event] {
 	return func(
 		logger *logp.Logger,
 		observer queue.Observer,
 		inputQueueSize int,
-		encoderFactory queue.EncoderFactory,
-	) (queue.Queue, error) {
+		encoderFactory queue.EncoderFactory[publisher.Event],
+	) (queue.Queue[publisher.Event], error) {
 		return NewQueue(logger, observer, settings, encoderFactory, paths)
 	}
 }
@@ -114,7 +115,7 @@ func NewQueue(
 	logger *logp.Logger,
 	observer queue.Observer,
 	settings Settings,
-	encoderFactory queue.EncoderFactory,
+	encoderFactory queue.EncoderFactory[publisher.Event],
 	paths *paths.Path,
 ) (*diskQueue, error) {
 	if paths == nil {
@@ -216,7 +217,7 @@ func NewQueue(
 	activeFrameCount -= int(nextReadPosition.frameIndex) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	logger.Infof("Found %v queued events consuming %v bytes, %v events still pending", initialEventCount, initialByteCount, activeFrameCount)
 
-	var encoder queue.Encoder
+	var encoder queue.Encoder[publisher.Event]
 	if encoderFactory != nil {
 		encoder = encoderFactory()
 	}
@@ -283,7 +284,7 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{MaxEvents: 0}
 }
 
-func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer[publisher.Event] {
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
