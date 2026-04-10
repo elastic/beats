@@ -49,10 +49,6 @@ const (
 	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
-func init() {
-	outputs.RegisterType("otelconsumer", makeOtelConsumer)
-}
-
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
@@ -61,7 +57,7 @@ type otelConsumer struct {
 	isReceiverTest bool // whether we are running in receivertest context
 }
 
-func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C, beatPaths *paths.Path) (outputs.Group, error) {
+func MakeOtelConsumer(beat beat.Info, observer outputs.Observer, cfg *config.C, beatPaths *paths.Path) (outputs.Group, error) {
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
