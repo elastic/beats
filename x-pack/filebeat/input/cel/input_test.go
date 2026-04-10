@@ -616,9 +616,9 @@ var inputTests = []struct {
   </item>
 </order>
 `
-				io.ReadAll(r.Body)
+				io.ReadAll(r.Body) //nolint:errcheck // No point checking errors in test server.
 				r.Body.Close()
-				w.Write([]byte(text))
+				w.Write([]byte(text)) //nolint:errcheck // No point checking errors in test server.
 			})
 			server := httptest.NewServer(r)
 			config["resource.url"] = server.URL
@@ -750,7 +750,7 @@ var inputTests = []struct {
 				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
 			}
 
-			w.Write([]byte(msg))
+			w.Write([]byte(msg)) //nolint:errcheck // No point checking errors in test server.
 		},
 		want: []map[string]interface{}{
 			{
@@ -798,7 +798,7 @@ var inputTests = []struct {
 				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
 			}
 
-			w.Write([]byte(msg))
+			w.Write([]byte(msg)) //nolint:errcheck // No point checking errors in test server.
 		},
 		want: []map[string]interface{}{
 			{
@@ -831,7 +831,7 @@ var inputTests = []struct {
 		},
 		handler: func(w http.ResponseWriter, r *http.Request) {
 			enc := json.NewEncoder(w)
-			enc.Encode(map[string][]any{"events": {r.Header.Get("foo")}})
+			enc.Encode(map[string][]any{"events": {r.Header.Get("foo")}}) //nolint:errcheck // No point checking errors in test server.
 		},
 		want: []map[string]interface{}{
 			{
@@ -852,7 +852,7 @@ var inputTests = []struct {
 	`,
 		},
 		handler: func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("hello"))
+			w.Write([]byte("hello")) //nolint:errcheck // No point checking errors in test server.
 		},
 		want: []map[string]interface{}{
 			{
@@ -873,7 +873,7 @@ var inputTests = []struct {
 	`,
 		},
 		handler: func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("hello"))
+			w.Write([]byte("hello")) //nolint:errcheck // No point checking errors in test server.
 		},
 		want: []map[string]interface{}{
 			{
@@ -912,7 +912,7 @@ var inputTests = []struct {
 				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
 			}
 
-			w.Write([]byte(msg))
+			w.Write([]byte(msg)) //nolint:errcheck // No point checking errors in test server.
 		},
 		want: []map[string]interface{}{
 			{
@@ -2309,7 +2309,7 @@ func TestInput(t *testing.T) {
 
 			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:          logp.NewLogger("cel_test"),
+				Logger:          logp.NewLogger("cel_test"), //nolint:forbidigo // test helper; no logp.Logger parameter available
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
@@ -2444,7 +2444,7 @@ func newChainTestServer(serve func(http.Handler) *httptest.Server) func(*testing
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
+		Logger:      logp.NewLogger("httpjson_test"), //nolint:forbidigo // test helper; no logp.Logger parameter available
 		ID:          "test_id",
 		Cancelation: ctx,
 	}, cancel
@@ -2521,7 +2521,6 @@ func retryHandler() http.HandlerFunc {
 	}
 }
 
-//nolint:errcheck // No point checking errors in test server.
 func tokenAuthHandler(want string, handle http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")

@@ -101,7 +101,7 @@ func (i input) now() time.Time {
 func (input) Name() string { return inputName }
 
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	cfg := src.(*source).cfg
+	cfg := src.(*source).cfg //nolint:errcheck // src is always *source in this input implementation
 	if !wantClient(cfg) {
 		return nil
 	}
@@ -111,7 +111,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
-	dataStreamName := src.(*source).cfg.DataStream // May be empty.
+	dataStreamName := src.(*source).cfg.DataStream //nolint:errcheck // src is always *source in this input implementation
 
 	var cursor map[string]interface{}
 	env.UpdateStatus(status.Starting, dataStreamName)
@@ -129,7 +129,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			parent: &env,
 		}
 	}
-	err := input{}.run(env, src.(*source), cursor, pub, health)
+	err := input{}.run(env, src.(*source), cursor, pub, health) //nolint:errcheck // src is always *source in this input implementation
 	if err != nil {
 		msg := "failed to run: " + err.Error()
 		if dataStreamName != "" {
@@ -183,7 +183,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName)) //nolint:forbidigo // no per-beat path instance available here
 		}
 		cfg.Resource.Tracer.Filename = resolved
 	}
@@ -1023,7 +1023,7 @@ type socketDialer struct {
 }
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
-	return net.Dial("unix", d.path)
+	return net.Dial("unix", d.path) //nolint:noctx // unix socket dial; no context propagation needed
 }
 
 func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
@@ -1345,7 +1345,7 @@ func test(url *url.URL) error {
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
+	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second) //nolint:noctx // connectivity test; explicit timeout used instead of context
 	if err != nil {
 		return fmt.Errorf("url %q is unreachable: %w", url, err)
 	}
