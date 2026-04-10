@@ -153,6 +153,12 @@ type namedStatusReporter struct {
 	parent status.StatusReporter
 }
 
+type publishCursors struct {
+	cursors      []interface{}
+	singleCursor bool
+	degraded     bool
+}
+
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	switch {
 	case r.name != "" && msg != "":
@@ -171,6 +177,33 @@ func sanitizeFileName(name string) string {
 	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
 	name = filepath.Clean(name)
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
+func getPublishCursors(state map[string]interface{}, events []interface{}, log *logp.Logger, health status.StatusReporter, degraded bool) publishCursors {
+	result := publishCursors{degraded: degraded}
+
+	c, ok := state["cursor"]
+	if !ok {
+		return result
+	}
+
+	result.cursors, ok = c.([]interface{})
+	if ok {
+		if len(result.cursors) != len(events) {
+			log.Errorw("unexpected cursor list length", "cursors", len(result.cursors), "events", len(events))
+			health.UpdateStatus(status.Degraded, "unexpected cursor list length")
+			result.degraded = true
+			// But try to continue.
+			if len(result.cursors) < len(events) {
+				result.cursors = nil
+			}
+		}
+		return result
+	}
+
+	result.cursors = []interface{}{c}
+	result.singleCursor = true
+	return result
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -581,28 +614,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// we will re-request these events.
 			delete(state, "events")
 
-			// Get cursors if they exist.
-			var (
-				cursors      []interface{}
-				singleCursor bool
-			)
-			if c, ok := state["cursor"]; ok {
-				cursors, ok = c.([]interface{})
-				if ok {
-					if len(cursors) != len(events) {
-						execLog.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
-						health.UpdateStatus(status.Degraded, "unexpected cursor list length")
-						isDegraded = true
-						// But try to continue.
-						if len(cursors) < len(events) {
-							cursors = nil
-						}
-					}
-				} else {
-					cursors = []interface{}{c}
-					singleCursor = true
-				}
-			}
+			cursorState := getPublishCursors(state, events, execLog, health, isDegraded)
+			cursors := cursorState.cursors
+			singleCursor := cursorState.singleCursor
+			isDegraded = cursorState.degraded
 			// Drop old cursor from state. This will be replaced with
 			// the current cursor object below; it is an array now.
 			delete(state, "cursor")
