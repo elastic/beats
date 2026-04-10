@@ -21,7 +21,9 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -59,7 +61,7 @@ type Pipeline struct {
 
 	monitors Monitors
 
-	outputController *outputController
+	outputController outputController
 
 	observer observer
 
@@ -70,6 +72,9 @@ type Pipeline struct {
 	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
 	// elapses.
 	forceCloseQueue bool
+
+	// Close _shouldn't_ be called multiple times, but handle it gracefully if it does.
+	closeOnce sync.Once
 
 	processors processing.Supporter
 
@@ -170,12 +175,12 @@ func New(
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	outputController, err := newProcessOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
-	p.outputController = output
-	p.outputController.Set(out)
+	outputController.Set(out)
+	p.outputController = outputController
 
 	return p, nil
 }
@@ -183,16 +188,21 @@ func New(
 // Close stops the pipeline, outputs and queue.
 // If WaitClose with WaitOnPipelineClose mode is configured, Close will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients must be closed before calling Close.
+// Note: clients will no longer accept new Publish calls once Close is started,
+// and will no longer receive event acknowledgments once Close returns.
 func (p *Pipeline) Close() error {
-	log := p.monitors.Logger
+	p.closeOnce.Do(func() {
+		log := p.monitors.Logger
 
-	log.Debug("close pipeline")
+		log.Debug("close pipeline")
 
-	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
+		// Note: active clients are not closed / disconnected.
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
+		defer cancel()
+		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
 
-	p.observer.cleanup()
+		p.observer.cleanup()
+	})
 	return nil
 }
 
@@ -295,21 +305,24 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
-	return p.outputController
+	if r, ok := p.outputController.(OutputReloader); ok {
+		return r
+	}
+	return noopReloader{}
 }
 
 // Parses the given config and returns a QueueFactory based on it.
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory, error) {
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
 			return nil, err
 		}
-		return memqueue.FactoryForSettings(settings), nil
+		return memqueue.FactoryForSettings[publisher.Event](settings), nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
@@ -319,6 +332,20 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *path
 	default:
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
+}
+
+type noopReloader struct{}
+
+func (n noopReloader) Reload(
+	cfg *reload.ConfigWithMeta,
+	_ func(outputs.Observer, conf.Namespace) (outputs.Group, error),
+) error {
+	// This function should never be called, but if it is, return an error we can troubleshoot.
+	var unitID string
+	if cfg != nil {
+		unitID = cfg.InputUnitID
+	}
+	return fmt.Errorf("unsupported reload triggered by unit '%v'", unitID)
 }
 
 type noopClientListener struct{}
