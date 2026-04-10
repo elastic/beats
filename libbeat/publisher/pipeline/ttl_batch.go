@@ -61,7 +61,7 @@ type batchSplitData struct {
 	outstandingEvents atomic.Int64
 }
 
-func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
+func newBatch(retryer retryer, original queue.Batch[publisher.Event], ttl int) *ttlBatch {
 	if original == nil {
 		panic("empty batch")
 	}
@@ -69,13 +69,7 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	count := original.Count()
 	events := make([]publisher.Event, 0, count)
 	for i := 0; i < count; i++ {
-		event, ok := original.Entry(i).(publisher.Event)
-		if ok {
-			// In Beats this conversion will always succeed because only
-			// publisher.Event objects are inserted into the queue, but
-			// there's no harm in making sure.
-			events = append(events, event)
-		}
+		events = append(events, original.Entry(i))
 	}
 	original.FreeEntries()
 
