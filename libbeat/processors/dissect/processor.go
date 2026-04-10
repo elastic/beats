@@ -32,7 +32,8 @@ import (
 const flagParsingError = "dissect_parsing_error"
 
 type processor struct {
-	config config
+	config     config
+	prefixKeys map[string]string // pre-computed prefix+key for each dissect field
 }
 
 func init() {
@@ -56,6 +57,16 @@ func NewProcessor(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		}
 	}
 	p := &processor{config: config}
+
+	// Pre-compute prefixed target keys so mapper() doesn't
+	// allocate a new string per field per event.
+	if config.TargetPrefix != "" {
+		prefix := config.TargetPrefix + "."
+		p.prefixKeys = make(map[string]string, len(config.Tokenizer.parser.fields))
+		for _, f := range config.Tokenizer.parser.fields {
+			p.prefixKeys[f.Key()] = prefix + f.Key()
+		}
+	}
 
 	return p, nil
 }
@@ -110,7 +121,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	if convertDataType {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
-		event, err = p.mapper(event, mapToMapStr(m))
+		event, err = p.mapFields(event, m)
 	}
 	if err != nil {
 		return backup, err
@@ -120,13 +131,17 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
-	prefix := ""
-	if p.config.TargetPrefix != "" {
-		prefix = p.config.TargetPrefix + "."
-	}
-	var prefixKey string
 	for k, v := range m {
-		prefixKey = prefix + k
+		prefixKey := k
+		if p.prefixKeys != nil {
+			if pk, ok := p.prefixKeys[k]; ok {
+				prefixKey = pk
+			} else {
+				// Dynamic key (e.g. from indirect field) not in the
+				// pre-computed set — fall back to prefix concatenation.
+				prefixKey = p.config.TargetPrefix + "." + k
+			}
+		}
 		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
 			_, _ = event.PutValue(prefixKey, v)
 		} else {
@@ -141,18 +156,34 @@ func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
 	return event, nil
 }
 
+// mapFields is a typed variant of mapper for Map (map[string]string),
+// avoiding the intermediate map[string]interface{} allocation from mapToMapStr.
+func (p *processor) mapFields(event *beat.Event, m Map) (*beat.Event, error) {
+	for k, v := range m {
+		prefixKey := k
+		if p.prefixKeys != nil {
+			if pk, ok := p.prefixKeys[k]; ok {
+				prefixKey = pk
+			} else {
+				prefixKey = p.config.TargetPrefix + "." + k
+			}
+		}
+		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
+			_, _ = event.PutValue(prefixKey, v)
+		} else {
+			if err != nil {
+				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
+			}
+			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
+		}
+	}
+	return event, nil
+}
+
 func (p *processor) String() string {
 	return "dissect=" + p.config.Tokenizer.Raw() +
 		",field=" + p.config.Field +
 		",target_prefix=" + p.config.TargetPrefix
-}
-
-func mapToMapStr(m Map) mapstr.M {
-	newMap := make(mapstr.M, len(m))
-	for k, v := range m {
-		newMap[k] = v
-	}
-	return newMap
 }
 
 func mapInterfaceToMapStr(m MapConverted) mapstr.M {
