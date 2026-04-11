@@ -137,6 +137,36 @@ func hasArtifactConfig(cfg *InstallArtifactConfig) bool {
 	return cfg != nil && strings.TrimSpace(cfg.ArtifactURL) != ""
 }
 
+func cloneInstallArtifactConfig(cfg *InstallArtifactConfig) *InstallArtifactConfig {
+	if cfg == nil {
+		return nil
+	}
+	clone := *cfg
+	if cfg.AllowInsecureURL != nil {
+		val := *cfg.AllowInsecureURL
+		clone.AllowInsecureURL = &val
+	}
+	return &clone
+}
+
+func cloneInstallPlatformConfig(cfg *InstallPlatformConfig) *InstallPlatformConfig {
+	if cfg == nil {
+		return nil
+	}
+	clone := *cfg
+	clone.AMD64 = cloneInstallArtifactConfig(cfg.AMD64)
+	clone.ARM64 = cloneInstallArtifactConfig(cfg.ARM64)
+	return &clone
+}
+
+func cloneInstallConfig(cfg InstallConfig) InstallConfig {
+	clone := cfg
+	clone.Linux = cloneInstallPlatformConfig(cfg.Linux)
+	clone.Darwin = cloneInstallPlatformConfig(cfg.Darwin)
+	clone.Windows = cloneInstallPlatformConfig(cfg.Windows)
+	return clone
+}
+
 func (c InstallConfig) AllowInsecureURLForPlatform(goos, goarch string) bool {
 	platformCfg := c.PlatformConfig(goos)
 	if platformCfg != nil {
@@ -174,14 +204,15 @@ func (c *InstallPlatformConfig) ArchConfig(goarch string) *InstallArtifactConfig
 	}
 }
 
-func (c *InstallConfig) NormalizeAndValidate() error {
+func (c InstallConfig) NormalizeAndValidate() (InstallConfig, error) {
+	normalized := cloneInstallConfig(c)
 	platforms := []struct {
 		name string
 		cfg  *InstallPlatformConfig
 	}{
-		{name: "linux", cfg: c.Linux},
-		{name: "darwin", cfg: c.Darwin},
-		{name: "windows", cfg: c.Windows},
+		{name: "linux", cfg: normalized.Linux},
+		{name: "darwin", cfg: normalized.Darwin},
+		{name: "windows", cfg: normalized.Windows},
 	}
 
 	for _, platform := range platforms {
@@ -202,14 +233,14 @@ func (c *InstallConfig) NormalizeAndValidate() error {
 			if err := normalizeAndValidateArtifactConfig(
 				arch.cfg,
 				fmt.Sprintf("osquery.elastic_options.install.%s.%s", platform.name, arch.name),
-				c.AllowInsecureURLForPlatform(platform.name, arch.name),
+				normalized.AllowInsecureURLForPlatform(platform.name, arch.name),
 			); err != nil {
-				return err
+				return InstallConfig{}, err
 			}
 		}
 	}
 
-	return nil
+	return normalized, nil
 }
 
 func normalizeAndValidateArtifactConfig(cfg *InstallArtifactConfig, configPath string, allowInsecure bool) error {

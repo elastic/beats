@@ -17,7 +17,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 )
 
 func TestParseEvent(t *testing.T) {

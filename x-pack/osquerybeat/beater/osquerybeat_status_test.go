@@ -89,6 +89,8 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
+func (m *testManager) PreInit() error                      { return nil }
+func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
@@ -399,6 +401,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 
 	count, ok := payload["count"].(float64)
 	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(1), count)
 
 	profiles, ok := payload["osquery_schedule"].([]interface{})
@@ -411,11 +414,12 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 
 	liveCount, ok := payload["live_query_profiles_count"].(float64)
 	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(0), liveCount)
 
 	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
 	require.True(t, ok)
-	assert.Len(t, liveProfiles, 0)
+	assert.Empty(t, liveProfiles)
 }
 
 // TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
