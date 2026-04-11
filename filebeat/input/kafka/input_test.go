@@ -42,10 +42,10 @@ func TestNewInputDone(t *testing.T) {
 	AssertNotStartedInputCanBeDone(t, config)
 }
 
-// AssertNotStartedInputCanBeDone checks that the context of an input can be
+// TestNoPanicOnClientError checks that the context of an input can be
 // done before starting the input, and it doesn't leak goroutines. This is
 // important to confirm that leaks don't happen with CheckConfig.
-func TestTestNoPanicOnClientError(t *testing.T) {
+func TestNoPanicOnClientError(t *testing.T) {
 	k := &kafkaInput{
 		config:       kafkaInputConfig{Hosts: []string{"127.0.0.1:1"}, Topics: []string{"topic-a"}},
 		saramaConfig: sarama.NewConfig(),
