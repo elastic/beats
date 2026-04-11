@@ -18,8 +18,8 @@
 package pipeline
 
 import (
+	"context"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -28,15 +28,22 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// outputController manages the pipelines output capabilities, like:
+type outputController interface {
+	waitClose(ctx context.Context, force bool) error
+	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
+}
+
+// processOutputController manages the pipelines output capabilities, like:
 // - start
 // - stop
 // - reload
-type outputController struct {
+type processOutputController struct {
 	beat     beat.Info
+	logger   *logp.Logger
 	monitors Monitors
 
 	// The queue is not created until the outputController is assigned a
@@ -44,14 +51,14 @@ type outputController struct {
 	// queue. At that time, any prior calls to outputController.queueProducer
 	// from incoming pipeline connections will be unblocked, and future
 	// requests will be handled synchronously.
-	queue           queue.Queue
+	queue           queue.Queue[publisher.Event]
 	queueLock       sync.Mutex
 	pendingRequests []producerRequest
 
 	// This factory will be used to create the queue when needed, unless
 	// it is overridden by output configuration when outputController.Set
 	// is called.
-	queueFactory queue.QueueFactory
+	queueFactory queue.QueueFactory[publisher.Event]
 
 	// consumer is a helper goroutine that reads event batches from the queue
 	// and sends them to workerChan for an output worker to process.
@@ -73,7 +80,7 @@ type outputController struct {
 
 type producerRequest struct {
 	config       queue.ProducerConfig
-	responseChan chan queue.Producer
+	responseChan chan queue.Producer[publisher.Event]
 }
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
@@ -82,15 +89,16 @@ type outputWorker interface {
 	Close() error
 }
 
-func newOutputController(
+func newProcessOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	retryObserver retryObserver,
-	queueFactory queue.QueueFactory,
+	queueFactory queue.QueueFactory[publisher.Event],
 	inputQueueSize int,
-) (*outputController, error) {
-	controller := &outputController{
+) (*processOutputController, error) {
+	controller := &processOutputController{
 		beat:           beat,
+		logger:         beat.Logger.Named("outputController"),
 		monitors:       monitors,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
@@ -101,10 +109,10 @@ func newOutputController(
 	return controller, nil
 }
 
-func (c *outputController) WaitClose(timeout time.Duration, force bool) error {
-	// First: signal the queue that we're shutting down, and wait up to the
-	// given duration for it to drain and process ACKs.
-	c.closeQueue(timeout, force)
+func (c *processOutputController) waitClose(ctx context.Context, force bool) error {
+	// First: signal the queue that we're shutting down, and allow it to drain
+	// and process ACKs until the given context terminates.
+	c.closeQueue(ctx, force)
 
 	// We've drained the queue as much as we can, signal eventConsumer to
 	// close, and wait for it to finish. After consumer.close returns,
@@ -120,7 +128,7 @@ func (c *outputController) WaitClose(timeout time.Duration, force bool) error {
 	return nil
 }
 
-func (c *outputController) Set(outGrp outputs.Group) {
+func (c *processOutputController) Set(outGrp outputs.Group) {
 	c.createQueueIfNeeded(outGrp)
 
 	// Set consumer to empty target to pause it while we reload
@@ -162,7 +170,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 }
 
 // Reload the output
-func (c *outputController) Reload(
+func (c *processOutputController) Reload(
 	cfg *reload.ConfigWithMeta,
 	outFactory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
 ) error {
@@ -189,14 +197,17 @@ func (c *outputController) Reload(
 
 // Close the queue, waiting up to the specified timeout for pending events
 // to complete.
-func (c *outputController) closeQueue(timeout time.Duration, force bool) {
+func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
 	if c.queue != nil {
+		c.logger.Infof("Output shutdown started. Waiting for enqueued events to be published.")
 		c.queue.Close(false)
 		select {
 		case <-c.queue.Done():
-		case <-time.After(timeout):
+			c.logger.Infof("Continue shutdown: All enqueued events have been published.")
+		case <-ctx.Done():
+			c.logger.Infof("Continue shutdown: Time out waiting for events to be published.")
 			if force {
 				c.queue.Close(force)
 				<-c.queue.Done()
@@ -214,7 +225,7 @@ func (c *outputController) closeQueue(timeout time.Duration, force bool) {
 
 // queueProducer creates a queue producer with the given config, blocking
 // until the queue is created if it does not yet exist.
-func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
+func (c *processOutputController) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
 	if publishDisabled {
 		// If publishDisabled is set ("-N" command line flag), then no output
 		// will ever be set, and no queue will ever be created. In this case,
@@ -235,14 +246,14 @@ func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Prod
 	// queue lock, and wait to receive our producer.
 	request := producerRequest{
 		config:       config,
-		responseChan: make(chan queue.Producer),
+		responseChan: make(chan queue.Producer[publisher.Event]),
 	}
 	c.pendingRequests = append(c.pendingRequests, request)
 	c.queueLock.Unlock()
 	return <-request.responseChan
 }
 
-func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
+func (c *processOutputController) createQueueIfNeeded(outGrp outputs.Group) {
 	logger := c.monitors.Logger
 	if len(outGrp.Clients) == 0 {
 		// If the output group is empty, there's nothing to do
@@ -298,11 +309,11 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 // a producer for a nonexistent queue.
 type emptyProducer struct{}
 
-func (emptyProducer) Publish(_ queue.Entry) (queue.EntryID, bool) {
+func (emptyProducer) Publish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (emptyProducer) TryPublish(_ queue.Entry) (queue.EntryID, bool) {
+func (emptyProducer) TryPublish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 

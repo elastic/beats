@@ -191,6 +191,13 @@ func (l *winEventLog) isForwarded() bool {
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
+func (l *winEventLog) shouldDetectGap(prevRecordID, currentRecordID uint64) bool {
+	if l.file || l.isForwarded() || prevRecordID == 0 {
+		return false
+	}
+	return currentRecordID > prevRecordID+1
+}
+
 func (l *winEventLog) hasWin2025ForwardedBugRisk() bool {
 	if !l.isForwarded() {
 		return false
@@ -492,9 +499,10 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	}
 
 	prevRecordID := l.lastRead.RecordNumber
-	if !l.file && prevRecordID > 0 && r.RecordID > prevRecordID+1 {
+	if l.shouldDetectGap(prevRecordID, r.RecordID) {
 		// Gap detection is channel-only. File reads can legitimately contain
-		// non-contiguous record IDs and should not trigger recovery.
+		// non-contiguous record IDs and should not trigger recovery. Forwarded
+		// events can also be non-contiguous.
 		l.log.Warnw("Record ID gap detected, resetting subscription.",
 			"channel", l.channelName,
 			"previous_record_id", prevRecordID,
