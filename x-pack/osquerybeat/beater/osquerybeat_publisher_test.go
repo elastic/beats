@@ -30,6 +30,9 @@ func (m *mockBeatPublisher) PublishActionResult(req map[string]interface{}, res 
 func (m *mockBeatPublisher) PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
 }
 
+func (m *mockBeatPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+}
+
 func (m *mockBeatPublisher) Configure(inputs []config.InputConfig) error {
 	return nil
 }

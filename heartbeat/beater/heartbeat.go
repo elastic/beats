@@ -197,7 +197,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -304,15 +303,7 @@ func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	ad, err := autodiscover.NewAutodiscover(
-		"heartbeat",
-		b.Publisher,
-		bt.monitorFactory,
-		autodiscover.QueryConfig(),
-		bt.config.Autodiscover,
-		b.Keystore,
-		b.Info.Logger,
-	)
+	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, bt.monitorFactory, autodiscover.QueryConfig(), bt.config.Autodiscover, b.Keystore, b.Info.Logger, nil)
 	if err != nil {
 		return nil, err
 	}
