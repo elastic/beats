@@ -23,24 +23,26 @@ import (
 )
 
 func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
-	log := logger.With(
-		"operation", event.Op.String(),
-		"source_name", src.Name(),
-	)
+	// Collect all fields upfront to create a single logger clone instead of
+	// one per conditional .With() call. Each .With() clones the entire zap
+	// core (including buffer pool allocation), so at high file counts this
+	// reduces memory pressure significantly.
+	fields := make([]any, 0, 10)
+	fields = append(fields, "operation", event.Op.String(), "source_name", src.Name())
 	if event.Descriptor.Fingerprint != "" {
-		log = log.With("fingerprint", event.Descriptor.Fingerprint)
+		fields = append(fields, "fingerprint", event.Descriptor.Fingerprint)
 	}
 	if event.Descriptor.Info != nil {
 		osID := event.Descriptor.Info.GetOSState().Identifier()
 		if osID != "" {
-			log = log.With("os_id", osID)
+			fields = append(fields, "os_id", osID)
 		}
 	}
 	if event.NewPath != "" {
-		log = log.With("new_path", event.NewPath)
+		fields = append(fields, "new_path", event.NewPath)
 	}
 	if event.OldPath != "" {
-		log = log.With("old_path", event.OldPath)
+		fields = append(fields, "old_path", event.OldPath)
 	}
-	return log
+	return logger.With(fields...)
 }

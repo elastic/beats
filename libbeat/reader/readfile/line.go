@@ -78,7 +78,7 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logger.Named("reader_line"),
+		logger:       logger,
 	}, nil
 }
 
