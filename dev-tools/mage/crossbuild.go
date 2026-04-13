@@ -389,7 +389,7 @@ func gitWorktreeVolumes(repoRoot string) ([]string, error) {
 		return nil, err
 	}
 	if info.IsDir() {
-		// Normal repository, no extra mounts needed.
+		// Regular repository, no extra mounts needed.
 		return nil, nil
 	}
 
