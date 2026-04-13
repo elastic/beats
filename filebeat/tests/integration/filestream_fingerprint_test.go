@@ -186,9 +186,8 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	filebeat.WaitPublishedEvents(10*time.Second, 85)
 }
 
-// Test configuration for growing_fingerprint file identity.
-// This tests that files of any size are ingested immediately and that
-// the fingerprint grows as the file grows.
+// growingFingerprintCfg is the test configuration for growing_fingerprint
+// file identity. Format args: logDir, checkInterval, tempDir.
 var growingFingerprintCfg = `
 filebeat.inputs:
   - type: filestream
@@ -198,7 +197,7 @@ filebeat.inputs:
     paths:
       - %s/*.log*
     prospector.scanner:
-      check_interval: 1s
+      check_interval: %s
       fingerprint:
         growing: true
         max_length: 100
@@ -249,7 +248,7 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	file4 := filepath.Join(logDir, "file4.log.gz")
 	file5 := filepath.Join(logDir, "file5.log.gz")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, tempDir))
+	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -358,7 +357,7 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 	file2 := filepath.Join(logDir, "file2.log")
 	file3 := filepath.Join(logDir, "file3.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, tempDir))
+	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -448,7 +447,7 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files(t *testing.T) {
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, tempDir))
+	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -533,7 +532,7 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_dele
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, tempDir))
+	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -601,7 +600,7 @@ func TestFilestreamGrowingFingerprintTruncation(t *testing.T) {
 
 	logFile := filepath.Join(logDir, "truncate.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, tempDir))
+	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -831,4 +830,113 @@ func printOutputOnFailure(t *testing.T, tempDir string) {
 		}
 		printOutputFileSorted(t, tempDir)
 	})
+}
+
+// TestFilestreamGrowingFingerprint_rename_and_grow tests that when a file is
+// renamed and subsequently grows, the growing_fingerprint identity preserves
+// the read offset. Without this fix, the rename+grow would be misclassified
+// as delete+create, causing the file to be re-read from offset 0.
+//
+// The test separates the rename and the growth into distinct scan cycles:
+//   - First, rename the file and wait for filebeat to register the rename.
+//   - Then, append new data and verify it is ingested from the correct offset.
+//
+// Note: the running harvester keeps publishing events under the ORIGINAL path
+// because the file path is baked into the reader at startup. The rename updates
+// the store metadata but does not affect the in-flight harvester's path.
+// The key assertion is offset continuity: 5 total events (not 6 from re-read).
+func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0755), "failed to create log directory")
+
+	appLog := filepath.Join(logDir, "app.log")
+	appLogRenamed := filepath.Join(logDir, "app.log.1")
+
+	filebeat.WriteConfigFile(fmt.Sprintf(growingFingerprintCfg, logDir, "5s", tempDir))
+	filebeat.Start()
+
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// ===== Phase 1: Create file with unique content (short fingerprint) =====
+	// With max_length=100 and ~50-byte lines, 1 line produces a ~50-byte
+	// fingerprint (100 hex chars) — short, so it is a prefix-match candidate.
+	appendToFile(t, appLog, generateLines("app original line", 1))
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", appLog),
+		15*time.Second,
+		"app.log was not fully read",
+	)
+	filebeat.WaitPublishedEvents(10*time.Second, 1)
+
+	// ===== Phase 2: Rename the file and wait for filebeat to register it =====
+	// The rename alone does not change the fingerprint — the exact FileID
+	// match detects it as OpRename.
+	require.NoError(t, os.Rename(appLog, appLogRenamed),
+		"failed to rename app.log -> app.log.1")
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("File %s has been renamed to %s", appLog, appLogRenamed),
+		15*time.Second,
+		"filebeat did not detect the rename",
+	)
+
+	// ===== Phase 3: Append new data to the renamed file =====
+	// The running harvester holds an open fd to the inode, so it reads the
+	// new data regardless of the path change. The fingerprint grows on the
+	// next scan, triggering prefix-match migration in the prospector.
+	appendToFile(t, appLogRenamed, generateLines("app new line", 4))
+
+	// Wait for the fingerprint migration — confirms the prospector detected
+	// the fingerprint growth and migrated the registry key.
+	filebeat.WaitLogsContains(
+		"migrated growing fingerprint entry",
+		15*time.Second,
+		"fingerprint migration did not occur after rename+grow",
+	)
+
+	// ===== Phase 4: Assert offset continuity =====
+	// Correct: 1 original + 4 new = 5 events.
+	// Broken (re-read from 0): 1 original + 5 re-read = 6 events.
+	//
+	// All events appear under the original path (app.log) because the running
+	// harvester's reader bakes in the path at startup and does not update it
+	// on rename. This is expected — the important thing is offset continuity.
+	filebeat.WaitPublishedEvents(15*time.Second, 5)
+
+	events := readOutputEvents(t, tempDir)
+	require.Len(t, events, 5,
+		"expected exactly 5 events (1 original + 4 new); 6 would mean re-read from offset 0")
+
+	// All events attributed to the original path (harvester does not update
+	// its baked-in path on rename).
+	msgs := messagesForFile(events, appLog)
+	require.Len(t, msgs, 5, "all events should be attributed to the original path")
+
+	// Verify no duplicate messages — each line is unique.
+	seen := make(map[string]struct{}, len(msgs))
+	for _, msg := range msgs {
+		_, duplicate := seen[msg]
+		require.False(t, duplicate, "duplicate event detected: %s", msg)
+		seen[msg] = struct{}{}
+	}
+
+	// Verify offsets are monotonically increasing — proves the harvester
+	// continued from where it left off, not re-read from 0.
+	for i := 1; i < len(events); i++ {
+		require.Greater(t, events[i].Log.Offset, events[i-1].Log.Offset,
+			"offsets must be monotonically increasing (event %d vs %d)", i-1, i)
+	}
+
+	// ===== Phase 5: Stop Filebeat =====
+	filebeat.Stop()
 }

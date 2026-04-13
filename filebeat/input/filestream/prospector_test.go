@@ -1583,13 +1583,13 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 		logger:                   logp.L(),
 		maxEncodedFingerprintLen: maxEncLen,
 	}
-	p.buildShortFPSet(store)
+	p.buildShortFingerprintSet(store)
 
-	require.Len(t, p.shortFingerprintEntries, 1)
-	entry, ok := p.shortFingerprintEntries["filestream::input::growing_fingerprint::aabb"]
+	require.Len(t, p.shortFingerprintIdx.entries, 1)
+	entry, ok := p.shortFingerprintIdx.entries["filestream::input::growing_fingerprint::aabb"]
 	require.True(t, ok, "expected short entry to be in set")
-	assert.Equal(t, "aabb", entry.fingerprint)
-	assert.Equal(t, "/a.log", entry.source)
+	assert.Equal(t, "aabb", entry.Fingerprint)
+	assert.Equal(t, "/a.log", entry.Source)
 }
 
 func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
@@ -1616,7 +1616,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries:  make(map[string]shortFingerprintEntry),
+			shortFingerprintIdx: newShortFingerprintIndex(maxEncLen),
 		}
 		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::growing_fingerprint::aabb", "aabb")
 		src := identifier.GetSource(event)
@@ -1625,11 +1625,11 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 
-		require.Len(t, p.shortFingerprintEntries, 1)
-		entry, ok := p.shortFingerprintEntries["filestream::input::growing_fingerprint::aabb"]
+		require.Len(t, p.shortFingerprintIdx.entries, 1)
+		entry, ok := p.shortFingerprintIdx.entries["filestream::input::growing_fingerprint::aabb"]
 		require.True(t, ok)
-		assert.Equal(t, "aabb", entry.fingerprint)
-		assert.Equal(t, "/a.log", entry.source)
+		assert.Equal(t, "aabb", entry.Fingerprint)
+		assert.Equal(t, "/a.log", entry.Source)
 	})
 
 	t.Run("OpCreate with max-length fingerprint does NOT add entry", func(t *testing.T) {
@@ -1638,7 +1638,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries:  make(map[string]shortFingerprintEntry),
+			shortFingerprintIdx: newShortFingerprintIndex(maxEncLen),
 		}
 		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::growing_fingerprint::"+maxFP, maxFP)
 		src := identifier.GetSource(event)
@@ -1647,7 +1647,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 
-		assert.Len(t, p.shortFingerprintEntries, 0)
+		assert.Len(t, p.shortFingerprintIdx.entries, 0)
 	})
 
 	t.Run("OpDelete removes entry", func(t *testing.T) {
@@ -1656,9 +1656,9 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries: map[string]shortFingerprintEntry{
-				srcID: {fingerprint: "aabb", source: "/a.log"},
-			},
+			shortFingerprintIdx: &shortFingerprintIndex{maxLen: maxEncLen, entries: map[string]shortFingerprintEntry{
+				srcID: {Fingerprint: "aabb", Source: "/a.log"},
+			}},
 		}
 		event := makeEvent(loginp.OpDelete, "/a.log", srcID, "aabb")
 		event.OldPath = "/a.log"
@@ -1669,7 +1669,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 
-		assert.Len(t, p.shortFingerprintEntries, 0)
+		assert.Len(t, p.shortFingerprintIdx.entries, 0)
 	})
 
 	t.Run("OpRename updates source path", func(t *testing.T) {
@@ -1678,9 +1678,9 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries: map[string]shortFingerprintEntry{
-				srcID: {fingerprint: "aabb", source: "/a.log"},
-			},
+			shortFingerprintIdx: &shortFingerprintIndex{maxLen: maxEncLen, entries: map[string]shortFingerprintEntry{
+				srcID: {Fingerprint: "aabb", Source: "/a.log"},
+			}},
 		}
 		event := loginp.FSEvent{
 			Op:      loginp.OpRename,
@@ -1698,10 +1698,10 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 
-		require.Len(t, p.shortFingerprintEntries, 1)
-		entry := p.shortFingerprintEntries[srcID]
-		assert.Equal(t, "/a.log.1", entry.source)
-		assert.Equal(t, "aabb", entry.fingerprint)
+		require.Len(t, p.shortFingerprintIdx.entries, 1)
+		entry := p.shortFingerprintIdx.entries[srcID]
+		assert.Equal(t, "/a.log.1", entry.Source)
+		assert.Equal(t, "aabb", entry.Fingerprint)
 	})
 
 	t.Run("OpTruncate removes stale entry by path", func(t *testing.T) {
@@ -1712,9 +1712,9 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries: map[string]shortFingerprintEntry{
-				oldSrcID: {fingerprint: "aabb", source: "/a.log"},
-			},
+			shortFingerprintIdx: &shortFingerprintIndex{maxLen: maxEncLen, entries: map[string]shortFingerprintEntry{
+				oldSrcID: {Fingerprint: "aabb", Source: "/a.log"},
+			}},
 		}
 		event := makeEvent(loginp.OpTruncate, "/a.log", truncatedSrcID, "xx")
 		src := identifier.GetSource(event)
@@ -1723,7 +1723,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 
-		assert.Len(t, p.shortFingerprintEntries, 0, "stale entry should be removed by path match")
+		assert.Len(t, p.shortFingerprintIdx.entries, 0, "stale entry should be removed by path match")
 	})
 }
 
@@ -1749,9 +1749,9 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries: map[string]shortFingerprintEntry{
-				oldKey: {fingerprint: oldFP, source: path},
-			},
+			shortFingerprintIdx: &shortFingerprintIndex{maxLen: maxEncLen, entries: map[string]shortFingerprintEntry{
+				oldKey: {Fingerprint: oldFP, Source: path},
+			}},
 		}
 
 		event := loginp.FSEvent{
@@ -1766,10 +1766,10 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 
 		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
 
-		assert.NotContains(t, p.shortFingerprintEntries, oldKey, "old entry should be removed")
-		require.Contains(t, p.shortFingerprintEntries, newSrcID, "new entry should be added")
-		assert.Equal(t, newFP, p.shortFingerprintEntries[newSrcID].fingerprint)
-		assert.Equal(t, path, p.shortFingerprintEntries[newSrcID].source)
+		assert.NotContains(t, p.shortFingerprintIdx.entries, oldKey, "old entry should be removed")
+		require.Contains(t, p.shortFingerprintIdx.entries, newSrcID, "new entry should be added")
+		assert.Equal(t, newFP, p.shortFingerprintIdx.entries[newSrcID].Fingerprint)
+		assert.Equal(t, path, p.shortFingerprintIdx.entries[newSrcID].Source)
 	})
 
 	t.Run("short to max: old removed, new NOT added", func(t *testing.T) {
@@ -1788,9 +1788,9 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintEntries: map[string]shortFingerprintEntry{
-				oldKey: {fingerprint: oldFP, source: path},
-			},
+			shortFingerprintIdx: &shortFingerprintIndex{maxLen: maxEncLen, entries: map[string]shortFingerprintEntry{
+				oldKey: {Fingerprint: oldFP, Source: path},
+			}},
 		}
 
 		event := loginp.FSEvent{
@@ -1805,9 +1805,9 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 
 		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
 
-		assert.NotContains(t, p.shortFingerprintEntries, oldKey, "old entry should be removed")
-		assert.NotContains(t, p.shortFingerprintEntries, newSrcID, "max-length entry should NOT be added")
-		assert.Len(t, p.shortFingerprintEntries, 0)
+		assert.NotContains(t, p.shortFingerprintIdx.entries, oldKey, "old entry should be removed")
+		assert.NotContains(t, p.shortFingerprintIdx.entries, newSrcID, "max-length entry should NOT be added")
+		assert.Len(t, p.shortFingerprintIdx.entries, 0)
 	})
 }
 
@@ -1826,7 +1826,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		logger:                   logp.L(),
 		identifier:               identifier,
 		maxEncodedFingerprintLen: maxEncLen,
-		shortFingerprintEntries:  make(map[string]shortFingerprintEntry),
+		shortFingerprintIdx: newShortFingerprintIndex(maxEncLen),
 	}
 	store := newMockMetadataUpdater()
 	hg := newTestHarvesterGroup()
@@ -1859,10 +1859,10 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 	}
 	assert.Equal(t, map[string]shortFingerprintEntry{
-		makeKey("aa"): {fingerprint: "aa", source: "/a.log"},
-		makeKey("bb"): {fingerprint: "bb", source: "/b.log"},
-		makeKey("cc"): {fingerprint: "cc", source: "/c.log"},
-	}, p.shortFingerprintEntries, "cycle 1: all 3 short entries present")
+		makeKey("aa"): {Fingerprint: "aa", Source: "/a.log"},
+		makeKey("bb"): {Fingerprint: "bb", Source: "/b.log"},
+		makeKey("cc"): {Fingerprint: "cc", Source: "/c.log"},
+	}, p.shortFingerprintIdx.entries, "cycle 1: all 3 short entries present")
 
 	// --- Cycle 2: file A grows (still short: "aa" -> "aabb") ---
 	event := loginp.FSEvent{
@@ -1877,10 +1877,10 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	src := identifier.GetSource(event)
 	p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 	assert.Equal(t, map[string]shortFingerprintEntry{
-		makeKey("aabb"): {fingerprint: "aabb", source: "/a.log"},
-		makeKey("bb"):   {fingerprint: "bb", source: "/b.log"},
-		makeKey("cc"):   {fingerprint: "cc", source: "/c.log"},
-	}, p.shortFingerprintEntries, "cycle 2: file A migrated aa->aabb, B and C unchanged")
+		makeKey("aabb"): {Fingerprint: "aabb", Source: "/a.log"},
+		makeKey("bb"):   {Fingerprint: "bb", Source: "/b.log"},
+		makeKey("cc"):   {Fingerprint: "cc", Source: "/c.log"},
+	}, p.shortFingerprintIdx.entries, "cycle 2: file A migrated aa->aabb, B and C unchanged")
 
 	// --- Cycle 3: file A grows to max ("aabb" -> "aabb0000...") ---
 	event = loginp.FSEvent{
@@ -1895,9 +1895,9 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	src = identifier.GetSource(event)
 	p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 	assert.Equal(t, map[string]shortFingerprintEntry{
-		makeKey("bb"): {fingerprint: "bb", source: "/b.log"},
-		makeKey("cc"): {fingerprint: "cc", source: "/c.log"},
-	}, p.shortFingerprintEntries, "cycle 3: file A at max (removed), B and C remain")
+		makeKey("bb"): {Fingerprint: "bb", Source: "/b.log"},
+		makeKey("cc"): {Fingerprint: "cc", Source: "/c.log"},
+	}, p.shortFingerprintIdx.entries, "cycle 3: file A at max (removed), B and C remain")
 
 	// --- Cycle 4: file B grows to max ("bb" -> "bb0000...") ---
 	event = loginp.FSEvent{
@@ -1912,8 +1912,8 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	src = identifier.GetSource(event)
 	p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 	assert.Equal(t, map[string]shortFingerprintEntry{
-		makeKey("cc"): {fingerprint: "cc", source: "/c.log"},
-	}, p.shortFingerprintEntries, "cycle 4: file B at max (removed), only C remains")
+		makeKey("cc"): {Fingerprint: "cc", Source: "/c.log"},
+	}, p.shortFingerprintIdx.entries, "cycle 4: file B at max (removed), only C remains")
 
 	// --- Cycle 5: file C deleted ---
 	event = loginp.FSEvent{
@@ -1927,7 +1927,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	}
 	src = identifier.GetSource(event)
 	p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
-	assert.Empty(t, p.shortFingerprintEntries, "cycle 5: file C deleted, set is empty")
+	assert.Empty(t, p.shortFingerprintIdx.entries, "cycle 5: file C deleted, set is empty")
 }
 
 func mustInodeMarker(t *testing.T) fileIdentifier {

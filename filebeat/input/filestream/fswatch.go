@@ -78,6 +78,14 @@ type fileWatcher struct {
 	fileIdentifier   fileIdentifier
 	sourceIdentifier *loginp.SourceIdentifier
 
+	// growingFingerprint indicates that the growing fingerprint mode is active.
+	// When true, prefix-based rename detection is used as a fallback
+	// for files whose fingerprint grew between scans.
+	growingFingerprint bool
+	// maxEncodedFingerprintLen is the maximum encoded fingerprint length (hex chars).
+	// Only fingerprints shorter than this are candidates for prefix matching.
+	maxEncodedFingerprintLen int
+
 	// closedHarvesters is a map of harvester ID to the current
 	// offset of the file
 	closedHarvesters map[string]int64
@@ -113,9 +121,12 @@ func newFileWatcher(
 		closedHarvesters: map[string]int64{},
 		// notifyChan is a buffered channel to prevent the harvester from
 		// blocking while waiting for the fileWatcher to read from the channel
-		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
-		fileIdentifier:   fi,
-		sourceIdentifier: srci,
+		notifyChan:         make(chan loginp.HarvesterStatus, 5), // magic number
+		fileIdentifier:     fi,
+		sourceIdentifier:   srci,
+		growingFingerprint: config.Scanner.Fingerprint.Growing,
+		// *2 because hex encoding doubles the byte length.
+		maxEncodedFingerprintLen: int(config.Scanner.Fingerprint.MaxLength) * 2,
 	}, nil
 }
 
@@ -280,47 +291,99 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		w.closedHarvestersMutex.Unlock()
 	}
 
-	// remaining files in the prev map are the ones that are missing
-	// either because they have been deleted or renamed.
-	//
-	// TODO(AndersonQ): For growing_fingerprint, rename detection can fail.
-	// FileID() returns the fingerprint, so if a file is renamed AND grows
-	// between two scans, the old and new FileID won't match. The rename
-	// is then misclassified as delete + create. With cleanRemoved enabled
-	// (the default), the old registry entry is removed before the new
-	// file's prefix match can find and migrate it, causing the renamed
-	// file to be re-read from offset 0.
-	// This does not affect static fingerprint where the fingerprint never
-	// changes and rename detection works correctly.
-	// Possible fixes: use the OS file identifier (device+inode) for rename
-	// detection when growing_fingerprint is in use, or defer the entry
-	// removal so the prefix match has a chance to migrate it first.
+	// Remaining files in the prev map are missing — either deleted or renamed.
+	// Rename detection uses three phases:
+	//   Phase A: Exact FileID match (works for all identities including static fingerprint).
+	//   Phase B: Prefix match for growing_fingerprint — handles rename+grow
+	//            where the fingerprint changed between scans.
+	//   Phase C: Emit deletes and creates for unmatched entries.
+
+	// Phase A — exact renames: match remaining prev files against new files by FileID.
+	// For growing fingerprint, also build the short fingerprint index from entries
+	// that don't get an exact match — these are the candidates for Phase B.
+	var shortFingerprints *shortFingerprintIndex
+	if w.growingFingerprint {
+		shortFingerprints = newShortFingerprintIndex(w.maxEncodedFingerprintLen)
+	}
+
 	for remainingPath, remainingDesc := range w.prev {
-		var e loginp.FSEvent
+		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
 
-		id := remainingDesc.FileID()
-		srcID := w.getFileIdentity(remainingDesc)
-		if newDesc, renamed := newFilesByID[id]; renamed {
-			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc, srcID)
+		switch {
+		case renamed:
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(
+				remainingPath, newDesc.Filename, *newDesc, srcID):
+				renamedCount++
+			}
+
 			delete(newFilesByName, newDesc.Filename)
-			delete(newFilesByID, id)
-			renamedCount++
-		} else {
-			e = deleteEvent(remainingPath, remainingDesc, srcID)
-			removedCount++
-			w.closedHarvestersMutex.Lock()
-			delete(w.closedHarvesters, srcID)
-			w.closedHarvestersMutex.Unlock()
-		}
+			delete(newFilesByID, remainingDesc.FileID())
+			delete(w.prev, remainingPath)
 
-		select {
-		case <-ctx.Done():
-			return
-		case w.events <- e:
+		case w.growingFingerprint:
+			shortFingerprints.Add(
+				remainingPath, remainingDesc.Fingerprint, remainingPath)
 		}
 	}
 
-	// remaining files in newFiles are newly created files
+	// Phase B — prefix renames (growing fingerprint only): for remaining prev
+	// files with short fingerprints, check if any new file's fingerprint has
+	// the old fingerprint as a prefix. This handles files that were renamed
+	// AND grew between scans. The short fingerprint index was populated during
+	// Phase A from entries that didn't get an exact match.
+	if shortFingerprints.Len() > 0 {
+		type prefixMatch struct {
+			oldPath string
+			newPath string
+			newDesc *loginp.FileDescriptor
+		}
+		var matches []prefixMatch
+
+		for newPath, newDesc := range newFilesByName {
+			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint, "")
+			if found {
+				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
+				shortFingerprints.Remove(oldPath)
+			}
+		}
+
+		for _, m := range matches {
+			remainingDesc := w.prev[m.oldPath]
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID):
+				renamedCount++
+			}
+
+			delete(newFilesByName, m.newPath)
+			delete(newFilesByID, m.newDesc.FileID())
+			delete(w.prev, m.oldPath)
+		}
+	}
+
+	// Phase C — deletes: remaining prev files that weren't matched by either
+	// exact or prefix rename detection are genuinely deleted.
+	for remainingPath, remainingDesc := range w.prev {
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- deleteEvent(remainingPath, remainingDesc, srcID):
+			removedCount++
+		}
+
+		w.closedHarvestersMutex.Lock()
+		delete(w.closedHarvesters, srcID)
+		w.closedHarvestersMutex.Unlock()
+	}
+
+	// Phase C — creates: remaining new files are genuinely new.
 	for path, fd := range newFilesByName {
 		select {
 		case <-ctx.Done():
