@@ -271,6 +271,27 @@ func handlePublishError(err error, log *logp.Logger, health status.StatusReporte
 	health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
 }
 
+func recordPublishedEvent(metricsRecorder *metricsRecorder, ctx context.Context, pubSpan trace.Span, batchNum int, eventCount int) int {
+	if batchNum == 1 {
+		metricsRecorder.AddPublishedBatch(ctx, 1)
+	}
+	metricsRecorder.AddPublishedEvents(ctx, 1)
+	eventCount++
+	pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", eventCount))
+	return eventCount
+}
+
+func checkPublishResultContext(ctx context.Context, metricsRecorder *metricsRecorder, start time.Time, pubSpan trace.Span, execSpan trace.Span, runSpan trace.Span) error {
+	err := ctx.Err()
+	if err == nil {
+		return nil
+	}
+
+	metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
+	errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+	return err
+}
+
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -737,17 +758,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					// events we have now, with a fallback to the last guaranteed
 					// correctly published cursor.
 				}
-				if i == 0 {
-					metricsRecorder.AddPublishedBatch(pubCtx, 1)
-				}
-				metricsRecorder.AddPublishedEvents(pubCtx, 1)
-				pubSpanEventCount++
-				pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
+				pubSpanEventCount = recordPublishedEvent(metricsRecorder, pubCtx, pubSpan, i+1, pubSpanEventCount)
 
-				err = pubCtx.Err()
+				err = checkPublishResultContext(pubCtx, metricsRecorder, start, pubSpan, execSpan, runSpan)
 				if err != nil {
-					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 					return err
 				}
 			}
