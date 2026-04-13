@@ -305,6 +305,29 @@ func checkPublishResultContext(ctx context.Context, metricsRecorder *metricsReco
 	return err
 }
 
+func handleSingleEventObject(event map[string]interface{}, log *logp.Logger, health status.StatusReporter) {
+	if _, ok := event["error"]; ok {
+		// If we have an error, log the complete object on the basis
+		// that it is ECS-conformant.
+		if log.Core().Enabled(zapcore.ErrorLevel) {
+			kv := make([]any, 0, 2*len(event))
+			for k := range maps.Keys(event) {
+				kv = append(kv, k, event[k])
+			}
+			log.Errorw("single event object returned by evaluation", kv...)
+		}
+	} else {
+		// Otherwise, be consistent with the existing documented
+		// behaviour and log the entire object as the error.
+		log.Errorw("single event object returned by evaluation", "error", event)
+	}
+	if err, ok := event["error"]; ok {
+		health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
+	} else {
+		health.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+	}
+}
+
 func publishEventLoop(
 	events []interface{},
 	cursors []interface{},
@@ -824,26 +847,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					okSpans(end{execSpan})
 					return nil
 				}
-				if _, ok := e["error"]; ok {
-					// If we have an error, log the complete object on the basis
-					// that it is ECS-conformant.
-					if execLog.Core().Enabled(zapcore.ErrorLevel) {
-						kv := make([]any, 0, 2*len(e))
-						for k := range maps.Keys(e) {
-							kv = append(kv, k, e[k])
-						}
-						execLog.Errorw("single event object returned by evaluation", kv...)
-					}
-				} else {
-					// Otherwise, be consistent with the existing documented
-					// behaviour and log the entire object as the error.
-					execLog.Errorw("single event object returned by evaluation", "error", e)
-				}
-				if err, ok := e["error"]; ok {
-					health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
-				} else {
-					health.UpdateStatus(status.Degraded, "single event object returned by evaluation")
-				}
+				handleSingleEventObject(e, execLog, health)
 				isDegraded = true
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
