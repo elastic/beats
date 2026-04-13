@@ -11,7 +11,28 @@ import (
 // ElasticOptions contains Beat-specific options that are not part of
 // osquery's native config schema.
 type ElasticOptions struct {
-	Install *InstallConfig `config:"install" json:"-"`
+	Install             *InstallConfig             `config:"install" json:"-"`
+	QueryProfileStorage *QueryProfileStorageConfig `config:"query_profile_storage" json:"-"`
+}
+
+// QueryProfileStorageConfig controls local storage of live query profiles.
+type QueryProfileStorageConfig struct {
+	Enabled     *bool `config:"enabled" json:"-"`
+	MaxProfiles int   `config:"max_profiles" json:"-"`
+}
+
+func (c QueryProfileStorageConfig) EnabledOrDefault() bool {
+	if c.Enabled == nil {
+		return true
+	}
+	return *c.Enabled
+}
+
+func (c QueryProfileStorageConfig) MaxProfilesOrDefault() int {
+	if c.MaxProfiles <= 0 {
+		return DefaultQueryProfileMaxProfiles
+	}
+	return c.MaxProfiles
 }
 
 type Query struct {
@@ -43,6 +64,10 @@ type Query struct {
 	// A boolean to determine if "removed" actions should be logged, default true
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
+
+	// Optional internal flag to emit per-query profiling for this scheduled query.
+	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
+	Profile bool `config:"profile" json:"-"`
 }
 
 type Pack struct {

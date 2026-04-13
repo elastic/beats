@@ -281,7 +281,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	waitFinished := newSignalWait()
-	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
 	reg := b.Monitoring.StatsRegistry()
@@ -291,6 +290,21 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		done:  monitoring.NewUint(reg, "filebeat.events.done"),
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
+
+	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
+	// but it won't start any inputs/output
+	if err := b.Manager.PreInit(); err != nil {
+		return err
+	}
+
+	// Ensure that we only call b.Manager.Stop out of order
+	// if Run has failed early/before b.Manager.PostInit() was called.
+	managerEarlyStop := b.Manager.Stop
+	defer func() {
+		if managerEarlyStop != nil {
+			managerEarlyStop()
+		}
+	}()
 
 	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Paths)
 	if err := registryMigrator.Run(); err != nil {
@@ -441,9 +455,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		close(outDone) // finally close all active connections to publisher pipeline
 	}()
 
-	// Wait for all events to be processed or timeout
-	defer waitEvents.Wait()
-
 	if config.OverwritePipelines {
 		fb.logger.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
@@ -484,6 +495,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			config.Autodiscover,
 			b.Keystore,
 			fb.logger,
+			b.Paths,
 		)
 		if err != nil {
 			return err
@@ -491,10 +503,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
-	// We start the manager when all the subsystem are initialized and ready to received events.
-	if err := b.Manager.Start(); err != nil {
-		return err
-	}
+	b.Manager.PostInit()
+	managerEarlyStop = nil
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
@@ -510,34 +520,26 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	crawler.Stop()
 	cancelPipelineFactoryCtx()
 
-	timeout := fb.config.ShutdownTimeout
-	// Checks if on shutdown it should wait for all events to be published
-	waitPublished := fb.config.ShutdownTimeout > 0 || *once
-	if waitPublished {
-		// Wait for registrar to finish writing registry
+	// On a standard run the pipeline has already waited for acknowledgments
+	// and shut down at this point, so all events that will be acknowledged
+	// already have been. However for the "once" option supported by the
+	// log input, events may still be active.
+	if *once {
+		timeout := fb.config.ShutdownTimeout
+		// Wait for all events to be processed or timeout
+		waitEvents := newSignalWait()
+		defer waitEvents.Wait()
+
 		waitEvents.Add(withLog(wgEvents.Wait,
 			"Continue shutdown: All enqueued events being published.", fb.logger))
-		// Wait for either timeout or all events having been ACKed by outputs.
-		if fb.config.ShutdownTimeout > 0 {
-			fb.logger.Info("Shutdown output timer started. Waiting for max %v.", timeout)
+		// Wait for either timeout or explicit shutdown.
+		if timeout > 0 {
+			fb.logger.Infof("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
 				"Continue shutdown: Time out waiting for events being published.", fb.logger))
 		} else {
 			waitEvents.AddChan(fb.done)
 		}
-	}
-
-	// Stop the manager and stop the connection to any dependent services.
-	// The Manager started to have a working implementation when
-	// https://github.com/elastic/beats/pull/34416 was merged.
-	// This is intended to enable TLS certificates reload on a long
-	// running Beat.
-	//
-	// However calling b.Manager.Stop() here messes up the behavior of the
-	// --once flag because it makes Filebeat exit early.
-	// So if --once is passed, we don't call b.Manager.Stop().
-	if !*once {
-		b.Manager.Stop()
 	}
 
 	return nil

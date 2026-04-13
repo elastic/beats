@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	hbrunner "github.com/elastic/beats/v7/heartbeat/reload"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/heartbeat/tracer"
@@ -196,7 +197,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -284,7 +284,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		return nil
 	})
 
-	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
+	inputs := hbrunner.NewHBRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
 }
 
@@ -303,15 +303,7 @@ func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	ad, err := autodiscover.NewAutodiscover(
-		"heartbeat",
-		b.Publisher,
-		bt.monitorFactory,
-		autodiscover.QueryConfig(),
-		bt.config.Autodiscover,
-		b.Keystore,
-		b.Info.Logger,
-	)
+	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, bt.monitorFactory, autodiscover.QueryConfig(), bt.config.Autodiscover, b.Keystore, b.Info.Logger, nil)
 	if err != nil {
 		return nil, err
 	}

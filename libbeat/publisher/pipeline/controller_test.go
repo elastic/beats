@@ -60,11 +60,6 @@ func TestOutputReload(t *testing.T) {
 				numEventsToPublish := 15000 + (q % 5000) // 15000 to 19999
 				numOutputReloads := 350 + (q % 150)      // 350 to 499
 
-				queueConfig := conf.Namespace{}
-				conf, _ := conf.NewConfigFrom(
-					fmt.Sprintf("mem.events: %v", numEventsToPublish))
-				_ = queueConfig.Unpack(conf)
-
 				var publishedCount atomic.Uint64
 				countingPublishFn := func(batch publisher.Batch) error {
 					publishedCount.Add(uint64(len(batch.Events())))
@@ -72,28 +67,31 @@ func TestOutputReload(t *testing.T) {
 				}
 
 				logger := logptest.NewTestingLogger(t, "")
-				pipeline, err := New(
+
+				queueFactory, err := queueFactoryForUserConfig(
+					"mem",
+					conf.MustNewConfigFrom(fmt.Sprintf("events: %v", numEventsToPublish)),
+					nil)
+				require.NoError(t, err)
+				outputController, err := newProcessOutputController(
 					beat.Info{Logger: logger},
 					Monitors{Logger: logger},
-					queueConfig,
-					outputs.Group{},
-					Settings{},
+					&emptyObserver{},
+					queueFactory,
+					0,
 				)
 				require.NoError(t, err)
-				defer pipeline.Close()
-
 				var wg sync.WaitGroup
 				wg.Add(1)
 				go func() {
-					// Our initial pipeline has no outputs set, so we need
+					// Our initial controller has no outputs set, so we need
 					// to create the client in a goroutine since any
-					// Connect calls will block until the pipeline has an
+					// queueProducer calls will block until the pipeline has an
 					// output.
-					pipelineClient, err := pipeline.Connect()
-					require.NoError(t, err)
-					defer pipelineClient.Close()
+					queueProducer := outputController.queueProducer(queue.ProducerConfig{})
+					defer queueProducer.Close()
 					for i := uint(0); i < numEventsToPublish; i++ {
-						pipelineClient.Publish(beat.Event{})
+						queueProducer.Publish(publisher.Event{})
 					}
 					wg.Done()
 				}()
@@ -103,7 +101,7 @@ func TestOutputReload(t *testing.T) {
 					out := outputs.Group{
 						Clients: []outputs.Client{outputClient},
 					}
-					pipeline.outputController.Set(out)
+					outputController.Set(out)
 				}
 
 				wg.Wait()
@@ -124,7 +122,7 @@ func TestOutputReload(t *testing.T) {
 func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 	// Just fill out enough to confirm what's sent to the event consumer,
 	// we don't want to start up real helper routines.
-	controller := outputController{
+	controller := processOutputController{
 		beat: beat.Info{
 			Logger: logptest.NewTestingLogger(t, ""),
 		},
@@ -147,10 +145,10 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 
 func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
+	controller := processOutputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
-		queueFactory: memqueue.FactoryForSettings(
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](
 			memqueue.Settings{Events: 1},
 		),
 		consumer: &eventConsumer{
@@ -179,8 +177,8 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
-	controller := outputController{
-		queueFactory: memqueue.FactoryForSettings(
+	controller := processOutputController{
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](
 			memqueue.Settings{Events: 1},
 		),
 		consumer: &eventConsumer{
@@ -193,7 +191,7 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 	}
 	controller.Set(outputs.Group{
 		Clients:      []outputs.Client{newMockClient(nil)},
-		QueueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 2}),
+		QueueFactory: memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 2}),
 	})
 
 	// The pipeline queue settings has max events 1, the output has
@@ -203,11 +201,11 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 
 func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
-	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
+	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory[publisher.Event]) (queue.Queue[publisher.Event], error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
+	controller := processOutputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
@@ -229,8 +227,8 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
-		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
+	controller := processOutputController{
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
@@ -275,8 +273,8 @@ func TestQueueMetrics(t *testing.T) {
 	// monitoring namespace.
 	reg := monitoring.NewRegistry()
 	logger := logptest.NewTestingLogger(t, "")
-	controller := outputController{
-		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
+	controller := processOutputController{
+		queueFactory: memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1000}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,

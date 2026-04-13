@@ -183,6 +183,224 @@ func TestLoader_Configure(t *testing.T) {
 	}
 }
 
+func TestLoader_ConfigureRedirect(t *testing.T) {
+	targetManager := ConfigureWith(
+		makeConfigFakeInput(fakeInput{Type: "target"}),
+		logp.NewNopLogger(),
+	)
+
+	cases := map[string]struct {
+		setup  loaderConfig
+		config map[string]interface{}
+		check  inputCheck
+	}{
+		"redirect_success": {
+			setup: loaderConfig{
+				Plugins: []Plugin{
+					{
+						Name:      "source",
+						Stability: feature.Stable,
+						Manager: &fakeRedirectManager{
+							fakeInputManager: fakeInputManager{
+								OnConfigure: func(_ *conf.C) (Input, error) {
+									return nil, errors.New("should not be called")
+								},
+							},
+							OnRedirect: func(cfg *conf.C) (string, *conf.C, error) {
+								return "target", cfg, nil
+							},
+						},
+					},
+					{Name: "target", Stability: feature.Stable, Manager: targetManager},
+				},
+				TypeField: "type",
+			},
+			config: map[string]interface{}{"type": "source"},
+			check:  okSetup,
+		},
+		"no_redirect_passthrough": {
+			setup: loaderConfig{
+				Plugins: []Plugin{
+					{
+						Name:      "source",
+						Stability: feature.Stable,
+						Manager: &fakeRedirectManager{
+							fakeInputManager: fakeInputManager{
+								OnConfigure: func(_ *conf.C) (Input, error) {
+									return &fakeInput{Type: "source"}, nil
+								},
+							},
+							OnRedirect: func(_ *conf.C) (string, *conf.C, error) {
+								return "", nil, nil
+							},
+						},
+					},
+				},
+				TypeField: "type",
+			},
+			config: map[string]interface{}{"type": "source"},
+			check:  okSetup,
+		},
+		"redirect_to_unknown_target": {
+			setup: loaderConfig{
+				Plugins: []Plugin{
+					{
+						Name:      "source",
+						Stability: feature.Stable,
+						Manager: &fakeRedirectManager{
+							OnRedirect: func(_ *conf.C) (string, *conf.C, error) {
+								return "nonexistent", conf.NewConfig(), nil
+							},
+						},
+					},
+				},
+				TypeField: "type",
+			},
+			config: map[string]interface{}{"type": "source"},
+			check:  failSetup,
+		},
+		"redirect_error": {
+			setup: loaderConfig{
+				Plugins: []Plugin{
+					{
+						Name:      "source",
+						Stability: feature.Stable,
+						Manager: &fakeRedirectManager{
+							OnRedirect: func(_ *conf.C) (string, *conf.C, error) {
+								return "", nil, errors.New("translation failed")
+							},
+						},
+					},
+				},
+				TypeField: "type",
+			},
+			config: map[string]interface{}{"type": "source"},
+			check:  failSetup,
+		},
+		"non-redirector_manager_unchanged": {
+			setup: loaderConfig{
+				Plugins: []Plugin{
+					{
+						Name:      "plain",
+						Stability: feature.Stable,
+						Manager:   ConfigureWith(makeConfigFakeInput(fakeInput{Type: "plain"}), logp.NewNopLogger()),
+					},
+				},
+				TypeField: "type",
+			},
+			config: map[string]interface{}{"type": "plain"},
+			check:  okSetup,
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			loader := test.setup.MustNewLoader()
+			input, err := loader.Configure(conf.MustNewConfigFrom(test.config))
+			test.check(t, input, err)
+		})
+	}
+}
+
+func TestLoader_DeleteRedirect(t *testing.T) {
+	t.Run("delete_follows_redirect", func(t *testing.T) {
+		var deletedWith *conf.C
+		translatedCfg := conf.MustNewConfigFrom(map[string]interface{}{
+			"type": "target",
+			"key":  "translated",
+		})
+
+		setup := loaderConfig{
+			Plugins: []Plugin{
+				{
+					Name:      "source",
+					Stability: feature.Stable,
+					Manager: &fakeRedirectManager{
+						OnRedirect: func(_ *conf.C) (string, *conf.C, error) {
+							return "target", translatedCfg, nil
+						},
+					},
+				},
+				{
+					Name:      "target",
+					Stability: feature.Stable,
+					Manager: &fakeDeleteManager{
+						fakeInputManager: fakeInputManager{
+							OnConfigure: func(_ *conf.C) (Input, error) {
+								return &fakeInput{Type: "target"}, nil
+							},
+						},
+						OnDelete: func(cfg *conf.C) error {
+							deletedWith = cfg
+							return nil
+						},
+					},
+				},
+			},
+			TypeField: "type",
+		}
+
+		loader := setup.MustNewLoader()
+		err := loader.Delete(conf.MustNewConfigFrom(map[string]interface{}{"type": "source"}))
+		require.NoError(t, err)
+		require.NotNil(t, deletedWith, "Delete should have been called on target")
+
+		key, err := deletedWith.String("key", -1)
+		require.NoError(t, err)
+		require.Equal(t, "translated", key)
+	})
+
+	t.Run("delete_no_redirect", func(t *testing.T) {
+		var deleted bool
+		setup := loaderConfig{
+			Plugins: []Plugin{
+				{
+					Name:      "source",
+					Stability: feature.Stable,
+					Manager: &fakeDeleteManager{
+						OnDelete: func(_ *conf.C) error {
+							deleted = true
+							return nil
+						},
+					},
+				},
+			},
+			TypeField: "type",
+		}
+
+		loader := setup.MustNewLoader()
+		err := loader.Delete(conf.MustNewConfigFrom(map[string]interface{}{"type": "source"}))
+		require.NoError(t, err)
+		require.True(t, deleted, "Delete should have been called on source")
+	})
+
+	t.Run("delete_on_non-deletable_manager_is_noop", func(t *testing.T) {
+		setup := loaderConfig{
+			Plugins: []Plugin{
+				{
+					Name:      "source",
+					Stability: feature.Stable,
+					Manager: &fakeRedirectManager{
+						OnRedirect: func(_ *conf.C) (string, *conf.C, error) {
+							return "target", conf.NewConfig(), nil
+						},
+					},
+				},
+				{
+					Name:      "target",
+					Stability: feature.Stable,
+					Manager:   ConfigureWith(nil, logp.NewNopLogger()),
+				},
+			},
+			TypeField: "type",
+		}
+
+		loader := setup.MustNewLoader()
+		err := loader.Delete(conf.MustNewConfigFrom(map[string]interface{}{"type": "source"}))
+		require.NoError(t, err)
+	})
+}
+
 func TestLoader_ConfigureFIPS(t *testing.T) {
 	loaderCfg := loaderConfig{
 		Plugins: []Plugin{
