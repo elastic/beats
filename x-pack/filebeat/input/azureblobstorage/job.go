@@ -201,7 +201,7 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 		for dec.Next() {
 			offset, msg, _, err := dec.DecodeValue()
 			if err != nil {
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					return nil
 				}
 				j.status.UpdateStatus(status.Degraded, err.Error())
