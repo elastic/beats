@@ -535,6 +535,12 @@ type evaluationResponse struct {
 	shouldRetry bool
 }
 
+type publishPreparation struct {
+	cursors      []interface{}
+	singleCursor bool
+	degraded     bool
+}
+
 func processEvaluationResponse(
 	state map[string]interface{},
 	limiter *rate.Limiter,
@@ -610,6 +616,36 @@ func processEvaluationResponse(
 	}
 
 	return result, nil
+}
+
+func preparePublishState(
+	state map[string]interface{},
+	events []interface{},
+	execLog *logp.Logger,
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	execCtx context.Context,
+	execSpan trace.Span,
+	runDegraded bool,
+) publishPreparation {
+	// We have a non-empty batch of events to process.
+	metricsRecorder.AddReceivedBatch(execCtx, 1)
+	metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
+	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
+	// Drop events from state. If we fail during the publication,
+	// we will re-request these events.
+	delete(state, "events")
+
+	cursorState := getPublishCursors(state, events, execLog, health, runDegraded)
+	// Drop old cursor from state. This will be replaced with
+	// the current cursor object below; it is an array now.
+	delete(state, "cursor")
+
+	return publishPreparation{
+		cursors:      cursorState.cursors,
+		singleCursor: cursorState.singleCursor,
+		degraded:     cursorState.degraded,
+	}
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -955,22 +991,20 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			events := response.events
 
-			// We have a non-empty batch of events to process.
-			metricsRecorder.AddReceivedBatch(execCtx, 1)
-			metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
 			runSpanEventCount += len(events)
-			execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-			// Drop events from state. If we fail during the publication,
-			// we will re-request these events.
-			delete(state, "events")
-
-			cursorState := getPublishCursors(state, events, execLog, health, isDegraded)
-			cursors := cursorState.cursors
-			singleCursor := cursorState.singleCursor
-			isDegraded = cursorState.degraded
-			// Drop old cursor from state. This will be replaced with
-			// the current cursor object below; it is an array now.
-			delete(state, "cursor")
+			prepared := preparePublishState(
+				state,
+				events,
+				execLog,
+				health,
+				metricsRecorder,
+				execCtx,
+				execSpan,
+				isDegraded,
+			)
+			cursors := prepared.cursors
+			singleCursor := prepared.singleCursor
+			isDegraded = prepared.degraded
 
 			publishResult, err := publishEvents(
 				execCtx,
