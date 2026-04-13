@@ -541,6 +541,11 @@ type publishPreparation struct {
 	degraded     bool
 }
 
+type executionCompletion struct {
+	done                bool
+	maxExecutionLimited bool
+}
+
 func processEvaluationResponse(
 	state map[string]interface{},
 	limiter *rate.Limiter,
@@ -646,6 +651,46 @@ func preparePublishState(
 		singleCursor: cursorState.singleCursor,
 		degraded:     cursorState.degraded,
 	}
+}
+
+func completeExecution(
+	state map[string]interface{},
+	goodCursor map[string]interface{},
+	start time.Time,
+	interval time.Duration,
+	remainingBudget int,
+	maxExecutions int,
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	execCtx context.Context,
+	execLog *logp.Logger,
+	execSpan trace.Span,
+) executionCompletion {
+	// Replace the last known good cursor.
+	state["cursor"] = goodCursor
+	metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+	if more, _ := state["want_more"].(bool); !more {
+		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
+		return executionCompletion{done: true}
+	}
+	execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
+
+	// Check we have a remaining execution budget.
+	if remainingBudget <= 0 {
+		msg := "reached maximum number of CEL executions"
+		execLog.Warnw(msg+": will continue at next periodic evaluation",
+			"limit", maxExecutions,
+			"next_eval_time", start.Add(interval),
+		)
+		health.UpdateStatus(status.Degraded, msg)
+		execSpan.SetStatus(codes.Unset, msg)
+		return executionCompletion{
+			done:                true,
+			maxExecutionLimited: true,
+		}
+	}
+
+	return executionCompletion{}
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -1030,32 +1075,31 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			goodCursor = publishResult.goodCursor
 			isDegraded = publishResult.degraded
 
-			// Replace the last known good cursor.
-			state["cursor"] = goodCursor
-			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-			if more, _ := state["want_more"].(bool); !more {
-				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
+			// Check we have a remaining execution budget.
+			budget--
+			completion := completeExecution(
+				state,
+				goodCursor,
+				start,
+				cfg.Interval,
+				budget,
+				*cfg.MaxExecutions,
+				health,
+				metricsRecorder,
+				execCtx,
+				execLog,
+				execSpan,
+			)
+			if completion.maxExecutionLimited {
+				execSpan.End()
+				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
+				runSpan.SetStatus(codes.Unset, "reached maximum number of CEL executions")
+				return nil
+			}
+			if completion.done {
 				okSpans(end{execSpan}, runSpan)
 				return nil
 			}
-			execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
-
-			// Check we have a remaining execution budget.
-			budget--
-			if budget <= 0 {
-				msg := "reached maximum number of CEL executions"
-				execLog.Warnw(msg+": will continue at next periodic evaluation",
-					"limit", *cfg.MaxExecutions,
-					"next_eval_time", start.Add(cfg.Interval),
-				)
-				health.UpdateStatus(status.Degraded, msg)
-				execSpan.SetStatus(codes.Unset, msg)
-				execSpan.End()
-				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
-				runSpan.SetStatus(codes.Unset, msg)
-				return nil
-			}
-
 			okSpans(end{execSpan})
 		}
 	})
