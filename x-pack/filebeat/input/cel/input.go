@@ -173,6 +173,13 @@ type publishLoopState struct {
 	eventCount          int
 }
 
+type publishResult struct {
+	cursor         map[string]interface{}
+	goodCursor     map[string]interface{}
+	degraded       bool
+	runDurationCtx context.Context
+}
+
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	switch {
 	case r.name != "" && msg != "":
@@ -378,6 +385,78 @@ func publishEventLoop(
 	}
 
 	return state, nil
+}
+
+func publishEvents(
+	execCtx context.Context,
+	otelTracer trace.Tracer,
+	log *logp.Logger,
+	pub inputcursor.Publisher,
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	start time.Time,
+	events []interface{},
+	cursors []interface{},
+	singleCursor bool,
+	cursor map[string]interface{},
+	goodCursor map[string]interface{},
+	degraded bool,
+	execSpan trace.Span,
+	runSpan trace.Span,
+) (publishResult, error) {
+	result := publishResult{
+		cursor:         cursor,
+		goodCursor:     goodCursor,
+		degraded:       degraded,
+		runDurationCtx: execCtx,
+	}
+
+	pubStart := time.Now()
+	pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
+	pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", 0)) // to be overridden if there are events
+	pubLog := logWithTracingIds(log, pubSpan)
+
+	publishState, err := publishEventLoop(
+		events,
+		cursors,
+		singleCursor,
+		cursor,
+		goodCursor,
+		degraded,
+		pub,
+		pubCtx,
+		pubSpan,
+		execSpan,
+		runSpan,
+		pubLog,
+		health,
+		metricsRecorder,
+		start,
+	)
+	if err != nil {
+		return result, err
+	}
+
+	result.cursor = publishState.cursor
+	result.goodCursor = publishState.goodCursor
+	result.degraded = publishState.degraded
+
+	if !result.degraded {
+		health.UpdateStatus(status.Running, "")
+	}
+
+	metricsRecorder.AddPublishDuration(pubCtx, time.Since(pubStart))
+	// Advance the cursor to the final state if there was no error during
+	// publications. This is needed to transition to the next set of events.
+	if !publishState.hadPublicationError && !result.degraded {
+		result.goodCursor = result.cursor
+		metricsRecorder.AddProgramSuccessExecution(pubCtx)
+		okSpans(pubSpan)
+	}
+	pubSpan.End()
+
+	result.runDurationCtx = pubCtx
+	return result, nil
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -796,56 +875,33 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// the current cursor object below; it is an array now.
 			delete(state, "cursor")
 
-			pubStart := time.Now()
-			var hadPublicationError bool
-
-			pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
-			pubSpanEventCount := 0
-			pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
-			pubLog := logWithTracingIds(log, pubSpan)
-			publishState, err := publishEventLoop(
+			publishResult, err := publishEvents(
+				execCtx,
+				otelTracer,
+				log,
+				pub,
+				health,
+				metricsRecorder,
+				start,
 				events,
 				cursors,
 				singleCursor,
 				cursor,
 				goodCursor,
 				isDegraded,
-				pub,
-				pubCtx,
-				pubSpan,
 				execSpan,
 				runSpan,
-				pubLog,
-				health,
-				metricsRecorder,
-				start,
 			)
 			if err != nil {
 				return err
 			}
-			cursor = publishState.cursor
-			goodCursor = publishState.goodCursor
-			isDegraded = publishState.degraded
-			hadPublicationError = publishState.hadPublicationError
-			pubSpanEventCount = publishState.eventCount
-
-			if !isDegraded {
-				health.UpdateStatus(status.Running, "")
-			}
-
-			metricsRecorder.AddPublishDuration(pubCtx, time.Since(pubStart))
-			// Advance the cursor to the final state if there was no error during
-			// publications. This is needed to transition to the next set of events.
-			if !hadPublicationError && !isDegraded {
-				goodCursor = cursor
-				metricsRecorder.AddProgramSuccessExecution(pubCtx)
-				okSpans(pubSpan)
-			}
-			pubSpan.End()
+			cursor = publishResult.cursor
+			goodCursor = publishResult.goodCursor
+			isDegraded = publishResult.degraded
 
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
-			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+			metricsRecorder.AddProgramRunDuration(publishResult.runDurationCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
 				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
 				okSpans(end{execSpan}, runSpan)
