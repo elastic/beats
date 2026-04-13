@@ -7,6 +7,7 @@
 package registry
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
