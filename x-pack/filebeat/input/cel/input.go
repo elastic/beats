@@ -165,6 +165,14 @@ type publishCursorState struct {
 	goodCursor map[string]interface{}
 }
 
+type publishLoopState struct {
+	cursor              map[string]interface{}
+	goodCursor          map[string]interface{}
+	degraded            bool
+	hadPublicationError bool
+	eventCount          int
+}
+
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	switch {
 	case r.name != "" && msg != "":
@@ -290,6 +298,86 @@ func checkPublishResultContext(ctx context.Context, metricsRecorder *metricsReco
 	metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
 	errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
 	return err
+}
+
+func publishEventLoop(
+	events []interface{},
+	cursors []interface{},
+	singleCursor bool,
+	cursor map[string]interface{},
+	goodCursor map[string]interface{},
+	degraded bool,
+	pub inputcursor.Publisher,
+	pubCtx context.Context,
+	pubSpan trace.Span,
+	execSpan trace.Span,
+	runSpan trace.Span,
+	pubLog *logp.Logger,
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	start time.Time,
+) (publishLoopState, error) {
+	state := publishLoopState{
+		cursor:     cursor,
+		goodCursor: goodCursor,
+		degraded:   degraded,
+	}
+
+	for i, e := range events {
+		event, ok := e.(map[string]interface{})
+		if !ok {
+			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+			errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+			return state, err
+		}
+
+		cursorState, err := getPublishCursorForEvent(i, len(events), cursors, singleCursor, state.cursor, state.goodCursor)
+		state.goodCursor = cursorState.goodCursor
+		if err != nil {
+			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
+			errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+			return state, err
+		}
+
+		pubCursor := cursorState.pubCursor
+		state.cursor = cursorState.cursor
+
+		// This is checked prior to the publish attempt since the
+		// cursor.Publisher interface does not document the behaviour
+		// related to context cancellation and the context is not
+		// explicitly passed in, so favour this explicit clarity.
+		breakLoop, markDegraded := checkPublishContext(pubCtx, pubLog, health, len(events)-i)
+		if markDegraded {
+			state.degraded = true
+		}
+		if breakLoop {
+			return state, nil
+		}
+
+		err = pub.Publish(beat.Event{
+			Timestamp: time.Now(),
+			Fields:    event,
+		}, pubCursor)
+		if err != nil {
+			state.hadPublicationError = true
+			handlePublishError(err, pubLog, health)
+			errorSpans(err, pubSpan)
+			state.degraded = true
+			cursors = nil // We are lost, so retry with this event's cursor,
+			continue      // but continue with the events that we have without
+			// advancing the cursor. This allows us to potentially publish the
+			// events we have now, with a fallback to the last guaranteed
+			// correctly published cursor.
+		}
+
+		state.eventCount = recordPublishedEvent(metricsRecorder, pubCtx, pubSpan, i+1, state.eventCount)
+		err = checkPublishResultContext(pubCtx, metricsRecorder, start, pubSpan, execSpan, runSpan)
+		if err != nil {
+			return state, err
+		}
+	}
+
+	return state, nil
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -715,56 +803,31 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			pubSpanEventCount := 0
 			pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
 			pubLog := logWithTracingIds(log, pubSpan)
-		loop:
-			for i, e := range events {
-				event, ok := e.(map[string]interface{})
-				if !ok {
-					err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-					return err
-				}
-				cursorState, err := getPublishCursorForEvent(i, len(events), cursors, singleCursor, cursor, goodCursor)
-				goodCursor = cursorState.goodCursor
-				if err != nil {
-					metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-					errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-					return err
-				}
-				pubCursor := cursorState.pubCursor
-				cursor = cursorState.cursor
-				// This is checked prior to the publish attempt since the
-				// cursor.Publisher interface does not document the behaviour
-				// related to context cancellation and the context is not
-				// explicitly passed in, so favour this explicit clarity.
-				breakLoop, markDegraded := checkPublishContext(pubCtx, pubLog, health, len(events)-i)
-				if markDegraded {
-					isDegraded = true
-				}
-				if breakLoop {
-					break loop
-				}
-				err = pub.Publish(beat.Event{
-					Timestamp: time.Now(),
-					Fields:    event,
-				}, pubCursor)
-				if err != nil {
-					hadPublicationError = true
-					handlePublishError(err, pubLog, health)
-					errorSpans(err, pubSpan)
-					isDegraded = true
-					cursors = nil // We are lost, so retry with this event's cursor,
-					continue      // but continue with the events that we have without
-					// advancing the cursor. This allows us to potentially publish the
-					// events we have now, with a fallback to the last guaranteed
-					// correctly published cursor.
-				}
-				pubSpanEventCount = recordPublishedEvent(metricsRecorder, pubCtx, pubSpan, i+1, pubSpanEventCount)
-
-				err = checkPublishResultContext(pubCtx, metricsRecorder, start, pubSpan, execSpan, runSpan)
-				if err != nil {
-					return err
-				}
+			publishState, err := publishEventLoop(
+				events,
+				cursors,
+				singleCursor,
+				cursor,
+				goodCursor,
+				isDegraded,
+				pub,
+				pubCtx,
+				pubSpan,
+				execSpan,
+				runSpan,
+				pubLog,
+				health,
+				metricsRecorder,
+				start,
+			)
+			if err != nil {
+				return err
 			}
+			cursor = publishState.cursor
+			goodCursor = publishState.goodCursor
+			isDegraded = publishState.degraded
+			hadPublicationError = publishState.hadPublicationError
+			pubSpanEventCount = publishState.eventCount
 
 			if !isDegraded {
 				health.UpdateStatus(status.Running, "")
