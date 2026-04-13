@@ -85,7 +85,7 @@ func readFileViaNTFS(filePath string) ([]byte, error) {
 
 	data := make([]byte, infos.Size)
 	_, err = attr.Data(ntfsCtx).ReadAt(data, 0)
-	if err != nil && err != io.EOF {
+	if err != nil && !errors.Is(err, io.EOF) {
 		return nil, fmt.Errorf("failed to read file data: %w", err)
 	}
 	return data, nil
