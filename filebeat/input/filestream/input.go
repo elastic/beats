@@ -217,7 +217,7 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	log := ctx.Logger.With("path", fs.newPath, "state-id", src.Name())
 	state := initState(log, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
