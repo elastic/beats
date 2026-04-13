@@ -170,14 +170,12 @@ type publishLoopState struct {
 	goodCursor          map[string]interface{}
 	degraded            bool
 	hadPublicationError bool
-	eventCount          int
 }
 
 type publishResult struct {
-	cursor         map[string]interface{}
-	goodCursor     map[string]interface{}
-	degraded       bool
-	runDurationCtx context.Context
+	cursor     map[string]interface{}
+	goodCursor map[string]interface{}
+	degraded   bool
 }
 
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
@@ -329,6 +327,7 @@ func publishEventLoop(
 		goodCursor: goodCursor,
 		degraded:   degraded,
 	}
+	eventCount := 0
 
 	for i, e := range events {
 		event, ok := e.(map[string]interface{})
@@ -377,7 +376,7 @@ func publishEventLoop(
 			// correctly published cursor.
 		}
 
-		state.eventCount = recordPublishedEvent(metricsRecorder, pubCtx, pubSpan, i+1, state.eventCount)
+		eventCount = recordPublishedEvent(metricsRecorder, pubCtx, pubSpan, i+1, eventCount)
 		err = checkPublishResultContext(pubCtx, metricsRecorder, start, pubSpan, execSpan, runSpan)
 		if err != nil {
 			return state, err
@@ -403,12 +402,11 @@ func publishEvents(
 	degraded bool,
 	execSpan trace.Span,
 	runSpan trace.Span,
-) (publishResult, error) {
+) (publishResult, context.Context, error) {
 	result := publishResult{
-		cursor:         cursor,
-		goodCursor:     goodCursor,
-		degraded:       degraded,
-		runDurationCtx: execCtx,
+		cursor:     cursor,
+		goodCursor: goodCursor,
+		degraded:   degraded,
 	}
 
 	pubStart := time.Now()
@@ -434,7 +432,7 @@ func publishEvents(
 		start,
 	)
 	if err != nil {
-		return result, err
+		return result, pubCtx, err
 	}
 
 	result.cursor = publishState.cursor
@@ -455,8 +453,7 @@ func publishEvents(
 	}
 	pubSpan.End()
 
-	result.runDurationCtx = pubCtx
-	return result, nil
+	return result, pubCtx, nil
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -875,7 +872,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// the current cursor object below; it is an array now.
 			delete(state, "cursor")
 
-			publishResult, err := publishEvents(
+			publishResult, publishCtx, err := publishEvents(
 				execCtx,
 				otelTracer,
 				log,
@@ -901,7 +898,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
-			metricsRecorder.AddProgramRunDuration(publishResult.runDurationCtx, time.Since(start))
+			metricsRecorder.AddProgramRunDuration(publishCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
 				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
 				okSpans(end{execSpan}, runSpan)
