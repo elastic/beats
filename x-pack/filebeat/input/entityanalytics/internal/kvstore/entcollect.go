@@ -12,6 +12,8 @@ import (
 	"github.com/elastic/entcollect"
 )
 
+var _ entcollect.Store = (*EntcollectStore)(nil)
+
 // EntcollectStore wraps a *Transaction (single bbolt bucket) to
 // satisfy the entcollect.Store interface.
 type EntcollectStore struct {

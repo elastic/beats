@@ -66,6 +66,9 @@ func (n *minimalStateInput) Run(runCtx v2.Context, connector beat.PipelineConnec
 	if err = os.MkdirAll(dataDir, 0700); err != nil {
 		return fmt.Errorf("kvstore: unable to make data directory: %w", err)
 	}
+	// TODO: bbolt is a stopgap; the OTel path uses the
+	// elasticsearchstorage extension and this will follow once
+	// ES-backed state is available to Beats inputs.
 	filename := filepath.Join(dataDir, runCtx.ID+".db")
 	store, err := kvstore.NewStore(log, filename, 0600)
 	if err != nil {
