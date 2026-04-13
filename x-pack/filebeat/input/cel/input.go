@@ -479,6 +479,54 @@ func publishEvents(
 	return result, nil
 }
 
+func (i input) executeEvaluation(
+	execCtx context.Context,
+	env v2.Context,
+	cfg config,
+	contextInjector *otel.ContextInjector,
+	prg cel.Program,
+	ast *cel.Ast,
+	state map[string]interface{},
+	budget int,
+	wantDump bool,
+	metricsRecorder *metricsRecorder,
+	execLog *logp.Logger,
+	execSpan trace.Span,
+	runSpan trace.Span,
+	health status.StatusReporter,
+) (map[string]interface{}, time.Time, bool, error) {
+	start := i.now().In(time.UTC)
+
+	state, err := evalWith(execCtx, contextInjector, prg, ast, state, start, wantDump, budget-1)
+	metricsRecorder.AddCELDuration(execCtx, time.Since(start))
+	execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+	if err != nil {
+		var dump dumpError
+		switch {
+		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+			errorSpans(err, runSpan, end{execSpan})
+			return state, start, false, err
+		case errors.As(err, &dump):
+			path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
+			dir := filepath.Dir(path)
+			base := filepath.Base(path)
+			ext := filepath.Ext(base)
+			prefix := strings.TrimSuffix(base, ext)
+			path = filepath.Join(dir, prefix+"-"+i.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
+			execLog.Debugw("writing failure dump file", "path", path)
+			err := dump.writeToFile(path)
+			if err != nil {
+				execLog.Errorw("failed to write failure dump", "path", path, "error", err)
+			}
+		}
+		execLog.Errorw("failed evaluation", "error", err)
+		health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
+	}
+
+	return state, start, err != nil, nil
+}
+
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -689,35 +737,26 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metricsRecorder.AddProgramExecution(execCtx)
-			start := i.now().In(time.UTC)
-
-			state, err = evalWith(execCtx, contextInjector, prg, ast, state, start, wantDump, budget-1)
-			metricsRecorder.AddCELDuration(execCtx, time.Since(start))
-			execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
+			start := time.Time{}
+			state, start, isDegraded, err = i.executeEvaluation(
+				execCtx,
+				env,
+				cfg,
+				contextInjector,
+				prg,
+				ast,
+				state,
+				budget,
+				wantDump,
+				metricsRecorder,
+				execLog,
+				execSpan,
+				runSpan,
+				health,
+			)
 			if err != nil {
-				var dump dumpError
-				switch {
-				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-					metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-					errorSpans(err, runSpan, end{execSpan})
-					return err
-				case errors.As(err, &dump):
-					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
-					dir := filepath.Dir(path)
-					base := filepath.Base(path)
-					ext := filepath.Ext(base)
-					prefix := strings.TrimSuffix(base, ext)
-					path = filepath.Join(dir, prefix+"-"+i.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
-					execLog.Debugw("writing failure dump file", "path", path)
-					err := dump.writeToFile(path)
-					if err != nil {
-						execLog.Errorw("failed to write failure dump", "path", path, "error", err)
-					}
-				}
-				execLog.Errorw("failed evaluation", "error", err)
-				health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
+				return err
 			}
-			isDegraded = err != nil
 			if trace != nil {
 				execLog.Debugw("final transaction", "transaction.id", trace.TxID())
 			}
