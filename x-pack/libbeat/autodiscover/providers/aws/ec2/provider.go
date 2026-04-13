@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -43,6 +44,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 	log *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	log.Warn(cfgwarn.Experimental("aws_ec2 autodiscover is experimental"))
 
