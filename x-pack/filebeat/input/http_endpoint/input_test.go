@@ -530,7 +530,7 @@ func TestServerPool(t *testing.T) {
 				go func() {
 					defer wg.Done()
 					err := servers.serve(ctx, cfg, pub.Publish, metrics)
-					if err != nil && err != http.ErrServerClosed && wantErr == nil {
+					if err != nil && err != http.ErrServerClosed && wantErr == nil { //nolint:errorlint // http.ErrServerClosed is a documented sentinel, never wrapped.
 						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
 					}
 				}()
@@ -1206,7 +1206,7 @@ func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr err
 		if _, ok := m[cfg.addr]; ok {
 			continue
 		}
-		ln, err := net.Listen("tcp", "127.0.0.1:0")
+		ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
 		if err != nil {
 			t.Fatalf("allocating port for %s: %v", cfg.addr, err)
 		}
@@ -1236,7 +1236,7 @@ func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr err
 		}
 	}
 
-	if e, ok := wantErr.(invalidTLSStateErr); ok {
+	if e, ok := wantErr.(invalidTLSStateErr); ok { //nolint:errorlint // invalidTLSStateErr is never wrapped.
 		if actual, ok := m[e.addr]; ok {
 			e.addr = actual
 			wantErr = e
@@ -1251,7 +1251,7 @@ func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr err
 // OS will not recycle the port before the caller binds it.
 func freeAddr(t *testing.T) string {
 	t.Helper()
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatalf("allocating port: %v", err)
 	}
