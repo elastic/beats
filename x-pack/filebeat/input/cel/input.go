@@ -402,7 +402,7 @@ func publishEvents(
 	degraded bool,
 	execSpan trace.Span,
 	runSpan trace.Span,
-) (publishResult, context.Context, error) {
+) (publishResult, error) {
 	result := publishResult{
 		cursor:     cursor,
 		goodCursor: goodCursor,
@@ -432,7 +432,7 @@ func publishEvents(
 		start,
 	)
 	if err != nil {
-		return result, pubCtx, err
+		return result, err
 	}
 
 	result.cursor = publishState.cursor
@@ -453,7 +453,7 @@ func publishEvents(
 	}
 	pubSpan.End()
 
-	return result, pubCtx, nil
+	return result, nil
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -872,7 +872,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			// the current cursor object below; it is an array now.
 			delete(state, "cursor")
 
-			publishResult, publishCtx, err := publishEvents(
+			publishResult, err := publishEvents(
 				execCtx,
 				otelTracer,
 				log,
@@ -898,7 +898,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			// Replace the last known good cursor.
 			state["cursor"] = goodCursor
-			metricsRecorder.AddProgramRunDuration(publishCtx, time.Since(start))
+			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 			if more, _ := state["want_more"].(bool); !more {
 				execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
 				okSpans(end{execSpan}, runSpan)
