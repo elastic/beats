@@ -157,7 +157,7 @@ type certReloadConfig struct {
 
 func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
-		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
+		return errors.New("'restart_on_cert_change.period' must be equal or greater than 1s")
 	}
 
 	if c.Reload.Enabled && runtime.GOOS == "windows" {
@@ -511,27 +511,28 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctxDashboards, cancelDashboards := context.WithCancel(context.Background())
 
-	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
-	// Since publisher.Close is not safe to be called more than once this is necessary.
-	var once sync.Once
-	stopBeat := func() {
-		once.Do(func() {
-			b.Instrumentation.Tracer().Close()
-			// If the publisher has a Close() method, call it before stopping the beater.
-			if c, ok := b.Publisher.(io.Closer); ok {
-				c.Close()
-			}
-			beater.Stop()
+	// On Stop, the manager will trigger the callback to shut down the
+	// publisher pipeline and then notify the beater.
+	var stopOnce sync.Once
+	b.Manager.SetStopCallback(
+		func() {
+			stopOnce.Do(func() {
+				b.Instrumentation.Tracer().Close()
+				// If the publisher has a Close() method, call it before stopping the beater.
+				if c, ok := b.Publisher.(io.Closer); ok {
+					c.Close()
+				}
+				beater.Stop()
+			})
 		})
-	}
-	svc.HandleSignals(stopBeat, cancel)
 
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(stopBeat)
+	// Besides a manager-initiated shutdown from Agent config state,
+	// we stop the manager explicitly on SIGINT / SIGHUP / etc.
+	svc.HandleSignals(b.Manager.Stop, cancelDashboards)
 
-	err = b.loadDashboards(ctx, false)
+	err = b.loadDashboards(ctxDashboards, false)
 	if err != nil {
 		return err
 	}
@@ -1002,7 +1003,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("beat meta file failed to encode vaules: %w", encodeErr)
+		return fmt.Errorf("beat meta file failed to encode values: %w", encodeErr)
 	}
 
 	// move temporary file into final location

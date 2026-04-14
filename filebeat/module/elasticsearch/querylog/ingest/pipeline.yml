@@ -1,0 +1,12 @@
+description: Pipeline for Elasticsearch query logs. Expects events already parsed as JSON by the filestream ndjson parser.
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    copy_from: "@timestamp"
+    field: event.created
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

@@ -181,6 +181,7 @@ func newOTELCELMetrics(log *logp.Logger,
 	resource resource.Resource,
 	tripper http.RoundTripper,
 	metricExporter sdkmetric.Exporter,
+	otelhttpOptions []otelhttp.Option,
 ) (*otelCELMetrics, *otelhttp.Transport, error) {
 	var manualExportFunc func(context.Context) error
 	var meterProvider metric.MeterProvider
@@ -247,7 +248,8 @@ func newOTELCELMetrics(log *logp.Logger,
 			return nil
 		}
 	}
-	transport := otelhttp.NewTransport(tripper, otelhttp.WithMeterProvider(meterProvider))
+	opts := append([]otelhttp.Option{otelhttp.WithMeterProvider(meterProvider)}, otelhttpOptions...)
+	transport := otelhttp.NewTransport(tripper, opts...)
 
 	meter := meterProvider.Meter("github.com/elastic/beats/x-pack/filebeat/otel/cel_metrics.go")
 
