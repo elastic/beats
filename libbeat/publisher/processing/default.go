@@ -224,7 +224,7 @@ func newBuilder(
 	for _, mod := range modifiers {
 		m := mod.BuiltinFields(info)
 		if len(m) > 0 {
-			builtin.DeepUpdate(m.Clone())
+			builtin.DeepCloneUpdate(m)
 		}
 	}
 	if len(builtin) > 0 {
@@ -313,7 +313,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 			if clientFields == nil {
 				clientFields = mapstr.M{}
 			}
-			clientFields.DeepUpdate(m.Clone())
+			clientFields.DeepCloneUpdate(m)
 		}
 	}
 	if len(clientFields) > 0 {
@@ -349,7 +349,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
 	fields := cfg.Fields.Clone()
-	fields.DeepUpdate(b.fields.Clone())
+	fields.DeepCloneUpdate(b.fields)
 	if em := cfg.EventMetadata; len(em.Fields) > 0 {
 		if err := mapstr.MergeFieldsDeep(fields, em.Fields.Clone(), em.FieldsUnderRoot); err != nil {
 			return nil, fmt.Errorf("failed merging client event metadata into fields: %w", err)
