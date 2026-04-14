@@ -103,7 +103,7 @@ func TestDecompressGzip(t *testing.T) {
 			output: mapstr.M{
 				"field1": "invalid gzipped data",
 				"error": mapstr.M{
-					"message": "Failed to decompress field in decompress_gzip_field processor: error decompressing field field1: gzip: invalid header",
+					"message": "failed to decompress field in decompress_gzip_field processor: error decompressing field field1: gzip: invalid header",
 				},
 			},
 			error: true,
@@ -140,7 +140,7 @@ func TestDecompressGzip(t *testing.T) {
 			output: mapstr.M{
 				"field1": "my value",
 				"error": mapstr.M{
-					"message": "Failed to decompress field in decompress_gzip_field processor: could not fetch value for key: field2, Error: key not found",
+					"message": "failed to decompress field in decompress_gzip_field processor: could not fetch value for key: field2, Error: key not found",
 				},
 			},
 			error: true,

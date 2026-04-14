@@ -84,7 +84,7 @@ func NewReplaceString(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
 	// Creates a copy of the event to revert in case of failure
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
@@ -95,7 +95,9 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 			f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 			if f.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
