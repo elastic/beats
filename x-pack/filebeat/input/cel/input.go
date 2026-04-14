@@ -673,6 +673,64 @@ func completeExecution(
 	return executionCompletion{}
 }
 
+func publishResponseEvents(
+	runState *periodicRunState,
+	events []interface{},
+	execCtx context.Context,
+	otelTracer trace.Tracer,
+	log *logp.Logger,
+	pub inputcursor.Publisher,
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	start time.Time,
+	execLog *logp.Logger,
+	execSpan trace.Span,
+	runSpan trace.Span,
+) error {
+	runState.eventCount = len(events)
+	// We have a non-empty batch of events to process.
+	metricsRecorder.AddReceivedBatch(execCtx, 1)
+	metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
+	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
+	// Drop events from state. If we fail during the publication,
+	// we will re-request these events.
+	delete(runState.state, "events")
+
+	cursor, hasCursor := runState.state["cursor"]
+	prepared := getPublishCursors(cursor, hasCursor, len(events), execLog, health)
+	// Drop old cursor from state. This will be replaced with
+	// the current cursor object below; it is an array now.
+	delete(runState.state, "cursor")
+	if prepared.degraded {
+		runState.degraded = true
+	}
+
+	publishResult, err := publishEvents(
+		execCtx,
+		otelTracer,
+		log,
+		pub,
+		health,
+		metricsRecorder,
+		start,
+		events,
+		prepared.cursors,
+		prepared.hasSingleCursor,
+		runState.currentCursor,
+		runState.safeCursor,
+		runState.degraded,
+		execSpan,
+		runSpan,
+	)
+	if err != nil {
+		return err
+	}
+	runState.currentCursor = publishResult.currentCursor
+	runState.safeCursor = publishResult.safeCursor
+	runState.degraded = publishResult.degraded
+	return nil
+}
+
 func (i input) executeOnce(
 	runCtx context.Context,
 	env v2.Context,
@@ -847,27 +905,9 @@ func (i input) executeOnce(
 		outcome = executeOnceOutcome{kind: executeOnceFinish}
 		return outcome, nil
 	}
-	events := response.events
-
-	runState.eventCount = len(events)
-	// We have a non-empty batch of events to process.
-	metricsRecorder.AddReceivedBatch(execCtx, 1)
-	metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
-	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-	// Drop events from state. If we fail during the publication,
-	// we will re-request these events.
-	delete(runState.state, "events")
-
-	cursor, hasCursor := runState.state["cursor"]
-	prepared := getPublishCursors(cursor, hasCursor, len(events), execLog, health)
-	// Drop old cursor from state. This will be replaced with
-	// the current cursor object below; it is an array now.
-	delete(runState.state, "cursor")
-	if prepared.degraded {
-		runState.degraded = true
-	}
-
-	publishResult, err := publishEvents(
+	err = publishResponseEvents(
+		runState,
+		response.events,
 		execCtx,
 		otelTracer,
 		log,
@@ -875,21 +915,13 @@ func (i input) executeOnce(
 		health,
 		metricsRecorder,
 		start,
-		events,
-		prepared.cursors,
-		prepared.hasSingleCursor,
-		runState.currentCursor,
-		runState.safeCursor,
-		runState.degraded,
+		execLog,
 		execSpan,
 		runSpan,
 	)
 	if err != nil {
 		return outcome, err
 	}
-	runState.currentCursor = publishResult.currentCursor
-	runState.safeCursor = publishResult.safeCursor
-	runState.degraded = publishResult.degraded
 
 	// Check we have a remaining execution budget.
 	budget--
