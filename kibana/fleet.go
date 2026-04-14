@@ -46,6 +46,7 @@ const (
 	fleetUnEnrollAgentAPI        = "/api/fleet/agents/%s/unenroll"
 	fleetUninstallTokensAPI      = "/api/fleet/uninstall_tokens" //nolint:gosec // NOT the "Potential hardcoded credentials"
 	fleetUpgradeAgentAPI         = "/api/fleet/agents/%s/upgrade"
+	fleetRollbackAgentAPI        = "/api/fleet/agents/%s/rollback"
 	fleetAgentDownloadSourcesAPI = "/api/fleet/agent_download_sources"
 	fleetAgentDownloadSourceAPI  = "/api/fleet/agent_download_sources/%s"
 	fleetProxiesAPI              = "/api/fleet/proxies"
@@ -571,6 +572,28 @@ func (client *Client) UpgradeAgent(ctx context.Context, request UpgradeAgentRequ
 	resp, err := client.SendWithContext(ctx, http.MethodPost, apiURL, nil, nil, bytes.NewReader(reqBody))
 	if err != nil {
 		return r, fmt.Errorf("error calling upgrade agent API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	err = readJSONResponse(resp, &r)
+	return r, err
+}
+
+type RollbackAgentRequest struct {
+	ID string `json:"-"` // ID is not part of the request body sent to the Fleet API
+}
+
+type RollbackAgentResponse struct {
+	ActionID string `json:"actionId,omitempty"`
+	Message  string `json:"message,omitempty"`
+}
+
+// RollbackAgent rolls back the requested agent
+func (client *Client) RollbackAgent(ctx context.Context, request RollbackAgentRequest) (r RollbackAgentResponse, err error) {
+	apiURL := fmt.Sprintf(fleetRollbackAgentAPI, request.ID)
+	resp, err := client.SendWithContext(ctx, http.MethodPost, apiURL, nil, nil, nil)
+	if err != nil {
+		return r, fmt.Errorf("error calling rollback agent API: %w", err)
 	}
 	defer resp.Body.Close()
 
