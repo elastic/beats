@@ -301,7 +301,7 @@ func checkPublishResultContext(ctx context.Context, metricsRecorder *metricsReco
 	}
 
 	metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-	errorSpans(err, end{pubSpan}, execSpan, runSpan)
+	errorSpans(err, pubSpan, execSpan, runSpan)
 	return err
 }
 
@@ -356,7 +356,7 @@ func publishEventLoop(
 		event, ok := e.(map[string]interface{})
 		if !ok {
 			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-			errorSpans(err, end{pubSpan}, execSpan, runSpan)
+			errorSpans(err, pubSpan, execSpan, runSpan)
 			return state, err
 		}
 
@@ -364,7 +364,7 @@ func publishEventLoop(
 		state.safeCursor = cursorState.safeCursor
 		if err != nil {
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-			errorSpans(err, end{pubSpan}, execSpan, runSpan)
+			errorSpans(err, pubSpan, execSpan, runSpan)
 			return state, err
 		}
 
@@ -434,6 +434,7 @@ func publishEvents(
 
 	pubStart := time.Now()
 	pubCtx, pubSpan := otelTracer.Start(execCtx, "cel.program.publish")
+	defer pubSpan.End()
 	pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", 0)) // to be overridden if there are events
 	pubLog := logWithTracingIds(log, pubSpan)
 
@@ -474,7 +475,6 @@ func publishEvents(
 		metricsRecorder.AddProgramSuccessExecution(pubCtx)
 		okSpans(pubSpan)
 	}
-	pubSpan.End()
 
 	return result, nil
 }
