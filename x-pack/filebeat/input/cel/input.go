@@ -556,14 +556,13 @@ type executeOnceOutcome struct {
 	maxExecutionLimited bool
 }
 
-type executeOnceResult struct {
+type periodicRunState struct {
 	state         map[string]interface{}
 	waitUntil     time.Time
 	currentCursor map[string]interface{}
 	safeCursor    map[string]interface{}
 	degraded      bool
 	eventCount    int
-	outcome       executeOnceOutcome
 }
 
 func processEvaluationResponse(
@@ -722,7 +721,7 @@ func (i input) executeOnce(
 	contextInjector *otel.ContextInjector,
 	prg cel.Program,
 	ast *cel.Ast,
-	state map[string]interface{},
+	runState *periodicRunState,
 	budget int,
 	wantDump bool,
 	metricsRecorder *metricsRecorder,
@@ -733,19 +732,11 @@ func (i input) executeOnce(
 	health status.StatusReporter,
 	limiter *rate.Limiter,
 	goodURL string,
-	currentCursor map[string]interface{},
-	safeCursor map[string]interface{},
-	isDegraded bool,
 	executionNumber int,
-) (executeOnceResult, error) {
-	result := executeOnceResult{
-		state:         state,
-		currentCursor: currentCursor,
-		safeCursor:    safeCursor,
-		degraded:      isDegraded,
-		outcome: executeOnceOutcome{
-			kind: executeOnceContinue,
-		},
+) (executeOnceOutcome, error) {
+	runState.eventCount = 0
+	outcome := executeOnceOutcome{
+		kind: executeOnceContinue,
 	}
 
 	execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
@@ -760,18 +751,18 @@ func (i input) executeOnce(
 	if trace != nil {
 		execLog.Debugw("previous transaction", "transaction.id", trace.TxID())
 	}
-	execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: result.state, cfg: cfg.Redact})
+	execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: runState.state, cfg: cfg.Redact})
 	metricsRecorder.AddProgramExecution(execCtx)
 	start := time.Time{}
 	var err error
-	result.state, start, result.degraded, err = i.executeEvaluation(
+	runState.state, start, runState.degraded, err = i.executeEvaluation(
 		execCtx,
 		env,
 		cfg,
 		contextInjector,
 		prg,
 		ast,
-		result.state,
+		runState.state,
 		budget,
 		wantDump,
 		metricsRecorder,
@@ -781,7 +772,7 @@ func (i input) executeOnce(
 		health,
 	)
 	if err != nil {
-		return result, err
+		return outcome, err
 	}
 	if trace != nil {
 		execLog.Debugw("final transaction", "transaction.id", trace.TxID())
@@ -870,7 +861,7 @@ func (i input) executeOnce(
 	// been stored and we can continue from that point, recovering
 	// the lost events and potentially re-requesting e3.
 	response, err := processEvaluationResponse(
-		result.state,
+		runState.state,
 		limiter,
 		goodURL,
 		health,
@@ -880,35 +871,35 @@ func (i input) executeOnce(
 		execCtx,
 		execSpan,
 		runSpan,
-		result.degraded,
+		runState.degraded,
 	)
 	if err != nil {
-		return result, err
+		return outcome, err
 	}
-	result.waitUntil = response.waitUntil
-	result.degraded = response.degraded
+	runState.waitUntil = response.waitUntil
+	runState.degraded = response.degraded
 	if response.shouldRetry {
-		result.outcome = executeOnceOutcome{kind: executeOnceRetry}
-		return result, nil
+		outcome = executeOnceOutcome{kind: executeOnceRetry}
+		return outcome, nil
 	}
 	if response.done {
-		result.outcome = executeOnceOutcome{kind: executeOnceFinish}
-		return result, nil
+		outcome = executeOnceOutcome{kind: executeOnceFinish}
+		return outcome, nil
 	}
 	events := response.events
 
-	result.eventCount = len(events)
+	runState.eventCount = len(events)
 	prepared := preparePublishState(
-		result.state,
+		runState.state,
 		events,
 		execLog,
 		health,
 		metricsRecorder,
 		execCtx,
 		execSpan,
-		result.degraded,
+		runState.degraded,
 	)
-	result.degraded = prepared.degraded
+	runState.degraded = prepared.degraded
 
 	publishResult, err := publishEvents(
 		execCtx,
@@ -921,24 +912,24 @@ func (i input) executeOnce(
 		events,
 		prepared.cursors,
 		prepared.hasSingleCursor,
-		result.currentCursor,
-		result.safeCursor,
-		result.degraded,
+		runState.currentCursor,
+		runState.safeCursor,
+		runState.degraded,
 		execSpan,
 		runSpan,
 	)
 	if err != nil {
-		return result, err
+		return outcome, err
 	}
-	result.currentCursor = publishResult.currentCursor
-	result.safeCursor = publishResult.safeCursor
-	result.degraded = publishResult.degraded
+	runState.currentCursor = publishResult.currentCursor
+	runState.safeCursor = publishResult.safeCursor
+	runState.degraded = publishResult.degraded
 
 	// Check we have a remaining execution budget.
 	budget--
 	completion := completeExecution(
-		result.state,
-		result.safeCursor,
+		runState.state,
+		runState.safeCursor,
 		start,
 		cfg.Interval,
 		budget,
@@ -950,23 +941,23 @@ func (i input) executeOnce(
 		execSpan,
 	)
 	if completion.maxExecutionLimited {
-		result.outcome = executeOnceOutcome{
+		outcome = executeOnceOutcome{
 			kind:                executeOnceFinish,
 			maxExecutionLimited: true,
 		}
-		return result, nil
+		return outcome, nil
 	}
 	if completion.done {
 		okSpans(execSpan)
-		result.outcome = executeOnceOutcome{
+		outcome = executeOnceOutcome{
 			kind:          executeOnceFinish,
 			markRunSpanOK: true,
 		}
-		return result, nil
+		return outcome, nil
 	}
 
 	okSpans(execSpan)
-	return result, nil
+	return outcome, nil
 }
 
 func (i input) run(env v2.Context, src *source, currentCursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -1070,7 +1061,6 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 	if currentCursor != nil {
 		state["cursor"] = currentCursor
 	}
-	safeCursor := currentCursor
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metricsRecorder.SetResourceURL(goodURL)
@@ -1108,6 +1098,11 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
+	runState := periodicRunState{
+		state:         state,
+		currentCursor: currentCursor,
+		safeCursor:    currentCursor,
+	}
 	err = periodically(ctx, cfg.Interval, func() error {
 		runSpanExecutionCount := 0
 		runSpanEventCount := 0
@@ -1129,11 +1124,11 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 		defer metricsRecorder.EndPeriodic(runCtx)
 		runLog.Debug("process periodic request")
 		var (
-			budget    = *cfg.MaxExecutions
-			waitUntil time.Time
+			budget = *cfg.MaxExecutions
 		)
 		// Keep track of whether CEL is degraded for this periodic run.
-		var isDegraded bool
+		runState.waitUntil = time.Time{}
+		runState.degraded = false
 		if doCov {
 			defer func() {
 				// If doCov is true, log the updated coverage details.
@@ -1143,7 +1138,7 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 			}()
 		}
 		for {
-			if wait := time.Until(waitUntil); wait > 0 {
+			if wait := time.Until(runState.waitUntil); wait > 0 {
 				err = waitForRateLimit(runCtx, runSpan, otelTracer, wait)
 				if err != nil {
 					return err
@@ -1155,7 +1150,7 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 			}
 
 			runSpanExecutionCount++
-			result, err := i.executeOnce(
+			outcome, err := i.executeOnce(
 				runCtx,
 				env,
 				cfg,
@@ -1163,7 +1158,7 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 				contextInjector,
 				prg,
 				ast,
-				state,
+				&runState,
 				budget,
 				wantDump,
 				metricsRecorder,
@@ -1174,31 +1169,23 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 				health,
 				limiter,
 				goodURL,
-				currentCursor,
-				safeCursor,
-				isDegraded,
 				runSpanExecutionCount,
 			)
 			if err != nil {
 				return err
 			}
-			state = result.state
-			waitUntil = result.waitUntil
-			currentCursor = result.currentCursor
-			safeCursor = result.safeCursor
-			isDegraded = result.degraded
-			runSpanEventCount += result.eventCount
-			switch result.outcome.kind {
+			runSpanEventCount += runState.eventCount
+			switch outcome.kind {
 			case executeOnceContinue:
 			case executeOnceRetry:
 				continue
 			case executeOnceFinish:
-				if result.outcome.maxExecutionLimited {
+				if outcome.maxExecutionLimited {
 					runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
 					runSpan.SetStatus(codes.Unset, "reached maximum number of CEL executions")
 					return nil
 				}
-				if result.outcome.markRunSpanOK {
+				if outcome.markRunSpanOK {
 					okSpans(runSpan)
 				}
 				return nil
