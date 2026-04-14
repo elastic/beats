@@ -250,7 +250,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case strings.HasPrefix(platform, "linux/ppc"):
 		tagSuffix = "ppc-debian11"
 	case platform == "linux/s390x":
-		tagSuffix = "s390x-debian11"
+		tagSuffix = "s390x-debian12"
 	case strings.HasPrefix(platform, "linux"):
 		tagSuffix = "main-debian11"
 	case platform == "windows/arm64":
