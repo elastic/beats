@@ -546,17 +546,28 @@ type executionCompletion struct {
 	maxExecutionLimited bool
 }
 
-type executeOnceResult struct {
-	state               map[string]interface{}
-	waitUntil           time.Time
-	cursor              map[string]interface{}
-	goodCursor          map[string]interface{}
-	degraded            bool
-	eventCount          int
-	retry               bool
-	finishRun           bool
+type executeOnceOutcomeKind uint8
+
+const (
+	executeOnceContinue executeOnceOutcomeKind = iota
+	executeOnceRetry
+	executeOnceFinish
+)
+
+type executeOnceOutcome struct {
+	kind                executeOnceOutcomeKind
 	markRunSpanOK       bool
 	maxExecutionLimited bool
+}
+
+type executeOnceResult struct {
+	state      map[string]interface{}
+	waitUntil  time.Time
+	cursor     map[string]interface{}
+	goodCursor map[string]interface{}
+	degraded   bool
+	eventCount int
+	outcome    executeOnceOutcome
 }
 
 func processEvaluationResponse(
@@ -735,6 +746,9 @@ func (i input) executeOnce(
 		cursor:     cursor,
 		goodCursor: goodCursor,
 		degraded:   isDegraded,
+		outcome: executeOnceOutcome{
+			kind: executeOnceContinue,
+		},
 	}
 
 	execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
@@ -877,11 +891,11 @@ func (i input) executeOnce(
 	result.waitUntil = response.waitUntil
 	result.degraded = response.degraded
 	if response.shouldRetry {
-		result.retry = true
+		result.outcome = executeOnceOutcome{kind: executeOnceRetry}
 		return result, nil
 	}
 	if response.done {
-		result.finishRun = true
+		result.outcome = executeOnceOutcome{kind: executeOnceFinish}
 		return result, nil
 	}
 	events := response.events
@@ -939,14 +953,18 @@ func (i input) executeOnce(
 		execSpan,
 	)
 	if completion.maxExecutionLimited {
-		result.finishRun = true
-		result.maxExecutionLimited = true
+		result.outcome = executeOnceOutcome{
+			kind:                executeOnceFinish,
+			maxExecutionLimited: true,
+		}
 		return result, nil
 	}
 	if completion.done {
 		okSpans(execSpan)
-		result.finishRun = true
-		result.markRunSpanOK = true
+		result.outcome = executeOnceOutcome{
+			kind:          executeOnceFinish,
+			markRunSpanOK: true,
+		}
 		return result, nil
 	}
 
@@ -1184,16 +1202,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			goodCursor = result.goodCursor
 			isDegraded = result.degraded
 			runSpanEventCount += result.eventCount
-			if result.retry {
+			switch result.outcome.kind {
+			case executeOnceContinue:
+			case executeOnceRetry:
 				continue
-			}
-			if result.maxExecutionLimited {
-				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
-				runSpan.SetStatus(codes.Unset, "reached maximum number of CEL executions")
-				return nil
-			}
-			if result.finishRun {
-				if result.markRunSpanOK {
+			case executeOnceFinish:
+				if result.outcome.maxExecutionLimited {
+					runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
+					runSpan.SetStatus(codes.Unset, "reached maximum number of CEL executions")
+					return nil
+				}
+				if result.outcome.markRunSpanOK {
 					okSpans(runSpan)
 				}
 				return nil
