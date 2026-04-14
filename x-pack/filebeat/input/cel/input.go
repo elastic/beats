@@ -531,12 +531,6 @@ type evaluationResponse struct {
 	shouldRetry bool
 }
 
-type publishPreparation struct {
-	cursors         []interface{}
-	hasSingleCursor bool
-	degraded        bool
-}
-
 type executionCompletion struct {
 	done                bool
 	maxExecutionLimited bool
@@ -651,7 +645,7 @@ func preparePublishState(
 	execCtx context.Context,
 	execSpan trace.Span,
 	runDegraded bool,
-) publishPreparation {
+) publishCursors {
 	// We have a non-empty batch of events to process.
 	metricsRecorder.AddReceivedBatch(execCtx, 1)
 	metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
@@ -666,11 +660,7 @@ func preparePublishState(
 	// the current cursor object below; it is an array now.
 	delete(state, "cursor")
 
-	return publishPreparation{
-		cursors:         cursorState.cursors,
-		hasSingleCursor: cursorState.hasSingleCursor,
-		degraded:        cursorState.degraded,
-	}
+	return cursorState
 }
 
 func completeExecution(
