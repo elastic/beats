@@ -115,22 +115,17 @@ func (p *addCloudMetadata) init() {
 	})
 }
 
-func (p *addCloudMetadata) getMeta() mapstr.M {
-	p.init()
-	return p.metadata.Clone()
-}
-
 func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	meta := p.getMeta()
-	if len(meta) == 0 {
+	p.init()
+	if len(p.metadata) == 0 {
 		return event, nil
 	}
 
-	err := p.addMeta(event, meta)
+	err := p.addMeta(event, p.metadata)
 	if err != nil {
 		return nil, err
 	}
-	return event, err
+	return event, nil
 }
 
 func (p *addCloudMetadata) String() string {
@@ -138,7 +133,7 @@ func (p *addCloudMetadata) String() string {
 	select {
 	case <-p.initDone:
 		// init() completed
-		metadataStr = p.getMeta().String()
+		metadataStr = p.metadata.Clone().String()
 	default:
 	}
 	return "add_cloud_metadata=" + metadataStr
@@ -160,6 +155,16 @@ func (p *addCloudMetadata) addMeta(event *beat.Event, meta mapstr.M) error {
 			if v != nil {
 				continue
 			}
+		}
+		switch mv := metaVal.(type) {
+		case mapstr.M:
+			fresh := make(mapstr.M, len(mv))
+			fresh.DeepCloneUpdate(mv)
+			metaVal = fresh
+		case map[string]interface{}:
+			fresh := make(mapstr.M, len(mv))
+			fresh.DeepCloneUpdate(mapstr.M(mv))
+			metaVal = fresh
 		}
 		_, err := event.PutValue(key, metaVal)
 		if err != nil {
