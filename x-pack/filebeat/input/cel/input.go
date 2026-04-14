@@ -194,8 +194,8 @@ func sanitizeFileName(name string) string {
 
 // getPublishCursors normalizes the evaluation cursor into the slice form used
 // during publication.
-func getPublishCursors(cursor any, hasCursor bool, eventCount int, log *logp.Logger, health status.StatusReporter, degraded bool) publishCursors {
-	result := publishCursors{degraded: degraded}
+func getPublishCursors(cursor any, hasCursor bool, eventCount int, log *logp.Logger, health status.StatusReporter) publishCursors {
+	result := publishCursors{}
 
 	if !hasCursor {
 		return result
@@ -861,11 +861,13 @@ func (i input) executeOnce(
 	delete(runState.state, "events")
 
 	cursor, hasCursor := runState.state["cursor"]
-	prepared := getPublishCursors(cursor, hasCursor, len(events), execLog, health, runState.degraded)
+	prepared := getPublishCursors(cursor, hasCursor, len(events), execLog, health)
 	// Drop old cursor from state. This will be replaced with
 	// the current cursor object below; it is an array now.
 	delete(runState.state, "cursor")
-	runState.degraded = prepared.degraded
+	if prepared.degraded {
+		runState.degraded = true
+	}
 
 	publishResult, err := publishEvents(
 		execCtx,
