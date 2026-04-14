@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Use single-pass DeepCloneUpdate to eliminate Clone+DeepUpdate allocations in add_fields, cloud/host/observer metadata, rename, and pipeline setup
+component: libbeat
