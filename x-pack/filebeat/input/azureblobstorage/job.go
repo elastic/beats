@@ -194,8 +194,29 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	}
 	var evtOffset int64
 	switch dec := dec.(type) {
+<<<<<<< HEAD
 	case decoder:
 		defer dec.close()
+=======
+	case decoder.ValueDecoder:
+		defer dec.Close()
+
+		for dec.Next() {
+			offset, msg, _, err := dec.DecodeValue()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+				j.status.UpdateStatus(status.Degraded, err.Error())
+				return err
+			}
+			evt := j.createEvent(string(msg), offset)
+			j.publish(evt, !dec.More(), id)
+		}
+
+	case decoder.Decoder:
+		defer dec.Close()
+>>>>>>> 34634a3e8 ([filebeat][ABS] - Fix CSV decoder JSON escaping in azure-blob-storage input (#50097))
 
 		for dec.next() {
 			msg, err := dec.decode()
