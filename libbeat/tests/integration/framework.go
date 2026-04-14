@@ -52,6 +52,7 @@ import (
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
@@ -1233,7 +1234,7 @@ func StartMockES(
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint:errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
@@ -1258,6 +1259,48 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	}, timeout, 200*time.Millisecond)
 }
 
+<<<<<<< HEAD
+=======
+// RemoveOutputFile removes all files matching output*.ndjson in the Beat
+// temporary folder. On error t.Fatal is called
+func (b *BeatProc) RemoveOutputFile() {
+	t := b.t
+	outputFiles, err := filepath.Glob(filepath.Join(b.TempDir(), "output*.ndjson"))
+	if err != nil {
+		t.Fatalf("failed to match glob pattern for output files: %s", err)
+	}
+
+	for _, file := range outputFiles {
+		if err := os.Remove(file); err != nil {
+			t.Fatalf("cannot remove file: %s", err)
+		}
+	}
+}
+
+// TestMainWithBuild is a TestMain helper that builds the beat test binary,
+// runs all tests, cleans up and exits. It resolves paths relative to the
+// working directory (the test package directory), so "../../" reaches the
+// beat root from <beat>/tests/integration/.
+//
+//	func TestMain(m *testing.M) {
+//	    integration.TestMainWithBuild(m, "filebeat")
+//	}
+func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
+	beatRoot, err := filepath.Abs("../../")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
+		os.Exit(1)
+	}
+	_, err = testbin.Build(beatName, beatRoot, opts...)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
+		os.Exit(1)
+	}
+
+	os.Exit(m.Run())
+}
+
+>>>>>>> 323f731f8 (filebeat: auto-build test binary in Go integration tests via TestMain (#49583))
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
 // then it reads up to n events. It assumes the filename
 // for the output is 'output' and 'path' is set to the TempDir.
