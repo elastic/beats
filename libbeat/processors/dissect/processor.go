@@ -116,66 +116,66 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	backup := event.Clone()
-
 	if convertDataType {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
 		event, err = p.mapFields(event, m)
 	}
-	if err != nil {
-		return backup, err
-	}
 
-	return event, nil
+	return event, err
+}
+
+// prefixedKey returns the pre-computed prefix+key string when available,
+// falling back to runtime concatenation for dynamic keys (e.g. indirect fields).
+func (p *processor) prefixedKey(k string) string {
+	if p.prefixKeys != nil {
+		if pk, ok := p.prefixKeys[k]; ok {
+			return pk
+		}
+		// Dynamic key not in the pre-computed set — fall back to concatenation.
+		return p.config.TargetPrefix + "." + k
+	}
+	return k
 }
 
 func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
-	for k, v := range m {
-		prefixKey := k
-		if p.prefixKeys != nil {
-			if pk, ok := p.prefixKeys[k]; ok {
-				prefixKey = pk
-			} else {
-				// Dynamic key (e.g. from indirect field) not in the
-				// pre-computed set — fall back to prefix concatenation.
-				prefixKey = p.config.TargetPrefix + "." + k
+	// Check all keys before writing any so we never need a clone for rollback.
+	if !p.config.OverwriteKeys {
+		for k := range m {
+			prefixKey := p.prefixedKey(k)
+			found, err := event.HasKey(prefixKey)
+			if found {
+				return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 			}
-		}
-		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
-			_, _ = event.PutValue(prefixKey, v)
-		} else {
-			// When the target key exists but is a string instead of a map.
-			if err != nil {
+			if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
 				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
-			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}
 	}
-
+	for k, v := range m {
+		_, _ = event.PutValue(p.prefixedKey(k), v)
+	}
 	return event, nil
 }
 
 // mapFields is a typed variant of mapper for Map (map[string]string),
 // avoiding the intermediate map[string]interface{} allocation from mapToMapStr.
 func (p *processor) mapFields(event *beat.Event, m Map) (*beat.Event, error) {
-	for k, v := range m {
-		prefixKey := k
-		if p.prefixKeys != nil {
-			if pk, ok := p.prefixKeys[k]; ok {
-				prefixKey = pk
-			} else {
-				prefixKey = p.config.TargetPrefix + "." + k
+	// Check all keys before writing any so we never need a clone for rollback.
+	if !p.config.OverwriteKeys {
+		for k := range m {
+			prefixKey := p.prefixedKey(k)
+			found, err := event.HasKey(prefixKey)
+			if found {
+				return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 			}
-		}
-		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
-			_, _ = event.PutValue(prefixKey, v)
-		} else {
-			if err != nil {
+			if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
 				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
-			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}
+	}
+	for k, v := range m {
+		_, _ = event.PutValue(p.prefixedKey(k), v)
 	}
 	return event, nil
 }
