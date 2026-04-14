@@ -172,12 +172,6 @@ type publishLoopState struct {
 	hadPublicationError bool
 }
 
-type publishResult struct {
-	currentCursor map[string]interface{}
-	safeCursor    map[string]interface{}
-	degraded      bool
-}
-
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	switch {
 	case r.name != "" && msg != "":
@@ -425,8 +419,8 @@ func publishEvents(
 	degraded bool,
 	execSpan trace.Span,
 	runSpan trace.Span,
-) (publishResult, error) {
-	result := publishResult{
+) (publishLoopState, error) {
+	result := publishLoopState{
 		currentCursor: currentCursor,
 		safeCursor:    safeCursor,
 		degraded:      degraded,
