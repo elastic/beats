@@ -1616,7 +1616,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintIdx: newShortFingerprintIndex(maxEncLen),
+			shortFingerprintIdx:      newShortFingerprintIndex(maxEncLen),
 		}
 		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::growing_fingerprint::aabb", "aabb")
 		src := identifier.GetSource(event)
@@ -1638,7 +1638,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: maxEncLen,
-			shortFingerprintIdx: newShortFingerprintIndex(maxEncLen),
+			shortFingerprintIdx:      newShortFingerprintIndex(maxEncLen),
 		}
 		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::growing_fingerprint::"+maxFP, maxFP)
 		src := identifier.GetSource(event)
@@ -1826,7 +1826,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		logger:                   logp.L(),
 		identifier:               identifier,
 		maxEncodedFingerprintLen: maxEncLen,
-		shortFingerprintIdx: newShortFingerprintIndex(maxEncLen),
+		shortFingerprintIdx:      newShortFingerprintIndex(maxEncLen),
 	}
 	store := newMockMetadataUpdater()
 	hg := newTestHarvesterGroup()
