@@ -554,6 +554,52 @@ type periodicRunState struct {
 	eventCount    int
 }
 
+func normalizeEvaluationEvents(
+	state map[string]interface{},
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	start time.Time,
+	execLog *logp.Logger,
+	execCtx context.Context,
+	execSpan trace.Span,
+	runSpan trace.Span,
+) (events []interface{}, done bool, degraded bool, err error) {
+	e, ok := state["events"]
+	if !ok {
+		err = errors.New("unexpected missing events array from evaluation")
+		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+		errorSpans(err, execSpan, runSpan)
+		return nil, false, false, err
+	}
+
+	switch e := e.(type) {
+	case []interface{}:
+		if len(e) == 0 {
+			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+			metricsRecorder.AddProgramSuccessExecution(execCtx)
+			okSpans(execSpan)
+			return nil, true, false, nil
+		}
+		return e, false, false, nil
+	case map[string]interface{}:
+		if e == nil {
+			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+			metricsRecorder.AddProgramSuccessExecution(execCtx)
+			okSpans(execSpan)
+			return nil, true, false, nil
+		}
+		handleSingleEventObject(e, execLog, health)
+		// Make sure the cursor is not updated.
+		delete(state, "cursor")
+		return []interface{}{e}, false, true, nil
+	default:
+		err = fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
+		errorSpans(err, execSpan, runSpan)
+		return nil, false, false, err
+	}
+}
+
 func processEvaluationResponse(
 	state map[string]interface{},
 	limiter *rate.Limiter,
@@ -587,41 +633,17 @@ func processEvaluationResponse(
 		execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", goodURL)
 	}
 
-	e, ok := state["events"]
-	if !ok {
-		err := errors.New("unexpected missing events array from evaluation")
-		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-		errorSpans(err, execSpan, runSpan)
-		return result, err
-	}
-
-	switch e := e.(type) {
-	case []interface{}:
-		if len(e) == 0 {
-			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-			metricsRecorder.AddProgramSuccessExecution(execCtx)
-			okSpans(execSpan)
-			result.done = true
-			return result, nil
-		}
-		result.events = e
-	case map[string]interface{}:
-		if e == nil {
-			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-			metricsRecorder.AddProgramSuccessExecution(execCtx)
-			okSpans(execSpan)
-			result.done = true
-			return result, nil
-		}
-		handleSingleEventObject(e, execLog, health)
-		result.degraded = true
-		result.events = []interface{}{e}
-		// Make sure the cursor is not updated.
-		delete(state, "cursor")
-	default:
-		err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-		errorSpans(err, execSpan, runSpan)
+	result.events, result.done, result.degraded, err = normalizeEvaluationEvents(
+		state,
+		health,
+		metricsRecorder,
+		start,
+		execLog,
+		execCtx,
+		execSpan,
+		runSpan,
+	)
+	if err != nil {
 		return result, err
 	}
 
