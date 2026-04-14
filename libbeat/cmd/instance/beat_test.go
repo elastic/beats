@@ -507,6 +507,8 @@ func (m mockManager) RegisterDiagnosticHook(name, description, filename, content
 func (m mockManager) SetPayload(payload map[string]any)             {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) PreInit() error                                { return nil }
+func (m mockManager) PostInit()                                     {}
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
 func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action management.Action)     {}

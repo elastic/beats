@@ -118,6 +118,10 @@ func (r *rpc) setFromConfig(config *rpcConfig) error {
 	return nil
 }
 
+func (r *rpc) Close() {
+	r.callsSeen.StopJanitor()
+}
+
 func (r *rpc) GetPorts() []int {
 	return r.ports
 }
