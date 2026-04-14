@@ -18,7 +18,6 @@
 package readfile
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -26,25 +25,15 @@ import (
 )
 
 const (
-	idxhiKey = "log.file.idxhi"
-	idxloKey = "log.file.idxlo"
-	volKey   = "log.file.vol"
+	idxhiKey = "idxhi"
+	idxloKey = "idxlo"
+	volKey   = "vol"
 )
 
-func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwner bool, includeGroup bool) error {
+func setFileSystemMetadata(fi file.ExtendedFileInfo, fileMap mapstr.M, includeOwner bool, includeGroup bool) error {
 	osstate := fi.GetOSState()
-	_, err := fields.Put(idxhiKey, strconv.FormatUint(osstate.IdxHi, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", idxhiKey, err)
-	}
-	_, err = fields.Put(idxloKey, strconv.FormatUint(osstate.IdxLo, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", idxloKey, err)
-	}
-	_, err = fields.Put(volKey, strconv.FormatUint(osstate.Vol, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", volKey, err)
-	}
-
+	fileMap[idxhiKey] = strconv.FormatUint(osstate.IdxHi, 10)
+	fileMap[idxloKey] = strconv.FormatUint(osstate.IdxLo, 10)
+	fileMap[volKey] = strconv.FormatUint(osstate.Vol, 10)
 	return nil
 }
