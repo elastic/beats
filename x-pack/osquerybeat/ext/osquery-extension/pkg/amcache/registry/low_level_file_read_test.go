@@ -12,9 +12,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"www.velocidex.com/golang/regparser"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	"www.velocidex.com/golang/regparser"
 )
 
 func Test_readFileViaNTFS(t *testing.T) {
