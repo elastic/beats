@@ -69,7 +69,7 @@ type Result struct {
 }
 
 // Columns returns the column definitions for the elastic_ntfs_volumes table.
-// Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+// Windows mounted volume information including device type, drive letter, and filesystem
 func Columns() []table.ColumnDefinition {
 	// Generate column definitions automatically from the Result struct using reflection.
 	// This ensures the columns always match the struct definition and prevents drift.

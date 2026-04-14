@@ -75,7 +75,7 @@ type Result struct {
 }
 
 // Columns returns the column definitions for the elastic_ntfs_partitions table.
-// Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+// Windows disk partition layout information from IOCTL_DISK_GET_DRIVE_LAYOUT_EX
 func Columns() []table.ColumnDefinition {
 	// Generate column definitions automatically from the Result struct using reflection.
 	// This ensures the columns always match the struct definition and prevents drift.

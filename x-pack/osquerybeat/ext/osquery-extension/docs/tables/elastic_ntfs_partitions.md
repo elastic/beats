@@ -2,7 +2,7 @@
 
 # elastic_ntfs_partitions
 
-Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+Windows disk partition layout information from IOCTL_DISK_GET_DRIVE_LAYOUT_EX
 
 ## Platforms
 

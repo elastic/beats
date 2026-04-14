@@ -116,7 +116,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 		}
 	}
 	{
-		// Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+		// Windows disk partition layout information from IOCTL_DISK_GET_DRIVE_LAYOUT_EX
 		genFunc, err := elasticntfspartitions.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_ntfs_partitions: %v", err)
@@ -126,7 +126,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 		}
 	}
 	{
-		// Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+		// Windows mounted volume information including device type, drive letter, and filesystem
 		genFunc, err := elasticntfsvolumes.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_ntfs_volumes: %v", err)

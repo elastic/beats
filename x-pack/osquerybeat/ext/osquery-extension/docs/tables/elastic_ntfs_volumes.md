@@ -2,7 +2,7 @@
 
 # elastic_ntfs_volumes
 
-Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+Windows mounted volume information including device type, drive letter, and filesystem
 
 ## Platforms
 
