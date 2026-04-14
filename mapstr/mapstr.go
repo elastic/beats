@@ -84,6 +84,76 @@ func (m M) DeepUpdateNoOverwrite(d M) {
 	m.deepUpdateMap(d, false)
 }
 
+// DeepCloneUpdate recursively merges the key-value pairs from d into this map,
+// creating fresh copies of all nested maps. Unlike DeepUpdate, this never
+// aliases d's sub-maps into m — the destination gets independent copies of
+// all nested map values. Scalar values (strings, ints, bools, etc.) are
+// shared safely since they are immutable in Go.
+//
+// This is equivalent to m.DeepUpdate(d.Clone()) but performs the clone and
+// merge in a single pass, avoiding the intermediate allocation of a full
+// clone.
+func (m M) DeepCloneUpdate(d M) {
+	for k, v := range d {
+		switch srcVal := v.(type) {
+		case M:
+			if dstMap, ok := m[k].(M); ok {
+				dstMap.DeepCloneUpdate(srcVal)
+			} else {
+				fresh := make(M, len(srcVal))
+				fresh.DeepCloneUpdate(srcVal)
+				m[k] = fresh
+			}
+		case map[string]interface{}:
+			if dstMap, ok := m[k].(M); ok {
+				dstMap.DeepCloneUpdate(M(srcVal))
+			} else {
+				fresh := make(M, len(srcVal))
+				fresh.DeepCloneUpdate(M(srcVal))
+				m[k] = fresh
+			}
+		default:
+			m[k] = v
+		}
+	}
+}
+
+// DeepCloneUpdateNoOverwrite is like DeepCloneUpdate but skips keys that
+// already exist in the destination. This is equivalent to
+// m.DeepUpdateNoOverwrite(d.Clone()) but performs the clone and merge
+// in a single pass.
+//
+// When the source value is a map and the destination value is a non-map
+// scalar, the scalar is replaced by a fresh copy of the source map.
+// This matches deepUpdateValue semantics where a map always wins over
+// a non-map, regardless of the overwrite flag.
+func (m M) DeepCloneUpdateNoOverwrite(d M) {
+	for k, v := range d {
+		switch srcVal := v.(type) {
+		case M:
+			if dstMap, ok := m[k].(M); ok {
+				dstMap.DeepCloneUpdateNoOverwrite(srcVal)
+			} else {
+				fresh := make(M, len(srcVal))
+				fresh.DeepCloneUpdate(srcVal)
+				m[k] = fresh
+			}
+		case map[string]interface{}:
+			if dstMap, ok := m[k].(M); ok {
+				dstMap.DeepCloneUpdateNoOverwrite(M(srcVal))
+			} else {
+				fresh := make(M, len(srcVal))
+				fresh.DeepCloneUpdate(M(srcVal))
+				m[k] = fresh
+			}
+		default:
+			if _, exists := m[k]; !exists {
+				m[k] = v
+			}
+		}
+	}
+}
+
 func (m M) deepUpdateMap(d M, overwrite bool) {
 	for k, v := range d {
 		switch val := v.(type) {
