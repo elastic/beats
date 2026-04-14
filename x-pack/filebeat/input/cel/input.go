@@ -636,33 +636,6 @@ func processEvaluationResponse(
 	return result, nil
 }
 
-func preparePublishState(
-	state map[string]interface{},
-	events []interface{},
-	execLog *logp.Logger,
-	health status.StatusReporter,
-	metricsRecorder *metricsRecorder,
-	execCtx context.Context,
-	execSpan trace.Span,
-	runDegraded bool,
-) publishCursors {
-	// We have a non-empty batch of events to process.
-	metricsRecorder.AddReceivedBatch(execCtx, 1)
-	metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
-	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-	// Drop events from state. If we fail during the publication,
-	// we will re-request these events.
-	delete(state, "events")
-
-	cursor, hasCursor := state["cursor"]
-	cursorState := getPublishCursors(cursor, hasCursor, len(events), execLog, health, runDegraded)
-	// Drop old cursor from state. This will be replaced with
-	// the current cursor object below; it is an array now.
-	delete(state, "cursor")
-
-	return cursorState
-}
-
 func completeExecution(
 	state map[string]interface{},
 	safeCursor map[string]interface{},
@@ -879,16 +852,19 @@ func (i input) executeOnce(
 	events := response.events
 
 	runState.eventCount = len(events)
-	prepared := preparePublishState(
-		runState.state,
-		events,
-		execLog,
-		health,
-		metricsRecorder,
-		execCtx,
-		execSpan,
-		runState.degraded,
-	)
+	// We have a non-empty batch of events to process.
+	metricsRecorder.AddReceivedBatch(execCtx, 1)
+	metricsRecorder.AddReceivedEvents(execCtx, uint(len(events)))
+	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
+	// Drop events from state. If we fail during the publication,
+	// we will re-request these events.
+	delete(runState.state, "events")
+
+	cursor, hasCursor := runState.state["cursor"]
+	prepared := getPublishCursors(cursor, hasCursor, len(events), execLog, health, runState.degraded)
+	// Drop old cursor from state. This will be replaced with
+	// the current cursor object below; it is an array now.
+	delete(runState.state, "cursor")
 	runState.degraded = prepared.degraded
 
 	publishResult, err := publishEvents(
