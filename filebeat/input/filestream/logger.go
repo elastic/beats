@@ -22,20 +22,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
-	log := logger.With(
-		"operation", event.Op.String(),
-		"source_name", src.Name(),
-	)
-	if event.Descriptor.Fingerprint != "" {
-		log = log.With("fingerprint", event.Descriptor.Fingerprint)
-	}
-	if event.Descriptor.Info != nil {
-		osID := event.Descriptor.Info.GetOSState().Identifier()
-		if osID != "" {
-			log = log.With("os_id", osID)
+func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source, includeFileIdentity bool) *logp.Logger {
+	log := logger.With("operation", event.Op.String())
+
+	if includeFileIdentity {
+		log = log.With("source_name", src.Name())
+
+		if event.Descriptor.Fingerprint != "" {
+			log = log.With("fingerprint", event.Descriptor.Fingerprint)
+		}
+
+		if event.Descriptor.Info != nil {
+			osID := event.Descriptor.Info.GetOSState().Identifier()
+			if osID != "" {
+				log = log.With("os_id", osID)
+			}
 		}
 	}
+
 	if event.NewPath != "" {
 		log = log.With("new_path", event.NewPath)
 	}

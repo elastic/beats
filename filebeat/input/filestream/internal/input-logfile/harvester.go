@@ -174,9 +174,6 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
 	if fn == nil {
 		return
@@ -193,10 +190,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Restarting harvester for file")
+	ctx.Logger.Debugf("Restarting harvester for file '%s'", hg.identifier.ID(src))
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
@@ -225,7 +219,7 @@ func startHarvester(
 		// until a slot is available. Without this early check, repeated file events
 		// would spawn goroutines that wait on the semaphore only to discover (after
 		// acquiring it) that a harvester is already running, causing a goroutine leak.
-		ctx.Logger.Debug("Harvester already running")
+		ctx.Logger.Debugf("Harvester already running for '%s'", srcID)
 		return nil
 	}
 
@@ -233,7 +227,7 @@ func startHarvester(
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
-				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
+				ctx.Logger.Errorf("Harvester for '%s' crashed with: %+v", srcID, err)
 				hg.readers.remove(srcID)
 			}
 
@@ -263,7 +257,7 @@ func startHarvester(
 			// only thing it does is to log the error. So to avoid unnecessary errors,
 			// we just return nil.
 			if errors.Is(err, ErrHarvesterAlreadyRunning) {
-				ctx.Logger.Debug("Harvester already running")
+				ctx.Logger.Debugf("Harvester already running for '%s'", srcID)
 				return nil
 			}
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
@@ -271,10 +265,10 @@ func startHarvester(
 
 		defer func() {
 			if err != nil {
-				ctx.Logger.Debugf("Stopped harvester for file due to an error: %s", err)
+				ctx.Logger.Debugf("Stopped harvester for file '%s' due to an error: %s", srcID, err)
 				return
 			}
-			ctx.Logger.Debugf("Stopped harvester for file")
+			ctx.Logger.Debugf("Stopped harvester for file '%s'", srcID)
 		}()
 
 		ctx.Cancelation = harvesterCtx
@@ -312,7 +306,7 @@ func startHarvester(
 				// Unpack should never fail, if it fails either the cursor
 				// structure had a breaking change or our registry is corrupted.
 				// Either way, it is better to not notify the observer.
-				ctx.Logger.Errorf("cannot unpack cursor at the end of the harvester: %s", err)
+				ctx.Logger.Errorf("cannot unpack cursor at the end of harvester '%s': %s", srcID, err)
 				return
 			}
 
@@ -320,7 +314,7 @@ func startHarvester(
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 
-		ctx.Logger.Debug("Starting harvester for file")
+		ctx.Logger.Debugf("Starting harvester for file '%s'", srcID)
 		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)

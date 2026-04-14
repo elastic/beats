@@ -646,6 +646,11 @@ stack: ga 9.3
 Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
 
+### `include_file_identity` [filestream-input-include_file_identity]
+```yaml {applies_to}
+stack: ga 9.5
+```
+Include file identity metadata in published events and logger context. When set to `true`, identity-related fields are added to published events and to the logger context. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 

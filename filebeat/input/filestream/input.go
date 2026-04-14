@@ -71,6 +71,7 @@ type filestream struct {
 	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
+	includeFileIdentity       bool
 	hasLineFilter             bool
 
 	// Function references for testing
@@ -151,6 +152,7 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		includeFileIdentity:       c.IncludeFileIdentity,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		waitGracePeriodFn:         waitGracePeriod,
@@ -519,7 +521,11 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+	fingerprint := ""
+	if inp.includeFileIdentity {
+		fingerprint = fs.desc.Fingerprint
+	}
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 

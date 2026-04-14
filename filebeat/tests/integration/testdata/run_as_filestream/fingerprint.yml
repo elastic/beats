@@ -6,6 +6,7 @@ filebeat.inputs:
       fingerprint.enabled: true
     paths:
       - {{ .logfile }}
+    include_file_identity: true
 
 output.file:
   path: ${path.home}
