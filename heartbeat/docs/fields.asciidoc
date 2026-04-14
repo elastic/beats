@@ -184,7 +184,7 @@ type: integer
 [float]
 === relative_trace
 
-trace event with timing information that are realtive to journey timings in microseconds
+trace event with timing information that are relative to journey timings in microseconds
 
 
 

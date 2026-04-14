@@ -133,6 +133,78 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 	return inputs, nil
 }
 
+func CreateInputsFromStreamsForReceiver(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo) ([]map[string]interface{}, error) {
+	if raw.GetStreams() == nil {
+		streamSource, err := handleSimpleConfig(raw)
+		if err != nil {
+			return []map[string]interface{}{}, err
+		}
+
+		streamSource, err = createStreamRulesForReceiver(raw, streamSource, &proto.Stream{}, defaultDataStreamType, agentInfo)
+		if err != nil {
+			return nil, fmt.Errorf("error creating stream rules for a simple config (empty streams array): %w", err)
+		}
+
+		return []map[string]interface{}{streamSource}, nil
+	}
+
+	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
+	for iter, stream := range raw.GetStreams() {
+		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
+		streamSource, err := createStreamRulesForReceiver(raw, streamSource, stream, defaultDataStreamType, agentInfo)
+		if err != nil {
+			return nil, fmt.Errorf("error creating stream rules: %w", err)
+		}
+
+		id, ok := streamSource["id"].(string)
+		if ok && id != "" && strings.HasPrefix(id, celInputPrefix) {
+			if raw.Meta != nil && raw.Meta.Package != nil {
+				packageData := make(map[string]string)
+				packageData["name"] = raw.Meta.Package.Name
+				packageData["version"] = raw.Meta.Package.Version
+				streamSource["package"] = packageData
+			}
+		}
+		inputs[iter] = streamSource
+	}
+
+	return inputs, nil
+}
+
+func createStreamRulesForReceiver(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo) (map[string]interface{}, error) {
+	if _, exists := streamSource["index"]; exists {
+		delete(streamSource, "data_stream")
+	} else {
+		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
+	}
+
+	// Global processors from the input config are still injected individually.
+	streamSource = injectGlobalProcesssors(raw, streamSource)
+
+	// Replace injectAgentInfoRule + injectStreamProcessors with a single
+	// add_agent_metadata processor.
+	if agentInfo == nil {
+		streamSource, err := injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, nil)
+		if err != nil {
+			return nil, fmt.Errorf("error injecting stream processors: %w", err)
+		}
+		return streamSource, nil
+	}
+
+	dsType, dataset, namespace := metadataFromDatastreamValues(defaultDataStreamType, raw, stream)
+	proc := generateAgentMetadataProcessor(
+		agentInfo,
+		raw.GetId(),
+		stream.GetId(),
+		dsType,
+		dataset,
+		namespace,
+	)
+
+	streamSource["processors"] = prependProcessors(streamSource, []interface{}{proc})
+	return streamSource, nil
+}
+
 // CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
 func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
@@ -316,6 +388,28 @@ func generateAddFieldsProcessor(fields mapstr.M, target string) mapstr.M {
 			"target": target,
 		},
 	}
+}
+
+func generateAgentMetadataProcessor(agentInfo *client.AgentInfo, inputID, streamID, dataStreamType, dataset, namespace string) mapstr.M {
+	cfg := mapstr.M{
+		"data_stream": mapstr.M{
+			"dataset":   dataset,
+			"namespace": namespace,
+			"type":      dataStreamType,
+		},
+		"elastic_agent": mapstr.M{
+			"id":       agentInfo.ID,
+			"snapshot": agentInfo.Snapshot,
+			"version":  agentInfo.Version,
+		},
+	}
+	if inputID != "" {
+		cfg["input_id"] = inputID
+	}
+	if streamID != "" {
+		cfg["stream_id"] = streamID
+	}
+	return mapstr.M{"add_agent_metadata": cfg}
 }
 
 // prependProcessors takes an existing input or stream-level config, extracts any existing processors in the config,
