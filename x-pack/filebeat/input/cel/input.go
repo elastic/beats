@@ -192,29 +192,31 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func getPublishCursors(state map[string]interface{}, events []interface{}, log *logp.Logger, health status.StatusReporter, degraded bool) publishCursors {
+// getPublishCursors normalizes the evaluation cursor into the slice form used
+// during publication.
+func getPublishCursors(cursor any, hasCursor bool, eventCount int, log *logp.Logger, health status.StatusReporter, degraded bool) publishCursors {
 	result := publishCursors{degraded: degraded}
 
-	c, ok := state["cursor"]
-	if !ok {
+	if !hasCursor {
 		return result
 	}
 
-	result.cursors, ok = c.([]interface{})
+	cursors, ok := cursor.([]interface{})
 	if ok {
-		if len(result.cursors) != len(events) {
-			log.Errorw("unexpected cursor list length", "cursors", len(result.cursors), "events", len(events))
+		result.cursors = cursors
+		if len(result.cursors) != eventCount {
+			log.Errorw("unexpected cursor list length", "cursors", len(result.cursors), "events", eventCount)
 			health.UpdateStatus(status.Degraded, "unexpected cursor list length")
 			result.degraded = true
 			// But try to continue.
-			if len(result.cursors) < len(events) {
+			if len(result.cursors) < eventCount {
 				result.cursors = nil
 			}
 		}
 		return result
 	}
 
-	result.cursors = []interface{}{c}
+	result.cursors = []interface{}{cursor}
 	result.hasSingleCursor = true
 	return result
 }
@@ -659,7 +661,8 @@ func preparePublishState(
 	// we will re-request these events.
 	delete(state, "events")
 
-	cursorState := getPublishCursors(state, events, execLog, health, runDegraded)
+	cursor, hasCursor := state["cursor"]
+	cursorState := getPublishCursors(cursor, hasCursor, len(events), execLog, health, runDegraded)
 	// Drop old cursor from state. This will be replaced with
 	// the current cursor object below; it is an array now.
 	delete(state, "cursor")
