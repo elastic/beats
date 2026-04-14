@@ -55,8 +55,12 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Go integration tests now build the binary automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target is only needed for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 
@@ -196,14 +200,11 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
-
 	// We pre-cache go module dependencies before running the unit tests with
 	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
 	// will try to download the dependencies and could fail because the TLS
