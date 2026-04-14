@@ -52,6 +52,7 @@ import (
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
@@ -1233,7 +1234,7 @@ func StartMockES(
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint:errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
@@ -1256,6 +1257,29 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		assert.Equal(collect, events, b.CountFileLines(path))
 	}, timeout, 200*time.Millisecond)
+}
+
+// TestMainWithBuild is a TestMain helper that builds the beat test binary,
+// runs all tests, cleans up and exits. It resolves paths relative to the
+// working directory (the test package directory), so "../../" reaches the
+// beat root from <beat>/tests/integration/.
+//
+//	func TestMain(m *testing.M) {
+//	    integration.TestMainWithBuild(m, "filebeat")
+//	}
+func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
+	beatRoot, err := filepath.Abs("../../")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
+		os.Exit(1)
+	}
+	_, err = testbin.Build(beatName, beatRoot, opts...)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
+		os.Exit(1)
+	}
+
+	os.Exit(m.Run())
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,
