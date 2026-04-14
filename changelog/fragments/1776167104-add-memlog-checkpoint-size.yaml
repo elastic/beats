@@ -1,0 +1,5 @@
+kind: enhancement
+summary: Add configurable memlog checkpoint size for the registry
+component: filebeat
+pr: https://github.com/elastic/beats/pull/50117
+issue: https://github.com/elastic/beats/issues/50114

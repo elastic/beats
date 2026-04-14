@@ -90,9 +90,13 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 				Config:   cfg.Bbolt,
 			})
 		case "memlog", "":
+			limit := cfg.Memlog.CheckpointSize
 			reg, err = memlog.New(logger, memlog.Settings{
 				Root:     resolvedPath,
 				FileMode: cfg.Permissions,
+				Checkpoint: func(filesize uint64) bool {
+					return filesize >= limit
+				},
 			})
 		default:
 			return nil, fmt.Errorf("unknown registry backend: %q", cfg.Backend)
