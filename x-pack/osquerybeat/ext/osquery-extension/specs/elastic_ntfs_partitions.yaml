@@ -1,0 +1,55 @@
+type: table
+name: elastic_ntfs_partitions
+description: Windows disk partition layout information from IOCTL_DISK_GET_DRIVE_LAYOUT_EX
+platforms:
+  - windows
+group: ntfs
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/ntfs
+
+columns:
+  - name: device
+    type: TEXT
+    description: Device name (e.g. "\\.\PHYSICALDRIVE0")
+  - name: drive_letter
+    type: TEXT
+    description: Drive letter assigned to the partition (e.g. "C:")
+  - name: id
+    type: TEXT
+    description: Partition id
+  - name: number
+    type: INTEGER
+    description: Partition number (e.g. 1)
+  - name: style
+    type: TEXT
+    description: Partition style (e.g. MBR, GPT, RAW)
+  - name: type
+    type: TEXT
+    description: Partition type (e.g. "System", "Basic", "Recovery")
+  - name: starting_offset
+    type: BIGINT
+    description: Starting offset of the partition in bytes
+  - name: length
+    type: BIGINT
+    description: Length of the partition in bytes
+  - name: attributes_mask
+    type: TEXT
+    description: Raw partition attributes bitmask value, formatted as hexadecimal string (e.g. "0x0000000000000001")
+  - name: attributes
+    type: TEXT
+    description: Human-readable partition attributes (e.g. "RequiredPartition,NoDriveLetter")
+  - name: name
+    type: TEXT
+    description: Partition name (e.g. "Basic data partition")
+
+documentation:
+  description: |
+    Returns all partitions detected on the system
+  examples:
+    - title: List all partitions
+      query: |
+        SELECT * FROM elastic_ntfs_partitions;
+  notes:
+    - "Windows only"
+  related_tables:
+    - elastic_ntfs_volumes

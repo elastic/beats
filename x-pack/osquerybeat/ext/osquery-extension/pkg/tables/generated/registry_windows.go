@@ -13,6 +13,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists"
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/ntfs"
 
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
@@ -27,6 +28,8 @@ import (
 	elasticamcachedriverpackage "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_package"
 	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 	elasticjumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/elastic_jumplists"
+	elasticntfspartitions "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_partitions"
+	elasticntfsvolumes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_volumes"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
@@ -110,6 +113,26 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, 
 		} else {
 			server.RegisterPlugin(table.NewPlugin("elastic_jumplists", elasticjumplists.Columns(), genFunc))
 			log.Infof("Registered table: elastic_jumplists")
+		}
+	}
+	{
+		// Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+		genFunc, err := elasticntfspartitions.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_partitions: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_partitions", elasticntfspartitions.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_partitions")
+		}
+	}
+	{
+		// Windows NTFS $INDEX_ALLOCATION attribute data, parsed for $I30 directories
+		genFunc, err := elasticntfsvolumes.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_volumes: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_volumes", elasticntfsvolumes.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_volumes")
 		}
 	}
 }

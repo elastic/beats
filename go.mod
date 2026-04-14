@@ -271,6 +271,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.42.0
 	go.uber.org/goleak v1.3.0
 	sigs.k8s.io/kind v0.29.0
+	www.velocidex.com/golang/go-ntfs v0.1.1
 	www.velocidex.com/golang/regparser v0.0.0-20250203141505-31e704a67ef7
 )
 
@@ -529,7 +530,6 @@ require (
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
-	www.velocidex.com/golang/go-ntfs v0.1.1 // indirect
 )
 
 require (
