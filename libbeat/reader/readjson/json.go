@@ -18,10 +18,10 @@
 package readjson
 
 import (
-	"bytes"
-	gojson "encoding/json"
 	"fmt"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,11 +31,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+var jsoniterAPI = jsoniter.Config{UseNumber: true}.Froze()
+
 // JSONReader parses JSON inputs
 type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
 	logger *logp.Logger
+	iter   *jsoniter.Iterator // reused across Next calls; not goroutine-safe, one per reader
 }
 
 type JSONParser struct {
@@ -49,6 +52,7 @@ func NewJSONReader(r reader.Reader, cfg *Config, logger *logp.Logger) *JSONReade
 		reader: r,
 		cfg:    cfg,
 		logger: logger.Named("reader_json"),
+		iter:   jsoniter.NewIterator(jsoniterAPI),
 	}
 }
 
@@ -58,26 +62,41 @@ func NewJSONParser(r reader.Reader, cfg *ParserConfig, logger *logp.Logger) *JSO
 			reader: r,
 			cfg:    &cfg.Config,
 			logger: logger.Named("parser_json"),
+			iter:   jsoniter.NewIterator(jsoniterAPI),
 		},
 		cfg.Field,
 		cfg.Target,
 	}
 }
 
-// decodeJSON unmarshals the text parameter into a MapStr and
-// returns the new text column if one was requested.
+// decode unmarshals text into a MapStr and returns the new text column if one
+// was requested. It reuses r.iter across calls to avoid per-line allocations.
 func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
-	var jsonFields map[string]interface{}
-
-	err := unmarshal(text, &jsonFields)
-	if err != nil || jsonFields == nil {
+	if r.iter == nil {
+		r.iter = jsoniter.NewIterator(jsoniterAPI)
+	}
+	r.iter.ResetBytes(text)
+	// Reject non-object input (null, arrays, bare scalars) up front so that the
+	// error path below fires with err==nil, matching the behaviour of the old
+	// stdlib decoder which set jsonFields=nil and err=nil for JSON null input.
+	if r.iter.WhatIsNext() != jsoniter.ObjectValue {
+		if !r.cfg.IgnoreDecodingError {
+			r.logger.Errorf("Error decoding JSON: %v", nil)
+		}
+		if r.cfg.AddErrorKey {
+			return text, mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", nil))}
+		}
+		return text, nil
+	}
+	jsonFields := mapstr.M(iterParseObject(r.iter))
+	if err := r.iter.Error; err != nil {
 		if !r.cfg.IgnoreDecodingError {
 			r.logger.Errorf("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
-			jsonFields = mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
+			return text, mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
-		return text, jsonFields
+		return text, nil
 	}
 
 	if len(r.cfg.MessageKey) == 0 {
@@ -103,17 +122,63 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 	return []byte(textString), jsonFields
 }
 
-// unmarshal is equivalent with json.Unmarshal but it converts numbers
-// to int64 where possible, instead of using always float64.
+// unmarshal parses a JSON object from text, resolving numbers to int64 or
+// float64 at parse time. It creates a one-shot iterator; callers that parse
+// many lines should use a JSONReader which reuses its iterator across calls.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
-	dec := gojson.NewDecoder(bytes.NewReader(text))
-	dec.UseNumber()
-	err := dec.Decode(fields)
-	if err != nil {
-		return err
+	iter := jsoniter.NewIterator(jsoniterAPI)
+	iter.ResetBytes(text)
+	*fields = iterParseObject(iter)
+	return iter.Error
+}
+
+// iterParseObject parses a JSON object from iter, resolving numbers to int64
+// or float64 at parse time. The iterator must be positioned at the start of an
+// object.
+func iterParseObject(iter *jsoniter.Iterator) map[string]interface{} {
+	fields := make(map[string]interface{}, 16)
+	iterParseObjectInto(iter, fields)
+	return fields
+}
+
+func iterParseObjectInto(iter *jsoniter.Iterator, fields map[string]interface{}) {
+	for field := iter.ReadObject(); field != ""; field = iter.ReadObject() {
+		fields[field] = iterParseValue(iter)
 	}
-	jsontransform.TransformNumbers(*fields)
-	return nil
+}
+
+func iterParseValue(iter *jsoniter.Iterator) interface{} {
+	switch iter.WhatIsNext() {
+	case jsoniter.StringValue:
+		return iter.ReadString()
+	case jsoniter.NumberValue:
+		n := iter.ReadNumber()
+		if i, err := n.Int64(); err == nil {
+			return i
+		}
+		if f, err := n.Float64(); err == nil {
+			return f
+		}
+		return n.String()
+	case jsoniter.BoolValue:
+		return iter.ReadBool()
+	case jsoniter.NilValue:
+		iter.ReadNil()
+		return nil
+	case jsoniter.ObjectValue:
+		nested := make(map[string]interface{}, 4)
+		iterParseObjectInto(iter, nested)
+		return nested
+	case jsoniter.ArrayValue:
+		arr := make([]interface{}, 0, 4)
+		for iter.ReadArray() {
+			arr = append(arr, iterParseValue(iter))
+		}
+		return arr
+	default:
+		iter.Skip()
+		return nil
+	}
 }
 
 // Next decodes JSON and returns the filled Line object.
