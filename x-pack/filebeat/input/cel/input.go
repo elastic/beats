@@ -546,6 +546,19 @@ type executionCompletion struct {
 	maxExecutionLimited bool
 }
 
+type executeOnceResult struct {
+	state               map[string]interface{}
+	waitUntil           time.Time
+	cursor              map[string]interface{}
+	goodCursor          map[string]interface{}
+	degraded            bool
+	eventCount          int
+	retry               bool
+	finishRun           bool
+	markRunSpanOK       bool
+	maxExecutionLimited bool
+}
+
 func processEvaluationResponse(
 	state map[string]interface{},
 	limiter *rate.Limiter,
@@ -691,6 +704,254 @@ func completeExecution(
 	}
 
 	return executionCompletion{}
+}
+
+func (i input) executeOnce(
+	runCtx context.Context,
+	env v2.Context,
+	cfg config,
+	trace *httplog.LoggingRoundTripper,
+	contextInjector *otel.ContextInjector,
+	prg cel.Program,
+	ast *cel.Ast,
+	state map[string]interface{},
+	budget int,
+	wantDump bool,
+	metricsRecorder *metricsRecorder,
+	otelTracer trace.Tracer,
+	runSpan trace.Span,
+	log *logp.Logger,
+	pub inputcursor.Publisher,
+	health status.StatusReporter,
+	limiter *rate.Limiter,
+	goodURL string,
+	cursor map[string]interface{},
+	goodCursor map[string]interface{},
+	isDegraded bool,
+	executionNumber int,
+) (executeOnceResult, error) {
+	result := executeOnceResult{
+		state:      state,
+		cursor:     cursor,
+		goodCursor: goodCursor,
+		degraded:   isDegraded,
+	}
+
+	execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
+	execSpan.SetAttributes(
+		attribute.Int("cel.program.execution_number", executionNumber),
+		attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
+	)
+	execLog := logWithTracingIds(log, execSpan)
+
+	// Process a set of event requests.
+	if trace != nil {
+		execLog.Debugw("previous transaction", "transaction.id", trace.TxID())
+	}
+	execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: result.state, cfg: cfg.Redact})
+	metricsRecorder.AddProgramExecution(execCtx)
+	start := time.Time{}
+	var err error
+	result.state, start, result.degraded, err = i.executeEvaluation(
+		execCtx,
+		env,
+		cfg,
+		contextInjector,
+		prg,
+		ast,
+		result.state,
+		budget,
+		wantDump,
+		metricsRecorder,
+		execLog,
+		execSpan,
+		runSpan,
+		health,
+	)
+	if err != nil {
+		return result, err
+	}
+	if trace != nil {
+		execLog.Debugw("final transaction", "transaction.id", trace.TxID())
+	}
+
+	// On exit, state is expected to be in the shape:
+	//
+	// {
+	//     "cursor": [
+	//         {...},
+	//         ...
+	//     ],
+	//     "events": [
+	//         {...},
+	//         ...
+	//     ],
+	//     "url": <resource address>,
+	//     "status_code": <HTTP request status code if a network request>,
+	//     "header": <HTTP response headers if a network request>,
+	//     "rate_limit": <HTTP rate limit map if required by API>,
+	//     "want_more": bool
+	// }
+	//
+	// The "events" array must be present, but may be empty or null.
+	// In the case of an error condition in the CEL program it is
+	// acceptable to return a single object which will be wrapped as
+	// an array below. It is the responsibility of the downstream
+	// processor to handle this object correctly (which may be to drop
+	// the event). The error event will also be logged.
+	// If it is not empty, it must only have objects as elements.
+	// Additional fields may be present at the root of the object.
+	// The evaluation is repeated with the new state, after removing
+	// the events field, if the "want_more" field is present and true
+	// and a non-zero events array is returned.
+	//
+	// If cursor is present it must be either a single object or an
+	// array with the same length as events; each element i of the
+	// cursor array will be the details for obtaining the events at or
+	// beyond event i in events. If the cursor is a single object it
+	// is will be the details for obtaining events after the last
+	// event in the events array and will only be retained on
+	// successful publication of all the events in the array.
+	//
+	// If rate_limit is present it should be a map with numeric fields
+	// rate and burst. It may also have a string error field and
+	// other fields which will be logged. If it has an error field
+	// the rate and burst will not be used to set rate limit behaviour.
+	//
+	// The status code and rate_limit values may be omitted if they do
+	// not contribute to control.
+	//
+	// The following details how a cursor array works:
+	//
+	// Result after request resulting in 5 events. Each c obtained with
+	// an e points to the ~next e.
+	//
+	//    +----+   +----+        +----+
+	//    | e1 |   | c1 |        | e1 |
+	//    +----+   +----+        +----+   +----+
+	//    | e2 |   | c2 |        | e2 | < | c1 |
+	//    +----+   +----+        +----+   +----+
+	//    | e3 |   | c3 |        | e3 | < | c2 |
+	//    +----+   +----+   =>   +----+   +----+
+	//    | e4 |   | c4 |        | e4 | < | c3 |
+	//    +----+   +----+        +----+   +----+
+	//    | e5 |   | c5 |        | e5 | < | c4 |
+	//    +----+   +----+        +----+   +----+
+	//                           |next| < | c5 |
+	//                           +----+   +----+
+	//
+	// After a successful publication this will leave a single c and
+	// and empty events array. So the next evaluation has a boot.
+	//
+	// If the publication fails or execution is terminated at some
+	// point during the events array, we may end up with, e.g.
+	//
+	//    +----+  +----+        +----+   +----+
+	//    | e3 |  | c3 |        |next| < | c3 |
+	//    +----+  +----+        +----+   +----+
+	//    | e4 |  | c4 |   =>
+	//    +----+  +----+          lost events
+	//    | e5 |  | c5 |
+	//    +----+  +----+
+	//
+	// At this point, the c3 cursor (or at worst the c2 cursor) has
+	// been stored and we can continue from that point, recovering
+	// the lost events and potentially re-requesting e3.
+	response, err := processEvaluationResponse(
+		result.state,
+		limiter,
+		goodURL,
+		health,
+		metricsRecorder,
+		start,
+		execLog,
+		execCtx,
+		execSpan,
+		runSpan,
+		result.degraded,
+	)
+	if err != nil {
+		return result, err
+	}
+	result.waitUntil = response.waitUntil
+	result.degraded = response.degraded
+	if response.shouldRetry {
+		result.retry = true
+		return result, nil
+	}
+	if response.done {
+		result.finishRun = true
+		return result, nil
+	}
+	events := response.events
+
+	result.eventCount = len(events)
+	prepared := preparePublishState(
+		result.state,
+		events,
+		execLog,
+		health,
+		metricsRecorder,
+		execCtx,
+		execSpan,
+		result.degraded,
+	)
+	result.degraded = prepared.degraded
+
+	publishResult, err := publishEvents(
+		execCtx,
+		otelTracer,
+		log,
+		pub,
+		health,
+		metricsRecorder,
+		start,
+		events,
+		prepared.cursors,
+		prepared.singleCursor,
+		result.cursor,
+		result.goodCursor,
+		result.degraded,
+		execSpan,
+		runSpan,
+	)
+	if err != nil {
+		return result, err
+	}
+	result.cursor = publishResult.cursor
+	result.goodCursor = publishResult.goodCursor
+	result.degraded = publishResult.degraded
+
+	// Check we have a remaining execution budget.
+	budget--
+	completion := completeExecution(
+		result.state,
+		result.goodCursor,
+		start,
+		cfg.Interval,
+		budget,
+		*cfg.MaxExecutions,
+		health,
+		metricsRecorder,
+		execCtx,
+		execLog,
+		execSpan,
+	)
+	if completion.maxExecutionLimited {
+		execSpan.End()
+		result.finishRun = true
+		result.maxExecutionLimited = true
+		return result, nil
+	}
+	if completion.done {
+		okSpans(end{execSpan})
+		result.finishRun = true
+		result.markRunSpanOK = true
+		return result, nil
+	}
+
+	okSpans(end{execSpan})
+	return result, nil
 }
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
@@ -890,24 +1151,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			runSpanExecutionCount++
-			execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
-			execSpan.SetAttributes(
-				attribute.Int("cel.program.execution_number", runSpanExecutionCount),
-				attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
-			)
-			execLog := logWithTracingIds(log, execSpan)
-
-			// Process a set of event requests.
-			if trace != nil {
-				execLog.Debugw("previous transaction", "transaction.id", trace.TxID())
-			}
-			execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
-			metricsRecorder.AddProgramExecution(execCtx)
-			start := time.Time{}
-			state, start, isDegraded, err = i.executeEvaluation(
-				execCtx,
+			result, err := i.executeOnce(
+				runCtx,
 				env,
 				cfg,
+				trace,
 				contextInjector,
 				prg,
 				ast,
@@ -915,192 +1163,41 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				budget,
 				wantDump,
 				metricsRecorder,
-				execLog,
-				execSpan,
-				runSpan,
-				health,
-			)
-			if err != nil {
-				return err
-			}
-			if trace != nil {
-				execLog.Debugw("final transaction", "transaction.id", trace.TxID())
-			}
-
-			// On exit, state is expected to be in the shape:
-			//
-			// {
-			//     "cursor": [
-			//         {...},
-			//         ...
-			//     ],
-			//     "events": [
-			//         {...},
-			//         ...
-			//     ],
-			//     "url": <resource address>,
-			//     "status_code": <HTTP request status code if a network request>,
-			//     "header": <HTTP response headers if a network request>,
-			//     "rate_limit": <HTTP rate limit map if required by API>,
-			//     "want_more": bool
-			// }
-			//
-			// The "events" array must be present, but may be empty or null.
-			// In the case of an error condition in the CEL program it is
-			// acceptable to return a single object which will be wrapped as
-			// an array below. It is the responsibility of the downstream
-			// processor to handle this object correctly (which may be to drop
-			// the event). The error event will also be logged.
-			// If it is not empty, it must only have objects as elements.
-			// Additional fields may be present at the root of the object.
-			// The evaluation is repeated with the new state, after removing
-			// the events field, if the "want_more" field is present and true
-			// and a non-zero events array is returned.
-			//
-			// If cursor is present it must be either a single object or an
-			// array with the same length as events; each element i of the
-			// cursor array will be the details for obtaining the events at or
-			// beyond event i in events. If the cursor is a single object it
-			// is will be the details for obtaining events after the last
-			// event in the events array and will only be retained on
-			// successful publication of all the events in the array.
-			//
-			// If rate_limit is present it should be a map with numeric fields
-			// rate and burst. It may also have a string error field and
-			// other fields which will be logged. If it has an error field
-			// the rate and burst will not be used to set rate limit behaviour.
-			//
-			// The status code and rate_limit values may be omitted if they do
-			// not contribute to control.
-			//
-			// The following details how a cursor array works:
-			//
-			// Result after request resulting in 5 events. Each c obtained with
-			// an e points to the ~next e.
-			//
-			//    +----+   +----+        +----+
-			//    | e1 |   | c1 |        | e1 |
-			//    +----+   +----+        +----+   +----+
-			//    | e2 |   | c2 |        | e2 | < | c1 |
-			//    +----+   +----+        +----+   +----+
-			//    | e3 |   | c3 |        | e3 | < | c2 |
-			//    +----+   +----+   =>   +----+   +----+
-			//    | e4 |   | c4 |        | e4 | < | c3 |
-			//    +----+   +----+        +----+   +----+
-			//    | e5 |   | c5 |        | e5 | < | c4 |
-			//    +----+   +----+        +----+   +----+
-			//                           |next| < | c5 |
-			//                           +----+   +----+
-			//
-			// After a successful publication this will leave a single c and
-			// and empty events array. So the next evaluation has a boot.
-			//
-			// If the publication fails or execution is terminated at some
-			// point during the events array, we may end up with, e.g.
-			//
-			//    +----+  +----+        +----+   +----+
-			//    | e3 |  | c3 |        |next| < | c3 |
-			//    +----+  +----+        +----+   +----+
-			//    | e4 |  | c4 |   =>
-			//    +----+  +----+          lost events
-			//    | e5 |  | c5 |
-			//    +----+  +----+
-			//
-			// At this point, the c3 cursor (or at worst the c2 cursor) has
-			// been stored and we can continue from that point, recovering
-			// the lost events and potentially re-requesting e3.
-
-			response, err := processEvaluationResponse(
-				state,
-				limiter,
-				goodURL,
-				health,
-				metricsRecorder,
-				start,
-				execLog,
-				execCtx,
-				execSpan,
-				runSpan,
-				isDegraded,
-			)
-			if err != nil {
-				return err
-			}
-			waitUntil = response.waitUntil
-			isDegraded = response.degraded
-			if response.shouldRetry {
-				continue
-			}
-			if response.done {
-				return nil
-			}
-			events := response.events
-
-			runSpanEventCount += len(events)
-			prepared := preparePublishState(
-				state,
-				events,
-				execLog,
-				health,
-				metricsRecorder,
-				execCtx,
-				execSpan,
-				isDegraded,
-			)
-			cursors := prepared.cursors
-			singleCursor := prepared.singleCursor
-			isDegraded = prepared.degraded
-
-			publishResult, err := publishEvents(
-				execCtx,
 				otelTracer,
+				runSpan,
 				log,
 				pub,
 				health,
-				metricsRecorder,
-				start,
-				events,
-				cursors,
-				singleCursor,
+				limiter,
+				goodURL,
 				cursor,
 				goodCursor,
 				isDegraded,
-				execSpan,
-				runSpan,
+				runSpanExecutionCount,
 			)
 			if err != nil {
 				return err
 			}
-			cursor = publishResult.cursor
-			goodCursor = publishResult.goodCursor
-			isDegraded = publishResult.degraded
-
-			// Check we have a remaining execution budget.
-			budget--
-			completion := completeExecution(
-				state,
-				goodCursor,
-				start,
-				cfg.Interval,
-				budget,
-				*cfg.MaxExecutions,
-				health,
-				metricsRecorder,
-				execCtx,
-				execLog,
-				execSpan,
-			)
-			if completion.maxExecutionLimited {
-				execSpan.End()
+			state = result.state
+			waitUntil = result.waitUntil
+			cursor = result.cursor
+			goodCursor = result.goodCursor
+			isDegraded = result.degraded
+			runSpanEventCount += result.eventCount
+			if result.retry {
+				continue
+			}
+			if result.maxExecutionLimited {
 				runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
 				runSpan.SetStatus(codes.Unset, "reached maximum number of CEL executions")
 				return nil
 			}
-			if completion.done {
-				okSpans(end{execSpan}, runSpan)
+			if result.finishRun {
+				if result.markRunSpanOK {
+					okSpans(runSpan)
+				}
 				return nil
 			}
-			okSpans(end{execSpan})
 		}
 	})
 	switch {
