@@ -1147,21 +1147,10 @@ func (i input) run(env v2.Context, src *source, currentCursor map[string]interfa
 		}
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
-				waitCtx, waitSpan := otelTracer.Start(runCtx, "cel.periodic.run.ratelimitwait")
-				// We have a special-case wait for when we have a zero limit.
-				// x/time/rate allow a burst through even when the limit is zero
-				// so in order to ensure that we don't try until we are out of
-				// purgatory we calculate how long we should wait according to
-				// the retry after for a 429 and rate limit headers if we have
-				// a zero rate quota. See handleResponse below.
-				select {
-				case <-waitCtx.Done():
-					runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
-					waitSpan.End()
-					return waitCtx.Err()
-				case <-time.After(wait):
+				err = waitForRateLimit(runCtx, runSpan, otelTracer, wait)
+				if err != nil {
+					return err
 				}
-				waitSpan.End()
 			} else if err = runCtx.Err(); err != nil {
 				// Otherwise exit if we have been cancelled.
 				runSpan.SetStatus(codes.Unset, runCtx.Err().Error())
@@ -1256,6 +1245,25 @@ func okSpans(spans ...trace.Span) {
 		if e, ok := sp.(end); ok {
 			e.End()
 		}
+	}
+}
+
+func waitForRateLimit(runCtx context.Context, runSpan trace.Span, otelTracer trace.Tracer, wait time.Duration) error {
+	waitCtx, waitSpan := otelTracer.Start(runCtx, "cel.periodic.run.ratelimitwait")
+	defer waitSpan.End()
+
+	// We have a special-case wait for when we have a zero limit.
+	// x/time/rate allow a burst through even when the limit is zero
+	// so in order to ensure that we don't try until we are out of
+	// purgatory we calculate how long we should wait according to
+	// the retry after for a 429 and rate limit headers if we have
+	// a zero rate quota. See handleResponse below.
+	select {
+	case <-waitCtx.Done():
+		runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
+		return waitCtx.Err()
+	case <-time.After(wait):
+		return nil
 	}
 }
 
