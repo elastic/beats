@@ -570,11 +570,8 @@ func processEvaluationResponse(
 	execCtx context.Context,
 	execSpan trace.Span,
 	runSpan trace.Span,
-	degraded bool,
 ) (evaluationResponse, error) {
-	result := evaluationResponse{
-		degraded: degraded,
-	}
+	result := evaluationResponse{}
 
 	waitUntil, shouldRetry, err := handleResponse(execLog, state, limiter)
 	result.waitUntil = waitUntil
@@ -834,13 +831,14 @@ func (i input) executeOnce(
 		execCtx,
 		execSpan,
 		runSpan,
-		runState.degraded,
 	)
 	if err != nil {
 		return outcome, err
 	}
 	runState.waitUntil = response.waitUntil
-	runState.degraded = response.degraded
+	if response.degraded {
+		runState.degraded = true
+	}
 	if response.shouldRetry {
 		outcome = executeOnceOutcome{kind: executeOnceRetry}
 		return outcome, nil
