@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add paths filter to golangci-lint workflow so it only runs when Go-related files change, reducing unnecessary CI executions.
+component: beats
