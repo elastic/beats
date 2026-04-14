@@ -22,27 +22,54 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
-	// Collect all fields upfront to create a single logger clone instead of
-	// one per conditional .With() call. Each .With() clones the entire zap
-	// core (including buffer pool allocation), so at high file counts this
-	// reduces memory pressure significantly.
-	fields := make([]any, 0, 10)
-	fields = append(fields, "operation", event.Op.String(), "source_name", src.Name())
-	if event.Descriptor.Fingerprint != "" {
-		fields = append(fields, "fingerprint", event.Descriptor.Fingerprint)
+type lazyLog struct {
+	log      *logp.Logger
+	event    loginp.FSEvent
+	enriched bool
+}
+
+func (l *lazyLog) Debugf(format string, args ...interface{}) {
+	if l.log.IsDebug() {
+		l.enrich().Debugf(format, args...)
 	}
-	if event.Descriptor.Info != nil {
-		osID := event.Descriptor.Info.GetOSState().Identifier()
-		if osID != "" {
-			fields = append(fields, "os_id", osID)
+}
+
+func (l *lazyLog) Warnf(format string, args ...interface{}) {
+	l.enrich().Warnf(format, args...)
+}
+
+func (l *lazyLog) Errorf(format string, args ...any) {
+	l.enrich().Errorf(format, args...)
+}
+
+func (l *lazyLog) enrich() *logp.Logger {
+	if !l.enriched {
+		l.enriched = true
+		fields := make([]any, 0, 12)
+		fields = append(fields, "operation", l.event.Op.String(), "source_file", l.event.SrcID)
+
+		if l.event.Descriptor.Fingerprint != "" {
+			fields = append(fields, "fingerprint", l.event.Descriptor.Fingerprint)
 		}
+		if l.event.Descriptor.Info != nil {
+			if osID := l.event.Descriptor.Info.GetOSState().Identifier(); osID != "" {
+				fields = append(fields, "os_id", osID)
+			}
+		}
+		if l.event.NewPath != "" {
+			fields = append(fields, "new_path", l.event.NewPath)
+		}
+		if l.event.OldPath != "" {
+			fields = append(fields, "old_path", l.event.OldPath)
+		}
+		l.log = l.log.With(fields...)
 	}
-	if event.NewPath != "" {
-		fields = append(fields, "new_path", event.NewPath)
+	return l.log
+}
+
+func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) lazyLog {
+	return lazyLog{
+		log:   logger,
+		event: event,
 	}
-	if event.OldPath != "" {
-		fields = append(fields, "old_path", event.OldPath)
-	}
-	return logger.With(fields...)
 }
