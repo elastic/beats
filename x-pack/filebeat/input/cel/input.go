@@ -1224,27 +1224,16 @@ func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
 	)
 }
 
-// end is a tag type indicating spans in errorSpans and okSpans should be ended.
-type end struct {
-	trace.Span
-}
-
 func errorSpans(err error, spans ...trace.Span) {
 	for _, sp := range spans {
 		sp.RecordError(err)
 		sp.SetStatus(codes.Error, err.Error())
-		if e, ok := sp.(end); ok {
-			e.End()
-		}
 	}
 }
 
 func okSpans(spans ...trace.Span) {
 	for _, sp := range spans {
 		sp.SetStatus(codes.Ok, "")
-		if e, ok := sp.(end); ok {
-			e.End()
-		}
 	}
 }
 
