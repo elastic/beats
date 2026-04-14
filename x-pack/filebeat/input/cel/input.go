@@ -154,28 +154,28 @@ type namedStatusReporter struct {
 }
 
 type publishCursors struct {
-	cursors      []interface{}
-	singleCursor bool
-	degraded     bool
+	cursors         []interface{}
+	hasSingleCursor bool
+	degraded        bool
 }
 
 type publishCursorState struct {
-	pubCursor  interface{}
-	cursor     map[string]interface{}
-	goodCursor map[string]interface{}
+	pubCursor     interface{}
+	currentCursor map[string]interface{}
+	safeCursor    map[string]interface{}
 }
 
 type publishLoopState struct {
-	cursor              map[string]interface{}
-	goodCursor          map[string]interface{}
+	currentCursor       map[string]interface{}
+	safeCursor          map[string]interface{}
 	degraded            bool
 	hadPublicationError bool
 }
 
 type publishResult struct {
-	cursor     map[string]interface{}
-	goodCursor map[string]interface{}
-	degraded   bool
+	currentCursor map[string]interface{}
+	safeCursor    map[string]interface{}
+	degraded      bool
 }
 
 func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
@@ -221,42 +221,42 @@ func getPublishCursors(state map[string]interface{}, events []interface{}, log *
 	}
 
 	result.cursors = []interface{}{c}
-	result.singleCursor = true
+	result.hasSingleCursor = true
 	return result
 }
 
-func getPublishCursorForEvent(index int, eventCount int, cursors []interface{}, singleCursor bool, cursor map[string]interface{}, goodCursor map[string]interface{}) (publishCursorState, error) {
+func getPublishCursorForEvent(index int, eventCount int, cursors []interface{}, hasSingleCursor bool, currentCursor map[string]interface{}, safeCursor map[string]interface{}) (publishCursorState, error) {
 	result := publishCursorState{
-		cursor:     cursor,
-		goodCursor: goodCursor,
+		currentCursor: currentCursor,
+		safeCursor:    safeCursor,
 	}
 	if cursors == nil {
 		return result, nil
 	}
 
-	if singleCursor {
+	if hasSingleCursor {
 		// Only set the cursor for publication at the last event
 		// when a single cursor object has been provided.
 		if index != eventCount-1 {
 			return result, nil
 		}
 
-		result.goodCursor = cursor
+		result.safeCursor = currentCursor
 		nextCursor, ok := cursors[0].(map[string]interface{})
 		if !ok {
 			return result, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 		}
-		result.cursor = nextCursor
+		result.currentCursor = nextCursor
 		result.pubCursor = nextCursor
 		return result, nil
 	}
 
-	result.goodCursor = cursor
+	result.safeCursor = currentCursor
 	nextCursor, ok := cursors[index].(map[string]interface{})
 	if !ok {
 		return result, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[index])
 	}
-	result.cursor = nextCursor
+	result.currentCursor = nextCursor
 	result.pubCursor = nextCursor
 	return result, nil
 }
@@ -331,9 +331,9 @@ func handleSingleEventObject(event map[string]interface{}, log *logp.Logger, hea
 func publishEventLoop(
 	events []interface{},
 	cursors []interface{},
-	singleCursor bool,
-	cursor map[string]interface{},
-	goodCursor map[string]interface{},
+	hasSingleCursor bool,
+	currentCursor map[string]interface{},
+	safeCursor map[string]interface{},
 	degraded bool,
 	pub inputcursor.Publisher,
 	pubCtx context.Context,
@@ -346,9 +346,9 @@ func publishEventLoop(
 	start time.Time,
 ) (publishLoopState, error) {
 	state := publishLoopState{
-		cursor:     cursor,
-		goodCursor: goodCursor,
-		degraded:   degraded,
+		currentCursor: currentCursor,
+		safeCursor:    safeCursor,
+		degraded:      degraded,
 	}
 	eventCount := 0
 
@@ -360,8 +360,8 @@ func publishEventLoop(
 			return state, err
 		}
 
-		cursorState, err := getPublishCursorForEvent(i, len(events), cursors, singleCursor, state.cursor, state.goodCursor)
-		state.goodCursor = cursorState.goodCursor
+		cursorState, err := getPublishCursorForEvent(i, len(events), cursors, hasSingleCursor, state.currentCursor, state.safeCursor)
+		state.safeCursor = cursorState.safeCursor
 		if err != nil {
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
 			errorSpans(err, end{pubSpan}, execSpan, runSpan)
@@ -369,7 +369,7 @@ func publishEventLoop(
 		}
 
 		pubCursor := cursorState.pubCursor
-		state.cursor = cursorState.cursor
+		state.currentCursor = cursorState.currentCursor
 
 		// This is checked prior to the publish attempt since the
 		// cursor.Publisher interface does not document the behaviour
@@ -392,11 +392,11 @@ func publishEventLoop(
 			handlePublishError(err, pubLog, health)
 			errorSpans(err, pubSpan)
 			state.degraded = true
-			cursors = nil // We are lost, so retry with this event's cursor,
+			cursors = nil // We are lost, so retry with this event's current cursor,
 			continue      // but continue with the events that we have without
 			// advancing the cursor. This allows us to potentially publish the
-			// events we have now, with a fallback to the last guaranteed
-			// correctly published cursor.
+			// events we have now, with a fallback to the last safe
+			// cursor.
 		}
 
 		eventCount = recordPublishedEvent(metricsRecorder, pubCtx, pubSpan, i+1, eventCount)
@@ -419,17 +419,17 @@ func publishEvents(
 	start time.Time,
 	events []interface{},
 	cursors []interface{},
-	singleCursor bool,
-	cursor map[string]interface{},
-	goodCursor map[string]interface{},
+	hasSingleCursor bool,
+	currentCursor map[string]interface{},
+	safeCursor map[string]interface{},
 	degraded bool,
 	execSpan trace.Span,
 	runSpan trace.Span,
 ) (publishResult, error) {
 	result := publishResult{
-		cursor:     cursor,
-		goodCursor: goodCursor,
-		degraded:   degraded,
+		currentCursor: currentCursor,
+		safeCursor:    safeCursor,
+		degraded:      degraded,
 	}
 
 	pubStart := time.Now()
@@ -440,9 +440,9 @@ func publishEvents(
 	publishState, err := publishEventLoop(
 		events,
 		cursors,
-		singleCursor,
-		cursor,
-		goodCursor,
+		hasSingleCursor,
+		currentCursor,
+		safeCursor,
 		degraded,
 		pub,
 		pubCtx,
@@ -458,8 +458,8 @@ func publishEvents(
 		return result, err
 	}
 
-	result.cursor = publishState.cursor
-	result.goodCursor = publishState.goodCursor
+	result.currentCursor = publishState.currentCursor
+	result.safeCursor = publishState.safeCursor
 	result.degraded = publishState.degraded
 
 	if !result.degraded {
@@ -470,7 +470,7 @@ func publishEvents(
 	// Advance the cursor to the final state if there was no error during
 	// publications. This is needed to transition to the next set of events.
 	if !publishState.hadPublicationError && !result.degraded {
-		result.goodCursor = result.cursor
+		result.safeCursor = result.currentCursor
 		metricsRecorder.AddProgramSuccessExecution(pubCtx)
 		okSpans(pubSpan)
 	}
@@ -536,9 +536,9 @@ type evaluationResponse struct {
 }
 
 type publishPreparation struct {
-	cursors      []interface{}
-	singleCursor bool
-	degraded     bool
+	cursors         []interface{}
+	hasSingleCursor bool
+	degraded        bool
 }
 
 type executionCompletion struct {
@@ -561,13 +561,13 @@ type executeOnceOutcome struct {
 }
 
 type executeOnceResult struct {
-	state      map[string]interface{}
-	waitUntil  time.Time
-	cursor     map[string]interface{}
-	goodCursor map[string]interface{}
-	degraded   bool
-	eventCount int
-	outcome    executeOnceOutcome
+	state         map[string]interface{}
+	waitUntil     time.Time
+	currentCursor map[string]interface{}
+	safeCursor    map[string]interface{}
+	degraded      bool
+	eventCount    int
+	outcome       executeOnceOutcome
 }
 
 func processEvaluationResponse(
@@ -671,15 +671,15 @@ func preparePublishState(
 	delete(state, "cursor")
 
 	return publishPreparation{
-		cursors:      cursorState.cursors,
-		singleCursor: cursorState.singleCursor,
-		degraded:     cursorState.degraded,
+		cursors:         cursorState.cursors,
+		hasSingleCursor: cursorState.hasSingleCursor,
+		degraded:        cursorState.degraded,
 	}
 }
 
 func completeExecution(
 	state map[string]interface{},
-	goodCursor map[string]interface{},
+	safeCursor map[string]interface{},
 	start time.Time,
 	interval time.Duration,
 	remainingBudget int,
@@ -690,8 +690,8 @@ func completeExecution(
 	execLog *logp.Logger,
 	execSpan trace.Span,
 ) executionCompletion {
-	// Replace the last known good cursor.
-	state["cursor"] = goodCursor
+	// Replace the last safe cursor.
+	state["cursor"] = safeCursor
 	metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 	if more, _ := state["want_more"].(bool); !more {
 		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
@@ -736,16 +736,16 @@ func (i input) executeOnce(
 	health status.StatusReporter,
 	limiter *rate.Limiter,
 	goodURL string,
-	cursor map[string]interface{},
-	goodCursor map[string]interface{},
+	currentCursor map[string]interface{},
+	safeCursor map[string]interface{},
 	isDegraded bool,
 	executionNumber int,
 ) (executeOnceResult, error) {
 	result := executeOnceResult{
-		state:      state,
-		cursor:     cursor,
-		goodCursor: goodCursor,
-		degraded:   isDegraded,
+		state:         state,
+		currentCursor: currentCursor,
+		safeCursor:    safeCursor,
+		degraded:      isDegraded,
 		outcome: executeOnceOutcome{
 			kind: executeOnceContinue,
 		},
@@ -923,9 +923,9 @@ func (i input) executeOnce(
 		start,
 		events,
 		prepared.cursors,
-		prepared.singleCursor,
-		result.cursor,
-		result.goodCursor,
+		prepared.hasSingleCursor,
+		result.currentCursor,
+		result.safeCursor,
 		result.degraded,
 		execSpan,
 		runSpan,
@@ -933,15 +933,15 @@ func (i input) executeOnce(
 	if err != nil {
 		return result, err
 	}
-	result.cursor = publishResult.cursor
-	result.goodCursor = publishResult.goodCursor
+	result.currentCursor = publishResult.currentCursor
+	result.safeCursor = publishResult.safeCursor
 	result.degraded = publishResult.degraded
 
 	// Check we have a remaining execution budget.
 	budget--
 	completion := completeExecution(
 		result.state,
-		result.goodCursor,
+		result.safeCursor,
 		start,
 		cfg.Interval,
 		budget,
@@ -972,7 +972,7 @@ func (i input) executeOnce(
 	return result, nil
 }
 
-func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
+func (i input) run(env v2.Context, src *source, currentCursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
@@ -1070,10 +1070,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	if !slices.Contains(cfg.Redact.Fields, "secret") {
 		cfg.Redact.Fields = append(cfg.Redact.Fields, "secret")
 	}
-	if cursor != nil {
-		state["cursor"] = cursor
+	if currentCursor != nil {
+		state["cursor"] = currentCursor
 	}
-	goodCursor := cursor
+	safeCursor := currentCursor
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metricsRecorder.SetResourceURL(goodURL)
@@ -1188,8 +1188,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				health,
 				limiter,
 				goodURL,
-				cursor,
-				goodCursor,
+				currentCursor,
+				safeCursor,
 				isDegraded,
 				runSpanExecutionCount,
 			)
@@ -1198,8 +1198,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 			state = result.state
 			waitUntil = result.waitUntil
-			cursor = result.cursor
-			goodCursor = result.goodCursor
+			currentCursor = result.currentCursor
+			safeCursor = result.safeCursor
 			isDegraded = result.degraded
 			runSpanEventCount += result.eventCount
 			switch result.outcome.kind {
