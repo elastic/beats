@@ -221,7 +221,7 @@ func NewForReceiver(
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, settings.Paths, monitors, p.observer, queueFactory)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory)
 	if err != nil {
 		return nil, err
 	}

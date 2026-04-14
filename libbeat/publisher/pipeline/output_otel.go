@@ -26,10 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type otelOutputController struct {
@@ -50,7 +48,6 @@ type otelOutputController struct {
 
 func newOTelOutputController(
 	beatInfo beat.Info,
-	paths *paths.Path,
 	monitors Monitors,
 	retryObserver retryObserver,
 	queueFactory queue.QueueFactory[publisher.Event],
@@ -71,7 +68,7 @@ func newOTelOutputController(
 
 	// Initialize output group
 	out, err := loadOutput(monitors, func(outStats outputs.Observer) (string, outputs.Group, error) {
-		out, err := otelconsumer.MakeOtelConsumer(beatInfo, outStats, config.NewConfig(), paths)
+		out, err := otelconsumer.MakeOtelConsumer(beatInfo, outStats)
 		return "otelconsumer", out, err
 	})
 	if err != nil {

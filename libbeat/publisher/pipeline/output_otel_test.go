@@ -39,7 +39,6 @@ func TestOTelQueueMetrics(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	controller, err := newOTelOutputController(
 		beat.Info{Logger: logger},
-		nil,
 		Monitors{
 			Logger:  logger,
 			Metrics: reg,
