@@ -301,7 +301,7 @@ func checkPublishResultContext(ctx context.Context, metricsRecorder *metricsReco
 	}
 
 	metricsRecorder.AddProgramRunDuration(ctx, time.Since(start))
-	errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+	errorSpans(err, end{pubSpan}, execSpan, runSpan)
 	return err
 }
 
@@ -356,7 +356,7 @@ func publishEventLoop(
 		event, ok := e.(map[string]interface{})
 		if !ok {
 			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-			errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+			errorSpans(err, end{pubSpan}, execSpan, runSpan)
 			return state, err
 		}
 
@@ -364,7 +364,7 @@ func publishEventLoop(
 		state.goodCursor = cursorState.goodCursor
 		if err != nil {
 			metricsRecorder.AddProgramRunDuration(pubCtx, time.Since(start))
-			errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
+			errorSpans(err, end{pubSpan}, execSpan, runSpan)
 			return state, err
 		}
 
@@ -505,7 +505,7 @@ func (i input) executeEvaluation(
 		switch {
 		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-			errorSpans(err, runSpan, end{execSpan})
+			errorSpans(err, runSpan, execSpan)
 			return state, start, false, err
 		case errors.As(err, &dump):
 			path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
@@ -581,10 +581,10 @@ func processEvaluationResponse(
 	if err != nil || shouldRetry {
 		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 		if err != nil {
-			errorSpans(err, end{execSpan}, runSpan)
+			errorSpans(err, execSpan, runSpan)
 			return result, err
 		}
-		errorSpans(errors.New("invalid response"), end{execSpan})
+		errorSpans(errors.New("invalid response"), execSpan)
 		result.shouldRetry = true
 		return result, nil
 	}
@@ -599,7 +599,7 @@ func processEvaluationResponse(
 	if !ok {
 		err := errors.New("unexpected missing events array from evaluation")
 		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-		errorSpans(err, end{execSpan}, runSpan)
+		errorSpans(err, execSpan, runSpan)
 		return result, err
 	}
 
@@ -608,7 +608,7 @@ func processEvaluationResponse(
 		if len(e) == 0 {
 			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 			metricsRecorder.AddProgramSuccessExecution(execCtx)
-			okSpans(end{execSpan})
+			okSpans(execSpan)
 			result.done = true
 			return result, nil
 		}
@@ -617,7 +617,7 @@ func processEvaluationResponse(
 		if e == nil {
 			metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
 			metricsRecorder.AddProgramSuccessExecution(execCtx)
-			okSpans(end{execSpan})
+			okSpans(execSpan)
 			result.done = true
 			return result, nil
 		}
@@ -629,7 +629,7 @@ func processEvaluationResponse(
 	default:
 		err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 		metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-		errorSpans(err, end{execSpan}, runSpan)
+		errorSpans(err, execSpan, runSpan)
 		return result, err
 	}
 
@@ -738,6 +738,7 @@ func (i input) executeOnce(
 	}
 
 	execCtx, execSpan := otelTracer.Start(runCtx, "cel.program.execution")
+	defer execSpan.End()
 	execSpan.SetAttributes(
 		attribute.Int("cel.program.execution_number", executionNumber),
 		attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
@@ -938,19 +939,18 @@ func (i input) executeOnce(
 		execSpan,
 	)
 	if completion.maxExecutionLimited {
-		execSpan.End()
 		result.finishRun = true
 		result.maxExecutionLimited = true
 		return result, nil
 	}
 	if completion.done {
-		okSpans(end{execSpan})
+		okSpans(execSpan)
 		result.finishRun = true
 		result.markRunSpanOK = true
 		return result, nil
 	}
 
-	okSpans(end{execSpan})
+	okSpans(execSpan)
 	return result, nil
 }
 
