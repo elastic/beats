@@ -96,7 +96,7 @@ func TestRenameRun(t *testing.T) {
 				"a": 2,
 				"b": "q",
 				"error": mapstr.M{
-					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
+					"message": "failed to rename fields in processor: target field b already exists, drop or rename this field first",
 				},
 			},
 			error:         true,
@@ -195,7 +195,7 @@ func TestRenameRun(t *testing.T) {
 				"a": 9,
 				"c": 10,
 				"error": mapstr.M{
-					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
+					"message": "failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
 				},
 			},
 			error:         true,
