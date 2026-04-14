@@ -13,9 +13,13 @@ jobs:
     uses: elastic/docs-builder/.github/workflows/preview-build.yml@main
     with:
       enable-vale-linting: true
+<<<<<<< HEAD
       path-pattern: docs/**
     permissions:
       deployments: write
       id-token: write
       contents: read
       pull-requests: write
+=======
+      use-release-branches: true
+>>>>>>> 3fb6501cb (ci: enable use-release-branches for docs workflows (#50098))
