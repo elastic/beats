@@ -76,9 +76,9 @@ func TestDecoding(t *testing.T) {
 			content:       "text/csv",
 			numEvents:     2,
 			assertAgainst: "txn_quoted.json",
-			config: decoder.Config{
-				Codec: &decoder.CodecConfig{
-					CSV: &decoder.CSVCodecConfig{
+			config: decoderConfig{
+				Codec: &codecConfig{
+					CSV: &csvCodecConfig{
 						Enabled: true,
 					},
 				},

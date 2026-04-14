@@ -19,12 +19,14 @@ summary: Fix CSV decoder producing malformed JSON when field values contain doub
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  The azure-blob-storage input's decode path only matched the decoder.Decoder
-  interface, which builds JSON via string concatenation without escaping field
-  values. CSV values containing double quotes (e.g. RFC 2045 MIME type
-  parameters) produce malformed JSON, causing downstream ingest pipeline
-  failures. Add a decoder.ValueDecoder switch case which uses json.Marshal
-  for correct escaping, matching the pattern already used by the GCS input.
+  The azure-blob-storage input's CSV decode path builds JSON via string
+  concatenation without escaping field values. CSV values containing double
+  quotes (e.g. RFC 2045 MIME type parameters) produce malformed JSON, causing
+  downstream ingest pipeline failures. Add a valueDecoder switch case ahead of
+  the plain decoder case so the CSV decoder's decodeValue() method is used,
+  which serializes via json.Marshal for correct escaping. Also fix decodeValue()
+  itself, which previously cleared its state then called decode(), causing a
+  "decode called before next" error.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
