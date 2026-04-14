@@ -82,89 +82,22 @@ The registry will be migrated to the new location only if a registry using the d
 
 ### `registry.backend` [_registry_backend]
 
-::::{warning}
-The bbolt backend is **experimental** and may change or be removed in future releases. Do not use in production without understanding the risks.
-::::
-
 The storage backend used for the registry. Supported values:
 
 - `memlog` (default): An in-memory log with periodic disk flushing. This is the original backend and is well-tested.
-- `bbolt`: A [bbolt (BoltDB)](https://github.com/etcd-io/bbolt) database for persistent on-disk storage with support for compaction and TTL-based entry cleanup.
+- `otel_file_storage`: Persists registry state using the same on-disk layout as the OpenTelemetry Collector [file_storage](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage) extension. Registry files live under the directory specified by `registry.path`. Optional settings are configured under `registry.otel_file_storage`.
 
 ```yaml
 filebeat.registry.backend: memlog
 ```
 
-When set to `bbolt`, the database files are stored under the directory specified by `registry.path`. The bbolt-specific settings are configured under `registry.bbolt`.
+### `registry.otel_file_storage` [_registry_otel_file_storage]
 
+These settings apply only when `registry.backend` is set to `otel_file_storage`. They map directly to the OpenTelemetry Collector [file_storage extension configuration](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage). Filebeat overrides the following defaults:
 
-### `registry.bbolt.timeout` [_registry_bbolt_timeout]
-
-The amount of time to wait to obtain a file lock on the bbolt database file. Default: `1s`.
-
-```yaml
-filebeat.registry.bbolt.timeout: 1s
-```
-
-
-### `registry.bbolt.fsync` [_registry_bbolt_fsync]
-
-Controls whether the database calls `fdatasync()` after each write transaction commit. Default: `false`.
-
-When set to `false`, writes are buffered by the operating system and flushed to disk lazily. This provides significantly higher write throughput but means that recent writes can be lost if the machine crashes (power failure, kernel panic, etc.) because data may still be in the OS page cache. A normal Filebeat shutdown is not affected — the database is closed cleanly and all data is flushed.
-
-When set to `true`, every write transaction is synced to disk before returning. This guarantees durability at the cost of reduced write throughput, as each `Set` call must wait for the disk I/O to complete.
-
-For most deployments, the default (`false`) is recommended. The registry tracks file offsets, so the worst case after an unclean shutdown is re-reading a small amount of log data that was already sent but whose offset was not yet persisted to disk.
-
-```yaml
-filebeat.registry.bbolt.fsync: false
-```
-
-
-### `registry.bbolt.compaction.on_start` [_registry_bbolt_compaction_on_start]
-
-If `true`, database compaction runs every time Filebeat starts. Compaction rewrites the database file to reclaim unused disk space. Default: `false`.
-
-```yaml
-filebeat.registry.bbolt.compaction.on_start: false
-```
-
-
-### `registry.bbolt.compaction.max_transaction_size` [_registry_bbolt_compaction_max_transaction_size]
-
-The maximum number of items processed per transaction during compaction and retention cleanup. Limiting the transaction size prevents a single large transaction from consuming excessive memory or holding a write lock for too long. A value of `0` disables batching, processing all items in a single transaction. Default: `65536`.
-
-```yaml
-filebeat.registry.bbolt.compaction.max_transaction_size: 65536
-```
-
-
-### `registry.bbolt.compaction.cleanup_on_start` [_registry_bbolt_compaction_cleanup_on_start]
-
-If `true`, leftover temporary files from a previous compaction that was interrupted (for example, by a crash) are removed when Filebeat starts. Default: `false`.
-
-```yaml
-filebeat.registry.bbolt.compaction.cleanup_on_start: false
-```
-
-
-### `registry.bbolt.retention.ttl` [_registry_bbolt_retention_ttl]
-
-How long entries are kept in the store before being removed. A zero value disables TTL-based removal. Expired entries become invisible to reads immediately, but are only physically deleted from disk when `registry.bbolt.retention.interval` is also set to a positive value. Default: `0` (disabled).
-
-```yaml
-filebeat.registry.bbolt.retention.ttl: 0
-```
-
-
-### `registry.bbolt.retention.interval` [_registry_bbolt_retention_interval]
-
-How often to remove expired entries from disk. Only effective when `registry.bbolt.retention.ttl` is also set to a positive value. A zero value disables periodic removal. Default: `0` (disabled).
-
-```yaml
-filebeat.registry.bbolt.retention.interval: 0
-```
+- `directory` is always set to the resolved `registry.path`.
+- `create_directory` defaults to `true` when no `otel_file_storage` section is provided (upstream default is `false`).
+- `directory_permissions` defaults to `0700` when `create_directory` is `true` and `directory_permissions` is not set explicitly.
 
 
 ### `shutdown_timeout` [shutdown-timeout]

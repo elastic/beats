@@ -1330,55 +1330,33 @@ filebeat.inputs:
 #filebeat.registry.migrate_file: ${path.data}/registry
 
 # The storage backend for the registry. Supported values are "memlog" and
-# "bbolt". The default is "memlog", which uses an in-memory log with periodic
-# disk flushing. The "bbolt" backend uses a bbolt (BoltDB) database for
-# persistent on-disk storage with support for compaction and TTL-based cleanup.
+# "otel_file_storage". The default is "memlog", which uses an in-memory log
+# with periodic disk flushing. The "otel_file_storage" backend stores state
+# using the same on-disk layout as the OpenTelemetry Collector file_storage
+# extension (under registry.path).
 #filebeat.registry.backend: memlog
 
-# ----------------------- Bbolt backend settings -------------------------------
-# WARNING: The bbolt backend is EXPERIMENTAL and may change or be removed in
-# future releases. Do not use in production without understanding the risks.
+# ----------------------- OTel file_storage backend settings -------------------
+# These settings apply only when filebeat.registry.backend is set to
+# "otel_file_storage". Registry data files live under filebeat.registry.path;
+# optional fields below map to the OpenTelemetry file_storage extension config.
+# The running beat name (for example "filebeat") is used as the OpenTelemetry
+# receiver identity for storage client file naming; no separate setting is used.
 #
-# These settings apply only when filebeat.registry.backend is set to "bbolt".
-# The database files are stored under the registry.path directory.
-# Configuration parameter names are aligned with the OpenTelemetry
-# filestorage extension for future compatibility.
-
-# Timeout for obtaining a file lock on the bbolt database file. Default: 1s.
-#filebeat.registry.bbolt.timeout: 1s
-
-# Controls whether fdatasync is called after each write transaction commit.
-# When false (the default), writes are buffered by the OS and flushed lazily.
-# This is faster but recent writes can be lost on an unclean shutdown (power
-# failure, kernel panic). A normal Filebeat shutdown is not affected.
-# When true, every write is synced to disk before returning, guaranteeing
-# durability at the cost of reduced write throughput. Default: false.
-#filebeat.registry.bbolt.fsync: false
-
-# If true, database compaction runs on every start. Compaction rewrites the
-# database to reclaim unused disk space. Default: false.
-#filebeat.registry.bbolt.compaction.on_start: false
-
-# Maximum number of items processed per transaction during compaction and
-# retention cleanup. A value of 0 disables batching, processing all items
-# in a single transaction. Default: 65536.
-#filebeat.registry.bbolt.compaction.max_transaction_size: 65536
-
-# If true, leftover temporary files from a previous compaction that was
-# interrupted (e.g. by a crash) are removed on start. Default: false.
-#filebeat.registry.bbolt.compaction.cleanup_on_start: false
-
-# How long entries are kept before being removed. A zero value disables
-# TTL-based removal. Expired entries become invisible to reads immediately,
-# but are only physically deleted from disk when retention.interval is also
-# set to a positive value. Default: 0 (disabled).
-#filebeat.registry.bbolt.retention.ttl: 0
-
-# How often to remove expired entries from disk. Only effective when
-# retention.ttl is also set to a positive value. A zero value disables
-# periodic removal.
-# Default: 0 (disabled).
-#filebeat.registry.bbolt.retention.interval: 0
+#filebeat.registry.otel_file_storage.timeout: 1s
+#filebeat.registry.otel_file_storage.fsync: false
+# Filebeat defaults create_directory to true when no otel_file_storage
+# section is provided. When otel_file_storage is configured explicitly,
+# the upstream default (false) applies unless overridden here.
+#filebeat.registry.otel_file_storage.create_directory: true
+# directory_permissions defaults to "0700" when create_directory is true
+# and directory_permissions is not set explicitly.
+#filebeat.registry.otel_file_storage.directory_permissions: "0700"
+#filebeat.registry.otel_file_storage.recreate: false
+#
+# See the OpenTelemetry Collector file_storage extension documentation for
+# compaction and other nested options:
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
