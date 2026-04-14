@@ -531,11 +531,6 @@ type evaluationResponse struct {
 	shouldRetry bool
 }
 
-type executionCompletion struct {
-	done                bool
-	maxExecutionLimited bool
-}
-
 type executeOnceOutcomeKind uint8
 
 const (
@@ -633,9 +628,8 @@ func processEvaluationResponse(
 	return result, nil
 }
 
-func completeExecution(
-	state map[string]interface{},
-	safeCursor map[string]interface{},
+func finishExecution(
+	runState *periodicRunState,
 	start time.Time,
 	interval time.Duration,
 	remainingBudget int,
@@ -645,13 +639,16 @@ func completeExecution(
 	execCtx context.Context,
 	execLog *logp.Logger,
 	execSpan trace.Span,
-) executionCompletion {
+) executeOnceOutcome {
 	// Replace the last safe cursor.
-	state["cursor"] = safeCursor
+	runState.state["cursor"] = runState.safeCursor
 	metricsRecorder.AddProgramRunDuration(execCtx, time.Since(start))
-	if more, _ := state["want_more"].(bool); !more {
+	if more, _ := runState.state["want_more"].(bool); !more {
 		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
-		return executionCompletion{done: true}
+		return executeOnceOutcome{
+			kind:          executeOnceFinish,
+			markRunSpanOK: true,
+		}
 	}
 	execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
 
@@ -664,13 +661,13 @@ func completeExecution(
 		)
 		health.UpdateStatus(status.Degraded, msg)
 		execSpan.SetStatus(codes.Unset, msg)
-		return executionCompletion{
-			done:                true,
+		return executeOnceOutcome{
+			kind:                executeOnceFinish,
 			maxExecutionLimited: true,
 		}
 	}
 
-	return executionCompletion{}
+	return executeOnceOutcome{kind: executeOnceContinue}
 }
 
 func publishResponseEvents(
@@ -925,9 +922,8 @@ func (i input) executeOnce(
 
 	// Check we have a remaining execution budget.
 	budget--
-	completion := completeExecution(
-		runState.state,
-		runState.safeCursor,
+	outcome = finishExecution(
+		runState,
 		start,
 		cfg.Interval,
 		budget,
@@ -938,19 +934,10 @@ func (i input) executeOnce(
 		execLog,
 		execSpan,
 	)
-	if completion.maxExecutionLimited {
-		outcome = executeOnceOutcome{
-			kind:                executeOnceFinish,
-			maxExecutionLimited: true,
-		}
-		return outcome, nil
-	}
-	if completion.done {
+	if outcome.markRunSpanOK {
 		okSpans(execSpan)
-		outcome = executeOnceOutcome{
-			kind:          executeOnceFinish,
-			markRunSpanOK: true,
-		}
+	}
+	if outcome.kind == executeOnceFinish {
 		return outcome, nil
 	}
 
