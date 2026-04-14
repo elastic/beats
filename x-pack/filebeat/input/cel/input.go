@@ -728,6 +728,48 @@ func publishResponseEvents(
 	return nil
 }
 
+func interpretEvaluationResponse(
+	runState *periodicRunState,
+	limiter *rate.Limiter,
+	goodURL string,
+	health status.StatusReporter,
+	metricsRecorder *metricsRecorder,
+	start time.Time,
+	execLog *logp.Logger,
+	execCtx context.Context,
+	execSpan trace.Span,
+	runSpan trace.Span,
+) ([]interface{}, executeOnceOutcome, error) {
+	outcome := executeOnceOutcome{kind: executeOnceContinue}
+
+	response, err := processEvaluationResponse(
+		runState.state,
+		limiter,
+		goodURL,
+		health,
+		metricsRecorder,
+		start,
+		execLog,
+		execCtx,
+		execSpan,
+		runSpan,
+	)
+	if err != nil {
+		return nil, outcome, err
+	}
+	runState.waitUntil = response.waitUntil
+	if response.degraded {
+		runState.degraded = true
+	}
+	if response.shouldRetry {
+		return nil, executeOnceOutcome{kind: executeOnceRetry}, nil
+	}
+	if response.done {
+		return nil, executeOnceOutcome{kind: executeOnceFinish}, nil
+	}
+	return response.events, outcome, nil
+}
+
 func (i input) executeOnce(
 	runCtx context.Context,
 	env v2.Context,
@@ -875,8 +917,8 @@ func (i input) executeOnce(
 	// At this point, the c3 cursor (or at worst the c2 cursor) has
 	// been stored and we can continue from that point, recovering
 	// the lost events and potentially re-requesting e3.
-	response, err := processEvaluationResponse(
-		runState.state,
+	events, outcome, err := interpretEvaluationResponse(
+		runState,
 		limiter,
 		goodURL,
 		health,
@@ -890,21 +932,12 @@ func (i input) executeOnce(
 	if err != nil {
 		return outcome, err
 	}
-	runState.waitUntil = response.waitUntil
-	if response.degraded {
-		runState.degraded = true
-	}
-	if response.shouldRetry {
-		outcome = executeOnceOutcome{kind: executeOnceRetry}
-		return outcome, nil
-	}
-	if response.done {
-		outcome = executeOnceOutcome{kind: executeOnceFinish}
+	if outcome.kind != executeOnceContinue {
 		return outcome, nil
 	}
 	err = publishResponseEvents(
 		runState,
-		response.events,
+		events,
 		execCtx,
 		otelTracer,
 		log,
