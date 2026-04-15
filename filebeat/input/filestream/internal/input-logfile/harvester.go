@@ -321,7 +321,7 @@ func startHarvester(
 				return
 			}
 
-			hg.notifyObserver(ctx.Cancelation, srcID, st.Offset)
+			hg.notifyObserver(canceler, srcID, st.Offset)
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 
