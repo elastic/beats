@@ -580,6 +580,73 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 	assert.NotNil(t, errObj["message"])
 }
 
+// TestDecodeJSONFieldsNumberTypes verifies that the jsoniter parseValue converts
+// JSON numbers to the correct Go types (int64, float64) rather than leaving
+// them as json.Number strings. This is the central correctness claim of the
+// jsoniter switch.
+func TestDecodeJSONFieldsNumberTypes(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"fields":         []string{"msg"},
+		"overwrite_keys": true,
+		"target":         "",
+	})
+	proc, err := NewDecodeJSONFields(cfg, log)
+	require.NoError(t, err)
+
+	cases := []struct {
+		name  string
+		input string
+		field string
+		want  interface{}
+	}{
+		{"int", `{"n":42}`, "n", int64(42)},
+		{"int_negative", `{"n":-7}`, "n", int64(-7)},
+		{"int_large", `{"n":1475026826760}`, "n", int64(1475026826760)},
+		{"int64_max", `{"n":9223372036854775807}`, "n", int64(9223372036854775807)},
+		{"int64_overflow_to_float", `{"n":9223372036854775808}`, "n", float64(9.223372036854776e+18)},
+		{"float", `{"f":3.14}`, "f", float64(3.14)},
+		{"float_negative", `{"f":-2.718}`, "f", float64(-2.718)},
+		{"float_scientific", `{"f":1.5e10}`, "f", float64(1.5e10)},
+		{"int_as_scientific", `{"n":1e5}`, "n", float64(1e5)},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			event := &beat.Event{Fields: mapstr.M{"msg": tc.input}}
+			result, err := proc.Run(event)
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, result.Fields[tc.field])
+		})
+	}
+}
+
+// TestDecodeJSONFieldsConsecutiveRuns verifies that a parse error on one Run
+// call does not corrupt the reused iterator so that the next Run call still
+// works correctly. This is the state-isolation property of the reused iterator.
+func TestDecodeJSONFieldsConsecutiveRuns(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"fields":         []string{"msg"},
+		"overwrite_keys": true,
+		"target":         "",
+	})
+	proc, err := NewDecodeJSONFields(cfg, log)
+	require.NoError(t, err)
+
+	// First run: truncated JSON — parse fails, iter.Error is set internally.
+	event1 := &beat.Event{Fields: mapstr.M{"msg": `{"truncated":`}}
+	_, err1 := proc.Run(event1)
+	assert.Error(t, err1, "truncated JSON should produce an error")
+
+	// Second run: valid JSON — must succeed even though the first run errored.
+	event2 := &beat.Event{Fields: mapstr.M{"msg": `{"level":"info","count":3}`}}
+	result, err2 := proc.Run(event2)
+	require.NoError(t, err2, "valid JSON after a failed run must succeed")
+	assert.Equal(t, int64(3), result.Fields["count"])
+	assert.Equal(t, "info", result.Fields["level"])
+}
+
 func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
 	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
 

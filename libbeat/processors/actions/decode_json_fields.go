@@ -18,11 +18,13 @@
 package actions
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"strings"
+	"unsafe"
+
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -35,6 +37,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// djfAPI configures jsoniter to surface numbers as json.Number so that
+// parseValue can convert them to int64/float64 inline without a second pass.
+var djfAPI = jsoniter.Config{UseNumber: true}.Froze()
+
 type decodeJSONFields struct {
 	fields        []string
 	maxDepth      int
@@ -45,6 +51,7 @@ type decodeJSONFields struct {
 	documentID    string
 	target        *string
 	logger        *logp.Logger
+	iter          *jsoniter.Iterator // reused across Run calls; not goroutine-safe
 }
 
 type config struct {
@@ -96,6 +103,7 @@ func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		documentID:    config.DocumentID,
 		target:        config.Target,
 		logger:        logger,
+		iter: jsoniter.NewIterator(djfAPI),
 	}
 	return f, nil
 }
@@ -118,7 +126,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		var output interface{}
-		err = unmarshal(f.maxDepth, text, &output, f.processArray)
+		err = f.unmarshal(f.maxDepth, text, &output, f.processArray)
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
@@ -182,8 +190,10 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
-	if err := decodeJSON(text, fields); err != nil {
+// unmarshal decodes text as JSON and, when maxDepth > 1, recursively decodes
+// any string values that look like JSON objects or arrays.
+func (f *decodeJSONFields) unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
+	if err := f.decodeJSON(text, fields); err != nil {
 		return err
 	}
 
@@ -201,7 +211,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		}
 
 		var tmp interface{}
-		err := unmarshal(maxDepth, str, &tmp, processArray)
+		err := f.unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
 			return v, errors.Is(err, errProcessingSkipped)
 		}
@@ -232,29 +242,75 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	return nil
 }
 
-func decodeJSON(text string, to *interface{}) error {
-	dec := json.NewDecoder(strings.NewReader(text))
-	dec.UseNumber()
-	err := dec.Decode(to)
-
-	if err != nil {
+// decodeJSON parses text as a single JSON value into *to, resolving numbers to
+// int64 or float64 at parse time. It reuses f.iter and f.numBuf across calls.
+func (f *decodeJSONFields) decodeJSON(text string, to *interface{}) error {
+	// unsafe.Slice aliases the string backing array without copying. The bytes
+	// are only read by the iterator and are not stored, so the lifetime
+	// constraint is satisfied for the duration of this call.
+	b := unsafe.Slice(unsafe.StringData(text), len(text)) //nolint:gosec // G103: text is a local string; b is not stored past decodeJSON
+	f.iter.ResetBytes(b)
+	f.iter.Error = nil // ResetBytes does not clear prior errors
+	*to = f.parseValue()
+	if err := f.iter.Error; err != nil {
+		f.iter.Error = nil
 		return err
 	}
-
-	if dec.More() {
+	// Detect trailing content (multiple JSON elements in the input).
+	//
+	// WhatIsNext() peeks at the next token:
+	//   - At clean EOF it calls loadMore(), which sets iter.Error = io.EOF and
+	//     returns 0 → WhatIsNext returns InvalidValue with iter.Error = io.EOF.
+	//   - For a trailing non-JSON char (e.g. "11:38:04") it reads the char,
+	//     unreads it, and returns InvalidValue with iter.Error still nil.
+	//   - For a second JSON value it returns a non-InvalidValue type.
+	// Only the io.EOF case means we truly consumed all input.
+	next := f.iter.WhatIsNext()
+	parseErr := f.iter.Error
+	f.iter.Error = nil
+	if next != jsoniter.InvalidValue || !errors.Is(parseErr, io.EOF) {
 		return errors.New("multiple json elements found")
-	}
-
-	if _, err := dec.Token(); err != nil && !errors.Is(err, io.EOF) {
-		return err
-	}
-
-	switch O := (*to).(type) {
-	case map[string]interface{}:
-		jsontransform.TransformNumbers(O)
 	}
 	return nil
 }
+
+// parseValue parses any JSON value from f.iter, resolving numbers inline.
+func (f *decodeJSONFields) parseValue() interface{} {
+	switch f.iter.WhatIsNext() {
+	case jsoniter.StringValue:
+		return f.iter.ReadString()
+	case jsoniter.NumberValue:
+		n := f.iter.ReadNumber()
+		if i, err := n.Int64(); err == nil {
+			return i
+		}
+		if fv, err := n.Float64(); err == nil {
+			return fv
+		}
+		return n.String()
+	case jsoniter.BoolValue:
+		return f.iter.ReadBool()
+	case jsoniter.NilValue:
+		f.iter.ReadNil()
+		return nil
+	case jsoniter.ObjectValue:
+		nested := make(map[string]interface{}, 4)
+		for field := f.iter.ReadObject(); field != ""; field = f.iter.ReadObject() {
+			nested[field] = f.parseValue()
+		}
+		return nested
+	case jsoniter.ArrayValue:
+		arr := make([]interface{}, 0, 4)
+		for f.iter.ReadArray() {
+			arr = append(arr, f.parseValue())
+		}
+		return arr
+	default:
+		f.iter.Skip()
+		return nil
+	}
+}
+
 
 func (f decodeJSONFields) String() string {
 	return "decode_json_fields=" + strings.Join(f.fields, ", ")
