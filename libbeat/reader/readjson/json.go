@@ -72,10 +72,10 @@ func NewJSONParser(r reader.Reader, cfg *ParserConfig, logger *logp.Logger) *JSO
 // decode unmarshals text into a MapStr and returns the new text column if one
 // was requested. It reuses r.iter across calls to avoid per-line allocations.
 func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
-	if r.iter == nil {
-		r.iter = jsoniter.NewIterator(jsoniterAPI)
-	}
 	r.iter.ResetBytes(text)
+	r.iter.Error = nil // ResetBytes does not clear prior errors; a stale error would
+	// cause WhatIsNext to mis-consume the first byte via unreadByte, corrupting the
+	// next parse. See analogous clear in decode_json_fields.decodeJSON.
 	// Reject non-object input (null, arrays, bare scalars) up front so that the
 	// error path below fires with err==nil, matching the behaviour of the old
 	// stdlib decoder which set jsonFields=nil and err=nil for JSON null input.
@@ -136,7 +136,7 @@ func unmarshal(text []byte, fields *map[string]interface{}) error {
 // or float64 at parse time. The iterator must be positioned at the start of an
 // object.
 func iterParseObject(iter *jsoniter.Iterator) map[string]interface{} {
-	fields := make(map[string]interface{}, 16)
+	fields := make(map[string]interface{}, 8)
 	iterParseObjectInto(iter, fields)
 	return fields
 }
@@ -204,7 +204,7 @@ func createJSONError(message string) mapstr.M {
 
 // Next decodes JSON and returns the filled Line object.
 func (p *JSONParser) Next() (reader.Message, error) {
-	message, err := p.JSONReader.reader.Next()
+	message, err := p.reader.Next()
 	if err != nil {
 		return message, err
 	}
@@ -218,7 +218,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		}
 	}
 	var jsonFields mapstr.M
-	message.Content, jsonFields = p.JSONReader.decode(from)
+	message.Content, jsonFields = p.decode(from)
 
 	if len(jsonFields) == 0 {
 		return message, err
@@ -236,7 +236,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		message.Fields["message"] = string(message.Content)
 	}
 
-	if key := p.JSONReader.cfg.DocumentID; key != "" {
+	if key := p.cfg.DocumentID; key != "" {
 		if tmp, err := jsonFields.GetValue(key); err == nil {
 			if id, ok := tmp.(string); ok {
 				jsonFields.Delete(key)
@@ -255,7 +255,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 			Meta:      message.Meta,
 			Fields:    message.Fields,
 		}
-		jsontransform.WriteJSONKeys(event, jsonFields, p.JSONReader.cfg.ExpandKeys, p.JSONReader.cfg.OverwriteKeys, p.JSONReader.cfg.AddErrorKey)
+		jsontransform.WriteJSONKeys(event, jsonFields, p.cfg.ExpandKeys, p.cfg.OverwriteKeys, p.cfg.AddErrorKey)
 		message.Ts = event.Timestamp
 		message.Fields = event.Fields
 		message.Meta = event.Meta
@@ -305,7 +305,7 @@ func MergeJSONFields(data mapstr.M, jsonFields mapstr.M, text *string, config Co
 			case time.Time:
 				ts = t
 			case common.Time:
-				ts = time.Time(ts)
+				ts = time.Time(t)
 			}
 			delete(data, "@timestamp")
 		}

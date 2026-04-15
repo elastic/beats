@@ -18,11 +18,14 @@
 package actions
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
+	"sync"
+
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -35,6 +38,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// djfAPI configures jsoniter to surface numbers as json.Number so that
+// parseValue can convert them to int64/float64 inline without a second pass.
+var djfAPI = jsoniter.Config{UseNumber: true}.Froze()
+
+// djfIterState bundles a reusable iterator and scratch buffer.
+// One instance is held in iterPool per concurrent caller; it must not be
+// used across goroutines simultaneously.
+type djfIterState struct {
+	iter   *jsoniter.Iterator
+	numBuf []byte // scratch buffer for number parsing; reset to [:0] before each number
+}
+
 type decodeJSONFields struct {
 	fields        []string
 	maxDepth      int
@@ -45,6 +60,7 @@ type decodeJSONFields struct {
 	documentID    string
 	target        *string
 	logger        *logp.Logger
+	iterPool      sync.Pool // pools *djfIterState; safe for concurrent Run calls
 }
 
 type config struct {
@@ -96,6 +112,14 @@ func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		documentID:    config.DocumentID,
 		target:        config.Target,
 		logger:        logger,
+		iterPool: sync.Pool{
+			New: func() interface{} {
+				return &djfIterState{
+					iter:   jsoniter.NewIterator(djfAPI),
+					numBuf: make([]byte, 0, 64),
+				}
+			},
+		},
 	}
 	return f, nil
 }
@@ -118,7 +142,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		var output interface{}
-		err = unmarshal(f.maxDepth, text, &output, f.processArray)
+		err = f.unmarshal(f.maxDepth, text, &output, f.processArray)
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
@@ -182,8 +206,10 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
-	if err := decodeJSON(text, fields); err != nil {
+// unmarshal decodes text as JSON and, when maxDepth > 1, recursively decodes
+// any string values that look like JSON objects or arrays.
+func (f *decodeJSONFields) unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
+	if err := f.decodeJSON(text, fields); err != nil {
 		return err
 	}
 
@@ -201,7 +227,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		}
 
 		var tmp interface{}
-		err := unmarshal(maxDepth, str, &tmp, processArray)
+		err := f.unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
 			return v, errors.Is(err, errProcessingSkipped)
 		}
@@ -232,31 +258,93 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	return nil
 }
 
-func decodeJSON(text string, to *interface{}) error {
-	dec := json.NewDecoder(strings.NewReader(text))
-	dec.UseNumber()
-	err := dec.Decode(to)
+// decodeJSON parses text as a single JSON value into *to, resolving numbers to
+// int64 or float64 at parse time. It borrows a *djfIterState from the pool for
+// the duration of the call; safe for concurrent use.
+func (f *decodeJSONFields) decodeJSON(text string, to *interface{}) error {
+	st := f.iterPool.Get().(*djfIterState)
+	defer f.iterPool.Put(st)
 
-	if err != nil {
+	st.iter.ResetBytes([]byte(text))
+	st.iter.Error = nil // ResetBytes does not clear prior errors
+	*to = f.parseValue(st)
+	if err := st.iter.Error; err != nil {
+		st.iter.Error = nil
 		return err
 	}
-
-	if dec.More() {
+	// Detect trailing content (multiple JSON elements in the input).
+	//
+	// WhatIsNext() peeks at the next token:
+	//   - At clean EOF it calls loadMore(), which sets iter.Error = io.EOF and
+	//     returns 0 → WhatIsNext returns InvalidValue with iter.Error = io.EOF.
+	//   - For a trailing non-JSON char (e.g. "11:38:04") it reads the char,
+	//     unreads it, and returns InvalidValue with iter.Error still nil.
+	//   - For a second JSON value it returns a non-InvalidValue type.
+	// Only the io.EOF case means we truly consumed all input.
+	next := st.iter.WhatIsNext()
+	parseErr := st.iter.Error
+	st.iter.Error = nil
+	if next != jsoniter.InvalidValue || !errors.Is(parseErr, io.EOF) {
 		return errors.New("multiple json elements found")
-	}
-
-	if _, err := dec.Token(); err != nil && !errors.Is(err, io.EOF) {
-		return err
-	}
-
-	switch O := (*to).(type) {
-	case map[string]interface{}:
-		jsontransform.TransformNumbers(O)
 	}
 	return nil
 }
 
-func (f decodeJSONFields) String() string {
+// parseValue parses any JSON value from st.iter, resolving numbers inline.
+func (f *decodeJSONFields) parseValue(st *djfIterState) interface{} {
+	switch st.iter.WhatIsNext() {
+	case jsoniter.StringValue:
+		return st.iter.ReadString()
+	case jsoniter.NumberValue:
+		st.numBuf = st.numBuf[:0]
+		st.numBuf = st.iter.SkipAndAppendBytes(st.numBuf)
+		return djfParseNumber(st.numBuf)
+	case jsoniter.BoolValue:
+		return st.iter.ReadBool()
+	case jsoniter.NilValue:
+		st.iter.ReadNil()
+		return nil
+	case jsoniter.ObjectValue:
+		nested := make(map[string]interface{}, 4)
+		for field := st.iter.ReadObject(); field != ""; field = st.iter.ReadObject() {
+			nested[field] = f.parseValue(st)
+		}
+		return nested
+	case jsoniter.ArrayValue:
+		arr := make([]interface{}, 0, 4)
+		for st.iter.ReadArray() {
+			arr = append(arr, f.parseValue(st))
+		}
+		return arr
+	default:
+		st.iter.Skip()
+		return nil
+	}
+}
+
+// djfParseNumber converts raw JSON number bytes to int64, float64, or string.
+func djfParseNumber(b []byte) interface{} {
+	if len(b) == 0 {
+		return nil
+	}
+	for _, c := range b {
+		if c == '.' || c == 'e' || c == 'E' {
+			if fv, err := strconv.ParseFloat(string(b), 64); err == nil {
+				return fv
+			}
+			return string(b)
+		}
+	}
+	if i, err := strconv.ParseInt(string(b), 10, 64); err == nil {
+		return i
+	}
+	if fv, err := strconv.ParseFloat(string(b), 64); err == nil {
+		return fv
+	}
+	return string(b)
+}
+
+func (f *decodeJSONFields) String() string {
 	return "decode_json_fields=" + strings.Join(f.fields, ", ")
 }
 

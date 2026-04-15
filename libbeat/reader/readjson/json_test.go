@@ -19,6 +19,7 @@ package readjson
 
 import (
 	"bytes"
+	stdjson "encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -28,8 +29,26 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+)
+
+// stdlibUnmarshal is the pre-iterator implementation used as the oracle
+// baseline in TestIterParseMatchesUnmarshal and the stdlib comparison benchmarks.
+func stdlibUnmarshal(text []byte, fields *map[string]interface{}) error {
+	dec := stdjson.NewDecoder(bytes.NewReader(text))
+	dec.UseNumber()
+	if err := dec.Decode(fields); err != nil {
+		return err
+	}
+	jsontransform.TransformNumbers(*fields)
+	return nil
+}
+
+var (
+	benchMediumLine   = []byte(`{"message":"GET /api/users 200","level":"info","timestamp":"2024-01-15T10:30:00Z","duration":142,"method":"GET","path":"/api/users","status":200,"bytes_sent":1024,"user_agent":"Mozilla/5.0","remote_addr":"10.0.0.1"}`)
+	benchJournaldLine = []byte(`{"message":"pam_unix(sudo:session): session closed for user root","event":{"kind":"event"},"host":{"hostname":"x-wing","id":"a6a19d57efcf4bf38705c63217a63ba3"},"journald":{"audit":{"login_uid":1000,"session":"1"},"custom":{"syslog_timestamp":"Nov 22 18:10:04 "},"gid":0,"host":{"boot_id":"537d392f028b4dd4b9b1995a4c78cfb6"},"pid":2084586,"process":{"capabilities":"1ffffffffff","command_line":"sudo journalctl --user --rotate","executable":"/usr/bin/sudo","name":"sudo"},"uid":1000},"log":{"syslog":{"appname":"sudo","facility":{"code":10},"priority":6}},"process":{"args":["sudo","journalctl","--user","--rotate"],"args_count":4,"command_line":"sudo journalctl --user --rotate","pid":2084586,"thread":{"capabilities":{"effective":["CAP_CHOWN","CAP_DAC_OVERRIDE","CAP_DAC_READ_SEARCH","CAP_FOWNER","CAP_FSETID","CAP_KILL","CAP_SETGID","CAP_SETUID"]}}}}`)
 )
 
 func TestUnmarshal(t *testing.T) {
@@ -117,14 +136,14 @@ func TestUnmarshal(t *testing.T) {
 
 func TestDecodeJSON(t *testing.T) {
 	var tests = []struct {
-		Text            string
-		Config          Config
-		ExpectedText    string
-		ExpectedMap     mapstr.M
+		Text         string
+		Config       Config
+		ExpectedText string
+		ExpectedMap  mapstr.M
 		// errMsgContains, when non-empty, asserts that the error.message field
 		// contains this substring instead of requiring an exact match. Use this
 		// for cases where the underlying parser's error message wording may vary.
-		errMsgContains  string
+		errMsgContains string
 	}{
 		{
 			Text:         `{"message": "test", "value": 1}`,
@@ -205,17 +224,21 @@ func TestDecodeJSON(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "json_test")
 	for _, test := range tests {
 
-		var p JSONReader
-		p.cfg = &test.Config
-		p.logger = logger
+		p := JSONReader{
+			cfg:    &test.Config,
+			logger: logger,
+			iter:   jsoniter.NewIterator(jsoniterAPI),
+		}
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
 		if test.errMsgContains != "" {
 			// Check that the error message field contains the expected substring rather
 			// than requiring an exact match, since parser error message wording may vary.
 			if errMap, ok := M["error"].(mapstr.M); ok {
-				assert.True(t, strings.Contains(errMap["message"].(string), test.errMsgContains),
-					"error.message %q should contain %q", errMap["message"], test.errMsgContains)
+				msg, ok := errMap["message"].(string)
+				require.True(t, ok, "error.message should be a string, got %T", errMap["message"])
+				assert.True(t, strings.Contains(msg, test.errMsgContains),
+					"error.message %q should contain %q", msg, test.errMsgContains)
 			} else {
 				assert.Fail(t, "expected error field not present in decoded map")
 			}
@@ -226,9 +249,6 @@ func TestDecodeJSON(t *testing.T) {
 }
 
 func TestMergeJSONFields(t *testing.T) {
-	type io struct {
-	}
-
 	text := "hello"
 
 	now := time.Now().UTC()
@@ -304,7 +324,7 @@ func TestMergeJSONFields(t *testing.T) {
 				"type":  "test",
 				"error": mapstr.M{"type": "json", "message": "@timestamp not overwritten (parse error on 2016-04-05T18:47:18.44XX4Z)"},
 			},
-			ExpectedTimestamp: time.Time{},
+			ExpectedTimestamp: now,
 		},
 
 		"wrong @timestamp format": {
@@ -317,7 +337,7 @@ func TestMergeJSONFields(t *testing.T) {
 				"type":  "test",
 				"error": mapstr.M{"type": "json", "message": "@timestamp not overwritten (not string)"},
 			},
-			ExpectedTimestamp: time.Time{},
+			ExpectedTimestamp: now,
 		},
 		"ignore non-string type field": {
 			// if overwrite_keys is true, but the `type` key in json is not a string, ignore it
@@ -351,7 +371,7 @@ func TestMergeJSONFields(t *testing.T) {
 				"type":  "test_type",
 				"error": mapstr.M{"type": "json", "message": "type not overwritten (invalid value [_type])"},
 			},
-			ExpectedTimestamp: time.Time{},
+			ExpectedTimestamp: now,
 		},
 		"do not set error if AddErrorKey is false": {
 			Data:       mapstr.M{"@timestamp": common.Time(now), "type": "test_type", "json": mapstr.M{"type": "_type"}},
@@ -361,7 +381,7 @@ func TestMergeJSONFields(t *testing.T) {
 				"type":  "test_type",
 				"error": nil,
 			},
-			ExpectedTimestamp: time.Time{},
+			ExpectedTimestamp: now,
 		},
 		"extract event id": {
 			// if document_id is set, extract the ID from the event
@@ -431,7 +451,8 @@ func TestMergeJSONFields(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			var jsonFields mapstr.M
 			if fields, ok := test.Data["json"]; ok {
-				jsonFields = fields.(mapstr.M)
+				jsonFields, ok = fields.(mapstr.M)
+				require.True(t, ok, "json field should be mapstr.M, got %T", fields)
 			}
 
 			id, ts := MergeJSONFields(test.Data, jsonFields, test.Text, test.JSONConfig)
@@ -474,10 +495,10 @@ func TestIterParseMatchesUnmarshal(t *testing.T) {
 		{"int_large", []byte(`{"n":9999999999999}`)},
 		{"int64_max", []byte(`{"n":9223372036854775807}`)},
 		{"int64_min", []byte(`{"n":-9223372036854775808}`)},
-		{"int64_overflow_pos", []byte(`{"n":9223372036854775808}`)},  // > int64 max → float64
-		{"int64_overflow_neg", []byte(`{"n":-9223372036854775809}`)}, // < int64 min → float64
+		{"int64_overflow_pos", []byte(`{"n":9223372036854775808}`)},        // > int64 max → float64
+		{"int64_overflow_neg", []byte(`{"n":-9223372036854775809}`)},       // < int64 min → float64
 		{"int_beyond_float64_precision", []byte(`{"n":9007199254740993}`)}, // 2^53+1: exact as int64, lossy as float64
-		{"int_scientific", []byte(`{"n":1e5}`)},  // "1e5" fails ParseInt → float64(100000)
+		{"int_scientific", []byte(`{"n":1e5}`)},                            // "1e5" fails ParseInt → float64(100000)
 		{"int_scientific_large", []byte(`{"n":1e18}`)},
 
 		// --- float edge cases ---
@@ -589,6 +610,61 @@ func TestIterParseMatchesUnmarshal(t *testing.T) {
 			require.NoError(t, iter.Error)
 
 			assert.Equal(t, want, got)
+		})
+	}
+}
+
+// TestDecodeJSONErrorRecovery verifies that a parse error on line N does not
+// corrupt the reused iterator so that line N+1 still parses correctly.
+// This is a regression test for the missing r.iter.Error = nil reset in decode().
+func TestDecodeJSONErrorRecovery(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "json_test")
+	p := JSONReader{
+		cfg:    &Config{IgnoreDecodingError: true},
+		logger: logger,
+		iter:   jsoniter.NewIterator(jsoniterAPI),
+	}
+
+	// First call: truncated JSON → parse error, iter.Error is set.
+	_, m := p.decode([]byte(`{"bad":`))
+	assert.Nil(t, m, "truncated JSON should produce nil map")
+
+	// Second call: valid JSON → must succeed even though the previous call errored.
+	_, m = p.decode([]byte(`{"level":"info","count":3}`))
+	assert.Equal(t, mapstr.M{"level": "info", "count": int64(3)}, m,
+		"valid JSON after a parse error must decode correctly")
+}
+
+// TestDecodeJSONNonObjectInputs verifies that non-object top-level JSON values
+// (arrays, scalars) are rejected by decode() rather than silently producing an
+// empty map. This is important because the old stdlib path and the new jsoniter
+// path must behave identically at the boundary.
+func TestDecodeJSONNonObjectInputs(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "json_test")
+
+	for _, tc := range []struct {
+		name  string
+		input []byte
+	}{
+		{"array", []byte(`[1,2,3]`)},
+		{"bare_string", []byte(`"hello"`)},
+		{"bare_int", []byte(`42`)},
+		{"bare_bool", []byte(`true`)},
+		{"null", []byte(`null`)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			p := JSONReader{
+				cfg:    &Config{IgnoreDecodingError: true},
+				logger: logger,
+				iter:   jsoniter.NewIterator(jsoniterAPI),
+			}
+			_, m := p.decode(tc.input)
+			assert.Nil(t, m, "non-object input should produce nil map")
+
+			// A subsequent valid-object call must still succeed.
+			_, m = p.decode([]byte(`{"k":"v"}`))
+			assert.Equal(t, mapstr.M{"k": "v"}, m,
+				"valid JSON after a non-object input must decode correctly")
 		})
 	}
 }

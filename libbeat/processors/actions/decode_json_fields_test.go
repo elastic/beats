@@ -19,6 +19,7 @@ package actions
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -578,6 +579,32 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 	assert.Equal(t, "message", errObj["field"])
 	assert.NotNil(t, errObj["data"])
 	assert.NotNil(t, errObj["message"])
+}
+
+// TestRunConcurrent verifies that multiple goroutines can safely call Run on
+// the same processor instance. Without the sync.Pool fix, the race detector
+// would catch the shared f.iter field being written concurrently.
+func TestRunConcurrent(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"fields":         []string{"msg"},
+		"overwrite_keys": true,
+	})
+	log := logptest.NewTestingLogger(t, "")
+	proc, err := NewDecodeJSONFields(cfg, log)
+	require.NoError(t, err)
+
+	var wg sync.WaitGroup
+	for range 50 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for range 100 {
+				event := &beat.Event{Fields: mapstr.M{"msg": `{"a":1,"b":"two","c":3.14}`}}
+				_, _ = proc.Run(event)
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
