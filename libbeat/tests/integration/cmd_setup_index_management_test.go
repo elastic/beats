@@ -201,6 +201,7 @@ func TestSetupTemplateNameAndPatternOnILMDisabled(t *testing.T) {
 	customTemplate := "mockbeat_foobar"
 	policy := "mockbeat"
 	t.Cleanup(func() {
+		deleteDataStream(t, esURL, customTemplate)
 		deleteIndexTemplate(t, esURL, customTemplate)
 		deleteILMPolicy(t, esURL, policy)
 	})
@@ -246,6 +247,7 @@ func TestSetupOverwriteTemplateOnILMPolicyCreated(t *testing.T) {
 	customTemplate := "mockbeat_foobar"
 	policy := "mockbeat"
 	t.Cleanup(func() {
+		deleteDataStream(t, esURL, customTemplate)
 		deleteIndexTemplate(t, esURL, customTemplate)
 		deleteILMPolicy(t, esURL, policy)
 	})
@@ -425,10 +427,10 @@ func deleteIndexTemplate(t *testing.T, esURL url.URL, template string) {
 	t.Helper()
 	templateURL, err := FormatIndexTemplateURL(t, esURL, template)
 	require.NoError(t, err)
-	status, _, err := HttpDo(t, http.MethodDelete, templateURL)
+	status, body, err := HttpDo(t, http.MethodDelete, templateURL)
 	require.NoError(t, err)
 	if status != http.StatusOK && status != http.StatusNotFound {
-		t.Errorf("unexpected status %d deleting index template %s", status, template)
+		t.Errorf("unexpected status %d deleting index template %s, body: %s", status, template, string(body))
 	}
 }
 
