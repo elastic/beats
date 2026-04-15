@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -97,19 +97,19 @@ func TestProcessReceivedEventsUpdatesProcessingTimeOnce(t *testing.T) {
 			EventData:    azeventhubs.EventData{Body: []byte(`{"records":[{"msg":"one"}]}`)},
 			EnqueuedTime: &now,
 			PartitionKey: &partitionKey,
-			Offset:       0,
+			Offset:       "0",
 		},
 		{
 			EventData:    azeventhubs.EventData{Body: []byte(`{"records":[{"msg":"two"}]}`)},
 			EnqueuedTime: &now,
 			PartitionKey: &partitionKey,
-			Offset:       1,
+			Offset:       "1",
 		},
 		{
 			EventData:    azeventhubs.EventData{Body: []byte(`{"records":[{"msg":"three"}]}`)},
 			EnqueuedTime: &now,
 			PartitionKey: &partitionKey,
-			Offset:       2,
+			Offset:       "2",
 		},
 	}
 
