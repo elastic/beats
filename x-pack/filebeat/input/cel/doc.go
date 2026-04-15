@@ -63,7 +63,7 @@ CEL Metrics exported for each periodic run:
 
 		Name                                        Description                                                                              Metric Type
 
-		input.cel.periodic.run                      the number of times a periodic run was started.                                          Int64Counter
+		input.cel.periodic.run.count                the number of times a periodic run was started.                                          Int64Counter
 		input.cel.periodic.program.run.started      the number of times a program was started in a periodic run.                             Int64Counter
 		input.cel.periodic.program.run.success      the number of times a program terminated without an error in a periodic run.             Int64Counter
 		input.cel.periodic.batch.received           the number of the number of batches generated in a periodic run.                         Int64Counter

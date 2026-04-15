@@ -253,11 +253,11 @@ func newOTELCELMetrics(log *logp.Logger,
 
 	meter := meterProvider.Meter("github.com/elastic/beats/x-pack/filebeat/otel/cel_metrics.go")
 
-	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run",
+	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run.count",
 		metric.WithDescription("Number of times a periodic run was started."),
 		metric.WithUnit("{run}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run.count: %w", err)
 	}
 	programRunStartedCount, err := meter.Int64Counter("input.cel.periodic.program.run.started",
 		metric.WithDescription("Number of times a CEL program was started in a periodic run."),
