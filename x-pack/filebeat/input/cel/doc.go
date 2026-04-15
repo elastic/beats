@@ -71,8 +71,8 @@ CEL Metrics exported for each periodic run:
 		input.cel.periodic.event.received           the number of the number of events generated in a periodic run.                          Int64Counter
 		input.cel.periodic.event.published          the number of the number of events published in a periodic run.                          Int64Counter
 		input.cel.periodic.run.duration             the total duration of time in seconds spent in a periodic run.                           Float64Counter
-		input.cel.periodic.cel.duration             the total duration of time in seconds spent processing CEL programs in a periodic run.   Float64Histogram
-		input.cel.periodic.event.publish.duration   the total duration of time in seconds publishing events in a periodic run.               Float64Histogram
+		input.cel.periodic.cel.duration             the total duration of time in seconds spent processing CEL programs in a periodic run.   Float64Counter
+		input.cel.periodic.event.publish.duration   the total duration of time in seconds publishing events in a periodic run.               Float64Counter
 		input.cel.program.batch.received            the number of batches the program has generated.                                         Int64Histogram
 	    input.cel.program.event.received            the number of events the program has generated.                                          Int64Histogram
 	    input.cel.program.batch.published           the number of batches the program has published.                                         Int64Histogram
