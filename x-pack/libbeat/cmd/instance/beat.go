@@ -269,8 +269,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
-	outputFactory := b.MakeOutputFactory(b.Config.Output)
-
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
@@ -278,11 +276,10 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		WaitClose:      receiverPublisherCloseTimeout,
 		Paths:          b.Paths,
 	}
-	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
-	b.Registry.MustRegisterOutput(b.MakeOutputReloader(publisher.OutputReloader()))
 	b.Publisher = publisher
 
 	return b, nil
