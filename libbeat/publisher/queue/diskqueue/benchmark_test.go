@@ -74,7 +74,7 @@ func makePublisherEvent(r *rand.Rand) publisher.Event {
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Producer) {
+func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Producer[publisher.Event]) {
 	s := DefaultSettings()
 	s.Path = b.TempDir()
 
@@ -95,7 +95,7 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	return q, p
 }
 
-func publishEvents(r *rand.Rand, p queue.Producer, num int) {
+func publishEvents(r *rand.Rand, p queue.Producer[publisher.Event], num int) {
 	for i := 0; i < num; i++ {
 		e := makePublisherEvent(r)
 		_, ok := p.Publish(e)
@@ -123,14 +123,14 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 // produceAndConsume generates and publishes events in a go routine, in
 // the main go routine it consumes and acks them.  This interleaves
 // publish and consume.
-func produceAndConsume(r *rand.Rand, p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+func produceAndConsume(r *rand.Rand, p queue.Producer[publisher.Event], q *diskQueue, num_events int, batch_size int) error {
 	go publishEvents(r, p, num_events)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 // produceThenConsume generates and publishes events, when all events
 // are published it consumes and acks them.
-func produceThenConsume(r *rand.Rand, p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+func produceThenConsume(r *rand.Rand, p queue.Producer[publisher.Event], q *diskQueue, num_events int, batch_size int) error {
 	publishEvents(r, p, num_events)
 	return getAndAckEvents(q, num_events, batch_size)
 }

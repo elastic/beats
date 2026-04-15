@@ -34,7 +34,7 @@ import (
 
 type outputController interface {
 	waitClose(ctx context.Context, force bool) error
-	queueProducer(config queue.ProducerConfig) queue.Producer
+	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
 }
 
 // processOutputController manages the pipelines output capabilities, like:
@@ -51,14 +51,14 @@ type processOutputController struct {
 	// queue. At that time, any prior calls to outputController.queueProducer
 	// from incoming pipeline connections will be unblocked, and future
 	// requests will be handled synchronously.
-	queue           queue.Queue
+	queue           queue.Queue[publisher.Event]
 	queueLock       sync.Mutex
 	pendingRequests []producerRequest
 
 	// This factory will be used to create the queue when needed, unless
 	// it is overridden by output configuration when outputController.Set
 	// is called.
-	queueFactory queue.QueueFactory
+	queueFactory queue.QueueFactory[publisher.Event]
 
 	// consumer is a helper goroutine that reads event batches from the queue
 	// and sends them to workerChan for an output worker to process.
@@ -80,7 +80,7 @@ type processOutputController struct {
 
 type producerRequest struct {
 	config       queue.ProducerConfig
-	responseChan chan queue.Producer
+	responseChan chan queue.Producer[publisher.Event]
 }
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
@@ -93,7 +93,7 @@ func newProcessOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	retryObserver retryObserver,
-	queueFactory queue.QueueFactory,
+	queueFactory queue.QueueFactory[publisher.Event],
 	inputQueueSize int,
 ) (*processOutputController, error) {
 	controller := &processOutputController{
@@ -225,7 +225,7 @@ func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 
 // queueProducer creates a queue producer with the given config, blocking
 // until the queue is created if it does not yet exist.
-func (c *processOutputController) queueProducer(config queue.ProducerConfig) queue.Producer {
+func (c *processOutputController) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
 	if publishDisabled {
 		// If publishDisabled is set ("-N" command line flag), then no output
 		// will ever be set, and no queue will ever be created. In this case,
@@ -246,7 +246,7 @@ func (c *processOutputController) queueProducer(config queue.ProducerConfig) que
 	// queue lock, and wait to receive our producer.
 	request := producerRequest{
 		config:       config,
-		responseChan: make(chan queue.Producer),
+		responseChan: make(chan queue.Producer[publisher.Event]),
 	}
 	c.pendingRequests = append(c.pendingRequests, request)
 	c.queueLock.Unlock()
@@ -309,11 +309,11 @@ func (c *processOutputController) createQueueIfNeeded(outGrp outputs.Group) {
 // a producer for a nonexistent queue.
 type emptyProducer struct{}
 
-func (emptyProducer) Publish(_ queue.Entry) (queue.EntryID, bool) {
+func (emptyProducer) Publish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (emptyProducer) TryPublish(_ queue.Entry) (queue.EntryID, bool) {
+func (emptyProducer) TryPublish(_ publisher.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
