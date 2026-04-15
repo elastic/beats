@@ -19,6 +19,7 @@ package actions
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -578,6 +579,61 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 	assert.Equal(t, "message", errObj["field"])
 	assert.NotNil(t, errObj["data"])
 	assert.NotNil(t, errObj["message"])
+}
+
+// TestDecodeJSONFieldsConcurrent verifies that concurrent calls to Run() on a
+// shared decodeJSONFields processor do not corrupt each other's output.
+//
+// decodeJSONFields.Run() borrows a *sonicDecoder.Decoder from a sync.Pool for
+// each call and returns it when done. This test exercises that path under
+// genuine concurrency; run with -race to catch any pool misuse or aliasing bugs.
+func TestDecodeJSONFieldsConcurrent(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"fields":         []string{"msg"},
+		"overwrite_keys": true,
+	})
+	log := logptest.NewTestingLogger(t, "decode_json_fields_concurrent")
+	proc, err := NewDecodeJSONFields(cfg, log)
+	require.NoError(t, err)
+
+	// Two distinct JSON payloads with non-overlapping field names so
+	// cross-contamination is immediately visible in the output.
+	// The processor config has no target, so decoded fields land under the
+	// source field name ("msg") — assert via the dot-notation path "msg.<key>".
+	type testCase struct {
+		input    string
+		wantKey  string
+		wantVal  interface{}
+	}
+	cases := []testCase{
+		{
+			input:   `{"service":"auth","status":200,"ok":true}`,
+			wantKey: "msg.service",
+			wantVal: "auth",
+		},
+		{
+			input:   `{"datacenter":"us-east-1","latency":42,"ok":false}`,
+			wantKey: "msg.datacenter",
+			wantVal: "us-east-1",
+		},
+	}
+
+	const goroutines = 50
+	var wg sync.WaitGroup
+	wg.Add(goroutines)
+	for i := range goroutines {
+		tc := cases[i%len(cases)]
+		go func() {
+			defer wg.Done()
+			event := &beat.Event{Fields: mapstr.M{"msg": tc.input}}
+			out, runErr := proc.Run(event)
+			require.NoError(t, runErr)
+			got, getErr := out.Fields.GetValue(tc.wantKey)
+			require.NoError(t, getErr, "expected key %q missing from output", tc.wantKey)
+			require.Equal(t, tc.wantVal, got, "wrong value for key %q", tc.wantKey)
+		}()
+	}
+	wg.Wait()
 }
 
 func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
