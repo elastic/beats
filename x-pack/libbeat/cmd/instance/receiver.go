@@ -174,14 +174,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		br.reporter = rep
 	}
 
-	br.beat.Manager.SetStopCallback(func() {
-		if c, ok := br.beat.Publisher.(io.Closer); ok {
-			if err := c.Close(); err != nil {
-				br.Logger.Errorf("error closing beat receiver publisher: %v", err)
-			}
-		}
-	})
-
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
 		if groupReporter != nil {
@@ -193,7 +185,7 @@ func (br *BeatReceiver) Start(host component.Host) error {
 	return nil
 }
 
-// BeatReceiver.Stop() stops beat receiver.
+// BeatReceiver.Shutdown() stops beat receiver.
 func (br *BeatReceiver) Shutdown() error {
 	if br.bridge != nil {
 		br.bridge.Shutdown()
@@ -201,6 +193,19 @@ func (br *BeatReceiver) Shutdown() error {
 	if br.releaseSystemBridge != nil {
 		br.releaseSystemBridge()
 	}
+	// Notify the publisher pipeline to shut down (if configured this will
+	// wait for a specified timeout for outstanding events to be
+	// acknowledged).
+	// On a live system the cast to io.Closer will always succeed because
+	// Publisher is implemented by pipeline.Pipeline.
+	if c, ok := br.beat.Publisher.(io.Closer); ok {
+		if err := c.Close(); err != nil {
+			br.Logger.Errorf("error closing beat receiver publisher: %v", err)
+		}
+	}
+
+	// At this point the publisher pipeline is stopped and no more events can
+	// be sent or acknowledged. Notify the beater to shutdown as well.
 	br.beater.Stop()
 
 	// Trigger the stop callback to close the publisher pipeline. Some beaters

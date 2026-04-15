@@ -50,6 +50,45 @@ service:
 	}, 30*time.Second, 100*time.Millisecond, "Expected debug log with test message not found")
 }
 
+func TestHeartbeatReceiver(t *testing.T) {
+	cfg := `receivers:
+  heartbeatreceiver:
+    heartbeat:
+      monitors:
+        - type: tcp
+          id: test-tcp
+          schedule: "@every 60s"
+          hosts:
+            - "localhost:0"
+          enabled: true
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - heartbeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+	col := New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Starting metrics logging every 30s").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected heartbeat receiver to start and log metrics")
+}
+
 // TestOsquerybeatReceiverRegistered verifies that the osquerybeat receiver
 // factory is properly registered with the collector. The osquerybeat receiver
 // requires the osqueryd binary to run a full pipeline, so this test starts the
