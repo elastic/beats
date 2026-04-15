@@ -86,14 +86,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	// extracting it here for ease of use
 	logger := b.Info.Logger
 
-	// if output is set and if output is not otelconsumer, inform users
-	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
-		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
-	}
-
-	// all beatreceivers will use otelconsumer output by default
-	receiverConfig["output"] = map[string]any{
-		"otelconsumer": map[string]any{},
+	if receiverConfig["output"] != nil {
+		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 	}
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
