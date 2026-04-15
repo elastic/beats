@@ -16,5 +16,7 @@ jobs:
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-issue-fixer.lock.yml@v0
     with:
       allowed-bot-users: "github-actions[bot],elastic-vault-github-plugin-prod[bot]"
+      additional-instructions: |
+        Use `skip-changelog` and `backport-active-all` labels when creating the pull request.
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
