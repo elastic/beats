@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -52,9 +53,10 @@ func stdlibUnmarshal(text []byte, fields *map[string]interface{}) error {
 // This mirrors what filestream does for each log line with parsers.ndjson enabled.
 //
 // sub-benchmarks:
-//   0_stdlib_baseline    – original encoding/json path (pre-optimization)
-//   1_sonic_reuse        – this branch: sonic UseNumber + Reset reuse + TransformNumbers
-//   2_sonic_reuse_raw    – raw sonic decoder (same code path, no extra wrappers)
+//
+//	0_stdlib_baseline – original encoding/json path (pre-optimization)
+//	1_sonic_reader    – this branch: JSONReader.decode() — the real production path
+//	2_sonic_unsafe    – ideal ceiling: same but with unsafe.String to skip input copy
 func BenchmarkJSONPipelineE2E(b *testing.B) {
 	labelsProc := addfields.NewAddFields(
 		mapstr.M{"labels": mapstr.M{"env": "production", "datacenter": "us-east-1"}},
@@ -88,10 +90,25 @@ func BenchmarkJSONPipelineE2E(b *testing.B) {
 				}
 			})
 
-			// 1_sonic_reuse is the actual implementation in this branch:
-			// JSONReader.decode() reuses its decoder via Reset; numbers go through
-			// UseNumber + TransformNumbers. Works identically on all architectures.
-			b.Run("1_sonic_reuse", func(b *testing.B) {
+			// 1_sonic_reader exercises the actual JSONReader.decode() production path:
+			// newDecoder() + Reset(string(text)) + Decode + TransformNumbers.
+			b.Run("1_sonic_reader", func(b *testing.B) {
+				b.ReportAllocs()
+				r := &JSONReader{cfg: &Config{OverwriteKeys: true}, logger: logp.NewLogger("bench")}
+				for b.Loop() {
+					_, jsonFields := r.decode(line)
+					event := &beat.Event{Fields: mapstr.M{}}
+					jsontransform.WriteJSONKeys(event, mapstr.M(jsonFields), false, true, false)
+					event, _ = labelsProc.Run(event)
+					event, _ = serviceProc.Run(event)
+					_ = event
+				}
+			})
+
+			// 2_sonic_unsafe is the theoretical ceiling: same as 1_sonic_reader but
+			// passes the input via unsafe.String to avoid the string(text) copy.
+			// Shows how much the input copy in 1_sonic_reader costs.
+			b.Run("2_sonic_unsafe", func(b *testing.B) {
 				b.ReportAllocs()
 				lineStr := unsafe.String(unsafe.SliceData(line), len(line)) //nolint:gosec
 				dc := sonicDecoder.NewDecoder(lineStr)
