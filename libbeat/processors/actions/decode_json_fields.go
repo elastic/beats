@@ -101,7 +101,7 @@ func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		decoderPool: sync.Pool{
 			New: func() interface{} {
 				dec := sonicDecoder.NewDecoder("")
-				dec.UseNumber()
+				dec.UseInt64()
 				return dec
 			},
 		},
@@ -243,8 +243,8 @@ func (f *decodeJSONFields) unmarshal(maxDepth int, text string, fields *interfac
 
 // decodeJSON parses text as a single JSON value into *to. It borrows a
 // *sonicDecoder.Decoder from the pool for the duration of the call; safe for
-// concurrent use. Numbers come out as json.Number and are converted to int64
-// or float64 by TransformNumbers (map results only, matching previous behaviour).
+// concurrent use. Numbers are decoded directly as int64 (integers) or float64
+// (fractions/overflow) via UseInt64 — no json.Number boxing or TransformNumbers walk.
 func (f *decodeJSONFields) decodeJSON(text string, to *interface{}) error {
 	dec := f.decoderPool.Get().(*sonicDecoder.Decoder)
 	defer f.decoderPool.Put(dec)
@@ -254,9 +254,6 @@ func (f *decodeJSONFields) decodeJSON(text string, to *interface{}) error {
 	}
 	if err := dec.CheckTrailings(); err != nil {
 		return errors.New("multiple json elements found")
-	}
-	if m, ok := (*to).(map[string]interface{}); ok {
-		jsontransform.TransformNumbers(m)
 	}
 	return nil
 }

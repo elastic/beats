@@ -47,7 +47,11 @@ type JSONParser struct {
 
 func newDecoder() *sonicDecoder.Decoder {
 	dec := sonicDecoder.NewDecoder("")
-	dec.UseNumber()
+	// UseInt64 decodes JSON integers as int64 and floats as float64 in a single
+	// pass, eliminating the json.Number boxing + TransformNumbers walk that
+	// UseNumber requires. Overflow integers (> maxInt64) fall back to float64,
+	// which matches TransformNumbers behaviour for the same inputs.
+	dec.UseInt64()
 	return dec
 }
 
@@ -107,8 +111,6 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 		}
 		return text, nil
 	}
-	jsontransform.TransformNumbers(jsonFields)
-
 	if len(r.cfg.MessageKey) == 0 {
 		return []byte(""), jsonFields
 	}
@@ -132,17 +134,14 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 	return []byte(textString), jsonFields
 }
 
-// unmarshal parses text as a JSON object, converting numbers to int64 or
-// float64. It creates a one-shot decoder; callers that parse many lines should
-// use a JSONReader which reuses its decoder across calls.
+// unmarshal parses text as a JSON object, decoding numbers as int64/float64.
+// It creates a one-shot decoder; callers that parse many lines should use a
+// JSONReader which reuses its decoder across calls.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
 	dec := sonicDecoder.NewDecoder(string(text))
-	dec.UseNumber()
+	dec.UseInt64()
 	if err := dec.Decode(fields); err != nil {
 		return err
-	}
-	if *fields != nil {
-		jsontransform.TransformNumbers(*fields)
 	}
 	return nil
 }

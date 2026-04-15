@@ -54,9 +54,13 @@ func stdlibUnmarshal(text []byte, fields *map[string]interface{}) error {
 //
 // sub-benchmarks:
 //
-//	0_stdlib_baseline – original encoding/json path (pre-optimization)
-//	1_sonic_reader    – this branch: JSONReader.decode() — the real production path
-//	2_sonic_unsafe    – ideal ceiling: same but with unsafe.String to skip input copy
+//	0_stdlib_baseline  – original encoding/json path (pre-optimization)
+//	1_sonic_reader     – production path: reused decoder, UseInt64, unsafe.String aliasing,
+//	                     no TransformNumbers walk
+//	2_sonic_unsafe_num – UseNumber + TransformNumbers (the old approach); shows what
+//	                     eliminating the TransformNumbers walk saves
+//	3_sonic_useint64   – same as 1_sonic_reader but using a standalone decoder (not the
+//	                     JSONReader wrapper); confirms both paths are equivalent
 func BenchmarkJSONPipelineE2E(b *testing.B) {
 	labelsProc := addfields.NewAddFields(
 		mapstr.M{"labels": mapstr.M{"env": "production", "datacenter": "us-east-1"}},
@@ -91,7 +95,7 @@ func BenchmarkJSONPipelineE2E(b *testing.B) {
 			})
 
 			// 1_sonic_reader exercises the actual JSONReader.decode() production path:
-			// newDecoder() + Reset(string(text)) + Decode + TransformNumbers.
+			// reused decoder + Reset(unsafe.String) + Decode + TransformNumbers.
 			b.Run("1_sonic_reader", func(b *testing.B) {
 				b.ReportAllocs()
 				r := &JSONReader{cfg: &Config{OverwriteKeys: true}, logger: logp.NewLogger("bench")}
@@ -105,19 +109,38 @@ func BenchmarkJSONPipelineE2E(b *testing.B) {
 				}
 			})
 
-			// 2_sonic_unsafe is the theoretical ceiling: same as 1_sonic_reader but
-			// passes the input via unsafe.String to avoid the string(text) copy.
-			// Shows how much the input copy in 1_sonic_reader costs.
-			b.Run("2_sonic_unsafe", func(b *testing.B) {
+			// 2_sonic_unsafe_num: UseNumber + unsafe.String, fresh decoder (no Reset reuse).
+			// Isolates the cost of decoder-reuse vs fresh allocation.
+			b.Run("2_sonic_unsafe_num", func(b *testing.B) {
+				b.ReportAllocs()
+				lineStr := unsafe.String(unsafe.SliceData(line), len(line)) //nolint:gosec
+				for b.Loop() {
+					dc := sonicDecoder.NewDecoder(lineStr)
+					dc.UseNumber()
+					var jsonFields map[string]interface{}
+					_ = dc.Decode(&jsonFields)
+					jsontransform.TransformNumbers(jsonFields)
+					event := &beat.Event{Fields: mapstr.M{}}
+					jsontransform.WriteJSONKeys(event, mapstr.M(jsonFields), false, true, false)
+					event, _ = labelsProc.Run(event)
+					event, _ = serviceProc.Run(event)
+					_ = event
+				}
+			})
+
+			// 3_sonic_useint64: UseInt64 decodes integers as int64 and floats as
+			// float64 in a single pass — no json.Number boxing, no TransformNumbers
+			// walk. This is the candidate next optimisation step.
+			b.Run("3_sonic_useint64", func(b *testing.B) {
 				b.ReportAllocs()
 				lineStr := unsafe.String(unsafe.SliceData(line), len(line)) //nolint:gosec
 				dc := sonicDecoder.NewDecoder(lineStr)
-				dc.UseNumber()
+				dc.UseInt64()
 				for b.Loop() {
 					var jsonFields map[string]interface{}
 					dc.Reset(lineStr)
 					_ = dc.Decode(&jsonFields)
-					jsontransform.TransformNumbers(jsonFields)
+					// No TransformNumbers needed: sonic emits int64/float64 directly.
 					event := &beat.Event{Fields: mapstr.M{}}
 					jsontransform.WriteJSONKeys(event, mapstr.M(jsonFields), false, true, false)
 					event, _ = labelsProc.Run(event)
