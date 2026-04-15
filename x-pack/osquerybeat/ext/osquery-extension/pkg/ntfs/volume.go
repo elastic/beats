@@ -19,6 +19,7 @@ import (
 	elasticntfsvolumes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_volumes"
 	"github.com/osquery/osquery-go/plugin/table"
 	"golang.org/x/sys/windows"
+	"www.velocidex.com/golang/go-ntfs/parser"
 )
 
 const (
@@ -58,6 +59,14 @@ type Volume struct {
 	// It will be nil for non-NTFS volumes.
 	sessionNeedsClose atomic.Bool
 	ntfsSession       func() (*NTFSSession, error)
+}
+
+func (v *Volume) ntfsContext() (*parser.NTFSContext, error) {
+	session, err := v.ntfsSession()
+	if err != nil {
+		return nil, err
+	}
+	return session.Context(), nil
 }
 
 // normalizeDriveLetter validates and normalizes a drive letter input, ensuring it is a single uppercase character.
@@ -131,7 +140,9 @@ func newVolume(driveLetter string) (*Volume, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create file: %w", err)
 	}
-	defer windows.CloseHandle(handle)
+
+	// Defer with a funcion to bypass errcheck on the CloseHandle since it is ignored intentionally
+	defer func() { _ = windows.CloseHandle(handle) }()
 
 	// Query the device number
 	var sdn STORAGE_DEVICE_NUMBER

@@ -182,7 +182,9 @@ func GetPartitions(physicalDrive string) ([]*Partition, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer windows.CloseHandle(handle)
+
+	// Defer with a funcion to bypass errcheck on the CloseHandle since it is ignored intentionally
+	defer func() { _ = windows.CloseHandle(handle) }()
 
 	// Allocate enough for the header plus up to 128 partitions, which should
 	// be plenty.  Any more and we will log an error.If we run into an issue where customers have more than 128 partitions
@@ -196,7 +198,7 @@ func GetPartitions(physicalDrive string) ([]*Partition, error) {
 		handle,
 		IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
 		nil, 0,
-		&buf[0], uint32(len(buf)),
+		&buf[0], uint32(len(buf)), //nolint:gosec // G115: buf is sized to 128 partitions, well within uint32
 		&bytesReturned,
 		nil,
 	)

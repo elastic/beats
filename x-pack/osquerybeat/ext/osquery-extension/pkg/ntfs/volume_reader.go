@@ -24,8 +24,8 @@ func (r *windowsVolumeReader) ReadAt(p []byte, off int64) (int, error) {
 	// ReadAt still needs to issue aligned reads to the kernel.
 	var done uint32
 	overlapped := &windows.Overlapped{
-		Offset:     uint32(off & 0xFFFFFFFF),
-		OffsetHigh: uint32(off >> 32),
+		Offset:     uint32(off & 0xFFFFFFFF),     //nolint:gosec // G115: masked to low 32 bits
+		OffsetHigh: uint32(off >> 32),            //nolint:gosec // G115: shifted to high 32 bits
 	}
 	err := windows.ReadFile(r.handle, p, &done, overlapped)
 	if err != nil {
@@ -36,7 +36,10 @@ func (r *windowsVolumeReader) ReadAt(p []byte, off int64) (int, error) {
 
 // Close closes the volume handle.
 func (r *windowsVolumeReader) Close() {
-	windows.CloseHandle(r.handle)
+	err := windows.CloseHandle(r.handle)
+	if err != nil {
+		getLogger().Errorf("failed to close handle: %v\n", err)
+	}
 }
 
 // NewVolumeReader opens a handle to the specified drive letter (e.g. "C") and returns a windowsVolumeReader for it.
