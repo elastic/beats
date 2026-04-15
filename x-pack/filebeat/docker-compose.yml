@@ -106,11 +106,6 @@ services:
     restart: "no"
   kafka:
     build: ${ES_BEATS}/testing/environments/docker/kafka
-    healthcheck:
-      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/localhost/9094'"]
-      interval: 2s
-      timeout: 2s
-      retries: 30
     ports:
       - 9092:9092
       - 9093:9093
