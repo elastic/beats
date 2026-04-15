@@ -18,6 +18,7 @@
 package readjson
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -243,5 +244,78 @@ func TestDecodeSequentialNoCrossContamination(t *testing.T) {
 	for i := range oracleLines {
 		require.Equal(t, results[i].expected, results[i].got,
 			"line %d result was contaminated by subsequent decodes", i)
+	}
+}
+
+// TestDecodeNumberTypes verifies that decode() emits the correct Go types for
+// JSON number values: integers → int64, fractions → float64. Neither json.Number
+// (missing TransformNumbers) nor float64-for-integers (sonic compat path ignoring
+// UseInt64, or a future regression in the UseNumber+TransformNumbers path) are
+// acceptable.
+//
+// This test will fail immediately if:
+//   - sonic's compat decoder is active and UseInt64 is mistakenly used
+//     (compat silently ignores UseInt64, emitting float64 for integers)
+//   - TransformNumbers is accidentally removed from the decode path
+//     (leaving json.Number in the map instead of int64/float64)
+//   - a sonic update changes number type semantics
+func TestDecodeNumberTypes(t *testing.T) {
+	r := &JSONReader{
+		cfg:    &Config{OverwriteKeys: true},
+		logger: logp.NewLogger("oracle_test"),
+	}
+
+	input := []byte(`{` +
+		`"int_zero":0,` +
+		`"int_pos":42,` +
+		`"int_neg":-7,` +
+		`"int_large":9223372036854775807,` +
+		`"float_pos":3.14,` +
+		`"float_neg":-2.718,` +
+		`"float_exp":1.5e10,` +
+		`"str":"hello",` +
+		`"bool":true` +
+		`}`)
+
+	_, got := r.decode(input)
+	require.NotNil(t, got, "decode returned nil map")
+
+	intCases := []struct {
+		key  string
+		want int64
+	}{
+		{"int_zero", 0},
+		{"int_pos", 42},
+		{"int_neg", -7},
+		{"int_large", 9223372036854775807},
+	}
+	for _, tc := range intCases {
+		v := got[tc.key]
+		got64, ok := v.(int64)
+		require.True(t, ok,
+			"key %q: want int64(%d), got %T(%v) — "+
+				"if float64: sonic compat path may be active (UseInt64 silently ignored); "+
+				"if json.Number: TransformNumbers was not called",
+			tc.key, tc.want, v, v)
+		require.Equal(t, tc.want, got64, "key %q: wrong int64 value", tc.key)
+	}
+
+	floatCases := []struct {
+		key  string
+		want float64
+	}{
+		{"float_pos", 3.14},
+		{"float_neg", -2.718},
+		{"float_exp", 1.5e10},
+	}
+	for _, tc := range floatCases {
+		v := got[tc.key]
+		_, isJSONNumber := v.(json.Number)
+		require.False(t, isJSONNumber,
+			"key %q: got json.Number — TransformNumbers was not called", tc.key)
+		gotF, ok := v.(float64)
+		require.True(t, ok,
+			"key %q: want float64(%v), got %T(%v)", tc.key, tc.want, v, v)
+		require.InDelta(t, tc.want, gotF, 1e-9, "key %q: wrong float64 value", tc.key)
 	}
 }
