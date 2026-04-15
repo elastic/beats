@@ -263,13 +263,13 @@ func newOTELCELMetrics(log *logp.Logger,
 		metric.WithDescription("Number of times a CEL program was started in a periodic run."),
 		metric.WithUnit("{run}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.started: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.program.run.started: %w", err)
 	}
 	programRunSuccessCount, err := meter.Int64Counter("input.cel.periodic.program.run.success",
 		metric.WithDescription("Number of times a CEL program terminated without an error in a periodic run."),
 		metric.WithUnit("{run}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.success: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.program.run.success: %w", err)
 	}
 	periodicBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.received",
 		metric.WithDescription("Number of event batches generated in a periodic run."),
