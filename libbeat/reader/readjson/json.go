@@ -48,6 +48,7 @@ type JSONParser struct {
 func newDecoder() *sonicDecoder.Decoder {
 	dec := sonicDecoder.NewDecoder("")
 	dec.UseNumber()
+	dec.CopyString() // prevent decoded strings from aliasing the input buffer
 	return dec
 }
 
