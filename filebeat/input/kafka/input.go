@@ -224,7 +224,9 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 
 // Filters kafka topics with provided regex list and returns a new list with topics or nil if not able to get topics
 func filterKafkaTopics(sarClient sarama.Client, log *logp.Logger, filters []*regexp.Regexp) []string {
+	sarClient.RefreshMetadata()
 	allTopics, err := sarClient.Topics()
+	log.Debugw("topics found", "topics", allTopics)
 	if err != nil {
 		log.Errorw("Error getting topics from kafka", "error", err)
 		return nil
