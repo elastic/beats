@@ -3935,7 +3935,7 @@ type: keyword
 *`cef.extensions.destinationMacAddress`*::
 +
 --
-Six colon-seperated hexadecimal numbers.
+Six colon-separated hexadecimal numbers.
 
 type: keyword
 
