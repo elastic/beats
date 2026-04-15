@@ -18,6 +18,7 @@
 package readjson
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -25,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -114,10 +116,11 @@ func TestUnmarshal(t *testing.T) {
 
 func TestDecodeJSON(t *testing.T) {
 	var tests = []struct {
-		Text         string
-		Config       Config
-		ExpectedText string
-		ExpectedMap  mapstr.M
+		Text                string
+		Config              Config
+		ExpectedText        string
+		ExpectedMap         mapstr.M
+		expectDecodingError bool // true when only "Error decoding JSON:" prefix is checked, not the exact message
 	}{
 		{
 			Text:         `{"message": "test", "value": 1}`,
@@ -158,11 +161,12 @@ func TestDecodeJSON(t *testing.T) {
 			ExpectedMap:  mapstr.M{"error": mapstr.M{"message": "Error decoding JSON: <nil>", "type": "json"}},
 		},
 		{
-			// Add key error helps debugging this
-			Text:         `{"message": "test", "value": "`,
-			Config:       Config{MessageKey: "value", AddErrorKey: true},
-			ExpectedText: `{"message": "test", "value": "`,
-			ExpectedMap:  mapstr.M{"error": mapstr.M{"message": "Error decoding JSON: unexpected EOF", "type": "json"}},
+			// Add key error helps debugging this; exact message is decoder-specific
+			Text:                `{"message": "test", "value": "`,
+			Config:              Config{MessageKey: "value", AddErrorKey: true},
+			ExpectedText:        `{"message": "test", "value": "`,
+			ExpectedMap:         mapstr.M{"error": mapstr.M{"type": "json"}},
+			expectDecodingError: true,
 		},
 		{
 			// If the text key is not found, put an error
@@ -196,13 +200,25 @@ func TestDecodeJSON(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "json_test")
 	for _, test := range tests {
-
 		var p JSONReader
 		p.cfg = &test.Config
 		p.logger = logger
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
-		assert.Equal(t, test.ExpectedMap, M)
+		if test.expectDecodingError {
+			// Only verify that the error key is present with type:"json" and that
+			// the message starts with "Error decoding JSON:" — the exact text is
+			// decoder-specific and not part of the contract.
+			require.NotNil(t, M)
+			errMap, ok := M["error"].(mapstr.M)
+			require.True(t, ok, "expected error to be a mapstr.M")
+			assert.Equal(t, "json", errMap["type"])
+			msg, _ := errMap["message"].(string)
+			assert.True(t, strings.HasPrefix(msg, "Error decoding JSON:"),
+				"error message should start with 'Error decoding JSON:', got: %q", msg)
+		} else {
+			assert.Equal(t, test.ExpectedMap, M)
+		}
 	}
 }
 

@@ -18,10 +18,11 @@
 package readjson
 
 import (
-	"bytes"
-	gojson "encoding/json"
 	"fmt"
 	"time"
+	"unsafe"
+
+	sonicDecoder "github.com/bytedance/sonic/decoder"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -36,11 +37,18 @@ type JSONReader struct {
 	reader reader.Reader
 	cfg    *Config
 	logger *logp.Logger
+	dec    *sonicDecoder.Decoder // reused across calls; lazily initialised
 }
 
 type JSONParser struct {
 	JSONReader
 	field, target string
+}
+
+func newDecoder() *sonicDecoder.Decoder {
+	dec := sonicDecoder.NewDecoder("")
+	dec.UseNumber()
+	return dec
 }
 
 // NewJSONReader creates a new reader that can decode JSON.
@@ -49,6 +57,7 @@ func NewJSONReader(r reader.Reader, cfg *Config, logger *logp.Logger) *JSONReade
 		reader: r,
 		cfg:    cfg,
 		logger: logger.Named("reader_json"),
+		dec:    newDecoder(),
 	}
 }
 
@@ -58,27 +67,33 @@ func NewJSONParser(r reader.Reader, cfg *ParserConfig, logger *logp.Logger) *JSO
 			reader: r,
 			cfg:    &cfg.Config,
 			logger: logger.Named("parser_json"),
+			dec:    newDecoder(),
 		},
 		cfg.Field,
 		cfg.Target,
 	}
 }
 
-// decodeJSON unmarshals the text parameter into a MapStr and
-// returns the new text column if one was requested.
+// decode unmarshals text as a JSON object into a MapStr and returns the new
+// text column if MessageKey is configured. It reuses r.dec across calls to
+// avoid per-line allocations; lazy init handles zero-value JSONReader in tests.
 func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
+	if r.dec == nil {
+		r.dec = newDecoder()
+	}
 	var jsonFields map[string]interface{}
-
-	err := unmarshal(text, &jsonFields)
+	r.dec.Reset(unsafe.String(unsafe.SliceData(text), len(text))) //nolint:gosec // G103: aliasing own slice for zero-copy reset
+	err := r.dec.Decode(&jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
 			r.logger.Errorf("Error decoding JSON: %v", err)
 		}
 		if r.cfg.AddErrorKey {
-			jsonFields = mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
+			return text, mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", err))}
 		}
-		return text, jsonFields
+		return text, nil
 	}
+	jsontransform.TransformNumbers(jsonFields)
 
 	if len(r.cfg.MessageKey) == 0 {
 		return []byte(""), jsonFields
@@ -103,16 +118,18 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 	return []byte(textString), jsonFields
 }
 
-// unmarshal is equivalent with json.Unmarshal but it converts numbers
-// to int64 where possible, instead of using always float64.
+// unmarshal parses text as a JSON object, converting numbers to int64 or
+// float64. It creates a one-shot decoder; callers that parse many lines should
+// use a JSONReader which reuses its decoder across calls.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
-	dec := gojson.NewDecoder(bytes.NewReader(text))
+	dec := sonicDecoder.NewDecoder(unsafe.String(unsafe.SliceData(text), len(text))) //nolint:gosec
 	dec.UseNumber()
-	err := dec.Decode(fields)
-	if err != nil {
+	if err := dec.Decode(fields); err != nil {
 		return err
 	}
-	jsontransform.TransformNumbers(*fields)
+	if *fields != nil {
+		jsontransform.TransformNumbers(*fields)
+	}
 	return nil
 }
 

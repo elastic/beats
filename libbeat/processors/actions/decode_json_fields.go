@@ -18,11 +18,12 @@
 package actions
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"strings"
+	"sync"
+
+	sonicDecoder "github.com/bytedance/sonic/decoder"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -45,6 +46,7 @@ type decodeJSONFields struct {
 	documentID    string
 	target        *string
 	logger        *logp.Logger
+	decoderPool   sync.Pool // pools *sonicDecoder.Decoder; safe for concurrent Run calls
 }
 
 type config struct {
@@ -96,6 +98,13 @@ func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 		documentID:    config.DocumentID,
 		target:        config.Target,
 		logger:        logger,
+		decoderPool: sync.Pool{
+			New: func() interface{} {
+				dec := sonicDecoder.NewDecoder("")
+				dec.UseNumber()
+				return dec
+			},
+		},
 	}
 	return f, nil
 }
@@ -118,7 +127,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		}
 
 		var output interface{}
-		err = unmarshal(f.maxDepth, text, &output, f.processArray)
+		err = f.unmarshal(f.maxDepth, text, &output, f.processArray)
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
@@ -182,8 +191,8 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
-	if err := decodeJSON(text, fields); err != nil {
+func (f *decodeJSONFields) unmarshal(maxDepth int, text string, fields *interface{}, processArray bool) error {
+	if err := f.decodeJSON(text, fields); err != nil {
 		return err
 	}
 
@@ -201,7 +210,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		}
 
 		var tmp interface{}
-		err := unmarshal(maxDepth, str, &tmp, processArray)
+		err := f.unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
 			return v, errors.Is(err, errProcessingSkipped)
 		}
@@ -232,26 +241,22 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	return nil
 }
 
-func decodeJSON(text string, to *interface{}) error {
-	dec := json.NewDecoder(strings.NewReader(text))
-	dec.UseNumber()
-	err := dec.Decode(to)
-
-	if err != nil {
+// decodeJSON parses text as a single JSON value into *to. It borrows a
+// *sonicDecoder.Decoder from the pool for the duration of the call; safe for
+// concurrent use. Numbers come out as json.Number and are converted to int64
+// or float64 by TransformNumbers (map results only, matching previous behaviour).
+func (f *decodeJSONFields) decodeJSON(text string, to *interface{}) error {
+	dec := f.decoderPool.Get().(*sonicDecoder.Decoder)
+	defer f.decoderPool.Put(dec)
+	dec.Reset(text)
+	if err := dec.Decode(to); err != nil {
 		return err
 	}
-
-	if dec.More() {
+	if err := dec.CheckTrailings(); err != nil {
 		return errors.New("multiple json elements found")
 	}
-
-	if _, err := dec.Token(); err != nil && !errors.Is(err, io.EOF) {
-		return err
-	}
-
-	switch O := (*to).(type) {
-	case map[string]interface{}:
-		jsontransform.TransformNumbers(O)
+	if m, ok := (*to).(map[string]interface{}); ok {
+		jsontransform.TransformNumbers(m)
 	}
 	return nil
 }
