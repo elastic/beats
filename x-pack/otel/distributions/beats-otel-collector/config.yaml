@@ -70,7 +70,7 @@ exporters:
 
   kafka:
     brokers:
-      - localhost:9092
+      - localhost:9094
     logs:
       topic: otlp_logs
       encoding: otlp_json
