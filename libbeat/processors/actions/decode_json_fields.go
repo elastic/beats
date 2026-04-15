@@ -102,7 +102,6 @@ func NewDecodeJSONFields(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 			New: func() interface{} {
 				dec := sonicDecoder.NewDecoder("")
 				dec.UseNumber()
-				dec.CopyString() // prevent decoded strings from aliasing the input buffer
 				return dec
 			},
 		},

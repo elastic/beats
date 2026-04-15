@@ -20,7 +20,6 @@ package readjson
 import (
 	"fmt"
 	"time"
-	"unsafe"
 
 	sonicDecoder "github.com/bytedance/sonic/decoder"
 
@@ -48,7 +47,6 @@ type JSONParser struct {
 func newDecoder() *sonicDecoder.Decoder {
 	dec := sonicDecoder.NewDecoder("")
 	dec.UseNumber()
-	dec.CopyString() // prevent decoded strings from aliasing the input buffer
 	return dec
 }
 
@@ -83,7 +81,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 		r.dec = newDecoder()
 	}
 	var jsonFields map[string]interface{}
-	r.dec.Reset(unsafe.String(unsafe.SliceData(text), len(text))) //nolint:gosec // G103: aliasing own slice for zero-copy reset
+	r.dec.Reset(string(text))
 	err := r.dec.Decode(&jsonFields)
 	if err != nil || jsonFields == nil {
 		if !r.cfg.IgnoreDecodingError {
@@ -123,7 +121,7 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 // float64. It creates a one-shot decoder; callers that parse many lines should
 // use a JSONReader which reuses its decoder across calls.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
-	dec := sonicDecoder.NewDecoder(unsafe.String(unsafe.SliceData(text), len(text))) //nolint:gosec
+	dec := sonicDecoder.NewDecoder(string(text))
 	dec.UseNumber()
 	if err := dec.Decode(fields); err != nil {
 		return err
