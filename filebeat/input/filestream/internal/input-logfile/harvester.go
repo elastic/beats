@@ -162,10 +162,7 @@ func (hg *defaultHarvesterGroup) notifyObserver(canceler inputv2.Canceler, srcID
 	if hg.notifyChan == nil {
 		return
 	}
-	// During shutdown the watcher goroutine that drains this channel
-	// exits before harvesters finish, so a plain blocking send would
-	// stall every closing harvester until the task group's 1-minute
-	// timeout expires.
+
 	select {
 	case hg.notifyChan <- HarvesterStatus{srcID, size}:
 	case <-canceler.Done():
