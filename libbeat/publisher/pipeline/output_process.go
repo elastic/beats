@@ -32,11 +32,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type outputController interface {
-	waitClose(ctx context.Context, force bool) error
-	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
-}
-
 // processOutputController manages the pipelines output capabilities, like:
 // - start
 // - stop
@@ -98,7 +93,7 @@ func newProcessOutputController(
 ) (*processOutputController, error) {
 	controller := &processOutputController{
 		beat:           beat,
-		logger:         beat.Logger.Named("outputController"),
+		logger:         beat.Logger.Named("processOutputController"),
 		monitors:       monitors,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
@@ -195,8 +190,8 @@ func (c *processOutputController) Reload(
 	return nil
 }
 
-// Close the queue, waiting up to the specified timeout for pending events
-// to complete.
+// Close the queue and output, waiting for pending events until all are
+// acknowledged or the provided context expires.
 func (c *processOutputController) closeQueue(ctx context.Context, force bool) {
 	c.queueLock.Lock()
 	defer c.queueLock.Unlock()
