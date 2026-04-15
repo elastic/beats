@@ -269,6 +269,15 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
+	var intakeQueueID string
+	if queueID, ok := receiverConfig["shared_intake_queue"]; ok {
+		if queueStrID, ok := queueID.(string); ok {
+			intakeQueueID = queueStrID
+		} else {
+			return nil, fmt.Errorf("shared_intake_queue must be a string")
+		}
+	}
+
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
@@ -276,7 +285,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		WaitClose:      receiverPublisherCloseTimeout,
 		Paths:          b.Paths,
 	}
-	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
