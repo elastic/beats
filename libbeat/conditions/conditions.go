@@ -37,6 +37,7 @@ type Config struct {
 	OR        []Config               `config:"or"`
 	AND       []Config               `config:"and"`
 	NOT       *Config                `config:"not"`
+	IsEmpty   string                 `config:"is_empty"`
 }
 
 // Condition is the interface for all defined conditions
@@ -87,6 +88,8 @@ func NewCondition(config *Config, logger *logp.Logger) (Condition, error) {
 		if err == nil {
 			condition, err = NewNotCondition(inner)
 		}
+	case config.IsEmpty != "":
+		condition = NewIsEmptyCondition(config.IsEmpty)
 	default:
 		err = errors.New("missing or invalid condition")
 	}

@@ -291,7 +291,7 @@ func (b *builder) Processors() []string {
 func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
 	var (
 		// pipeline processors
-		processors = newGroup("processPipeline", b.log)
+		pipelineProcessors = newGroup("processPipeline", b.log)
 
 		// client fields and metadata
 		clientMeta      = cfg.Meta
@@ -301,6 +301,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	needsCopy := b.alwaysCopy || localProcessors != nil || b.processors != nil
 
 	builtin := b.builtinMeta
+	if cfg.DisableHost {
+		tmp := builtin.Clone()
+		delete(tmp, "host")
+		builtin = tmp
+	}
 
 	var clientFields mapstr.M
 	for _, mod := range b.modifiers {
@@ -321,15 +326,15 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	// setup 1: generalize/normalize output (P)
 	if cfg.EventNormalization != nil {
 		if *cfg.EventNormalization {
-			processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
+			pipelineProcessors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
 		}
 	} else if !b.skipNormalize {
-		processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
+		pipelineProcessors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
 	}
 
 	// setup 2: add Meta from client config (C)
 	if m := clientMeta; len(m) > 0 {
-		processors.add(clientEventMeta(m, needsCopy))
+		pipelineProcessors.add(clientEventMeta(m, needsCopy))
 	}
 
 	// setup 4, 5: pipeline tags + client tags
@@ -337,7 +342,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	tags = append(tags, b.tags...)
 	tags = append(tags, cfg.EventMetadata.Tags...)
 	if len(tags) > 0 {
-		processors.add(newProcessor("add_tags", func(event *beat.Event) (*beat.Event, error) {
+		pipelineProcessors.add(newProcessor("add_tags", func(event *beat.Event) (*beat.Event, error) {
 			_ = mapstr.AddTagsWithKey(event.Fields, "tags", tags)
 			return event, nil
 		}))
@@ -358,22 +363,22 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
 		fieldsNeedsCopy := needsCopy || cfg.DynamicFields != nil || hasKeyAnyOf(fields, builtin)
-		processors.add(addfields.NewAddFields(fields, fieldsNeedsCopy, true))
+		pipelineProcessors.add(addfields.NewAddFields(fields, fieldsNeedsCopy, true))
 	}
 
 	if cfg.DynamicFields != nil {
 		checkCopy := func(m mapstr.M) bool {
 			return needsCopy || hasKeyAnyOf(m, builtin)
 		}
-		processors.add(makeAddDynMetaProcessor("dynamicFields", cfg.DynamicFields, checkCopy))
+		pipelineProcessors.add(makeAddDynMetaProcessor("dynamicFields", cfg.DynamicFields, checkCopy))
 	}
 
 	// setup 5: client processor list
-	processors.add(localProcessors)
+	pipelineProcessors.add(localProcessors)
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
-		processors.add(addfields.NewAddFields(meta, needsCopy, false))
+		pipelineProcessors.add(addfields.NewAddFields(meta, needsCopy, false))
 	}
 
 	// setup 8: pipeline processors list
@@ -385,63 +390,70 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		}
 
 		// Add the global pipeline as a function processor, so clients cannot close it
-		processors.add(newProcessor(b.processors.title, b.processors.Run))
+		pipelineProcessors.add(newProcessor(b.processors.title, b.processors.Run))
 	}
 
 	// setup 9: time series metadata
 	if b.timeSeries {
-		processors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields, b.log))
+		pipelineProcessors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields, b.log))
 	}
 
 	// setup 10: debug print final event (P)
 	if b.log.IsDebug() || management.UnderAgent() {
-		processors.add(debugPrintProcessor(b.info, b.log))
+		pipelineProcessors.add(debugPrintProcessor(b.info, b.log))
 	}
 
 	if cfg.DisableHost {
 		drop_hostname_cfg, err := config.NewConfigFrom(map[string]interface{}{
-			"fields":         []string{"host.name"},
-			"ignore_missing": true,
+			"fields":                 []string{"host.name"},
+			"ignore_missing":         true,
+			"when.not.contains.tags": "forwarded",
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed creating drop_fields processor config for host.name field: %w", err)
 		}
-		proc, err := actions.NewDropFields(drop_hostname_cfg, b.log)
+		proc, err := processors.NewConditional(actions.NewDropFields)(drop_hostname_cfg, b.log)
 		if err != nil {
 			return nil, fmt.Errorf("failed creating drop_fields processor for host.name field: %w", err)
 		}
-		processors.add(proc)
+		pipelineProcessors.add(proc)
+		fmt.Println("first done")
 
-		// If host.name is the only field under host, we need to drop the empty "host" object as well.
+		// If host.name was the only field under host, we need to drop the empty "host" object as well.
 		drop_host_cfg, err := config.NewConfigFrom(map[string]interface{}{
 			"fields":         []string{"host"},
 			"ignore_missing": true,
 			"when": map[string]interface{}{
-				"not": map[string]interface{}{
-					"has_fields": []string{"host"},
+				"and": []map[string]interface{}{
+					{
+						"is_empty": "host",
+					},
+					{
+						"not.contains.tags": "forwarded",
+					},
 				},
 			},
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed creating drop_fields processor config for host field: %w", err)
 		}
-		proc, err = actions.NewDropFields(drop_host_cfg, b.log)
+		proc, err = processors.NewConditional(actions.NewDropFields)(drop_host_cfg, b.log)
 		if err != nil {
 			return nil, fmt.Errorf("failed creating drop_fields processor for host field: %w", err)
 		}
-		processors.add(proc)
+		pipelineProcessors.add(proc)
 	}
 	// setup 11: drop all events if outputs are disabled (P)
 	if drop {
-		processors.add(dropDisabledProcessor)
+		pipelineProcessors.add(dropDisabledProcessor)
 	}
 
-	err := processors.SetPaths(paths)
+	err := pipelineProcessors.SetPaths(paths)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set paths for processing pipeline: %w", err)
 	}
 
-	return processors, nil
+	return pipelineProcessors, nil
 }
 
 func (b *builder) Close() error {

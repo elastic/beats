@@ -577,6 +577,10 @@ func TestDisableHost(t *testing.T) {
 
 		assert.NotContains(t, actual.Fields.Flatten(), "host.name",
 			"host.name field added by a processor should be dropped when DisableHost is true")
+		assert.Contains(t, actual.Fields.Flatten(), "host.hostname",
+			"host.hostname field added by a processor should not be dropped when DisableHost is true")
+		assert.Contains(t, actual.Fields.Flatten(), "host.os.name",
+			"host.os.name field added by a processor should not be dropped when DisableHost is true")
 		assert.Equal(t, "abc", actual.Fields["value"])
 	})
 
@@ -648,6 +652,40 @@ func TestDisableHost(t *testing.T) {
 			assert.NotContains(t, p.String(), "drop_fields",
 				"pipeline should not contain a drop_fields processor when DisableHost is false")
 		}
+	})
+
+	t.Run("doesn't removes host.name field for forwarded events", func(t *testing.T) {
+		// The old implementation only deleted host from builtin; it could not drop
+		// host.* fields that a processor adds during event processing. The new
+		// implementation appends a drop_fields processor at the end of the pipeline.
+		support, err := MakeDefaultSupport(true, nil)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		// Client processor that injects a richer host object (mimicking add_host_metadata).
+		hostProc := newGroup("test", logp.L())
+		hostProc.add(addfields.NewAddFields(mapstr.M{
+			"host": mapstr.M{
+				"name":     "injected-host",
+				"hostname": "injected-host.example.com",
+				"os":       mapstr.M{"name": "Linux"},
+			},
+		}, true, true))
+
+		prog, err := support.Create(beat.ProcessingConfig{
+			DisableHost: true,
+			Processor:   hostProc,
+		}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc", "tags": []string{"forwarded"}},
+		})
+		require.NoError(t, err)
+
+		assert.Contains(t, actual.Fields.Flatten(), "host.name",
+			"host.name field should not be removed for forwarded events")
+		assert.Equal(t, "abc", actual.Fields["value"])
 	})
 }
 
