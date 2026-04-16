@@ -552,7 +552,7 @@ func TestLoadDataFastPath(t *testing.T) {
 	p, err := newWithHostInfoFactory(testConfig, logptest.NewTestingLogger(t, ""), factory)
 	require.NoError(t, err)
 	require.IsType(t, (*addHostMetadata)(nil), p)
-	proc := p.(*addHostMetadata)
+	proc, _ := p.(*addHostMetadata)
 
 	// Construction triggers one fetch.
 	assert.Equal(t, int64(1), info.HostInfoRequestCount.Load())
@@ -596,8 +596,8 @@ func TestCachedDataNotCorruptedByDownstreamMutation(t *testing.T) {
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, host1Raw)
 	require.IsType(t, mapstr.M{}, host2Raw)
-	host1Map := host1Raw.(mapstr.M)
-	host2Map := host2Raw.(mapstr.M)
+	host1Map, _ := host1Raw.(mapstr.M)
+	host2Map, _ := host2Raw.(mapstr.M)
 	assert.NotSame(t, &host1Map, &host2Map, "host maps on successive events must not be aliased")
 
 	_, _ = event1.PutValue("host.name", "MUTATED")

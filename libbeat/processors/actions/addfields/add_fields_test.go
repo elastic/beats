@@ -425,7 +425,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 		// Original must be unchanged
 		require.IsType(t, mapstr.M{}, original["@metadata"])
-		meta := original["@metadata"].(mapstr.M)
+		meta, _ := original["@metadata"].(mapstr.M)
 		assert.Equal(t, "cached-input", meta["input_id"])
 	})
 
