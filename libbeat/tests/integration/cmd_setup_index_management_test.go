@@ -24,6 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -55,6 +56,9 @@ func TestSetupIdxMgmt(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
 	policy := "mockbeat"
+	deleteDataStream(t, esURL, dataStream)
+	deleteIndexTemplate(t, esURL, dataStream)
+	deleteILMPolicy(t, esURL, policy)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, dataStream)
 		deleteIndexTemplate(t, esURL, dataStream)
@@ -76,6 +80,9 @@ func TestSetupTemplateDisabled(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
 	policy := "mockbeat"
+	deleteDataStream(t, esURL, dataStream)
+	deleteIndexTemplate(t, esURL, dataStream)
+	deleteILMPolicy(t, esURL, policy)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, dataStream)
 		deleteIndexTemplate(t, esURL, dataStream)
@@ -97,6 +104,9 @@ func TestSetupILMDisabled(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
 	policy := "mockbeat"
+	deleteDataStream(t, esURL, dataStream)
+	deleteIndexTemplate(t, esURL, dataStream)
+	deleteILMPolicy(t, esURL, policy)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, dataStream)
 		deleteIndexTemplate(t, esURL, dataStream)
@@ -118,6 +128,9 @@ func TestSetupPolicyName(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
 	customPolicy := "mockbeat_bar"
+	deleteDataStream(t, esURL, dataStream)
+	deleteIndexTemplate(t, esURL, dataStream)
+	deleteILMPolicy(t, esURL, customPolicy)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, dataStream)
 		deleteIndexTemplate(t, esURL, dataStream)
@@ -139,6 +152,9 @@ func TestSetupILMPolicyNoOverwrite(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
 	policyName := "mockbeat-test"
+	deleteDataStream(t, esURL, dataStream)
+	deleteIndexTemplate(t, esURL, dataStream)
+	deleteILMPolicy(t, esURL, policyName)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, dataStream)
 		deleteIndexTemplate(t, esURL, dataStream)
@@ -200,6 +216,9 @@ func TestSetupTemplateNameAndPatternOnILMDisabled(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	customTemplate := "mockbeat_foobar"
 	policy := "mockbeat"
+	deleteDataStream(t, esURL, customTemplate)
+	deleteIndexTemplate(t, esURL, customTemplate)
+	deleteILMPolicy(t, esURL, policy)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, customTemplate)
 		deleteIndexTemplate(t, esURL, customTemplate)
@@ -223,6 +242,8 @@ func TestSetupTemplateWithOpts(t *testing.T) {
 	EnsureESIsRunning(t)
 	esURL := GetESURL(t, "http")
 	dataStream := "mockbeat-9.9.9"
+	deleteDataStream(t, esURL, dataStream)
+	deleteIndexTemplate(t, esURL, dataStream)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, dataStream)
 		deleteIndexTemplate(t, esURL, dataStream)
@@ -246,6 +267,9 @@ func TestSetupOverwriteTemplateOnILMPolicyCreated(t *testing.T) {
 	esURL := GetESURL(t, "http")
 	customTemplate := "mockbeat_foobar"
 	policy := "mockbeat"
+	deleteDataStream(t, esURL, customTemplate)
+	deleteIndexTemplate(t, esURL, customTemplate)
+	deleteILMPolicy(t, esURL, policy)
 	t.Cleanup(func() {
 		deleteDataStream(t, esURL, customTemplate)
 		deleteIndexTemplate(t, esURL, customTemplate)
@@ -296,7 +320,7 @@ func isTemplateLoaded(t *testing.T, template string) bool {
 	if status == http.StatusNotFound {
 		return false
 	}
-	require.Equal(t, http.StatusOK, status, "unexpected status checking template %s", template)
+	require.Equalf(t, http.StatusOK, status, "unexpected status checking template %s, body: %s", template, string(body))
 
 	var r IndexTemplateResult
 	require.NoError(t, json.Unmarshal(body, &r))
@@ -325,7 +349,7 @@ func isIndexPatternSet(t *testing.T, template string, expectedPattern string) bo
 	require.NoError(t, err)
 	status, body, err := HttpDo(t, http.MethodGet, indexURL)
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, status, "incorrect status code")
+	require.Equalf(t, http.StatusOK, status, "incorrect status code %d, body: %s", status, string(body))
 
 	var r IndexTemplateResult
 	require.NoError(t, json.Unmarshal(body, &r))
@@ -351,7 +375,7 @@ func isPolicyCreated(t *testing.T, policy string) bool {
 	if status == http.StatusNotFound {
 		return false
 	}
-	require.Equal(t, http.StatusOK, status, "unexpected status checking policy %s", policy)
+	require.Equalf(t, http.StatusOK, status, "unexpected status checking policy %s, status: %d, body: %s", policy, status, string(body))
 
 	if !strings.Contains(string(body), `"max_primary_shard_size":"50gb"`) {
 		return false
@@ -378,7 +402,7 @@ func putILMPolicy(t *testing.T, esURL url.URL, policyName string, body []byte) {
 	policyURL, err := FormatPolicyURL(t, esURL, policyName)
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	ctx, cancel := context.WithDeadline(t.Context(), time.Now().Add(30*time.Second))
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, policyURL.String(), bytes.NewReader(body))
 	require.NoError(t, err)
@@ -387,7 +411,9 @@ func putILMPolicy(t *testing.T, esURL url.URL, policyName string, body []byte) {
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
-	require.Equal(t, http.StatusOK, resp.StatusCode, "failed to PUT ILM policy %s", policyName)
+	bodyBytes, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+	require.Equalf(t, http.StatusOK, resp.StatusCode, "failed to PUT ILM policy: %s, resp: %d, body: %s", policyName, resp.StatusCode, string(bodyBytes))
 }
 
 // getILMPolicyPhases returns the phases map for the named ILM policy.
@@ -397,7 +423,7 @@ func getILMPolicyPhases(t *testing.T, esURL url.URL, policyName string) map[stri
 	require.NoError(t, err)
 	status, body, err := HttpDo(t, http.MethodGet, policyURL)
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, status, "failed to GET ILM policy %s", policyName)
+	require.Equalf(t, http.StatusOK, status, "failed to GET ILM policy %s, body: %s", policyName, string(body))
 
 	var result map[string]any
 	require.NoError(t, json.Unmarshal(body, &result))
@@ -415,10 +441,10 @@ func deleteILMPolicy(t *testing.T, esURL url.URL, policyName string) {
 	t.Helper()
 	policyURL, err := FormatPolicyURL(t, esURL, policyName)
 	require.NoError(t, err)
-	status, _, err := HttpDo(t, http.MethodDelete, policyURL)
+	status, body, err := HttpDo(t, http.MethodDelete, policyURL)
 	require.NoError(t, err)
 	if status != http.StatusOK && status != http.StatusNotFound {
-		t.Errorf("unexpected status %d deleting ILM policy %s", status, policyName)
+		t.Errorf("unexpected status %d deleting ILM policy %s, body: %s", status, policyName, string(body))
 	}
 }
 
@@ -439,10 +465,10 @@ func deleteDataStream(t *testing.T, esURL url.URL, dataStream string) {
 	t.Helper()
 	dsURL, err := FormatDatastreamURL(t, esURL, dataStream)
 	require.NoError(t, err)
-	status, _, err := HttpDo(t, http.MethodDelete, dsURL)
+	status, body, err := HttpDo(t, http.MethodDelete, dsURL)
 	require.NoError(t, err)
 	if status != http.StatusOK && status != http.StatusNotFound {
-		t.Errorf("unexpected status %d deleting data stream %s", status, dataStream)
+		t.Errorf("unexpected status %d deleting data stream %s, body: %s", status, dataStream, string(body))
 	}
 }
 
@@ -453,7 +479,7 @@ func getIndexTemplateSettings(t *testing.T, esURL url.URL, template string) map[
 	require.NoError(t, err)
 	status, body, err := HttpDo(t, http.MethodGet, indexURL)
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, status, "failed to GET index template %s", template)
+	require.Equalf(t, http.StatusOK, status, "failed to GET index template %s, status: %d, body: %s", template, status, string(body))
 
 	var r struct {
 		IndexTemplates []struct {
