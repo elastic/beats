@@ -236,20 +236,12 @@ require (
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
-<<<<<<< HEAD
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/mitchellh/gox v1.0.1
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/otiai10/copy v1.14.1
-=======
-	github.com/forensicanalysis/fslib v0.15.2
-	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.149.0
-	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
-	github.com/richardlehane/mscfb v1.0.6
-	github.com/rogpeppe/go-internal v1.14.1
->>>>>>> 8da485803 (otel: add tests for kafkaexporter (#50144))
+	github.com/otiai10/copy v1.14.1
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.55.0
 	go.opentelemetry.io/collector/component/componenttest v0.149.0
@@ -441,12 +433,8 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/zipkin v0.149.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
-<<<<<<< HEAD
-	github.com/otiai10/mint v1.6.3 // indirect
-=======
 	github.com/openzipkin/zipkin-go v0.4.3 // indirect
-	github.com/pelletier/go-toml v1.9.5 // indirect
->>>>>>> 8da485803 (otel: add tests for kafkaexporter (#50144))
+	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect

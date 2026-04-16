@@ -125,11 +125,7 @@ func getComponent() (otelcol.Factories, error) {
 	exporters, err := otelcol.MakeFactoryMap(
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
-<<<<<<< HEAD
-=======
-		logstashexporter.NewFactory(),
 		kafkaexporter.NewFactory(),
->>>>>>> 8da485803 (otel: add tests for kafkaexporter (#50144))
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
