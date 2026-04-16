@@ -16,10 +16,11 @@ import (
 
 	"golang.org/x/sys/windows"
 
+	"github.com/osquery/osquery-go/plugin/table"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticntfspartitions "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_partitions"
-	"github.com/osquery/osquery-go/plugin/table"
 )
 
 const (

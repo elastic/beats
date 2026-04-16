@@ -14,12 +14,13 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
-	elasticntfsvolumes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_volumes"
 	"github.com/osquery/osquery-go/plugin/table"
 	"golang.org/x/sys/windows"
 	"www.velocidex.com/golang/go-ntfs/parser"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticntfsvolumes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_volumes"
 )
 
 const (
