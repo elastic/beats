@@ -32,13 +32,8 @@ func TestInitializeAWSConfig(t *testing.T) {
 
 	assert.Equal(t, inputConfig.AccessKeyID, retrievedAWSConfig.AccessKeyID)
 	assert.Equal(t, inputConfig.SecretAccessKey, retrievedAWSConfig.SecretAccessKey)
-<<<<<<< HEAD
 	assert.True(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify) //nolint:errcheck // no need in test
 	assert.NotNil(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).Proxy)                            //nolint:errcheck // no need in test
-=======
-	assert.Equal(t, true, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify) //nolint:errcheck // no need in test
-	assert.NotNil(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).Proxy)                                   //nolint:errcheck // no need in test
->>>>>>> 183016ce9 ([libbeat] aws auth method: fix service name and region overwrite (#47712))
 }
 
 func TestGetAWSCredentials(t *testing.T) {
