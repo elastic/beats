@@ -95,7 +95,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 				},
 			},
 			afterFn: func(e *beat.Event) {
-				e.PutValue("dest.two.two", 3)
+				_, _ = e.PutValue("dest.two.two", 3)
 			},
 		},
 
@@ -121,7 +121,8 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 			},
 			afterFn: func(e *beat.Event) {
 				val, _ := e.GetValue("dest.two")
-				val.([]interface{})[1] = "c"
+				v, _ := val.([]interface{})
+				v[1] = "c"
 			},
 		},
 

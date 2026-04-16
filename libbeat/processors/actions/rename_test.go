@@ -262,11 +262,11 @@ func TestRenameRun(t *testing.T) {
 func TestRenameSingleFieldNoClone(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "rename_test")
 	tests := []struct {
-		name        string
-		input       mapstr.M
-		from, to    string
-		wantErr     bool
-		wantFields  mapstr.M
+		name       string
+		input      mapstr.M
+		from, to   string
+		wantErr    bool
+		wantFields mapstr.M
 	}{
 		{
 			name:       "success: single non-overlapping rename",
