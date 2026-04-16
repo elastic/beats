@@ -285,7 +285,7 @@ func TestErrorFlagging(t *testing.T) {
 		assert.Contains(t, flags, flagParsingError)
 	})
 
-	t.Run("when the parsing is succesful do not add a flag", func(t *testing.T) {
+	t.Run("when the parsing is successful do not add a flag", func(t *testing.T) {
 		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"tokenizer": "%{ok} %{valid}",
 		})
