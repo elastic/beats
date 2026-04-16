@@ -176,9 +176,7 @@ func (br *BeatReceiver) Start(host component.Host) error {
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		// set beatreceiver status
-		if groupReporter != nil {
-			groupReporter.UpdateStatus(status.Failed, err.Error())
-		}
+		groupReporter.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
 
@@ -207,12 +205,6 @@ func (br *BeatReceiver) Shutdown() error {
 	// At this point the publisher pipeline is stopped and no more events can
 	// be sent or acknowledged. Notify the beater to shutdown as well.
 	br.beater.Stop()
-
-	// Trigger the stop callback to close the publisher pipeline. Some beaters
-	// (e.g. metricbeat) call Manager.Stop() in their Run() method, but others
-	// (e.g. osquerybeat) do not. The OtelManager.stopOnce ensures the
-	// callback runs exactly once regardless.
-	br.beat.Manager.Stop()
 
 	br.beat.Instrumentation.Tracer().Close()
 	proc := br.beat.GetProcessors()

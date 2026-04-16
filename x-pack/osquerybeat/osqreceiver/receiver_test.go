@@ -64,7 +64,9 @@ func BenchmarkFactory(b *testing.B) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		rcvr, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
 }

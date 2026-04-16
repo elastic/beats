@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -95,8 +96,9 @@ type osquerybeat struct {
 	watcher        *Watcher
 	disableWatcher bool
 
-	osquerydFactory osqd.RunnerFactory
-	executablePath  func() (string, error)
+	osquerydFactory          osqd.RunnerFactory
+	executablePath           func() (string, error)
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 type osquerybeatPublisher interface {
@@ -712,6 +714,10 @@ func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntim
 // Stop stops osquerybeat.
 func (bt *osquerybeat) Stop() {
 	bt.close()
+}
+
+func (bt *osquerybeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin, rah *resetableActionHandler) {
