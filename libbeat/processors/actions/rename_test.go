@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -452,4 +453,40 @@ func TestRenameField(t *testing.T) {
 		assert.Equal(t, expMeta, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
+}
+
+// BenchmarkRenameSingleField benchmarks a single-field rename with different
+// top-level keys (e.g. message → event.original), the common agent pattern.
+func BenchmarkRenameSingleField(b *testing.B) {
+	c, err := conf.NewConfigFrom(map[string]interface{}{
+		"fields": []map[string]interface{}{
+			{"from": "message", "to": "event.original"},
+		},
+		"fail_on_error": true,
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	p, err := NewRenameFields(c, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{
+			Fields: mapstr.M{
+				"message": "test log line with some content",
+				"agent":   mapstr.M{"name": "test", "version": "8.17.0"},
+				"host":    mapstr.M{"name": "myhost", "os": mapstr.M{"type": "linux"}},
+				"cloud":   mapstr.M{"provider": "gcp", "region": "us-central1"},
+			},
+		}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
 }
