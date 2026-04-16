@@ -86,14 +86,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	// extracting it here for ease of use
 	logger := b.Info.Logger
 
-	// if output is set and if output is not otelconsumer, inform users
-	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
-		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
-	}
-
-	// all beatreceivers will use otelconsumer output by default
-	receiverConfig["output"] = map[string]any{
-		"otelconsumer": map[string]any{},
+	if receiverConfig["output"] != nil {
+		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 	}
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
@@ -269,6 +263,15 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
+	var intakeQueueID string
+	if queueID, ok := receiverConfig["shared_intake_queue"]; ok {
+		if queueStrID, ok := queueID.(string); ok {
+			intakeQueueID = queueStrID
+		} else {
+			return nil, fmt.Errorf("shared_intake_queue must be a string")
+		}
+	}
+
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
@@ -276,7 +279,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		WaitClose:      receiverPublisherCloseTimeout,
 		Paths:          b.Paths,
 	}
-	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
