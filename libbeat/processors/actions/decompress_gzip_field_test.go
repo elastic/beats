@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -222,4 +223,46 @@ func TestDecompressGzip(t *testing.T) {
 		assert.Equal(t, expectedMeta, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
+}
+
+// TestDecompressGzipFailOnErrorSafety verifies that when FailOnError=true and
+// decompression fails, the event fields are unchanged.
+func TestDecompressGzipFailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name  string
+		input mapstr.M
+	}{
+		{
+			name:  "invalid gzip data",
+			input: mapstr.M{"field1": "not gzip data"},
+		},
+		{
+			name:  "missing source field",
+			input: mapstr.M{"other": "value"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &decompressGzipField{
+				log: logptest.NewTestingLogger(t, "decompress_gzip_field"),
+				config: decompressGzipFieldConfig{
+					Field:       fromTo{From: "field1", To: "field2"},
+					FailOnError: true,
+				},
+			}
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := f.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
 }
