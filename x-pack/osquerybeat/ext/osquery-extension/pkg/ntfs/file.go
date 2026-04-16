@@ -17,13 +17,6 @@ import (
 	"www.velocidex.com/golang/go-ntfs/parser"
 )
 
-type entryType string
-
-const (
-	entryTypeFile      entryType = "file"
-	entryTypeDirectory entryType = "directory"
-)
-
 type fileNode struct {
 	mftEntry *parser.MFT_ENTRY
 	volume   *Volume
@@ -56,9 +49,10 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 	}
 
 	result := &elasticntfsfile.Result{
-		Drive:  f.volume.DriveLetter,
-		Device: f.volume.Device,
-		Inode:  int64(f.mftEntry.Record_number()),
+		Drive:     f.volume.DriveLetter,
+		Device:    f.volume.Device,
+		Partition: int32(f.volume.PartitionNumber), //nolint:gosec // G115: partition numbers are small and won't overflow int32
+		Inode:     int64(f.mftEntry.Record_number()),
 	}
 
 	result.Path = f.BuildFullPath()
@@ -90,22 +84,22 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 	fn := preferredFileName(fileNames)
 	if fn != nil {
 		result.Filename = fn.Name()
-		result.AllocatedSize = int64(fn.Allocated_size())
-		result.FnBtime = fn.Created().Time.Unix()
-		result.FnMtime = fn.File_modified().Time.Unix()
-		result.FnCtime = fn.Mft_modified().Time.Unix()
-		result.FnAtime = fn.File_accessed().Time.Unix()
+		result.AllocatedSize = int64(fn.Allocated_size()) //nolint:gosec // G115: NTFS allocated sizes fit within int64 range
+		result.FnBtime = fn.Created().Unix()
+		result.FnMtime = fn.File_modified().Unix()
+		result.FnCtime = fn.Mft_modified().Unix()
+		result.FnAtime = fn.File_accessed().Unix()
 	}
 
 	// Timestamps, flags, security ID, and owner ID from $STANDARD_INFORMATION.
 	if si, err := f.mftEntry.StandardInformation(ntfsCtx); err == nil {
-		result.Btime = si.Create_time().Time.Unix()
-		result.Mtime = si.File_altered_time().Time.Unix()
-		result.Ctime = si.Mft_altered_time().Time.Unix()
-		result.Atime = si.File_accessed_time().Time.Unix()
-		result.Flags = int32(si.Flags().Value)
-		result.SecurityId = int32(si.Sid())
-		result.OwnerId = int32(si.Owner_id())
+		result.Btime = si.Create_time().Unix()
+		result.Mtime = si.File_altered_time().Unix()
+		result.Ctime = si.Mft_altered_time().Unix()
+		result.Atime = si.File_accessed_time().Unix()
+		result.Flags = int32(si.Flags().Value) //nolint:gosec // G115: Windows file attribute flags are 32-bit values
+		result.SecurityId = int32(si.Sid())    //nolint:gosec // G115: security IDs fit in int32 as defined by the schema
+		result.OwnerId = int32(si.Owner_id())  //nolint:gosec // G115: owner IDs fit in int32 as defined by the schema
 	}
 
 	// Size, ADS presence, and ObjectID from attribute enumeration.
@@ -113,7 +107,7 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 		switch attr.Type().Value {
 		case 128: // $DATA
 			if attr.Name() == "" {
-				result.Size = int64(attr.DataSize())
+				result.Size = attr.DataSize()
 			} else {
 				result.Ads = 1
 			}

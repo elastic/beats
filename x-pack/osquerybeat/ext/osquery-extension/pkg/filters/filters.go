@@ -211,6 +211,19 @@ func GetConstraintFilters(queryContext table.QueryContext) []Filter {
 	return results
 }
 
+// GetColumnConstraints gets the constraints for a specific column and operator from the query context
+func GetColumnConstraints(queryContext table.QueryContext, columnName string, operator table.Operator) []Filter {
+	var filters []Filter
+	if clist, ok := queryContext.Constraints[columnName]; ok {
+		for _, constraint := range clist.Constraints {
+			if constraint.Operator == operator {
+				filters = append(filters, Filter{ColumnName: columnName, Operator: operator, Expression: constraint.Expression})
+			}
+		}
+	}
+	return filters
+}
+
 // GetValueByTag gets the value of a field by its tag
 func GetValueByOsqueryTag(s any, tagValue string) (reflect.Value, error) {
 	// Get the Value of the struct

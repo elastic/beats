@@ -63,6 +63,7 @@ func GetGenerateFunc(log *logger.Logger, client *client.ResilientClient) (table.
 type Result struct {
 	Drive          string `osquery:"drive"`           // Volume drive letter (e.g. C)
 	Device         string `osquery:"device"`          // Volume device path (e.g. \\.\C:)
+	Partition      int32  `osquery:"partition"`       // Partition number of the volume (e.g. 1)
 	Inode          int64  `osquery:"inode"`           // MFT record number (inode)
 	SequenceNumber int32  `osquery:"sequence_number"` // MFT entry sequence number
 	ParentInode    int64  `osquery:"parent_inode"`    // MFT record number of the parent directory

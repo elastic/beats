@@ -22,6 +22,7 @@ Returns information about files on NTFS volumes, parsed from the $MFT file on Wi
 |--------|------|-------------|
 | `drive` | `TEXT` | Volume drive letter (e.g. C) |
 | `device` | `TEXT` | Volume device path (e.g. \\.\C:) |
+| `partition` | `INTEGER` | Partition number of the volume (e.g. 1) |
 | `inode` | `BIGINT` | MFT record number (inode) |
 | `sequence_number` | `INTEGER` | MFT entry sequence number |
 | `parent_inode` | `BIGINT` | MFT record number of the parent directory |

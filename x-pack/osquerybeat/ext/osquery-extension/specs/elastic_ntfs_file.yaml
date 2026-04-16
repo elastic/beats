@@ -14,6 +14,9 @@ columns:
   - name: device
     type: TEXT
     description: Volume device path (e.g. \\.\C:)
+  - name: partition
+    type: INTEGER
+    description: Partition number of the volume (e.g. 1)
   - name: inode
     type: BIGINT
     description: MFT record number (inode)

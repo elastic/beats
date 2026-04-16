@@ -15,14 +15,16 @@ import (
 
 	"www.velocidex.com/golang/go-ntfs/parser"
 
+	"github.com/osquery/osquery-go/plugin/table"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticntfsfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_file"
-	"github.com/osquery/osquery-go/plugin/table"
 )
 
-func (v *Volume) explodePath(p string, remove_ads bool) ([]string, error) {
+// Validates a given path and drive letter, then splits the path into components.
+func (v *Volume) explodePath(p string) ([]string, error) {
 	if p == "" {
 		return nil, fmt.Errorf("path is empty")
 	}
@@ -34,9 +36,9 @@ func (v *Volume) explodePath(p string, remove_ads bool) ([]string, error) {
 		}
 		p = strings.TrimPrefix(p, v.DriveLetter+":/")
 	}
-	if remove_ads {
-		p = strings.Split(p, ":")[0] // remove ADS if any as not needed
-	}
+	// Remove ADS if present, as NTFS file enumeration does not consider ADS as part of the filename
+	p = strings.Split(p, ":")[0]
+
 	if p == "" {
 		return nil, fmt.Errorf("path is empty after removing drive letter and ADS")
 	}
@@ -47,6 +49,7 @@ func (v *Volume) explodePath(p string, remove_ads bool) ([]string, error) {
 // childrenMatching lists all direct children of parent whose names satisfy predicate.
 // It owns the Dir → GetMFT → NewFileInfo pipeline and applies the correct MftReference mask.
 func (v *Volume) childrenMatching(parent *fileNode, predicate func(string) bool) ([]*fileNode, error) {
+	log := getLogger()
 	ntfsCtx, err := v.ntfsContext()
 	if err != nil {
 		return nil, err
@@ -57,21 +60,29 @@ func (v *Volume) childrenMatching(parent *fileNode, predicate func(string) bool)
 		if name == "." || name == ".." {
 			continue
 		}
+
 		// Dir returns both DOS and Win32 entries for each child; We will skip the DOS entries
 		// since they will create duplicate inodes in the results
 		if idx.File().NameType().Name == "DOS" {
 			continue
 		}
+
+		// Apply the predicate to filter out unwanted children before the more expensive GetMFT call.
 		if !predicate(name) {
 			continue
 		}
+
+		// The MftReference needs to be masked to get the actual record number
 		mftEntry, err := ntfsCtx.GetMFT(int64(idx.MftReference() & 0xFFFFFFFFFFFF))
 		if err != nil {
 			return nil, fmt.Errorf("GetMFT for %q: %w", name, err)
 		}
+
+		// Create a fileNode for this child and add it to the results if successful
 		node, err := NewFileNode(v, mftEntry, name, parent)
 		if err != nil {
-			return nil, fmt.Errorf("NewFileInfo for %q: %w", name, err)
+			log.Errorf("newFileNode failed for %q: %v", name, err)
+			continue
 		}
 		result = append(result, node)
 	}
@@ -87,15 +98,16 @@ func (v *Volume) lookupChild(parent *fileNode, name string) (*fileNode, error) {
 	}
 	mftEntry, err := parent.mftEntry.Open(ntfsCtx, name)
 	if err != nil {
-		return nil, fmt.Errorf("Open %q: %w", name, err)
+		return nil, fmt.Errorf("open %q: %w", name, err)
 	}
 	node, err := NewFileNode(v, mftEntry, name, parent)
 	if err != nil {
-		return nil, fmt.Errorf("NewFileInfo for %q: %w", name, err)
+		return nil, fmt.Errorf("newFileNode failed for %q: %w", name, err)
 	}
 	return node, nil
 }
 
+// Shortcut Helper for the Root MFT entry
 func (v *Volume) Root() (*parser.MFT_ENTRY, error) {
 	ntfsCtx, err := v.ntfsContext()
 	if err != nil {
@@ -144,7 +156,7 @@ func (v *Volume) FindByInode(inode int64) (*fileNode, error) {
 }
 
 func (v *Volume) FindByPath(fullPath string, parent *fileNode) (*fileNode, error) {
-	explodedPath, err := v.explodePath(fullPath, true)
+	explodedPath, err := v.explodePath(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to explode path: %w", err)
 	}
@@ -186,96 +198,20 @@ func (v *Volume) FindByDirectory(directory string, pattern string) ([]*fileNode,
 		matched, _ := path.Match(pattern, name)
 		return matched
 	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to list children of directory %s: %w", directory, err)
+	}
 	return children, nil
 }
 
-func (v *Volume) IndexEntries(directory string, filename string) ([]*fileNode, error) {
-	ntfsCtx, err := v.ntfsContext()
-	if err != nil {
-		return nil, err
-	}
-
-	node, err := v.FindByPath(directory, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find node for path %s: %w", directory, err)
-	}
-	log := getLogger()
-
-	dirEntries := node.mftEntry.DirNodes(ntfsCtx)
-
-	var slacks []*parser.INDEX_RECORD_ENTRY
-	var active []*parser.INDEX_RECORD_ENTRY
-	for _, dirEntry := range dirEntries {
-		slacks = append(slacks, dirEntry.ScanSlack(ntfsCtx)...)
-		active = append(active, dirEntry.GetRecords(ntfsCtx)...)
-	}
-
-	log.Infof("Found %d index record entries in slack for directory %s", len(slacks), directory)
-	log.Infof("Found %d active index record entries for directory %s", len(active), directory)
-
-	notepad_slacks := 0
-	for _, slack := range slacks {
-		if !strings.EqualFold(slack.File().Name(), filename) {
-			continue
-		}
-		// if !slack.IsValid() {
-		// 	log.Errorf("Skipping invalid index record entry for %s: %s", filename, slack.DebugString())
-		// 	continue
-		// }
-		// log.Infof("Found matching slack index record entry for %s: %s", filename, slack.DebugString())
-		log.Infof("SlackEntryOffset: %d, SlackEntrySize: %s", slack.Offset, slack.DebugString())
-		notepad_slacks++
-	}
-
-	notepad_actives := 0
-	for _, active := range active {
-		if !strings.EqualFold(active.File().Name(), filename) {
-			continue
-		}
-		// if !active.IsValid() {
-		// 	log.Errorf("Skipping invalid index record entry for %s: %s", filename, active.DebugString())
-		// 	continue
-		// }
-		// log.Infof("Found matching active index record entry for %s: %s", filename, active.DebugString())
-		notepad_actives++
-	}
-	log.Infof("Total matching slack index record entries for %s: %d", filename, notepad_slacks)
-	log.Infof("Total matching active index record entries for %s: %d", filename, notepad_actives)
-
-	// fileInfos := parser.ExtractI30List(v.ntfsContext(), node.mftEntry)
-	// log.Infof("Extracted %d index entries for directory %s", len(fileInfos), directory)
-
-	// for _, fileInfo := range fileInfos {
-	// 	if !strings.EqualFold(fileInfo.Name, filename) {
-	// 		continue
-	// 	}
-	// 	marshaled, err := json.MarshalIndent(fileInfo, "", "  ")
-	// 	if err != nil {
-	// 		log.Errorf("Failed to marshal fileInfo for %s: %v", filename, err)
-	// 		continue
-	// 	}
-	// 	log.Infof("Found matching index entry for %s: %s", filename, string(marshaled))
-	// }
-
-	// for _, idx := range node.mftEntry.Dir(v.ntfsContext()) {
-	// 	if !strings.EqualFold(idx.File().Name(), filename) {
-	// 		continue
-	// 	}
-	// 	mftEntry, err := v.ntfsContext().GetMFT(int64(idx.MftReference() & 0xFFFFFFFFFFFF))
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("GetMFT for %q: %w", filename, err)
-	// 	}
-	// 	fileInfos := parser.ExtractI30List(v.ntfsContext(), mftEntry)
-	// 	log.Infof("Extracted %d index entries for %s in directory %s", len(fileInfos), filename, directory)
-	// }
-	return nil, nil
-}
-
+// Drive letter is a required parameter for constructing a Volume, so we need it to move forward with the query.
+// It can be provided directly as a constraint, or indirectly via a path or directory constraint.
+// This function attempts to extract the drive letter from the query constraints in order of specificity: drive > path > directory.
 func determineDriveLetter(queryContext table.QueryContext) (string, error) {
 	driveFilters := filters.GetColumnConstraints(queryContext, "drive", table.OperatorEquals)
 	if len(driveFilters) > 0 {
 		if len(driveFilters) > 1 {
-			return "", fmt.Errorf("Multiple drive constraints found, only one is supported: %s", driveFilters[0].Expression)
+			return "", fmt.Errorf("multiple drive constraints found, only one is supported: %s", driveFilters[0].Expression)
 		}
 		return driveFilters[0].Expression, nil
 	}
@@ -294,7 +230,7 @@ func determineDriveLetter(queryContext table.QueryContext) (string, error) {
 	pathFilters := filters.GetColumnConstraints(queryContext, "path", table.OperatorEquals)
 	if len(pathFilters) > 0 {
 		if len(pathFilters) > 1 {
-			return "", fmt.Errorf("Multiple path constraints found, only one is supported: %s", pathFilters[0].Expression)
+			return "", fmt.Errorf("multiple path constraints found, only one is supported: %s", pathFilters[0].Expression)
 		}
 		return getDriveLetterFromPath(pathFilters[0].Expression)
 	}
@@ -302,7 +238,7 @@ func determineDriveLetter(queryContext table.QueryContext) (string, error) {
 	directoryFilters := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
 	if len(directoryFilters) > 0 {
 		if len(directoryFilters) > 1 {
-			return "", fmt.Errorf("Multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
+			return "", fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
 		}
 		return getDriveLetterFromPath(directoryFilters[0].Expression)
 	}
@@ -310,24 +246,25 @@ func determineDriveLetter(queryContext table.QueryContext) (string, error) {
 }
 
 func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticntfsfile.Result, error) {
-	
+	setLogger(log)
+
 	directoryConstraints := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
 	pathConstraints := filters.GetColumnConstraints(queryContext, "path", table.OperatorEquals)
 	inodeConstraints := filters.GetColumnConstraints(queryContext, "inode", table.OperatorEquals)
 	filenameConstraints := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
-	
+
 	// Check for conflicting constraints
 	if len(directoryConstraints) > 0 && (len(pathConstraints) > 0 || len(inodeConstraints) > 0) {
 		return nil, fmt.Errorf("directory constraint cannot be combined with path or inode constraints")
 	}
 	if len(directoryConstraints) > 1 {
-		return nil, fmt.Errorf("Multiple directory constraints found, only one is supported: %s", directoryConstraints[0].Expression)
+		return nil, fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryConstraints[0].Expression)
 	}
 	if len(directoryConstraints) > 0 && len(filenameConstraints) == 0 {
 		return nil, fmt.Errorf("directory constraint requires a filename glob constraint")
 	}
 	if len(directoryConstraints) > 0 && len(filenameConstraints) > 1 {
-		return nil, fmt.Errorf("Multiple filename constraints found, only one is supported: %s", filenameConstraints[0].Expression)
+		return nil, fmt.Errorf("multiple filename constraints found, only one is supported: %s", filenameConstraints[0].Expression)
 	}
 
 	if len(pathConstraints) > 0 && len(inodeConstraints) > 0 {
@@ -336,12 +273,12 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 
 	// Check for multiple constraints
 	if len(pathConstraints) > 1 {
-		return nil, fmt.Errorf("Multiple path constraints found, only one is supported: %s", pathConstraints[0].Expression)
+		return nil, fmt.Errorf("multiple path constraints found, only one is supported: %s", pathConstraints[0].Expression)
 	}
 
 	// Check for multiple constraints
 	if len(inodeConstraints) > 1 {
-		return nil, fmt.Errorf("Multiple inode constraints found, only one is supported: %s", inodeConstraints[0].Expression)
+		return nil, fmt.Errorf("multiple inode constraints found, only one is supported: %s", inodeConstraints[0].Expression)
 	}
 
 	// Determine the drive letter from the query constraints
@@ -391,15 +328,15 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 		return []elasticntfsfile.Result{*materialized}, nil
 	}
 
-	// Handle directory constraint	
+	// Handle directory constraint
 	if len(directoryConstraints) > 0 {
 		directoryFilters := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
 		if len(directoryFilters) != 1 {
-			return nil, fmt.Errorf("Multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
+			return nil, fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
 		}
 		filenameFilters := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
 		if len(filenameFilters) != 1 {
-			return nil, fmt.Errorf("Directory constraint requires a filename glob constraint")
+			return nil, fmt.Errorf("directory constraint requires a filename glob constraint")
 		}
 		directory := directoryFilters[0].Expression
 		pattern := filenameFilters[0].Expression
@@ -413,7 +350,7 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 		for _, node := range nodes {
 			record, err := node.Materialize()
 			if err != nil {
-				log.Errorf("Failed to materialize file record for node %v: %v", node, err)
+				log.Errorf("failed to materialize file record for node %v: %v", node, err)
 				continue
 			}
 			results = append(results, *record)

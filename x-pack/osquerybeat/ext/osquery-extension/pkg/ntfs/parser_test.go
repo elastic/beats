@@ -30,14 +30,6 @@ func TestGetPartitions(t *testing.T) {
 	}
 }
 
-func TestIndexEntries(t *testing.T) {
-	volumeInfo, err := newVolume("C")
-	assert.NoError(t, err, "GetVolumeInformation Failed")
-	
-	_, err = volumeInfo.IndexEntries("C:\\Windows\\System32", "notepad.exe")
-	assert.NoError(t, err, "IndexEntries Failed")
-}
-
 func TestGetAllDriveLetters(t *testing.T) {
 	got, gotErr := getAllDriveLetters()
 	assert.NoError(t, gotErr, "GetAllDriveLetters() should not return an error")
@@ -56,30 +48,30 @@ func TestGetVolumeInformation(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			name: "C drive information",
+			name:        "C drive information",
 			driveLetter: "C",
 			want: &Volume{
-				DriveLetter: "C",
-				Device: "\\\\.\\PhysicalDrive0",
+				DriveLetter:    "C",
+				Device:         "\\\\.\\PhysicalDrive0",
 				FileSystemName: "NTFS",
 			},
 			wantErr: false,
 		},
 		{
-			name: "C: drive information with colon",
+			name:        "C: drive information with colon",
 			driveLetter: "C:",
 			want: &Volume{
-				DriveLetter: "C",
-				Device: "\\\\.\\PhysicalDrive0",
+				DriveLetter:    "C",
+				Device:         "\\\\.\\PhysicalDrive0",
 				FileSystemName: "NTFS",
 			},
 			wantErr: false,
 		},
 		{
-			name: "Invalid drive letter",
+			name:        "Invalid drive letter",
 			driveLetter: "Z",
-			want: nil,
-			wantErr: true,
+			want:        nil,
+			wantErr:     true,
 		},
 	}
 
@@ -108,15 +100,15 @@ func TestVolumeInfo_FindByInode(t *testing.T) {
 		// Named input parameters for receiver constructor.
 		driveLetter string
 		// Named input parameters for target function.
-		inode    int64
+		inode   int64
 		want    *fileNode
 		wantErr bool
 	}{
 		{
-			name: "Find existing file by inode",
+			name:        "Find existing file by inode",
 			driveLetter: "C",
-			inode: 46459, // Replace with a valid inode for testing
-			want: &fileNode{
+			inode:       46459, // Replace with a valid inode for testing
+			want:        &fileNode{
 				// TODO: Fill in the expected fileNode fields.
 			},
 			wantErr: false,
@@ -154,10 +146,10 @@ func TestVolumeInfo_FindByPath(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Find existing file by path",
+			name:        "Find existing file by path",
 			driveLetter: "C",
-			path: "C:\\Windows\\System32\\notepad.exe",
-			want: &parser.MFT_ENTRY{
+			path:        "C:\\Windows\\System32\\notepad.exe",
+			want:        &parser.MFT_ENTRY{
 				// TODO: Fill in the expected MFT_ENTRY fields.
 			},
 			wantErr: false,
@@ -237,3 +229,53 @@ func TestVolumeInfo_FindByPath(t *testing.T) {
 // 		})
 // 	}
 // }
+
+func TestVolume_explodePath(t *testing.T) {
+	tests := []struct {
+		name    string
+		volume  *Volume
+		p       string
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "normal path",
+			volume: &Volume{
+				DriveLetter: "C",
+			},
+			p: "C:\\Windows\\System32\\notepad.exe",
+			want: []string{
+				"Windows",
+				"System32",
+				"notepad.exe",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Wrong drive letter in path",
+			volume: &Volume{
+				DriveLetter: "C",
+			},
+			p:       "D:\\Windows\\System32\\notepad.exe",
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := tt.volume.explodePath(tt.p)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("explodePath() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("explodePath() succeeded unexpectedly")
+			}
+			if !assert.Equal(t, tt.want, got, "explodePath() = %v, want %v", got, tt.want) {
+				t.Errorf("explodePath() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
