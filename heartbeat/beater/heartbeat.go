@@ -56,8 +56,9 @@ type Heartbeat struct {
 	monitorReloader    *cfgfile.Reloader
 	monitorFactory     *monitors.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
-	replaceStateLoader       func(sl monitorstate.StateLoader)
-	trace                    tracer.Tracer
+	replaceStateLoader func(sl monitorstate.StateLoader)
+	trace              tracer.Tracer
+
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
