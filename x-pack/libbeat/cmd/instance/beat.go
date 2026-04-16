@@ -86,9 +86,23 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	// extracting it here for ease of use
 	logger := b.Info.Logger
 
-	// if output is set and if output is not otelconsumer, inform users
-	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
-		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
+	// Read any existing otelconsumer output configuration (e.g. include_metadata)
+	// before we overwrite the output section. If the user configured a different
+	// output, warn them and discard it.
+	if out, ok := receiverConfig["output"]; ok {
+		if outMap, ok := out.(map[string]any); ok {
+			if oc, ok := outMap["otelconsumer"]; ok {
+				if ocMap, ok := oc.(map[string]any); ok {
+					if v, ok := ocMap["include_metadata"]; ok {
+						if include, ok := v.(bool); ok {
+							b.Info.IncludeMetadata = include
+						}
+					}
+				}
+			} else {
+				logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
+			}
+		}
 	}
 
 	// all beatreceivers will use otelconsumer output by default
