@@ -112,7 +112,7 @@ var _ osquerybeatPublisher = (*pub.Publisher)(nil)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
-	log := logp.NewLogger("osquerybeat") //nolint:forbidigo // existing code; tests create beat.Beat without Info.Logger
+	log := b.Info.Logger
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
