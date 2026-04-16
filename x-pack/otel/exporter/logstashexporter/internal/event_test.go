@@ -11,13 +11,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/client"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 )
 
 func TestParseEvent(t *testing.T) {
@@ -29,17 +27,6 @@ func TestParseEvent(t *testing.T) {
 	}{
 		{
 			name: "valid beats event with timestamp",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
 				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
@@ -54,17 +41,6 @@ func TestParseEvent(t *testing.T) {
 		},
 		{
 			name: "valid beats event without timestamp",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
 				observedTime := time.Now()
@@ -78,62 +54,7 @@ func TestParseEvent(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "invalid beats event metadata - missing beat name",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatVersionCtxKey: {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			setupLog: func() plog.LogRecord {
-				lr := plog.NewLogRecord()
-				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
-
-				bodyMap := lr.Body().SetEmptyMap()
-				bodyMap.PutStr("message", "test message")
-
-				return lr
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid beats event metadata - empty beat name",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatIndexPrefixCtxKey: {""},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			setupLog: func() plog.LogRecord {
-				lr := plog.NewLogRecord()
-				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
-
-				bodyMap := lr.Body().SetEmptyMap()
-				bodyMap.PutStr("message", "test message")
-
-				return lr
-			},
-			wantErr: true,
-		},
-		{
 			name: "invalid event body - not a map",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:    {"filebeat"},
-						otelctx.BeatVersionCtxKey: {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
 				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
@@ -147,7 +68,6 @@ func TestParseEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.setupCtx()
 			log := tt.setupLog()
 
 			event, err := parseEvent(&log)
@@ -156,13 +76,8 @@ func TestParseEvent(t *testing.T) {
 				require.Error(t, err)
 				assert.True(t, consumererror.IsPermanent(err))
 			} else {
-				ctxData := client.FromContext(ctx)
 
 				require.NoError(t, err)
-
-				// Verify metadata from context
-				assert.Equal(t, ctxData.Metadata.Get("beat_name")[0], event.Meta["beat"])
-				assert.Equal(t, ctxData.Metadata.Get("beat_version")[0], event.Meta["version"])
 
 				// Verify fields match original log record body
 				originalBody := log.Body().Map().AsRaw()
