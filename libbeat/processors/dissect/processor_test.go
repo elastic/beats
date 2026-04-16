@@ -495,11 +495,10 @@ func TestPrefixWithIndirectField(t *testing.T) {
 		"field":         "message",
 		"target_prefix": "dissect",
 	}
-	c, _ := conf.NewConfigFrom(settings)
+	c, err := conf.NewConfigFrom(settings)
+	require.NoError(t, err)
 	p, err := NewProcessor(c, logptest.NewTestingLogger(t, ""))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	event := &beat.Event{
 		Fields: mapstr.M{
@@ -508,28 +507,18 @@ func TestPrefixWithIndirectField(t *testing.T) {
 	}
 
 	result, err := p.Run(event)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// The indirect field creates a dynamic key "id" with value "7736".
 	// With target_prefix="dissect", it should become "dissect.id".
 	val, err := result.GetValue("dissect.id")
-	if err != nil {
-		t.Fatalf("expected dissect.id to exist: %v", err)
-	}
-	if val != "7736" {
-		t.Fatalf("expected dissect.id=7736, got %v", val)
-	}
+	require.NoError(t, err, "expected dissect.id to exist")
+	assert.Equal(t, "7736", val)
 
 	// Also verify the static field
 	val, err = result.GetValue("dissect.message")
-	if err != nil {
-		t.Fatalf("expected dissect.message to exist: %v", err)
-	}
-	if val != "hello" {
-		t.Fatalf("expected dissect.message=hello, got %v", val)
-	}
+	require.NoError(t, err, "expected dissect.message to exist")
+	assert.Equal(t, "hello", val)
 }
 
 // BenchmarkDissectProcessor benchmarks the full processor Run path
@@ -583,11 +572,10 @@ func BenchmarkDissectProcessor(b *testing.B) {
 				"field":         "message",
 				"target_prefix": tc.prefix,
 			}
-			c, _ := conf.NewConfigFrom(settings)
+			c, err := conf.NewConfigFrom(settings)
+			require.NoError(b, err)
 			p, err := NewProcessor(c, logptest.NewTestingLogger(b, ""))
-			if err != nil {
-				b.Fatal(err)
-			}
+			require.NoError(b, err)
 
 			event := &beat.Event{
 				Fields: mapstr.M{
