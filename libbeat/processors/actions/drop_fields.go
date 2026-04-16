@@ -42,14 +42,14 @@ type dropFields struct {
 
 func init() {
 	processors.RegisterPlugin("drop_fields",
-		checks.ConfigChecked(newDropFields,
+		checks.ConfigChecked(NewDropFields,
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "when", "ignore_missing")))
 
-	jsprocessor.RegisterPlugin("DropFields", newDropFields)
+	jsprocessor.RegisterPlugin("DropFields", NewDropFields)
 }
 
-func newDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
+func NewDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`

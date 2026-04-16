@@ -267,6 +267,24 @@ func TestProcessorsConfigs(t *testing.T) {
 				"tags":   []string{"tag"},
 			},
 		},
+		"with beat default fields and disable host": {
+			factory: MakeDefaultBeatSupport(true),
+			local: beat.ProcessingConfig{
+				DisableHost: true,
+			},
+			event: `{"value": "abc"}`,
+			want: mapstr.M{
+				"ecs": ecsFields,
+				"agent": mapstr.M{
+					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
+					"name":         "test.host.name",
+					"id":           "123e4567-e89b-12d3-a456-426655440001",
+					"type":         "test",
+					"version":      "0.1",
+				},
+				"value": "abc",
+			},
+		},
 	}
 
 	for name, test := range cases {
@@ -492,6 +510,145 @@ func TestProcessingDiagnostics(t *testing.T) {
 
 	p := factory.Processors()
 	assert.Empty(t, p)
+}
+
+func TestDisableHost(t *testing.T) {
+	defaultInfo := beat.Info{
+		Beat:        "test",
+		EphemeralID: uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440000")),
+		Hostname:    "test.host.name",
+		ID:          uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440001")),
+		Name:        "test.host.name",
+		Version:     "0.1",
+	}
+
+	t.Run("removes host.name builtin field added via WithHost modifier", func(t *testing.T) {
+		// MakeDefaultBeatSupport includes WithHost which adds host.name as a builtin field.
+		// DisableHost must drop it from the final event.
+		factory := MakeDefaultBeatSupport(true)
+		support, err := factory(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		prog, err := support.Create(beat.ProcessingConfig{DisableHost: true}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+
+		assert.NotContains(t, actual.Fields, "host",
+			"host field should be removed when DisableHost is true")
+		assert.Contains(t, actual.Fields, "ecs",
+			"ecs field should not be affected by DisableHost")
+		assert.Contains(t, actual.Fields, "agent",
+			"agent field should not be affected by DisableHost")
+	})
+
+	t.Run("removes host.name fields added via client processor", func(t *testing.T) {
+		// The old implementation only deleted host from builtin; it could not drop
+		// host.* fields that a processor adds during event processing. The new
+		// implementation appends a drop_fields processor at the end of the pipeline.
+		support, err := MakeDefaultSupport(true, nil)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		// Client processor that injects a richer host object (mimicking add_host_metadata).
+		hostProc := newGroup("test", logp.L())
+		hostProc.add(addfields.NewAddFields(mapstr.M{
+			"host": mapstr.M{
+				"name":     "injected-host",
+				"hostname": "injected-host.example.com",
+				"os":       mapstr.M{"name": "Linux"},
+			},
+		}, true, true))
+
+		prog, err := support.Create(beat.ProcessingConfig{
+			DisableHost: true,
+			Processor:   hostProc,
+		}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+
+		assert.NotContains(t, actual.Fields.Flatten(), "host.name",
+			"host.name field added by a processor should be dropped when DisableHost is true")
+		assert.Equal(t, "abc", actual.Fields["value"])
+	})
+
+	t.Run("no error when host field is absent", func(t *testing.T) {
+		// The drop_fields processor is configured with ignore_missing: true so
+		// it must not error when no host field exists.
+		support, err := MakeDefaultSupport(true, nil, WithECS)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		prog, err := support.Create(beat.ProcessingConfig{DisableHost: true}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+		require.NotNil(t, actual)
+		assert.NotContains(t, actual.Fields, "host")
+	})
+
+	t.Run("host.name fields preserved when DisableHost is false", func(t *testing.T) {
+		factory := MakeDefaultBeatSupport(true)
+		support, err := factory(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		prog, err := support.Create(beat.ProcessingConfig{DisableHost: false}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+
+		assert.Equal(t, mapstr.M{"name": "test.host.name"}, actual.Fields["host"],
+			"host field should be present when DisableHost is false")
+	})
+
+	t.Run("drop_fields processor is added to pipeline when DisableHost is true", func(t *testing.T) {
+		b, err := newBuilder(defaultInfo, logptest.NewTestingLogger(t, ""), nil, mapstr.EventMetadata{}, nil, false, false)
+		require.NoError(t, err)
+
+		proc, err := b.Create(beat.ProcessingConfig{DisableHost: true}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		grp, ok := proc.(*group)
+		require.True(t, ok)
+
+		var procNames []string
+		for _, p := range grp.list {
+			procNames = append(procNames, p.String())
+		}
+		assert.Contains(t, procNames, `drop_fields={"Fields":["host.name"],"RegexpFields":[],"IgnoreMissing":true}`,
+			"pipeline should contain a drop_fields processor for host.name when DisableHost is true")
+	})
+
+	t.Run("drop_fields processor is not added when DisableHost is false", func(t *testing.T) {
+		b, err := newBuilder(defaultInfo, logptest.NewTestingLogger(t, ""), nil, mapstr.EventMetadata{}, nil, false, false)
+		require.NoError(t, err)
+
+		proc, err := b.Create(beat.ProcessingConfig{DisableHost: false}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		grp, ok := proc.(*group)
+		require.True(t, ok)
+
+		for _, p := range grp.list {
+			assert.NotContains(t, p.String(), "drop_fields",
+				"pipeline should not contain a drop_fields processor when DisableHost is false")
+		}
+	})
 }
 
 func fromJSON(in string) mapstr.M {

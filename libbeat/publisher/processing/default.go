@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -300,11 +301,6 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	needsCopy := b.alwaysCopy || localProcessors != nil || b.processors != nil
 
 	builtin := b.builtinMeta
-	if cfg.DisableHost {
-		tmp := builtin.Clone()
-		delete(tmp, "host")
-		builtin = tmp
-	}
 
 	var clientFields mapstr.M
 	for _, mod := range b.modifiers {
@@ -402,6 +398,39 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
+	if cfg.DisableHost {
+		drop_hostname_cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"fields":         []string{"host.name"},
+			"ignore_missing": true,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed creating drop_fields processor config for host.name field: %w", err)
+		}
+		proc, err := actions.NewDropFields(drop_hostname_cfg, b.log)
+		if err != nil {
+			return nil, fmt.Errorf("failed creating drop_fields processor for host.name field: %w", err)
+		}
+		processors.add(proc)
+
+		// If host.name is the only field under host, we need to drop the empty "host" object as well.
+		drop_host_cfg, err := config.NewConfigFrom(map[string]interface{}{
+			"fields":         []string{"host"},
+			"ignore_missing": true,
+			"when": map[string]interface{}{
+				"not": map[string]interface{}{
+					"has_fields": []string{"host"},
+				},
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed creating drop_fields processor config for host field: %w", err)
+		}
+		proc, err = actions.NewDropFields(drop_host_cfg, b.log)
+		if err != nil {
+			return nil, fmt.Errorf("failed creating drop_fields processor for host field: %w", err)
+		}
+		processors.add(proc)
+	}
 	// setup 11: drop all events if outputs are disabled (P)
 	if drop {
 		processors.add(dropDisabledProcessor)
