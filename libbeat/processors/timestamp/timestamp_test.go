@@ -53,7 +53,8 @@ func TestParsePatterns(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			evt.Timestamp = time.Time{}
-			require.NoError(t, evt.PutValue("ts", expected.Format(format)))
+			_, putErr := evt.PutValue("ts", expected.Format(format))
+			require.NoError(t, putErr)
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -77,7 +78,8 @@ func TestParsePatterns(t *testing.T) {
 
 		for _, timeValue := range times {
 			evt.Timestamp = time.Time{}
-			require.NoError(t, evt.PutValue("ts", timeValue))
+			_, putErr := evt.PutValue("ts", timeValue)
+			require.NoError(t, putErr)
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -101,7 +103,8 @@ func TestParsePatterns(t *testing.T) {
 
 		for _, timeValue := range times {
 			evt.Timestamp = time.Time{}
-			require.NoError(t, evt.PutValue("ts", timeValue))
+			_, putErr := evt.PutValue("ts", timeValue)
+			require.NoError(t, putErr)
 
 			evt, err = p.Run(evt)
 			if err != nil {
