@@ -46,7 +46,7 @@ func createEvents(ctx context.Context, logs *plog.Logs) ([]publisher.Event, erro
 	for _, rl := range logs.ResourceLogs().All() {
 		for _, sl := range rl.ScopeLogs().All() {
 			for _, lr := range sl.LogRecords().All() {
-				record, err := parseEvent(ctx, &lr)
+				record, err := parseEvent(&lr)
 				if err != nil {
 					return nil, err
 				}

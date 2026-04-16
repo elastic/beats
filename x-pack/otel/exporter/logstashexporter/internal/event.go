@@ -5,7 +5,6 @@
 package internal
 
 import (
-	"context"
 	"errors"
 	"time"
 
@@ -14,30 +13,31 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 )
 
-func parseEvent(ctx context.Context, logRecord *plog.LogRecord) (beat.Event, error) {
-	metadata := getEventMeta(ctx)
-	if !isBeatsEvent(metadata) {
-		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event metadata"))
-	}
-
+func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
 	fields, ok := parseEventFields(logRecord)
 	if !ok {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event body, expected a map, got: " + logRecord.Body().Type().String()))
 	}
+
+	metadata := getEventMeta(fields)
 
 	timestamp, ok := parseEventTimestamp(fields)
 	if !ok {
 		timestamp = logRecord.ObservedTimestamp().AsTime()
 	}
 
-	return beat.Event{
+	event := beat.Event{
 		Timestamp: timestamp,
-		Meta:      metadata,
 		Fields:    fields,
-	}, nil
+	}
+
+	if metadata != nil {
+		event.Meta = metadata
+	}
+
+	return event, nil
 }
 
 func parseEventFields(logRecord *plog.LogRecord) (map[string]any, bool) {
@@ -62,18 +62,10 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-func isBeatsEvent(metadata map[string]any) bool {
-	v, ok := metadata["beat"]
-	return ok && v != nil && v != ""
-}
-
-// getEventMeta gives beat.Event.Meta from the context metadata
-// The value of `[@metadata][beat]` is taken from the `Index` option of logstash output.
-// In Elastic Agent, `Index` option is not available, hence, the value of `[@metadata][beat]` is derived from `IndexPrefix`
-func getEventMeta(ctx context.Context) map[string]any {
-	metadata := otelctx.GetBeatEventMeta(ctx)
-	return map[string]any{
-		otelctx.MetadataBeatKey:    metadata[otelctx.MetadataIndexPrefixKey],
-		otelctx.MetadataVersionKey: metadata[otelctx.MetadataVersionKey],
+func getEventMeta(logRecordBody map[string]any) map[string]any {
+	meta, ok := logRecordBody["@metadata"].(map[string]any)
+	if !ok {
+		return nil
 	}
+	return meta
 }
