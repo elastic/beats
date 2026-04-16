@@ -296,7 +296,12 @@ func NewFunc(r *Registry, name string, f func(Mode, Visitor), opts ...Option) *F
 	return v
 }
 
-func (f *Func) Visit(m Mode, vs Visitor) { f.f(m, vs) }
+func (f *Func) Visit(m Mode, vs Visitor) {
+	if f == nil || f.f == nil {
+		return
+	}
+	f.f(m, vs)
+}
 
 func (m makeExpvar) String() string { return m() }
 

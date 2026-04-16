@@ -195,3 +195,26 @@ func TestNilReg(t *testing.T) {
 	require.NotNil(t, testUint)
 
 }
+
+func TestFuncVisitNilGuard(t *testing.T) {
+	t.Run("nil receiver does not panic", func(t *testing.T) {
+		var f *Func
+		assert.NotPanics(t, func() {
+			f.Visit(Full, nil)
+		})
+	})
+
+	t.Run("nil inner func does not panic", func(t *testing.T) {
+		f := &Func{}
+		assert.NotPanics(t, func() {
+			f.Visit(Full, nil)
+		})
+	})
+
+	t.Run("non-nil func is called", func(t *testing.T) {
+		called := false
+		f := &Func{f: func(m Mode, v Visitor) { called = true }}
+		f.Visit(Full, nil)
+		assert.True(t, called)
+	})
+}
