@@ -339,3 +339,54 @@ func TestMetadataTarget(t *testing.T) {
 	assert.Equal(t, evt.Fields, newEvt.Fields)
 	assert.Equal(t, evt.Timestamp, newEvt.Timestamp)
 }
+
+// BenchmarkTimestampSingleLayout measures the common case: one layout that
+// matches every event. This is the hot path in most filebeat deployments.
+func BenchmarkTimestampSingleLayout(b *testing.B) {
+	c := defaultConfig()
+	c.Field = "ts"
+	c.Layouts = []string{time.RFC3339Nano}
+
+	p, err := newFromConfig(c, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	tsStr := time.Date(2025, 3, 7, 11, 6, 39, 123456789, time.UTC).Format(time.RFC3339Nano)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{Fields: mapstr.M{"ts": tsStr}}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkTimestampMultipleLayouts measures the case where multiple layouts
+// are configured and the matching layout is the last one tried.
+func BenchmarkTimestampMultipleLayouts(b *testing.B) {
+	c := defaultConfig()
+	c.Field = "ts"
+	c.Layouts = []string{time.ANSIC, time.RFC822, time.RFC3339Nano}
+
+	p, err := newFromConfig(c, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	// Use RFC3339Nano format so the first two layouts fail.
+	tsStr := time.Date(2025, 3, 7, 11, 6, 39, 123456789, time.UTC).Format(time.RFC3339Nano)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{Fields: mapstr.M{"ts": tsStr}}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}

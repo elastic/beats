@@ -231,3 +231,383 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 		})
 	}
 }
+
+// newAnnotatorForTest builds a kubernetesAnnotator with a pre-populated cache
+// (no network calls). The matcher looks up events by "container.id".
+func newAnnotatorForTest(t *testing.T, cacheKey string, meta mapstr.M) *kubernetesAnnotator {
+	t.Helper()
+
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
+		"lookup_fields": []string{"container.id"},
+	})
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	processor := &kubernetesAnnotator{
+		log:   logptest.NewTestingLogger(t, selector),
+		cache: newCache(10 * time.Second),
+		matchers: &Matchers{
+			matchers: []Matcher{matcher},
+		},
+		kubernetesAvailable: true,
+	}
+	processor.cache.set(cacheKey, meta)
+	return processor
+}
+
+// baseEvent returns an event that will match cacheKey via container.id.
+func baseEvent(containerID string) *beat.Event {
+	return &beat.Event{
+		Fields: mapstr.M{
+			"container": mapstr.M{
+				"id": containerID,
+			},
+		},
+	}
+}
+
+// TestAnnotatorRunFullContainerMetadata verifies the primary split behaviour:
+// OCI container field gets id/runtime/image.name but NOT name or raw image;
+// kubernetes field gets container.name but NOT id/runtime/image.
+func TestAnnotatorRunFullContainerMetadata(t *testing.T) {
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+			"container": mapstr.M{
+				"name":    "mycontainer",
+				"image":   "myimage:latest",
+				"id":      "abc123",
+				"runtime": "containerd",
+			},
+		},
+	}
+	processor := newAnnotatorForTest(t, "abc123", meta)
+
+	event, err := processor.Run(baseEvent("abc123"))
+	require.NoError(t, err)
+
+	// --- OCI container field ---
+	containerRaw, err := event.Fields.GetValue("container")
+	require.NoError(t, err, "event.Fields[\"container\"] must be set")
+	require.IsType(t, mapstr.M{}, containerRaw, "container must be a mapstr.M")
+	container := containerRaw.(mapstr.M)
+
+	assert.Equal(t, "abc123", container["id"], "container.id should be set")
+	assert.Equal(t, "containerd", container["runtime"], "container.runtime should be set")
+
+	imageRaw, err := container.GetValue("image")
+	require.NoError(t, err, "container.image must be set")
+	require.IsType(t, mapstr.M{}, imageRaw, "container.image must be a mapstr.M")
+	imageMap := imageRaw.(mapstr.M)
+	assert.Equal(t, "myimage:latest", imageMap["name"], "container.image.name should match original image value")
+
+	assert.NotContains(t, container, "name", "container must NOT have a 'name' key")
+	_, hasRawImage := container["image"].(string)
+	assert.False(t, hasRawImage, "container.image must not be a raw string")
+
+	// --- kubernetes field ---
+	k8sRaw, err := event.Fields.GetValue("kubernetes")
+	require.NoError(t, err, "event.Fields[\"kubernetes\"] must be set")
+	require.IsType(t, mapstr.M{}, k8sRaw)
+	k8s := k8sRaw.(mapstr.M)
+
+	k8sContainerRaw, err := k8s.GetValue("container")
+	require.NoError(t, err, "kubernetes.container must be present")
+	require.IsType(t, mapstr.M{}, k8sContainerRaw)
+	k8sContainer := k8sContainerRaw.(mapstr.M)
+
+	assert.Equal(t, "mycontainer", k8sContainer["name"], "kubernetes.container.name should be kept")
+	assert.NotContains(t, k8sContainer, "id", "kubernetes.container must NOT have id")
+	assert.NotContains(t, k8sContainer, "runtime", "kubernetes.container must NOT have runtime")
+	assert.NotContains(t, k8sContainer, "image", "kubernetes.container must NOT have image")
+}
+
+// TestAnnotatorRunContainerWithoutImage verifies that when there is no image in
+// the metadata, the OCI container field has id and runtime but no image key.
+func TestAnnotatorRunContainerWithoutImage(t *testing.T) {
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+			"container": mapstr.M{
+				"name":    "mycontainer",
+				"id":      "abc456",
+				"runtime": "docker",
+			},
+		},
+	}
+	processor := newAnnotatorForTest(t, "abc456", meta)
+
+	event, err := processor.Run(baseEvent("abc456"))
+	require.NoError(t, err)
+
+	containerRaw, err := event.Fields.GetValue("container")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, containerRaw)
+	container := containerRaw.(mapstr.M)
+
+	assert.Equal(t, "abc456", container["id"])
+	assert.Equal(t, "docker", container["runtime"])
+	assert.NotContains(t, container, "image", "container must NOT have image key when no image in metadata")
+}
+
+// TestAnnotatorRunContainerWithoutName verifies that missing container.name
+// does not panic and the OCI container field still has id and image.name.
+func TestAnnotatorRunContainerWithoutName(t *testing.T) {
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+			"container": mapstr.M{
+				"image": "busybox:latest",
+				"id":    "abc789",
+			},
+		},
+	}
+	processor := newAnnotatorForTest(t, "abc789", meta)
+
+	event, err := processor.Run(baseEvent("abc789"))
+	require.NoError(t, err)
+
+	containerRaw, err := event.Fields.GetValue("container")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, containerRaw)
+	container := containerRaw.(mapstr.M)
+
+	assert.Equal(t, "abc789", container["id"])
+	imageRaw, err := container.GetValue("image")
+	require.NoError(t, err, "container.image must be set")
+	require.IsType(t, mapstr.M{}, imageRaw)
+	imageMap := imageRaw.(mapstr.M)
+	assert.Equal(t, "busybox:latest", imageMap["name"])
+}
+
+// TestAnnotatorRunNoContainerSubMap verifies that when the metadata has no
+// kubernetes.container key at all, the OCI container field is not created and
+// the kubernetes field is correctly populated.
+func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{
+				"name": "mypod",
+				"uid":  "uid-001",
+			},
+		},
+	}
+
+	// Use pod.name as the lookup field since there's no container sub-map.
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
+		"lookup_fields": []string{"pod.name"},
+	})
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	processor := &kubernetesAnnotator{
+		log:   logptest.NewTestingLogger(t, selector),
+		cache: newCache(10 * time.Second),
+		matchers: &Matchers{
+			matchers: []Matcher{matcher},
+		},
+		kubernetesAvailable: true,
+	}
+	processor.cache.set("mypod", meta)
+
+	event, err := processor.Run(&beat.Event{
+		Fields: mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+		},
+	})
+	require.NoError(t, err)
+
+	// OCI container field should NOT be set.
+	_, containerErr := event.Fields.GetValue("container")
+	assert.Error(t, containerErr, "event.Fields[\"container\"] must NOT be set when there is no kubernetes.container")
+
+	// kubernetes field should be present and correct.
+	k8sRaw, err := event.Fields.GetValue("kubernetes")
+	require.NoError(t, err, "event.Fields[\"kubernetes\"] must be set")
+	require.IsType(t, mapstr.M{}, k8sRaw)
+	k8s := k8sRaw.(mapstr.M)
+
+	podRaw, err := k8s.GetValue("pod")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, podRaw)
+	pod := podRaw.(mapstr.M)
+	assert.Equal(t, "mypod", pod["name"])
+}
+
+// TestAnnotatorRunExtraContainerFieldsPreserved verifies that unknown extra
+// fields in kubernetes.container are forwarded to the OCI container field.
+func TestAnnotatorRunExtraContainerFieldsPreserved(t *testing.T) {
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+			"container": mapstr.M{
+				"name":         "mycontainer",
+				"image":        "myimage:v1",
+				"id":           "xtra001",
+				"runtime":      "containerd",
+				"custom_field": "extra",
+			},
+		},
+	}
+	processor := newAnnotatorForTest(t, "xtra001", meta)
+
+	event, err := processor.Run(baseEvent("xtra001"))
+	require.NoError(t, err)
+
+	containerRaw, err := event.Fields.GetValue("container")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, containerRaw)
+	container := containerRaw.(mapstr.M)
+
+	assert.Equal(t, "extra", container["custom_field"], "extra container fields must be preserved in OCI container")
+}
+
+// TestAnnotatorRunCacheNotMutated verifies that running the processor multiple
+// times on different events does not mutate the cached metadata entry.
+func TestAnnotatorRunCacheNotMutated(t *testing.T) {
+	originalMeta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+			"container": mapstr.M{
+				"name":    "mycontainer",
+				"image":   "myimage:v2",
+				"id":      "cache001",
+				"runtime": "containerd",
+			},
+		},
+	}
+	processor := newAnnotatorForTest(t, "cache001", originalMeta)
+
+	// Run three times.
+	for i := 0; i < 3; i++ {
+		_, err := processor.Run(baseEvent("cache001"))
+		require.NoError(t, err)
+	}
+
+	// Inspect the cache directly.
+	cached := processor.cache.get("cache001")
+	require.NotNil(t, cached, "cache entry must still exist")
+
+	k8sRaw, err := cached.GetValue("kubernetes")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, k8sRaw)
+	k8s := k8sRaw.(mapstr.M)
+
+	k8sContainerRaw, err := k8s.GetValue("container")
+	require.NoError(t, err, "kubernetes.container must still be in cache")
+	require.IsType(t, mapstr.M{}, k8sContainerRaw)
+	k8sContainer := k8sContainerRaw.(mapstr.M)
+
+	assert.Equal(t, "mycontainer", k8sContainer["name"], "cache must still have container.name")
+	assert.Equal(t, "myimage:v2", k8sContainer["image"], "cache must still have container.image as a raw string")
+	assert.Equal(t, "cache001", k8sContainer["id"], "cache must still have container.id")
+	assert.Equal(t, "containerd", k8sContainer["runtime"], "cache must still have container.runtime")
+}
+
+// TestAnnotatorRunEventIndependence verifies that mutating the container field
+// on the result of one Run() call does not affect the result of a subsequent call.
+func TestAnnotatorRunEventIndependence(t *testing.T) {
+	meta := mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{"name": "mypod"},
+			"container": mapstr.M{
+				"name":    "mycontainer",
+				"image":   "myimage:v3",
+				"id":      "indep001",
+				"runtime": "containerd",
+			},
+		},
+	}
+	processor := newAnnotatorForTest(t, "indep001", meta)
+
+	event1, err := processor.Run(baseEvent("indep001"))
+	require.NoError(t, err)
+
+	event2, err := processor.Run(baseEvent("indep001"))
+	require.NoError(t, err)
+
+	// Mutate event1's container field.
+	containerRaw1, err := event1.Fields.GetValue("container")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, containerRaw1)
+	container1 := containerRaw1.(mapstr.M)
+	container1["injected"] = "mutation"
+
+	// event2's container field must be unaffected.
+	containerRaw2, err := event2.Fields.GetValue("container")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, containerRaw2)
+	container2 := containerRaw2.(mapstr.M)
+
+	assert.NotContains(t, container2, "injected", "mutating first result must not affect second result")
+}
+
+func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
+		"lookup_fields": []string{"container.id"},
+	})
+	matcher, err := NewFieldMatcher(*cfg, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	processor := &kubernetesAnnotator{
+		log:   logptest.NewTestingLogger(b, selector),
+		cache: newCache(10 * time.Second),
+		matchers: &Matchers{
+			matchers: []Matcher{matcher},
+		},
+		kubernetesAvailable: true,
+	}
+
+	const cacheKey = "abc123container"
+
+	processor.cache.set(cacheKey, mapstr.M{
+		"kubernetes": mapstr.M{
+			"pod": mapstr.M{
+				"name":      "test-pod",
+				"uid":       "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+				"namespace": "default",
+				"labels": mapstr.M{
+					"app":     "myapp",
+					"version": "v1.2.3",
+					"env":     "production",
+				},
+				"annotations": mapstr.M{
+					"deployment.kubernetes.io/revision": "3",
+				},
+			},
+			"node": mapstr.M{
+				"name": "node-1",
+			},
+			"namespace": "default",
+			"container": mapstr.M{
+				"name":    "mycontainer",
+				"image":   "myrepo/myimage:latest",
+				"id":      cacheKey,
+				"runtime": "containerd",
+			},
+		},
+	})
+
+	b.ResetTimer()
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		// Construct a minimal event with only the lookup field — no Clone() overhead
+		// counted against the benchmark. Run() will add kubernetes.* and container.*
+		// fields to this fresh event.
+		event := &beat.Event{
+			Fields: mapstr.M{
+				"container": mapstr.M{
+					"id": cacheKey,
+				},
+				"message": "some log line",
+			},
+		}
+		_, err := processor.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}

@@ -501,3 +501,44 @@ func (m *mockWatcher) ListenStart() bus.Listener {
 func (m *mockWatcher) ListenStop() bus.Listener {
 	return nil
 }
+
+func BenchmarkAddDockerMetadata(b *testing.B) {
+	cfg, err := config.NewConfigFrom(map[string]interface{}{
+		"match_fields": []string{"container.id"},
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	p, err := buildDockerMetadataProcessor(logptest.NewTestingLogger(b, ""), cfg, MockWatcherFactory(
+		map[string]*docker.Container{
+			"abc123": {
+				ID:    "abc123def456",
+				Image: "myrepo/myimage:latest",
+				Name:  "my-container",
+				Labels: map[string]string{
+					"app":     "myapp",
+					"version": "v1.2.3",
+					"env":     "production",
+				},
+			},
+		}, nil))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{
+			Fields: mapstr.M{
+				"container": mapstr.M{"id": "abc123"},
+				"message":   "test log line",
+			},
+		}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
