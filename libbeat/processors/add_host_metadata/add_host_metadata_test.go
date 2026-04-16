@@ -551,8 +551,8 @@ func TestLoadDataFastPath(t *testing.T) {
 
 	p, err := newWithHostInfoFactory(testConfig, logptest.NewTestingLogger(t, ""), factory)
 	require.NoError(t, err)
-	proc, ok := p.(*addHostMetadata)
-	require.True(t, ok)
+	require.IsType(t, (*addHostMetadata)(nil), p)
+	proc := p.(*addHostMetadata)
 
 	// Construction triggers one fetch.
 	assert.Equal(t, int64(1), info.HostInfoRequestCount.Load())
@@ -585,11 +585,22 @@ func TestCachedDataNotCorruptedByDownstreamMutation(t *testing.T) {
 	// Run the processor and mutate the result.
 	event1, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	require.NoError(t, err)
-	_, _ = event1.PutValue("host.name", "MUTATED")
 
-	// Run again — the second event must see the original cached data.
+	// Run again before mutating — the host maps must be independent copies.
 	event2, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	require.NoError(t, err)
+
+	host1Raw, err := event1.GetValue("host")
+	require.NoError(t, err)
+	host2Raw, err := event2.GetValue("host")
+	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, host1Raw)
+	require.IsType(t, mapstr.M{}, host2Raw)
+	host1Map := host1Raw.(mapstr.M)
+	host2Map := host2Raw.(mapstr.M)
+	assert.NotSame(t, &host1Map, &host2Map, "host maps on successive events must not be aliased")
+
+	_, _ = event1.PutValue("host.name", "MUTATED")
 
 	name, err := event2.GetValue("host.name")
 	require.NoError(t, err)
@@ -877,4 +888,129 @@ func newWithHostInfoFactory(cfg *conf.C, log *logp.Logger, factory hostInfoFacto
 	}
 
 	return p, nil
+}
+
+// BenchmarkAddHostMetadataCacheHit benchmarks the common case: cached host
+// metadata is still valid and returned without refreshing.
+func BenchmarkAddHostMetadataCacheHit(b *testing.B) {
+	cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		"cache.ttl": "5m",
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	p, err := New(cfg, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	// Prime the cache with one call
+	event := &beat.Event{Fields: mapstr.M{"message": "warmup"}}
+	_, _ = p.Run(event)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{
+			Fields: mapstr.M{
+				"message": "test log line",
+			},
+		}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkCacheRead compares the old mutex-based cache read against the new
+// atomic-based lock-free fast path, both with and without goroutine contention.
+
+var sinkData mapstr.M
+
+func BenchmarkCacheRead(b *testing.B) {
+	testData := mapstr.M{
+		"host": mapstr.M{
+			"name":         "myhost",
+			"hostname":     "myhost",
+			"architecture": "x86_64",
+			"os": mapstr.M{
+				"type":     "linux",
+				"platform": "ubuntu",
+				"name":     "Ubuntu",
+				"family":   "debian",
+				"version":  "22.04",
+				"kernel":   "5.15.0-91-generic",
+			},
+			"ip":  []string{"10.0.0.5", "172.17.0.1"},
+			"mac": []string{"02:42:ac:11:00:01"},
+			"id":  "a1b2c3d4e5f67890",
+		},
+	}
+
+	b.Run("Mutex/1", func(b *testing.B) {
+		benchMutexCache(b, testData, 1)
+	})
+	b.Run("Atomic/1", func(b *testing.B) {
+		benchAtomicCache(b, testData, 1)
+	})
+	b.Run("Mutex/4", func(b *testing.B) {
+		benchMutexCache(b, testData, 4)
+	})
+	b.Run("Atomic/4", func(b *testing.B) {
+		benchAtomicCache(b, testData, 4)
+	})
+	b.Run("Mutex/16", func(b *testing.B) {
+		benchMutexCache(b, testData, 16)
+	})
+	b.Run("Atomic/16", func(b *testing.B) {
+		benchAtomicCache(b, testData, 16)
+	})
+}
+
+// Old pattern: always acquire mutex, read data + check timestamp under lock.
+func benchMutexCache(b *testing.B, data mapstr.M, parallelism int) {
+	var mu sync.Mutex
+	ptr := mapstr.NewPointer(data)
+	lastUpdate := time.Now()
+	ttl := 5 * time.Minute
+
+	b.SetParallelism(parallelism)
+	b.ReportAllocs()
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			mu.Lock()
+			d := ptr.Get()
+			if d != nil && !lastUpdate.Add(ttl).Before(time.Now()) {
+				mu.Unlock()
+				sinkData = d
+				continue
+			}
+			mu.Unlock()
+		}
+	})
+}
+
+// New pattern: atomic timestamp check + atomic pointer read, no lock needed.
+func benchAtomicCache(b *testing.B, data mapstr.M, parallelism int) {
+	ptr := mapstr.NewPointer(data)
+	var lastUpdate atomic.Int64
+	lastUpdate.Store(time.Now().UnixNano())
+	ttl := 5 * time.Minute
+
+	b.SetParallelism(parallelism)
+	b.ReportAllocs()
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			d := ptr.Get()
+			ts := lastUpdate.Load()
+			if d != nil && !time.Unix(0, ts).Add(ttl).Before(time.Now()) {
+				sinkData = d
+				continue
+			}
+		}
+	})
 }
