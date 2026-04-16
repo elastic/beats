@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -251,6 +252,63 @@ func TestRenameRun(t *testing.T) {
 			}
 
 			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
+		})
+	}
+}
+
+// TestRenameSingleFieldNoClone verifies that a single rename with non-overlapping
+// top-level paths uses renameFieldSafe and returns the same event pointer (no clone).
+func TestRenameSingleFieldNoClone(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "rename_test")
+	tests := []struct {
+		name        string
+		input       mapstr.M
+		from, to    string
+		wantErr     bool
+		wantFields  mapstr.M
+	}{
+		{
+			name:       "success: single non-overlapping rename",
+			input:      mapstr.M{"message": "hello"},
+			from:       "message",
+			to:         "event.original",
+			wantFields: mapstr.M{"event": mapstr.M{"original": "hello"}},
+		},
+		{
+			name:    "error: target already exists",
+			input:   mapstr.M{"a": 1, "b": 2},
+			from:    "a",
+			to:      "b",
+			wantErr: true,
+			wantFields: mapstr.M{
+				"a": 1,
+				"b": 2,
+				"error": mapstr.M{
+					"message": "failed to rename fields in processor: target field b already exists, drop or rename this field first",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &renameFields{
+				config: renameFieldsConfig{
+					Fields:      []fromTo{{From: tc.from, To: tc.to}},
+					FailOnError: true,
+				},
+				logger: log,
+			}
+			event := &beat.Event{Fields: tc.input.Clone()}
+
+			result, err := f.Run(event)
+			if tc.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Same(t, event, result, "single non-overlapping rename must not clone the event")
+			assert.Equal(t, tc.wantFields, result.Fields)
 		})
 	}
 }

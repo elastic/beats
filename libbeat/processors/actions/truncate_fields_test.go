@@ -236,7 +236,6 @@ func TestTruncateFieldsFailOnErrorSafety(t *testing.T) {
 	require.Error(t, err)
 	assert.Same(t, event, result)
 
-	result.Fields.Delete("error")
 	assert.Equal(t, original, result.Fields,
 		"event fields must be unchanged after error (clone skip safety)")
 }
@@ -265,7 +264,6 @@ func TestTruncateFieldsMultiFieldBackup(t *testing.T) {
 	require.Error(t, err)
 
 	// Multi-field: backup was taken and restored; f1 truncation must be undone.
-	result.Fields.Delete("error")
 	assert.Equal(t, original, result.Fields,
 		"first field's truncation must be rolled back when second field fails")
 }
