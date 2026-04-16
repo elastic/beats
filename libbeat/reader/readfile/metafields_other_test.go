@@ -43,9 +43,9 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
 	require.IsType(t, mapstr.M{}, actual["log"], "expected log to be mapstr.M")
-	logMap := actual["log"].(mapstr.M)
+	logMap, _ := actual["log"].(mapstr.M)
 	require.IsType(t, mapstr.M{}, logMap["file"], "expected log.file to be mapstr.M")
-	fileMap := logMap["file"].(mapstr.M)
+	fileMap, _ := logMap["file"].(mapstr.M)
 
 	require.Equal(t, "17", fileMap[deviceIDKey])
 	delete(fileMap, deviceIDKey)
@@ -64,9 +64,9 @@ func checkFieldsWithOwnerGroup(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
 	require.IsType(t, mapstr.M{}, actual["log"], "expected log to be mapstr.M")
-	logMap := actual["log"].(mapstr.M)
+	logMap, _ := actual["log"].(mapstr.M)
 	require.IsType(t, mapstr.M{}, logMap["file"], "expected log.file to be mapstr.M")
-	fileMap := logMap["file"].(mapstr.M)
+	fileMap, _ := logMap["file"].(mapstr.M)
 
 	require.Equal(t, "17", fileMap[deviceIDKey])
 	delete(fileMap, deviceIDKey)
