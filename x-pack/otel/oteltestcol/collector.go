@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -124,6 +125,11 @@ func getComponent() (otelcol.Factories, error) {
 	exporters, err := otelcol.MakeFactoryMap(
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
+<<<<<<< HEAD
+=======
+		logstashexporter.NewFactory(),
+		kafkaexporter.NewFactory(),
+>>>>>>> 8da485803 (otel: add tests for kafkaexporter (#50144))
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
