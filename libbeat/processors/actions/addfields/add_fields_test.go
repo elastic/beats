@@ -54,7 +54,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			// Verify overwrite happened
 			ea, err := result.GetValue("elastic_agent.id")
@@ -85,7 +85,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			id, err := result.GetValue("agent.id")
 			require.NoError(t, err)
@@ -112,7 +112,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			// id should NOT be overwritten
 			id, err := result.GetValue("agent.id")
@@ -133,7 +133,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 			event := &beat.Event{Fields: nil}
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			v, err := result.GetValue("new_field")
 			require.NoError(t, err)
@@ -158,7 +158,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 			}
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 			assert.Equal(t, mapstr.M{"keep": "this"}, result.Fields)
 		})
 	})
@@ -178,7 +178,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			// Fields should be untouched
 			assert.Equal(t, mapstr.M{"message": "hello"}, result.Fields)
@@ -284,7 +284,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			// Check metadata
 			v, err := result.GetValue("@metadata.input_id")
@@ -320,7 +320,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			// Timestamp should be updated
 			assert.Equal(t, newTs, result.Timestamp)
@@ -346,7 +346,7 @@ func TestAddFieldsBehavior(t *testing.T) {
 
 			result, err := p.Run(event)
 			require.NoError(t, err)
-			require.NotNil(t, result)
+			assert.Same(t, event, result)
 
 			// Timestamp should NOT be overwritten in no-overwrite mode
 			assert.Equal(t, now, result.Timestamp)
