@@ -1,0 +1,5 @@
+kind: enhancement
+
+summary: "perf: defer mapstr.M allocation in EncoderReader until fields are actually needed, reducing allocations per line"
+
+component: filebeat

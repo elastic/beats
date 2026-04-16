@@ -54,6 +54,9 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
+	if message.Fields == nil {
+		message.Fields = mapstr.M{}
+	}
 	message.Fields.DeepUpdate(mapstr.M{
 		"log": mapstr.M{
 			"offset": r.offset,
