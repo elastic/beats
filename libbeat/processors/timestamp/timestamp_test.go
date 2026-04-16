@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -36,8 +35,6 @@ import (
 var expected = time.Date(2015, 3, 7, 11, 6, 39, 0, time.UTC)
 
 func TestParsePatterns(t *testing.T) {
-	logp.TestingSetup()
-
 	c := defaultConfig()
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.ANSIC, time.RFC3339Nano, time.RFC3339)
@@ -56,7 +53,7 @@ func TestParsePatterns(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			evt.Timestamp = time.Time{}
-			evt.PutValue("ts", expected.Format(format))
+			require.NoError(t, evt.PutValue("ts", expected.Format(format)))
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -80,7 +77,7 @@ func TestParsePatterns(t *testing.T) {
 
 		for _, timeValue := range times {
 			evt.Timestamp = time.Time{}
-			evt.PutValue("ts", timeValue)
+			require.NoError(t, evt.PutValue("ts", timeValue))
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -94,7 +91,7 @@ func TestParsePatterns(t *testing.T) {
 	t.Run("UNIX_MS", func(t *testing.T) {
 		p.Layouts = []string{"UNIX_MS"}
 
-		epochMs := int64(expected.UnixNano()) / int64(time.Millisecond)
+		epochMs := expected.UnixNano() / int64(time.Millisecond)
 		times := []interface{}{
 			epochMs,
 			float64(epochMs),
@@ -104,7 +101,7 @@ func TestParsePatterns(t *testing.T) {
 
 		for _, timeValue := range times {
 			evt.Timestamp = time.Time{}
-			evt.PutValue("ts", timeValue)
+			require.NoError(t, evt.PutValue("ts", timeValue))
 
 			evt, err = p.Run(evt)
 			if err != nil {

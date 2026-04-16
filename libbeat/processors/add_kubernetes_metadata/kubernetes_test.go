@@ -290,7 +290,7 @@ func TestAnnotatorRunFullContainerMetadata(t *testing.T) {
 	containerRaw, err := event.Fields.GetValue("container")
 	require.NoError(t, err, "event.Fields[\"container\"] must be set")
 	require.IsType(t, mapstr.M{}, containerRaw, "container must be a mapstr.M")
-	container := containerRaw.(mapstr.M)
+	container, _ := containerRaw.(mapstr.M)
 
 	assert.Equal(t, "abc123", container["id"], "container.id should be set")
 	assert.Equal(t, "containerd", container["runtime"], "container.runtime should be set")
@@ -298,7 +298,7 @@ func TestAnnotatorRunFullContainerMetadata(t *testing.T) {
 	imageRaw, err := container.GetValue("image")
 	require.NoError(t, err, "container.image must be set")
 	require.IsType(t, mapstr.M{}, imageRaw, "container.image must be a mapstr.M")
-	imageMap := imageRaw.(mapstr.M)
+	imageMap, _ := imageRaw.(mapstr.M)
 	assert.Equal(t, "myimage:latest", imageMap["name"], "container.image.name should match original image value")
 
 	assert.NotContains(t, container, "name", "container must NOT have a 'name' key")
@@ -309,12 +309,12 @@ func TestAnnotatorRunFullContainerMetadata(t *testing.T) {
 	k8sRaw, err := event.Fields.GetValue("kubernetes")
 	require.NoError(t, err, "event.Fields[\"kubernetes\"] must be set")
 	require.IsType(t, mapstr.M{}, k8sRaw)
-	k8s := k8sRaw.(mapstr.M)
+	k8s, _ := k8sRaw.(mapstr.M)
 
 	k8sContainerRaw, err := k8s.GetValue("container")
 	require.NoError(t, err, "kubernetes.container must be present")
 	require.IsType(t, mapstr.M{}, k8sContainerRaw)
-	k8sContainer := k8sContainerRaw.(mapstr.M)
+	k8sContainer, _ := k8sContainerRaw.(mapstr.M)
 
 	assert.Equal(t, "mycontainer", k8sContainer["name"], "kubernetes.container.name should be kept")
 	assert.NotContains(t, k8sContainer, "id", "kubernetes.container must NOT have id")
@@ -343,7 +343,7 @@ func TestAnnotatorRunContainerWithoutImage(t *testing.T) {
 	containerRaw, err := event.Fields.GetValue("container")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, containerRaw)
-	container := containerRaw.(mapstr.M)
+	container, _ := containerRaw.(mapstr.M)
 
 	assert.Equal(t, "abc456", container["id"])
 	assert.Equal(t, "docker", container["runtime"])
@@ -370,13 +370,13 @@ func TestAnnotatorRunContainerWithoutName(t *testing.T) {
 	containerRaw, err := event.Fields.GetValue("container")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, containerRaw)
-	container := containerRaw.(mapstr.M)
+	container, _ := containerRaw.(mapstr.M)
 
 	assert.Equal(t, "abc789", container["id"])
 	imageRaw, err := container.GetValue("image")
 	require.NoError(t, err, "container.image must be set")
 	require.IsType(t, mapstr.M{}, imageRaw)
-	imageMap := imageRaw.(mapstr.M)
+	imageMap, _ := imageRaw.(mapstr.M)
 	assert.Equal(t, "busybox:latest", imageMap["name"])
 }
 
@@ -425,12 +425,12 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 	k8sRaw, err := event.Fields.GetValue("kubernetes")
 	require.NoError(t, err, "event.Fields[\"kubernetes\"] must be set")
 	require.IsType(t, mapstr.M{}, k8sRaw)
-	k8s := k8sRaw.(mapstr.M)
+	k8s, _ := k8sRaw.(mapstr.M)
 
 	podRaw, err := k8s.GetValue("pod")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, podRaw)
-	pod := podRaw.(mapstr.M)
+	pod, _ := podRaw.(mapstr.M)
 	assert.Equal(t, "mypod", pod["name"])
 }
 
@@ -457,7 +457,7 @@ func TestAnnotatorRunExtraContainerFieldsPreserved(t *testing.T) {
 	containerRaw, err := event.Fields.GetValue("container")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, containerRaw)
-	container := containerRaw.(mapstr.M)
+	container, _ := containerRaw.(mapstr.M)
 
 	assert.Equal(t, "extra", container["custom_field"], "extra container fields must be preserved in OCI container")
 }
@@ -491,12 +491,12 @@ func TestAnnotatorRunCacheNotMutated(t *testing.T) {
 	k8sRaw, err := cached.GetValue("kubernetes")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, k8sRaw)
-	k8s := k8sRaw.(mapstr.M)
+	k8s, _ := k8sRaw.(mapstr.M)
 
 	k8sContainerRaw, err := k8s.GetValue("container")
 	require.NoError(t, err, "kubernetes.container must still be in cache")
 	require.IsType(t, mapstr.M{}, k8sContainerRaw)
-	k8sContainer := k8sContainerRaw.(mapstr.M)
+	k8sContainer, _ := k8sContainerRaw.(mapstr.M)
 
 	assert.Equal(t, "mycontainer", k8sContainer["name"], "cache must still have container.name")
 	assert.Equal(t, "myimage:v2", k8sContainer["image"], "cache must still have container.image as a raw string")
@@ -530,14 +530,14 @@ func TestAnnotatorRunEventIndependence(t *testing.T) {
 	containerRaw1, err := event1.Fields.GetValue("container")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, containerRaw1)
-	container1 := containerRaw1.(mapstr.M)
+	container1, _ := containerRaw1.(mapstr.M)
 	container1["injected"] = "mutation"
 
 	// event2's container field must be unaffected.
 	containerRaw2, err := event2.Fields.GetValue("container")
 	require.NoError(t, err)
 	require.IsType(t, mapstr.M{}, containerRaw2)
-	container2 := containerRaw2.(mapstr.M)
+	container2, _ := containerRaw2.(mapstr.M)
 
 	assert.NotContains(t, container2, "injected", "mutating first result must not affect second result")
 }
