@@ -237,6 +237,7 @@ func getVolumes() ([]*Volume, error) {
 }
 
 func volumesGenerateFunc(_ context.Context, _ table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticntfsvolumes.Result, error) {
+	setLogger(log)
 	volumes, err := getVolumes()
 	if err != nil {
 		return nil, err

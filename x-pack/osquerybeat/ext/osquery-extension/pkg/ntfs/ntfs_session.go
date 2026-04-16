@@ -40,10 +40,20 @@ func NewNTFSSession(driveLetter string) (*NTFSSession, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	reader, err := NewVolumeReader(driveLetter)
 	if err != nil {
 		return nil, err
 	}
+
+	// Close the reader if we fail to initialize the session
+	initialized := false
+	defer func() {
+		if !initialized {
+			reader.Close()
+		}
+	}()
+
 	pagedReader, err := parser.NewPagedReader(reader, 1024, 10000)
 	if err != nil {
 		return nil, err
@@ -52,5 +62,7 @@ func NewNTFSSession(driveLetter string) (*NTFSSession, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	initialized = true
 	return &NTFSSession{ctx: ctx, reader: reader}, nil
 }
