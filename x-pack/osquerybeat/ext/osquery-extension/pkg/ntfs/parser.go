@@ -207,6 +207,7 @@ func (v *Volume) FindByDirectory(directory string, pattern string) ([]*fileNode,
 // Drive letter is a required parameter for constructing a Volume, so we need it to move forward with the query.
 // It can be provided directly as a constraint, or indirectly via a path or directory constraint.
 // This function attempts to extract the drive letter from the query constraints in order of specificity: drive > path > directory.
+<<<<<<< HEAD
 func determineDriveLetter(driveConstraints []filters.Filter, pathConstraints []filters.Filter, directoryConstraints []filters.Filter) (string, error) {
 	if len(driveConstraints) > 0 {
 		if len(driveConstraints) > 1 {
@@ -219,6 +220,15 @@ func determineDriveLetter(driveConstraints []filters.Filter, pathConstraints []f
 		}
 
 		return strings.ToUpper(driveLetter), nil
+=======
+func determineDriveLetter(queryContext table.QueryContext) (string, error) {
+	driveFilters := filters.GetColumnConstraints(queryContext, "drive", table.OperatorEquals)
+	if len(driveFilters) > 0 {
+		if len(driveFilters) > 1 {
+			return "", fmt.Errorf("multiple drive constraints found, only one is supported: %s", driveFilters[0].Expression)
+		}
+		return driveFilters[0].Expression, nil
+>>>>>>> 6f08e96ba1 (file table work)
 	}
 
 	getDriveLetterFromPath := func(path string) (string, error) {
@@ -232,16 +242,30 @@ func determineDriveLetter(driveConstraints []filters.Filter, pathConstraints []f
 		return driveLetter, nil
 	}
 
+<<<<<<< HEAD
 	if len(pathConstraints) > 0 {
 		if len(pathConstraints) > 1 {
 			return "", fmt.Errorf("multiple path constraints found, only one is supported: %s", pathConstraints[0].Expression)
+=======
+	pathFilters := filters.GetColumnConstraints(queryContext, "path", table.OperatorEquals)
+	if len(pathFilters) > 0 {
+		if len(pathFilters) > 1 {
+			return "", fmt.Errorf("multiple path constraints found, only one is supported: %s", pathFilters[0].Expression)
+>>>>>>> 6f08e96ba1 (file table work)
 		}
 		return getDriveLetterFromPath(pathConstraints[0].Expression)
 	}
 
+<<<<<<< HEAD
 	if len(directoryConstraints) > 0 {
 		if len(directoryConstraints) > 1 {
 			return "", fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryConstraints[0].Expression)
+=======
+	directoryFilters := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
+	if len(directoryFilters) > 0 {
+		if len(directoryFilters) > 1 {
+			return "", fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
+>>>>>>> 6f08e96ba1 (file table work)
 		}
 		return getDriveLetterFromPath(directoryConstraints[0].Expression)
 	}
@@ -251,14 +275,18 @@ func determineDriveLetter(driveConstraints []filters.Filter, pathConstraints []f
 func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticntfsfile.Result, error) {
 	setLogger(log)
 
+<<<<<<< HEAD
 	results := []elasticntfsfile.Result{}
 
 	driveConstraints := filters.GetColumnConstraints(queryContext, "drive", table.OperatorEquals)
+=======
+>>>>>>> 6f08e96ba1 (file table work)
 	directoryConstraints := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
 	pathConstraints := filters.GetColumnConstraints(queryContext, "path", table.OperatorEquals)
 	inodeConstraints := filters.GetColumnConstraints(queryContext, "inode", table.OperatorEquals)
 	filenameConstraints := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
 
+<<<<<<< HEAD
 	// Determine the drive letter from the query constraints
 	driveLetter, err := determineDriveLetter(driveConstraints, directoryConstraints, pathConstraints)
 	if err != nil {
@@ -270,6 +298,14 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 	if len(directoryConstraints) > 0 && (len(pathConstraints) > 0 || len(inodeConstraints) > 0) {
 		log.Warningf("directory constraint cannot be combined with path or inode constraints")
 		return results, nil
+=======
+	// Check for conflicting constraints
+	if len(directoryConstraints) > 0 && (len(pathConstraints) > 0 || len(inodeConstraints) > 0) {
+		return nil, fmt.Errorf("directory constraint cannot be combined with path or inode constraints")
+	}
+	if len(directoryConstraints) > 1 {
+		return nil, fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryConstraints[0].Expression)
+>>>>>>> 6f08e96ba1 (file table work)
 	}
 
 	if len(directoryConstraints) > 0 && len(filenameConstraints) == 0 {
@@ -278,8 +314,12 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 	}
 
 	if len(directoryConstraints) > 0 && len(filenameConstraints) > 1 {
+<<<<<<< HEAD
 		log.Warning("multiple filename constraints found, only one is supported")
 		return results, nil
+=======
+		return nil, fmt.Errorf("multiple filename constraints found, only one is supported: %s", filenameConstraints[0].Expression)
+>>>>>>> 6f08e96ba1 (file table work)
 	}
 
 	if len(pathConstraints) > 0 && len(inodeConstraints) > 0 {
@@ -293,13 +333,21 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 	}
 
 	if len(pathConstraints) > 1 {
+<<<<<<< HEAD
 		log.Warning("multiple path constraints found, only one is supported")
 		return results, nil
+=======
+		return nil, fmt.Errorf("multiple path constraints found, only one is supported: %s", pathConstraints[0].Expression)
+>>>>>>> 6f08e96ba1 (file table work)
 	}
 
 	if len(inodeConstraints) > 1 {
+<<<<<<< HEAD
 		log.Warning("multiple inode constraints found, only one is supported")
 		return results, nil
+=======
+		return nil, fmt.Errorf("multiple inode constraints found, only one is supported: %s", inodeConstraints[0].Expression)
+>>>>>>> 6f08e96ba1 (file table work)
 	}
 
 	if len(filenameConstraints) > 0 && len(directoryConstraints) == 0 {
@@ -366,8 +414,22 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 
 	// Handle directory constraint
 	if len(directoryConstraints) > 0 {
+<<<<<<< HEAD
 		directory := directoryConstraints[0].Expression
 		pattern := filenameConstraints[0].Expression
+=======
+		directoryFilters := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
+		if len(directoryFilters) != 1 {
+			return nil, fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
+		}
+		filenameFilters := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
+		if len(filenameFilters) != 1 {
+			return nil, fmt.Errorf("directory constraint requires a filename glob constraint")
+		}
+		directory := directoryFilters[0].Expression
+		pattern := filenameFilters[0].Expression
+		log.Infof("Performing directory search with filename pattern: %s", pattern)
+>>>>>>> 6f08e96ba1 (file table work)
 		nodes, err := vol.FindByDirectory(directory, pattern)
 		if err != nil {
 			log.Warningf("failed to perform scoped search for directory %s: %v", directory, err)
