@@ -100,6 +100,10 @@ When set to `bbolt`, the database files are stored under the directory specified
 
 ### `registry.memlog.checkpoint_size` [_registry_memlog_checkpoint_size]
 
+```{applies_to}
+stack: ga 9.4.0
+```
+
 The registry file size threshold, in bytes, that triggers a checkpoint. When the registry file reaches this size, Filebeat writes a full snapshot of the registry state and resets the file. Larger values mean fewer checkpoints, but a larger registry file. Default: `10485760` (10 MB).
 
 The minimum value is `10485760` (10 MB). This setting only applies when `registry.backend` is set to `memlog` (the default). Increasing this value can improve performance when tracking tens of thousands of files or more.
