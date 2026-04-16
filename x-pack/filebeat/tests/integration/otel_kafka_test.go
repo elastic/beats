@@ -18,7 +18,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/sarama"
