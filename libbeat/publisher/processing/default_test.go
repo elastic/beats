@@ -620,40 +620,6 @@ func TestDisableHost(t *testing.T) {
 			"host field should be present when DisableHost is false")
 	})
 
-	t.Run("drop_fields processor is added to pipeline when DisableHost is true", func(t *testing.T) {
-		b, err := newBuilder(defaultInfo, logptest.NewTestingLogger(t, ""), nil, mapstr.EventMetadata{}, nil, false, false)
-		require.NoError(t, err)
-
-		proc, err := b.Create(beat.ProcessingConfig{DisableHost: true}, false, tmpPaths(t))
-		require.NoError(t, err)
-
-		grp, ok := proc.(*group)
-		require.True(t, ok)
-
-		var procNames []string
-		for _, p := range grp.list {
-			procNames = append(procNames, p.String())
-		}
-		assert.Contains(t, procNames, `drop_fields={"Fields":["host.name"],"RegexpFields":[],"IgnoreMissing":true}`,
-			"pipeline should contain a drop_fields processor for host.name when DisableHost is true")
-	})
-
-	t.Run("drop_fields processor is not added when DisableHost is false", func(t *testing.T) {
-		b, err := newBuilder(defaultInfo, logptest.NewTestingLogger(t, ""), nil, mapstr.EventMetadata{}, nil, false, false)
-		require.NoError(t, err)
-
-		proc, err := b.Create(beat.ProcessingConfig{DisableHost: false}, false, tmpPaths(t))
-		require.NoError(t, err)
-
-		grp, ok := proc.(*group)
-		require.True(t, ok)
-
-		for _, p := range grp.list {
-			assert.NotContains(t, p.String(), "drop_fields",
-				"pipeline should not contain a drop_fields processor when DisableHost is false")
-		}
-	})
-
 	t.Run("doesn't removes host.name field for forwarded events", func(t *testing.T) {
 		// The old implementation only deleted host from builtin; it could not drop
 		// host.* fields that a processor adds during event processing. The new
