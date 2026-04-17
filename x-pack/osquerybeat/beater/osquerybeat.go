@@ -86,11 +86,33 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	}
 
 	bt := &osquerybeat{
+<<<<<<< HEAD
 		b:               b,
 		config:          c,
 		log:             log,
 		pub:             pub.New(b, log),
 		osquerydFactory: osqd.New,
+=======
+		b:                    b,
+		config:               c,
+		osqueryInstallConfig: installCfg,
+		log:                  log,
+		pub:                  pub.New(b, log),
+		qp:                   newQueryProfiler(log),
+		osquerydFactory:      osqd.New,
+		executablePath:       os.Executable,
+	}
+
+	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
+	if profileCfg.EnabledOrDefault() {
+		profileDir := b.Info.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
+		store, err := newLiveProfileStore(log, profileDir, profileCfg.MaxProfilesOrDefault())
+		if err != nil {
+			log.Warnw("failed to initialize live query profile storage", "error", err)
+		} else {
+			bt.liveProfiles = store
+		}
+>>>>>>> 184a91bf6 (Move Paths from beat.Beat to beat.Info (#49836))
 	}
 
 	return bt, nil
