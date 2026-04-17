@@ -139,20 +139,19 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
+		beatEvent := event.Content.Fields.Clone()
+		if beatEvent == nil {
+			beatEvent = mapstr.M{}
+		}
+
 		if out.beatInfo.IncludeMetadata {
 			meta := event.Content.Meta.Clone()
 			meta["beat"] = out.beatInfo.Beat
 			meta["version"] = out.beatInfo.Version
 			meta["type"] = "_doc"
-			if err := logRecord.Attributes().PutEmptyMap("@metadata").FromRaw(meta); err != nil {
-				out.log.Errorf("received an error while converting @metadata to log record attribute: %v", err)
-			}
+			beatEvent["@metadata"] = meta
 		}
 
-		beatEvent := event.Content.Fields.Clone()
-		if beatEvent == nil {
-			beatEvent = mapstr.M{}
-		}
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 

@@ -143,12 +143,6 @@ func TestFilebeatOTelKafkaExporterIncludesMetadata(t *testing.T) {
     output:
       otelconsumer:
         include_metadata: true
-processors:
-  transform/promote_metadata:
-    log_statements:
-      - context: log
-        statements:
-          - set(body["@metadata"], attributes["@metadata"])
 exporters:
   kafka:
     brokers:
@@ -161,8 +155,6 @@ service:
     logs:
       receivers:
         - filebeatreceiver
-      processors:
-        - transform/promote_metadata
       exporters:
         - kafka
   telemetry:
