@@ -96,11 +96,13 @@ func BenchmarkFilestream(b *testing.B) {
 			name         string
 			includeLines string
 			excludeLines string
+			expEvents    int
 		}{
-			{"none", "", ""},
-			{"include", "include_lines: ['^rather']", ""},
-			{"exclude", "", "exclude_lines: ['^NOMATCH']"},
-			{"include_and_exclude", "include_lines: ['^rather']", "exclude_lines: ['^NOMATCH']"},
+			{"none", "", "", lineCount},
+			{"include", "include_lines: ['^rather']", "", lineCount},
+			{"exclude", "", "exclude_lines: ['^NOMATCH']", lineCount},
+			{"include_and_exclude", "include_lines: ['^rather']", "exclude_lines: ['^NOMATCH']", lineCount},
+			{"drop_all", "include_lines: [' - 9999$']", "", 1},
 		}
 		for _, fc := range filterCases {
 			b.Run(fc.name, func(b *testing.B) {
@@ -116,7 +118,7 @@ paths:
     - %s
 `, fc.includeLines, fc.excludeLines, filename)
 				for i := 0; i < b.N; i++ {
-					runFilestreamBenchmark(b, logger, fmt.Sprintf("filter-%s-%d", fc.name, i), cfg, lineCount)
+					runFilestreamBenchmark(b, logger, fmt.Sprintf("filter-%s-%d", fc.name, i), cfg, fc.expEvents)
 				}
 			})
 		}
@@ -422,6 +424,7 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	require.NoError(t, err)
 	return filename
 }
+
 
 func createTestStore(t testing.TB) statestore.States {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
