@@ -50,7 +50,7 @@ func TestManager(t *testing.T) {
 		defer func() {
 			management.SetUnderAgent(false) // reset to false
 		}()
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore(), false)
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, &otelmanager.OtelManager{}, beat.Manager)
@@ -69,7 +69,7 @@ type: "log"`)
 		defer func() {
 			management.SetUnderAgent(false) // reset to false
 		}()
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore(), false)
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, &management.FallbackManager{}, beat.Manager)
