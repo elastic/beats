@@ -126,27 +126,21 @@ paths:
 }
 
 func filestreamBenchCfg(path string, fingerprint bool) string {
+	identity := `
+prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~`
 	if fingerprint {
-		return fmt.Sprintf(`
-type: filestream
-prospector.scanner:
-  fingerprint.enabled: true
-  check_interval: 100ms
-close.reader.on_eof: true
-file_identity.fingerprint: ~
-paths:
-  - %s
-`, path)
+		identity = `
+prospector.scanner.fingerprint.enabled: true
+file_identity.fingerprint: ~`
 	}
 	return fmt.Sprintf(`
 type: filestream
 prospector.scanner.check_interval: 100ms
-prospector.scanner.fingerprint.enabled: false
-close.reader.on_eof: true
-file_identity.native: ~
+close.reader.on_eof: true%s
 paths:
   - %s
-`, path)
+`, identity, path)
 }
 
 func TestTakeOverTags(t *testing.T) {
