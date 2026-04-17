@@ -71,7 +71,6 @@ service:
 
 	t.Logf("received Kafka message: %s", string(received))
 
-	// With raw encoding the message is the JSON-marshaled body map directly.
 	var body mapstr.M
 	require.NoError(t, json.Unmarshal(received, &body), "Kafka message is not valid JSON")
 	got := body.Flatten()
@@ -112,10 +111,6 @@ service:
 	}
 }
 
-// TestFilebeatOTelKafkaExporterIncludesMetadata verifies that Beat event
-// metadata is preserved end-to-end through the OTel pipeline and
-// survives body-only encodings. With include_metadata enabled,
-// the @metadata field is persisted to the log record attribute.
 func TestFilebeatOTelKafkaExporterIncludesMetadata(t *testing.T) {
 	topic := fmt.Sprintf("test-otel-kafka-meta-%s", uuid.Must(uuid.NewV4()).String())
 
@@ -166,7 +161,6 @@ service:
 
 	t.Logf("received Kafka message: %s", string(received))
 
-	// With raw encoding the message is the JSON-marshaled body map directly.
 	var body mapstr.M
 	require.NoError(t, json.Unmarshal(received, &body), "Kafka message is not valid JSON")
 	got := body.Flatten()
