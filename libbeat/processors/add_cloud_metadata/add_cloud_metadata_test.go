@@ -89,10 +89,10 @@ func TestAddMetaEventsAreIndependent(t *testing.T) {
 	require.NoError(t, err)
 	cloud2Raw, err := event2.Fields.GetValue("cloud")
 	require.NoError(t, err)
-	require.IsType(t, mapstr.M{}, cloud1Raw)
-	require.IsType(t, mapstr.M{}, cloud2Raw)
-	cloud1Map := cloud1Raw.(mapstr.M)
-	cloud2Map := cloud2Raw.(mapstr.M)
+	cloud1Map, ok := cloud1Raw.(mapstr.M)
+	require.True(t, ok, "expected cloud on event1 to be mapstr.M")
+	cloud2Map, ok := cloud2Raw.(mapstr.M)
+	require.True(t, ok, "expected cloud on event2 to be mapstr.M")
 	assert.NotSame(t, &cloud1Map, &cloud2Map, "cloud maps on different events must not be aliased")
 
 	// Mutate the cloud map on event1.
@@ -122,10 +122,10 @@ func TestAddMetaSharedMetadataUnmutated(t *testing.T) {
 	// The event's cloud map must not be the same pointer as the shared metadata.
 	cloud1Raw, err := event1.Fields.GetValue("cloud")
 	require.NoError(t, err)
-	require.IsType(t, mapstr.M{}, cloud1Raw)
-	cloud1Map := cloud1Raw.(mapstr.M)
-	require.IsType(t, mapstr.M{}, meta["cloud"])
-	metaCloudMap := meta["cloud"].(mapstr.M)
+	cloud1Map, ok := cloud1Raw.(mapstr.M)
+	require.True(t, ok, "expected cloud on event1 to be mapstr.M")
+	metaCloudMap, ok := meta["cloud"].(mapstr.M)
+	require.True(t, ok, "expected meta[cloud] to be mapstr.M")
 	assert.NotSame(t, &cloud1Map, &metaCloudMap, "event cloud map must not alias shared metadata")
 
 	// Aggressively mutate event1's cloud map.
