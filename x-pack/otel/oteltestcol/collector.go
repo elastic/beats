@@ -23,7 +23,6 @@ import (
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -123,7 +122,6 @@ func getComponent() (otelcol.Factories, error) {
 
 	processors, err := otelcol.MakeFactoryMap(
 		beatprocessor.NewFactory(),
-		transformprocessor.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
