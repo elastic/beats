@@ -141,7 +141,7 @@ func TestRawEncodingNoDoubleNewline(t *testing.T) {
 				assert.NotContains(t, body, "\n\n",
 					"bulk body must not contain empty lines; got:\n%s", body)
 				lines := splitNDJSON(body)
-				assert.Equal(t, 2, len(lines),
+				assert.Len(t, lines, 2,
 					"bulk body should have exactly 2 NDJSON lines (meta + document); got %d:\n%s", len(lines), body)
 			})
 		}
