@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add CPU and memory request metrics to the Kubernetes pod and container metricsets.
+component: metricbeat

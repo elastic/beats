@@ -69,6 +69,8 @@ func (s *PodTestSuite) SetupTest() {
 	s.ContainerMetrics = util.NewContainerMetrics()
 	s.ContainerMetrics.CoresLimit = util.NewFloat64Metric(0.5)
 	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+	s.ContainerMetrics.CoresRequest = util.NewFloat64Metric(0.25)
+	s.ContainerMetrics.MemoryRequest = util.NewFloat64Metric(7311360)
 
 	s.AnotherContainerMetrics = util.NewContainerMetrics()
 	s.AnotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
@@ -100,11 +102,16 @@ func (s *PodTestSuite) TestEventMapping() {
 		"cpu.usage.nanocores": 11263994,
 		"cpu.usage.node.pct":  0.005631997,
 		"cpu.usage.limit.pct": 0.022527988,
+		"cpu.request.cores":   0.25,
+		"cpu.usage.request.pct": 0.04505597600000000,
 
-		"memory.usage.bytes":           1462272,
-		"memory.usage.node.pct":        0.01,
-		"memory.usage.limit.pct":       0.1,
-		"memory.working_set.limit.pct": 0.09943977591036414,
+		"memory.usage.bytes":             1462272,
+		"memory.usage.node.pct":          0.01,
+		"memory.usage.limit.pct":         0.1,
+		"memory.working_set.limit.pct":   0.09943977591036414,
+		"memory.request.bytes":           7311360.0,
+		"memory.usage.request.pct":       0.2,
+		"memory.working_set.request.pct": 0.19887955182072828,
 	}
 
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
@@ -186,8 +193,8 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_NodeAndOneContaine
 // Scenario:
 // Node metrics are defined,
 // Pod contains 2 containers:
-// - nginx with both cpu and memore limits defined
-// - sidecar with memory limit defined
+// - nginx with both cpu and memory limits and requests defined
+// - sidecar with memory limit defined but no requests
 func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
@@ -204,21 +211,35 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 		// Following comments explain what is the difference with the test `TestEventMapping
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
-		// "cpu.usage.limit.pct" is not reported, since AnotherCntainer does not contain CoresLimit
+		// "cpu.usage.limit.pct" is not reported, since AnotherContainer does not contain CoresLimit
+		// "cpu.request.cores" and "cpu.usage.request.pct" are not reported, since AnotherContainer has no CoresRequest
 
 		"memory.usage.bytes":           2924544,             // 2x since 2 containers
 		"memory.usage.node.pct":        0.02,                // 2x usage since 2 containers
 		"memory.usage.limit.pct":       0.1,                 // 2x usage / 2x limit = same value
 		"memory.working_set.limit.pct": 0.09943977591036414, // 2x usage / 2x limit = same value
+		// "memory.request.bytes" and related pct fields are not reported, since AnotherContainer has no MemoryRequest
 	}
 
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
+
+	// Verify request fields are absent when not all containers have requests
+	s.assertFieldAbsent(events[0], "cpu.request.cores")
+	s.assertFieldAbsent(events[0], "cpu.usage.request.pct")
+	s.assertFieldAbsent(events[0], "memory.request.bytes")
+	s.assertFieldAbsent(events[0], "memory.usage.request.pct")
+	s.assertFieldAbsent(events[0], "memory.working_set.request.pct")
 }
 
 func (s *PodTestSuite) testValue(event mapstr.M, field string, expected interface{}) {
 	data, err := event.GetValue(field)
 	s.NoError(err, "Could not read field "+field)
 	s.EqualValues(expected, data, "Wrong value for field "+field)
+}
+
+func (s *PodTestSuite) assertFieldAbsent(event mapstr.M, field string) {
+	_, err := event.GetValue(field)
+	s.Error(err, "Expected field "+field+" to be absent, but it was present")
 }
 
 func (s *PodTestSuite) addContainerMetric(containerName string, containerMetric *util.ContainerMetrics) {
