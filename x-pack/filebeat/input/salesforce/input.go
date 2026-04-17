@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -43,6 +44,12 @@ const (
 	formatRFC3339Like = "2006-01-02T15:04:05.999Z"
 )
 
+// salesforceInput is the runtime state of a single configured input
+// instance. The embedded config is the unpacked user configuration; srcConfig
+// is a pointer to the same value, retained separately so run-time helpers can
+// nil-check the pointer without re-validating the embedded struct. All
+// timestamps, including the persisted cursor reachable through cursor, are
+// kept in UTC.
 type salesforceInput struct {
 	ctx           context.Context
 	publisher     inputcursor.Publisher
@@ -136,12 +143,30 @@ func (s *salesforceInput) run(env v2.Context) error {
 	defer func() {
 		env.UpdateStatus(status.Stopped, "Salesforce input stopped")
 	}()
+	if s.srcConfig == nil || s.srcConfig.EventMonitoringMethod == nil {
+		return errors.New("internal error: salesforce monitoring configuration is not set")
+	}
+	ctx := s.ctx
+	if ctx == nil {
+		return errors.New("internal error: salesforce context is not set")
+	}
+	// elfFails / objectFails track the number of consecutive failures for
+	// each collection method across collection iterations within this
+	// run() invocation. The counter is included in the Degraded status
+	// message (and the error log) once it exceeds 1 so an operator watching
+	// agent status can distinguish a transient hiccup from a sustained
+	// outage without having to cross-reference log timestamps. Counters
+	// reset to zero on the first successful run after a failure streak.
+	var elfFails, objectFails int
+
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
-			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
-			s.log.Errorf("Problem running EventLogFile collection: %s", err)
+			elfFails++
+			env.UpdateStatus(status.Degraded, formatCollectionStatus("EventLogFile", elfFails, err))
+			s.log.Errorf("Problem running EventLogFile collection (consecutive failures: %d): %s", elfFails, err)
 		} else {
+			elfFails = 0
 			s.log.Info("Initial EventLogFile collection completed successfully")
 		}
 	}
@@ -149,15 +174,18 @@ func (s *salesforceInput) run(env v2.Context) error {
 	if s.srcConfig.EventMonitoringMethod.Object.isEnabled() {
 		err := s.RunObject()
 		if err != nil {
-			env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
-			s.log.Errorf("Problem running Object collection: %s", err)
+			objectFails++
+			env.UpdateStatus(status.Degraded, formatCollectionStatus("Object", objectFails, err))
+			s.log.Errorf("Problem running Object collection (consecutive failures: %d): %s", objectFails, err)
 		} else {
+			objectFails = 0
 			s.log.Info("Initial Object collection completed successfully")
 		}
 	}
 
 	eventLogFileTicker, objectMethodTicker := &time.Ticker{}, &time.Ticker{}
 	eventLogFileTicker.C, objectMethodTicker.C = nil, nil
+	var eventLogFileBackoffUntil, objectBackoffUntil time.Time
 
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		eventLogFileTicker = time.NewTicker(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
@@ -174,36 +202,69 @@ func (s *salesforceInput) run(env v2.Context) error {
 		// run if the context is already cancelled, but we have already received
 		// another ticker making the channel ready.
 		select {
-		case <-s.ctx.Done():
+		case <-ctx.Done():
 			env.UpdateStatus(status.Stopping, "Salesforce input stopping")
-			return s.isError(s.ctx.Err())
+			return s.isError(ctx.Err())
 		default:
 		}
 
 		select {
-		case <-s.ctx.Done():
+		case <-ctx.Done():
 			env.UpdateStatus(status.Stopping, "Salesforce input stopping")
-			return s.isError(s.ctx.Err())
+			return s.isError(ctx.Err())
 		case <-eventLogFileTicker.C:
+			if !eventLogFileBackoffUntil.IsZero() && time.Now().Before(eventLogFileBackoffUntil) {
+				s.log.Debugf("Skipping EventLogFile collection until %s after previous failure", eventLogFileBackoffUntil.Format(time.RFC3339Nano))
+				continue
+			}
 			s.log.Info("Running EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
-				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running EventLogFile collection: %v", err))
-				s.log.Errorf("Problem running EventLogFile collection: %s", err)
+				elfFails++
+				env.UpdateStatus(status.Degraded, formatCollectionStatus("EventLogFile", elfFails, err))
+				s.log.Errorf("Problem running EventLogFile collection (consecutive failures: %d): %s", elfFails, err)
+				eventLogFileBackoffUntil = time.Now().Add(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 			} else {
+				if elfFails > 0 {
+					s.log.Infof("EventLogFile collection recovered after %d consecutive failures", elfFails)
+				}
+				elfFails = 0
+				eventLogFileBackoffUntil = time.Time{}
 				env.UpdateStatus(status.Running, "EventLogFile collection completed successfully")
 				s.log.Info("EventLogFile collection completed successfully")
 			}
 		case <-objectMethodTicker.C:
+			if !objectBackoffUntil.IsZero() && time.Now().Before(objectBackoffUntil) {
+				s.log.Debugf("Skipping Object collection until %s after previous failure", objectBackoffUntil.Format(time.RFC3339Nano))
+				continue
+			}
 			s.log.Info("Running Object collection")
 			if err := s.RunObject(); err != nil {
-				env.UpdateStatus(status.Degraded, fmt.Sprintf("Error running Object collection: %v", err))
-				s.log.Errorf("Problem running Object collection: %s", err)
+				objectFails++
+				env.UpdateStatus(status.Degraded, formatCollectionStatus("Object", objectFails, err))
+				s.log.Errorf("Problem running Object collection (consecutive failures: %d): %s", objectFails, err)
+				objectBackoffUntil = time.Now().Add(s.srcConfig.EventMonitoringMethod.Object.Interval)
 			} else {
+				if objectFails > 0 {
+					s.log.Infof("Object collection recovered after %d consecutive failures", objectFails)
+				}
+				objectFails = 0
+				objectBackoffUntil = time.Time{}
 				env.UpdateStatus(status.Running, "Object collection completed successfully")
 				s.log.Info("Object collection completed successfully")
 			}
 		}
 	}
+}
+
+// formatCollectionStatus renders the Degraded status message surfaced to
+// Elastic Agent when a collection run fails. The consecutive-failure count
+// is included once fails > 1 so a single transient failure still reads
+// naturally while a sustained outage becomes visually distinct.
+func formatCollectionStatus(method string, fails int, err error) string {
+	if fails > 1 {
+		return fmt.Sprintf("Error running %s collection (%d consecutive failures): %v", method, fails, err)
+	}
+	return fmt.Sprintf("Error running %s collection: %v", method, err)
 }
 
 func (s *salesforceInput) isError(err error) error {
@@ -215,6 +276,62 @@ func (s *salesforceInput) isError(err error) error {
 	return err
 }
 
+// isAuthError reports whether err looks like a Salesforce authentication
+// failure, i.e. a 401 Unauthorized response or a canonical Salesforce auth
+// error code. It is intentionally string-based because go-sfdc flattens the
+// underlying *http.Response into a free-form error message (see
+// soql.Resource.queryResponse) and does not export a typed sentinel.
+//
+// Matches (in priority order):
+//   - INVALID_SESSION_ID: the canonical Salesforce error code returned when
+//     the access token is expired, revoked, or otherwise invalid.
+//   - INVALID_AUTH_HEADER: returned when the Authorization header is
+//     malformed, which covers the "no active session" case go-sfdc produces
+//     before an initial token fetch succeeds.
+//   - ": 401 " / "status code 401": fallback for raw-status responses
+//     without a Salesforce-shaped JSON error body.
+func isAuthError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := err.Error()
+	return strings.Contains(msg, "INVALID_SESSION_ID") ||
+		strings.Contains(msg, "INVALID_AUTH_HEADER") ||
+		strings.Contains(msg, ": 401 ") ||
+		strings.Contains(msg, "status code 401")
+}
+
+// reopenSession acquires a fresh Salesforce session and SOQL resource,
+// replacing s.clientSession and s.soqlr on success. It is called by the
+// SOQL / ELF-download paths when they see an auth error so a token that
+// was revoked or expired mid-run can be replaced without restarting the
+// input.
+//
+// reopenSession is not safe for concurrent use; the input's Run loop is
+// single-goroutine today and callers are expected to invoke it serially
+// during a failed query's error-handling path.
+func (s *salesforceInput) reopenSession() error {
+	if s.sfdcConfig == nil {
+		return errors.New("internal error: salesforce configuration is not set")
+	}
+	newSess, err := session.Open(*s.sfdcConfig)
+	if err != nil {
+		return fmt.Errorf("failed to re-open salesforce session: %w", err)
+	}
+	newSoqlr, err := soql.NewResource(newSess)
+	if err != nil {
+		return fmt.Errorf("failed to re-create SOQL resource on new session: %w", err)
+	}
+	s.clientSession = newSess
+	s.soqlr = newSoqlr
+	s.log.Info("Salesforce session re-opened after auth failure")
+	return nil
+}
+
+// SetupSFClientConnection opens an authenticated Salesforce session using
+// the previously prepared sfdcConfig, stores it on the receiver for reuse
+// (EventLogFile CSV downloads reuse the session for the Authorization
+// header), and returns a SOQL resource bound to it.
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	s.log.Info("Setting up Salesforce client connection")
 	if s.sfdcConfig == nil {
@@ -255,32 +372,215 @@ func isZero[T comparable](v T) bool {
 	return v == *new(T)
 }
 
+// objectConfig returns the Object method's config block with nil guards on
+// the receiver, srcConfig, and EventMonitoringMethod. A non-nil error here
+// is a programming bug (Setup should have rejected the configuration) and
+// is surfaced verbatim so callers can include it in their own error chains.
+func (s *salesforceInput) objectConfig() (*EventMonitoringConfig, error) {
+	if s == nil || s.srcConfig == nil || s.srcConfig.EventMonitoringMethod == nil {
+		return nil, errors.New("internal error: object monitoring configuration is not set")
+	}
+	return &s.srcConfig.EventMonitoringMethod.Object, nil
+}
+
+// eventLogFileConfig is the EventLogFile counterpart to objectConfig.
+func (s *salesforceInput) eventLogFileConfig() (*EventMonitoringConfig, error) {
+	if s == nil || s.srcConfig == nil || s.srcConfig.EventMonitoringMethod == nil {
+		return nil, errors.New("internal error: event log file monitoring configuration is not set")
+	}
+	return &s.srcConfig.EventMonitoringMethod.EventLogFile, nil
+}
+
 // RunObject runs the Object method of the Event Monitoring API to collect events.
 func (s *salesforceInput) RunObject() error {
-	s.log.Infof("Running Object collection with interval: %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
+	objectCfg, err := s.objectConfig()
+	if err != nil {
+		return err
+	}
 
+	s.log.Infof("Running Object collection with interval: %s", objectCfg.Interval)
+
+	if objectCfg.Batch.isEnabled() {
+		return s.runObjectBatches()
+	}
+
+	totalEvents, err := s.runObjectQuery(s.objectCursor(nil))
+	if err != nil {
+		return err
+	}
+	s.log.Infof("Total events: %d", totalEvents)
+
+	return nil
+}
+
+// objectCursor builds the template context map exposed to the Object
+// query's "value" template. It returns nil when no cursor has been
+// persisted yet and batch is nil, so the caller falls back to the
+// "default" template on the very first run.
+//
+// When batch is non-nil (bounded batching), batch_start_time and
+// batch_end_time are added under the "object" key. first_event_time,
+// last_event_time and progress_time are forwarded whenever they are
+// populated, so a template can prefer progress_time on resume but still
+// fall back to the legacy watermarks after an upgrade.
+//
+// When batch is nil (unbatched collection) and progress_time exists from a
+// previous batched run, first_event_time / last_event_time are projected as
+// the later of the legacy watermark and progress_time. This keeps a user who
+// disables batching from replaying quiet time ranges that batching has
+// already advanced through, while still allowing later unbatched runs to move
+// beyond the old progress_time using their native legacy cursor fields.
+func (s *salesforceInput) objectCursor(batch *objectBatchWindow) mapstr.M {
 	var cursor mapstr.M
-	if !isZero(s.cursor.Object.FirstEventTime) || !isZero(s.cursor.Object.LastEventTime) {
+	if !isZero(s.cursor.Object.FirstEventTime) || !isZero(s.cursor.Object.LastEventTime) || !isZero(s.cursor.Object.ProgressTime) || batch != nil {
 		object := make(mapstr.M)
-		if !isZero(s.cursor.Object.FirstEventTime) {
-			object.Put("first_event_time", s.cursor.Object.FirstEventTime)
+		firstEventTime := s.cursor.Object.FirstEventTime
+		lastEventTime := s.cursor.Object.LastEventTime
+		if batch == nil && !isZero(s.cursor.Object.ProgressTime) {
+			firstEventTime = laterObjectResumeWatermark(firstEventTime, s.cursor.Object.ProgressTime)
+			lastEventTime = laterObjectResumeWatermark(lastEventTime, s.cursor.Object.ProgressTime)
 		}
-		if !isZero(s.cursor.Object.LastEventTime) {
-			object.Put("last_event_time", s.cursor.Object.LastEventTime)
+		if !isZero(firstEventTime) {
+			object.Put("first_event_time", firstEventTime)
+		}
+		if !isZero(lastEventTime) {
+			object.Put("last_event_time", lastEventTime)
+		}
+		// Batched object collection advances with progress_time. first/last_event_time
+		// still reflect the observed events from the most recent successful window
+		// so existing templates keep working, but they are not the batching cursor.
+		if !isZero(s.cursor.Object.ProgressTime) {
+			object.Put("progress_time", s.cursor.Object.ProgressTime)
+		}
+		if batch != nil {
+			object.Put("batch_start_time", formatBatchCursorTime(batch.Start))
+			object.Put("batch_end_time", formatBatchCursorTime(batch.End))
 		}
 		cursor = mapstr.M{"object": object}
 	}
 
-	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.Object.Query, cursor)
+	return cursor
+}
+
+// laterObjectResumeWatermark returns whichever of legacyWatermark or
+// progressTime represents the later point in time. It is used when a user
+// disables batching after previously persisting progress_time so unbatched
+// templates that still reference first_event_time / last_event_time resume
+// from the latest safe watermark rather than replaying already-drained batch
+// windows.
+//
+// This comparison is best-effort: if either value cannot be parsed, the
+// legacy watermark is returned unchanged to avoid introducing a new failure
+// path for pre-existing state that older releases would have passed through
+// verbatim to the template.
+func laterObjectResumeWatermark(legacyWatermark, progressTime string) string {
+	if isZero(progressTime) {
+		return legacyWatermark
+	}
+	progressTS, err := parseBatchCursorTime(progressTime)
 	if err != nil {
-		return fmt.Errorf("error forming query based on cursor: %w", err)
+		return legacyWatermark
+	}
+	if isZero(legacyWatermark) {
+		return progressTime
+	}
+	legacyTS, err := parseBatchCursorTime(legacyWatermark)
+	if err != nil {
+		return legacyWatermark
+	}
+	if progressTS.After(legacyTS) {
+		return progressTime
+	}
+	return legacyWatermark
+}
+
+// runObjectBatches drives bounded-batch Object collection. It issues up to
+// batch.max_windows_per_run bounded SOQL queries per tick, advancing
+// progress_time at the end of each successful (Start, End] window.
+//
+// Each window is computed from the latest persisted cursor by
+// nextObjectBatchWindow, which also applies the upgrade-safety fallback
+// from legacy first_event_time / last_event_time watermarks. The object
+// cursor is snapshotted before each query and restored on error, so a
+// failed paginated window retries the exact same bounds on the next tick
+// instead of re-advancing from first/last_event_time values partially
+// updated mid-window by runObjectQuery.
+//
+// The loop also stops early once a window reaches runEnd, because any
+// further window would be empty.
+func (s *salesforceInput) runObjectBatches() error {
+	objectCfg, err := s.objectConfig()
+	if err != nil {
+		return err
+	}
+
+	runEnd := timeNow().UTC()
+	totalEvents := 0
+
+	for i := 0; i < objectCfg.Batch.getMaxWindowsPerRun(); i++ {
+		window, ok, err := s.nextObjectBatchWindow(runEnd)
+		if err != nil {
+			return fmt.Errorf("error building object batch window: %w", err)
+		}
+		if !ok {
+			break
+		}
+
+		prevCursor := s.cursor.Object
+		count, err := s.runObjectQuery(s.objectCursor(&window))
+		if err != nil {
+			s.cursor.Object = prevCursor
+			return err
+		}
+		totalEvents += count
+		s.cursor.Object.ProgressTime = formatBatchCursorTime(window.End)
+
+		if !window.End.Before(runEnd) {
+			break
+		}
+	}
+
+	s.log.Infof("Total events: %d", totalEvents)
+
+	return nil
+}
+
+// runObjectQuery renders the Object query from the provided template
+// context, issues it against Salesforce, walks every page of results, and
+// publishes one event per record. It returns the total number of events
+// published.
+//
+// Per-row side effects:
+//
+//   - first_event_time is written from the cursor field of the first row of
+//     the first page only (legacy semantics required for ORDER BY EventDate
+//     DESC real-time objects, where the first row is the newest).
+//   - last_event_time is written from every row, overwriting on each call,
+//     so at end-of-query it reflects the final row seen.
+//
+// Any mid-stream error aborts immediately and returns the count published
+// so far. The caller is responsible for deciding whether to keep or revert
+// those partial cursor mutations (runObjectBatches reverts on error to keep
+// retry semantics stable).
+func (s *salesforceInput) runObjectQuery(cursor mapstr.M) (int, error) {
+	objectCfg, err := s.objectConfig()
+	if err != nil {
+		return 0, err
+	}
+	if objectCfg.Query == nil || objectCfg.Cursor == nil || objectCfg.Cursor.Field == "" {
+		return 0, errors.New("internal error: object query/cursor configuration is not set")
+	}
+
+	query, err := s.FormQueryWithCursor(objectCfg.Query, cursor)
+	if err != nil {
+		return 0, fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
 	s.log.Infof("Query formed: %s", query.Query)
 
-	res, err := s.soqlr.Query(query, false)
+	res, err := s.queryWithReauth(query)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	totalEvents := 0
@@ -292,10 +592,10 @@ func (s *salesforceInput) RunObject() error {
 
 			jsonStrEvent, err := json.Marshal(val)
 			if err != nil {
-				return err
+				return 0, err
 			}
 
-			if timestamp, ok := val[s.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+			if timestamp, ok := val[objectCfg.Cursor.Field].(string); ok {
 				if firstEvent {
 					s.cursor.Object.FirstEventTime = timestamp
 				}
@@ -304,7 +604,7 @@ func (s *salesforceInput) RunObject() error {
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")
 			if err != nil {
-				return err
+				return 0, err
 			}
 			firstEvent = false
 			totalEvents++
@@ -316,18 +616,25 @@ func (s *salesforceInput) RunObject() error {
 
 		res, err = res.Next()
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
-	s.log.Infof("Total events: %d", totalEvents)
 
-	return nil
+	return totalEvents, nil
 }
 
 // RunEventLogFile runs the EventLogFile method of the Event Monitoring API to
 // collect events.
 func (s *salesforceInput) RunEventLogFile() error {
-	s.log.Infof("Running EventLogFile collection with interval: %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+	eventLogFileCfg, err := s.eventLogFileConfig()
+	if err != nil {
+		return err
+	}
+	if eventLogFileCfg.Query == nil || eventLogFileCfg.Cursor == nil || eventLogFileCfg.Cursor.Field == "" {
+		return errors.New("internal error: event log file query/cursor configuration is not set")
+	}
+
+	s.log.Infof("Running EventLogFile collection with interval: %s", eventLogFileCfg.Interval)
 
 	var cursor mapstr.M
 	if !isZero(s.cursor.EventLogFile.FirstEventTime) || !isZero(s.cursor.EventLogFile.LastEventTime) {
@@ -341,14 +648,14 @@ func (s *salesforceInput) RunEventLogFile() error {
 		cursor = mapstr.M{"event_log_file": eventLogFile}
 	}
 
-	query, err := s.FormQueryWithCursor(s.EventMonitoringMethod.EventLogFile.Query, cursor)
+	query, err := s.FormQueryWithCursor(eventLogFileCfg.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
 	s.log.Infof("Query formed: %s", query.Query)
 
-	res, err := s.soqlr.Query(query, false)
+	res, err := s.queryWithReauth(query)
 	if err != nil {
 		return err
 	}
@@ -356,7 +663,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	// NOTE: This is a failsafe check because the HTTP client is always set.
 	// This check allows unit tests to verify correct behavior when the HTTP
 	// client is nil.
-	if s.sfdcConfig.Client == nil {
+	if s.sfdcConfig == nil || s.sfdcConfig.Client == nil {
 		return errors.New("internal error: salesforce configuration is not set properly")
 	}
 
@@ -368,60 +675,22 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return fmt.Errorf("LogFile field not found or not a string in Salesforce event log file: %v", rec.Record().Fields())
 			}
 
-			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.URL+logfile, nil)
+			published, err := s.fetchAndPublishLogFile(logfile)
 			if err != nil {
-				return fmt.Errorf("error creating request for log file: %w", err)
+				return err
 			}
 
-			s.clientSession.AuthorizationHeader(req)
-
-			// NOTE: If we ever see a production issue relaated to this, then only
-			// we should consider adding the header: "X-PrettyPrint:1"
-			//
-			// // NOTE: X-PrettyPrint:1 is for formatted response and ideally we do
-			// // not need it. But see:
-			// // https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_event_log_file_download.htm?q=X-PrettyPrint%3A1
-			// req.Header.Add("X-PrettyPrint", "1")
-
-			resp, err := s.sfdcConfig.Client.Do(req)
-			if err != nil {
-				return fmt.Errorf("error fetching log file: %w", err)
-			}
-
-			if resp.StatusCode != http.StatusOK {
-				resp.Body.Close()
-				return fmt.Errorf("unexpected status code %d for log file", resp.StatusCode)
-			}
-
-			body, err := io.ReadAll(resp.Body)
-			resp.Body.Close()
-			if err != nil {
-				return fmt.Errorf("error reading log file body: %w", err)
-			}
-
-			recs, err := s.decodeAsCSV(body)
-			if err != nil {
-				return fmt.Errorf("error decoding CSV: %w", err)
-			}
-
-			if timestamp, ok := rec.Record().Fields()[s.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+			// Advance the EventLogFile cursor only after the whole CSV stream is
+			// processed successfully. This avoids skipping unread rows when a
+			// mid-stream parse/publish failure happens.
+			if timestamp, ok := rec.Record().Fields()[eventLogFileCfg.Cursor.Field].(string); ok {
 				if firstEvent {
 					s.cursor.EventLogFile.FirstEventTime = timestamp
 				}
 				s.cursor.EventLogFile.LastEventTime = timestamp
 			}
 
-			for _, val := range recs {
-				jsonStrEvent, err := json.Marshal(val)
-				if err != nil {
-					return fmt.Errorf("error json marshaling event: %w", err)
-				}
-
-				if err := publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile"); err != nil {
-					return fmt.Errorf("error publishing event: %w", err)
-				}
-				totalEvents++
-			}
+			totalEvents += published
 			firstEvent = false
 		}
 
@@ -439,6 +708,86 @@ func (s *salesforceInput) RunEventLogFile() error {
 	return nil
 }
 
+// queryWithReauth issues the given SOQL query and, if the response looks
+// like an auth failure (see isAuthError), re-opens the Salesforce session
+// and retries exactly once. Pagination follow-ups (QueryResult.Next) are
+// NOT retried here because go-sfdc's result object retains a pointer to
+// the old session; if a 401 surfaces mid-pagination it is allowed to
+// bubble up and the next run() tick retries the window from scratch,
+// which then exercises this helper from the top.
+func (s *salesforceInput) queryWithReauth(query *querier) (*soql.QueryResult, error) {
+	res, err := s.soqlr.Query(query, false)
+	if err == nil {
+		return res, nil
+	}
+	if !isAuthError(err) {
+		return nil, err
+	}
+	s.log.Warnw("SOQL query failed with auth error; re-opening session and retrying once",
+		"error", err)
+	if reopenErr := s.reopenSession(); reopenErr != nil {
+		return nil, fmt.Errorf("auth error (%v) and session re-open failed: %w", err, reopenErr)
+	}
+	return s.soqlr.Query(query, false)
+}
+
+// fetchAndPublishLogFile downloads the referenced EventLogFile CSV and
+// streams each row into the publisher via publishCSVRecords. If the server
+// responds with 401 on the first attempt, reopenSession is called and the
+// download is retried exactly once; all other non-200 statuses are surfaced
+// to the caller. The logfile path is taken verbatim from the LogFile field
+// on the EventLogFile record and is appended to s.URL as the go-sfdc
+// library does not expose a helper for this.
+func (s *salesforceInput) fetchAndPublishLogFile(logfile string) (int, error) {
+	resp, err := s.downloadLogFileOnce(logfile)
+	if err != nil {
+		return 0, err
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		resp.Body.Close()
+		s.log.Warn("EventLogFile download returned 401; re-opening session and retrying once")
+		if reopenErr := s.reopenSession(); reopenErr != nil {
+			return 0, fmt.Errorf("log file download got 401 and session re-open failed: %w", reopenErr)
+		}
+		resp, err = s.downloadLogFileOnce(logfile)
+		if err != nil {
+			return 0, err
+		}
+	}
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		return 0, fmt.Errorf("unexpected status code %d for log file", resp.StatusCode)
+	}
+	published, err := s.publishCSVRecords(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return 0, fmt.Errorf("error processing log file CSV: %w", err)
+	}
+	return published, nil
+}
+
+// downloadLogFileOnce issues a single GET against the EventLogFile
+// download URL, attaching the current session's authorization header. The
+// caller is responsible for closing resp.Body and for handling any retry
+// semantics (401, 5xx, etc.). It is split from fetchAndPublishLogFile so
+// the retry loop can reuse the same request construction without risk of
+// consuming the body twice.
+func (s *salesforceInput) downloadLogFileOnce(logfile string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.URL+logfile, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request for log file: %w", err)
+	}
+	s.clientSession.AuthorizationHeader(req)
+	// NOTE: If we ever see a production issue related to this, then only
+	// we should consider adding the header: "X-PrettyPrint:1". See:
+	// https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_event_log_file_download.htm?q=X-PrettyPrint%3A1
+	resp, err := s.sfdcConfig.Client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching log file: %w", err)
+	}
+	return resp, nil
+}
+
 // getSFDCConfig returns a new Salesforce configuration based on the configuration.
 func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	var (
@@ -447,6 +796,9 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 	)
 
 	if cfg.Auth == nil {
+		return nil, errors.New("no auth provider enabled")
+	}
+	if cfg.Auth.OAuth2 == nil {
 		return nil, errors.New("no auth provider enabled")
 	}
 
@@ -493,7 +845,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 	}
 
-	client, err := newClient(*cfg, s.log)
+	client, err := newClient(*cfg, s.inputCtx, s.log)
 	if err != nil {
 		return nil, fmt.Errorf("problem with client: %w", err)
 	}
@@ -503,6 +855,39 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 		Client:      client,
 		Version:     cfg.Version,
 	}, nil
+}
+
+// inputCtx returns the input's live cancellation context, or
+// context.Background when Setup has not run yet. Used by the ctxTransport
+// wrapper so that every outgoing Salesforce HTTP request (including SOQL
+// queries that go-sfdc builds with http.NewRequest rather than
+// NewRequestWithContext) inherits input cancellation.
+func (s *salesforceInput) inputCtx() context.Context {
+	if s == nil || s.ctx == nil {
+		return context.Background()
+	}
+	return s.ctx
+}
+
+// ctxTransport is an http.RoundTripper wrapper that clones every outgoing
+// request with a context supplied by getCtx. It lets the salesforce input
+// propagate input-level cancellation into HTTP calls built by third-party
+// code (notably go-sfdc's SOQL queries, which use http.NewRequest and do
+// not thread any context through). When getCtx returns nil the request is
+// forwarded unchanged so tests that bypass Setup are unaffected.
+type ctxTransport struct {
+	rt     http.RoundTripper
+	getCtx func() context.Context
+}
+
+// RoundTrip implements http.RoundTripper.
+func (t *ctxTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.getCtx != nil {
+		if ctx := t.getCtx(); ctx != nil {
+			req = req.Clone(ctx)
+		}
+	}
+	return t.rt.RoundTrip(req)
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.
@@ -537,10 +922,25 @@ func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 	}
 }
 
-func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
+// newClient builds the Salesforce HTTP client. getCtx, when non-nil, is
+// used to inject the input's live cancellation context into every outgoing
+// request so graceful shutdown aborts in-flight SOQL queries immediately
+// instead of waiting for transport.Timeout.
+func newClient(cfg config, getCtx func() context.Context, log *logp.Logger) (*http.Client, error) {
 	c, err := cfg.Resource.Transport.Client(httpcommon.WithLogger(log))
 	if err != nil {
 		return nil, err
+	}
+
+	// Wrap the inner transport so ctx cancellation reaches requests built
+	// by go-sfdc without passing through http.NewRequestWithContext. This
+	// wraps BEFORE retryablehttp so the injection happens on every retry
+	// attempt, not just the first.
+	if getCtx != nil {
+		if c.Transport == nil {
+			c.Transport = http.DefaultTransport
+		}
+		c.Transport = &ctxTransport{rt: c.Transport, getCtx: getCtx}
 	}
 
 	if maxAttempts := cfg.Resource.Retry.getMaxAttempts(); maxAttempts > 1 {
@@ -565,6 +965,10 @@ func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
 
 // publishEvent publishes an event using the configured publisher pub.
 func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte, dataCollectionMethod string) error {
+	if pub == nil {
+		return errors.New("publisher is not set")
+	}
+
 	event := beat.Event{
 		Timestamp: timeNow(),
 		Fields: mapstr.M{
@@ -583,58 +987,100 @@ type textContextError struct {
 	body []byte
 }
 
-// decodeAsCSV decodes the provided byte slice as a CSV and returns a slice of
-// maps, where each map represents a row in the CSV with the header fields as
-// keys and the row values as values.
-func (s *salesforceInput) decodeAsCSV(p []byte) ([]map[string]string, error) {
-	r := csv.NewReader(bytes.NewReader(p))
+// processCSVRecords streams a Salesforce EventLogFile CSV from r, reusing
+// the underlying csv.Reader row buffer and invoking onRecord once per data
+// row with a freshly allocated header-keyed map. Processing stops at the
+// first error returned by onRecord (bubbled up unchanged) or at a CSV
+// decode error (wrapped with the 1-based row number, counting the header).
+// An empty body - or a body with only a header - is not an error and
+// returns (0, nil). The function returns the number of successfully
+// handled rows, which is the meaningful total even when the caller later
+// receives an error, because rows processed before the failure have
+// already been emitted.
+func (s *salesforceInput) processCSVRecords(r io.Reader, onRecord func(map[string]string) error) (int, error) {
+	csvReader := csv.NewReader(r)
 
 	// To share the backing array for performance.
-	r.ReuseRecord = true
+	csvReader.ReuseRecord = true
 
 	// Lazy quotes are enabled to allow for quoted fields with commas. More flexible
 	// in handling CSVs.
 	// NOTE(shmsr): Although, we didn't face any issue with LazyQuotes == false, but I
 	// think we should keep it enabled to avoid any issues in the future.
-	r.LazyQuotes = true
+	csvReader.LazyQuotes = true
 
-	// Header row is always expected, otherwise we can't map values to keys in
-	// the event.
-	header, err := r.Read()
+	header, err := csvReader.Read()
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			return nil, nil
+			return 0, nil
 		}
-		return nil, fmt.Errorf("failed to read CSV header: %w", err)
+		return 0, fmt.Errorf("failed to read CSV header: %w", err)
 	}
 
-	// As buffer reuse is enabled, copying header is important.
 	header = slices.Clone(header)
 
-	var results []map[string]string //nolint:prealloc // not sure about the size to prealloc with
-
-	// NOTE:
-	//
-	// Read sets `r.FieldsPerRecord` to the number of fields in the first record,
-	// so that future records must have the same field count.
-	// So, if len(header) != len(event), the Read will return an error and hence
-	// we need not put an explicit check.
+	count := 0
+	rowNum := 1
 	for {
-		record, err := r.Read()
+		rowNum++
+		record, err := csvReader.Read()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
-				break
+				return count, nil
 			}
-			s.log.Errorf("failed to read CSV record: %v\n%s", err, p)
-			return nil, textContextError{error: fmt.Errorf("failed to read CSV record: %w for: %v", err, record), body: p}
+			return count, fmt.Errorf("failed to read CSV row %d: %w for: %v", rowNum, err, record)
 		}
 
 		event := make(map[string]string, len(header))
 		for i, h := range header {
 			event[h] = record[i]
 		}
-		results = append(results, event)
-	}
 
+		if err := onRecord(event); err != nil {
+			return count, err
+		}
+		count++
+	}
+}
+
+// publishCSVRecords streams an EventLogFile CSV body from r and publishes
+// each row as an event tagged event.provider="EventLogFile". It is the
+// primary production helper for EventLogFile parsing; the full-buffer
+// decodeAsCSV variant exists only for tests that need to inspect the
+// parsed rows directly.
+//
+// Streaming means earlier rows can reach the publisher before a later row
+// causes an error. That tradeoff is accepted (and covered by tests) to
+// avoid buffering arbitrarily large EventLogFile bodies in memory. The
+// EventLogFile cursor is advanced by the caller only after the whole file
+// has been processed, so a partial failure forces the entire file to be
+// re-fetched and re-published on the next tick.
+func (s *salesforceInput) publishCSVRecords(r io.Reader) (int, error) {
+	return s.processCSVRecords(r, func(val map[string]string) error {
+		jsonStrEvent, err := json.Marshal(val)
+		if err != nil {
+			return fmt.Errorf("error json marshaling event: %w", err)
+		}
+
+		if err := publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile"); err != nil {
+			return fmt.Errorf("error publishing event: %w", err)
+		}
+		return nil
+	})
+}
+
+// decodeAsCSV decodes the provided byte slice as a CSV and returns a slice of
+// maps, where each map represents a row in the CSV with the header fields as
+// keys and the row values as values.
+func (s *salesforceInput) decodeAsCSV(p []byte) ([]map[string]string, error) {
+	var results []map[string]string //nolint:prealloc // not sure about the size to prealloc with
+	_, err := s.processCSVRecords(bytes.NewReader(p), func(event map[string]string) error {
+		results = append(results, event)
+		return nil
+	})
+	if err != nil {
+		s.log.Errorf("failed to decode CSV: %v\n%s", err, p)
+		return nil, textContextError{error: err, body: p}
+	}
 	return results, nil
 }

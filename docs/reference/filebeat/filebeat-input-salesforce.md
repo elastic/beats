@@ -10,9 +10,9 @@ applies_to:
 # Salesforce input [filebeat-input-salesforce]
 
 
-Use the `salesforce` input to monitor Salesforce events either via the [Salesforce EventLogFile (ELF) API](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm) or the [Salesforce Real-time event monitoring API](https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring). Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
+Use the `salesforce` input to monitor Salesforce events using either the [Salesforce EventLogFile (ELF) API](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm) or the [Salesforce Real-time event monitoring API](https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring). Both use the REST API under the hood to run SOQL queries against the Salesforce instance and fetch the relevant events.
 
-The Salesforce input maintains cursor states between requests to track the last event retrieved in each execution. These cursor states are passed to the next event monitoring execution to resume fetching events from the last known position. The cursor states allow the input to pick up where it left off and provide control over the behavior of the input.
+The Salesforce input maintains cursor states between requests to track collection progress for each execution. These cursor states are passed to the next event monitoring execution to resume fetching events from the last known position. The cursor states allow the input to pick up where it left off and provide control over the behavior of the input.
 
 Here are some supported authentication methods and event monitoring methods:
 
@@ -32,12 +32,12 @@ Here are some supported authentication methods and event monitoring methods:
 Here are some key points about how cursors are used in the Salesforce input:
 
 * Separate cursor states are maintained for each configured event monitoring method (`event_log_file` and `object`).
-* The cursor state stores the unique identifier of the last event retrieved, based on the `cursor.field` specified in the configuration.
-* On the first run, the `query.default` is used to fetch an initial set of events.
+* The cursor state stores the persisted watermark used by the query templates. In simple incremental queries this is usually the last observed `cursor.field` value. In bounded object batching it also includes `object.progress_time`.
+* On the first run, the `query.default` is used to fetch an initial set of events unless the input precomputes a derived cursor for bounded batching.
 * On subsequent runs, the `query.value` template is populated with the cursor state to fetch events since the last execution.
 * If the input is restarted, it will resume from the last persisted cursor state rather than starting over from scratch.
 
-Using cursors allows the Salesforce input to reliably keep track of its progress and avoid missing or duplicating events across executions. The cursor field should be chosen carefully to have a monotonically increasing value for each new event.
+Using cursors allows the Salesforce input to reliably keep track of its progress and avoid missing or duplicating events across executions. Choose cursor inputs that advance predictably between runs. For EventLogFile this usually means a monotonically increasing field such as `CreatedDate`. For bounded object catch-up, use `object.progress_time` together with `object.batch_start_time` and `object.batch_end_time`.
 
 Event Monitoring methods are highly configurable and can be used to monitor any supported object or event log file. The input can be configured to monitor multiple objects or event log files at the same time.
 
@@ -68,16 +68,21 @@ filebeat.inputs:
         enabled: true
         interval: 1h
         query:
-          default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-          value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST"
+          default: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
+          value: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST"
         cursor:
           field: "CreatedDate"
       object:
         enabled: true
         interval: 5m
+        batch:
+          enabled: true
+          initial_interval: 24h
+          window: 5m
+          max_windows_per_run: 12
         query:
-          default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
-          value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]"
+          default: "SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate DESC"
+          value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.batch_start_time ]] AND EventDate <= [[ .cursor.object.batch_end_time ]] ORDER BY EventDate DESC"
         cursor:
           field: "EventDate"
 ```
@@ -128,26 +133,34 @@ To get started with [real-time](https://developer.salesforce.com/blogs/2020/05/i
 
 ## Execution [_execution_2]
 
-The `salesforce` input is a long-running program that retrieves events from a Salesforce instance and sends them to the specified output. The program executes in a loop, fetching events from the Salesforce instance at a preconfigured interval. Each event monitoring method can be configured to run separately and at different intervals. To prevent a sudden spike in memory usage, if multiple event monitoring methods are configured, they are scheduled to run one at a time. Even if the intervals overlap, only one method will be executed randomly, and the other will be executed after the first one completes.
+The `salesforce` input is a long-running program that retrieves events from a Salesforce instance and sends them to the specified output. The program executes in a loop, fetching events from the Salesforce instance at a preconfigured interval. Each event monitoring method can be configured to run separately and at different intervals.
+
+When multiple event monitoring methods are enabled, they run in the same input loop (single goroutine). After the initial one-shot collection runs, the steady-state ticker loop handles one ready method at a time. If both method tickers are ready at the same time, Go's `select` chooses one ready case non-deterministically, and that collection runs to completion before the loop handles the next ready ticker. In practice, this means long-running collection in one method can delay the other method.
 
 There are two methods to fetch the events from the Salesforce instance:
 
-* `event_log_file`: [EventLogFile](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm) is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org’s operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce’s query language SOQL to query the object.
-* `object`: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for monitoring [objects](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_list.htm) in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. With this method, we query the object using Salesforce’s query language ([SOQL](https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql.htm)). The collection happens at the configured scrape `interval`.
+* `event_log_file`: [EventLogFile](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm) is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org’s operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce’s query language SOQL to query the object. Keep the query filter, sort order, and `cursor.field` aligned on the same watermark field. The built-in module templates use `CreatedDate`, and downloaded CSV rows are processed as a stream to reduce memory pressure.
+* `object`: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for monitoring [objects](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_list.htm) in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. With this method, we query the object using Salesforce’s query language ([SOQL](https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql.htm)). The collection happens at the configured scrape `interval`. For high-volume objects, enable bounded batching so one large catch-up query does not have to process the full backlog at once.
 
 ::::{note}
 **Salesforce Objects and SOQL Query Field Ordering Limitations**
 
-Each Salesforce Object contains a set of fields, but SOQL queries have restrictions on the fields that can be ordered and the specific ordering method. The Object description on the Salesforce Developers page provides information about these limitations. For instance, the Login Object only allows ordering by the EventDate field in descending order.
+Each Salesforce Object contains a set of fields, but SOQL queries have restrictions on the fields that can be ordered and the specific ordering method. The Object description on the Salesforce Developers page provides information about these limitations. For instance, the Login Object only allows ordering by the `EventDate` field in descending order. When collecting a large backlog for `LoginEvent` or `LogoutEvent`, prefer bounded windows such as `EventDate > batch_start_time AND EventDate <= batch_end_time ORDER BY EventDate DESC` instead of one unbounded catch-up query.
 
-When collecting data over time using cursors, the following cursor inputs are available:
+When collecting data over time using cursors, the following persisted cursor inputs are available:
 
 * `object.first_event_time`: This cursor input stores the cursor value from the first event encountered during data collection using the object method.
 * `object.last_event_time`: This cursor input stores the cursor value from the last event encountered during data collection using the object method.
+* `object.progress_time`: This cursor input stores the end of the last successfully processed object batch window. It is the durable batching watermark for restart-safe catch-up.
 * `event_log_file.first_event_time`: This cursor input stores the cursor value from the first event encountered during data collection using the event log file method.
 * `event_log_file.last_event_time`: This cursor input stores the cursor value from the last event encountered during data collection using the event log file method.
 
-By selecting one of the above cursor inputs, users can collect data from both the object and event log file in the desired order. The cursor configuration can be customized based on the user’s specific requirements.
+When object batching is enabled, the `query.value` template also receives two derived inputs for the current run:
+
+* `object.batch_start_time`: Exclusive lower bound for the current object batch window.
+* `object.batch_end_time`: Inclusive upper bound for the current object batch window.
+
+By selecting the appropriate cursor inputs, users can collect data from both the object and event log file in the desired order. The cursor configuration can be customized based on the user’s specific requirements.
 
 ::::
 
@@ -300,14 +313,16 @@ The interval to collect the events from the Salesforce instance using the EventL
 
 The default query to fetch the events from the Salesforce instance using the EventLogFile API.
 
-In case the cursor state is not available, the default query will be used to fetch the events from the Salesforce instance. The default query must be a valid SOQL query. If the SOQL query in `event_monitoring_method.event_log_file.query.value` is not valid, the default query will be used to fetch the events from the Salesforce instance.
+In case the cursor state is not available, the default query will be used to fetch the events from the Salesforce instance. The default query must be a valid SOQL query.
 
 
 ## `event_monitoring_method.event_log_file.query.value` [_event_monitoring_method_event_log_file_query_value]
 
-The SOQL query to fetch the events from the Salesforce instance using the EventLogFile API but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query. If the SOQL query is not valid, the default query will be used to fetch the events from the Salesforce instance.
+The SOQL query to fetch the events from the Salesforce instance using the EventLogFile API but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query.
 
 In case of restarts or subsequent executions, the cursor state will be used to fetch the events from the Salesforce instance. The cursor state is the last event time of the last event fetched from the Salesforce instance. The cursor state is taken from `event_monitoring_method.event_log_file.cursor.field` field for the last event fetched from the Salesforce instance.
+
+The default and value queries should keep their filter field, sort field, and `cursor.field` aligned. For example, if `cursor.field` is `CreatedDate`, both queries should filter on `CreatedDate` and use `ORDER BY CreatedDate`.
 
 
 ## `event_monitoring_method.event_log_file.cursor.field` [_event_monitoring_method_event_log_file_cursor_field]
@@ -329,24 +344,48 @@ Whether to use the REST API for objects for event monitoring. Default: `false`.
 
 The interval to collect the events from the Salesforce instance using the REST API from objects.
 
+## `event_monitoring_method.object.batch.enabled` [_event_monitoring_method_object_batch_enabled]
+
+Whether to split object catch-up into bounded SOQL windows. Default: `false`.
+
+## `event_monitoring_method.object.batch.initial_interval` [_event_monitoring_method_object_batch_initial_interval]
+
+The historical lookback used to seed the first bounded object window when batching is enabled. The first batched query starts at `now - initial_interval`.
+
+When you use the built-in Salesforce module templates for `login` and `logout`, leaving `var.initial_interval` unset causes the generated object batching configuration to fall back to `var.real_time_interval` for the first bounded window. Set `var.initial_interval` explicitly if you want a deeper first-run catch-up window.
+
+## `event_monitoring_method.object.batch.window` [_event_monitoring_method_object_batch_window]
+
+The size of each bounded object batch window. Each run queries at most `window` worth of object data per batch.
+
+## `event_monitoring_method.object.batch.max_windows_per_run` [_event_monitoring_method_object_batch_max_windows_per_run]
+
+The maximum number of bounded object batch windows to execute in one input run before yielding to the next interval. Default: `1`.
+
 
 ## `event_monitoring_method.object.query.default` [_event_monitoring_method_object_query_default]
 
 The default SOQL query to fetch the events from the Salesforce instance using the REST API from objects.
 
-In case the cursor state is not available, the default query will be used to fetch the events from the Salesforce instance. The default query must be a valid SOQL query. If the SOQL query in `event_monitoring_method.object.query.value` is not valid, the default query will be used to fetch the events from the Salesforce instance.
+In case the cursor state is not available, the default query will be used to fetch the events from the Salesforce instance. The default query must be a valid SOQL query.
+
+When object batching is enabled, the input seeds the first batch window from `event_monitoring_method.object.batch.initial_interval` and executes the value query immediately with derived cursor inputs instead of using an unbounded default query.
 
 
 ## `event_monitoring_method.object.query.value` [_event_monitoring_method_object_query_value]
 
-The SOQL query to fetch the events from the Salesforce instance using the REST API from objects but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query. If the SOQL query is not valid, the default query will be used to fetch the events from the Salesforce instance.
+The SOQL query to fetch the events from the Salesforce instance using the REST API from objects but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query.
 
 In case of restarts or subsequent executions, the cursor state will be used to fetch the events from the Salesforce instance. The cursor state is the last event time of the last event fetched from the Salesforce instance. The cursor state is taken from `event_monitoring_method.object.cursor.field` field for the last event fetched from the Salesforce instance.
+
+When object batching is enabled, the value query can use `object.progress_time`, `object.batch_start_time`, and `object.batch_end_time` to build bounded windows. This is the recommended pattern for high-volume `LoginEvent` and `LogoutEvent` collection.
 
 
 ## `event_monitoring_method.object.cursor.field` [_event_monitoring_method_object_cursor_field]
 
 The field to use to fetch the cursor state from the last event fetched from the Salesforce instance. The field must be a valid field in the SOQL query specified in `event_monitoring_method.object.query.default` and `event_monitoring_method.object.query.value` i.e., part of the selected fields in the SOQL query.
+
+For high-volume objects, the query should also order on the same field whenever Salesforce supports it. `LoginEvent` and `LogoutEvent` should use `ORDER BY EventDate DESC`.
 
 
 ## Common options [filebeat-input-salesforce-common-options]

@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -48,6 +49,7 @@ const (
 	defaultLoginObjectQuery           = "SELECT FIELDS(STANDARD) FROM LoginEvent"
 	valueLoginObjectQuery             = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]"
 	defaultLoginObjectQueryWithCursor = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2023-12-06T05:44:24.973+0000"
+	valueBatchedLoginObjectQuery      = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.batch_start_time ]] AND EventDate <= [[ .cursor.object.batch_end_time ]] ORDER BY EventDate DESC"
 
 	defaultLoginEventLogFileQuery = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
 	valueLoginEventLogFileQuery   = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST"
@@ -143,6 +145,10 @@ func TestFormQueryWithCursor(t *testing.T) {
 			}
 			if tc.wantErr != nil {
 				return
+			}
+
+			if querier == nil {
+				t.Fatal("expected querier to be non-nil")
 			}
 
 			assert.EqualValues(t, tc.wantQuery, querier.Query)
@@ -391,19 +397,1444 @@ func TestInput(t *testing.T) {
 				return
 			}
 
-			if len(client.published) < len(tc.expected) {
-				t.Errorf("unexpected number of published events: got:%d want at least:%d", len(client.published), len(tc.expected))
-				tc.expected = tc.expected[:len(client.published)]
-			}
+			require.Equal(t, len(tc.expected), len(client.published),
+				"unexpected number of published events")
 
-			client.published = client.published[:len(tc.expected)]
-			for i, got := range client.published {
+			for i := 0; i < len(tc.expected) && i < len(client.published); i++ {
+				got := client.published[i]
 				if !reflect.DeepEqual(got.Fields["message"], tc.expected[i]) {
 					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, tc.expected[i]))
 				}
 			}
 		})
 	}
+}
+
+func TestRunObjectWithBatching(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		firstBatchQuery  = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:45:00.000Z AND EventDate <= 2024-01-01T11:50:00.000Z ORDER BY EventDate DESC"
+		secondBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:50:00.000Z AND EventDate <= 2024-01-01T11:55:00.000Z ORDER BY EventDate DESC"
+		firstBatchJSON   = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000001AAA" }, "Id": "000000000000001AAA", "EventDate": "2024-01-01T11:49:00.000+0000" } ] }`
+		secondBatchJSON  = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000002AAA" }, "Id": "000000000000002AAA", "EventDate": "2024-01-01T11:54:30.000+0000" } ] }`
+	)
+
+	var (
+		queries []string
+		server  *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == firstBatchQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstBatchJSON))
+		case r.FormValue("q") == secondBatchQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(secondBatchJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	authConfig := map[string]interface{}{
+		"user_password_flow": map[string]interface{}{
+			"enabled":       true,
+			"client.id":     "clientid",
+			"client.secret": "clientsecret",
+			"token_url":     server.URL,
+			"username":      "username",
+			"password":      "password",
+		},
+	}
+
+	baseConfig := map[string]interface{}{
+		"url":         server.URL,
+		"version":     56,
+		"auth.oauth2": authConfig,
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 2,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected batched object collection to succeed")
+
+	assert.Equal(t, []string{firstBatchQuery, secondBatchQuery}, queries, "expected batched query windows to be executed in order")
+	assert.Len(t, client.published, 2, "expected one event from each batch window")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected batch progress to advance to the end of the last processed window")
+}
+
+func TestRunObjectWithBatchingIncludesEventAtBatchEndBoundary(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		firstBatchQuery  = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:45:00.000Z AND EventDate <= 2024-01-01T11:50:00.000Z ORDER BY EventDate DESC"
+		secondBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:50:00.000Z AND EventDate <= 2024-01-01T11:55:00.000Z ORDER BY EventDate DESC"
+		firstBatchJSON   = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000041AAA" }, "Id": "000000000000041AAA", "EventDate": "2024-01-01T11:50:00.000+0000" } ] }`
+		secondBatchJSON  = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000042AAA" }, "Id": "000000000000042AAA", "EventDate": "2024-01-01T11:54:30.000+0000" } ] }`
+	)
+
+	var (
+		queries []string
+		server  *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == firstBatchQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstBatchJSON))
+		case r.FormValue("q") == secondBatchQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(secondBatchJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 2,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected batched object collection with boundary event to succeed")
+
+	assert.Equal(t, []string{firstBatchQuery, secondBatchQuery}, queries, "expected batched boundary queries to be executed in order")
+	assert.Len(t, client.published, 2, "expected one event from each batch window including the inclusive end-boundary event")
+
+	firstMessage, ok := client.published[0].Fields["message"].(string)
+	require.True(t, ok, "expected published event message to be a string")
+	assert.Contains(t, firstMessage, `"EventDate":"2024-01-01T11:50:00.000+0000"`, "expected the inclusive batch end-boundary event to be published")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected batch progress to advance after processing a boundary event")
+}
+
+func TestRunObjectRequiresObjectConfig(t *testing.T) {
+	s := &salesforceInput{
+		cursor: &state{},
+		log:    logp.NewLogger("salesforceInput"),
+	}
+
+	err := s.RunObject()
+	require.Error(t, err, "expected RunObject to reject a missing object configuration")
+	assert.ErrorContains(t, err, "object monitoring configuration is not set", "expected RunObject to report the missing object configuration")
+}
+
+func TestRunObjectRequiresObjectQueryCursorConfig(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.EventMonitoringMethod = &eventMonitoringMethod{
+		Object: EventMonitoringConfig{
+			Enabled:  pointer(true),
+			Interval: time.Second,
+		},
+	}
+
+	s := &salesforceInput{
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	err := s.RunObject()
+	require.Error(t, err, "expected RunObject to reject missing object query/cursor configuration")
+	assert.ErrorContains(t, err, "object query/cursor configuration is not set", "expected RunObject to report missing object query/cursor configuration")
+}
+
+func TestRunObjectWithBatchingSeedsFirstWindowFromLegacyFirstEventTime(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		legacyResumeBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:55:00.000Z AND EventDate <= 2024-01-01T12:00:00.000Z ORDER BY EventDate DESC"
+		resumeBatchJSON        = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000044AAA" }, "Id": "000000000000044AAA", "EventDate": "2024-01-01T11:59:30.000+0000" } ] }`
+	)
+
+	var (
+		queries []string
+		server  *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == legacyResumeBatchQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(resumeBatchJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor: &state{
+			Object: dateTimeCursor{
+				FirstEventTime: "2024-01-01T11:55:00.000+0000",
+				LastEventTime:  "2024-01-01T11:54:30.000+0000",
+			},
+		},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected batched object collection to resume successfully from the legacy first_event_time watermark")
+
+	require.Len(t, queries, 1, "expected exactly one resumed batch query")
+	assert.Equal(t, legacyResumeBatchQuery, queries[0], "expected the first batched window after upgrade to seed from the legacy first_event_time watermark")
+}
+
+func TestIsAuthError(t *testing.T) {
+	cases := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{
+			name: "nil error is not auth error",
+			err:  nil,
+			want: false,
+		},
+		{
+			name: "canonical INVALID_SESSION_ID from go-sfdc",
+			err:  errors.New("insert response err: INVALID_SESSION_ID: Session expired or invalid"),
+			want: true,
+		},
+		{
+			name: "INVALID_AUTH_HEADER from go-sfdc",
+			err:  errors.New("insert response err: INVALID_AUTH_HEADER: Authorization header is missing"),
+			want: true,
+		},
+		{
+			name: "raw 401 status from go-sfdc when body is not sfdc.Error-shaped",
+			err:  errors.New("insert response err: 401 401 Unauthorized"),
+			want: true,
+		},
+		{
+			name: "download path status code phrasing",
+			err:  errors.New("unexpected status code 401 for log file"),
+			want: true,
+		},
+		{
+			name: "403 is not auth error (we do not retry permission failures)",
+			err:  errors.New("insert response err: INSUFFICIENT_ACCESS: You do not have access"),
+			want: false,
+		},
+		{
+			name: "500 is not auth error",
+			err:  errors.New("insert response err: 500 500 Internal Server Error"),
+			want: false,
+		},
+		{
+			name: "unrelated wrapping that happens to contain 401 as a substring is not matched",
+			err:  errors.New("error fetching record Id=00Q401abc: network reset"),
+			want: false,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, isAuthError(tc.err))
+		})
+	}
+}
+
+func TestFormatCollectionStatus(t *testing.T) {
+	tests := []struct {
+		name   string
+		method string
+		fails  int
+		err    error
+		want   string
+	}{
+		{
+			name:   "first failure keeps the short degraded message",
+			method: "Object",
+			fails:  1,
+			err:    errors.New("boom"),
+			want:   "Error running Object collection: boom",
+		},
+		{
+			name:   "second failure includes consecutive failure count",
+			method: "EventLogFile",
+			fails:  2,
+			err:    errors.New("boom"),
+			want:   "Error running EventLogFile collection (2 consecutive failures): boom",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, formatCollectionStatus(tc.method, tc.fails, tc.err))
+		})
+	}
+}
+
+func TestObjectCursorWithoutBatchUsesLatestResumeWatermark(t *testing.T) {
+	tests := []struct {
+		name               string
+		cursor             dateTimeCursor
+		wantFirstEventTime string
+		wantLastEventTime  string
+	}{
+		{
+			name: "progress_time wins over stale legacy watermarks after disabling batching",
+			cursor: dateTimeCursor{
+				FirstEventTime: "2024-01-01T11:45:00.000+0000",
+				LastEventTime:  "2024-01-01T11:44:30.000+0000",
+				ProgressTime:   "2024-01-01T12:00:00.000Z",
+			},
+			wantFirstEventTime: "2024-01-01T12:00:00.000Z",
+			wantLastEventTime:  "2024-01-01T12:00:00.000Z",
+		},
+		{
+			name: "newer unbatched first and last event times stay ahead of older progress_time",
+			cursor: dateTimeCursor{
+				FirstEventTime: "2024-01-01T12:05:00.000+0000",
+				LastEventTime:  "2024-01-01T12:04:30.000+0000",
+				ProgressTime:   "2024-01-01T12:00:00.000Z",
+			},
+			wantFirstEventTime: "2024-01-01T12:05:00.000+0000",
+			wantLastEventTime:  "2024-01-01T12:04:30.000+0000",
+		},
+		{
+			name: "progress_time seeds empty legacy watermarks for unbatched resume",
+			cursor: dateTimeCursor{
+				ProgressTime: "2024-01-01T12:00:00.000Z",
+			},
+			wantFirstEventTime: "2024-01-01T12:00:00.000Z",
+			wantLastEventTime:  "2024-01-01T12:00:00.000Z",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			s := &salesforceInput{
+				cursor: &state{
+					Object: tc.cursor,
+				},
+			}
+
+			cursor := s.objectCursor(nil)
+			require.NotNil(t, cursor, "expected object cursor projection for non-empty object state")
+
+			objectCursor, ok := cursor["object"].(mapstr.M)
+			require.True(t, ok, "expected object cursor map to be present")
+			assert.Equal(t, tc.wantFirstEventTime, objectCursor["first_event_time"], "expected unbatched object cursor projection to choose the correct first_event_time resume watermark")
+			assert.Equal(t, tc.wantLastEventTime, objectCursor["last_event_time"], "expected unbatched object cursor projection to choose the correct last_event_time resume watermark")
+			assert.Equal(t, tc.cursor.ProgressTime, objectCursor["progress_time"], "expected progress_time to remain available to custom templates")
+		})
+	}
+}
+
+func TestRunObjectReopensSessionOnInvalidSessionID(t *testing.T) {
+	const objectQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate ASC NULLS FIRST"
+
+	var (
+		mu              sync.Mutex
+		tokenRequests   int
+		firstQueryDone  bool
+		secondQueryDone bool
+		server          *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			mu.Lock()
+			tokenRequests++
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == objectQuery:
+			mu.Lock()
+			first := !firstQueryDone
+			if first {
+				firstQueryDone = true
+			} else {
+				secondQueryDone = true
+			}
+			mu.Unlock()
+			if first {
+				// Simulate an expired / revoked Salesforce access token.
+				w.Header().Set("content-type", "application/json")
+				w.WriteHeader(http.StatusUnauthorized)
+				_, _ = w.Write([]byte(`[{"errorCode":"INVALID_SESSION_ID","message":"Session expired or invalid"}]`))
+				return
+			}
+			// Second attempt: honour it after the input has re-authenticated.
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000001AAA" }, "Id": "000000000000001AAA", "EventDate": "2024-01-01T12:00:00.000+0000" } ] }`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": objectQuery,
+					"value":   objectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "reauth object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected the input to transparently recover from an INVALID_SESSION_ID response by re-opening the session and retrying the query")
+
+	mu.Lock()
+	defer mu.Unlock()
+	assert.Equal(t, 2, tokenRequests, "expected one token fetch at startup and a second one triggered by the 401 re-auth path")
+	assert.True(t, firstQueryDone, "expected the first (failing) SOQL query to have been seen")
+	assert.True(t, secondQueryDone, "expected the second (post-reauth) SOQL query to have been seen")
+	assert.Len(t, client.published, 1, "expected exactly one event to be published after the re-auth retry succeeded")
+}
+
+func TestRunEventLogFileReopensSessionOnUnauthorizedDownload(t *testing.T) {
+	var (
+		mu            sync.Mutex
+		tokenRequests int
+		queryRequests int
+		downloadHits  int
+		server        *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			mu.Lock()
+			tokenRequests++
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			mu.Lock()
+			queryRequests++
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			downloadHits++
+			first := downloadHits == 1
+			mu.Unlock()
+			if first {
+				w.WriteHeader(http.StatusUnauthorized)
+				_, _ = w.Write([]byte(`{"error":"expired session"}`))
+				return
+			}
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "reauth event log file config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunEventLogFile()
+	require.NoError(t, err, "expected the input to transparently recover from a 401 EventLogFile download by re-opening the session and retrying once")
+
+	mu.Lock()
+	defer mu.Unlock()
+	assert.Equal(t, 2, tokenRequests, "expected one token fetch at startup and a second one triggered by the 401 download re-auth path")
+	assert.Equal(t, 1, queryRequests, "expected the SOQL query itself to succeed without retry in this scenario")
+	assert.Equal(t, 2, downloadHits, "expected the EventLogFile download to be attempted once before and once after session re-open")
+	assert.Len(t, client.published, 1, "expected exactly one CSV row to be published after the re-auth retry succeeded")
+	assert.Equal(t, "2023-12-19T21:04:35.000+0000", s.cursor.EventLogFile.FirstEventTime, "expected successful retry to advance first_event_time")
+	assert.Equal(t, "2023-12-19T21:04:35.000+0000", s.cursor.EventLogFile.LastEventTime, "expected successful retry to advance last_event_time")
+}
+
+func TestRunObjectWithBatchingResumesFromProgressTime(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		resumeBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:55:00.000Z AND EventDate <= 2024-01-01T12:00:00.000Z ORDER BY EventDate DESC"
+		resumeBatchJSON  = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000003AAA" }, "Id": "000000000000003AAA", "EventDate": "2024-01-01T11:59:30.000+0000" } ] }`
+	)
+
+	var server *httptest.Server
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == resumeBatchQuery:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(resumeBatchJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor: &state{
+			Object: dateTimeCursor{
+				ProgressTime: "2024-01-01T11:55:00.000Z",
+			},
+		},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected batched object collection to resume successfully")
+
+	assert.Len(t, client.published, 1, "expected resumed batching to publish one event")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T12:00:00.000Z", objectCursor["progress_time"], "expected batch progress to advance from the persisted watermark")
+}
+
+func TestRunObjectWithBatchingResumeUsesProgressTimeAsExclusiveBoundary(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		resumeBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:55:00.000Z AND EventDate <= 2024-01-01T12:00:00.000Z ORDER BY EventDate DESC"
+		resumeBatchJSON  = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000043AAA" }, "Id": "000000000000043AAA", "EventDate": "2024-01-01T12:00:00.000+0000" } ] }`
+	)
+
+	var (
+		queries []string
+		server  *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == resumeBatchQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(resumeBatchJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor: &state{
+			Object: dateTimeCursor{
+				FirstEventTime: "2024-01-01T11:50:00.000+0000",
+				LastEventTime:  "2024-01-01T11:54:30.000+0000",
+				ProgressTime:   "2024-01-01T11:55:00.000Z",
+			},
+		},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected resumed batched object collection to succeed with progress_time as the exclusive lower boundary")
+
+	require.Len(t, queries, 1, "expected exactly one resumed batch query")
+	assert.Equal(t, resumeBatchQuery, queries[0], "expected resume query to use progress_time as the exclusive lower boundary")
+	assert.NotContains(t, queries[0], "EventDate >=", "expected resume query to remain exclusive at the lower boundary")
+	assert.Len(t, client.published, 1, "expected the resumed batch to publish one event")
+
+	firstMessage, ok := client.published[0].Fields["message"].(string)
+	require.True(t, ok, "expected published event message to be a string")
+	assert.Contains(t, firstMessage, `"EventDate":"2024-01-01T12:00:00.000+0000"`, "expected the resumed batch to publish the in-window boundary event")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T12:00:00.000Z", objectCursor["progress_time"], "expected resumed batch progress to advance to the end of the resumed window")
+}
+
+func TestRunObjectWithInvalidBatchProgressTime(t *testing.T) {
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     "https://salesforce.example",
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     "https://salesforce.example",
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	s := &salesforceInput{
+		cursor: &state{
+			Object: dateTimeCursor{
+				ProgressTime: "not-a-time",
+			},
+		},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	err = s.RunObject()
+	require.Error(t, err, "expected malformed batch progress time to fail")
+	assert.ErrorContains(t, err, `unsupported Salesforce cursor time format: "not-a-time"`, "expected malformed cursor error to describe the bad progress time")
+}
+
+func TestRunObjectWithBatchingPagination(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		batchedQuery        = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:50:00.000Z AND EventDate <= 2024-01-01T11:55:00.000Z ORDER BY EventDate DESC"
+		firstBatchPageJSON  = `{ "totalSize": 2, "done": false, "nextRecordsUrl": "/nextRecords/LoginEvents/BATCHPAGE", "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000011AAA" }, "Id": "000000000000011AAA", "EventDate": "2024-01-01T11:54:30.000+0000" } ] }`
+		secondBatchPageJSON = `{ "totalSize": 2, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000012AAA" }, "Id": "000000000000012AAA", "EventDate": "2024-01-01T11:53:30.000+0000" } ] }`
+	)
+
+	var server *httptest.Server
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == batchedQuery:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstBatchPageJSON))
+		case r.RequestURI == "/nextRecords/LoginEvents/BATCHPAGE":
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(secondBatchPageJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "10m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected batched object collection with pagination to succeed")
+
+	assert.Len(t, client.published, 2, "expected all paginated records within the window to be published")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected paginated batch windows to advance progress once the full window is processed")
+}
+
+func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		batchedQuery        = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:50:00.000Z AND EventDate <= 2024-01-01T11:55:00.000Z ORDER BY EventDate DESC"
+		firstBatchPageJSON  = `{ "totalSize": 2, "done": false, "nextRecordsUrl": "/nextRecords/LoginEvents/BATCHRETRY", "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000021AAA" }, "Id": "000000000000021AAA", "EventDate": "2024-01-01T11:54:30.000+0000" } ] }`
+		secondBatchPageJSON = `{ "totalSize": 2, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000022AAA" }, "Id": "000000000000022AAA", "EventDate": "2024-01-01T11:53:30.000+0000" } ] }`
+	)
+
+	var (
+		batchQueryCount int
+		nextPageCount   int
+		server          *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == batchedQuery:
+			batchQueryCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstBatchPageJSON))
+		case r.RequestURI == "/nextRecords/LoginEvents/BATCHRETRY":
+			nextPageCount++
+			if nextPageCount == 1 {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte(`{"error":"boom"}`))
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(secondBatchPageJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "10m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	firstPublisher := publisher{}
+	firstPublisher.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &firstPublisher,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.Error(t, err, "expected paginated batch failure to bubble up")
+	assert.Len(t, firstPublisher.published, 1, "expected the first page to publish before the next page failure")
+	assert.Empty(t, s.cursor.Object.ProgressTime, "expected failed paginated batch to leave progress_time unset so the same window can be retried")
+	assert.Equal(t, 1, batchQueryCount, "expected the failed run to execute the batch window once")
+	assert.Equal(t, 1, nextPageCount, "expected the failed run to attempt the next page once")
+
+	retryPublisher := publisher{}
+	retryPublisher.done = func() {}
+	s.publisher = &retryPublisher
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected retrying the same failed batch window to succeed")
+	assert.Equal(t, 2, batchQueryCount, "expected the same batch window to be queried again on retry")
+	assert.Equal(t, 2, nextPageCount, "expected the next page to be retried after the initial failure")
+	assert.Len(t, retryPublisher.published, 2, "expected the retried batch to publish both pages")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T11:55:00.000Z", objectCursor["progress_time"], "expected retry to advance progress only after the full paginated window succeeds")
+}
+
+func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFailure(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const (
+		firstBatchQuery  = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:45:00.000Z AND EventDate <= 2024-01-01T11:50:00.000Z ORDER BY EventDate DESC"
+		secondBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:50:00.000Z AND EventDate <= 2024-01-01T11:55:00.000Z ORDER BY EventDate DESC"
+		thirdBatchQuery  = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:55:00.000Z AND EventDate <= 2024-01-01T12:00:00.000Z ORDER BY EventDate DESC"
+		firstBatchJSON   = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000031AAA" }, "Id": "000000000000031AAA", "EventDate": "2024-01-01T11:49:00.000+0000" } ] }`
+		secondBatchJSON  = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/000000000000032AAA" }, "Id": "000000000000032AAA", "EventDate": "2024-01-01T11:54:30.000+0000" } ] }`
+		thirdBatchJSON   = `{"totalSize":0,"done":true,"records":[]}`
+	)
+
+	var (
+		firstBatchCount  int
+		secondBatchCount int
+		thirdBatchCount  int
+		server           *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == firstBatchQuery:
+			firstBatchCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstBatchJSON))
+		case r.FormValue("q") == secondBatchQuery:
+			secondBatchCount++
+			if secondBatchCount == 1 {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte(`{"error":"boom"}`))
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(secondBatchJSON))
+		case r.FormValue("q") == thirdBatchQuery:
+			thirdBatchCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(thirdBatchJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "15m",
+					"max_windows_per_run": 2,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	firstPublisher := publisher{}
+	firstPublisher.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &firstPublisher,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.Error(t, err, "expected the later batch window failure to bubble up")
+	assert.Len(t, firstPublisher.published, 1, "expected the first successful window to publish before the later window fails")
+	assert.Equal(t, 1, firstBatchCount, "expected the first window to run once")
+	assert.Equal(t, 1, secondBatchCount, "expected the second window to fail on its first attempt")
+	assert.Equal(t, "2024-01-01T11:50:00.000Z", s.cursor.Object.ProgressTime, "expected progress_time to remain at the end of the last successful window")
+
+	retryPublisher := publisher{}
+	retryPublisher.done = func() {}
+	s.publisher = &retryPublisher
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected the retry to resume from the last successful window and complete")
+	assert.Equal(t, 1, firstBatchCount, "expected retry to resume from the failed second window instead of replaying the first successful window")
+	assert.Equal(t, 2, secondBatchCount, "expected retry to re-run only the failed second window")
+	assert.Equal(t, 1, thirdBatchCount, "expected retry to continue into the next available window once the failed window succeeds")
+	assert.Len(t, retryPublisher.published, 1, "expected retry to publish only the remaining failed window")
+	assert.Equal(t, "2024-01-01T12:00:00.000Z", s.cursor.Object.ProgressTime, "expected progress_time to advance through the remaining available windows in the retry run")
+}
+
+func TestRunObjectWithBatchingAdvancesProgressOnEmptyWindow(t *testing.T) {
+	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
+	t.Cleanup(resetTimeNow)
+
+	const emptyBatchQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:55:00.000Z AND EventDate <= 2024-01-01T12:00:00.000Z ORDER BY EventDate DESC"
+
+	var server *httptest.Server
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == emptyBatchQuery:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"totalSize":0,"done":true,"records":[]}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"batch": map[string]interface{}{
+					"enabled":             true,
+					"initial_interval":    "5m",
+					"max_windows_per_run": 1,
+					"window":              "5m",
+				},
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueBatchedLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "batched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected empty batched window to succeed")
+	assert.Len(t, client.published, 0, "expected empty batched windows to publish no events")
+
+	var cursorState map[string]interface{}
+	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
+
+	objectCursor, ok := cursorState["object"].(map[string]interface{})
+	require.True(t, ok, "expected object cursor state to be present")
+	assert.Equal(t, "2024-01-01T12:00:00.000Z", objectCursor["progress_time"], "expected empty batched windows to still advance progress")
 }
 
 func defaultHandler(flow string, withoutQuery bool, msg1, msg2 string) http.HandlerFunc {
@@ -477,6 +1908,18 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	return nil
 }
 
+type failingPublisher struct{ err error }
+
+func (p failingPublisher) Publish(beat.Event, interface{}) error {
+	return p.err
+}
+
+func TestPublishEventRequiresPublisher(t *testing.T) {
+	err := publishEvent(nil, &state{}, []byte(`{"ok":true}`), "Object")
+	require.Error(t, err, "expected publishEvent to reject a missing publisher")
+	assert.ErrorContains(t, err, "publisher is not set", "expected publishEvent to report the missing publisher")
+}
+
 func TestDecodeAsCSV(t *testing.T) {
 	sampleELF := `"EVENT_TYPE","TIMESTAMP","REQUEST_ID","ORGANIZATION_ID","USER_ID","RUN_TIME","CPU_TIME","URI","SESSION_KEY","LOGIN_KEY","USER_TYPE","REQUEST_STATUS","DB_TOTAL_TIME","LOGIN_TYPE","BROWSER_TYPE","API_TYPE","API_VERSION","USER_NAME","TLS_PROTOCOL","CIPHER_SUITE","AUTHENTICATION_METHOD_REFERENCE","LOGIN_SUB_TYPE","TIMESTAMP_DERIVED","USER_ID_DERIVED","CLIENT_IP","URI_ID_DERIVED","LOGIN_STATUS","SOURCE_IP"
 "Login","20231218054831.655","4u6LyuMrDvb_G-l1cJIQk-","00D5j00000DgAYG","0055j00000AT6I1","1219","127","/services/oauth2/token","","bY5Wfv8t/Ith7WVE","Standard","","1051271151","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:31.655Z","0055j00000AT6I1AAL","Salesforce.com IP","","LOGIN_NO_ERROR","103.108.207.58"
@@ -490,6 +1933,9 @@ func TestDecodeAsCSV(t *testing.T) {
 	wantNumOfEvents := 2
 	gotNumOfEvents := len(mp)
 	assert.Equal(t, wantNumOfEvents, gotNumOfEvents)
+	if len(mp) == 0 {
+		t.Fatal("expected decoded CSV events to be non-empty")
+	}
 
 	wantEventFields := map[string]string{
 		"LOGIN_TYPE":                      "i",
@@ -523,6 +1969,125 @@ func TestDecodeAsCSV(t *testing.T) {
 	}
 
 	assert.Equal(t, wantEventFields, mp[0])
+}
+
+func TestPublishCSVRecords(t *testing.T) {
+	sampleELF := `"EVENT_TYPE","TIMESTAMP","REQUEST_ID","ORGANIZATION_ID","USER_ID","RUN_TIME","CPU_TIME","URI","SESSION_KEY","LOGIN_KEY","USER_TYPE","REQUEST_STATUS","DB_TOTAL_TIME","LOGIN_TYPE","BROWSER_TYPE","API_TYPE","API_VERSION","USER_NAME","TLS_PROTOCOL","CIPHER_SUITE","AUTHENTICATION_METHOD_REFERENCE","LOGIN_SUB_TYPE","TIMESTAMP_DERIVED","USER_ID_DERIVED","CLIENT_IP","URI_ID_DERIVED","LOGIN_STATUS","SOURCE_IP"
+"Login","20231218054831.655","4u6LyuMrDvb_G-l1cJIQk-","00D5j00000DgAYG","0055j00000AT6I1","1219","127","/services/oauth2/token","","bY5Wfv8t/Ith7WVE","Standard","","1051271151","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:31.655Z","0055j00000AT6I1AAL","Salesforce.com IP","","LOGIN_NO_ERROR","103.108.207.58"
+"Login","20231218054832.003","4u6LyuHSDv8LLVl1cJOqGV","00D5j00000DgAYG","0055j00000AT6I1","1277","104","/services/oauth2/token","","u60el7VqW8CSSKcW","Standard","","674857427","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:32.003Z","0055j00000AT6I1AAL","103.108.207.58","","LOGIN_NO_ERROR","103.108.207.58"`
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		cursor:    &state{},
+		log:       logp.NewLogger("salesforceInput"),
+		publisher: &client,
+	}
+
+	count, err := s.publishCSVRecords(strings.NewReader(sampleELF))
+	require.NoError(t, err, "expected CSV streaming publisher to decode and publish all rows")
+	assert.Equal(t, 2, count, "expected CSV streaming publisher to return the number of published rows")
+	assert.Len(t, client.published, 2, "expected CSV streaming publisher to emit one event per row")
+	assert.Equal(t, expectedELFEvent, client.published[0].Fields["message"], "expected the first streamed CSV record to match the decoded event payload")
+}
+
+func TestPublishCSVRecordsReportsRowNumberOnParseError(t *testing.T) {
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		cursor:    &state{},
+		log:       logp.NewLogger("salesforceInput"),
+		publisher: &client,
+	}
+
+	count, err := s.publishCSVRecords(strings.NewReader("EVENT_TYPE,TIMESTAMP\nLogin,20231218054831.655\nLogout\n"))
+	require.Error(t, err, "expected malformed CSV data to fail during streaming")
+	assert.Equal(t, 1, count, "expected rows before the malformed record to still be published")
+	assert.Len(t, client.published, 1, "expected streaming to publish rows that were decoded before the parse failure")
+	assert.ErrorContains(t, err, "row 3", "expected CSV streaming errors to identify the failing row")
+}
+
+func TestRunEventLogFileReturnsProcessingErrors(t *testing.T) {
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     "http://placeholder.invalid",
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     "http://placeholder.invalid",
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "expected ELF config to unpack")
+
+	setupServer := newTestServerBasedOnConfig(httptest.NewServer)
+	setupServer(t, defaultHandler(NoPaginationFlow, false, oneEventLogfileFirstResponseJSON, oneEventLogfileSecondResponseCSV), &cfg)
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: failingPublisher{err: errors.New("publisher exploded")},
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunEventLogFile()
+	require.Error(t, err, "expected publisher failures to bubble out of ELF processing")
+	assert.ErrorContains(t, err, "error processing log file CSV", "expected RunEventLogFile to describe ELF processing errors generically")
+	assert.ErrorContains(t, err, "error publishing event: publisher exploded", "expected the wrapped error to preserve the publisher failure")
+	assert.Empty(t, s.cursor.EventLogFile.FirstEventTime, "expected failed ELF stream processing to not advance first_event_time")
+	assert.Empty(t, s.cursor.EventLogFile.LastEventTime, "expected failed ELF stream processing to not advance last_event_time")
+}
+
+func TestRunEventLogFileRequiresQueryCursorConfig(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.EventMonitoringMethod = &eventMonitoringMethod{
+		EventLogFile: EventMonitoringConfig{
+			Enabled:  pointer(true),
+			Interval: time.Hour,
+		},
+	}
+
+	s := &salesforceInput{
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	err := s.RunEventLogFile()
+	require.Error(t, err, "expected RunEventLogFile to reject missing event log file query/cursor configuration")
+	assert.ErrorContains(t, err, "event log file query/cursor configuration is not set", "expected RunEventLogFile to report missing event log file query/cursor configuration")
 }
 
 func TestSalesforceInputRunWithMethod(t *testing.T) {
@@ -570,7 +2135,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Default: getValueTpl(defaultLoginEventLogFileQuery),
 					Value:   getValueTpl(valueLoginEventLogFileQuery),
 				},
-				Cursor: &cursorConfig{Field: "EventDate"},
+				Cursor: &cursorConfig{Field: "CreatedDate"},
 			},
 		}
 		elfEventMonitotingWithWrongQuery = eventMonitoringMethod{
@@ -581,7 +2146,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Default: getValueTpl(invalidDefaultLoginEventLogFileQuery),
 					Value:   getValueTpl(invalidValueLoginEventLogFileQuery),
 				},
-				Cursor: &cursorConfig{Field: "EventDate"},
+				Cursor: &cursorConfig{Field: "CreatedDate"},
 			},
 		}
 	)
@@ -785,13 +2350,11 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				}
 			}
 
-			if len(client.published) < len(tt.expected) {
-				t.Errorf("unexpected number of published events: got:%d want at least:%d", len(client.published), len(tt.expected))
-				tt.expected = tt.expected[:len(client.published)]
-			}
+			require.Equal(t, len(tt.expected), len(client.published),
+				"unexpected number of published events")
 
-			client.published = client.published[:len(tt.expected)]
-			for i, got := range client.published {
+			for i := 0; i < len(tt.expected) && i < len(client.published); i++ {
+				got := client.published[i]
 				if !reflect.DeepEqual(got.Fields["message"], tt.expected[i]) {
 					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, tt.expected[i]))
 				}
@@ -910,4 +2473,790 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 		assert.Equal(t, 0, urlHits, "url should NOT receive requests when token_url is set")
 		assert.Equal(t, 1, tokenURLHits, "token_url should receive the OAuth request")
 	})
+}
+
+func TestGetSFDCConfigRejectsNilOAuth2(t *testing.T) {
+	cfg := defaultConfig()
+	cfg.Auth = &authConfig{}
+
+	input := &salesforceInput{config: cfg, log: logp.NewLogger("test")}
+
+	var (
+		sfdcCfg *sfdc.Configuration
+		err     error
+	)
+	require.NotPanics(t, func() {
+		sfdcCfg, err = input.getSFDCConfig(&cfg)
+	}, "expected getSFDCConfig to reject nil OAuth2 without panicking")
+
+	assert.Nil(t, sfdcCfg, "expected no Salesforce config when OAuth2 is missing")
+	require.Error(t, err, "expected getSFDCConfig to reject nil OAuth2")
+	assert.ErrorContains(t, err, "no auth provider enabled")
+}
+
+func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			requestKinds = append(requestKinds, "elf_soql")
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			requestKinds = append(requestKinds, "elf_log_get")
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery:
+			requestKinds = append(requestKinds, "object_soql")
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":         server.URL,
+		"version":     56,
+		"auth.oauth2": defaultUserPasswordFlowMap,
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": defaultEventLogFileMonitoringMethodMap,
+			"object":         defaultObjectMonitoringMethodConfigMap,
+		},
+	}
+	authOAuth2, _ := baseConfig["auth.oauth2"].(map[string]interface{})
+	userPasswordFlow, _ := authOAuth2["user_password_flow"].(map[string]interface{})
+	userPasswordFlow["token_url"] = server.URL
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logp.NewLogger("salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancel := context.WithCancelCause(timeoutCtx)
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logp.L().With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after collecting both startup events")
+
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKinds, "expected initial EventLogFile collection to complete before initial object collection starts")
+	require.Len(t, client.published, 2, "expected one ELF event and one object event from the mixed startup path")
+	assert.Equal(t, expectedELFEvent, client.published[0].Fields["message"], "expected the first published startup event to come from EventLogFile")
+	assert.Equal(t, expectedObjectEvent, client.published[1].Fields["message"], "expected the second published startup event to come from Object monitoring")
+}
+
+func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+		mu           sync.Mutex
+	)
+	countKindLocked := func(kind string) int {
+		count := 0
+		for _, requestKind := range requestKinds {
+			if requestKind == kind {
+				count++
+			}
+		}
+		return count
+	}
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery, r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery, r.FormValue("q") == defaultLoginObjectQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "50ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+			"object": map[string]interface{}{
+				"interval": "80ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logp.NewLogger("salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	// Cancel once the publisher has observed at least two ELF and two
+	// Object events. Gating cancellation on published events (rather than
+	// inbound server requests) guarantees the in-flight SOQL response that
+	// produced the second event was fully consumed before the input's
+	// context is cancelled; otherwise input cancellation would abort the
+	// in-flight HTTP request through ctxTransport and the test would count
+	// fewer publications than requests.
+	client.done = func() {
+		var elfCount, objectCount int
+		for _, ev := range client.published {
+			switch ev.Fields["message"] {
+			case expectedELFEvent:
+				elfCount++
+			case expectedObjectEvent:
+				objectCount++
+			}
+		}
+		if elfCount >= 2 && objectCount >= 2 {
+			cancelCause(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logp.L().With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after both ticker branches ran")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	elfSOQLCount := countKindLocked("elf_soql")
+	elfLogGetCount := countKindLocked("elf_log_get")
+	objectSOQLCount := countKindLocked("object_soql")
+	mu.Unlock()
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 6, "expected startup plus at least one ticker run for each mixed monitoring method")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKindsCopy[:3], "expected mixed startup ordering to remain unchanged before ticker work starts")
+	assert.GreaterOrEqual(t, elfSOQLCount, 2, "expected EventLogFile SOQL to run at startup and at least once from its ticker")
+	assert.GreaterOrEqual(t, elfLogGetCount, 2, "expected EventLogFile log fetch to run at startup and at least once from its ticker")
+	assert.GreaterOrEqual(t, objectSOQLCount, 2, "expected Object SOQL to run at startup and at least once from its ticker")
+
+	var elfPublished, objectPublished int
+	for _, event := range client.published {
+		if event.Fields["message"] == expectedELFEvent {
+			elfPublished++
+		}
+		if event.Fields["message"] == expectedObjectEvent {
+			objectPublished++
+		}
+	}
+	assert.GreaterOrEqual(t, elfPublished, 2, "expected EventLogFile to publish at startup and at least once from ticker-driven collection")
+	assert.GreaterOrEqual(t, objectPublished, 2, "expected Object monitoring to publish at startup and at least once from ticker-driven collection")
+}
+
+func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+
+	var (
+		cancel           context.CancelCauseFunc
+		firstFailureSeen bool
+		requestKinds     []string
+		server           *httptest.Server
+		mu               sync.Mutex
+	)
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql_error")
+			shouldCancelSoon := !firstFailureSeen
+			firstFailureSeen = true
+			mu.Unlock()
+
+			time.Sleep(150 * time.Millisecond)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+
+			if shouldCancelSoon && cancel != nil {
+				go func() {
+					time.Sleep(20 * time.Millisecond)
+					cancel(nil)
+				}()
+			}
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "50ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected EventLogFile monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logp.NewLogger("salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	client.done = func() {}
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	cancel = cancelCause
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logp.L().With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected EventLogFile run loop to stop cleanly after the first failed ticker run")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	mu.Unlock()
+
+	var failureCount int
+	for _, kind := range requestKindsCopy {
+		if kind == "elf_soql_error" {
+			failureCount++
+		}
+	}
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 3, "expected startup EventLogFile requests followed by a ticker-driven failure")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "elf_soql_error"}, requestKindsCopy[:3], "expected startup EventLogFile requests before the first ticker failure")
+	assert.Equal(t, 1, failureCount, "expected a failed EventLogFile ticker run to wait for a fresh interval before retrying instead of immediately consuming a queued tick")
+}
+
+func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFailure(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+		mu           sync.Mutex
+	)
+	countKindLocked := func(kind string) int {
+		count := 0
+		for _, requestKind := range requestKinds {
+			if requestKind == kind {
+				count++
+			}
+		}
+		return count
+	}
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql_error")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery, r.FormValue("q") == defaultLoginObjectQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql")
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "40ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+			"object": map[string]interface{}{
+				"interval": "80ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logp.NewLogger("salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	// Cancel once at least two Object events have been published so the
+	// in-flight Object response has been fully consumed before ctxTransport
+	// propagates the cancelled ctx into outstanding HTTP reads. The failing
+	// ELF ticker request is allowed to complete on its own schedule since
+	// the test also asserts elfSOQLErrorCount >= 1 independently.
+	var elfFailSeen bool
+	client.done = func() {
+		var objectCount int
+		for _, ev := range client.published {
+			if ev.Fields["message"] == expectedObjectEvent {
+				objectCount++
+			}
+		}
+		mu.Lock()
+		elfFailSeen = elfFailSeen || countKindLocked("elf_soql_error") >= 1
+		mu.Unlock()
+		if elfFailSeen && objectCount >= 2 {
+			cancelCause(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logp.L().With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after ELF ticker failure and later object progress")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	elfSOQLErrorCount := countKindLocked("elf_soql_error")
+	elfLogGetCount := countKindLocked("elf_log_get")
+	objectSOQLCount := countKindLocked("object_soql")
+	mu.Unlock()
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 4, "expected startup requests plus the failing ELF ticker request and a later object request")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKindsCopy[:3], "expected mixed startup ordering to remain unchanged before the failing ELF ticker run")
+	assert.GreaterOrEqual(t, elfSOQLErrorCount, 1, "expected at least one ticker-driven EventLogFile SOQL failure")
+	assert.Equal(t, 1, elfLogGetCount, "expected no additional EventLogFile log fetch after the ticker-driven SOQL failure")
+	assert.GreaterOrEqual(t, objectSOQLCount, 2, "expected Object monitoring to keep running after EventLogFile ticker failure")
+
+	var elfPublished, objectPublished int
+	for _, event := range client.published {
+		if event.Fields["message"] == expectedELFEvent {
+			elfPublished++
+		}
+		if event.Fields["message"] == expectedObjectEvent {
+			objectPublished++
+		}
+	}
+	assert.Equal(t, 1, elfPublished, "expected only the startup EventLogFile run to publish when later ticker SOQL requests fail")
+	assert.GreaterOrEqual(t, objectPublished, 2, "expected Object monitoring to continue publishing after EventLogFile ticker failure")
+}
+
+func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFailure(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+
+	var (
+		requestKinds []string
+		server       *httptest.Server
+		mu           sync.Mutex
+	)
+	countKindLocked := func(kind string) int {
+		count := 0
+		for _, requestKind := range requestKinds {
+			if requestKind == kind {
+				count++
+			}
+		}
+		return count
+	}
+	maybeCancelLocked := func() {
+		// This test cancels from publisher.done so the second ELF publish is
+		// observed after the object ticker failure.
+	}
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultLoginEventLogFileQuery, r.FormValue("q") == valueLoginEventLogFileQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_soql")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileFirstResponseJSON))
+		case r.RequestURI == "/services/data/v58.0/sobjects/EventLogFile/0AT5j00002LqQTxGAN/LogFile":
+			mu.Lock()
+			requestKinds = append(requestKinds, "elf_log_get")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.FormValue("q") == defaultLoginObjectQuery:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneObjectEvents))
+		case r.FormValue("q") == defaultLoginObjectQueryWithCursor:
+			mu.Lock()
+			requestKinds = append(requestKinds, "object_soql_error")
+			maybeCancelLocked()
+			mu.Unlock()
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "80ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginEventLogFileQuery,
+					"value":   valueLoginEventLogFileQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+			"object": map[string]interface{}{
+				"interval": "40ms",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected mixed event monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logp.NewLogger("salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+	client.done = func() {
+		mu.Lock()
+		objectSOQLErrorCount := countKindLocked("object_soql_error")
+		mu.Unlock()
+
+		elfPublished := 0
+		for _, event := range client.published {
+			if event.Fields["message"] == expectedELFEvent {
+				elfPublished++
+			}
+		}
+		if objectSOQLErrorCount >= 1 && elfPublished >= 2 {
+			cancelCause(nil)
+		}
+	}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logp.L().With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected mixed event monitoring run to stop cleanly after object ticker failure and later EventLogFile progress")
+
+	mu.Lock()
+	requestKindsCopy := append([]string(nil), requestKinds...)
+	elfSOQLCount := countKindLocked("elf_soql")
+	elfLogGetCount := countKindLocked("elf_log_get")
+	objectSOQLErrorCount := countKindLocked("object_soql_error")
+	mu.Unlock()
+
+	require.GreaterOrEqual(t, len(requestKindsCopy), 5, "expected startup requests plus failing object ticker request and later EventLogFile requests")
+	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKindsCopy[:3], "expected mixed startup ordering to remain unchanged before the failing object ticker run")
+	assert.GreaterOrEqual(t, objectSOQLErrorCount, 1, "expected at least one ticker-driven object SOQL failure")
+	assert.GreaterOrEqual(t, elfSOQLCount, 2, "expected EventLogFile SOQL to continue after object ticker failure")
+	assert.GreaterOrEqual(t, elfLogGetCount, 2, "expected EventLogFile log fetch to continue after object ticker failure")
+
+	var elfPublished, objectPublished int
+	for _, event := range client.published {
+		if event.Fields["message"] == expectedELFEvent {
+			elfPublished++
+		}
+		if event.Fields["message"] == expectedObjectEvent {
+			objectPublished++
+		}
+	}
+	assert.GreaterOrEqual(t, elfPublished, 2, "expected EventLogFile to keep publishing after object ticker failure")
+	assert.Equal(t, 1, objectPublished, "expected only the startup Object run to publish when later ticker SOQL requests fail")
 }

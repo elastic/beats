@@ -1,0 +1,18 @@
+kind: bug-fix
+summary: Harden Salesforce input batching compatibility and auth-failure recovery.
+description: |
+  Preserve Salesforce object cursor continuity across bounded-batch upgrades
+  and toggles. Existing installs now seed batched windows from legacy
+  first_event_time / last_event_time state, and disabling batching resumes
+  unbatched queries from the latest safe watermark instead of replaying quiet
+  windows that batching already drained.
+
+  Tighten batching safety by rejecting object configs that enable batching
+  without referencing both batch_start_time and batch_end_time, or that still
+  reference those placeholders after batching is disabled.
+
+  Improve resilience by propagating input cancellation into Salesforce HTTP
+  requests, retrying the initial SOQL request and EventLogFile download once
+  after INVALID_SESSION_ID / INVALID_AUTH_HEADER failures, and surfacing
+  consecutive collection failures in Elastic Agent status.
+component: filebeat

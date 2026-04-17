@@ -16,6 +16,7 @@ import (
 
 type valueTpl struct {
 	*template.Template
+	source string
 }
 
 var (
@@ -83,9 +84,19 @@ func (t *valueTpl) Unpack(in string) error {
 		return err
 	}
 
-	*t = valueTpl{Template: tpl}
+	*t = valueTpl{Template: tpl, source: in}
 
 	return nil
+}
+
+// Source returns the original template string when available. Validation uses
+// this to reason about whether a query is batch-aware before any runtime
+// cursor substitution happens.
+func (t *valueTpl) Source() string {
+	if t == nil {
+		return ""
+	}
+	return t.source
 }
 
 // parseDuration parses a duration string and returns the time.Duration value.
