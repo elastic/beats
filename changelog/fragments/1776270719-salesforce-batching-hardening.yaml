@@ -11,6 +11,11 @@ description: |
   without referencing both batch_start_time and batch_end_time, or that still
   reference those placeholders after batching is disabled.
 
+  Prevent SetupAuditTrail resume gaps when multiple audit rows share the same
+  CreatedDate by persisting the last seen object Id as a tie-breaker. Existing
+  installs remain compatible: older cursor state keeps the legacy resume
+  boundary until the next successful run records the new field.
+
   Improve resilience by propagating input cancellation into Salesforce HTTP
   requests, retrying the initial SOQL request and EventLogFile download once
   after INVALID_SESSION_ID / INVALID_AUTH_HEADER failures, and surfacing

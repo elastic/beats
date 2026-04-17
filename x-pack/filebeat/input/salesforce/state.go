@@ -37,6 +37,10 @@ type dateTimeCursor struct {
 	// the most recent successful query. Used by templates that can sort
 	// ascending on the cursor field, such as EventLogFile.
 	LastEventTime string `struct:"last_event_time,omitempty"`
+	// LastEventID holds the record Id of the last record seen in the most
+	// recent successful query. Templates that resume on a non-unique cursor
+	// field can use it as a stable same-timestamp tie-breaker.
+	LastEventID string `struct:"last_event_id,omitempty"`
 	// ProgressTime is the bounded-batch watermark written by the batched
 	// Object collection path (see batch.go). It advances in fixed-width
 	// windows independently of individual event timestamps and is the

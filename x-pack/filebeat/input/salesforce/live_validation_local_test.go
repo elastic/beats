@@ -329,8 +329,8 @@ func TestLiveSalesforceValidation(t *testing.T) {
 				Enabled:  pointer(true),
 				Interval: 5 * time.Minute,
 				Query: &QueryConfig{
-					Default: getValueTpl(`SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] ORDER BY CreatedDate ASC NULLS FIRST`),
-					Value:   getValueTpl(`SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST`),
+					Default: getValueTpl(`SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] ORDER BY CreatedDate ASC NULLS FIRST, Id ASC`),
+					Value:   getValueTpl(`SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]][[ if .cursor.object.last_event_id ]] OR (CreatedDate = [[ .cursor.object.last_event_time ]] AND Id > '[[ .cursor.object.last_event_id ]]')[[ end ]] ORDER BY CreatedDate ASC NULLS FIRST, Id ASC`),
 				},
 				Cursor: &cursorConfig{Field: "CreatedDate"},
 			},

@@ -430,6 +430,9 @@ func (s *salesforceInput) RunObject() error {
 // disables batching from replaying quiet time ranges that batching has
 // already advanced through, while still allowing later unbatched runs to move
 // beyond the old progress_time using their native legacy cursor fields.
+// last_event_id is also exposed on the unbatched path, even when empty, so
+// templates can use it as an optional tie-breaker for non-unique timestamp
+// cursor fields without breaking old persisted state that predates it.
 func (s *salesforceInput) objectCursor(batch *objectBatchWindow) mapstr.M {
 	var cursor mapstr.M
 	if !isZero(s.cursor.Object.FirstEventTime) || !isZero(s.cursor.Object.LastEventTime) || !isZero(s.cursor.Object.ProgressTime) || batch != nil {
@@ -445,6 +448,9 @@ func (s *salesforceInput) objectCursor(batch *objectBatchWindow) mapstr.M {
 		}
 		if !isZero(lastEventTime) {
 			object.Put("last_event_time", lastEventTime)
+		}
+		if batch == nil || !isZero(s.cursor.Object.LastEventID) {
+			object.Put("last_event_id", s.cursor.Object.LastEventID)
 		}
 		// Batched object collection advances with progress_time. first/last_event_time
 		// still reflect the observed events from the most recent successful window
@@ -557,6 +563,9 @@ func (s *salesforceInput) runObjectBatches() error {
 //     DESC real-time objects, where the first row is the newest).
 //   - last_event_time is written from every row, overwriting on each call,
 //     so at end-of-query it reflects the final row seen.
+//   - last_event_id is written from the record Id when present, so
+//     same-timestamp ascending queries can resume from the last ACKed row
+//     instead of skipping later rows that share the same timestamp.
 //
 // Any mid-stream error aborts immediately and returns the count published
 // so far. The caller is responsible for deciding whether to keep or revert
@@ -600,6 +609,11 @@ func (s *salesforceInput) runObjectQuery(cursor mapstr.M) (int, error) {
 					s.cursor.Object.FirstEventTime = timestamp
 				}
 				s.cursor.Object.LastEventTime = timestamp
+			}
+			if id, ok := val["Id"].(string); ok {
+				s.cursor.Object.LastEventID = id
+			} else {
+				s.cursor.Object.LastEventID = ""
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")

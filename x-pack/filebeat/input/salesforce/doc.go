@@ -52,6 +52,10 @@
 //   - last_event_time - timestamp of the last event seen during the most
 //     recent successful query. Retained so templates that can sort ascending
 //     (EventLogFile, ApiEvent, ...) can resume from there.
+//   - last_event_id - optional record Id of the last event seen during the
+//     most recent successful query. Unbatched object templates can use it as
+//     a same-timestamp tie-breaker when the cursor field itself is not
+//     unique, as with SetupAuditTrail ordered by CreatedDate ASC.
 //   - progress_time - bounded-batch watermark, written only by the batched
 //     object collection path. Records how far into the backlog the input has
 //     advanced, independent of individual event timestamps.
@@ -106,6 +110,14 @@
 // and progress_time. This prevents the unbatched query from replaying quiet
 // windows that batching already drained, while still letting subsequent
 // unbatched runs move beyond the old batched watermark naturally.
+//
+// SetupAuditTrail has a different migration concern: CreatedDate is not
+// unique, so modern unbatched resume queries also persist last_event_id and
+// use it as a same-timestamp tie-breaker. Older persisted state does not have
+// that field, so the first post-upgrade run keeps the legacy
+// CreatedDate > last_event_time boundary and starts recording last_event_id
+// for subsequent runs. This is additive and backward compatible: it does not
+// change existing resume semantics until the new field has been observed.
 //
 // # Fault tolerance
 //

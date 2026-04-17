@@ -907,6 +907,226 @@ func TestObjectCursorWithoutBatchUsesLatestResumeWatermark(t *testing.T) {
 	}
 }
 
+func TestRunObjectResumeWithLastEventIDKeepsSameTimestampRows(t *testing.T) {
+	const (
+		defaultSetupAuditTrailQuery = "SELECT Id,CreatedDate,Action FROM SetupAuditTrail ORDER BY CreatedDate ASC, Id ASC"
+		resumeSetupAuditTrailQuery  = "SELECT Id,CreatedDate,Action FROM SetupAuditTrail WHERE CreatedDate > 2024-01-01T12:00:00.000+0000 OR (CreatedDate = 2024-01-01T12:00:00.000+0000 AND Id > '0Ym000000000001AAA') ORDER BY CreatedDate ASC, Id ASC"
+		firstRunJSON                = `{ "totalSize": 3, "done": true, "records": [ { "attributes": { "type": "SetupAuditTrail", "url": "/services/data/v58.0/sobjects/SetupAuditTrail/0Ym000000000001AAA" }, "Id": "0Ym000000000001AAA", "CreatedDate": "2024-01-01T12:00:00.000+0000", "Action": "FirstAction" }, { "attributes": { "type": "SetupAuditTrail", "url": "/services/data/v58.0/sobjects/SetupAuditTrail/0Ym000000000002AAA" }, "Id": "0Ym000000000002AAA", "CreatedDate": "2024-01-01T12:00:00.000+0000", "Action": "SecondAction" }, { "attributes": { "type": "SetupAuditTrail", "url": "/services/data/v58.0/sobjects/SetupAuditTrail/0Ym000000000003AAA" }, "Id": "0Ym000000000003AAA", "CreatedDate": "2024-01-01T12:00:01.000+0000", "Action": "ThirdAction" } ] }`
+		resumeRunJSON               = `{ "totalSize": 2, "done": true, "records": [ { "attributes": { "type": "SetupAuditTrail", "url": "/services/data/v58.0/sobjects/SetupAuditTrail/0Ym000000000002AAA" }, "Id": "0Ym000000000002AAA", "CreatedDate": "2024-01-01T12:00:00.000+0000", "Action": "SecondAction" }, { "attributes": { "type": "SetupAuditTrail", "url": "/services/data/v58.0/sobjects/SetupAuditTrail/0Ym000000000003AAA" }, "Id": "0Ym000000000003AAA", "CreatedDate": "2024-01-01T12:00:01.000+0000", "Action": "ThirdAction" } ] }`
+	)
+
+	var (
+		defaultQueryCount int
+		resumeQueryCount  int
+		server            *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultSetupAuditTrailQuery:
+			defaultQueryCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstRunJSON))
+		case r.FormValue("q") == resumeSetupAuditTrailQuery:
+			resumeQueryCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(resumeRunJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultSetupAuditTrailQuery,
+					"value":   "SELECT Id,CreatedDate,Action FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]][[ if .cursor.object.last_event_id ]] OR (CreatedDate = [[ .cursor.object.last_event_time ]] AND Id > '[[ .cursor.object.last_event_id ]]')[[ end ]] ORDER BY CreatedDate ASC, Id ASC",
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "setup audit trail object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	firstPublisher := publisher{}
+	firstPublisher.done = func() {}
+
+	firstRun := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &firstPublisher,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	firstRun.sfdcConfig, err = firstRun.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	firstRun.soqlr, err = firstRun.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = firstRun.RunObject()
+	require.NoError(t, err, "expected initial setup audit trail run to succeed")
+	require.Len(t, firstPublisher.cursors, 3, "expected first run to publish three setup audit trail rows")
+
+	var resumedState state
+	require.NoError(t, typeconv.Convert(&resumedState, firstPublisher.cursors[0]), "expected first published cursor snapshot to be convertible to state")
+
+	retryPublisher := publisher{}
+	retryPublisher.done = func() {}
+
+	resumeRun := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &retryPublisher,
+		cursor:    &resumedState,
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	resumeRun.sfdcConfig, err = resumeRun.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config for resume run to succeed")
+
+	resumeRun.soqlr, err = resumeRun.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup for resume run to succeed")
+
+	err = resumeRun.RunObject()
+	require.NoError(t, err, "expected resumed setup audit trail run to continue within the same CreatedDate bucket")
+
+	assert.Equal(t, 1, defaultQueryCount, "expected initial setup audit trail query to run once")
+	assert.Equal(t, 1, resumeQueryCount, "expected resume setup audit trail query to include the last_event_id tie-breaker")
+	require.Len(t, retryPublisher.published, 2, "expected resumed setup audit trail run to publish the remaining same-timestamp row and the later row")
+
+	firstResumeMessage, ok := retryPublisher.published[0].Fields["message"].(string)
+	require.True(t, ok, "expected first resumed setup audit trail event message to be a string")
+	assert.Contains(t, firstResumeMessage, `"Id":"0Ym000000000002AAA"`, "expected resumed setup audit trail run to continue with the remaining same-timestamp row")
+
+	secondResumeMessage, ok := retryPublisher.published[1].Fields["message"].(string)
+	require.True(t, ok, "expected second resumed setup audit trail event message to be a string")
+	assert.Contains(t, secondResumeMessage, `"Id":"0Ym000000000003AAA"`, "expected resumed setup audit trail run to include the later CreatedDate row")
+}
+
+func TestRunObjectSetupAuditTrailResumeWithoutLastEventIDUsesLegacyBoundary(t *testing.T) {
+	const (
+		legacyResumeQuery = "SELECT Id,CreatedDate,Action FROM SetupAuditTrail WHERE CreatedDate > 2024-01-01T12:00:00.000+0000 ORDER BY CreatedDate ASC, Id ASC"
+		legacyResumeJSON  = `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "SetupAuditTrail", "url": "/services/data/v58.0/sobjects/SetupAuditTrail/0Ym000000000010AAA" }, "Id": "0Ym000000000010AAA", "CreatedDate": "2024-01-01T12:00:01.000+0000", "Action": "LaterAction" } ] }`
+	)
+
+	var (
+		queries []string
+		server  *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == legacyResumeQuery:
+			queries = append(queries, r.FormValue("q"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(legacyResumeJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": "SELECT Id,CreatedDate,Action FROM SetupAuditTrail ORDER BY CreatedDate ASC, Id ASC",
+					"value":   "SELECT Id,CreatedDate,Action FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]][[ if .cursor.object.last_event_id ]] OR (CreatedDate = [[ .cursor.object.last_event_time ]] AND Id > '[[ .cursor.object.last_event_id ]]')[[ end ]] ORDER BY CreatedDate ASC, Id ASC",
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "setup audit trail object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor: &state{
+			Object: dateTimeCursor{
+				LastEventTime: "2024-01-01T12:00:00.000+0000",
+			},
+		},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected upgraded setup audit trail state without last_event_id to keep using the legacy last_event_time boundary")
+
+	require.Len(t, queries, 1, "expected exactly one legacy resume query")
+	assert.Equal(t, legacyResumeQuery, queries[0], "expected existing setup audit trail state without last_event_id to remain compatible")
+	assert.NotContains(t, queries[0], "Id >", "expected legacy resume query to omit the Id tie-breaker until last_event_id has been persisted")
+	require.Len(t, client.published, 1, "expected legacy-compatible resume to still publish returned setup audit trail rows")
+}
+
 func TestRunObjectReopensSessionOnInvalidSessionID(t *testing.T) {
 	const objectQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate ASC NULLS FIRST"
 
