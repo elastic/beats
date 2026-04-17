@@ -139,7 +139,7 @@ func (d *eventDecoder) reset() {
 
 // Buffer prepares the read buffer to hold the next event of n bytes.
 func (d *eventDecoder) Buffer(n int) []byte {
-	if cap(d.buf) > n {
+	if cap(d.buf) >= n {
 		d.buf = d.buf[:n]
 	} else {
 		d.buf = make([]byte, n)
@@ -180,6 +180,7 @@ func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
 		return publisher.Event{}, err
 	}
 
+	//nolint:gosec // G115: our encoder only writes EventFlags (uint8) values, so to.Flags is always 0-255
 	return publisher.Event{
 		Flags: publisher.EventFlags(to.Flags),
 		Content: beat.Event{
