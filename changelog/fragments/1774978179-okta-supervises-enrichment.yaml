@@ -1,0 +1,12 @@
+kind: enhancement
+summary: Add supervises enrichment option to the Okta entity analytics provider.
+description: |
+  Add a new "supervises" value to the enrich_with option of the Okta entity analytics
+  provider. When enabled, each user document is enriched with a supervises field containing
+  the list of users they manage. Each entry includes the managed user's id, profile.email,
+  and profile.login (the Okta username). The list is derived by querying the Okta API for
+  users whose profile.managerId matches the manager's user ID. The option is disabled by
+  default because it requires one additional API call per user, which may exceed Okta rate
+  limits in large deployments.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/49781

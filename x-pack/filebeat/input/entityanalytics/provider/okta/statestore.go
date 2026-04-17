@@ -36,11 +36,13 @@ const (
 )
 
 type User struct {
-	okta.User `json:"properties"`
-	Groups    []okta.Group  `json:"groups"`
-	Roles     []okta.Role   `json:"roles"`
-	Factors   []okta.Factor `json:"factors"`
-	State     State         `json:"state"`
+	okta.User  `json:"properties"`
+	Groups     []okta.Group          `json:"groups"`
+	Roles      []okta.Role           `json:"roles"`
+	Factors    []okta.Factor         `json:"factors"`
+	Devices    []okta.Device         `json:"devices"`
+	Supervises []okta.SupervisedUser `json:"supervises"`
+	State      State                 `json:"state"`
 }
 
 type Device struct {
@@ -140,10 +142,10 @@ func (s *stateStore) storeUser(u okta.User) *User {
 	if existing, ok := s.users[u.ID]; ok {
 		su.State = Modified
 		*existing = su
-	} else {
-		su.State = Discovered
-		s.users[u.ID] = &su
+		return existing
 	}
+	su.State = Discovered
+	s.users[u.ID] = &su
 	return &su
 }
 

@@ -116,7 +116,9 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
-	if err := installCfg.NormalizeAndValidate(); err != nil {
+	var err error
+	installCfg, err = installCfg.NormalizeAndValidate()
+	if err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
 
@@ -133,7 +135,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
 	if profileCfg.EnabledOrDefault() {
-		profileDir := b.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
+		profileDir := b.Info.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
 		store, err := newLiveProfileStore(log, profileDir, profileCfg.MaxProfilesOrDefault())
 		if err != nil {
 			log.Warnw("failed to initialize live query profile storage", "error", err)
@@ -278,7 +280,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
 	}
-	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)

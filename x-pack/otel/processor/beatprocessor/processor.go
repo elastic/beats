@@ -12,12 +12,12 @@ import (
 	"go.opentelemetry.io/collector/component"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
-	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
