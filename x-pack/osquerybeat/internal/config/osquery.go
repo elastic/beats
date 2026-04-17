@@ -121,19 +121,29 @@ func (c QueryProfileStorageConfig) MaxProfilesOrDefault() int {
 	return c.MaxProfiles
 }
 
-// NativeSchedule holds interval and policy fields for native (interval-based) schedules.
-// Embedded in Query so these appear at the same level in config (query, interval, schedule_id, start_date).
+type CommonScheduleConfig struct {
+	// SpaceID can match across queries in a pack; Fleet may set a pack-level default_space_id.
+	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
+	// ScheduleID is always per-query (policy schedule identity); it is not inherited from the pack.
+	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"`
+}
+
+// NativeSchedule holds interval and start_date for native (interval-based) schedules.
+// Used for Query (embedded with CommonScheduleConfig) and for Pack.DefaultNativeSchedule.
 type NativeSchedule struct {
-	Interval   int    `config:"interval" json:"interval"`
-	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"` // from Kibana; used in scheduled result/response docs
-	StartDate  string `config:"start_date,omitempty" json:"start_date,omitempty"`   // RFC3339; for schedule_execution_count
+	Interval  int    `config:"interval" json:"interval,omitempty"`
+	StartDate string `config:"start_date,omitempty" json:"start_date,omitempty"` // RFC3339; for schedule_execution_count
 }
 
 type Query struct {
-	Query          string             `config:"query" json:"query"`
-	NativeSchedule `config:",inline"` // interval, schedule_id, start_date (flat in config)
-	// SpaceID is the optional policy space identifier for this scheduled query.
-	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
+	Query string `config:"query" json:"query"`
+
+	CommonScheduleConfig `config:",inline"`
+	NativeSchedule       `config:",inline"`
+	// RRuleSchedule provides RRULE-based scheduling as an alternative to interval.
+	// When set, queries are scheduled by osquerybeat instead of osqueryd's native scheduler.
+	// A query must not set both interval (native) and rrule_schedule; see ValidateQueryScheduleMode.
+	RRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
 
 	Platform    string `config:"platform" json:"platform,omitempty"`
 	Version     string `config:"version" json:"version,omitempty"`
@@ -154,11 +164,6 @@ type Query struct {
 	// Optional internal flag to emit per-query profiling for this scheduled query.
 	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
 	Profile bool `config:"profile" json:"-"`
-
-	// RRuleSchedule provides RRULE-based scheduling as an alternative to interval.
-	// When set, queries are scheduled by osquerybeat instead of osqueryd's native scheduler.
-	// A query must not set both interval (native) and rrule_schedule; see ValidateQueryScheduleMode.
-	RRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
 }
 
 type Pack struct {
@@ -169,21 +174,20 @@ type Pack struct {
 	Platform  string   `config:"platform" json:"platform,omitempty"`
 	Version   string   `config:"version" json:"version,omitempty"`
 	Shard     int      `config:"shard" json:"shard,omitempty"`
-	// DefaultNativeSchedule provides interval, schedule_id, and start_date defaults for queries
-	// in this pack that omit them. Omitted from JSON sent to osqueryd. Mutually exclusive at
-	// pack level with an enabled rrule_schedule (see ValidatePackScheduleDefaults). When set,
+
+	// DefaultNativeSchedule provides interval and start_date defaults for queries in this pack
+	// that omit them. Omitted from JSON sent to osqueryd. Mutually exclusive at
+	// pack level with an enabled default_rrule_schedule (see ValidatePackScheduleDefaults). When set,
 	// every query in the pack must use native scheduling after merge (ValidatePackQueriesAfterMerge).
 	DefaultNativeSchedule NativeSchedule `config:"default_native_schedule" json:"-"`
 	// DefaultRRuleSchedule provides RRULE defaults for queries that do not define rrule_schedule.
-	// Config key rrule_schedule matches Fleet/reference docs. Omitted from JSON sent to osqueryd.
+	// Config key default_rrule_schedule. Omitted from JSON sent to osqueryd.
 	// When enabled, every query in the pack must use rrule_schedule after merge.
-	DefaultRRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
+	DefaultRRuleSchedule *RRuleScheduleConfig `config:"default_rrule_schedule,omitempty" json:"-"`
 	// DefaultSpaceID is applied to queries that omit space_id (native and RRULE).
-	DefaultSpaceID string `config:"space_id,omitempty" json:"-"`
-	// DefaultScheduleID is applied to queries that omit schedule_id after default_native_schedule
-	// fields are merged (useful for RRULE packs where default_native_schedule is unset).
-	DefaultScheduleID string           `config:"schedule_id,omitempty" json:"-"`
-	Queries           map[string]Query `config:"queries" json:"queries,omitempty"`
+	DefaultSpaceID string `config:"default_space_id,omitempty" json:"-"`
+
+	Queries map[string]Query `config:"queries" json:"queries,omitempty"`
 }
 
 // > SELECT * FROM osquery_events where type = 'subscriber';

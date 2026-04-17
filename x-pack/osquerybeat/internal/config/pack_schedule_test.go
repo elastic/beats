@@ -38,13 +38,6 @@ func TestValidatePackScheduleDefaults(t *testing.T) {
 		assert.ErrorIs(t, err, ErrPackConflictingScheduleDefaults)
 	})
 
-	t.Run("reject schedule_id without interval", func(t *testing.T) {
-		err := ValidatePackScheduleDefaults(Pack{
-			DefaultNativeSchedule: NativeSchedule{ScheduleID: "x"},
-		})
-		assert.ErrorIs(t, err, ErrPackNativeScheduleMetadataWithoutInterval)
-	})
-
 	t.Run("reject start_date without interval", func(t *testing.T) {
 		err := ValidatePackScheduleDefaults(Pack{
 			DefaultNativeSchedule: NativeSchedule{StartDate: "2024-01-01T00:00:00Z"},
@@ -91,34 +84,29 @@ func TestMergeQueryWithPackScheduleDefaults(t *testing.T) {
 	t.Run("inherits native from pack", func(t *testing.T) {
 		pack := Pack{
 			DefaultNativeSchedule: NativeSchedule{
-				Interval:   120,
-				ScheduleID: "pack-sched",
-				StartDate:  "2024-06-01T00:00:00Z",
+				Interval:  120,
+				StartDate: "2024-06-01T00:00:00Z",
 			},
 		}
 		q := Query{Query: "select 1"}
 		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
 		require.NoError(t, err)
 		assert.Equal(t, 120, got.Interval)
-		assert.Equal(t, "pack-sched", got.ScheduleID)
+		assert.Equal(t, "", got.ScheduleID, "schedule_id is never inherited from the pack")
 		assert.Equal(t, "2024-06-01T00:00:00Z", got.StartDate)
 	})
 
 	t.Run("query overrides native fields", func(t *testing.T) {
 		pack := Pack{
 			DefaultNativeSchedule: NativeSchedule{
-				Interval:   120,
-				ScheduleID: "pack-sched",
-				StartDate:  "2024-06-01T00:00:00Z",
+				Interval:  120,
+				StartDate: "2024-06-01T00:00:00Z",
 			},
 		}
 		q := Query{
-			Query: "select 1",
-			NativeSchedule: NativeSchedule{
-				Interval:   30,
-				ScheduleID: "q-sched",
-				StartDate:  "2025-01-01T00:00:00Z",
-			},
+			Query:                "select 1",
+			NativeSchedule:       NativeSchedule{Interval: 30, StartDate: "2025-01-01T00:00:00Z"},
+			CommonScheduleConfig: CommonScheduleConfig{ScheduleID: "q-sched"},
 		}
 		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
 		require.NoError(t, err)
@@ -139,7 +127,7 @@ func TestMergeQueryWithPackScheduleDefaults(t *testing.T) {
 
 	t.Run("query rrule skips pack native merge fields", func(t *testing.T) {
 		pack := Pack{
-			DefaultNativeSchedule: NativeSchedule{Interval: 300, ScheduleID: "p", StartDate: "2024-01-01T00:00:00Z"},
+			DefaultNativeSchedule: NativeSchedule{Interval: 300, StartDate: "2024-01-01T00:00:00Z"},
 		}
 		q := Query{
 			Query:         "select 1",
@@ -188,27 +176,25 @@ func TestMergeQueryWithPackScheduleDefaults(t *testing.T) {
 		assert.ErrorIs(t, err, ErrConflictingScheduleModes)
 	})
 
-	t.Run("inherits pack default schedule_id and space_id", func(t *testing.T) {
+	t.Run("inherits pack default space_id only", func(t *testing.T) {
 		pack := Pack{
-			DefaultScheduleID: "policy-sched",
-			DefaultSpaceID:    "space-1",
+			DefaultSpaceID: "space-1",
 		}
 		q := Query{Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}}
 		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
 		require.NoError(t, err)
-		assert.Equal(t, "policy-sched", got.ScheduleID)
+		assert.Equal(t, "", got.ScheduleID)
 		assert.Equal(t, "space-1", got.SpaceID)
 	})
 
-	t.Run("query overrides pack default schedule_id and space_id", func(t *testing.T) {
+	t.Run("query overrides pack default space_id", func(t *testing.T) {
 		pack := Pack{
-			DefaultScheduleID: "pack-sched",
-			DefaultSpaceID:    "pack-space",
+			DefaultSpaceID: "pack-space",
 		}
 		q := Query{
-			Query:          "select 1",
-			NativeSchedule: NativeSchedule{Interval: 60, ScheduleID: "q-sched"},
-			SpaceID:        "q-space",
+			Query:                "select 1",
+			NativeSchedule:       NativeSchedule{Interval: 60},
+			CommonScheduleConfig: CommonScheduleConfig{ScheduleID: "q-sched", SpaceID: "q-space"},
 		}
 		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
 		require.NoError(t, err)
@@ -216,16 +202,18 @@ func TestMergeQueryWithPackScheduleDefaults(t *testing.T) {
 		assert.Equal(t, "q-space", got.SpaceID)
 	})
 
-	t.Run("pack default schedule_id applies to inherited rrule query", func(t *testing.T) {
+	t.Run("inherited rrule gets pack space_id schedule_id stays per-query", func(t *testing.T) {
 		pack := Pack{
 			DefaultRRuleSchedule: packRRULE,
-			DefaultScheduleID:    "rrule-policy-sched",
 			DefaultSpaceID:       "s1",
 		}
-		q := Query{Query: "select 1"}
+		q := Query{
+			Query:                "select 1",
+			CommonScheduleConfig: CommonScheduleConfig{ScheduleID: "query-sched-1"},
+		}
 		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
 		require.NoError(t, err)
-		assert.Equal(t, "rrule-policy-sched", got.ScheduleID)
+		assert.Equal(t, "query-sched-1", got.ScheduleID)
 		assert.Equal(t, "s1", got.SpaceID)
 		require.NotNil(t, got.RRuleSchedule)
 	})
@@ -286,7 +274,7 @@ func TestValidatePackQueriesAfterMerge(t *testing.T) {
 
 	t.Run("ok all inherit native from pack default", func(t *testing.T) {
 		p := Pack{
-			DefaultNativeSchedule: NativeSchedule{Interval: 300, ScheduleID: "s"},
+			DefaultNativeSchedule: NativeSchedule{Interval: 300},
 			Queries: map[string]Query{
 				"a": {Query: "select 1"},
 				"b": {Query: "select 2"},

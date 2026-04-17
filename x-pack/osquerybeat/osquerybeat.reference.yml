@@ -110,10 +110,9 @@ osquerybeat:
 #      osquery:
 #        packs:
 #          security_pack:
-#            # Optional: space_id and schedule_id apply to all pack queries that omit them (native and RRULE).
-#            #space_id: "default"
-#            #schedule_id: "policy-schedule-uuid"
-#            rrule_schedule:
+#            # Optional pack default: space_id is shared; each query sets its own schedule_id.
+#            #default_space_id: "default"
+#            default_rrule_schedule:
 #              rrule: "FREQ=DAILY"  # Daily
 #              start_date: "2024-01-01T00:00:00Z"
 #              splay: "1h"  # Up to 1 hour random delay
@@ -128,17 +127,17 @@ osquerybeat:
 #                  start_date: "2024-01-01T00:00:00Z"
 #                  splay: "90s"  # Up to 90 seconds delay
 #
-# Pack-level native scheduling (interval / schedule_id / start_date defaults for the pack).
-# A pack cannot set both default_native_schedule.interval and rrule_schedule.
+# Pack-level native scheduling (interval and start_date defaults for the pack; schedule_id is per-query).
+# A pack cannot set both default_native_schedule.interval and default_rrule_schedule.
 #  packs:
 #    infra_pack:
 #      default_native_schedule:
 #        interval: 300
-#        #schedule_id: "policy-pack-sched"
 #        #start_date: "2024-01-01T00:00:00Z"
 #      queries:
 #        uptime:
 #          query: "select * from uptime"
+#          #schedule_id: "required-per-query-uuid"
 #        fast:
 #          query: "select 1"
 #          interval: 60
@@ -150,7 +149,7 @@ osquerybeat:
 # - Maximum splay is 12 hours (safe for minimum 1-day interval)
 #
 # Note: A query must use either native interval scheduling or rrule_schedule, not both.
-# The same rule applies to pack-level defaults: use default_native_schedule or rrule_schedule,
+# The same rule applies to pack-level defaults: use default_native_schedule or default_rrule_schedule,
 # not both. Queries scheduled via RRULE are executed by osquerybeat directly, bypassing
 # osquery's native scheduler.
 #

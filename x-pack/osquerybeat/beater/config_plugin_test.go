@@ -486,11 +486,13 @@ func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
 					queryName: {
 						Query: querySQL,
 						NativeSchedule: config.NativeSchedule{
-							Interval:   queryPeriod,
-							ScheduleID: scheduleID,
-							StartDate:  startDate,
+							Interval:  queryPeriod,
+							StartDate: startDate,
 						},
-						SpaceID: spaceID,
+						CommonScheduleConfig: config.CommonScheduleConfig{
+							ScheduleID: scheduleID,
+							SpaceID:    spaceID,
+						},
 					},
 				},
 			},
@@ -606,7 +608,7 @@ func TestSet_PackNativeMetadataWithoutIntervalRejected(t *testing.T) {
 			Osquery: &config.OsqueryConfig{
 				Packs: map[string]config.Pack{
 					"bad": {
-						DefaultNativeSchedule: config.NativeSchedule{ScheduleID: "only-id"},
+						DefaultNativeSchedule: config.NativeSchedule{StartDate: "2024-01-01T00:00:00Z"},
 						Queries:               map[string]config.Query{"q": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}}},
 					},
 				},
@@ -641,12 +643,14 @@ func TestSet_PackDefaultNativeScheduleMergedIntoQueries(t *testing.T) {
 				Packs: map[string]config.Pack{
 					packName: {
 						DefaultNativeSchedule: config.NativeSchedule{
-							Interval:   300,
-							ScheduleID: "pack-default-sched",
-							StartDate:  "2026-01-01T00:00:00Z",
+							Interval:  300,
+							StartDate: "2026-01-01T00:00:00Z",
 						},
 						Queries: map[string]config.Query{
-							queryName: {Query: "select * from uptime"},
+							queryName: {
+								Query:                "select * from uptime",
+								CommonScheduleConfig: config.CommonScheduleConfig{ScheduleID: "per-query-sched"},
+							},
 						},
 					},
 				},
@@ -669,7 +673,7 @@ func TestSet_PackDefaultNativeScheduleMergedIntoQueries(t *testing.T) {
 	if diff := cmp.Diff(300, qi.Interval); diff != "" {
 		t.Error(diff)
 	}
-	if diff := cmp.Diff("pack-default-sched", qi.ScheduleID); diff != "" {
+	if diff := cmp.Diff("per-query-sched", qi.ScheduleID); diff != "" {
 		t.Error(diff)
 	}
 	if diff := cmp.Diff("2026-01-01T00:00:00Z", qi.StartDate); diff != "" {
