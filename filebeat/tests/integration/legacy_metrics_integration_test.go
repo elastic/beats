@@ -17,7 +17,7 @@
 
 //go:build integration
 
-package filestream
+package integration
 
 import (
 	"encoding/json"

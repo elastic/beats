@@ -15,16 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelconsumer
+//go:build integration
+
+package integration
 
 import (
-	"github.com/elastic/elastic-agent-libs/config"
+	"testing"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-type otelConsumerConfig struct {
-	Queue config.Namespace `config:"queue"`
-}
-
-func defaultConfig() otelConsumerConfig {
-	return otelConsumerConfig{}
+func TestMain(m *testing.M) {
+	integration.TestMainWithBuild(m, "filebeat")
 }

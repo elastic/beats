@@ -115,7 +115,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -138,7 +138,7 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -258,7 +258,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -296,7 +296,7 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -334,7 +334,7 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)

@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
+	"github.com/elastic/beats/v7/x-pack/heartbeat/hbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
@@ -21,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -103,6 +105,7 @@ func (c *Collector) Shutdown() {
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
 		fbreceiver.NewFactory(),
+		hbreceiver.NewFactory(),
 		mbreceiver.NewFactory(),
 	)
 	if err != nil {
@@ -128,6 +131,7 @@ func getComponent() (otelcol.Factories, error) {
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
 		logstashexporter.NewFactory(),
+		kafkaexporter.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
