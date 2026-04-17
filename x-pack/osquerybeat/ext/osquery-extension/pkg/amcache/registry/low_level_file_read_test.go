@@ -27,7 +27,6 @@ func Test_readFileViaNTFS(t *testing.T) {
 	if err != nil {
 		t.Skipf("requires raw-volume read permissions and amcache hive presence: %v", err)
 	}
-	assert.NoError(t, err, "readFileViaNTFS() failed: %v", err)
 	assert.NotEmpty(t, data, "readFileViaNTFS() returned empty data")
 
 	magic := []byte{0x72, 0x65, 0x67, 0x66} // "regf"

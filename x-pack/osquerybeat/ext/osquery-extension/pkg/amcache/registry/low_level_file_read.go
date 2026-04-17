@@ -87,7 +87,7 @@ func readFileViaNTFS(filePath string) ([]byte, error) {
 	// set an arbitrary maximum file size to prevent trying to read very large files into memory.
 	// The amcache hive should be well under this limit.
 	const maxFileSize = 256 * 1024 * 1024 // 256 MB
-	if infos.Size > maxFileSize {
+	if infos.Size <= 0 || infos.Size > maxFileSize {
 		return nil, fmt.Errorf("file size %d exceeds maximum supported size of %d bytes", infos.Size, maxFileSize)
 	}
 
