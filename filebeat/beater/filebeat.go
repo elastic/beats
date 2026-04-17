@@ -489,7 +489,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			config.Autodiscover,
 			b.Keystore,
 			fb.logger,
-			b.Paths,
+			b.Info.Paths,
 		)
 		if err != nil {
 			return err
