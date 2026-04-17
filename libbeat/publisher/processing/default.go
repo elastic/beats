@@ -417,7 +417,6 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 			return nil, fmt.Errorf("failed creating drop_fields processor for host.name field: %w", err)
 		}
 		pipelineProcessors.add(proc)
-		fmt.Println("first done")
 
 		// If host.name was the only field under host, we need to drop the empty "host" object as well.
 		drop_host_cfg, err := config.NewConfigFrom(map[string]interface{}{

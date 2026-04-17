@@ -192,7 +192,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		"with client processor": {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
-					g := newGroup("test", logp.L())
+					g := newGroup("test", logptest.NewTestingLogger(t, ""))
 					g.add(addfields.NewAddFields(mapstr.M{"custom": "value"}, true, true))
 					return g
 				}(),
@@ -305,7 +305,7 @@ func TestProcessorsConfigs(t *testing.T) {
 				factory = MakeDefaultSupport(true, nil)
 			}
 
-			support, err := factory(info, logp.L(), cfg)
+			support, err := factory(info, logptest.NewTestingLogger(t, ""), cfg)
 			require.NoError(t, err)
 
 			prog, err := support.Create(test.local, test.drop, tmpPaths(t))
@@ -388,7 +388,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logp.L(), config.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false, tmpPaths(t))
@@ -409,7 +409,7 @@ func TestNormalization(t *testing.T) {
 }
 
 func BenchmarkNormalization(b *testing.B) {
-	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(b, ""), config.NewConfig())
 	require.NoError(b, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, false, tmpPaths(b))
@@ -423,7 +423,7 @@ func BenchmarkNormalization(b *testing.B) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true, tmpPaths(t))
@@ -438,7 +438,7 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	dynFields := mapstr.NewPointer(mapstr.M{})
@@ -461,7 +461,7 @@ func TestDynamicFields(t *testing.T) {
 }
 
 func TestProcessingClose(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	// Inject a processor in the builder that we can check if has been closed.
@@ -469,12 +469,12 @@ func TestProcessingClose(t *testing.T) {
 	b, ok := factory.(*builder)
 	require.True(t, ok)
 	if b.processors == nil {
-		b.processors = newGroup("global", logp.L())
+		b.processors = newGroup("global", logptest.NewTestingLogger(t, ""))
 	}
 	b.processors.add(factoryProcessor)
 
 	clientProcessor := &processorWithClose{}
-	g := newGroup("test", logp.L())
+	g := newGroup("test", logptest.NewTestingLogger(t, ""))
 	g.add(clientProcessor)
 
 	prog, err := factory.Create(beat.ProcessingConfig{
@@ -505,7 +505,7 @@ func TestProcessingClose(t *testing.T) {
 }
 
 func TestProcessingDiagnostics(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	p := factory.Processors()
@@ -554,7 +554,7 @@ func TestDisableHost(t *testing.T) {
 		require.NoError(t, err)
 
 		// Client processor that injects a richer host object (mimicking add_host_metadata).
-		hostProc := newGroup("test", logp.L())
+		hostProc := newGroup("test", logptest.NewTestingLogger(t, ""))
 		hostProc.add(addfields.NewAddFields(mapstr.M{
 			"host": mapstr.M{
 				"name":     "injected-host",
@@ -628,7 +628,7 @@ func TestDisableHost(t *testing.T) {
 		require.NoError(t, err)
 
 		// Client processor that injects a richer host object (mimicking add_host_metadata).
-		hostProc := newGroup("test", logp.L())
+		hostProc := newGroup("test", logptest.NewTestingLogger(t, ""))
 		hostProc.add(addfields.NewAddFields(mapstr.M{
 			"host": mapstr.M{
 				"name":     "injected-host",
