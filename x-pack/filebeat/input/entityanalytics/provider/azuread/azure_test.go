@@ -80,3 +80,72 @@ func TestAzure_DoFetch(t *testing.T) {
 		})
 	}
 }
+
+func TestAzure_DoFetch_MFAEnrichment(t *testing.T) {
+	dbFilename := "TestAzure_DoFetch_MFAEnrichment.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() {
+		testCleanupStore(store, dbFilename)
+	})
+	// The mock fetcher returns shared *fetcher.User pointers. Reset any MFA
+	// data set by this test so it doesn't bleed into subsequent tests.
+	t.Cleanup(func() {
+		for _, u := range mockfetcher.UserResponse {
+			u.MFA = nil
+		}
+	})
+
+	a := azure{
+		conf:    conf{Dataset: "users", EnrichWith: []string{"mfa"}},
+		logger:  logp.L(),
+		auth:    mockauth.New(""),
+		fetcher: mockfetcher.New(),
+	}
+
+	ss, err := newStateStore(store)
+	require.NoError(t, err)
+	defer ss.close(false)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, _, err = a.doFetch(ctx, ss, false)
+	require.NoError(t, err)
+
+	// Verify that MFA details were populated for users that have matching
+	// entries in MFAResponse.
+	for userID, wantMFA := range mockfetcher.MFAResponse {
+		u, ok := ss.users[userID]
+		require.Truef(t, ok, "expected user %q to be in state", userID)
+		require.NotNilf(t, u.MFA, "expected user %q to have MFA details", userID)
+		require.Equal(t, wantMFA, u.MFA)
+	}
+}
+
+func TestAzure_DoFetch_NoMFAEnrichment(t *testing.T) {
+	dbFilename := "TestAzure_DoFetch_NoMFAEnrichment.db"
+	store := testSetupStore(t, dbFilename)
+	t.Cleanup(func() {
+		testCleanupStore(store, dbFilename)
+	})
+
+	// No enrich_with set: MFA field must remain nil.
+	a := azure{
+		conf:    conf{Dataset: "users"},
+		logger:  logp.L(),
+		auth:    mockauth.New(""),
+		fetcher: mockfetcher.New(),
+	}
+
+	ss, err := newStateStore(store)
+	require.NoError(t, err)
+	defer ss.close(false)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, _, err = a.doFetch(ctx, ss, false)
+	require.NoError(t, err)
+
+	for _, u := range ss.users {
+		require.Nil(t, u.MFA, "expected user %q to have no MFA details when enrich_with is not set", u.ID)
+	}
+}

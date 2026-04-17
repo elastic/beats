@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -75,10 +76,10 @@ type readerLoop struct {
 	// If set, this encoding helper is called on events after loading
 	// them from disk, to convert them to their final output serialization
 	// format.
-	outputEncoder queue.Encoder
+	outputEncoder queue.Encoder[publisher.Event]
 }
 
-func newReaderLoop(settings Settings, outputEncoder queue.Encoder, paths *paths.Path) *readerLoop {
+func newReaderLoop(settings Settings, outputEncoder queue.Encoder[publisher.Event], paths *paths.Path) *readerLoop {
 	return &readerLoop{
 		settings: settings,
 		paths:    paths,

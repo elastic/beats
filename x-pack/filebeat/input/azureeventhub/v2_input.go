@@ -20,8 +20,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2/checkpoints"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
@@ -561,8 +561,10 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 
 		// Update input metrics.
 		in.metrics.processedMessages.Inc()
-		in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 	}
+
+	// Update input metrics.
+	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 
 	return nil
 }
