@@ -100,7 +100,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 					}
 				}
 			} else {
-				logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
+				logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 			}
 		}
 	}
@@ -128,17 +128,17 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		if err := p.InitPaths(&partialConfig.Path); err != nil {
 			return nil, fmt.Errorf("error initializing default paths: %w", err)
 		}
-		b.Paths = p
+		b.Info.Paths = p
 	} else {
 		if err := instance.InitPaths(cfg); err != nil {
 			return nil, fmt.Errorf("error initializing paths: %w", err)
 		}
-		b.Paths = paths.Paths
+		b.Info.Paths = paths.Paths
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Paths)
+	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Info.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -196,9 +196,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", b.Paths.String())
+	logger.Infof("%s", b.Info.Paths.String())
 
-	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Info.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading meta data: %w", err)
@@ -283,14 +283,23 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
+	var intakeQueueID string
+	if queueID, ok := receiverConfig["shared_intake_queue"]; ok {
+		if queueStrID, ok := queueID.(string); ok {
+			intakeQueueID = queueStrID
+		} else {
+			return nil, fmt.Errorf("shared_intake_queue must be a string")
+		}
+	}
+
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
-		Paths:          b.Paths,
+		Paths:          b.Info.Paths,
 	}
-	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
