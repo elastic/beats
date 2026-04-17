@@ -563,9 +563,12 @@ func (s *salesforceInput) runObjectBatches() error {
 //     DESC real-time objects, where the first row is the newest).
 //   - last_event_time is written from every row, overwriting on each call,
 //     so at end-of-query it reflects the final row seen.
-//   - last_event_id is written from the record Id when present, so
-//     same-timestamp ascending queries can resume from the last ACKed row
-//     instead of skipping later rows that share the same timestamp.
+//   - last_event_id is reset to empty at the start of the run and then
+//     written from the record Id whenever a row exposes one. Rows without an
+//     Id do not clear a previously observed one within the same run. This
+//     lets same-timestamp ascending queries resume from the last ACKed row
+//     instead of skipping later rows that share the same timestamp, while
+//     never carrying a stale Id across runs that no longer return one.
 //
 // Any mid-stream error aborts immediately and returns the count published
 // so far. The caller is responsible for deciding whether to keep or revert
@@ -594,6 +597,11 @@ func (s *salesforceInput) runObjectQuery(cursor mapstr.M) (int, error) {
 
 	totalEvents := 0
 	firstEvent := true
+	// Reset LastEventID at the start of each run so stale values from a
+	// previous query (e.g. after a user changes their SOQL to omit Id) can
+	// never be carried forward as a tie-breaker into a new last_event_time
+	// bucket. Rows with an Id below will repopulate it.
+	s.cursor.Object.LastEventID = ""
 
 	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
@@ -612,8 +620,6 @@ func (s *salesforceInput) runObjectQuery(cursor mapstr.M) (int, error) {
 			}
 			if id, ok := val["Id"].(string); ok {
 				s.cursor.Object.LastEventID = id
-			} else {
-				s.cursor.Object.LastEventID = ""
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")

@@ -1127,6 +1127,98 @@ func TestRunObjectSetupAuditTrailResumeWithoutLastEventIDUsesLegacyBoundary(t *t
 	require.Len(t, client.published, 1, "expected legacy-compatible resume to still publish returned setup audit trail rows")
 }
 
+// TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows verifies that
+// once a user switches to a custom SOQL query that no longer SELECTs Id, any
+// previously persisted last_event_id is reset even when the query succeeds but
+// returns no rows. This specifically guards the start-of-run reset path.
+func TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows(t *testing.T) {
+	const (
+		customQuery   = "SELECT CreatedDate,Action FROM SetupAuditTrail ORDER BY CreatedDate ASC"
+		customRunJSON = `{ "totalSize": 0, "done": true, "records": [] }`
+	)
+
+	var server *httptest.Server
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == customQuery:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(customRunJSON))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": customQuery,
+					"value":   customQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "custom setup audit trail object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor: &state{
+			Object: dateTimeCursor{
+				LastEventTime: "2024-01-01T00:00:00.000+0000",
+				LastEventID:   "0Ym000000000STALEAAA",
+			},
+		},
+		srcConfig: &cfg,
+		log:       logp.NewLogger("salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.NoError(t, err, "expected custom setup audit trail run without Id to succeed even when it returns no rows")
+
+	require.Len(t, client.published, 0, "expected no events to be published when the custom query returns no rows")
+	assert.Empty(t, s.cursor.Object.LastEventID, "expected a successful no-row run to clear any stale last_event_id rather than carry it into a future last_event_time bucket")
+	assert.Equal(t, "2024-01-01T00:00:00.000+0000", s.cursor.Object.LastEventTime, "expected last_event_time to remain unchanged when the custom query returns no rows")
+}
+
 func TestRunObjectReopensSessionOnInvalidSessionID(t *testing.T) {
 	const objectQuery = "SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate ASC NULLS FIRST"
 
