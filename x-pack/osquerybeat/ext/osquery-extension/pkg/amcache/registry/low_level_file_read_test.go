@@ -13,13 +13,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"www.velocidex.com/golang/regparser"
-
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 func Test_readFileViaNTFS(t *testing.T) {
-	log := logger.New(os.Stdout, true)
-
 	// Read the actual amcache hive using the readFileViaNTFS function to ensure it can read the file and return valid registry data.
 	amcachePath := "C:\\Windows\\AppCompat\\Programs\\Amcache.hve"
 	if _, err := os.Stat(amcachePath); err != nil {
