@@ -252,10 +252,10 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			StartTime:        time.Now(),
 			EphemeralID:      metricreport.EphemeralID(), //nolint:staticcheck //keep behavior for now
 			FIPSDistribution: version.FIPSDistribution,
+			Paths:            paths.New(),
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
-		Paths:    paths.New(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -390,7 +390,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Paths,
+		Paths:          b.Info.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -430,7 +430,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !management.UnderAgent() {
-		bl := locks.New(b.Info, b.Paths)
+		bl := locks.New(b.Info, b.Info.Paths)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -691,7 +691,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Info.Paths, b.Config.LifecycleConfig)
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -767,11 +767,11 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
-	b.Paths = paths.Paths
+	b.Info.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := LoadKeystore(cfg, b.Info.Beat, b.Paths)
+	store, err := LoadKeystore(cfg, b.Info.Beat, b.Info.Paths)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -831,9 +831,9 @@ func (b *Beat) configure(settings Settings) error {
 	b.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", b.Paths.String())
+	logger.Infof("%s", b.Info.Paths.String())
 
-	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Info.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return err
@@ -1069,7 +1069,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
-		err = dashboards.ImportDashboards(ctx, b.Info, b.Paths.Resolve(paths.Home, ""),
+		err = dashboards.ImportDashboards(ctx, b.Info, b.Info.Paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return fmt.Errorf("error importing Kibana dashboards: %w", err)
@@ -1135,7 +1135,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Info.Paths, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}
@@ -1278,7 +1278,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
-	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), b.Paths)
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), b.Info.Paths)
 }
 
 func (b *Beat) registerClusterUUIDFetching() {
@@ -1382,10 +1382,10 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"type": b.Info.Beat,
 		"uuid": b.Info.ID,
 		"path": mapstr.M{
-			"config": b.Paths.Resolve(paths.Config, ""),
-			"data":   b.Paths.Resolve(paths.Data, ""),
-			"home":   b.Paths.Resolve(paths.Home, ""),
-			"logs":   b.Paths.Resolve(paths.Logs, ""),
+			"config": b.Info.Paths.Resolve(paths.Config, ""),
+			"data":   b.Info.Paths.Resolve(paths.Data, ""),
+			"home":   b.Info.Paths.Resolve(paths.Home, ""),
+			"logs":   b.Info.Paths.Resolve(paths.Logs, ""),
 		},
 	}
 	log.Infow("Beat info", "beat", beat)
