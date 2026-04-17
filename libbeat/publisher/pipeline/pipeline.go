@@ -199,6 +199,7 @@ func NewForReceiver(
 	monitors Monitors,
 	userQueueConfig conf.Namespace,
 	settings Settings,
+	intakeQueueID string,
 ) (*Pipeline, error) {
 	p := &Pipeline{
 		beatInfo:         beatInfo,
@@ -221,7 +222,7 @@ func NewForReceiver(
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
 	if err != nil {
 		return nil, err
 	}
