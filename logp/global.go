@@ -29,7 +29,10 @@ import (
 // Deprecated: Use logp.NewLogger.
 func MakeDebug(selector string) func(string, ...interface{}) {
 	return func(format string, v ...interface{}) {
-		globalLogger().Named(selector).Debug(fmt.Sprintf(format, v...))
+		log := globalLogger().Named(selector)
+		if log.Core().Enabled(zap.DebugLevel) {
+			log.Debug(fmt.Sprintf(format, v...))
+		}
 	}
 }
 
