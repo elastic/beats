@@ -86,38 +86,7 @@ func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
 func (m *testManager) RegisterAction(management.Action)    {}
 func (m *testManager) UnregisterAction(management.Action)  {}
-<<<<<<< HEAD
 func (m *testManager) RegisterDiagnosticHook(string, string, string, string, management.DiagnosticHook) {
-=======
-func (m *testManager) RegisterDiagnosticHook(name, _ string, _ string, _ string, hook management.DiagnosticHook) {
-	if m.diagHook == nil {
-		m.diagHook = make(map[string]management.DiagnosticHook)
-	}
-	m.diagHook[name] = hook
-}
-
-func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquerybeat, *beat.Beat, *testManager) {
-	t.Helper()
-
-	mgr := &testManager{}
-	b := &beat.Beat{
-		Manager:    mgr,
-		Registry:   reload.NewRegistry(),
-		Monitoring: beatmonitoring.NewMonitoring(),
-	}
-	b.Info.Paths = newTestBeatPaths(t)
-
-	cfg := agentconfig.NewConfig()
-	beater, err := New(b, cfg)
-	require.NoError(t, err)
-
-	ob, ok := beater.(*osquerybeat)
-	require.True(t, ok)
-	for _, override := range overrides {
-		override(ob)
-	}
-	return ob, b, mgr
->>>>>>> 184a91bf6 (Move Paths from beat.Beat to beat.Info (#49836))
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -129,10 +98,6 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-<<<<<<< HEAD
-=======
-	b.Info.Paths = newTestBeatPaths(t)
->>>>>>> 184a91bf6 (Move Paths from beat.Beat to beat.Info (#49836))
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -237,10 +202,6 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-<<<<<<< HEAD
-=======
-	b.Info.Paths = newTestBeatPaths(t)
->>>>>>> 184a91bf6 (Move Paths from beat.Beat to beat.Info (#49836))
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -278,10 +239,6 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-<<<<<<< HEAD
-=======
-	b.Info.Paths = newTestBeatPaths(t)
->>>>>>> 184a91bf6 (Move Paths from beat.Beat to beat.Info (#49836))
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -319,10 +276,6 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-<<<<<<< HEAD
-=======
-	b.Info.Paths = newTestBeatPaths(t)
->>>>>>> 184a91bf6 (Move Paths from beat.Beat to beat.Info (#49836))
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
