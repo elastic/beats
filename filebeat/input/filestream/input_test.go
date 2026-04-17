@@ -419,7 +419,6 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	return filename
 }
 
-
 func createTestStore(t testing.TB) statestore.States {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
