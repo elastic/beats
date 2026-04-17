@@ -408,6 +408,7 @@ func TestProducerShutdown(t *testing.T) {
 }
 
 func BenchmarkProducerThroughput(b *testing.B) {
+	b.ReportAllocs()
 	const queueSize = 10000
 	const publishWorkers = 10
 	testQueue := NewQueue[int](
