@@ -13,7 +13,7 @@ subgraph PERIODIC["Periodic Loop"]
            CEL["Run CEL<br/>Process Batches<br/>Generate Events"]
            PublishEvents["Publish Events"]
            ErrorCheck{"Error or Done?"}
-           RunStartMetric["Records: <br/>input.cel.periodic.run"]
+           RunStartMetric["Records: <br/>input.cel.periodic.run.count"]
            ProgramStartMetric["Records: <br/>input.cel.periodic.program.run.started"]
            HTTPMetrics["Records from HTTP Client Transport: <br/>http.client.request.duration <br/>http.client.request.body.size"]
            CELMetrics["Records: <br/>input.cel.periodic.cel.duration <br/>input.cel.program.run.duration<br/> input.cel.periodic.batch.received<br/> input.cel.program.batch.received<br/> input.cel.periodic.event.received<br/>  input.cel.program.event.received"]
@@ -48,4 +48,3 @@ subgraph PERIODIC["Periodic Loop"]
     style PublishMetrics fill:#009E73,stroke:#4a3728,color:#fff
     style EndLoopMetrics fill:#009E73,stroke:#4a3728,color:#fff
     style HTTPMetrics fill:#3d6a8f,stroke:#1e3a5f,color:#fff
-

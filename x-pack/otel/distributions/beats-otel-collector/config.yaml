@@ -59,16 +59,23 @@ exporters:
   logstash:
     hosts: ["localhost:5044"]
     # Logstash export configuration
-  
+
   # Standard exporters
   debug:
     verbosity: detailed
-  
+
   elasticsearch:
     endpoint: http://localhost:9200
     # Elasticsearch export configuration
-  
-  # Placeholder for testing  
+
+  kafka:
+    brokers:
+      - localhost:9094
+    logs:
+      topic: otlp_logs
+      encoding: otlp_json
+
+  # Placeholder for testing
   nop:
 
 connectors:
