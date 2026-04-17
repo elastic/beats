@@ -298,6 +298,20 @@ CPU usage metrics
     format: percent
 
 
+**`kubernetes.container.cpu.usage.request.pct`**
+:   CPU usage as a percentage of the defined request for the container. Not emitted if the container has no CPU request defined.
+
+    type: scaled_float
+
+    format: percent
+
+
+**`kubernetes.container.cpu.request.cores`**
+:   Requested CPU cores for the container. Not emitted if the container has no CPU request defined.
+
+    type: double
+
+
 ## logs [_logs]
 
 Logs info
@@ -376,6 +390,22 @@ Logs info
     format: percent
 
 
+**`kubernetes.container.memory.usage.request.pct`**
+:   Memory usage as a percentage of the defined request for the container. Not emitted if the container has no memory request defined.
+
+    type: scaled_float
+
+    format: percent
+
+
+**`kubernetes.container.memory.request.bytes`**
+:   Requested memory bytes for the container. Not emitted if the container has no memory request defined.
+
+    type: double
+
+    format: bytes
+
+
 **`kubernetes.container.memory.rss.bytes`**
 :   RSS memory usage
 
@@ -394,6 +424,14 @@ Logs info
 
 **`kubernetes.container.memory.workingset.limit.pct`**
 :   Working set memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+
+    type: scaled_float
+
+    format: percent
+
+
+**`kubernetes.container.memory.workingset.request.pct`**
+:   Working set memory usage as a percentage of the defined request for the container. Not emitted if the container has no memory request defined.
 
     type: scaled_float
 
@@ -1010,6 +1048,20 @@ CPU usage metrics
     format: percent
 
 
+**`kubernetes.pod.cpu.usage.request.pct`**
+:   CPU usage as a percentage of the defined cpu requests sum of the pod containers. If any container is missing a request the metric is not emitted.
+
+    type: scaled_float
+
+    format: percent
+
+
+**`kubernetes.pod.cpu.request.cores`**
+:   Requested CPU cores sum of the pod containers. If any container is missing a request the metric is not emitted.
+
+    type: double
+
+
 **`kubernetes.pod.memory.usage.bytes`**
 :   Total memory usage
 
@@ -1028,6 +1080,14 @@ CPU usage metrics
 
 **`kubernetes.pod.memory.usage.limit.pct`**
 :   Memory usage as a percentage of the defined memory limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
+
+    type: scaled_float
+
+    format: percent
+
+
+**`kubernetes.pod.memory.usage.request.pct`**
+:   Memory usage as a percentage of the defined memory requests sum of the pod containers. If any container is missing a request the metric is not emitted.
 
     type: scaled_float
 
@@ -1056,6 +1116,22 @@ CPU usage metrics
     type: scaled_float
 
     format: percent
+
+
+**`kubernetes.pod.memory.working_set.request.pct`**
+:   Working set memory usage as a percentage of the defined requests sum of the pod containers. If any container is missing a request the metric is not emitted.
+
+    type: scaled_float
+
+    format: percent
+
+
+**`kubernetes.pod.memory.request.bytes`**
+:   Requested memory bytes sum of the pod containers. If any container is missing a request the metric is not emitted.
+
+    type: double
+
+    format: bytes
 
 
 **`kubernetes.pod.memory.rss.bytes`**
