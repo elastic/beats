@@ -157,7 +157,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		done:              make(chan struct{}),
 		config:            config,
 		registry:          registry,
-		paths:             b.Paths,
+		paths:             b.Info.Paths,
 		logger:            b.Info.Logger,
 		dynamicCfgEnabled: dynamicCfgEnabled,
 	}
@@ -289,7 +289,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules, b.Paths)
+		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules, b.Info.Paths)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
