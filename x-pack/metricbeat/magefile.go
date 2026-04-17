@@ -109,8 +109,12 @@ func PythonUnitTest() error {
 	return devtools.PythonTest(args)
 }
 
-// BuildSystemTestBinary build a system test binary depending on the runner.
+// Deprecated: BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Go integration tests now build the binary automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target is only needed for Python system tests.")
 	var opts []testbin.Option
 	// On Windows 7 32-bit we run out of memory if we enable DWARF.
 	if isWindows32bitRunner() {
