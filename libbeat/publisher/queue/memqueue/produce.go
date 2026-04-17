@@ -18,9 +18,22 @@
 package memqueue
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var respChanPool = sync.Pool{
+	New: func() interface{} {
+		return make(chan queue.EntryID, 1)
+	},
+}
+
+func getRespChan() chan queue.EntryID {
+	ch, _ := respChanPool.Get().(chan queue.EntryID)
+	return ch
+}
 
 type forgetfulProducer[T any] struct {
 	broker    *broker[T]
@@ -73,10 +86,9 @@ func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) q
 }
 
 func (p *forgetfulProducer[T]) makePushRequest(event T) pushRequest[T] {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest[T]{
 		event: event,
-		resp:  resp}
+		resp:  getRespChan()}
 }
 
 func (p *forgetfulProducer[T]) Publish(event T) (queue.EntryID, bool) {
@@ -92,14 +104,13 @@ func (p *forgetfulProducer[T]) Close() {
 }
 
 func (p *ackProducer[T]) makePushRequest(event T) pushRequest[T] {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest[T]{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+		resp:       getRespChan()}
 }
 
 func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
@@ -132,6 +143,11 @@ func (st *openState[T]) publish(req pushRequest[T]) (queue.EntryID, bool) {
 	if st.encoder != nil {
 		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
 	}
+	// handlePendingResponse fully drains the channel before returning,
+	// so it is always safe to recycle after this function completes.
+	if req.resp != nil {
+		defer respChanPool.Put(req.resp)
+	}
 	select {
 	case st.events <- req:
 		return st.handlePendingResponse(req.resp)
@@ -149,6 +165,9 @@ func (st *openState[T]) tryPublish(req pushRequest[T]) (queue.EntryID, bool) {
 	// sending the entry to the queue.
 	if st.encoder != nil {
 		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
+	}
+	if req.resp != nil {
+		defer respChanPool.Put(req.resp)
 	}
 	select {
 	case st.events <- req:
