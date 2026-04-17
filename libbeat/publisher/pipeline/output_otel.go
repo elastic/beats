@@ -51,7 +51,13 @@ func newOTelOutputController(
 	monitors Monitors,
 	retryObserver retryObserver,
 	queueFactory queue.QueueFactory[publisher.Event],
+	intakeQueueID string,
 ) (*otelOutputController, error) {
+	if intakeQueueID != "" {
+		monitors.Logger.Debugf("newOTelOutputController: intake queue ID %v (inactive)", intakeQueueID)
+	} else {
+		monitors.Logger.Debugf("newOtelOutputController: no intake queue ID specified")
+	}
 
 	// Queue metrics are reported under the pipeline namespace
 	var pipelineMetrics *monitoring.Registry
