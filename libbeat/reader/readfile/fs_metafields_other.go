@@ -28,6 +28,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// platformFileFields is the number of fields setFileSystemMetadata always writes
+// into the log.file submap on this platform (device_id and inode).
+// Optional fields (owner, group) are counted separately in metafields.go.
+const platformFileFields = 2
+
+// Keys written into the log.file submap by setFileSystemMetadata.
 const (
 	deviceIDKey = "device_id"
 	inodeKey    = "inode"

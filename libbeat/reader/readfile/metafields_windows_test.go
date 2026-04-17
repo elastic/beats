@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -68,4 +69,38 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 func checkFieldsWithOwnerGroup(t *testing.T, expected, actual mapstr.M) {
 	// Including owner and group are not supported on Windows yet
 	checkFields(t, expected, actual)
+}
+
+// TestCachedMetaSizing verifies that cachedMeta ends up with exactly the right
+// number of entries on Windows. Owner and group are not supported on Windows so
+// only path, the three volume fields, and fingerprint contribute to the count.
+func TestCachedMetaSizing(t *testing.T) {
+	fi := createTestFileInfo()
+	msg := reader.Message{Content: []byte("line"), Bytes: 4, Fields: mapstr.M{}}
+
+	tests := []struct {
+		name        string
+		fingerprint string
+		wantLen     int
+	}{
+		{"base only", "", 1 + platformFileFields},
+		{"with fingerprint", "hash", 1 + platformFileFields + 1},
+	}
+	// owner/group are not supported on Windows and do not add fields regardless
+	// of the includeOwner/includeGroup flags, so they are not tested here.
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := &FileMetaReader{
+				reader:      msgReader([]reader.Message{msg}),
+				path:        "test/path",
+				fi:          fi,
+				fingerprint: tc.fingerprint,
+			}
+			_, err := r.Next()
+			require.NoError(t, err)
+			require.Equal(t, tc.wantLen, len(r.cachedMeta),
+				"cachedMeta entry count should match the pre-allocated size")
+		})
+	}
 }

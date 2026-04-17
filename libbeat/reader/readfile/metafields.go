@@ -70,7 +70,21 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 	// Build into a local variable so a failed setFileSystemMetadata does not
 	// leave r.cachedMeta in a partial state.
 	if r.cachedMeta == nil {
-		m := make(mapstr.M, 4)
+		// Pre-size exactly: path + platform-invariant fields + optional fields.
+		// platformFileFields is defined per-platform in fs_metafields_*.go.
+		// On Windows, includeOwner/includeGroup are not supported so they add
+		// no fields; the slight over-allocation is harmless.
+		size := 1 + platformFileFields // path + platform fields
+		if r.includeOwner {
+			size++
+		}
+		if r.includeGroup {
+			size++
+		}
+		if r.fingerprint != "" {
+			size++
+		}
+		m := make(mapstr.M, size)
 		m["path"] = r.path
 		if err := setFileSystemMetadata(r.fi, m, r.includeOwner, r.includeGroup); err != nil {
 			return message, fmt.Errorf("failed to set file system metadata: %w", err)
@@ -84,6 +98,11 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 	// Copy cached fields into a fresh map for this event.
 	fileMap := make(mapstr.M, len(r.cachedMeta))
 	maps.Copy(fileMap, r.cachedMeta)
+	// Direct assignment replaces any existing "log" key rather than merging.
+	// This is intentional and safe: FileMetaReader is always the first component
+	// in the pipeline to write log.* fields. Downstream readers (parsers,
+	// LimitReader) run after this and merge into the map we write here via
+	// AddFields() / Update(), so nothing is lost.
 	message.Fields["log"] = mapstr.M{
 		"offset": r.offset,
 		"file":   fileMap,

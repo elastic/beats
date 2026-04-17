@@ -24,6 +24,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// platformFileFields is the number of fields setFileSystemMetadata always writes
+// into the log.file submap on this platform (idxhi, idxlo, and vol).
+const platformFileFields = 3
+
+// Keys written into the log.file submap by setFileSystemMetadata.
 const (
 	idxhiKey = "idxhi"
 	idxloKey = "idxlo"
