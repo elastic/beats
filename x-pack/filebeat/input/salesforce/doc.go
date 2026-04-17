@@ -13,17 +13,24 @@
 //
 //   - EventLogFile: queries the EventLogFile SObject for newly available log
 //     files and downloads each referenced CSV, emitting one event per CSV row.
-//   - Object: issues a SOQL query against any Real-Time Event Monitoring
-//     object (LoginEvent, LogoutEvent, ApiEvent, ...) and emits one event per
-//     returned row.
+//   - Object: issues a SOQL query against supported Salesforce objects
+//     collected through this input (for example LoginEvent, LogoutEvent,
+//     ApiEvent, SetupAuditTrail, ...) and emits one event per returned row.
 //
 // Both methods are driven by user-supplied SOQL templates (see the QueryConfig
-// type and the module-provided default/value templates). The "default"
-// template is used the first time the input runs; the "value" template is
-// used on every subsequent run and receives the persisted cursor via the
-// [[ .cursor ]] variable. The user also configures a cursor field (for
-// example, EventDate or LogDate) that the input reads from each returned
-// record to advance its watermark.
+// type and the module-provided default/value templates). Template selection is
+// based on whether a cursor context map exists, not strictly on "first run"
+// versus "later run": the "default" template is used only when the input has
+// no cursor map to pass, while the "value" template is used whenever
+// [[ .cursor ]] is non-nil. In practice that means a clean unbatched run starts
+// with "default", later unbatched runs use "value", and bounded object
+// batching uses "value" for every window because it always supplies
+// [[ .cursor.object.batch_start_time ]] / [[ .cursor.object.batch_end_time ]].
+// User templates typically read nested cursor paths such as
+// [[ .cursor.object.last_event_time ]] or
+// [[ .cursor.event_log_file.last_event_time ]]. The user also configures a
+// cursor field (for example, EventDate or LogDate) that the input reads from
+// each returned record to advance its watermark.
 //
 // # Collection lifecycle
 //
@@ -43,7 +50,7 @@
 // [state] struct containing one [dateTimeCursor] per method
 // (object + event_log_file):
 //
-//   - first_event_time - timestamp of the first event seen during the most
+//   - first_event_time - timestamp from the first returned row of the most
 //     recent successful query for the method. This is the field the legacy
 //     module templates (LoginEvent / LogoutEvent) use as their resume point,
 //     because those SObjects only allow ORDER BY EventDate DESC so the first
@@ -111,13 +118,16 @@
 // windows that batching already drained, while still letting subsequent
 // unbatched runs move beyond the old batched watermark naturally.
 //
-// SetupAuditTrail has a different migration concern: CreatedDate is not
-// unique, so modern unbatched resume queries also persist last_event_id and
-// use it as a same-timestamp tie-breaker. Older persisted state does not have
-// that field, so the first post-upgrade run keeps the legacy
-// CreatedDate > last_event_time boundary and starts recording last_event_id
-// for subsequent runs. This is additive and backward compatible: it does not
-// change existing resume semantics until the new field has been observed.
+// SetupAuditTrail is the current motivating example for last_event_id:
+// CreatedDate is not unique, so its shipped unbatched resume query uses
+// last_event_id as a same-timestamp tie-breaker. The underlying cursor field
+// is generic, though: any ascending object query that orders by a non-unique
+// timestamp and also selects Id can use the same pattern. Older persisted
+// state does not have last_event_id, so the first post-upgrade run keeps the
+// legacy CreatedDate > last_event_time boundary and starts recording
+// last_event_id for subsequent runs. This is additive and backward compatible:
+// it does not change existing resume semantics until the new field has been
+// observed.
 //
 // # Fault tolerance
 //
