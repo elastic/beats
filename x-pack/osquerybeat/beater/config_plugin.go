@@ -98,11 +98,26 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	return p
 }
 
+// Set replaces the in-memory osquery policy, rebuilds query lookup state, and resets the cached
+// osqueryd config string. Validation errors (invalid ECS mapping, incompatible native vs RRULE
+// scheduling, pack schedule defaults, and so on) are returned immediately: callers that treat
+// a failed Set as fatal—such as runOsquery's input loop—will stop the osquery runner until policy
+// is corrected and a new input arrives.
 func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	return p.set(inputs)
+}
+
+// EffectiveOsqueryConfig returns the osquery policy snapshot last applied successfully by Set,
+// including merged pack-level schedule defaults. Callers that need the same view of policy as
+// osqueryd rendering and RRULE scheduling must use this (or equivalent) after Set—do not assume
+// inputs[0].Osquery remains the canonical merged struct across refactors.
+func (p *ConfigPlugin) EffectiveOsqueryConfig() *config.OsqueryConfig {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.osqueryConfig
 }
 
 func (p *ConfigPlugin) Count() int {
@@ -268,6 +283,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
+		if err := config.ValidateQueryScheduleMode(qi); err != nil {
+			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
+		}
 		qi, err = registerQuery(name, p.namespace, qi, "")
 		if err != nil {
 			return err
@@ -277,16 +295,26 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
 	for packName, pack := range osqueryConfig.Packs {
+		if err := config.ValidatePackScheduleDefaults(pack); err != nil {
+			return fmt.Errorf("osquery.packs[%q]: %w", packName, err)
+		}
 		packID := pack.PackID
 		if packID == "" {
 			packID = packName
 		}
 		for name, qi := range pack.Queries {
+			qi, err = config.MergeQueryWithPackScheduleDefaults(pack, qi)
+			if err != nil {
+				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, name, err)
+			}
 			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi, packID)
 			if err != nil {
 				return err
 			}
 			pack.Queries[name] = qi
+		}
+		if err := config.ValidatePackQueriesAfterMerge(pack); err != nil {
+			return fmt.Errorf("osquery.packs[%q]: %w", packName, err)
 		}
 	}
 

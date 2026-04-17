@@ -13,6 +13,52 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestOsqueryConfig_Render_OmitsRRULEQueries(t *testing.T) {
+	snapshot := true
+	rrule := &RRuleScheduleConfig{RRule: "FREQ=DAILY", StartDate: "2024-01-01T00:00:00Z"}
+	cfg := OsqueryConfig{
+		Schedule: map[string]Query{
+			"native": {Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}, Snapshot: &snapshot},
+			"rrule":  {Query: "select 2", RRuleSchedule: rrule, Snapshot: &snapshot},
+		},
+		Packs: map[string]Pack{
+			"mixed": {
+				Queries: map[string]Query{
+					"a": {Query: "select 3", NativeSchedule: NativeSchedule{Interval: 120}, Snapshot: &snapshot},
+					"b": {Query: "select 4", RRuleSchedule: rrule, Snapshot: &snapshot},
+				},
+			},
+			"rrule_only": {
+				Queries: map[string]Query{
+					"x": {Query: "select 5", RRuleSchedule: rrule, Snapshot: &snapshot},
+				},
+			},
+		},
+	}
+	out, err := cfg.Render()
+	require.NoError(t, err)
+	var decoded map[string]interface{}
+	require.NoError(t, json.Unmarshal(out, &decoded))
+	sched, ok := decoded["schedule"].(map[string]interface{})
+	require.True(t, ok, "schedule present")
+	_, hasRRule := sched["rrule"]
+	assert.False(t, hasRRule, "RRULE-only top-level query must not appear in osqueryd config")
+	_, hasNative := sched["native"]
+	assert.True(t, hasNative)
+	packs, ok := decoded["packs"].(map[string]interface{})
+	require.True(t, ok)
+	mixed, ok := packs["mixed"].(map[string]interface{})
+	require.True(t, ok)
+	mq, ok := mixed["queries"].(map[string]interface{})
+	require.True(t, ok)
+	_, hasB := mq["b"]
+	assert.False(t, hasB, "RRULE pack query must be omitted")
+	_, hasA := mq["a"]
+	assert.True(t, hasA)
+	_, hasRROnly := packs["rrule_only"]
+	assert.False(t, hasRROnly, "pack with only RRULE queries must be omitted")
+}
+
 func TestOsqueryConfig_Render_Options(t *testing.T) {
 	// Native osquery options (e.g. schedule_splay_percent, schedule_max_drift) are
 	// passed through in Options; defaults are applied when building config for osqueryd (beater).
@@ -88,9 +134,9 @@ func TestRRuleScheduleConfig_GetSplay(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name:     "max splay 1h",
-			splay:    "1h",
-			expected: time.Hour,
+			name:     "max splay 12h",
+			splay:    "12h",
+			expected: 12 * time.Hour,
 			wantErr:  false,
 		},
 		{
@@ -101,7 +147,7 @@ func TestRRuleScheduleConfig_GetSplay(t *testing.T) {
 		},
 		{
 			name:    "exceeds max",
-			splay:   "2h",
+			splay:   "13h",
 			wantErr: true,
 		},
 		{

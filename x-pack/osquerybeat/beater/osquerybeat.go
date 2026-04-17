@@ -476,7 +476,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.registerActionHandler(b, cli, configPlugin, rah)
 		defer bt.unregisterActionHandler(b, rah)
 
-		// Process input
+		// Process Elastic Agent/Fleet input. A failed Set means the policy cannot be applied
+		// safely (invalid ECS mapping, schedule rules, and so on); we exit this runner so the beat
+		// surfaces the error instead of continuing with stale or partial osquery extension state.
 		for {
 			select {
 			case <-ctx.Done():
@@ -490,10 +492,14 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 				}
 				cache.Resize(configPlugin.Count())
 
-				// Update RRULE-scheduled queries
-				if rruleHandler != nil && len(inputConfigs) > 0 && inputConfigs[0].Osquery != nil {
-					if err := rruleHandler.UpdateFromConfig(inputConfigs[0].Osquery); err != nil {
+				// Align RRULE jobs with the same merged policy snapshot Set committed (including pack
+				// defaults). EffectiveOsqueryConfig is nil only before the first successful Set.
+				if rruleHandler != nil {
+					if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
 						bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
+						if clearErr := rruleHandler.UpdateFromConfig(nil); clearErr != nil {
+							bt.log.Errorf("failed to clear RRULE scheduled queries after update error: %v", clearErr)
+						}
 					}
 				}
 			}

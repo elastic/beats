@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	// MaxSplay is the maximum allowed splay duration.
-	MaxSplay = time.Hour
+	// MaxSplay is the maximum allowed splay duration (aligns with daily-or-longer RRULE minimum).
+	MaxSplay = 12 * time.Hour
 	// DefaultSplay is the default splay duration (disabled)
 	DefaultSplay = 0
 )
@@ -35,7 +35,7 @@ type RRuleScheduleConfig struct {
 	// Splay is the maximum random delay before query execution.
 	// This helps spread out query execution times to avoid thundering herd effects.
 	// Accepts duration strings: "30s", "5m", "2h", etc.
-	// Range: 0s to 1h. Default: 0s (disabled).
+	// Range: 0s to 12h (see MaxSplay). Default: 0s (disabled).
 	Splay string `config:"splay,omitempty" json:"splay,omitempty"`
 
 	// Timeout is the query execution timeout in seconds
@@ -126,11 +126,11 @@ func (c QueryProfileStorageConfig) MaxProfilesOrDefault() int {
 type NativeSchedule struct {
 	Interval   int    `config:"interval" json:"interval"`
 	ScheduleID string `config:"schedule_id,omitempty" json:"schedule_id,omitempty"` // from Kibana; used in scheduled result/response docs
-	StartDate  string `config:"start_date,omitempty" json:"start_date,omitempty"`     // RFC3339; for schedule_execution_count
+	StartDate  string `config:"start_date,omitempty" json:"start_date,omitempty"`   // RFC3339; for schedule_execution_count
 }
 
 type Query struct {
-	Query          string `config:"query" json:"query"`
+	Query          string             `config:"query" json:"query"`
 	NativeSchedule `config:",inline"` // interval, schedule_id, start_date (flat in config)
 	// SpaceID is the optional policy space identifier for this scheduled query.
 	SpaceID string `config:"space_id,omitempty" json:"space_id,omitempty"`
@@ -155,21 +155,35 @@ type Query struct {
 	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
 	Profile bool `config:"profile" json:"-"`
 
-	// RRuleSchedule provides RRULE-based scheduling as an alternative to interval
-	// When set, queries are scheduled by osquerybeat instead of osqueryd's native scheduler
-	// If both interval and rrule_schedule are set, rrule_schedule takes precedence
+	// RRuleSchedule provides RRULE-based scheduling as an alternative to interval.
+	// When set, queries are scheduled by osquerybeat instead of osqueryd's native scheduler.
+	// A query must not set both interval (native) and rrule_schedule; see ValidateQueryScheduleMode.
 	RRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
 }
 
 type Pack struct {
 	// PackID is the policy-defined pack identifier; used in result/response documents for correlation.
 	// If empty, the pack map key (pack name) is used when publishing.
-	PackID    string           `config:"pack_id,omitempty" json:"pack_id,omitempty"`
-	Discovery []string         `config:"discovery" json:"discovery,omitempty"`
-	Platform  string           `config:"platform" json:"platform,omitempty"`
-	Version   string           `config:"version" json:"version,omitempty"`
-	Shard     int              `config:"shard" json:"shard,omitempty"`
-	Queries   map[string]Query `config:"queries" json:"queries,omitempty"`
+	PackID    string   `config:"pack_id,omitempty" json:"pack_id,omitempty"`
+	Discovery []string `config:"discovery" json:"discovery,omitempty"`
+	Platform  string   `config:"platform" json:"platform,omitempty"`
+	Version   string   `config:"version" json:"version,omitempty"`
+	Shard     int      `config:"shard" json:"shard,omitempty"`
+	// DefaultNativeSchedule provides interval, schedule_id, and start_date defaults for queries
+	// in this pack that omit them. Omitted from JSON sent to osqueryd. Mutually exclusive at
+	// pack level with an enabled rrule_schedule (see ValidatePackScheduleDefaults). When set,
+	// every query in the pack must use native scheduling after merge (ValidatePackQueriesAfterMerge).
+	DefaultNativeSchedule NativeSchedule `config:"default_native_schedule" json:"-"`
+	// DefaultRRuleSchedule provides RRULE defaults for queries that do not define rrule_schedule.
+	// Config key rrule_schedule matches Fleet/reference docs. Omitted from JSON sent to osqueryd.
+	// When enabled, every query in the pack must use rrule_schedule after merge.
+	DefaultRRuleSchedule *RRuleScheduleConfig `config:"rrule_schedule,omitempty" json:"-"`
+	// DefaultSpaceID is applied to queries that omit space_id (native and RRULE).
+	DefaultSpaceID string `config:"space_id,omitempty" json:"-"`
+	// DefaultScheduleID is applied to queries that omit schedule_id after default_native_schedule
+	// fields are merged (useful for RRULE packs where default_native_schedule is unset).
+	DefaultScheduleID string           `config:"schedule_id,omitempty" json:"-"`
+	Queries           map[string]Query `config:"queries" json:"queries,omitempty"`
 }
 
 // > SELECT * FROM osquery_events where type = 'subscriber';
@@ -212,7 +226,49 @@ type OsqueryConfig struct {
 	AutoTableConstruction map[string]interface{} `config:"auto_table_construction" json:"auto_table_construction,omitempty"`
 }
 
+// forOsqueryd returns a copy of c without queries that osquerybeat runs via RRULE (they would
+// otherwise appear with interval 0 and are not meant for osqueryd's native scheduler).
+func (c OsqueryConfig) forOsqueryd() OsqueryConfig {
+	out := c
+	out.Schedule = nil
+	if len(c.Schedule) > 0 {
+		for name, q := range c.Schedule {
+			if q.RRuleSchedule.IsEnabled() {
+				continue
+			}
+			if out.Schedule == nil {
+				out.Schedule = make(map[string]Query)
+			}
+			out.Schedule[name] = q
+		}
+	}
+	out.Packs = nil
+	if len(c.Packs) > 0 {
+		for packName, pack := range c.Packs {
+			np := pack
+			np.Queries = nil
+			for qname, q := range pack.Queries {
+				if q.RRuleSchedule.IsEnabled() {
+					continue
+				}
+				if np.Queries == nil {
+					np.Queries = make(map[string]Query)
+				}
+				np.Queries[qname] = q
+			}
+			if len(np.Queries) == 0 {
+				continue
+			}
+			if out.Packs == nil {
+				out.Packs = make(map[string]Pack)
+			}
+			out.Packs[packName] = np
+		}
+	}
+	return out
+}
+
 // Render serializes the OsqueryConfig to JSON for osqueryd configuration.
 func (c OsqueryConfig) Render() ([]byte, error) {
-	return json.MarshalIndent(c, "", "    ")
+	return json.MarshalIndent(c.forOsqueryd(), "", "    ")
 }

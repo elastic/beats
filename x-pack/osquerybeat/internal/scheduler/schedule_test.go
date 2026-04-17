@@ -10,6 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 )
 
 func TestRecurrenceSchedule_Parse(t *testing.T) {
@@ -402,7 +404,7 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 		{
 			name:    "max splay",
 			rrule:   "FREQ=DAILY",
-			splay:   MaxSplay,
+			splay:   config.MaxSplay,
 			wantErr: false,
 		},
 		{
@@ -414,7 +416,7 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 		{
 			name:    "over max splay",
 			rrule:   "FREQ=DAILY",
-			splay:   MaxSplay + time.Hour,
+			splay:   config.MaxSplay + time.Hour,
 			wantErr: true,
 		},
 		{
@@ -504,7 +506,7 @@ func TestRecurrenceSchedule_UnpackInvalidSplay(t *testing.T) {
 			cfg: map[string]interface{}{
 				"rrule":      "FREQ=DAILY",
 				"start_date": "2024-01-15T09:00:00Z",
-				"splay":      "2h",
+				"splay":      "13h",
 			},
 			wantErr: true,
 		},

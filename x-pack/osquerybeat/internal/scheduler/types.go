@@ -6,7 +6,6 @@ package scheduler
 
 import (
 	"errors"
-	"time"
 )
 
 // Common schedule errors
@@ -17,10 +16,6 @@ var (
 
 // Common schedule constants
 const (
-	// MaxSplay is the maximum allowed splay duration.
-	MaxSplay = time.Hour
-
 	// DefaultSplay is the default splay duration if not specified (disabled)
 	DefaultSplay = 0
 )
-

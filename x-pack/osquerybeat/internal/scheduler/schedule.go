@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/teambition/rrule-go"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 )
 
 // RRULE-specific errors
@@ -174,8 +176,8 @@ func (s *RecurrenceSchedule) ValidateSplay() error {
 	if s.Splay < 0 {
 		return fmt.Errorf("splay cannot be negative: %v", s.Splay)
 	}
-	if s.Splay > MaxSplay {
-		return fmt.Errorf("splay cannot exceed %v, got: %v", MaxSplay, s.Splay)
+	if s.Splay > config.MaxSplay {
+		return fmt.Errorf("splay cannot exceed %v, got: %v", config.MaxSplay, s.Splay)
 	}
 	if s.Splay == 0 {
 		return nil
@@ -238,8 +240,8 @@ func (s *RecurrenceSchedule) Unpack(cfg map[string]interface{}) error {
 		if d < 0 {
 			return fmt.Errorf("splay cannot be negative: %s", v)
 		}
-		if d > MaxSplay {
-			return fmt.Errorf("splay cannot exceed %v, got: %s", MaxSplay, v)
+		if d > config.MaxSplay {
+			return fmt.Errorf("splay cannot exceed %v, got: %s", config.MaxSplay, v)
 		}
 		s.Splay = d
 	} else {

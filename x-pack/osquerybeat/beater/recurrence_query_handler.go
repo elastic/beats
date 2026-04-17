@@ -78,7 +78,8 @@ func (h *recurrenceQueryHandler) UpdateFromConfig(osqConfig *config.OsqueryConfi
 	// Process packs
 	for packName, pack := range osqConfig.Packs {
 		for queryName, q := range pack.Queries {
-			// RRULE scheduling is query-level only.
+			// Expect merged pack defaults (callers should pass ConfigPlugin.EffectiveOsqueryConfig
+			// after a successful Set, not raw agent input).
 			if !q.RRuleSchedule.IsEnabled() {
 				continue
 			}
