@@ -2046,6 +2046,7 @@ func BenchmarkOTelConsumerIncludeMetadata(b *testing.B) {
 
 				cfg := renderOtelConfig(b, `receivers:
   filebeatreceiver:
+    include_metadata: {{.IncludeMetadata}}
     filebeat:
       inputs:
         - type: benchmark
@@ -2053,9 +2054,6 @@ func BenchmarkOTelConsumerIncludeMetadata(b *testing.B) {
           count: {{.EventCount}}
     path.home: {{.PathHome}}
     queue.mem.flush.timeout: 0s
-    output:
-      otelconsumer:
-        include_metadata: {{.IncludeMetadata}}
 exporters:
   debug:
     verbosity: detailed

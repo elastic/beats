@@ -52,7 +52,7 @@ var fqdnOnce = sync.OnceValues(func() (string, error) {
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core, includeMetadata bool) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -64,6 +64,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
+	b.Info.IncludeMetadata = includeMetadata
 
 	// begin code similar to configure
 	if err = plugin.Initialize(); err != nil {
@@ -86,20 +87,10 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	// extracting it here for ease of use
 	logger := b.Info.Logger
 
-	// Read any existing otelconsumer output configuration (e.g. include_metadata)
-	// before we overwrite the output section. If the user configured a different
-	// output, warn them and discard it.
+	// Warn if the user configured a custom output — it is not supported in receivers.
 	if out, ok := receiverConfig["output"]; ok {
 		if outMap, ok := out.(map[string]any); ok {
-			if oc, ok := outMap["otelconsumer"]; ok {
-				if ocMap, ok := oc.(map[string]any); ok {
-					if v, ok := ocMap["include_metadata"]; ok {
-						if include, ok := v.(bool); ok {
-							b.Info.IncludeMetadata = include
-						}
-					}
-				}
-			} else {
+			if _, hasOtelconsumer := outMap["otelconsumer"]; !hasOtelconsumer {
 				logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 			}
 		}

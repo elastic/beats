@@ -125,6 +125,7 @@ func TestFilebeatOTelKafkaExporterIncludesMetadata(t *testing.T) {
 
 	otelCfg := fmt.Sprintf(`receivers:
   filebeatreceiver:
+    include_metadata: true
     filebeat:
       inputs:
         - type: filestream
@@ -140,9 +141,6 @@ func TestFilebeatOTelKafkaExporterIncludesMetadata(t *testing.T) {
     queue.mem.flush.timeout: 0s
     setup.template.enabled: false
     path.home: %s
-    output:
-      otelconsumer:
-        include_metadata: true
 exporters:
   kafka:
     brokers:
