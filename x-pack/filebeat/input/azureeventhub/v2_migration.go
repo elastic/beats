@@ -10,12 +10,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -178,12 +177,7 @@ func (m *migrationAssistant) checkAndMigratePartition(
 		PartitionID:             partitionID,
 	}
 
-	offset, err := strconv.ParseInt(checkpointV1.Checkpoint.Offset, 10, 64)
-	if err != nil {
-		return fmt.Errorf("failed to parse offset: %w", err)
-	}
-
-	checkpointV2.Offset = &offset
+	checkpointV2.Offset = &checkpointV1.Checkpoint.Offset
 	checkpointV2.SequenceNumber = &checkpointV1.Checkpoint.SequenceNumber
 
 	// Stores the checkpoint v2 information for the partition
