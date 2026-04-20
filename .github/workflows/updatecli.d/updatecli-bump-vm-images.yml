@@ -76,7 +76,7 @@ targets:
         - .buildkite/x-pack/pipeline.xpack.otel.yml
         - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
-      matchpattern: '(IMAGE_.+): "platform-ingest-beats-(.+)-(.+)"'
+      matchpattern: '(IMAGE_.+): "platform-ingest-beats-(.+)-([\d]+)"'
       replacepattern: '$1: "platform-ingest-beats-$2-{{ source "latestVersion" }}"'
 
   update-azure-buildkite-pipelines:
