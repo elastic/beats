@@ -31,10 +31,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -49,10 +47,6 @@ const (
 	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
-func init() {
-	outputs.RegisterType("otelconsumer", makeOtelConsumer)
-}
-
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
@@ -61,12 +55,7 @@ type otelConsumer struct {
 	isReceiverTest bool // whether we are running in receivertest context
 }
 
-func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C, beatPaths *paths.Path) (outputs.Group, error) {
-	ocConfig := defaultConfig()
-	if err := cfg.Unpack(&ocConfig); err != nil {
-		return outputs.Fail(err)
-	}
-
+func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 
 	// Default to runtime.NumCPU() workers
@@ -81,7 +70,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, beatPaths, clients...)
+	return outputs.Group{Clients: clients}, nil
 }
 
 // Close is a noop for otelconsumer
