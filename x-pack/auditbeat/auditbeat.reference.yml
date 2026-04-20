@@ -1875,6 +1875,13 @@ logging.files:
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
 
+# Enables the state store inspector that exposes the beat's internal state
+# store via the HTTP endpoint. When enabled, the following endpoints become
+# available:
+#   http://localhost:5066/store-inspector/states      - JSON dump of all states
+#   http://localhost:5066/store-inspector/states.html  - Web UI for browsing and deleting states
+#http.state_inspector.enabled: false
+
 # ============================== Process Security ==============================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.

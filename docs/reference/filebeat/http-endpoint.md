@@ -46,6 +46,9 @@ The HTTP endpoint has the following configuration settings:
 `http.pprof.mutex_profile_rate`
 :   (Optional) `mutex_profile_rate` controls the fraction of mutex contention events that are reported in the mutex profile available from `/debug/pprof/mutex`. On average 1/rate events are reported. To turn off profiling entirely, pass rate 0. The default value is 0.
 
+`http.state_inspector.enabled`
+:   (Optional) Enable the state store inspector. When enabled, the internal state store used by the beat is exposed via HTTP for inspection and manipulation. Default is `false`. See [State Inspector](#state-inspector) for details.
+
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
 You can query a unix socket using the `cURL` command and the `--unix-socket` flag.
@@ -200,4 +203,23 @@ curl 'http://localhost:5066/inputs/'
 curl 'http://localhost:5066/inputs/?pretty'
 curl 'http://localhost:5066/inputs/?type=aws-s3&pretty'
 ```
+
+
+## State Inspector [state-inspector]
+
+`/store-inspector/states` returns a JSON array of all key-value pairs in Filebeat's internal state store. `/store-inspector/states.html` serves a web UI for browsing and deleting individual state entries.
+
+These endpoints are only available when `http.state_inspector.enabled` is set to `true`.
+
+```js
+curl -XGET 'localhost:5066/store-inspector/states?pretty'
+```
+
+To delete a specific state entry:
+
+```js
+curl -XDELETE 'localhost:5066/store-inspector/states/<key>'
+```
+
+Filebeat exposes its input registry through this endpoint.
 

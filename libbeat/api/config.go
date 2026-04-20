@@ -19,13 +19,19 @@ package api
 
 import "os"
 
+// StateInspectorConfig holds the configuration for the state store inspector.
+type StateInspectorConfig struct {
+	Enabled bool `config:"enabled"`
+}
+
 // Config is the configuration for the API endpoint.
 type Config struct {
-	Enabled            bool   `config:"enabled"`
-	Host               string `config:"host"`
-	Port               int    `config:"port"`
-	User               string `config:"named_pipe.user"`
-	SecurityDescriptor string `config:"named_pipe.security_descriptor"`
+	Enabled            bool                 `config:"enabled"`
+	Host               string               `config:"host"`
+	Port               int                  `config:"port"`
+	User               string               `config:"named_pipe.user"`
+	SecurityDescriptor string               `config:"named_pipe.security_descriptor"`
+	StateInspector     StateInspectorConfig `config:"state_inspector"`
 }
 
 // DefaultConfig is the default configuration used by the API endpoint.

@@ -326,6 +326,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	defer stateStore.Close()
 
+	if b.API != nil && b.API.StateInspectorEnabled() {
+		b.API.SetStateInspectorRegistry(stateStore.shared.registry, stateStore.storeName)
+	}
+
 	// If notifier is set, configure the listener for output configuration
 	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
 	// in order to allow it fully configure
