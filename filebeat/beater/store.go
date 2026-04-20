@@ -182,7 +182,7 @@ func filestorageConfigFromRegistry(cfg config.Registry, resolvedPath string) (*f
 	out.Directory = resolvedPath
 
 	const defaultDirPerms = "0700"
-	if len(cfg.FileStorage) == 0 {
+	if cfg.FileStorage == nil {
 		out.CreateDirectory = true
 		out.DirectoryPermissions = defaultDirPerms
 	} else {

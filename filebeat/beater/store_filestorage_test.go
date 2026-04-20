@@ -141,6 +141,19 @@ func TestFilestorageConfigFromRegistry_ExplicitMap(t *testing.T) {
 	assert.NotNil(t, fsCfg.Compaction)
 }
 
+func TestFilestorageConfigFromRegistry_EmptyMap(t *testing.T) {
+	dir := t.TempDir()
+	fsCfg, err := filestorageConfigFromRegistry(config.Registry{
+		Permissions: 0o600,
+		FileStorage: map[string]any{},
+	}, dir)
+	require.NoError(t, err)
+
+	assert.Equal(t, dir, fsCfg.Directory)
+	assert.False(t, fsCfg.CreateDirectory)
+	assert.NotNil(t, fsCfg.Compaction)
+}
+
 func TestFilestorageConfigFromRegistry_PartialMap(t *testing.T) {
 	dir := t.TempDir()
 	fsCfg, err := filestorageConfigFromRegistry(config.Registry{
