@@ -23,14 +23,18 @@ import (
 	"sync"
 	"time"
 
+	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/confmap"
+
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/features"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend/bbolt"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/otelstorage"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -83,11 +87,19 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 		)
 
 		switch cfg.Backend {
-		case "bbolt":
-			reg, err = bbolt.New(logger, bbolt.Settings{
-				Root:     resolvedPath,
-				FileMode: cfg.Permissions,
-				Config:   cfg.Bbolt,
+		case "otel_file_storage":
+			fsCfg, fsErr := filestorageConfigFromRegistry(cfg, resolvedPath)
+			if fsErr != nil {
+				return nil, fsErr
+			}
+			recvID, idErr := otelReceiverIDFromBeat(info)
+			if idErr != nil {
+				return nil, idErr
+			}
+			reg, err = otelstorage.NewFileStorage(otelstorage.Settings{
+				Config:     fsCfg,
+				ReceiverID: recvID,
+				Logger:     logger,
 			})
 		case "memlog", "":
 			reg, err = memlog.New(logger, memlog.Settings{
@@ -156,4 +168,47 @@ func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 
 func (s *filebeatStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
+}
+
+// filestorageConfigFromRegistry builds a filestorage.Config from the user's
+// registry configuration. When no otel_file_storage section is provided,
+// factory defaults are used with CreateDirectory defaulting to true and
+// DirectoryPermissions defaulting to 0700 so that standalone Filebeat creates
+// its registry directory automatically.
+// When the user provides an explicit otel_file_storage section, their
+// CreateDirectory value is honored as-is.
+func filestorageConfigFromRegistry(cfg config.Registry, resolvedPath string) (*filestorage.Config, error) {
+	out := otelstorage.DefaultFileStorageConfig()
+	out.Directory = resolvedPath
+
+	const defaultDirPerms = "0700"
+	if cfg.FileStorage == nil {
+		out.CreateDirectory = true
+		out.DirectoryPermissions = defaultDirPerms
+	} else {
+		cm := confmap.NewFromStringMap(cfg.FileStorage)
+		if err := cm.Unmarshal(out); err != nil {
+			return nil, fmt.Errorf("failed to parse otel_file_storage config: %w", err)
+		}
+		out.Directory = resolvedPath
+		if out.CreateDirectory && cfg.FileStorage["directory_permissions"] == nil {
+			out.DirectoryPermissions = defaultDirPerms
+		}
+	}
+
+	if err := out.Validate(); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// otelReceiverIDFromBeat returns the OpenTelemetry receiver [component.ID] used by the
+// file_storage backend for per-client file naming. Standalone Filebeat does not expose a
+// separate config key; the running beat name (e.g. "filebeat") is used.
+func otelReceiverIDFromBeat(info beat.Info) (component.ID, error) {
+	var id component.ID
+	if err := id.UnmarshalText([]byte(info.Beat)); err != nil {
+		return id, fmt.Errorf("invalid beat name for otel_file_storage registry: %w", err)
+	}
+	return id, nil
 }
