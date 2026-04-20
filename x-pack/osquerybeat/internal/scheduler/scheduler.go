@@ -149,10 +149,12 @@ func (s *Scheduler) UpdateQueries(queries []*ScheduledQuery) error {
 		return ErrOutsideScheduleWindow
 	}
 
-	// Track which queries to keep
+	// Track which active scheduled queries the new policy still contains.
 	newQueryNames := make(map[string]bool)
 	for _, sq := range queries {
-		newQueryNames[sq.Name] = true
+		if sq.Schedule != nil && sq.Schedule.IsActive() {
+			newQueryNames[sq.Name] = true
+		}
 	}
 
 	// Remove queries that are no longer present
@@ -169,14 +171,23 @@ func (s *Scheduler) UpdateQueries(queries []*ScheduledQuery) error {
 	// Add or update queries
 	for _, sq := range queries {
 		if sq.Schedule == nil || !sq.Schedule.IsActive() {
+			if existing, ok := s.queries[sq.Name]; ok {
+				if existing.cancel != nil {
+					existing.cancel()
+				}
+				delete(s.queries, sq.Name)
+				s.log.Infof("Removed scheduled query '%s'", sq.Name)
+			}
 			continue
 		}
 
 		// Check if query needs updating
 		if existing, ok := s.queries[sq.Name]; ok {
-			// If schedule hasn't changed, skip
-			if existing.query.Schedule.RRule == sq.Schedule.RRule &&
-				existing.query.Query == sq.Query {
+			// If nothing material changed, skip
+			if existing.query.Query == sq.Query &&
+				existing.query.Timeout == sq.Timeout &&
+				existing.query.ScheduleID == sq.ScheduleID &&
+				existing.query.Schedule.Equal(sq.Schedule) {
 				continue
 			}
 			// Cancel existing job
@@ -261,10 +272,10 @@ func (s *Scheduler) runJob(ctx context.Context, job *scheduledJob) {
 		case <-ctx.Done():
 			return
 		case <-time.After(waitDuration):
-			// Execution time (after splay); use for execution index
+			// Actual execution time (after splay); index follows the planned occurrence slot.
 			runTime := time.Now()
 			executionIndex := 0
-			if n, ok := schedule.ExecutionIndex(runTime); ok {
+			if n, ok := schedule.ExecutionIndex(nextRun); ok {
 				executionIndex = n
 			}
 			s.executeQuery(ctx, sq, runTime, nextRun, executionIndex)

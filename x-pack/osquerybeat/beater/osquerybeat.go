@@ -461,6 +461,19 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		rruleHandler.Start(ctx)
 		defer rruleHandler.Stop()
 
+		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
+		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
+		configPlugin.SetOnGenerateConfigApplied(func() {
+			if rruleHandler != nil {
+				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
+					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
+					if clearErr := rruleHandler.UpdateFromConfig(nil); clearErr != nil {
+						bt.log.Errorf("failed to clear RRULE scheduled queries after update error: %v", clearErr)
+					}
+				}
+			}
+		})
+
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
 			monitorOsquerydHealth(ctx, cli, osqdMetrics, bt.log)
@@ -491,17 +504,6 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 					return err
 				}
 				cache.Resize(configPlugin.Count())
-
-				// Align RRULE jobs with the same merged policy snapshot Set committed (including pack
-				// defaults). EffectiveOsqueryConfig is nil only before the first successful Set.
-				if rruleHandler != nil {
-					if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
-						bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
-						if clearErr := rruleHandler.UpdateFromConfig(nil); clearErr != nil {
-							bt.log.Errorf("failed to clear RRULE scheduled queries after update error: %v", clearErr)
-						}
-					}
-				}
 			}
 		}
 	})

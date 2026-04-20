@@ -56,7 +56,7 @@ func (s *RecurrenceSchedule) Parse() error {
 	// Parse the RRULE
 	rule, err := rrule.StrToRRule(s.RRule)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrInvalidRRule, err)
+		return fmt.Errorf("%w: %w", ErrInvalidRRule, err)
 	}
 
 	// Use start_date as DTSTART for determinism
@@ -199,6 +199,32 @@ func (s *RecurrenceSchedule) ValidateSplay() error {
 // IsActive returns true if the schedule has a valid rrule
 func (s *RecurrenceSchedule) IsActive() bool {
 	return s.RRule != "" && s.rule != nil
+}
+
+// Equal reports whether s and o represent the same recurrence configuration
+// (RRule string, window, and splay). Parsed rule state is not compared; callers
+// should compare fields that affect scheduling behavior.
+func (s *RecurrenceSchedule) Equal(o *RecurrenceSchedule) bool {
+	if s == nil && o == nil {
+		return true
+	}
+	if s == nil || o == nil {
+		return false
+	}
+	if s.RRule != o.RRule || s.Splay != o.Splay {
+		return false
+	}
+	return timePtrEqual(s.StartDate, o.StartDate) && timePtrEqual(s.EndDate, o.EndDate)
+}
+
+func timePtrEqual(a, b *time.Time) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	return a.Equal(*b)
 }
 
 // String returns the RRULE expression

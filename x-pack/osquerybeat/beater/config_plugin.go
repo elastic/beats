@@ -81,6 +81,11 @@ type ConfigPlugin struct {
 	// Osquery configuration
 	osqueryConfig *config.OsqueryConfig
 
+	// onGenerateConfigApplied, if set, is invoked after osqueryd pulls generated config
+	// and pending query metadata is promoted (see GenerateConfig). Used so RRULE
+	// scheduling advances in lockstep with native osqueryd schedule application.
+	onGenerateConfigApplied func()
+
 	// Raw config bytes cached
 	configString string
 
@@ -111,13 +116,24 @@ func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 }
 
 // EffectiveOsqueryConfig returns the osquery policy snapshot last applied successfully by Set,
-// including merged pack-level schedule defaults. Callers that need the same view of policy as
-// osqueryd rendering and RRULE scheduling must use this (or equivalent) after Set—do not assume
-// inputs[0].Osquery remains the canonical merged struct across refactors.
+// including merged pack-level schedule defaults. RRULE execution should read this snapshot only
+// after osqueryd has applied generated config (for example from a post-GenerateConfig hook), so
+// native and RRULE schedules stay aligned. Do not assume inputs[0].Osquery remains the canonical
+// merged struct across refactors.
 func (p *ConfigPlugin) EffectiveOsqueryConfig() *config.OsqueryConfig {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
 	return p.osqueryConfig
+}
+
+// SetOnGenerateConfigApplied registers a callback invoked after a successful
+// GenerateConfig once staged query metadata has been applied. The callback must
+// not call back into ConfigPlugin methods that take the write lock while the
+// plugin still holds it; GenerateConfig invokes this only after releasing the lock.
+func (p *ConfigPlugin) SetOnGenerateConfigApplied(fn func()) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+	p.onGenerateConfigApplied = fn
 }
 
 func (p *ConfigPlugin) Count() int {
@@ -166,10 +182,9 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 	p.log.Debug("configPlugin GenerateConfig is called")
 
 	p.mx.Lock()
-	defer p.mx.Unlock()
-
 	c, err := p.render()
 	if err != nil {
+		p.mx.Unlock()
 		return nil, err
 	}
 
@@ -179,11 +194,19 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 		p.newQueryInfoMap = nil
 	}
 
+	onApplied := p.onGenerateConfigApplied
 	p.log.Debug("Osqueryd configuration:", c)
 
-	return map[string]string{
+	res := map[string]string{
 		configName: c,
-	}, nil
+	}
+	p.mx.Unlock()
+
+	if onApplied != nil {
+		onApplied()
+	}
+
+	return res, nil
 }
 
 func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig {

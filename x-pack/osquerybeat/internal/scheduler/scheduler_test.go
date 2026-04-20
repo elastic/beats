@@ -13,12 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestScheduler_NewAndStartStop(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	var called atomic.Int32
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
@@ -39,8 +38,7 @@ func TestScheduler_NewAndStartStop(t *testing.T) {
 }
 
 func TestScheduler_AddRemoveQuery(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
@@ -80,8 +78,7 @@ func TestScheduler_AddRemoveQuery(t *testing.T) {
 }
 
 func TestScheduler_UpdateQueries(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
@@ -173,8 +170,7 @@ func TestScheduler_QueryWithSplay(t *testing.T) {
 }
 
 func TestScheduler_QueryEndDateExpired(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	var executed atomic.Int32
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
@@ -213,8 +209,7 @@ func TestScheduler_QueryEndDateExpired(t *testing.T) {
 }
 
 func TestScheduler_ContextCancellation(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	var executed atomic.Int32
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
@@ -262,8 +257,7 @@ func TestScheduler_ContextCancellation(t *testing.T) {
 }
 
 func TestScheduler_NilSchedule(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
@@ -287,8 +281,7 @@ func TestScheduler_NilSchedule(t *testing.T) {
 }
 
 func TestScheduler_InactiveSchedule(t *testing.T) {
-	_ = logp.DevelopmentSetup()
-	log := logp.NewLogger("test")
+	log := logptest.NewTestingLogger(t, "")
 
 	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil

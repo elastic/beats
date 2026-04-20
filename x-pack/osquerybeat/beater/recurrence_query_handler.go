@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -69,8 +70,7 @@ func (h *recurrenceQueryHandler) UpdateFromConfig(osqConfig *config.OsqueryConfi
 
 		sq, err := h.createScheduledQuery(name, q)
 		if err != nil {
-			h.log.Errorf("Failed to create scheduled query '%s': %v", name, err)
-			continue
+			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
 		queries = append(queries, sq)
 	}
@@ -87,8 +87,7 @@ func (h *recurrenceQueryHandler) UpdateFromConfig(osqConfig *config.OsqueryConfi
 			fullName := getPackQueryName(packName, queryName)
 			sq, err := h.createScheduledQuery(fullName, q)
 			if err != nil {
-				h.log.Errorf("Failed to create scheduled query '%s': %v", fullName, err)
-				continue
+				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, queryName, err)
 			}
 			queries = append(queries, sq)
 		}
