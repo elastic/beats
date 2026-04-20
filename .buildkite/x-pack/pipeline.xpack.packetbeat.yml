@@ -13,6 +13,8 @@ env:
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
   IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
+  IMAGE_WIN_10_VERSION: "1.0.1776669597"
+  IMAGE_WIN_11_VERSION: "1.0.1776669597"
   IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
   IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
   IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
@@ -318,6 +320,9 @@ steps:
         agents:
           provider: "azure"
           image: "${IMAGE_WIN_10}"
+          imageVersion: "${IMAGE_WIN_10_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
@@ -342,6 +347,9 @@ steps:
         agents:
           provider: "azure"
           image: "${IMAGE_WIN_11}"
+          imageVersion: "${IMAGE_WIN_11_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
@@ -393,6 +401,9 @@ steps:
         agents:
           provider: "azure"
           image: "${IMAGE_WIN_10}"
+          imageVersion: "${IMAGE_WIN_10_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
