@@ -541,6 +541,57 @@ func TestServerPool(t *testing.T) {
 	}
 }
 
+// remapAddrs allocates OS-assigned ports for each unique logical address in
+// cfgs and returns deep copies of cfgs, events, and wantErr with the real
+// addresses substituted. The originals are not modified.
+func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr error) ([]*httpEndpoint, []target, error) {
+	t.Helper()
+
+	m := make(map[string]string) // logical addr → real addr
+	for _, cfg := range cfgs {
+		if _, ok := m[cfg.addr]; ok {
+			continue
+		}
+		ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatalf("allocating port for %s: %v", cfg.addr, err)
+		}
+		m[cfg.addr] = ln.Addr().String()
+		ln.Close()
+	}
+
+	out := make([]*httpEndpoint, len(cfgs))
+	for i, cfg := range cfgs {
+		c := *cfg
+		actual := m[cfg.addr]
+		host, port, err := net.SplitHostPort(actual)
+		if err != nil {
+			t.Fatalf("splitting address %s: %v", actual, err)
+		}
+		c.addr = actual
+		c.config.ListenAddress = host
+		c.config.ListenPort = port
+		out[i] = &c
+	}
+
+	ev := make([]target, len(events))
+	copy(ev, events)
+	for i := range ev {
+		for logical, actual := range m {
+			ev[i].url = strings.Replace(ev[i].url, logical, actual, 1)
+		}
+	}
+
+	if e, ok := wantErr.(invalidTLSStateErr); ok { //nolint:errorlint // invalidTLSStateErr is never wrapped.
+		if actual, ok := m[e.addr]; ok {
+			e.addr = actual
+			wantErr = e
+		}
+	}
+
+	return out, ev, wantErr
+}
+
 // TestConcurrentExceedMaxInFlight tests that concurrent requests are properly
 // rejected when in-flight bytes exceed the high water mark. This requires
 // holding bytes until ACK, which means we need a publisher that delays ACK.
@@ -664,6 +715,20 @@ func TestConcurrentExceedMaxInFlight(t *testing.T) {
 
 	cancel()
 	wg.Wait()
+}
+
+// freeAddr returns a 127.0.0.1:<port> address with an OS-assigned port that
+// was momentarily free. There is a small TOCTOU window, but in practice the
+// OS will not recycle the port before the caller binds it.
+func freeAddr(t *testing.T) string {
+	t.Helper()
+	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("allocating port: %v", err)
+	}
+	addr := ln.Addr().String()
+	ln.Close()
+	return addr
 }
 
 func TestNewHTTPEndpoint(t *testing.T) {
@@ -1195,71 +1260,6 @@ func TestSimultaneousShutdown(t *testing.T) {
 
 // waitForServer polls addr until a TCP connection succeeds or the
 // timeout expires.
-// remapAddrs allocates OS-assigned ports for each unique logical address in
-// cfgs and returns deep copies of cfgs, events, and wantErr with the real
-// addresses substituted. The originals are not modified.
-func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr error) ([]*httpEndpoint, []target, error) {
-	t.Helper()
-
-	m := make(map[string]string) // logical addr → real addr
-	for _, cfg := range cfgs {
-		if _, ok := m[cfg.addr]; ok {
-			continue
-		}
-		ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
-		if err != nil {
-			t.Fatalf("allocating port for %s: %v", cfg.addr, err)
-		}
-		m[cfg.addr] = ln.Addr().String()
-		ln.Close()
-	}
-
-	out := make([]*httpEndpoint, len(cfgs))
-	for i, cfg := range cfgs {
-		c := *cfg
-		actual := m[cfg.addr]
-		host, port, err := net.SplitHostPort(actual)
-		if err != nil {
-			t.Fatalf("splitting address %s: %v", actual, err)
-		}
-		c.addr = actual
-		c.config.ListenAddress = host
-		c.config.ListenPort = port
-		out[i] = &c
-	}
-
-	ev := make([]target, len(events))
-	copy(ev, events)
-	for i := range ev {
-		for logical, actual := range m {
-			ev[i].url = strings.Replace(ev[i].url, logical, actual, 1)
-		}
-	}
-
-	if e, ok := wantErr.(invalidTLSStateErr); ok { //nolint:errorlint // invalidTLSStateErr is never wrapped.
-		if actual, ok := m[e.addr]; ok {
-			e.addr = actual
-			wantErr = e
-		}
-	}
-
-	return out, ev, wantErr
-}
-
-// freeAddr returns a 127.0.0.1:<port> address with an OS-assigned port that
-// was momentarily free. There is a small TOCTOU window, but in practice the
-// OS will not recycle the port before the caller binds it.
-func freeAddr(t *testing.T) string {
-	t.Helper()
-	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatalf("allocating port: %v", err)
-	}
-	addr := ln.Addr().String()
-	ln.Close()
-	return addr
-}
-
 func waitForServer(t *testing.T, addr string, timeout time.Duration) {
 	t.Helper()
 	deadline := time.After(timeout)
