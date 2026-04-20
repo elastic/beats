@@ -52,7 +52,7 @@ var fqdnOnce = sync.OnceValues(func() (string, error) {
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core, includeMetadata bool) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -64,7 +64,13 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
-	b.Info.IncludeMetadata = includeMetadata
+
+	if v, ok := receiverConfig["include_metadata"]; ok {
+		if include, ok := v.(bool); ok {
+			b.Info.IncludeMetadata = include
+		}
+		delete(receiverConfig, "include_metadata")
+	}
 
 	// begin code similar to configure
 	if err = plugin.Initialize(); err != nil {

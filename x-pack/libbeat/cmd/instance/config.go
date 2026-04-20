@@ -10,11 +10,6 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
-// ReceiverConfig holds configuration common to all Beat receivers.
-// Embed this (with mapstructure:",squash") in each receiver's Config struct.
-type ReceiverConfig struct {
-	IncludeMetadata bool `mapstructure:"include_metadata"`
-}
 
 // DeDotKeys converts any dot-separated keys (e.g. "path.home",
 // "management.otel.enabled") into nested submaps.

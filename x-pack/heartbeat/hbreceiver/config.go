@@ -15,8 +15,7 @@ import (
 // Config is config settings for heartbeat receiver.  The structure of
 // which is the same as the heartbeat.yml configuration file.
 type Config struct {
-	xpInstance.ReceiverConfig `mapstructure:",squash"`
-	Beatconfig                map[string]any `mapstructure:",remain"`
+	Beatconfig map[string]any `mapstructure:",remain"`
 }
 
 // Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.

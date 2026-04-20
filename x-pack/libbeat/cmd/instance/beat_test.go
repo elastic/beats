@@ -36,7 +36,7 @@ func TestManager(t *testing.T) {
 		"path.home": tmpDir,
 	}
 	t.Run("otel management disabled - key missing", func(t *testing.T) {
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore(), false)
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), cfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		// it should fallback to FallbackManager if key is missing
@@ -50,7 +50,7 @@ func TestManager(t *testing.T) {
 		defer func() {
 			management.SetUnderAgent(false) // reset to false
 		}()
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore(), false)
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, &otelmanager.OtelManager{}, beat.Manager)
@@ -69,7 +69,7 @@ type: "log"`)
 		defer func() {
 			management.SetUnderAgent(false) // reset to false
 		}()
-		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore(), false)
+		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		assert.IsType(t, &management.FallbackManager{}, beat.Manager)
