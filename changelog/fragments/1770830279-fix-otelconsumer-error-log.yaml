@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Fix otelconsumer logging hundreds of errors per second when queue is full
+
+component: libbeat
+
+issue: https://github.com/elastic/beats/issues/48803
