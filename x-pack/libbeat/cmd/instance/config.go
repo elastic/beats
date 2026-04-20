@@ -10,7 +10,6 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 )
 
-
 // DeDotKeys converts any dot-separated keys (e.g. "path.home",
 // "management.otel.enabled") into nested submaps.
 func DeDotKeys(conf *confmap.Conf) error {

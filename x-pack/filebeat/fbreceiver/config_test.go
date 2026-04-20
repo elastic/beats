@@ -82,8 +82,7 @@ func TestUnmarshalIncludeMetadata(t *testing.T) {
 		"filebeat":         map[string]any{"inputs": []any{}},
 	})
 	require.NoError(t, cfg.Unmarshal(userConf))
-	assert.True(t, cfg.IncludeMetadata)
-	assert.NotContains(t, cfg.Beatconfig, "include_metadata")
+	assert.Equal(t, true, cfg.Beatconfig["include_metadata"])
 }
 
 func TestValidate(t *testing.T) {
