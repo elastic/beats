@@ -11,8 +11,8 @@ env:
 
   IMAGE_RHEL9_X86_64: "platform-ingest-beats-rhel-9-1772337686"
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
-  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1772337686"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1775016079"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
   IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
   IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
   IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
@@ -219,11 +219,8 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
@@ -246,11 +243,8 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
