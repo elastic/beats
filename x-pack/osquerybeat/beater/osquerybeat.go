@@ -457,7 +457,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		defer bt.setDiagnosticsQueryExecutor(nil)
 
 		// Initialize and start RRULE query handler after osqueryd connection is established
-		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub)
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles)
 		rruleHandler.Start(ctx)
 		defer rruleHandler.Stop()
 

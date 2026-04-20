@@ -19,8 +19,21 @@ import (
 )
 
 const (
-	defaultRRuleQueryTimeout = 1 * time.Minute
+	defaultRRuleQueryTimeout  = 1 * time.Minute
+	rruleRuntimeProfileSource = "rrule"
 )
+
+// rruleRuntimeProfileState holds optional live-style profiling for one RRULE execution.
+type rruleRuntimeProfileState struct {
+	queryName            string
+	ns                   string
+	responseID           string
+	sql                  string
+	shouldPublishProfile bool
+	shouldCollectProfile bool
+	before               runtimeSnapshot
+	beforeReady          bool
+}
 
 // recurrenceQueryHandler handles RRULE-scheduled query execution
 type recurrenceQueryHandler struct {
@@ -29,15 +42,19 @@ type recurrenceQueryHandler struct {
 	cli          *osqdcli.Client
 	configPlugin *ConfigPlugin
 	publisher    scheduledQueryPublisher
+	profiles     liveProfileRecorder
 }
 
-// newRecurrenceQueryHandler creates a new RRULE query handler
-func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlugin *ConfigPlugin, pub scheduledQueryPublisher) *recurrenceQueryHandler {
+// newRecurrenceQueryHandler creates a new RRULE query handler.
+// profiles may be nil; when set, runtime-style profiles are recorded for every RRULE execution
+// (same backing store as live queries), and policy-driven publish still follows LookupQueryProfile.
+func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlugin *ConfigPlugin, pub scheduledQueryPublisher, profiles liveProfileRecorder) *recurrenceQueryHandler {
 	h := &recurrenceQueryHandler{
 		log:          log.With("component", "rrule-query-handler"),
 		cli:          cli,
 		configPlugin: configPlugin,
 		publisher:    pub,
+		profiles:     profiles,
 	}
 
 	h.scheduler = scheduler.New(log, h.executeQuery)
@@ -133,33 +150,86 @@ func (h *recurrenceQueryHandler) createScheduledQuery(name string, q config.Quer
 	}
 
 	return &scheduler.ScheduledQuery{
-		Name:     name,
-		Query:    q.Query,
-		Timeout:  timeout,
-		Schedule: recurrenceSchedule,
+		Name:       name,
+		Query:      q.Query,
+		Timeout:    timeout,
+		Schedule:   recurrenceSchedule,
 		ScheduleID: q.ScheduleID,
 	}, nil
+}
+
+// initRRuleRuntimeProfiling collects a pre-query process snapshot when profiling is enabled
+// for this query (publish flag and/or local profile store).
+func (h *recurrenceQueryHandler) initRRuleRuntimeProfiling(ctx context.Context, name, ns, responseID, sql string) rruleRuntimeProfileState {
+	st := rruleRuntimeProfileState{
+		queryName:            name,
+		ns:                   ns,
+		responseID:           responseID,
+		sql:                  sql,
+		shouldPublishProfile: h.configPlugin.LookupQueryProfile(name),
+	}
+	st.shouldCollectProfile = st.shouldPublishProfile || h.profiles != nil
+	if !st.shouldCollectProfile {
+		return st
+	}
+	snapshot, snapErr := collectRuntimeSnapshot(ctx, h.cli)
+	if snapErr != nil {
+		h.log.Debugf("failed to collect pre-query profile snapshot for %s: %v", name, snapErr)
+		return st
+	}
+	st.before = snapshot
+	st.beforeReady = true
+	return st
+}
+
+// completeRRuleRuntimeProfiling collects the post-query snapshot and records or publishes
+// the profile. queryErr is the error from the user query, if any.
+func (h *recurrenceQueryHandler) completeRRuleRuntimeProfiling(ctx context.Context, st rruleRuntimeProfileState, queryDuration time.Duration, queryErr error) {
+	if !st.shouldCollectProfile {
+		return
+	}
+	if !st.beforeReady {
+		if st.shouldPublishProfile {
+			h.log.Debug("profile requested but skipped: pre-query snapshot was not collected")
+		} else {
+			h.log.Debug("profile storage skipped: pre-query snapshot was not collected")
+		}
+		return
+	}
+	after, snapErr := collectRuntimeSnapshot(ctx, h.cli)
+	if snapErr != nil {
+		h.log.Debugf("failed to collect post-query profile snapshot for %s: %v", st.queryName, snapErr)
+		return
+	}
+	prof := buildRuntimeQueryProfile(rruleRuntimeProfileSource, st.sql, st.before, after, queryDuration, queryErr)
+	if h.profiles != nil {
+		h.profiles.RecordLiveProfile(st.sql, prof)
+	}
+	if st.shouldPublishProfile {
+		h.publisher.PublishQueryProfile(config.QueryProfileDatastream(st.ns), st.queryName, "", st.responseID, prof, nil)
+	}
 }
 
 // executeQuery is called by the scheduler to execute a query
 func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int, plannedScheduleTime time.Time) error {
 	h.log.Debugf("Executing RRULE-scheduled query '%s' (execution #%d)", name, executionIndex)
 
-	startedAt := time.Now()
-
-	// Execute the query via osquery client
-	// Note: Query() already resolves the result types
-	hits, err := h.cli.Query(ctx, query, timeout)
-	if err != nil {
-		return err
-	}
-
-	completedAt := time.Now()
-
-	// Get namespace for this query
 	ns, ok := h.configPlugin.LookupNamespace(name)
 	if !ok {
 		ns = config.DefaultNamespace
+	}
+
+	responseID := uuid.Must(uuid.NewV4()).String()
+	profSt := h.initRRuleRuntimeProfiling(ctx, name, ns, responseID, query)
+
+	startedAt := time.Now()
+	hits, err := h.cli.Query(ctx, query, timeout)
+	queryDuration := time.Since(startedAt)
+	completedAt := time.Now()
+	h.completeRRuleRuntimeProfiling(ctx, profSt, queryDuration, err)
+
+	if err != nil {
+		return err
 	}
 
 	// Get query info for ECS mapping, pack/space, and schedule id fallback
@@ -175,9 +245,6 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 	if scheduleID == "" {
 		scheduleID = name
 	}
-
-	// Generate a response ID
-	responseID := uuid.Must(uuid.NewV4()).String()
 
 	// Publish results with response_id + schedule fields for parity across scheduled outputs.
 	meta := map[string]interface{}{

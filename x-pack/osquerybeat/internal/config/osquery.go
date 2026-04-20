@@ -161,8 +161,10 @@ type Query struct {
 	// This is the same as osquery behavior
 	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 
-	// Optional internal flag to emit per-query profiling for this scheduled query.
-	// This is consumed by osquerybeat and not rendered into osqueryd configuration.
+	// Optional internal flag to emit per-query profiling for this scheduled query
+	// (native: osquery_schedule metrics; RRULE: process-level deltas like live queries).
+	// RRULE/live profiling uses the same serialized osquery client; native osqueryd schedules
+	// can still add process load outside that bracket. Not rendered into osqueryd configuration.
 	Profile bool `config:"profile" json:"-"`
 }
 
