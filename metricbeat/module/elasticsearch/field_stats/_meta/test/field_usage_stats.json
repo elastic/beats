@@ -1,0 +1,79 @@
+{
+    "_shards": {
+        "total": 2,
+        "successful": 2,
+        "failed": 0
+    },
+    "my-index-000001": {
+        "shards": [
+            {
+                "tracking_id": "A_LkEJn8TYWkWJn0Fq-xhA",
+                "tracking_started_at_millis": 1710000000000,
+                "routing": {
+                    "state": "STARTED",
+                    "primary": true,
+                    "node": "node-1",
+                    "relocating_node": null
+                },
+                "stats": {
+                    "all_fields": {
+                        "any": 120,
+                        "inverted_index": {
+                            "terms": 50,
+                            "postings": 40,
+                            "proximity": 10,
+                            "positions": 8,
+                            "term_frequencies": 30,
+                            "offsets": 5,
+                            "payloads": 0
+                        },
+                        "stored_fields": 60,
+                        "doc_values": 45,
+                        "points": 20,
+                        "norms": 15,
+                        "term_vectors": 0,
+                        "knn_vectors": 0
+                    },
+                    "fields": {
+                        "message": {
+                            "any": 80,
+                            "inverted_index": {
+                                "terms": 30,
+                                "postings": 25,
+                                "proximity": 5,
+                                "positions": 4,
+                                "term_frequencies": 20,
+                                "offsets": 3,
+                                "payloads": 0
+                            },
+                            "stored_fields": 40,
+                            "doc_values": 0,
+                            "points": 0,
+                            "norms": 10,
+                            "term_vectors": 0,
+                            "knn_vectors": 0
+                        },
+                        "@timestamp": {
+                            "any": 40,
+                            "inverted_index": {
+                                "terms": 20,
+                                "postings": 15,
+                                "proximity": 5,
+                                "positions": 4,
+                                "term_frequencies": 10,
+                                "offsets": 2,
+                                "payloads": 0
+                            },
+                            "stored_fields": 20,
+                            "doc_values": 45,
+                            "points": 20,
+                            "norms": 5,
+                            "term_vectors": 0,
+                            "knn_vectors": 0
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}
