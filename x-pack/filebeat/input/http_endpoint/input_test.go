@@ -547,7 +547,8 @@ func TestServerPool(t *testing.T) {
 func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr error) ([]*httpEndpoint, []target, error) {
 	t.Helper()
 
-	m := make(map[string]string) // logical addr → real addr
+	m := make(map[string]string)      // logical addr → real addr
+	lns := make([]net.Listener, 0, 2) // hold open until all allocated
 	for _, cfg := range cfgs {
 		if _, ok := m[cfg.addr]; ok {
 			continue
@@ -557,6 +558,9 @@ func remapAddrs(t *testing.T, cfgs []*httpEndpoint, events []target, wantErr err
 			t.Fatalf("allocating port for %s: %v", cfg.addr, err)
 		}
 		m[cfg.addr] = ln.Addr().String()
+		lns = append(lns, ln)
+	}
+	for _, ln := range lns {
 		ln.Close()
 	}
 
