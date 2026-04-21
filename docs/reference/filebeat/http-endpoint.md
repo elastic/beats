@@ -208,7 +208,7 @@ curl 'http://localhost:5066/inputs/?type=aws-s3&pretty'
 ## State Inspector [state-inspector]
 
 ```{applies_to}
-stack: 9.5
+stack: preview 9.5
 ```
 
 ::::{warning}
