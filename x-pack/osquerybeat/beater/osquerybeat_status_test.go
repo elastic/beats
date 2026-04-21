@@ -111,6 +111,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -134,6 +135,7 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -254,6 +256,7 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -292,6 +295,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
@@ -330,6 +334,7 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		startErr: assert.AnError, // Manager.Start() will fail
 	}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
