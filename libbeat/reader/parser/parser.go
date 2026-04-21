@@ -173,7 +173,7 @@ func (c *Config) Create(in reader.Reader, log *logp.Logger) Parser {
 			if err != nil {
 				return p
 			}
-			p = readjson.NewContainerParser(p, &config, log)
+			p = readjson.NewContainerParser(p, &config, int(c.pCfg.MaxBytes), log)
 		case "syslog":
 			config := syslog.DefaultConfig()
 			cfg := ns.Config()

@@ -92,7 +92,6 @@ func (m *testManager) Start() error {
 func (m *testManager) PreInit() error                      { return nil }
 func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
-func (m *testManager) WaitForStop(_ time.Duration) bool    { return true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
 func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
@@ -112,11 +111,12 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -135,11 +135,12 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -255,11 +256,12 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -293,11 +295,12 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -331,11 +334,12 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		startErr: assert.AnError, // Manager.Start() will fail
 	}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
