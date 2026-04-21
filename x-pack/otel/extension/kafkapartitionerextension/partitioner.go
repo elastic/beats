@@ -179,9 +179,9 @@ func makeFieldsHashPartitioner(
 		}
 		var hash uint32
 		if err != nil {
-			log.Errorf("Hashing partition key failed: %+v", err)
 			if dropFail {
-				return rand.IntN(numPartitions)
+				log.Errorf("Hashing partition key failed: %+v", err)
+				return -1
 			}
 			hash = rand.Uint32()
 		} else {
