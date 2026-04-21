@@ -1,0 +1,90 @@
+# Beats OpenTelemetry Collector Distribution
+
+**This distribution is used to ensure compatibility between Beats components and the OpenTelemetry collector builder. It is not intended for public release.**
+
+## Components Included
+
+### Receivers
+- **filebeatreceiver** - Filebeat receiver
+- **metricbeatreceiver** - Metricbeat receiver
+- **filelogreceiver** - File log receiver
+- **hostmetricsreceiver** - Host metrics receiver
+- **httpcheckreceiver** - HTTP check receiver
+- **jaegerreceiver** - Jaeger receiver
+- **prometheusreceiver** - Prometheus receiver
+- **otlp** - OTLP receiver
+- **nop** - No-op receiver
+- **zipkinreceiver** - Zipkin receiver
+
+### Processors
+- **beat** - Beats processor
+- **attributes** - Attributes processor
+- **batch** - Batch processor
+- **cumulativetodelta** - Cumulative to delta processor
+- **filter** - Filter processor
+- **k8sattributes** - Kubernetes attributes processor
+- **memory_limiter** - Memory limiter processor
+- **resourcedetection** - Resource detection processor
+- **resource** - Resource processor
+- **transform** - Transform processor
+
+### Exporters
+- **logstash** - Logstash exporter
+- **elasticsearch** - Elasticsearch exporter
+- **kafka** - Kafka exporter
+- **debug** - Debug exporter
+- **file** - File exporter
+- **nop** - No-op exporter
+- **otlp** - OTLP gRPC exporter
+- **otlphttp** - OTLP HTTP exporter
+
+### Extensions
+- **beatsauth** - Beats authentication extension
+- **elasticsearch_storage** - Elasticsearch storage extension
+- **basicauth** - Basic auth extension
+- **bearertokenauth** - Bearer token auth extension
+- **file_storage** - File storage extension
+- **health_check** - Health check extension
+- **memory_limiter** - Memory limiter extension
+- **pprof** - pprof extension
+
+### Config Providers
+- **env** - Environment variable provider
+- **file** - File provider
+- **http** - HTTP provider
+- **https** - HTTPS provider
+- **yaml** - YAML provider
+
+## Contributing
+
+All Beats components should be added to this distribution's manifest to ensure integration with OpenTelemetry Collector binaries. 
+
+To add a new Beats component located at `./x-pack/otel/extension/customextension`, append the following entries to the [manifest.yaml](./manifest.yaml) file:
+
+```yaml
+receivers:
+  - gomod: github.com/elastic/beats/v7/x-pack/otel/extension/customextension v0.0.0
+
+# Add to replaces section:
+replaces:
+  - github.com/elastic/beats/v7/x-pack/otel/extension/customextension => ../extension/customextension
+```
+
+Then add the component to the example [configuration file](./config.yaml).
+
+## Building
+
+This distribution can be built using the [OpenTelemetry Collector Builder (OCB)](https://opentelemetry.io/docs/collector/extend/ocb/):
+
+```bash
+ocb --config manifest.yaml
+```
+
+## Testing
+
+The components can be tested using the configuration in [config.yaml](./config.yaml).
+
+```
+cd _build
+./beats-otel-collector --config ../config.yaml
+```

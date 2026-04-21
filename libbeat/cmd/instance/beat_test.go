@@ -26,7 +26,6 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -514,10 +513,6 @@ func (m mockManager) Status() status.Status                         { return sta
 func (m mockManager) Stop()                                         {}
 func (m mockManager) UnregisterAction(action management.Action)     {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
-func (m mockManager) WaitForStop(_ time.Duration) bool {
-	m.Stop()
-	return true
-}
 
 func TestManager(t *testing.T) {
 	// set the mockManger factory.

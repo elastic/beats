@@ -11,8 +11,10 @@ env:
 
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
   IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1772337686"
-  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1772337686"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1772337686"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
+  IMAGE_WIN_10_VERSION: "1.0.1776697195"
+  IMAGE_WIN_11_VERSION: "1.0.1776697195"
   IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
   IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
   IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
@@ -259,9 +261,13 @@ steps:
         env:
           ASDF_TERRAFORM_VERSION: "1.9.3"
           ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
-          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
-          TF_VAR_ech_region: "us-gov-east-1"
-          TF_VAR_deployment_template_id: "aws-general-purpose"
+# We are temporarily using the Production CFT environment instead of the Staging GovCloud
+# one.  This is being done until issues with creating deployments in Staging GovCloud are
+# fixed. Once this happens, uncomment the lines below and delete the gcp-us-west2 line.
+#          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
+#          TF_VAR_ech_region: "us-gov-east-1"
+#          TF_VAR_deployment_template_id: "aws-general-purpose"
+          TF_VAR_ech_region: "gcp-us-west2"
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh x-pack/metricbeat
         retry:
@@ -284,7 +290,12 @@ steps:
               branches: "main"
               debug: true
           - elastic/vault-secrets#v0.1.0:
-              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
+# We are temporarily using the Production CFT environment API key instead of the
+# Staging GovCloud one.  This is being done until issues with creating deployments in
+# Staging GovCloud are fixed. Once this happens, uncomment the line below and delete
+# the vault_ec_key_prod line.
+#              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
+              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-prod"
               field: "apiKey"
               env_var: "EC_API_KEY"
         notify:
@@ -389,11 +400,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          imageVersion: "${IMAGE_WIN_10_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
@@ -416,11 +427,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          imageVersion: "${IMAGE_WIN_11_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"

@@ -123,9 +123,7 @@ func gzipFile(logger *logp.Logger, src string, dst io.Writer) error {
 	writer.Name = filepath.Base(src)
 
 	if _, err := io.Copy(writer, reader); err != nil {
-		if err != nil {
-			return fmt.Errorf("cannot gzip file '%s': '%w'", src, err)
-		}
+		return fmt.Errorf("cannot gzip file '%s': '%w'", src, err)
 	}
 
 	return nil
