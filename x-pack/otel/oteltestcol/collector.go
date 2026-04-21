@@ -13,9 +13,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/hbreceiver"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
@@ -104,9 +106,11 @@ func (c *Collector) Shutdown() {
 
 func getComponent() (otelcol.Factories, error) {
 	receivers, err := otelcol.MakeFactoryMap(
+		abreceiver.NewFactory(),
 		fbreceiver.NewFactory(),
 		hbreceiver.NewFactory(),
 		mbreceiver.NewFactory(),
+		osqreceiver.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
