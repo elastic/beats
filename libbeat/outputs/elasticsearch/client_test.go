@@ -306,13 +306,10 @@ func TestPublish(t *testing.T) {
 		events := []publisher.Event{event1, event2, event3}
 		eventsRaw := `{"index":{"_index":"test","_type":"doc"}}
 {"@timestamp":"0001-01-01T00:00:00.000Z","field":1}
-
 {"index":{"_index":"test","_type":"doc"}}
 {"@timestamp":"0001-01-01T00:00:00.000Z","field":2}
-
 {"index":{"_index":"test","_type":"doc"}}
 {"@timestamp":"0001-01-01T00:00:00.000Z","field":3}
-
 `
 		batch := &batchMock{
 			events: events,
