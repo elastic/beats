@@ -9,6 +9,7 @@ package ntfs
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -25,6 +26,11 @@ import (
 
 const (
 	IOCTL_DISK_GET_DRIVE_LAYOUT_EX = 0x00070050
+
+	// maxPhysicalDrives bounds the \\.\PhysicalDriveN probe range. Windows
+	// supports up to 256 disks but real endpoints have far fewer; 128 is
+	// ample headroom without making enumeration expensive on sparse setups.
+	maxPhysicalDrives = 128
 )
 
 // Fixed 48-byte header preceding the variable-length partition array.
@@ -252,36 +258,73 @@ func uint32ToInt32(value uint32) int32 {
 	return int32(value)
 }
 
+// GetPhysicalDrives enumerates \\.\PhysicalDriveN devices exposed by the
+// Windows storage stack, independent of drive-letter mounts. Probing by
+// path catches raw, offline, hidden, and otherwise unmounted disks that
+// getVolumes() cannot see (it only enumerates letters from
+// GetLogicalDrives).
+func GetPhysicalDrives() []string {
+	log := getLogger()
+	var drives []string
+	for i := range maxPhysicalDrives {
+		path := fmt.Sprintf(`\\.\PhysicalDrive%d`, i)
+		ptr, err := windows.UTF16PtrFromString(path)
+		if err != nil {
+			continue
+		}
+		handle, err := windows.CreateFile(
+			ptr,
+			0,
+			windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE,
+			nil,
+			windows.OPEN_EXISTING,
+			0,
+			0,
+		)
+		if err != nil {
+			if !errors.Is(err, windows.ERROR_FILE_NOT_FOUND) {
+				log.Infof("GetPhysicalDrives: probe %s: %v", path, err)
+			}
+			continue
+		}
+		_ = windows.CloseHandle(handle)
+		drives = append(drives, path)
+	}
+	return drives
+}
+
 func partitionsGenerateFunc(_ context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticntfspartitions.Result, error) {
 	setLogger(log)
 
+	// Build a device -> partition-number -> drive-letter map from mounted
+	// volumes. This is purely decoration: getVolumes() only sees disks with
+	// mounted letters, so it must not drive which disks are enumerated.
+	driveLetterByPartition := make(map[string]map[uint32]string)
 	volumes, err := getVolumes()
 	if err != nil {
-		return nil, err
+		log.Errorf("Failed to enumerate volumes for drive-letter mapping: %v", err)
 	}
-
-	physicalDriveSet := make(map[string]map[uint32]string)
 	for _, v := range volumes {
 		if v.DeviceType != "DISK" {
 			continue
 		}
-		if _, ok := physicalDriveSet[v.Device]; !ok {
-			physicalDriveSet[v.Device] = make(map[uint32]string)
+		if _, ok := driveLetterByPartition[v.Device]; !ok {
+			driveLetterByPartition[v.Device] = make(map[uint32]string)
 		}
-		physicalDriveSet[v.Device][v.PartitionNumber] = v.DriveLetter
+		driveLetterByPartition[v.Device][v.PartitionNumber] = v.DriveLetter
 	}
 
 	var results []elasticntfspartitions.Result
-	for d := range physicalDriveSet {
+	for _, d := range GetPhysicalDrives() {
 		partitions, err := GetPartitions(d)
 		if err != nil {
-			log.Errorf("Failed to get partitions for volume %s: %v", d, err)
+			log.Errorf("Failed to get partitions for drive %s: %v", d, err)
 			continue
 		}
 		for _, p := range partitions {
 			results = append(results, elasticntfspartitions.Result{
 				Device:         d,
-				DriveLetter:    physicalDriveSet[d][p.Number],
+				DriveLetter:    driveLetterByPartition[d][p.Number],
 				Id:             p.Id,
 				Number:         uint32ToInt32(p.Number),
 				Style:          p.Style,
