@@ -99,7 +99,7 @@ func TestCachedMetaSizing(t *testing.T) {
 			}
 			_, err := r.Next()
 			require.NoError(t, err)
-			require.Equal(t, tc.wantLen, len(r.cachedMeta),
+			require.Len(t, r.cachedMeta, tc.wantLen,
 				"cachedMeta entry count should match the pre-allocated size")
 		})
 	}
