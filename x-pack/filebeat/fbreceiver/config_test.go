@@ -10,6 +10,82 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+<<<<<<< HEAD
+=======
+func TestUnmarshal(t *testing.T) {
+	t.Run("partial path override preserves defaults", func(t *testing.T) {
+		cfg := &Config{
+			Beatconfig: map[string]any{
+				"path": map[string]any{
+					"home": "/default/home",
+					"data": "/default/data",
+				},
+			},
+		}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"path.home": "/custom/home",
+			"filebeat":  map[string]any{"inputs": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		pathMap, ok := cfg.Beatconfig["path"].(map[string]any)
+		require.True(t, ok, "path should be a map")
+		assert.Equal(t, "/custom/home", pathMap["home"], "user override should win")
+		assert.Equal(t, "/default/data", pathMap["data"], "unspecified default should be preserved")
+		assert.Contains(t, cfg.Beatconfig, "filebeat")
+	})
+
+	t.Run("no defaults does not error", func(t *testing.T) {
+		cfg := &Config{}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"filebeat": map[string]any{"inputs": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+		assert.Contains(t, cfg.Beatconfig, "filebeat")
+	})
+
+	t.Run("full path override replaces both", func(t *testing.T) {
+		cfg := &Config{
+			Beatconfig: map[string]any{
+				"path": map[string]any{
+					"home": "/default/home",
+					"data": "/default/data",
+				},
+			},
+		}
+
+		userConf := confmap.NewFromStringMap(map[string]any{
+			"path": map[string]any{
+				"home": "/custom/home",
+				"data": "/custom/data",
+			},
+			"filebeat": map[string]any{"inputs": []any{}},
+		})
+
+		require.NoError(t, cfg.Unmarshal(userConf))
+
+		pathMap, ok := cfg.Beatconfig["path"].(map[string]any)
+		require.True(t, ok)
+		assert.Equal(t, "/custom/home", pathMap["home"])
+		assert.Equal(t, "/custom/data", pathMap["data"])
+	})
+}
+
+func TestUnmarshalIncludeMetadata(t *testing.T) {
+	cfg := &Config{}
+	userConf := confmap.NewFromStringMap(map[string]any{
+		"include_metadata": true,
+		"filebeat":         map[string]any{"inputs": []any{}},
+	})
+	require.NoError(t, cfg.Unmarshal(userConf))
+	assert.Equal(t, true, cfg.Beatconfig["include_metadata"])
+}
+
+>>>>>>> 2e949e6c4 (otel: option to preserve at metadata field in log record body (#50191))
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
 		c           *Config

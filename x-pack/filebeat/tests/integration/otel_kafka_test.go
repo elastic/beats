@@ -7,18 +7,22 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/pdata/pcommon"
-	"go.opentelemetry.io/collector/pdata/plog"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
+=======
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+>>>>>>> 2e949e6c4 (otel: option to preserve at metadata field in log record body (#50191))
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/sarama"
@@ -27,15 +31,19 @@ import (
 // kafkaBroker is the Kafka OUTSIDE listener, which advertises localhost:9094
 const kafkaBroker = "localhost:9094"
 
-func TestFilebeatOTelKafkaExporter(t *testing.T) {
-	topic := fmt.Sprintf("test-otel-kafka-%s", uuid.Must(uuid.NewV4()).String())
+func TestFilebeatOTelKafkaE2E(t *testing.T) {
+	numEvents := 1
 
 	tmpdir := t.TempDir()
-	logFilePath := filepath.Join(tmpdir, "kafka_test.log")
-	writeEventsToLogFile(t, logFilePath, 1)
+	fbTopic := fmt.Sprintf("test-fb-kafka-%s", uuid.Must(uuid.NewV4()).String())
+	otelTopic := fmt.Sprintf("test-otel-kafka-%s", uuid.Must(uuid.NewV4()).String())
+
+	logFilePath := filepath.Join(tmpdir, "kafka_e2e.log")
+	writeEventsToLogFile(t, logFilePath, numEvents)
 
 	otelCfg := fmt.Sprintf(`receivers:
   filebeatreceiver:
+    include_metadata: true
     filebeat:
       inputs:
         - type: filestream
@@ -45,6 +53,11 @@ func TestFilebeatOTelKafkaExporter(t *testing.T) {
             - %s
           prospector.scanner.fingerprint.enabled: false
           file_identity.native: ~
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
     queue.mem.flush.timeout: 0s
     setup.template.enabled: false
     path.home: %s
@@ -54,7 +67,7 @@ exporters:
       - %s
     logs:
       topic: %s
-      encoding: otlp_json
+      encoding: raw
 service:
   pipelines:
     logs:
@@ -65,9 +78,67 @@ service:
   telemetry:
     metrics:
       level: none
-`, logFilePath, tmpdir, kafkaBroker, topic)
+`, logFilePath, tmpdir, kafkaBroker, otelTopic)
 
 	oteltestcol.New(t, otelCfg)
+
+	fbCfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    paths:
+      - %s
+output:
+  kafka:
+    hosts:
+      - %s
+    topic: %s
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+    - add_host_metadata: ~
+    - add_cloud_metadata: ~
+    - add_docker_metadata: ~
+    - add_kubernetes_metadata: ~
+`, logFilePath, kafkaBroker, fbTopic)
+
+	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	filebeat.WriteConfigFile(fbCfg)
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	otelMsg := consumeKafkaTopic(t, otelTopic)
+	fbMsg := consumeKafkaTopic(t, fbTopic)
+
+	t.Logf("otel kafka message: %s", string(otelMsg))
+	t.Logf("filebeat kafka message: %s", string(fbMsg))
+
+	var otelBody, fbBody mapstr.M
+	require.NoError(t, json.Unmarshal(otelMsg, &otelBody), "OTel kafka message is not valid JSON")
+	require.NoError(t, json.Unmarshal(fbMsg, &fbBody), "filebeat kafka message is not valid JSON")
+
+	assert.NotEmpty(t, otelBody["@metadata"], "expected @metadata to be present in OTel kafka message")
+
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"log.file.inode",
+		"log.file.device_id",
+	}
+
+	oteltest.AssertMapsEqual(t, fbBody, otelBody, ignoredFields, "expected documents to be equal")
+
+	assert.Equal(t, "filebeat", otelBody.Flatten()["agent.type"], "expected agent.type to be 'filebeat' in otel doc")
+	assert.Equal(t, "filebeat", fbBody.Flatten()["agent.type"], "expected agent.type to be 'filebeat' in filebeat doc")
+}
+
+// consumeKafkaTopic waits for a topic to appear and returns the first message received.
+func consumeKafkaTopic(t *testing.T, topic string) []byte {
+	t.Helper()
 
 	cfg := sarama.NewConfig()
 	cfg.Consumer.Return.Errors = true
@@ -88,14 +159,12 @@ service:
 	require.NoError(t, err, "failed to create Kafka consumer")
 	t.Cleanup(func() { _ = consumer.Close() })
 
-	// Wait for the topic
 	msgs := make(chan *sarama.ConsumerMessage, 10)
 	require.Eventually(t, func() bool {
 		partitions, err := consumer.Partitions(topic)
 		if err != nil || len(partitions) == 0 {
 			return false
 		}
-		// Spin up one goroutine per partition forwarding into msgs.
 		for _, partition := range partitions {
 			pc, err := consumer.ConsumePartition(topic, partition, sarama.OffsetOldest)
 			if err != nil {
@@ -111,7 +180,6 @@ service:
 		return true
 	}, 30*time.Second, 500*time.Millisecond, "topic %q did not appear within 30s", topic)
 
-	// Poll until at least one message arrives.
 	var received []byte
 	require.Eventually(t, func() bool {
 		select {
@@ -123,57 +191,5 @@ service:
 		}
 	}, 30*time.Second, 500*time.Millisecond, "no message received from Kafka topic %q", topic)
 
-	t.Logf("received Kafka message: %s", string(received))
-
-	// Decode the OTLP JSON payload.
-	unmarshaler := &plog.JSONUnmarshaler{}
-	logs, err := unmarshaler.UnmarshalLogs(received)
-	require.NoError(t, err, "Kafka message is not valid OTLP JSON")
-	require.Equal(t, 1, logs.ResourceLogs().Len(), "expected 1 resource log")
-
-	scopeLogs := logs.ResourceLogs().At(0).ScopeLogs()
-	require.Equal(t, 1, scopeLogs.Len(), "expected 1 scope log")
-
-	logRecords := scopeLogs.At(0).LogRecords()
-	require.Equal(t, 1, logRecords.Len(), "expected 1 log record")
-
-	body := logRecords.At(0).Body()
-	require.Equal(t, pcommon.ValueTypeMap, body.Type(), "expected log record body to be a map (bodymap encoding)")
-
-	got := otelmap.ToMapstr(body.Map()).Flatten()
-
-	// Check non-deterministic fields are present
-	agentVersion, _ := got.GetValue("agent.version")
-	require.NotEmpty(t, agentVersion, "expected agent.version to be set")
-	agentID, _ := got.GetValue("agent.id")
-	require.NotEmpty(t, agentID, "expected agent.id to be set")
-	agentEphemeralID, _ := got.GetValue("agent.ephemeral_id")
-	require.NotEmpty(t, agentEphemeralID, "expected agent.ephemeral_id to be set")
-	hostName, _ := got.GetValue("host.name")
-	require.NotEmpty(t, hostName, "expected host.name to be set")
-	timestamp, _ := got.GetValue("@timestamp")
-	require.NotEmpty(t, timestamp, "expected @timestamp to be set")
-
-	// Remove non-deterministic fields before comparison.
-	_ = got.Delete("@timestamp")
-	_ = got.Delete("agent.id")
-	_ = got.Delete("agent.ephemeral_id")
-	_ = got.Delete("agent.name")
-	_ = got.Delete("agent.version")
-	_ = got.Delete("host.name")
-	_ = got.Delete("log.file.device_id")
-	_ = got.Delete("log.file.inode")
-
-	want := mapstr.M{
-		"message":       "Line 0",
-		"agent.type":    "filebeat",
-		"input.type":    "filestream",
-		"ecs.version":   "8.0.0",
-		"log.offset":    int64(0),
-		"log.file.path": logFilePath,
-	}
-
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Fatalf("log event fields mismatch (-want +got):\n%s", diff)
-	}
+	return received
 }
