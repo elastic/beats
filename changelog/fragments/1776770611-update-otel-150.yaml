@@ -28,7 +28,7 @@ summary: Update OTel Collector components to v0.150.0/v1.56.0
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component:
+component: all
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs
