@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -74,7 +75,7 @@ func TestProduceConsumer(t *testing.T) {
 }
 
 func makeTestQueue() queuetest.QueueFactory {
-	return func(t *testing.T) queue.Queue {
+	return func(t *testing.T) queue.Queue[publisher.Event] {
 		dir := t.TempDir()
 		settings := DefaultSettings()
 		settings.Path = dir

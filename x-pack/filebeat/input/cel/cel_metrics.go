@@ -181,6 +181,7 @@ func newOTELCELMetrics(log *logp.Logger,
 	resource resource.Resource,
 	tripper http.RoundTripper,
 	metricExporter sdkmetric.Exporter,
+	otelhttpOptions []otelhttp.Option,
 ) (*otelCELMetrics, *otelhttp.Transport, error) {
 	var manualExportFunc func(context.Context) error
 	var meterProvider metric.MeterProvider
@@ -247,27 +248,28 @@ func newOTELCELMetrics(log *logp.Logger,
 			return nil
 		}
 	}
-	transport := otelhttp.NewTransport(tripper, otelhttp.WithMeterProvider(meterProvider))
+	opts := append([]otelhttp.Option{otelhttp.WithMeterProvider(meterProvider)}, otelhttpOptions...)
+	transport := otelhttp.NewTransport(tripper, opts...)
 
 	meter := meterProvider.Meter("github.com/elastic/beats/x-pack/filebeat/otel/cel_metrics.go")
 
-	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run",
+	periodicRunCount, err := meter.Int64Counter("input.cel.periodic.run.count",
 		metric.WithDescription("Number of times a periodic run was started."),
 		metric.WithUnit("{run}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.run.count: %w", err)
 	}
 	programRunStartedCount, err := meter.Int64Counter("input.cel.periodic.program.run.started",
 		metric.WithDescription("Number of times a CEL program was started in a periodic run."),
 		metric.WithUnit("{run}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.run.started: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.program.run.started: %w", err)
 	}
 	programRunSuccessCount, err := meter.Int64Counter("input.cel.periodic.program.run.success",
 		metric.WithDescription("Number of times a CEL program terminated without an error in a periodic run."),
 		metric.WithUnit("{run}"))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create input.cel.program.success: %w", err)
+		return nil, nil, fmt.Errorf("failed to create input.cel.periodic.program.run.success: %w", err)
 	}
 	periodicBatchCount, err := meter.Int64Counter("input.cel.periodic.batch.received",
 		metric.WithDescription("Number of event batches generated in a periodic run."),

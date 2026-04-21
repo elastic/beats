@@ -18,6 +18,8 @@ jobs:
     steps:
       - id: generator
         uses: elastic/oblt-actions/elastic/active-branches@v1
+        with:
+          filter-branches: true
 
   bump-elastic-stack:
     runs-on: ubuntu-latest

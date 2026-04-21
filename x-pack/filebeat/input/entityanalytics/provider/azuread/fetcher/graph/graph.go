@@ -50,6 +50,8 @@ const (
 	apiGroupType  = "#microsoft.graph.group"
 	apiUserType   = "#microsoft.graph.user"
 	apiDeviceType = "#microsoft.graph.device"
+
+	mfaDetailsPath = "/reports/authenticationMethods/userRegistrationDetails"
 )
 
 // apiUserResponse matches the format of a user response from the Graph API.
@@ -71,6 +73,28 @@ type apiDeviceResponse struct {
 	NextLink  string      `json:"@odata.nextLink"`
 	DeltaLink string      `json:"@odata.deltaLink"`
 	Devices   []deviceAPI `json:"value"`
+}
+
+// apiMFAResponse matches the format of a userRegistrationDetails response from the Graph API.
+type apiMFAResponse struct {
+	NextLink string       `json:"@odata.nextLink"`
+	Details  []mfaDetails `json:"value"`
+}
+
+// mfaDetails matches the format of a single userRegistrationDetails entry from the API.
+type mfaDetails struct {
+	ID                                            string   `json:"id"`
+	IsMFACapable                                  bool     `json:"isMfaCapable"`
+	IsMFARegistered                               bool     `json:"isMfaRegistered"`
+	IsPasswordlessCapable                         bool     `json:"isPasswordlessCapable"`
+	IsSsprCapable                                 bool     `json:"isSsprCapable"`
+	IsSsprEnabled                                 bool     `json:"isSsprEnabled"`
+	IsSsprRegistered                              bool     `json:"isSsprRegistered"`
+	IsSystemPreferredAuthenticationMethodEnabled  bool     `json:"isSystemPreferredAuthenticationMethodEnabled"`
+	MethodsRegistered                             []string `json:"methodsRegistered"`
+	SystemPreferredAuthenticationMethods          []string `json:"systemPreferredAuthenticationMethods"`
+	UserPreferredMethodForSecondaryAuthentication string   `json:"userPreferredMethodForSecondaryAuthentication"`
+	UserType                                      string   `json:"userType"`
 }
 
 // userAPI matches the format of user data from the API.
@@ -179,6 +203,7 @@ type graph struct {
 	groupsURL          string
 	devicesURL         string
 	deviceOwnerUserURL string
+	mfaDetailsURL      string
 }
 
 // SetLogger sets the logger on this fetcher.
@@ -354,6 +379,60 @@ func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ s
 	}
 }
 
+// UserMFADetails retrieves MFA registration details for all users from Azure
+// Active Directory using Microsoft's Graph API. Returns a map from user UUID
+// to MFARegistrationDetails, or an error if a failure occurred.
+func (f *graph) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFARegistrationDetails, error) {
+	result := make(map[uuid.UUID]*fetcher.MFARegistrationDetails)
+	fetchURL := f.mfaDetailsURL
+
+	for {
+		var response apiMFAResponse
+
+		body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch MFA registration details: %w", err)
+		}
+
+		dec := json.NewDecoder(body)
+		if err = dec.Decode(&response); err != nil {
+			_ = body.Close()
+			return nil, fmt.Errorf("unable to decode MFA registration details response: %w", err)
+		}
+		_ = body.Close()
+
+		for _, d := range response.Details {
+			id, err := uuid.FromString(d.ID)
+			if err != nil {
+				f.logger.Warnf("Skipping MFA entry with invalid user ID %q: %v", d.ID, err)
+				continue
+			}
+			result[id] = &fetcher.MFARegistrationDetails{
+				IsMFACapable:          d.IsMFACapable,
+				IsMFARegistered:       d.IsMFARegistered,
+				IsPasswordlessCapable: d.IsPasswordlessCapable,
+				IsSsprCapable:         d.IsSsprCapable,
+				IsSsprEnabled:         d.IsSsprEnabled,
+				IsSsprRegistered:      d.IsSsprRegistered,
+				IsSystemPreferredAuthenticationMethodEnabled: d.IsSystemPreferredAuthenticationMethodEnabled,
+				MethodsRegistered:                             d.MethodsRegistered,
+				SystemPreferredAuthenticationMethods:          d.SystemPreferredAuthenticationMethods,
+				UserPreferredMethodForSecondaryAuthentication: d.UserPreferredMethodForSecondaryAuthentication,
+				UserType: d.UserType,
+			}
+			f.logger.Debugf("Got MFA registration details for user %q from API", id)
+		}
+
+		if response.NextLink == "" {
+			return result, nil
+		}
+		if response.NextLink == fetchURL {
+			return result, nextLinkLoopError{"mfa_registration_details"}
+		}
+		fetchURL = response.NextLink
+	}
+}
+
 // doRequest is a convenience function for making HTTP requests to the Graph API.
 // It will automatically handle requesting a token using the authenticator attached
 // to this fetcher.
@@ -391,7 +470,7 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
 	}
 
-	if c.Tracer != nil {
+	if c.Tracer.enabled() {
 		id = sanitizeFileName(id)
 		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
@@ -458,6 +537,12 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		return nil, fmt.Errorf("invalid device owner/user URL endpoint: %w", err)
 	}
 	f.deviceOwnerUserURL = ownerUserURL.String()
+
+	mfaDetailsURL, err := url.Parse(f.conf.APIEndpoint + mfaDetailsPath)
+	if err != nil {
+		return nil, fmt.Errorf("invalid MFA details URL endpoint: %w", err)
+	}
+	f.mfaDetailsURL = mfaDetailsURL.String()
 
 	return &f, nil
 }

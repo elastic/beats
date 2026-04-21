@@ -31,6 +31,27 @@ type User struct {
 	Modified bool `json:"-"`
 	// Deleted indicates the user has been deleted.
 	Deleted bool `json:"deleted"`
+	// MFA contains MFA registration details for this user. This field is not
+	// persisted; it is populated during each sync/update cycle when the "mfa"
+	// enrich_with option is set.
+	MFA *MFARegistrationDetails `json:"-"`
+}
+
+// MFARegistrationDetails contains MFA registration information for a user
+// retrieved from the /reports/authenticationMethods/userRegistrationDetails
+// endpoint. This data is not persisted across sync cycles.
+type MFARegistrationDetails struct {
+	IsMFACapable                                  bool     `json:"isMfaCapable"`
+	IsMFARegistered                               bool     `json:"isMfaRegistered"`
+	IsPasswordlessCapable                         bool     `json:"isPasswordlessCapable"`
+	IsSsprCapable                                 bool     `json:"isSsprCapable"`
+	IsSsprEnabled                                 bool     `json:"isSsprEnabled"`
+	IsSsprRegistered                              bool     `json:"isSsprRegistered"`
+	IsSystemPreferredAuthenticationMethodEnabled  bool     `json:"isSystemPreferredAuthenticationMethodEnabled"`
+	MethodsRegistered                             []string `json:"methodsRegistered"`
+	SystemPreferredAuthenticationMethods          []string `json:"systemPreferredAuthenticationMethods"`
+	UserPreferredMethodForSecondaryAuthentication string   `json:"userPreferredMethodForSecondaryAuthentication"`
+	UserType                                      string   `json:"userType"`
 }
 
 // Merge will merge the attributes and group memberships of another User

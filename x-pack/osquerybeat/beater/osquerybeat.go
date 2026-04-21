@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -91,11 +92,13 @@ type osquerybeat struct {
 	diagMx        sync.RWMutex
 	diagQueryExec queryExecutor
 
-	// parent process watcher
-	watcher *Watcher
+	// parent process watcher (disabled via disableWatcher when running as an OTel receiver)
+	watcher        *Watcher
+	disableWatcher bool
 
-	osquerydFactory osqd.RunnerFactory
-	executablePath  func() (string, error)
+	osquerydFactory          osqd.RunnerFactory
+	executablePath           func() (string, error)
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 type osquerybeatPublisher interface {
@@ -109,14 +112,16 @@ var _ osquerybeatPublisher = (*pub.Publisher)(nil)
 
 // New creates an instance of osquerybeat.
 func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
-	log := logp.NewLogger("osquerybeat")
+	log := b.Info.Logger
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 	installCfg := config.GetOsqueryInstallConfig(c.Inputs)
-	if err := installCfg.NormalizeAndValidate(); err != nil {
+	var err error
+	installCfg, err = installCfg.NormalizeAndValidate()
+	if err != nil {
 		return nil, fmt.Errorf("invalid osquery.elastic_options.install configuration: %w", err)
 	}
 
@@ -133,7 +138,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
 	if profileCfg.EnabledOrDefault() {
-		profileDir := b.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
+		profileDir := b.Info.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
 		store, err := newLiveProfileStore(log, profileDir, profileCfg.MaxProfilesOrDefault())
 		if err != nil {
 			log.Warnw("failed to initialize live query profile storage", "error", err)
@@ -154,10 +159,12 @@ func (bt *osquerybeat) init() (context.Context, error) {
 	var ctx context.Context
 	ctx, bt.cancel = context.WithCancel(context.Background())
 
-	if bt.watcher != nil {
-		bt.watcher.Close()
+	if !bt.disableWatcher {
+		if bt.watcher != nil {
+			bt.watcher.Close()
+		}
+		bt.watcher = NewWatcher(bt.log)
 	}
-	bt.watcher = NewWatcher(bt.log)
 	return ctx, nil
 }
 
@@ -274,11 +281,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Ensure that all the hooks and actions are ready before starting the Manager
 	// to receive configuration.
 	bt.registerDiagnosticHooks(b)
-	if err := b.Manager.Start(); err != nil {
+	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
 	}
-	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -383,12 +389,6 @@ func (bt *osquerybeat) setDiagnosticsQueryExecutor(qe queryExecutor) {
 	bt.diagMx.Lock()
 	defer bt.diagMx.Unlock()
 	bt.diagQueryExec = qe
-}
-
-func (bt *osquerybeat) getDiagnosticsQueryExecutor() queryExecutor {
-	bt.diagMx.RLock()
-	defer bt.diagMx.RUnlock()
-	return bt.diagQueryExec
 }
 
 func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Runner, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler, osqdMetrics *osquerydMetrics) error {
@@ -714,6 +714,10 @@ func (bt *osquerybeat) resolveOsqueryRuntime(ctx context.Context) (osqueryRuntim
 // Stop stops osquerybeat.
 func (bt *osquerybeat) Stop() {
 	bt.close()
+}
+
+func (bt *osquerybeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin, rah *resetableActionHandler) {

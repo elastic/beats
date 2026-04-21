@@ -89,6 +89,8 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
+func (m *testManager) PreInit() error                      { return nil }
+func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
@@ -109,11 +111,12 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -132,11 +135,12 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -252,11 +256,12 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -290,11 +295,12 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -328,11 +334,12 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		startErr: assert.AnError, // Manager.Start() will fail
 	}
 	b := &beat.Beat{
+		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
 	}
-	b.Paths = newTestBeatPaths(t)
+	b.Info.Paths = newTestBeatPaths(t)
 
 	cfg := agentconfig.NewConfig()
 	beater, err := New(b, cfg)
@@ -399,6 +406,7 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 
 	count, ok := payload["count"].(float64)
 	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(1), count)
 
 	profiles, ok := payload["osquery_schedule"].([]interface{})
@@ -411,11 +419,12 @@ func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 
 	liveCount, ok := payload["live_query_profiles_count"].(float64)
 	require.True(t, ok)
+	//nolint:testifylint // We're comparing integers from a JSON
 	assert.Equal(t, float64(0), liveCount)
 
 	liveProfiles, ok := payload["live_query_profiles"].([]interface{})
 	require.True(t, ok)
-	assert.Len(t, liveProfiles, 0)
+	assert.Empty(t, liveProfiles)
 }
 
 // TestOsquerybeatStatusReporting_RuntimeResolutionFailure tests status reporting
