@@ -62,14 +62,6 @@ type Volume struct {
 	ntfsSession       func() (*NTFSSession, error)
 }
 
-func (v *Volume) ntfsContext() (*parser.NTFSContext, error) {
-	session, err := v.ntfsSession()
-	if err != nil {
-		return nil, err
-	}
-	return session.Context(), nil
-}
-
 // normalizeDriveLetter validates and normalizes a drive letter input, ensuring it is a single uppercase character.
 func normalizeDriveLetter(driveLetter string) (string, error) {
 	d := strings.TrimSpace(driveLetter)
