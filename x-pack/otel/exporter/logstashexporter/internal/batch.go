@@ -5,7 +5,6 @@
 package internal
 
 import (
-	"context"
 	"sync"
 	"sync/atomic"
 
@@ -30,8 +29,8 @@ type LogBatch struct {
 	mu            sync.RWMutex
 }
 
-func NewLogBatch(ctx context.Context, logs plog.Logs) (*LogBatch, error) {
-	events, err := createEvents(ctx, &logs)
+func NewLogBatch(logs plog.Logs) (*LogBatch, error) {
+	events, err := createEvents(&logs)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +40,7 @@ func NewLogBatch(ctx context.Context, logs plog.Logs) (*LogBatch, error) {
 	}, nil
 }
 
-func createEvents(ctx context.Context, logs *plog.Logs) ([]publisher.Event, error) {
+func createEvents(logs *plog.Logs) ([]publisher.Event, error) {
 	var events []publisher.Event
 	for _, rl := range logs.ResourceLogs().All() {
 		for _, sl := range rl.ScopeLogs().All() {

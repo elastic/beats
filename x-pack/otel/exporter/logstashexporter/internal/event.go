@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 )
 
 func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
@@ -21,7 +22,7 @@ func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
 		return beat.Event{}, consumererror.NewPermanent(errors.New("invalid beats event body, expected a map, got: " + logRecord.Body().Type().String()))
 	}
 
-	metadata := getEventMeta(fields)
+	removeRedundantMetadataFields(fields)
 
 	timestamp, ok := parseEventTimestamp(fields)
 	if !ok {
@@ -31,10 +32,6 @@ func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
 	event := beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
-	}
-
-	if metadata != nil {
-		event.Meta = metadata
 	}
 
 	return event, nil
@@ -62,10 +59,11 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-func getEventMeta(logRecordBody map[string]any) map[string]any {
-	meta, ok := logRecordBody["@metadata"].(map[string]any)
-	if !ok {
-		return nil
-	}
-	return meta
+// removeRedundantMetadataFields removes certain metadata fields that will be generated again when the event is serialized.
+// See https://github.com/elastic/beats/blob/v9.3.3/libbeat/outputs/codec/json/event.go#L43-L54
+// Not removing these fields would create duplicate fields and bloat the final event size
+func removeRedundantMetadataFields(fields map[string]any) {
+	delete(fields, otelctx.MetadataBeatKey)
+	delete(fields, otelctx.MetadataVersionKey)
+	delete(fields, "type")
 }
