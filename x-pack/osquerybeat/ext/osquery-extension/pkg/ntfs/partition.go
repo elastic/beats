@@ -62,6 +62,29 @@ var partitionTypeNames = map[string]string{
 	"DE94BBA4-06D1-4D40-A16A-BFD50179D6AC": "Recovery",
 }
 
+// mbrPartitionTypeNames maps the 1-byte MBR partition type to a friendly
+// name. Unknown values fall back to their hex representation.
+var mbrPartitionTypeNames = map[byte]string{
+	0x00: "Empty",
+	0x01: "FAT12",
+	0x04: "FAT16 <32M",
+	0x05: "Extended",
+	0x06: "FAT16",
+	0x07: "NTFS/exFAT",
+	0x0B: "FAT32",
+	0x0C: "FAT32 LBA",
+	0x0E: "FAT16 LBA",
+	0x0F: "Extended LBA",
+	0x27: "Windows Recovery",
+	0x42: "Dynamic Disk",
+	0x82: "Linux Swap",
+	0x83: "Linux",
+	0x8E: "Linux LVM",
+	0xEE: "GPT Protective",
+	0xEF: "EFI System",
+	0xFD: "Linux RAID",
+}
+
 // This needs to be an ordered list in order to make the output
 // of gptAttributeNamesFromBitmask deterministic for testing and display purposes
 // because go map iteration order is random.
@@ -93,6 +116,18 @@ type PARTITION_INFORMATION_GPT struct {
 	Name          [36]uint16
 }
 
+// PARTITION_INFORMATION_MBR mirrors the MBR member of the Windows
+// PARTITION_INFORMATION_EX union. It is strictly smaller than
+// PARTITION_INFORMATION_GPT, so it safely overlays the union bytes via Mbr().
+type PARTITION_INFORMATION_MBR struct {
+	PartitionType       byte
+	BootIndicator       byte
+	RecognizedPartition byte
+	_                   byte // alignment padding before HiddenSectors
+	HiddenSectors       uint32
+	PartitionId         [16]byte // GUID (Win10+; zeroed on older Windows)
+}
+
 type PARTITION_INFORMATION_EX struct {
 	PartitionStyle   uint32
 	_                [4]byte // alignment padding before int64
@@ -101,7 +136,20 @@ type PARTITION_INFORMATION_EX struct {
 	PartitionNumber  uint32
 	RewritePartition bool
 	_                [3]byte                   // padding
-	Gpt              PARTITION_INFORMATION_GPT // union; MBR is smaller so GPT fits
+	Gpt              PARTITION_INFORMATION_GPT // union; MBR is smaller and accessed via Mbr()
+}
+
+// Mbr reinterprets the union member as MBR partition info. Valid only when
+// PartitionStyle is MBR (0).
+func (p *PARTITION_INFORMATION_EX) Mbr() *PARTITION_INFORMATION_MBR {
+	return (*PARTITION_INFORMATION_MBR)(unsafe.Pointer(&p.Gpt))
+}
+
+// MbrSignature reads the MBR disk signature from the header's union member.
+// Valid only when PartitionStyle is MBR (0); DiskId overlays the MBR
+// DRIVE_LAYOUT_INFORMATION_MBR whose first 4 bytes are the signature.
+func (h *DRIVE_LAYOUT_INFORMATION_EX_HEADER) MbrSignature() uint32 {
+	return binary.LittleEndian.Uint32(h.DiskId[0:4])
 }
 
 type Partition struct {
@@ -125,7 +173,7 @@ func guidStringFromBytes(b [16]byte) string {
 	return fmt.Sprintf("%08X-%04X-%04X-%04X-%012X", d1, d2, d3, b[8:10], b[10:16])
 }
 
-func NewPartition(partitionInfo *PARTITION_INFORMATION_EX) (*Partition, error) {
+func NewPartition(partitionInfo *PARTITION_INFORMATION_EX, mbrDiskSignature uint32) (*Partition, error) {
 	if partitionInfo == nil {
 		return nil, fmt.Errorf("partitionInfo is nil")
 	}
@@ -142,8 +190,8 @@ func NewPartition(partitionInfo *PARTITION_INFORMATION_EX) (*Partition, error) {
 		Length:         partitionInfo.PartitionLength,
 	}
 
-	// For MBR partitions, we won't have a type GUID or name, but we can still return the style and offsets.
-	if styleName == "GPT" {
+	switch styleName {
+	case "GPT":
 		partitionType := guidStringFromBytes(partitionInfo.Gpt.PartitionType)
 		if name, ok := partitionTypeNames[partitionType]; ok {
 			partitionType = name
@@ -161,6 +209,20 @@ func NewPartition(partitionInfo *PARTITION_INFORMATION_EX) (*Partition, error) {
 		p.AttributesMask = fmt.Sprintf("0x%016X", partitionInfo.Gpt.Attributes)
 		p.Attributes = attributes
 		p.Name = windows.UTF16ToString(partitionInfo.Gpt.Name[:])
+	case "MBR":
+		mbr := partitionInfo.Mbr()
+		typeName := fmt.Sprintf("0x%02X", mbr.PartitionType)
+		if name, ok := mbrPartitionTypeNames[mbr.PartitionType]; ok {
+			typeName = name
+		}
+		p.Type = typeName
+		p.Id = fmt.Sprintf("MBR-%08X-%d", mbrDiskSignature, partitionInfo.PartitionNumber)
+		p.AttributesMask = fmt.Sprintf("0x%02X", mbr.BootIndicator)
+		if mbr.BootIndicator != 0 {
+			p.Attributes = "Bootable"
+		} else {
+			p.Attributes = "None"
+		}
 	}
 
 	return p, nil
@@ -234,12 +296,20 @@ func GetPartitions(physicalDrive string) ([]*Partition, error) {
 		return nil, fmt.Errorf("DeviceIoControl returned %d bytes, need %d for header + %d * %d partitions", bytesReturned, headerSize, partitionCount, partitionSize)
 	}
 
+	// The MBR disk signature lives in the header's union region and is only
+	// meaningful when the drive layout is MBR; it's used to build stable MBR
+	// partition ids.
+	var mbrDiskSignature uint32
+	if partitionStyleNames[header.PartitionStyle] == "MBR" {
+		mbrDiskSignature = header.MbrSignature()
+	}
+
 	// parse each partition entry and convert to our Partition struct
 	var partitions []*Partition
 	for i := range partitionCount {
 		offset := headerSize + i*partitionSize
 		partitionInfo := (*PARTITION_INFORMATION_EX)(unsafe.Pointer(&buf[offset]))
-		partition, err := NewPartition(partitionInfo)
+		partition, err := NewPartition(partitionInfo, mbrDiskSignature)
 		if err != nil {
 			log.Errorf("Failed to parse partition %d: %v", i, err)
 			continue
