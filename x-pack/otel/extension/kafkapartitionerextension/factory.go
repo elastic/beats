@@ -12,8 +12,10 @@ import (
 	"go.opentelemetry.io/collector/extension"
 )
 
+var Type component.Type = component.MustNewType("kafkapartitioner")
+
 func NewFactory() extension.Factory {
-	return extension.NewFactory(component.MustNewType("kafkapartitioner"), createDefaultConfig, newExtension, component.StabilityLevelDevelopment)
+	return extension.NewFactory(Type, createDefaultConfig, newExtension, component.StabilityLevelDevelopment)
 }
 
 func newExtension(ctx context.Context, set extension.Settings, cfg component.Config) (extension.Extension, error) {

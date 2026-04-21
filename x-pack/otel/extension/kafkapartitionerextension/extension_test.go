@@ -11,7 +11,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/extension/extensiontest"
 	"go.uber.org/zap/zaptest"
@@ -19,7 +18,7 @@ import (
 
 func newTestPartitioner(t *testing.T, partitionerConfig map[string]any) *kafkaPartitioner {
 	t.Helper()
-	settings := extensiontest.NewNopSettings(component.MustNewType("kafkapartitioner"))
+	settings := extensiontest.NewNopSettings(Type)
 	settings.Logger = zaptest.NewLogger(t)
 	ext, err := newExtension(context.Background(), settings, &Config{
 		PartitionerConfig: partitionerConfig,
