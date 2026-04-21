@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/cmd"
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
@@ -23,7 +22,7 @@ import (
 	_ "github.com/elastic/beats/v7/auditbeat/include"
 
 	// Import X-Pack modules.
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
@@ -44,8 +43,8 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("could not convert otel config to auditbeat config")
 	}
 	settings := cmd.AuditbeatSettings(nil)
-	settings.Processing = processing.MakeDefaultSupport(true, nil, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
+	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
 	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
 	if err != nil {
