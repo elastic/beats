@@ -83,7 +83,7 @@ func TestPublishPoolNoAllocsInSteadyState(t *testing.T) {
 
 	// Without pool: 1 alloc/op (make(chan queue.EntryID, 1) in makePushRequest).
 	// With pool warm: 0 allocs/op (channel comes from pool).
-	assert.Equal(t, 0.0, allocs,
+	assert.InDelta(t, 0.0, allocs, 0,
 		"Publish should not allocate a response channel after pool warmup; "+
 			"got %.1f allocs/op — check that pool.Put is reached after every publish", allocs)
 }
