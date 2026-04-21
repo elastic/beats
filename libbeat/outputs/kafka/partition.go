@@ -235,7 +235,7 @@ func makeHashPartitioner() partitioner {
 		}
 
 		// create positive hash value
-		return hash2Partition(hash, numPartitions)
+		return Hash2Partition(hash, numPartitions), nil
 	}
 }
 
@@ -249,7 +249,7 @@ func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool)
 
 			var err error
 			for _, field := range fields {
-				err = hashFieldValue(hasher, msg.data.Content.Fields, field)
+				err = HashFieldValue(hasher, msg.data.Content.Fields, field)
 				if err != nil {
 					break
 				}
@@ -268,16 +268,16 @@ func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool)
 			hash = msg.hash
 		}
 
-		return hash2Partition(hash, numPartitions)
+		return Hash2Partition(hash, numPartitions), nil
 	}
 }
 
-func hash2Partition(hash uint32, numPartitions int32) (int32, error) {
+func Hash2Partition(hash uint32, numPartitions int32) int32 {
 	p := int32(hash) & 0x7FFFFFFF
-	return p % numPartitions, nil
+	return p % numPartitions
 }
 
-func hashFieldValue(h hash.Hash32, event mapstr.M, field string) error {
+func HashFieldValue(h hash.Hash32, event mapstr.M, field string) error {
 	type stringer interface {
 		String() string
 	}

@@ -5,18 +5,15 @@
 package kafkapartitionerextension
 
 import (
-	"encoding/binary"
 	"fmt"
-	"hash"
 	"hash/fnv"
 	"math/rand/v2"
-	"strconv"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 
+	"github.com/elastic/beats/v7/libbeat/outputs/kafka"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type partitionBuilder func(*logp.Logger, *config.C, bool) (kgo.Partitioner, error)
@@ -159,7 +156,7 @@ func makeHashKgoPartitioner() kgo.Partitioner {
 			hasher.Reset()
 			_, _ = hasher.Write(msg.Key)
 
-			return hash2Partition(hasher.Sum32(), numPartitions)
+			return int(kafka.Hash2Partition(rand.Uint32(), int32(numPartitions)))
 		}
 	})
 }
@@ -176,12 +173,15 @@ func makeFieldsHashPartitioner(
 		unmarshaled, err := unmarshalLogs(msg.Value)
 		if err != nil {
 			log.Errorf("failed to unmarshal logs into map: %v", err)
-			return hash2Partition(rand.Uint32(), numPartitions)
+			if dropFail {
+				return -1
+			}
+			return int(kafka.Hash2Partition(rand.Uint32(), int32(numPartitions)))
 		}
 
 		hasher.Reset()
 		for _, field := range fields {
-			err = hashFieldValue(hasher, unmarshaled, field)
+			err = kafka.HashFieldValue(hasher, unmarshaled, field)
 			if err != nil {
 				break
 			}
@@ -197,61 +197,8 @@ func makeFieldsHashPartitioner(
 			hash = hasher.Sum32()
 		}
 
-		return hash2Partition(hash, numPartitions)
+		return int(kafka.Hash2Partition(hash, int32(numPartitions)))
 	}
-}
-
-func hash2Partition(hash uint32, numPartitions int) int {
-	return int(hash&0x7fffffff) % numPartitions
-}
-
-func hashFieldValue(h hash.Hash32, event mapstr.M, field string) error {
-	type stringer interface {
-		String() string
-	}
-
-	type hashable interface {
-		Hash32(h hash.Hash32) error
-	}
-
-	v, err := event.GetValue(field)
-	if err != nil {
-		return err
-	}
-
-	switch s := v.(type) {
-	case hashable:
-		return s.Hash32(h)
-
-	case string:
-		_, err = h.Write([]byte(s))
-
-	case []byte:
-		_, err = h.Write(s)
-
-	case stringer:
-		_, err = h.Write([]byte(s.String()))
-
-	case int8, int16, int32, int64, int,
-		uint8, uint16, uint32, uint64, uint:
-		err = binary.Write(h, binary.LittleEndian, v)
-
-	case float32:
-		tmp := strconv.FormatFloat(float64(s), 'g', -1, 32)
-		_, err = h.Write([]byte(tmp))
-
-	case float64:
-		tmp := strconv.FormatFloat(s, 'g', -1, 64)
-		_, err = h.Write([]byte(tmp))
-
-	default:
-		err = binary.Write(h, binary.LittleEndian, v)
-		if err != nil {
-			return fmt.Errorf("cannot hash key '%v' of unknown type", field)
-		}
-	}
-
-	return err
 }
 
 func partitionerFn(partition func(string) func(r *kgo.Record, n int) int, requireConsistency bool) kgo.Partitioner {
