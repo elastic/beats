@@ -142,8 +142,8 @@ func TestAddMetaSharedMetadataUnmutated(t *testing.T) {
 	assert.Equal(t, "us-east-1", region2, "shared metadata must not be corrupted by event mutation")
 
 	// The shared p.metadata itself must also be clean.
-	require.IsType(t, mapstr.M{}, meta["cloud"])
-	cloudMeta := meta["cloud"].(mapstr.M)
+	cloudMeta, ok := meta["cloud"].(mapstr.M)
+	require.True(t, ok, "expected meta[cloud] to be mapstr.M")
 	assert.Equal(t, "us-east-1", cloudMeta["region"],
 		"p.metadata must remain unchanged after events are processed")
 }
@@ -172,12 +172,12 @@ func TestAddMetaNestedMapsAreCloned(t *testing.T) {
 	// Mutate a deeply nested value in event1.
 	tags1Raw, err := event1.Fields.GetValue("cloud.instance.tags")
 	require.NoError(t, err)
-	require.IsType(t, mapstr.M{}, tags1Raw)
-	tags1Map := tags1Raw.(mapstr.M)
+	tags1Map, ok := tags1Raw.(mapstr.M)
+	require.True(t, ok, "expected tags on event1 to be mapstr.M")
 	tags2Raw, err := event2.Fields.GetValue("cloud.instance.tags")
 	require.NoError(t, err)
-	require.IsType(t, mapstr.M{}, tags2Raw)
-	tags2Map := tags2Raw.(mapstr.M)
+	tags2Map, ok := tags2Raw.(mapstr.M)
+	require.True(t, ok, "expected tags on event2 to be mapstr.M")
 	assert.NotSame(t, &tags1Map, &tags2Map, "tags maps on different events must not be aliased")
 	tags1Map["env"] = "dev"
 
@@ -187,12 +187,12 @@ func TestAddMetaNestedMapsAreCloned(t *testing.T) {
 	assert.Equal(t, "prod", tags2env, "deeply nested maps must be independently cloned per event")
 
 	// p.metadata must also be unchanged.
-	require.IsType(t, mapstr.M{}, meta["cloud"])
-	metaCloud := meta["cloud"].(mapstr.M)
-	require.IsType(t, mapstr.M{}, metaCloud["instance"])
-	metaInstance := metaCloud["instance"].(mapstr.M)
-	require.IsType(t, mapstr.M{}, metaInstance["tags"])
-	metaTags := metaInstance["tags"].(mapstr.M)
+	metaCloud, ok := meta["cloud"].(mapstr.M)
+	require.True(t, ok, "expected meta[cloud] to be mapstr.M")
+	metaInstance, ok := metaCloud["instance"].(mapstr.M)
+	require.True(t, ok, "expected meta[cloud][instance] to be mapstr.M")
+	metaTags, ok := metaInstance["tags"].(mapstr.M)
+	require.True(t, ok, "expected meta[cloud][instance][tags] to be mapstr.M")
 	assert.Equal(t, "prod", metaTags["env"],
 		"p.metadata nested map must remain unchanged")
 }
@@ -310,10 +310,10 @@ func TestAddMetaWithMultipleTopLevelKeys(t *testing.T) {
 	require.NoError(t, err)
 	cluster2Raw, err := event2.Fields.GetValue("orchestrator.cluster")
 	require.NoError(t, err)
-	require.IsType(t, mapstr.M{}, cluster1Raw)
-	require.IsType(t, mapstr.M{}, cluster2Raw)
-	cluster1Map := cluster1Raw.(mapstr.M)
-	cluster2Map := cluster2Raw.(mapstr.M)
+	cluster1Map, ok := cluster1Raw.(mapstr.M)
+	require.True(t, ok, "expected cluster on event1 to be mapstr.M")
+	cluster2Map, ok := cluster2Raw.(mapstr.M)
+	require.True(t, ok, "expected cluster on event2 to be mapstr.M")
 	assert.NotSame(t, &cluster1Map, &cluster2Map, "cluster maps on different events must not be aliased")
 	cluster1Map["name"] = "mutated"
 
@@ -348,10 +348,10 @@ func TestDeepCloneUpdateNoAliasing(t *testing.T) {
 	require.NoError(t, err)
 	dstCloud, err := dst.GetValue("cloud")
 	require.NoError(t, err)
-	require.IsType(t, mapstr.M{}, srcCloud)
-	require.IsType(t, mapstr.M{}, dstCloud)
-	srcCloudMap := srcCloud.(mapstr.M)
-	dstCloudMap := dstCloud.(mapstr.M)
+	srcCloudMap, ok := srcCloud.(mapstr.M)
+	require.True(t, ok, "expected src cloud to be mapstr.M")
+	dstCloudMap, ok := dstCloud.(mapstr.M)
+	require.True(t, ok, "expected dst cloud to be mapstr.M")
 	assert.NotSame(t, &srcCloudMap, &dstCloudMap, "src and dst cloud maps must not be aliased after DeepCloneUpdate")
 
 	// Mutate dst.
