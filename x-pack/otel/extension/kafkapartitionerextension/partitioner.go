@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type partitionBuilder func(*logp.Logger, *config.C) (kgo.Partitioner, error)
+type partitionBuilder func(*logp.Logger, *config.C, bool) (kgo.Partitioner, error)
 
 var partitioners = map[string]partitionBuilder{
 	"random":      cfgRandomPartitioner,
@@ -49,18 +49,27 @@ func makePartitioner(
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to marshal config %w", err)
+		return nil, fmt.Errorf("unable to get config %w", err)
 	}
-
+	// parse shared config
+	reachable := struct {
+		Reachable bool `config:"reachable_only"`
+	}{
+		Reachable: false,
+	}
+	err = cfg.Unpack(&reachable)
+	if err != nil {
+		return nil, fmt.Errorf("unable to unpack config %w", err)
+	}
 	builder := partitioners[name]
 	if builder == nil {
 		return nil, fmt.Errorf("unknown kafka partition mode %v", name)
 	}
 
-	return builder(log, cfg)
+	return builder(log, cfg, reachable.Reachable)
 }
 
-func cfgRandomPartitioner(_ *logp.Logger, cfg *config.C) (kgo.Partitioner, error) {
+func cfgRandomPartitioner(_ *logp.Logger, cfg *config.C, reachable bool) (kgo.Partitioner, error) {
 	conf := struct {
 		GroupEvents int `config:"group_events" validate:"min=1"`
 	}{
@@ -71,7 +80,7 @@ func cfgRandomPartitioner(_ *logp.Logger, cfg *config.C) (kgo.Partitioner, error
 		return nil, err
 	}
 
-	return kgo.BasicConsistentPartitioner(func(topic string) func(*kgo.Record, int) int {
+	return partitionerFn(func(topic string) func(*kgo.Record, int) int {
 		N := conf.GroupEvents
 		count := N
 		partition := 0
@@ -84,10 +93,10 @@ func cfgRandomPartitioner(_ *logp.Logger, cfg *config.C) (kgo.Partitioner, error
 			count++
 			return partition
 		}
-	}), nil
+	}, reachable), nil
 }
 
-func cfgRoundRobinPartitioner(_ *logp.Logger, cfg *config.C) (kgo.Partitioner, error) {
+func cfgRoundRobinPartitioner(_ *logp.Logger, cfg *config.C, reachable bool) (kgo.Partitioner, error) {
 	conf := struct {
 		GroupEvents int `config:"group_events" validate:"min=1"`
 	}{
@@ -98,7 +107,7 @@ func cfgRoundRobinPartitioner(_ *logp.Logger, cfg *config.C) (kgo.Partitioner, e
 		return nil, err
 	}
 
-	return kgo.BasicConsistentPartitioner(func(topic string) func(*kgo.Record, int) int {
+	return partitionerFn(func(topic string) func(*kgo.Record, int) int {
 		N := conf.GroupEvents
 		count := N
 		partition := rand.IntN(1<<31 - 1)
@@ -114,10 +123,10 @@ func cfgRoundRobinPartitioner(_ *logp.Logger, cfg *config.C) (kgo.Partitioner, e
 			count++
 			return partition
 		}
-	}), nil
+	}, reachable), nil
 }
 
-func cfgHashPartitioner(log *logp.Logger, cfg *config.C) (kgo.Partitioner, error) {
+func cfgHashPartitioner(log *logp.Logger, cfg *config.C, reachable bool) (kgo.Partitioner, error) {
 	conf := struct {
 		Hash   []string `config:"hash"`
 		Random bool     `config:"random"`
@@ -133,9 +142,9 @@ func cfgHashPartitioner(log *logp.Logger, cfg *config.C) (kgo.Partitioner, error
 		return makeHashKgoPartitioner(), nil
 	}
 
-	return kgo.BasicConsistentPartitioner(func(topic string) func(*kgo.Record, int) int {
+	return partitionerFn(func(topic string) func(*kgo.Record, int) int {
 		return makeFieldsHashPartitioner(log, conf.Hash, !conf.Random)
-	}), nil
+	}, reachable), nil
 }
 
 func makeHashKgoPartitioner() kgo.Partitioner {
@@ -244,3 +253,26 @@ func hashFieldValue(h hash.Hash32, event mapstr.M, field string) error {
 
 	return err
 }
+
+func partitionerFn(partition func(string) func(r *kgo.Record, n int) int, requireConsistency bool) kgo.Partitioner {
+	return &basicPartitioner{fn: partition, requireConsistency: requireConsistency}
+}
+
+type (
+	basicPartitioner struct {
+		fn                 func(string) func(*kgo.Record, int) int
+		requireConsistency bool
+	}
+
+	basicTopicPartitioner struct {
+		fn                 func(*kgo.Record, int) int
+		requireConsistency bool
+	}
+)
+
+func (b *basicPartitioner) ForTopic(t string) kgo.TopicPartitioner {
+	return &basicTopicPartitioner{fn: b.fn(t), requireConsistency: b.requireConsistency}
+}
+
+func (b *basicTopicPartitioner) RequiresConsistency(*kgo.Record) bool { return !b.requireConsistency }
+func (b *basicTopicPartitioner) Partition(r *kgo.Record, n int) int   { return b.fn(r, n) }
