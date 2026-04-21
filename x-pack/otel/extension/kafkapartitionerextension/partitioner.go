@@ -8,10 +8,11 @@ import (
 	"math/rand/v2"
 	"strconv"
 
+	"github.com/twmb/franz-go/pkg/kgo"
+
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/twmb/franz-go/pkg/kgo"
 )
 
 type partitionBuilder func(*logp.Logger, *config.C) (kgo.Partitioner, error)

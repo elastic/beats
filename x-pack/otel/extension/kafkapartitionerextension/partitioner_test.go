@@ -8,11 +8,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/twmb/franz-go/pkg/kgo"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func getPartitioner(t *testing.T, cfg map[string]any) (kgo.Partitioner, kgo.TopicPartitioner) {
