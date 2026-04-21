@@ -55,6 +55,8 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 		Inode:     int64(f.mftEntry.Record_number()),
 	}
 
+	result.SequenceNumber = int32(f.mftEntry.Sequence_value()) //nolint:gosec // G115: sequence numbers are 16-bit values that fit comfortably in int32
+
 	result.Path = f.BuildFullPath()
 	result.Directory = filepath.Dir(result.Path)
 	if f.parent != nil {

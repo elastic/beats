@@ -158,7 +158,7 @@ func (v *Volume) FindByInode(inode int64) (*fileNode, error) {
 func (v *Volume) FindByPath(fullPath string, parent *fileNode) (*fileNode, error) {
 	explodedPath, err := v.explodePath(fullPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to explode path: %w", err)
+		return nil, fmt.Errorf("failed to parse path: %w", err)
 	}
 	if len(explodedPath) == 0 {
 		return nil, fmt.Errorf("path %s is invalid after splitting components", fullPath)
@@ -207,13 +207,18 @@ func (v *Volume) FindByDirectory(directory string, pattern string) ([]*fileNode,
 // Drive letter is a required parameter for constructing a Volume, so we need it to move forward with the query.
 // It can be provided directly as a constraint, or indirectly via a path or directory constraint.
 // This function attempts to extract the drive letter from the query constraints in order of specificity: drive > path > directory.
-func determineDriveLetter(queryContext table.QueryContext) (string, error) {
-	driveFilters := filters.GetColumnConstraints(queryContext, "drive", table.OperatorEquals)
-	if len(driveFilters) > 0 {
-		if len(driveFilters) > 1 {
-			return "", fmt.Errorf("multiple drive constraints found, only one is supported: %s", driveFilters[0].Expression)
+func determineDriveLetter(driveConstraints []filters.Filter, pathConstraints []filters.Filter, directoryConstraints []filters.Filter) (string, error) {
+	if len(driveConstraints) > 0 {
+		if len(driveConstraints) > 1 {
+			return "", fmt.Errorf("multiple drive constraints found, only one is supported: %s", driveConstraints[0].Expression)
 		}
-		return driveFilters[0].Expression, nil
+
+		driveLetter := driveConstraints[0].Expression
+		if len(driveLetter) != 1 {
+			return "", fmt.Errorf("drive constraint must be a single letter (e.g. 'C'), got %q", driveLetter)
+		}
+
+		return strings.ToUpper(driveLetter), nil
 	}
 
 	getDriveLetterFromPath := func(path string) (string, error) {
@@ -227,20 +232,18 @@ func determineDriveLetter(queryContext table.QueryContext) (string, error) {
 		return driveLetter, nil
 	}
 
-	pathFilters := filters.GetColumnConstraints(queryContext, "path", table.OperatorEquals)
-	if len(pathFilters) > 0 {
-		if len(pathFilters) > 1 {
-			return "", fmt.Errorf("multiple path constraints found, only one is supported: %s", pathFilters[0].Expression)
+	if len(pathConstraints) > 0 {
+		if len(pathConstraints) > 1 {
+			return "", fmt.Errorf("multiple path constraints found, only one is supported: %s", pathConstraints[0].Expression)
 		}
-		return getDriveLetterFromPath(pathFilters[0].Expression)
+		return getDriveLetterFromPath(pathConstraints[0].Expression)
 	}
 
-	directoryFilters := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
-	if len(directoryFilters) > 0 {
-		if len(directoryFilters) > 1 {
-			return "", fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
+	if len(directoryConstraints) > 0 {
+		if len(directoryConstraints) > 1 {
+			return "", fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryConstraints[0].Expression)
 		}
-		return getDriveLetterFromPath(directoryFilters[0].Expression)
+		return getDriveLetterFromPath(directoryConstraints[0].Expression)
 	}
 	return "", fmt.Errorf("no drive, path, or directory constraints found")
 }
@@ -248,105 +251,129 @@ func determineDriveLetter(queryContext table.QueryContext) (string, error) {
 func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticntfsfile.Result, error) {
 	setLogger(log)
 
+	results := []elasticntfsfile.Result{}
+
+	driveConstraints := filters.GetColumnConstraints(queryContext, "drive", table.OperatorEquals)
 	directoryConstraints := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
 	pathConstraints := filters.GetColumnConstraints(queryContext, "path", table.OperatorEquals)
 	inodeConstraints := filters.GetColumnConstraints(queryContext, "inode", table.OperatorEquals)
 	filenameConstraints := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
 
+	// Determine the drive letter from the query constraints
+	driveLetter, err := determineDriveLetter(driveConstraints, directoryConstraints, pathConstraints)
+	if err != nil {
+		log.Warningf("%v", err)
+		return results, nil
+	}
+
 	// Check for conflicting constraints
 	if len(directoryConstraints) > 0 && (len(pathConstraints) > 0 || len(inodeConstraints) > 0) {
-		return nil, fmt.Errorf("directory constraint cannot be combined with path or inode constraints")
+		log.Warningf("directory constraint cannot be combined with path or inode constraints")
+		return results, nil
 	}
-	if len(directoryConstraints) > 1 {
-		return nil, fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryConstraints[0].Expression)
-	}
+
 	if len(directoryConstraints) > 0 && len(filenameConstraints) == 0 {
-		return nil, fmt.Errorf("directory constraint requires a filename glob constraint")
+		log.Warning("directory constraint requires a filename glob constraint")
+		return results, nil
 	}
+
 	if len(directoryConstraints) > 0 && len(filenameConstraints) > 1 {
-		return nil, fmt.Errorf("multiple filename constraints found, only one is supported: %s", filenameConstraints[0].Expression)
+		log.Warning("multiple filename constraints found, only one is supported")
+		return results, nil
 	}
 
 	if len(pathConstraints) > 0 && len(inodeConstraints) > 0 {
-		return nil, fmt.Errorf("path and inode constraints cannot be combined")
+		log.Warning("path and inode constraints cannot be combined")
+		return results, nil
 	}
 
-	// Check for multiple constraints
+	if len(directoryConstraints) > 1 {
+		log.Warning("multiple directory constraints found, only one is supported")
+		return results, nil
+	}
+
 	if len(pathConstraints) > 1 {
-		return nil, fmt.Errorf("multiple path constraints found, only one is supported: %s", pathConstraints[0].Expression)
+		log.Warning("multiple path constraints found, only one is supported")
+		return results, nil
 	}
 
-	// Check for multiple constraints
 	if len(inodeConstraints) > 1 {
-		return nil, fmt.Errorf("multiple inode constraints found, only one is supported: %s", inodeConstraints[0].Expression)
+		log.Warning("multiple inode constraints found, only one is supported")
+		return results, nil
 	}
 
-	// Determine the drive letter from the query constraints
-	driveLetter, err := determineDriveLetter(queryContext)
-	if err != nil {
-		return nil, fmt.Errorf("failed to determine drive letter from query constraints: %w", err)
+	if len(filenameConstraints) > 0 && len(directoryConstraints) == 0 {
+		log.Warning("filename glob constraint requires a directory constraint")
+		return results, nil
+	}
+
+	if len(filenameConstraints) > 0 && (len(inodeConstraints) > 0 || len(pathConstraints) > 0) {
+		log.Warning("filename glob constraint cannot be combined with inode or path constraints")
+		return results, nil
 	}
 
 	// Open the volume
 	vol, err := newVolume(driveLetter)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open volume for drive %s: %w", driveLetter, err)
+		log.Warningf("failed to open volume for drive %s: %v", driveLetter, err)
+		return results, nil
 	}
 	defer vol.Close()
 
 	// Handle inode constraint
 	if len(inodeConstraints) > 0 {
 		inodeStr := inodeConstraints[0].Expression
-		log.Infof("Query has inode constraint: %s", inodeStr)
 		inode, err := strconv.Atoi(inodeStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to convert inode %s to integer: %w", inodeStr, err)
+			log.Warningf("invalid inode constraint %s: %v", inodeStr, err)
+			return results, nil
 		}
+
 		result, err := vol.FindByInode(int64(inode))
 		if err != nil {
-			return nil, fmt.Errorf("failed to find by inode %d: %w", inode, err)
+			log.Warningf("Failed to find by inode %d: %v", inode, err)
+			return results, nil
 		}
+
 		materialized, err := result.Materialize()
 		if err != nil {
-			return nil, fmt.Errorf("failed to materialize result for inode %d: %w", inode, err)
+			log.Warningf("Failed to materialize result for inode %d: %v", inode, err)
+			return results, nil
 		}
-		return []elasticntfsfile.Result{*materialized}, nil
+
+		results = append(results, *materialized)
+		return results, nil
 	}
 
 	// Handle path constraint
 	if len(pathConstraints) > 0 {
 		path := pathConstraints[0].Expression
-		log.Infof("Query has path constraint: %s", path)
 		result, err := vol.FindByPath(path, nil)
+
 		if err != nil {
-			return nil, fmt.Errorf("failed to find by path %s: %w", path, err)
+			log.Warningf("Failed to find by path %s: %v", path, err)
+			return results, nil
 		}
 		materialized, err := result.Materialize()
 		if err != nil {
-			return nil, fmt.Errorf("failed to materialize result for path %s: %w", path, err)
+			log.Warningf("Failed to materialize result for path %s: %v", path, err)
+			return results, nil
 		}
-		return []elasticntfsfile.Result{*materialized}, nil
+
+		results = append(results, *materialized)
+		return results, nil
 	}
 
 	// Handle directory constraint
 	if len(directoryConstraints) > 0 {
-		directoryFilters := filters.GetColumnConstraints(queryContext, "directory", table.OperatorEquals)
-		if len(directoryFilters) != 1 {
-			return nil, fmt.Errorf("multiple directory constraints found, only one is supported: %s", directoryFilters[0].Expression)
-		}
-		filenameFilters := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
-		if len(filenameFilters) != 1 {
-			return nil, fmt.Errorf("directory constraint requires a filename glob constraint")
-		}
-		directory := directoryFilters[0].Expression
-		pattern := filenameFilters[0].Expression
-		log.Infof("Performing directory search with filename pattern: %s", pattern)
+		directory := directoryConstraints[0].Expression
+		pattern := filenameConstraints[0].Expression
 		nodes, err := vol.FindByDirectory(directory, pattern)
 		if err != nil {
-			return nil, fmt.Errorf("failed to perform scoped search for directory %s: %w", directory, err)
+			log.Warningf("failed to perform scoped search for directory %s: %v", directory, err)
+			return results, nil
 		}
 
-		var results []elasticntfsfile.Result
 		for _, node := range nodes {
 			record, err := node.Materialize()
 			if err != nil {
@@ -357,7 +384,8 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 		}
 		return results, nil
 	}
-	return nil, fmt.Errorf("unsupported query, must have either directory constraint with filename glob, or path constraint, or inode constraint")
+	log.Warning("no valid constraints found for query, must have either directory constraint with filename glob, or path constraint, or inode constraint")
+	return results, nil
 }
 
 func init() {

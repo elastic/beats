@@ -74,9 +74,7 @@ type Result struct {
 	HardLinkCount  int32  `osquery:"hard_link_count"` // Number of hard links to this MFT entry
 	Active         int32  `osquery:"active"`          // 1 if the MFT entry is allocated (active), 0 if not
 	Size           int64  `osquery:"size"`            // Logical file size in bytes (from the default $DATA attribute)
-	Slack          int32  `osquery:"slack"`           // 1 if slack space is present, 0 otherwise
 	AllocatedSize  int64  `osquery:"allocated_size"`  // Allocated size in bytes (from the $FILE_NAME attribute)
-	RealSize       int64  `osquery:"real_size"`       // Real (on-disk) size in bytes
 	Flags          int32  `osquery:"flags"`           // File attribute flags from $STANDARD_INFORMATION
 	Ads            int32  `osquery:"ads"`             // 1 if the file has one or more Alternate Data Streams, 0 otherwise
 	ObjectId       string `osquery:"object_id"`       // Object identifier GUID from the $OBJECT_ID attribute

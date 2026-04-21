@@ -33,9 +33,7 @@ Returns information about files on NTFS volumes, parsed from the $MFT file on Wi
 | `hard_link_count` | `INTEGER` | Number of hard links to this MFT entry |
 | `active` | `INTEGER` | 1 if the MFT entry is allocated (active), 0 if not |
 | `size` | `BIGINT` | Logical file size in bytes (from the default $DATA attribute) |
-| `slack` | `INTEGER` | 1 if slack space is present, 0 otherwise |
 | `allocated_size` | `BIGINT` | Allocated size in bytes (from the $FILE_NAME attribute) |
-| `real_size` | `BIGINT` | Real (on-disk) size in bytes |
 | `flags` | `INTEGER` | File attribute flags from $STANDARD_INFORMATION |
 | `ads` | `INTEGER` | 1 if the file has one or more Alternate Data Streams, 0 otherwise |
 | `object_id` | `TEXT` | Object identifier GUID from the $OBJECT_ID attribute |

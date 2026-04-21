@@ -47,15 +47,9 @@ columns:
   - name: size
     type: BIGINT
     description: Logical file size in bytes (from the default $DATA attribute)
-  - name: slack
-    type: INTEGER
-    description: 1 if slack space is present, 0 otherwise
   - name: allocated_size
     type: BIGINT
     description: Allocated size in bytes (from the $FILE_NAME attribute)
-  - name: real_size
-    type: BIGINT
-    description: Real (on-disk) size in bytes
   - name: flags
     type: INTEGER
     description: File attribute flags from $STANDARD_INFORMATION
