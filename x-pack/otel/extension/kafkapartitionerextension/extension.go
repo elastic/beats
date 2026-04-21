@@ -6,7 +6,7 @@ package kafkapartitionerextension
 
 import (
 	"context"
-	"hash/fnv"
+	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter"
@@ -21,11 +21,19 @@ var _ extension.Extension = (*kafkaPartitioner)(nil)
 var _ kafkaexporter.RecordPartitionerExtension = (*kafkaPartitioner)(nil)
 
 type kafkaPartitioner struct {
-	cfg    *Config
-	logger *zap.Logger
+	cfg         *Config
+	logger      *zap.Logger
+	partitioner kgo.Partitioner
 }
 
-func (*kafkaPartitioner) Start(context.Context, component.Host) error {
+func (k *kafkaPartitioner) Start(context.Context, component.Host) error {
+	partitioner, err := makePartitioner(logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
+		return k.logger.Core()
+	})), k.cfg.PartitionerConfig)
+	if err != nil {
+		return fmt.Errorf("error configuring the partitioner: %w", err)
+	}
+	k.partitioner = partitioner
 	return nil
 }
 
@@ -34,19 +42,5 @@ func (*kafkaPartitioner) Shutdown(context.Context) error {
 }
 
 func (k *kafkaPartitioner) GetPartitioner() kgo.Partitioner {
-	partitioner, err := makePartitioner(logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return k.logger.Core()
-	})), k.cfg.PartitionerConfig)
-	if err != nil {
-		k.logger.Error("error creating partitioner, defaulting to sticky key partitioner with fnv32 hasher", zap.Error(err))
-		return kgo.StickyKeyPartitioner(kgo.SaramaCompatHasher(fnv32a))
-	}
-	return partitioner
-}
-
-func fnv32a(b []byte) uint32 {
-	h := fnv.New32a()
-	h.Reset()
-	h.Write(b)
-	return h.Sum32()
+	return k.partitioner
 }
