@@ -688,7 +688,6 @@ func testFSNotifyReaderOperation(
 		fsNotifyR, err := NewEventReader(Config{
 			Paths:     []string{dir},
 			Recursive: true,
-			Backend:   BackendFSNotify, // Explicitly use fsnotify for comparison
 		}, logp.NewLogger("test"))
 		require.NoError(t, err)
 
