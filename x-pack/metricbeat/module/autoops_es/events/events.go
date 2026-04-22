@@ -67,13 +67,6 @@ func ReportEvent(r mb.ReporterV2, event mb.Event, index int, total int) {
 	r.Event(event)
 }
 
-<<<<<<< HEAD
-// Report Metricbeat Events marked with the same transaction
-func ReportEvents(r mb.ReporterV2, events []mb.Event) {
-	var total = len(events)
-
-	for index, event := range events {
-=======
 // Create a new Metricbeat Events without a Transaction ID (so it has no predictable relationship to other events outside of @timestamp) and report them.
 // This should only be used when it happens to be an array of events that have no relationship to each other.
 func CreateAndReportEventsWithoutTransactionId(r mb.ReporterV2, info *utils.ClusterInfo, metricSets []mapstr.M) {
@@ -82,19 +75,10 @@ func CreateAndReportEventsWithoutTransactionId(r mb.ReporterV2, info *utils.Clus
 	for index, metricSetFields := range metricSets {
 		event := CreateEventWithoutTransactionId(info, metricSetFields)
 
->>>>>>> 26db6c4dc ([AutoOps] Use UUIDv7 in place of UUIDv4 and drop dashes (#50078))
 		ReportEvent(r, event, index, total)
 	}
 }
 
-<<<<<<< HEAD
-// Create a new Metricbeat Events with a shared, random Transaction ID
-func CreateAndReportEventsWithRandomTransactionId(r mb.ReporterV2, info *utils.ClusterInfo, metricSets []mapstr.M) {
-	CreateAndReportEvents(r, info, metricSets, utils.NewUUIDV4())
-}
-
-=======
->>>>>>> 26db6c4dc ([AutoOps] Use UUIDv7 in place of UUIDv4 and drop dashes (#50078))
 // Create a new Metricbeat Events
 func CreateAndReportEvents(r mb.ReporterV2, info *utils.ClusterInfo, metricSets []mapstr.M, transactionId string) {
 	var total = len(metricSets)
