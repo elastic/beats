@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"time"
@@ -33,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-docappender/v2"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -193,13 +195,20 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
+		// Work around the fact that Elasticsearch exporter returns 401 as a non-permanent error.
+		isAuthorizationError := false
+		var flushFailedErr docappender.ErrorFlushFailed
+		if errors.As(err, &flushFailedErr) {
+			isAuthorizationError = flushFailedErr.StatusCode() == http.StatusUnauthorized
+		}
+
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
 		// it cannot decode it. Retrying in this case is useless.
 		//
 		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
-		if consumererror.IsPermanent(err) {
+		if consumererror.IsPermanent(err) || isAuthorizationError {
 			st.PermanentErrors(len(events))
 			batch.Drop()
 		} else {
