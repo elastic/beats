@@ -46,7 +46,11 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 			// the way this works, we decide to export ILM or DSL based on the user's config.
 			// This means that if a user has no index management config, we'll default to ILM, regardless of what the user
 			// is connected to. Might not be a problem since a user who doesn't have any custom lifecycle config has nothing to export?
+<<<<<<< HEAD
 			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Paths, b.Config.LifecycleConfig)
+=======
+			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Config.LifecycleConfig)
+>>>>>>> 8b7236f25 (idxmgmt: remove redundant beatPaths parameter (#49838))
 			if err != nil {
 				fatalf("error creating file handler: %s", err)
 			}
