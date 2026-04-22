@@ -77,7 +77,7 @@ func initPartitionStrategy(
 	}
 
 	if len(partition) > 1 {
-		return nil, false, errors.New("Too many partitioners")
+		return nil, false, errors.New("too many partitioners")
 	}
 
 	// extract partitioner from config
@@ -273,7 +273,7 @@ func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool)
 }
 
 func Hash2Partition(hash uint32, numPartitions int32) int32 {
-	p := int32(hash) & 0x7FFFFFFF
+	p := int32(hash) & 0x7FFFFFFF //nolint:gosec // Conversion from int to int32 is safe here.
 	return p % numPartitions
 }
 

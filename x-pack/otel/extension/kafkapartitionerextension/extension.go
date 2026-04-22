@@ -13,7 +13,6 @@ import (
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -28,9 +27,11 @@ type kafkaPartitioner struct {
 }
 
 func (k *kafkaPartitioner) Start(context.Context, component.Host) error {
-	partitioner, err := makePartitioner(logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return k.logger.Core()
-	})), k.cfg.PartitionerConfig)
+	logger, err := logp.NewZapLogger(k.logger)
+	if err != nil {
+		return fmt.Errorf("error creating logger: %w", err)
+	}
+	partitioner, err := makePartitioner(logger, k.cfg.PartitionerConfig)
 	if err != nil {
 		return fmt.Errorf("error configuring the partitioner: %w", err)
 	}
