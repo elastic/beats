@@ -17,6 +17,8 @@ extensions:
     import: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/otel/extension/kafkapartitionerextension
 
 connectors:
 

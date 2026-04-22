@@ -7,6 +7,7 @@ extensions:
   elasticsearch_storage:
     hosts:
       - http://localhost:9200
+  kafkapartitioner:
 
 receivers:
   # Beats receivers
@@ -110,7 +111,7 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearch_storage]
+  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
   
   pipelines:
     logs:
