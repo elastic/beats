@@ -108,3 +108,4 @@ targets:
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
       matchpattern: '(IMAGE_.+): "1.0.(.+)"'
       replacepattern: '$1: "1.0.{{ source "latestVersion" }}"'
+      searchpattern: 'IMAGE_.+: "1.0.+"'
