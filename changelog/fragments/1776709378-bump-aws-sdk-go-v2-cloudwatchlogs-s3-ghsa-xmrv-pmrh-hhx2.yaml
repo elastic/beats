@@ -1,6 +1,6 @@
 kind: security
 
-summary: Bump aws-sdk-go-v2 cloudwatchlogs to v1.65.0 and s3 to v1.97.3 to fix GHSA-xmrv-pmrh-hhx2
+summary: Bump aws-sdk-go-v2/service/cloudwatchlogs to v1.65.0 to fix GHSA-xmrv-pmrh-hhx2
 
 component: all
 
