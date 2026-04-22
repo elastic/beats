@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -50,23 +51,17 @@ func createTestFileInfo() file.ExtendedFileInfo {
 func checkFields(t *testing.T, expected, actual mapstr.M) {
 	t.Helper()
 
-	idxhi, err := actual.GetValue(idxhiKey)
-	require.NoError(t, err)
-	require.Equal(t, "100", idxhi)
-	err = actual.Delete(idxhiKey)
-	require.NoError(t, err)
+	require.IsType(t, mapstr.M{}, actual["log"], "expected log to be mapstr.M")
+	logMap, _ := actual["log"].(mapstr.M)
+	require.IsType(t, mapstr.M{}, logMap["file"], "expected log.file to be mapstr.M")
+	fileMap, _ := logMap["file"].(mapstr.M)
 
-	idxlo, err := actual.GetValue(idxloKey)
-	require.NoError(t, err)
-	require.Equal(t, "200", idxlo)
-	err = actual.Delete(idxloKey)
-	require.NoError(t, err)
-
-	vol, err := actual.GetValue(volKey)
-	require.NoError(t, err)
-	require.Equal(t, "300", vol)
-	err = actual.Delete(volKey)
-	require.NoError(t, err)
+	require.Equal(t, "100", fileMap[idxhiKey])
+	delete(fileMap, idxhiKey)
+	require.Equal(t, "200", fileMap[idxloKey])
+	delete(fileMap, idxloKey)
+	require.Equal(t, "300", fileMap[volKey])
+	delete(fileMap, volKey)
 
 	require.Equal(t, expected, actual)
 }
@@ -74,4 +69,38 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 func checkFieldsWithOwnerGroup(t *testing.T, expected, actual mapstr.M) {
 	// Including owner and group are not supported on Windows yet
 	checkFields(t, expected, actual)
+}
+
+// TestCachedMetaSizing verifies that cachedMeta ends up with exactly the right
+// number of entries on Windows. Owner and group are not supported on Windows so
+// only path, the three volume fields, and fingerprint contribute to the count.
+func TestCachedMetaSizing(t *testing.T) {
+	fi := createTestFileInfo()
+	msg := reader.Message{Content: []byte("line"), Bytes: 4, Fields: mapstr.M{}}
+
+	tests := []struct {
+		name        string
+		fingerprint string
+		wantLen     int
+	}{
+		{"base only", "", 1 + platformFileFields},
+		{"with fingerprint", "hash", 1 + platformFileFields + 1},
+	}
+	// owner/group are not supported on Windows and do not add fields regardless
+	// of the includeOwner/includeGroup flags, so they are not tested here.
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := &FileMetaReader{
+				reader:      msgReader([]reader.Message{msg}),
+				path:        "test/path",
+				fi:          fi,
+				fingerprint: tc.fingerprint,
+			}
+			_, err := r.Next()
+			require.NoError(t, err)
+			require.Len(t, r.cachedMeta, tc.wantLen,
+				"cachedMeta entry count should match the pre-allocated size")
+		})
+	}
 }
