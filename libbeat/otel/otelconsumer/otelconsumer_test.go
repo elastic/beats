@@ -396,5 +396,5 @@ type testStatusCodeError struct {
 	msg        string
 }
 
-func (e *testStatusCodeError) Error() string  { return e.msg }
+func (e *testStatusCodeError) Error() string   { return e.msg }
 func (e *testStatusCodeError) StatusCode() int { return e.statusCode }
