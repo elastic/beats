@@ -75,18 +75,12 @@ func NewAppendProcessor(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 }
 
 func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if f.config.FailOnError {
-		backup = event.Clone()
-	}
-
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
 		f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 		if f.config.FailOnError {
-			event = backup
 			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {
 				return nil, fmt.Errorf("failed to append fields in append processor: %w", err)
 			}
@@ -134,7 +128,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 	}
 
 	// replace the existing target with new array
-	if err := event.Delete(target); err != nil && !(err.Error() == "key not found") {
+	if err := event.Delete(target); err != nil && err.Error() != "key not found" {
 		return fmt.Errorf("unable to delete the target field %s due to error: %w", target, err)
 	}
 	if _, err := event.PutValue(target, arr); err != nil {
