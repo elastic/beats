@@ -212,6 +212,11 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	if cloudResourceID == "" {
 		errs = append(errs, errors.New("cloud resource id is not configured"))
 	}
+	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
+	// called using credentials from another assumed role (role chaining).
+	if config.AssumeRoleDuration > time.Hour {
+		errs = append(errs, errors.New("assume role duration cannot exceed 1h for identity federation role chaining"))
+	}
 	if len(errs) > 0 {
 		return fmt.Errorf("identity federation config is invalid: %w", errors.Join(errs...))
 	}

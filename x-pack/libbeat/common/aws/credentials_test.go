@@ -57,7 +57,7 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 	config := ConfigAWS{
 		RoleArn:                "arn:aws:iam::123456789012:role/customer-role",
 		ExternalID:             "external-id-456",
-		AssumeRoleDuration:     2 * time.Hour,
+		AssumeRoleDuration:     45 * time.Minute,
 		AssumeRoleExpiryWindow: 10 * time.Minute,
 	}
 
@@ -121,7 +121,7 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 						q, err := url.ParseQuery(body)
 						assert.NoError(t, err)
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
-						assert.Equal(t, "7200", q.Get("DurationSeconds")) // 2 * time.Hour
+						assert.Equal(t, "2700", q.Get("DurationSeconds")) // 45 * time.Minute
 						assert.Equal(t, cloudResourceID+"-"+config.ExternalID, q.Get("ExternalId"))
 						assert.Equal(t, config.RoleArn, q.Get("RoleArn"))
 						return middleware.FinalizeOutput{
@@ -172,6 +172,15 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 		require.ErrorContains(t, err, "elastic global role")
 		require.ErrorContains(t, err, "id token")
 		require.ErrorContains(t, err, "cloud resource id")
+	})
+
+	t.Run("assume role duration exceeds 1h", func(t *testing.T) {
+		t.Setenv(identityfederationaws.GlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(identityfederationaws.IDTokenFileEnvVar, "/path/token")
+		t.Setenv(identityfederationaws.CloudResourceIDEnvVar, "abc123")
+
+		err := applyIdentityFederationChain(ConfigAWS{AssumeRoleDuration: 2 * time.Hour}, &aws.Config{}, logger)
+		require.ErrorContains(t, err, "assume role duration cannot exceed 1h")
 	})
 }
 

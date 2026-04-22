@@ -149,6 +149,12 @@ func NewIRSAChain(ctx context.Context, cfg IRSAChainConfig) (*awssdk.Config, err
 		region = "us-east-1"
 	}
 
+	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
+	// called using credentials from another assumed role (role chaining).
+	if cfg.AssumeRoleDuration > time.Hour {
+		return nil, fmt.Errorf("assume role duration cannot exceed 1h for identity federation role chaining")
+	}
+
 	baseCfg, err := awsconfig.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("loading default AWS config for IRSA chain: %w", err)
@@ -210,6 +216,12 @@ func NewOIDCChain(ctx context.Context, cfg OIDCChainConfig) (*awssdk.Config, err
 	region := cfg.Region
 	if region == "" {
 		region = "us-east-1"
+	}
+
+	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
+	// called using credentials from another assumed role (role chaining).
+	if cfg.AssumeRoleDuration > time.Hour {
+		return nil, fmt.Errorf("assume role duration cannot exceed 1h for identity federation role chaining")
 	}
 
 	baseCfg, err := awsconfig.LoadDefaultConfig(ctx)
