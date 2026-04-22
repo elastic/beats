@@ -5,8 +5,12 @@
 ## Components Included
 
 ### Receivers
+- **auditbeatreceiver** - Auditbeat receiver
 - **filebeatreceiver** - Filebeat receiver
+- **heartbeatreceiver** - Heartbeat receiver
 - **metricbeatreceiver** - Metricbeat receiver
+- **osquerybeatreceiver** - Osquerybeat receiver
+- **packetbeatreceiver** - Packetbeat receiver
 - **filelogreceiver** - File log receiver
 - **hostmetricsreceiver** - Host metrics receiver
 - **httpcheckreceiver** - HTTP check receiver

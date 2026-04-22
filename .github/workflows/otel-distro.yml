@@ -2,18 +2,10 @@ name: otel-distro
 
 on:
   pull_request:
-    paths:
-      - 'x-pack/otel/**'
-      - 'x-pack/filebeat/fbreceiver/**'
-      - 'x-pack/metricbeat/mbreceiver/**'
   push:
     branches:
       - main
       - 8.*
-    paths:
-      - 'x-pack/otel/**'
-      - 'x-pack/filebeat/fbreceiver/**'
-      - 'x-pack/metricbeat/mbreceiver/**'
   workflow_dispatch:
 
 permissions:

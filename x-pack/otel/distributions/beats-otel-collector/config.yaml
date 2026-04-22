@@ -10,6 +10,10 @@ extensions:
 
 receivers:
   # Beats receivers
+  auditbeatreceiver:
+    auditbeat:
+      # Auditbeat receiver configuration
+
   filebeatreceiver:
     filebeat:
       inputs:
@@ -18,12 +22,24 @@ receivers:
           message: "test message"
           count: 1
       # Filebeat receiver configuration
-  
+
+  heartbeatreceiver:
+    heartbeat:
+      # Heartbeat receiver configuration
+
   metricbeatreceiver:
     metricbeat:
       modules:
        - module: system
       # Metricbeat receiver configuration
+
+  osquerybeatreceiver:
+    osquerybeat:
+      # Osquerybeat receiver configuration
+
+  packetbeatreceiver:
+    packetbeat:
+      # Packetbeat receiver configuration
   
   # Standard OTEL receivers
   otlp:
@@ -85,7 +101,7 @@ service:
   
   pipelines:
     logs:
-      receivers: [filebeatreceiver, metricbeatreceiver, otlp, nop]
+      receivers: [auditbeatreceiver, filebeatreceiver, heartbeatreceiver, metricbeatreceiver, osquerybeatreceiver, packetbeatreceiver, otlp, nop]
       processors: [memory_limiter, beat, resource, batch]
       exporters: [logstash, elasticsearch, debug, nop]
     
