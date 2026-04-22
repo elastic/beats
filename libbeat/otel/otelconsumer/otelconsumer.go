@@ -154,6 +154,15 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
+
+		if out.beatInfo.IncludeMetadata {
+			meta := event.Content.Meta.Clone()
+			meta["beat"] = out.beatInfo.Beat
+			meta["version"] = out.beatInfo.Version
+			meta["type"] = "_doc"
+			beatEvent["@metadata"] = meta
+		}
+
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 
