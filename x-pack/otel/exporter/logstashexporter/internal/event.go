@@ -29,12 +29,10 @@ func parseEvent(logRecord *plog.LogRecord) (beat.Event, error) {
 		timestamp = logRecord.ObservedTimestamp().AsTime()
 	}
 
-	event := beat.Event{
+	return beat.Event{
 		Timestamp: timestamp,
 		Fields:    fields,
-	}
-
-	return event, nil
+	}, nil
 }
 
 func parseEventFields(logRecord *plog.LogRecord) (map[string]any, bool) {
@@ -61,7 +59,7 @@ func parseEventTimestamp(logRecordBody map[string]any) (time.Time, bool) {
 
 // removeRedundantMetadataFields removes certain metadata fields that will be generated again when the event is serialized.
 // See https://github.com/elastic/beats/blob/v9.3.3/libbeat/outputs/codec/json/event.go#L43-L54
-// Not removing these fields would create duplicate fields and bloat the final event size
+// Not removing these fields would create duplicates and bloat the final event size
 func removeRedundantMetadataFields(fields map[string]any) {
 	delete(fields, otelctx.MetadataBeatKey)
 	delete(fields, otelctx.MetadataVersionKey)
