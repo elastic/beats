@@ -85,6 +85,8 @@ targets:
     scmid: githubConfig
     kind: file
     spec:
+      # Only files containing Azure Windows images (IMAGE_WIN_*: "1.0.*")
+      # Removed 6 files that don't have Azure images to prevent matchpattern failures
       files:
         - .buildkite/auditbeat/auditbeat-pipeline.yml
         - .buildkite/filebeat/filebeat-pipeline.yml
@@ -100,5 +102,5 @@ targets:
         - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
         - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
-      matchpattern: '(IMAGE_.+): "1.0.(.+)"'
+      matchpattern: '(IMAGE_.+): "1\.0\.([\d]+)"'
       replacepattern: '$1: "1.0.{{ source "latestVersion" }}"'
