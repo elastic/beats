@@ -8,6 +8,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
+=======
+	"net/http"
+	"os"
+>>>>>>> fdea8cd23 (fix(otelconsumer): do not retry 401 errors from Elasticsearch (#50261)):libbeat/otel/otelconsumer/otelconsumer.go
 	"runtime"
 	"time"
 
@@ -37,8 +42,23 @@ const (
 	beatVersionCtxtKey    = "beat_version"
 )
 
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
+=======
+// statusCodeError is satisfied by errors that carry an HTTP status code,
+// such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
+type statusCodeError interface {
+	StatusCode() int
+}
+
+type otelConsumer struct {
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // whether we are running in receivertest context
+>>>>>>> fdea8cd23 (fix(otelconsumer): do not retry 401 errors from Elasticsearch (#50261)):libbeat/otel/otelconsumer/otelconsumer.go
 }
 
 type otelConsumer struct {
@@ -172,13 +192,20 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(out.newConsumerContext(ctx), pLogs)
 	if err != nil {
+		// Work around the fact that Elasticsearch exporter returns 401 as a non-permanent error.
+		isAuthorizationError := false
+		var statusErr statusCodeError
+		if errors.As(err, &statusErr) {
+			isAuthorizationError = statusErr.StatusCode() == http.StatusUnauthorized
+		}
+
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
 		// it cannot decode it. Retrying in this case is useless.
 		//
 		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
-		if consumererror.IsPermanent(err) {
+		if consumererror.IsPermanent(err) || isAuthorizationError {
 			st.PermanentErrors(len(events))
 			batch.Drop()
 		} else {
