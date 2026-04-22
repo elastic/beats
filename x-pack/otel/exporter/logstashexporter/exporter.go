@@ -91,7 +91,7 @@ func (l *logstashExporter) ConsumeLogs(ctx context.Context, ld plog.Logs) error 
 		return err
 	}
 
-	batch, err := internal.NewLogBatch(ctx, ld)
+	batch, err := internal.NewLogBatch(ld)
 	if err != nil {
 		return err
 	}
