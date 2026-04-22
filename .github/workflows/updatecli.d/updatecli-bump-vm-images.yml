@@ -86,8 +86,6 @@ targets:
     kind: file
     spec:
       files:
-        - .buildkite/aws-tests-pipeline.yml
-        - .buildkite/packaging.pipeline.yml
         - .buildkite/auditbeat/auditbeat-pipeline.yml
         - .buildkite/filebeat/filebeat-pipeline.yml
         - .buildkite/heartbeat/heartbeat-pipeline.yml
@@ -95,17 +93,12 @@ targets:
         - .buildkite/metricbeat/pipeline.yml
         - .buildkite/packetbeat/pipeline.packetbeat.yml
         - .buildkite/winlogbeat/pipeline.winlogbeat.yml
-        - .buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml
         - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
-        - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
         - .buildkite/x-pack/pipeline.xpack.filebeat.yml
         - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
-        - .buildkite/x-pack/pipeline.xpack.libbeat.yml
         - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
         - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
-        - .buildkite/x-pack/pipeline.xpack.otel.yml
         - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
         - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
       matchpattern: '(IMAGE_.+): "1.0.(.+)"'
       replacepattern: '$1: "1.0.{{ source "latestVersion" }}"'
-      searchpattern: 'IMAGE_.+: "1.0.+"'
