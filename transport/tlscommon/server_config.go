@@ -21,22 +21,47 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// CertificateReload is the configuration for hot-reloading TLS certificates.
+// Use DefaultCertificateReload to get a value with sensible defaults (enabled,
+// 5 s reload interval).
+type CertificateReload struct {
+	Enabled        *bool         `config:"enabled" yaml:"enabled,omitempty"`
+	ReloadInterval time.Duration `config:"reload_interval" yaml:"reload_interval,omitempty"`
+}
+
+// DefaultCertificateReload returns a CertificateReload with sensible defaults:
+// enabled with a 5-second reload interval.
+func DefaultCertificateReload() CertificateReload {
+	enabled := true
+	return CertificateReload{
+		Enabled:        &enabled,
+		ReloadInterval: defaultReloadInterval,
+	}
+}
+
+// IsEnabled returns true unless certificate reload has been explicitly disabled.
+func (c *CertificateReload) IsEnabled() bool {
+	return c.Enabled == nil || *c.Enabled
+}
+
 // ServerConfig defines the user configurable tls options for any TCP based service.
 type ServerConfig struct {
-	Enabled          *bool               `config:"enabled" yaml:"enabled,omitempty"`
-	VerificationMode TLSVerificationMode `config:"verification_mode" yaml:"verification_mode,omitempty"` // one of 'none', 'full', 'strict', 'certificate'
-	Versions         []TLSVersion        `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
-	CipherSuites     []CipherSuite       `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
-	CAs              []string            `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
-	Certificate      CertificateConfig   `config:",inline" yaml:",inline"`
-	CurveTypes       []TLSCurveType      `config:"curve_types" yaml:"curve_types,omitempty"`
-	ClientAuth       *TLSClientAuth      `config:"client_authentication" yaml:"client_authentication,omitempty"` //`none`, `optional` or `required`
-	CASha256         []string            `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
+	Enabled           *bool               `config:"enabled" yaml:"enabled,omitempty"`
+	VerificationMode  TLSVerificationMode `config:"verification_mode" yaml:"verification_mode,omitempty"` // one of 'none', 'full', 'strict', 'certificate'
+	Versions          []TLSVersion        `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
+	CipherSuites      []CipherSuite       `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
+	CAs               []string            `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
+	Certificate       CertificateConfig   `config:",inline" yaml:",inline"`
+	CurveTypes        []TLSCurveType      `config:"curve_types" yaml:"curve_types,omitempty"`
+	ClientAuth        *TLSClientAuth      `config:"client_authentication" yaml:"client_authentication,omitempty"` //`none`, `optional` or `required`
+	CASha256          []string            `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
+	CertificateReload CertificateReload   `config:"certificate_reload" yaml:"certificate_reload,omitempty"`
 }
 
 // LoadTLSServerConfig tranforms a ServerConfig into a `tls.Config` to be used directly with golang
