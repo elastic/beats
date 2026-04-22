@@ -42,17 +42,10 @@ type Info struct {
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
 
-<<<<<<< HEAD
-	LogConsumer consumer.Logs // otel log consumer
-	ComponentID string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
-	Logger      *logp.Logger
-=======
 	LogConsumer     consumer.Logs // otel log consumer
 	ComponentID     string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
 	IncludeMetadata bool          // when true, otelconsumer includes @metadata in the log record body
 	Logger          *logp.Logger
-	Paths           *paths.Path // per beat paths definition
->>>>>>> 2e949e6c4 (otel: option to preserve at metadata field in log record body (#50191))
 }
 
 func (i Info) FQDNAwareHostname(useFQDN bool) string {
