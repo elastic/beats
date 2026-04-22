@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Update mito to v1.24.2, fixing runtime error location reporting.
+component: filebeat
