@@ -519,7 +519,10 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+	// TODO: with 50115 adding the possibility to have the fingerprint, it's an
+	// issue to the growing fingerprint as it cannot be updated as the file grows.
+	// It's only updated on file open, not on OpWrite
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, offset)
 
 	r = inp.parsers.Create(r, log)
 

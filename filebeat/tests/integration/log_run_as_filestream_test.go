@@ -388,10 +388,6 @@ func TestLogAsFilestreamSupportsFingerprint(t *testing.T) {
 			t.Errorf("Event %d expecting type 'log', got %q", i, ev.Input.Type)
 		}
 
-		if len(ev.Log.File.Fingerprint) == 0 {
-			t.Errorf("Event %d fingerprint cannot be empty", i)
-		}
-
 		if !slices.Contains(ev.Tags, "take_over") {
 			t.Errorf("Event %d: 'take_over' tag not present", i)
 		}

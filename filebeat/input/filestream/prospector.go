@@ -73,16 +73,18 @@ func init() {
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	logger                *logp.Logger
-	filewatcher           loginp.FSWatcher
-	identifier            fileIdentifier
-	ignoreOlder           time.Duration
-	ignoreInactiveSince   ignoreInactiveType
-	cleanRemoved          bool
-	stateChangeCloser     stateChangeCloserConfig
-	takeOver              loginp.TakeOverConfig
-	filestreamIdentifiers map[string]fileIdentifier
-	logIdentifiers        map[string]file.StateIdentifier
+	logger                   *logp.Logger
+	filewatcher              loginp.FSWatcher
+	identifier               fileIdentifier
+	ignoreOlder              time.Duration
+	ignoreInactiveSince      ignoreInactiveType
+	cleanRemoved             bool
+	stateChangeCloser        stateChangeCloserConfig
+	takeOver                 loginp.TakeOverConfig
+	filestreamIdentifiers    map[string]fileIdentifier
+	logIdentifiers           map[string]file.StateIdentifier
+	maxEncodedFingerprintLen int
+	shortFingerprintIdx      *shortFingerprintIndex
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -207,15 +209,15 @@ func (p *fileProspector) Init(
 
 	identifierName := p.identifier.Name()
 
-	// If the file identity has changed to fingerprint, update the registry
-	// keys so we can keep the state. This is only supported from file
-	// identities that do not require configuration:
+	// If the file identity has changed to fingerprint or growing_fingerprint,
+	// update the registry keys so we can keep the state. This is only
+	// supported from file identities that do not require configuration:
 	//  - native (inode + device ID)
 	//  - path
-	if identifierName != fingerprintName {
+	if identifierName != fingerprintName && identifierName != growingFingerprintName {
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 	} else {
-		p.logger.Debug("trying to migrate file identity to fingerprint")
+		p.logger.Debugf("trying to migrate file identity to %s", identifierName)
 		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
@@ -338,7 +340,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -361,7 +363,17 @@ func (p *fileProspector) onFSEvent(
 	ignoreSince time.Time,
 ) {
 
-	log = log.With("source_file", event.SrcID)
+	// TODO(AndersonQ): improve the split between loginp.OpRename and
+	//  loginp.OpCreate, loginp.OpWrite.
+
+	// For growing_fingerprint, handle prefix matching and migration.
+	// Skip for OpRename: handleGrowingFingerprintLookup assumes event.SrcID is
+	// the current identity — its KeyExists fast path returns true for the old key
+	// and skips migration. OpRename migration is handled in the OpRename case below.
+	if p.identifier.Name() == growingFingerprintName && event.Op != loginp.OpRename {
+		src = p.handleGrowingFingerprintLookup(log, event, src, updater)
+	}
+
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
@@ -372,6 +384,8 @@ func (p *fileProspector) onFSEvent(
 			if err != nil {
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
+
+			p.shortFingerprintIdx.Add(event.SrcID, event.Descriptor.Fingerprint, event.NewPath)
 
 		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
@@ -388,6 +402,10 @@ func (p *fileProspector) onFSEvent(
 			return
 		}
 
+		// Note: For growing_fingerprint, migration updates the key in-place.
+		// The harvester manager tracks by resource pointer, so if a harvester
+		// is already running on this resource (even with old key), it will
+		// be detected as "Harvester already running".
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
@@ -399,15 +417,45 @@ func (p *fileProspector) onFSEvent(
 		}
 		group.Restart(ctx, src)
 
+		// Remove stale short fingerprint entry by source path.
+		// We can't use event.SrcID because truncation changes the fingerprint,
+		// so the SrcID is based on the truncated content, not the old fingerprint.
+		p.shortFingerprintIdx.RemoveBySource(event.NewPath)
+
 	case loginp.OpDelete:
 		log.Debugf("File %s has been removed", event.OldPath)
 
 		p.onRemove(log, event, src, updater, group)
+		p.shortFingerprintIdx.Remove(event.SrcID)
 
 	case loginp.OpRename:
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 
+		// For growing_fingerprint: if the fingerprint grew during the rename,
+		// migrate the registry key BEFORE onRename. We use event.OldPath for
+		// the prefix lookup because shortFingerprintEntries still has the old
+		// source path at this point.
+		// Migration must happen first so onRename's UpdateMetadata finds the
+		// entry under the new key (which uses the new fingerprint from src).
+		if p.identifier.Name() == growingFingerprintName {
+			oldKey, found := p.findGrowingFingerprintMatch(
+				updater, event.Descriptor.Fingerprint, event.OldPath)
+			if found {
+				newKey, err := p.migrateGrowingFingerprint(updater, oldKey, src, event)
+				if err != nil {
+					log.Errorf("failed to migrate growing fingerprint on rename: %v", err)
+				} else {
+					p.shortFingerprintIdx.Remove(oldKey)
+					p.shortFingerprintIdx.Add(newKey, event.Descriptor.Fingerprint, event.NewPath)
+				}
+			}
+		}
+
 		p.onRename(log, ctx, event, src, updater, group)
+
+		// Update source path for non-migrated short fingerprint entries
+		// (e.g., rename without fingerprint growth, or non-growing identities).
+		p.shortFingerprintIdx.UpdateSource(event.SrcID, event.NewPath)
 
 	default:
 		log.Errorf("Unknown operation '%s'", event.Op.String())
@@ -513,4 +561,175 @@ func (t *ignoreInactiveType) Unpack(v string) error {
 	}
 	*t = val
 	return nil
+}
+
+// handleGrowingFingerprintLookup handles the special lookup logic for
+// growing_fingerprint identity.
+func (p *fileProspector) handleGrowingFingerprintLookup(
+	log *logp.Logger,
+	event loginp.FSEvent,
+	src loginp.Source,
+	updater loginp.StateMetadataUpdater) loginp.Source {
+	// Empty fingerprint - nothing to match
+	if event.Descriptor.Fingerprint == "" {
+		return src
+	}
+
+	// Fast path: if the current fingerprint key already exists, no migration
+	// needed.
+	if updater.KeyExists(event.SrcID) {
+		return src
+	}
+
+	// Try to find a prefix match (file may have grown)
+	oldKey, found := p.findGrowingFingerprintMatch(updater, event.Descriptor.Fingerprint, event.NewPath)
+	if !found {
+		return src
+	}
+
+	// Found a prefix match - migrate to new key
+	if _, err := p.migrateGrowingFingerprint(updater, oldKey, src, event); err != nil {
+		log.Errorf("failed to migrate growing fingerprint: %v", err)
+		// Continue anyway - might create duplicate, but better than losing data
+		return src
+	}
+
+	// Update short fingerprint set after successful migration
+	p.shortFingerprintIdx.Remove(oldKey)
+	p.shortFingerprintIdx.Add(event.SrcID, event.Descriptor.Fingerprint, event.NewPath)
+
+	// Migration succeeded - the old harvester is still running and will continue
+	// reading. We should NOT start a new harvester.
+	return src
+}
+
+// buildShortFingerprintSet scans the store once and populates shortFingerprintIdx with
+// entries whose fingerprint is shorter than maxEncodedFingerprintLen.
+func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUpdater) {
+	p.shortFingerprintIdx = newShortFingerprintIndex(p.maxEncodedFingerprintLen)
+
+	updater.IterateOnPrefix(func(key string, meta interface{}) bool {
+		// key format: filestream::INPUT_ID::growing_fingerprint::FINGERPRINT
+		// Find '::' separator positions manually to avoid wrong match
+		// if the input ID contains "growing_fingerprint::".
+		var seps [4]int
+		nSeps := 0
+		for i := 0; i < len(key)-1; i++ {
+			if key[i] == ':' && key[i+1] == ':' {
+				seps[nSeps] = i
+				nSeps++
+				if nSeps == 4 {
+					break
+				}
+				i++
+			}
+		}
+		if nSeps != 3 {
+			return true // malformed key
+		}
+
+		identityName := key[seps[1]+2 : seps[2]]
+		if identityName != growingFingerprintName {
+			return true // not a growing_fingerprint entry
+		}
+
+		fingerprint := key[seps[2]+2:]
+
+		var fm fileMeta
+		if err := convertToFileMeta(meta, &fm); err != nil {
+			return true
+		}
+
+		p.shortFingerprintIdx.Add(key, fingerprint, fm.Source)
+		return true
+	})
+}
+
+// findGrowingFingerprintMatch looks for an existing registry entry whose
+// fingerprint is a prefix of the current file's fingerprint. This handles
+// the case where a file has grown since the last scan.
+//
+// Only entries in the shortFingerprintIdx (fingerprint < maxEncodedFingerprintLen)
+// are searched, making this O(K) where K is the number of still-growing entries.
+func (p *fileProspector) findGrowingFingerprintMatch(
+	updater loginp.StateMetadataUpdater,
+	currentFingerprint string,
+	currentPath string,
+) (oldKey string, found bool) {
+	if currentFingerprint == "" {
+		return "", false
+	}
+
+	// Build short fingerprint set on first use
+	if p.shortFingerprintIdx == nil {
+		p.buildShortFingerprintSet(updater)
+	}
+
+	key, entry, ok := p.shortFingerprintIdx.FindPrefixMatch(currentFingerprint, currentPath)
+	if !ok {
+		return "", false
+	}
+
+	p.logger.Debugf(
+		"found growing fingerprint prefix match for %s: %s (stored len %d, current len %d)",
+		currentPath, key, len(entry.Fingerprint)/2, len(currentFingerprint)/2,
+	)
+	return key, true
+}
+
+// migrateGrowingFingerprint migrates a registry entry from an old key to a new key.
+// This is called when a file's fingerprint has grown.
+// Returns the new key on success.
+func (p *fileProspector) migrateGrowingFingerprint(
+	updater loginp.StateMetadataUpdater,
+	oldKey string,
+	newSrc loginp.Source,
+	event loginp.FSEvent,
+) (string, error) {
+	newMeta := fileMeta{
+		Source:         event.NewPath,
+		IdentifierName: growingFingerprintName,
+	}
+
+	prefix := strings.Split(oldKey, growingFingerprintName)
+	if len(prefix) != 2 {
+		return "", fmt.Errorf("invalid old key format: %s", oldKey)
+	}
+	newKey := prefix[0] + newSrc.Name()
+
+	err := updater.UpdateKey(oldKey, newKey, newMeta)
+	if err != nil {
+		return "", fmt.Errorf("failed to migrate growing fingerprint from %s to %s: %w", oldKey, newKey, err)
+	}
+
+	p.logger.Debugf("migrated growing fingerprint entry (key len %d -> %d)", len(oldKey), len(newKey))
+	return newKey, nil
+}
+
+// convertToFileMeta converts an interface{} to fileMeta using type conversion.
+// This is needed because the metadata is stored as interface{} in the store.
+func convertToFileMeta(meta interface{}, fm *fileMeta) error {
+	if meta == nil {
+		return fmt.Errorf("meta is nil")
+	}
+
+	// Try direct type assertion first
+	if m, ok := meta.(fileMeta); ok {
+		*fm = m
+		return nil
+	}
+
+	// Try map conversion (common when loaded from JSON)
+	// TODO(AndersonQ): is it really needed?
+	if m, ok := meta.(map[string]interface{}); ok {
+		if source, ok := m["source"].(string); ok {
+			fm.Source = source
+		}
+		if identifierName, ok := m["identifier_name"].(string); ok {
+			fm.IdentifierName = identifierName
+		}
+		return nil
+	}
+
+	return fmt.Errorf("cannot convert %T to fileMeta", meta)
 }

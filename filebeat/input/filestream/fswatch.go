@@ -40,10 +40,11 @@ import (
 )
 
 const (
-	RecursiveGlobDepth           = 8
-	DefaultFingerprintSize int64 = 1024 // 1KB
-	scannerDebugKey              = "scanner"
-	watcherDebugKey              = "file_watcher"
+	RecursiveGlobDepth                  = 8
+	DefaultFingerprintSize        int64 = 1024 // 1KB
+	DefaultGrowingFingerprintSize int64 = 1000 // Same as OTEL's filelog receiver
+	scannerDebugKey                     = "scanner"
+	watcherDebugKey                     = "file_watcher"
 )
 
 var (
@@ -76,6 +77,14 @@ type fileWatcher struct {
 	notifyChan       chan loginp.HarvesterStatus
 	fileIdentifier   fileIdentifier
 	sourceIdentifier *loginp.SourceIdentifier
+
+	// growingFingerprint indicates that the growing fingerprint mode is active.
+	// When true, prefix-based rename detection is used as a fallback
+	// for files whose fingerprint grew between scans.
+	growingFingerprint bool
+	// maxEncodedFingerprintLen is the maximum encoded fingerprint length (hex chars).
+	// Only fingerprints shorter than this are candidates for prefix matching.
+	maxEncodedFingerprintLen int
 
 	// closedHarvesters is a map of harvester ID to the current
 	// offset of the file
@@ -112,9 +121,12 @@ func newFileWatcher(
 		closedHarvesters: map[string]int64{},
 		// notifyChan is a buffered channel to prevent the harvester from
 		// blocking while waiting for the fileWatcher to read from the channel
-		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
-		fileIdentifier:   fi,
-		sourceIdentifier: srci,
+		notifyChan:         make(chan loginp.HarvesterStatus, 5), // magic number
+		fileIdentifier:     fi,
+		sourceIdentifier:   srci,
+		growingFingerprint: config.Scanner.Fingerprint.Growing,
+		// *2 because hex encoding doubles the byte length.
+		maxEncodedFingerprintLen: int(config.Scanner.Fingerprint.MaxLength) * 2,
 	}, nil
 }
 
@@ -172,6 +184,7 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
+	// file identity is updated in GetFiles
 	paths := w.scanner.GetFiles()
 
 	// for debugging purposes
@@ -193,7 +206,11 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// with a different file, it is a new file
 		prevDesc, ok := w.prev[path]
 		sfd := fd // to avoid memory aliasing
-		if !ok || !loginp.SameFile(&prevDesc, &sfd) {
+		if !ok || !loginp.SameFile(w.log, &prevDesc, &sfd) {
+			// if ok {
+			// 	w.log.Infof("file %q has been replaced by a new file. Old ID %q, new ID %q",
+			// 		path, prevDesc.FileID(), fd.FileID())
+			// }
 			newFilesByName[path] = &sfd
 			newFilesByID[fd.FileID()] = &sfd
 			continue
@@ -274,34 +291,99 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		w.closedHarvestersMutex.Unlock()
 	}
 
-	// remaining files in the prev map are the ones that are missing
-	// either because they have been deleted or renamed
+	// Remaining files in the prev map are missing — either deleted or renamed.
+	// Rename detection uses three phases:
+	//   Phase A: Exact FileID match (works for all identities including static fingerprint).
+	//   Phase B: Prefix match for growing_fingerprint — handles rename+grow
+	//            where the fingerprint changed between scans.
+	//   Phase C: Emit deletes and creates for unmatched entries.
+
+	// Phase A — exact renames: match remaining prev files against new files by FileID.
+	// For growing fingerprint, also build the short fingerprint index from entries
+	// that don't get an exact match — these are the candidates for Phase B.
+	var shortFingerprints *shortFingerprintIndex
+	if w.growingFingerprint {
+		shortFingerprints = newShortFingerprintIndex(w.maxEncodedFingerprintLen)
+	}
+
 	for remainingPath, remainingDesc := range w.prev {
-		var e loginp.FSEvent
+		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
 
-		id := remainingDesc.FileID()
-		srcID := w.getFileIdentity(remainingDesc)
-		if newDesc, renamed := newFilesByID[id]; renamed {
-			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc, srcID)
+		switch {
+		case renamed:
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(
+				remainingPath, newDesc.Filename, *newDesc, srcID):
+				renamedCount++
+			}
+
 			delete(newFilesByName, newDesc.Filename)
-			delete(newFilesByID, id)
-			renamedCount++
-		} else {
-			e = deleteEvent(remainingPath, remainingDesc, srcID)
-			removedCount++
-			w.closedHarvestersMutex.Lock()
-			delete(w.closedHarvesters, srcID)
-			w.closedHarvestersMutex.Unlock()
-		}
+			delete(newFilesByID, remainingDesc.FileID())
+			delete(w.prev, remainingPath)
 
-		select {
-		case <-ctx.Done():
-			return
-		case w.events <- e:
+		case w.growingFingerprint:
+			shortFingerprints.Add(
+				remainingPath, remainingDesc.Fingerprint, remainingPath)
 		}
 	}
 
-	// remaining files in newFiles are newly created files
+	// Phase B — prefix renames (growing fingerprint only): for remaining prev
+	// files with short fingerprints, check if any new file's fingerprint has
+	// the old fingerprint as a prefix. This handles files that were renamed
+	// AND grew between scans. The short fingerprint index was populated during
+	// Phase A from entries that didn't get an exact match.
+	if shortFingerprints.Len() > 0 {
+		type prefixMatch struct {
+			oldPath string
+			newPath string
+			newDesc *loginp.FileDescriptor
+		}
+		var matches []prefixMatch
+
+		for newPath, newDesc := range newFilesByName {
+			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint, "")
+			if found {
+				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
+				shortFingerprints.Remove(oldPath)
+			}
+		}
+
+		for _, m := range matches {
+			remainingDesc := w.prev[m.oldPath]
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID):
+				renamedCount++
+			}
+
+			delete(newFilesByName, m.newPath)
+			delete(newFilesByID, m.newDesc.FileID())
+			delete(w.prev, m.oldPath)
+		}
+	}
+
+	// Phase C — deletes: remaining prev files that weren't matched by either
+	// exact or prefix rename detection are genuinely deleted.
+	for remainingPath, remainingDesc := range w.prev {
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- deleteEvent(remainingPath, remainingDesc, srcID):
+			removedCount++
+		}
+
+		w.closedHarvestersMutex.Lock()
+		delete(w.closedHarvesters, srcID)
+		w.closedHarvestersMutex.Unlock()
+	}
+
+	// Phase C — creates: remaining new files are genuinely new.
 	for path, fd := range newFilesByName {
 		select {
 		case <-ctx.Done():
@@ -367,6 +449,12 @@ type fingerprintConfig struct {
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
+	// Growing enables the growing fingerprint mode where the fingerprint
+	// is the raw bytes (not a hash) and can grow as the file grows.
+	Growing bool `config:"growing"`
+	// MaxLength is the maximum number of bytes to use for the growing fingerprint.
+	// Default is 1000 bytes (same as OTEL's filelog receiver).
+	MaxLength int64 `config:"max_length"`
 }
 
 type fileScannerConfig struct {
@@ -382,9 +470,11 @@ func defaultFileScannerConfig() fileScannerConfig {
 		Symlinks:      false,
 		RecursiveGlob: true,
 		Fingerprint: fingerprintConfig{
-			Enabled: true,
-			Offset:  0,
-			Length:  DefaultFingerprintSize,
+			Enabled:   true,
+			Offset:    0,
+			Length:    DefaultFingerprintSize,
+			Growing:   false,
+			MaxLength: DefaultGrowingFingerprintSize,
 		},
 	}
 }
@@ -399,6 +489,7 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
+	growingBuffer    []byte // buffer for growing fingerprint mode
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -410,7 +501,11 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 		compression: compression,
 	}
 
-	if s.cfg.Fingerprint.Enabled {
+	if s.cfg.Fingerprint.Growing {
+		// Growing fingerprint mode: use raw bytes, no minimum size requirement
+		s.log.Debugf("growing fingerprint mode enabled: max_length %d", s.cfg.Fingerprint.MaxLength)
+		s.growingBuffer = make([]byte, s.cfg.Fingerprint.MaxLength)
+	} else if s.cfg.Fingerprint.Enabled { // TODO(AndersonQ): it's confusing having cfg.Fingerprint.Enabled and cfg.Fingerprint.Growing meaning different things
 		if s.cfg.Fingerprint.Length < sha256.BlockSize {
 			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
@@ -606,6 +701,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	fd.Info = it.info
 	var file File
 
+	// Growing fingerprint mode: compute raw bytes fingerprint
+	if s.cfg.Fingerprint.Growing {
+		return s.computeGrowingFingerprint(it, fd)
+	}
+
 	if !s.cfg.Fingerprint.Enabled {
 		return fd, nil
 	}
@@ -714,6 +814,58 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	}
 
 	fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
+
+	return fd, nil
+}
+
+// computeGrowingFingerprint computes a raw bytes fingerprint for the growing
+// fingerprint file identity. Unlike the hash-based fingerprint, this stores
+// the actual file content (hex-encoded) and can grow as the file grows.
+// Files of any size are supported - if the file is smaller than max_length,
+// the entire content is used as the fingerprint.
+func (s *fileScanner) computeGrowingFingerprint(it *ingestTarget, fd loginp.FileDescriptor) (loginp.FileDescriptor, error) {
+	// Empty files have no fingerprint yet - empty string fingerprint
+	if it.info.Size() == 0 {
+		// s.log.Info("fileScanner: computeGrowingFingerprint: size 0, nothing to compute", fd.Filename)
+		return fd, nil
+	}
+
+	osFile, err := os.Open(it.originalFilename)
+	if err != nil {
+		return fd, fmt.Errorf("failed to open %q for growing fingerprint: %w", it.originalFilename, err)
+	}
+	defer osFile.Close()
+
+	// Check for GZIP if allowed
+	if s.compression == CompressionAuto || s.compression == CompressionGZIP {
+		fd.GZIP, err = IsGZIP(osFile)
+		if err != nil {
+			return fd, fmt.Errorf("failed to check if %q is gzip: %w", it.originalFilename, err)
+		}
+	}
+
+	var r io.Reader = osFile
+	if fd.GZIP {
+		// fingerprint is computed on decompressed data
+		gzReader, err := newGzipSeekerReader(osFile, int(s.cfg.Fingerprint.MaxLength))
+		if err != nil {
+			return fd, fmt.Errorf("failed to create gzip reader for %q: %w", it.originalFilename, err)
+		}
+		defer gzReader.Close()
+		r = gzReader
+	}
+
+	// because the file might gzipped, we do not know the size of the
+	// decompressed data in advance. Thus, the read the max length is read.
+	n, err := io.ReadFull(r, s.growingBuffer[:s.cfg.Fingerprint.MaxLength])
+	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
+		return fd, fmt.Errorf("failed to read %q for growing fingerprint: %w", it.originalFilename, err)
+	}
+	// To expensive for 100k file, used for debug only
+	// s.log.Infof("fileScanner: computeGrowingFingerprint: for file %s: %d/%d bytes",
+	// 	fd.Filename, n, s.cfg.Fingerprint.MaxLength)
+
+	fd.Fingerprint = hex.EncodeToString(s.growingBuffer[:n])
 
 	return fd, nil
 }
