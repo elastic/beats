@@ -52,6 +52,24 @@ steps:
     key: "x-pack-otel-mandatory-tests"
 
     steps:
+      - label: ":ubuntu: x-pack/otel: Build OTel Collector Distribution"
+        key: "x-pack-otel-mandatory-build-distro"
+        command: |
+          go install go.opentelemetry.io/collector/cmd/builder@v0.150.0
+          mv $(go env GOPATH)/bin/builder $(go env GOPATH)/bin/ocb
+          cd x-pack/otel
+          mage buildOtelDistro
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/otel: Build OTel Collector Distribution"
+
       - label: ":ubuntu: x-pack/otel: Ubuntu x86_64 Unit Tests"
         key: "x-pack-otel-mandatory-linux-unit-test"
         command: |
