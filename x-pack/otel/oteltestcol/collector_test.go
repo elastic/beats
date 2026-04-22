@@ -6,6 +6,7 @@ package oteltestcol
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 
@@ -171,4 +172,47 @@ service:
 			FilterMessageSnippet("Publish event").
 			FilterMessageSnippet(`"message": "osqtest message"`).Len() == 1
 	}, 30*time.Second, 100*time.Millisecond, "Expected collector to start with osquerybeat receiver registered")
+}
+
+func TestPacketbeatReceiver(t *testing.T) {
+	device := "lo"
+	if runtime.GOOS == "darwin" {
+		device = "lo0"
+	}
+	cfg := fmt.Sprintf(`receivers:
+  packetbeatreceiver:
+    packetbeat:
+      interfaces:
+        device: %s
+      protocols:
+        - type: http
+          ports:
+            - 80
+            - 8080
+    logging:
+      level: debug
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - packetbeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`, device)
+	col := New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Starting metrics logging every 30s").Len() > 0
+	}, 30*time.Second, 100*time.Millisecond, "Expected packetbeat receiver to start and log metrics")
 }

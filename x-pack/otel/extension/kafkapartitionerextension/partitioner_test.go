@@ -415,7 +415,7 @@ func TestHash2Partition(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := kafka.Hash2Partition(tt.hash, int32(tt.numPartitions))
+			got := kafka.Hash2Partition(tt.hash, int32(tt.numPartitions)) //nolint:gosec // it's a test
 			assert.Equal(t, tt.expected, got)
 		})
 	}
