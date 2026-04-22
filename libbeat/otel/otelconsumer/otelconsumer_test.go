@@ -240,6 +240,32 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
 
+	t.Run("drops batch on 401 Unauthorized error", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return &testStatusCodeError{statusCode: 401, msg: "flush failed (401): unauthorized"}
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
+	})
+
+	t.Run("retries batch on non-401 status code error", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return &testStatusCodeError{statusCode: 500, msg: "flush failed (500): internal server error"}
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
 	t.Run("sets the elasticsearchexporter doc id attribute from metadata", func(t *testing.T) {
 		batch := outest.NewBatch(event4)
 
@@ -364,3 +390,11 @@ func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
 }
+
+type testStatusCodeError struct {
+	statusCode int
+	msg        string
+}
+
+func (e *testStatusCodeError) Error() string  { return e.msg }
+func (e *testStatusCodeError) StatusCode() int { return e.statusCode }

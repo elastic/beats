@@ -34,7 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-docappender/v2"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -48,6 +47,12 @@ const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
 )
+
+// statusCodeError is satisfied by errors that carry an HTTP status code,
+// such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
+type statusCodeError interface {
+	StatusCode() int
+}
 
 type otelConsumer struct {
 	observer       outputs.Observer
@@ -197,9 +202,9 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	if err != nil {
 		// Work around the fact that Elasticsearch exporter returns 401 as a non-permanent error.
 		isAuthorizationError := false
-		var flushFailedErr docappender.ErrorFlushFailed
-		if errors.As(err, &flushFailedErr) {
-			isAuthorizationError = flushFailedErr.StatusCode() == http.StatusUnauthorized
+		var statusErr statusCodeError
+		if errors.As(err, &statusErr) {
+			isAuthorizationError = statusErr.StatusCode() == http.StatusUnauthorized
 		}
 
 		// Permanent errors shouldn't be retried. This tipically means

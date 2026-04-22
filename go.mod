@@ -235,7 +235,6 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
-	github.com/elastic/go-docappender/v2 v2.14.0
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
@@ -347,6 +346,7 @@ require (
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/ebitengine/purego v0.10.0 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.8.0 // indirect
+	github.com/elastic/go-docappender/v2 v2.14.0 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
