@@ -1,0 +1,50 @@
+name: otel-distro
+
+on:
+  pull_request:
+    paths:
+      - 'x-pack/otel/**'
+      - 'x-pack/filebeat/fbreceiver/**'
+      - 'x-pack/metricbeat/mbreceiver/**'
+  push:
+    branches:
+      - main
+      - 8.*
+    paths:
+      - 'x-pack/otel/**'
+      - 'x-pack/filebeat/fbreceiver/**'
+      - 'x-pack/metricbeat/mbreceiver/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  build:
+    name: build-otel-distro
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: .go-version
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev
+
+      - name: Install ocb
+        run: |
+          go install go.opentelemetry.io/collector/cmd/builder@latest
+          mv $(go env GOPATH)/bin/builder $(go env GOPATH)/bin/ocb
+
+      - name: Install mage
+        run: go install github.com/magefile/mage
+
+      - name: Build beats-otel-collector
+        working-directory: x-pack/otel
+        run: mage buildOtelDistro
+
+      - name: Verify binary exists
+        run: test -f x-pack/otel/distributions/beats-otel-collector/_build/beats-otel-collector
