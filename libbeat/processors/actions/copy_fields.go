@@ -70,18 +70,20 @@ func NewCopyFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 
 func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
 		err := f.copyField(field.From, field.To, event)
 		if err != nil {
-			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %w", err)
+			errMsg := fmt.Errorf("failed to copy fields in copy_fields processor: %w", err)
 			f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 			if f.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
