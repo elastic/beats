@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/twmb/franz-go/pkg/kgo"
 
+	"github.com/elastic/beats/v7/libbeat/outputs/kafka"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -403,7 +404,7 @@ func TestHash2Partition(t *testing.T) {
 		name          string
 		hash          uint32
 		numPartitions int
-		expected      int
+		expected      int32
 	}{
 		{"zero hash", 0, 10, 0},
 		{"hash equals numPartitions", 10, 10, 0},
@@ -414,7 +415,7 @@ func TestHash2Partition(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := hash2Partition(tt.hash, tt.numPartitions)
+			got := kafka.Hash2Partition(tt.hash, int32(tt.numPartitions))
 			assert.Equal(t, tt.expected, got)
 		})
 	}
