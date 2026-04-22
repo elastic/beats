@@ -199,6 +199,7 @@ require (
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.150.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
 	github.com/pierrec/lz4/v4 v4.1.26
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.309.1
@@ -237,7 +238,6 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/forensicanalysis/fslib v0.15.2
 	github.com/mattn/go-sqlite3 v1.14.32
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
 	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/richardlehane/mscfb v1.0.6
 	github.com/rogpeppe/go-internal v1.14.1
