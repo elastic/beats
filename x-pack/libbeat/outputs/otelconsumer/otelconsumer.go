@@ -37,15 +37,14 @@ const (
 	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
-=======
+}
+
 // statusCodeError is satisfied by errors that carry an HTTP status code,
 // such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
 type statusCodeError interface {
 	StatusCode() int
->>>>>>> fdea8cd23 (fix(otelconsumer): do not retry 401 errors from Elasticsearch (#50261)):libbeat/otel/otelconsumer/otelconsumer.go
 }
 
 type otelConsumer struct {
