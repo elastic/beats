@@ -16,7 +16,7 @@ import (
 
 // snappyStreamID is the 10-byte stream identifier chunk that begins every
 // Snappy framed stream. See https://github.com/google/snappy/blob/main/framing_format.txt.
-var snappyStreamID = []byte{0xff, 0x06, 0x00, 0x00, 0x73, 0x4e, 0x61, 0x50, 0x70, 0x59}
+var snappyStreamID = []byte("\xff\x06\x00\x00sNaPpY")
 
 // IsStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
 // represents gzipped content or not. A buffered reader is used so the function can peek into the byte
