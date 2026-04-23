@@ -692,11 +692,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-<<<<<<< HEAD
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
-=======
 			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
->>>>>>> 8b7236f25 (idxmgmt: remove redundant beatPaths parameter (#49838))
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -1141,11 +1137,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-<<<<<<< HEAD
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
-=======
 		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
->>>>>>> 8b7236f25 (idxmgmt: remove redundant beatPaths parameter (#49838))
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}
