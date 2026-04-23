@@ -5,20 +5,12 @@
 package utils
 
 import (
+	"strings"
+
 	"github.com/gofrs/uuid/v5"
 )
 
-// Generate a random UUID using the default algorithm (v7)
+// Generate a random UUID using the default algorithm (v7) without dashes.
 func NewUUID() string {
-	return NewUUIDV7()
-}
-
-// Generate a random UUID using the v4 algorithm
-func NewUUIDV4() string {
-	return uuid.Must(uuid.NewV4()).String()
-}
-
-// Generate a random UUID using the v7 algorithm
-func NewUUIDV7() string {
-	return uuid.Must(uuid.NewV7()).String()
+	return strings.ReplaceAll(uuid.Must(uuid.NewV7()).String(), "-", "")
 }
