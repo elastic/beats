@@ -41,11 +41,17 @@ receivers:
     metricbeat:
       modules:
         - module: system
+          metricsets: [cpu]
+          period: 10s
 
   osquerybeatreceiver:
     osquerybeat:
       inputs:
         - type: osquery
+          streams:
+            - id: example
+              query: "select * from processes"
+              interval: 60
 
   packetbeatreceiver:
     packetbeat:
