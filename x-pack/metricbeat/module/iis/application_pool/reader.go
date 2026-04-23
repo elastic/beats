@@ -79,6 +79,8 @@ var appPoolCounters = map[string]string{
 	// .NET CLR LocksAndThreads
 	"net_clr.locks_and_threads.contention_rate_per_sec": "\\.NET CLR LocksAndThreads(w3wp*)\\Contention Rate / sec",
 	"net_clr.locks_and_threads.current_queue_length":    "\\.NET CLR LocksAndThreads(w3wp*)\\Current Queue Length",
+
+	"state": "\\APP_POOL_WAS(*)\\Current Application Pool State",
 }
 
 // newReader creates a new instance of Reader.
@@ -145,9 +147,18 @@ func (r *Reader) initAppPools() error {
 			continue
 		}
 		for _, v := range childQueries {
-			if err := r.query.AddCounter(v, "", "float", len(childQueries) > 1); err != nil {
-				return fmt.Errorf(`failed to add counter (query="%v"): %w`, v, err)
+			if key == "test_state.state" {
+				if err := r.query.AddCounter(v, "", "long", len(childQueries) > 1); err != nil {
+					r.log.Infof("FAILED_COUNTER: %+v", err)
+					return fmt.Errorf(`failed to add counter (query="%v"): %w`, v, err)
+				}
+				r.log.Infof("ADDED_COUNTER: %+v", r.query.Counters)
+			} else {
+				if err := r.query.AddCounter(v, "", "float", len(childQueries) > 1); err != nil {
+					return fmt.Errorf(`failed to add counter (query="%v"): %w`, v, err)
+				}
 			}
+
 			r.workerProcesses[v] = key
 		}
 	}
@@ -155,6 +166,7 @@ func (r *Reader) initAppPools() error {
 	if err != nil {
 		return fmt.Errorf("failed removing unused counter values: %w", err)
 	}
+
 	return nil
 }
 
@@ -197,6 +209,7 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 			},
 			RootFields: mapstr.M{},
 		}
+
 		for counterPath, value := range values {
 			for _, val := range value {
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
@@ -214,7 +227,7 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 						continue
 					}
 				}
-				if hasWorkerProcess(val.Instance, workers, appPool.workerProcessIds) {
+				if hasWorkerProcess(val.Instance, workers, appPool.workerProcessIds) || val.Instance == appPool.name {
 					if r.workerProcesses[counterPath] == ecsProcessId {
 						events[appPool.name].RootFields.Put(r.workerProcesses[counterPath], val.Measurement)
 					} else if len(r.workerProcesses[counterPath]) != 0 {
