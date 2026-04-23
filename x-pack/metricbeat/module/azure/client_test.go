@@ -41,7 +41,7 @@ var (
 					},
 				}}},
 	}
-	countUnit = armmonitor.MetricUnit("Count")
+	countUnit = armmonitor.Unit("Count")
 )
 
 func mockMapResourceMetrics(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
@@ -65,7 +65,7 @@ func TestInitResources(t *testing.T) {
 		mr.On("Error", mock.Anything).Return(true)
 		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resources were found based on all the configurations options entered")
-		assert.Equal(t, len(client.ResourceConfigurations.Metrics), 0)
+		assert.Empty(t, client.ResourceConfigurations.Metrics)
 		m.AssertExpectations(t)
 	})
 }
@@ -94,8 +94,8 @@ func TestGetMetricValues(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		metrics := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
-		assert.Equal(t, len(metrics), 0)
-		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
+		assert.Empty(t, metrics)
+		assert.Empty(t, client.ResourceConfigurations.Metrics[0].Values)
 		m.AssertExpectations(t)
 	})
 	t.Run("return metric values", func(t *testing.T) {
@@ -117,8 +117,8 @@ func TestGetMetricValues(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
-		assert.Equal(t, len(metricValues), 0)
-		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
+		assert.Empty(t, metricValues)
+		assert.Empty(t, client.ResourceConfigurations.Metrics[0].Values)
 		m.AssertExpectations(t)
 	})
 
@@ -175,14 +175,14 @@ func TestGetMetricValues(t *testing.T) {
 
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 
-		require.Equal(t, len(metricValues), 1)
-		require.Equal(t, len(metricValues[0].Values), 1)
+		require.Len(t, metricValues, 1)
+		require.Len(t, metricValues[0].Values, 1)
 
-		assert.Equal(t, *metricValues[0].Values[0].avg, 1.0)
-		assert.Equal(t, *metricValues[0].Values[0].max, 2.0)
-		assert.Equal(t, *metricValues[0].Values[0].min, 3.0)
+		assert.InDelta(t, 1.0, *metricValues[0].Values[0].avg, 0.001)
+		assert.InDelta(t, 2.0, *metricValues[0].Values[0].max, 0.001)
+		assert.InDelta(t, 3.0, *metricValues[0].Values[0].min, 0.001)
 
-		require.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 1)
+		require.Len(t, client.ResourceConfigurations.Metrics[0].Values, 1)
 
 		m.AssertExpectations(t)
 	})
@@ -258,19 +258,19 @@ func TestGetMetricValues(t *testing.T) {
 
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 
-		require.Equal(t, 3, len(metricValues))
+		require.Len(t, metricValues, 3)
 
-		require.Equal(t, 1, len(metricValues[0].Values))
-		require.Equal(t, 1, len(metricValues[1].Values))
-		require.Equal(t, 1, len(metricValues[2].Values))
+		require.Len(t, metricValues[0].Values, 1)
+		require.Len(t, metricValues[1].Values, 1)
+		require.Len(t, metricValues[2].Values, 1)
 
 		require.NotNil(t, metricValues[0].Values[0].max, "max value is nil")
 		require.NotNil(t, metricValues[1].Values[0].min, "min value is nil")
 		require.NotNil(t, metricValues[2].Values[0].avg, "avg value is nil")
 
-		assert.Equal(t, *metricValues[0].Values[0].max, 3.0)
-		assert.Equal(t, *metricValues[1].Values[0].min, 1.0)
-		assert.Equal(t, *metricValues[2].Values[0].avg, 2.0)
+		assert.InDelta(t, 3.0, *metricValues[0].Values[0].max, 0.001)
+		assert.InDelta(t, 1.0, *metricValues[1].Values[0].min, 0.001)
+		assert.InDelta(t, 2.0, *metricValues[2].Values[0].avg, 0.001)
 
 		m.AssertExpectations(t)
 	})
