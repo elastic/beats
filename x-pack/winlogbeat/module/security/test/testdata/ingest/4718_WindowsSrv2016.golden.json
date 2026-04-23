@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-07-27T09:30:41.8778082Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "system-security-access-removed",
