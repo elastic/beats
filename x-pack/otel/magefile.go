@@ -69,7 +69,10 @@ func RunOtelDistro() error {
 	}
 
 	binary := filepath.Join(wd, distroDir, "_build", binaryName)
-	if _, err := os.Stat(binary); os.IsNotExist(err) {
+	if _, err := os.Stat(binary); err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("checking binary at %s: %w", binary, err)
+		}
 		return fmt.Errorf("binary not found at %s: run 'mage buildOtelDistro' first", binary)
 	}
 
