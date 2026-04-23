@@ -8,11 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
-=======
 	"net/http"
-	"os"
->>>>>>> fdea8cd23 (fix(otelconsumer): do not retry 401 errors from Elasticsearch (#50261)):libbeat/otel/otelconsumer/otelconsumer.go
 	"runtime"
 	"time"
 
@@ -42,23 +38,14 @@ const (
 	beatVersionCtxtKey    = "beat_version"
 )
 
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
-=======
+}
+
 // statusCodeError is satisfied by errors that carry an HTTP status code,
 // such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
 type statusCodeError interface {
 	StatusCode() int
-}
-
-type otelConsumer struct {
-	observer       outputs.Observer
-	logsConsumer   consumer.Logs
-	beatInfo       beat.Info
-	log            *logp.Logger
-	isReceiverTest bool // whether we are running in receivertest context
->>>>>>> fdea8cd23 (fix(otelconsumer): do not retry 401 errors from Elasticsearch (#50261)):libbeat/otel/otelconsumer/otelconsumer.go
 }
 
 type otelConsumer struct {
