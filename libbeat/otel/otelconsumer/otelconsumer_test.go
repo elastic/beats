@@ -35,6 +35,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -66,6 +67,8 @@ func TestPublish(t *testing.T) {
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
 		}
+		consumer.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), 1*time.Millisecond, 2*time.Millisecond)
+		consumer.backoffInit.Do(func() {})
 		return consumer
 	}
 
@@ -264,6 +267,72 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("backoff resets on success", func(t *testing.T) {
+		callCount := 0
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			callCount++
+			if callCount == 2 {
+				return nil
+			}
+			return errors.New("retryable error")
+		})
+
+		batch1 := outest.NewBatch(event1)
+		err := otelConsumer.Publish(ctx, batch1)
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch1.Signals[0].Tag)
+
+		batch2 := outest.NewBatch(event1)
+		err = otelConsumer.Publish(ctx, batch2)
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch2.Signals[0].Tag)
+
+		batch3 := outest.NewBatch(event1)
+		err = otelConsumer.Publish(ctx, batch3)
+		assert.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch3.Signals[0].Tag)
+	})
+
+	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
+		batch := outest.NewBatch(event1)
+
+		cancelCtx, cancelFn := context.WithCancel(context.Background())
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("retryable error")
+		})
+		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(cancelCtx.Done(), 10*time.Second, 10*time.Second)
+
+		publishDone := make(chan struct{})
+		go func() {
+			_ = otelConsumer.Publish(cancelCtx, batch)
+			close(publishDone)
+		}()
+
+		time.Sleep(50 * time.Millisecond)
+		cancelFn()
+		<-publishDone
+
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchCancelled, batch.Signals[0].Tag)
+	})
+
+	t.Run("no backoff delay on permanent error", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return consumererror.NewPermanent(errors.New("permanent error"))
+		})
+
+		start := time.Now()
+		err := otelConsumer.Publish(ctx, batch)
+		elapsed := time.Since(start)
+
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
+		assert.Less(t, elapsed, 100*time.Millisecond, "permanent errors should not trigger backoff delay")
 	})
 
 	t.Run("sets the elasticsearchexporter doc id attribute from metadata", func(t *testing.T) {
