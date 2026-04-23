@@ -150,14 +150,14 @@ require (
 	cloud.google.com/go/redis v1.18.2
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.20.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
-	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.11.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.6.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.6.3
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.20
@@ -178,7 +178,7 @@ require (
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06
-	github.com/elastic/mito v1.24.1
+	github.com/elastic/mito v1.24.2
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0
@@ -188,7 +188,7 @@ require (
 	github.com/go-resty/resty/v2 v2.17.1
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/google/cel-go v0.26.1
+	github.com/google/cel-go v0.28.0
 	github.com/googleapis/gax-go/v2 v2.15.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
@@ -282,7 +282,7 @@ require (
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
-	github.com/Azure/go-amqp v1.4.0 // indirect
+	github.com/Azure/go-amqp v1.5.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.24 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
@@ -460,7 +460,6 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
-	github.com/stoewer/go-strcase v1.3.1 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/twmb/franz-go v1.20.7 // indirect
@@ -532,7 +531,7 @@ require (
 	golang.org/x/telemetry v0.0.0-20260311193753-579e4da9a98c // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.17.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260226221140-a57be14db171 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b // indirect
