@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix user-facing typos (defauling, choosen) in libbeat lifecycle log and x-pack/filebeat module docs
+component: libbeat
+pr: https://github.com/elastic/beats/issues/50262
