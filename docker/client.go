@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

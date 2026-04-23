@@ -27,8 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/events"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/events"
+	dockerclient "github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
@@ -47,16 +48,16 @@ type MockClient struct {
 	done chan interface{}
 }
 
-func (m *MockClient) ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error) {
+func (m *MockClient) ContainerList(ctx context.Context, options dockerclient.ContainerListOptions) (dockerclient.ContainerListResult, error) {
 	if m.containersErr != nil {
-		return nil, m.containersErr
+		return dockerclient.ContainerListResult{}, m.containersErr
 	}
 	res := m.containers[0]
 	m.containers = m.containers[1:]
-	return res, nil
+	return dockerclient.ContainerListResult{Items: res}, nil
 }
 
-func (m *MockClient) Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error) {
+func (m *MockClient) Events(ctx context.Context, options dockerclient.EventsListOptions) dockerclient.EventsResult {
 	eventsC := make(chan events.Message)
 	errorsC := make(chan error)
 
@@ -72,11 +73,11 @@ func (m *MockClient) Events(ctx context.Context, options events.ListOptions) (<-
 		close(m.done)
 	}()
 
-	return eventsC, errorsC
+	return dockerclient.EventsResult{Messages: eventsC, Err: errorsC}
 }
 
-func (m *MockClient) ContainerInspect(ctx context.Context, containerID string) (container.InspectResponse, error) {
-	return container.InspectResponse{}, errors.New("unimplemented")
+func (m *MockClient) ContainerInspect(ctx context.Context, containerID string, options dockerclient.ContainerInspectOptions) (dockerclient.ContainerInspectResult, error) {
+	return dockerclient.ContainerInspectResult{}, errors.New("unimplemented")
 }
 
 func TestWatcherInitialization(t *testing.T) {

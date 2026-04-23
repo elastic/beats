@@ -28,9 +28,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/api/types/filters"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/events"
+	dockerclient "github.com/moby/moby/client"
+
 	"github.com/docker/go-connections/tlsconfig"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -106,14 +107,14 @@ type Container struct {
 	Image       string
 	Labels      map[string]string
 	IPAddresses []string
-	Ports       []container.Port
+	Ports       []container.PortSummary
 }
 
 // Client for docker interface
 type Client interface {
-	ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error)
-	ContainerInspect(ctx context.Context, container string) (container.InspectResponse, error)
-	Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error)
+	ContainerList(ctx context.Context, options dockerclient.ContainerListOptions) (dockerclient.ContainerListResult, error)
+	ContainerInspect(ctx context.Context, container string, options dockerclient.ContainerInspectOptions) (dockerclient.ContainerInspectResult, error)
+	Events(ctx context.Context, options dockerclient.EventsListOptions) dockerclient.EventsResult
 }
 
 // WatcherConstructor represent a function that creates a new Watcher from giving parameters
@@ -147,7 +148,7 @@ func NewWatcher(log *logp.Logger, host string, tls *TLSConfig, storeShortID bool
 	}
 
 	// Extra check to confirm that Docker is available
-	_, err = client.Info(context.Background())
+	_, err = client.Info(context.Background(), dockerclient.InfoOptions{})
 	if err != nil {
 		client.Close()
 		return nil, err
@@ -214,7 +215,7 @@ func (w *watcher) Start() error {
 
 	w.Lock()
 	defer w.Unlock()
-	containers, err := w.listContainers(container.ListOptions{})
+	containers, err := w.listContainers(dockerclient.ContainerListOptions{})
 	if err != nil {
 		w.log.Errorf("Failed to call listContainers: %v", err)
 	}
@@ -251,8 +252,7 @@ func (w *watcher) Stop() {
 func (w *watcher) watch() {
 	defer w.stopped.Done()
 
-	filter := filters.NewArgs()
-	filter.Add("type", "container")
+	filter := make(dockerclient.Filters).Add("type", "container")
 
 	// Ticker to restart the watcher when no events are received after some time.
 	tickChan := time.NewTicker(dockerEventsWatchPityTimerInterval)
@@ -265,7 +265,7 @@ func (w *watcher) watch() {
 
 		w.log.Debugf("Fetching events since %s", lastValidTimestamp)
 
-		options := events.ListOptions{
+		options := dockerclient.EventsListOptions{
 			Since:   lastValidTimestamp.Format(time.RFC3339Nano),
 			Filters: filter,
 		}
@@ -273,10 +273,10 @@ func (w *watcher) watch() {
 		ctx, cancel := context.WithCancel(w.ctx)
 		defer cancel()
 
-		events, errs := w.client.Events(ctx, options)
+		result := w.client.Events(ctx, options)
 		for {
 			select {
-			case event := <-events:
+			case event := <-result.Messages:
 				w.log.Debugf("Got a new docker event: %v", event)
 				if event.TimeNano > 0 {
 					lastValidTimestamp = time.Unix(0, event.TimeNano)
@@ -291,7 +291,7 @@ func (w *watcher) watch() {
 				case "die":
 					w.containerDelete(event)
 				}
-			case err := <-errs:
+			case err := <-result.Err:
 				if errors.Is(err, io.EOF) {
 					// Client disconnected, watch is not done, reconnect
 					w.log.Debug("EOF received in events stream, restarting watch call")
@@ -327,10 +327,9 @@ func (w *watcher) watch() {
 }
 
 func (w *watcher) containerUpdate(event events.Message) {
-	filter := filters.NewArgs()
-	filter.Add("id", event.Actor.ID)
+	filter := make(dockerclient.Filters).Add("id", event.Actor.ID)
 
-	containers, err := w.listContainers(container.ListOptions{
+	containers, err := w.listContainers(dockerclient.ContainerListOptions{
 		Filters: filter,
 	})
 	if err != nil || len(containers) != 1 {
@@ -369,26 +368,27 @@ func (w *watcher) containerDelete(event events.Message) {
 	}
 }
 
-func (w *watcher) listContainers(options container.ListOptions) ([]*Container, error) {
+func (w *watcher) listContainers(options dockerclient.ContainerListOptions) ([]*Container, error) {
 	log := w.log
 
 	log.Debug("List containers")
 	ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
 	defer cancel()
 
-	containers, err := w.client.ContainerList(ctx, options)
+	listResult, err := w.client.ContainerList(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 
+	containers := listResult.Items
 	result := make([]*Container, len(containers))
 	for idx, c := range containers {
 		var ipaddresses []string
 		if c.NetworkSettings != nil {
 			// Handle alternate platforms like VMWare's VIC that might not have this data.
 			for _, net := range c.NetworkSettings.Networks {
-				if net.IPAddress != "" {
-					ipaddresses = append(ipaddresses, net.IPAddress)
+				if net.IPAddress.IsValid() {
+					ipaddresses = append(ipaddresses, net.IPAddress.String())
 				}
 			}
 		}
@@ -399,9 +399,9 @@ func (w *watcher) listContainers(options container.ListOptions) ([]*Container, e
 			log.Debugf("Inspect container %s", c.ID)
 			ctx, cancel := context.WithTimeout(w.ctx, dockerRequestTimeout)
 			defer cancel()
-			info, err := w.client.ContainerInspect(ctx, c.ID)
+			inspectResult, err := w.client.ContainerInspect(ctx, c.ID, dockerclient.ContainerInspectOptions{})
 			if err == nil {
-				ipaddresses = append(ipaddresses, info.Config.Hostname)
+				ipaddresses = append(ipaddresses, inspectResult.Container.Config.Hostname)
 			} else {
 				log.Warnf("unable to inspect container %s due to error %+v", c.ID, err)
 			}

@@ -26,9 +26,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/docker/docker/api"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -37,15 +35,15 @@ func TestNewClient(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 
-	_, err = c.ContainerList(context.Background(), container.ListOptions{})
+	_, err = c.ContainerList(context.Background(), client.ContainerListOptions{})
 	assert.NoError(t, err)
 
 	// This test only works on newer Docker versions (any supported one really)
 	switch c.ClientVersion() {
 	case "1.22":
 		t.Skip("Docker version is too old for this test")
-	case api.DefaultVersion:
-		t.Logf("Using default API version: %s", api.DefaultVersion)
+	case client.MaxAPIVersion:
+		t.Logf("Using default API version: %s", client.MaxAPIVersion)
 	default:
 		t.Logf("Negotiated version: %s", c.ClientVersion())
 	}
@@ -58,6 +56,6 @@ func TestNewClient(t *testing.T) {
 	assert.NotNil(t, c)
 	assert.Equal(t, "1.22", c.ClientVersion())
 
-	_, err = c.ContainerList(context.Background(), container.ListOptions{})
+	_, err = c.ContainerList(context.Background(), client.ContainerListOptions{})
 	assert.NoError(t, err)
 }
