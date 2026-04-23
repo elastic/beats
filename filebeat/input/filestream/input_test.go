@@ -123,8 +123,6 @@ paths:
 			})
 		}
 	})
-<<<<<<< HEAD
-=======
 }
 
 func filestreamBenchCfg(path string, fingerprint bool) string {
@@ -143,7 +141,6 @@ close.reader.on_eof: true%s
 paths:
   - %s
 `, identity, path)
->>>>>>> 297752842 (filestream: Fix shutdown logic and improve benchmark (#50137))
 }
 
 func TestTakeOverTags(t *testing.T) {
