@@ -28,11 +28,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/moby/moby/api/pkg/stdcopy"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/mount"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -124,7 +123,7 @@ func (tr *DockerTestRunner) CreateAndRunPermissionMatrix(ctx context.Context,
 
 	tr.Runner.Logf("Running %d tests", len(cases))
 
-	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	apiClient, err := client.New()
 	require.NoError(tr.Runner, err)
 	defer apiClient.Close()
 
@@ -163,7 +162,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context, apiClient *cli
 		tr.Container = "golang:alpine"
 	}
 
-	_, err := apiClient.Ping(ctx)
+	_, err := apiClient.Ping(ctx, client.PingOptions{NegotiateAPIVersion: true})
 	if err != nil {
 		tr.Runner.Skipf("got error in container list, docker isn't installed or not running: %s", err)
 	}
@@ -203,8 +202,8 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context, apiClient *cli
 }
 
 // createTestContainer creates a container with the given test path and test name
-func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *logp.Logger, apiClient *client.Client) container.CreateResponse {
-	reader, err := apiClient.ImagePull(ctx, tr.Container, image.PullOptions{})
+func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *logp.Logger, apiClient *client.Client) client.ContainerCreateResult {
+	reader, err := apiClient.ImagePull(ctx, tr.Container, client.ImagePullOptions{})
 	require.NoError(tr.Runner, err, "error pulling image")
 	defer reader.Close()
 
@@ -247,45 +246,50 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, logger *log
 	gomodcacheValue = bytes.TrimSuffix(gomodcacheValue, []byte("\n"))
 	require.NotEmpty(tr.Runner, gomodcacheValue)
 
-	resp, err := apiClient.ContainerCreate(ctx, &container.Config{
-		Image:      tr.Container,
-		Cmd:        testRunCmd,
-		Tty:        false,
-		WorkingDir: "/app",
-		Env:        containerEnv,
-		User:       tr.RunAsUser,
-	}, &container.HostConfig{
-		CgroupnsMode: tr.CgroupNSMode,
-		Privileged:   tr.Privileged,
-		Binds:        []string{fmt.Sprintf("/:%s", mountPath), fmt.Sprintf("%s:/app", cwd)},
-		Mounts: []mount.Mount{
-			{
-				Type:   mount.TypeBind,
-				Source: string(gomodcacheValue),
-				Target: "/go/pkg/mod",
+	resp, err := apiClient.ContainerCreate(ctx, client.ContainerCreateOptions{
+		Config: &container.Config{
+			Image:      tr.Container,
+			Cmd:        testRunCmd,
+			Tty:        false,
+			WorkingDir: "/app",
+			Env:        containerEnv,
+			User:       tr.RunAsUser,
+		},
+		HostConfig: &container.HostConfig{
+			CgroupnsMode: tr.CgroupNSMode,
+			Privileged:   tr.Privileged,
+			Binds:        []string{fmt.Sprintf("/:%s", mountPath), fmt.Sprintf("%s:/app", cwd)},
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: string(gomodcacheValue),
+					Target: "/go/pkg/mod",
+				},
 			},
 		},
-	}, nil, nil, "")
+	})
 	require.NoError(tr.Runner, err, "error creating container")
 
 	return resp
 }
 
-func (tr *DockerTestRunner) runContainerTest(ctx context.Context, apiClient *client.Client, resp container.CreateResponse) RunResult {
-	err := apiClient.ContainerStart(ctx, resp.ID, container.StartOptions{})
+func (tr *DockerTestRunner) runContainerTest(ctx context.Context, apiClient *client.Client, resp client.ContainerCreateResult) RunResult {
+	_, err := apiClient.ContainerStart(ctx, resp.ID, client.ContainerStartOptions{})
 	require.NoError(tr.Runner, err, "error starting container")
 
 	res := RunResult{}
 
-	statusCh, errCh := apiClient.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	waitResult := apiClient.ContainerWait(ctx, resp.ID, client.ContainerWaitOptions{
+		Condition: container.WaitConditionNotRunning,
+	})
 	select {
-	case err := <-errCh:
+	case err := <-waitResult.Error:
 		require.NoError(tr.Runner, err, "error in container")
-	case status := <-statusCh:
+	case status := <-waitResult.Result:
 		res.ReturnCode = status.StatusCode
 	}
 
-	out, err := apiClient.ContainerLogs(ctx, resp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := apiClient.ContainerLogs(ctx, resp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	require.NoError(tr.Runner, err, "error fetching logs")
 
 	stdout := bytes.NewBufferString("")

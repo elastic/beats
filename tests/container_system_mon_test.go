@@ -27,8 +27,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
@@ -82,7 +82,7 @@ func TestKernelProc(t *testing.T) {
 		FatalLogMessages: []string{"error", "Error"},
 	}
 
-	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	apiClient, err := client.New()
 	require.NoError(t, err)
 	defer apiClient.Close()
 
@@ -146,7 +146,7 @@ func TestFilesystem(t *testing.T) {
 		Privileged: false,
 	}
 
-	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	apiClient, err := client.New()
 	require.NoError(t, err)
 	defer apiClient.Close()
 
@@ -167,7 +167,7 @@ func TestMemoryZswap(t *testing.T) {
 		Testname:   "TestMemoryFromContainer",
 	}
 
-	apiClient, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	apiClient, err := client.New()
 	require.NoError(t, err)
 	defer apiClient.Close()
 
