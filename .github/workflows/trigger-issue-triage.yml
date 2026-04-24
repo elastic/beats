@@ -21,5 +21,7 @@ jobs:
         export GOTOOLCHAIN=auto
         make mage
       allowed-bot-users: "github-actions[bot],elastic-vault-github-plugin-prod[bot]"
+      additional-instructions: |
+        Use `triaged` label when the triage action has provided the triage response.
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
