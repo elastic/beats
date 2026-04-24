@@ -47,7 +47,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -77,7 +76,7 @@ type Filebeat struct {
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -110,7 +109,11 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		EnableAllFilesets:         enableAllFilesets,
 		ForceEnableModuleFilesets: forceEnableModuleFilesets,
 	}
+<<<<<<< HEAD
 	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides, b.Paths)
+=======
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
+>>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +197,11 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			ForceEnableModuleFilesets: forceEnableModuleFilesets,
 		}
 
+<<<<<<< HEAD
 		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides, b.Paths)
+=======
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides)
+>>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
 				// All module configs need to be loaded to enable all the filesets
@@ -313,7 +320,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
+<<<<<<< HEAD
 	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
+=======
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+>>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
@@ -379,7 +390,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
 	inputsLogger := fb.logger.Named("input")
+<<<<<<< HEAD
 	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore, b.Paths)
+=======
+	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
+>>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
@@ -421,8 +436,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			fb.logger.Warn(pipelinesWarning)
 		}
 	}
+<<<<<<< HEAD
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines, b.Paths)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Paths)
+=======
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Info.Paths)
+>>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 	if err != nil {
 		fb.logger.Errorf("Could not init crawler: %v", err)
 		return err
