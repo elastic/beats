@@ -6,7 +6,6 @@ package otelmanager
 
 import (
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -75,8 +74,4 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
 	n.receiverName = receiverName
-}
-func (n *OtelManager) WaitForStop(_ time.Duration) bool {
-	n.Stop()
-	return true
 }

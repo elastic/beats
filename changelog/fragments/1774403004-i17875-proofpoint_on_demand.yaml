@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Add support for URL and URL query parsing and formatting in the Streaming input CEL environment.
-component: filebeat
