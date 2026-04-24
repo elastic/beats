@@ -31,6 +31,7 @@
 ### Exporters
 - **logstash** - Logstash exporter
 - **elasticsearch** - Elasticsearch exporter
+- **kafka** - Kafka exporter
 - **debug** - Debug exporter
 - **file** - File exporter
 - **nop** - No-op exporter
