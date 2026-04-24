@@ -69,7 +69,11 @@ func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error)
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
+<<<<<<< HEAD
 	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths.Paths)
+=======
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger, Paths: paths}, false, fileset.FilesetOverrides{})
+>>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 	if err != nil {
 		return nil, err
 	}
