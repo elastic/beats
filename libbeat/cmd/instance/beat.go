@@ -252,6 +252,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			StartTime:        time.Now(),
 			EphemeralID:      metricreport.EphemeralID(), //nolint:staticcheck //keep behavior for now
 			FIPSDistribution: version.FIPSDistribution,
+			IsAgentless:      beat.LookupIsAgentlessMode(),
 			Paths:            paths.New(),
 		},
 		Fields:   fields,

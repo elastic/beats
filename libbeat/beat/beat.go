@@ -129,8 +129,12 @@ func (beat *Beat) GenerateUserAgent() {
 	mode := beat.userAgentMode()
 	unprivileged := beat.userAgentUnprivilegedMode()
 
+	var uaOpts []string
+	if beat.Info.IsAgentless {
+		uaOpts = append(uaOpts, "agentless")
+	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
-		mode, unprivileged, beat.Info.FIPSDistribution)
+		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
 }
 
 // BeatConfig struct contains the basic configuration of every beat

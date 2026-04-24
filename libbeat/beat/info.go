@@ -18,6 +18,7 @@
 package beat
 
 import (
+	"os"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,6 +27,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+// EnvAgentless is the environment variable whose presence indicates agentless mode.
+// Keep aligned with github.com/elastic/elastic-agent/pkg/agentless.EnvName.
+const EnvAgentless = "ELASTIC_AGENT_IS_AGENTLESS"
+
+// LookupIsAgentlessMode reports whether the current process environment indicates
+// agentless mode (ELASTIC_AGENT_IS_AGENTLESS is set; value is ignored).
+func LookupIsAgentlessMode() bool {
+	_, ok := os.LookupEnv(EnvAgentless)
+	return ok
+}
 
 // Info stores a beats instance meta data.
 type Info struct {
@@ -42,6 +54,7 @@ type Info struct {
 	StartTime        time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
+	IsAgentless      bool      // Whether the beat runs in agentless mode (set from the environment at startup).
 
 	LogConsumer     consumer.Logs // otel log consumer
 	ComponentID     string        // otel component id from the collector config e.g. "filebeatreceiver/logs"

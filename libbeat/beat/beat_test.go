@@ -104,6 +104,12 @@ func TestUserAgentString(t *testing.T) {
 			beat:             &Beat{Info: Info{Beat: "testbeat", FIPSDistribution: false}, Manager: nil},
 			expectedComments: []string{},
 		},
+		{
+			name: "agentless",
+			beat: &Beat{Info: Info{Beat: "testbeat", IsAgentless: true},
+				Manager: testManager{isEnabled: false}},
+			expectedComments: []string{"Standalone", "agentless"},
+		},
 	}
 
 	// User-Agent will take the form of
