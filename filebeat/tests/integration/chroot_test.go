@@ -33,17 +33,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/build"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/mount"
+	"github.com/moby/moby/client"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
 func TestJournaldChroot(t *testing.T) {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := client.New(client.FromEnv)
 	if err != nil {
 		t.Fatalf("Failed to create Docker client: %s", err)
 	}
@@ -66,7 +65,7 @@ func TestJournaldChroot(t *testing.T) {
 func buildDockerImage(t *testing.T, cli *client.Client, imageName, tempDir, filebeatPath string) {
 	buildContextDir := "testdata/journald_chroot"
 
-	buildOptions := build.ImageBuildOptions{
+	buildOptions := client.ImageBuildOptions{
 		Tags:       []string{imageName},
 		Dockerfile: "Dockerfile", // Dockerfile path relative to the build context
 	}
@@ -127,13 +126,16 @@ func startDockerContainer(t *testing.T, cli *client.Client, imageName, syslogID 
 		AutoRemove: true,
 	}
 
-	resp, err := cli.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "")
+	resp, err := cli.ContainerCreate(ctx, client.ContainerCreateOptions{
+		Config:     containerConfig,
+		HostConfig: hostConfig,
+	})
 	if err != nil {
 		t.Fatalf("Failed to create Docker container: %s", err)
 	}
 
 	// Attach to the container's logs
-	attachResp, err := cli.ContainerAttach(ctx, resp.ID, container.AttachOptions{
+	attachResp, err := cli.ContainerAttach(ctx, resp.ID, client.ContainerAttachOptions{
 		Stream: true,
 		Stdout: true,
 		Stderr: true,
@@ -150,7 +152,7 @@ func startDockerContainer(t *testing.T, cli *client.Client, imageName, syslogID 
 		}
 	}()
 
-	if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+	if _, err := cli.ContainerStart(ctx, resp.ID, client.ContainerStartOptions{}); err != nil {
 		t.Fatalf("Failed to start Docker container: %s", err)
 	}
 
@@ -158,7 +160,7 @@ func startDockerContainer(t *testing.T, cli *client.Client, imageName, syslogID 
 		// By the time t.Cleanup runs the test context is already cancelled
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		if err := cli.ContainerStop(ctx, resp.ID, container.StopOptions{}); err != nil {
+		if _, err := cli.ContainerStop(ctx, resp.ID, client.ContainerStopOptions{}); err != nil {
 			t.Logf("Failed to stop container %s: %s\n", resp.ID, err)
 		}
 	})

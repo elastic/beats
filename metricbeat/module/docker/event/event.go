@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/events"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -51,7 +51,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *client.Client
+	dockerClient *dockerclient.Client
 	dedot        bool
 	logger       *logp.Logger
 }
@@ -79,23 +79,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Run listens for docker events and reports them
 func (m *MetricSet) Run(ctx context.Context, reporter mb.ReporterV2) {
-	options := events.ListOptions{
+	options := dockerclient.EventsListOptions{
 		Since: fmt.Sprintf("%d", time.Now().Unix()),
 	}
 
 	defer m.dockerClient.Close()
 
 	for {
-		events, errors := m.dockerClient.Events(ctx, options)
+		result := m.dockerClient.Events(ctx, options)
 
 	WATCH:
 		for {
 			select {
-			case event := <-events:
+			case event := <-result.Messages:
 				m.logger.Debug("Got a new docker event: %v", event)
 				m.reportEvent(reporter, event)
 
-			case err := <-errors:
+			case err := <-result.Err:
 				// An error can be received on context cancellation, don't reconnect
 				// if context is done.
 				select {
@@ -131,11 +131,8 @@ func (m *MetricSet) reportEvent(reporter mb.ReporterV2, event events.Message) {
 	reporter.Event(mb.Event{
 		Timestamp: time,
 		MetricSetFields: mapstr.M{
-			"id":     event.ID,
 			"type":   event.Type,
 			"action": event.Action,
-			"status": event.Status,
-			"from":   event.From,
 			"actor": mapstr.M{
 				"id":         event.Actor.ID,
 				"attributes": attributes,

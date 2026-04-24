@@ -30,9 +30,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/stretchr/testify/require"
@@ -135,7 +134,7 @@ func startOpenldapContainer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	reader, err := c.ImagePull(ctx, "bitnami/openldap:2", image.PullOptions{})
+	reader, err := c.ImagePull(ctx, "bitnami/openldap:2", client.ImagePullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,39 +144,41 @@ func startOpenldapContainer(t *testing.T) {
 	reader.Close()
 
 	resp, err := c.ContainerCreate(ctx,
-		&container.Config{
-			Image: "bitnami/openldap:2",
-			ExposedPorts: nat.PortSet{
-				"1389/tcp": struct{}{},
+		client.ContainerCreateOptions{
+			Config: &container.Config{
+				Image: "bitnami/openldap:2",
+				ExposedPorts: nat.PortSet{
+					"1389/tcp": struct{}{},
+				},
+				Env: []string{
+					"LDAP_URI=ldap://openldap:1389",
+					"LDAP_BASE=dc=example,dc=org",
+					"LDAP_BIND_DN=cn=admin,dc=example,dc=org",
+					"LDAP_BIND_PASSWORD=adminpassword",
+				},
 			},
-			Env: []string{
-				"LDAP_URI=ldap://openldap:1389",
-				"LDAP_BASE=dc=example,dc=org",
-				"LDAP_BIND_DN=cn=admin,dc=example,dc=org",
-				"LDAP_BIND_PASSWORD=adminpassword",
-			},
-		},
-		&container.HostConfig{
-			PortBindings: nat.PortMap{
-				"1389/tcp": []nat.PortBinding{
-					{
-						HostIP:   "0.0.0.0",
-						HostPort: "1389",
+			HostConfig: &container.HostConfig{
+				PortBindings: nat.PortMap{
+					"1389/tcp": []nat.PortBinding{
+						{
+							HostIP:   "0.0.0.0",
+							HostPort: "1389",
+						},
 					},
 				},
 			},
-		}, nil, nil, "")
+		})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := c.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+	if _, err := c.ContainerStart(ctx, resp.ID, client.ContainerStartOptions{}); err != nil {
 		t.Fatal(err)
 	}
 
 	t.Cleanup(func() {
 		defer c.Close()
-		if err := c.ContainerRemove(ctx, resp.ID, container.RemoveOptions{RemoveVolumes: true, Force: true}); err != nil {
+		if _, err := c.ContainerRemove(ctx, resp.ID, client.ContainerRemoveOptions{RemoveVolumes: true, Force: true}); err != nil {
 			t.Error(err)
 		}
 	})

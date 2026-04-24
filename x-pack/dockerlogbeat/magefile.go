@@ -19,11 +19,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
@@ -113,7 +110,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 	}
 	defer buildContext.Close()
 
-	buildOpts := types.ImageBuildOptions{
+	buildOpts := client.ImageBuildOptions{
 		Tags:       []string{rootImageName},
 		Dockerfile: dockerfile,
 	}
@@ -167,7 +164,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// create the container that will become our rootfs
-		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, nil, "")
+		CreatedContainerBody, err := cli.ContainerCreate(ctx, client.ContainerCreateOptions{Config: &container.Config{Image: rootImageName}})
 		if err != nil {
 			return fmt.Errorf("error creating container: %w", err)
 		}
@@ -190,7 +187,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// export the container to a tar file
-		exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID)
+		exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID, client.ContainerExportOptions{})
 		if err != nil {
 			return fmt.Errorf("error exporting container: %w", err)
 		}
@@ -219,12 +216,12 @@ func BuildContainer(ctx context.Context) error {
 
 func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.Client) error {
 	fmt.Printf("Removing container %s\n", containerID)
-	err := cli.ContainerRemove(ctx, containerID, container.RemoveOptions{RemoveVolumes: true, Force: true})
+	_, err := cli.ContainerRemove(ctx, containerID, client.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	if err != nil {
 		return fmt.Errorf("error removing container: %w", err)
 	}
 
-	resp, err := cli.ImageRemove(ctx, rootImageName, image.RemoveOptions{Force: true})
+	resp, err := cli.ImageRemove(ctx, rootImageName, client.ImageRemoveOptions{Force: true})
 	if err != nil {
 		return fmt.Errorf("error removing image: %w", err)
 	}
@@ -240,13 +237,13 @@ func Uninstall(ctx context.Context) error {
 	}
 
 	// check to see if we have a plugin we need to remove
-	plugins, err := cli.PluginList(ctx, filters.Args{})
+	pluginResult, err := cli.PluginList(ctx, client.PluginListOptions{})
 	if err != nil {
 		return fmt.Errorf("error getting list of plugins: %w", err)
 	}
 
 	toRemoveName := ""
-	for _, plugin := range plugins {
+	for _, plugin := range pluginResult.Items {
 		if strings.Contains(plugin.Name, logDriverName) {
 			toRemoveName = plugin.Name
 			break
@@ -256,11 +253,11 @@ func Uninstall(ctx context.Context) error {
 		return nil
 	}
 
-	err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
+	_, err = cli.PluginDisable(ctx, toRemoveName, client.PluginDisableOptions{Force: true})
 	if err != nil {
 		return fmt.Errorf("error disabling plugin: %w", err)
 	}
-	err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
+	_, err = cli.PluginRemove(ctx, toRemoveName, client.PluginRemoveOptions{Force: true})
 	if err != nil {
 		return fmt.Errorf("error removing plugin: %w", err)
 	}
@@ -290,12 +287,12 @@ func Install(ctx context.Context) error {
 		return fmt.Errorf("error creating archive of work dir: %w", err)
 	}
 
-	err = cli.PluginCreate(ctx, archive, types.PluginCreateOptions{RepoName: name})
+	_, err = cli.PluginCreate(ctx, archive, client.PluginCreateOptions{RepoName: name})
 	if err != nil {
 		return fmt.Errorf("error creating plugin: %w", err)
 	}
 
-	err = cli.PluginEnable(ctx, name, types.PluginEnableOptions{})
+	_, err = cli.PluginEnable(ctx, name, client.PluginEnableOptions{})
 	if err != nil {
 		return fmt.Errorf("error enabling plugin: %w", err)
 	}
@@ -428,10 +425,9 @@ func Update() {
 }
 
 func newDockerClient(ctx context.Context) (*client.Client, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := client.New(client.FromEnv)
 	if err != nil {
 		return nil, err
 	}
-	cli.NegotiateAPIVersion(ctx)
 	return cli, nil
 }
