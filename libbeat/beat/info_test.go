@@ -20,14 +20,8 @@ package beat
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestLookupIsAgentlessMode(t *testing.T) {
-	t.Setenv(EnvAgentless, "1")
-	assert.True(t, LookupIsAgentlessMode())
-}
 
 func TestFQDNAwareHostname(t *testing.T) {
 	info := Info{
