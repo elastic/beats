@@ -68,8 +68,8 @@ func storeKey(resolvedPath, backendName string) string {
 	return backendName + "://" + resolvedPath
 }
 
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
-	resolvedPath := beatPaths.Resolve(paths.Data, cfg.Path)
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
+	resolvedPath := info.Paths.Resolve(paths.Data, cfg.Path)
 	key := storeKey(resolvedPath, cfg.Backend)
 
 	globalMu.Lock()
