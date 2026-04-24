@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -130,7 +131,7 @@ func (beat *Beat) GenerateUserAgent() {
 	unprivileged := beat.userAgentUnprivilegedMode()
 
 	var uaOpts []string
-	if beat.Info.IsAgentless {
+	if features.IsElasticsearchStateStoreEnabled() {
 		uaOpts = append(uaOpts, "agentless")
 	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),

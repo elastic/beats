@@ -42,7 +42,6 @@ type Info struct {
 	StartTime        time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
-	IsAgentless      bool      // Whether the beat runs in agentless mode (set from the environment at startup).
 
 	LogConsumer     consumer.Logs // otel log consumer
 	ComponentID     string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
