@@ -172,7 +172,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.8.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.2
-	github.com/elastic/elastic-agent-libs v0.36.0
+	github.com/elastic/elastic-agent-libs v0.38.0
 	github.com/elastic/elastic-agent-system-metrics v0.14.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
@@ -568,3 +568,6 @@ replace (
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
 )
+
+// remove layter we're playing
+replace github.com/elastic/elastic-agent-libs => github.com/michalpristas/elastic-agent-libs v0.38.0
