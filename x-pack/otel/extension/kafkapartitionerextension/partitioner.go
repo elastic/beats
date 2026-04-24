@@ -156,7 +156,7 @@ func makeHashKgoPartitioner() kgo.Partitioner {
 			hasher.Reset()
 			_, _ = hasher.Write(msg.Key)
 
-			return int(kafka.Hash2Partition(rand.Uint32(), int32(numPartitions))) //nolint:gosec // Conversion from int to int32 is safe here.
+			return int(kafka.Hash2Partition(hasher.Sum32(), int32(numPartitions))) //nolint:gosec // Conversion from int to int32 is safe here.
 		}
 	})
 }
