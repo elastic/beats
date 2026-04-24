@@ -48,7 +48,7 @@ func nestedEventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *util
 			return err
 		}
 
-		r.Event(events.CreateEventWithRandomTransactionId(info, parsed))
+		r.Event(events.CreateEventWithoutTransactionId(info, parsed))
 	}
 
 	return nil

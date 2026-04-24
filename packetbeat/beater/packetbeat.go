@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
@@ -88,6 +89,8 @@ type packetbeat struct {
 	overwritePipelines bool
 	done               chan struct{}
 	stopOnce           sync.Once
+
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 // New returns a new Packetbeat beat.Beater.
@@ -244,4 +247,8 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
 	pb.stopOnce.Do(func() { close(pb.done) })
+}
+
+func (pb *packetbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	pb.otelStatusFactoryWrapper = wrapper
 }
