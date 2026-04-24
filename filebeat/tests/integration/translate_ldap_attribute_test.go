@@ -34,6 +34,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/network"
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
