@@ -35,7 +35,6 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -61,15 +60,13 @@ func TestPublish(t *testing.T) {
 		logger := logptest.NewTestingLogger(t, "")
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
-		consumer := &otelConsumer{
+		return &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
+			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
 		}
-		consumer.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), 1*time.Millisecond, 2*time.Millisecond)
-		consumer.backoffInit.Do(func() {})
-		return consumer
 	}
 
 	t.Run("ack batch on consumer success", func(t *testing.T) {
@@ -302,7 +299,7 @@ func TestPublish(t *testing.T) {
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(cancelCtx.Done(), 10*time.Second, 10*time.Second)
+		otelConsumer.retry = retryConfig{init: 10 * time.Second, max: 10 * time.Second}
 
 		publishDone := make(chan struct{})
 		go func() {

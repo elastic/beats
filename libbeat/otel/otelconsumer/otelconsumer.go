@@ -59,6 +59,11 @@ type statusCodeError interface {
 	StatusCode() int
 }
 
+type retryConfig struct {
+	init time.Duration
+	max  time.Duration
+}
+
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
@@ -66,12 +71,18 @@ type otelConsumer struct {
 	log            *logp.Logger
 	isReceiverTest bool // whether we are running in receivertest context
 
+	retry        retryConfig
 	retryBackoff backoff.Backoff
 	backoffInit  sync.Once
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
+
+	retry := retryConfig{init: retryBackoffInit, max: retryBackoffMax}
+	if isReceiverTest {
+		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
+	}
 
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
@@ -82,6 +93,7 @@ func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group,
 			beatInfo:       beat,
 			log:            beat.Logger.Named("otelconsumer"),
 			isReceiverTest: isReceiverTest,
+			retry:          retry,
 		})
 	}
 
@@ -207,7 +219,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	}
 
 	out.backoffInit.Do(func() {
-		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), retryBackoffInit, retryBackoffMax)
+		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
 	})
 
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
