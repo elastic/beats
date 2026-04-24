@@ -222,8 +222,8 @@ github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.3 h1:8frWkH+rWP1joKQlWJe
 github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.28.3/go.mod h1:7M/THRNcz6t6fMas6nZ/ldxGM/Dx2BWGRRcSJxn6X7o=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.2 h1:pc8D62wqqWtXlIFp5/e/rhpVPxWnA0craqovONbol5M=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.2/go.mod h1:W6zagkMLyJeopkbOOzERmC4tTQD2I3vdrpw30ywOeEU=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.2 h1:3/bbtfzzGkbhzMUBCwX4BcfBx7YDDjENC2sZvIySKa0=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.2/go.mod h1:Wd99awP91azT7t59fylEjtBYazJvNAneRveTthS7g/0=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.65.0 h1:3yaFbUbuLfN8n1q01wZtQtHRzUDc/jm0VvniMY0IPE8=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.65.0/go.mod h1:PobeppEnIjw4pcgjFryNDZCTH7AiqZw0yb5r98Gvf9c=
 github.com/aws/aws-sdk-go-v2/service/costexplorer v1.51.1 h1:JbMktMCPMjlTwzmy0naf32foE8sRqhhF168INXesYcM=
 github.com/aws/aws-sdk-go-v2/service/costexplorer v1.51.1/go.mod h1:KHj6GnIt74Ke10Z4kRFDoEvldmSA6mkYJMy804s9E7E=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.277.0 h1:RHJSkRXDGkAKrV4CTEsZsZkOmSpxXKO4aKx4rXd94K4=
