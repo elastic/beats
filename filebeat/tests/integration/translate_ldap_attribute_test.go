@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/netip"
 	"os"
 	"path"
 	"path/filepath"
@@ -147,8 +148,8 @@ func startOpenldapContainer(t *testing.T) {
 		client.ContainerCreateOptions{
 			Config: &container.Config{
 				Image: "bitnami/openldap:2",
-				ExposedPorts: nat.PortSet{
-					"1389/tcp": struct{}{},
+				ExposedPorts: network.PortSet{
+					network.MustParsePort("1389/tcp"): struct{}{},
 				},
 				Env: []string{
 					"LDAP_URI=ldap://openldap:1389",
@@ -158,10 +159,10 @@ func startOpenldapContainer(t *testing.T) {
 				},
 			},
 			HostConfig: &container.HostConfig{
-				PortBindings: nat.PortMap{
-					"1389/tcp": []nat.PortBinding{
+				PortBindings: network.PortMap{
+					network.MustParsePort("1389/tcp"): []network.PortBinding{
 						{
-							HostIP:   "0.0.0.0",
+							HostIP:   netip.MustParseAddr("0.0.0.0"),
 							HostPort: "1389",
 						},
 					},
