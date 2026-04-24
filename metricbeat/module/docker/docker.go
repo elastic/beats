@@ -26,9 +26,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/docker/go-connections/tlsconfig"
 	"github.com/moby/moby/api/types/container"
 	dockerclient "github.com/moby/moby/client"
-	"github.com/docker/go-connections/tlsconfig"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"

@@ -19,10 +19,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/moby/moby/api/types/container"
-	"github.com/moby/moby/client"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	// mage:import
