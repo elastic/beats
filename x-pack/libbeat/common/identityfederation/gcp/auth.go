@@ -23,9 +23,9 @@ import (
 )
 
 const (
-	gcpSTSTokenURL        = "https://sts.googleapis.com/v1/token"
-	gcpIAMCredentialsURL  = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/"
-	awsTokenType          = "urn:ietf:params:aws:token-type:aws4_request"
+	gcpSTSTokenURL        = "https://sts.googleapis.com/v1/token"        //nolint:gosec // not a credential, it's a public API endpoint
+	gcpIAMCredentialsURL  = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/" //nolint:gosec // not a credential, it's a public API endpoint
+	awsTokenType          = "urn:ietf:params:aws:token-type:aws4_request" //nolint:gosec // not a credential, it's an IETF token type identifier
 	gcpCloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 	defaultAWSRegion      = "us-east-1"
 )
@@ -60,13 +60,13 @@ type Params struct {
 func (p Params) validate() error {
 	var errs []error
 	if p.Audience == "" {
-		errs = append(errs, errors.New("Audience is required"))
+		errs = append(errs, errors.New("audience is required"))
 	}
 	if p.GlobalRoleARN == "" {
-		errs = append(errs, errors.New("GlobalRoleARN is required"))
+		errs = append(errs, errors.New("global role ARN is required"))
 	}
 	if p.JWTFilePath == "" {
-		errs = append(errs, errors.New("JWTFilePath is required"))
+		errs = append(errs, errors.New("JWT file path is required"))
 	}
 	if len(errs) > 0 {
 		return fmt.Errorf("invalid GCP identity federation params: %w", errors.Join(errs...))
