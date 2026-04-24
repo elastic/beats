@@ -26,7 +26,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.13
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.13
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.45.2
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.50.2
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.65.0
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.51.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.277.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.45.4
@@ -199,6 +199,7 @@ require (
 	github.com/microsoft/go-mssqldb v1.9.5
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.150.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
 	github.com/pierrec/lz4/v4 v4.1.26
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.309.1
@@ -237,10 +238,10 @@ require (
 	github.com/coder/websocket v1.8.14
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/mattn/go-sqlite3 v1.14.32
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
 	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/richardlehane/mscfb v1.0.6
 	github.com/rogpeppe/go-internal v1.14.1
+	github.com/twmb/franz-go v1.20.7
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 	go.opentelemetry.io/collector/client v1.56.0
 	go.opentelemetry.io/collector/component/componenttest v0.150.0
@@ -253,6 +254,7 @@ require (
 	go.opentelemetry.io/collector/exporter/exportertest v0.150.0
 	go.opentelemetry.io/collector/extension v1.56.0
 	go.opentelemetry.io/collector/extension/extensionauth v1.56.0
+	go.opentelemetry.io/collector/extension/extensiontest v0.150.0
 	go.opentelemetry.io/collector/pipeline v1.56.0
 	go.opentelemetry.io/collector/processor v1.56.0
 	go.opentelemetry.io/collector/processor/processorhelper v0.150.0
@@ -473,7 +475,6 @@ require (
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/numcpus v0.11.0 // indirect
-	github.com/twmb/franz-go v1.20.7 // indirect
 	github.com/twmb/franz-go/pkg/kadm v1.17.2 // indirect
 	github.com/twmb/franz-go/pkg/kmsg v1.13.1 // indirect
 	github.com/twmb/franz-go/pkg/sasl/kerberos v1.1.0 // indirect
@@ -503,7 +504,6 @@ require (
 	go.opentelemetry.io/collector/exporter/xexporter v0.150.0 // indirect
 	go.opentelemetry.io/collector/extension/extensioncapabilities v0.150.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.150.0 // indirect
-	go.opentelemetry.io/collector/extension/extensiontest v0.150.0 // indirect
 	go.opentelemetry.io/collector/extension/xextension v0.150.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.56.0 // indirect
 	go.opentelemetry.io/collector/internal/componentalias v0.150.0 // indirect
