@@ -72,11 +72,13 @@ var tlsCipherSuites = map[string]CipherSuite{
 	"TLS-CHACHA20-POLY1305-SHA256": CipherSuite(tls.TLS_CHACHA20_POLY1305_SHA256),
 }
 
-var supportedCipherSuites = make(map[CipherSuite]string, len(tlsCipherSuites))
-var tlsCipherSuitesInverse = make(map[CipherSuite]string, len(tlsCipherSuites))
-var tlsRenegotiationSupportTypesInverse = make(map[TLSRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
-var tlsVerificationModesInverse = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
-var tlsClientAuthTypesInverse = make(map[TLSClientAuth]string, len(tlsClientAuthTypes))
+var (
+	supportedCipherSuites               = make(map[CipherSuite]string, len(tlsCipherSuites))
+	tlsCipherSuitesInverse              = make(map[CipherSuite]string, len(tlsCipherSuites))
+	tlsRenegotiationSupportTypesInverse = make(map[TLSRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
+	tlsVerificationModesInverse         = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
+	tlsClientAuthTypesInverse           = make(map[TLSClientAuth]string, len(tlsClientAuthTypes))
+)
 
 // Init creates a inverse representation of the values mapping.
 func init() {
@@ -97,13 +99,16 @@ func init() {
 	}
 }
 
-var supportedCurveTypes = make(map[TLSCurveType]string, len(tlsCurveTypes))
-var tlsCurveTypes = map[string]TLSCurveType{
-	"P-256":  TLSCurveType(tls.CurveP256),
-	"P-384":  TLSCurveType(tls.CurveP384),
-	"P-521":  TLSCurveType(tls.CurveP521),
-	"X25519": TLSCurveType(tls.X25519),
-}
+var (
+	supportedCurveTypes = make(map[TLSCurveType]string, len(tlsCurveTypes))
+	tlsCurveTypes       = map[string]TLSCurveType{
+		"P-256":          TLSCurveType(tls.CurveP256),
+		"P-384":          TLSCurveType(tls.CurveP384),
+		"P-521":          TLSCurveType(tls.CurveP521),
+		"X25519":         TLSCurveType(tls.X25519),
+		"X25519MLKEM768": TLSCurveType(tls.X25519MLKEM768),
+	}
+)
 
 var tlsRenegotiationSupportTypes = map[string]TLSRenegotiationSupport{
 	"never":  TLSRenegotiationSupport(tls.RenegotiateNever),
