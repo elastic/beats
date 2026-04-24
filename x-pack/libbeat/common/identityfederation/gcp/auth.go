@@ -23,9 +23,9 @@ import (
 )
 
 const (
-	gcpSTSTokenURL        = "https://sts.googleapis.com/v1/token"        //nolint:gosec // not a credential, it's a public API endpoint
+	gcpSTSTokenURL        = "https://sts.googleapis.com/v1/token"                                  //nolint:gosec // not a credential, it's a public API endpoint
 	gcpIAMCredentialsURL  = "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/" //nolint:gosec // not a credential, it's a public API endpoint
-	awsTokenType          = "urn:ietf:params:aws:token-type:aws4_request" //nolint:gosec // not a credential, it's an IETF token type identifier
+	awsTokenType          = "urn:ietf:params:aws:token-type:aws4_request"                          //nolint:gosec // not a credential, it's an IETF token type identifier
 	gcpCloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 	defaultAWSRegion      = "us-east-1"
 )
