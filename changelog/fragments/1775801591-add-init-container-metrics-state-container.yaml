@@ -1,4 +1,4 @@
 kind: enhancement
-summary: Collect init container metrics in state_container metricset
+summary: Collect init container metrics in kubernetes state_container metricset
 component: "metricbeat"
 issue: https://github.com/elastic/beats/issues/49797
