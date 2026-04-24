@@ -570,4 +570,4 @@ replace (
 )
 
 // remove layter we're playing
-replace github.com/elastic/elastic-agent-libs => github.com/michalpristas/elastic-agent-libs v0.38.0
+replace github.com/elastic/elastic-agent-libs => github.com/michalpristas/elastic-agent-libs v0.38.1

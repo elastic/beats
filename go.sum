@@ -808,8 +808,8 @@ github.com/mdlayher/netlink v1.7.2 h1:/UtM3ofJap7Vl4QWCPDGXY8d3GIY2UGSDbK+QWmY8/
 github.com/mdlayher/netlink v1.7.2/go.mod h1:xraEF7uJbxLhc5fpHL4cPe221LI2bdttWlU+ZGLfQSw=
 github.com/mdlayher/socket v0.5.1 h1:VZaqt6RkGkt2OE9l3GcC6nZkqD3xKeQLyfleW/uBcos=
 github.com/mdlayher/socket v0.5.1/go.mod h1:TjPLHI1UgwEv5J1B5q0zTZq12A/6H7nKmtTanQE37IQ=
-github.com/michalpristas/elastic-agent-libs v0.38.0 h1:eirkQlqwMVw3BY9UtvxSJ/9Eg24o6bdu2b0IGqgmPE4=
-github.com/michalpristas/elastic-agent-libs v0.38.0/go.mod h1:axkpqDCCzAky6G4D/cklgtZQa3jTNGAMVHVkU0u6YbU=
+github.com/michalpristas/elastic-agent-libs v0.38.1 h1:JWsKWn6UWpkP7FIVGqAR+bhFuxp+WlEb3alKYQzVsfQ=
+github.com/michalpristas/elastic-agent-libs v0.38.1/go.mod h1:axkpqDCCzAky6G4D/cklgtZQa3jTNGAMVHVkU0u6YbU=
 github.com/microsoft/go-mssqldb v1.9.5 h1:orwya0X/5bsL1o+KasupTkk2eNTNFkTQG0BEe/HxCn0=
 github.com/microsoft/go-mssqldb v1.9.5/go.mod h1:VCP2a0KEZZtGLRHd1PsLavLFYy/3xX2yJUPycv3Sr2Q=
 github.com/microsoft/wmi v0.38.3 h1:RVbn+m2jlPRsB2fLADXqabJj/EhMXQbvKM7OYS8VOv0=
