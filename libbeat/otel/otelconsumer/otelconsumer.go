@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"time"
@@ -31,10 +32,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -49,8 +48,10 @@ const (
 	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
-func init() {
-	outputs.RegisterType("otelconsumer", makeOtelConsumer)
+// statusCodeError is satisfied by errors that carry an HTTP status code,
+// such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
+type statusCodeError interface {
+	StatusCode() int
 }
 
 type otelConsumer struct {
@@ -61,12 +62,7 @@ type otelConsumer struct {
 	isReceiverTest bool // whether we are running in receivertest context
 }
 
-func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C, beatPaths *paths.Path) (outputs.Group, error) {
-	ocConfig := defaultConfig()
-	if err := cfg.Unpack(&ocConfig); err != nil {
-		return outputs.Fail(err)
-	}
-
+func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 
 	// Default to runtime.NumCPU() workers
@@ -81,7 +77,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, beatPaths, clients...)
+	return outputs.Group{Clients: clients}, nil
 }
 
 // Close is a noop for otelconsumer
@@ -154,6 +150,15 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		if beatEvent == nil {
 			beatEvent = mapstr.M{}
 		}
+
+		if out.beatInfo.IncludeMetadata {
+			meta := event.Content.Meta.Clone()
+			meta["beat"] = out.beatInfo.Beat
+			meta["version"] = out.beatInfo.Version
+			meta["type"] = "_doc"
+			beatEvent["@metadata"] = meta
+		}
+
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 
@@ -195,13 +200,20 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
+		// Work around the fact that Elasticsearch exporter returns 401 as a non-permanent error.
+		isAuthorizationError := false
+		var statusErr statusCodeError
+		if errors.As(err, &statusErr) {
+			isAuthorizationError = statusErr.StatusCode() == http.StatusUnauthorized
+		}
+
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
 		// it cannot decode it. Retrying in this case is useless.
 		//
 		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
-		if consumererror.IsPermanent(err) {
+		if consumererror.IsPermanent(err) || isAuthorizationError {
 			st.PermanentErrors(len(events))
 			batch.Drop()
 		} else {
