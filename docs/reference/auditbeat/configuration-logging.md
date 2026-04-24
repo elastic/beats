@@ -38,6 +38,11 @@ When Auditbeat is running on a Linux system with systemd, it uses by default the
 You can specify the following options in the `logging` section of the `auditbeat.yml` config file:
 
 
+::::{warning}
+The `logging.to_*` options are mutually exclusive. Only one option should be set to `true`. If multiple are set, only the first one will be used and the rest will be silently ignored.
+::::
+
+
 ### `logging.to_stderr` [_logging_to_stderr]
 
 When true, writes all logging output to standard error output. This is equivalent to using the `-e` command line option.
