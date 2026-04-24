@@ -83,8 +83,8 @@ func UserAgent(binaryNameCapitalized string, version, commit, buildTime string, 
 		buildTime,
 	}
 	for _, val := range additionalComments {
-		if val != "" {
-			uaValues = append(uaValues, val)
+		if trimmed := strings.TrimSpace(val); len(trimmed) > 0 {
+			uaValues = append(uaValues, trimmed)
 		}
 	}
 	builder.WriteByte('(')
@@ -99,6 +99,7 @@ func UserAgentWithBeatTelemetry(
 	mode AgentManagementMode,
 	unprivileged AgentUnprivilegedMode,
 	isFIPSDistribution bool,
+	additionalComments ...string,
 ) string {
 	var builder strings.Builder
 	builder.WriteString("Elastic-" + binaryNameCapitalized + "/" + version + " ")
@@ -114,6 +115,11 @@ func UserAgentWithBeatTelemetry(
 	}
 	if isFIPSDistribution {
 		uaValues = append(uaValues, "FIPS")
+	}
+	for _, val := range additionalComments {
+		if trimmed := strings.TrimSpace(val); len(trimmed) > 0 {
+			uaValues = append(uaValues, trimmed)
+		}
 	}
 
 	builder.WriteByte('(')

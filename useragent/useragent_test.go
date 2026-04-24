@@ -48,4 +48,10 @@ func TestUserAgentWithBeatTelemetry(t *testing.T) {
 
 	// Require deliberate update in case we want to extend the User Agent later
 	assert.LessOrEqual(t, len(ua2), 100, "User agent string should be less than 100 characters")
+
+	ua3 := UserAgentWithBeatTelemetry("FakeBeat", v, mode, unprivileged, isFIPSDistribution, "agentless")
+	assert.Regexp(t, regexp.MustCompile(`; Managed; Unprivileged; FIPS; agentless\)$`), ua3)
+
+	ua4 := UserAgentWithBeatTelemetry("FakeBeat", v, mode, unprivileged, isFIPSDistribution, "agentless", " test ", "   ", "\r\n\t")
+	assert.Regexp(t, regexp.MustCompile(`; Managed; Unprivileged; FIPS; agentless; test\)$`), ua4)
 }
