@@ -131,8 +131,11 @@ func (m *MetricSet) reportEvent(reporter mb.ReporterV2, event events.Message) {
 	reporter.Event(mb.Event{
 		Timestamp: time,
 		MetricSetFields: mapstr.M{
+			"id":     event.Actor.ID,
 			"type":   event.Type,
 			"action": event.Action,
+			"status": string(event.Action),
+			"from":   event.Actor.Attributes["image"],
 			"actor": mapstr.M{
 				"id":         event.Actor.ID,
 				"attributes": attributes,
