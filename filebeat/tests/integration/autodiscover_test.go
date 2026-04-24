@@ -493,8 +493,8 @@ func kindNodeGatewayIP(t *testing.T, nodeName string) string {
 
 	if inspectResult.Container.NetworkSettings != nil {
 		for _, networkSettings := range inspectResult.Container.NetworkSettings.Networks {
-			if networkSettings != nil && networkSettings.Gateway != "" {
-				return networkSettings.Gateway
+			if networkSettings != nil && networkSettings.Gateway.IsValid() {
+				return networkSettings.Gateway.String()
 			}
 		}
 	}
