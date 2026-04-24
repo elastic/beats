@@ -19,10 +19,14 @@ package kibana
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -185,6 +189,174 @@ headers:
 	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Accept"))
 	assert.Equal(t, []string{"1"}, requests[1].Header.Values("kbn-xsrf"))
 
+}
+
+func TestRetryOnStatus(t *testing.T) {
+	var requestCount atomic.Int32
+	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n := requestCount.Add(1)
+		if n < 3 {
+			w.WriteHeader(http.StatusBadGateway) // 502 — triggers retry
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer kibanaTS.Close()
+
+	conn := Connection{
+		URL:  kibanaTS.URL,
+		HTTP: http.DefaultClient,
+		Retry: RetryConfig{
+			MaxRetries:    3,
+			RetryOnStatus: []int{502, 503, 504},
+		},
+	}
+	code, _, err := conn.Request(http.MethodGet, "", nil, nil, nil)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, code)
+	assert.Equal(t, int32(3), requestCount.Load())
+}
+
+func TestRetryExhausted(t *testing.T) {
+	var requestCount atomic.Int32
+	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount.Add(1)
+		w.WriteHeader(http.StatusServiceUnavailable) // 503 — always retried
+		_, _ = w.Write([]byte(`{"message":"unavailable"}`))
+	}))
+	defer kibanaTS.Close()
+
+	conn := Connection{
+		URL:  kibanaTS.URL,
+		HTTP: http.DefaultClient,
+		Retry: RetryConfig{
+			MaxRetries:    2,
+			RetryOnStatus: []int{503},
+		},
+	}
+	// After MaxRetries exhausted, the last response is returned rather than an error.
+	code, _, _ := conn.Request(http.MethodGet, "", nil, nil, nil)
+	assert.Equal(t, http.StatusServiceUnavailable, code)
+	assert.Equal(t, int32(3), requestCount.Load()) // 1 initial + 2 retries
+}
+
+func TestRetryDisabled(t *testing.T) {
+	var requestCount atomic.Int32
+	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount.Add(1)
+		w.WriteHeader(http.StatusBadGateway)
+		_, _ = w.Write([]byte(`{"message":"bad gateway"}`))
+	}))
+	defer kibanaTS.Close()
+
+	conn := Connection{
+		URL:  kibanaTS.URL,
+		HTTP: http.DefaultClient,
+		Retry: RetryConfig{
+			MaxRetries:    0,
+			RetryOnStatus: []int{502},
+		},
+	}
+	_, _, _ = conn.Request(http.MethodGet, "", nil, nil, nil)
+	assert.Equal(t, int32(1), requestCount.Load())
+}
+
+func TestRetryCustomRetryOnError(t *testing.T) {
+	retryOnErrorCalled := false
+	// A server that immediately closes connections forces a transport error.
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Hijack and close to simulate a connection reset.
+		hj, ok := w.(http.Hijacker)
+		if !ok {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		conn, _, _ := hj.Hijack()
+		conn.Close()
+	}))
+	defer ts.Close()
+
+	conn := Connection{
+		URL:  ts.URL,
+		HTTP: http.DefaultClient,
+		Retry: RetryConfig{
+			MaxRetries: 1,
+			RetryOnError: func(req *http.Request, err error) bool {
+				retryOnErrorCalled = true
+				return false // don't retry
+			},
+		},
+	}
+	resp, err := conn.Send(http.MethodGet, "", nil, nil, nil)
+	if resp != nil {
+		resp.Body.Close()
+	}
+	require.Error(t, err)
+	assert.True(t, retryOnErrorCalled)
+}
+
+func TestRetryBackoff(t *testing.T) {
+	var requestCount atomic.Int32
+	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n := requestCount.Add(1)
+		if n < 2 {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer kibanaTS.Close()
+
+	backoffCalled := false
+	conn := Connection{
+		URL:  kibanaTS.URL,
+		HTTP: http.DefaultClient,
+		Retry: RetryConfig{
+			MaxRetries:    2,
+			RetryOnStatus: []int{502},
+			RetryBackoff: func(attempt int) time.Duration {
+				backoffCalled = true
+				assert.Equal(t, 1, attempt)
+				return 0 // no actual sleep so the test stays fast
+			},
+		},
+	}
+	code, _, err := conn.Request(http.MethodGet, "", nil, nil, nil)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, code)
+	assert.True(t, backoffCalled)
+}
+
+func TestRetryWithBody(t *testing.T) {
+	const payload = `{"hello":"world"}`
+	var requestCount atomic.Int32
+	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n := requestCount.Add(1)
+		body, _ := io.ReadAll(r.Body)
+		assert.Equal(t, payload, string(body), "body must be identical on every attempt")
+		if n < 2 {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer kibanaTS.Close()
+
+	conn := Connection{
+		URL:  kibanaTS.URL,
+		HTTP: http.DefaultClient,
+		Retry: RetryConfig{
+			MaxRetries:    2,
+			RetryOnStatus: []int{502},
+		},
+	}
+	code, _, err := conn.Request(http.MethodPost, "", nil, nil, strings.NewReader(payload))
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, code)
+	assert.Equal(t, int32(2), requestCount.Load())
 }
 
 func TestNewKibanaClientWithMultipartData(t *testing.T) {

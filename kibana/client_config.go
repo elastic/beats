@@ -19,12 +19,33 @@ package kibana
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const elasticAPIVersionHeaderKey = "Elastic-Api-Version"
 const elasticAPIDefaultVersion = "2023-10-31"
+
+// RetryConfig configures retry behaviour for requests made by the Kibana client.
+// The API mirrors the Elasticsearch Go client retry configuration.
+type RetryConfig struct {
+	// MaxRetries is the maximum number of retry attempts per request. Defaults to 3.
+	MaxRetries int `config:"max_retries" yaml:"max_retries,omitempty"`
+
+	// RetryOnStatus is the list of HTTP status codes that trigger a retry.
+	// Defaults to [502, 503, 504].
+	RetryOnStatus []int `config:"retry_on_status" yaml:"retry_on_status,omitempty"`
+
+	// RetryOnError is called for transport errors to decide whether to retry.
+	// When nil, all transport errors are retried. Return true to retry.
+	RetryOnError func(*http.Request, error) bool `config:"-" yaml:"-"`
+
+	// RetryBackoff returns the duration to wait before the given retry attempt (1-based).
+	// When nil, requests are retried immediately with no delay.
+	RetryBackoff func(attempt int) time.Duration `config:"-" yaml:"-"`
+}
 
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
@@ -42,6 +63,7 @@ type ClientConfig struct {
 
 	IgnoreVersion bool
 
+	Retry     RetryConfig                      `config:"retry" yaml:"retry,omitempty"`
 	Transport httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"`
 }
 
@@ -58,6 +80,10 @@ func DefaultClientConfig() ClientConfig {
 		ServiceToken: "",
 		Transport:    httpcommon.DefaultHTTPTransportSettings(),
 		Headers:      map[string]string{elasticAPIVersionHeaderKey: elasticAPIDefaultVersion},
+		Retry: RetryConfig{
+			MaxRetries:    3,
+			RetryOnStatus: []int{502, 503, 504},
+		},
 	}
 }
 
