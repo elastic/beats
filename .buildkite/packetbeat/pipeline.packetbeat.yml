@@ -11,8 +11,8 @@ env:
 
   IMAGE_RHEL9_X86_64: "platform-ingest-beats-rhel-9-1776781006"
   IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1776781006"
-  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1772337686"
-  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1775016079"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1776781006"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1776781006"
   IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1776781006"
   IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1776781006"
   IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1776781006"
