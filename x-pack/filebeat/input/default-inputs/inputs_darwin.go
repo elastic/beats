@@ -28,21 +28,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/streaming"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/unifiedlogs"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States, p *paths.Path) []v2.Plugin {
+func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
 		azureeventhub.Plugin(log),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
-		entityanalytics.Plugin(log, p),
+		entityanalytics.Plugin(log, store, info.Paths),
 		gcs.Plugin(log, store),
 		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
-		awss3.Plugin(log, store, p),
+		awss3.Plugin(log, store, info.Paths),
 		awscloudwatch.Plugin(log, store),
 		lumberjack.Plugin(log),
 		salesforce.Plugin(log, store),
