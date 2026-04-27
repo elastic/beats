@@ -49,19 +49,10 @@ const (
 	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
-<<<<<<< HEAD
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
 }
 
-// statusCodeError is satisfied by errors that carry an HTTP status code,
-// such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
-type statusCodeError interface {
-	StatusCode() int
-}
-
-=======
->>>>>>> 4ed1c3acb (Revert "fix(otelconsumer): do not retry 401 errors from Elasticsearch (#50261)" (#50341))
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
