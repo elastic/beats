@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Preserve `time.Duration` values in Beat-to-OTel log conversion.
+summary: Fix conversion of time duration fields such as event.duration when using Beats receivers
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
