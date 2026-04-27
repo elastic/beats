@@ -39,7 +39,7 @@ You can specify the following options in the `logging` section of the `packetbea
 
 
 ::::{warning}
-The `logging.to_*` options are mutually exclusive. Only one option should be set to `true`. If multiple are set, only the first one will be used and the rest will be silently ignored.
+The `logging.to_*` options are mutually exclusive. If multiple are set to `true`, only the first one takes effect, following the precedence order of the options listed below.
 ::::
 
 
