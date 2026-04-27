@@ -25,8 +25,8 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	"github.com/elastic/beats/v7/filebeat/features"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
