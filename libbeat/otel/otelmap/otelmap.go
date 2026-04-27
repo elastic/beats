@@ -76,6 +76,8 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
 		case common.Time:
 			m[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
+		case time.Duration:
+			m[key] = int64(x)
 		case []time.Time:
 			s := make([]any, 0, len(x))
 			for _, i := range x {
