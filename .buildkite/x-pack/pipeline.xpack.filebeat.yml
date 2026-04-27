@@ -207,6 +207,7 @@ steps:
               context: "x-pack/filebeat: Go fips140=only Integration Tests"
 
       - label: ":ubuntu: x-pack/filebeat: FIPS ECH Integration Tests"
+        skip: "https://github.com/elastic/beats/issues/50269: ssh keys not FIPS"
         env:
           ASDF_TERRAFORM_VERSION: "1.9.3"
           ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
