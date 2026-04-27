@@ -210,6 +210,57 @@ func (m M) Delete(key string) error {
 	return nil
 }
 
+// DeleteWithCleanup deletes the given key from the map and removes any
+// resulting empty parent maps by backtracking up the path.
+func (m M) DeleteWithCleanup(key string) error {
+	type segment struct {
+		m M
+		k string
+	}
+
+	parts := strings.Split(key, ".")
+	stack := make([]segment, 0, len(parts))
+
+	current := m
+	for i, part := range parts {
+		v, ok := current[part]
+		if !ok {
+			return ErrKeyNotFound
+		}
+		if i == len(parts)-1 {
+			stack = append(stack, segment{
+				m: current,
+				k: part,
+			})
+			break
+		}
+		vMap, ok := tryToMapStr(v)
+		if !ok {
+			return ErrKeyNotFound
+		}
+		stack = append(stack, segment{
+			m: current,
+			k: part,
+		})
+		current = vMap
+	}
+	// Delete the leaf key.
+	leaf := stack[len(stack)-1]
+	delete(leaf.m, leaf.k)
+
+	// Walk back up the path and prune any parent maps that are now empty.
+	for i := len(stack) - 2; i >= 0; i-- {
+		f := stack[i]
+		child, ok := tryToMapStr(f.m[f.k])
+		if !ok || len(child) > 0 {
+			break
+		}
+		delete(f.m, f.k)
+	}
+
+	return nil
+}
+
 // CopyFieldsTo copies the field specified by key to the given map. It will
 // overwrite the key if it exists. An error is returned if the key does not
 // exist in the source map.
