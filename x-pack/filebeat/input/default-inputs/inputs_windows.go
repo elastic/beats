@@ -36,7 +36,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2
 		azureeventhub.Plugin(log),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
-		entityanalytics.Plugin(log, info.Paths),
+		entityanalytics.Plugin(log, store, info.Paths),
 		gcs.Plugin(log, store),
 		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),
