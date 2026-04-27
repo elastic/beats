@@ -148,6 +148,6 @@ func (l *addLocale) Format(zone string, offset int) string {
 	return ft
 }
 
-func (l addLocale) String() string {
+func (l *addLocale) String() string {
 	return "add_locale=[format=" + l.TimezoneFormat.String() + "]"
 }
