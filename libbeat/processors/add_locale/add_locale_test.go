@@ -122,6 +122,8 @@ func BenchmarkConstruct(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
-		_, err = p.Run(&beat.Event{Fields: input})
+		if _, err = p.Run(&beat.Event{Fields: input}); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
