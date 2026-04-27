@@ -20,7 +20,7 @@ import (
 
 func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
-		entityanalytics.Plugin(log, info.Paths),
+		entityanalytics.Plugin(log, store, info.Paths),
 		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
