@@ -61,7 +61,7 @@ func TestNewPublisher_FieldMapping(t *testing.T) {
 		},
 	}
 
-	if err := pub(context.Background(), doc); err != nil {
+	if err := pub(t.Context(), doc); err != nil {
 		t.Fatalf("Publish: %v", err)
 	}
 

@@ -16,7 +16,7 @@ const testEntcollectBucket = "entcollect.test"
 func TestEntcollectStore_SetGet(t *testing.T) {
 	t.Parallel()
 
-	store := testSetupStore(t, "TestEntcollectStore_SetGet.db")
+	store := testSetupStore(t, t.Name()+".db")
 	t.Cleanup(func() { testCleanupStore(store) })
 
 	type obj struct {
@@ -49,7 +49,7 @@ func TestEntcollectStore_SetGet(t *testing.T) {
 func TestEntcollectStore_GetMissing(t *testing.T) {
 	t.Parallel()
 
-	store := testSetupStore(t, "TestEntcollectStore_GetMissing.db")
+	store := testSetupStore(t, t.Name()+".db")
 	t.Cleanup(func() { testCleanupStore(store) })
 
 	err := store.RunTransaction(false, func(tx *Transaction) error {
@@ -65,7 +65,7 @@ func TestEntcollectStore_GetMissing(t *testing.T) {
 func TestEntcollectStore_Delete(t *testing.T) {
 	t.Parallel()
 
-	store := testSetupStore(t, "TestEntcollectStore_Delete.db")
+	store := testSetupStore(t, t.Name()+".db")
 	t.Cleanup(func() { testCleanupStore(store) })
 
 	err := store.RunTransaction(true, func(tx *Transaction) error {
