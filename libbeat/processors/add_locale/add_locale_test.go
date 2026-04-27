@@ -63,7 +63,7 @@ func TestTimezoneFormat(t *testing.T) {
 
 	posZone, posOffset := time.Now().In(posLoc).Zone()
 
-	posAddLocal := addLocale{TimezoneFormat: Offset}
+	posAddLocal := &addLocale{TimezoneFormat: Offset}
 
 	posVal := posAddLocal.Format(posZone, posOffset)
 
@@ -78,11 +78,25 @@ func TestTimezoneFormat(t *testing.T) {
 
 	negZone, negOffset := time.Now().In(negLoc).Zone()
 
-	negAddLocal := addLocale{TimezoneFormat: Offset}
+	negAddLocal := &addLocale{TimezoneFormat: Offset}
 
 	negVal := negAddLocal.Format(negZone, negOffset)
 
 	assert.Regexp(t, `\-[\d]{2}\:[\d]{2}`, negVal)
+}
+
+func TestTimezoneFormatCacheRefreshOnChange(t *testing.T) {
+	loc := &addLocale{TimezoneFormat: Offset}
+
+	first := loc.cachedFormatOnChange("CET", 3600)
+	assert.Equal(t, "+01:00", first, "expected initial cached timezone format")
+
+	cached := loc.cachedFormatOnChange("CET", 3600)
+	assert.Equal(t, first, cached, "expected cached timezone format for same zone/offset")
+
+	updated := loc.cachedFormatOnChange("CEST", 7200)
+	assert.Equal(t, "+02:00", updated, "expected cache refresh after zone/offset change")
+	assert.NotEqual(t, first, updated, "expected refreshed value to differ after offset change")
 }
 
 func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {

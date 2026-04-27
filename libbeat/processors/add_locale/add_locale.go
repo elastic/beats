@@ -20,6 +20,7 @@ package add_locale
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -31,6 +32,11 @@ import (
 
 type addLocale struct {
 	TimezoneFormat TimezoneFormat
+	cacheMu        sync.RWMutex
+	cachedZone     string
+	cachedOffset   int
+	cachedFormat   string
+	hasCachedValue bool
 }
 
 // TimezoneFormat type
@@ -82,12 +88,12 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 			config.Format)
 
 	}
-	return loc, nil
+	return &loc, nil
 }
 
-func (l addLocale) Run(event *beat.Event) (*beat.Event, error) {
+func (l *addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
-	format := l.Format(zone, offset)
+	format := l.cachedFormatOnChange(zone, offset)
 	_, _ = event.PutValue("event.timezone", format)
 	return event, nil
 }
@@ -98,7 +104,32 @@ const (
 	hour = 60 * min
 )
 
-func (l addLocale) Format(zone string, offset int) string {
+func (l *addLocale) cachedFormatOnChange(zone string, offset int) string {
+	l.cacheMu.RLock()
+	if l.hasCachedValue && l.cachedZone == zone && l.cachedOffset == offset {
+		cached := l.cachedFormat
+		l.cacheMu.RUnlock()
+		return cached
+	}
+	l.cacheMu.RUnlock()
+
+	formatted := l.Format(zone, offset)
+
+	l.cacheMu.Lock()
+	if l.hasCachedValue && l.cachedZone == zone && l.cachedOffset == offset {
+		formatted = l.cachedFormat
+	} else {
+		l.cachedZone = zone
+		l.cachedOffset = offset
+		l.cachedFormat = formatted
+		l.hasCachedValue = true
+	}
+	l.cacheMu.Unlock()
+
+	return formatted
+}
+
+func (l *addLocale) Format(zone string, offset int) string {
 	var ft string
 	switch l.TimezoneFormat {
 	case Abbreviation:
