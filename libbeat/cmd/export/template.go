@@ -47,11 +47,7 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 				fatalfInitCmd(err)
 			}
 
-<<<<<<< HEAD
-			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Paths, b.Config.LifecycleConfig)
-=======
 			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Config.LifecycleConfig)
->>>>>>> 8b7236f25 (idxmgmt: remove redundant beatPaths parameter (#49838))
 			if err != nil {
 				fatalf("error creating file handler: %s", err)
 			}
