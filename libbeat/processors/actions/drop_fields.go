@@ -45,7 +45,7 @@ func init() {
 	processors.RegisterPlugin("drop_fields",
 		checks.ConfigChecked(NewDropFields,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "when", "ignore_missing")))
+			checks.AllowedFields("fields", "when", "ignore_missing", "cleanup")))
 
 	jsprocessor.RegisterPlugin("DropFields", NewDropFields)
 }
