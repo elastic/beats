@@ -4,22 +4,9 @@ extensions:
   pprof:
     endpoint: 0.0.0.0:1777
   beatsauth:
-  elasticsearch_storage:
-    hosts:
-      - http://localhost:9200
-  kafkapartitioner:
 
 receivers:
   # Beats receivers
-  auditbeatreceiver:
-    auditbeat:
-      modules:
-        - module: file_integrity
-          enabled: true
-          paths:
-            - /usr/bin
-            - /usr/sbin
-
   filebeatreceiver:
     filebeat:
       inputs:
@@ -28,15 +15,6 @@ receivers:
           message: "test message"
           count: 1
 
-  heartbeatreceiver:
-    heartbeat:
-      monitors:
-        - type: tcp
-          id: test-tcp
-          schedule: "@every 60s"
-          hosts: ["localhost:80"]
-          enabled: true
-
   metricbeatreceiver:
     metricbeat:
       modules:
@@ -44,23 +22,6 @@ receivers:
           metricsets: [cpu]
           period: 10s
 
-  osquerybeatreceiver:
-    osquerybeat:
-      inputs:
-        - type: osquery
-          streams:
-            - id: example
-              query: "select * from processes"
-              interval: 60
-
-  packetbeatreceiver:
-    packetbeat:
-      interfaces:
-        device: any
-      protocols:
-        - type: http
-          ports: [80, 8080]
-  
   # Standard OTEL receivers
   otlp:
     protocols:
@@ -68,7 +29,7 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
-  
+
   # Placeholder for testing
   nop:
 
@@ -76,14 +37,14 @@ processors:
   # Beats processor
   beat:
     # Beat-specific processing configuration
-  
-  # Standard processors  
+
+  # Standard processors
   batch:
-  
+
   memory_limiter:
     limit_mib: 256
     check_interval: 5s
-  
+
   resource:
     attributes:
       - key: service.name
@@ -91,11 +52,6 @@ processors:
         action: upsert
 
 exporters:
-  # Beats exporters
-  logstash:
-    hosts: ["localhost:5044"]
-    # Logstash export configuration
-
   # Standard exporters
   debug:
     verbosity: detailed
@@ -117,19 +73,19 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
-  
+  extensions: [health_check, pprof, beatsauth]
+
   pipelines:
     logs:
-      receivers: [auditbeatreceiver, filebeatreceiver, heartbeatreceiver, metricbeatreceiver, osquerybeatreceiver, packetbeatreceiver, otlp, nop]
+      receivers: [filebeatreceiver, metricbeatreceiver, otlp, nop]
       processors: [memory_limiter, beat, resource, batch]
-      exporters: [logstash, elasticsearch, debug, nop]
-    
+      exporters: [elasticsearch, debug, nop]
+
     metrics:
       receivers: [otlp, nop]
       processors: [memory_limiter, resource, batch]
       exporters: [elasticsearch, debug, nop]
-    
+
     traces:
       receivers: [otlp, nop]
       processors: [memory_limiter, resource, batch]
