@@ -59,6 +59,8 @@ func (n *OtelManager) Stop() {
 // Returning true might lead to side effects.
 func (n *OtelManager) Enabled() bool                             { return false }
 func (n *OtelManager) AgentInfo() management.AgentInfo           { return management.AgentInfo{} }
+func (n *OtelManager) PreInit() error                            { return nil }
+func (n *OtelManager) PostInit()                                 {}
 func (n *OtelManager) Start() error                              { return nil }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
 func (n *OtelManager) RegisterAction(action management.Action)   {}

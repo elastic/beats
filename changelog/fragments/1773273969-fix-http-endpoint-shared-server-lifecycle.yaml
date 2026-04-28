@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Fix http_endpoint input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs.
+description: |
+  Decouple the shared HTTP server lifetime from any single input. Previously,
+  the server context was derived from the creator input, so cancelling a joiner
+  blocked forever (deadlock) and cancelling the creator shut down all inputs on
+  the same port. The server now lives until the last input deregisters.
+component: filebeat
