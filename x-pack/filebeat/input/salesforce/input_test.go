@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -3571,4 +3572,153 @@ func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFail
 	}
 	assert.GreaterOrEqual(t, elfPublished, 2, "expected EventLogFile to keep publishing after object ticker failure")
 	assert.Equal(t, 1, objectPublished, "expected only the startup Object run to publish when later ticker SOQL requests fail")
+}
+
+// newClientForCancellationTest builds a Salesforce HTTP client through the
+// production newClient with short retry waits so cancellation tests stay
+// quick. getCtx is plumbed unchanged into newClient.
+func newClientForCancellationTest(t *testing.T, getCtx func() context.Context, maxAttempts int) *http.Client {
+	t.Helper()
+	waitMin := 100 * time.Millisecond
+	waitMax := 500 * time.Millisecond
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 5 * time.Second
+	cfg := config{
+		Resource: &resourceConfig{
+			Retry: retryConfig{
+				MaxAttempts: &maxAttempts,
+				WaitMin:     &waitMin,
+				WaitMax:     &waitMax,
+			},
+			Transport: transport,
+		},
+	}
+	c, err := newClient(cfg, getCtx, logp.NewLogger("salesforce-test"))
+	require.NoError(t, err, "newClient should succeed with valid retry config")
+	return c
+}
+
+// TestNewClientShortCircuitsRetryOnContextCancel asserts that cancelling
+// the input context while the retryablehttp wrapper is mid-backoff returns
+// promptly instead of running the full attempt budget. ctxTransport on the
+// inner http.Transport alone is not enough — retryablehttp inspects
+// req.Context() (which go-sfdc leaves as context.Background) when deciding
+// whether to retry, so the input context must also be threaded through the
+// retryablehttp boundary.
+func TestNewClientShortCircuitsRetryOnContextCancel(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var attempts atomic.Int32
+	firstSeen := make(chan struct{}, 1)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if attempts.Add(1) == 1 {
+			select {
+			case firstSeen <- struct{}{}:
+			default:
+			}
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	client := newClientForCancellationTest(t, func() context.Context { return ctx }, 5)
+
+	go func() {
+		select {
+		case <-firstSeen:
+		case <-time.After(2 * time.Second):
+			return
+		}
+		// Cancel mid-backoff: retryablehttp's first sleep is 100ms, so
+		// 50ms gives it time to enter the wait before we cancel.
+		time.Sleep(50 * time.Millisecond)
+		cancel()
+	}()
+
+	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	require.NoError(t, err)
+
+	start := time.Now()
+	resp, err := client.Do(req)
+	elapsed := time.Since(start)
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
+
+	require.Error(t, err, "client.Do should surface the cancellation as an error")
+	require.ErrorIs(t, err, context.Canceled, "cancellation should propagate as context.Canceled")
+	// Without the fix, retryablehttp runs the full backoff (~1.7s with
+	// these settings: 100+200+400+500+500 ms) and the server receives 5
+	// attempts. With the fix retryablehttp bails after attempt 1.
+	require.Less(t, elapsed, 1*time.Second, "retryablehttp ran the full backoff instead of honoring input cancellation (took %s)", elapsed)
+	require.LessOrEqual(t, int(attempts.Load()), 1, "server received %d attempts; retryablehttp should have stopped after the first once the input context was cancelled", attempts.Load())
+}
+
+// TestNewClientPreCancelledContextShortCircuits asserts that when the
+// input context is already cancelled before a request is issued, the
+// retryablehttp wrapper returns immediately and the request never makes
+// it through more than a single attempt.
+func TestNewClientPreCancelledContextShortCircuits(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var attempts atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	client := newClientForCancellationTest(t, func() context.Context { return ctx }, 5)
+
+	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	require.NoError(t, err)
+
+	start := time.Now()
+	resp, err := client.Do(req)
+	elapsed := time.Since(start)
+	if resp != nil {
+		_ = resp.Body.Close()
+	}
+
+	require.Error(t, err, "client.Do should fail when the input context is already cancelled")
+	require.ErrorIs(t, err, context.Canceled)
+	require.Less(t, elapsed, 200*time.Millisecond, "pre-cancelled context should short-circuit (took %s)", elapsed)
+	require.LessOrEqual(t, int(attempts.Load()), 1, "pre-cancelled context should not produce a full retry storm; server saw %d attempts", attempts.Load())
+}
+
+// TestNewClientNilGetCtxStillRetries asserts the retry behavior is
+// unchanged when no input context is plumbed through (getCtx == nil),
+// covering the unit-test path and any other caller that constructs a
+// client without an active input.
+func TestNewClientNilGetCtxStillRetries(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	var attempts atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	const maxAttempts = 2
+	client := newClientForCancellationTest(t, nil, maxAttempts)
+
+	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	require.NoError(t, err)
+
+	resp, err := client.Do(req)
+	require.NoError(t, err, "retryablehttp surfaces the last 5xx response without an error")
+	require.NotNil(t, resp)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	// retryablehttp counts retries, not total attempts, so MaxAttempts=N
+	// produces 1 initial + N retries = N+1 hits at the server.
+	require.Equal(t, int32(maxAttempts+1), attempts.Load(), "with no input context plumbed in, retryablehttp should still run the full attempt budget")
 }

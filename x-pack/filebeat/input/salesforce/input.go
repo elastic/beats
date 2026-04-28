@@ -978,6 +978,21 @@ func newClient(cfg config, getCtx func() context.Context, log *logp.Logger) (*ht
 		// BUG: retryablehttp ignores the timeout previously set. So, setting it
 		// again.
 		c.Timeout = cfg.Resource.Transport.Timeout
+
+		// Wrap the StandardClient transport so the input's cancellation
+		// context is attached to the request before retryablehttp's
+		// CheckRetry / Backoff inspect req.Context().Err(). The inner
+		// ctxTransport set above on the original http.Transport is not
+		// enough on its own: retryablehttp wraps the http.Client, and the
+		// requests it sees are built by go-sfdc with http.NewRequest (no
+		// context). Without this outer wrap, retryablehttp treats every
+		// cancelled-by-inner-ctxTransport attempt as a retryable network
+		// error and runs the full backoff before giving up, so SIGTERM
+		// during an in-flight SOQL query waits ~30s instead of returning
+		// promptly.
+		if getCtx != nil {
+			c.Transport = &ctxTransport{rt: c.Transport, getCtx: getCtx}
+		}
 	}
 
 	return c, nil
