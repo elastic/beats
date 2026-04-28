@@ -24,14 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
-func TestLeak(t *testing.T) {
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
+func getConfigAndFactory(t *testing.T, monitorHost string) (Config, receiver.Factory) {
 	config := Config{
 		Beatconfig: map[string]any{
 			"auditbeat": map[string]any{
@@ -56,13 +49,26 @@ func TestLeak(t *testing.T) {
 		},
 	}
 	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
+	return config, factory
+}
+
+func TestLeak(t *testing.T) {
+	monitorSocket := genSocketPath()
+	var monitorHost string
+	if runtime.GOOS == "windows" {
+		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
+	} else {
+		monitorHost = "unix://" + monitorSocket
+	}
 
 	t.Run("healthy consumer", func(t *testing.T) {
+		config, factory := getConfigAndFactory(t, monitorHost)
 		defer oteltest.VerifyNoLeaks(t)
 		var consumeLogs oteltest.DummyConsumer
 		startAndStopReceiver(t, factory, &consumeLogs, &config)
 	})
 	t.Run("unhealthy consumer", func(t *testing.T) {
+		config, factory := getConfigAndFactory(t, monitorHost)
 		defer oteltest.VerifyNoLeaks(t)
 		consumeLogs := oteltest.DummyConsumer{ConsumeError: errors.New("cannot publish data")}
 		startAndStopReceiver(t, factory, &consumeLogs, &config)
