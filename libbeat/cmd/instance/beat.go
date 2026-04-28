@@ -1277,7 +1277,11 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
+<<<<<<< HEAD
 	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), b.Paths)
+=======
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
+>>>>>>> c37cfcf33 (outputs: remove redundant beatPaths parameter from Factory (#49839))
 }
 
 func (b *Beat) registerClusterUUIDFetching() {
