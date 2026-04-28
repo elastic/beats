@@ -84,7 +84,7 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 		loc.TimezoneFormat = Offset
 	default:
 		return nil, fmt.Errorf("'%s' is not a valid format option for the "+
-			"add_locale processor. Valid options are 'abbreviation' and 'offset'.",
+			"add_locale processor. Valid options are 'abbreviation' and 'offset'",
 			config.Format)
 
 	}

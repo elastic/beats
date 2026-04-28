@@ -108,6 +108,11 @@ func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {
 	}
 
 	actual, err := p.Run(&beat.Event{Fields: input})
+	if err != nil {
+		log.Error("Error running add_locale processor")
+		t.Fatal(err)
+	}
+
 	return actual.Fields
 }
 
