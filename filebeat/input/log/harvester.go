@@ -691,7 +691,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 	}
 
 	if h.config.JSON != nil {
-		r = readjson.NewJSONReader(r, h.config.JSON, h.logger)
+		r = readjson.NewJSONReader(r, h.config.JSON, h.config.MaxBytes, h.logger)
 	}
 
 	r = readfile.NewStripNewline(r, h.config.LineTerminator)

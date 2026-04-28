@@ -165,7 +165,7 @@ func (c *Config) Create(in reader.Reader, log *logp.Logger) Parser {
 			if err != nil {
 				return p
 			}
-			p = readjson.NewJSONParser(p, &config, log)
+			p = readjson.NewJSONParser(p, &config, int(c.pCfg.MaxBytes), log)
 		case "container":
 			config := readjson.DefaultContainerConfig()
 			cfg := ns.Config()

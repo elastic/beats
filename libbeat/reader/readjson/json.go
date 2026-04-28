@@ -20,6 +20,7 @@ package readjson
 import (
 	"bytes"
 	gojson "encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -33,9 +34,10 @@ import (
 
 // JSONReader parses JSON inputs
 type JSONReader struct {
-	reader reader.Reader
-	cfg    *Config
-	logger *logp.Logger
+	reader   reader.Reader
+	cfg      *Config
+	maxBytes int
+	logger   *logp.Logger
 }
 
 type JSONParser struct {
@@ -43,21 +45,25 @@ type JSONParser struct {
 	field, target string
 }
 
+var errMaxBytesExceeded = errors.New("max_bytes exceeded while decoding JSON")
+
 // NewJSONReader creates a new reader that can decode JSON.
-func NewJSONReader(r reader.Reader, cfg *Config, logger *logp.Logger) *JSONReader {
+func NewJSONReader(r reader.Reader, cfg *Config, maxBytes int, logger *logp.Logger) *JSONReader {
 	return &JSONReader{
-		reader: r,
-		cfg:    cfg,
-		logger: logger.Named("reader_json"),
+		reader:   r,
+		cfg:      cfg,
+		maxBytes: maxBytes,
+		logger:   logger.Named("reader_json"),
 	}
 }
 
-func NewJSONParser(r reader.Reader, cfg *ParserConfig, logger *logp.Logger) *JSONParser {
+func NewJSONParser(r reader.Reader, cfg *ParserConfig, maxBytes int, logger *logp.Logger) *JSONParser {
 	return &JSONParser{
 		JSONReader{
-			reader: r,
-			cfg:    &cfg.Config,
-			logger: logger.Named("parser_json"),
+			reader:   r,
+			cfg:      &cfg.Config,
+			maxBytes: maxBytes,
+			logger:   logger.Named("parser_json"),
 		},
 		cfg.Field,
 		cfg.Target,
@@ -103,6 +109,25 @@ func (r *JSONReader) decode(text []byte) ([]byte, mapstr.M) {
 	return []byte(textString), jsonFields
 }
 
+func (r *JSONReader) decodeMessage(message *reader.Message, text []byte) ([]byte, mapstr.M) {
+	if r.maxBytes <= 0 || len(text) <= r.maxBytes {
+		return r.decode(text)
+	}
+
+	truncated := make([]byte, r.maxBytes)
+	copy(truncated, text)
+	message.AddFlagsWithKey("log.flags", "truncated") //nolint:errcheck // It is safe to ignore the error.
+
+	if !r.cfg.IgnoreDecodingError {
+		r.logger.Errorf("Error decoding JSON: %v", errMaxBytesExceeded)
+	}
+	if r.cfg.AddErrorKey {
+		return truncated, mapstr.M{"error": createJSONError(fmt.Sprintf("Error decoding JSON: %v", errMaxBytesExceeded))}
+	}
+
+	return truncated, nil
+}
+
 // unmarshal is equivalent with json.Unmarshal but it converts numbers
 // to int64 where possible, instead of using always float64.
 func unmarshal(text []byte, fields *map[string]interface{}) error {
@@ -124,7 +149,7 @@ func (r *JSONReader) Next() (reader.Message, error) {
 	}
 
 	var fields mapstr.M
-	message.Content, fields = r.decode(message.Content)
+	message.Content, fields = r.decodeMessage(&message, message.Content)
 	message.AddFields(mapstr.M{"json": fields})
 	return message, nil
 }
@@ -153,7 +178,7 @@ func (p *JSONParser) Next() (reader.Message, error) {
 		}
 	}
 	var jsonFields mapstr.M
-	message.Content, jsonFields = p.JSONReader.decode(from)
+	message.Content, jsonFields = p.JSONReader.decodeMessage(&message, from)
 
 	if len(jsonFields) == 0 {
 		return message, err

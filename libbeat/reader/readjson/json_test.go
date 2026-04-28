@@ -206,6 +206,50 @@ func TestDecodeJSON(t *testing.T) {
 	}
 }
 
+func TestJSONReaderMaxBytesWithoutMessageKey(t *testing.T) {
+	input := []byte(`{"field":"012345678901234567890123456789"}`)
+	maxBytes := 20
+
+	r := &mockReader{messages: [][]byte{input}}
+	jsonReader := NewJSONReader(r, &Config{AddErrorKey: true}, maxBytes, logptest.NewTestingLogger(t, "json_test"))
+	message, err := jsonReader.Next()
+
+	assert.NoError(t, err)
+	assert.Equal(t, string(input[:maxBytes]), string(message.Content))
+	assertJSONTruncated(t, message.Fields)
+	assert.Equal(t,
+		mapstr.M{"error": mapstr.M{"message": "Error decoding JSON: max_bytes exceeded while decoding JSON", "type": "json"}},
+		message.Fields["json"],
+	)
+}
+
+func TestJSONParserMaxBytesWithoutMessageKey(t *testing.T) {
+	input := []byte(`{"field":"012345678901234567890123456789"}`)
+	maxBytes := 20
+
+	r := &mockReader{messages: [][]byte{input}}
+	jsonParser := NewJSONParser(r, &ParserConfig{Config: Config{AddErrorKey: true}}, maxBytes, logptest.NewTestingLogger(t, "json_test"))
+	message, err := jsonParser.Next()
+
+	assert.NoError(t, err)
+	assert.Equal(t, string(input[:maxBytes]), string(message.Content))
+	assert.Equal(t, string(input[:maxBytes]), message.Fields["message"])
+	assertJSONTruncated(t, message.Fields)
+	assert.Equal(t,
+		mapstr.M{"message": "Error decoding JSON: max_bytes exceeded while decoding JSON", "type": "json"},
+		message.Fields["error"],
+	)
+	assert.NotContains(t, message.Fields, "field")
+}
+
+func assertJSONTruncated(t *testing.T, fields mapstr.M) {
+	t.Helper()
+
+	flags, err := fields.GetValue("log.flags")
+	assert.NoError(t, err, "'log.flags' not present in event")
+	assert.Contains(t, flags, "truncated", "truncated flag should be set")
+}
+
 func TestMergeJSONFields(t *testing.T) {
 	type io struct {
 	}
