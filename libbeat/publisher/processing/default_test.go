@@ -621,9 +621,6 @@ func TestDisableHost(t *testing.T) {
 	})
 
 	t.Run("doesn't removes host.name field for forwarded events", func(t *testing.T) {
-		// The old implementation only deleted host from builtin; it could not drop
-		// host.* fields that a processor adds during event processing. The new
-		// implementation appends a drop_fields processor at the end of the pipeline.
 		support, err := MakeDefaultSupport(true, nil)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
 		require.NoError(t, err)
 

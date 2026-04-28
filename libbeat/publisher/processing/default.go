@@ -398,15 +398,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		pipelineProcessors.add(timeseries.NewTimeSeriesProcessor(b.timeseriesFields, b.log))
 	}
 
-	// setup 10: debug print final event (P)
-	if b.log.IsDebug() || management.UnderAgent() {
-		pipelineProcessors.add(debugPrintProcessor(b.info, b.log))
-	}
-
 	if cfg.DisableHost {
 		drop_hostname_cfg, err := config.NewConfigFrom(map[string]interface{}{
 			"fields":                 []string{"host.name"},
 			"ignore_missing":         true,
+			"cleanup":                true,
 			"when.not.contains.tags": "forwarded",
 		})
 		if err != nil {
@@ -417,31 +413,13 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 			return nil, fmt.Errorf("failed creating drop_fields processor for host.name field: %w", err)
 		}
 		pipelineProcessors.add(proc)
-
-		// If host.name was the only field under host, we need to drop the empty "host" object as well.
-		drop_host_cfg, err := config.NewConfigFrom(map[string]interface{}{
-			"fields":         []string{"host"},
-			"ignore_missing": true,
-			"when": map[string]interface{}{
-				"and": []map[string]interface{}{
-					{
-						"is_empty": "host",
-					},
-					{
-						"not.contains.tags": "forwarded",
-					},
-				},
-			},
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed creating drop_fields processor config for host field: %w", err)
-		}
-		proc, err = processors.NewConditional(actions.NewDropFields)(drop_host_cfg, b.log)
-		if err != nil {
-			return nil, fmt.Errorf("failed creating drop_fields processor for host field: %w", err)
-		}
-		pipelineProcessors.add(proc)
 	}
+
+	// setup 10: debug print final event (P)
+	if b.log.IsDebug() || management.UnderAgent() {
+		pipelineProcessors.add(debugPrintProcessor(b.info, b.log))
+	}
+
 	// setup 11: drop all events if outputs are disabled (P)
 	if drop {
 		pipelineProcessors.add(dropDisabledProcessor)

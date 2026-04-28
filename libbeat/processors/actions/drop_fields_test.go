@@ -79,6 +79,47 @@ func TestDropFieldRun(t *testing.T) {
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
 
+	t.Run("cleanup removes empty parent maps after field deletion", func(t *testing.T) {
+		e := &beat.Event{
+			Fields: mapstr.M{
+				"parent": mapstr.M{
+					"child": "value",
+				},
+				"other": "other_value",
+			},
+		}
+		p := dropFields{
+			Fields:  []string{"parent.child"},
+			Cleanup: true,
+		}
+		newEvent, err := p.Run(e)
+		assert.NoError(t, err)
+		assert.Equal(t, mapstr.M{
+			"other": "other_value",
+		}, newEvent.Fields)
+	})
+
+	t.Run("without cleanup empty parent maps remain after field deletion", func(t *testing.T) {
+		e := &beat.Event{
+			Fields: mapstr.M{
+				"parent": mapstr.M{
+					"child": "value",
+				},
+				"other": "other_value",
+			},
+		}
+		p := dropFields{
+			Fields:  []string{"parent.child"},
+			Cleanup: false,
+		}
+		newEvent, err := p.Run(e)
+		assert.NoError(t, err)
+		assert.Equal(t, mapstr.M{
+			"parent": mapstr.M{},
+			"other":  "other_value",
+		}, newEvent.Fields)
+	})
+
 	t.Run("supports a regexp field", func(t *testing.T) {
 		event = &beat.Event{
 			Fields: mapstr.M{
@@ -126,6 +167,31 @@ func TestNewDropFields(t *testing.T) {
 		assert.Equal(t, []string{"third"}, processor.Fields)
 		assert.Equal(t, "<substring 'second'>", processor.RegexpFields[0].String())
 		assert.Equal(t, "(?-s:field_.*1)", processor.RegexpFields[1].String())
+	})
+
+	t.Run("parses cleanup option", func(t *testing.T) {
+		c := config2.MustNewConfigFrom(map[string]interface{}{
+			"fields":  []string{"field1"},
+			"cleanup": true,
+		})
+		procInt, err := NewDropFields(c, logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+
+		processor, ok := procInt.(*dropFields)
+		assert.True(t, ok)
+		assert.True(t, processor.Cleanup)
+	})
+
+	t.Run("cleanup defaults to false when not specified", func(t *testing.T) {
+		c := config2.MustNewConfigFrom(map[string]interface{}{
+			"fields": []string{"field1"},
+		})
+		procInt, err := NewDropFields(c, logptest.NewTestingLogger(t, ""))
+		require.NoError(t, err)
+
+		processor, ok := procInt.(*dropFields)
+		assert.True(t, ok)
+		assert.False(t, processor.Cleanup)
 	})
 
 	t.Run("returns error when regexp field is badly written", func(t *testing.T) {

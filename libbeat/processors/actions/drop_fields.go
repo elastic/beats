@@ -38,6 +38,7 @@ type dropFields struct {
 	Fields        []string
 	RegexpFields  []match.Matcher
 	IgnoreMissing bool
+	Cleanup       bool
 }
 
 func init() {
@@ -53,6 +54,7 @@ func NewDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`
+		Cleanup       bool     `config:"cleanup"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
@@ -86,7 +88,7 @@ func NewDropFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 		}
 	}
 
-	f := &dropFields{Fields: configFields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields}
+	f := &dropFields{Fields: configFields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields, Cleanup: config.Cleanup}
 	return f, nil
 }
 
@@ -111,7 +113,13 @@ func (f *dropFields) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (f *dropFields) deleteField(event *beat.Event, field string, errs *[]error) {
-	if err := event.Delete(field); err != nil {
+	var err error
+	if f.Cleanup {
+		err = event.DeleteWithCleanup(field)
+	} else {
+		err = event.Delete(field)
+	}
+	if err != nil {
 		if !f.IgnoreMissing || !errors.Is(err, mapstr.ErrKeyNotFound) {
 			*errs = append(*errs, fmt.Errorf("failed to drop field [%v], error: %w", field, err))
 		}

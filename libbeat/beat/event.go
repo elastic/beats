@@ -285,6 +285,27 @@ func (e *Event) Delete(key string) error {
 	return e.Fields.Delete(key)
 }
 
+// DeleteWithCleanup deletes the given key from the event and removes empty parent maps if needed.
+func (e *Event) DeleteWithCleanup(key string) error {
+	if key == TimestampFieldKey {
+		return ErrDeleteTimestamp
+	}
+	if key == MetadataFieldKey {
+		return ErrAlterMetadataKey
+	}
+	if subKey, ok := e.metadataSubKey(key); ok {
+		if e.Meta == nil {
+			return mapstr.ErrKeyNotFound
+		}
+		return e.Meta.DeleteWithCleanup(subKey)
+	}
+
+	if e.Fields == nil {
+		return mapstr.ErrKeyNotFound
+	}
+	return e.Fields.DeleteWithCleanup(key)
+}
+
 func (e *Event) metadataSubKey(key string) (string, bool) {
 	if !strings.HasPrefix(key, metadataKeyPrefix) {
 		return "", false
