@@ -41,9 +41,24 @@ func makeLogstash(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
+) (outputs.Group, error) {
+<<<<<<< HEAD
+	lsConfig, err := readConfig(cfg, beat)
+=======
+	log := beat.Logger.Named("logstash")
+	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix, beat.Paths)
+}
+
+func MakeLogstashClients(
+	beatVersion string,
+	logger *logp.Logger,
+	observer outputs.Observer,
+	rawCfg *conf.C,
+	beatIndexPrefix string,
 	beatPaths *paths.Path,
 ) (outputs.Group, error) {
-	lsConfig, err := readConfig(cfg, beat)
+	config, err := readConfig(rawCfg, beatIndexPrefix)
+>>>>>>> c37cfcf33 (outputs: remove redundant beatPaths parameter from Factory (#49839))
 	if err != nil {
 		return outputs.Fail(err)
 	}
