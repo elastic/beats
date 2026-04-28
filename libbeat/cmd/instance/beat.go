@@ -430,7 +430,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !management.UnderAgent() {
-		bl := locks.New(b.Info, b.Info.Paths)
+		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -691,7 +691,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Info.Paths, b.Config.LifecycleConfig)
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -1135,7 +1135,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Info.Paths, b.Config.LifecycleConfig)
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}

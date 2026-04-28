@@ -26,9 +26,9 @@ func TestCreateEventWithRandomTransactionId(t *testing.T) {
 		"obj2.field1": "value3",
 	}
 
-	event := CreateEventWithRandomTransactionId(&info, metricSetFields)
+	event := CreateEventWithoutTransactionId(&info, metricSetFields)
 
-	auto_ops_testing.CheckEventWithRandomTransactionId(t, event, info)
+	auto_ops_testing.CheckEventWithoutTransactionId(t, event, info)
 
 	// metrics exist
 	require.True(t, len(*event.MetricSetFields.FlattenKeys()) == 3)
