@@ -7,9 +7,19 @@ extensions:
   elasticsearch_storage:
     hosts:
       - http://localhost:9200
+  kafkapartitioner:
 
 receivers:
   # Beats receivers
+  auditbeatreceiver:
+    auditbeat:
+      modules:
+        - module: file_integrity
+          enabled: true
+          paths:
+            - /usr/bin
+            - /usr/sbin
+
   filebeatreceiver:
     filebeat:
       inputs:
@@ -17,13 +27,39 @@ receivers:
           enabled: true
           message: "test message"
           count: 1
-      # Filebeat receiver configuration
-  
+
+  heartbeatreceiver:
+    heartbeat:
+      monitors:
+        - type: tcp
+          id: test-tcp
+          schedule: "@every 60s"
+          hosts: ["localhost:80"]
+          enabled: true
+
   metricbeatreceiver:
     metricbeat:
       modules:
-       - module: system
-      # Metricbeat receiver configuration
+        - module: system
+          metricsets: [cpu]
+          period: 10s
+
+  osquerybeatreceiver:
+    osquerybeat:
+      inputs:
+        - type: osquery
+          streams:
+            - id: example
+              query: "select * from processes"
+              interval: 60
+
+  packetbeatreceiver:
+    packetbeat:
+      interfaces:
+        device: any
+      protocols:
+        - type: http
+          ports: [80, 8080]
   
   # Standard OTEL receivers
   otlp:
@@ -81,11 +117,11 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearch_storage]
+  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
   
   pipelines:
     logs:
-      receivers: [filebeatreceiver, metricbeatreceiver, otlp, nop]
+      receivers: [auditbeatreceiver, filebeatreceiver, heartbeatreceiver, metricbeatreceiver, osquerybeatreceiver, packetbeatreceiver, otlp, nop]
       processors: [memory_limiter, beat, resource, batch]
       exporters: [logstash, elasticsearch, debug, nop]
     
@@ -98,3 +134,7 @@ service:
       receivers: [otlp, nop]
       processors: [memory_limiter, resource, batch]
       exporters: [debug, nop]
+
+  telemetry:
+    metrics:
+      level: none
