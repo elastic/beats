@@ -5,12 +5,8 @@
 ## Components Included
 
 ### Receivers
-- **auditbeatreceiver** - Auditbeat receiver
 - **filebeatreceiver** - Filebeat receiver
-- **heartbeatreceiver** - Heartbeat receiver
 - **metricbeatreceiver** - Metricbeat receiver
-- **osquerybeatreceiver** - Osquerybeat receiver
-- **packetbeatreceiver** - Packetbeat receiver
 - **filelogreceiver** - File log receiver
 - **hostmetricsreceiver** - Host metrics receiver
 - **httpcheckreceiver** - HTTP check receiver
@@ -44,8 +40,6 @@
 
 ### Extensions
 - **beatsauth** - Beats authentication extension
-- **elasticsearch_storage** - Elasticsearch storage extension
-- **kafkapartitioner** - Kafka partitioner extension
 - **basicauth** - Basic auth extension
 - **bearertokenauth** - Bearer token auth extension
 - **file_storage** - File storage extension
