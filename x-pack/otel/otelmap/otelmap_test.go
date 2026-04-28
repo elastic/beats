@@ -53,6 +53,14 @@ func TestFromMapstrCommonTime(t *testing.T) {
 	}
 }
 
+func TestFromMapstrDuration(t *testing.T) {
+	input := mapstr.M{"duration": 1500 * time.Millisecond}
+	want := mapstr.M{"duration": int64(1500 * time.Millisecond)}
+
+	ConvertNonPrimitive(input)
+	assert.Equal(t, want, input)
+}
+
 func TestFromMapstrString(t *testing.T) {
 	tests := map[string]struct {
 		mapstr_val  interface{}
