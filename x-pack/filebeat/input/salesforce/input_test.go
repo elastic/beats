@@ -35,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -137,7 +136,7 @@ func TestFormQueryWithCursor(t *testing.T) {
 
 			sfInput := &salesforceInput{
 				config: config{},
-				log:    logp.NewLogger("salesforce_test"),
+				log:    logptest.NewTestingLogger(t, "salesforce_test"),
 			}
 
 			querier, err := sfInput.FormQueryWithCursor(queryConfig, tc.cursor)
@@ -152,7 +151,7 @@ func TestFormQueryWithCursor(t *testing.T) {
 				t.Fatal("expected querier to be non-nil")
 			}
 
-			assert.EqualValues(t, tc.wantQuery, querier.Query)
+			assert.Equal(t, tc.wantQuery, querier.Query)
 		})
 	}
 }
@@ -350,7 +349,7 @@ func TestInput(t *testing.T) {
 				timeout = tc.timeout
 			}
 			inputCtx := v2.Context{
-				Logger: logp.NewLogger("salesforce"),
+				Logger: logptest.NewTestingLogger(t, "salesforce"),
 				ID:     "test_id",
 			}
 
@@ -377,7 +376,7 @@ func TestInput(t *testing.T) {
 			salesforceInput.cancel = cancelClause
 			salesforceInput.srcConfig = &cfg
 			salesforceInput.publisher = &client
-			salesforceInput.log = logp.L().With("input_url", "salesforce")
+			salesforceInput.log = logptest.NewTestingLogger(t, "").With("input_url", "salesforce")
 
 			salesforceInput.sfdcConfig, err = salesforceInput.getSFDCConfig(&cfg)
 			assert.NoError(t, err)
@@ -398,7 +397,7 @@ func TestInput(t *testing.T) {
 				return
 			}
 
-			require.Equal(t, len(tc.expected), len(client.published),
+			require.Len(t, client.published, len(tc.expected),
 				"unexpected number of published events")
 
 			for i := 0; i < len(tc.expected) && i < len(client.published); i++ {
@@ -500,7 +499,7 @@ func TestRunObjectWithBatching(t *testing.T) {
 		publisher: &client,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -608,7 +607,7 @@ func TestRunObjectWithBatchingIncludesEventAtBatchEndBoundary(t *testing.T) {
 		publisher: &client,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -638,7 +637,7 @@ func TestRunObjectWithBatchingIncludesEventAtBatchEndBoundary(t *testing.T) {
 func TestRunObjectRequiresObjectConfig(t *testing.T) {
 	s := &salesforceInput{
 		cursor: &state{},
-		log:    logp.NewLogger("salesforceInput"),
+		log:    logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	err := s.RunObject()
@@ -658,7 +657,7 @@ func TestRunObjectRequiresObjectQueryCursorConfig(t *testing.T) {
 	s := &salesforceInput{
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	err := s.RunObject()
@@ -750,7 +749,7 @@ func TestRunObjectWithBatchingSeedsFirstWindowFromLegacyFirstEventTime(t *testin
 			},
 		},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -985,7 +984,7 @@ func TestRunObjectResumeWithLastEventIDKeepsSameTimestampRows(t *testing.T) {
 		publisher: &firstPublisher,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	firstRun.sfdcConfig, err = firstRun.getSFDCConfig(&cfg)
@@ -1011,7 +1010,7 @@ func TestRunObjectResumeWithLastEventIDKeepsSameTimestampRows(t *testing.T) {
 		publisher: &retryPublisher,
 		cursor:    &resumedState,
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	resumeRun.sfdcConfig, err = resumeRun.getSFDCConfig(&cfg)
@@ -1110,7 +1109,7 @@ func TestRunObjectSetupAuditTrailResumeWithoutLastEventIDUsesLegacyBoundary(t *t
 			},
 		},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1203,7 +1202,7 @@ func TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows(t *testing.T
 			},
 		},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1215,7 +1214,7 @@ func TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows(t *testing.T
 	err = s.RunObject()
 	require.NoError(t, err, "expected custom setup audit trail run without Id to succeed even when it returns no rows")
 
-	require.Len(t, client.published, 0, "expected no events to be published when the custom query returns no rows")
+	require.Empty(t, client.published, "expected no events to be published when the custom query returns no rows")
 	assert.Empty(t, s.cursor.Object.LastEventID, "expected a successful no-row run to clear any stale last_event_id rather than carry it into a future last_event_time bucket")
 	assert.Equal(t, "2024-01-01T00:00:00.000+0000", s.cursor.Object.LastEventTime, "expected last_event_time to remain unchanged when the custom query returns no rows")
 }
@@ -1308,7 +1307,7 @@ func TestRunObjectReopensSessionOnInvalidSessionID(t *testing.T) {
 		publisher: &client,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1414,7 +1413,7 @@ func TestRunEventLogFileReopensSessionOnUnauthorizedDownload(t *testing.T) {
 		publisher: &client,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1515,7 +1514,7 @@ func TestRunObjectWithBatchingResumesFromProgressTime(t *testing.T) {
 			},
 		},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1622,7 +1621,7 @@ func TestRunObjectWithBatchingResumeUsesProgressTimeAsExclusiveBoundary(t *testi
 			},
 		},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1695,7 +1694,7 @@ func TestRunObjectWithInvalidBatchProgressTime(t *testing.T) {
 			},
 		},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	err = s.RunObject()
@@ -1782,7 +1781,7 @@ func TestRunObjectWithBatchingPagination(t *testing.T) {
 		publisher: &client,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -1895,7 +1894,7 @@ func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
 		publisher: &firstPublisher,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -2028,7 +2027,7 @@ func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFai
 		publisher: &firstPublisher,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -2129,7 +2128,7 @@ func TestRunObjectWithBatchingAdvancesProgressOnEmptyWindow(t *testing.T) {
 		publisher: &client,
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -2140,7 +2139,7 @@ func TestRunObjectWithBatchingAdvancesProgressOnEmptyWindow(t *testing.T) {
 
 	err = s.RunObject()
 	require.NoError(t, err, "expected empty batched window to succeed")
-	assert.Len(t, client.published, 0, "expected empty batched windows to publish no events")
+	assert.Empty(t, client.published, "expected empty batched windows to publish no events")
 
 	var cursorState map[string]interface{}
 	require.NoError(t, typeconv.Convert(&cursorState, s.cursor), "expected cursor state to be convertible")
@@ -2238,7 +2237,7 @@ func TestDecodeAsCSV(t *testing.T) {
 "Login","20231218054831.655","4u6LyuMrDvb_G-l1cJIQk-","00D5j00000DgAYG","0055j00000AT6I1","1219","127","/services/oauth2/token","","bY5Wfv8t/Ith7WVE","Standard","","1051271151","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:31.655Z","0055j00000AT6I1AAL","Salesforce.com IP","","LOGIN_NO_ERROR","103.108.207.58"
 "Login","20231218054832.003","4u6LyuHSDv8LLVl1cJOqGV","00D5j00000DgAYG","0055j00000AT6I1","1277","104","/services/oauth2/token","","u60el7VqW8CSSKcW","Standard","","674857427","i","Go-http-client/1.1","","9998.0","salesforceinstance@devtest.in","TLSv1.2","ECDHE-RSA-AES256-GCM-SHA384","","","2023-12-18T05:48:32.003Z","0055j00000AT6I1AAL","103.108.207.58","","LOGIN_NO_ERROR","103.108.207.58"`
 
-	s := &salesforceInput{log: logp.NewLogger("salesforceInput")}
+	s := &salesforceInput{log: logptest.NewTestingLogger(t, "salesforceInput")}
 
 	mp, err := s.decodeAsCSV([]byte(sampleELF))
 	assert.NoError(t, err)
@@ -2294,7 +2293,7 @@ func TestPublishCSVRecords(t *testing.T) {
 
 	s := &salesforceInput{
 		cursor:    &state{},
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 		publisher: &client,
 	}
 
@@ -2302,7 +2301,9 @@ func TestPublishCSVRecords(t *testing.T) {
 	require.NoError(t, err, "expected CSV streaming publisher to decode and publish all rows")
 	assert.Equal(t, 2, count, "expected CSV streaming publisher to return the number of published rows")
 	assert.Len(t, client.published, 2, "expected CSV streaming publisher to emit one event per row")
-	assert.Equal(t, expectedELFEvent, client.published[0].Fields["message"], "expected the first streamed CSV record to match the decoded event payload")
+	gotMsg, ok := client.published[0].Fields["message"].(string)
+	require.True(t, ok, "expected published event message to be a string")
+	assert.JSONEq(t, expectedELFEvent, gotMsg, "expected the first streamed CSV record to match the decoded event payload")
 }
 
 func TestPublishCSVRecordsReportsRowNumberOnParseError(t *testing.T) {
@@ -2311,7 +2312,7 @@ func TestPublishCSVRecordsReportsRowNumberOnParseError(t *testing.T) {
 
 	s := &salesforceInput{
 		cursor:    &state{},
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 		publisher: &client,
 	}
 
@@ -2366,7 +2367,7 @@ func TestRunEventLogFileReturnsProcessingErrors(t *testing.T) {
 		cursor:    &state{},
 		srcConfig: &cfg,
 		publisher: failingPublisher{err: errors.New("publisher exploded")},
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -2395,7 +2396,7 @@ func TestRunEventLogFileRequiresQueryCursorConfig(t *testing.T) {
 	s := &salesforceInput{
 		cursor:    &state{},
 		srcConfig: &cfg,
-		log:       logp.NewLogger("salesforceInput"),
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
 	}
 
 	err := s.RunEventLogFile()
@@ -2619,7 +2620,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				cursor:     tt.fields.cursor,
 				srcConfig:  tt.fields.srcConfig,
 				sfdcConfig: tt.fields.sfdcConfig,
-				log:        logp.NewLogger("salesforceInput"),
+				log:        logptest.NewTestingLogger(t, "salesforceInput"),
 				soqlr:      tt.fields.soqlr,
 			}
 
@@ -2663,7 +2664,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				}
 			}
 
-			require.Equal(t, len(tt.expected), len(client.published),
+			require.Len(t, client.published, len(tt.expected),
 				"unexpected number of published events")
 
 			for i := 0; i < len(tt.expected) && i < len(client.published); i++ {
@@ -2693,7 +2694,7 @@ func newTestServerBasedOnConfig(newServer func(http.Handler) *httptest.Server) f
 }
 
 func TestPlugin(t *testing.T) {
-	_ = Plugin(logp.NewLogger("salesforce_test"), stateStore{})
+	_ = Plugin(logptest.NewTestingLogger(t, "salesforce_test"), stateStore{})
 }
 
 // TestJWTBearerFlowTokenURL verifies that the salesforce input correctly passes
@@ -2755,7 +2756,7 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 
 		cfg := newConfig(srv.URL, "", keyPath) // token_url is empty
 
-		input := &salesforceInput{config: *cfg, log: logp.NewLogger("test")}
+		input := &salesforceInput{config: *cfg, log: logptest.NewTestingLogger(t, "test")}
 		sfdcCfg, err := input.getSFDCConfig(cfg)
 		require.NoError(t, err)
 
@@ -2776,7 +2777,7 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 
 		cfg := newConfig(urlSrv.URL, tokenURLSrv.URL, keyPath) // token_url is set
 
-		input := &salesforceInput{config: *cfg, log: logp.NewLogger("test")}
+		input := &salesforceInput{config: *cfg, log: logptest.NewTestingLogger(t, "test")}
 		sfdcCfg, err := input.getSFDCConfig(cfg)
 		require.NoError(t, err)
 
@@ -2792,7 +2793,7 @@ func TestGetSFDCConfigRejectsNilOAuth2(t *testing.T) {
 	cfg := defaultConfig()
 	cfg.Auth = &authConfig{}
 
-	input := &salesforceInput{config: cfg, log: logp.NewLogger("test")}
+	input := &salesforceInput{config: cfg, log: logptest.NewTestingLogger(t, "test")}
 
 	var (
 		sfdcCfg *sfdc.Configuration
@@ -2862,7 +2863,7 @@ func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.
 	defer cancelTimeout()
 
 	inputCtx := v2.Context{
-		Logger: logp.NewLogger("salesforce"),
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
 		ID:     "test_id",
 	}
 
@@ -2881,7 +2882,7 @@ func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.
 		cursor:    &state{},
 		srcConfig: &cfg,
 		publisher: &client,
-		log:       logp.L().With("input_url", "salesforce"),
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -2895,8 +2896,12 @@ func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.
 
 	assert.Equal(t, []string{"elf_soql", "elf_log_get", "object_soql"}, requestKinds, "expected initial EventLogFile collection to complete before initial object collection starts")
 	require.Len(t, client.published, 2, "expected one ELF event and one object event from the mixed startup path")
-	assert.Equal(t, expectedELFEvent, client.published[0].Fields["message"], "expected the first published startup event to come from EventLogFile")
-	assert.Equal(t, expectedObjectEvent, client.published[1].Fields["message"], "expected the second published startup event to come from Object monitoring")
+	elfMsg, ok := client.published[0].Fields["message"].(string)
+	require.True(t, ok, "expected ELF event message to be a string")
+	objMsg, ok := client.published[1].Fields["message"].(string)
+	require.True(t, ok, "expected object event message to be a string")
+	assert.JSONEq(t, expectedELFEvent, elfMsg, "expected the first published startup event to come from EventLogFile")
+	assert.JSONEq(t, expectedObjectEvent, objMsg, "expected the second published startup event to come from Object monitoring")
 }
 
 func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) {
@@ -3000,7 +3005,7 @@ func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) 
 	defer cancelTimeout()
 
 	inputCtx := v2.Context{
-		Logger: logp.NewLogger("salesforce"),
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
 		ID:     "test_id",
 	}
 
@@ -3035,7 +3040,7 @@ func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) 
 		cursor:    &state{},
 		srcConfig: &cfg,
 		publisher: &client,
-		log:       logp.L().With("input_url", "salesforce"),
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -3167,7 +3172,7 @@ func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
 	defer cancelTimeout()
 
 	inputCtx := v2.Context{
-		Logger: logp.NewLogger("salesforce"),
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
 		ID:     "test_id",
 	}
 
@@ -3183,7 +3188,7 @@ func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
 		cursor:    &state{},
 		srcConfig: &cfg,
 		publisher: &client,
-		log:       logp.L().With("input_url", "salesforce"),
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -3319,7 +3324,7 @@ func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFail
 	defer cancelTimeout()
 
 	inputCtx := v2.Context{
-		Logger: logp.NewLogger("salesforce"),
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
 		ID:     "test_id",
 	}
 
@@ -3353,7 +3358,7 @@ func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFail
 		cursor:    &state{},
 		srcConfig: &cfg,
 		publisher: &client,
-		log:       logp.L().With("input_url", "salesforce"),
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -3507,7 +3512,7 @@ func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFail
 	defer cancelTimeout()
 
 	inputCtx := v2.Context{
-		Logger: logp.NewLogger("salesforce"),
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
 		ID:     "test_id",
 	}
 
@@ -3536,7 +3541,7 @@ func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFail
 		cursor:    &state{},
 		srcConfig: &cfg,
 		publisher: &client,
-		log:       logp.L().With("input_url", "salesforce"),
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
 	}
 
 	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
@@ -3593,7 +3598,7 @@ func newClientForCancellationTest(t *testing.T, getCtx func() context.Context, m
 			Transport: transport,
 		},
 	}
-	c, err := newClient(cfg, getCtx, logp.NewLogger("salesforce-test"))
+	c, err := newClient(cfg, getCtx, logptest.NewTestingLogger(t, "salesforce-test"))
 	require.NoError(t, err, "newClient should succeed with valid retry config")
 	return c
 }
@@ -3638,7 +3643,7 @@ func TestNewClientShortCircuitsRetryOnContextCancel(t *testing.T) {
 		cancel()
 	}()
 
-	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
 	require.NoError(t, err)
 
 	start := time.Now()
@@ -3676,7 +3681,7 @@ func TestNewClientPreCancelledContextShortCircuits(t *testing.T) {
 
 	client := newClientForCancellationTest(t, func() context.Context { return ctx }, 5)
 
-	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
 	require.NoError(t, err)
 
 	start := time.Now()
@@ -3709,7 +3714,7 @@ func TestNewClientNilGetCtxStillRetries(t *testing.T) {
 	const maxAttempts = 2
 	client := newClientForCancellationTest(t, nil, maxAttempts)
 
-	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
 	require.NoError(t, err)
 
 	resp, err := client.Do(req)

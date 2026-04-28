@@ -746,7 +746,7 @@ func (s *salesforceInput) queryWithReauth(query *querier) (*soql.QueryResult, er
 	s.log.Warnw("SOQL query failed with auth error; re-opening session and retrying once",
 		"error", err)
 	if reopenErr := s.reopenSession(); reopenErr != nil {
-		return nil, fmt.Errorf("auth error (%v) and session re-open failed: %w", err, reopenErr)
+		return nil, fmt.Errorf("auth error (%w) and session re-open failed: %w", err, reopenErr)
 	}
 	return s.soqlr.Query(query, false)
 }

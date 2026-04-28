@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -43,7 +43,7 @@ func (stateStore) StoreFor(string) (*statestore.Store, error) {
 func (stateStore) CleanupInterval() time.Duration { return time.Duration(0) }
 
 func TestInputManager(t *testing.T) {
-	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})
+	inputManager := NewInputManager(logptest.NewTestingLogger(t, "salesforce_test"), stateStore{})
 
 	var inputTaskGroup unison.TaskGroup
 	defer inputTaskGroup.Stop() //nolint:errcheck // ignore error in test
@@ -84,7 +84,7 @@ func TestInputManager(t *testing.T) {
 }
 
 func TestInputManagerRejectsInvalidConfigOnCreate(t *testing.T) {
-	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})
+	inputManager := NewInputManager(logptest.NewTestingLogger(t, "salesforce_test"), stateStore{})
 
 	var inputTaskGroup unison.TaskGroup
 	defer inputTaskGroup.Stop() //nolint:errcheck // ignore error in test
