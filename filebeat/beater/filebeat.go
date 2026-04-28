@@ -312,7 +312,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Info.Paths)
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
