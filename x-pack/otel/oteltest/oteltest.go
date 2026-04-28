@@ -218,6 +218,11 @@ func VerifyNoLeaks(t *testing.T) {
 		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
 		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
+		// On Windows, some HTTP/2 client goroutines are leaked.
+		// https://github.com/elastic/beats/pull/50219#issuecomment-4286973591
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).readLoop"),
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).writeLoop"),
+		goleak.IgnoreAnyFunction("golang.org/x/net/http2.(*clientConnReadLoop).run"),
 	}
 
 	goleak.VerifyNone(t, skipped...)
