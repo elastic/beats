@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -36,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -142,8 +144,6 @@ func run(codec codec.Codec, logger *logp.Logger, batches ...publisher.Batch) (st
 func event(k, v string) mapstr.M {
 	return mapstr.M{k: v}
 }
-<<<<<<< HEAD
-=======
 
 func TestMakeConsoleWithFormatCodec(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
@@ -206,4 +206,3 @@ func TestMakeConsoleCodecConfigErrors(t *testing.T) {
 		})
 	}
 }
->>>>>>> c37cfcf33 (outputs: remove redundant beatPaths parameter from Factory (#49839))
