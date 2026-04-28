@@ -4,4 +4,4 @@ summary: Migrate from deprecated github.com/docker/docker to github.com/moby/mob
 
 component: all
 
-issue: https://github.com/elastic/ingest-dev/issues/7341
+pr: https://github.com/elastic/beats/pull/50300
