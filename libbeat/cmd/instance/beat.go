@@ -428,11 +428,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !management.UnderAgent() {
-<<<<<<< HEAD
-		bl := locks.New(b.Info, b.Paths)
-=======
 		bl := locks.New(b.Info)
->>>>>>> 7aa847748 (locks: remove redundant beatPaths parameter (#49837))
 		err := bl.Lock()
 		if err != nil {
 			return err
