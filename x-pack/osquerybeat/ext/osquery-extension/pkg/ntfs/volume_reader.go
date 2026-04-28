@@ -8,6 +8,7 @@ package ntfs
 
 import (
 	"fmt"
+	"io"
 
 	"golang.org/x/sys/windows"
 )
@@ -29,6 +30,9 @@ func (r *windowsVolumeReader) ReadAt(p []byte, off int64) (int, error) {
 	err := windows.ReadFile(r.handle, p, &done, overlapped)
 	if err != nil {
 		return int(done), err
+	}
+	if int(done) < len(p) {
+		return int(done), io.EOF
 	}
 	return int(done), nil
 }
