@@ -61,7 +61,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -125,7 +125,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -241,7 +241,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 					"cursor":["What's next?"],
 				})`,
@@ -261,7 +261,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -273,7 +273,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-	              bytes(state.response).decode_json().as(inner_body,{
+	              state.response.decode_json().as(inner_body,{
 					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [],
 	          })`,
 			"state": map[string]interface{}{
@@ -315,7 +315,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -348,7 +348,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -381,7 +381,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -417,7 +417,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"retry": map[string]interface{}{
@@ -452,7 +452,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"retry": map[string]interface{}{
@@ -469,7 +469,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"ssl": map[string]interface{}{
@@ -539,7 +539,7 @@ var inputTests = []struct {
 		handler:     defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -621,7 +621,7 @@ var inputTests = []struct {
 				},
 			},
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -704,7 +704,7 @@ var inputTests = []struct {
 				},
 			},
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -938,6 +938,112 @@ func TestInput(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestURLProgramReconnect verifies that url_program is re-evaluated before
+// each reconnection using the evolved cursor state. The test server records
+// the request URL for each connection and closes the first connection after
+// sending one message to force the error-reconnect path. The CEL program
+// updates the cursor with a timestamp from the message, and url_program
+// appends sinceTime from the cursor when present. The test asserts that:
+//   - the first connection URL has no sinceTime (no cursor yet)
+//   - the second connection URL includes sinceTime from the first message's
+//     timestamp, proving that url_program was re-evaluated with the cursor
+//     that process() returned after handling the first message
+func TestURLProgramReconnect(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
+
+	logp.TestingSetup()
+
+	var (
+		mu        sync.Mutex
+		urls      []string
+		connCount int
+	)
+
+	// The server records the request URL for each connection. It sends one
+	// JSON message per connection and closes the first connection to force
+	// the client through the error-reconnect path in FollowStream.
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		urls = append(urls, r.URL.String())
+		connCount++
+		n := connCount
+		mu.Unlock()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+
+		msg := fmt.Sprintf(`{"ts":"2024-01-01T%02d:00:00Z","data":"msg-%d"}`, n, n)
+		if err := conn.WriteMessage(websocket.TextMessage, []byte(msg)); err != nil {
+			return
+		}
+
+		if n == 1 {
+			conn.Close()
+		}
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"url":         "ws" + server.URL[4:] + "/v1/stream",
+		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
+		"program": `
+			state.response.decode_json().as(body, {
+				"cursor": {"last_timestamp": body.ts},
+				"events": [body],
+			})`,
+		"retry": map[string]interface{}{
+			"blanket_retries": true,
+			"wait_min":        "10ms",
+			"wait_max":        "50ms",
+		},
+	}
+	cfg := conf.MustNewConfigFrom(config)
+
+	c := defaultConfig()
+	c.Redact = &redact{}
+	err := cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	v2Ctx := v2.Context{
+		Logger:          logp.NewLogger("websocket_test"),
+		ID:              "test_id:url_program_reconnect",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	var client publisher
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel()
+		}
+	}
+
+	src := &source{c}
+	err = input{}.run(v2Ctx, src, nil, &client)
+	if err != nil && err != context.Canceled {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(urls) < 2 {
+		t.Fatalf("expected at least 2 connections, got %d", len(urls))
+	}
+
+	assert.Equal(t, "/v1/stream", urls[0])
+	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z")
 }
 
 var _ inputcursor.Publisher = (*publisher)(nil)
