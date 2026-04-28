@@ -33,17 +33,17 @@ func TestLocker(t *testing.T) {
 	tmpPaths := newTestPaths(t)
 	logger := logptest.NewTestingLogger(t, "")
 
-	b1 := beat.Info{Beat: beatName, Logger: logger}
-	b2 := beat.Info{Beat: beatName, Logger: logger}
+	b1 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	b2 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
 
 	// Try to get a lock for the first beat. Expect it to succeed.
-	bl1 := New(b1, tmpPaths)
+	bl1 := New(b1)
 	err := bl1.Lock()
 	require.NoError(t, err)
 
 	// Try to get a lock for the second beat. Expect it to fail because the
 	// first beat already has the lock.
-	bl2 := New(b2, tmpPaths)
+	bl2 := New(b2)
 	err = bl2.Lock()
 	require.Error(t, err)
 }
@@ -53,12 +53,12 @@ func TestUnlock(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	tmpPaths := newTestPaths(t)
 
-	b1 := beat.Info{Beat: beatName, Logger: logger}
-	b2 := beat.Info{Beat: beatName, Logger: logger}
-	bl2 := New(b2, tmpPaths)
+	b1 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	b2 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	bl2 := New(b2)
 
 	// Try to get a lock for the first beat. Expect it to succeed.
-	bl1 := New(b1, tmpPaths)
+	bl1 := New(b1)
 	err := bl1.Lock()
 	require.NoError(t, err)
 
@@ -76,12 +76,12 @@ func TestUnlockWithRemainingFile(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	tmpPaths := newTestPaths(t)
 
-	b1 := beat.Info{Beat: beatName, Logger: logger}
-	b2 := beat.Info{Beat: beatName, Logger: logger}
-	bl2 := New(b2, tmpPaths)
+	b1 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	b2 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	bl2 := New(b2)
 
 	// Try to get a lock for the first beat. Expect it to succeed.
-	bl1 := New(b1, tmpPaths)
+	bl1 := New(b1)
 	err := bl1.Lock()
 	require.NoError(t, err)
 
