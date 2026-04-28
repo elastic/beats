@@ -88,7 +88,7 @@ func RunTests(
 		config.Pipeline,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config(), beatPaths)
+			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
 		pipelineSettings,
