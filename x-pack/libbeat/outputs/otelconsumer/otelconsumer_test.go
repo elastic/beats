@@ -187,6 +187,32 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, "bodymap", gotValue.AsString())
 	})
 
+	t.Run("preserves time.Duration fields as nanoseconds", func(t *testing.T) {
+		eventWithDuration := beat.Event{
+			Fields: mapstr.M{
+				"event": mapstr.M{
+					"duration": 1500 * time.Millisecond,
+				},
+			},
+		}
+
+		batch := outest.NewBatch(eventWithDuration)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+			eventBody, ok := body["event"].(map[string]any)
+			require.True(t, ok, "event body should be encoded as a map")
+			assert.EqualValues(t, 1500*time.Millisecond, eventBody["duration"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
 		batch := outest.NewBatch(event1, event2, event3)
 
