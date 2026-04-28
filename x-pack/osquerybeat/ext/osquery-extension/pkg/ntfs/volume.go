@@ -16,7 +16,6 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 	"golang.org/x/sys/windows"
-	"www.velocidex.com/golang/go-ntfs/parser"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"

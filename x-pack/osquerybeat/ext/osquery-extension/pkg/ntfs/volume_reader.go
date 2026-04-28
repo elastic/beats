@@ -17,11 +17,10 @@ type windowsVolumeReader struct {
 	handle windows.Handle
 }
 
-// ReadAt reads from the volume at the specified offset. The offset must be sector-aligned (512-byte boundaries).
+// ReadAt reads from the volume at the specified offset. The handle is opened
+// with system buffering enabled, so p, len(p), and off are not required to be
+// sector-aligned.
 func (r *windowsVolumeReader) ReadAt(p []byte, off int64) (int, error) {
-	// Windows raw volume reads must be sector-aligned (512-byte boundaries).
-	// go-ntfs's PagedReader handles alignment for us, but the underlying
-	// ReadAt still needs to issue aligned reads to the kernel.
 	var done uint32
 	overlapped := &windows.Overlapped{
 		Offset:     uint32(off & 0xFFFFFFFF), //nolint:gosec // G115: shifted to low 32 bits
@@ -60,7 +59,7 @@ func NewVolumeReader(driveLetter string) (*windowsVolumeReader, error) {
 		windows.FILE_SHARE_READ|windows.FILE_SHARE_WRITE,
 		nil,
 		windows.OPEN_EXISTING,
-		windows.FILE_FLAG_NO_BUFFERING, // required for raw sector reads
+		0, // system buffering: avoids sector-alignment constraints on ReadAt and lets Windows cache hot MFT reads
 		0,
 	)
 	if err != nil {
