@@ -22,6 +22,7 @@ import (
 	"encoding"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"runtime"
 	"time"
@@ -65,12 +66,6 @@ type floating interface {
 
 type mapstrOrMap interface {
 	mapstr.M | map[string]any
-}
-
-// statusCodeError is satisfied by errors that carry an HTTP status code,
-// such as docappender.ErrorFlushFailed errors returned from the OTelCol Elasticsearch exporter.
-type statusCodeError interface {
-	StatusCode() int
 }
 
 type otelConsumer struct {
@@ -388,9 +383,13 @@ func encodeSignedSliceDirect[T signed](dest pcommon.Slice, src []T) error {
 func encodeUnsignedSliceDirect[T unsigned](dest pcommon.Slice, src []T) error {
 	dest.EnsureCapacity(len(src))
 	for _, item := range src {
-		dest.AppendEmpty().SetInt(int64(item))
+		dest.AppendEmpty().SetInt(maskUnsignedInt(uint64(item)))
 	}
 	return nil
+}
+
+func maskUnsignedInt(value uint64) int64 {
+	return int64(value & uint64(math.MaxInt64))
 }
 
 func encodeValueDirect(dest pcommon.Value, value any) error {
@@ -416,7 +415,7 @@ func encodeValueDirect(dest pcommon.Value, value any) error {
 		dest.SetInt(v)
 		return nil
 	case uint:
-		dest.SetInt(int64(v))
+		dest.SetInt(maskUnsignedInt(uint64(v)))
 		return nil
 	case uint8:
 		dest.SetInt(int64(v))
@@ -428,7 +427,7 @@ func encodeValueDirect(dest pcommon.Value, value any) error {
 		dest.SetInt(int64(v))
 		return nil
 	case uint64:
-		dest.SetInt(int64(v))
+		dest.SetInt(maskUnsignedInt(v))
 		return nil
 	case float32:
 		dest.SetDouble(float64(v))
@@ -501,10 +500,6 @@ func encodeValueDirect(dest pcommon.Value, value any) error {
 	default:
 		return errDirectEncodeUnsupported
 	}
-}
-
-func unknownTypeString(value any) string {
-	return fmt.Sprintf("unknown type: %T", value)
 }
 
 func otelTimestamp(t time.Time) string {

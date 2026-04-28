@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"go.opentelemetry.io/collector/pdata/plog"
 )
 
