@@ -144,7 +144,7 @@ func (pr *patternReader) readFirst() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// no lines buffered -> ignore timeout
-			if err == errSigMultilineTimeout {
+			if errors.Is(err, errSigMultilineTimeout) {
 				continue
 			}
 
@@ -170,7 +170,7 @@ func (pr *patternReader) readNext() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// handle multiline timeout signal
-			if err == errSigMultilineTimeout {
+			if errors.Is(err, errSigMultilineTimeout) {
 				// no lines buffered -> ignore timeout
 				if pr.msgBuffer.isEmpty() {
 					continue
