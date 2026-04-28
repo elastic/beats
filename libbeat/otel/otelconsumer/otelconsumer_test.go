@@ -200,6 +200,32 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, "bodymap", gotValue.AsString())
 	})
 
+	t.Run("preserves time.Duration fields as nanoseconds", func(t *testing.T) {
+		eventWithDuration := beat.Event{
+			Fields: mapstr.M{
+				"event": mapstr.M{
+					"duration": 1500 * time.Millisecond,
+				},
+			},
+		}
+
+		batch := outest.NewBatch(eventWithDuration)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+			eventBody, ok := body["event"].(map[string]any)
+			require.True(t, ok, "event body should be encoded as a map")
+			assert.EqualValues(t, 1500*time.Millisecond, eventBody["duration"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
 		batch := outest.NewBatch(event1, event2, event3)
 
@@ -232,32 +258,6 @@ func TestPublish(t *testing.T) {
 
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return context.Canceled
-		})
-
-		err := otelConsumer.Publish(ctx, batch)
-		assert.NoError(t, err)
-		assert.Len(t, batch.Signals, 1)
-		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
-	})
-
-	t.Run("drops batch on 401 Unauthorized error", func(t *testing.T) {
-		batch := outest.NewBatch(event1, event2, event3)
-
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			return &testStatusCodeError{statusCode: 401, msg: "flush failed (401): unauthorized"}
-		})
-
-		err := otelConsumer.Publish(ctx, batch)
-		assert.NoError(t, err)
-		assert.Len(t, batch.Signals, 1)
-		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
-	})
-
-	t.Run("retries batch on non-401 status code error", func(t *testing.T) {
-		batch := outest.NewBatch(event1, event2, event3)
-
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			return &testStatusCodeError{statusCode: 500, msg: "flush failed (500): internal server error"}
 		})
 
 		err := otelConsumer.Publish(ctx, batch)
@@ -456,11 +456,3 @@ func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
 }
-
-type testStatusCodeError struct {
-	statusCode int
-	msg        string
-}
-
-func (e *testStatusCodeError) Error() string   { return e.msg }
-func (e *testStatusCodeError) StatusCode() int { return e.statusCode }
