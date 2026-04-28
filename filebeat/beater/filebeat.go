@@ -203,7 +203,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules, b.Paths)
+			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules, b.Info.Paths)
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -262,7 +262,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger, b.Paths))
+			gzipRegistry(b.Info.Logger, b.Info.Paths))
 	}
 
 	if !fb.moduleRegistry.Empty() {
@@ -299,7 +299,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 	}()
 
-	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Paths)
+	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
 		return err
@@ -312,7 +312,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Info.Paths)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
@@ -421,7 +421,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
-	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Paths)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Info.Paths)
 	if err != nil {
 		fb.logger.Errorf("Could not init crawler: %v", err)
 		return err
@@ -491,7 +491,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			config.Autodiscover,
 			b.Keystore,
 			fb.logger,
-			b.Paths,
+			b.Info.Paths,
 		)
 		if err != nil {
 			return err
