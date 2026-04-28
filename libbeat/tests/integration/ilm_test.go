@@ -153,8 +153,8 @@ func TestILMDefault(t *testing.T) {
 			Total struct{ Value int } `json:"total"`
 		} `json:"hits"`
 	}
-	require.NoError(t, json.Unmarshal(searchBody, &resp), "unmarshal search body: %s", string(searchBody))
-	require.Greater(t, resp.Hits.Total.Value, 0, "no documents found in data stream: %s", string(searchBody))
+	require.NoErrorf(t, json.Unmarshal(searchBody, &resp), "unmarshal search body: %s", string(searchBody))
+	require.Positivef(t, resp.Hits.Total.Value, "no documents found in data stream: %s", string(searchBody))
 }
 
 // TestILMDisabled verifies that with ILM disabled:
@@ -221,8 +221,8 @@ func TestILMDisabled(t *testing.T) {
 			Total struct{ Value int } `json:"total"`
 		} `json:"hits"`
 	}
-	require.NoError(t, json.Unmarshal(searchBody, &resp), "unmarshal search body: %s", string(searchBody))
-	require.Greater(t, resp.Hits.Total.Value, 0, "no documents found in data stream: %s", string(searchBody))
+	require.NoErrorf(t, json.Unmarshal(searchBody, &resp), "unmarshal search body: %s", string(searchBody))
+	require.Positivef(t, resp.Hits.Total.Value, "no documents found in data stream: %s", string(searchBody))
 }
 
 // TestILMCustomPolicyName verifies that a custom ILM policy name can be
