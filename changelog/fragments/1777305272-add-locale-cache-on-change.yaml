@@ -1,3 +1,3 @@
 kind: enhancement
-summary: Cache add_locale timezone formatting and refresh only when zone or offset changes
+summary: Cache add_locale processor and refresh only when zone or offset changes
 component: libbeat
