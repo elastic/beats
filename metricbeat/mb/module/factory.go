@@ -42,11 +42,7 @@ type metricSetWithProcessors interface {
 }
 
 // NewFactory creates new Reloader instance for the given config
-<<<<<<< HEAD
-func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, paths *paths.Path, options ...Option) cfgfile.RunnerFactory {
-=======
-func NewFactory(beatInfo beat.Info, monitoring beatmonitoring.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
->>>>>>> 7b5d59d60 (metricbeat: remove redundant paths field from module Factory (#49840))
+func NewFactory(beatInfo beat.Info, monitoring beat.Monitoring, registry *mb.Register, options ...Option) cfgfile.RunnerFactory {
 	return &Factory{
 		beatInfo:   beatInfo,
 		monitoring: monitoring,
