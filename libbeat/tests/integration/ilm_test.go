@@ -20,6 +20,7 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -147,7 +148,13 @@ func TestILMDefault(t *testing.T) {
 	require.NoError(t, err)
 	_, searchBody, err := HttpDo(t, http.MethodGet, searchURL)
 	require.NoError(t, err)
-	require.Contains(t, string(searchBody), `"value":`, "no documents found in data stream")
+	var resp struct {
+		Hits struct {
+			Total struct{ Value int } `json:"total"`
+		} `json:"hits"`
+	}
+	require.NoError(t, json.Unmarshal(searchBody, &resp), "unmarshal search body: %s", string(searchBody))
+	require.Greater(t, resp.Hits.Total.Value, 0, "no documents found in data stream: %s", string(searchBody))
 }
 
 // TestILMDisabled verifies that with ILM disabled:
@@ -209,7 +216,13 @@ func TestILMDisabled(t *testing.T) {
 	require.NoError(t, err)
 	_, searchBody, err := HttpDo(t, http.MethodGet, searchURL)
 	require.NoError(t, err)
-	require.Contains(t, string(searchBody), `"value":`, "no documents found in data stream")
+	var resp struct {
+		Hits struct {
+			Total struct{ Value int } `json:"total"`
+		} `json:"hits"`
+	}
+	require.NoError(t, json.Unmarshal(searchBody, &resp), "unmarshal search body: %s", string(searchBody))
+	require.Greater(t, resp.Hits.Total.Value, 0, "no documents found in data stream: %s", string(searchBody))
 }
 
 // TestILMCustomPolicyName verifies that a custom ILM policy name can be
