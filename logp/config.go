@@ -28,7 +28,6 @@ type Config struct {
 	Level     Level    `config:"level"`     // Logging level (error, warning, info, debug).
 	Selectors []string `config:"selectors"` // Selectors for debug level logging.
 
-	toObserver  bool
 	toIODiscard bool
 	ToStderr    bool `config:"to_stderr" yaml:"to_stderr"`
 	ToSyslog    bool `config:"to_syslog" yaml:"to_syslog"`

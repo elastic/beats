@@ -33,6 +33,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestLogger(t *testing.T) {
@@ -64,15 +65,18 @@ func TestLogger(t *testing.T) {
 }
 
 func TestLoggerLevel(t *testing.T) {
-	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
-		t.Fatalf("cannot initialise logger on development mode: %+v", err)
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	cfg := Config{
+		Level: DebugLevel,
 	}
+	logger, err := ConfigureWithCoreLocal(cfg, observedCore)
+	require.NoError(t, err)
 
 	const loggerName = "tester"
-	logger := NewLogger(loggerName)
+	logger = logger.Named(loggerName)
 
 	logger.Debug("debug")
-	logs := ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.DebugLevel, logs[0].Level)
 		assert.Equal(t, loggerName, logs[0].LoggerName)
@@ -80,7 +84,7 @@ func TestLoggerLevel(t *testing.T) {
 	}
 
 	logger.Info("info")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.InfoLevel, logs[0].Level)
 		assert.Equal(t, loggerName, logs[0].LoggerName)
@@ -88,7 +92,7 @@ func TestLoggerLevel(t *testing.T) {
 	}
 
 	logger.Warn("warn")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.WarnLevel, logs[0].Level)
 		assert.Equal(t, loggerName, logs[0].LoggerName)
@@ -96,7 +100,7 @@ func TestLoggerLevel(t *testing.T) {
 	}
 
 	logger.Error("error")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.ErrorLevel, logs[0].Level)
 		assert.Equal(t, loggerName, logs[0].LoggerName)
@@ -105,42 +109,66 @@ func TestLoggerLevel(t *testing.T) {
 }
 
 func TestLoggerSetLevel(t *testing.T) {
-	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
-		t.Fatal(err)
+	cfg := Config{
+		Level:   DebugLevel,
+		ToFiles: true,
+		Files: FileConfig{
+			Path:            t.TempDir(),
+			Name:            t.Name(),
+			RotateOnStartup: false,
+			MaxSize:         1024,
+			Permissions:     0o700,
+		},
 	}
+	err := Configure(cfg)
+	require.NoError(t, err)
 
 	const loggerName = "tester"
 	logger := NewLogger(loggerName)
 
 	logger.Debug("debug")
-	logs := ObserverLogs().TakeAll()
-	if assert.Len(t, logs, 1) {
-		assert.Equal(t, zap.DebugLevel, logs[0].Level)
-		assert.Equal(t, loggerName, logs[0].LoggerName)
-		assert.Equal(t, "debug", logs[0].Message)
-	}
-
 	SetLevel(zap.InfoLevel)
 	logger.Info("info")
-	logs = ObserverLogs().TakeAll()
-	if assert.Len(t, logs, 1) {
-		assert.Equal(t, zap.InfoLevel, logs[0].Level)
-		assert.Equal(t, loggerName, logs[0].LoggerName)
-		assert.Equal(t, "info", logs[0].Message)
-	}
-
 	logger.Debug("debug")
-	logs = ObserverLogs().TakeAll()
-	assert.Empty(t, logs, 1)
+
+	err = logger.Close()
+	require.NoError(t, err)
+
+	entries, err := os.ReadDir(cfg.Files.Path)
+	require.NoError(t, err)
+	require.Len(t, entries, 1)
+
+	bb, err := os.ReadFile(filepath.Join(cfg.Files.Path, entries[0].Name()))
+	require.NoError(t, err)
+
+	lines := bytes.Split(bytes.Trim(bb, "\n"), []byte("\n"))
+	require.Len(t, lines, 2, "expected 2 log lines but got %d", len(lines))
+
+	debug := make(map[string]any)
+	err = json.Unmarshal(lines[0], &debug)
+	require.NoError(t, err)
+	assert.Equal(t, "debug", debug["log.level"])
+	assert.Equal(t, loggerName, debug["log.logger"])
+	assert.Equal(t, "debug", debug["message"])
+
+	info := make(map[string]any)
+	err = json.Unmarshal(lines[1], &info)
+	require.NoError(t, err)
+	assert.Equal(t, "info", info["log.level"])
+	assert.Equal(t, loggerName, info["log.logger"])
+	assert.Equal(t, "info", info["message"])
 }
 
 func TestL(t *testing.T) {
-	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
-		t.Fatal(err)
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	cfg := Config{
+		Level: DebugLevel,
 	}
+	err := ConfigureWithCore(cfg, observedCore)
+	require.NoError(t, err)
 
 	L().Infow("infow", "rate", 2)
-	logs := ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		log := logs[0]
 		assert.Equal(t, zap.InfoLevel, log.Level)
@@ -151,7 +179,7 @@ func TestL(t *testing.T) {
 
 	const loggerName = "tester"
 	L().Named(loggerName).Warnf("warning %d", 1)
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		log := logs[0]
 		assert.Equal(t, zap.WarnLevel, log.Level)
@@ -205,18 +233,17 @@ func TestLoggingECSFields(t *testing.T) {
 			Name: "beat1",
 		},
 	}
-	ToObserverOutput()(&cfg)
-	err := Configure(cfg)
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	logger, err := ConfigureWithCoreLocal(cfg, observedCore)
 	require.NoError(t, err)
 
-	logger := NewLogger("tester")
-
 	logger.Debug("debug")
-	logs := ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
-		if assert.Len(t, logs[0].Context, 1) {
-			assert.Equal(t, "service.name", logs[0].Context[0].Key)
-			assert.Equal(t, "beat1", logs[0].Context[0].String)
+		m := logs[0].ContextMap()
+		if assert.Len(t, m, 2) {
+			assert.Equal(t, "beat1", m["service.name"])
+			assert.Contains(t, m, "ecs.version")
 		}
 	}
 }
@@ -466,7 +493,6 @@ func TestTypedLoggerCore(t *testing.T) {
 			if tc.expectedTypedLog != typedLog {
 				t.Errorf("expecting typed log to be %q, got %q", tc.expectedTypedLog, typedLog)
 			}
-
 		})
 	}
 
@@ -603,7 +629,6 @@ func TestTypedLoggerCoreWith(t *testing.T) {
 func TestCreateLogOutputAllDisabled(t *testing.T) {
 	cfg := DefaultConfig(DefaultEnvironment)
 	cfg.toIODiscard = false
-	cfg.toObserver = false
 	cfg.ToEventLog = false
 	cfg.ToFiles = false
 	cfg.ToStderr = false
@@ -766,7 +791,6 @@ func TestConfigureWithCore(t *testing.T) {
 			t.Fatalf("expected msg of '%s', got '%s'", expectedMsg, val)
 		}
 	})
-
 }
 
 func strField(key, val string) zapcore.Field {

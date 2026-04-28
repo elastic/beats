@@ -27,6 +27,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestHasSelector(t *testing.T) {
@@ -37,26 +39,31 @@ func TestHasSelector(t *testing.T) {
 }
 
 func TestLoggerSelectors(t *testing.T) {
-	if err := DevelopmentSetup(WithSelectors("good", " padded "), ToObserverOutput()); err != nil {
-		t.Fatal(err)
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+
+	cfg := Config{
+		Level:     DebugLevel,
+		Selectors: []string{"good", " padded "},
 	}
+	logger, err := ConfigureWithCoreLocal(cfg, observedCore)
+	require.NoError(t, err)
 
-	assert.True(t, HasSelector("padded"))
+	assert.True(t, logger.HasSelector("padded"), logger.selectors)
 
-	good := NewLogger("good")
-	bad := NewLogger("bad")
+	good := logger.Named("good")
+	bad := logger.Named("bad")
 
 	good.Debug("is logged")
-	logs := ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	assert.Len(t, logs, 1)
 
 	// Selectors only apply to debug level logs.
 	bad.Debug("not logged")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	assert.Len(t, logs, 0)
 
 	bad.Info("is also logged")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	assert.Len(t, logs, 1)
 }
 

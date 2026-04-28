@@ -26,17 +26,22 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestGlobalLoggerLevel(t *testing.T) {
-	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
-		t.Fatal(err)
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	cfg := Config{
+		Level: DebugLevel,
 	}
+	err := ConfigureWithCore(cfg, observedCore)
+	require.NoError(t, err)
 
 	const loggerName = "tester"
 
 	Debug(loggerName, "debug")
-	logs := ObserverLogs().TakeAll()
+	logs := observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.DebugLevel, logs[0].Level)
 		assert.Equal(t, loggerName, logs[0].LoggerName)
@@ -44,7 +49,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	}
 
 	Info("info")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.InfoLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
@@ -52,7 +57,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	}
 
 	Warn("warning")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.WarnLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
@@ -60,7 +65,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	}
 
 	Err("error")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.ErrorLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
@@ -68,7 +73,7 @@ func TestGlobalLoggerLevel(t *testing.T) {
 	}
 
 	Critical("critical")
-	logs = ObserverLogs().TakeAll()
+	logs = observedLogs.TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.ErrorLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
@@ -80,11 +85,16 @@ func TestRecover(t *testing.T) {
 	const recoveryExplanation = "Something went wrong"
 	const cause = "unexpected condition"
 
-	err := DevelopmentSetup(ToObserverOutput())
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	cfg := Config{
+		Level:     DebugLevel,
+		AddCaller: true,
+	}
+	err := ConfigureWithCore(cfg, observedCore)
 	require.NoError(t, err)
 
 	defer func() {
-		logs := ObserverLogs().TakeAll()
+		logs := observedLogs.TakeAll()
 		if assert.Len(t, logs, 1) {
 			log := logs[0]
 			assert.Equal(t, zap.ErrorLevel, log.Level)

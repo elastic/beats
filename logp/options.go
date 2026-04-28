@@ -35,17 +35,6 @@ func WithSelectors(selectors ...string) Option {
 	}
 }
 
-// ToObserverOutput specifies that the output should be collected in memory so
-// that they can be read by an observer by calling ObserverLogs().
-//
-// Deprecated: Use logptest.NewTestingLoggerWithObserver.
-func ToObserverOutput() Option {
-	return func(cfg *Config) {
-		cfg.toObserver = true
-		cfg.ToStderr = false
-	}
-}
-
 // ToDiscardOutput configures the logger to write to io.Discard. This is for
 // benchmarking purposes only.
 func ToDiscardOutput() Option {
