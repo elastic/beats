@@ -17,6 +17,8 @@ extensions:
     import: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/otel/extension/kafkapartitionerextension
 
 connectors:
 
@@ -32,9 +34,17 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.150.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheckreceiver v0.150.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/heartbeat/hbreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.150.0
