@@ -3727,3 +3727,226 @@ func TestNewClientNilGetCtxStillRetries(t *testing.T) {
 	// produces 1 initial + N retries = N+1 hits at the server.
 	require.Equal(t, int32(maxAttempts+1), attempts.Load(), "with no input context plumbed in, retryablehttp should still run the full attempt budget")
 }
+
+// TestRunObjectCooldownSuppressesNextTickerTick exercises the steady-state
+// post-failure cooldown documented in doc.go: a failed Object collection is
+// expected to suppress the next ticker tick so a sustained outage produces one
+// failed Salesforce API call per (2 * interval), not one per interval. A naive
+// "now + interval" cooldown races the ticker — the next tick fires at the same
+// instant the cooldown expires (time.NewTicker(interval) keeps that cadence),
+// so time.Now().Before(backoff) evaluates to false at every tick and no tick
+// is ever skipped.
+//
+// The test fails fast on every Object SOQL call (no handler latency) and lets
+// the natural ticker cadence run for ~5 intervals. Without a safety margin
+// every tick fires a request; with the cooldown padded past the next tick,
+// every other tick is suppressed.
+func TestRunObjectCooldownSuppressesNextTickerTick(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const interval = 100 * time.Millisecond
+	const runFor = 550 * time.Millisecond
+
+	var (
+		objectFailureCount atomic.Int32
+		server             *httptest.Server
+	)
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case strings.Contains(r.FormValue("q"), "FROM LoginEvent"):
+			objectFailureCount.Add(1)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": interval.String(),
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected Object monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), runFor)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	client.done = func() {}
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected Object run loop to stop cleanly when the timeout fires")
+
+	got := int(objectFailureCount.Load())
+	// Without the cooldown fix the loop runs the initial request plus a
+	// failed request on every tick, so over ~5 intervals we observe 5 or
+	// more requests. With the cooldown firing once per failure, every
+	// second tick is suppressed and the count stays at <= 3 (initial run +
+	// at most two ticker-driven retries within the 550ms window).
+	require.LessOrEqual(t, got, 3, "expected the post-failure cooldown to suppress alternating Object ticks under sustained failure (got %d Object SOQL hits in %s with interval=%s)", got, runFor, interval)
+	require.GreaterOrEqual(t, got, 1, "expected at least the startup Object SOQL request to reach the server")
+}
+
+// TestRunObjectInitialFailureSetsCooldown asserts that a failure during the
+// startup-phase Object collection (the run() invocation that happens BEFORE
+// the ticker starts) also installs the cooldown. Without it, the very first
+// ticker tick after a startup failure always fires a fresh request because
+// the startup error path increments objectFails and updates status but
+// leaves objectBackoffUntil zero — so the first ticker tick sees no backoff
+// and runs another doomed request one interval later.
+func TestRunObjectInitialFailureSetsCooldown(t *testing.T) {
+	logptest.NewTestingLogger(t, "")
+
+	const interval = 100 * time.Millisecond
+	const runFor = 180 * time.Millisecond
+
+	var (
+		objectFailureCount atomic.Int32
+		server             *httptest.Server
+	)
+
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case strings.Contains(r.FormValue("q"), "FROM LoginEvent"):
+			objectFailureCount.Add(1)
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	baseConfig := map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": interval.String(),
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(baseConfig).Unpack(&cfg)
+	require.NoError(t, err, "expected Object monitoring config to unpack")
+
+	timeoutCtx, cancelTimeout := context.WithTimeout(context.Background(), runFor)
+	defer cancelTimeout()
+
+	inputCtx := v2.Context{
+		Logger: logptest.NewTestingLogger(t, "salesforce"),
+		ID:     "test_id",
+	}
+
+	var client publisher
+	client.done = func() {}
+	ctx, cancelCause := context.WithCancelCause(timeoutCtx)
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancelCause,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		publisher: &client,
+		log:       logptest.NewTestingLogger(t, "").With("input_url", "salesforce"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.run(inputCtx)
+	require.NoError(t, err, "expected Object run loop to stop cleanly when the timeout fires")
+
+	got := int(objectFailureCount.Load())
+	// Window is initial run (T~0) + the first ticker tick (T~interval) + a
+	// small buffer. With the bug the first ticker tick fires a second
+	// request because the startup failure path leaves objectBackoffUntil
+	// zero. With the fix the cooldown installed by the startup failure
+	// suppresses the first tick, so only the startup request is observed.
+	require.Equal(t, 1, got, "expected the startup Object failure to install a cooldown that suppresses the first ticker tick (got %d Object SOQL hits in %s with interval=%s)", got, runFor, interval)
+}

@@ -158,6 +158,12 @@ func (s *salesforceInput) run(env v2.Context) error {
 	// outage without having to cross-reference log timestamps. Counters
 	// reset to zero on the first successful run after a failure streak.
 	var elfFails, objectFails int
+	// eventLogFileBackoffUntil / objectBackoffUntil are declared up here so a
+	// failure during the immediate startup-phase collection (below) can
+	// install the cooldown that the ticker loop reads. Without that, the
+	// first ticker tick after a startup failure always processed a fresh
+	// request, doubling Salesforce API pressure during a sustained outage.
+	var eventLogFileBackoffUntil, objectBackoffUntil time.Time
 
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
@@ -165,6 +171,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 			elfFails++
 			env.UpdateStatus(status.Degraded, formatCollectionStatus("EventLogFile", elfFails, err))
 			s.log.Errorf("Problem running EventLogFile collection (consecutive failures: %d): %s", elfFails, err)
+			eventLogFileBackoffUntil = nextBackoffUntil(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 		} else {
 			elfFails = 0
 			s.log.Info("Initial EventLogFile collection completed successfully")
@@ -177,6 +184,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 			objectFails++
 			env.UpdateStatus(status.Degraded, formatCollectionStatus("Object", objectFails, err))
 			s.log.Errorf("Problem running Object collection (consecutive failures: %d): %s", objectFails, err)
+			objectBackoffUntil = nextBackoffUntil(s.srcConfig.EventMonitoringMethod.Object.Interval)
 		} else {
 			objectFails = 0
 			s.log.Info("Initial Object collection completed successfully")
@@ -185,7 +193,6 @@ func (s *salesforceInput) run(env v2.Context) error {
 
 	eventLogFileTicker, objectMethodTicker := &time.Ticker{}, &time.Ticker{}
 	eventLogFileTicker.C, objectMethodTicker.C = nil, nil
-	var eventLogFileBackoffUntil, objectBackoffUntil time.Time
 
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		eventLogFileTicker = time.NewTicker(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
@@ -222,7 +229,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 				elfFails++
 				env.UpdateStatus(status.Degraded, formatCollectionStatus("EventLogFile", elfFails, err))
 				s.log.Errorf("Problem running EventLogFile collection (consecutive failures: %d): %s", elfFails, err)
-				eventLogFileBackoffUntil = time.Now().Add(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+				eventLogFileBackoffUntil = nextBackoffUntil(s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 			} else {
 				if elfFails > 0 {
 					s.log.Infof("EventLogFile collection recovered after %d consecutive failures", elfFails)
@@ -242,7 +249,7 @@ func (s *salesforceInput) run(env v2.Context) error {
 				objectFails++
 				env.UpdateStatus(status.Degraded, formatCollectionStatus("Object", objectFails, err))
 				s.log.Errorf("Problem running Object collection (consecutive failures: %d): %s", objectFails, err)
-				objectBackoffUntil = time.Now().Add(s.srcConfig.EventMonitoringMethod.Object.Interval)
+				objectBackoffUntil = nextBackoffUntil(s.srcConfig.EventMonitoringMethod.Object.Interval)
 			} else {
 				if objectFails > 0 {
 					s.log.Infof("Object collection recovered after %d consecutive failures", objectFails)
@@ -265,6 +272,20 @@ func formatCollectionStatus(method string, fails int, err error) string {
 		return fmt.Sprintf("Error running %s collection (%d consecutive failures): %v", method, fails, err)
 	}
 	return fmt.Sprintf("Error running %s collection: %v", method, err)
+}
+
+// nextBackoffUntil returns the wall-clock time the next ticker tick should be
+// suppressed until after a failed collection. The naive choice "now + interval"
+// races the ticker: time.NewTicker(interval) keeps firing on the original
+// cadence, so the next tick arrives at almost exactly the same instant the
+// backoff would otherwise expire and the Before-check evaluates to false. We
+// pad the window by half an interval so the next tick is reliably suppressed
+// while the tick after that is still let through, delivering the
+// "one-tick-suppressed" cadence promised by doc.go (i.e. one failed Salesforce
+// API call per 2 * interval during a sustained outage instead of one per
+// interval).
+func nextBackoffUntil(interval time.Duration) time.Time {
+	return time.Now().Add(interval + interval/2)
 }
 
 func (s *salesforceInput) isError(err error) error {

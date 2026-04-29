@@ -153,10 +153,12 @@
 //   - formatCollectionStatus surfaces per-method consecutive-failure counts
 //     in the Elastic Agent status line (status.Degraded) once the second
 //     consecutive failure occurs, and logs a recovery line when a run
-//     succeeds after a failure streak. Combined with the existing
-//     fixed one-interval cool-off in run() (skipping work until the next
-//     interval after a failure), this makes sustained outages visible to
-//     operators without drowning the logs in boilerplate.
+//     succeeds after a failure streak. Combined with the per-method
+//     post-failure cool-off in run() (which suppresses the next ticker
+//     tick after any failure, including the immediate startup-phase
+//     collection), this makes sustained outages visible to operators
+//     without drowning the logs in boilerplate or doubling Salesforce
+//     API pressure during the outage.
 //
 // Cursor durability: the input publishes events via input-cursor's
 // Publisher, which only persists cursor state to the registry after the
