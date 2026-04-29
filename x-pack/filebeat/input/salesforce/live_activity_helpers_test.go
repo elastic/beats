@@ -752,12 +752,31 @@ type oauthPasswordResponse struct {
 	TokenType   string `json:"token_type"`
 }
 
+// liveOAuthBaseURL returns the host portion of a Salesforce OAuth token URL.
+// SALESFORCE_TOKEN_URL may legitimately be either a base host (e.g.
+// "https://login.salesforce.com") or a full token URL ending in
+// "/services/oauth2/token"; both are accepted, with surrounding whitespace
+// and trailing slashes tolerated.
+func liveOAuthBaseURL(rawURL string) string {
+	trimmed := strings.TrimRight(strings.TrimSpace(rawURL), "/")
+	trimmed = strings.TrimSuffix(trimmed, "/services/oauth2/token")
+	return strings.TrimRight(trimmed, "/")
+}
+
+func liveOAuthTokenEndpoint(rawURL string) string {
+	return liveOAuthBaseURL(rawURL) + "/services/oauth2/token"
+}
+
+func liveOAuthRevokeEndpoint(rawURL string) string {
+	return liveOAuthBaseURL(rawURL) + "/services/oauth2/revoke"
+}
+
 // liveOAuthRevokeTokenBestEffort POSTs to the OAuth2 revoke endpoint after SOAP logout.
 // The session may already be invalid; some orgs return 400 — that is non-fatal and logged only.
 func liveOAuthRevokeTokenBestEffort(t *testing.T, creds liveSalesforceCreds, accessToken string) {
 	t.Helper()
 
-	revokeURL := strings.TrimSuffix(strings.TrimSpace(creds.TokenURL), "/token") + "/revoke"
+	revokeURL := liveOAuthRevokeEndpoint(creds.TokenURL)
 	form := url.Values{}
 	form.Set("token", accessToken)
 
@@ -814,7 +833,7 @@ func liveOAuthPasswordExchange(t *testing.T, creds liveSalesforceCreds) (accessT
 	form.Set("client_id", creds.ClientID)
 	form.Set("client_secret", creds.ClientSecret)
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, creds.TokenURL, strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, liveOAuthTokenEndpoint(creds.TokenURL), strings.NewReader(form.Encode()))
 	require.NoError(t, err, "expected OAuth token request to be buildable")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
@@ -1467,4 +1486,113 @@ func TestLiveActivityAndFilebeatEnvGates(t *testing.T) {
 	t.Setenv(envSalesforceLiveRunFilebeat, "1")
 	assert.False(t, liveActivityGenerationEnabled())
 	assert.True(t, liveFilebeatSmokeEnabled())
+}
+
+func TestLiveOAuthTokenEndpointAcceptsBothFormats(t *testing.T) {
+	cases := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"base host", "https://login.salesforce.com", "https://login.salesforce.com/services/oauth2/token"},
+		{"base host trailing slash", "https://login.salesforce.com/", "https://login.salesforce.com/services/oauth2/token"},
+		{"full token url", "https://login.salesforce.com/services/oauth2/token", "https://login.salesforce.com/services/oauth2/token"},
+		{"full token url trailing slash", "https://login.salesforce.com/services/oauth2/token/", "https://login.salesforce.com/services/oauth2/token"},
+		{"surrounding whitespace", "  https://login.salesforce.com  ", "https://login.salesforce.com/services/oauth2/token"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, liveOAuthTokenEndpoint(tc.in))
+		})
+	}
+}
+
+func TestLiveOAuthRevokeEndpointAcceptsBothFormats(t *testing.T) {
+	cases := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"base host", "https://login.salesforce.com", "https://login.salesforce.com/services/oauth2/revoke"},
+		{"base host trailing slash", "https://login.salesforce.com/", "https://login.salesforce.com/services/oauth2/revoke"},
+		{"full token url", "https://login.salesforce.com/services/oauth2/token", "https://login.salesforce.com/services/oauth2/revoke"},
+		{"full token url trailing slash", "https://login.salesforce.com/services/oauth2/token/", "https://login.salesforce.com/services/oauth2/revoke"},
+		{"surrounding whitespace", "  https://login.salesforce.com  ", "https://login.salesforce.com/services/oauth2/revoke"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, liveOAuthRevokeEndpoint(tc.in))
+		})
+	}
+}
+
+func TestLiveOAuthPasswordExchangeAcceptsBaseHost(t *testing.T) {
+	var hits int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/services/oauth2/token" || r.Method != http.MethodPost {
+			http.NotFound(w, r)
+			return
+		}
+		hits++
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"access_token":"tok","instance_url":"https://instance.example.test","token_type":"Bearer"}`)
+	}))
+	t.Cleanup(srv.Close)
+
+	creds := liveSalesforceCreds{
+		TokenURL:      srv.URL,
+		Username:      "u",
+		Password:      "p",
+		SecurityToken: "s",
+		ClientID:      "cid",
+		ClientSecret:  "cs",
+	}
+	accessToken, instanceURL := liveOAuthPasswordExchange(t, creds)
+	assert.Equal(t, "tok", accessToken)
+	assert.Equal(t, "https://instance.example.test", instanceURL)
+	assert.Equal(t, 1, hits)
+}
+
+func TestLiveOAuthPasswordExchangeAcceptsFullTokenURL(t *testing.T) {
+	var hits int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/services/oauth2/token" || r.Method != http.MethodPost {
+			http.NotFound(w, r)
+			return
+		}
+		hits++
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"access_token":"tok","instance_url":"https://instance.example.test","token_type":"Bearer"}`)
+	}))
+	t.Cleanup(srv.Close)
+
+	creds := liveSalesforceCreds{
+		TokenURL:      srv.URL + "/services/oauth2/token",
+		Username:      "u",
+		Password:      "p",
+		SecurityToken: "s",
+		ClientID:      "cid",
+		ClientSecret:  "cs",
+	}
+	accessToken, instanceURL := liveOAuthPasswordExchange(t, creds)
+	assert.Equal(t, "tok", accessToken)
+	assert.Equal(t, "https://instance.example.test", instanceURL)
+	assert.Equal(t, 1, hits)
+}
+
+func TestLiveOAuthRevokeTokenBestEffortAcceptsBaseHost(t *testing.T) {
+	var hits int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/services/oauth2/revoke" || r.Method != http.MethodPost {
+			http.NotFound(w, r)
+			return
+		}
+		hits++
+		w.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(srv.Close)
+
+	creds := liveSalesforceCreds{TokenURL: srv.URL}
+	liveOAuthRevokeTokenBestEffort(t, creds, "dummy-access-token")
+	assert.Equal(t, 1, hits)
 }
