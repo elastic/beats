@@ -72,7 +72,11 @@ func parseBatchCursorTime(raw string) (time.Time, error) {
 // following priority:
 //
 //  1. progress_time - the batched-path watermark. Used on every run after
-//     the first successful batched window.
+//     the first successful batched window. When first_event_time or
+//     last_event_time were advanced past progress_time by an unbatched run
+//     (i.e. the user toggled batch.enabled off and back on), the start is
+//     projected forward to the latest of the three so the first re-enabled
+//     window doesn't replay events the unbatched path already drained.
 //  2. first_event_time - legacy real-time module watermark. Used the first
 //     time the batched path runs on an install that was previously using
 //     the unbatched real-time template (login / logout), so upgrades resume
@@ -102,7 +106,7 @@ func (s *salesforceInput) nextObjectBatchWindow(runEnd time.Time) (objectBatchWi
 		if err != nil {
 			return objectBatchWindow{}, false, err
 		}
-		start = ts
+		start = laterBatchStart(ts, s.cursor.Object.FirstEventTime, s.cursor.Object.LastEventTime)
 	case !isZero(s.cursor.Object.FirstEventTime):
 		// Legacy object collection resumed from first_event_time. Seed the first
 		// batched window from that watermark so upgrades don't skip or replay data.
@@ -133,6 +137,29 @@ func (s *salesforceInput) nextObjectBatchWindow(runEnd time.Time) (objectBatchWi
 		Start: start,
 		End:   end,
 	}, true, nil
+}
+
+// laterBatchStart returns the latest of progressTS and any parseable legacy
+// watermark in fallbacks. Unparseable fallbacks are ignored on purpose: the
+// progress_time path is the authoritative cursor when set, so a corrupt
+// legacy field shouldn't fail an otherwise valid resume — the symmetric
+// projection in objectCursor (laterObjectResumeWatermark) makes the same
+// trade-off for the unbatched direction.
+func laterBatchStart(progressTS time.Time, fallbacks ...string) time.Time {
+	start := progressTS
+	for _, fallback := range fallbacks {
+		if isZero(fallback) {
+			continue
+		}
+		fallbackTS, err := parseBatchCursorTime(fallback)
+		if err != nil {
+			continue
+		}
+		if fallbackTS.After(start) {
+			start = fallbackTS
+		}
+	}
+	return start
 }
 
 // objectBatchConfig returns the Object method's batchConfig. It returns an

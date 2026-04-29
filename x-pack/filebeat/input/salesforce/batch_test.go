@@ -141,6 +141,40 @@ func TestNextObjectBatchWindow(t *testing.T) {
 			},
 			wantOK: true,
 		},
+		"newer first_event_time projects progress_time forward on re-enable": {
+			cursor: dateTimeCursor{
+				ProgressTime:   "2024-01-01T11:50:00.000Z",
+				FirstEventTime: "2024-01-01T11:59:25.438+0000",
+				LastEventTime:  "2024-01-01T11:59:25.438+0000",
+			},
+			want: objectBatchWindow{
+				Start: time.Date(2024, time.January, 1, 11, 59, 25, 438000000, time.UTC),
+				End:   time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+			},
+			wantOK: true,
+		},
+		"newer last_event_time projects progress_time forward on re-enable": {
+			cursor: dateTimeCursor{
+				ProgressTime:  "2024-01-01T11:50:00.000Z",
+				LastEventTime: "2024-01-01T11:57:30.000+0000",
+			},
+			want: objectBatchWindow{
+				Start: time.Date(2024, time.January, 1, 11, 57, 30, 0, time.UTC),
+				End:   time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+			},
+			wantOK: true,
+		},
+		"unparseable legacy watermark leaves progress_time start unchanged": {
+			cursor: dateTimeCursor{
+				ProgressTime:   "2024-01-01T11:55:00.000Z",
+				FirstEventTime: "not-a-time",
+			},
+			want: objectBatchWindow{
+				Start: time.Date(2024, time.January, 1, 11, 55, 0, 0, time.UTC),
+				End:   time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC),
+			},
+			wantOK: true,
+		},
 		"invalid legacy first_event_time fails loud": {
 			cursor: dateTimeCursor{
 				FirstEventTime: "not-a-time",
