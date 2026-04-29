@@ -9,12 +9,19 @@ import (
 	"errors"
 	"fmt"
 	"runtime"
+	"sync"
 	"time"
 
 	"go.opentelemetry.io/collector/client"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
+=======
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+>>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/x-pack/otel/otelmap"
@@ -33,12 +40,35 @@ import (
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 	beatNameCtxKey        = "beat_name"
 	beatVersionCtxtKey    = "beat_version"
 )
 
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
+=======
+
+	retryBackoffInit = 1 * time.Second
+	retryBackoffMax  = 60 * time.Second
+)
+
+type retryConfig struct {
+	init time.Duration
+	max  time.Duration
+}
+
+type otelConsumer struct {
+	observer       outputs.Observer
+	logsConsumer   consumer.Logs
+	beatInfo       beat.Info
+	log            *logp.Logger
+	isReceiverTest bool // whether we are running in receivertest context
+
+	retry        retryConfig
+	retryBackoff backoff.Backoff
+	backoffInit  sync.Once
+>>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 }
 
 type otelConsumer struct {
@@ -54,14 +84,28 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		return outputs.Fail(err)
 	}
 
+	retry := retryConfig{init: retryBackoffInit, max: retryBackoffMax}
+	if isReceiverTest {
+		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
+	}
+
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
 	for range runtime.NumCPU() {
 		clients = append(clients, &otelConsumer{
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 			observer:     observer,
 			logsConsumer: beat.LogConsumer,
 			beatInfo:     beat,
 			log:          beat.Logger.Named("otelconsumer"),
+=======
+			observer:       observer,
+			logsConsumer:   beat.LogConsumer,
+			beatInfo:       beat,
+			log:            beat.Logger.Named("otelconsumer"),
+			isReceiverTest: isReceiverTest,
+			retry:          retry,
+>>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 		})
 	}
 
@@ -170,9 +214,23 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 	err := out.logsConsumer.ConsumeLogs(out.newConsumerContext(ctx), pLogs)
+=======
+	out.backoffInit.Do(func() {
+		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
+	})
+
+	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
+>>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 	if err != nil {
-		// Permanent errors shouldn't be retried. This tipically means
+		// Queue full errors are expected backpressure signals, not true errors.
+		// Skip logging to avoid log spam since we already track this via metrics.
+		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
+		}
+
+		// Permanent errors shouldn't be retried. This typically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
 		// it cannot decode it. Retrying in this case is useless.
@@ -183,19 +241,27 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
+			if !out.retryBackoff.Wait() {
+				batch.Cancelled()
+				return nil
+			}
 			batch.Retry()
 		}
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 
 		// Queue full errors are expected backpressure signals, not true errors.
 		// Skip logging to avoid log spam since we already track this via metrics.
 		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
 			return fmt.Errorf("failed to send batch events to otel collector: %w", err)
 		}
+=======
+>>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 		return nil
 	}
 
 	batch.ACK()
 	st.AckedEvents(len(events))
+	out.retryBackoff.Reset()
 	return nil
 }
 
