@@ -358,7 +358,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
 			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
-			newCursor, err := s.process(ctx, state, s.cursor, s.now().In(time.UTC))
+			currentCursor, ok := state["cursor"].(map[string]any)
+			if !ok {
+				currentCursor = s.cursor
+			}
+			newCursor, err := s.process(ctx, state, currentCursor, s.now().In(time.UTC))
 			if newCursor != nil {
 				state["cursor"] = newCursor
 			}

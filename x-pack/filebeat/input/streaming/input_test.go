@@ -1045,6 +1045,114 @@ func TestURLProgramReconnect(t *testing.T) {
 	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z")
 }
 
+// TestURLProgramReconnectZeroEvents verifies that a zero-events message does
+// not regress the cursor to the startup snapshot. The scenario:
+//
+//  1. Input starts with an initial persisted cursor (last_timestamp=00:00:00Z).
+//  2. First message advances the cursor to 01:00:00Z.
+//  3. Second message produces zero events (empty data field).
+//  4. Connection drops, triggering a reconnect.
+//  5. The reconnect URL must contain sinceTime=01:00:00Z (advanced), not
+//     sinceTime=00:00:00Z (initial).
+func TestURLProgramReconnectZeroEvents(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
+
+	var (
+		mu        sync.Mutex
+		urls      []string
+		connCount int
+	)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		urls = append(urls, r.URL.String())
+		connCount++
+		n := connCount
+		mu.Unlock()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+
+		if n == 1 {
+			// First connection: send a message that advances the cursor,
+			// then one that produces zero events, then close.
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"2024-01-01T01:00:00Z","data":"msg-1"}`))
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"","data":""}`))
+			time.Sleep(50 * time.Millisecond)
+			conn.Close()
+			return
+		}
+		// Second connection: send a message so the test can complete.
+		conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"2024-01-01T02:00:00Z","data":"msg-2"}`))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"url":         "ws" + server.URL[4:] + "/v1/stream",
+		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
+		"program": `
+			state.response.decode_json().as(body,
+				body.data != "" ?
+					{"cursor": {"last_timestamp": body.ts}, "events": [body]}
+				:
+					{"events": []}
+			)`,
+		"retry": map[string]interface{}{
+			"blanket_retries": true,
+			"wait_min":        "10ms",
+			"wait_max":        "50ms",
+		},
+	}
+	cfg := conf.MustNewConfigFrom(config)
+
+	c := defaultConfig()
+	c.Redact = &redact{}
+	err := cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	v2Ctx := v2.Context{
+		Logger:          logptest.NewTestingLogger(t, "websocket_test"),
+		ID:              "test_id:url_program_reconnect_zero_events",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	var client publisher
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel()
+		}
+	}
+
+	initialCursor := map[string]any{"last_timestamp": "2024-01-01T00:00:00Z"}
+	src := &source{c}
+	err = input{}.run(v2Ctx, src, initialCursor, &client)
+	if err != nil && err != context.Canceled { //nolint:errorlint // ctx.Err() is never wrapped.
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(urls) < 2 {
+		t.Fatalf("expected at least 2 connections, got %d", len(urls))
+	}
+
+	assert.Contains(t, urls[0], "sinceTime=2024-01-01T00:00:00Z",
+		"first connection should use the initial persisted cursor")
+	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z",
+		"second connection should use the advanced cursor, not the initial one")
+}
+
 var _ inputcursor.Publisher = (*publisher)(nil)
 
 type publisher struct {
