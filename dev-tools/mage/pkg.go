@@ -32,21 +32,81 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+// PackageArgs defines runtime configuration for package builds.
+type PackageArgs struct {
+	Platforms    BuildPlatformList
+	PackageTypes []PackageType
+	Snapshot     bool
+}
+
+// DefaultPackageArgsFromEnv returns package args based on current globals and
+// runtime env var overrides (PLATFORMS, PACKAGES, SNAPSHOT, DEV).
+func DefaultPackageArgsFromEnv() (PackageArgs, error) {
+	snapshot, err := parseBoolEnvOverride("SNAPSHOT", Snapshot)
+	if err != nil {
+		return PackageArgs{},
+			fmt.Errorf("cannot parse env var SNAPSHOT as boolean: %w", err)
+	}
+
+	args := PackageArgs{
+		Platforms: append(BuildPlatformList(nil), Platforms...),
+		Snapshot:  snapshot,
+	}
+
+	if expression := os.Getenv("PLATFORMS"); len(expression) > 0 {
+		args.Platforms = NewPlatformList(expression)
+	}
+	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
+		args.PackageTypes = ParsePackageTypes(packageTypes)
+	}
+
+	return args, nil
+}
+
+func parseBoolEnvOverride(name string, fallback bool) (bool, error) {
+	value, found := os.LookupEnv(name)
+	if !found || value == "" {
+		return fallback, nil
+	}
+
+	parsed, err := strconv.ParseBool(value)
+	if err != nil {
+		return fallback, fmt.Errorf("failed to parse %s env value: %w", name, err)
+	}
+	return parsed, nil
+}
+
+// PackageWithArgs returns a package build function configured with args.
+func PackageWithArgs(args PackageArgs) func() error {
+	return func() error {
+		return packageWithArgs(args)
+	}
+}
+
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
-	if len(Platforms) == 0 {
+	args, err := DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	return packageWithArgs(args)
+}
+
+func packageWithArgs(args PackageArgs) error {
+	platforms := args.Platforms
+	packageTypes := args.PackageTypes
+	snapshot := args.Snapshot
+
+	if len(platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
 		return nil
 	}
 
 	if len(Packages) == 0 {
 		return errors.New("no package specs are registered. Call " +
-			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
+			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first")
 	}
-
-	// platforms := updateWithDarwinUniversal(Platforms)
-	platforms := Platforms
 
 	var tasks []interface{}
 	for _, target := range platforms {
@@ -61,7 +121,7 @@ func Package() error {
 			}
 
 			for _, pkgType := range pkg.Types {
-				if !isPackageTypeSelected(pkgType) {
+				if !isPackageTypeSelected(pkgType, packageTypes) {
 					log.Printf("Skipping %s package type because it is not selected", pkgType)
 					continue
 				}
@@ -105,7 +165,7 @@ func Package() error {
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
-				spec.Snapshot = Snapshot
+				spec.Snapshot = snapshot
 				spec.evalContext = map[string]interface{}{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
@@ -247,14 +307,14 @@ func saveIronbank() error {
 	return nil
 }
 
-// isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
-// pkgType is present on SelectedPackageTypes. It returns false otherwise.
-func isPackageTypeSelected(pkgType PackageType) bool {
-	if len(SelectedPackageTypes) == 0 {
+// isPackageTypeSelected returns true if selected is empty or if pkgType is
+// present on selected. It returns false otherwise.
+func isPackageTypeSelected(pkgType PackageType, selected []PackageType) bool {
+	if len(selected) == 0 {
 		return true
 	}
 
-	for _, t := range SelectedPackageTypes {
+	for _, t := range selected {
 		if t == pkgType {
 			return true
 		}
@@ -341,7 +401,7 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "-v")
 	}
 
-	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"))
+	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/..."))
 
 	if params.HasModules {
 		args = append(args, "--modules")
