@@ -134,15 +134,14 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 	buf := new(bytes.Buffer)
 	data := tr.Clone()
 	data.Put("cursor", trCtx.cursorMap())
-	data.Put("first_event", trCtx.firstEventClone())
-	data.Put("last_event", trCtx.lastEventClone())
-	data.Put("last_response", trCtx.lastResponseClone().templateValues())
+	data.Put("first_event", trCtx.firstEvent)
+	data.Put("last_event", trCtx.lastEvent)
+	data.Put("last_response", trCtx.lastResponse.templateValues())
 	if trCtx.firstResponse != nil {
-		data.Put("first_response", trCtx.firstResponseClone().templateValues())
+		data.Put("first_response", trCtx.firstResponse.templateValues())
 	}
-	// This is only set when chaining is used
 	if trCtx.parentTrCtx != nil {
-		data.Put("parent_last_response", trCtx.parentTrCtx.lastResponseClone().templateValues())
+		data.Put("parent_last_response", trCtx.parentTrCtx.lastResponse.templateValues())
 	}
 
 	if err := t.Template.Execute(buf, data); err != nil {
