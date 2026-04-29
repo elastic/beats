@@ -133,6 +133,10 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, targetName
 
 	buf := new(bytes.Buffer)
 	data := tr.Clone()
+	// Note that mapstr.M methods are available from within the template.
+	// This allows templates to mutate values within the maps. Doing so
+	// is not supported and will lead to undefined behaviour. The only way
+	// to prevent this is to clone the map, which is excessively expensive.
 	data.Put("cursor", trCtx.cursorMap())
 	data.Put("first_event", trCtx.firstEvent)
 	data.Put("last_event", trCtx.lastEvent)
