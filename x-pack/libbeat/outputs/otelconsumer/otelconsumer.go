@@ -15,12 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
-=======
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
->>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
@@ -45,14 +40,13 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
-=======
+}
+
 type retryConfig struct {
 	init time.Duration
 	max  time.Duration
->>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294)):libbeat/otel/otelconsumer/otelconsumer.go
 }
 
 type otelConsumer struct {
