@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	cfg "github.com/elastic/elastic-agent-libs/config"
@@ -386,4 +387,55 @@ func TestDecodeCSVField_String(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, "decode_csv_field={\"Fields\":{\"a\":\"csv.a\",\"b\":\"csv.b\"},\"IgnoreMissing\":true,\"TrimLeadingSpace\":false,\"OverwriteKeys\":false,\"FailOnError\":true,\"Separator\":\"#\"}", p.String())
+}
+
+// TestDecodeCSVFailOnErrorSafety verifies that when FailOnError=true and
+// decoding fails, the event fields are unchanged (proving clone skip is safe).
+func TestDecodeCSVFailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name   string
+		config mapstr.M
+		input  mapstr.M
+	}{
+		{
+			name: "missing source field",
+			config: mapstr.M{
+				"fields": mapstr.M{
+					"missing": "target",
+				},
+			},
+			input: mapstr.M{"other": "value"},
+		},
+		{
+			name: "non-string field value",
+			config: mapstr.M{
+				"fields": mapstr.M{
+					"message": "message",
+				},
+			},
+			input: mapstr.M{"message": 42},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			processor, err := NewDecodeCSVField(
+				cfg.MustNewConfigFrom(tc.config),
+				logptest.NewTestingLogger(t, ""),
+			)
+			require.NoError(t, err)
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := processor.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
 }
