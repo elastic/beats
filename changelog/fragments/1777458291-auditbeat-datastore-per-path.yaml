@@ -1,0 +1,5 @@
+kind: bug-fix
+summary: Release the bolt file lock when the last datastore bucket is closed.
+component: auditbeat
+pr: https://github.com/elastic/beats/pull/50386
+issue: https://github.com/elastic/beats/issues/50381

@@ -207,11 +207,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
-	if err := datastore.Update(migrateDatastoreSchema, base.GetPath()); err != nil {
-		return nil, fmt.Errorf("datastore schema migration failed: %w", err)
-	}
-
-	bucket, err := datastore.OpenBucket(bucketNameV2, base.GetPath())
+	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, base.GetPath(), migrateDatastoreSchema)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
