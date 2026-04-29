@@ -202,7 +202,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
 	github.com/pierrec/lz4/v4 v4.1.26
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/prometheus v0.311.3
+	github.com/prometheus/prometheus v0.311.2-0.20260410083055-07c6232d159b
 	github.com/shirou/gopsutil/v4 v4.26.3
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.16
