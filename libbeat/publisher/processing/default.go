@@ -399,6 +399,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	}
 
 	if cfg.DisableHost {
+		// setup 10: remove host.name field, if disable_host is set.
 		drop_hostname_cfg, err := config.NewConfigFrom(map[string]interface{}{
 			"fields":                 []string{"host.name"},
 			"ignore_missing":         true,
@@ -415,12 +416,12 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		pipelineProcessors.add(proc)
 	}
 
-	// setup 10: debug print final event (P)
+	// setup 11: debug print final event (P)
 	if b.log.IsDebug() || management.UnderAgent() {
 		pipelineProcessors.add(debugPrintProcessor(b.info, b.log))
 	}
 
-	// setup 11: drop all events if outputs are disabled (P)
+	// setup 12: drop all events if outputs are disabled (P)
 	if drop {
 		pipelineProcessors.add(dropDisabledProcessor)
 	}
