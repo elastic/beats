@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const defaultReloadInterval = 5 * time.Second
@@ -37,7 +39,9 @@ const defaultReloadInterval = 5 * time.Second
 type CertReloader struct {
 	certPath       string
 	keyPath        string
+	passphrase     string
 	reloadInterval time.Duration
+	log            *logp.Logger
 
 	mu         sync.RWMutex
 	cert       *tls.Certificate
@@ -55,6 +59,13 @@ func WithReloadInterval(d time.Duration) CertReloaderOption {
 	}
 }
 
+// WithPassphrase sets the passphrase used to decrypt encrypted private keys.
+func WithPassphrase(passphrase string) CertReloaderOption {
+	return func(r *CertReloader) {
+		r.passphrase = passphrase
+	}
+}
+
 // NewCertReloader creates a CertReloader for the given cert and key file paths.
 // It performs an initial load of the certificate pair, returning an error if the
 // initial load fails.
@@ -67,12 +78,13 @@ func NewCertReloader(certPath, keyPath string, opts ...CertReloaderOption) (*Cer
 		certPath:       certPath,
 		keyPath:        keyPath,
 		reloadInterval: defaultReloadInterval,
+		log:            logp.NewLogger("tls"),
 	}
 	for _, opt := range opts {
 		opt(r)
 	}
 
-	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	cert, err := r.loadKeyPair()
 	if err != nil {
 		return nil, fmt.Errorf("initial certificate load failed: %w", err)
 	}
@@ -80,6 +92,18 @@ func NewCertReloader(certPath, keyPath string, opts ...CertReloaderOption) (*Cer
 	r.nextReload = time.Now().Add(r.reloadInterval)
 
 	return r, nil
+}
+
+func (r *CertReloader) loadKeyPair() (tls.Certificate, error) {
+	certPEM, err := ReadPEMFile(r.log, r.certPath, r.passphrase)
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("reading certificate file: %w", err)
+	}
+	keyPEM, err := ReadPEMFile(r.log, r.keyPath, r.passphrase)
+	if err != nil {
+		return tls.Certificate{}, fmt.Errorf("reading key file: %w", err)
+	}
+	return tls.X509KeyPair(certPEM, keyPEM)
 }
 
 // GetCertificate returns the current certificate, reloading from disk if the
@@ -103,7 +127,7 @@ func (r *CertReloader) GetCertificate(_ *tls.ClientHelloInfo) (*tls.Certificate,
 
 	r.nextReload = time.Now().Add(r.reloadInterval)
 
-	cert, err := tls.LoadX509KeyPair(r.certPath, r.keyPath)
+	cert, err := r.loadKeyPair()
 	if err != nil {
 		return r.cert, nil
 	}
