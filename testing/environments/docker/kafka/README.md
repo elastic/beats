@@ -10,7 +10,11 @@ The files in the `certs` directory were generated with these commands:
 
 ```sh
 # create the broker's key
-keytool -keystore broker.keystore.jks -storepass KafkaTest -alias broker -validity 5000 -keyalg RSA -sigalg SHA256withRSA -genkey
+keytool -genkeypair -keystore broker.keystore.jks -storepass KafkaTest \
+  -alias broker -keyalg RSA -keysize 2048 -validity 5000 \
+  -dname "CN=kafka" \
+  -ext "SAN=dns:kafka,dns:localhost,ip:127.0.0.1"
+
 
 What is your first and last name?
   [Unknown]:  kafka
@@ -26,8 +30,21 @@ keytool -keystore client.truststore.jks -storepass KafkaTest -alias CARoot -keya
 keytool -keystore broker.keystore.jks -storepass KafkaTest -alias broker -certreq -file broker-cert
 
 # sign it with the CA
-openssl x509 -req -CA ca-cert -CAkey ca-key -in broker-cert -out broker-cert-signed -days 5000 -CAcreateserial -passin pass:KafkaTest -sha256
-
+openssl x509 -req \
+  -in broker-cert \
+  -CA ca-cert -CAkey ca-key \
+  -CAcreateserial \
+  -out broker-cert-signed \
+  -days 5000 \
+  -passin pass:KafkaTest \
+  -sha256 \
+  -extfile <(printf '%s\n' \
+    '[v3_req]' \
+    'subjectAltName=DNS:kafka,DNS:localhost,IP:127.0.0.1' \
+    'keyUsage=digitalSignature,keyEncipherment' \
+    'extendedKeyUsage=serverAuth') \
+  -extensions v3_req
+  
 # import CA and signed cert back into server keystore
 keytool -keystore broker.keystore.jks -storepass KafkaTest -alias CARoot -import -file ca-cert
 keytool -keystore broker.keystore.jks -storepass KafkaTest -alias broker -import -file broker-cert-signed
