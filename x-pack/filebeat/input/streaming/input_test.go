@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -953,8 +954,6 @@ func TestInput(t *testing.T) {
 func TestURLProgramReconnect(t *testing.T) {
 	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
 
-	logp.TestingSetup()
-
 	var (
 		mu        sync.Mutex
 		urls      []string
@@ -1017,7 +1016,7 @@ func TestURLProgramReconnect(t *testing.T) {
 	defer cancel()
 
 	v2Ctx := v2.Context{
-		Logger:          logp.NewLogger("websocket_test"),
+		Logger:          logptest.NewTestingLogger(t, "websocket_test"),
 		ID:              "test_id:url_program_reconnect",
 		Cancelation:     ctx,
 		MetricsRegistry: monitoring.NewRegistry(),
