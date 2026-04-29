@@ -91,7 +91,7 @@ func TestTimezoneCacheRefreshOnChange(t *testing.T) {
 	// Pre-populate the cache with the current zone/offset so Run won't
 	// refresh it, then confirm the cache pointer is preserved across calls.
 	zone, offset := time.Now().Zone()
-	loc.cache.Store(&tzEntry{zone: zone, offset: offset, format: loc.Format(zone, offset)})
+	loc.cache.Store(&tzEntry{zone: zone, offset: offset, boxedFormat: loc.Format(zone, offset)})
 	first := loc.cache.Load()
 
 	for i := 0; i < 5; i++ {
@@ -101,11 +101,11 @@ func TestTimezoneCacheRefreshOnChange(t *testing.T) {
 	assert.Same(t, first, loc.cache.Load(), "cache entry must be reused when zone/offset are unchanged")
 
 	// A change in zone/offset must invalidate the cache.
-	loc.cache.Store(&tzEntry{zone: "STALE", offset: offset + 1, format: "stale"})
+	loc.cache.Store(&tzEntry{zone: "STALE", offset: offset + 1, boxedFormat: "stale"})
 	_, err := loc.Run(&beat.Event{Fields: mapstr.M{}})
 	assert.NoError(t, err, "Run should not error")
 	refreshed := loc.cache.Load()
-	assert.NotEqual(t, "stale", refreshed.format, "cache must be refreshed when zone/offset change")
+	assert.NotEqual(t, "stale", refreshed.boxedFormat, "cache must be refreshed when zone/offset change")
 	assert.Equal(t, zone, refreshed.zone, "cache should reflect current zone")
 	assert.Equal(t, offset, refreshed.offset, "cache should reflect current offset")
 }

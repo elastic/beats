@@ -32,17 +32,20 @@ import (
 
 type addLocale struct {
 	TimezoneFormat TimezoneFormat
-	// cache holds the last formatted timezone string, refreshed when the
-	// underlying zone or offset changes (e.g. on DST transitions). Stores
-	// race benignly: Format is deterministic, so repeated computation by
-	// concurrent goroutines is harmless.
+	// cache holds the last formatted timezone, refreshed when the underlying
+	// zone or offset changes (e.g. on DST transitions). Stores race benignly:
+	// Format is deterministic, so repeated computation by concurrent
+	// goroutines is harmless.
 	cache atomic.Pointer[tzEntry]
 }
 
 type tzEntry struct {
 	zone   string
 	offset int
-	format string
+	// boxedFormat holds the formatted string already wrapped in an interface{}
+	// so passing it to event.PutValue does not box (and heap-allocate) on
+	// every event. The boxing happens once, when the cache entry is built.
+	boxedFormat any
 }
 
 // TimezoneFormat type
@@ -101,10 +104,10 @@ func (l *addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
 	e := l.cache.Load()
 	if e == nil || e.zone != zone || e.offset != offset {
-		e = &tzEntry{zone: zone, offset: offset, format: l.Format(zone, offset)}
+		e = &tzEntry{zone: zone, offset: offset, boxedFormat: l.Format(zone, offset)}
 		l.cache.Store(e)
 	}
-	_, _ = event.PutValue("event.timezone", e.format)
+	_, _ = event.PutValue("event.timezone", e.boxedFormat)
 	return event, nil
 }
 
