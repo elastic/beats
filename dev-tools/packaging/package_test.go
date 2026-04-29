@@ -610,7 +610,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef strin
 				t.Fatalf("error loading docker image: %s", err)
 			}
 		} else {
-			_, err = dockerClient.ImageInspect(ctx, imageID, client.ImageInspectOptions{})
+			_, err = dockerClient.ImageInspect(ctx, imageID)
 			if err != nil {
 				t.Fatalf("error inspecting docker image %q from daemon: %s", imageID, err)
 			}
