@@ -13,9 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/Azure/go-autorest/autorest/date"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -46,11 +43,11 @@ type MetricValue struct {
 	Value       map[string]interface{}
 	Segments    []MetricValue
 	Interval    string
-	Start       *date.Time
-	End         *date.Time
+	Start       *time.Time
+	End         *time.Time
 }
 
-func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue {
+func mapMetricValues(metricValues ListMetricsResultsItem) []MetricValue {
 	var mapped []MetricValue
 	for _, item := range *metricValues.Value {
 		metricValue := MetricValue{
@@ -59,7 +56,7 @@ func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue
 			Value:       map[string]interface{}{},
 			SegmentName: map[string]string{},
 		}
-		metricValue.Interval = fmt.Sprintf("%sTO%s", item.Body.Value.Start, item.Body.Value.End)
+		metricValue.Interval = formatInterval(item.Body.Value.Start, item.Body.Value.End)
 		if item.Body != nil && item.Body.Value != nil {
 			if item.Body.Value.AdditionalProperties != nil {
 				metrics := getAdditionalPropMetric(item.Body.Value.AdditionalProperties)
@@ -84,7 +81,21 @@ func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue
 	return mapped
 }
 
-func mapSegment(segment insights.MetricsSegmentInfo, parentSeg map[string]string) MetricValue {
+// formatInterval renders the start/end pair the same way the legacy
+// (autorest) date.Time.String() did so that the MetricValue.Interval string
+// stays in a familiar format for any downstream consumers.
+func formatInterval(start, end *time.Time) string {
+	var s, e string
+	if start != nil {
+		s = start.Format(time.RFC3339Nano)
+	}
+	if end != nil {
+		e = end.Format(time.RFC3339Nano)
+	}
+	return fmt.Sprintf("%sTO%s", s, e)
+}
+
+func mapSegment(segment MetricsSegmentInfo, parentSeg map[string]string) MetricValue {
 	metricValue := MetricValue{Value: map[string]interface{}{}, SegmentName: map[string]string{}}
 	if segment.AdditionalProperties != nil {
 		metrics := getAdditionalPropMetric(segment.AdditionalProperties)
@@ -129,7 +140,7 @@ func newMetricTimeKey(start, end time.Time) metricTimeKey {
 	return metricTimeKey{Start: start, End: end}
 }
 
-func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId string, namespace string) []mb.Event {
+func EventsMapping(metricValues ListMetricsResultsItem, applicationId string, namespace string) []mb.Event {
 	var events []mb.Event
 	if metricValues.Value == nil {
 		return events
@@ -140,7 +151,7 @@ func EventsMapping(metricValues insights.ListMetricsResultsItem, applicationId s
 	groupedByDimensions := groupMetricsByDimension(mValues)
 
 	for _, group := range groupedByDimensions {
-		event := createGroupEvent(group, newMetricTimeKey(group[0].Start.Time, group[0].End.Time), applicationId, namespace)
+		event := createGroupEvent(group, newMetricTimeKey(*group[0].Start, *group[0].End), applicationId, namespace)
 
 		// Only add events that have metric values.
 		if len(event.MetricSetFields) > 0 {
