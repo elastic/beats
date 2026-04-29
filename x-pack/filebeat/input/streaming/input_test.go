@@ -1030,7 +1030,7 @@ func TestURLProgramReconnect(t *testing.T) {
 
 	src := &source{c}
 	err = input{}.run(v2Ctx, src, nil, &client)
-	if err != nil && err != context.Canceled {
+	if err != nil && err != context.Canceled { //nolint:errorlint // ctx.Err() is never wrapped.
 		t.Fatalf("unexpected error: %v", err)
 	}
 
