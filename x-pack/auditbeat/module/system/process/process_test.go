@@ -24,13 +24,9 @@ func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
-	f.(*SysInfoMetricSet).lastState = time.Now() //nolint:errcheck // unchecked type assertion
+	f.(*SysInfoMetricSet).lastState = time.Now()
 	p := testProcess()
-<<<<<<< HEAD
 	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*Process{p}))
-=======
-	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache([]*Process{p}) //nolint:errcheck // unchecked type assertion
->>>>>>> f00c98361 (auditbeat tests: remove global paths mutation (#49875))
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
