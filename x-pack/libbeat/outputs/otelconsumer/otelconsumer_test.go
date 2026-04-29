@@ -47,13 +47,13 @@ func TestPublish(t *testing.T) {
 		logger := logptest.NewTestingLogger(t, "")
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
-		consumer := &otelConsumer{
+		return &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
+			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
 		}
-		return consumer
 	}
 
 	t.Run("ack batch on consumer success", func(t *testing.T) {
@@ -251,6 +251,103 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("retries are delayed by exponential backoff", func(t *testing.T) {
+		const (
+			initBackoff = 50 * time.Millisecond
+			maxBackoff  = 500 * time.Millisecond
+		)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("retryable error")
+		})
+		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+
+		// Measure the duration of each Publish call. Each call blocks during
+		// backoff Wait(), so elapsed time reflects the actual backoff delay.
+		var durations []time.Duration
+		for range 3 {
+			batch := outest.NewBatch(event1)
+			start := time.Now()
+			err := otelConsumer.Publish(ctx, batch)
+			durations = append(durations, time.Since(start))
+			require.NoError(t, err, "Publish should not return an error")
+			assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag, "batch should be retried")
+		}
+
+		assert.GreaterOrEqual(t, durations[0], initBackoff, "first retry delay should be at least ~init")
+		assert.GreaterOrEqual(t, durations[1], 2*initBackoff, "second retry delay should be at least ~2*init (exponential growth)")
+		assert.GreaterOrEqual(t, durations[2], 4*initBackoff, "third retry delay should be at least ~4*init (exponential growth)")
+	})
+
+	t.Run("backoff resets on success", func(t *testing.T) {
+		const (
+			initBackoff = 50 * time.Millisecond
+			maxBackoff  = 500 * time.Millisecond
+		)
+
+		callCount := 0
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			callCount++
+			if callCount == 3 {
+				return nil
+			}
+			return errors.New("retryable error")
+		})
+		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+
+		// Two failures grow the backoff past init level.
+		batch1 := outest.NewBatch(event1)
+		err := otelConsumer.Publish(ctx, batch1)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch1.Signals[0].Tag, "first batch should be retried")
+
+		batch2 := outest.NewBatch(event1)
+		err = otelConsumer.Publish(ctx, batch2)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch2.Signals[0].Tag, "second batch should be retried")
+
+		// Third call succeeds, triggering backoff Reset().
+		batch3 := outest.NewBatch(event1)
+		err = otelConsumer.Publish(ctx, batch3)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch3.Signals[0].Tag, "third batch should be acked")
+
+		// Next failure should use init-level backoff ([init, 2*init) = [50ms, 100ms)),
+		// not the grown level which would be [4*init, 8*init) = [200ms, 400ms).
+		batch4 := outest.NewBatch(event1)
+		start := time.Now()
+		err = otelConsumer.Publish(ctx, batch4)
+		duration := time.Since(start)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch4.Signals[0].Tag, "fourth batch should be retried")
+		// In equal jitter backoff strategy, initial backoff is between initBackoff and 2*initBackoff.
+		const margin = 10 * time.Millisecond
+		assert.Less(t, duration, 2*initBackoff+margin, "after success, backoff should reset to init level, not continue growing (got %v)", duration)
+	})
+
+	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
+		batch := outest.NewBatch(event1)
+
+		cancelCtx, cancelFn := context.WithCancel(context.Background())
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("retryable error")
+		})
+		otelConsumer.retry = retryConfig{init: 10 * time.Second, max: 10 * time.Second}
+
+		publishDone := make(chan struct{})
+		go func() {
+			_ = otelConsumer.Publish(cancelCtx, batch)
+			close(publishDone)
+		}()
+
+		time.Sleep(50 * time.Millisecond)
+		cancelFn()
+		<-publishDone
+
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchCancelled, batch.Signals[0].Tag)
 	})
 
 	t.Run("sets the elasticsearchexporter doc id attribute from metadata", func(t *testing.T) {
