@@ -53,14 +53,13 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-<<<<<<< HEAD
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
-=======
+}
+
 type retryConfig struct {
 	init time.Duration
 	max  time.Duration
->>>>>>> 7171f70d2 (fix(otelconsumer): add back-off to retries (#50294))
 }
 
 type otelConsumer struct {
