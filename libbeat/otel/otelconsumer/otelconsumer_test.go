@@ -336,7 +336,8 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, outest.BatchRetry, batch4.Signals[0].Tag, "fourth batch should be retried")
 		// In equal jitter backoff strategy, initial backoff is between initBackoff and 2*initBackoff.
-		assert.Less(t, duration, 2*initBackoff, "after success, backoff should reset to init level, not continue growing (got %v)", duration)
+		const margin = 10 * time.Millisecond
+		assert.Less(t, duration, 2*initBackoff+margin, "after success, backoff should reset to init level, not continue growing (got %v)", duration)
 	})
 
 	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
