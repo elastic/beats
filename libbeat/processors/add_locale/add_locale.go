@@ -20,7 +20,7 @@ package add_locale
 import (
 	"fmt"
 	"strings"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -32,11 +32,17 @@ import (
 
 type addLocale struct {
 	TimezoneFormat TimezoneFormat
-	cacheMu        sync.RWMutex
-	cachedZone     string
-	cachedOffset   int
-	cachedFormat   string
-	hasCachedValue bool
+	// cache holds the last formatted timezone string, refreshed when the
+	// underlying zone or offset changes (e.g. on DST transitions). Stores
+	// race benignly: Format is deterministic, so repeated computation by
+	// concurrent goroutines is harmless.
+	cache atomic.Pointer[tzEntry]
+}
+
+type tzEntry struct {
+	zone   string
+	offset int
+	format string
 }
 
 // TimezoneFormat type
@@ -93,8 +99,12 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 
 func (l *addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
-	format := l.cachedFormatOnChange(zone, offset)
-	_, _ = event.PutValue("event.timezone", format)
+	e := l.cache.Load()
+	if e == nil || e.zone != zone || e.offset != offset {
+		e = &tzEntry{zone: zone, offset: offset, format: l.Format(zone, offset)}
+		l.cache.Store(e)
+	}
+	_, _ = event.PutValue("event.timezone", e.format)
 	return event, nil
 }
 
@@ -103,31 +113,6 @@ const (
 	min  = 60 * sec
 	hour = 60 * min
 )
-
-func (l *addLocale) cachedFormatOnChange(zone string, offset int) string {
-	l.cacheMu.RLock()
-	if l.hasCachedValue && l.cachedZone == zone && l.cachedOffset == offset {
-		cached := l.cachedFormat
-		l.cacheMu.RUnlock()
-		return cached
-	}
-	l.cacheMu.RUnlock()
-
-	formatted := l.Format(zone, offset)
-
-	l.cacheMu.Lock()
-	if l.hasCachedValue && l.cachedZone == zone && l.cachedOffset == offset {
-		formatted = l.cachedFormat
-	} else {
-		l.cachedZone = zone
-		l.cachedOffset = offset
-		l.cachedFormat = formatted
-		l.hasCachedValue = true
-	}
-	l.cacheMu.Unlock()
-
-	return formatted
-}
 
 func (l *addLocale) Format(zone string, offset int) string {
 	var ft string

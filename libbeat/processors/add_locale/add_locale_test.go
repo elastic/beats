@@ -85,18 +85,29 @@ func TestTimezoneFormat(t *testing.T) {
 	assert.Regexp(t, `\-[\d]{2}\:[\d]{2}`, negVal)
 }
 
-func TestTimezoneFormatCacheRefreshOnChange(t *testing.T) {
+func TestTimezoneCacheRefreshOnChange(t *testing.T) {
 	loc := &addLocale{TimezoneFormat: Offset}
 
-	first := loc.cachedFormatOnChange("CET", 3600)
-	assert.Equal(t, "+01:00", first, "expected initial cached timezone format")
+	// Pre-populate the cache with the current zone/offset so Run won't
+	// refresh it, then confirm the cache pointer is preserved across calls.
+	zone, offset := time.Now().Zone()
+	loc.cache.Store(&tzEntry{zone: zone, offset: offset, format: loc.Format(zone, offset)})
+	first := loc.cache.Load()
 
-	cached := loc.cachedFormatOnChange("CET", 3600)
-	assert.Equal(t, first, cached, "expected cached timezone format for same zone/offset")
+	for i := 0; i < 5; i++ {
+		_, err := loc.Run(&beat.Event{Fields: mapstr.M{}})
+		assert.NoError(t, err, "Run should not error")
+	}
+	assert.Same(t, first, loc.cache.Load(), "cache entry must be reused when zone/offset are unchanged")
 
-	updated := loc.cachedFormatOnChange("CEST", 7200)
-	assert.Equal(t, "+02:00", updated, "expected cache refresh after zone/offset change")
-	assert.NotEqual(t, first, updated, "expected refreshed value to differ after offset change")
+	// A change in zone/offset must invalidate the cache.
+	loc.cache.Store(&tzEntry{zone: "STALE", offset: offset + 1, format: "stale"})
+	_, err := loc.Run(&beat.Event{Fields: mapstr.M{}})
+	assert.NoError(t, err, "Run should not error")
+	refreshed := loc.cache.Load()
+	assert.NotEqual(t, "stale", refreshed.format, "cache must be refreshed when zone/offset change")
+	assert.Equal(t, zone, refreshed.zone, "cache should reflect current zone")
+	assert.Equal(t, offset, refreshed.offset, "cache should reflect current offset")
 }
 
 func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {
@@ -131,4 +142,26 @@ func BenchmarkConstruct(b *testing.B) {
 			b.Fatal(err)
 		}
 	}
+}
+
+// BenchmarkRunParallel exercises the cache hot path from many goroutines so
+// the cost of the cache synchronization (atomic load vs. mutex) is visible.
+func BenchmarkRunParallel(b *testing.B) {
+	p, err := New(config.NewConfig(), logp.NewNopLogger())
+	if err != nil {
+		b.Fatal(err)
+	}
+	// Prime the cache so every iteration takes the hit path.
+	if _, err := p.Run(&beat.Event{Fields: mapstr.M{}}); err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			if _, err := p.Run(&beat.Event{Fields: mapstr.M{}}); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
 }
