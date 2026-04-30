@@ -15,22 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testing
+//go:build integration
+
+package integration
 
 import (
-	"os"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-// SetupDataDir sets up a temporary data directory to use for testing.
-func SetupDataDir(t testing.TB) func() {
-	// path.data should be set so that the DB is written to a predictable location.
-	var err error
-	paths.Paths.Data, err = os.MkdirTemp("", "beat-data-dir")
-	if err != nil {
-		t.Fatal()
-	}
-	return func() { os.RemoveAll(paths.Paths.Data) }
+func TestMain(m *testing.M) {
+	integration.TestMainWithBuild(m, "filebeat")
 }
