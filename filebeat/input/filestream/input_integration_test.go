@@ -846,7 +846,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 		time.Sleep(10 * time.Millisecond)
 	}
 	env.pipeline.clients[0].waitUntilPublishingHasStarted()
-	env.pipeline.clients[0].canceler()
+	env.pipeline.clients[0].cancel()
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
