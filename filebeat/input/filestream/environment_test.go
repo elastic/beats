@@ -587,8 +587,13 @@ type mockClient struct {
 	published  []beat.Event
 	ackHandler beat.EventListener
 	closed     atomic.Bool
-	mtx        sync.Mutex
-	canceler   context.CancelFunc
+	// publishingStarted is set the first time PublishAll is called. It must
+	// be readable without holding mtx because PublishAll keeps mtx while
+	// invoking ackHandler.ACKEvents, which can block (e.g. with a blocking
+	// ack handler used in TestFilestreamTruncateBlockedOutput).
+	publishingStarted atomic.Bool
+	mtx               sync.Mutex
+	canceler          context.CancelFunc
 }
 
 // GetEvents returns the published events
@@ -610,6 +615,12 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	defer c.mtx.Unlock()
 
 	c.publishing = append(c.publishing, events...)
+	if len(events) > 0 {
+		// Only flag as started for non-empty batches so an empty PublishAll
+		// does not wake waitUntilPublishingHasStarted prematurely (preserving
+		// the pre-fix semantics of `len(c.publishing) > 0`).
+		c.publishingStarted.Store(true)
+	}
 	for _, event := range events {
 		c.ackHandler.AddEvent(event, true)
 	}
@@ -619,7 +630,7 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 }
 
 func (c *mockClient) waitUntilPublishingHasStarted() {
-	for len(c.publishing) == 0 {
+	for !c.publishingStarted.Load() {
 		time.Sleep(10 * time.Millisecond)
 	}
 }
