@@ -443,15 +443,12 @@ scanner:
 		for i, actualEvent := range actualEvents {
 			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
-<<<<<<< HEAD
-=======
 
 		// Stop the watcher and wait for its goroutine to return so the buffer
 		// is no longer being written to before we read from it.
 		cancel()
 		<-runDone
 
->>>>>>> ce8b3732d (filebeat/input/filestream: fix data races in test mocks (#50417))
 		require.NotContainsf(t, buff.String(), "WARN",
 			"must be no warning messages")
 	})
