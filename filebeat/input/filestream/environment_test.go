@@ -317,8 +317,8 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(
 			e.t.Fatalf("could not stat '%s', err: %s", filepath, err)
 		}
 
-		fileSizeString.WriteString(fmt.Sprint(fi.Size()))
-		cursorString.WriteString(fmt.Sprint(entry.Cursor.Offset))
+		fmt.Fprint(&fileSizeString, fi.Size())
+		fmt.Fprint(&cursorString, entry.Cursor.Offset)
 
 		return entry.Cursor.Offset == expectedOffset
 	},
@@ -492,9 +492,9 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	}
 
 	var missingEvents []string
-	for i, found := range foundEvents {
-		if !found {
-			missingEvents = append(missingEvents, events[i])
+	for i, ev := range events {
+		if !foundEvents[i] {
+			missingEvents = append(missingEvents, ev)
 		}
 	}
 
@@ -593,7 +593,17 @@ type mockClient struct {
 	// ack handler used in TestFilestreamTruncateBlockedOutput).
 	publishingStarted atomic.Bool
 	mtx               sync.Mutex
-	canceler          context.CancelFunc
+	// done is closed by cancel() to release a blocked ack handler. Tests call
+	// cancel either directly (via this client) or via
+	// mockPipelineConnector.cancelAllClients.
+	done       chan struct{}
+	cancelOnce sync.Once
+}
+
+// cancel releases a blocked ack handler. Safe to call from multiple goroutines
+// and idempotent.
+func (c *mockClient) cancel() {
+	c.cancelOnce.Do(func() { close(c.done) })
 }
 
 // GetEvents returns the published events
@@ -678,15 +688,18 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	c := &mockClient{
-		canceler:   cancel,
-		ackHandler: newMockACKHandler(ctx, pc.blocking, config),
-	}
-
+	c := newMockClient(pc.blocking, config)
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
+}
+
+func newMockClient(blocking bool, config beat.ClientConfig) *mockClient {
+	done := make(chan struct{})
+	return &mockClient{
+		done:       done,
+		ackHandler: newMockACKHandler(done, blocking, config),
+	}
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
@@ -694,22 +707,24 @@ func (pc *mockPipelineConnector) cancelAllClients() {
 	defer pc.mtx.Unlock()
 
 	for _, client := range pc.clients {
-		client.canceler()
+		client.cancel()
 	}
 }
 
-func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
+func newMockACKHandler(done <-chan struct{}, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
 		return config.EventListener
 	}
 
-	return acker.Combine(blockingACKer(starter), config.EventListener)
+	return acker.Combine(blockingACKer(done), config.EventListener)
 }
 
-func blockingACKer(starter context.Context) beat.EventListener {
+// blockingACKer blocks the publisher's ack call until done is closed. Tests
+// rely on this to hold cursorPublisher.forward in PublishAll long enough to
+// observe back-pressure scenarios.
+func blockingACKer(done <-chan struct{}) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []any) {
-		for starter.Err() == nil {
-		}
+		<-done
 	})
 }
 
