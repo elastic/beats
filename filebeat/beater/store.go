@@ -46,23 +46,10 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
-<<<<<<< HEAD
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
 	var (
 		reg backend.Registry
 		err error
-=======
-func storeKey(resolvedPath, backendName string) string {
-	if backendName == "" {
-		backendName = "memlog"
-	}
-	return backendName + "://" + resolvedPath
-}
-
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
-	resolvedPath := info.Paths.Resolve(paths.Data, cfg.Path)
-	key := storeKey(resolvedPath, cfg.Backend)
->>>>>>> 25979e875 (filebeat: remove redundant beatPaths parameters (#49842))
 
 		esreg    *es.Registry
 		notifier *es.Notifier
@@ -74,7 +61,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 	}
 
 	reg, err = memlog.New(logger, memlog.Settings{
-		Root:     beatPaths.Resolve(paths.Data, cfg.Path),
+		Root:     info.Paths.Resolve(paths.Data, cfg.Path),
 		FileMode: cfg.Permissions,
 	})
 	if err != nil {
