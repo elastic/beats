@@ -23,10 +23,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNewReader(t *testing.T) {
-	reader, err := NewReader()
+	reader, err := NewReader(logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	defer reader.Close()
@@ -45,7 +47,7 @@ func TestOpenSCManager(t *testing.T) {
 	handle, err = openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)
 	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	closeHandle(handle)
+	closeHandle(handle) //nolint:errcheck //safe to ignore
 }
 
 func TestGetMachineGUID(t *testing.T) {
@@ -57,7 +59,7 @@ func TestGetMachineGUID(t *testing.T) {
 func TestRead(t *testing.T) {
 	t.Skip("Flaky test: https://github.com/elastic/beats/issues/22171")
 
-	reader, err := NewReader()
+	reader, err := NewReader(logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	result, err := reader.Read()
 	assert.NoError(t, err)

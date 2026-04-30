@@ -23,18 +23,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewDefaults(t *testing.T) {
-	_, err := New(cfg.NewConfig())
+	_, err := New(cfg.NewConfig(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestRun(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "communityid uses SHA-1.")
 	// From flowhash package testdata.
 	// 1:LQU9qZlK+B5F3KDmev6m5PMibrg= | 128.232.110.120 66.35.250.204 6 34855 80
 	evt := func() mapstr.M {
@@ -157,7 +160,7 @@ func TestRun(t *testing.T) {
 		c := defaultConfig()
 		c.Target = "@metadata.community_id"
 		c.Seed = 0
-		p, err := newFromConfig(c)
+		p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		out, err := p.Run(event)
@@ -175,7 +178,7 @@ func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash inte
 
 	c := defaultConfig()
 	c.Seed = seed
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -19,14 +19,16 @@ package docker
 
 // Config contains the config needed for the docker
 type Config struct {
-	TLS   *TLSConfig `config:"ssl"`
-	DeDot bool       `config:"labels.dedot"`
+	TLS    *TLSConfig `config:"ssl"`
+	DeDot  bool       `config:"labels.dedot"`
+	Podman bool       `config:"podman"`
 }
 
 // DefaultConfig returns default module config
 func DefaultConfig() Config {
 	return Config{
-		DeDot: true,
+		DeDot:  true,
+		Podman: false,
 	}
 }
 

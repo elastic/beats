@@ -22,9 +22,11 @@ import (
 	"time"
 
 	"github.com/prometheus/prometheus/model/labels"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func stringp(x string) *string {
@@ -35,12 +37,41 @@ func float64p(x float64) *float64 {
 	return &x
 }
 
-func uint64p(x uint64) *uint64 {
+func int64p(x int64) *int64 {
 	return &x
 }
 
-func int64p(x int64) *int64 {
-	return &x
+func TestParseMetricFamiliesMalformedInput(t *testing.T) {
+	logger := logp.NewLogger("test")
+
+	malformedInputs := [][]byte{
+		nil,
+		{},
+		[]byte("invalid"),
+		[]byte("metric_name{"),
+		[]byte("metric_name{label=}"),
+		[]byte("{A}0"),
+		[]byte("{A}00"),
+		[]byte("{A}000"),
+		[]byte("{A}0000"),
+		[]byte("{A} 1"),
+		[]byte("{A} 1\n"),
+		[]byte("{A}0\n"),
+		[]byte("{A}0 1"),
+		[]byte("{A}0 1\n"),
+		[]byte("{A}0\n000"),
+		[]byte("{A}00\n"),
+		[]byte("{A}00000"),
+		[]byte("{A}00 1"),
+		[]byte("{A}00 1\n"),
+		[]byte("{A}00\n000"),
+	}
+
+	for _, input := range malformedInputs {
+		assert.NotPanics(t, func() {
+			_, _ = ParseMetricFamilies(input, ContentTypeTextFormat, time.Now(), logger)
+		}, "ParseMetricFamilies should not panic on malformed input")
+	}
 }
 
 func TestCounterOpenMetrics(t *testing.T) {
@@ -507,7 +538,7 @@ first_metric{label1="value1"} 1
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logp.NewLogger("test"))
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logptest.NewTestingLogger(t, "test"))
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -587,7 +618,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  stringp("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
+						SampleCount: float64p(44000),
 						SampleSum:   float64p(234892394),
 						Quantile: []*Quantile{
 							{
@@ -639,7 +670,7 @@ summary_metric_impossible 123
 					Label: []*labels.Label{},
 					Name:  stringp("summary_metric"),
 					Summary: &Summary{
-						SampleCount: uint64p(44000),
+						SampleCount: float64p(44000),
 						SampleSum:   float64p(234892394),
 						Quantile: []*Quantile{
 							{
@@ -704,15 +735,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: stringp("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
+						SampleCount:      float64p(1.0),
 						SampleSum:        float64p(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001048576),
 							},
 						},
@@ -763,15 +794,15 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 					Name: stringp("http_server_requests_seconds"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: false,
-						SampleCount:      uint64p(1.0),
+						SampleCount:      float64p(1.0),
 						SampleSum:        float64p(0.046745444),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001),
 							},
 							{
-								CumulativeCount: uint64p(0),
+								CumulativeCount: float64p(0),
 								UpperBound:      float64p(0.001048576),
 							},
 						},
@@ -810,11 +841,11 @@ ggh 99
 					Name:  stringp("ggh"),
 					Histogram: &Histogram{
 						IsGaugeHistogram: true,
-						SampleCount:      uint64p(2.0),
+						SampleCount:      float64p(2.0),
 						SampleSum:        float64p(1),
 						Bucket: []*Bucket{
 							{
-								CumulativeCount: uint64p(2),
+								CumulativeCount: float64p(2),
 								UpperBound:      float64p(0.9),
 							},
 						},
@@ -898,4 +929,218 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
 	require.ElementsMatch(t, expected, result)
+}
+
+func TestParseMetricFamiliesContentTypes(t *testing.T) {
+	inputPrometheus := `
+# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4.20072246e+06
+`
+
+	inputOpenMetricsType := `# TYPE process_cpu_total counter
+# HELP process_cpu_total Some help.
+process_cpu_total 4200722.46
+# EOF
+`
+
+	expected := []*MetricFamily{
+		{
+			Name: stringp("process_cpu_total"),
+			Help: stringp("Some help."),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{},
+					Name:  stringp("process_cpu_total"),
+					Counter: &Counter{
+						Value: float64p(4.20072246e+06),
+					},
+				},
+			},
+		},
+	}
+
+	tests := []struct {
+		name        string
+		contentType string
+		wantErr     bool
+	}{
+		{"plain", "text/plain", false},
+		{"plain_charset", "text/plain; charset=utf-8", false},
+		{"plain_version_0_0_4", "text/plain; version=0.0.4; charset=utf-8", false},
+		{"plain_version_1.0.0", "text/plain; version=1.0.0; charset=utf-8", false},
+		{"json", "application/json", false},
+		{"html", "text/html; charset=utf-8", false},
+		{"empty_content_type", "", false},
+		{"openmetrics", "application/openmetrics-text", false},
+		{"octet_stream", "application/octet-stream", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := inputPrometheus
+
+			if tt.contentType == OpenMetricsType {
+				input = inputOpenMetricsType
+			}
+
+			result, err := ParseMetricFamilies([]byte(input), tt.contentType, time.Now(), logptest.NewTestingLogger(t, "test"))
+			if tt.wantErr {
+				require.Error(t, err, "expected error for %s", tt.contentType)
+				return
+			}
+
+			require.NoError(t, err, "unexpected error for %s", tt.contentType)
+			require.ElementsMatch(t, expected, result)
+		})
+	}
+}
+
+func TestInfoGetters(t *testing.T) {
+	// nil receiver
+	var nilInfo *Info
+	assert.Equal(t, int64(0), nilInfo.GetValue())
+	assert.False(t, nilInfo.HasValidValue())
+
+	// valid Info with value 1
+	val := int64(1)
+	info := &Info{Value: &val}
+	assert.Equal(t, int64(1), info.GetValue())
+	assert.True(t, info.HasValidValue())
+
+	// Info with value 0
+	val0 := int64(0)
+	info0 := &Info{Value: &val0}
+	assert.Equal(t, int64(0), info0.GetValue())
+	assert.False(t, info0.HasValidValue())
+}
+
+func TestStatesetGetters(t *testing.T) {
+	// nil receiver
+	var nilStateset *Stateset
+	assert.Equal(t, int64(0), nilStateset.GetValue())
+	assert.False(t, nilStateset.HasValidValue())
+
+	// Stateset with value 1
+	val1 := int64(1)
+	ss1 := &Stateset{Value: &val1}
+	assert.Equal(t, int64(1), ss1.GetValue())
+	assert.True(t, ss1.HasValidValue())
+
+	// Stateset with value 0
+	val0 := int64(0)
+	ss0 := &Stateset{Value: &val0}
+	assert.Equal(t, int64(0), ss0.GetValue())
+	assert.True(t, ss0.HasValidValue())
+
+	// Stateset with invalid value
+	val2 := int64(2)
+	ss2 := &Stateset{Value: &val2}
+	assert.False(t, ss2.HasValidValue())
+}
+
+func TestUnknownGetters(t *testing.T) {
+	// nil receiver
+	var nilUnknown *Unknown
+	assert.Equal(t, float64(0), nilUnknown.GetValue())
+
+	// valid Unknown
+	val := 42.5
+	u := &Unknown{Value: &val}
+	assert.Equal(t, 42.5, u.GetValue())
+}
+
+func TestOpenMetricGetters(t *testing.T) {
+	// nil receiver
+	var nilMetric *OpenMetric
+	assert.Nil(t, nilMetric.GetName())
+	assert.Nil(t, nilMetric.GetInfo())
+	assert.Nil(t, nilMetric.GetStateset())
+	assert.Nil(t, nilMetric.GetUnknown())
+	assert.Nil(t, nilMetric.GetGaugeHistogram())
+	assert.Equal(t, int64(0), nilMetric.GetTimestampMs())
+
+	// OpenMetric with Info
+	name := "test_info"
+	val := int64(1)
+	metric := &OpenMetric{
+		Name: &name,
+		Info: &Info{Value: &val},
+	}
+	assert.Equal(t, &name, metric.GetName())
+	assert.NotNil(t, metric.GetInfo())
+
+	// OpenMetric with Stateset
+	ssVal := int64(1)
+	ssMetric := &OpenMetric{
+		Stateset: &Stateset{Value: &ssVal},
+	}
+	assert.NotNil(t, ssMetric.GetStateset())
+
+	// OpenMetric with Unknown
+	uVal := 42.0
+	uMetric := &OpenMetric{
+		Unknown: &Unknown{Value: &uVal},
+	}
+	assert.NotNil(t, uMetric.GetUnknown())
+
+	// OpenMetric with GaugeHistogram
+	ghMetric := &OpenMetric{
+		Histogram: &Histogram{IsGaugeHistogram: true},
+	}
+	assert.NotNil(t, ghMetric.GetGaugeHistogram())
+	assert.Nil(t, ghMetric.GetHistogram()) // regular GetHistogram should return nil for gauge histogram
+
+	// OpenMetric with timestamp
+	ts := int64(1234567890)
+	tsMetric := &OpenMetric{
+		TimestampMs: &ts,
+	}
+	assert.Equal(t, int64(1234567890), tsMetric.GetTimestampMs())
+}
+
+func TestMetricFamilyGetUnit(t *testing.T) {
+	// nil unit
+	mf := &MetricFamily{}
+	assert.Empty(t, mf.GetUnit())
+
+	// empty unit
+	empty := ""
+	mf2 := &MetricFamily{Unit: &empty}
+	assert.Empty(t, mf2.GetUnit())
+
+	// valid unit
+	unit := "bytes"
+	mf3 := &MetricFamily{Unit: &unit}
+	assert.Equal(t, "bytes", mf3.GetUnit())
+}
+
+func TestGetContentType(t *testing.T) {
+	tests := []struct {
+		name        string
+		contentType string
+		expected    string
+	}{
+		{"empty", "", ""},
+		{"text_plain", "text/plain", ContentTypeTextFormat},
+		{"text_plain_version", "text/plain; version=0.0.4", ContentTypeTextFormat},
+		{"text_plain_wrong_version", "text/plain; version=1.0.0", ""},
+		{"openmetrics", "application/openmetrics-text", OpenMetricsType},
+		{"openmetrics_delimited", "application/openmetrics-text; encoding=delimited", OpenMetricsType},
+		{"openmetrics_wrong_encoding", "application/openmetrics-text; encoding=protobuf", ""},
+		{"json", "application/json", ""},
+		{"invalid", "not a valid; content type", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			header := make(map[string][]string)
+			if tt.contentType != "" {
+				header["Content-Type"] = []string{tt.contentType}
+			}
+			result := GetContentType(header)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }

@@ -26,7 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -79,16 +80,6 @@ var currentErr error // This hack is necessary because the Error method below ca
 func (m MockReporterV2) Error(err error) bool {
 	currentErr = err
 	return true
-}
-
-func TestReportErrorForMissingField(t *testing.T) {
-	field := "some.missing.field"
-	r := MockReporterV2{}
-	err := ReportErrorForMissingField(field, Elasticsearch, r)
-
-	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch API response", field)
-	assert.Equal(t, expectedError, err)
-	assert.Equal(t, expectedError, currentErr)
 }
 
 func TestFixTimestampField(t *testing.T) {
@@ -211,7 +202,7 @@ func TestConfigureModule(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.initConfig)
-			m, _, err := mb.NewModule(cfg, mockRegistry)
+			m, _, err := mb.NewModule(cfg, mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			bm, ok := m.(*mb.BaseModule)
@@ -219,7 +210,7 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newM, err := NewModule(bm, test.xpackEnabledMetricsets, test.optionalXpackMetricsets, logp.L())
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, test.optionalXpackMetricsets, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

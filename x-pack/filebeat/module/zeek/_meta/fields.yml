@@ -1,5 +1,5 @@
 - key: zeek
-  title: Zeek
+  title: Zeek (Bro)
   description: >
     Module for handling logs produced by Zeek/Bro
   fields:

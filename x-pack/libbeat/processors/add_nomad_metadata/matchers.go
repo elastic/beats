@@ -39,10 +39,10 @@ type Matchers struct {
 }
 
 // MatcherConstructor builds a new Matcher from its settings
-type MatcherConstructor func(config conf.C) (Matcher, error)
+type MatcherConstructor func(config conf.C, log *logp.Logger) (Matcher, error)
 
 // NewMatchers builds a Matchers object from its configurations
-func NewMatchers(configs PluginConfig) *Matchers {
+func NewMatchers(configs PluginConfig, log *logp.Logger) *Matchers {
 	matchers := []Matcher{}
 	for _, pluginConfigs := range configs {
 		for name, pluginConfig := range pluginConfigs {
@@ -52,7 +52,7 @@ func NewMatchers(configs PluginConfig) *Matchers {
 				continue
 			}
 
-			matcher, err := matchFunc(pluginConfig)
+			matcher, err := matchFunc(pluginConfig, log)
 			if err != nil {
 				logp.Warn("Unable to initialize matcher plugin %s due to error %v", name, err)
 				continue
@@ -99,7 +99,7 @@ type FieldMatcher struct {
 }
 
 // NewFieldMatcher builds a new list of fields to match from lookup_fields
-func NewFieldMatcher(cfg conf.C) (Matcher, error) {
+func NewFieldMatcher(cfg conf.C, _ *logp.Logger) (Matcher, error) {
 	config := struct {
 		LookupFields []string `config:"lookup_fields"`
 	}{}
@@ -133,11 +133,12 @@ func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 
 // FieldFormatMatcher represents a special field formatter that its created given a custom format
 type FieldFormatMatcher struct {
-	Codec codec.Codec
+	Codec  codec.Codec
+	logger *logp.Logger
 }
 
 // NewFieldFormatMatcher creates a custom FieldFormtMatcher given a configuration (`format` key)
-func NewFieldFormatMatcher(cfg conf.C) (Matcher, error) {
+func NewFieldFormatMatcher(cfg conf.C, logger *logp.Logger) (Matcher, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{}
@@ -152,7 +153,8 @@ func NewFieldFormatMatcher(cfg conf.C) (Matcher, error) {
 	}
 
 	return &FieldFormatMatcher{
-		Codec: format.New(fmtstr.MustCompileEvent(config.Format)),
+		Codec:  format.New(fmtstr.MustCompileEvent(config.Format)),
+		logger: logger,
 	}, nil
 
 }
@@ -165,7 +167,7 @@ func (f *FieldFormatMatcher) MetadataIndex(event mapstr.M) string {
 	})
 
 	if err != nil {
-		logp.Debug("nomad", "Unable to apply field format pattern on event")
+		f.logger.Named("nomand").Debugf("Unable to apply field format pattern on event")
 	}
 
 	if len(bytes) == 0 {

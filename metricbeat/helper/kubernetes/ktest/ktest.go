@@ -42,6 +42,27 @@ func getFiles(folder string) ([]string, error) {
 	return files, nil
 }
 
+// GetMetricInputFiles returns the metric files from the _meta/test folder located in root.
+// Metric test files are expected to be named as "metrics.{id}" and their corresponding expected
+// files are named as "metrics.{id}.expected".
+//
+// For example, if root is "." then it will return the files from "_meta/test"
+// in the current directory of the test.
+func GetMetricInputFiles(t *testing.T, root string) []string {
+	t.Helper()
+	allFiles, err := filepath.Glob(filepath.Join(root, "_meta/test/metrics.*"))
+	if err != nil {
+		t.Fatalf("failed to get test files: %v", err)
+	}
+	var files []string
+	for _, file := range allFiles {
+		if !strings.HasSuffix(file, ".expected") {
+			files = append(files, file)
+		}
+	}
+	return files
+}
+
 // GetTestCases Build test cases based on the files from folder, and the expected files in the expectedFolder
 func GetTestCases(folder string, expectedFolder string) (ptest.TestCases, error) {
 	var cases ptest.TestCases
@@ -103,7 +124,7 @@ func TestMetricsFamilyFromFiles(t *testing.T, files []string, mapping *p.Metrics
 func TestMetricsFamilyFromFolder(t *testing.T, folder string, mapping *p.MetricsMapping) {
 	files, err := getFiles(folder)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err.Error())
 	}
 	TestMetricsFamilyFromFiles(t, files, mapping)
 }

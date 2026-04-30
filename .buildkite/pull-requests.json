@@ -13,7 +13,7 @@
             "always_trigger_comment_regex": "^/(?:test)",
             "skip_ci_labels": ["skip-ci"],
             "skip_target_branches": [ ],
-            "skip_ci_on_only_changed": [ ],
+            "skip_ci_on_only_changed": [ "^.github/", "^.pre-commit-config.yaml", "^.mergify.yml", "\\.md$", "^docs/", "^updatecli-compose.yaml"],
             "always_require_ci_on_changed": [ ]
         }        
     ]

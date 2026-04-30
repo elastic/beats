@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package oracle
 
 import (
@@ -34,18 +36,6 @@ func SetSqlValue(logger *logp.Logger, output mapstr.M, targetFieldName string, v
 	}
 
 	return
-}
-
-func NewSqlWrapper(fieldName string, value SqlValue) *SqlValueWrapper {
-	return &SqlValueWrapper{
-		Field:    fieldName,
-		SqlValue: value,
-	}
-}
-
-type SqlValueWrapper struct {
-	Field    string
-	SqlValue SqlValue
 }
 
 type SqlValue interface {

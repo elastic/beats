@@ -15,9 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package filestream
 
 import (
+	"compress/gzip"
 	"context"
 	"fmt"
 	"os"
@@ -27,12 +30,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestFileWatcher(t *testing.T) {
@@ -53,7 +59,8 @@ scanner:
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	fw := createWatcherWithConfig(t, paths, cfgStr)
+	logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
+	fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 
 	go fw.Run(ctx)
 
@@ -72,6 +79,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // 5 bytes written
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -95,6 +103,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 10}), // +5 bytes appended
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -117,6 +126,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: newBasename, size: 10}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -137,6 +147,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -157,6 +168,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -176,6 +188,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 2}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -196,7 +209,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -214,6 +228,7 @@ scanner:
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 	})
 
@@ -222,13 +237,15 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 10ms
 `
 
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -245,6 +262,7 @@ scanner:
 				Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 
 		time := time.Now().Local().Add(time.Hour)
@@ -260,37 +278,30 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  fingerprint.enabled: false
+  check_interval: 50ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		logp.DevelopmentSetup(logp.ToObserverOutput())
-
-		fw := createWatcherWithConfig(t, paths, cfgStr)
-		go fw.Run(ctx)
+		fw := createWatcherWithConfig(t, logptest.NewTestingLogger(t, ""), paths, cfgStr)
+		// Wait for the watcher goroutine to exit before the subtest returns.
+		// logptest.NewTestingLogger writes via t.Log, which is unsafe to call
+		// after the subtest finishes and triggers a data race in
+		// testing.(*common).destination. The deferred cancel above runs
+		// before t.Cleanup, so this only needs to wait for Run to return.
+		runDone := make(chan struct{})
+		go func() {
+			defer close(runDone)
+			fw.Run(ctx)
+		}()
+		t.Cleanup(func() { <-runDone })
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
 		err := os.WriteFile(filename, nil, 0777)
 		require.NoError(t, err)
-
-		t.Run("issues a debug message in logs", func(t *testing.T) {
-			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
-			require.Eventually(t, func() bool {
-				logs := logp.ObserverLogs().FilterLevelExact(logp.DebugLevel.ZapLevel()).TakeAll()
-				if len(logs) == 0 {
-					return false
-				}
-				for _, l := range logs {
-					if strings.Contains(l.Message, expLogMsg) {
-						return true
-					}
-				}
-				return false
-			}, 100*time.Millisecond, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
-		})
 
 		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
 			err = os.WriteFile(filename, []byte("hello"), 0777)
@@ -305,6 +316,7 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // +5 bytes appended
 				},
 			}
+			expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 			requireEqualEvents(t, expEvent, e)
 		})
 	})
@@ -321,7 +333,8 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
+		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
+		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -339,6 +352,7 @@ scanner:
 				Info:        file.ExtendFileInfo(&testFileInfo{name: basename, size: 1024}),
 			},
 		}
+		expEvent.SrcID = fw.getFileIdentity(expEvent.Descriptor)
 		requireEqualEvents(t, expEvent, e)
 
 		// collisions are resolved in the alphabetical order, the first filename wins
@@ -370,17 +384,25 @@ scanner:
 		}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 100ms
 `
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		logp.DevelopmentSetup(logp.ToObserverOutput())
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
 
-		fw := createWatcherWithConfig(t, paths, cfgStr)
-
-		go fw.Run(ctx)
+		// Wrap Run so we can wait for the watcher goroutine to exit before
+		// inspecting the in-memory log buffer. The buffer returned by
+		// logp.NewInMemoryLocal is goroutine safe for writes only — reading
+		// it concurrently with watcher logging triggers the race detector.
+		runDone := make(chan struct{})
+		go func() {
+			defer close(runDone)
+			fw.Run(ctx)
+		}()
 
 		expectedEvents := []loginp.FSEvent{
 			{
@@ -400,6 +422,11 @@ scanner:
 				},
 			},
 		}
+
+		// Add the SrcIDs
+		for i := range expectedEvents {
+			expectedEvents[i].SrcID = fw.getFileIdentity(expectedEvents[i].Descriptor)
+		}
 		var actualEvents []loginp.FSEvent
 		actualEvents = append(actualEvents, fw.Event())
 		actualEvents = append(actualEvents, fw.Event())
@@ -418,8 +445,13 @@ scanner:
 			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
 
-		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
-		require.Lenf(t, logs, 0, "must be no warning messages, got: %v", logs)
+		// Stop the watcher and wait for its goroutine to return so the buffer
+		// is no longer being written to before we read from it.
+		cancel()
+		<-runDone
+
+		require.NotContainsf(t, buff.String(), "WARN",
+			"must be no warning messages")
 	})
 }
 
@@ -430,15 +462,23 @@ func TestFileScanner(t *testing.T) {
 
 	normalBasename := "normal.log"
 	undersizedBasename := "undersized.log"
+	normalGZIPBasename := "normal.gz.log"
+	undersizedGZIPBasename := "undersized.gz.log"
 	excludedBasename := "excluded.log"
 	excludedIncludedBasename := "excluded_included.log"
 	travelerBasename := "traveler.log"
 	normalSymlinkBasename := "normal_symlink.log"
 	exclSymlinkBasename := "excl_symlink.log"
 	travelerSymlinkBasename := "portal.log"
+	undersizedGlob := "undersized-*.txt"
 
 	normalFilename := filepath.Join(dir, normalBasename)
 	undersizedFilename := filepath.Join(dir, undersizedBasename)
+	undersized1Filename := filepath.Join(dir, "undersized-1.txt")
+	undersized2Filename := filepath.Join(dir, "undersized-2.txt")
+	undersized3Filename := filepath.Join(dir, "undersized-3.txt")
+	normalGZIPFilename := filepath.Join(dir, normalGZIPBasename)
+	undersizedGZIPFilename := filepath.Join(dir, undersizedGZIPBasename)
 	excludedFilename := filepath.Join(dir, excludedBasename)
 	excludedIncludedFilename := filepath.Join(dir, excludedIncludedBasename)
 	travelerFilename := filepath.Join(dir2, travelerBasename)
@@ -446,21 +486,49 @@ func TestFileScanner(t *testing.T) {
 	exclSymlinkFilename := filepath.Join(dir, exclSymlinkBasename)
 	travelerSymlinkFilename := filepath.Join(dir, travelerSymlinkBasename)
 
+	normalRepeat := 1024
+	undersizedRepeat := 128
 	files := map[string]string{
-		normalFilename:           strings.Repeat("a", 1024),
-		undersizedFilename:       strings.Repeat("a", 128),
-		excludedFilename:         strings.Repeat("nothing to see here", 1024),
-		excludedIncludedFilename: strings.Repeat("perhaps something to see here", 1024),
-		travelerFilename:         strings.Repeat("folks, I think I got lost", 1024),
+		normalFilename:           strings.Repeat("a", normalRepeat),
+		undersizedFilename:       strings.Repeat("a", undersizedRepeat),
+		excludedFilename:         strings.Repeat("nothing to see here", normalRepeat),
+		undersized1Filename:      strings.Repeat("1", 42),
+		undersized2Filename:      strings.Repeat("2", 42),
+		undersized3Filename:      strings.Repeat("3", 42),
+		excludedIncludedFilename: strings.Repeat("perhaps something to see here", normalRepeat),
+		travelerFilename:         strings.Repeat("folks, I think I got lost", normalRepeat),
+	}
+	// GZIP files should behave just like plain-text files. Thus using the same
+	// content length, but different data so the fingerprint won't be the same
+	gzFiles := map[string]string{
+		normalGZIPFilename:     strings.Repeat("g", normalRepeat),
+		undersizedGZIPFilename: strings.Repeat("g", undersizedRepeat),
 	}
 
-	sizes := make(map[string]int64, len(files))
+	sizes := make(map[string]int64, len(files)+len(gzFiles))
 	for filename, content := range files {
 		sizes[filename] = int64(len(content))
 	}
 	for filename, content := range files {
 		err := os.WriteFile(filename, []byte(content), 0777)
 		require.NoError(t, err)
+	}
+
+	for basename, content := range gzFiles {
+		f, err := os.OpenFile(basename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		require.NoError(t, err, "could not create gzip file")
+
+		w := gzip.NewWriter(f)
+		_, err = w.Write([]byte(content))
+		require.NoError(t, err, "could not write to gzip file")
+		require.NoError(t, w.Close(), "could not close gzip writer")
+
+		fi, err := f.Stat()
+		require.NoError(t, err, "could not stat gzip file to get its size")
+
+		sizes[basename] = fi.Size()
+		require.NoError(t, err)
+		require.NoError(t, f.Close(), "could not close gzip file")
 	}
 
 	// this is to test that a symlink for a known file does not add the file twice
@@ -480,9 +548,10 @@ func TestFileScanner(t *testing.T) {
 	require.NoError(t, err)
 
 	cases := []struct {
-		name    string
-		cfgStr  string
-		expDesc map[string]loginp.FileDescriptor
+		name        string
+		cfgStr      string
+		compression string
+		expDesc     map[string]loginp.FileDescriptor
 	}{
 		{
 			name: "returns all files when no limits, not including the repeated symlink",
@@ -503,11 +572,25 @@ scanner:
 						name: normalBasename,
 					}),
 				},
+				normalGZIPFilename: {
+					Filename: normalGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[normalGZIPFilename],
+						name: normalGZIPBasename,
+					}),
+				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[undersizedFilename],
 						name: undersizedBasename,
+					}),
+				},
+				undersizedGZIPFilename: {
+					Filename: undersizedGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[undersizedGZIPFilename],
+						name: undersizedGZIPBasename,
 					}),
 				},
 				excludedFilename: {
@@ -552,11 +635,25 @@ scanner:
 						name: normalBasename,
 					}),
 				},
+				normalGZIPFilename: {
+					Filename: normalGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[normalGZIPFilename],
+						name: normalGZIPBasename,
+					}),
+				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[undersizedFilename],
 						name: undersizedBasename,
+					}),
+				},
+				undersizedGZIPFilename: {
+					Filename: undersizedGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[undersizedGZIPFilename],
+						name: undersizedGZIPBasename,
 					}),
 				},
 				excludedFilename: {
@@ -595,11 +692,39 @@ scanner:
 						name: normalBasename,
 					}),
 				},
+				normalGZIPFilename: {
+					Filename: normalGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[normalGZIPFilename],
+						name: normalGZIPBasename,
+					}),
+				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[undersizedFilename],
 						name: undersizedBasename,
+					}),
+				},
+				normalGZIPFilename: {
+					Filename: normalGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[normalGZIPFilename],
+						name: normalGZIPBasename,
+					}),
+				},
+				undersizedFilename: {
+					Filename: undersizedFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[undersizedFilename],
+						name: undersizedBasename,
+					}),
+				},
+				undersizedGZIPFilename: {
+					Filename: undersizedGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[undersizedGZIPFilename],
+						name: undersizedGZIPBasename,
 					}),
 				},
 				travelerSymlinkFilename: {
@@ -615,6 +740,7 @@ scanner:
 			name: "returns no symlink if the original file is excluded",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   exclude_files: ['.*exclude.*', '.*traveler.*']
   symlinks: true
 `,
@@ -626,11 +752,25 @@ scanner:
 						name: normalBasename,
 					}),
 				},
+				normalGZIPFilename: {
+					Filename: normalGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[normalGZIPFilename],
+						name: normalGZIPBasename,
+					}),
+				},
 				undersizedFilename: {
 					Filename: undersizedFilename,
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[undersizedFilename],
 						name: undersizedBasename,
+					}),
+				},
+				undersizedGZIPFilename: {
+					Filename: undersizedGZIPFilename,
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[undersizedGZIPFilename],
+						name: undersizedGZIPBasename,
 					}),
 				},
 			},
@@ -661,6 +801,7 @@ scanner:
 			name: "returns no included symlink if the original file is not included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*']
   symlinks: true
 `,
@@ -678,6 +819,7 @@ scanner:
 			name: "returns an included symlink if the original file is included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*', '.*traveler.*']
   symlinks: true
 `,
@@ -699,7 +841,8 @@ scanner:
 			},
 		},
 		{
-			name: "returns all files except too small to fingerprint",
+			name:        "returns all files except too small to fingerprint",
+			compression: CompressionAuto,
 			cfgStr: `
 scanner:
   symlinks: true
@@ -716,6 +859,14 @@ scanner:
 					Info: file.ExtendFileInfo(&testFileInfo{
 						size: sizes[normalFilename],
 						name: normalBasename,
+					}),
+				},
+				normalGZIPFilename: {
+					Filename:    normalGZIPFilename,
+					Fingerprint: "af1ee623faf25c42385da9f1bc222a3ccfd6722d6d6bcdc78538215d479b7ac7",
+					Info: file.ExtendFileInfo(&testFileInfo{
+						size: sizes[normalGZIPFilename],
+						name: normalGZIPBasename,
 					}),
 				},
 				excludedFilename: {
@@ -795,7 +946,8 @@ scanner:
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			s := createScannerWithConfig(t, paths, tc.cfgStr)
+			logger := logptest.NewTestingLogger(t, "")
+			s := createScannerWithConfig(t, logger, paths, tc.cfgStr, tc.compression)
 			requireEqualFiles(t, tc.expDesc, s.GetFiles())
 		})
 	}
@@ -808,36 +960,136 @@ scanner:
     offset: 0
     length: 1024
 `
-		logp.DevelopmentSetup(logp.ToObserverOutput())
+		logger, buffer := logp.NewInMemoryLocal("test-logger", zapcore.EncoderConfig{})
 
-		// this file is 128 bytes long
-		paths := []string{filepath.Join(dir, undersizedBasename)}
-		s := createScannerWithConfig(t, paths, cfgStr)
+		// the glob for the very small files
+		paths := []string{filepath.Join(dir, undersizedGlob)}
+		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
 		files := s.GetFiles()
 		require.Empty(t, files)
-		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
-		require.Empty(t, logs, "there must be no warning logs for files too small")
+		files = s.GetFiles()
+		require.Empty(t, files)
+		files = s.GetFiles()
+		require.Empty(t, files)
+
+		logs := parseLogs(buffer.String())
+		require.NotEmpty(t, logs, "fileScanner.GetFiles must log messages")
+
+		// For each file that is too small to be ingested, s.GetFiles must log
+		// a summary warning (only once) and then an individual debug message per file
+		singleFileFormat := "cannot start ingesting from file %[1]q: filesize of %[1]q is 42 bytes"
+		expectedLogs := []struct {
+			level string
+			msg   string
+			count int
+		}{
+			{"warn", "ingestion from some files will be delayed", 1},
+			{"debug", fmt.Sprintf(singleFileFormat, undersized1Filename), 3},
+			{"debug", fmt.Sprintf(singleFileFormat, undersized2Filename), 3},
+			{"debug", fmt.Sprintf(singleFileFormat, undersized3Filename), 3},
+		}
+
+		for _, el := range expectedLogs {
+			found := 0
+			for _, log := range logs[1:] {
+				if !strings.HasPrefix(log.message, el.msg) {
+					continue
+				}
+				found++
+				assert.Equalf(t, el.level, log.level, "log level for %q does not match", el.msg)
+			}
+
+			assert.Equalf(t, el.count, found, "the amount of log lines %q does not match", el.msg)
+		}
 	})
 
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
-		cfgStr := `
-scanner:
-  fingerprint:
-    enabled: true
-    offset: 0
-    length: 1
-`
-		cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
-		require.NoError(t, err)
-
-		ns := &conf.Namespace{}
-		err = ns.Unpack(cfg)
-		require.NoError(t, err)
-
-		_, err = newFileWatcher(paths, ns)
+		cfg := fileWatcherConfig{
+			Scanner: fileScannerConfig{
+				Fingerprint: fingerprintConfig{
+					Enabled: true,
+					Offset:  0,
+					Length:  1,
+				},
+			}}
+		_, err = newFileWatcher(
+			logptest.NewTestingLogger(t, ""),
+			paths,
+			cfg,
+			CompressionNone,
+			false,
+			mustPathIdentifier(false),
+			mustSourceIdentifier("foo-id"),
+		)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
+
+	t.Run("empty regular files are silently excluded", func(t *testing.T) {
+		dir := t.TempDir()
+		empty := filepath.Join(dir, "empty.log")
+		err := os.WriteFile(empty, nil, 0644)
+		require.NoError(t, err)
+
+		nonEmpty := filepath.Join(dir, "nonempty.log")
+		err = os.WriteFile(nonEmpty, []byte("hello"), 0644)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    false,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		files := s.GetFiles()
+		assert.Len(t, files, 1, "empty.log must be excluded")
+		assert.Contains(t, files, nonEmpty, "nonempty.log should be included")
+		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
+	})
+
+	t.Run("symlinks to empty files are silently excluded", func(t *testing.T) {
+		dir := t.TempDir()
+		emptyTarget := filepath.Join(dir, "empty_target.txt")
+		err := os.WriteFile(emptyTarget, nil, 0644)
+		require.NoError(t, err)
+
+		emptyLink := filepath.Join(dir, "empty_link.log")
+		err = os.Symlink(emptyTarget, emptyLink)
+		require.NoError(t, err)
+
+		nonEmptyTarget := filepath.Join(dir, "nonempty_target.txt")
+		err = os.WriteFile(nonEmptyTarget, []byte("content"), 0644)
+		require.NoError(t, err)
+
+		nonEmptyLink := filepath.Join(dir, "nonempty_link.log")
+		err = os.Symlink(nonEmptyTarget, nonEmptyLink)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    true,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		files := s.GetFiles()
+		assert.Len(t, files, 1, "empty_link.log must be excluded")
+		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
+		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
+	})
+}
+
+func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
+	si, err := loginp.NewSourceIdentifier("filestream", inputID)
+	if err != nil {
+		// this will never happen
+		panic(err)
+	}
+
+	return si
 }
 
 const benchmarkFileCount = 1000
@@ -858,7 +1110,7 @@ func BenchmarkGetFiles(b *testing.B) {
 			Enabled: false,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -885,7 +1137,8 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 			Length:  1024,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+
+	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -894,21 +1147,33 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSWatcher {
+func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
+	tmpCfg := struct {
+		Scaner fileWatcherConfig `config:"scanner"`
+	}{
+		Scaner: defaultFileWatcherConfig(),
+	}
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
-	ns := &conf.Namespace{}
-	err = ns.Unpack(cfg)
-	require.NoError(t, err)
+	err = cfg.Unpack(&tmpCfg)
+	require.NoError(t, err, "cannot unpack file watcher config")
 
-	fw, err := newFileWatcher(paths, ns)
+	fw, err := newFileWatcher(
+		logger,
+		paths,
+		tmpCfg.Scaner,
+		CompressionNone,
+		false,
+		mustPathIdentifier(false),
+		mustSourceIdentifier("foo-id"),
+	)
 	require.NoError(t, err)
 
 	return fw
 }
 
-func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp.FSScanner {
+func createScannerWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string, compression string) loginp.FSScanner {
 	cfg, err := conf.NewConfigWithYAML([]byte(cfgStr), cfgStr)
 	require.NoError(t, err)
 
@@ -919,7 +1184,7 @@ func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 	config := defaultFileWatcherConfig()
 	err = ns.Config().Unpack(&config)
 	require.NoError(t, err)
-	scanner, err := newFileScanner(paths, config.Scanner)
+	scanner, err := newFileScanner(logger, paths, config.Scanner, compression)
 	require.NoError(t, err)
 
 	return scanner
@@ -927,7 +1192,7 @@ func createScannerWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 
 func requireEqualFiles(t *testing.T, expected, actual map[string]loginp.FileDescriptor) {
 	t.Helper()
-	require.Equalf(t, len(expected), len(actual), "amount of files does not match:\n\nexpected \n%v\n\n actual \n%v\n", filenames(expected), filenames(actual))
+	require.Lenf(t, actual, len(expected), "amount of files does not match:\n\nexpected \n%v\n\n actual \n%v\n", filenames(expected), filenames(actual))
 
 	for expFilename, expFD := range expected {
 		actFD, exists := actual[expFilename]
@@ -941,6 +1206,7 @@ func requireEqualEvents(t *testing.T, expected, actual loginp.FSEvent) {
 	require.Equal(t, expected.NewPath, actual.NewPath, "NewPath")
 	require.Equal(t, expected.OldPath, actual.OldPath, "OldPath")
 	require.Equal(t, expected.Op, actual.Op, "Op")
+	require.Equal(t, expected.SrcID, actual.SrcID, "SrcID")
 	requireEqualDescriptors(t, expected.Descriptor, actual.Descriptor)
 }
 
@@ -959,6 +1225,78 @@ func filenames(m map[string]loginp.FileDescriptor) (result string) {
 	return result
 }
 
+func TestGetIngestTarget(t *testing.T) {
+	t.Run("empty regular file", func(t *testing.T) {
+		dir := t.TempDir()
+
+		filename := filepath.Join(dir, "empty.log")
+		err := os.WriteFile(filename, nil, 0644)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    false,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		_, err = s.getIngestTarget(filename)
+		require.ErrorIs(t, err, errFileEmpty)
+	})
+
+	t.Run("symlink to an empty file", func(t *testing.T) {
+		dir := t.TempDir()
+		target := filepath.Join(dir, "empty_target.txt")
+		err := os.WriteFile(target, nil, 0644)
+		require.NoError(t, err)
+
+		link := filepath.Join(dir, "link.log")
+		err = os.Symlink(target, link)
+		require.NoError(t, err)
+
+		cfg := fileScannerConfig{
+			Symlinks:    true,
+			Fingerprint: fingerprintConfig{Enabled: false},
+		}
+		s, err := newFileScanner(logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+		require.NoError(t, err)
+
+		_, err = s.getIngestTarget(link)
+		require.ErrorIs(t, err, errFileEmpty)
+	})
+}
+
+func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "small.log")
+
+	fingerprintLength := int64(1024)
+
+	err := os.WriteFile(filename, []byte("a small file"), 0644)
+	require.NoError(t, err, "failed to create test file")
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  fingerprintLength,
+		},
+	}
+
+	s, err := newFileScanner(logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
+	require.NoError(t, err, "failed to create scanner")
+	it, err := s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget should succeed")
+
+	// Remove read permissions - if file is opened, we'll get permission denied
+	err = os.Chmod(filename, 0000)
+	require.NoError(t, err, "failed to chmod test file")
+
+	_, err = s.toFileDescriptor(&it)
+	require.ErrorIs(t, err, errFileTooSmall,
+		"expected errFileTooSmall, it probably tried to open the file")
+}
+
 func BenchmarkToFileDescriptor(b *testing.B) {
 	dir := b.TempDir()
 	basename := "created.log"
@@ -974,7 +1312,8 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 			Length:  1024,
 		},
 	}
-	s, err := newFileScanner(paths, cfg)
+
+	s, err := newFileScanner(logp.NewNopLogger(), paths, cfg, CompressionNone)
 	require.NoError(b, err)
 
 	it, err := s.getIngestTarget(filename)
@@ -985,4 +1324,38 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 		require.NoError(b, err)
 		require.Equal(b, "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a", fd.Fingerprint)
 	}
+}
+
+type logEntry struct {
+	timestamp string
+	level     string
+	message   string
+}
+
+// parseLogs parsers the logs in buff and returns them as a slice of logEntry.
+// It is meant to be used with `logp.NewInMemoryLocal` where buff is the
+// contents of the buffer returned by `logp.NewInMemoryLocal`.
+// Log entries are expected to be separated by a new line and each log entry
+// is expected to have 3 fields separated by a tab "\t": timestamp, level
+// and message.
+func parseLogs(buff string) []logEntry {
+	var logEntries []logEntry
+
+	for l := range strings.SplitSeq(buff, "\n") {
+		if l == "" {
+			continue
+		}
+
+		split := strings.Split(l, "\t")
+		if len(split) != 3 {
+			continue
+		}
+		logEntries = append(logEntries, logEntry{
+			timestamp: split[0],
+			level:     split[1],
+			message:   split[2],
+		})
+	}
+
+	return logEntries
 }

@@ -27,6 +27,7 @@ const (
 	ServiceDataproc       = "dataproc"
 	ServiceCloudSQL       = "cloudsql"
 	ServiceRedis          = "redis"
+	ServiceAIPlatform     = "aiplatform"
 )
 
 // Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
@@ -82,13 +83,14 @@ const (
 
 // NOTE: if you are adding labels make sure to update tests in metrics/metrics_requester_test.go.
 const (
-	DefaultResourceLabel  = "resource.label.zone"
-	ComputeResourceLabel  = "resource.labels.zone"
-	GKEResourceLabel      = "resource.label.location"
-	StorageResourceLabel  = "resource.label.location"
-	CloudSQLResourceLabel = "resource.labels.region"
-	DataprocResourceLabel = "resource.label.region"
-	RedisResourceLabel    = "resource.label.region"
+	DefaultResourceLabel    = "resource.label.zone"
+	ComputeResourceLabel    = "resource.labels.zone"
+	GKEResourceLabel        = "resource.label.location"
+	StorageResourceLabel    = "resource.label.location"
+	CloudSQLResourceLabel   = "resource.labels.region"
+	DataprocResourceLabel   = "resource.label.region"
+	RedisResourceLabel      = "resource.label.region"
+	AIPlatformResourceLabel = "resource.label.location"
 )
 
 // AlignersMapToGCP map contains available perSeriesAligner

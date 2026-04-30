@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -359,6 +360,10 @@ func CrossBuild() error {
 
 // Build builds the base container used by the docker plugin
 func Build() {
+	if !filterPlatformsForNativeArch() {
+		fmt.Println(">> build: skipping because no supported platform is enabled")
+		return
+	}
 	mg.SerialDeps(CrossBuild, BuildContainer)
 }
 
@@ -374,10 +379,13 @@ func GolangCrossBuild() error {
 
 // Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
+	if devtools.FIPSBuild && !slices.Contains(devtools.FIPSConfig.Beats, "dockerlogbeat") {
+		return
+	}
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	if !isSupportedPlatform() {
+	if !filterPlatformsForNativeArch() {
 		fmt.Println(">> package: skipping because no supported platform is enabled")
 		return
 	}
@@ -393,7 +401,9 @@ func Ironbank() error {
 	return nil
 }
 
-func isSupportedPlatform() bool {
+// filterPlatformsForNativeArch removes cross-architecture platforms that
+// can't be built on the current host, and reports whether any remain.
+func filterPlatformsForNativeArch() bool {
 	_, isAMD64Selected := devtools.Platforms.Get("linux/amd64")
 	_, isARM64Selected := devtools.Platforms.Get("linux/arm64")
 	arch := runtime.GOARCH

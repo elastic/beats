@@ -21,10 +21,10 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -198,7 +198,7 @@ func (s *indexSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, erro
 		Case:             outil.SelectorLowerCase,
 	}
 
-	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
+	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings, s.log)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, 
 	}
 
 	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
-		return false, "Loading template with ILM settings whithout loading ILM " +
+		return false, "Loading template with ILM settings without loading ILM " +
 			"policy can lead to issues and is not recommended. " +
 			"Check your configuration."
 	}
@@ -314,7 +314,7 @@ func (m *indexManager) setupWithILM() (bool, error) {
 		}
 		if withILM {
 			// mark ILM as enabled in indexState
-			m.support.st.withILM.CAS(false, true)
+			m.support.st.withILM.CompareAndSwap(false, true)
 		}
 	}
 	return withILM, nil

@@ -18,6 +18,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/gofrs/uuid/v5"
@@ -33,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -43,10 +45,13 @@ const (
 	defaultGroupsQuery  = "displayName,members"
 	defaultUsersQuery   = "accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
 	defaultDevicesQuery = "accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
+	expandName          = "$expand"
 
 	apiGroupType  = "#microsoft.graph.group"
 	apiUserType   = "#microsoft.graph.user"
 	apiDeviceType = "#microsoft.graph.device"
+
+	mfaDetailsPath = "/reports/authenticationMethods/userRegistrationDetails"
 )
 
 // apiUserResponse matches the format of a user response from the Graph API.
@@ -68,6 +73,28 @@ type apiDeviceResponse struct {
 	NextLink  string      `json:"@odata.nextLink"`
 	DeltaLink string      `json:"@odata.deltaLink"`
 	Devices   []deviceAPI `json:"value"`
+}
+
+// apiMFAResponse matches the format of a userRegistrationDetails response from the Graph API.
+type apiMFAResponse struct {
+	NextLink string       `json:"@odata.nextLink"`
+	Details  []mfaDetails `json:"value"`
+}
+
+// mfaDetails matches the format of a single userRegistrationDetails entry from the API.
+type mfaDetails struct {
+	ID                                            string   `json:"id"`
+	IsMFACapable                                  bool     `json:"isMfaCapable"`
+	IsMFARegistered                               bool     `json:"isMfaRegistered"`
+	IsPasswordlessCapable                         bool     `json:"isPasswordlessCapable"`
+	IsSsprCapable                                 bool     `json:"isSsprCapable"`
+	IsSsprEnabled                                 bool     `json:"isSsprEnabled"`
+	IsSsprRegistered                              bool     `json:"isSsprRegistered"`
+	IsSystemPreferredAuthenticationMethodEnabled  bool     `json:"isSystemPreferredAuthenticationMethodEnabled"`
+	MethodsRegistered                             []string `json:"methodsRegistered"`
+	SystemPreferredAuthenticationMethods          []string `json:"systemPreferredAuthenticationMethods"`
+	UserPreferredMethodForSecondaryAuthentication string   `json:"userPreferredMethodForSecondaryAuthentication"`
+	UserType                                      string   `json:"userType"`
 }
 
 // userAPI matches the format of user data from the API.
@@ -110,6 +137,7 @@ type removed struct {
 type graphConf struct {
 	APIEndpoint string    `config:"api_endpoint"`
 	Select      selection `config:"select"`
+	Expand      expansion `config:"expand"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
@@ -122,14 +150,46 @@ type tracerConfig struct {
 	lumberjack.Logger `config:",inline"`
 }
 
-func (t *tracerConfig) enabled() bool {
-	return t != nil && (t.Enabled == nil || *t.Enabled)
+// This is required due to circularity.
+const inputName = "azure-ad"
+
+func (c *tracerConfig) Validate() error {
+	if !c.enabled() {
+		return nil
+	}
+	if c.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
+	}
+	return nil
+}
+
+func (c *tracerConfig) enabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }
 
 type selection struct {
 	UserQuery   []string `config:"users"`
 	GroupQuery  []string `config:"groups"`
 	DeviceQuery []string `config:"devices"`
+}
+
+type expansion struct {
+	UserExpansion   map[string][]string `config:"users"`
+	GroupExpansion  map[string][]string `config:"groups"`
+	DeviceExpansion map[string][]string `config:"devices"`
 }
 
 // graph implements the fetcher.Fetcher interface.
@@ -143,6 +203,7 @@ type graph struct {
 	groupsURL          string
 	devicesURL         string
 	deviceOwnerUserURL string
+	mfaDetailsURL      string
 }
 
 // SetLogger sets the logger on this fetcher.
@@ -318,6 +379,60 @@ func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ s
 	}
 }
 
+// UserMFADetails retrieves MFA registration details for all users from Azure
+// Active Directory using Microsoft's Graph API. Returns a map from user UUID
+// to MFARegistrationDetails, or an error if a failure occurred.
+func (f *graph) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFARegistrationDetails, error) {
+	result := make(map[uuid.UUID]*fetcher.MFARegistrationDetails)
+	fetchURL := f.mfaDetailsURL
+
+	for {
+		var response apiMFAResponse
+
+		body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch MFA registration details: %w", err)
+		}
+
+		dec := json.NewDecoder(body)
+		if err = dec.Decode(&response); err != nil {
+			_ = body.Close()
+			return nil, fmt.Errorf("unable to decode MFA registration details response: %w", err)
+		}
+		_ = body.Close()
+
+		for _, d := range response.Details {
+			id, err := uuid.FromString(d.ID)
+			if err != nil {
+				f.logger.Warnf("Skipping MFA entry with invalid user ID %q: %v", d.ID, err)
+				continue
+			}
+			result[id] = &fetcher.MFARegistrationDetails{
+				IsMFACapable:          d.IsMFACapable,
+				IsMFARegistered:       d.IsMFARegistered,
+				IsPasswordlessCapable: d.IsPasswordlessCapable,
+				IsSsprCapable:         d.IsSsprCapable,
+				IsSsprEnabled:         d.IsSsprEnabled,
+				IsSsprRegistered:      d.IsSsprRegistered,
+				IsSystemPreferredAuthenticationMethodEnabled: d.IsSystemPreferredAuthenticationMethodEnabled,
+				MethodsRegistered:                             d.MethodsRegistered,
+				SystemPreferredAuthenticationMethods:          d.SystemPreferredAuthenticationMethods,
+				UserPreferredMethodForSecondaryAuthentication: d.UserPreferredMethodForSecondaryAuthentication,
+				UserType: d.UserType,
+			}
+			f.logger.Debugf("Got MFA registration details for user %q from API", id)
+		}
+
+		if response.NextLink == "" {
+			return result, nil
+		}
+		if response.NextLink == fetchURL {
+			return result, nextLinkLoopError{"mfa_registration_details"}
+		}
+		fetchURL = response.NextLink
+	}
+}
+
 // doRequest is a convenience function for making HTTP requests to the Graph API.
 // It will automatically handle requesting a token using the authenticator attached
 // to this fetcher.
@@ -355,12 +470,20 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
 	}
 
-	if c.Tracer != nil {
+	if c.Tracer.enabled() {
 		id = sanitizeFileName(id)
-		c.Tracer.Filename = strings.ReplaceAll(c.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		c.Tracer.Filename = resolved
 	}
 
-	client, err := c.Transport.Client()
+	client, err := c.Transport.Client(httpcommon.WithLogger(logger))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create HTTP client: %w", err)
 	}
@@ -380,21 +503,30 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	if err != nil {
 		return nil, fmt.Errorf("invalid groups URL endpoint: %w", err)
 	}
-	groupsURL.RawQuery = formatQuery(queryName, c.Select.GroupQuery, defaultGroupsQuery)
+	groupsURL.RawQuery, err = formatQuery(queryName, c.Select.GroupQuery, defaultGroupsQuery, c.Expand.GroupExpansion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to format group query: %w", err)
+	}
 	f.groupsURL = groupsURL.String()
 
 	usersURL, err := url.Parse(f.conf.APIEndpoint + "/users/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid users URL endpoint: %w", err)
 	}
-	usersURL.RawQuery = formatQuery(queryName, c.Select.UserQuery, defaultUsersQuery)
+	usersURL.RawQuery, err = formatQuery(queryName, c.Select.UserQuery, defaultUsersQuery, c.Expand.UserExpansion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to format user query: %w", err)
+	}
 	f.usersURL = usersURL.String()
 
 	devicesURL, err := url.Parse(f.conf.APIEndpoint + "/devices/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid devices URL endpoint: %w", err)
 	}
-	devicesURL.RawQuery = formatQuery(queryName, c.Select.DeviceQuery, defaultDevicesQuery)
+	devicesURL.RawQuery, err = formatQuery(queryName, c.Select.DeviceQuery, defaultDevicesQuery, c.Expand.DeviceExpansion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to format device query: %w", err)
+	}
 	f.devicesURL = devicesURL.String()
 
 	// The API takes a departure from the query approach here, so we
@@ -405,6 +537,12 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		return nil, fmt.Errorf("invalid device owner/user URL endpoint: %w", err)
 	}
 	f.deviceOwnerUserURL = ownerUserURL.String()
+
+	mfaDetailsURL, err := url.Parse(f.conf.APIEndpoint + mfaDetailsPath)
+	if err != nil {
+		return nil, fmt.Errorf("invalid MFA details URL endpoint: %w", err)
+	}
+	f.mfaDetailsURL = mfaDetailsURL.String()
 
 	return &f, nil
 }
@@ -455,9 +593,8 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	)
 	traceLogger := zap.New(core)
 
-	const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-	maxSize := max(1, cfg.Tracer.MaxSize) * 1e6
-	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, max(0, maxSize-margin), log)
+	maxBodyLen := max(1, cfg.Tracer.MaxSize) * 1e6 / 10 // 10% of file max
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
 }
 
@@ -471,12 +608,28 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func formatQuery(name string, query []string, dflt string) string {
+func formatQuery(name string, query []string, dflt string, expand map[string][]string) (string, error) {
 	q := dflt
 	if len(query) != 0 {
 		q = strings.Join(query, ",")
 	}
-	return url.Values{name: []string{q}}.Encode()
+	vals := url.Values{name: []string{q}}
+	if len(expand) != 0 {
+		exp := make([]string, 0, len(expand))
+		for k := range expand {
+			exp = append(exp, k)
+		}
+		sort.Strings(exp)
+		for i, k := range exp {
+			v, err := formatQuery(name, expand[k], q, nil)
+			if err != nil {
+				return "", err
+			}
+			exp[i] = fmt.Sprintf("%s(%s)", k, v)
+		}
+		vals.Add(expandName, strings.Join(exp, ","))
+	}
+	return url.QueryUnescape(vals.Encode())
 }
 
 // newUserFromAPI translates an API-representation of a user to a fetcher.User.

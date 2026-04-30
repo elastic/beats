@@ -1,0 +1,42 @@
+- name: component_template
+  type: group
+  release: beta
+  description: >
+    component template information from the cluster
+  fields:
+    - name: index
+      type: keyword
+      description: >
+        index name
+    - name: managed
+      type: boolean
+      description: >
+        indicate whether this index is ilm managed
+    - name: policy
+      type: keyword
+      description: >
+        policy name
+    - name: lifecycle_date_millis
+      type: long
+      description: >
+        lifecycle date in epoch millis
+    - name: lifecycle_date
+      type: date
+      description: >
+        lifecycle date
+    - name: phase
+      type: keyword
+      description: >
+        phase stage
+    - name: phase_time_millis
+      type: long
+      description: >
+        phase time in millis
+    - name: phase_time
+      type: date
+      description: >
+        phase time
+    - name: action
+      type: keyword
+      description: >
+        action name

@@ -467,6 +467,9 @@ output.elasticsearch:
   pipeline: my_pipeline_id
 ------------------------------------------------------------------------------
 
+IMPORTANT: The `pipeline` is always lowercased. If `pipeline: Foo-Bar`, then
+the pipeline name in {es} needs to be defined as `foo-bar`.
+
 For more information, see <<configuring-ingest-node>>.
 
 ifndef::apm-server[]
@@ -680,6 +683,8 @@ Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
 
+
+[[backoff-init-option]]
 ===== `backoff.init`
 
 The number of seconds to wait before trying to reconnect to Elasticsearch after
@@ -689,6 +694,7 @@ to `backoff.max`. After a successful connection, the backoff timer is reset. The
 default is `1s`.
 
 
+[[backoff-max-option]]
 ===== `backoff.max`
 
 The maximum number of seconds to wait before attempting to connect to
@@ -728,6 +734,13 @@ Configuration options for Kerberos authentication.
 
 See <<configuration-kerberos>> for more information.
 
+===== `queue`
+
+Configuration options for internal queue.
+
+See <<configuring-internal-queue>> for more information.
+
+Note:`queue` options can be set under +{beatname_lc}.yml+ or the `output` section but not both.
 ===== `non_indexable_policy`
 
 Specifies the behavior when the elasticsearch cluster explicitly rejects documents, for example on mapping conflicts.
@@ -774,7 +787,7 @@ output.elasticsearch:
   preset: balanced
 ------------------------------------------------------------------------------
 
-Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. Valid options are:
+Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. If a preset doesn't set a value for a particular field, the user-specified value will be used if present, otherwise the default. Valid options are:
 * `balanced`: good starting point for general efficiency
 * `throughput`: good for high data volumes, may increase cpu and memory requirements
 * `scale`: reduces ambient resource use in large low-throughput deployments
@@ -830,6 +843,18 @@ Presets represent current recommendations based on the intended goal; their effe
 |`15s`
 |`1s`
 |`60s`
+
+|<<backoff-init-option,`backoff.init`>>
+|none
+|none
+|`5s`
+|none
+
+|<<backoff-max-option,`backoff.max`>>
+|none
+|none
+|`300s`
+|none
 |===
 
 [[es-apis]]

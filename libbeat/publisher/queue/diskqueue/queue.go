@@ -21,9 +21,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // The string used to specify this queue in beats configurations.
@@ -35,6 +38,7 @@ type diskQueue struct {
 	logger   *logp.Logger
 	observer queue.Observer
 	settings Settings
+	paths    *paths.Path
 
 	// Metadata related to the segment files.
 	segments diskQueueSegments
@@ -86,19 +90,22 @@ type diskQueue struct {
 	// The channel to report that shutdown is finished, used by
 	// (*diskQueue).Done.
 	done chan struct{}
+
+	// Ensure we only close the close channel once, even when Close is called multiple times.
+	closeOnce sync.Once
 }
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
 // Settings object can be wrapped in a queue-agnostic interface for
 // later use by the pipeline.
-func FactoryForSettings(settings Settings) queue.QueueFactory {
+func FactoryForSettings(settings Settings, paths *paths.Path) queue.QueueFactory[publisher.Event] {
 	return func(
 		logger *logp.Logger,
 		observer queue.Observer,
 		inputQueueSize int,
-		encoderFactory queue.EncoderFactory,
-	) (queue.Queue, error) {
-		return NewQueue(logger, observer, settings, encoderFactory)
+		encoderFactory queue.EncoderFactory[publisher.Event],
+	) (queue.Queue[publisher.Event], error) {
+		return NewQueue(logger, observer, settings, encoderFactory, paths)
 	}
 }
 
@@ -108,11 +115,15 @@ func NewQueue(
 	logger *logp.Logger,
 	observer queue.Observer,
 	settings Settings,
-	encoderFactory queue.EncoderFactory,
+	encoderFactory queue.EncoderFactory[publisher.Event],
+	paths *paths.Path,
 ) (*diskQueue, error) {
+	if paths == nil {
+		return nil, errors.New("got nil paths")
+	}
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
-		"Initializing disk queue at path %v", settings.directoryPath())
+		"Initializing disk queue at path %v", settings.directoryPath(paths))
 	if observer == nil {
 		observer = queue.NewQueueObserver(nil)
 	}
@@ -124,16 +135,16 @@ func NewQueue(
 				"twice the segment size (%v)",
 			settings.MaxBufferSize, settings.MaxSegmentSize)
 	}
-	observer.MaxBytes(int(settings.MaxBufferSize))
+	observer.MaxBytes(int(settings.MaxBufferSize)) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 
 	// Create the given directory path if it doesn't exist.
-	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
+	err := os.MkdirAll(settings.directoryPath(paths), os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create disk queue directory: %w", err)
 	}
 
 	// Load the previous queue position, if any.
-	nextReadPosition, err := queuePositionFromPath(settings.stateFilePath())
+	nextReadPosition, err := queuePositionFromPath(settings.stateFilePath(paths))
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		// Errors reading / writing the position are non-fatal -- we just log a
 		// warning and fall back on the oldest existing segment, if any.
@@ -149,7 +160,7 @@ func NewQueue(
 		nextReadPosition.byteIndex = 0
 	}
 	positionFile, err := os.OpenFile(
-		settings.stateFilePath(), os.O_WRONLY|os.O_CREATE, 0600)
+		settings.stateFilePath(paths), os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		// This is not the _worst_ error: we could try operating even without a
 		// position file. But it indicates a problem with the queue permissions on
@@ -162,7 +173,7 @@ func NewQueue(
 
 	// Index any existing data segments to be placed in segments.reading.
 	initialSegments, err :=
-		scanExistingSegments(logger, settings.directoryPath())
+		scanExistingSegments(logger, settings.directoryPath(paths))
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +189,7 @@ func NewQueue(
 	for _, segment := range initialSegments {
 		initialEventCount += int(segment.frameCount)
 		// Event metrics for the queue observer don't include segment headser size
-		initialByteCount += int(segment.byteCount - segment.headerSize())
+		initialByteCount += int(segment.byteCount - segment.headerSize()) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	}
 	observer.Restore(initialEventCount, initialByteCount)
 
@@ -203,10 +214,10 @@ func NewQueue(
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
 	}
-	activeFrameCount -= int(nextReadPosition.frameIndex)
+	activeFrameCount -= int(nextReadPosition.frameIndex) //nolint:gosec // G115 Conversion from uint64 to int is safe here.
 	logger.Infof("Found %v queued events consuming %v bytes, %v events still pending", initialEventCount, initialByteCount, activeFrameCount)
 
-	var encoder queue.Encoder
+	var encoder queue.Encoder[publisher.Event]
 	if encoderFactory != nil {
 		encoder = encoderFactory()
 	}
@@ -215,6 +226,7 @@ func NewQueue(
 		logger:   logger,
 		observer: observer,
 		settings: settings,
+		paths:    paths,
 
 		segments: diskQueueSegments{
 			reading:          initialSegments,
@@ -225,9 +237,9 @@ func NewQueue(
 
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
-		readerLoop:  newReaderLoop(settings, encoder),
-		writerLoop:  newWriterLoop(logger, settings),
-		deleterLoop: newDeleterLoop(settings),
+		readerLoop:  newReaderLoop(settings, encoder, paths),
+		writerLoop:  newWriterLoop(logger, settings, paths),
+		deleterLoop: newDeleterLoop(settings, paths),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
 
@@ -248,10 +260,14 @@ func NewQueue(
 // diskQueue implementation of the queue.Queue interface
 //
 
-func (dq *diskQueue) Close() error {
+func (dq *diskQueue) Close(_ bool) error {
 	// Closing the done channel signals to the core loop that it should
 	// shut down the other helper goroutines and wrap everything up.
-	close(dq.close)
+	dq.closeOnce.Do(
+		func() {
+			close(dq.close)
+		},
+	)
 
 	return nil
 }
@@ -268,7 +284,7 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{MaxEvents: 0}
 }
 
-func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer[publisher.Event] {
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,

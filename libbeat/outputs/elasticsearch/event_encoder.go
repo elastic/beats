@@ -55,6 +55,10 @@ type encodedEvent struct {
 	// there's an ingestion error.
 	timestamp time.Time
 
+	// The meta fields from the original event (which aren't included in the
+	// encoding but may still need to be logged if there is an error).
+	meta mapstr.M
+
 	id       string
 	opType   events.OpType
 	pipeline string
@@ -66,8 +70,8 @@ func newEventEncoderFactory(
 	escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
-) queue.EncoderFactory {
-	return func() queue.Encoder {
+) queue.EncoderFactory[publisher.Event] {
+	return func() queue.Encoder[publisher.Event] {
 		return newEventEncoder(escapeHTML, indexSelector, pipelineSelector)
 	}
 }
@@ -75,7 +79,7 @@ func newEventEncoderFactory(
 func newEventEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
-) queue.Encoder {
+) queue.Encoder[publisher.Event] {
 	buf := bytes.NewBuffer(nil)
 	enc := eslegclient.NewJSONEncoder(buf, escapeHTML)
 	return &eventEncoder{
@@ -86,13 +90,7 @@ func newEventEncoder(escapeHTML bool,
 	}
 }
 
-func (pe *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
-	e, ok := entry.(publisher.Event)
-	if !ok {
-		// Currently all queue entries are publisher.Events but let's be cautious.
-		return entry, 0
-	}
-
+func (pe *eventEncoder) EncodeEntry(e publisher.Event) (publisher.Event, int) {
 	encodedEvent := pe.encodeRawEvent(&e.Content)
 	e.EncodedEvent = encodedEvent
 	e.Content = beat.Event{}
@@ -130,6 +128,7 @@ func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 	copy(bytes, bufBytes)
 	return &encodedEvent{
 		id:        id,
+		meta:      e.Meta,
 		timestamp: e.Timestamp,
 		opType:    opType,
 		pipeline:  pipeline,
@@ -152,9 +151,14 @@ func (e *encodedEvent) setDeadLetter(
 	e.encoding = []byte(deadLetterReencoding.String())
 }
 
-// String converts e.encoding to string and returns it.
+// String converts e.encoding (and meta fields if present)
+// to string and returns it.
 // The goal of this method is to provide an easy way to log
 // the event encoded.
 func (e *encodedEvent) String() string {
-	return string(e.encoding)
+	metaString := "none"
+	if e.meta != nil {
+		metaString = e.meta.String()
+	}
+	return string(e.encoding) + ", Meta: " + metaString
 }

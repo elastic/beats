@@ -48,13 +48,13 @@ func TestSchema(t *testing.T) {
 	}
 
 	event, _ := schema.Apply(source)
-	assert.Equal(t, event, mapstr.M{
+	assert.Equal(t, mapstr.M{
 		"test": "hello",
 		"test_obj": mapstr.M{
 			"test_a": "helloA",
 			"test_b": "helloB",
 		},
-	})
+	}, event)
 }
 
 func TestHasKey(t *testing.T) {
@@ -82,8 +82,8 @@ func test(key string, opts ...SchemaOption) Conv {
 
 func TestOptions(t *testing.T) {
 	conv := test("test", Optional)
-	assert.Equal(t, conv.Key, "test")
-	assert.Equal(t, conv.Optional, true)
+	assert.Equal(t, "test", conv.Key)
+	assert.True(t, conv.Optional)
 }
 
 func TestSchemaCases(t *testing.T) {
@@ -160,7 +160,7 @@ func TestSchemaCases(t *testing.T) {
 			if errs != nil {
 				errorMessage := errs.Error()
 				if tc.expectedErrorMessage == "" {
-					t.Errorf("unexpected error ocurred: %s", errorMessage)
+					t.Errorf("unexpected error occurred: %s", errorMessage)
 				}
 				assert.Contains(t, errorMessage, tc.expectedErrorMessage)
 			} else if tc.expectedErrorMessage != "" {

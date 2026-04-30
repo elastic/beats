@@ -18,7 +18,7 @@
 package dev_tools
 
 // This file contains tests that can be run on the generated packages.
-// To run these tests use `go test package_test.go`.
+// To run these tests from this directory use `go test ./dev-tools/packaging`.
 
 import (
 	"archive/tar"
@@ -26,28 +26,35 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
-	"encoding/json"
+	"context"
+	"debug/buildinfo"
+	"debug/elf"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 	"testing"
-
-	"errors"
+	"time"
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/docker/client"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
-	expectedConfigMode     = os.FileMode(0600)
-	expectedManifestMode   = os.FileMode(0644)
+	expectedConfigMode     = os.FileMode(0o600)
+	expectedManifestMode   = os.FileMode(0o644)
 	expectedModuleFileMode = expectedManifestMode
-	expectedModuleDirMode  = os.FileMode(0755)
+	expectedModuleDirMode  = os.FileMode(0o755)
 )
 
 var (
@@ -59,8 +66,8 @@ var (
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
 	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
-
-	licenseFiles = []string{"LICENSE.txt", "NOTICE.txt"}
+	fipsPackagePattern     = regexp.MustCompile(`\w+-fips-\w+`)
+	licenseFiles           = []string{"LICENSE.txt", "NOTICE.txt"}
 )
 
 var (
@@ -84,15 +91,20 @@ func TestDeb(t *testing.T) {
 	debs := getFiles(t, regexp.MustCompile(`\.deb$`))
 	buf := new(bytes.Buffer)
 	for _, deb := range debs {
-		checkDeb(t, deb, buf)
+		fipsPackage := fipsPackagePattern.MatchString(deb)
+		checkDeb(t, deb, buf, fipsPackage)
 	}
 }
 
 func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar)
+	tars := getFiles(t, regexp.MustCompile(`^-\w+\.tar\.gz$`))
+	for _, tarFile := range tars {
+		if strings.HasSuffix(tarFile, "docker.tar.gz") {
+			// We should skip the docker images archives , since those have their dedicated check
+			continue
+		}
+		fipsPackage := fipsPackagePattern.MatchString(tarFile)
+		checkTar(t, tarFile, fipsPackage)
 	}
 }
 
@@ -134,7 +146,7 @@ func checkRPM(t *testing.T, file string) {
 	ensureNoBuildIDLinks(t, p)
 }
 
-func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
+func checkDeb(t *testing.T, file string, buf *bytes.Buffer, fipsCheck bool) {
 	p, err := readDeb(file, buf)
 	if err != nil {
 		t.Error(err)
@@ -153,9 +165,30 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkModulesOwner(t, p, true)
 	checkModulesPermissions(t, p)
 	checkSystemdUnitPermissions(t, p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err, "Error extracting file %s", file)
+
+			require.FileExists(t, filepath.Join(extractDir, "debian-binary"))
+			require.FileExists(t, filepath.Join(extractDir, "control.tar.gz"))
+			dataTarFile := filepath.Join(extractDir, "data.tar.gz")
+			require.FileExists(t, dataTarFile)
+
+			dataExtractionDir := filepath.Join(extractDir, "data")
+			err = mage.Extract(dataTarFile, dataExtractionDir)
+			require.NoError(t, err, "Error extracting data tarball")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			// the expected location for the binary is under /usr/share/<beatName>/bin
+			containingDir := filepath.Join(dataExtractionDir, "usr", "share", beatName, "bin")
+			checkFIPS(t, beatName, containingDir)
+		})
+	}
 }
 
-func checkTar(t *testing.T, file string) {
+func checkTar(t *testing.T, file string, fipsCheck bool) {
 	p, err := readTar(file)
 	if err != nil {
 		t.Error(err)
@@ -170,6 +203,29 @@ func checkTar(t *testing.T, file string) {
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p, true)
 	checkLicensesPresent(t, "", p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err)
+			containingDir := strings.TrimSuffix(filepath.Base(file), ".tar.gz")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			checkFIPS(t, beatName, filepath.Join(extractDir, containingDir))
+		})
+	}
+}
+
+func extractBeatNameFromTarName(t *testing.T, fileName string) string {
+	// TODO check if cutting at the first '-' is an acceptable shortcut
+	t.Logf("Extracting beat name from filename %s", fileName)
+	const sep = "-"
+	beatName, _, found := strings.Cut(fileName, sep)
+	if !found {
+		t.Logf("separator %s not found in filename %s: beatName may be incorrect", sep, fileName)
+	}
+
+	return beatName
 }
 
 func checkZip(t *testing.T, file string) {
@@ -229,20 +285,47 @@ func checkNpcapNotices(pkg, file string, contents io.Reader) error {
 }
 
 func checkDocker(t *testing.T, file string) {
-	p, info, err := readDocker(file)
+	imageType, err := detectDockerImageType(file)
 	if err != nil {
-		t.Errorf("error reading file %v: %v", file, err)
+		t.Errorf("error detecting docker image format for %v: %v", file, err)
+		return
+	}
+	t.Logf("docker image format: %s", imageType)
+
+	var p *packageFile
+	var info *dockerInfo
+	var daemonImageRef string
+	switch imageType {
+	case dockerImageTypeLegacy:
+		p, info, err = readDocker(file)
+		if err != nil {
+			t.Errorf("error reading file %v: %v", file, err)
+			return
+		}
+	case dockerImageTypeOCI:
+		p, info, err = readDockerOCI(file)
+		if err != nil && errors.Is(err, errDockerArchiveEntryNotFound) {
+			t.Logf("OCI archive is missing blob data; falling back to an already-loaded daemon image discovered via manifest.json/RepoTags: %v", err)
+			p, info, daemonImageRef, err = readDockerOCIFromDaemon(t, file)
+		}
+		if err != nil {
+			t.Errorf("error reading file %v: %v", file, err)
+			return
+		}
+	default:
+		t.Errorf("unsupported docker image format %q for %s", imageType, file)
 		return
 	}
 
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
-	checkConfigPermissionsWithMode(t, p, os.FileMode(0644))
-	checkManifestPermissionsWithMode(t, p, os.FileMode(0644))
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0o644))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0o644))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkLicensesPresent(t, "licenses/", p)
+	checkDockerImageRun(t, p, file, daemonImageRef)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -356,7 +439,7 @@ func checkModulesOwner(t *testing.T, p *packageFile, expectRoot bool) {
 // Verify that the systemd unit file has a mode of 0644. It should not be
 // executable.
 func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
-	const expectedMode = os.FileMode(0644)
+	const expectedMode = os.FileMode(0o644)
 	t.Run(p.Name+" systemd unit file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if systemdUnitFilePattern.MatchString(entry.File) {
@@ -368,7 +451,7 @@ func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
 				return
 			}
 		}
-		t.Errorf("no systemd unit file found matching %v", configFilePattern)
+		t.Errorf("no systemd unit file found matching %v", systemdUnitFilePattern)
 	})
 }
 
@@ -443,7 +526,7 @@ func checkLicensesPresent(t *testing.T, prefix string, p *packageFile) {
 }
 
 func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
-	expectedMode := os.FileMode(0755)
+	expectedMode := os.FileMode(0o755)
 
 	t.Run(fmt.Sprintf("%s entrypoint", p.Name), func(t *testing.T) {
 		if len(info.Config.Entrypoint) == 0 {
@@ -451,8 +534,7 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 		}
 
 		entrypoint := info.Config.Entrypoint[0]
-		if strings.HasPrefix(entrypoint, "/") {
-			entrypoint := strings.TrimPrefix(entrypoint, "/")
+		if entrypoint, ok := strings.CutPrefix(entrypoint, "/"); ok {
 			entry, found := p.Contents[entrypoint]
 			if !found {
 				t.Fatalf("%s entrypoint not found in docker", entrypoint)
@@ -509,6 +591,155 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 			t.Errorf("unexpected docker user: %s", info.Config.User)
 		}
 	})
+}
+
+func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef string) {
+	t.Run(fmt.Sprintf("%s check docker images runs", p.Name), func(t *testing.T) {
+		ctx, cancel := dockerTestContext(t)
+		defer cancel()
+
+		dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			t.Fatalf("failed to get a Docker client: %s", err)
+		}
+
+		imageID := imageRef
+		if imageID == "" {
+			imageID, err = loadDockerImageFromArchive(ctx, dockerClient, imagePath)
+			if err != nil {
+				t.Fatalf("error loading docker image: %s", err)
+			}
+		} else {
+			_, err = dockerClient.ImageInspect(ctx, imageID)
+			if err != nil {
+				t.Fatalf("error inspecting docker image %q from daemon: %s", imageID, err)
+			}
+		}
+
+		var caps strslice.StrSlice
+		if strings.Contains(imageID, "packetbeat") {
+			caps = append(caps, "NET_ADMIN")
+		}
+
+		createResp, err := dockerClient.ContainerCreate(ctx,
+			&container.Config{
+				Image: imageID,
+			},
+			&container.HostConfig{
+				CapAdd: caps,
+			},
+			nil,
+			nil,
+			"")
+		if err != nil {
+			t.Fatalf("error creating container from image: %s", err)
+		}
+		defer func() {
+			err := dockerClient.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			if err != nil {
+				t.Errorf("error removing container: %s", err)
+			}
+		}()
+
+		err = dockerClient.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		if err != nil {
+			t.Fatalf("failed to start container: %s", err)
+		}
+		defer func() {
+			err := dockerClient.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			if err != nil {
+				t.Errorf("error stopping container: %s", err)
+			}
+		}()
+
+		timer := time.NewTimer(15 * time.Second)
+		defer timer.Stop()
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+
+		var logs []byte
+		sentinelLog := "Beat ID: "
+		for {
+			select {
+			case <-timer.C:
+				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
+				return
+			case <-ticker.C:
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				if err != nil {
+					t.Logf("could not get logs: %s", err)
+				}
+				logs, err = io.ReadAll(out)
+				out.Close()
+				if err != nil {
+					t.Logf("error reading logs: %s", err)
+				}
+				if bytes.Contains(logs, []byte(sentinelLog)) {
+					return
+				}
+			}
+		}
+	})
+}
+
+func dockerTestContext(t *testing.T) (context.Context, context.CancelFunc) {
+	t.Helper()
+
+	deadline, ok := t.Deadline()
+	if !ok {
+		return context.Background(), func() {}
+	}
+
+	return context.WithDeadline(context.Background(), deadline)
+}
+
+func loadDockerImageFromArchive(ctx context.Context, dockerClient *client.Client, imagePath string) (string, error) {
+	f, err := os.Open(imagePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open docker image %q: %w", imagePath, err)
+	}
+	defer f.Close()
+
+	loadResp, err := dockerClient.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
+	if err != nil {
+		return "", err
+	}
+	defer loadResp.Body.Close()
+
+	loadRespBody, err := io.ReadAll(loadResp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read image load response: %w", err)
+	}
+
+	imageID, err := parseLoadedImageRef(string(loadRespBody))
+	if err != nil {
+		return "", err
+	}
+	return imageID, nil
+}
+
+func parseLoadedImageRef(loadResponse string) (string, error) {
+	for _, prefix := range []string{"Loaded image: ", "Loaded image ID: "} {
+		_, after, ok := strings.Cut(loadResponse, prefix)
+		if !ok {
+			continue
+		}
+
+		end := len(after)
+		for i, r := range after {
+			if r == '\n' || r == '\r' || r == '"' || r == '\\' {
+				end = i
+				break
+			}
+		}
+
+		imageID := strings.TrimSpace(after[:end])
+		if imageID != "" {
+			return imageID, nil
+		}
+	}
+
+	return "", fmt.Errorf("image load response was unexpected: %s", loadResponse)
 }
 
 // ensureNoBuildIDLinks checks for regressions related to
@@ -657,11 +888,57 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 			File: header.Name,
 			UID:  header.Uid,
 			GID:  header.Gid,
-			Mode: os.FileMode(header.Mode),
+			Mode: os.FileMode(header.Mode), //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 		}
 	}
 
 	return p, nil
+}
+
+func checkFIPS(t *testing.T, beatName, path string) {
+	t.Logf("Checking %s for FIPS compliance", beatName)
+	binaryPath := filepath.Join(path, beatName) // TODO eventually we'll need to support checking a .exe
+	require.FileExistsf(t, binaryPath, "Unable to find beat executable %s", binaryPath)
+
+	info, err := buildinfo.ReadFile(binaryPath)
+	require.NoError(t, err)
+
+	foundTags := false
+	foundExperiment := false
+	for _, setting := range info.Settings {
+		switch setting.Key {
+		case "-tags":
+			foundTags = true
+			require.Contains(t, setting.Value, "requirefips")
+			continue
+		case "GOEXPERIMENT":
+			foundExperiment = true
+			require.Contains(t, setting.Value, "systemcrypto")
+			continue
+		}
+	}
+
+	require.True(t, foundTags, "Did not find -tags within binary version information")
+	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
+
+	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
+	f, err := elf.Open(binaryPath)
+	require.NoError(t, err, "unable to open ELF file")
+
+	symbols, err := f.Symbols()
+	if err != nil {
+		t.Logf("no symbols present in %q: %v", binaryPath, err)
+		return
+	}
+
+	hasOpenSSL := false
+	for _, symbol := range symbols {
+		if strings.Contains(symbol.Name, "OpenSSL_version") {
+			hasOpenSSL = true
+			break
+		}
+	}
+	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file
@@ -699,170 +976,4 @@ func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFil
 	}
 
 	return p, nil
-}
-
-func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
-	var manifest *dockerManifest
-	var info *dockerInfo
-	layers := make(map[string]*packageFile)
-
-	manifest, err := readManifest(dockerFile)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	file, err := os.Open(dockerFile)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer file.Close()
-
-	gzipReader, err := gzip.NewReader(file)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer gzipReader.Close()
-
-	tarReader := tar.NewReader(gzipReader)
-	for {
-		header, err := tarReader.Next()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, nil, err
-		}
-
-		switch {
-		case header.Name == manifest.Config:
-			info, err = readDockerInfo(tarReader)
-			if err != nil {
-				return nil, nil, err
-			}
-		case slices.Contains(manifest.Layers, header.Name):
-			layer, err := readTarContents(header.Name, tarReader)
-			if err != nil {
-				return nil, nil, err
-			}
-			layers[header.Name] = layer
-		}
-	}
-
-	if len(info.Config.Entrypoint) == 0 {
-		return nil, nil, fmt.Errorf("no entrypoint")
-	}
-
-	workingDir := info.Config.WorkingDir
-	entrypoint := info.Config.Entrypoint[0]
-
-	// Read layers in order and for each file keep only the entry seen in the later layer
-	p := &packageFile{Name: filepath.Base(dockerFile), Contents: map[string]packageEntry{}}
-	for _, layerFile := range layers {
-		for name, entry := range layerFile.Contents {
-			// Check only files in working dir and entrypoint
-			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
-				p.Contents[name] = entry
-			}
-			if excludedPathsPattern.MatchString(name) {
-				continue
-			}
-			// Add also licenses
-			for _, licenseFile := range licenseFiles {
-				if strings.Contains(name, licenseFile) {
-					p.Contents[name] = entry
-				}
-			}
-		}
-	}
-
-	if len(p.Contents) == 0 {
-		return nil, nil, fmt.Errorf("no files found in docker working directory (%s)", info.Config.WorkingDir)
-	}
-
-	return p, info, nil
-}
-
-func readManifest(dockerFile string) (*dockerManifest, error) {
-	var manifest *dockerManifest
-
-	file, err := os.Open(dockerFile)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	gzipReader, err := gzip.NewReader(file)
-	if err != nil {
-		return nil, err
-	}
-	defer gzipReader.Close()
-
-	tarReader := tar.NewReader(gzipReader)
-	for {
-		header, err := tarReader.Next()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, err
-		}
-
-		if header.Name == "manifest.json" {
-			manifest, err = readDockerManifest(tarReader)
-			if err != nil {
-				return nil, err
-			}
-			break
-		}
-	}
-	return manifest, err
-}
-
-type dockerManifest struct {
-	Config   string
-	RepoTags []string
-	Layers   []string
-}
-
-func readDockerManifest(r io.Reader) (*dockerManifest, error) {
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	var manifests []*dockerManifest
-	err = json.Unmarshal(data, &manifests)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(manifests) != 1 {
-		return nil, fmt.Errorf("one and only one manifest expected, %d found", len(manifests))
-	}
-
-	return manifests[0], nil
-}
-
-type dockerInfo struct {
-	Config struct {
-		Entrypoint []string
-		Labels     map[string]string
-		User       string
-		WorkingDir string
-	} `json:"config"`
-}
-
-func readDockerInfo(r io.Reader) (*dockerInfo, error) {
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	var info dockerInfo
-	err = json.Unmarshal(data, &info)
-	if err != nil {
-		return nil, err
-	}
-
-	return &info, nil
 }

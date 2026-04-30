@@ -55,13 +55,6 @@ func (e IOError) Error() string { return e.err.Error() }
 func (e IOError) Unwrap() error { return e.err }
 func (IOError) Type() string    { return "io" }
 
-func FailError(typ string, err error) mapstr.M {
-	return mapstr.M{
-		"type":    typ,
-		"message": err.Error(),
-	}
-}
-
 func Fail(r Reason) mapstr.M {
 	return mapstr.M{
 		"type":    r.Type(),

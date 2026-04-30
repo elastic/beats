@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
@@ -103,13 +105,13 @@ func kubernetesMetadataExist(event *beat.Event) bool {
 }
 
 // New constructs a new add_kubernetes_metadata processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err
 	}
 
-	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
+	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
 		cache:               newCache(config.CleanupTimeout),
@@ -172,7 +174,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		matchers := NewMatchers(config.Matchers)
+		matchers := NewMatchers(config.Matchers, k.log)
 
 		if matchers.Empty() {
 			k.log.Debugf("Could not initialize kubernetes plugin with zero matcher plugins")
@@ -189,7 +191,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		if config.Scope == "node" {
 			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
 			if err != nil {
-				k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
+				k.log.Errorf("Couldn't discover Kubernetes node: %v", err)
 				return
 			}
 			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
@@ -200,7 +202,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			Node:         config.Node,
 			Namespace:    config.Namespace,
 			HonorReSyncs: true,
-		}, nil)
+		}, nil, k.log)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
 			return
@@ -213,7 +215,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Node:         config.Node,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 			}
@@ -224,7 +226,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 			}
@@ -235,11 +237,24 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// Deployment -> Replicaset -> Pod
 		// CronJob -> job -> Pod
 		if metaConf.Deployment {
-			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-				SyncTimeout:  config.SyncPeriod,
-				Namespace:    config.Namespace,
-				HonorReSyncs: true,
-			}, nil)
+			metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+			if err != nil {
+				k.log.Errorf("Error creating metadata client due to error %+v", err)
+			}
+			replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+				"resource_metadata_enricher_rs",
+				client,
+				metadataClient,
+				schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+				kubernetes.WatchOptions{
+					SyncTimeout:  config.SyncPeriod,
+					Namespace:    config.Namespace,
+					HonorReSyncs: true,
+				},
+				nil,
+				metadata.RemoveUnnecessaryReplicaSetData,
+				k.log,
+			)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 			}
@@ -250,7 +265,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 				SyncTimeout:  config.SyncPeriod,
 				Namespace:    config.Namespace,
 				HonorReSyncs: true,
-			}, nil)
+			}, nil, k.log)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
 			}
@@ -268,15 +283,15 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(pod)
 			},
 		})
@@ -285,30 +300,30 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// be populated before trying to generate metadata for Pods.
 		if k.nodeWatcher != nil {
 			if err := k.nodeWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start node watcher: %v", err)
+				k.log.Debugf("Couldn't start node watcher: %v", err)
 				return
 			}
 		}
 		if k.nsWatcher != nil {
 			if err := k.nsWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start namespace watcher: %v", err)
+				k.log.Debugf("Couldn't start namespace watcher: %v", err)
 				return
 			}
 		}
 		if k.rsWatcher != nil {
 			if err := k.rsWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start replicaSet watcher: %v", err)
+				k.log.Debugf("Couldn't start replicaSet watcher: %v", err)
 				return
 			}
 		}
 		if k.jobWatcher != nil {
 			if err := k.jobWatcher.Start(); err != nil {
-				k.log.Debugf("add_kubernetes_metadata", "Couldn't start job watcher: %v", err)
+				k.log.Debugf("Couldn't start job watcher: %v", err)
 				return
 			}
 		}
 		if err := watcher.Start(); err != nil {
-			k.log.Debugf("add_kubernetes_metadata", "Couldn't start pod watcher: %v", err)
+			k.log.Debugf("Couldn't start pod watcher: %v", err)
 			return
 		}
 	})
@@ -336,22 +351,28 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	metaClone := metadata.Clone()
-	_ = metaClone.Delete("kubernetes.container.name")
-	containerImage, err := metadata.GetValue("kubernetes.container.image")
-	if err == nil {
-		_ = metaClone.Delete("kubernetes.container.image")
-		_, _ = metaClone.Put("kubernetes.container.image.name", containerImage)
-	}
-	cmeta, err := metaClone.Clone().GetValue("kubernetes.container")
-	if err == nil {
-		event.Fields.DeepUpdate(mapstr.M{
-			"container": cmeta,
-		})
+	// One full clone for the kubernetes field; one cheap sub-map clone for the OCI
+	// container field. This replaces the original three full clones.
+	kubeMeta := metadata.Clone()
+
+	// Build the OCI container field by cloning only the container sub-map —
+	// much cheaper than cloning the full metadata. Transform it in place:
+	// drop container.name and rewrite container.image -> container.image.name.
+	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
+		if cm, ok := containerVal.(mapstr.M); ok {
+			ociContainer := cm.Clone()
+			_ = ociContainer.Delete("name")
+			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
+				_ = ociContainer.Delete("image")
+				ociContainer["image"] = mapstr.M{"name": img}
+			}
+			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+		}
 	}
 
-	kubeMeta := metadata.Clone()
-	// remove container meta from kubernetes.container.*
+	// Remove container fields that belong only in the OCI section before writing
+	// kubernetes metadata to the event. container.name is intentionally kept here
+	// to match original behaviour.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
@@ -361,6 +382,9 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (k *kubernetesAnnotator) Close() error {
+	// ensure there are no goroutines leaking
+	// after the processor has been closed
+	k.initOnce.Do(func() {})
 	if k.watcher != nil {
 		k.watcher.Stop()
 	}

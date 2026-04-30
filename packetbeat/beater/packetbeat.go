@@ -18,12 +18,14 @@
 package beater
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
@@ -87,6 +89,8 @@ type packetbeat struct {
 	overwritePipelines bool
 	done               chan struct{}
 	stopOnce           sync.Once
+
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 // New returns a new Packetbeat beat.Beater.
@@ -111,7 +115,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}
 		overwritePipelines = config.OverwritePipelines
 		b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
-			esClient, err := eslegclient.NewConnectedClient(esConfig, "Packetbeat")
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Packetbeat", b.Info.Logger)
 			if err != nil {
 				return err
 			}
@@ -142,7 +148,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}()
 
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router())
+		err := inputmon.AttachHandler(b.API.Router(), (b.Monitoring.InputsRegistry()))
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
@@ -151,7 +157,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
 					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
@@ -162,7 +168,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 
 	if !b.Manager.Enabled() {
 		if b.Config.Output.Name() == "elasticsearch" {
-			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection) error {
+			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 				_, err := module.UploadPipelines(b.Info, esClient, pb.overwritePipelines)
 				return err
 			})
@@ -207,7 +213,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 // runManaged registers a packetbeat runner with the reload.Registry and starts
 // the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
-	runner := newReloader(management.DebugK, factory, b.Publisher)
+	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 
@@ -219,7 +225,6 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 
 	defer func() {
 		runner.Stop()
-		b.Manager.Stop()
 	}()
 
 	for {
@@ -242,4 +247,8 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
 	pb.stopOnce.Do(func() { close(pb.done) })
+}
+
+func (pb *packetbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	pb.otelStatusFactoryWrapper = wrapper
 }

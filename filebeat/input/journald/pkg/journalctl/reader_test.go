@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+
 package journalctl
 
 import (
@@ -23,12 +25,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"slices"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 //go:embed testdata/corner-cases.json
@@ -51,6 +58,7 @@ func TestEventWithNonStringData(t *testing.T) {
 				NextFunc: func(canceler input.Canceler) ([]byte, error) {
 					return rawEvent, nil
 				},
+				KillFunc: func() error { return nil },
 			}
 			r := Reader{
 				logger: logp.L(),
@@ -69,16 +77,30 @@ func TestEventWithNonStringData(t *testing.T) {
 var jdEvent []byte
 
 func TestRestartsJournalctlOnError(t *testing.T) {
+	logger, observedLogs := logptest.NewTestingLoggerWithObserver(t, "")
 	ctx := context.Background()
 
 	mock := JctlMock{
 		NextFunc: func(canceler input.Canceler) ([]byte, error) {
 			return jdEvent, errors.New("journalctl exited with code 42")
 		},
+		KillFunc: func() error { return nil },
+	}
+
+	versionMock := JctlMock{
+		NextFunc: func(canceler input.Canceler) ([]byte, error) {
+			ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
+			return []byte(ret), nil
+		},
+		KillFunc: func() error { return nil },
 	}
 
 	factoryCalls := atomic.Uint32{}
-	factory := func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
+	factory := func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error) {
+		if slices.Contains(args, "--version") {
+			return &versionMock, nil
+		}
+
 		factoryCalls.Add(1)
 		// Add a log to make debugging easier and better mimic the behaviour of the real factory/journalctl
 		logger.Debugf("starting new mock journalclt ID: %d", factoryCalls.Load())
@@ -97,26 +119,75 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, SeekHead, "", 0, "", factory)
+	reader, err := New(
+		logger,
+		ctx,
+		nil,
+		nil,
+		nil,
+		journalfield.IncludeMatches{},
+		[]int{},
+		SeekHead,
+		"",
+		0,
+		"",
+		false,
+		factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
 
 	isEntryEmpty := func(entry JournalEntry) bool {
-		return len(entry.Fields) == 0 && entry.Cursor == "" && entry.MonotonicTimestamp == 0 && entry.RealtimeTimestamp == 0
+		return len(entry.Fields) == 0 &&
+			entry.Cursor == "" &&
+			entry.MonotonicTimestamp == 0 &&
+			entry.RealtimeTimestamp == 0
 	}
 
 	// In the first call the mock will return an error, simulating journalctl crashing
-	// so we should get ErrRestarting
+	// the reader must handle it and only return the next valid entry and no error
 	entry, err := reader.Next(ctx)
-	if !errors.Is(err, ErrRestarting) {
-		t.Fatalf("expecting ErrRestarting when calling Next and journalctl crashed: %s", err)
+	if err != nil {
+		t.Fatalf("expecting no error, got: %s", err)
 	}
-	if !isEntryEmpty(entry) {
-		t.Fatal("the first call to Next must return an empty JournalEntry because 'journalctl has crashed'")
+	if isEntryEmpty(entry) {
+		t.Fatal("the first call to Next cannot return an empty entry")
 	}
 
-	for i := 0; i < 2; i++ {
+	// We need to assert the reader correctly handled the "crash" from journalctl
+	// so we look for the log messages, there should be exactly 4:
+	//  - Error reading journalctl version
+	//  - First journalctl start
+	//  - an error with the exit code 42
+	//  - the second journalctl start
+	// The exact log messages are:
+	//  - starting new mock journalclt ID: 1
+	//  - reader error: 'journalctl exited with code 42', restarting...
+	//  - starting new mock journalclt ID: 2
+
+	logs := observedLogs.TakeAll()
+	if len(logs) != 4 {
+		t.Errorf("expecting 4 log lines from 'input.journald.reader.journalctl-runner', got %d", len(logs))
+		for _, l := range logs {
+			t.Log(l.Message)
+		}
+		t.FailNow()
+	}
+
+	if logs[1].Message != "starting new mock journalclt ID: 1" {
+		t.Fatalf("first log message must be the mock starting wit ID 1, got '%s' instead", logs[0].Message)
+	}
+
+	if logs[2].Message != "reader error: 'journalctl exited with code 42', restarting..." {
+		t.Fatalf("second log message must reader error with journalctl exit code 42, got '%s' instead", logs[1].Message)
+	}
+
+	if logs[3].Message != "starting new mock journalclt ID: 2" {
+		t.Fatalf("third log message must be the mock starting wit ID 2, got '%s' instead", logs[2].Message)
+	}
+
+	// Call Next a couple more times to ensure we can read past the error
+	for range 2 {
 		entry, err := reader.Next(ctx)
 		if err != nil {
 			t.Fatalf("did not expect an error when calling Next 'after journalctl restart': %s", err)
@@ -125,5 +196,150 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		if isEntryEmpty(entry) {
 			t.Fatal("the second and third calls to Next must succeed")
 		}
+	}
+}
+
+func TestNewUsesMergeFlag(t *testing.T) {
+	f := func(_ input.Canceler, _ *logp.Logger, s ...string) (Jctl, error) {
+		return &JctlMock{
+			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+				ret := "systemd 259 (259.3-1-arch)\n+PAM +AUDIT -SELINUX +APPARMOR"
+				return []byte(ret), nil
+			},
+			KillFunc: func() error { return nil },
+		}, nil
+	}
+	r, err := New(
+		logp.NewNopLogger(),
+		t.Context(),
+		nil,
+		nil,
+		nil,
+		journalfield.IncludeMatches{},
+		nil,
+		SeekHead,
+		"",
+		0,
+		"",
+		true,
+		f)
+
+	if err != nil {
+		t.Fatalf("did not expect an error when calling New: %s", err)
+	}
+
+	if r == nil {
+		t.Fatal("the returned reader cannot be nil")
+	}
+
+	if !slices.Contains(r.args, "--merge") {
+		t.Fatalf("did not find '--merge' in the arguments to journalctl. Args: %s", r.args)
+	}
+}
+
+// fakeJournalctl writes a tiny shell script that prints a fake journalctl
+// version line and returns the path to that script.
+func fakeJournalctl(t *testing.T, version int) string {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "journalctl")
+	content := fmt.Sprintf("#!/bin/sh\necho 'systemd %d (%d-test)'\n", version, version)
+	if err := os.WriteFile(path, []byte(content), 0755); err != nil {
+		t.Fatalf("cannot write fake journalctl script: %s", err)
+	}
+	return path
+}
+
+func TestJournalctlSupportsBootAll(t *testing.T) {
+	tests := []struct {
+		name        string
+		version     int
+		invalidPath bool
+		wantBootAll bool
+	}{
+		{name: "v239 (RHEL8) does not get --boot all", version: 239, wantBootAll: false},
+		{name: "v241 does not get --boot all", version: 241, wantBootAll: false},
+		{name: "v242 gets --boot all", version: 242, wantBootAll: true},
+		{name: "v250 gets --boot all", version: 250, wantBootAll: true},
+		{name: "invalid binary path falls back safely", invalidPath: true, wantBootAll: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var path string
+			if tc.invalidPath {
+				path = "/nonexistent/journalctl"
+			} else {
+				path = fakeJournalctl(t, tc.version)
+			}
+
+			logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "..", "..", "build"))
+			got := journalctlSupportsBootAll(logger.Logger, NewFactory("", path))
+			if got != tc.wantBootAll {
+				t.Errorf("version %d: wantBootAll=%v but got=%v", tc.version, tc.wantBootAll, got)
+			}
+		})
+	}
+}
+
+func TestHandleSeekAndCursor(t *testing.T) {
+	tests := []struct {
+		name        string
+		mode        SeekMode
+		cursor      string
+		supports    bool
+		wantBootAll bool
+		wantArgs    []string
+	}{
+		{
+			name: "SeekHead without --boot all support",
+			mode: SeekHead, supports: false,
+			wantBootAll: false, wantArgs: []string{"--no-tail"},
+		},
+		{
+			name: "SeekHead with --boot all support",
+			mode: SeekHead, supports: true,
+			wantBootAll: true, wantArgs: []string{"--no-tail", "--boot", "all"},
+		},
+		{
+			name: "SeekTail never adds --boot all regardless of support",
+			mode: SeekTail, supports: true,
+			wantBootAll: false, wantArgs: []string{"--since", "now"},
+		},
+		{
+			name: "SeekSince without --boot all support",
+			mode: SeekSince, supports: false,
+			wantBootAll: false, wantArgs: []string{"--since"},
+		},
+		{
+			name: "SeekSince with --boot all support",
+			mode: SeekSince, supports: true,
+			wantBootAll: true, wantArgs: []string{"--since", "--boot", "all"},
+		},
+		{
+			name:   "cursor without --boot all support",
+			cursor: "some-cursor", supports: false,
+			wantBootAll: false, wantArgs: []string{"--after-cursor", "some-cursor"},
+		},
+		{
+			name:   "cursor with --boot all support",
+			cursor: "some-cursor", supports: true,
+			wantBootAll: true, wantArgs: []string{"--after-cursor", "some-cursor", "--boot", "all"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := handleSeekAndCursor(tc.mode, -5*time.Minute, tc.cursor, tc.supports)
+
+			hasBootAll := slices.Contains(got, "--boot") && slices.Contains(got, "all")
+			if hasBootAll != tc.wantBootAll {
+				t.Errorf("wantBootAll=%v but args=%v", tc.wantBootAll, got)
+			}
+			for _, want := range tc.wantArgs {
+				if !slices.Contains(got, want) {
+					t.Errorf("expected %q in args %v", want, got)
+				}
+			}
+		})
 	}
 }

@@ -27,6 +27,8 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -48,6 +50,7 @@ type Provider struct {
 	appenders autodiscover.Appenders
 	templates template.Mapper
 	discovery DiscoveryProber
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
@@ -58,6 +61,8 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
@@ -72,9 +77,10 @@ func AutodiscoverBuilder(
 	discovery := &Discovery{
 		ProviderUUID: uuid,
 		Interfaces:   config.Interfaces,
+		log:          logger,
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -82,7 +88,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -98,6 +104,7 @@ func AutodiscoverBuilder(
 		builders:  builders,
 		appenders: appenders,
 		discovery: discovery,
+		logger:    logger.Named("jolokia"),
 	}, nil
 }
 

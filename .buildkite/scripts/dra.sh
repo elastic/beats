@@ -15,7 +15,7 @@ set -euo pipefail
 BRANCH="${DRA_BRANCH:="${BUILDKITE_BRANCH:=""}"}"
 
 BEAT_VERSION=$(make get-version)
-
+VERSION_QUALIFIER="${VERSION_QUALIFIER:=""}"
 CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 function release_manager_login {
@@ -30,7 +30,7 @@ set +x
 release_manager_login
 
 # required by the release-manager docker image, otherwise we hit:
-# > java.io.FileNotFoundException: /artifacts/build/distributions/agentbeat/agentbeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
+# > java.io.FileNotFoundException: /artifacts/build/distributions/filebeat/filebeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
 chmod -R a+r build/*
 chmod -R a+w build
 
@@ -49,7 +49,9 @@ docker run --rm \
         --commit "${BUILDKITE_COMMIT}" \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
-        --artifact-set "main"
+        --artifact-set "main" \
+        --qualifier "${VERSION_QUALIFIER}"
+
 
 echo "+++ :hammer_and_pick: Publishing DRA artifacts for version [$BEAT_VERSION], branch [$BRANCH], workflow [$DRA_WORKFLOW] and DRY_RUN: [$DRY_RUN]"
 
@@ -68,6 +70,7 @@ docker run --rm \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "main" \
+        --qualifier "${VERSION_QUALIFIER}" \
         ${DRY_RUN} | tee rm-output.txt
 
 

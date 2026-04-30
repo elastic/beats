@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/mock"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -92,6 +93,7 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 		defer wg.Done()
 
 		// Set the configuration file path flag so the beat can read it
+		cfgfile.Initialize()
 		_ = flag.Set("c", "testdata/mockbeat.yml")
 		_ = instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
 			return &mockBeat, nil

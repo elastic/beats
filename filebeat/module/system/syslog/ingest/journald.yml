@@ -1,0 +1,34 @@
+description: Journald Pipeline for system/syslog Filebeat module
+processors:
+  - set:
+      field: event.ingested
+      copy_from: _ingest.timestamp
+  - set:
+      field: "process.pid"
+      copy_from: "journald.pid"
+      ignore_failure: true
+  - set:
+      field: "process.name"
+      copy_from: "journald.process.name"
+      ignore_failure: true
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: related.hosts
+      value: "{{host.hostname}}"
+      if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
+      allow_duplicates: false
+  - remove:
+      description: Remove the extra fields added by the Journald input
+      ignore_missing: true
+      field:
+        - journald
+        - process.thread
+        - syslog
+        - systemd
+        - message_id
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

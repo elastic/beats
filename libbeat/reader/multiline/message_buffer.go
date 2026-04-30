@@ -120,11 +120,11 @@ func (b *messageBuffer) addLine(m reader.Message) {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (b *messageBuffer) finalize() reader.Message {
 	if b.truncated > 0 {
-		b.message.AddFlagsWithKey("log.flags", "truncated")
+		b.message.AddFlagsWithKey("log.flags", "truncated") //nolint:errcheck // It is safe to ignore the error.
 	}
 
 	if b.numLines > 1 {
-		b.message.AddFlagsWithKey("log.flags", "multiline")
+		b.message.AddFlagsWithKey("log.flags", "multiline") //nolint:errcheck // It is safe to ignore the error.
 	}
 
 	// Copy message from existing content

@@ -26,11 +26,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -52,13 +56,13 @@ type fakeReportingFetcher struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakeReportingFetcher) Fetch(r mb.Reporter) {
+func (ms *fakeReportingFetcher) Fetch(r mb.ReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
-	r.Event(mapstr.M{"@timestamp": common.Time(t), "metric": 1})
+	r.Event(mb.TransformMapStrToEvent(ms.Module().Name(), mapstr.M{"@timestamp": common.Time(t), "metric": 1}, nil))
 }
 
 func newFakeReportingFetcher(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var r mb.ReportingMetricSet = &fakeReportingFetcher{BaseMetricSet: base}
+	var r mb.ReportingMetricSetV2 = &fakeReportingFetcher{BaseMetricSet: base}
 	return r, nil
 }
 
@@ -68,15 +72,15 @@ type fakePushMetricSet struct {
 	mb.BaseMetricSet
 }
 
-func (ms *fakePushMetricSet) Run(r mb.PushReporter) {
+func (ms *fakePushMetricSet) Run(r mb.PushReporterV2) {
 	t, _ := time.Parse(time.RFC3339, "2016-05-10T23:27:58.485Z")
 	event := mapstr.M{"@timestamp": common.Time(t), "metric": 1}
-	r.Event(event)
+	r.Event(mb.TransformMapStrToEvent(ms.Module().Name(), event, nil))
 	<-r.Done()
 }
 
 func newFakePushMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var r mb.PushMetricSet = &fakePushMetricSet{BaseMetricSet: base}
+	var r mb.PushMetricSetV2 = &fakePushMetricSet{BaseMetricSet: base}
 	return r, nil
 }
 
@@ -108,7 +112,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -139,7 +143,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -186,11 +190,10 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 				"hosts":      hosts,
 			})
 
-			m, err := module.NewWrapper(config, registry, module.WithMetricSetInfo())
+			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 			require.NoError(t, err)
 
 			done := make(chan struct{})
-			defer close(done)
 
 			output := m.Start(done)
 
@@ -198,8 +201,44 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 
 			hasPeriod, _ := event.Fields.HasKey("metricset.period")
 			assert.Equal(t, c.hasPeriod, hasPeriod, "has metricset.period in event %+v", event)
+
+			// stop worker
+			close(done)
+
+			// wait for shutdown
+			event, ok := <-output
+			assert.Falsef(t, ok, "received unexpected event: %+v", event)
 		})
 	}
+}
+
+func TestDurationIsAddedToEvent(t *testing.T) {
+	hosts := []string{"alpha"}
+	config := newConfig(t, map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{reportingFetcherName},
+		"hosts":      hosts,
+	})
+
+	registry := newTestRegistry(t)
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	require.NoError(t, err)
+
+	done := make(chan struct{})
+	output := m.Start(done)
+
+	event := <-output
+
+	fields := event.Fields.Flatten()
+	assert.Contains(t, fields, "event.duration", "event.duration should be present in event")
+	assert.Greater(t, fields["event.duration"], time.Duration(0), "event.duration should be greater than 0")
+
+	// stop worker
+	close(done)
+
+	// wait for shutdown to prevent logging after test completes
+	event, ok := <-output
+	assert.Falsef(t, ok, "received unexpected event: %+v", event)
 }
 
 func TestNewWrapperForMetricSet(t *testing.T) {
@@ -210,10 +249,10 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t))
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger())
 	require.NoError(t, err)
 
-	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], module.WithMetricSetInfo())
+	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beatmonitoring.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})

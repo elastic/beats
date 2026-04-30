@@ -25,9 +25,10 @@ const (
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config *panw.Config
-	logger *logp.Logger
-	client panw.PanwClient
+	config   *panw.Config
+	logger   *logp.Logger
+	client   panw.PanwClient
+	hostname string
 }
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -41,14 +42,14 @@ func init() {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panw system metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The panw system metricset is beta."))
 
 	config, err := panw.NewConfig(base)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := logp.NewLogger(base.FullyQualifiedName())
+	logger := base.Logger().Named(base.FullyQualifiedName())
 
 	//client := &pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey}}
 	client, err := panw.GetPanwClient(config)
@@ -56,11 +57,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	// Fetch hostname from system info
+	hostname, err := panw.GetHostname(client)
+	if err != nil {
+		logger.Warnf("Failed to fetch hostname from firewall: %v. Using empty hostname.", err)
+		hostname = ""
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
 		logger:        logger,
 		client:        client,
+		hostname:      hostname,
 	}, nil
 }
 

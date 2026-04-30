@@ -43,9 +43,10 @@ func InitializeModule() {
 type LogPathMatcher struct {
 	LogsPath     string
 	allocIDRegex *regexp.Regexp
+	logger       *logp.Logger
 }
 
-func newLogsPathMatcher(cfg conf.C) (add_nomad_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C, logger *logp.Logger) (add_nomad_metadata.Matcher, error) {
 	config := struct {
 		LogsPath string `config:"logs_path"`
 	}{
@@ -62,11 +63,12 @@ func newLogsPathMatcher(cfg conf.C) (add_nomad_metadata.Matcher, error) {
 		logPath = logPath + pathSeparator
 	}
 
-	logp.Debug("nomad", "logs_path matcher log path: %s", logPath)
+	logger.Named("nomad").Debugf("logs_path matcher log path: %s", logPath)
 
 	return &LogPathMatcher{
 		LogsPath:     logPath,
 		allocIDRegex: regexp.MustCompile(allocIDRegex),
+		logger:       logger,
 	}, nil
 }
 
@@ -77,10 +79,10 @@ func (m *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 
 	if err == nil {
 		path := value.(string)
-		logp.Debug("nomad", "Incoming log.file.path value: %s", path)
+		m.logger.Named("nomad").Debugf("Incoming log.file.path value: %s", path)
 
 		if !strings.Contains(path, m.LogsPath) {
-			logp.Debug("nomad", "Error extracting allocation id - source value does not contain matcher's logs_path '%s'.", m.LogsPath)
+			m.logger.Named("nomad").Debugf("Error extracting allocation id - source value does not contain matcher's logs_path '%s'.", m.LogsPath)
 			return ""
 		}
 
@@ -89,7 +91,7 @@ func (m *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 		// /appdata/nomad/alloc/18e5cd07-03bb-be76-35e5-39c799d369e6/alloc/logs/app-name.stdout.0
 
 		if !m.allocIDRegex.MatchString(path) {
-			logp.Debug("nomad", "Error extracting allocation id - source value doesn't contain a valid UUID '%s'.", path)
+			m.logger.Named("nomad").Debugf("Error extracting allocation id - source value doesn't contain a valid UUID '%s'.", path)
 			return ""
 		}
 

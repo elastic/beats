@@ -19,13 +19,15 @@ package kibana
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -43,12 +45,10 @@ const (
 	NodeRulesPath      = "api/monitoring_collection/node_rules"
 	ClusterActionsPath = "api/monitoring_collection/cluster_actions"
 	NodeActionsPath    = "api/monitoring_collection/node_actions"
-	SettingsPath       = "api/settings"
 )
 
 var (
 	v6_4_0 = version.MustNew("6.4.0")
-	v6_5_0 = version.MustNew("6.5.0")
 	v6_7_2 = version.MustNew("6.7.2")
 	v7_0_0 = version.MustNew("7.0.0")
 	v7_0_1 = version.MustNew("7.0.1")
@@ -56,9 +56,6 @@ var (
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
-
-	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
-	SettingsAPIAvailableVersion = v6_5_0
 
 	// Version of Kibana since when the rules and task manager APIs are available
 	RulesAPIAvailableVersion   = v8_2_0
@@ -92,7 +89,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	xpackEnabledMetricSets := []string{
 		"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions",
 	}
-	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, base.Logger.Named(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
@@ -121,11 +118,6 @@ func IsStatsAPIAvailable(currentKibanaVersion *version.V) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, StatsAPIAvailableVersion)
 }
 
-// IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
-func IsSettingsAPIAvailable(currentKibanaVersion *version.V) bool {
-	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
-}
-
 // IsRulesAPIAvailable returns whether the rules API is available in the given version of Kibana
 func IsRulesAPIAvailable(currentKibanaVersion *version.V) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, RulesAPIAvailableVersion)
@@ -144,9 +136,19 @@ func IsUsageExcludable(currentKibanaVersion *version.V) bool {
 		v7_0_1.LessThanOrEqual(false, currentKibanaVersion)
 }
 
-func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([]byte, error) {
-	currentURI := http.GetURI()
-	defer http.SetURI(currentURI) // Reset after this request
+// ReadBody reads the response body for responses from Kibana. It accepts both
+// 200 and 503 since Kibana returns valid status JSON on 503 (degraded state).
+func ReadBody(resp *http.Response) ([]byte, error) {
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 && resp.StatusCode != 503 {
+		return nil, fmt.Errorf("unexpected status code %d from Kibana", resp.StatusCode)
+	}
+	return io.ReadAll(resp.Body)
+}
+
+func fetchPath(h *helper.HTTP, currentPath, newPath string, apiKey string) ([]byte, error) {
+	currentURI := h.GetURI()
+	defer h.SetURI(currentURI) // Reset after this request
 
 	// Parse the URI to replace the path
 	u, err := url.Parse(currentURI)
@@ -158,9 +160,14 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([
 	u.RawQuery = ""
 
 	// Http helper includes the HostData with username and password
-	http.SetURI(u.String())
+	h.SetURI(u.String())
 	if apiKey != "" {
-		http.SetHeader("Authorization", "ApiKey "+apiKey)
+		h.SetHeader("Authorization", "ApiKey "+apiKey)
 	}
-	return http.FetchContent()
+
+	resp, err := h.FetchResponse()
+	if err != nil {
+		return nil, err
+	}
+	return ReadBody(resp)
 }

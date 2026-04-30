@@ -30,7 +30,7 @@
     "log": {
       "level": "information"
     },
-    "message": "A security-enabled local group membership was enumerated.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nGroup:\n\tSecurity ID:\t\tS-1-5-32-544\n\tGroup Name:\t\tAdministrators\n\tGroup Domain:\t\tBuiltin\n\nProcess Information:\n\tProcess ID:\t\t0x494\n\tProcess Name:\t\tC:\\Windows\\System32\\svchost.exe",
+    "message": "A security-enabled local group membership was enumerated.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3e7\n\nGroup:\n\tSecurity ID:\t\tS-1-5-32-544\n\tGroup Name:\t\tAdministrators\n\tGroup Domain:\t\tBuiltin\n\nProcess Information:\n\tProcess ID:\t\t0x494\n\tProcess Name:\t\tC:\\Windows\\System32\\svchost.exe",
     "related": {
       "user": [
         "WIN-41OB2LO92CR$"
@@ -42,8 +42,7 @@
       "name": "WIN-41OB2LO92CR$"
     },
     "winlog": {
-      "activity_id": "{c3ff3c1c-7dc1-0000-233e-ffc3c17dd501}",
-      "api": "wineventlog",
+      "activity_id": "{C3FF3C1C-7DC1-0000-233E-FFC3C17DD501}",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR",
       "event_data": {
@@ -71,7 +70,7 @@
           "id": 820
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "3002",
       "task": "Security Group Management"

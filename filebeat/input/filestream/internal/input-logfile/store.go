@@ -21,13 +21,15 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
+	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
@@ -36,8 +38,14 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
-	identifier *sourceIdentifier
-	store      *store
+	// identifier is the sourceIdentifier used to generate IDs fro this store.
+	identifier *SourceIdentifier
+	// identifiersToTakeOver are sourceIdentifier from previous input instances
+	// that this sourceStore will take states over.
+	identifiersToTakeOver []*SourceIdentifier
+	// store is the underlying store that encapsulates
+	// the in-memory and persistent store.
+	store *store
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -141,10 +149,10 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
+func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*store, error) {
 	ok := false
 
-	persistentStore, err := statestore.Access()
+	persistentStore, err := statestore.StoreFor("")
 	if err != nil {
 		return nil, err
 	}
@@ -163,10 +171,21 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
-func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
+// newSourceStore store returns a souceStore that will operate on the provided
+// store. identifier is required and is used to generate the ID for the
+// resources stored on store. identifiersToTakeOver is used by the TakeOver
+// method when taking over states from other Filestream inputs.
+// identifiersToTakeOver is optional and can be nil.
+func newSourceStore(
+	s *store,
+	identifier *SourceIdentifier,
+	identifiersToTakeOver []*SourceIdentifier,
+) *sourceStore {
+
 	return &sourceStore{
-		store:      s,
-		identifier: identifier,
+		store:                 s,
+		identifier:            identifier,
+		identifiersToTakeOver: identifiersToTakeOver,
 	}
 }
 
@@ -212,13 +231,21 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	}
 }
 
-// FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
+// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
-func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
 	for key, res := range s.store.ephemeralStore.table {
+		// Entries in the registry are soft deleted, once the gcStore runs,
+		// they're actually removed from the in-memory registry (ephemeralStore)
+		// and marked as removed in the registry operations log. So we need
+		// to skip all entries that were soft deleted.
+		if res.isDeleted() {
+			continue
+		}
+
 		if !s.identifier.MatchesInput(key) {
 			continue
 		}
@@ -229,72 +256,263 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 		}
 
 		newKey, updatedMeta := getNewID(res)
-		if len(newKey) > 0 && res.internalState.TTL > 0 {
+		if len(newKey) > 0 {
 			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
 				res.lock.Unlock()
 				continue
 			}
 
-			// Pending updates due to events that have not yet been ACKed
-			// are not included in the copy. Collection on
-			// the copy start from the last known ACKed position.
-			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed position using the new key
-			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
+			// writeState only writes to the log file (disk)
+			// the write is synchronous
 			s.store.writeState(r)
 
 			// Add the new resource to the ephemeralStore so the rest of the
 			// codebase can have access to the new value
 			s.store.ephemeralStore.table[newKey] = r
 
-			// Remove the old key from the store
-			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
-			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
+			// Remove the old key from the store aka delete. This is also
+			// synchronously written to the disk.
+			// We cannot use store.remove because it will
+			// acquire the same lock we hold, causing a deadlock.
+			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TLL, which soft-deletes it. This is the
+			//    mechanism used by store.remove. We cannot call store.remove
+			//    because it will acquire a lock we're holding.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
+			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
+			_ = s.store.persistentStore.Remove(res.key)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
 		res.lock.Unlock()
 	}
 }
 
-// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
-// for removal.
-func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+// TakeOver allows one Filestream input to take over states from other
+// Filestream inputs or the Log input. fn should return the new registry ID
+// and new CursorMeta. If fn returns an empty string, the entry is skipped.
+//
+// When fn returns a valid ID:
+//   - If the old resource was from a Filestream input, it is removed from both
+//     the in-memory and disk store.
+//   - If it was from a Log input, it is left untouched.
+func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
+	// Lock the ephemeral store so we can migrate the states in one go
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
+	matchPreviousFilestreamIDs := func(key string) bool {
+		for _, identifier := range s.identifiersToTakeOver {
+			if identifier.MatchesInput(key) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// Iterate through the states from any Filestream input
+	fromFilestreamInput := map[string]struct{}{}
 	for key, res := range s.store.ephemeralStore.table {
-		if !s.identifier.MatchesInput(key) {
+		// Entries in the registry are soft deleted, once the gcStore runs,
+		// they're actually removed from the in-memory registry (ephemeralStore)
+		// and marked as removed in the registry operations log. So we need
+		// to skip all entries that were soft deleted.
+		if res.isDeleted() {
+			continue
+		}
+
+		if !matchPreviousFilestreamIDs(key) {
+			continue
+		}
+
+		fromFilestreamInput[key] = struct{}{}
+	}
+
+	// Iterate through the whole store, no matter input type or input ID.
+	// That's the only way to access the log input states.
+	// We only iterate through the whole store if we're not migrating from
+	// a Filestream input
+	fromLogInput := map[string]TakeOverState{}
+	if len(s.identifiersToTakeOver) == 0 {
+		_ = s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
+			if strings.HasPrefix(key, "filebeat::logs::") {
+				logSt := inpFile.State{}
+				if err := value.Decode(&logSt); err != nil {
+					return true, err
+				}
+
+				st, err := newTakeOverState(logSt, nil)
+				if err != nil {
+					// This should never happen. newTakeOverState can only fail if
+					// Filestream state format has changed and when using the
+					// Log input state, the Filestream one is ignored
+					s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+					return true, err
+				}
+
+				st.Key = key
+				fromLogInput[key] = st
+			}
+
+			return true, nil
+		})
+	}
+
+	// Migrate all states from the Filestream input
+	for k := range fromFilestreamInput {
+		res := s.store.ephemeralStore.unsafeFind(k, false)
+		if res == nil {
+			// The resource does not exist or has been deleted.
+			// This should never happen, but better safe than sorry
 			continue
 		}
 
 		if !res.lock.TryLock() {
+			res.Release()
+			s.store.log.Infof("cannot lock '%s', will not migrate its state", k)
 			continue
 		}
 
-		newKey, updatedMeta := getNewID(res)
-		if len(newKey) > 0 && res.internalState.TTL > 0 {
-			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
-				res.lock.Unlock()
+		// cleanup must be called on any "exit point" from this loop iteration.
+		// It is responsible for correctly releasing the locked resource.
+		cleanup := func() {
+			res.Release()
+			res.lock.Unlock()
+		}
+
+		st, err := newTakeOverState(inpFile.State{}, res)
+		if err != nil {
+			// This should never happen. newTakeOverState can only fail if
+			// Filestream state format has changed
+			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+			cleanup()
+			continue
+		}
+		newKey, updatedMeta := fn(st)
+		if len(newKey) > 0 {
+			// If the new key already exists in the store, do nothing.
+			// Unlock the resource and return
+			if res := s.store.ephemeralStore.unsafeFind(newKey, false); res != nil {
+				res.Release()
+				cleanup()
 				continue
 			}
 
-			// Pending updates due to events that have not yet been ACKed
-			// are not included in the copy. Collection on
-			// the copy start from the last known ACKed position.
-			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed position using the new key
-			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
+			// writeState only writes to the log file (disk)
+			// the write is synchronous
 			s.store.writeState(r)
+
+			// Add the new resource to the ephemeralStore so the rest of the
+			// codebase can have access to the new value
+			s.store.ephemeralStore.table[newKey] = r
+
+			// Remove the old key from the store aka delete. This is also
+			// synchronously written to the disk.
+			// We cannot use store.remove because it will
+			// acquire the same lock we hold, causing a deadlock.
+			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TTL, which soft-deletes it.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
+			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
+			_ = s.store.persistentStore.Remove(res.key)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
 
-		res.lock.Unlock()
+		cleanup()
 	}
+
+	// Migrate all states from the Log input
+	for k, v := range fromLogInput {
+		newKey, updatedMeta := fn(v)
+		if len(newKey) > 0 {
+			res := s.store.ephemeralStore.unsafeFind(newKey, true)
+
+			// If the new key already exists in the store, the file has already
+			// been taken over. Skip it to avoid overwriting a valid Filestream
+			// state with a potentially stale Log input state.
+			if !res.IsNew() {
+				res.Release()
+				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", k, newKey)
+				continue
+			}
+
+			res.cursorMeta = updatedMeta
+			// Convert the offset to the correct type
+			res.cursor = struct {
+				Offset int64 `json:"offset" struct:"offset"`
+			}{
+				Offset: v.logInpOffset,
+			}
+
+			// Write to disk
+			s.store.writeState(res)
+
+			// Update in-memory store
+			s.store.ephemeralStore.table[newKey] = res
+
+			res.Release()
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
+		}
+	}
+}
+
+// TakeOverState is the state of a file whose state is being taken over.
+// [newTakeOverState] correctly populates the fields according to the source
+// state (Log or Filestream). Only the fields required outside of this package
+// are exported.
+type TakeOverState struct {
+	FileStateOS    file.StateOS
+	IdentifierName string
+	Key            string
+	Source         string
+
+	logInpOffset int64
+}
+
+// newTakeOverState creates a TakeOverState populated by the logSt or filestreamSt.
+// If filestreamSt is not nil, it is used, otherwise logSt is used.
+// An error is only returned if filestreamSt.UnpackCursorMeta fails, the only
+// reason for it to fail is if the data format in the store has changed.
+func newTakeOverState(logSt inpFile.State, filestreamSt *resource) (TakeOverState, error) {
+	st := TakeOverState{}
+
+	if filestreamSt != nil {
+		// This struct matches the fileMeta defined at input/filestream/input.go
+		meta := struct {
+			IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+			Source         string `json:"source" struct:"source"`
+		}{}
+		if err := filestreamSt.UnpackCursorMeta(&meta); err != nil {
+			return st, err
+		}
+
+		st.Source = meta.Source
+		st.IdentifierName = meta.IdentifierName
+		st.Key = filestreamSt.key
+
+		return st, nil
+	}
+
+	st.Source = logSt.Source
+	st.IdentifierName = logSt.IdentifierName
+	st.FileStateOS = logSt.FileStateOS
+	st.logInpOffset = logSt.Offset
+	st.Key = logSt.Id
+
+	return st, nil
 }
 
 func (s *store) Retain() { s.refCount.Retain() }
@@ -411,7 +629,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 
 	s.writeState(resource)
 
-	if resource.isDeleted() {
+	if resource.unsafeIsDeleted() {
 		// version must be incremented to make sure existing resource
 		// instances do not overwrite the removal of the entry
 		resource.version++
@@ -427,6 +645,17 @@ func (s *states) Find(key string, create bool) *resource {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	return s.unsafeFind(key, create)
+}
+
+// unsafeFind DOES NOT LOCK THE STORE!!! Only call unsafeFind if you're
+// currently holding the lock from states.mu.
+//
+// unsafeFind returns the resource for a given key. If the key is unknown and
+// create is set to false nil will be returned.
+// The resource returned by unsafeFind is marked as active. (*resource).Release
+// must be called to mark the resource as inactive again.
+func (s *states) unsafeFind(key string, create bool) *resource {
 	if resource := s.table[key]; resource != nil && !resource.isDeleted() {
 		resource.Retain()
 		return resource
@@ -442,6 +671,10 @@ func (s *states) Find(key string, create bool) *resource {
 		key:    key,
 		lock:   unison.MakeMutex(),
 	}
+	// -1 means this resource will not be cleaned up due to a timeout.
+	// The zero-value for internalState.TTL means this resource is
+	// soft-deleted.
+	resource.internalState.TTL = -1
 	s.table[key] = resource
 	resource.Retain()
 	return resource
@@ -454,21 +687,31 @@ func (r *resource) IsNew() bool {
 	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
+// isDeleted locks stateMutex then checks whether [resource] is deleted.
 func (r *resource) isDeleted() bool {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return r.unsafeIsDeleted()
+}
+
+// unsafeIsDeleted DOES NOT LOCK THE RESOURCE!!!
+// Only call unsafeIsDeleted if you're currently holding the
+// lock from resource.stateMutex
+func (r *resource) unsafeIsDeleted() bool {
 	return !r.internalState.Updated.IsZero() && r.internalState.TTL == 0
 }
 
 // Retain is used to indicate that 'resource' gets an additional 'owner'.
 // Owners of an resource can be active inputs or pending update operations
 // not yet written to disk.
-func (r *resource) Retain() { r.pending.Inc() }
+func (r *resource) Retain() { r.pending.Add(1) }
 
 // Release reduced the owner ship counter of the resource.
-func (r *resource) Release() { r.pending.Dec() }
+func (r *resource) Release() { r.pending.Add(^uint64(0)) }
 
 // UpdatesReleaseN is used to release ownership of N pending update operations.
 func (r *resource) UpdatesReleaseN(n uint) {
-	r.pending.Sub(uint64(n))
+	r.pending.Add(^uint64(n - 1))
 }
 
 // Finished returns true if the resource is not in use and if there are no pending updates
@@ -482,8 +725,14 @@ func (r *resource) UnpackCursor(to interface{}) error {
 	return typeconv.Convert(to, r.activeCursor())
 }
 
+// UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
 func (r *resource) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, r.cursorMeta)
+}
+
+// Key returns the resource's key
+func (r *resource) Key() string {
+	return r.key
 }
 
 // syncStateSnapshot returns the current insync state based on already ACKed update operations.
@@ -587,7 +836,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		var st state
 		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
+			log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
 				key, err)
 			return true, nil
 		}

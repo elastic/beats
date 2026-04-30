@@ -30,87 +30,116 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/beat"
 )
 
-var (
-	schema = s.Schema{
-		"cgroup":     c.Ifc("beat.cgroup"),
-		"system":     c.Ifc("system"),
-		"apm_server": c.Ifc("apm-server"),
-		"output":     c.Ifc("output"),
-		"cpu":        c.Ifc("beat.cpu"),
-		"info":       c.Ifc("beat.info"),
-		"uptime": c.Dict("beat.info.uptime", s.Schema{
-			"ms": c.Int("ms"),
+var schema = s.Schema{
+	"cgroup":     c.Ifc("beat.cgroup"),
+	"system":     c.Ifc("system"),
+	"apm_server": c.Ifc("apm-server"),
+	"output":     c.Ifc("output"),
+	"cpu":        c.Ifc("beat.cpu"),
+	"info":       c.Ifc("beat.info"),
+	"uptime": c.Dict("beat.info.uptime", s.Schema{
+		"ms": c.Int("ms"),
+	}),
+	"runtime": c.Dict("beat.runtime", s.Schema{
+		"goroutines": c.Int("goroutines"),
+	}, c.DictOptional),
+	"handles": c.Dict("beat.handles", s.Schema{
+		"limit": c.Dict("limit", s.Schema{
+			"hard": c.Int("hard"),
+			"soft": c.Int("soft"),
 		}),
-		"runtime": c.Dict("beat.runtime", s.Schema{
-			"goroutines": c.Int("goroutines"),
-		}, c.DictOptional),
-		"handles": c.Dict("beat.handles", s.Schema{
-			"limit": c.Dict("limit", s.Schema{
-				"hard": c.Int("hard"),
-				"soft": c.Int("soft"),
+		"open": c.Int("open"),
+	}),
+	"libbeat": c.Dict("libbeat", s.Schema{
+		"output": c.Dict("output", s.Schema{
+			"type": c.Str("type"),
+			"events": c.Dict("events", s.Schema{
+				"acked":         c.Int("acked"),
+				"active":        c.Int("active"),
+				"batches":       c.Int("batches"),
+				"dropped":       c.Int("dropped"),
+				"duplicates":    c.Int("duplicates"),
+				"failed":        c.Int("failed"),
+				"failure_store": c.Int("failure_store"),
+				"toomany":       c.Int("toomany"),
+				"total":         c.Int("total"),
 			}),
-			"open": c.Int("open"),
-		}),
-		"libbeat": c.Dict("libbeat", s.Schema{
-			"output": c.Dict("output", s.Schema{
-				"type": c.Str("type"),
-				"events": c.Dict("events", s.Schema{
-					"acked":      c.Int("acked"),
-					"active":     c.Int("active"),
-					"batches":    c.Int("batches"),
-					"dropped":    c.Int("dropped"),
-					"duplicates": c.Int("duplicates"),
-					"failed":     c.Int("failed"),
-					"toomany":    c.Int("toomany"),
-					"total":      c.Int("total"),
+			"read": c.Dict("read", s.Schema{
+				"bytes":  c.Int("bytes"),
+				"errors": c.Int("errors"),
+			}),
+			"write": c.Dict("write", s.Schema{
+				"bytes":  c.Int("bytes"),
+				"errors": c.Int("errors"),
+				"latency": c.Dict("latency", s.Schema{
+					"histogram": c.Dict("histogram", s.Schema{
+						"count":  c.Int("count"),
+						"max":    c.Int("max"),
+						"median": c.Float("median"),
+						"p95":    c.Float("p95"),
+						"p99":    c.Float("p99"),
+					}),
 				}),
-				"read": c.Dict("read", s.Schema{
+			}),
+		}),
+		"pipeline": c.Dict("pipeline", s.Schema{
+			"clients": c.Int("clients"),
+			"queue": c.Dict("queue", s.Schema{
+				"max_events": c.Int("max_events"),
+
+				"added": c.Dict("added", s.Schema{
+					"events": c.Int("events"),
 					"bytes":  c.Int("bytes"),
-					"errors": c.Int("errors"),
 				}),
-				"write": c.Dict("write", s.Schema{
+				"consumed": c.Dict("consumed", s.Schema{
+					"events": c.Int("events"),
 					"bytes":  c.Int("bytes"),
-					"errors": c.Int("errors"),
 				}),
+				"removed": c.Dict("removed", s.Schema{
+					"events": c.Int("events"),
+					"bytes":  c.Int("bytes"),
+				}),
+				"filled": c.Dict("filled", s.Schema{
+					"events": c.Int("events"),
+					"bytes":  c.Int("bytes"),
+					"pct":    c.Float("pct"),
+				}),
+
+				// Backwards compatibility: "acked" is the old name for
+				// "removed.events" and should not be used by new code/dashboards.
+				"acked": c.Int("acked"),
 			}),
-			"pipeline": c.Dict("pipeline", s.Schema{
-				"clients": c.Int("clients"),
-				"queue": c.Dict("queue", s.Schema{
-					"acked":      c.Int("acked"),
-					"max_events": c.Int("max_events"),
-				}),
-				"events": c.Dict("events", s.Schema{
-					"active":    c.Int("active"),
-					"dropped":   c.Int("dropped"),
-					"failed":    c.Int("failed"),
-					"filtered":  c.Int("filtered"),
-					"published": c.Int("published"),
-					"retry":     c.Int("retry"),
-					"total":     c.Int("total"),
-				}),
-			}),
-			"config": c.Dict("config", s.Schema{
-				"running": c.Int("module.running"),
-				"starts":  c.Int("module.starts"),
-				"stops":   c.Int("module.stops"),
-				"reloads": c.Int("reloads"),
+			"events": c.Dict("events", s.Schema{
+				"active":    c.Int("active"),
+				"dropped":   c.Int("dropped"),
+				"failed":    c.Int("failed"),
+				"filtered":  c.Int("filtered"),
+				"published": c.Int("published"),
+				"retry":     c.Int("retry"),
+				"total":     c.Int("total"),
 			}),
 		}),
-		"state": c.Dict("metricbeat.beat.state", s.Schema{
-			"events":   c.Int("events"),
-			"failures": c.Int("failures"),
-			"success":  c.Int("success"),
+		"config": c.Dict("config", s.Schema{
+			"running": c.Int("module.running"),
+			"starts":  c.Int("module.starts"),
+			"stops":   c.Int("module.stops"),
+			"reloads": c.Int("reloads"),
 		}),
-		"memstats": c.Dict("beat.memstats", s.Schema{
-			"gc_next": c.Int("gc_next"),
-			"memory": s.Object{
-				"alloc": c.Int("memory_alloc"),
-				"total": c.Int("memory_total"),
-			},
-			"rss": c.Int("rss"),
-		}),
-	}
-)
+	}),
+	"state": c.Dict("metricbeat.beat.state", s.Schema{
+		"events":   c.Int("events"),
+		"failures": c.Int("failures"),
+		"success":  c.Int("success"),
+	}),
+	"memstats": c.Dict("beat.memstats", s.Schema{
+		"gc_next": c.Int("gc_next"),
+		"memory": s.Object{
+			"alloc": c.Int("memory_alloc"),
+			"total": c.Int("memory_total"),
+		},
+		"rss": c.Int("rss"),
+	}),
+}
 
 func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content []byte, isXpack bool) error {
 	event := mb.Event{

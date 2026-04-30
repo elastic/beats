@@ -1,0 +1,367 @@
+[
+    {
+        "n" : ".monitoring-logstash",
+        "t" : "[.monitoring-logstash-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-beats",
+        "t" : "[.monitoring-beats-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-alerts-7",
+        "t" : "[.monitoring-alerts-7]",
+        "c" : ""
+    },
+    {
+        "n" : "customer-template",
+        "t" : "[my-indexes-*, my-indexes2-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-es",
+        "t" : "[.monitoring-es-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".monitoring-kibana",
+        "t" : "[.monitoring-kibana-7-*]",
+        "c" : ""
+    },
+    {
+        "n" : ".kibana-reporting",
+        "t" : "[.kibana-reporting*]",
+        "c" : "[kibana-reporting@settings, kibana-reporting@custom]"
+    },
+    {
+        "n" : ".monitoring-ent-search-mb",
+        "t" : "[.monitoring-ent-search-8-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "logs-apm.error@template",
+        "t" : "[logs-apm.error-*]",
+        "c" : "[logs@mappings, apm@mappings, apm@settings, apm-10d@lifecycle, logs-apm@settings, logs-apm.error@mappings, logs-apm.error-fallback@lifecycle, logs@custom, logs-apm.error@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".kibana-observability-ai-assistant-index-template-kb",
+        "t" : "[.kibana-observability-ai-assistant-kb*]",
+        "c" : "[.kibana-observability-ai-assistant-component-template-kb]"
+    },
+    {
+        "n" : "metrics-apm.service_destination.1m@template",
+        "t" : "[metrics-apm.service_destination.1m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_destination@mappings, metrics-apm.service_destination.1m-fallback@lifecycle, metrics@custom, metrics-apm.service_destination.1m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "metrics-apm.service_summary.60m@template",
+        "t" : "[metrics-apm.service_summary.60m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-390d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_summary@mappings, metrics-apm.service_summary.60m-fallback@lifecycle, metrics@custom, metrics-apm.service_summary.60m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "metrics-apm.service_summary.1m@template",
+        "t" : "[metrics-apm.service_summary.1m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_summary@mappings, metrics-apm.service_summary.1m-fallback@lifecycle, metrics@custom, metrics-apm.service_summary.1m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "ilm-history-7",
+        "t" : "[ilm-history-7*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".fleet-fileds-tohost-meta",
+        "t" : "[.fleet-fileds-tohost-meta-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics-apm.transaction.1m@template",
+        "t" : "[metrics-apm.transaction.1m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.transaction@mappings, metrics-apm.transaction.1m-fallback@lifecycle, metrics@custom, metrics-apm.transaction.1m@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".kibana-event-log-template",
+        "t" : "[.kibana-event-log-ds]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".fleet-fileds-fromhost-data",
+        "t" : "[.fleet-fileds-fromhost-data-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics-apm.service_transaction.60m@template",
+        "t" : "[metrics-apm.service_transaction.60m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-390d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_transaction@mappings, metrics-apm.service_transaction.60m-fallback@lifecycle, metrics@custom, metrics-apm.service_transaction.60m@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".alerts-observability.metrics.alerts-default-index-template",
+        "t" : "[.internal.alerts-observability.metrics.alerts-default-*]",
+        "c" : "[.alerts-ecs-mappings, .alerts-observability.metrics.alerts-mappings, .alerts-legacy-alert-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".kibana-elastic-ai-assistant-index-template-conversations",
+        "t" : "[.kibana-elastic-ai-assistant-conversations-*]",
+        "c" : "[.kibana-elastic-ai-assistant-component-template-conversations]"
+    },
+    {
+        "n" : ".slo-observability.summary",
+        "t" : "[.slo-observability.summary-*]",
+        "c" : "[.slo-observability.summary-mappings, .slo-observability.summary-settings]"
+    },
+    {
+        "n" : "metrics-apm.transaction.60m@template",
+        "t" : "[metrics-apm.transaction.60m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-390d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.transaction@mappings, metrics-apm.transaction.60m-fallback@lifecycle, metrics@custom, metrics-apm.transaction.60m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "logs",
+        "t" : "[logs-*-*]",
+        "c" : "[logs@mappings, logs@settings, logs@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".watch-history-16",
+        "t" : "[.watcher-history-16*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".monitoring-beats-mb",
+        "t" : "[.monitoring-beats-8-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics-apm.transaction.10m@template",
+        "t" : "[metrics-apm.transaction.10m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-180d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.transaction@mappings, metrics-apm.transaction.10m-fallback@lifecycle, metrics@custom, metrics-apm.transaction.10m@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".alerts-ml.anomaly-detection.alerts-default-index-template",
+        "t" : "[.internal.alerts-ml.anomaly-detection.alerts-default-*]",
+        "c" : "[.alerts-ml.anomaly-detection.alerts-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".monitoring-kibana-mb",
+        "t" : "[.monitoring-kibana-8-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics-apm.service_summary.10m@template",
+        "t" : "[metrics-apm.service_summary.10m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-180d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_summary@mappings, metrics-apm.service_summary.10m-fallback@lifecycle, metrics@custom, metrics-apm.service_summary.10m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "entities_v1_latest_index_template",
+        "t" : "[.entities-observability.latest-v1.*]",
+        "c" : "[entities_v1_latest_base, entities_v1_event, entities_v1_entity]"
+    },
+    {
+        "n" : ".kibana-data-quality-dashboard-results-index-template",
+        "t" : "[.kibana-data-quality-dashboard-results-*]",
+        "c" : "[.kibana-data-quality-dashboard-results-mappings, .kibana-data-quality-dashboard-ecs-mappings]"
+    },
+    {
+        "n" : ".ml-state",
+        "t" : "[.ml-state*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".monitoring-logstash-mb",
+        "t" : "[.monitoring-logstash-8-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".alerts-stack.alerts-default-index-template",
+        "t" : "[.internal.alerts-stack.alerts-default-*]",
+        "c" : "[.alerts-ecs-mappings, .alerts-stack.alerts-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".ml-anomalies-",
+        "t" : "[.ml-anomalies-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics",
+        "t" : "[metrics-*-*]",
+        "c" : "[metrics@mappings, data-streams@mappings, metrics@settings, metrics@custom]"
+    },
+    {
+        "n" : ".ml-notifications-000002",
+        "t" : "[.ml-notifications-000002]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics-apm.service_destination.10m@template",
+        "t" : "[metrics-apm.service_destination.10m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-180d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_destination@mappings, metrics-apm.service_destination.10m-fallback@lifecycle, metrics@custom, metrics-apm.service_destination.10m@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".ml-stats",
+        "t" : "[.ml-stats-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".slm-history-7",
+        "t" : "[.slm-history-7*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".alerts-security.alerts-default-index-template",
+        "t" : "[.internal.alerts-security.alerts-default-*]",
+        "c" : "[.alerts-ecs-mappings, .alerts-security.alerts-mappings, .alerts-legacy-alert-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".alerts-observability.slo.alerts-default-index-template",
+        "t" : "[.internal.alerts-observability.slo.alerts-default-*]",
+        "c" : "[.alerts-observability.slo.alerts-mappings, .alerts-legacy-alert-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : "behavioral_analytics-events-default",
+        "t" : "[behavioral_analytics-events-*]",
+        "c" : "[behavioral_analytics-events-settings, behavioral_analytics-events-mappings]"
+    },
+    {
+        "n" : ".fleet-fileds-fromhost-meta",
+        "t" : "[.fleet-fileds-fromhost-meta-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "elastic-connectors",
+        "t" : "[.elastic-connectors-v1]",
+        "c" : "[elastic-connectors-settings, elastic-connectors-mappings]"
+    },
+    {
+        "n" : ".kibana-elastic-ai-assistant-index-template-knowledge-base",
+        "t" : "[.kibana-elastic-ai-assistant-knowledge-base-*]",
+        "c" : "[.kibana-elastic-ai-assistant-component-template-knowledge-base]"
+    },
+    {
+        "n" : "metrics-apm.service_destination.60m@template",
+        "t" : "[metrics-apm.service_destination.60m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-390d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_destination@mappings, metrics-apm.service_destination.60m-fallback@lifecycle, metrics@custom, metrics-apm.service_destination.60m@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".alerts-default.alerts-default-index-template",
+        "t" : "[.internal.alerts-default.alerts-default-*]",
+        "c" : "[.alerts-framework-mappings]"
+    },
+    {
+        "n" : "elastic-connectors-sync-jobs",
+        "t" : "[.elastic-connectors-sync-jobs-v1]",
+        "c" : "[elastic-connectors-settings, elastic-connectors-sync-jobs-mappings]"
+    },
+    {
+        "n" : ".monitoring-es-mb",
+        "t" : "[.monitoring-es-8-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".alerts-ml.anomaly-detection-health.alerts-default-index-template",
+        "t" : "[.internal.alerts-ml.anomaly-detection-health.alerts-default-*]",
+        "c" : "[.alerts-ml.anomaly-detection-health.alerts-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".slo-observability.sli",
+        "t" : "[.slo-observability.sli-*]",
+        "c" : "[.slo-observability.sli-mappings, .slo-observability.sli-settings]"
+    },
+    {
+        "n" : ".alerts-observability.logs.alerts-default-index-template",
+        "t" : "[.internal.alerts-observability.logs.alerts-default-*]",
+        "c" : "[.alerts-ecs-mappings, .alerts-observability.logs.alerts-mappings, .alerts-legacy-alert-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : "entities_v1_history_index_template",
+        "t" : "[.entities-observability.history-v1.*]",
+        "c" : "[entities_v1_history_base, entities_v1_event, entities_v1_entity]"
+    },
+    {
+        "n" : "apm-source-map",
+        "t" : "[.apm-source-map]",
+        "c" : "[]"
+    },
+    {
+        "n" : "metrics-apm.service_transaction.10m@template",
+        "t" : "[metrics-apm.service_transaction.10m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-180d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_transaction@mappings, metrics-apm.service_transaction.10m-fallback@lifecycle, metrics@custom, metrics-apm.service_transaction.10m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "traces-apm@template",
+        "t" : "[traces-apm-*]",
+        "c" : "[traces@mappings, apm@mappings, apm@settings, apm-10d@lifecycle, traces-apm@mappings, traces-apm-fallback@lifecycle, traces@custom, traces-apm@custom, ecs@mappings]"
+    },
+    {
+        "n" : "logs-apm.app@template",
+        "t" : "[logs-apm.app.*-*]",
+        "c" : "[logs@mappings, apm@mappings, apm@settings, apm-10d@lifecycle, logs-apm@settings, logs-apm.app-fallback@lifecycle, logs@custom, logs-apm.app@custom, ecs@mappings]"
+    },
+    {
+        "n" : "metrics-apm.service_transaction.1m@template",
+        "t" : "[metrics-apm.service_transaction.1m-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.service_transaction@mappings, metrics-apm.service_transaction.1m-fallback@lifecycle, metrics@custom, metrics-apm.service_transaction.1m@custom, ecs@mappings]"
+    },
+    {
+        "n" : "synthetics",
+        "t" : "[synthetics-*-*]",
+        "c" : "[synthetics@mappings, data-streams@mappings, synthetics@settings]"
+    },
+    {
+        "n" : "metrics-apm.internal@template",
+        "t" : "[metrics-apm.internal-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.internal-fallback@lifecycle, metrics@custom, metrics-apm.internal@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".alerts-observability.uptime.alerts-default-index-template",
+        "t" : "[.internal.alerts-observability.uptime.alerts-default-*]",
+        "c" : "[.alerts-observability.uptime.alerts-mappings, .alerts-legacy-alert-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".kibana-observability-ai-assistant-index-template-conversations",
+        "t" : "[.kibana-observability-ai-assistant-conversations*]",
+        "c" : "[.kibana-observability-ai-assistant-component-template-conversations]"
+    },
+    {
+        "n" : ".alerts-observability.threshold.alerts-default-index-template",
+        "t" : "[.internal.alerts-observability.threshold.alerts-default-*]",
+        "c" : "[.alerts-ecs-mappings, .alerts-observability.threshold.alerts-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".alerts-transform.health.alerts-default-index-template",
+        "t" : "[.internal.alerts-transform.health.alerts-default-*]",
+        "c" : "[.alerts-transform.health.alerts-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : ".fleet-fileds-tohost-data",
+        "t" : "[.fleet-fileds-tohost-data-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : "traces-apm.rum@template",
+        "t" : "[traces-apm.rum-*]",
+        "c" : "[traces@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, traces-apm@mappings, traces-apm.rum@mappings, traces-apm.rum-fallback@lifecycle, traces@custom, traces-apm.rum@custom, ecs@mappings]"
+    },
+    {
+        "n" : "search-acl-filter",
+        "t" : "[.search-acl-filter-*]",
+        "c" : "[]"
+    },
+    {
+        "n" : ".deprecation-indexing-template",
+        "t" : "[.logs-deprecation.*]",
+        "c" : "[.deprecation-indexing-mappings, .deprecation-indexing-settings]"
+    },
+    {
+        "n" : "metrics-apm.app@template",
+        "t" : "[metrics-apm.app.*-*]",
+        "c" : "[metrics@mappings, apm@mappings, apm@settings, apm-90d@lifecycle, metrics-apm@mappings, metrics-apm@settings, metrics-apm.app-fallback@lifecycle, metrics@custom, metrics-apm.app@custom, ecs@mappings]"
+    },
+    {
+        "n" : ".alerts-observability.apm.alerts-default-index-template",
+        "t" : "[.internal.alerts-observability.apm.alerts-default-*]",
+        "c" : "[.alerts-observability.apm.alerts-mappings, .alerts-legacy-alert-mappings, .alerts-framework-mappings]"
+    },
+    {
+        "n" : "traces-apm.sampled@template",
+        "t" : "[traces-apm.sampled-*]",
+        "c" : "[traces@mappings, apm@mappings, apm@settings, traces-apm.sampled-fallback@lifecycle, traces@custom, traces-apm.sampled@custom, ecs@mappings]"
+    }
+]

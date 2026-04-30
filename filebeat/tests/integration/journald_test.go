@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration && linux
 
 package integration
@@ -24,19 +26,369 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"math/rand/v2"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, max int) {
-	cmd := exec.Command("systemd-cat", "-t", syslogID)
+//go:embed testdata/filebeat_journald.yml
+var journaldInputCfg string
+
+//go:embed testdata/filebeat_journald_all_boots.yml
+var journaldInputAllBootsCfg string
+
+var bootListLineRE = regexp.MustCompile(`^\s*([+-]?\d+)\s+([0-9a-fA-F]{32})\s+(.+)$`)
+
+func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	// render configuration
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
+
+	generateJournaldLogs(t, syslogID, 3, 100)
+
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
+
+	pidLine := filebeat.GetLastLogLine("journalctl started")
+	logEntry := struct {
+		Pid int `json:"process.pid"`
+	}{}
+	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
+		t.Errorf("could not parse PID log entry as JSON: %s. Line: %q", err, pidLine)
+	}
+
+	pid := logEntry.Pid
+	filebeat.WaitPublishedEvents(5*time.Second, 3)
+
+	// Kill journalctl
+	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
+		t.Fatalf("coluld not kill journalctl with PID %d: %s", pid, err)
+	}
+
+	generateJournaldLogs(t, syslogID, 5, 100)
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
+	filebeat.WaitPublishedEvents(5*time.Second, 8)
+}
+
+func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	// render configuration
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
+
+	defer func() {
+		if t.Failed() {
+			t.Logf("Syslog ID: %q", syslogID)
+		}
+	}()
+	generateJournaldLogs(t, syslogID, 3, 100)
+
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
+
+	// Ensure started line is logged and PID is correctly read
+	pidLine := filebeat.GetLastLogLine("journalctl started")
+	logEntry := struct {
+		Pid int `json:"process.pid"`
+	}{}
+	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
+		t.Errorf("could not parse PID log entry as JSON: %s. Line: %q", err, pidLine)
+	}
+
+	filebeat.WaitPublishedEvents(5*time.Second, 3)
+
+	// Stop Filebeat
+	filebeat.Stop()
+
+	// Generate more logs
+	generateJournaldLogs(t, syslogID, 5, 100)
+	// Restart Filebeat
+	filebeat.Start()
+
+	// Wait for journalctl to start
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
+
+	// Wait for last even in the output
+	filebeat.WaitPublishedEvents(5*time.Second, 8)
+}
+
+func TestJournaldLargeLines(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	// render configuration
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
+
+	defer func() {
+		if t.Failed() {
+			t.Logf("Syslog ID: %q", syslogID)
+		}
+	}()
+
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
+
+	evtLen := 9000
+	generateJournaldLogs(t, syslogID, 5, evtLen)
+
+	filebeat.WaitPublishedEvents(20*time.Second, 5)
+	type evt struct {
+		Message string `json:"message"`
+	}
+
+	evts := integration.GetEventsFromFileOutput[evt](filebeat, 5, false)
+	for i, e := range evts {
+		if len(e.Message) != evtLen {
+			t.Errorf("event %d: expecting len %d, got %d", i, evtLen, len(e.Message))
+			if len(e.Message) < 100 {
+				t.Logf("Message: %q", e.Message)
+			}
+		}
+	}
+}
+
+type bootInfo struct {
+	Offset         string
+	BootID         string
+	StartTimestamp string
+}
+
+type journaldAllBootsEvent struct {
+	Journald struct {
+		Host struct {
+			BootID string `json:"boot_id"`
+		} `json:"host"`
+	} `json:"journald"`
+}
+
+// TestJournaldInputReadsMessagesFromAllBoots is meant to be run manually in
+// VMs with small journals to validate we can read messages from all boots.
+// In machines with large journals, the test will be auto skipped to prevent
+// it from timeout or hanging.
+// See filebeat/input/journald/README.md for information about how to run
+// VMs with different versions of Systemd/Journald
+// Always run this test with -v to know if/where the test is taking time.
+func TestJournaldInputReadsMessagesFromAllBoots(t *testing.T) {
+	if os.Getenv("JOURNALD_MANUAL_TEST") == "" {
+		t.Skip("This test is meant to be run manually while developing.")
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	t.Log("Reading boot entries, this should be quick")
+	boots, listBootsRaw := listBoots(t)
+	if len(boots) <= 1 {
+		t.Fatalf("expected more than one boot in journalctl --list-boots output, got %d. Output:\n%s", len(boots), listBootsRaw)
+	}
+
+	oldestBoot := boots[0]
+	secondOldestBoot := boots[1]
+
+	t.Log("Counting boot entries from oldest boot, this can take several seconds.")
+	t.Logf("Boot offset %s, boot ID %s", oldestBoot.Offset, oldestBoot.BootID)
+	oldestBootEntries := countBootEntries(t, oldestBoot.Offset)
+
+	if oldestBootEntries > 50_000 {
+		t.Skipf("Too many entries in the first boot %d > 50_000", oldestBootEntries)
+	}
+
+	t.Log("Counting boot entries from second oldest boot, this can take several seconds.")
+	t.Logf("Boot offset %s, boot ID %s", secondOldestBoot.Offset, secondOldestBoot.BootID)
+	secondOldestBootEntries := countBootEntries(t, secondOldestBoot.Offset)
+
+	if secondOldestBootEntries > 50_000 {
+		t.Skipf("Too many entries in the second boot %d > 50_000", secondOldestBootEntries)
+	}
+
+	expectedMessages := oldestBootEntries + secondOldestBootEntries
+	if expectedMessages < 2 {
+		t.Fatalf(
+			"expected at least two journal entries from oldest two boots, got %d (oldest=%d second_oldest=%d)",
+			expectedMessages,
+			oldestBootEntries,
+			secondOldestBootEntries,
+		)
+	}
+
+	yamlCfg := fmt.Sprintf(journaldInputAllBootsCfg, filebeat.TempDir())
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
+	filebeat.WaitLogsContains("journalctl started", 10*time.Second, "journalctl did not start")
+
+	waitForAtLeastPublishedEvents(t, filebeat, expectedMessages, 2*time.Minute)
+
+	events := integration.GetEventsFromFileOutput[journaldAllBootsEvent](filebeat, expectedMessages, false)
+	bootIDs := distinctBootIDs(events)
+	assert.GreaterOrEqualf(
+		t,
+		len(bootIDs),
+		2,
+		"expected at least 2 distinct boot IDs; got %d. sample=%v",
+		len(bootIDs),
+		sortedBootIDsSample(bootIDs, 10),
+	)
+
+	if t.Failed() {
+		t.Logf("journalctl --list-boots output:\n%s", listBootsRaw)
+		t.Logf("oldest boot: offset=%s id=%s start=%q", oldestBoot.Offset, oldestBoot.BootID, oldestBoot.StartTimestamp)
+		t.Logf("second oldest boot: offset=%s id=%s start=%q", secondOldestBoot.Offset, secondOldestBoot.BootID, secondOldestBoot.StartTimestamp)
+		t.Logf("entry counts: oldest=%d second_oldest=%d expected_messages=%d", oldestBootEntries, secondOldestBootEntries, expectedMessages)
+		t.Logf("events read=%d distinct_boot_ids=%d sample=%v", len(events), len(bootIDs), sortedBootIDsSample(bootIDs, 10))
+	}
+}
+
+func listBoots(t *testing.T) (boots []bootInfo, raw string) {
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "journalctl", "--list-boots", "--no-pager", "--quiet")
+	output, err := cmd.CombinedOutput()
+	raw = string(output)
+	if err != nil {
+		t.Fatalf("could not run journalctl --list-boots: %s. Output: %q", err, strings.TrimSpace(raw))
+	}
+
+	lines := strings.SplitSeq(raw, "\n")
+	for line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+
+		matches := bootListLineRE.FindStringSubmatch(trimmed)
+		if len(matches) != 4 {
+			t.Fatalf("unexpected line in journalctl --list-boots output: %q", trimmed)
+		}
+
+		timeRange := strings.TrimSpace(matches[3])
+		startTimestamp := timeRange
+		if parts := strings.SplitN(timeRange, "—", 2); len(parts) == 2 {
+			startTimestamp = strings.TrimSpace(parts[0])
+		} else if parts := strings.SplitN(timeRange, "--", 2); len(parts) == 2 {
+			startTimestamp = strings.TrimSpace(parts[0])
+		}
+
+		boots = append(boots, bootInfo{
+			Offset:         matches[1],
+			BootID:         strings.ToLower(matches[2]),
+			StartTimestamp: startTimestamp,
+		})
+	}
+
+	return boots, raw
+}
+
+func countBootEntries(t *testing.T, bootOffset string) int {
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+
+	cmd := exec.CommandContext(
+		ctx,
+		"bash",
+		"-c",
+		`set -o pipefail; journalctl -b "$1" --output=json --no-pager --quiet | wc -l`,
+		"countBootEntries",
+		bootOffset,
+	)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("journalctl | wc -l failed for boot %q: %s. output=%q", bootOffset, err, strings.TrimSpace(string(output)))
+	}
+
+	countStr := strings.TrimSpace(string(output))
+	count, err := strconv.Atoi(countStr)
+	if err != nil {
+		t.Fatalf("could not parse wc -l output for boot %q: output=%q error=%s", bootOffset, countStr, err)
+	}
+
+	return count
+}
+
+func waitForAtLeastPublishedEvents(t *testing.T, b *integration.BeatProc, min int, timeout time.Duration) {
+	if min < 1 {
+		t.Fatalf("minimum number of events to wait for must be at least 1, got %d", min)
+	}
+
+	outputGlob := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	got := b.CountFileLines(outputGlob)
+	if got >= min {
+		return
+	}
+
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		got := b.CountFileLines(outputGlob)
+		assert.GreaterOrEqualf(collect, got, min, "expected at least %d events, got %d", min, got)
+	}, timeout, 2*time.Second)
+}
+
+func distinctBootIDs(events []journaldAllBootsEvent) map[string]struct{} {
+	ids := make(map[string]struct{}, len(events))
+	for _, evt := range events {
+		bootID := strings.TrimSpace(evt.Journald.Host.BootID)
+		if bootID == "" {
+			continue
+		}
+
+		ids[bootID] = struct{}{}
+	}
+
+	return ids
+}
+
+func sortedBootIDsSample(bootIDs map[string]struct{}, max int) []string {
+	if max <= 0 || len(bootIDs) == 0 {
+		return nil
+	}
+
+	ids := make([]string, 0, len(bootIDs))
+	for id := range bootIDs {
+		ids = append(ids, id)
+	}
+
+	sort.Strings(ids)
+	if len(ids) > max {
+		return ids[:max]
+	}
+
+	return ids
+}
+
+func generateJournaldLogs(t *testing.T, syslogID string, lines, size int) {
+	cmd := exec.CommandContext(t.Context(), "systemd-cat", "-t", syslogID)
 	w, err := cmd.StdinPipe()
 	if err != nil {
 		t.Errorf("cannot get stdin pipe from systemd-cat: %s", err)
@@ -56,13 +408,14 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 		}
 	}()
 
-	for count := 1; count <= max; count++ {
-		written, err := fmt.Fprintf(w, "Count: %03d\n", count)
+	for range lines {
+		expectedBytes := size + 1
+		written, err := fmt.Fprintln(w, largeStr(t, size))
 		if err != nil {
 			t.Errorf("could not write message to journald: %s", err)
 		}
-		if written != 11 {
-			t.Errorf("could not write the whole message, expecing to write 11 bytes, but wrote %d", written)
+		if written != expectedBytes {
+			t.Errorf("could not write the whole message, expecing to write %d bytes, but wrote %d", expectedBytes, written)
 		}
 		time.Sleep(time.Millisecond)
 	}
@@ -72,49 +425,15 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 	}
 }
 
-//go:embed testdata/filebeat_journald.yml
-var journaldInputCfg string
-
-func TestJournaldInput(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-
-	// render configuration
-	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
-	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
-
-	go generateJournaldLogs(t, context.Background(), syslogID, 3)
-
-	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start()
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-
-	pidLine := filebeat.GetLogLine("journalctl started with PID")
-	logEntry := struct{ Message string }{}
-	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
-		t.Errorf("could not parse PID log entry as JSON: %s", err)
+func largeStr(t *testing.T, len int) string {
+	str := strings.Builder{}
+	for range len {
+		c := rand.Int32N(93) + 33
+		if err := str.WriteByte(byte(c)); err != nil {
+			t.Fatal(err)
+		}
 	}
 
-	pid := 0
-	fmt.Sscanf(logEntry.Message, "journalctl started with PID %d", &pid)
-
-	filebeat.WaitForLogs("Count: 003", 5*time.Second, "did not find the third event in published events")
-
-	// Kill journalctl
-	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
-		t.Fatalf("coluld  not kill journalctl with PID %d: %s", pid, err)
-	}
-
-	go generateJournaldLogs(t, context.Background(), syslogID, 5)
-	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
-	filebeat.WaitForLogs("Count: 005", time.Second, "expected log message not found in published events SECOND")
-
-	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
-
-	if eventsPublished != 8 {
-		t.Fatalf("expecting 8 published events, got %d instead'", eventsPublished)
-	}
+	gen := str.String()
+	return gen
 }

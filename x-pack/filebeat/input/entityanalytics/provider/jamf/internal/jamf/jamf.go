@@ -205,9 +205,6 @@ func GetComputers(ctx context.Context, cli *http.Client, tenant string, tok Toke
 // GetUsers returns Jamf users using the list users API endpoint. tenant is the
 // Jamf user domain and key is the API token to use for the query. If user is not empty,
 // details for the specific user are returned, otherwise a list of all users is returned.
-// The query parameter holds queries as described in https://developer.Jamf.com/docs/reference/user-query/
-// with the query syntax described at https://developer.Jamf.com/docs/reference/core-Jamf-api/#filter.
-// Parts of the response may be omitted using the omit parameter.
 //
 // See https://developer.jamf.com/jamf-pro/reference/findusers for details.
 func GetUsers(ctx context.Context, cli *http.Client, tenant string, tok Token, query url.Values) ([]User, error) {

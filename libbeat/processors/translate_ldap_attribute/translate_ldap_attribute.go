@@ -1,0 +1,289 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+//go:build !requirefips
+
+package translate_ldap_attribute
+
+import (
+	"errors"
+	"fmt"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/go-ldap/ldap/v3"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+)
+
+const (
+	logName            = "processor.translate_ldap_attribute"
+	clientRetryBackoff = 30 * time.Second
+)
+
+var errInvalidType = errors.New("search attribute field value is not a string")
+
+func init() {
+	processors.RegisterPlugin("translate_ldap_attribute", New)
+	jsprocessor.RegisterPlugin("TranslateLDAPAttribute", New)
+}
+
+type processor struct {
+	config
+	client *ldapClient
+	log    *logp.Logger
+
+	clientMu          sync.Mutex
+	clientErr         error
+	nextClientAttempt time.Time
+}
+
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, fmt.Errorf("fail to unpack the translate_ldap_attribute configuration: %w", err)
+	}
+	if err := c.validate(); err != nil {
+		return nil, fmt.Errorf("invalid translate_ldap_attribute configuration: %w", err)
+	}
+
+	return newFromConfig(c, log)
+}
+
+func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
+	p := &processor{config: c}
+	p.log = logger.Named(logName).With(logp.Stringer("processor", p))
+	return p, nil
+}
+
+// newClient creates a new LDAP client by discovering and connecting to available servers.
+func newClient(c config, log *logp.Logger) (*ldapClient, error) {
+	// Auto-discover LDAP addresses if not provided
+	var addresses []string
+	if c.LDAPAddress != "" {
+		addresses = []string{c.LDAPAddress}
+	} else {
+		log.Info("LDAP address not configured, attempting auto-discovery")
+		discoveredAddresses, err := discoverLDAPAddress(c.LDAPDomain, log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to auto-discover LDAP server: %w", err)
+		}
+		addresses = discoveredAddresses
+		log.Infow("discovered LDAP servers", "count", len(addresses), "addresses", addresses)
+	}
+
+	// Prepare base LDAP config
+	ldapConfig := &ldapConfig{
+		baseDN:          c.LDAPBaseDN,
+		username:        c.LDAPBindUser,
+		password:        c.LDAPBindPassword,
+		searchAttr:      c.LDAPSearchAttribute,
+		mappedAttr:      c.LDAPMappedAttribute,
+		searchTimeLimit: c.LDAPSearchTimeLimit,
+	}
+	if c.LDAPTLS != nil {
+		tlsConfig, err := tlscommon.LoadTLSConfig(c.LDAPTLS, log)
+		if err != nil {
+			return nil, fmt.Errorf("could not load provided LDAP TLS configuration: %w", err)
+		}
+		ldapConfig.tlsConfig = tlsConfig.ToConfig()
+	}
+
+	// Try each discovered address in order until one succeeds
+	var lastErr error
+	for i, address := range addresses {
+		log.Debugw("attempting to connect to LDAP server", "attempt", i+1, "total", len(addresses), "address", address)
+		ldapConfig.address = address
+
+		// newLDAPClient handles connection, base DN discovery, and AD detection
+		client, err := newLDAPClient(ldapConfig, log)
+		if err != nil {
+			log.Debugw("failed to initialize LDAP client", "address", address, "error", err)
+			lastErr = err
+			continue
+		}
+
+		// Successfully connected and initialized
+		log.Infow("successfully connected to LDAP server", "address", address, "base_dn", client.baseDN)
+		return client, nil
+	}
+
+	// All addresses failed
+	return nil, fmt.Errorf("failed to connect to any discovered LDAP server (%d addresses tried): %w", len(addresses), lastErr)
+}
+
+func (p *processor) String() string {
+	return fmt.Sprintf("translate_ldap_attribute=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_search_attribute=%s, ldap_mapped_attribute=%s]",
+		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPBindUser, p.LDAPSearchAttribute, p.LDAPMappedAttribute)
+}
+
+func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
+	p.log.Debugw("run ldap translation")
+	err := p.translateLDAPAttr(event)
+	if err != nil {
+		// Always log errors at debug level, even when we are
+		// ignoring failures.
+		p.log.Debugw("ldap translation error", "error", err)
+	} else {
+		p.log.Debugw("ldap translation complete")
+	}
+	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound)) {
+		return event, nil
+	}
+	return event, err
+}
+
+func (p *processor) translateLDAPAttr(event *beat.Event) error {
+	client, err := p.ensureClient()
+	if err != nil {
+		return err
+	}
+
+	v, err := event.GetValue(p.Field)
+	if err != nil {
+		return err
+	}
+
+	searchValue, ok := v.(string)
+	if !ok {
+		return errInvalidType
+	}
+
+	searchFilter, err := p.prepareSearchFilter(searchValue)
+	if err != nil {
+		return err
+	}
+
+	p.log.Debugw("ldap search", "search_value", searchValue, "filter_value", searchFilter)
+	values, err := client.findObjectBy(searchFilter)
+	p.log.Debugw("ldap result", "common_name", values, "error", err)
+	if err != nil {
+		return err
+	}
+
+	values, err = p.maybeConvertMappedGUID(values)
+	if err != nil {
+		return fmt.Errorf("objectGUID conversion failed: %w", err)
+	}
+
+	field := p.Field
+	if p.TargetField != "" {
+		field = p.TargetField
+	}
+	_, err = event.PutValue(field, values)
+	return err
+}
+
+// prepareSearchFilter converts the search value to the appropriate format for LDAP queries.
+// It applies GUID binary conversion when required based on the ADGUIDTranslation configuration
+// and server type detection.
+func (p *processor) prepareSearchFilter(searchValue string) (string, error) {
+	// Determine if GUID conversion should be applied
+	var shouldConvertGUID bool
+	switch p.ADGUIDTranslation {
+	case guidTranslationAlways:
+		shouldConvertGUID = true
+	case guidTranslationNever:
+		shouldConvertGUID = false
+	default: // auto
+		shouldConvertGUID = strings.EqualFold(p.LDAPSearchAttribute, "objectGUID")
+	}
+
+	if !shouldConvertGUID {
+		return ldap.EscapeFilter(searchValue), nil
+	}
+
+	guidBytes, err := guidToBytes(searchValue)
+	if err != nil {
+		return "", fmt.Errorf("failed to convert GUID: %w", err)
+	}
+	searchFilter := escapeBinaryForLDAP(guidBytes)
+	return searchFilter, nil
+}
+
+// maybeConvertMappedGUID converts binary LDAP responses to canonical GUID strings
+// when AD GUID translation is enabled and the mapped attribute refers to objectGUID.
+func (p *processor) maybeConvertMappedGUID(values []string) ([]string, error) {
+	if !p.shouldConvertMappedGUID() || len(values) == 0 {
+		return values, nil
+	}
+
+	converted := make([]string, len(values))
+	for i, raw := range values {
+		guid, err := guidBytesToString([]byte(raw))
+		if err != nil {
+			return nil, err
+		}
+		converted[i] = guid
+	}
+	return converted, nil
+}
+
+func (p *processor) shouldConvertMappedGUID() bool {
+	if p.ADGUIDTranslation == guidTranslationNever {
+		return false
+	}
+	return strings.EqualFold(p.LDAPMappedAttribute, "objectGUID")
+}
+
+func (p *processor) Close() error {
+	p.clientMu.Lock()
+	defer p.clientMu.Unlock()
+	if p.client != nil {
+		p.client.close()
+		p.client = nil
+	}
+	p.clientErr = nil
+	p.nextClientAttempt = time.Time{}
+	return nil
+}
+
+func (p *processor) ensureClient() (*ldapClient, error) {
+	p.clientMu.Lock()
+	defer p.clientMu.Unlock()
+
+	if p.client != nil {
+		return p.client, nil
+	}
+
+	now := time.Now()
+	if !p.nextClientAttempt.IsZero() && now.Before(p.nextClientAttempt) && p.clientErr != nil {
+		return nil, fmt.Errorf("ldap client initialization paused until %s: %w", p.nextClientAttempt.Format(time.RFC3339), p.clientErr)
+	}
+
+	client, err := newClient(p.config, p.log)
+	if err != nil {
+		p.clientErr = err
+		p.nextClientAttempt = now.Add(clientRetryBackoff)
+		return nil, err
+	}
+
+	// Update config with discovered values for logging/debugging.
+	p.client = client
+	p.LDAPBaseDN = client.baseDN
+	p.LDAPAddress = client.address
+	p.clientErr = nil
+	p.nextClientAttempt = time.Time{}
+	return client, nil
+}

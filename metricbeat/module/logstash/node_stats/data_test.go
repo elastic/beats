@@ -27,7 +27,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/require"
 
@@ -53,7 +53,7 @@ func TestEventMapping(t *testing.T) {
 }
 
 func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents int, expectedErrors int) {
-	logger := logp.NewLogger("logstash.node_stats")
+	logger := logptest.NewTestingLogger(t, "logstash.node_stats")
 
 	for _, f := range fixtureVersions {
 		path := fmt.Sprintf("./_meta/test/node_stats.%s.json", f)

@@ -63,8 +63,12 @@ func init() {
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
 }
 
-// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Go integration tests now build the binary automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target is only needed for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 
@@ -86,7 +90,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -221,6 +225,30 @@ func GoIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
+	return devtools.GoTestIntegrationForModule(ctx)
+}
+
+// GoFIPSOnlyIntegTest executes the Go integration tests.
+// Sets GODEBUG=fips140=only.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	os.Setenv("GODEBUG", "fips140=only,tlsmlkem=0")
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 

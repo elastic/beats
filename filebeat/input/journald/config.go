@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
@@ -23,6 +25,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -36,8 +39,21 @@ import (
 // logged only once if an old config format is detected.
 var includeMatchesWarnOnce sync.Once
 
+// defaultJournalCtlPath is the default journalctl binary path for the normal
+// operation of the input. It requires that the jouranlctl binary is in the
+// PATH.
+var defaultJournalCtlPath = "journalctl"
+
+// defaultJournalCtlPathChroot is the default journalctl binary path when
+// using a chroot, which requires absolute paths.
+// See https://github.com/golang/go/issues/39341
+var defaultJournalCtlPathChroot = "/usr/bin/journalctl"
+
 // Config stores the options of a journald input.
 type config struct {
+	// ID is the input ID, each instance must have a unique ID
+	ID string `config:"id"`
+
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 
@@ -63,8 +79,27 @@ type config struct {
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
 
+	// Facility is a list of facilities to filter journal messages
+	Facilities []int `config:"facilities"`
+
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
+
+	// Allow ingesting log entries interleaved from all available journals,
+	// including remote ones.
+	Merge bool `config:"merge"`
+
+	// Chroot is the chroot folder used to call journalctl
+	Chroot string `config:"chroot"`
+
+	// JournalctlPath specifies the path to the `journalctl` binary.
+	// This field is required only if the Chroot option is set, as the
+	// input needs to locate the binary within the chroot environment.
+	// If Chroot is set, JournalctlPath must be an absolute path within
+	// the chroot environment. If JournalctlPath is not explicitly set,
+	// it defaults to `journalctl`, which assumes that the `journalctl`
+	// binary is available in the system's `PATH` environment variable.
+	JournalctlPath string `config:"journalctl_path"`
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration
@@ -82,8 +117,9 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 		im.Matches = append(im.Matches, matches...)
 
 		includeMatchesWarnOnce.Do(func() {
-			cfgwarn.Deprecate("", "Please migrate your journald input's "+
-				"include_matches config to the new more expressive format.")
+			// TODO: use a local logger here
+			logp.NewLogger("journald").Warn(cfgwarn.Deprecate("", "Please migrate your journald input's "+
+				"include_matches config to the new more expressive format."))
 		})
 		return nil
 	}
@@ -95,5 +131,6 @@ func defaultConfig() config {
 	return config{
 		Seek:               journalctl.SeekHead,
 		SaveRemoteHostname: false,
+		JournalctlPath:     defaultJournalCtlPath,
 	}
 }

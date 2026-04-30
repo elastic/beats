@@ -223,6 +223,9 @@ type PartialMetricsError struct {
 }
 
 func (p PartialMetricsError) Error() string {
+	if p.Err == nil {
+		return ""
+	}
 	return p.Err.Error()
 }
 

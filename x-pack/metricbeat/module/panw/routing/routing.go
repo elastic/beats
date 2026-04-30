@@ -24,9 +24,10 @@ const (
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config *panw.Config
-	logger *logp.Logger
-	client panw.PanwClient
+	config   *panw.Config
+	logger   *logp.Logger
+	client   panw.PanwClient
+	hostname string
 }
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -40,18 +41,25 @@ func init() {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panw routing metricset is beta.")
+	base.Logger().Warn(cfgwarn.Beta("The panw routing metricset is beta."))
 
 	config, err := panw.NewConfig(base)
 	if err != nil {
 		return nil, err
 	}
 
-	logger := logp.NewLogger(base.FullyQualifiedName())
+	logger := base.Logger().Named(base.FullyQualifiedName())
 
 	client, err := panw.GetPanwClient(config)
 	if err != nil {
 		return nil, err
+	}
+
+	// Fetch hostname from system info
+	hostname, err := panw.GetHostname(client)
+	if err != nil {
+		logger.Warnf("Failed to fetch hostname from firewall: %v. Using empty hostname.", err)
+		hostname = ""
 	}
 
 	return &MetricSet{
@@ -59,6 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config:        config,
 		logger:        logger,
 		client:        client,
+		hostname:      hostname,
 	}, nil
 }
 

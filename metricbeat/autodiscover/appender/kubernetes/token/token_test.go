@@ -26,11 +26,14 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestMain(m *testing.M) {
 	InitializeModule()
+
+	os.Exit(m.Run())
 }
 
 func TestTokenAppender(t *testing.T) {
@@ -88,13 +91,13 @@ token_path: "test"
 		test.event["config"] = []*conf.C{eConfig}
 		writeFile("test", "foo bar")
 
-		appender, err := NewTokenAppender(config)
+		appender, err := NewTokenAppender(config, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 		assert.NotNil(t, appender)
 
 		appender.Append(test.event)
 		cfgs, _ := test.event["config"].([]*conf.C)
-		assert.Equal(t, len(cfgs), 1)
+		assert.Len(t, cfgs, 1)
 
 		out := mapstr.M{}
 		cfgs[0].Unpack(&out)

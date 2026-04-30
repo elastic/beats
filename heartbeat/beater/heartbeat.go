@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-
 	"syscall"
 	"time"
 
@@ -34,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
+	hbrunner "github.com/elastic/beats/v7/heartbeat/reload"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/heartbeat/tracer"
@@ -58,6 +58,8 @@ type Heartbeat struct {
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
+
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 // New creates a new heartbeat.
@@ -79,7 +81,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		if err == nil {
 			trace = sockTrace
 		} else {
-			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %v", stConfig.Path, stConfig.Wait, err)
 		}
 	}
 
@@ -88,13 +90,13 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
-		esClient, err := makeESClient(b.Config.Output.Config(), 3, 2*time.Second)
+		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second)
 		if err != nil {
 			if parsedConfig.RunOnce {
 				trace.Abort()
 				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
 			} else {
-				logp.L().Warnf("skipping monitor state management: %w", err)
+				logp.L().Warnf("skipping monitor state management: %v", err)
 			}
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom))
@@ -184,7 +186,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
+		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors, b.Info.Paths)
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()
@@ -197,7 +199,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -275,9 +276,9 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		}
 
 		// Backoff panics with 0 duration, set to smallest unit
-		esClient, err := makeESClient(outCfg.Config(), 1, 1*time.Nanosecond)
+		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
-			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
+			logp.L().Warnf("skipping monitor state management during managed reload: %v", err)
 		} else {
 			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}
@@ -285,7 +286,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		return nil
 	})
 
-	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
+	inputs := hbrunner.NewHBRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
 }
 
@@ -304,14 +305,7 @@ func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	ad, err := autodiscover.NewAutodiscover(
-		"heartbeat",
-		b.Publisher,
-		bt.monitorFactory,
-		autodiscover.QueryConfig(),
-		bt.config.Autodiscover,
-		b.Keystore,
-	)
+	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, bt.monitorFactory, autodiscover.QueryConfig(), bt.config.Autodiscover, b.Keystore, b.Info.Logger, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -323,8 +317,12 @@ func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
+func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
+}
+
 // makeESClient establishes an ES connection meant to load monitors' state
-func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
+func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
 	var (
 		esClient *eslegclient.Connection
 		err      error
@@ -353,7 +351,8 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 	}
 
 	for i := 0; i < attempts; i++ {
-		esClient, err = eslegclient.NewConnectedClient(newCfg, "Heartbeat")
+		// TODO: use local logger here
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger(""))
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil

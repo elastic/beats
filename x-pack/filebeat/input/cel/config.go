@@ -15,14 +15,22 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/mito/lib"
 )
 
 const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -44,6 +52,12 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
+	// SecretState holds secret key-value pairs that are
+	// stored encrypted by Fleet (via secret: true) and
+	// placed at state.secret before CEL program execution.
+	// The state.secret key is unconditionally redacted in
+	// debug logs.
+	SecretState map[string]interface{} `config:"secret_state"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
@@ -58,6 +72,32 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+
+	// FailureDump configures failure dump behaviour.
+	FailureDump *dumpConfig `config:"failure_dump"`
+
+	// RecordCoverage indicates whether a program should
+	// record and log execution coverage.
+	RecordCoverage bool `config:"record_coverage"`
+
+	// Package contains information about the integration package.
+	// name and version are expected.
+	Package map[string]string `config:"package"`
+
+	// OTel configuration for which headers and request parameters should be
+	// redacted or unredacted in span attributes.
+	OTelTraceConfig *otel.TraceConfig `config:"otel.trace"`
+}
+
+func (c config) GetPackageData(key string) string {
+	if c.Package == nil {
+		return "unknown"
+	}
+	value, ok := c.Package[key]
+	if !ok {
+		return "unknown"
+	}
+	return value
 }
 
 type redact struct {
@@ -69,16 +109,28 @@ type redact struct {
 	Delete bool `config:"delete"`
 }
 
+// dumpConfig configures the CEL program to retain
+// the full evaluation state using the cel.OptTrackState
+// option. The state is written to a file in the path if
+// the evaluation fails.
+type dumpConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	Filename string `config:"filename"`
+}
+
+func (t *dumpConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
+}
+
 func (c config) Validate() error {
-	if c.Redact == nil {
-		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
-	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
 	if c.MaxExecutions != nil && *c.MaxExecutions <= 0 {
 		return fmt.Errorf("invalid maximum number of executions: %d <= 0", *c.MaxExecutions)
+	}
+	if _, exists := c.State["secret"]; exists {
+		return errors.New(`state must not contain a "secret" key: values intended to be secret cannot be guaranteed to be encrypted in the stored configuration; use secret_state instead`)
 	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
@@ -89,7 +141,8 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -208,10 +261,12 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 
 type ResourceConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
+	Headers                http.Header      `config:"headers"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
+	MaxBodySize            int64            `config:"max_body_size"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
 	KeepAlive              keepAlive        `config:"keep_alive"`
 
@@ -252,7 +307,7 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c *ResourceConfig) Validate() error {
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {
@@ -263,6 +318,13 @@ func (c *ResourceConfig) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
+	}
+	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 	return nil
 }

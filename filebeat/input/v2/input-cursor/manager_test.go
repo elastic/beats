@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 package cursor
 
 import (
@@ -27,16 +29,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -56,7 +62,7 @@ func TestManager_Init(t *testing.T) {
 		var grp unison.TaskGroup
 		store := createSampleStore(t, nil)
 		manager := &InputManager{
-			Logger:              logp.NewLogger("test"),
+			Logger:              logptest.NewTestingLogger(t, "test"),
 			StateStore:          store,
 			Type:                "test",
 			DefaultCleanTimeout: 10 * time.Millisecond,
@@ -88,7 +94,7 @@ func TestManager_Init(t *testing.T) {
 		//nolint:errcheck // We don't need the error from grp.Stop()
 		defer grp.Stop()
 		manager := &InputManager{
-			Logger:              logp.NewLogger("test"),
+			Logger:              logptest.NewTestingLogger(t, "test"),
 			StateStore:          store,
 			Type:                "test",
 			DefaultCleanTimeout: 10 * time.Millisecond,
@@ -101,6 +107,47 @@ func TestManager_Init(t *testing.T) {
 			time.Sleep(1 * time.Millisecond)
 		}
 	})
+}
+
+func TestManager_InitDefersStoreForES(t *testing.T) {
+	// Verify that ES-backed inputs defer store creation from Init() to Create().
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "test")
+	features.ReinitForTest()
+	t.Cleanup(func() { features.ReinitForTest() }) // restore after test
+
+	data := map[string]state{
+		"test::mykey": {Cursor: "value1"},
+	}
+	stateStore := createSampleStore(t, data)
+
+	var grp unison.TaskGroup
+	defer grp.Stop() //nolint:errcheck // We don't need the error from grp.Stop()
+
+	manager := &InputManager{
+		Logger:              logptest.NewTestingLogger(t, "test"),
+		StateStore:          stateStore,
+		Type:                "test",
+		DefaultCleanTimeout: 30 * time.Minute,
+		Configure: func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
+			return sourceList("mykey"), &fakeTestInput{}, nil
+		},
+	}
+
+	// Init() should not create a store for ES-backed inputs.
+	err := manager.Init(&grp)
+	require.NoError(t, err)
+	assert.Nil(t, manager.store, "store should be nil after Init() for ES-backed inputs")
+
+	// Create() should create the store with the inputID.
+	_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
+		"id": "my-input-id",
+	}))
+	require.NoError(t, err)
+	assert.NotNil(t, manager.store, "store should be created after Create()")
+
+	snap := storeMemorySnapshot(manager.store)
+	assert.Contains(t, snap, "test::mykey")
+	assert.Equal(t, "value1", snap["test::mykey"].Cursor)
 }
 
 func TestManager_Create(t *testing.T) {
@@ -129,7 +176,7 @@ func TestManager_Create(t *testing.T) {
 	})
 
 	t.Run("configuring inputs with overlapping sources is allowed", func(t *testing.T) {
-		manager := simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
+		manager := simpleManagerWithConfigure(t, func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error) {
 			config := struct{ Sources []string }{}
 			err := cfg.Unpack(&config)
 			return sourceList(config.Sources...), &fakeTestInput{}, err
@@ -250,7 +297,7 @@ func TestManager_InputsTest(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Test(input.TestContext{Logger: logp.NewLogger("test")})
+			err = inp.Test(input.TestContext{Logger: logptest.NewTestingLogger(t, "test")})
 			t.Logf("Test returned: %v", err)
 		}()
 
@@ -278,10 +325,16 @@ func TestManager_InputsRun(t *testing.T) {
 		defer cancel()
 
 		var clientCounters pubtest.ClientCounter
-		err = inp.Run(input.Context{
-			Logger:      manager.Logger,
-			Cancelation: cancelCtx,
-		}, clientCounters.BuildConnector())
+		id := uuid.Must(uuid.NewV4()).String()
+		ctx := input.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     cancelCtx,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          manager.Logger,
+		}
+		err = inp.Run(ctx, clientCounters.BuildConnector())
 		require.Error(t, err)
 		require.Equal(t, 0, clientCounters.Active())
 	})
@@ -302,10 +355,16 @@ func TestManager_InputsRun(t *testing.T) {
 		defer cancel()
 
 		var clientCounters pubtest.ClientCounter
-		err = inp.Run(input.Context{
-			Logger:      manager.Logger,
-			Cancelation: cancelCtx,
-		}, clientCounters.BuildConnector())
+		id := uuid.Must(uuid.NewV4()).String()
+		ctx := input.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     cancelCtx,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          manager.Logger,
+		}
+		err = inp.Run(ctx, clientCounters.BuildConnector())
 		require.Error(t, err)
 		require.Equal(t, 0, clientCounters.Active())
 	})
@@ -331,10 +390,16 @@ func TestManager_InputsRun(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Run(input.Context{
-				Logger:      manager.Logger,
-				Cancelation: cancelCtx,
-			}, clientCounters.BuildConnector())
+			id := uuid.Must(uuid.NewV4()).String()
+			ctx := input.Context{
+				ID:              id,
+				IDWithoutName:   id,
+				Name:            inp.Name(),
+				Cancelation:     cancelCtx,
+				MetricsRegistry: monitoring.NewRegistry(),
+				Logger:          manager.Logger,
+			}
+			err = inp.Run(ctx, clientCounters.BuildConnector())
 		}()
 
 		cancel()
@@ -344,14 +409,14 @@ func TestManager_InputsRun(t *testing.T) {
 	})
 
 	t.Run("continue sending from last known position", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "test")
 
 		type runConfig struct{ Max int }
 
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
 
-		manager := simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
+		manager := simpleManagerWithConfigure(t, func(cfg *conf.C, _ *logp.Logger) ([]Source, Input, error) {
 			config := runConfig{}
 			if err := cfg.Unpack(&config); err != nil {
 				return nil, nil, err
@@ -381,7 +446,7 @@ func TestManager_InputsRun(t *testing.T) {
 		var ids []int
 		pipeline := pubtest.ConstClient(&pubtest.FakeClient{
 			PublishFunc: func(event beat.Event) {
-				id := event.Fields["n"].(int)
+				id, _ := event.Fields["n"].(int)
 				ids = append(ids, id)
 			},
 		})
@@ -389,18 +454,30 @@ func TestManager_InputsRun(t *testing.T) {
 		// create and run first instance
 		inp, err := manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		require.NoError(t, inp.Run(input.Context{
-			Logger:      log,
-			Cancelation: context.Background(),
-		}, pipeline))
+		id := uuid.Must(uuid.NewV4()).String()
+		ctx := input.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     context.Background(),
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          log,
+		}
+		require.NoError(t, inp.Run(ctx, pipeline))
 
-		// create and run second instance instance
+		// create and run second instance
 		inp, err = manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		_ = inp.Run(input.Context{
-			Logger:      log,
-			Cancelation: context.Background(),
-		}, pipeline)
+		id = uuid.Must(uuid.NewV4()).String()
+		ctx = input.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Cancelation:     context.Background(),
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          log,
+		}
+		_ = inp.Run(ctx, pipeline)
 
 		// verify
 		assert.Equal(t, []int{0, 1, 2, 3, 4, 5}, ids)
@@ -455,20 +532,26 @@ func TestManager_InputsRun(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Run(input.Context{
-				Logger:      manager.Logger,
-				Cancelation: cancelCtx,
-			}, pipeline)
+			id := uuid.Must(uuid.NewV4()).String()
+			ctx := input.Context{
+				ID:              id,
+				IDWithoutName:   id,
+				Name:            inp.Name(),
+				Cancelation:     cancelCtx,
+				MetricsRegistry: monitoring.NewRegistry(),
+				Logger:          manager.Logger,
+			}
+			err = inp.Run(ctx, pipeline)
 		}()
-		// wait for test setup to shutdown
+		// wait for test setup to shut down
 		defer wg.Wait()
 
-		// wait for setup complete and events being send (pending operations in the pipeline)
+		// wait for setup complete and events being sent (pending operations in the pipeline)
 		wgACKer.Wait()
 		wgSend.Wait()
 
 		// 1. No cursor state in store yet, all operations are still pending
-		require.Equal(t, nil, store.snapshot()["test::key"].Cursor)
+		require.Nil(t, store.snapshot()["test::key"].Cursor)
 
 		// ACK first 2 events and check snapshot state
 		acker.ACKEvents(2)
@@ -494,12 +577,12 @@ func TestLockResource(t *testing.T) {
 		defer store.Release()
 
 		res := store.Get("test::key")
-		err := lockResource(logp.NewLogger("test"), res, context.TODO())
+		err := lockResource(logptest.NewTestingLogger(t, "test"), res, context.TODO())
 		require.NoError(t, err)
 	})
 
 	t.Run("fail to lock resource in use when context is cancelled", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "test")
 
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
@@ -522,7 +605,7 @@ func TestLockResource(t *testing.T) {
 	})
 
 	t.Run("succeed to lock resource after it has been released", func(t *testing.T) {
-		log := logp.NewLogger("test")
+		log := logptest.NewTestingLogger(t, "test")
 
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
@@ -553,9 +636,9 @@ func TestLockResource(t *testing.T) {
 
 func (s stringSource) Name() string { return string(s) }
 
-func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C) ([]Source, Input, error)) *InputManager {
+func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C, *logp.Logger) ([]Source, Input, error)) *InputManager {
 	return &InputManager{
-		Logger:     logp.NewLogger("test"),
+		Logger:     logptest.NewTestingLogger(t, "test"),
 		StateStore: createSampleStore(t, nil),
 		Type:       "test",
 		Configure:  configure,
@@ -563,7 +646,7 @@ func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C) ([]Source,
 }
 
 func constConfigureResult(t *testing.T, sources []Source, inp Input, err error) *InputManager {
-	return simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
+	return simpleManagerWithConfigure(t, func(cfg *conf.C, _ *logp.Logger) ([]Source, Input, error) {
 		return sources, inp, err
 	})
 }

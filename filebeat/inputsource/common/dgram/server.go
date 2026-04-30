@@ -57,9 +57,10 @@ func NewListener(
 	connect HandlerFactory,
 	listenerFactory ListenerFactory,
 	config *ListenerConfig,
+	logger *logp.Logger,
 ) *Listener {
 	return &Listener{
-		log:      logp.NewLogger(f.String()),
+		log:      logger.Named(f.String()),
 		family:   f,
 		config:   config,
 		listener: listenerFactory,
@@ -72,16 +73,20 @@ func (l *Listener) Run(ctx context.Context) error {
 	l.log.Info("Started listening for " + l.family.String() + " connection")
 
 	for ctx.Err() == nil {
-		l.doRun(ctx)
+		if err := l.doRun(ctx); err != nil {
+			return err
+		}
+
 	}
+
 	return nil
 }
 
-func (l *Listener) doRun(ctx context.Context) {
+func (l *Listener) doRun(ctx context.Context) error {
 	conn, err := l.listener()
 	if err != nil {
-		l.log.Debugw("Cannot connect", "error", err)
-		return
+		l.log.Errorw("Cannot connect", "error", err)
+		return err
 	}
 
 	connCtx, connCancel := ctxtool.WithFunc(ctx, func() {
@@ -92,7 +97,10 @@ func (l *Listener) doRun(ctx context.Context) {
 	err = l.connectAndRun(connCtx, conn)
 	if err != nil {
 		l.log.Debugw("Error while processing input", "error", err)
+		return err
 	}
+
+	return nil
 }
 
 func (l *Listener) Start() error {

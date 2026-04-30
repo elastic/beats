@@ -34,6 +34,11 @@ func TestEventMapping(t *testing.T) {
 		Folder: mo.Folder{
 			ManagedEntity: mo.ManagedEntity{
 				Name: "Folder1",
+				ExtensibleManagedObject: mo.ExtensibleManagedObject{
+					Self: types.ManagedObjectReference{
+						Value: "FL_0",
+					},
+				},
 			},
 		},
 	}
@@ -42,6 +47,9 @@ func TestEventMapping(t *testing.T) {
 
 	name, _ := event.GetValue("name")
 	assert.Equal(t, "Folder1", name)
+
+	id, _ := event.GetValue("id")
+	assert.Equal(t, "FL_0", id)
 
 	capacity, _ := event.GetValue("capacity.bytes")
 	assert.Equal(t, int64(100), capacity)

@@ -22,6 +22,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -29,16 +31,13 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
-const (
-	defaultScheme = "http"
-	pathConfigKey = "path"
-)
-
 var (
 	// HostParser parses host urls for RabbitMQ management plugin
 	HostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		PathConfigKey: pathConfigKey,
+		DefaultScheme:   "http",
+		DefaultUsername: getEnv("AUTOOPS_ES_USERNAME", "ELASTICSEARCH_READ_USERNAME"),
+		DefaultPassword: getEnv("AUTOOPS_ES_PASSWORD", "ELASTICSEARCH_READ_PASSWORD"),
+		PathConfigKey:   "path",
 	}.Build()
 )
 
@@ -53,6 +52,16 @@ const (
 	// cluster (e.g. a load-balancing proxy) fronting the cluster.
 	ScopeCluster
 )
+
+// Get an environment variable set via the `key` and, if unset, return the value of the environment variable
+// defined by `backupKey`. If that's not set, it will ultimately return "".
+func getEnv(key string, backupKey string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+
+	return os.Getenv(backupKey)
+}
 
 func (h *Scope) Unpack(str string) error {
 	switch str {
@@ -77,14 +86,15 @@ type MetricSetAPI interface {
 // management plugin
 type MetricSet struct {
 	mb.BaseMetricSet
+	hostURI     string
 	servicePath string
 	*helper.HTTP
 	Scope        Scope
 	XPackEnabled bool
 }
 
-// NewMetricSet creates an metric set that can be used to build other metric
-// sets that query RabbitMQ management plugin
+// NewMetricSet creates a metric set that can be used to build other metric
+// sets that query Elasticsearch APIs
 func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
@@ -98,7 +108,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}{
 		Scope:        ScopeNode,
 		XPackEnabled: false,
-		ApiKey:       "",
+		ApiKey:       getEnv("AUTOOPS_ES_API_KEY", "ELASTICSEARCH_READ_API_KEY"),
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -111,11 +121,31 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		if hostData.User != "" || hostData.Password != "" {
 			return nil, fmt.Errorf("cannot set both api_key and username/password")
 		}
-		http.SetHeader("Authorization", "ApiKey "+base64.StdEncoding.EncodeToString([]byte(config.ApiKey)))
+
+		apiKey := config.ApiKey
+
+		// Base64 encode the API Key if necessary
+		if strings.Contains(config.ApiKey, ":") {
+			apiKey = base64.StdEncoding.EncodeToString([]byte(apiKey))
+		}
+
+		http.SetHeader("Authorization", "ApiKey "+apiKey)
+	}
+
+	hostURI := base.HostData().SanitizedURI
+
+	// if you supply your URI like "http://localhost:9200/" we need to trim the trailing slash to avoid issues with
+	// downstream paths
+	if strings.HasSuffix(hostURI, "/") {
+		badURI := hostURI
+		hostURI = strings.TrimRight(hostURI, "/")
+
+		base.Logger().Warnf("host URI should not have a trailing slash, updated from %s to %s", badURI, hostURI)
 	}
 
 	ms := &MetricSet{
 		base,
+		hostURI,
 		servicePath,
 		http,
 		config.Scope,
@@ -129,13 +159,13 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 
 // GetServiceURI returns the URI of the Elasticsearch service being monitored by this metricset
 func (m *MetricSet) GetServiceURI() string {
-	return m.HostData().SanitizedURI + m.servicePath
+	return m.hostURI + m.servicePath
 }
 
 // SetServiceURI updates the URI of the Elasticsearch service being monitored by this metricset
 func (m *MetricSet) SetServiceURI(servicePath string) {
 	m.servicePath = servicePath
-	m.HTTP.SetURI(m.GetServiceURI())
+	m.SetURI(m.GetServiceURI())
 }
 
 func (m *MetricSet) ShouldSkipFetch() (bool, error) {
@@ -159,10 +189,9 @@ func (m *MetricSet) ShouldSkipFetch() (bool, error) {
 
 // GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
 func (m *MetricSet) GetMasterNodeID() (string, error) {
-	http := m.HTTP
 	resetURI := m.GetServiceURI()
 
-	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
+	content, err := fetchPath(m.HTTP, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
 	if err != nil {
 		return "", err
 	}
@@ -184,10 +213,9 @@ func (m *MetricSet) GetMasterNodeID() (string, error) {
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func (m *MetricSet) IsMLockAllEnabled(nodeID string) (bool, error) {
-	http := m.HTTP
 	resetURI := m.GetServiceURI()
 
-	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
+	content, err := fetchPath(m.HTTP, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
 	if err != nil {
 		return false, err
 	}

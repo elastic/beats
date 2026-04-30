@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -32,7 +33,8 @@ type Factory func(
 	im IndexManager,
 	beat beat.Info,
 	stats Observer,
-	cfg *config.C) (Group, error)
+	cfg *config.C,
+) (Group, error)
 
 // IndexManager provides additional index related services to the outputs.
 type IndexManager interface {
@@ -58,7 +60,7 @@ type Group struct {
 	Clients      []Client
 	BatchSize    int
 	Retry        int
-	QueueFactory queue.QueueFactory
+	QueueFactory queue.QueueFactory[publisher.Event]
 
 	// If the output supports early encoding (where events are converted to their
 	// output-serialized form before entering the queue) it should provide an
@@ -74,7 +76,7 @@ type Group struct {
 	// - If there is a fatal error in encoding, provide a non-nil EncodedEvent
 	//   and clear Content anyway. Metadata about the error should be saved in
 	//   EncodedEvent and reported when Publish is called.
-	EncoderFactory queue.EncoderFactory
+	EncoderFactory queue.EncoderFactory[publisher.Event]
 }
 
 // RegisterType registers a new output type.

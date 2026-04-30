@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -42,24 +43,6 @@ func emptyTransformContext() *transformContext {
 
 func (ctx *transformContext) cursorMap() mapstr.M {
 	return ctx.cursor.clone()
-}
-
-func (ctx *transformContext) lastEventClone() *mapstr.M {
-	clone := ctx.lastEvent.Clone()
-	return &clone
-}
-
-func (ctx *transformContext) firstEventClone() *mapstr.M {
-	clone := ctx.firstEvent.Clone()
-	return &clone
-}
-
-func (ctx *transformContext) firstResponseClone() *response {
-	return ctx.firstResponse.clone()
-}
-
-func (ctx *transformContext) lastResponseClone() *response {
-	return ctx.lastResponse.clone()
 }
 
 func (ctx *transformContext) updateCursor() {
@@ -188,14 +171,13 @@ type basicTransform interface {
 }
 
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
-func newTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
+func newTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, stat status.StatusReporter, log *logp.Logger) (transforms, error) {
 	trans := make(transforms, 0, len(config))
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
-			return nil, fmt.Errorf(
-				"each transform must have exactly one action, but found %d actions",
-				len(tfConfig.GetFields()),
-			)
+			err := fmt.Errorf("each transform must have exactly one action, but found %d actions", len(tfConfig.GetFields()))
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
 		}
 
 		actionName := tfConfig.GetFields()[0]
@@ -206,12 +188,15 @@ func newTransformsFromConfig(registeredTransforms registry, config transformsCon
 
 		constructor, found := registeredTransforms.get(namespace, actionName)
 		if !found {
-			return nil, fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms)
+			err := fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms)
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
 		}
 
 		common.PrintConfigDebugf(cfg, "Configure transform '%v' with:", actionName)
-		transform, err := constructor(cfg, log)
+		transform, err := constructor(cfg, stat, log)
 		if err != nil {
+			stat.UpdateStatus(status.Failed, fmt.Sprintf("failed to configure transform %s: %v", actionName, err))
 			return nil, err
 		}
 
@@ -221,8 +206,8 @@ func newTransformsFromConfig(registeredTransforms registry, config transformsCon
 	return trans, nil
 }
 
-func newBasicTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) ([]basicTransform, error) {
-	ts, err := newTransformsFromConfig(registeredTransforms, config, namespace, log)
+func newBasicTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, stat status.StatusReporter, log *logp.Logger) ([]basicTransform, error) {
+	ts, err := newTransformsFromConfig(registeredTransforms, config, namespace, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +216,9 @@ func newBasicTransformsFromConfig(registeredTransforms registry, config transfor
 	for _, t := range ts {
 		rt, ok := t.(basicTransform)
 		if !ok {
-			return nil, fmt.Errorf("transform %s is not a valid %s transform", t.transformName(), namespace)
+			err := fmt.Errorf("transform %s is not a valid %s transform", t.transformName(), namespace)
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
 		}
 		rts = append(rts, rt)
 	}

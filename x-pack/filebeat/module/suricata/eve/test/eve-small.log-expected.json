@@ -717,7 +717,7 @@
         "user_agent.os.full": "Mac OS X 10.14",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.14",
-        "user_agent.version": "84.0."
+        "user_agent.version": "84.0"
     },
     {
         "@timestamp": "2020-12-09T16:03:50.083307Z",

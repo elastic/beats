@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -47,19 +47,19 @@ type processor struct {
 
 // New constructs a new timestamp processor for parsing time strings into
 // time.Time values.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("failed to unpack the timestamp configuration: %w", err)
 	}
 
-	return newFromConfig(c)
+	return newFromConfig(c, log)
 }
 
-func newFromConfig(c config) (*processor, error) {
+func newFromConfig(c config, logger *logp.Logger) (*processor, error) {
 	p := &processor{
 		config:  c,
-		log:     logp.NewLogger(logName),
+		log:     logger.Named(logName),
 		isDebug: logp.IsDebug(logName),
 		tz:      c.Timezone.Location(),
 	}
@@ -127,32 +127,40 @@ func (p *processor) tryToTime(value interface{}) (time.Time, error) {
 }
 
 func (p *processor) parseValue(v interface{}) (time.Time, error) {
-	detailedErr := &parseError{}
-
+	// Try each layout, returning on first success. The parseError and cause
+	// list are only allocated when all layouts fail, keeping the success path
+	// allocation-free.
+	var causes []error
 	for _, layout := range p.Layouts {
 		ts, err := p.parseValueByLayout(v, layout)
 		if err == nil {
 			return ts, nil
 		}
-		var parseError *time.ParseError
-		if errors.As(err, &parseError) {
-			detailedErr.causes = append(detailedErr.causes, &parseErrorCause{parseError})
+		var pe *time.ParseError
+		if errors.As(err, &pe) {
+			causes = append(causes, &parseErrorCause{pe})
 		} else {
-			detailedErr.causes = append(detailedErr.causes, err)
+			causes = append(causes, err)
 		}
 	}
 
-	detailedErr.field = p.Field
-	detailedErr.time = v
+	return p.parseFailure(v, &parseError{
+		field:  p.Field,
+		time:   v,
+		causes: causes,
+	})
+}
 
+// parseFailure logs the error (if debug is enabled) and returns it.
+func (p *processor) parseFailure(v interface{}, err error) (time.Time, error) {
 	if p.isDebug {
 		if p.IgnoreFailure {
-			p.log.Debugw("(Ignored) Failure parsing time field.", "error", detailedErr)
+			p.log.Debugw("(Ignored) Failure parsing time field.", "error", err)
 		} else {
-			p.log.Debugw("Failure parsing time field.", "error", detailedErr)
+			p.log.Debugw("Failure parsing time field.", "error", err)
 		}
 	}
-	return time.Time{}, detailedErr
+	return time.Time{}, err
 }
 
 func (p *processor) parseValueByLayout(v interface{}, layout string) (time.Time, error) {

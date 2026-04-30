@@ -18,7 +18,6 @@
 package add_locale
 
 import (
-	"regexp"
 	"testing"
 	"time"
 
@@ -27,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -67,7 +67,7 @@ func TestTimezoneFormat(t *testing.T) {
 
 	posVal := posAddLocal.Format(posZone, posOffset)
 
-	assert.Regexp(t, regexp.MustCompile(`\+[\d]{2}\:[\d]{2}`), posVal)
+	assert.Regexp(t, `\+[\d]{2}\:[\d]{2}`, posVal)
 
 	// Test negative format
 
@@ -82,12 +82,12 @@ func TestTimezoneFormat(t *testing.T) {
 
 	negVal := negAddLocal.Format(negZone, negOffset)
 
-	assert.Regexp(t, regexp.MustCompile(`\-[\d]{2}\:[\d]{2}`), negVal)
+	assert.Regexp(t, `\-[\d]{2}\:[\d]{2}`, negVal)
 }
 
 func getActualValue(t *testing.T, config *config.C, input mapstr.M) mapstr.M {
-	log := logp.NewLogger("add_locale_test")
-	p, err := New(config)
+	log := logptest.NewTestingLogger(t, "add_locale_test")
+	p, err := New(config, log)
 	if err != nil {
 		log.Error("Error initializing add_locale")
 		t.Fatal(err)
@@ -102,7 +102,7 @@ func BenchmarkConstruct(b *testing.B) {
 
 	input := mapstr.M{}
 
-	p, err := New(testConfig)
+	p, err := New(testConfig, logp.NewNopLogger())
 	if err != nil {
 		b.Fatal(err)
 	}

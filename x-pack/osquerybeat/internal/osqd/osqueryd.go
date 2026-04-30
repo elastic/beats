@@ -18,10 +18,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/dolmen-go/contextio"
+	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -42,11 +43,23 @@ const (
 	flagDisableTables = "disable_tables"
 )
 
-var defaultDisabledTables = []string{"carves", "curl"}
+var (
+	defaultDisabledTables = []string{"carves", "curl"}
+)
+
+type Runner interface {
+	Check(ctx context.Context) error
+	Run(ctx context.Context, flags Flags) error
+	SocketPath() string
+	DataPath() string
+}
+
+type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
 
 type OSQueryD struct {
 	socketPath string
 	binPath    string
+	extPath    string
 	dataPath   string
 	certsPath  string
 	lensesPath string
@@ -71,6 +84,12 @@ func WithExtensionsTimeout(to int) Option {
 func WithBinaryPath(binPath string) Option {
 	return func(q *OSQueryD) {
 		q.binPath = binPath
+	}
+}
+
+func WithExtensionPath(extPath string) Option {
+	return func(q *OSQueryD) {
+		q.extPath = extPath
 	}
 }
 
@@ -104,7 +123,11 @@ func WithLoggerPlugin(name string) Option {
 	}
 }
 
-func New(socketPath string, opts ...Option) (*OSQueryD, error) {
+func New(socketPath string, opts ...Option) (Runner, error) {
+	return newOsqueryD(socketPath, opts...)
+}
+
+func newOsqueryD(socketPath string, opts ...Option) (*OSQueryD, error) {
 	q := &OSQueryD{
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
@@ -161,7 +184,8 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 	}
 
 	//nolint:gosec // works as expected
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		osquerydPath(q.binPath),
 		"--S",
 		"--version",
@@ -183,7 +207,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	}
 	defer cleanup()
 
-	cmd := q.createCommand(flags)
+	cmd := q.createCommand(ctx, flags)
 
 	q.log.Debugf("start osqueryd process: args: %v", cmd.Args)
 
@@ -192,17 +216,15 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	// Read standard output
 	var wg sync.WaitGroup
 
-	if q.isVerbose() {
-		stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			return err
-		}
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			_ = q.logOSQueryOutput(ctx, stdout)
-		}()
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
 	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_ = q.logOSQueryOutput(ctx, stdout)
+	}()
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -221,17 +243,13 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 		q.log.Errorf("osqueryd process failed job assign: %v", err)
 	}
 
-	var (
-		errbuf strings.Builder
-	)
-
-	ctxstderr := contextio.NewReader(ctx, stderr)
-	wait := func() error {
-		if _, cerr := io.Copy(&errbuf, ctxstderr); cerr != nil {
-			return cerr
-		}
-		return cmd.Wait()
-	}
+	// Capture stderr for error messages
+	// Log stderr line-by-line at error level for better visibility
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_ = q.logOSQueryOutput(ctx, stderr)
+	}()
 
 	finished := make(chan error, 1)
 
@@ -239,21 +257,15 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		finished <- wait()
+		finished <- cmd.Wait()
 	}()
 
 	select {
 	case err = <-finished:
 		if err != nil {
-			s := strings.TrimSpace(errbuf.String())
-			if s != "" {
-				err = fmt.Errorf("%s: %w", s, err)
-			}
-		}
-		if err != nil {
-			q.log.Errorf("process exited with error: %v", err)
+			q.log.Errorf("osqueryd process exited with error: %v", err)
 		} else {
-			q.log.Info("process exited")
+			q.log.Info("osqueryd process exited")
 		}
 	case <-ctx.Done():
 		q.log.Debug("kill process group on context done")
@@ -294,7 +306,10 @@ func (q *OSQueryD) prepare() (func(), error) {
 	}
 
 	// Prepare autoload osquery-extension
-	extensionPath := osqueryExtensionPath(q.binPath)
+	extensionPath := q.extPath
+	if extensionPath == "" {
+		extensionPath = osqueryExtensionPath(q.binPath)
+	}
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("extension path does not exist: %s, %w", extensionPath, err)
@@ -446,6 +461,23 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 		flags["config_refresh"] = q.configRefreshInterval
 	}
 
+	// Set the appropriate logger_min_status flag based on osquerybeat log level
+	// Map logp levels to osquery logger_min_status values: 1=WARNING, 2=ERROR
+	var logMinStatus int
+	level := zapcore.LevelOf(q.log.Core())
+	switch {
+	case level == zapcore.WarnLevel:
+		logMinStatus = 1 // WARNING
+	case level >= zapcore.ErrorLevel:
+		logMinStatus = 2 // ERROR+
+	}
+
+	// osquery default is 0 (INFO/DEBUG) but we control that with the verbose flag already
+	if logMinStatus > 0 {
+		flags["logger_min_status"] = logMinStatus
+		flags["disable_logging"] = false
+	}
+
 	if q.isVerbose() {
 		flags["verbose"] = true
 		flags["disable_logging"] = false
@@ -528,9 +560,9 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	return normalize(enabledTables), normalize(disabledTables)
 }
 
-func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+func (q *OSQueryD) createCommand(ctx context.Context, userFlags Flags) *exec.Cmd {
 	//nolint:gosec // works as expected
-	return exec.Command(
+	return exec.CommandContext(ctx,
 		osquerydPath(q.binPath), q.args(userFlags)...)
 }
 
@@ -539,11 +571,11 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	return QsquerydPathForPlatform(runtime.GOOS, dir)
+	return OsquerydPathForPlatform(runtime.GOOS, dir)
 }
 
-// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
-func QsquerydPathForPlatform(platform, dir string) string {
+// OsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func OsquerydPathForPlatform(platform, dir string) string {
 	if platform == "darwin" {
 		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
 
@@ -562,6 +594,18 @@ func osqueryExtensionPath(dir string) string {
 	return filepath.Join(dir, extensionName)
 }
 
+// OsqueryExtensionPathForPlatform returns the full path to osquery extension binary for platform.
+func OsqueryExtensionPathForPlatform(platform, dir string) string {
+	return filepath.Join(dir, osqueryExtensionFilename(platform))
+}
+
+func osqueryExtensionFilename(platform string) string {
+	if platform == "windows" {
+		return "osquery-extension.exe"
+	}
+	return "osquery-extension.ext"
+}
+
 func (q *OSQueryD) resolveDataPath(filename string) string {
 	return filepath.Join(q.dataPath, filename)
 }
@@ -571,26 +615,44 @@ func (q *OSQueryD) resolveCertsPath(filename string) string {
 }
 
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
-	log := q.log.With("ctx", "osqueryd output")
+	scanner := bufio.NewScanner(r)
+	scanner.Buffer(make([]byte, 2048), 64*1024) // 64KB max line size
 
-	buf := make([]byte, 2048)
-LOOP:
-	for {
-		n, err := r.Read(buf[:])
-		if n > 0 {
-			log.Info(string(buf[:n]))
-		}
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				err = nil
-			}
-			return err
-		}
+	log := q.log.With("ctx", "osqueryd")
+
+	for scanner.Scan() {
 		select {
 		case <-ctx.Done():
-			break LOOP
+			return ctx.Err()
 		default:
 		}
+
+		line := scanner.Text()
+		if line == "" {
+			continue
+		}
+
+		// Try to parse structured osquery log format
+		entry, err := osqlog.ParseGlogLine(line)
+		if err != nil {
+			// Failed to parse, log the raw line
+			var level osqlog.Level
+			if len(line) > 0 {
+				level = osqlog.Level(line[0])
+			} else {
+				level = osqlog.LevelInfo
+			}
+			osqlog.LogWithLevel(log, level, line)
+		} else {
+			// Successfully parsed, log with structured fields
+			entry.Log(log)
+		}
 	}
+
+	if err := scanner.Err(); err != nil {
+		log.Errorf("error reading osqueryd output: %v", err)
+		return err
+	}
+
 	return nil
 }

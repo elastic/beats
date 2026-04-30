@@ -22,8 +22,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func InitModule(config string) {
-	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
-		logp.Warn("%v", err)
+func InitModule(config string, logger *logp.Logger) {
+	if err := helper.CheckAndEnableSeDebugPrivilege(logger); err != nil {
+		logger.Warnf("%v", err)
 	}
 }

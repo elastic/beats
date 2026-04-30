@@ -42,9 +42,6 @@ const (
 	Name = "metricbeat"
 )
 
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(mapstr.M{
 	"ecs": mapstr.M{
@@ -59,7 +56,7 @@ func MetricbeatSettings(moduleNameSpace string) instance.Settings {
 	if moduleNameSpace == "" {
 		moduleNameSpace = "module"
 	}
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	return instance.Settings{
 		RunFlags:      runFlags,
@@ -79,8 +76,4 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
 	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
 	return rootCmd
-}
-
-func init() {
-	RootCmd = Initialize(MetricbeatSettings(""))
 }

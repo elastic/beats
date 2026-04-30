@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -15,6 +17,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -37,7 +41,7 @@ var (
 					},
 				}}},
 	}
-	countUnit = armmonitor.MetricUnit("Count")
+	countUnit = armmonitor.Unit("Count")
 )
 
 func mockMapResourceMetrics(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
@@ -45,13 +49,14 @@ func mockMapResourceMetrics(client *Client, resources []*armresources.GenericRes
 }
 
 func TestInitResources(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("return error when no resource options were configured", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resource options were configured")
 	})
 	t.Run("return error no resources were found", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		client.Config = resourceQueryConfig
 		m := &MockService{}
 		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, errors.New("invalid resource query"))
@@ -60,13 +65,14 @@ func TestInitResources(t *testing.T) {
 		mr.On("Error", mock.Anything).Return(true)
 		err := client.InitResources(mockMapResourceMetrics)
 		assert.Error(t, err, "no resources were found based on all the configurations options entered")
-		assert.Equal(t, len(client.ResourceConfigurations.Metrics), 0)
+		assert.Empty(t, client.ResourceConfigurations.Metrics)
 		m.AssertExpectations(t)
 	})
 }
 
 func TestGetMetricValues(t *testing.T) {
-	client := NewMockClient()
+	logger := logptest.NewTestingLogger(t, "")
+	client := NewMockClient(logger)
 	client.Config = resourceIDConfig
 
 	t.Run("return no error when no metric values are returned but log and send event", func(t *testing.T) {
@@ -88,8 +94,8 @@ func TestGetMetricValues(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		metrics := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
-		assert.Equal(t, len(metrics), 0)
-		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
+		assert.Empty(t, metrics)
+		assert.Empty(t, client.ResourceConfigurations.Metrics[0].Values)
 		m.AssertExpectations(t)
 	})
 	t.Run("return metric values", func(t *testing.T) {
@@ -111,13 +117,13 @@ func TestGetMetricValues(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
-		assert.Equal(t, len(metricValues), 0)
-		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
+		assert.Empty(t, metricValues)
+		assert.Empty(t, client.ResourceConfigurations.Metrics[0].Values)
 		m.AssertExpectations(t)
 	})
 
 	t.Run("multiple aggregation types", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		referenceTime := time.Now().UTC()
 		client.ResourceConfigurations = ResourceConfiguration{
 			Metrics: []Metric{
@@ -169,20 +175,20 @@ func TestGetMetricValues(t *testing.T) {
 
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 
-		require.Equal(t, len(metricValues), 1)
-		require.Equal(t, len(metricValues[0].Values), 1)
+		require.Len(t, metricValues, 1)
+		require.Len(t, metricValues[0].Values, 1)
 
-		assert.Equal(t, *metricValues[0].Values[0].avg, 1.0)
-		assert.Equal(t, *metricValues[0].Values[0].max, 2.0)
-		assert.Equal(t, *metricValues[0].Values[0].min, 3.0)
+		assert.InDelta(t, 1.0, *metricValues[0].Values[0].avg, 0.001)
+		assert.InDelta(t, 2.0, *metricValues[0].Values[0].max, 0.001)
+		assert.InDelta(t, 3.0, *metricValues[0].Values[0].min, 0.001)
 
-		require.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 1)
+		require.Len(t, client.ResourceConfigurations.Metrics[0].Values, 1)
 
 		m.AssertExpectations(t)
 	})
 
 	t.Run("single aggregation types", func(t *testing.T) {
-		client := NewMockClient()
+		client := NewMockClient(logger)
 		referenceTime := time.Now().UTC()
 		timestamp := time.Now().UTC()
 		client.ResourceConfigurations = ResourceConfiguration{
@@ -252,73 +258,20 @@ func TestGetMetricValues(t *testing.T) {
 
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 
-		require.Equal(t, 3, len(metricValues))
+		require.Len(t, metricValues, 3)
 
-		require.Equal(t, 1, len(metricValues[0].Values))
-		require.Equal(t, 1, len(metricValues[1].Values))
-		require.Equal(t, 1, len(metricValues[2].Values))
+		require.Len(t, metricValues[0].Values, 1)
+		require.Len(t, metricValues[1].Values, 1)
+		require.Len(t, metricValues[2].Values, 1)
 
 		require.NotNil(t, metricValues[0].Values[0].max, "max value is nil")
 		require.NotNil(t, metricValues[1].Values[0].min, "min value is nil")
 		require.NotNil(t, metricValues[2].Values[0].avg, "avg value is nil")
 
-		assert.Equal(t, *metricValues[0].Values[0].max, 3.0)
-		assert.Equal(t, *metricValues[1].Values[0].min, 1.0)
-		assert.Equal(t, *metricValues[2].Values[0].avg, 2.0)
+		assert.InDelta(t, 3.0, *metricValues[0].Values[0].max, 0.001)
+		assert.InDelta(t, 1.0, *metricValues[1].Values[0].min, 0.001)
+		assert.InDelta(t, 2.0, *metricValues[2].Values[0].avg, 0.001)
 
 		m.AssertExpectations(t)
 	})
-}
-
-func TestBuildBuildTimespan(t *testing.T) {
-	t.Run("Collection period greater than the time grain (PT1M metric every 5 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1M"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T18:51:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period equal to time grain (PT1M metric every 1 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1M"
-		collectionPeriod := 1 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T18:55:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period equal to time grain (PT5M metric every 5 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT5M"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T18:51:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period equal to time grain (PT1H metric every 60 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1H"
-		collectionPeriod := 60 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
-	t.Run("Collection period is less that time grain (PT1H metric every 5 minutes)", func(t *testing.T) {
-		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
-		timeGain := "PT1H"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
-
-		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
-	})
-
 }

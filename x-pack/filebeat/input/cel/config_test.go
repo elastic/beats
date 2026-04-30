@@ -10,7 +10,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -52,6 +54,59 @@ func TestRegexpConfig(t *testing.T) {
 	}
 }
 
+func TestSecretStateValidation(t *testing.T) {
+	base := config{
+		Interval: time.Minute,
+		Program:  `{}`,
+		Resource: &ResourceConfig{URL: &urlConfig{URL: &url.URL{}}},
+	}
+
+	t.Run("state_with_secret_key_rejected", func(t *testing.T) {
+		cfg := base
+		cfg.State = map[string]interface{}{
+			"secret": map[string]interface{}{"api_key": "hidden"},
+		}
+		err := cfg.Validate()
+		if err == nil {
+			t.Fatal("expected error for state containing \"secret\" key")
+		}
+		const want = `state must not contain a "secret" key`
+		if !strings.HasPrefix(err.Error(), want) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("state_with_secret_key_rejected_without_secret_state", func(t *testing.T) {
+		cfg := base
+		cfg.State = map[string]interface{}{
+			"secret": "value",
+		}
+		err := cfg.Validate()
+		if err == nil {
+			t.Fatal("expected error for state containing \"secret\" key even without secret_state")
+		}
+	})
+
+	t.Run("state_without_secret_key_accepted", func(t *testing.T) {
+		cfg := base
+		cfg.State = map[string]interface{}{
+			"token": "not_actually_secret",
+		}
+		err := cfg.Validate()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("nil_state_accepted", func(t *testing.T) {
+		cfg := base
+		err := cfg.Validate()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+}
+
 func TestIsEnabled(t *testing.T) {
 	type enabler interface {
 		isEnabled() bool
@@ -63,6 +118,7 @@ func TestIsEnabled(t *testing.T) {
 	}{
 		{name: "basic", auth: &basicAuthConfig{}},
 		{name: "digest", auth: &digestAuthConfig{}},
+		{name: "file", auth: &fileAuthConfig{}},
 		{name: "OAuth2", auth: &oAuth2Config{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -90,7 +146,106 @@ func TestIsEnabled(t *testing.T) {
 // take methods are for testing only.
 func (b *basicAuthConfig) take(on *bool)  { b.Enabled = on }
 func (d *digestAuthConfig) take(on *bool) { d.Enabled = on }
+func (f *fileAuthConfig) take(on *bool)   { f.Enabled = on }
 func (o *oAuth2Config) take(on *bool)     { o.Enabled = on }
+
+func TestFileAuthConfigValidate(t *testing.T) {
+	t.Run("requires path", func(t *testing.T) {
+		cfg := &fileAuthConfig{}
+		if err := cfg.Validate(); err == nil || err.Error() != "path must be set" {
+			t.Fatalf("expected path requirement error, got: %v", err)
+		}
+	})
+
+	t.Run("requires positive refresh interval", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "token")
+		if err := os.WriteFile(path, []byte("secret"), 0o600); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
+		}
+		zero := time.Duration(0)
+		cfg := &fileAuthConfig{Path: path, RefreshInterval: &zero}
+		if err := cfg.Validate(); err == nil || err.Error() != "refresh_interval must be greater than 0" {
+			t.Fatalf("expected refresh interval error, got: %v", err)
+		}
+	})
+
+	t.Run("valid configuration", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "token")
+		if err := os.WriteFile(path, []byte("secret"), 0o600); err != nil {
+			t.Fatalf("failed to write test file: %v", err)
+		}
+		refresh := time.Second
+		cfg := &fileAuthConfig{Path: path, RefreshInterval: &refresh}
+		if err := cfg.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+	})
+}
+
+func TestFileAuthConfigDefaults(t *testing.T) {
+	cfg := &fileAuthConfig{}
+	if got := cfg.headerName(); got != defaultFileAuthHeader {
+		t.Fatalf("unexpected default header: got %q want %q", got, defaultFileAuthHeader)
+	}
+	if got := cfg.refreshInterval(); got != defaultFileAuthRefreshInterval {
+		t.Fatalf("unexpected default refresh interval: got %v want %v", got, defaultFileAuthRefreshInterval)
+	}
+
+	header := "X-Api-Key"
+	cfg.Header = header
+	if got := cfg.headerName(); got != header {
+		t.Fatalf("unexpected header override: got %q want %q", got, header)
+	}
+
+	refresh := 42 * time.Second
+	cfg.RefreshInterval = &refresh
+	if got := cfg.refreshInterval(); got != refresh {
+		t.Fatalf("unexpected refresh interval override: got %v want %v", got, refresh)
+	}
+}
+
+func TestConfigFileAuthMutualExclusion(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "secret")
+	if err := os.WriteFile(path, []byte("secret"), 0o600); err != nil {
+		t.Fatalf("failed to write secret file: %v", err)
+	}
+
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"resource.url":        "localhost",
+		"auth.file.path":      path,
+		"auth.basic.user":     "user",
+		"auth.basic.password": "pass",
+	})
+	conf := defaultConfig()
+	conf.Program = "{}"
+	conf.Redact = &redact{}
+	err := cfg.Unpack(&conf)
+	wantErr := errors.New("only one kind of auth can be enabled accessing 'auth'")
+	if fmt.Sprint(err) != fmt.Sprint(wantErr) {
+		t.Fatalf("unexpected error: got %v want %v", err, wantErr)
+	}
+}
+
+func TestConfigFileAuthDisabledAllowsOther(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "secret")
+	if err := os.WriteFile(path, []byte("secret"), 0o600); err != nil {
+		t.Fatalf("failed to write secret file: %v", err)
+	}
+
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"resource.url":        "localhost",
+		"auth.file.enabled":   false,
+		"auth.file.path":      path,
+		"auth.basic.user":     "user",
+		"auth.basic.password": "pass",
+	})
+	conf := defaultConfig()
+	conf.Program = "{}"
+	conf.Redact = &redact{}
+	if err := cfg.Unpack(&conf); err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+}
 
 func TestOAuth2GetTokenURL(t *testing.T) {
 	const host = "http://localhost"

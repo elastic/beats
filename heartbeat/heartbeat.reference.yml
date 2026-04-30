@@ -1083,7 +1083,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -1660,7 +1660,7 @@ logging.files:
   #path: /var/log/heartbeat
 
   # The name of the files where the logs are written to.
-  #name: heartbeat-event-data
+  #name: heartbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

@@ -36,7 +36,8 @@ func TestEventMapping(t *testing.T) {
 			ConfigStatus:  "green",
 			ExtensibleManagedObject: mo.ExtensibleManagedObject{
 				Self: types.ManagedObjectReference{
-					Type: "Network",
+					Type:  "Network",
+					Value: "NT_0",
 				},
 			},
 		},
@@ -53,6 +54,9 @@ func TestEventMapping(t *testing.T) {
 
 	name, _ := event.GetValue("name")
 	assert.NotNil(t, name)
+
+	id, _ := event.GetValue("id")
+	assert.EqualValues(t, "NT_0", id)
 
 	status, _ := event.GetValue("status")
 	assert.Equal(t, types.ManagedEntityStatus("green"), status)

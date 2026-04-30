@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,17 +63,17 @@ func init() {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *config.C) (beat.Processor, error) {
+func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %s", err)
 	}
 
-	return newDecodeXML(config)
+	return newDecodeXML(config, log)
 }
 
-func newDecodeXML(config decodeXMLConfig) (beat.Processor, error) {
+func newDecodeXML(config decodeXMLConfig, logger *logp.Logger) (beat.Processor, error) {
 	// Default target to overwriting field.
 	if config.Target == nil {
 		config.Target = &config.Field
@@ -81,7 +81,7 @@ func newDecodeXML(config decodeXMLConfig) (beat.Processor, error) {
 
 	return &decodeXML{
 		decodeXMLConfig: config,
-		log:             logp.NewLogger(logName),
+		log:             logger.Named(logName),
 	}, nil
 }
 

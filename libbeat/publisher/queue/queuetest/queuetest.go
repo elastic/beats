@@ -21,14 +21,17 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // QueueFactory is used to create a per test queue instance.
-type QueueFactory func(t *testing.T) queue.Queue
+type QueueFactory func(t *testing.T) queue.Queue[publisher.Event]
 
-type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func()
+type workerFactory func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue[publisher.Event]) func()
 
 type testCase struct {
 	name                 string
@@ -199,10 +202,12 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 
 			queue := queueFactory(t)
 			defer func() {
-				err := queue.Close()
-				if err != nil {
-					t.Error(err)
-				}
+				err := queue.Close(false)
+				require.NoError(t, err)
+				// close again to verify this doesn't cause any issues
+				err = queue.Close(true)
+				require.NoError(t, err)
+				<-queue.Done()
 			}()
 
 			var wg sync.WaitGroup
@@ -218,7 +223,7 @@ func runTestCases(t *testing.T, tests []testCase, queueFactory QueueFactory) {
 func multiple(
 	fns ...workerFactory,
 ) workerFactory {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, queue queue.Queue) func() {
+	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, queue queue.Queue[publisher.Event]) func() {
 		runners := make([]func(), len(fns))
 		for i, gen := range fns {
 			runners[i] = gen(wg, info, log, queue)
@@ -236,8 +241,8 @@ func makeProducer(
 	maxEvents int,
 	waitACK bool,
 	makeFields func(int) mapstr.M,
-) func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue) func() {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
+) func(*sync.WaitGroup, interface{}, *TestLogger, queue.Queue[publisher.Event]) func() {
+	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue[publisher.Event]) func() {
 		wg.Add(1)
 		return func() {
 			defer wg.Done()
@@ -282,7 +287,7 @@ func makeConsumer(maxEvents, batchSize int) workerFactory {
 }
 
 func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
-	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue) func() {
+	return func(wg *sync.WaitGroup, info interface{}, log *TestLogger, b queue.Queue[publisher.Event]) func() {
 		wg.Add(1)
 		return func() {
 			defer wg.Done()

@@ -18,9 +18,9 @@
 [libdefaults]
     default_realm = ${REALM_NAME}
     dns_canonicalize_hostname = false
-    dns_lookup_kdc = false
-    dns_lookup_realm = false
-    dns_uri_lookup = false
+    dns_lookup_kdc = true
+    dns_lookup_realm = true
+    dns_uri_lookup = true
     forwardable = true
     ignore_acceptor_hostname = true
     rdns = false

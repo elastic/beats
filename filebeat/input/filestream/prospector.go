@@ -20,12 +20,13 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -39,7 +40,6 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
-	prospectorDebugKey               = "file_prospector"
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
@@ -47,22 +47,127 @@ var ignoreInactiveSettings = map[string]ignoreInactiveType{
 	ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
 }
 
+var identifiersMap = map[string]fileIdentifier{}
+
+func init() {
+	for name, factory := range identifierFactories {
+		if name == inodeMarkerName {
+			// inode marker requires a specific config we cannot infer.
+			continue
+		}
+
+		// only inode marker requires an active logger
+		// passing nil logger for other identifier
+		identifier, err := factory(nil, nil)
+		if err != nil {
+			// Skip identifiers we cannot create. E.g: inode_marker is not
+			// supported on Windows
+			continue
+		}
+		identifiersMap[name] = identifier
+	}
+}
+
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
 // The FS events then trigger either new Harvester runs or updates
 // the statestore.
 type fileProspector struct {
-	filewatcher         loginp.FSWatcher
-	identifier          fileIdentifier
-	ignoreOlder         time.Duration
-	ignoreInactiveSince ignoreInactiveType
-	cleanRemoved        bool
-	stateChangeCloser   stateChangeCloserConfig
+	logger                *logp.Logger
+	filewatcher           loginp.FSWatcher
+	identifier            fileIdentifier
+	ignoreOlder           time.Duration
+	ignoreInactiveSince   ignoreInactiveType
+	cleanRemoved          bool
+	stateChangeCloser     stateChangeCloserConfig
+	takeOver              loginp.TakeOverConfig
+	filestreamIdentifiers map[string]fileIdentifier
+	logIdentifiers        map[string]file.StateIdentifier
+}
+
+func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
+	if p.takeOver.FromFilestream() {
+		fsEvent := loginp.FSEvent{
+			NewPath:    v.Source,
+			Descriptor: fd,
+		}
+
+		return p.filestreamIdentifiers[name].GetSource(fsEvent).Name()
+	}
+
+	state := file.State{
+		FileStateOS: v.FileStateOS,
+		Source:      v.Source,
+	}
+
+	// The stream field is used when generating the ID, so if takeOver has
+	// a stream set, we use it, so the ID matches the input we're taking over.
+	if p.takeOver.Stream == "stdout" || p.takeOver.Stream == "stderr" {
+		state.Meta = map[string]string{
+			"stream": p.takeOver.Stream,
+		}
+	}
+
+	id, _ := p.logIdentifiers[name].GenerateID(state)
+	return id
+}
+
+func (p *fileProspector) takeOverFn(
+	v loginp.TakeOverState,
+	files map[string]loginp.FileDescriptor,
+	newID func(loginp.Source) string,
+) (string, any) {
+	fm := fileMeta{
+		Source:         v.Source,
+		IdentifierName: v.IdentifierName,
+	}
+
+	fd, ok := files[fm.Source]
+	if !ok {
+		return "", fm
+	}
+
+	// Return early (do nothing) if:
+	//  - The old identifier is neither native, path or fingerprint
+	oldIdentifierName := fm.IdentifierName
+	if oldIdentifierName != nativeName &&
+		oldIdentifierName != pathName &&
+		oldIdentifierName != fingerprintName {
+		return "", nil
+	}
+
+	// Our current file (source) is in the registry, now we need to ensure
+	// this registry entry (resource) actually refers to our file. Sources
+	// are identified by path, however as log files rotate the same path
+	// can point to different files.
+	//
+	// So to ensure we're dealing with the resource from our current file,
+	// we use the old identifier to generate a registry key for the current
+	// file we're trying to migrate, if this key matches with the key in the
+	// registry, then we proceed to update the registry.
+	split := strings.Split(v.Key, "::")
+	if len(split) != 4 {
+		// This should never happen.
+		p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key)
+		return "", fm
+	}
+
+	idFromRegistry := strings.Join(split[2:], "::")
+	idFromPreviousIdentity := p.previousID(oldIdentifierName, fd, v)
+
+	if idFromPreviousIdentity != idFromRegistry {
+		return "", fm
+	}
+
+	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+	fm.IdentifierName = p.identifier.Name()
+	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
+	return newKey, fm
 }
 
 func (p *fileProspector) Init(
-	cleaner,
-	globalCleaner loginp.ProspectorCleaner,
+	prospectorStore,
+	globalStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
 	files := p.filewatcher.GetFiles()
@@ -70,7 +175,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	globalStore.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -87,7 +192,7 @@ func (p *fileProspector) Init(
 	})
 
 	if p.cleanRemoved {
-		cleaner.CleanIf(func(v loginp.Value) bool {
+		prospectorStore.CleanIf(func(v loginp.Value) bool {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
 			if err != nil {
@@ -101,24 +206,99 @@ func (p *fileProspector) Init(
 	}
 
 	identifierName := p.identifier.Name()
-	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
-		var fm fileMeta
-		err := v.UnpackCursorMeta(&fm)
-		if err != nil {
-			return "", nil
-		}
 
-		fd, ok := files[fm.Source]
-		if !ok {
-			return "", fm
-		}
+	// If the file identity has changed to fingerprint, update the registry
+	// keys so we can keep the state. This is only supported from file
+	// identities that do not require configuration:
+	//  - native (inode + device ID)
+	//  - path
+	if identifierName != fingerprintName {
+		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
+	} else {
+		p.logger.Debug("trying to migrate file identity to fingerprint")
+		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
+			var fm fileMeta
+			err := v.UnpackCursorMeta(&fm)
+			if err != nil {
+				return "", nil
+			}
 
-		if fm.IdentifierName != identifierName {
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}).Name()
+			fd, ok := files[fm.Source]
+			if !ok {
+				return "", fm
+			}
+
+			// Return early (do nothing) if:
+			//  - The identifiers are the same
+			//  - The old identifier is neither native nor path
+			oldIdentifierName := fm.IdentifierName
+			if oldIdentifierName == identifierName ||
+				(oldIdentifierName != nativeName && oldIdentifierName != pathName) {
+				return "", nil
+			}
+
+			// Our current file (source) is in the registry, now we need to ensure
+			// this registry entry (resource) actually refers to our file. Sources
+			// are identified by path. However, as log files rotate the same path
+			// can point to a different file.
+			//
+			// So, to ensure we're dealing with the resource from our current file,
+			// we use the old identifier to generate a registry key for the current
+			// file we're trying to migrate, if this key matches with the key in the
+			// registry, then we proceed to update the registry.
+			registryKey := v.Key()
+			oldIdentifier, ok := identifiersMap[oldIdentifierName]
+			if !ok {
+				// This should never happen, but we properly handle it just in case.
+				// If we cannot find the identifier, move on to the next entry
+				// some identifiers cannot be migrated
+				p.logger.Errorf(
+					"old file identity '%s' not found while migrating entry to "+
+						"new file identity '%s'. If the file still exists, it will be re-ingested",
+					oldIdentifierName,
+					identifierName,
+				)
+				return "", nil
+			}
+			previousIdentifierKey := newID(oldIdentifier.GetSource(
+				loginp.FSEvent{
+					NewPath:    fm.Source,
+					Descriptor: fd,
+				}))
+
+			// If the registry key and the key generated by the old identifier
+			// do not match, log it at debug level and do nothing.
+			if previousIdentifierKey != registryKey {
+				return "", fm
+			}
+
+			// The resource matches the file we found in the file system, generate
+			// a new registry key and return it alongside the updated meta.
+			newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 			fm.IdentifierName = identifierName
+			p.logger.Infof("registry key: '%s' and previous file identity key: '%s', are the same, migrating. Source: '%s'",
+				registryKey, previousIdentifierKey, fm.Source)
+
 			return newKey, fm
-		}
-		return "", fm
+		})
+	}
+
+	return nil
+}
+
+// TakeOver migrates states from other inputs (Log input or other Filestream
+// inputs with different IDs) to this input. It must be called after Init and
+// before Run so that it is not triggered during CheckConfig validation.
+func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID func(loginp.Source) string) error {
+	if !p.takeOver.Enabled {
+		return nil
+	}
+
+	files := p.filewatcher.GetFiles()
+
+	// Take over states from other Filestream inputs or the log input
+	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {
+		return p.takeOverFn(v, files, newID)
 	})
 
 	return nil
@@ -128,13 +308,19 @@ func (p *fileProspector) Init(
 //
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
-	log := ctx.Logger.With("prospector", prospectorDebugKey)
-	log.Debug("Starting prospector")
-	defer log.Debug("Prospector has stopped")
+	p.logger.Debug("Starting prospector")
+	defer p.logger.Debug("Prospector has stopped")
 
-	defer p.stopHarvesterGroup(log, hg)
+	// ctx.Logger has its 'log.logger' set to 'input.filestream'.
+	// Because the harvester is not really part of the prospector,
+	// we use this logger instead of the prospector logger.
+	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
 	var tg unison.MultiErrGroup
+
+	// The harvester needs to notify the FileWatcher
+	// when it closes
+	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
@@ -152,17 +338,19 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Errorf("running prospector failed: %v", errors.Join(errs...))
+		p.logger.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
+// onFSEvent uses 'log' instead of the [fileProspector] logger
+// because 'log' has been enriched with event information
 func (p *fileProspector) onFSEvent(
 	log *logp.Logger,
 	ctx input.Context,
@@ -172,9 +360,12 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
+
+	log = log.With("source_file", event.SrcID)
 	switch event.Op {
-	case loginp.OpCreate, loginp.OpWrite:
-		if event.Op == loginp.OpCreate {
+	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
+		switch event.Op {
+		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
@@ -182,8 +373,11 @@ func (p *fileProspector) onFSEvent(
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
 
-		} else if event.Op == loginp.OpWrite {
+		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
+
+		case loginp.OpNotChanged:
+			log.Debugf("File %s has not changed, trying to start new harvester", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -216,7 +410,7 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unknown return value %v", event.Op)
+		log.Errorf("Unknown operation '%s'", event.Op.String())
 	}
 }
 
@@ -271,8 +465,8 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
 			meta.IdentifierName = p.identifier.Name()
-			log.Warnf("Error while getting cursor meta data of entry '%s': '%w'"+
-				", using prospector's identifier: '%s'",
+			log.Warnf(
+				"Error while getting cursor meta data of entry '%s': '%v', using prospector's identifier: '%s'",
 				src.Name(), err, meta.IdentifierName)
 		}
 		err = s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: meta.IdentifierName})

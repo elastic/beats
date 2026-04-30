@@ -1,0 +1,9 @@
+{
+    "indices": [
+        {
+            "name": "my-index",
+            "aliases": ["alias-1"],
+            "attributes": ["open"]
+        }
+    ]
+}

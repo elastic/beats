@@ -1,0 +1,736 @@
+{
+    "index_templates": [
+        {
+            "name": ".kibana-reporting",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-reporting*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".monitoring-ent-search-mb",
+            "index_template": {
+                "index_patterns": [
+                    ".monitoring-ent-search-8-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "logs-apm.error@template",
+            "index_template": {
+                "index_patterns": [
+                    "logs-apm.error-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".kibana-observability-ai-assistant-index-template-kb",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-observability-ai-assistant-kb*"
+                ]
+            }
+        },
+        {
+            "name": "metrics-apm.service_destination.1m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_destination.1m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.service_summary.60m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_summary.60m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.service_summary.1m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_summary.1m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "ilm-history-7",
+            "index_template": {
+                "index_patterns": [
+                    "ilm-history-7*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".fleet-fileds-tohost-meta",
+            "index_template": {
+                "index_patterns": [
+                    ".fleet-fileds-tohost-meta-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.transaction.1m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.transaction.1m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".kibana-event-log-template",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-event-log-ds"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".fleet-fileds-fromhost-data",
+            "index_template": {
+                "index_patterns": [
+                    ".fleet-fileds-fromhost-data-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.service_transaction.60m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_transaction.60m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-observability.metrics.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-observability.metrics.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".kibana-elastic-ai-assistant-index-template-conversations",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-elastic-ai-assistant-conversations-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".slo-observability.summary",
+            "index_template": {
+                "index_patterns": [
+                    ".slo-observability.summary-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.transaction.60m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.transaction.60m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "logs",
+            "index_template": {
+                "index_patterns": [
+                    "logs-*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".watch-history-16",
+            "index_template": {
+                "index_patterns": [
+                    ".watcher-history-16*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".monitoring-beats-mb",
+            "index_template": {
+                "index_patterns": [
+                    ".monitoring-beats-8-*"
+                ]
+            }
+        },
+        {
+            "name": "metrics-apm.transaction.10m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.transaction.10m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-ml.anomaly-detection.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-ml.anomaly-detection.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".monitoring-kibana-mb",
+            "index_template": {
+                "index_patterns": [
+                    ".monitoring-kibana-8-*"
+                ]
+            }
+        },
+        {
+            "name": "metrics-apm.service_summary.10m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_summary.10m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "entities_v1_latest_index_template",
+            "index_template": {
+                "index_patterns": [
+                    ".entities-observability.latest-v1.*"
+                ]
+            }
+        },
+        {
+            "name": ".kibana-data-quality-dashboard-results-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-data-quality-dashboard-results-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-state",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-state*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".monitoring-logstash-mb",
+            "index_template": {
+                "index_patterns": [
+                    ".monitoring-logstash-8-*"
+                ]
+            }
+        },
+        {
+            "name": ".alerts-stack.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-stack.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-anomalies-",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-anomalies-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-notifications-000002",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-notifications-000002"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.service_destination.10m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_destination.10m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-stats",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-stats-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".slm-history-7",
+            "index_template": {
+                "index_patterns": [
+                    ".slm-history-7*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-security.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-security.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-observability.slo.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-observability.slo.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "behavioral_analytics-events-default",
+            "index_template": {
+                "index_patterns": [
+                    "behavioral_analytics-events-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".fleet-fileds-fromhost-meta",
+            "index_template": {
+                "index_patterns": [
+                    ".fleet-fileds-fromhost-meta-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "elastic-connectors",
+            "index_template": {
+                "index_patterns": [
+                    ".elastic-connectors-v1"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".kibana-elastic-ai-assistant-index-template-knowledge-base",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-elastic-ai-assistant-knowledge-base-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.service_destination.60m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_destination.60m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-default.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-default.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "elastic-connectors-sync-jobs",
+            "index_template": {
+                "index_patterns": [
+                    ".elastic-connectors-sync-jobs-v1"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".monitoring-es-mb",
+            "index_template": {
+                "index_patterns": [
+                    ".monitoring-es-8-*"
+                ]
+            }
+        },
+        {
+            "name": ".alerts-ml.anomaly-detection-health.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-ml.anomaly-detection-health.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".slo-observability.sli",
+            "index_template": {
+                "index_patterns": [
+                    ".slo-observability.sli-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-observability.logs.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-observability.logs.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "entities_v1_history_index_template",
+            "index_template": {
+                "index_patterns": [
+                    ".entities-observability.history-v1.*"
+                ]
+            }
+        },
+        {
+            "name": "apm-source-map",
+            "index_template": {
+                "index_patterns": [
+                    ".apm-source-map"
+                ]
+            }
+        },
+        {
+            "name": "metrics-apm.service_transaction.10m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_transaction.10m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "traces-apm@template",
+            "index_template": {
+                "index_patterns": [
+                    "traces-apm-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "logs-apm.app@template",
+            "index_template": {
+                "index_patterns": [
+                    "logs-apm.app.*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.service_transaction.1m@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.service_transaction.1m-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "synthetics",
+            "index_template": {
+                "index_patterns": [
+                    "synthetics-*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.internal@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.internal-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-observability.uptime.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-observability.uptime.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".kibana-observability-ai-assistant-index-template-conversations",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-observability-ai-assistant-conversations*"
+                ]
+            }
+        },
+        {
+            "name": ".alerts-observability.threshold.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-observability.threshold.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-transform.health.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-transform.health.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".fleet-fileds-tohost-data",
+            "index_template": {
+                "index_patterns": [
+                    ".fleet-fileds-tohost-data-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "traces-apm.rum@template",
+            "index_template": {
+                "index_patterns": [
+                    "traces-apm.rum-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "search-acl-filter",
+            "index_template": {
+                "index_patterns": [
+                    ".search-acl-filter-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".deprecation-indexing-template",
+            "index_template": {
+                "index_patterns": [
+                    ".logs-deprecation.*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics-apm.app@template",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-apm.app.*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".alerts-observability.apm.alerts-default-index-template",
+            "index_template": {
+                "index_patterns": [
+                    ".internal.alerts-observability.apm.alerts-default-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "traces-apm.sampled@template",
+            "index_template": {
+                "index_patterns": [
+                    "traces-apm.sampled-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "my-index-template-1",
+            "index_template": {
+                "index_patterns": [
+                    "my-index1-*",
+                    "my-index2-*",
+                    "my-index3-*"
+                ]
+            }
+        },
+        {
+            "name": "my-index-template-2",
+            "index_template": {
+                "index_patterns": [
+                    "my-other-index-*",
+                    "my-other-index2-*"
+                ]
+            }
+        },
+        {
+            "name": "my-index-template-3"
+        }
+    ]
+}

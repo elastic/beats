@@ -20,12 +20,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset/gen"
 	"github.com/elastic/beats/v7/libbeat/generator/fields"
 	"github.com/elastic/beats/v7/licenses"
 )
@@ -99,12 +98,12 @@ func main() {
 			log.Fatal(err)
 		}
 
-		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", filepath.ToSlash(p))
+		bs, err := gen.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", filepath.ToSlash(p))
 		if err != nil {
 			log.Fatalf("Error creating golang file from template: %v", err)
 		}
 
-		err = ioutil.WriteFile(filepath.Join(dir, module, "fields.go"), bs, 0644)
+		err = os.WriteFile(filepath.Join(dir, module, "fields.go"), bs, 0644)
 		if err != nil {
 			log.Fatalf("Error writing fields.go: %v", err)
 		}
@@ -112,6 +111,6 @@ func main() {
 }
 
 func usageFlag() {
-	fmt.Fprintf(os.Stderr, usageText)
+	fmt.Fprint(os.Stderr, usageText)
 	flag.PrintDefaults()
 }

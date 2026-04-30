@@ -6,14 +6,15 @@ package httpjson
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/elastic/mito/lib/xml"
-
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/mito/lib/xml"
 )
 
 const responseNamespace = "response"
@@ -47,7 +48,7 @@ func (resp *response) clone() *response {
 	return clone
 }
 
-func (resp *response) asTransformables(log *logp.Logger) []transformable {
+func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger, allowStringArray bool) []transformable {
 	var ts []transformable
 
 	convertAndAppend := func(m map[string]interface{}) {
@@ -60,17 +61,28 @@ func (resp *response) asTransformables(log *logp.Logger) []transformable {
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
+		var scalars int
 		for _, v := range tresp {
-			m, ok := v.(map[string]interface{})
-			if !ok {
-				log.Debugf("events must be JSON objects, but got %T: skipping", v)
-				continue
+			switch v := v.(type) {
+			case string, float64:
+				scalars++
+			case map[string]interface{}:
+				convertAndAppend(v)
+			default:
+				msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
+				log.Debug(msg)
+				stat.UpdateStatus(status.Degraded, msg)
 			}
-			convertAndAppend(m)
+		}
+		if scalars > 0 && (scalars != len(tresp) || !allowStringArray) {
+			msg := fmt.Sprintf("events must be JSON objects, but got %d scalar values in array of length %d", scalars, len(tresp))
+			log.Debug(msg)
+			stat.UpdateStatus(status.Degraded, msg)
 		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
 	default:
+		stat.UpdateStatus(status.Degraded, "response is not a valid JSON")
 		log.Debugf("response is not a valid JSON")
 	}
 
@@ -99,14 +111,16 @@ type responseProcessor struct {
 	pagination *pagination
 	xmlDetails map[string]xml.Detail
 	log        *logp.Logger
+	status     status.StatusReporter
 }
 
-func newResponseProcessor(config config, pagination *pagination, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) []*responseProcessor {
+func newResponseProcessor(config config, pagination *pagination, xmlDetails map[string]xml.Detail, metrics *inputMetrics, stat status.StatusReporter, log *logp.Logger) []*responseProcessor {
 	rps := make([]*responseProcessor, 0, len(config.Chain)+1)
 
 	rp := &responseProcessor{
 		pagination: pagination,
 		xmlDetails: xmlDetails,
+		status:     stat,
 		log:        log,
 		metrics:    metrics,
 	}
@@ -114,10 +128,10 @@ func newResponseProcessor(config config, pagination *pagination, xmlDetails map[
 		rps = append(rps, rp)
 		return rps
 	}
-	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Transforms, responseNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Transforms, responseNamespace, stat, log)
 	rp.transforms = ts
 
-	split, _ := newSplitResponse(config.Response.Split, log)
+	split, _ := newSplitResponse(config.Response.Split, stat, log)
 
 	rp.split = split
 
@@ -126,15 +140,16 @@ func newResponseProcessor(config config, pagination *pagination, xmlDetails map[
 		rp := &responseProcessor{
 			pagination: pagination,
 			xmlDetails: xmlDetails,
+			status:     stat,
 			log:        log,
 			metrics:    metrics,
 		}
 		// chain calls responseProcessor object
 		if ch.Step != nil && ch.Step.Response != nil {
-			split, _ := newSplitResponse(ch.Step.Response.Split, log)
+			split, _ := newSplitResponse(ch.Step.Response.Split, stat, log)
 			rp.split = split
 		} else if ch.While != nil && ch.While.Response != nil {
-			split, _ := newSplitResponse(ch.While.Response.Split, log)
+			split, _ := newSplitResponse(ch.While.Response.Split, stat, log)
 			rp.split = split
 		}
 
@@ -144,12 +159,13 @@ func newResponseProcessor(config config, pagination *pagination, xmlDetails map[
 	return rps
 }
 
-func newChainResponseProcessor(config chainConfig, client *httpClient, xmlDetails map[string]xml.Detail, metrics *inputMetrics, log *logp.Logger) *responseProcessor {
+func newChainResponseProcessor(config chainConfig, client *httpClient, xmlDetails map[string]xml.Detail, metrics *inputMetrics, stat status.StatusReporter, log *logp.Logger) *responseProcessor {
 	pagination := &pagination{client: client, log: log}
 
 	rp := &responseProcessor{
 		pagination: pagination,
 		xmlDetails: xmlDetails,
+		status:     stat,
 		log:        log,
 		metrics:    metrics,
 	}
@@ -158,10 +174,10 @@ func newChainResponseProcessor(config chainConfig, client *httpClient, xmlDetail
 			return rp
 		}
 
-		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Step.Response.Transforms, responseNamespace, log)
+		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Step.Response.Transforms, responseNamespace, stat, log)
 		rp.transforms = ts
 
-		split, _ := newSplitResponse(config.Step.Response.Split, log)
+		split, _ := newSplitResponse(config.Step.Response.Split, stat, log)
 
 		rp.split = split
 	} else if config.While != nil {
@@ -169,10 +185,10 @@ func newChainResponseProcessor(config chainConfig, client *httpClient, xmlDetail
 			return rp
 		}
 
-		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.While.Response.Transforms, responseNamespace, log)
+		ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.While.Response.Transforms, responseNamespace, stat, log)
 		rp.transforms = ts
 
-		split, _ := newSplitResponse(config.While.Response.Split, log)
+		split, _ := newSplitResponse(config.While.Response.Split, stat, log)
 
 		rp.split = split
 	}
@@ -186,12 +202,12 @@ type handler interface {
 	handleError(error)
 }
 
-func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler) {
+func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate, allowStringArray bool, h handler) {
 	trCtx.clearIntervalData()
 
 	var npages int64
 	for i, httpResp := range resps {
-		iter := rp.pagination.newPageIterator(ctx, trCtx, httpResp, rp.xmlDetails)
+		iter := rp.pagination.newPageIterator(ctx, trCtx, httpResp, rp.xmlDetails, rp.status)
 		for {
 			pageStartTime := time.Now()
 			page, hasNext, err := iter.next()
@@ -207,7 +223,7 @@ func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transfo
 				return
 			}
 
-			respTrs := page.asTransformables(rp.log)
+			respTrs := page.asTransformables(rp.status, rp.log, allowStringArray)
 
 			if len(respTrs) == 0 {
 				return

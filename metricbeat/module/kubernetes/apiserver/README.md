@@ -64,12 +64,40 @@
 
 `apiserver_audit_requests_rejected_total`
 
-## Setup environment for manual tests
+## Generating expectation files
 
-Probably the easiest way of testing apiserver is creating a cluster (kind, minikube?), configuring kubeconfig and then
+In order to support a new Kubernetes releases you'll have to generate new expectation files for this module in `_meta/test`. For that, start by deploying a new kubernetes cluster on the required Kubernetes version, for example:
 
 ```bash
-kubectl proxy --port 8000
+kind create cluster --image kindest/node:v1.32.0
 ```
 
-Metrics for apiserver will be available at `http://localhost:8000/metrics`
+After that, you can apply the [`kubernetes.yml`](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/kubernetes.yml) file from the root of the kubernetes module:
+
+```bash
+kubectl apply -f kubernetes.yml
+```
+
+This is required since accessing the apiserver metrics requires additional permissions.
+
+Next, expose the apiserver api:
+
+```bash
+kubectl port-forward -n kube-system pod/kube-apiserver-kind-control-plane 6443
+```
+
+Then you can fetch the metrics from the url provided in the output and save it to a new `_meta/test/metrics.x.xx` file.
+
+```bash
+curl -k https://localhost:6443/metrics > _meta/test/metrics.x.xx
+```
+
+Run the following commands to generate and test the expected files:
+
+```bash
+cd metricbeat/module/kubernetes/apiserver
+# generate the expected files
+go test ./... --data
+# test the expected files
+go test ./...
+```

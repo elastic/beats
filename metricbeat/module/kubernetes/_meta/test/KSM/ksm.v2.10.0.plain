@@ -515,8 +515,10 @@ kube_pod_container_state_started{namespace="default",pod="web-0",uid="e9cebbf1-9
 kube_pod_container_state_started{namespace="kube-system",pod="fluentd-elasticsearch-m2tlp",uid="7c4da822-be1a-4ee2-9f43-fded815d2452",container="fluentd-elasticsearch"} 1.698751173e+09
 # HELP kube_pod_container_status_last_terminated_reason Describes the last reason the container was in terminated state.
 # TYPE kube_pod_container_status_last_terminated_reason gauge
+kube_pod_container_status_last_terminated_reason{namespace="default",pod="failpodloop",uid="a67536f5-5f43-4f43-8cea-ae304364c76f",container="fail",reason="Error"} 1
 # HELP kube_pod_container_status_last_terminated_exitcode Describes the exit code for the last container in terminated state.
 # TYPE kube_pod_container_status_last_terminated_exitcode gauge
+kube_pod_container_status_last_terminated_exitcode{namespace="default",pod="failpodloop",uid="a67536f5-5f43-4f43-8cea-ae304364c76f",container="fail"} 42
 # HELP kube_pod_container_status_ready [STABLE] Describes whether the containers readiness check succeeded.
 # TYPE kube_pod_container_status_ready gauge
 kube_pod_container_status_ready{namespace="kube-system",pod="kindnet-xg6gs",uid="ecb2283b-05a4-4a4b-b9da-c1cc217e2915",container="kindnet-cni"} 1
@@ -655,24 +657,39 @@ kube_pod_ips{namespace="kube-system",pod="etcd-kind-control-plane",uid="e90dd6ea
 kube_pod_ips{namespace="kube-system",pod="kindnet-xg6gs",uid="ecb2283b-05a4-4a4b-b9da-c1cc217e2915",ip="172.18.0.2",ip_family="4"} 1
 # HELP kube_pod_init_container_info [STABLE] Information about an init container in a pod.
 # TYPE kube_pod_init_container_info gauge
+kube_pod_init_container_info{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",image_spec="busybox:1.36",image="docker.io/library/busybox:1.36",image_id="docker.io/library/busybox@sha256:2c5e2045f35086c019e80c86f32b2c0ec3c3bcc1b82a15940c4667bce02e4a8f",container_id="containerd://a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"} 1
 # HELP kube_pod_init_container_resource_limits The number of requested limit resource by an init container.
 # TYPE kube_pod_init_container_resource_limits gauge
+kube_pod_init_container_resource_limits{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",resource="cpu",unit="core"} 0.2
+kube_pod_init_container_resource_limits{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",resource="memory",unit="byte"} 67108864
 # HELP kube_pod_init_container_resource_requests The number of requested request resource by an init container.
 # TYPE kube_pod_init_container_resource_requests gauge
+kube_pod_init_container_resource_requests{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",resource="cpu",unit="core"} 0.1
+kube_pod_init_container_resource_requests{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",resource="memory",unit="byte"} 33554432
 # HELP kube_pod_init_container_status_last_terminated_reason Describes the last reason the init container was in terminated state.
 # TYPE kube_pod_init_container_status_last_terminated_reason gauge
+kube_pod_init_container_status_last_terminated_reason{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",reason="Completed"} 1
+# HELP kube_pod_init_container_status_last_terminated_exitcode Describes the exit code for the last container in terminated state.
+# TYPE kube_pod_init_container_status_last_terminated_exitcode gauge
+kube_pod_init_container_status_last_terminated_exitcode{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config"} 0
 # HELP kube_pod_init_container_status_ready [STABLE] Describes whether the init containers readiness check succeeded.
 # TYPE kube_pod_init_container_status_ready gauge
+kube_pod_init_container_status_ready{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config"} 0
 # HELP kube_pod_init_container_status_restarts_total [STABLE] The number of restarts for the init container.
 # TYPE kube_pod_init_container_status_restarts_total counter
+kube_pod_init_container_status_restarts_total{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config"} 0
 # HELP kube_pod_init_container_status_running [STABLE] Describes whether the init container is currently in running state.
 # TYPE kube_pod_init_container_status_running gauge
+kube_pod_init_container_status_running{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config"} 0
 # HELP kube_pod_init_container_status_terminated [STABLE] Describes whether the init container is currently in terminated state.
 # TYPE kube_pod_init_container_status_terminated gauge
+kube_pod_init_container_status_terminated{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config"} 1
 # HELP kube_pod_init_container_status_terminated_reason Describes the reason the init container is currently in terminated state.
 # TYPE kube_pod_init_container_status_terminated_reason gauge
+kube_pod_init_container_status_terminated_reason{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config",reason="Completed"} 1
 # HELP kube_pod_init_container_status_waiting [STABLE] Describes whether the init container is currently in waiting state.
 # TYPE kube_pod_init_container_status_waiting gauge
+kube_pod_init_container_status_waiting{namespace="default",pod="web-0",uid="e9cebbf1-9f61-45b5-b4d2-d6b2a4768d14",container="init-config"} 0
 # HELP kube_pod_init_container_status_waiting_reason Describes the reason the init container is currently in waiting state.
 # TYPE kube_pod_init_container_status_waiting_reason gauge
 # HELP kube_pod_annotations Kubernetes annotations converted to Prometheus labels.
@@ -1291,3 +1308,43 @@ kube_storageclass_created{storageclass="standard"} 1.698675685e+09
 # TYPE kube_storageclass_annotations gauge
 # HELP kube_storageclass_labels [STABLE] Kubernetes labels converted to Prometheus labels.
 # TYPE kube_storageclass_labels gauge
+# TYPE kube_horizontalpodautoscaler_info gauge
+kube_horizontalpodautoscaler_info{namespace="default",horizontalpodautoscaler="cpu",scaletargetref_api_version="apps/v1",scaletargetref_kind="Deployment",scaletargetref_name="helloweb"} 1
+# HELP kube_horizontalpodautoscaler_metadata_generation [STABLE] The generation observed by the HorizontalPodAutoscaler controller.
+# TYPE kube_horizontalpodautoscaler_metadata_generation gauge
+kube_horizontalpodautoscaler_metadata_generation{namespace="default",horizontalpodautoscaler="cpu"} 0
+# HELP kube_horizontalpodautoscaler_spec_max_replicas [STABLE] Upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.
+# TYPE kube_horizontalpodautoscaler_spec_max_replicas gauge
+kube_horizontalpodautoscaler_spec_max_replicas{namespace="default",horizontalpodautoscaler="cpu"} 5
+# HELP kube_horizontalpodautoscaler_spec_min_replicas [STABLE] Lower limit for the number of pods that can be set by the autoscaler, default 1.
+# TYPE kube_horizontalpodautoscaler_spec_min_replicas gauge
+kube_horizontalpodautoscaler_spec_min_replicas{namespace="default",horizontalpodautoscaler="cpu"} 1
+# HELP kube_horizontalpodautoscaler_spec_target_metric The metric specifications used by this autoscaler when calculating the desired replica count.
+# TYPE kube_horizontalpodautoscaler_spec_target_metric gauge
+kube_horizontalpodautoscaler_spec_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="utilization"} 30
+# HELP kube_horizontalpodautoscaler_status_target_metric The current metric status used by this autoscaler when calculating the desired replica count.
+# TYPE kube_horizontalpodautoscaler_status_target_metric gauge
+kube_horizontalpodautoscaler_status_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="value"} 0.001
+kube_horizontalpodautoscaler_status_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="average"} 0.001
+kube_horizontalpodautoscaler_status_target_metric{namespace="default",horizontalpodautoscaler="cpu",metric_name="cpu",metric_target_type="utilization"} 1
+# HELP kube_horizontalpodautoscaler_status_current_replicas [STABLE] Current number of replicas of pods managed by this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_current_replicas gauge
+kube_horizontalpodautoscaler_status_current_replicas{namespace="default",horizontalpodautoscaler="cpu"} 1
+# HELP kube_horizontalpodautoscaler_status_desired_replicas [STABLE] Desired number of replicas of pods managed by this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_desired_replicas gauge
+kube_horizontalpodautoscaler_status_desired_replicas{namespace="default",horizontalpodautoscaler="cpu"} 1
+# HELP kube_horizontalpodautoscaler_annotations Kubernetes annotations converted to Prometheus labels.
+# TYPE kube_horizontalpodautoscaler_annotations gauge
+# HELP kube_horizontalpodautoscaler_labels [STABLE] Kubernetes labels converted to Prometheus labels.
+# TYPE kube_horizontalpodautoscaler_labels gauge
+# HELP kube_horizontalpodautoscaler_status_condition [STABLE] The condition of this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_condition gauge
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="AbleToScale",status="true"} 1
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="AbleToScale",status="false"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="AbleToScale",status="unknown"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingActive",status="true"} 1
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingActive",status="false"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingActive",status="unknown"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingLimited",status="true"} 0
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingLimited",status="false"} 1
+kube_horizontalpodautoscaler_status_condition{namespace="default",horizontalpodautoscaler="cpu",condition="ScalingLimited",status="unknown"} 0

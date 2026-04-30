@@ -20,12 +20,11 @@ Beat  | Description
 --- | ---
 [Auditbeat](https://github.com/elastic/beats/tree/main/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
 [Filebeat](https://github.com/elastic/beats/tree/main/filebeat) | Tails and ships log files
-[Functionbeat](https://github.com/elastic/beats/tree/main/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
 [Heartbeat](https://github.com/elastic/beats/tree/main/heartbeat) | Ping remote services for availability
 [Metricbeat](https://github.com/elastic/beats/tree/main/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/main/packetbeat) | Monitors the network and applications by sniffing packets
 [Winlogbeat](https://github.com/elastic/beats/tree/main/winlogbeat) | Fetches and ships Windows Event logs
-[Osquerybeat](https://github.com/elastic/beats/tree/main/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
+[Osquerybeat](https://github.com/elastic/beats/tree/main/x-pack/osquerybeat) | Runs Osquery and manages interaction with it.
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
@@ -41,7 +40,6 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Beats platform](https://www.elastic.co/guide/en/beats/libbeat/current/index.html)
 * [Auditbeat](https://www.elastic.co/guide/en/beats/auditbeat/current/index.html)
 * [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
-* [Functionbeat](https://www.elastic.co/guide/en/beats/functionbeat/current/index.html)
 * [Heartbeat](https://www.elastic.co/guide/en/beats/heartbeat/current/index.html)
 * [Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
@@ -71,6 +69,12 @@ create your own Beat.
 
 Please start by reading our [CONTRIBUTING](CONTRIBUTING.md) file.
 
+## AI Coding Agents
+
+Repository instructions for AI coding agents are in [AGENTS.md](AGENTS.md). 
+To use it, copy it to the agent-specific filename: CLAUDE.md, GEMINI.md,
+and similar files, which are ignored by Git.
+
 ## Building Beats from the Source
 
 See our [CONTRIBUTING](CONTRIBUTING.md) file for information about setting up
@@ -89,6 +93,8 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 
 * [beats CI pipeline](https://buildkite.com/elastic/beats)
   * `/test` will kick off a default build.
+* [docs CI pipeline](https://buildkite.com/elastic/docs-build-pr)
+  * `run docs-build` will kick off a docs build.
 
 ### PR Labels
 

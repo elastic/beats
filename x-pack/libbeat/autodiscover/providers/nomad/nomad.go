@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // NomadEventKey is the key under which custom metadata is going
@@ -54,8 +55,10 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("The nomad autodiscover provider is experimental.")
+	logger.Warn(cfgwarn.Experimental("The nomad autodiscover provider is experimental."))
 
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
@@ -73,12 +76,12 @@ func AutodiscoverBuilder(
 		return nil, fmt.Errorf("failed to initialize nomad API client: %w", err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, err
 	}
@@ -113,12 +116,12 @@ func AutodiscoverBuilder(
 		options.Node = node
 	}
 
-	watcher, err := nomad.NewWatcher(client, options)
+	watcher, err := nomad.NewWatcher(client, options, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize nomad watcher: %w", err)
 	}
 
-	logger := logp.NewLogger("nomad")
+	logger = logger.Named("nomad")
 	p := &Provider{
 		config:    config,
 		bus:       bus,
@@ -242,15 +245,15 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	rawMeta, ok := event["meta"]
 	if ok {
-		meta = rawMeta.(mapstr.M)
+		meta = rawMeta.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 		if nomadMeta, ok := meta["nomad"]; ok {
-			meta = nomadMeta.(mapstr.M)
+			meta = nomadMeta.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 		}
 
 		// The builder base config can configure any of the field values of nomad if need be.
 		e["nomad"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
-			tags = rawAnn.(mapstr.M)
+			tags = rawAnn.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 
 			e["tags"] = tags
 		}
@@ -263,7 +266,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
 	// metadata about the runtime driver.
 	if rawCont, ok := meta["container"]; ok {
-		container = rawCont.(mapstr.M)
+		container = rawCont.(mapstr.M) //nolint:errcheck // preserve existing behaviour
 		e["container"] = container
 	}
 

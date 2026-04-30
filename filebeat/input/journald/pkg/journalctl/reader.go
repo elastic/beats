@@ -15,13 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
+//go:build linux
+
 package journalctl
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -52,13 +59,22 @@ type JournalEntry struct {
 
 // JctlFactory is a function that returns an instance of journalctl ready to use.
 // It exists to allow testing
-type JctlFactory func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error)
+type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error)
 
 // Jctl abstracts the call to journalctl, it exists only for testing purposes
 //
 //go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
 type Jctl interface {
-	Next(input.Canceler) ([]byte, error)
+	// Next returns the next journal entry. If there is no entry available
+	// next will block until there is an entry or cancel is cancelled.
+	//
+	// If cancel is cancelled, Next returns a zero value JournalEntry
+	// and ErrCancelled.
+	Next(input.Canceler) (data []byte, err error)
+
+	// Kill terminates the journalctl process and blocks until all
+	// background goroutines (stdout/stderr readers and the process-wait
+	// goroutine) have exited.
 	Kill() error
 }
 
@@ -74,33 +90,101 @@ type Jctl interface {
 // More details can be found in the PR introducing this feature and related
 // issues. PR: https://github.com/elastic/beats/pull/40061.
 type Reader struct {
-	args   []string
+	// logger is the logger for the reader
+	logger *logp.Logger
+
+	// jctlLogger is the logger for the code controlling
+	// the journalctl process
+	jctlLogger *logp.Logger
+
+	// args are arguments for journalctl that never change,
+	// like the message filters, format, etc
+	args []string
+
+	// extraArgs are the arguments used in the first call to
+	// journalctl that will be replaced by the cursor argument
+	// once data has been ingested
+	extraArgs []string
+
+	// cursor is the jornalctl cursor, it is also stored in Filebeat's registry
 	cursor string
 
-	logger   *logp.Logger
 	canceler input.Canceler
 
 	jctl        Jctl
 	jctlFactory JctlFactory
 
+	// supportsBootAll indicates whether the running journalctl supports
+	// `--boot all` (introduced in systemd/journalctl v242).
+	supportsBootAll bool
+
 	backoff backoff.Backoff
+}
+
+// maybeAddBootAll appends "--boot", "all" to args only when boot-all is
+// supported by the running journalctl.
+func maybeAddBootAll(args []string, supportsBootAll bool) []string {
+	if !supportsBootAll {
+		return args
+	}
+
+	return append(args, "--boot", "all")
+}
+
+// journalctlSupportsBootAll reports whether `--boot all` should be used.
+// On any detection failure, it safely falls back to false.
+func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	jctl, err := factory(ctx, logger, "--version")
+	if err != nil {
+		logger.Warnf("cannot call journalctl to get its version: %s. Omitting '--boot all'", err)
+		return false
+	}
+
+	defer jctl.Kill() //nolint:errcheck // there is nothing we can do with this error
+
+	out, err := jctl.Next(ctx)
+	if err != nil {
+		logger.Warnf("cannot read journalctl output: %s", err)
+		return false
+	}
+	// first line: "systemd 239 (239-82.el8_10.2)"
+	firstLine := strings.SplitN(string(out), "\n", 2)[0]
+	fields := strings.Fields(firstLine)
+	if len(fields) < 2 {
+		logger.Warnf("journalctl version invalid format: %q", strings.TrimSpace(string(out)))
+		return false
+	}
+
+	version, err := strconv.Atoi(fields[1])
+	if err != nil {
+		logger.Warnf("cannot convert journalctl version to int: %s", err)
+		return false
+	}
+
+	logger.Debugf("journalctl version: %d", version)
+	return version >= 242
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
 // If there is a cursor, only the cursor is used, seek is ignored.
-// If there is no cursor, then seek is used
-func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string) []string {
+// If there is no cursor, then seek is used.
+// --boot all is only added when the journalctl version supports it (>= 242).
+func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, supportsBootAll bool) []string {
 	if cursor != "" {
-		return []string{"--after-cursor", cursor}
+		return maybeAddBootAll([]string{"--after-cursor", cursor}, supportsBootAll)
 	}
 
 	switch mode {
 	case SeekSince:
-		return []string{"--since", time.Now().Add(since).Format(sinceTimeFormat)}
+		return maybeAddBootAll([]string{
+			"--since", time.Now().Add(since).Format(sinceTimeFormat),
+		}, supportsBootAll)
 	case SeekTail:
 		return []string{"--since", "now"}
 	case SeekHead:
-		return []string{"--no-tail"}
+		return maybeAddBootAll([]string{"--no-tail"}, supportsBootAll)
 	default:
 		// That should never happen
 		return []string{}
@@ -137,17 +221,36 @@ func New(
 	syslogIdentifiers []string,
 	transports []string,
 	matchers journalfield.IncludeMatches,
+	facilities []int,
 	mode SeekMode,
 	cursor string,
 	since time.Duration,
 	file string,
+	merge bool,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
 	logger = logger.Named("reader")
-	args := []string{"--utc", "--output=json", "--follow"}
+
+	args := []string{"--utc", "--output=json", "--no-pager", "--all", "--follow"}
+
 	if file != "" && file != localSystemJournalID {
-		args = append(args, "--file", file)
+
+		st, err := os.Stat(file)
+		if err != nil {
+			logger.Debugf("cannot stat file: %s. Using '--file %s'", err, file)
+			args = append(args, "--file", file)
+		} else {
+			if st.IsDir() {
+				args = append(args, "--directory", file)
+			} else {
+				args = append(args, "--file", file)
+			}
+		}
+	}
+
+	if merge {
+		args = append(args, "--merge")
 	}
 
 	for _, u := range units {
@@ -166,29 +269,44 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
-	otherArgs := handleSeekAndCursor(mode, since, cursor)
-
-	jctl, err := newJctl(canceler, logger.Named("journalctl-runner"), "journalctl", append(args, otherArgs...)...)
-	if err != nil {
-		return &Reader{}, err
+	for _, facility := range facilities {
+		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
+	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
+	extraArgs := handleSeekAndCursor(mode, since, cursor, supportsBootAll)
+
 	r := Reader{
-		args:        args,
-		cursor:      cursor,
-		jctl:        jctl,
-		logger:      logger,
-		canceler:    canceler,
-		jctlFactory: newJctl,
-		backoff:     backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+		logger:          logger,
+		jctlLogger:      logger.Named("journalctl-runner"),
+		args:            args,
+		extraArgs:       extraArgs,
+		cursor:          cursor,
+		canceler:        canceler,
+		jctlFactory:     newJctl,
+		supportsBootAll: supportsBootAll,
+		backoff:         backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+	}
+
+	if err := r.newJctl(extraArgs...); err != nil {
+		return &Reader{}, err
 	}
 
 	return &r, nil
 }
 
-// Close stops the `journalctl` process and waits for all
-// goroutines to return, the canceller passed to `New` should
-// be cancelled before `Close` is called
+func (r *Reader) newJctl(extraArgs ...string) error {
+	args := append(r.args, extraArgs...)
+
+	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, args...)
+	r.jctl = jctl
+
+	return err
+}
+
+// Close stops the `journalctl` process and waits for all goroutines to
+// return. The canceller passed to `New` should be cancelled before `Close`
+// is called so that the reader goroutines can drain.
 func (r *Reader) Close() error {
 	r.logger.Infof("shutting down journalctl, waiting up to: %s", time.Minute)
 
@@ -199,84 +317,140 @@ func (r *Reader) Close() error {
 	return nil
 }
 
+// next reads the next entry from journalctl. It handles any errors from
+// journalctl restarting it as necessary with a backoff strategy. It either
+// returns a valid journald entry or ErrCancelled when the input is cancelled.
+func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
+	msg, err := r.jctl.Next(cancel)
+
+	// Check if the input has been cancelled
+	if cancel.Err() != nil {
+		// The caller is responsible for calling Reader.Close to terminate
+		// journalctl. Cancelling this canceller only means this Next call was
+		// cancelled. Because the input has been cancelled, we ignore the message
+		// and any error it might have returned.
+		return nil, ErrCancelled
+	}
+
+	// Two options:
+	//   - No error, return the message
+	//   - Error, journalctl exited with an error, restart with
+	//     backoff if necessary.
+	if err == nil {
+		return msg, nil
+	}
+	r.logger.Warnf("reader error: '%s', restarting...", err)
+
+	// Handle backoff
+	//
+	// If the last restart (if any) was more than 5s ago,
+	// recreate the backoff and do not wait.
+	// We recreate the backoff so r.backoff.Last().IsZero()
+	// will return true next time it's called making us to
+	// wait in case jouranlctl crashes in less than 5s.
+	if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
+		r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
+	} else {
+		r.backoff.Wait()
+	}
+
+	var extraArgs []string
+	// Corner case: journalctl exited with an error before reading the
+	// 1st message. This means we don't have a cursor and need to restart
+	// it with the initial arguments.
+	if r.cursor == "" {
+		extraArgs = r.extraArgs
+	} else {
+		// We have a cursor, set it instead of the other options that select
+		// where in the journal to start reading because they are incompatible
+		// with setting the cursor.
+		extraArgs = maybeAddBootAll([]string{"--after-cursor", r.cursor}, r.supportsBootAll)
+	}
+
+	if err := r.newJctl(extraArgs...); err != nil {
+		// If we cannot restart journalct, there is nothing we can do.
+		return nil, fmt.Errorf("cannot restart journalctl: %w", err)
+	}
+
+	// Return an empty message and wait for the caller to call us again
+	return nil, ErrRestarting
+}
+
 // Next returns the next journal entry. If there is no entry available
 // next will block until there is an entry or cancel is cancelled.
 //
 // If cancel is cancelled, Next returns a zero value JournalEntry
 // and ErrCancelled.
 func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
-	d, err := r.jctl.Next(cancel)
-
-	// Check if the input has been cancelled
-	select {
-	case <-cancel.Done():
-		// Input has been cancelled, ignore the message?
-		return JournalEntry{}, err
-	default:
-		// Two options:
-		//   - No error, go parse the message
-		//   - Error, journalctl is not running any more, restart it
+	// r.next returns ErrRestarting when journalctl is restarting,
+	// this happens in two situations:
+	//  - When the reader first starts, it runs journalctl without the follow
+	//    flat to read messages from all previous boots, journalctl exits once
+	//    all messages are read.
+	//  - journalctl exited unexpectedly and was restarted.
+	// On both cases Readr.Next must block until we have a valid journal entry
+	// or the input is cancelled.
+	for {
+		msg, err := r.next(cancel)
 		if err != nil {
-			r.logger.Warnf("reader error: '%s', restarting...", err)
-			// Copy r.args and if needed, add the cursor flag
-			args := append([]string{}, r.args...)
-			if r.cursor != "" {
-				args = append(args, "--after-cursor", r.cursor)
+			if errors.Is(err, ErrRestarting) {
+				continue
 			}
-
-			// If the last restart (if any) was more than 5s ago,
-			// recreate the backoff and do not wait.
-			// We recreate the backoff so r.backoff.Last().IsZero()
-			// will return true next time it's called making us to
-			// wait in case jouranlctl crashes in less than 5s.
-			if !r.backoff.Last().IsZero() && time.Now().Sub(r.backoff.Last()) > 5*time.Second {
-				r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
-			} else {
-				r.backoff.Wait()
-			}
-
-			jctl, err := r.jctlFactory(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", args...)
-			if err != nil {
-				// If we cannot restart journalct, there is nothing we can do.
-				return JournalEntry{}, fmt.Errorf("cannot restart journalctl: %w", err)
-			}
-			r.jctl = jctl
-
-			// Return an empty message and wait for the input to call us again
-			return JournalEntry{}, ErrRestarting
+			return JournalEntry{}, err
 		}
-	}
 
+		return r.handleMessage(msg)
+	}
+}
+
+func (r *Reader) handleMessage(msg []byte) (JournalEntry, error) {
 	fields := map[string]any{}
-	if err := json.Unmarshal(d, &fields); err != nil {
-		r.logger.Error("journal event cannot be parsed as map[string]any, look at the events log file for the raw journal event")
+	if err := json.Unmarshal(msg, &fields); err != nil {
+		r.logger.Error("journal event cannot be parsed as map[string]any, " +
+			"look at the events log file for the raw journal event")
+
 		// Log raw data to events log file
-		msg := fmt.Sprintf("data cannot be parsed as map[string]any JSON: '%s'", string(d))
-		r.logger.Errorw(msg, logp.TypeKey, logp.EventType, "error.message", err.Error())
+		msg := fmt.Sprintf("data cannot be parsed as map[string]any. Data: '%s'",
+			string(msg))
+		r.logger.Errorw(
+			msg,
+			"error.message", err.Error(),
+			logp.TypeKey, logp.EventType)
+
 		return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
 	}
 
 	ts, isString := fields["__REALTIME_TIMESTAMP"].(string)
 	if !isString {
-		return JournalEntry{}, fmt.Errorf("'__REALTIME_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__REALTIME_TIMESTAMP"])
+		return JournalEntry{},
+			fmt.Errorf("'__REALTIME_TIMESTAMP': '%[1]v', type %[1]T is not a string",
+				fields["__REALTIME_TIMESTAMP"])
 	}
 	unixTS, err := strconv.ParseUint(ts, 10, 64)
 	if err != nil {
-		return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
+		return JournalEntry{},
+			fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w",
+				err)
 	}
 
 	monotomicTs, isString := fields["__MONOTONIC_TIMESTAMP"].(string)
 	if !isString {
-		return JournalEntry{}, fmt.Errorf("'__MONOTONIC_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__MONOTONIC_TIMESTAMP"])
+		return JournalEntry{},
+			fmt.Errorf("'__MONOTONIC_TIMESTAMP': '%[1]v', type %[1]T is not a string",
+				fields["__MONOTONIC_TIMESTAMP"])
 	}
 	monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
 	if err != nil {
-		return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
+		return JournalEntry{},
+			fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w",
+				err)
 	}
 
 	cursor, isString := fields["__CURSOR"].(string)
 	if !isString {
-		return JournalEntry{}, fmt.Errorf("'_CURSOR': '%[1]v', type %[1]T is not a string", fields["_CURSOR"])
+		return JournalEntry{},
+			fmt.Errorf("'_CURSOR': '%[1]v', type %[1]T is not a string",
+				fields["_CURSOR"])
 	}
 
 	// Update our cursor so we can restart journalctl if needed

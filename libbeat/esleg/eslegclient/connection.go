@@ -67,7 +67,6 @@ type Connection struct {
 	// requests will share the same cancellable context
 	// so they can be aborted on Close()
 	reqsContext context.Context
-	cancelReqs  func()
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -82,7 +81,7 @@ type ConnectionSettings struct {
 
 	Kerberos *kerberos.Config
 
-	OnConnectCallback func() error
+	OnConnectCallback func(*Connection) error
 	Observer          transport.IOStatser
 
 	Parameters       map[string]string
@@ -94,7 +93,7 @@ type ConnectionSettings struct {
 	Transport httpcommon.HTTPTransportSettings
 
 	// UserAgent can be used to report the agent running mode
-	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// to ES via the User Agent string. If running under Agent (management.UnderAgent() == true)
 	// then this string will be appended to the user agent.
 	UserAgent string
 }
@@ -109,9 +108,9 @@ type ESVersionData struct {
 	BuildFlavor string `json:"build_flavor"`
 }
 
-// NewConnection returns a new Elasticsearch client
-func NewConnection(s ConnectionSettings) (*Connection, error) {
-	logger := logp.NewLogger("esclientleg")
+// NewConnection returns a new Elasticsearch client.
+func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) {
+	logger := log.Named("esclientleg")
 
 	if s.IdleConnTimeout == 0 {
 		s.IdleConnTimeout = 1 * time.Minute
@@ -177,22 +176,19 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 
 	esClient := esHTTPClient(httpClient)
 	if s.Kerberos.IsEnabled() {
-		esClient, err = kerberos.NewClient(s.Kerberos, httpClient, s.URL)
+		esClient, err = kerberos.NewClient(s.Kerberos, httpClient)
 		if err != nil {
 			return nil, err
 		}
 		logger.Info("kerberos client created")
 	}
 
-	ctx, cancelFunc := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
 		responseBuffer:     bytes.NewBuffer(nil),
-		reqsContext:        ctx,
-		cancelReqs:         cancelFunc,
 	}
 
 	if s.APIKey != "" {
@@ -207,15 +203,15 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
 // The returned Connection is a non-thread-safe connection.
-func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
+func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
-		logp.Debug("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
-		logp.Info("using proxy URL: %s", proxyURL.URI().String())
+		log.Debugf("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
+		log.Infof("using proxy URL: %s", proxyURL.URI().String())
 	}
 
 	params := config.Params
@@ -227,7 +223,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	for _, host := range config.Hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
 		if err != nil {
-			logp.Err("invalid host param set: %s, Error: %v", host, err)
+			log.Errorf("invalid host param set: %s, Error: %v", host, err)
 			return nil, err
 		}
 
@@ -242,7 +238,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 			Headers:          config.Headers,
 			CompressionLevel: config.CompressionLevel,
 			Transport:        config.Transport,
-		})
+		}, log)
 		if err != nil {
 			return clients, err
 		}
@@ -255,8 +251,8 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 }
 
 // NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
-func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
-	clients, err := NewClients(cfg, beatname)
+func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string, log *logp.Logger) (*Connection, error) {
+	clients, err := NewClients(cfg, beatname, log)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +260,7 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	errors := []string{}
 
 	for _, client := range clients {
-		err = client.Connect()
+		err = client.Connect(ctx)
 		if err != nil {
 			const errMsg = "error connecting to Elasticsearch at %v: %v"
 			client.log.Errorf(errMsg, client.URL, err)
@@ -279,17 +275,22 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 
 // Connect connects the client. It runs a GET request against the root URL of
 // the configured host, updates the known Elasticsearch version and calls
-// globally configured handlers.
-func (conn *Connection) Connect() error {
+// globally configured handlers. The context is used to control the lifecycle
+// of the HTTP requests/connections, the caller is responsible for cancelling
+// the context to stop any in-flight requests.
+func (conn *Connection) Connect(ctx context.Context) error {
 	if conn.log == nil {
 		conn.log = logp.NewLogger("esclientleg")
 	}
+
+	conn.reqsContext = ctx
+
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
 
 	if conn.OnConnectCallback != nil {
-		if err := conn.OnConnectCallback(); err != nil {
+		if err := conn.OnConnectCallback(conn); err != nil {
 			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %w", err)
 		}
 	}
@@ -323,7 +324,7 @@ func (conn *Connection) Ping() (ESPingData, error) {
 	return response, nil
 }
 
-// Close closes a connection.
+// Close closes any idle connections from the HTTP client.
 func (conn *Connection) Close() error {
 	conn.HTTP.CloseIdleConnections()
 	return nil
@@ -346,19 +347,21 @@ func (conn *Connection) Test(d testing.Driver) {
 			d.Warn("TLS", "secure connection disabled")
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
-				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+				tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS, conn.log)
 				if err != nil {
 					d.Fatal("load tls config", err)
 				}
 
 				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
+				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout, conn.log)
 				_, err = tlsDialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
 		}
 
-		err = conn.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		err = conn.Connect(ctx)
 		d.Fatal("talk to server", err)
 		version := conn.GetVersion()
 		d.Info("version", version.String())
@@ -440,13 +443,14 @@ func (conn *Connection) getVersion() error {
 		conn.version = *v
 	}
 
-	if versionData.Version.BuildFlavor == "serverless" {
+	switch versionData.Version.BuildFlavor {
+	case "serverless":
 		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
 		conn.isServerless = true
-	} else if versionData.Version.BuildFlavor == "default" {
+	case "default":
 		conn.isServerless = false
 		// not sure if this is even possible, just being defensive
-	} else {
+	default:
 		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 

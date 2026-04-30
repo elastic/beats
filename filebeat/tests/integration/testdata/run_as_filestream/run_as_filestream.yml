@@ -1,0 +1,22 @@
+filebeat.inputs:
+  - type: log
+    id: test-run-as-filestream
+    paths:
+      - {{ .logfile }}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+queue.mem:
+  flush.min_events: 50
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+
+features:
+  log_input_run_as_filestream:
+    enabled: true

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -27,6 +28,7 @@ type SourceJob struct {
 	browserCfg *Config
 	ctx        context.Context
 	cancel     context.CancelFunc
+	mtx        sync.Mutex
 }
 
 func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
@@ -39,8 +41,13 @@ func NewSourceJob(rawCfg *config.C) (*SourceJob, error) {
 		browserCfg: DefaultConfig(),
 		ctx:        ctx,
 		cancel:     cancel,
+		mtx:        sync.Mutex{},
 	}
 	err := rawCfg.Unpack(s.browserCfg)
+	if err != nil {
+		return nil, ErrBadConfig(err)
+	}
+	err = s.browserCfg.Source.Active().Decode()
 	if err != nil {
 		return nil, ErrBadConfig(err)
 	}
@@ -65,6 +72,9 @@ func (sj *SourceJob) Workdir() string {
 }
 
 func (sj *SourceJob) Params() map[string]interface{} {
+	sj.mtx.Lock()
+	defer sj.mtx.Unlock()
+
 	return sj.browserCfg.Params
 }
 
@@ -89,6 +99,22 @@ func (sj *SourceJob) Close() error {
 
 	// Cancel running jobs ctxs
 	sj.cancel()
+
+	return nil
+}
+
+// Update updates selective job fields in-place for running monitors
+func (sj *SourceJob) Update(c *config.C) error {
+	var cfg Config
+	err := c.Unpack(&cfg)
+	if err != nil {
+		return fmt.Errorf("error unpacking browser config for update: %w", err)
+	}
+
+	sj.mtx.Lock()
+	defer sj.mtx.Unlock()
+	// Update fields that don't require a restart
+	sj.browserCfg.Params = cfg.Params
 
 	return nil
 }
@@ -125,7 +151,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			logp.L().Warnf("could not serialize playwright options '%v': %w", sj.browserCfg.PlaywrightOpts, err)
+			logp.L().Warnf("could not serialize playwright options '%v': %v", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
@@ -164,12 +190,12 @@ func (sj *SourceJob) jobs() []jobs.Job {
 	var j jobs.Job
 
 	isScript := sj.browserCfg.Source.Inline != nil
-	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
+	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeoutKey, sj.browserCfg.Timeout+30*time.Second)
 	sFields := sj.StdFields()
 
 	if isScript {
 		src := sj.browserCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sFields, sj.extraArgs(sFields.Origin != "")...)
+		j = synthexec.InlineJourneyJob(ctx, src, sj.Params, sFields, sj.extraArgs(sFields.Origin != "")...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := sj.Fetch()
@@ -177,7 +203,7 @@ func (sj *SourceJob) jobs() []jobs.Job {
 				return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
 			}
 
-			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
+			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params, sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
 			if err != nil {
 				return nil, err
 			}
@@ -191,6 +217,7 @@ func (sj *SourceJob) plugin() plugin.Plugin {
 	return plugin.Plugin{
 		Jobs:      sj.jobs(),
 		DoClose:   sj.Close,
+		DoUpdate:  sj.Update,
 		Endpoints: 1,
 	}
 }

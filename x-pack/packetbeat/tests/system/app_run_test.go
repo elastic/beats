@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && !agentbeat
-// +build integration,!agentbeat
+//go:build integration
+// +build integration
 
 package system
 
@@ -37,7 +37,7 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	if err != nil {
 		return "", "", err
 	}
-	cmd := exec.CommandContext(ctx, packetbeatPath, append([]string{"-systemTest", "-c", conf}, args...)...)
+	cmd := exec.CommandContext(ctx, packetbeatPath, append([]string{"--systemTest", "-c", conf}, args...)...)
 	cmd.Dir = t.TempDir()
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = &stdoutBuf

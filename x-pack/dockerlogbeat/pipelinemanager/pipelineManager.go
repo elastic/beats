@@ -5,6 +5,7 @@
 package pipelinemanager
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -12,7 +13,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -159,7 +160,8 @@ func (pm *PipelineManager) CreateReaderForContainer(info logger.Info, config log
 	}
 
 	go func() {
-		watcher := logReader.ReadLogs(config)
+		ctx := context.Background()
+		watcher := logReader.ReadLogs(ctx, config)
 
 		enc := protoio.NewUint32DelimitedWriter(pipeWriter, binary.BigEndian)
 		defer enc.Close()

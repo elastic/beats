@@ -1,12 +1,13 @@
 # Tomcat is started to fetch Jolokia metrics from it
-FROM openjdk:8-jdk-alpine
+FROM amazoncorretto:8u472-alpine3.22-jre
 
-ENV TOMCAT_VERSION 7.0.86
-ENV TC apache-tomcat-${TOMCAT_VERSION}
+ENV TOMCAT_VERSION=7.0.86
+ENV TC=apache-tomcat-${TOMCAT_VERSION}
 ARG JOLOKIA_VERSION
 
 RUN apk update && \
-    apk add curl openssl ca-certificates bash
+    apk upgrade --no-cache && \
+    apk add curl openssl ca-certificates bash 
 
 HEALTHCHECK --interval=1s --retries=90 CMD curl -f localhost:8778/jolokia/
 EXPOSE 8778
@@ -24,10 +25,11 @@ RUN retry --min 1 --max 180 -- curl -J -L -s -f --show-error -O \
     sha256sum -c jolokia.sum && \
     mv jolokia-war-${JOLOKIA_VERSION}.war /usr/${TC}/webapps/jolokia.war && rm jolokia.sum
 
+
 # JMX setting to request authentication with remote connection
-RUN echo "monitorRole QED" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password && \
-    echo "controlRole R&D" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password && \
-    chmod 600 /usr/lib/jvm/java-1.8-openjdk/jre/lib/management/jmxremote.password
+RUN echo "monitorRole QED" >> /usr/lib/jvm/default-jvm/jre/lib/management/jmxremote.password && \
+    echo "controlRole R&D" >> /usr/lib/jvm/default-jvm/jre/lib/management/jmxremote.password && \
+    chmod 600 /usr/lib/jvm/default-jvm/jre/lib/management/jmxremote.password
 
 ADD jolokia.xml /usr/${TC}/conf/Catalina/localhost/jolokia.xml
 

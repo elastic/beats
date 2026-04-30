@@ -1,1 +1,0 @@
-This is the top-level streaming metricset of the nats module

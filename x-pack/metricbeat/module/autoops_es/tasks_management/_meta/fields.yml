@@ -1,0 +1,38 @@
+- name: tasks_management
+  type: group
+  release: beta
+  description: >
+    tasks information from cluster
+  fields:
+    - name: taskId
+      type: keyword
+      description: >
+        task full id
+    - name: id
+      type: integer
+      description: >
+        task internal node id
+    - name: node
+      type: keyword
+      description: >
+        node id
+    - name: taskType
+      type: keyword
+      description: >
+        task type
+    - name: action
+      type: keyword
+      description: >
+        task action
+    - name: startTimeInMillis
+      type: long
+      description: >
+        task start time in millis
+    - name: runningTimeInNanos
+      type: long
+      description: >
+        task running time in nanos
+    - name: parentTaskId
+      type: keyword
+      description: >
+        task parent id

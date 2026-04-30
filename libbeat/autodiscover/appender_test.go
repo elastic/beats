@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type fakeAppender struct{}
@@ -32,7 +33,7 @@ func (f *fakeAppender) Append(event bus.Event) {
 	event["foo"] = "bar"
 }
 
-func newFakeAppender(_ *conf.C) (Appender, error) {
+func newFakeAppender(_ *conf.C, _ *logp.Logger) (Appender, error) {
 	return &fakeAppender{}, nil
 }
 
@@ -63,7 +64,7 @@ func TestAppenderRegistry(t *testing.T) {
 	cfgs := []*conf.C{cfg}
 	appenders, err := NewAppenders(cfgs)
 	assert.NoError(t, err)
-	assert.Equal(t, len(appenders), 1)
+	assert.Len(t, appenders, 1)
 
 	// Attempt to build using an incorrect config
 	incorrectConfig := AppenderConfig{
@@ -79,8 +80,8 @@ func TestAppenderRegistry(t *testing.T) {
 	// Try to append onto an event using fakeAppender and the result should have one item
 	event := bus.Event{}
 	appender.Append(event)
-	assert.Equal(t, len(event), 1)
-	assert.Equal(t, event["foo"], "bar")
+	assert.Len(t, event, 1)
+	assert.Equal(t, "bar", event["foo"])
 
 	appenders = Appenders{}
 	appenders = append(appenders, appender)
@@ -89,6 +90,6 @@ func TestAppenderRegistry(t *testing.T) {
 	// the same result
 	event = bus.Event{}
 	appenders.Append(event)
-	assert.Equal(t, len(event), 1)
-	assert.Equal(t, event["foo"], "bar")
+	assert.Len(t, event, 1)
+	assert.Equal(t, "bar", event["foo"])
 }

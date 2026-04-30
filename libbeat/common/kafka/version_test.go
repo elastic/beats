@@ -20,7 +20,7 @@ package kafka
 import (
 	"testing"
 
-	"github.com/Shopify/sarama"
+	"github.com/elastic/sarama"
 )
 
 func TestVersionGet(t *testing.T) {
@@ -62,7 +62,7 @@ func TestSaramaUpdate(t *testing.T) {
 	// If any of these versions are considered valid by our parsing code,
 	// it means someone updated sarama without updating the parsing code
 	// for the new version. Gently remind them.
-	flagVersions := []Version{"2.8.1", "2.9.0"}
+	flagVersions := []Version{"4.2.0", "4.3.0"}
 	for _, v := range flagVersions {
 		if _, ok := v.Get(); ok {
 			t.Fatalf(
@@ -70,8 +70,9 @@ func TestSaramaUpdate(t *testing.T) {
 					"If so, remember to:\n"+
 					"- Update truncatedKafkaVersions in libbeat/common/kafka/version.go\n"+
 					"- Update the documentation to list the latest version:\n"+
-					"  * libbeat/outputs/kafka/docs/kafka.asciidoc\n"+
-					"  * filebeat/docs/inputs/inputs-kafka.asciidoc\n"+
+					"  * docs/reference/auditbeat/kafka-output.md\n"+
+					"  * docs/reference/filebeat/filebeat-input-kafka.md\n"+
+					"  * docs/reference/BEAT/kafka-output.md for each beat\n"+
 					"- Update TestSaramaUpdate in libbeat/common/kafka/version_test.go\n",
 				v)
 

@@ -27,37 +27,66 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestDiskQueueUnderAgent(t *testing.T) {
+	const (
+		batchSize = 10
+		retry     = 3
+	)
 
-	type args struct {
-		cfg            string
-		batchSize      int
-		retry          int
-		encoderFactory queue.EncoderFactory
-		clients        []Client
-	}
 	tests := []struct {
-		name    string
-		args    args
-		want    Group
-		wantErr bool
+		name          string
+		cfg           func(tempDir string) string
+		pathsFunc     func(tempDir string) *paths.Path
+		wantStatePath func(tempDir string) string
 	}{
 		{
-			name: "Happy path",
-			args: args{
-				cfg: `
+			name: "explicit path in config",
+			cfg: func(tempDir string) string {
+				return fmt.Sprintf(`
                     disk:
                         max_size: 100MB
                         path: %s
-                `,
-				clients:   []Client{},
-				batchSize: 10,
-				retry:     3,
+                `, tempDir)
+			},
+			pathsFunc: func(string) *paths.Path { return paths.New() },
+			wantStatePath: func(tempDir string) string {
+				return filepath.Join(tempDir, "state.dat")
+			},
+		},
+		{
+			name: "falls back to beat data path",
+			cfg: func(string) string {
+				return `
+                    disk:
+                        max_size: 100MB
+                `
+			},
+			pathsFunc: func(tempDir string) *paths.Path {
+				return &paths.Path{Data: tempDir}
+			},
+			wantStatePath: func(tempDir string) string {
+				return filepath.Join(tempDir, "diskqueue", "state.dat")
+			},
+		},
+		{
+			name: "explicit path takes precedence over data path",
+			cfg: func(tempDir string) string {
+				return fmt.Sprintf(`
+                    disk:
+                        max_size: 100MB
+                        path: %s
+                `, filepath.Join(tempDir, "explicit"))
+			},
+			pathsFunc: func(tempDir string) *paths.Path {
+				return &paths.Path{Data: filepath.Join(tempDir, "data")}
+			},
+			wantStatePath: func(tempDir string) string {
+				return filepath.Join(tempDir, "explicit", "state.dat")
 			},
 		},
 	}
@@ -71,34 +100,30 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			tempDir := t.TempDir()
 
 			queueConfig := config.Namespace{}
-			conf, err := config.NewConfigFrom(fmt.Sprintf(tt.args.cfg, tempDir))
+			conf, err := config.NewConfigFrom(tt.cfg(tempDir))
 			require.NoError(t, err, "error parsing queue config")
 			err = queueConfig.Unpack(conf)
 			require.NoError(t, err, "error unpacking queue config")
 
 			management.SetUnderAgent(true)
 
-			actualGroup, err := Success(queueConfig, tt.args.batchSize, tt.args.retry, tt.args.encoderFactory, tt.args.clients...)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Success() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			beatPaths := tt.pathsFunc(tempDir)
 
-			if tt.wantErr {
-				// if an error was expected, we need no more assertions: return
-				return
-			}
-
-			require.NotNil(t, actualGroup)
-			require.NotNil(t, actualGroup.QueueFactory)
-
-			testlogger, _ := logp.NewInMemory("test-diskqueue", zapcore.EncoderConfig{})
-
-			actualQueue, err := actualGroup.QueueFactory(testlogger, nil, 1, nil)
+			successLogger, logBuf := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
+			group, err := Success(queueConfig, batchSize, retry, nil, successLogger, beatPaths)
 			require.NoError(t, err)
-			require.NotNil(t, actualQueue)
-			// assert that the file exists in the path we specified
-			assert.FileExists(t, filepath.Join(tempDir, "state.dat"))
+			require.NotNil(t, group)
+			require.NotNil(t, group.QueueFactory)
+
+			assert.Contains(t, logBuf.String(), "unsupported and in technical preview")
+
+			queueLogger, _ := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
+			q, err := group.QueueFactory(queueLogger, nil, 1, nil)
+			require.NoError(t, err)
+			require.NotNil(t, q)
+			defer func() { require.NoError(t, q.Close(true)) }()
+
+			assert.FileExists(t, tt.wantStatePath(tempDir))
 		})
 	}
 }

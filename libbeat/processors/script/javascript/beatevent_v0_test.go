@@ -28,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -179,7 +181,7 @@ func TestBeatEventV0(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := monitoring.NewRegistry()
 
-			p, err := NewFromConfig(Config{Tag: tc.name, Source: header + tc.source + footer}, reg)
+			p, err := NewFromConfig(Config{Tag: tc.name, Source: header + tc.source + footer}, reg, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -195,7 +197,7 @@ func TestBeatEventV0(t *testing.T) {
 			// Validate that the processor's metrics exist.
 			var found bool
 			prefix := fmt.Sprintf("processor.javascript.%s.histogram.process_time", tc.name)
-			reg.Do(monitoring.Full, func(name string, v interface{}) {
+			reg.Do(monitoring.Full, func(name string, v any) {
 				if !found && strings.HasPrefix(name, prefix) {
 					found = true
 				}
@@ -212,14 +214,14 @@ func BenchmarkBeatEventV0(b *testing.B) {
 
 	benchTest := func(tc testCase, timeout time.Duration) func(b *testing.B) {
 		return func(b *testing.B) {
-			p, err := NewFromConfig(Config{Source: header + tc.source + footer, Timeout: timeout}, nil)
+			p, err := NewFromConfig(Config{Source: header + tc.source + footer, Timeout: timeout}, nil, logp.NewNopLogger())
 			if err != nil {
 				b.Fatal(err)
 			}
 
 			event := testEvent()
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				_, err := p.Run(event)
 				if err != nil {
 					b.Fatal(err)

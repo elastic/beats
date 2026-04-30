@@ -1,0 +1,20 @@
+{
+    "order": 1,
+    "index_patterns": ["*"],
+    "settings": {
+        "index": {
+            "number_of_shards": "2",
+            "auto_expand_replicas": "0-1"
+        }
+    },
+    "mappings": {
+        "dynamic": false,
+        "properties": {
+            "@timestamp": {
+                "type": "date"
+            }
+        }
+    },
+    "aliases": {},
+    "ignored_field": {}
+}

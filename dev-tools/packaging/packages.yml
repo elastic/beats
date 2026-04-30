@@ -15,6 +15,11 @@ shared:
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
 
+  - &common_fips
+    <<: *common
+    name: '{{.BeatName}}-fips'
+    fips: true
+
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -49,18 +54,16 @@ shared:
       /usr/share/{{.BeatName}}/kibana:
         source: _meta/kibana.generated
         mode: 0644
-      /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
-        source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
-        mode: 0755
       /usr/bin/{{.BeatName}}:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/beatname.sh.tmpl'
         mode: 0755
       /lib/systemd/system/{{.BeatServiceName}}.service:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
         mode: 0644
-      /etc/init.d/{{.BeatServiceName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
-        mode: 0755
+
+  - &deb_rpm_spec_fips
+    <<: *deb_rpm_spec
+    <<: *common_fips
 
   # MacOS pkg spec for community beats.
   - &macos_beat_pkg_spec
@@ -144,6 +147,14 @@ shared:
     files:
       <<: *binary_files
 
+  - &binary_spec_fips
+    <<: *common_fips
+    files:
+      <<: *binary_files
+      '{{.BeatName}}{{.BinaryExt}}':
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
+
   # Binary package spec (zip for windows) for community beats.
   - &windows_binary_spec
     <<: *common
@@ -159,7 +170,7 @@ shared:
   - &docker_spec
     <<: *binary_spec
     extra_vars:
-      from: '--platform=linux/amd64 ubuntu:24.04'
+      from: '--platform=linux/amd64 redhat/ubi9-minimal'
       buildFrom: '--platform=linux/amd64 cgr.dev/chainguard/wolfi-base'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
@@ -172,18 +183,18 @@ shared:
   - &docker_arm_spec
     <<: *docker_spec
     extra_vars:
-      from: '--platform=linux/arm64 ubuntu:24.04'
+      from: '--platform=linux/arm64 redhat/ubi9-minimal'
       buildFrom: '--platform=linux/arm64 cgr.dev/chainguard/wolfi-base'
 
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: '--platform=linux/amd64 docker.elastic.co/ubi9/ubi-minimal'
+      from: '--platform=linux/amd64 redhat/ubi9-minimal'
 
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: '--platform=linux/arm64 docker.elastic.co/ubi9/ubi-minimal'
+      from: '--platform=linux/arm64 redhat/ubi9-minimal'
 
   - &docker_wolfi_spec
     extra_vars:
@@ -623,3 +634,20 @@ specs:
             source: data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
             symlink: true
             mode: 0755
+
+  # Elastic Beat with Elastic License and binary taken the current directory.
+  elastic_beat_xpack_fips:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: linux
+      types: [tgz]
+      spec:
+        <<: *binary_spec_fips
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      types: [deb]
+      spec:
+        <<: *deb_rpm_spec_fips
+        <<: *elastic_license_for_deb_rpm

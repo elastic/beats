@@ -16,13 +16,6 @@ echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
 wait_for_port 2181
 
-# create a user beats with password KafkaTest, for use in client SASL authentication
-/kafka/bin/kafka-configs.sh \
-	--zookeeper localhost:2181 \
-	--alter --add-config 'SCRAM-SHA-512=[password=KafkaTest]' \
-	--entity-type users \
-	--entity-name beats
-
 # Start Kafka with three listeners. The INSIDE listener makes Kafka reachable inside of docker
 # networks when the container hostname matches KAFKA_ADVERTISED_HOST. The OUTSIDE and SASL_SSL both
 # bind to localhost and are reachable from the host machine on the loopback interface.
@@ -34,12 +27,15 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override listeners=INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,SASL_SSL://0.0.0.0:9093 \
     --override advertised.listeners=INSIDE://${KAFKA_ADVERTISED_HOST}:9092,OUTSIDE://localhost:9094,SASL_SSL://localhost:9093 \
     --override inter.broker.listener.name=INSIDE \
-    --override sasl.enabled.mechanisms=SCRAM-SHA-512 \
+    --override sasl.enabled.mechanisms=SCRAM-SHA-512,SCRAM-SHA-256,PLAIN \
     --override listener.name.sasl_ssl.scram-sha-512.sasl.jaas.config="org.apache.kafka.common.security.scram.ScramLoginModule required;" \
+    --override listener.name.sasl_ssl.scram-sha-256.sasl.jaas.config="org.apache.kafka.common.security.scram.ScramLoginModule required;" \
+    --override listener.name.sasl_ssl.plain.sasl.jaas.config="org.apache.kafka.common.security.plain.PlainLoginModule required user_beats=\"KafkaTest\";" \
     --override logs.dir=${KAFKA_LOGS_DIR} \
     --override log4j.logger.kafka=DEBUG,kafkaAppender \
     --override log.flush.interval.ms=200 \
     --override num.partitions=3 \
+    --override auto.leader.rebalance.enable=false \
     --override ssl.keystore.location=/broker.keystore.jks \
     --override ssl.keystore.password=KafkaTest \
     --override ssl.truststore.location=/broker.truststore.jks \
@@ -48,6 +44,29 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
 wait_for_port 9092
 
 echo "Kafka load status code $?"
+
+# Wait for all listeners to be ready
+echo "Waiting for OUTSIDE listener on port 9094"
+wait_for_port 9094
+
+echo "Waiting for SASL_SSL listener on port 9093"
+wait_for_port 9093
+
+# create a user beats with password KafkaTest, for use in client SASL authentication
+echo "Creating SASL users"
+/kafka/bin/kafka-configs.sh \
+	--bootstrap-server localhost:9092 \
+	--alter --add-config 'SCRAM-SHA-512=[password=KafkaTest]' \
+	--entity-type users \
+	--entity-name beats
+
+/kafka/bin/kafka-configs.sh \
+	--bootstrap-server localhost:9092 \
+	--alter --add-config 'SCRAM-SHA-256=[password=KafkaTest]' \
+	--entity-type users \
+	--entity-name beats
+
+echo "Kafka is ready"
 
 # Make sure the container keeps running
 tail -f /dev/null

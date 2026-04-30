@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package monitor
 
 import (
@@ -13,7 +15,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -52,7 +56,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry)
+	module, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
 	assert.Nil(t, module)
 	assert.Nil(t, metricsets)
 	assert.Error(t, err, "no resource options defined: module azure - monitor metricset")
@@ -60,7 +64,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry)
+	module, metricsets, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

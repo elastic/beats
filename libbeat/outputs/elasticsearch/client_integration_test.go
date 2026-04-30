@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build integration
 
 package elasticsearch
@@ -22,12 +24,14 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
 	"go.elastic.co/apm/v2/apmtest"
+	"go.uber.org/zap"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -38,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -52,25 +57,22 @@ func TestClientPublishEvent(t *testing.T) {
 }
 
 func TestClientPublishEventKerberosAware(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/21295")
-
-	err := setupRoleMapping(t, eslegtest.GetEsKerberosHost())
+	kerberosURL := "http://localhost:9203"
+	err := setupRoleMapping(t, kerberosURL)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	index := "beat-int-pub-single-event-behind-kerb"
 	cfg := map[string]interface{}{
-		"hosts":    eslegtest.GetEsKerberosHost(),
-		"index":    index,
-		"username": "",
-		"password": "",
+		"hosts": kerberosURL,
+		"index": index,
 		"kerberos": map[string]interface{}{
 			"auth_type":   "password",
 			"config_path": "testdata/krb5.conf",
-			"username":    eslegtest.GetUser(),
-			"password":    eslegtest.GetPass(),
-			"realm":       "ELASTIC",
+			"username":    "beats",
+			"password":    "testing",
+			"realm":       "elastic",
 		},
 	}
 
@@ -78,7 +80,8 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 }
 
 func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
-	output, client := connectTestEsWithStats(t, cfg, index)
+	registry := monitoring.NewRegistry()
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
 
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)
@@ -108,9 +111,9 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 
 	assert.Equal(t, 1, resp.Count)
 
-	outputSnapshot := monitoring.CollectFlatSnapshot(monitoring.Default.GetRegistry("output-"+index), monitoring.Full, true)
-	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
-	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
+	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
+	assert.Positive(t, outputSnapshot.Ints["write.bytes"], "output.events.write.bytes must be greater than 0")
+	assert.Positive(t, outputSnapshot.Ints["read.bytes"], "output.events.read.bytes must be greater than 0")
 	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
 	assert.Equal(t, int64(0), outputSnapshot.Ints["read.errors"])
 }
@@ -118,15 +121,13 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 func TestClientPublishEventWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	// Check version
@@ -201,19 +202,17 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-test-dli-index"
 	deadletterIndex := "beat-int-test-dli-dead-letter-index"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index": index,
 		"non_indexable_policy": map[string]interface{}{
 			"dead_letter_index": map[string]interface{}{
 				"index": deadletterIndex,
 			},
 		},
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 	_, _, _ = client.conn.Delete(deadletterIndex, "", "", nil)
 
@@ -263,15 +262,13 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	if client.conn.GetVersion().Major < 5 {
@@ -346,9 +343,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func TestClientPublishTracer(t *testing.T) {
 	index := "beat-apm-tracer-test"
-	output, client := connectTestEsWithoutStats(t, map[string]interface{}{
+	output, client := connectTestEs(t, map[string]interface{}{
 		"index": index,
-	})
+	}, nil)
 
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
@@ -373,7 +370,7 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "publishEvents", firstSpan.Name)
 	assert.Equal(t, "output", firstSpan.Type)
 	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.ID))
-	assert.True(t, len(firstSpan.Context.Tags) > 0, "no tags found")
+	assert.NotEmpty(t, firstSpan.Context.Tags, "no tags found")
 
 	secondSpan := spans[0]
 	assert.Contains(t, secondSpan.Name, "POST")
@@ -384,17 +381,11 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 
-func connectTestEsWithStats(t *testing.T, cfg interface{}, suffix string) (outputs.Client, *Client) {
-	m := monitoring.Default.NewRegistry("output-" + suffix)
-	s := outputs.NewStats(m)
-	return connectTestEs(t, cfg, s)
-}
-
-func connectTestEsWithoutStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
-	return connectTestEs(t, cfg, outputs.NewNilObserver())
-}
-
 func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outputs.Client, *Client) {
+	t.Helper()
+	if stats == nil {
+		stats = outputs.NewNilObserver()
+	}
 	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"hosts":            eslegtest.GetEsHost(),
 		"username":         eslegtest.GetUser(),
@@ -415,9 +406,10 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	info := beat.Info{Beat: "libbeat"}
+	logger := logptest.NewTestingLogger(t, "elasticsearch", zap.AddCallerSkip(1))
+	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
-	im, _ := idxmgmt.DefaultSupport(nil, info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
+	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)
@@ -427,21 +419,26 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		outputs.NetworkClient
 		Client() outputs.NetworkClient
 	}
-	client := randomClient(output).(clientWrap).Client().(*Client)
+	client, ok := randomClient(output).(clientWrap).Client().(*Client)
+	assert.True(t, ok)
 
-	// Load version number
-	_ = client.Connect()
+	// Load version ctx
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to ES: %s", err)
+	}
 
 	return client, client
 }
 
-// setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
+// setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, host string) error {
-	_, client := connectTestEsWithoutStats(t, map[string]interface{}{
+	_, client := connectTestEs(t, map[string]interface{}{
 		"hosts":    host,
-		"username": "elastic",
-		"password": "changeme",
-	})
+		"username": "admin",
+		"password": "testing",
+	}, nil)
 
 	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
 
@@ -450,7 +447,7 @@ func setupRoleMapping(t *testing.T, host string) error {
 		"enabled": true,
 		"rules": map[string]interface{}{
 			"field": map[string]interface{}{
-				"username": "beats@ELASTIC",
+				"username": "beats@elastic",
 			},
 		},
 	})
@@ -468,6 +465,122 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 		panic("no elasticsearch client")
 	}
 
-	client := grp.Clients[rand.Intn(L)]
-	return client.(outputs.NetworkClient)
+	client := grp.Clients[rand.IntN(L)]
+	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
+}
+
+// configureDatastreamFailureStore creates an index template with the failure
+// store enabled and two mapped fields. The index template will match the passed
+// data stream (ds).
+func configureDatastreamFailureStore(t *testing.T, client *Client, ds string) {
+	templateBody := map[string]any{
+		"index_patterns": []string{ds + "*"},
+		"data_stream":    map[string]any{},
+		"template": map[string]any{
+			"data_stream_options": map[string]any{
+				"failure_store": map[string]any{
+					"enabled": true,
+				},
+			},
+			"mappings": map[string]any{
+				"properties": map[string]any{
+					"answer": map[string]any{
+						"type": "integer",
+					},
+					"not_a_number": map[string]any{
+						"type": "keyword",
+					},
+				},
+			},
+		},
+	}
+
+	status, resp, err := client.conn.Request("PUT", "/_index_template/idx-tmpl-"+ds, "", nil, templateBody)
+	if err != nil {
+		t.Fatalf("failed to configure datastream %s: %v", ds, err)
+	}
+	if status >= 300 {
+		t.Fatalf("unexpected status code %d while configuring datastream %s: %s", status, ds, resp)
+	}
+}
+
+// createDatastreamFailureStore creates and initialises a data stream with the
+// failure store enabled used to test the output failure store metrics.
+func createDatastreamFailureStore(t *testing.T, client *Client, ds string) {
+	configureDatastreamFailureStore(t, client, ds)
+	timestamp := time.Now().Format(time.RFC3339)
+	body := []any{
+		map[string]any{
+			"create": map[string]any{},
+		},
+		map[string]any{
+			"@timestamp":   timestamp,
+			"answer":       42,
+			"not_a_number": "forty two",
+		},
+	}
+
+	// We need to manually send a bulk request because Publish sets the index
+	// in the body, which causes ES to create an index instead of a data stream.
+	// An index does not use the failure store.
+	status, _, err := client.conn.Bulk(t.Context(), ds, "", nil, nil, body)
+	if err != nil {
+		t.Fatalf("failed to create datastream %s: %v", ds, err)
+	}
+	if status >= 300 {
+		t.Fatalf("unexpected status code %d while creating datastream %s", status, ds)
+	}
+}
+
+func TestFailureStoreOutputMetrics(t *testing.T) {
+	ds := "test-failure-store-" + uuid.Must(uuid.NewV4()).String()
+	registry := monitoring.NewRegistry()
+
+	cfg := map[string]any{
+		"index": ds,
+	}
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry, logp.NewNopLogger()))
+
+	createDatastreamFailureStore(t, client, ds)
+
+	batch := encodeBatch(client, outest.NewBatch(
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"answer":       "forty two",
+				"not_a_number": "this should work",
+			},
+		},
+		beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"answer":       42,
+				"not_a_number": "forty two",
+			},
+		},
+	))
+
+	err := output.Publish(context.Background(), batch)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, _, err = client.conn.Refresh(ds)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, resp, err := client.conn.CountSearchURI(ds, "", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Expect two events in the index: one from the batch and another
+	// from when we created the datastream
+	assert.Equal(t, 2, resp.Count)
+
+	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
+	// Ensure the correct number of events was acked and sent to the failure store
+	assert.EqualValues(t, 1, outputSnapshot.Ints["events.failure_store"], "failure store metric was not incremented")
+	assert.EqualValues(t, 2, outputSnapshot.Ints["events.acked"], "wrong number of acked events")
 }

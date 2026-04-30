@@ -25,7 +25,7 @@ const (
 	defaultTimeout = 1 * time.Minute
 
 	// The longest the query is allowed to run. Since queries are run one at a time, this will block all other queries until this query completes.
-	defaultMaxTimeout     = 15 * time.Minute
+	defaultMaxTimeout     = 24 * time.Hour
 	defaultConnectRetries = 10
 )
 
@@ -68,7 +68,7 @@ type Client struct {
 	cli *osquery.ExtensionManagerClient
 	mx  sync.Mutex
 
-	cache Cache
+	cache Cache[string, map[string]string]
 
 	cliLimiter *semaphore.Weighted
 }
@@ -106,7 +106,7 @@ func New(socketPath string, opts ...Option) *Client {
 		timeout:        defaultTimeout,
 		maxTimeout:     defaultMaxTimeout,
 		connectRetries: defaultConnectRetries,
-		cache:          &nullSafeCache{},
+		cache:          &nullSafeCache[string, map[string]string]{},
 		cliLimiter:     semaphore.NewWeighted(limit),
 	}
 
@@ -120,19 +120,27 @@ func New(socketPath string, opts ...Option) *Client {
 func (c *Client) Connect(ctx context.Context) error {
 	c.mx.Lock()
 	defer c.mx.Unlock()
-	c.log.Debugf("connect osquery client: socket_path: %s, retries: %v", c.socketPath, c.connectRetries)
+	if c.log != nil {
+		c.log.Debugf("connect osquery client: socket_path: %s, retries: %v", c.socketPath, c.connectRetries)
+	}
 	if c.cli != nil {
 		err := ErrAlreadyConnected
-		c.log.Error(err)
+		if c.log != nil {
+			c.log.Error(err)
+		}
 		return err
 	}
 
 	err := c.reconnect(ctx)
 	if err != nil {
-		c.log.Errorf("osquery client failed to connect: %v", err)
+		if c.log != nil {
+			c.log.Errorf("osquery client failed to connect: %v", err)
+		}
 		return err
 	}
-	c.log.Info("osquery client is connected")
+	if c.log != nil {
+		c.log.Info("osquery client is connected")
+	}
 	return err
 }
 
@@ -147,10 +155,14 @@ func (c *Client) reconnect(ctx context.Context) error {
 }
 
 func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (cli *osquery.ExtensionManagerClient, err error) {
+	var retryLog *logp.Logger
+	if c.log != nil {
+		retryLog = c.log.With("context", "osquery client connect")
+	}
 	r := retry{
 		maxRetry:  c.connectRetries,
 		retryWait: retryWait,
-		log:       c.log.With("context", "osquery client connect"),
+		log:       retryLog,
 	}
 
 	err = r.Run(ctx, func(_ context.Context) error {
@@ -205,7 +217,9 @@ func (c *Client) Query(ctx context.Context, sql string, timeout time.Duration) (
 		timeout = c.maxTimeout
 	}
 
-	c.log.Debugf("osquery connect, query: %s, timeout: %v", sql, timeout)
+	if c.log != nil {
+		c.log.Debugf("osquery connect, query: %s, timeout: %v", sql, timeout)
+	}
 
 	// Use a separate connection for queries in order to be able to recover from timed out queries
 	cli, err := c.connectWithRetry(ctx, timeout)
@@ -258,15 +272,9 @@ func (c *Client) resolveResult(ctx context.Context, sql string, hits []map[strin
 }
 
 func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]string, error) {
-	var colTypes map[string]string
-
-	if v, ok := c.cache.Get(sql); ok {
-		colTypes, ok = v.(map[string]string)
-		if ok {
-			c.log.Debugf("using cached column types for query: %s", sql)
-		} else {
-			c.log.Error("failed get the column types from cache, incompatible type")
-		}
+	colTypes, ok := c.cache.Get(sql)
+	if ok && c.log != nil {
+		c.log.Debugf("using cached column types for query: %s", sql)
 	}
 
 	if colTypes == nil {

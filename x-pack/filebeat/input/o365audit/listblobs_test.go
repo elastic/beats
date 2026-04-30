@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"strconv"
@@ -107,7 +107,7 @@ func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg interfac
 	}
 	response := &http.Response{
 		StatusCode:    200,
-		Body:          ioutil.NopCloser(bytes.NewReader(js)),
+		Body:          io.NopCloser(io.MultiReader(strings.NewReader("\xef\xbb\xbf"), bytes.NewReader(js))),
 		ContentLength: int64(len(js)),
 	}
 	if nextUrl != "" {
@@ -163,7 +163,7 @@ func (f *fakePoll) subscriptionError(t testing.TB, lb listBlob) (subscribe, list
 	t.Log(string(js))
 	resp := &http.Response{
 		StatusCode: 400,
-		Body:       ioutil.NopCloser(bytes.NewReader(js)),
+		Body:       io.NopCloser(bytes.NewReader(js)),
 	}
 	for _, a := range lb.OnResponse(resp) {
 		if err := a(f); !assert.NoError(t, err) {
@@ -186,9 +186,10 @@ func testConfig() apiEnvironment {
 	logp.TestingSetup()
 	config := defaultConfig()
 	return apiEnvironment{
-		Config: config.API,
-		Logger: logp.NewLogger(pluginName + " test"),
-		Clock: func() time.Time {
+		status: noopReporter{},
+		config: config.API,
+		logger: logp.NewLogger(pluginName + " test"),
+		clock: func() time.Time {
 			return now
 		},
 	}
@@ -215,8 +216,8 @@ func TestListBlob(t *testing.T) {
 		makeBlob(now.Add(-time.Hour*12), "today_1"),
 		makeBlob(now.Add(-time.Hour*7), "today_2"),
 	}
-	ctx.TenantID = "1234"
-	ctx.ContentType = contentType
+	ctx.tenantID = "1234"
+	ctx.contentType = contentType
 	lb := makeListBlob(checkpoint{}, ctx)
 	var f fakePoll
 	// 6 days ago
@@ -292,15 +293,15 @@ func TestSubscriptionStart(t *testing.T) {
 	logp.TestingSetup()
 	log := logp.L()
 	ctx := apiEnvironment{
-		ContentType: contentType,
-		TenantID:    "1234",
-		Logger:      log,
-		Clock: func() time.Time {
+		contentType: contentType,
+		tenantID:    "1234",
+		logger:      log,
+		clock: func() time.Time {
 			return now
 		},
 	}
-	ctx.TenantID = "1234"
-	ctx.ContentType = contentType
+	ctx.tenantID = "1234"
+	ctx.contentType = contentType
 	lb := makeListBlob(checkpoint{}, ctx)
 	var f fakePoll
 	s, l := f.subscriptionError(t, lb)
@@ -309,11 +310,11 @@ func TestSubscriptionStart(t *testing.T) {
 	assert.Equal(t, lb.startTime, l.startTime)
 	assert.Equal(t, lb.delay, l.delay)
 	assert.Equal(t, lb.cursor, l.cursor)
-	assert.Equal(t, lb.env.TenantID, l.env.TenantID)
-	assert.Equal(t, lb.env.ContentType, l.env.ContentType)
-	assert.Equal(t, lb.env.Logger, l.env.Logger)
-	assert.Equal(t, contentType, s.ContentType)
-	assert.Equal(t, "1234", s.TenantID)
+	assert.Equal(t, lb.env.tenantID, l.env.tenantID)
+	assert.Equal(t, lb.env.contentType, l.env.contentType)
+	assert.Equal(t, lb.env.logger, l.env.logger)
+	assert.Equal(t, contentType, s.contentType)
+	assert.Equal(t, "1234", s.tenantID)
 }
 
 func TestPagination(t *testing.T) {
@@ -328,8 +329,8 @@ func TestPagination(t *testing.T) {
 		makeBlob(now.Add(-time.Hour*47+7*time.Nanosecond), "e7"),
 		makeBlob(now.Add(-time.Hour*47+8*time.Nanosecond), "e8"),
 	}
-	ctx.TenantID = "1234"
-	ctx.ContentType = contentType
+	ctx.tenantID = "1234"
+	ctx.contentType = contentType
 	lb := makeListBlob(checkpoint{Timestamp: now.Add(-time.Hour * 48)}, ctx)
 	var f fakePoll
 	// 6 days ago
@@ -372,11 +373,11 @@ func TestAdvance(t *testing.T) {
 	}
 	now := &now1
 	ctx := testConfig()
-	ctx.Clock = func() time.Time {
+	ctx.clock = func() time.Time {
 		return *now
 	}
-	ctx.TenantID = "tenant"
-	ctx.ContentType = contentType
+	ctx.tenantID = "tenant"
+	ctx.contentType = contentType
 	lb := makeListBlob(checkpoint{Timestamp: start}, ctx)
 	assert.Equal(t, start, lb.startTime)
 	assert.Equal(t, start.Add(time.Hour*24), lb.endTime)

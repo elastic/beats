@@ -1,0 +1,16 @@
+- name: ntp
+  type: group
+  description: >
+    `ntp` contains Network Time Protocol (NTP) metrics.
+  release: beta
+  version:
+    beta: 9.2.0
+  fields:
+  - name: host
+    type: keyword
+    description: >
+      The remote NTP server address.
+  - name: offset
+    type: long
+    description: >
+      The estimated offset of the local host's system clock relative to the server's clock (in ns).

@@ -25,7 +25,7 @@
     "log": {
       "level": "information"
     },
-    "message": "The audit log was cleared.\nSubject:\n\tSecurity ID:\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\tAdministrator\n\tDomain Name:\tWLBEAT\n\tLogon ID:\t0x50E87",
+    "message": "The audit log was cleared.\nSubject:\n\tSecurity ID:\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\tAdministrator\n\tDomain Name:\tWLBEAT\n\tLogon ID:\t0x50e87",
     "related": {
       "user": [
         "Administrator"
@@ -37,7 +37,6 @@
       "name": "Administrator"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_id": "1102",
@@ -54,7 +53,7 @@
           "id": 1824
         }
       },
-      "provider_guid": "{fc65ddd8-d6ef-4962-83d5-6e5cfe9ce148}",
+      "provider_guid": "{FC65DDD8-D6EF-4962-83D5-6E5CFE9CE148}",
       "provider_name": "Microsoft-Windows-Eventlog",
       "record_id": "14224",
       "task": "Log clear",

@@ -21,9 +21,26 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
-	"io/ioutil"
+	"math"
 	"sort"
+	"sync"
+
+	"github.com/elastic/elastic-agent-libs/iobuf"
 )
+
+type Priority int32
+
+const (
+	Highest          Priority = 1
+	ECSFieldsPri     Priority = 5
+	LibbeatFieldsPri Priority = 10
+	BeatFieldsPri    Priority = 50
+	ModuleFieldsPri  Priority = 100
+	Lowest           Priority = math.MaxInt32
+)
+
+var beatFieldsCacheMu sync.Mutex
+var beatFieldsCache = map[string][]byte{}
 
 // FieldsRegistry contains a list of fields.yml files
 // As each entry is an array of bytes multiple fields.yml can be added under one path.
@@ -52,6 +69,10 @@ func SetFields(beat, name string, p Priority, asset func() string) error {
 
 // GetFields returns a byte array contains all fields for the given beat
 func GetFields(beat string) ([]byte, error) {
+	if cached, ok := getBeatFieldsCache(beat); ok {
+		return cached, nil
+	}
+
 	var fields []byte
 
 	// Get all priorities and sort them
@@ -85,6 +106,8 @@ func GetFields(beat string) ([]byte, error) {
 			}
 		}
 	}
+
+	setBeatFieldsCache(beat, fields)
 	return fields, nil
 }
 
@@ -104,9 +127,21 @@ func EncodeData(data string) (string, error) {
 	return base64.StdEncoding.EncodeToString(zlibBuf.Bytes()), nil
 }
 
+func getBeatFieldsCache(beat string) ([]byte, bool) {
+	beatFieldsCacheMu.Lock()
+	defer beatFieldsCacheMu.Unlock()
+	cached, ok := beatFieldsCache[beat]
+	return cached, ok
+}
+
+func setBeatFieldsCache(beat string, fields []byte) {
+	beatFieldsCacheMu.Lock()
+	defer beatFieldsCacheMu.Unlock()
+	beatFieldsCache[beat] = fields
+}
+
 // DecodeData base64 decodes the data and uncompresses it
 func DecodeData(data string) ([]byte, error) {
-
 	decoded, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
 		return nil, err
@@ -119,5 +154,5 @@ func DecodeData(data string) ([]byte, error) {
 	}
 	defer r.Close()
 
-	return ioutil.ReadAll(r)
+	return iobuf.ReadAll(r)
 }

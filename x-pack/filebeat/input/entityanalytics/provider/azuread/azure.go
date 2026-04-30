@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 // Package azuread provides an identity asset provider for Azure Active Directory.
 package azuread
 
@@ -15,6 +17,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
@@ -25,8 +28,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/ctxtool"
 )
+
+func init() {
+	if err := provider.Register(Name, New); err != nil {
+		panic(err)
+	}
+}
 
 // Name of this provider.
 const Name = "azure-ad"
@@ -53,6 +63,21 @@ type azure struct {
 	ctx v2.Context
 }
 
+// New creates a new instance of an Azure Active Directory identity provider.
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
+	p := azure{
+		conf: defaultConf(),
+	}
+	p.Manager = &kvstore.Manager{
+		Logger:    logger,
+		Type:      FullName,
+		Configure: p.configure,
+		Path:      path,
+	}
+
+	return &p, nil
+}
+
 // Name returns the name of this provider.
 func (p *azure) Name() string {
 	return FullName
@@ -73,6 +98,7 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 
 // Run will start data collection on this provider.
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+	inputCtx.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.ctx = inputCtx
 
@@ -89,8 +115,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	}
 	p.fetcher.SetLogger(p.logger)
 
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.conf.SyncInterval))
@@ -100,18 +125,26 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
+	inputCtx.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				return inputCtx.Cancelation.Err()
+				err := inputCtx.Cancelation.Err()
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
+				return err
 			}
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				p.logger.Errorw("Error running full sync", "error", err)
+				msg := "Error running full sync"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -130,8 +163,12 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				p.logger.Errorw("Error running incremental update", "error", err)
+				msg := "Error running incremental update"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -140,6 +177,10 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		}
 	}
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // runFullSync performs a full synchronization. It will fetch user and group
 // identities from Azure Active Directory, enrich users with group memberships,
@@ -399,7 +440,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		updatedUsers.ForEach(func(userID uuid.UUID) {
 			u, ok := state.users[userID]
 			if !ok {
-				p.logger.Errorf("Unable to find user %q in state", userID)
+				p.logger.Debugf("Unable to find user %q in state", userID)
 				return
 			}
 			u.Modified = true
@@ -415,12 +456,36 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		})
 	}
 
+	// Enrich users with MFA registration details if requested. MFA enrichment
+	// is best-effort: changes to MFA state alone do not independently trigger
+	// incremental user updates. MFA data is only refreshed when at least one
+	// user identity delta has occurred (or during a full sync), so published
+	// user documents will reflect the latest MFA state at the time of the
+	// triggering delta, not necessarily at the moment the MFA state changed.
+	// Skip the MFA API call on no-op incremental updates since no user
+	// documents will be published anyway.
+	if wantUsers && p.conf.wantMFA() && (fullSync || updatedUsers.Len() != 0) {
+		for _, u := range state.users {
+			u.MFA = nil
+		}
+		mfaDetails, err := p.fetcher.UserMFADetails(ctx)
+		if err != nil {
+			p.logger.Warnf("Failed to fetch MFA registration details, skipping MFA enrichment: %v", err)
+		} else {
+			for userID, details := range mfaDetails {
+				if u, ok := state.users[userID]; ok {
+					u.MFA = details
+				}
+			}
+		}
+	}
+
 	// Expand device group memberships.
 	if wantDevices {
 		updatedDevices.ForEach(func(devID uuid.UUID) {
 			d, ok := state.devices[devID]
 			if !ok {
-				p.logger.Errorf("Unable to find device %q in state", devID)
+				p.logger.Debugf("Unable to find device %q in state", devID)
 				return
 			}
 			d.Modified = true
@@ -495,6 +560,10 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	})
 	if len(groups) != 0 {
 		_, _ = userDoc.Put("user.group", groups)
+	}
+
+	if u.MFA != nil {
+		_, _ = userDoc.Put("azure_ad.mfa", u.MFA)
 	}
 
 	event := beat.Event{
@@ -587,24 +656,4 @@ func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
 	}
 	p.cfg = cfg
 	return p, nil
-}
-
-// New creates a new instance of an Azure Active Directory identity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
-	p := azure{
-		conf: defaultConf(),
-	}
-	p.Manager = &kvstore.Manager{
-		Logger:    logger,
-		Type:      FullName,
-		Configure: p.configure,
-	}
-
-	return &p, nil
-}
-
-func init() {
-	if err := provider.Register(Name, New); err != nil {
-		panic(err)
-	}
 }

@@ -102,6 +102,12 @@ packetbeat.flows:
   # Overrides where flow events are indexed.
   #index: my-custom-flow-index
 
+  # In situations where flows can contain different src/dst pairs on the return
+  # route, enabling this allows the flow to be constructed matching based on
+  # higher level protocol details if available.
+  allow_mismatched_eth: false
+
+
 # =========================== Transaction protocols ============================
 
 packetbeat.protocols:
@@ -259,7 +265,7 @@ packetbeat.protocols:
   #send_all_headers: false
 
   # A list of headers to redact if present in the HTTP request. This will keep
-  # the header field present, but will redact it's value to show the headers
+  # the header field present, but will redact its value to show the headers
   # presence.
   #redact_headers: []
 
@@ -1462,7 +1468,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -2039,7 +2045,7 @@ logging.files:
   #path: /var/log/packetbeat
 
   # The name of the files where the logs are written to.
-  #name: packetbeat-event-data
+  #name: packetbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

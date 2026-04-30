@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -28,11 +30,14 @@ var (
 // Config options
 type Config struct {
 	// shared config options
-	ClientId                string        `config:"client_id"  validate:"required"`
-	ClientSecret            string        `config:"client_secret"  validate:"required"`
-	TenantId                string        `config:"tenant_id"  validate:"required"`
-	SubscriptionId          string        `config:"subscription_id"  validate:"required"`
-	Period                  time.Duration `config:"period" validate:"nonzero,required"`
+	ClientId       string        `config:"client_id"  validate:"required"`
+	ClientSecret   string        `config:"client_secret"  validate:"required"`
+	TenantId       string        `config:"tenant_id"  validate:"required"`
+	SubscriptionId string        `config:"subscription_id"  validate:"required"`
+	Period         time.Duration `config:"period" validate:"nonzero,required"`
+	// Latency is the time it takes for the Azure service to publish the metric values.
+	// This is used to compensate for the latency in the timespan.
+	Latency                 time.Duration `config:"latency" validate:"positive"`
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
 	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
@@ -44,6 +49,24 @@ type Config struct {
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
+	// Use BatchApi for metric values collection
+	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
+	// DefaultTimeGrain sets the default time interval when the resource config
+	// doesn't specify one. If no time grain is configured, this value will be
+	// used whenever possible.
+	//
+	// When the metric definition doesn't support this time grain, we fall back
+	// to the smallest supported interval.
+	//
+	// Note: currently, this is only used for the storage metricset.
+	DefaultTimeGrain string `config:"default_timegrain"` // defaults to PT5M
+}
+
+// createDefaultConfig creates a default config for the metricset.
+func createDefaultConfig() Config {
+	return Config{
+		DefaultTimeGrain: "PT5M",
+	}
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
@@ -88,7 +111,7 @@ func (conf *Config) Validate() error {
 			if err != nil {
 				return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 			}
-			conf.ActiveDirectoryEndpoint = add.(string)
+			conf.ActiveDirectoryEndpoint, _ = add.(string)
 		}
 		if conf.ActiveDirectoryEndpoint == "" {
 			return fmt.Errorf("no active directory endpoint has been configured")

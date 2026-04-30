@@ -39,7 +39,7 @@ func buildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
 		return nil, fmt.Errorf("wrong settings for config.modules.path, it is expected to end with *.yml. Got: %s", glob)
 	}
 
-	modulesManager, err := cfgfile.NewGlobManager(glob, ".yml", ".disabled")
+	modulesManager, err := cfgfile.NewGlobManager(glob, ".yml", ".disabled", beat.Info.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("initialization error: %w", err)
 	}

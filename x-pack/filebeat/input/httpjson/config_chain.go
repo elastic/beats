@@ -95,23 +95,3 @@ type responseChainConfig struct {
 	Transforms transformsConfig `config:"transforms"`
 	Split      *splitConfig     `config:"split"`
 }
-
-func defaultChainConfig() config {
-	chaincfg := defaultConfig()
-	chaincfg.Chain = []chainConfig{
-		{
-			While: &whileConfig{
-				Auth:     chaincfg.Auth,
-				Request:  chaincfg.Request,
-				Response: &responseChainConfig{},
-			},
-			Step: &stepConfig{
-				Auth:     chaincfg.Auth,
-				Request:  chaincfg.Request,
-				Response: &responseChainConfig{},
-			},
-		},
-	}
-
-	return chaincfg
-}

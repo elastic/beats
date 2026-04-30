@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -64,7 +64,7 @@ func init() {
 }
 
 // NewReplaceString returns a new replace processor.
-func NewReplaceString(c *conf.C) (beat.Processor, error) {
+func NewReplaceString(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := replaceStringConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -76,7 +76,7 @@ func NewReplaceString(c *conf.C) (beat.Processor, error) {
 
 	f := &replaceString{
 		config: config,
-		log:    logp.NewLogger("replace"),
+		log:    log.Named("replace"),
 	}
 	return f, nil
 }
@@ -84,18 +84,20 @@ func NewReplaceString(c *conf.C) (beat.Processor, error) {
 func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
 	// Creates a copy of the event to revert in case of failure
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
 		err := f.replaceField(field.Field, field.Pattern, *field.Replacement, event)
 		if err != nil {
-			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err)
+			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err) //nolint:staticcheck //Keep old behavior
 			f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 			if f.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
@@ -115,10 +117,15 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 		return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 	}
 
-	updatedString := pattern.ReplaceAllString(currentValue.(string), replacement)
+	currentValueString, ok := currentValue.(string)
+	if !ok {
+		return fmt.Errorf("key '%s' expected type string, but got %T with value '%v'", field, currentValue, currentValue)
+	}
+
+	updatedString := pattern.ReplaceAllString(currentValueString, replacement)
 	_, err = event.PutValue(field, updatedString)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %w", replacement, currentValue, err)
+		return fmt.Errorf("could not put value: %s: %s, %w", replacement, currentValueString, err)
 	}
 	return nil
 }

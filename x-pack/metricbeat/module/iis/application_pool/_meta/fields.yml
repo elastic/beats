@@ -70,3 +70,69 @@
           type: float
           description: >
             Number of filters per sec.
+        - name: exceptions_thrown_per_sec
+          type: float
+          description: >
+            Number of Exceptions Thrown / sec.
+        - name: memory
+          type: group
+          description: >
+            Memory overview.
+          fields:
+            - name: bytes_in_all_heaps
+              type: float
+              description: >
+                Number of bytes in all heaps.
+            - name: gen_0_collections
+              type: float
+              description: >
+                Number of Gen 0 Collections.
+            - name: gen_1_collections
+              type: float
+              description: >
+                Number of Gen 1 Collections.
+            - name: gen_2_collections
+              type: float
+              description: >
+                Number of Gen 2 Collections.
+            - name: total_committed_bytes
+              type: float
+              description: >
+                Number of total committed bytes.
+            - name: allocated_bytes_per_sec
+              type: float
+              description: >
+                Allocated Bytes/sec.
+            - name: gen_0_heap_size
+              type: float
+              description: >
+                Gen 0 heap size.
+            - name: gen_1_heap_size
+              type: float
+              description: >
+                Gen 1 heap size.
+            - name: gen_2_heap_size
+              type: float
+              description: >
+                Gen 2 heap size.
+            - name: large_object_heap_size
+              type: float
+              description: >
+                Large Object Heap size.
+            - name: time_in_gc_perc
+              type: float
+              description: >
+                % Time in GC.
+        - name: locks_and_threads
+          type: group
+          description: >
+            LocksAndThreads overview.
+          fields:
+            - name: contention_rate_per_sec
+              type: float
+              description: >
+                Contention Rate / sec.
+            - name: current_queue_length
+              type: float
+              description: >
+                Current Queue Length.

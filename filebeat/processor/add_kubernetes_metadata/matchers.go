@@ -52,7 +52,7 @@ type LogPathMatcher struct {
 	logger       *logp.Logger
 }
 
-func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
+func newLogsPathMatcher(cfg conf.C, log *logp.Logger) (add_kubernetes_metadata.Matcher, error) {
 	config := struct {
 		LogsPath     string `config:"logs_path"`
 		ResourceType string `config:"resource_type"`
@@ -72,7 +72,6 @@ func newLogsPathMatcher(cfg conf.C) (add_kubernetes_metadata.Matcher, error) {
 	}
 	resourceType := config.ResourceType
 
-	log := logp.NewLogger("kubernetes")
 	log.Debugf("logs_path matcher log path: %s", logPath)
 	log.Debugf("logs_path matcher resource type: %s", resourceType)
 
@@ -89,7 +88,11 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 		return ""
 	}
 
-	source := value.(string)
+	source, ok := value.(string)
+	if !ok {
+		f.logger.Debugf("Error extracting log.file.path from the event: value is not a string.")
+		return ""
+	}
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
 
 	if !strings.Contains(source, f.LogsPath) {
@@ -129,7 +132,7 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 				}
 			}
 
-			f.logger.Error("Error extracting pod uid - source value does not contains matcher's logs_path")
+			f.logger.Error("Error extracting pod UID - source value does not contain matcher's logs_path")
 			return ""
 		}
 	} else {

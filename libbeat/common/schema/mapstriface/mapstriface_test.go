@@ -19,6 +19,7 @@ package mapstriface
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
@@ -122,7 +123,7 @@ func TestConversions(t *testing.T) {
 	}
 
 	event, _ := schema.Apply(input)
-	assert.Equal(t, event, expected)
+	assert.Equal(t, expected, event)
 }
 
 func TestOptionalField(t *testing.T) {
@@ -244,9 +245,10 @@ func TestFullFieldPathInErrors(t *testing.T) {
 		}
 
 		_, errs := c.Schema.ApplyTo(mapstr.M{}, c.Input)
-		assert.Error(t, errs.Err(), c.Description)
-		if assert.Equal(t, 1, len(errs), c.Description) {
-			keyErr, ok := errs[0].(s.KeyError)
+		assert.NotEmpty(t, errs, c.Description)
+		if assert.Len(t, errs, 1, c.Description) {
+			var keyErr s.KeyError
+			ok := errors.As(errs[0], &keyErr)
 			if assert.True(t, ok, c.Description) {
 				assert.Equal(t, c.Expected, keyErr.Key(), c.Description)
 			}

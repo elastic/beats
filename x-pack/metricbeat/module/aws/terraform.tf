@@ -12,6 +12,7 @@ provider "aws" {
       org          = "obs"
       team         = "cloud-monitoring"
       project      = "metricbeat_aws-ci"
+      ephemeral    = "true"
     }
   }
 }
@@ -78,5 +79,9 @@ data "aws_ami" "latest-amzn" {
     values = [
       "amzn2-ami-hvm-*",
     ]
+  }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }

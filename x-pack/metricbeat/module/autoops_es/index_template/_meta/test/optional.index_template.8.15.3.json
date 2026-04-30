@@ -1,0 +1,29 @@
+{
+    "index_templates": [
+        {
+            "name": "missing-composedof-response",
+            "index_template": {
+                "index_patterns": [
+                    "index-pattern1-*",
+                    "index-pattern2-*"
+                ]
+            }
+        },
+        {
+            "name": "ignored-response",
+            "index_template": {
+                "index_patterns": [
+                    "index-pattern-ignored3-*"
+                ]
+            }
+        },
+        {
+            "name": "simple-response",
+            "index_template": {
+                "index_patterns": [
+                    "patter-2-*"
+                ]
+            }
+        }
+    ]
+}

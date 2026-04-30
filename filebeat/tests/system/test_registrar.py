@@ -308,11 +308,21 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=2),
                         max_timeout=10)
 
+        # The "Updating state for renamed file" message is only logged once
+        # the harvester for the renamed file has finished (closed via
+        # close_inactive). Wait explicitly for the harvester close so that
+        # the rename detection check below is not racing with close_inactive
+        # on slow CI workers (see #26378).
+        self.wait_until(
+            lambda: self.log_contains(
+                "File is inactive. Closing because close_inactive"),
+            max_timeout=30)
+
         # Wait until rotation is detected
         self.wait_until(
             lambda: self.log_contains(
                 "Updating state for renamed file"),
-            max_timeout=10)
+            max_timeout=30)
 
         time.sleep(1)
 
@@ -1352,9 +1362,11 @@ class Test(BaseTest):
         self.render_config_template(
             type='container',
             input_raw='''
+  allow_deprecated_use: true
   paths: {path}
   stream: stdout
 - type: container
+  allow_deprecated_use: true
   paths: {path}
   stream: stderr
 '''.format(path=os.path.abspath(self.working_dir) + "/log/*/*.log")

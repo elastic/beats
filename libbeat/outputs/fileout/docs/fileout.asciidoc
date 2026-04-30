@@ -87,3 +87,11 @@ If the output file already exists on startup, immediately rotate it and start wr
 Output codec configuration. If the `codec` section is missing, events will be json encoded.
 
 See <<configuration-output-codec>> for more information.
+
+===== `queue`
+
+Configuration options for internal queue.
+
+See <<configuring-internal-queue>> for more information.
+
+Note:`queue` options can be set under +{beatname_lc}.yml+ or the `output` section but not both.

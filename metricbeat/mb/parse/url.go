@@ -36,6 +36,7 @@ type URLHostParserBuilder struct {
 	DefaultUsername string
 	DefaultPassword string
 	DefaultScheme   string
+	DefaultPort     string
 	QueryParams     string
 }
 
@@ -104,7 +105,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		// Combine paths and normalize
 		fullPath := strings.Trim(p.Join(basePath, path), "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.DefaultPort, b.QueryParams)
 	}
 }
 
@@ -116,7 +117,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
 }
 
-// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
+// NewHostDataFromURLWithTransport allows to specify the type of transport to use in conjunction with the
 // url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
 func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
@@ -143,8 +144,8 @@ func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.Ho
 // ParseURL returns HostData object from a raw 'host' value and a series of
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
-func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
-	u, transport, err := getURL(rawHost, scheme, user, pass, path, query)
+func ParseURL(rawHost, scheme, user, pass, path, defaultPort, query string) (mb.HostData, error) {
+	u, transport, err := getURL(rawHost, scheme, user, pass, path, defaultPort, query)
 
 	if err != nil {
 		return mb.HostData{}, err
@@ -186,7 +187,7 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 // getURL constructs a URL from the rawHost value and adds the provided user,
 // password, path, and query params if one was not set in the rawURL value.
 func getURL(
-	rawURL, scheme, username, password, path, query string,
+	rawURL, scheme, username, password, path, defaultPort, query string,
 ) (*url.URL, dialer.Builder, error) {
 
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
@@ -198,7 +199,7 @@ func getURL(
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, t, fmt.Errorf("error parsing URL: %v", err)
+		return nil, t, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	// discover the transport to use to communicate with the host if we have a combined scheme.
@@ -231,7 +232,7 @@ func getURL(
 			u.Path = "/" + segs[1]
 		}
 
-		p = `\\.\pipe\` + strings.Replace(p, "/", "\\", -1)
+		p = `\\.\pipe\` + strings.ReplaceAll(p, "/", "\\")
 		t = dialer.NewNpipeDialerBuilder(p)
 	default:
 		t = dialer.NewDefaultDialerBuilder()
@@ -244,17 +245,21 @@ func getURL(
 			return nil, t, fmt.Errorf("error parsing URL: empty host")
 		}
 
-		// Validate the host. The port is optional.
-		host, _, err := net.SplitHostPort(u.Host)
+		// Validate the host.
+		host, port, err := net.SplitHostPort(u.Host)
 		if err != nil {
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
 			} else {
-				return nil, t, fmt.Errorf("error parsing URL: %v", err)
+				return nil, t, fmt.Errorf("error parsing URL: %w", err)
 			}
 		}
 		if host == "" {
 			return nil, t, fmt.Errorf("error parsing URL: empty host")
+		}
+		// Add default port to host if port is empty and defaultport is set
+		if port == "" && defaultPort != "" {
+			u.Host = net.JoinHostPort(host, defaultPort)
 		}
 	}
 

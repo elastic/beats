@@ -64,9 +64,6 @@ type Settings struct {
 	RetryInterval    time.Duration
 	MaxRetryInterval time.Duration
 
-	// EncryptionKey is used to encrypt data if SchemaVersion 2 is used.
-	EncryptionKey []byte
-
 	// UseCompression enables or disables LZ4 compression
 	UseCompression bool
 }
@@ -119,11 +116,12 @@ func (c *userConfig) Validate() error {
 }
 
 // DefaultSettings returns a Settings object with reasonable default values
-// for all important fields.
+// for all important fields. Callers must set Paths when using default Path
+// resolution (i.e. when Settings.Path is empty).
 func DefaultSettings() Settings {
 	return Settings{
 		MaxSegmentSize: 100 * (1 << 20), // 100MiB
-		MaxBufferSize:  (1 << 30),       // 1GiB
+		MaxBufferSize:  1 << 30,         // 1GiB
 
 		ReadAheadLimit:  512,
 		WriteAheadLimit: 2048,
@@ -143,13 +141,13 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 	settings := DefaultSettings()
 	settings.Path = userConfig.Path
 
-	settings.MaxBufferSize = uint64(userConfig.MaxSize)
+	settings.MaxBufferSize = uint64(userConfig.MaxSize) //nolint:gosec // G115 - Validate() ensures MaxSize >= 10MB
 	if userConfig.SegmentSize != nil {
-		settings.MaxSegmentSize = uint64(*userConfig.SegmentSize)
+		settings.MaxSegmentSize = uint64(*userConfig.SegmentSize) //nolint:gosec // G115 - Validate() ensures SegmentSize >= 1MB
 	} else {
 		// If no value is specified, default segment size is total queue size
 		// divided by 10.
-		settings.MaxSegmentSize = uint64(userConfig.MaxSize) / 10
+		settings.MaxSegmentSize = uint64(userConfig.MaxSize) / 10 //nolint:gosec // G115 - Validate() ensures MaxSize >= 10MB
 	}
 
 	if userConfig.ReadAheadLimit != nil {
@@ -173,20 +171,20 @@ func SettingsForUserConfig(config *config.C) (Settings, error) {
 // bookkeeping helpers
 //
 
-func (settings Settings) directoryPath() string {
+func (settings Settings) directoryPath(fallback *paths.Path) string {
 	if settings.Path == "" {
-		return paths.Resolve(paths.Data, "diskqueue")
+		return fallback.Resolve(paths.Data, "diskqueue")
 	}
 	return settings.Path
 }
 
-func (settings Settings) stateFilePath() string {
-	return filepath.Join(settings.directoryPath(), "state.dat")
+func (settings Settings) stateFilePath(fallback *paths.Path) string {
+	return filepath.Join(settings.directoryPath(fallback), "state.dat")
 }
 
-func (settings Settings) segmentPath(segmentID segmentID) string {
+func (settings Settings) segmentPath(segmentID segmentID, fallback *paths.Path) string {
 	return filepath.Join(
-		settings.directoryPath(),
+		settings.directoryPath(fallback),
 		fmt.Sprintf("%v.seg", segmentID))
 }
 

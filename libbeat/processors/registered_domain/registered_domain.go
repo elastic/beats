@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -48,19 +48,19 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v processor configuration: %w", procName, err)
 	}
 
-	return newRegisteredDomain(c)
+	return newRegisteredDomain(c, log)
 }
 
-func newRegisteredDomain(c config) (*processor, error) {
-	cfgwarn.Beta("The " + procName + " processor is beta.")
+func newRegisteredDomain(c config, logger *logp.Logger) (*processor, error) {
+	log := logger.Named(logName)
+	logger.Warn(cfgwarn.Beta("The " + procName + " processor is beta."))
 
-	log := logp.NewLogger(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
 	}

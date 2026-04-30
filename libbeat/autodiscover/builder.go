@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -42,7 +44,7 @@ type Builders struct {
 }
 
 // BuilderConstructor is a func used to generate a Builder object
-type BuilderConstructor func(*config.C) (Builder, error)
+type BuilderConstructor func(c *config.C, logger *logp.Logger, paths *paths.Path) (Builder, error)
 
 // AddBuilder registers a new BuilderConstructor
 func (r *registry) AddBuilder(name string, builder BuilderConstructor) error {
@@ -77,7 +79,7 @@ func (r *registry) GetBuilder(name string) BuilderConstructor {
 }
 
 // BuildBuilder reads provider configuration and instantiate one
-func (r *registry) BuildBuilder(c *config.C) (Builder, error) {
+func (r *registry) BuildBuilder(c *config.C, paths *paths.Path) (Builder, error) {
 	var config BuilderConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -89,7 +91,7 @@ func (r *registry) BuildBuilder(c *config.C) (Builder, error) {
 		return nil, fmt.Errorf("unknown autodiscover builder %s", config.Type)
 	}
 
-	return builder(c)
+	return builder(c, r.logger, paths)
 }
 
 // GetConfig creates configs for all builders initialized.
@@ -120,6 +122,7 @@ func NewBuilders(
 	bConfigs []*config.C,
 	hintsCfg *config.C,
 	keystoreProvider bus.KeystoreProvider,
+	paths *paths.Path,
 ) (Builders, error) {
 	var builders Builders
 	if hintsCfg.Enabled() {
@@ -128,12 +131,15 @@ func NewBuilders(
 		}
 
 		// pass rest of hints settings to the builder
-		hintsCfg.SetString("type", -1, "hints")
+		err := hintsCfg.SetString("type", -1, "hints")
+		if err != nil {
+			return Builders{}, fmt.Errorf("autodiscover NewBuilder: could not set 'type' to 'hints' on hints config: %w", err)
+		}
 		bConfigs = append(bConfigs, hintsCfg)
 	}
 
 	for _, bcfg := range bConfigs {
-		builder, err := Registry.BuildBuilder(bcfg)
+		builder, err := Registry.BuildBuilder(bcfg, paths)
 		if err != nil {
 			return Builders{}, err
 		}

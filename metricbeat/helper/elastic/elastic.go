@@ -18,8 +18,11 @@
 package elastic
 
 import (
+	"errors"
 	"fmt"
-	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -44,9 +47,6 @@ const (
 
 	// Beats product
 	Beats
-
-	// Enterprise Search product
-	EnterpriseSearch
 )
 
 func (p Product) xPackMonitoringIndexString() string {
@@ -55,7 +55,6 @@ func (p Product) xPackMonitoringIndexString() string {
 		"kibana",
 		"logstash",
 		"beats",
-		"ent-search",
 	}
 
 	if int(p) < 0 || int(p) > len(indexProductNames) {
@@ -71,7 +70,6 @@ func (p Product) String() string {
 		"kibana",
 		"logstash",
 		"beats",
-		"enterprisesearch",
 	}
 
 	if int(p) < 0 || int(p) > len(productNames) {
@@ -89,29 +87,15 @@ func MakeXPackMonitoringIndexName(product Product) string {
 	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
 }
 
-// ReportErrorForMissingField reports and returns an error message for the given
-// field being missing in API response received from a given product
-func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) error {
-	err := MakeErrorForMissingField(field, product)
-	r.Error(err)
-	return err
-}
-
 // MakeErrorForMissingField returns an error message for the given field being missing in an API
 // response received from a given product
 func MakeErrorForMissingField(field string, product Product) error {
-	return fmt.Errorf("Could not find field '%v' in %v API response", field, strings.Title(product.String()))
+	return fmt.Errorf("could not find field '%v' in %v API response", field, cases.Title(language.English).String(product.String()))
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
 func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *version.V) bool {
 	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
-}
-
-// ReportAndLogError reports and logs the given error
-func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
-	r.Error(err)
-	l.Error(err)
 }
 
 // FixTimestampField converts the given timestamp field in the given map from a float64 to an
@@ -120,7 +104,7 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
 func FixTimestampField(m mapstr.M, field string) error {
 	v, err := m.GetValue(field)
-	if err == mapstr.ErrKeyNotFound {
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		return nil
 	}
 	if err != nil {
@@ -161,10 +145,17 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 	metricsets := xpackEnabledMetricsets
 	if err == nil && cfgdMetricsets != nil {
 		// Type cast the metricsets to a slice of strings
-		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
-		cfgdMetricsetsStrings := make([]string, len(cfgdMetricsetsSlice))
+		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("configured metricsets are not an slice for module %s: %v", moduleName, cfgdMetricsets)
+		}
+
+		cfgdMetricsetsStrings := make([]string, 0, len(cfgdMetricsetsSlice))
 		for i := range cfgdMetricsetsSlice {
-			cfgdMetricsetsStrings[i] = cfgdMetricsetsSlice[i].(string)
+			asString, ok := cfgdMetricsetsSlice[i].(string)
+			if ok {
+				cfgdMetricsetsStrings = append(cfgdMetricsetsStrings, asString)
+			}
 		}
 
 		// Add any optional metricsets which are not already configured

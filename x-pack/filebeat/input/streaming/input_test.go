@@ -6,6 +6,7 @@ package streaming
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -22,9 +23,12 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 //nolint:gosec // These are test tokens and are not used in production code.
@@ -41,7 +45,10 @@ type WebSocketHandler func(*testing.T, *websocket.Conn, []string)
 var inputTests = []struct {
 	name          string
 	server        func(*testing.T, WebSocketHandler, map[string]interface{}, []string)
+	proxyServer   func(*testing.T, WebSocketHandler, map[string]interface{}, []string) *httptest.Server
+	oauth2Server  func(*testing.T, http.HandlerFunc, map[string]interface{})
 	handler       WebSocketHandler
+	oauth2Handler http.HandlerFunc
 	config        map[string]interface{}
 	response      []string
 	time          func() time.Time
@@ -55,7 +62,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -119,11 +126,12 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
-		response: []string{`
+		response: []string{
+			`
 			{
 				"pps": {
 					"agent": "example.proofpoint.com",
@@ -173,7 +181,8 @@ var inputTests = []struct {
 					"pri": 35342
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyX"
-	   }`},
+	   }`,
+		},
 		want: []map[string]interface{}{
 			{
 				"pps": map[string]interface{}{
@@ -233,7 +242,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 					"cursor":["What's next?"],
 				})`,
@@ -253,7 +262,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 		},
@@ -265,7 +274,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-	              bytes(state.response).decode_json().as(inner_body,{
+	              state.response.decode_json().as(inner_body,{
 					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [],
 	          })`,
 			"state": map[string]interface{}{
@@ -274,7 +283,8 @@ var inputTests = []struct {
 				},
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -306,14 +316,15 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
 				"basic_token": basicToken,
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -338,14 +349,15 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
 				"bearer_token": bearerToken,
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -370,7 +382,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"auth": map[string]interface{}{
@@ -380,7 +392,8 @@ var inputTests = []struct {
 				},
 			},
 		},
-		response: []string{`
+		response: []string{
+			`
 	       {
 	          "pps": {
 	              "agent": "example.proofpoint.com",
@@ -405,7 +418,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"retry": map[string]interface{}{
@@ -414,14 +427,15 @@ var inputTests = []struct {
 				"wait_max":     "2s",
 			},
 		},
-		response: []string{`
-         {
-            "pps": {
-                "agent": "example.proofpoint.com",
-                "cid": "mmeng_uivm071"
-            },
-            "ts": 1502908200
-        }`,
+		response: []string{
+			`
+	       {
+	          "pps": {
+	              "agent": "example.proofpoint.com",
+	              "cid": "mmeng_uivm071"
+	          },
+	          "ts": 1502908200
+	      }`,
 		},
 		want: []map[string]interface{}{
 			{
@@ -439,7 +453,7 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-					bytes(state.response).decode_json().as(inner_body,{
+					state.response.decode_json().as(inner_body,{
 					"events": [inner_body],
 				})`,
 			"retry": map[string]interface{}{
@@ -448,7 +462,306 @@ var inputTests = []struct {
 				"wait_max":     "2s",
 			},
 		},
-		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake"),
+		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake and (status 403)"),
+	},
+	{
+		name:    "single_event_tls",
+		server:  webSocketServerWithTLS(httptest.NewUnstartedServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					state.response.decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"ssl": map[string]interface{}{
+				"enabled":                 true,
+				"certificate_authorities": []string{"testdata/certs/ca.crt"},
+				"certificate":             "testdata/certs/cert.pem",
+				"key":                     "testdata/certs/key.pem",
+			},
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+		   }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
+	{
+		name:        "basic_proxy_forwarding",
+		proxyServer: newWebSocketProxyTestServer,
+		handler:     defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					state.response.decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+			 }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
+	{
+		name: "oauth2_blank_auth_style",
+		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["auth.token_url"] = s.URL + "/token"
+			config["url"] = "ws://placeholder"
+			t.Cleanup(s.Close)
+		},
+		oauth2Handler: oauth2TokenHandler,
+		server:        webSocketTestServerWithAuth(httptest.NewServer),
+		handler:       defaultHandler,
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"scopes": []string{
+					"scope1",
+					"scope2",
+				},
+				"endpoint_params": map[string]string{
+					"param1": "v1",
+				},
+			},
+			"program": `
+					state.response.decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+			 }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
+	{
+		name: "oauth2_in_params_auth_style",
+		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["auth.token_url"] = s.URL + "/token"
+			config["url"] = "ws://placeholder"
+			t.Cleanup(s.Close)
+		},
+		oauth2Handler: oauth2TokenHandler,
+		server:        webSocketTestServerWithAuth(httptest.NewServer),
+		handler:       defaultHandler,
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"auth_style":    "in_params",
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"scopes": []string{
+					"scope1",
+					"scope2",
+				},
+				"endpoint_params": map[string]string{
+					"param1": "v1",
+				},
+			},
+			"program": `
+					state.response.decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+			 }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
 	},
 }
 
@@ -512,7 +825,6 @@ func TestURLEval(t *testing.T) {
 	logp.TestingSetup()
 	for _, test := range urlEvalTests {
 		t.Run(test.name, func(t *testing.T) {
-
 			cfg := conf.MustNewConfigFrom(test.config)
 
 			conf := config{}
@@ -552,13 +864,20 @@ func TestURLEval(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket setup requires SHA-1.")
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
 	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
+			if test.oauth2Server != nil {
+				test.oauth2Server(t, test.oauth2Handler, test.config)
+			}
 			if test.server != nil {
 				test.server(t, test.handler, test.config, test.response)
+			}
+			if test.proxyServer != nil {
+				test.proxyServer(t, test.handler, test.config, test.response)
 			}
 
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -588,9 +907,10 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			v2Ctx := v2.Context{
-				Logger:      logp.NewLogger("websocket_test"),
-				ID:          "test_id:" + test.name,
-				Cancelation: ctx,
+				Logger:          logp.NewLogger("websocket_test"),
+				ID:              "test_id:" + test.name,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {
@@ -619,6 +939,218 @@ func TestInput(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestURLProgramReconnect verifies that url_program is re-evaluated before
+// each reconnection using the evolved cursor state. The test server records
+// the request URL for each connection and closes the first connection after
+// sending one message to force the error-reconnect path. The CEL program
+// updates the cursor with a timestamp from the message, and url_program
+// appends sinceTime from the cursor when present. The test asserts that:
+//   - the first connection URL has no sinceTime (no cursor yet)
+//   - the second connection URL includes sinceTime from the first message's
+//     timestamp, proving that url_program was re-evaluated with the cursor
+//     that process() returned after handling the first message
+func TestURLProgramReconnect(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
+
+	var (
+		mu        sync.Mutex
+		urls      []string
+		connCount int
+	)
+
+	// The server records the request URL for each connection. It sends one
+	// JSON message per connection and closes the first connection to force
+	// the client through the error-reconnect path in FollowStream.
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		urls = append(urls, r.URL.String())
+		connCount++
+		n := connCount
+		mu.Unlock()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+
+		msg := fmt.Sprintf(`{"ts":"2024-01-01T%02d:00:00Z","data":"msg-%d"}`, n, n)
+		if err := conn.WriteMessage(websocket.TextMessage, []byte(msg)); err != nil {
+			return
+		}
+
+		if n == 1 {
+			conn.Close()
+		}
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"url":         "ws" + server.URL[4:] + "/v1/stream",
+		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
+		"program": `
+			state.response.decode_json().as(body, {
+				"cursor": {"last_timestamp": body.ts},
+				"events": [body],
+			})`,
+		"retry": map[string]interface{}{
+			"blanket_retries": true,
+			"wait_min":        "10ms",
+			"wait_max":        "50ms",
+		},
+	}
+	cfg := conf.MustNewConfigFrom(config)
+
+	c := defaultConfig()
+	c.Redact = &redact{}
+	err := cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	v2Ctx := v2.Context{
+		Logger:          logptest.NewTestingLogger(t, "websocket_test"),
+		ID:              "test_id:url_program_reconnect",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	var client publisher
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel()
+		}
+	}
+
+	src := &source{c}
+	err = input{}.run(v2Ctx, src, nil, &client)
+	if err != nil && err != context.Canceled { //nolint:errorlint // ctx.Err() is never wrapped.
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(urls) < 2 {
+		t.Fatalf("expected at least 2 connections, got %d", len(urls))
+	}
+
+	assert.Equal(t, "/v1/stream", urls[0])
+	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z")
+}
+
+// TestURLProgramReconnectZeroEvents verifies that a zero-events message does
+// not regress the cursor to the startup snapshot. The scenario:
+//
+//  1. Input starts with an initial persisted cursor (last_timestamp=00:00:00Z).
+//  2. First message advances the cursor to 01:00:00Z.
+//  3. Second message produces zero events (empty data field).
+//  4. Connection drops, triggering a reconnect.
+//  5. The reconnect URL must contain sinceTime=01:00:00Z (advanced), not
+//     sinceTime=00:00:00Z (initial).
+func TestURLProgramReconnectZeroEvents(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "websocket uses SHA-1.")
+
+	var (
+		mu        sync.Mutex
+		urls      []string
+		connCount int
+	)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		urls = append(urls, r.URL.String())
+		connCount++
+		n := connCount
+		mu.Unlock()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+
+		if n == 1 {
+			// First connection: send a message that advances the cursor,
+			// then one that produces zero events, then close.
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"2024-01-01T01:00:00Z","data":"msg-1"}`))
+			conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"","data":""}`))
+			time.Sleep(50 * time.Millisecond)
+			conn.Close()
+			return
+		}
+		// Second connection: send a message so the test can complete.
+		conn.WriteMessage(websocket.TextMessage, []byte(`{"ts":"2024-01-01T02:00:00Z","data":"msg-2"}`))
+	}))
+	defer server.Close()
+
+	config := map[string]interface{}{
+		"url":         "ws" + server.URL[4:] + "/v1/stream",
+		"url_program": `has(state.?cursor.last_timestamp) ? state.url + "?sinceTime=" + state.cursor.last_timestamp : state.url`,
+		"program": `
+			state.response.decode_json().as(body,
+				body.data != "" ?
+					{"cursor": {"last_timestamp": body.ts}, "events": [body]}
+				:
+					{"events": []}
+			)`,
+		"retry": map[string]interface{}{
+			"blanket_retries": true,
+			"wait_min":        "10ms",
+			"wait_max":        "50ms",
+		},
+	}
+	cfg := conf.MustNewConfigFrom(config)
+
+	c := defaultConfig()
+	c.Redact = &redact{}
+	err := cfg.Unpack(&c)
+	if err != nil {
+		t.Fatalf("unexpected error unpacking config: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	v2Ctx := v2.Context{
+		Logger:          logptest.NewTestingLogger(t, "websocket_test"),
+		ID:              "test_id:url_program_reconnect_zero_events",
+		Cancelation:     ctx,
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	var client publisher
+	client.done = func() {
+		if len(client.published) >= 2 {
+			cancel()
+		}
+	}
+
+	initialCursor := map[string]any{"last_timestamp": "2024-01-01T00:00:00Z"}
+	src := &source{c}
+	err = input{}.run(v2Ctx, src, initialCursor, &client)
+	if err != nil && err != context.Canceled { //nolint:errorlint // ctx.Err() is never wrapped.
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(urls) < 2 {
+		t.Fatalf("expected at least 2 connections, got %d", len(urls))
+	}
+
+	assert.Contains(t, urls[0], "sinceTime=2024-01-01T00:00:00Z",
+		"first connection should use the initial persisted cursor")
+	assert.Contains(t, urls[1], "sinceTime=2024-01-01T01:00:00Z",
+		"second connection should use the advanced cursor, not the initial one")
 }
 
 var _ inputcursor.Publisher = (*publisher)(nil)
@@ -731,7 +1263,7 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 			handler(t, conn, response)
 		}))
 		// only set the resource URL if it is not already set
-		if config["url"] == nil {
+		if config["url"] == nil || config["url"] == "ws://placeholder" {
 			config["url"] = "ws" + server.URL[4:]
 		}
 		t.Cleanup(server.Close)
@@ -771,6 +1303,46 @@ func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*t
 	}
 }
 
+// webSocketServerWithTLS simulates a WebSocket server with TLS based authentication.
+func webSocketServerWithTLS(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			upgrader := websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					return true
+				},
+			}
+
+			conn, err := upgrader.Upgrade(w, r, nil)
+			if err != nil {
+				t.Fatalf("error upgrading connection to WebSocket: %v", err)
+				return
+			}
+
+			handler(t, conn, response)
+		}))
+		//nolint:gosec // there is no need to use a secure cert for testing
+		server.TLS = &tls.Config{
+			Certificates: []tls.Certificate{generateSelfSignedCert(t)},
+		}
+		server.StartTLS()
+
+		if config["url"] == nil {
+			config["url"] = "ws" + server.URL[4:]
+		}
+		t.Cleanup(server.Close)
+	}
+}
+
+// generateSelfSignedCert returns a self-signed certificate for testing purposes based on the dummy certs in the testdata directory
+func generateSelfSignedCert(t *testing.T) tls.Certificate {
+	cert, err := tls.LoadX509KeyPair("testdata/certs/cert.pem", "testdata/certs/key.pem")
+	if err != nil {
+		t.Fatalf("failed to generate self-signed cert: %v", err)
+	}
+	return cert
+}
+
 // defaultHandler is a default handler for WebSocket connections.
 func defaultHandler(t *testing.T, conn *websocket.Conn, response []string) {
 	for _, r := range response {
@@ -778,5 +1350,106 @@ func defaultHandler(t *testing.T, conn *websocket.Conn, response []string) {
 		if err != nil {
 			t.Fatalf("error writing message to WebSocket: %v", err)
 		}
+	}
+}
+
+// webSocketTestServer creates a WebSocket target server that communicates with the proxy handler.
+func webSocketTestServer(t *testing.T, handler WebSocketHandler, response []string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			t.Fatalf("failed to upgrade WebSocket connection: %v", err)
+			return
+		}
+		handler(t, conn, response)
+	}))
+}
+
+// webSocketProxyHandler forwards WebSocket connections to the target server.
+//
+//nolint:errcheck //we can safely ignore errors checks here
+func webSocketProxyHandler(targetURL string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Response.Body.Close()
+		//nolint:bodyclose // we can ignore the body close here
+		targetConn, _, err := websocket.DefaultDialer.Dial(targetURL, nil)
+		if err != nil {
+			http.Error(w, "failed to connect to backend WebSocket server", http.StatusBadGateway)
+			return
+		}
+		defer targetConn.Close()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		}
+		clientConn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			http.Error(w, "failed to upgrade client connection", http.StatusInternalServerError)
+			return
+		}
+		defer clientConn.Close()
+		// forward messages between client and target server
+		go func() {
+			for {
+				messageType, message, err := targetConn.ReadMessage()
+				if err != nil {
+					break
+				}
+				clientConn.WriteMessage(messageType, message)
+			}
+		}()
+		for {
+			messageType, message, err := clientConn.ReadMessage()
+			if err != nil {
+				break
+			}
+			targetConn.WriteMessage(messageType, message)
+		}
+	}
+}
+
+// newWebSocketProxyTestServer creates a proxy server forwarding WebSocket traffic.
+func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) *httptest.Server {
+	backendServer := webSocketTestServer(t, handler, response)
+	config["url"] = "ws" + backendServer.URL[4:]
+	config["proxy_url"] = "ws" + backendServer.URL[4:]
+	return httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
+}
+
+//nolint:errcheck // no point checking errors in test server.
+func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/token" {
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+	r.ParseForm()
+	switch {
+	case r.Method != http.MethodPost:
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong method"}`))
+	case r.FormValue("grant_type") != "client_credentials":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong grant_type"}`))
+	case r.FormValue("client_id") != "a_client_id":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong client_id"}`))
+	case r.FormValue("client_secret") != "a_client_secret":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong client_secret"}`))
+	case r.FormValue("scope") != "scope1 scope2":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong scope"}`))
+	case r.FormValue("param1") != "v1":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong param1"}`))
+	default:
+		w.Write([]byte(`{"token_type": "Bearer", "expires_in": "3600", "access_token": "` + bearerToken + `"}`))
 	}
 }

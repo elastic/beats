@@ -5,10 +5,10 @@
 package module
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/winlogbeat/module"
 	"github.com/elastic/beats/v7/x-pack/winlogbeat/module/wintest"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -81,7 +82,7 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		t.Fatal(err)
 	}
 	if *wintest.KeepRunning {
-		fmt.Fprintln(os.Stdout, "Use this to manually cleanup containers: docker-compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
+		fmt.Fprintln(os.Stdout, "Use this to manually cleanup containers: docker", "compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
 	}
 	t.Cleanup(func() {
 		stop := !*wintest.KeepRunning
@@ -99,13 +100,15 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		Password:         pass,
 		CompressionLevel: 3,
 		Transport:        httpcommon.HTTPTransportSettings{Timeout: time.Minute},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
 	}
 	defer conn.Close()
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
 	}
@@ -230,7 +233,7 @@ func writeGolden(t testing.TB, source, dir string, events []mapstr.M) {
 	}
 
 	outPath := filepath.Join(dir, filepath.Base(source)+".golden.json")
-	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil {
+	if err := os.WriteFile(outPath, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -238,7 +241,7 @@ func writeGolden(t testing.TB, source, dir string, events []mapstr.M) {
 func readGolden(t testing.TB, source, dir string) []mapstr.M {
 	inPath := filepath.Join(dir, filepath.Base(source)+".golden.json")
 
-	data, err := ioutil.ReadFile(inPath)
+	data, err := os.ReadFile(inPath)
 	if err != nil {
 		t.Fatal(err)
 	}

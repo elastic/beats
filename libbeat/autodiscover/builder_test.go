@@ -21,9 +21,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -33,14 +36,15 @@ func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	return []*conf.C{conf.NewConfig()}
 }
 
-func newFakeBuilder(_ *conf.C) (Builder, error) {
+func newFakeBuilder(_ *conf.C, logger *logp.Logger, _ *paths.Path) (Builder, error) {
 	return &fakeBuilder{}, nil
 }
 
 func TestBuilderRegistry(t *testing.T) {
 	// Add a new builder
 	reg := NewRegistry()
-	reg.AddBuilder("fake", newFakeBuilder)
+	err := reg.AddBuilder("fake", newFakeBuilder)
+	require.NoError(t, err)
 
 	// Check if that builder is available in registry
 	b := reg.GetBuilder("fake")
@@ -56,14 +60,14 @@ func TestBuilderRegistry(t *testing.T) {
 	// Make sure that config building doesn't fail
 	assert.NoError(t, err)
 
-	builder, err := reg.BuildBuilder(cfg)
+	builder, err := reg.BuildBuilder(cfg, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, builder)
 
 	// Try to create a config with fake builder and assert length
 	// of configs returned is one
 	res := builder.CreateConfig(nil)
-	assert.Equal(t, len(res), 1)
+	assert.Len(t, res, 1)
 
 	builders := Builders{}
 	builders.builders = append(builders.builders, builder)
@@ -71,5 +75,5 @@ func TestBuilderRegistry(t *testing.T) {
 	// Try using builders object for the same as above and expect
 	// the same result
 	res = builders.GetConfig(nil)
-	assert.Equal(t, len(res), 1)
+	assert.Len(t, res, 1)
 }

@@ -21,10 +21,10 @@ package journald
 
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{}
 }

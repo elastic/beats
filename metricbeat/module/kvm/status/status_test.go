@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package status
 
 import (
@@ -59,7 +61,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	statName, err := e.MetricSetFields.GetValue("state")
 	if err == nil {
-		assert.EqualValues(t, statName.(string), "running")
+		assert.Equal(t, "running", statName.(string))
 	} else {
 		t.Errorf("error while getting value from event: %v", err)
 	}

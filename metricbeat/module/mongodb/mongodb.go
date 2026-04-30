@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package mongodb
 
 import (
@@ -31,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -117,8 +120,7 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 	return parse.NewHostDataFromURL(u), nil
 }
 
-func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode readpref.Mode) (*mongo.Client, error) {
-
+func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode readpref.Mode, logger *logp.Logger) (*mongo.Client, error) {
 	clientOptions := options.Client()
 
 	// options.Credentials must be nil for the driver to work properly if no auth is provided. Zero values breaks
@@ -143,16 +145,16 @@ func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode read
 	if mode == 0 {
 		mode = readpref.NearestMode
 	}
-
 	readPreference, err := readpref.New(mode)
 	if err != nil {
 		return nil, err
 	}
 	clientOptions.SetReadPreference(readPreference)
+
 	clientOptions.SetConnectTimeout(timeout)
 
 	if config.TLS.IsEnabled() {
-		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 		if err != nil {
 			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
@@ -160,13 +162,10 @@ func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode read
 		clientOptions.SetTLSConfig(tlsConfig.ToConfig())
 	}
 
-	client, err := mongo.NewClient(clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("could not create mongodb client: %w", err)
 	}
 
-	if err = client.Connect(context.Background()); err != nil {
-		return client, fmt.Errorf("could not connect to mongodb: %w", err)
-	}
 	return client, nil
 }

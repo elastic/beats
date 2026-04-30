@@ -56,6 +56,7 @@ func init() {
 
 // Load uses a Config object to create a new complete Pipeline instance with
 // configured queue and outputs. This is a non-blocking operation, and outputs should connect lazily.
+// Deprecated: Use LoadWithSettings
 func Load(
 	beatInfo beat.Info,
 	monitors Monitors,
@@ -131,9 +132,9 @@ func loadOutput(
 			}
 
 		} else {
-			metrics = monitors.Metrics.NewRegistry("output")
+			metrics = monitors.Metrics.GetOrCreateRegistry("output")
 		}
-		outStats = outputs.NewStats(metrics)
+		outStats = outputs.NewStats(metrics, monitors.Logger)
 	}
 
 	outName, out, err := makeOutput(outStats)
@@ -152,7 +153,7 @@ func loadOutput(
 				return outputs.Group{}, err
 			}
 		} else {
-			telemetry = monitors.Telemetry.NewRegistry("output")
+			telemetry = monitors.Telemetry.GetOrCreateRegistry("output")
 		}
 		monitoring.NewString(telemetry, "name").Set(outName)
 		monitoring.NewInt(telemetry, "batch_size").Set(int64(out.BatchSize))

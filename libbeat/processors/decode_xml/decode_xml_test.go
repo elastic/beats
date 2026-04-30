@@ -24,6 +24,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -412,7 +414,7 @@ func TestDecodeXML(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			t.Parallel()
 
-			f, err := newDecodeXML(test.config)
+			f, err := newDecodeXML(test.config, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			event := &beat.Event{
@@ -438,7 +440,7 @@ func TestDecodeXML(t *testing.T) {
 			Target: &target,
 		}
 
-		f, err := newDecodeXML(config)
+		f, err := newDecodeXML(config, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		event := &beat.Event{
@@ -483,7 +485,7 @@ func BenchmarkProcessor_Run(b *testing.B) {
 	c := defaultConfig()
 	target := "xml"
 	c.Target = &target
-	p, err := newDecodeXML(c)
+	p, err := newDecodeXML(c, logp.NewNopLogger())
 	require.NoError(b, err)
 
 	b.Run("single_object", func(b *testing.B) {
@@ -542,7 +544,7 @@ func TestXMLToDocumentID(t *testing.T) {
 	p, err := newDecodeXML(decodeXMLConfig{
 		Field:      "message",
 		DocumentID: "catalog.book.seq",
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	input := mapstr.M{

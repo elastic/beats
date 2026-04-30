@@ -28,6 +28,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/43252")
 	// Creating a new simulator model with VPX server to collect broad range of data.
 	model := simulator.VPX()
 	err := model.Create()

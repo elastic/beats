@@ -18,7 +18,7 @@
 
     action set_version {
         if err := m.setVersion(data[tok:p]); err != nil {
-            errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok+1})
+            errs = append(errs, &ValidationError{Err: err, Pos: tok+1})
         }
     }
 
@@ -48,7 +48,7 @@
     }
 
     action set_escape {
-        s.sdValueEscapes = append(s.sdValueEscapes, p)
+        s.sdValueEscapes = append(s.sdValueEscapes, p-1)
     }
 
     nil_value = '-';
@@ -56,10 +56,11 @@
     version = graph+ > tok %set_version;
 
     escape_chars    = ('"' | ']' | bs);
-    param_value_escape = (bs >set_escape escape_chars);
+    param_value_escape = bs (escape_chars >set_escape);
     sd_name         = (graph - ('=' | ']' | '"' | sp)){1,32};
     param_name      = sd_name >tok %set_param_name;
-    param_value     = ((any - escape_chars) | param_value_escape)+ >tok %set_param_value;
+    param_value_unsafe = (bs (any - escape_chars));
+    param_value     = ((any - escape_chars) | param_value_escape | param_value_unsafe)+ >tok %set_param_value;
     sd_param        = param_name '=' '"' param_value '"' >init_sd_escapes;
     sd_id           = sd_name >tok %set_sd_id;
     sd_element      = '[' sd_id (sp sd_param)* ']';
@@ -74,7 +75,7 @@
     header = priority version sp timestamp sp hostname sp app_name sp proc_id sp msg_id;
 
     sd_raw_escape = (bs | ']');
-    sd_raw_values = ((bs ']') | (any - sd_raw_escape));
+    sd_raw_values = ((bs any) | (any - sd_raw_escape));
     sd_raw        = nil_value | ('[' sd_raw_values+ ']')+ >tok %set_sd_raw;
 
     msg = any* >tok %set_msg;

@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func testSetupServer(t *testing.T, tokenValue string, expiresIn int) *httptest.Server {
+func testSetupServer(t *testing.T, expectedClientSecret string, tokenValue string, expiresIn int) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		payload := authResponse{
 			TokenType:    "Bearer",
@@ -28,6 +28,7 @@ func testSetupServer(t *testing.T, tokenValue string, expiresIn int) *httptest.S
 		}
 		data, err := json.Marshal(payload)
 		require.NoError(t, err)
+		require.Equal(t, expectedClientSecret, r.FormValue("client_secret"))
 
 		_, err = w.Write(data)
 		require.NoError(t, err)
@@ -62,12 +63,13 @@ func TestRenew(t *testing.T) {
 		value := "test-value"
 		expiresIn := 1000
 
-		srv := testSetupServer(t, value, expiresIn)
+		clientSecret := "value&chars=to|escape" // #nosec G101
+		srv := testSetupServer(t, clientSecret, value, expiresIn)
 		defer srv.Close()
 
 		cfg, err := config.NewConfigFrom(&conf{
 			Endpoint: "http://" + srv.Listener.Addr().String(),
-			Secret:   "value",
+			Secret:   clientSecret,
 			ClientID: "client-id",
 			TenantID: "tenant-id",
 		})
@@ -90,7 +92,7 @@ func TestRenew(t *testing.T) {
 		cachedToken := "cached-value"
 		expireTime := time.Now().Add(1000 * time.Second)
 
-		srv := testSetupServer(t, cachedToken, 1000)
+		srv := testSetupServer(t, "no-client-secret-used", cachedToken, 1000)
 		defer srv.Close()
 
 		cfg, err := config.NewConfigFrom(&conf{

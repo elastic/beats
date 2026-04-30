@@ -19,19 +19,21 @@ package status
 
 import (
 	"bufio"
+	"errors"
 	"regexp"
 	"strings"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	scoreboardRegexp = regexp.MustCompile("(Scoreboard):\\s+((_|S|R|W|K|D|C|L|G|I|\\.)+)")
+	scoreboardRegexp = regexp.MustCompile(`(Scoreboard):\s+((_|S|R|W|K|D|C|L|G|I|\.)+)`)
 
 	// This should match: "CPUSystem: .01"
-	matchNumber = regexp.MustCompile("(^[0-9a-zA-Z ]+):\\s+(\\d*\\.?\\d+)")
+	matchNumber = regexp.MustCompile(`(^[0-9a-zA-Z ]+):\s+(\d*\.?\d+)`)
 
 	schema = s.Schema{
 		"total_accesses":    c.Int("Total Accesses"),
@@ -102,12 +104,12 @@ func applySchema(event mapstr.M, fullEvent map[string]interface{}) error {
 	if _, found := fullEvent["ServerUptimeSeconds"]; !found {
 		applicableSchema = schemaOld
 	}
-	_, err := applicableSchema.ApplyTo(event, fullEvent)
-	return err.Err()
+	_, errs := applicableSchema.ApplyTo(event, fullEvent)
+	return errors.Join(errs...)
 }
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, hostname string) (mapstr.M, error) {
+func eventMapping(scanner *bufio.Scanner, hostname string, logger *logp.Logger) (mapstr.M, error) {
 	var (
 		totalS          int
 		totalR          int
@@ -172,7 +174,7 @@ func eventMapping(scanner *bufio.Scanner, hostname string) (mapstr.M, error) {
 			totalDot = strings.Count(match[2], ".")
 			totalAll = totalUnderscore + totalS + totalR + totalW + totalK + totalD + totalC + totalL + totalG + totalI + totalDot
 		} else {
-			debugf("Unexpected line in apache server-status output: %s", scanner.Text())
+			logger.Named("apache-status").Debugf("Unexpected line in apache server-status output: %s", scanner.Text())
 		}
 	}
 

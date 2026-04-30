@@ -18,12 +18,11 @@
 package processing
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type group struct {
@@ -44,9 +44,9 @@ type processorFn struct {
 	fn   func(event *beat.Event) (*beat.Event, error)
 }
 
-func newGeneralizeProcessor(keepNull bool) *processorFn {
-	logger := logp.NewLogger("publisher_processing")
-	g := common.NewGenericEventConverter(keepNull)
+func newGeneralizeProcessor(keepNull bool, logger *logp.Logger) *processorFn {
+	logger = logger.Named("publisher_processing")
+	g := common.NewGenericEventConverter(keepNull, logger)
 	return newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
 		if len(event.Fields) == 0 {
@@ -90,14 +90,14 @@ func (p *group) Close() error {
 	if p == nil {
 		return nil
 	}
-	var errs multierror.Errors
+	var errs []error
 	for _, processor := range p.list {
 		err := processors.Close(processor)
 		if err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (p *group) String() string {
@@ -115,6 +115,17 @@ func (p *group) String() string {
 
 func (p *group) All() []beat.Processor {
 	return p.list
+}
+
+func (p *group) SetPaths(paths *paths.Path) error {
+	var err error
+	for _, processor := range p.list {
+		pathSetter, ok := processor.(processors.PathSetter)
+		if ok {
+			err = errors.Join(err, pathSetter.SetPaths(paths))
+		}
+	}
+	return err
 }
 
 func (p *group) Run(event *beat.Event) (*beat.Event, error) {
@@ -169,7 +180,6 @@ func addMeta(event *beat.Event, meta mapstr.M) {
 	if event.Meta == nil {
 		event.Meta = meta
 	} else {
-		event.Meta.Clone()
 		event.Meta.DeepUpdate(meta)
 	}
 }
@@ -208,7 +218,6 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 
 		b, err := encoder.Encode(info.Beat, event)
 		if err != nil {
-			//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
 			return event, nil
 		}
 

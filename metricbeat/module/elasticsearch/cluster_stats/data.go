@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -215,7 +216,13 @@ func getClusterMetadataSettings(httpClient *helper.HTTP) (mapstr.M, error) {
 	return clusterSettings, nil
 }
 
-func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventMapping(
+	r mb.ReporterV2,
+	httpClient *helper.HTTP,
+	info elasticsearch.Info,
+	content []byte,
+	isXpack bool,
+	_ *logp.Logger) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -231,7 +238,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, []string{})
 	if err != nil {
 		return fmt.Errorf("failed to get cluster state from Elasticsearch: %w", err)
 	}

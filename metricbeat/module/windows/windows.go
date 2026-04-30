@@ -36,9 +36,9 @@ func init() {
 	}
 }
 
-func initModule() {
-	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
-		logp.Warn("%v", err)
+func initModule(logger *logp.Logger) {
+	if err := helper.CheckAndEnableSeDebugPrivilege(logger); err != nil {
+		logger.Warnf("%v", err)
 	}
 }
 
@@ -48,7 +48,7 @@ type Module struct {
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	once.Do(func() {
-		initModule()
+		initModule(base.Logger)
 	})
 
 	return &Module{BaseModule: base}, nil

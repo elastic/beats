@@ -20,6 +20,7 @@ package diskqueue
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -28,7 +29,7 @@ type diskQueueBatch struct {
 	frames []*readFrame
 }
 
-func (dq *diskQueue) Get(eventCount int) (queue.Batch, error) {
+func (dq *diskQueue) Get(eventCount int) (queue.Batch[publisher.Event], error) {
 	// We can always eventually read at least one frame unless the queue or the
 	// consumer is closed.
 	frame, ok := <-dq.readerLoop.output
@@ -93,8 +94,11 @@ func (batch *diskQueueBatch) Count() int {
 	return len(batch.frames)
 }
 
-func (batch *diskQueueBatch) Entry(i int) queue.Entry {
+func (batch *diskQueueBatch) Entry(i int) publisher.Event {
 	return batch.frames[i].event
+}
+
+func (batch *diskQueueBatch) FreeEntries() {
 }
 
 func (batch *diskQueueBatch) Done() {

@@ -74,7 +74,7 @@ func (a *oauth2) renewToken(ctx context.Context) error {
 	reqValues := url.Values{
 		"client_id":     []string{a.conf.ClientID},
 		"scope":         a.conf.Scopes,
-		"client_secret": []string{url.QueryEscape(a.conf.Secret)},
+		"client_secret": []string{a.conf.Secret},
 		"grant_type":    []string{"client_credentials"},
 	}
 	reqEncoded := reqValues.Encode()
@@ -138,7 +138,7 @@ func New(cfg *config.C, logger *logp.Logger) (authenticator.Authenticator, error
 		return nil, fmt.Errorf("unable to unpack oauth2 Authenticator config: %w", err)
 	}
 
-	client, err := c.Transport.Client()
+	client, err := c.Transport.Client(httpcommon.WithLogger(logger))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create HTTP client: %w", err)
 	}

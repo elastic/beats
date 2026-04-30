@@ -6,7 +6,6 @@ package persistentcache
 
 import (
 	"bytes"
-	"encoding/json"
 
 	ugorjicodec "github.com/ugorji/go/codec"
 )
@@ -14,22 +13,6 @@ import (
 type codec interface {
 	Decode([]byte, interface{}) error
 	Encode(interface{}) ([]byte, error)
-}
-
-type jsonCodec struct{}
-
-func newJSONCodec() *jsonCodec {
-	return &jsonCodec{}
-}
-
-// Encode encodes an object in json format.
-func (*jsonCodec) Encode(v interface{}) ([]byte, error) {
-	return json.Marshal(v)
-}
-
-// Decode decodes an object from its json representation.
-func (*jsonCodec) Decode(d []byte, v interface{}) error {
-	return json.Unmarshal(d, v)
 }
 
 type cborCodec struct {

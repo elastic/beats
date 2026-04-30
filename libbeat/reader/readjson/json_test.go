@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -87,6 +87,16 @@ func TestUnmarshal(t *testing.T) {
 			Output: map[string]interface{}{
 				"a": int64(-3),
 				"b": float64(-1),
+			},
+		},
+		{
+			Name:  "Key collision",
+			Input: `{"log.level":"info","log":{"source":"connectors-py-default"},"log":{"logger":"agent_component.cli"}}`,
+			Output: map[string]interface{}{
+				"log.level": "info",
+				"log": map[string]interface{}{
+					"logger": "agent_component.cli",
+				},
 			},
 		},
 	}
@@ -184,11 +194,12 @@ func TestDecodeJSON(t *testing.T) {
 		},
 	}
 
+	logger := logptest.NewTestingLogger(t, "json_test")
 	for _, test := range tests {
 
 		var p JSONReader
 		p.cfg = &test.Config
-		p.logger = logp.NewLogger("json_test")
+		p.logger = logger
 		text, M := p.decode([]byte(test.Text))
 		assert.Equal(t, test.ExpectedText, string(text))
 		assert.Equal(t, test.ExpectedMap, M)
@@ -349,6 +360,51 @@ func TestMergeJSONFields(t *testing.T) {
 			Data:          mapstr.M{"json": mapstr.M{"a.b": mapstr.M{"c": "c"}, "a.b.d": "d"}},
 			JSONConfig:    Config{ExpandKeys: true, KeysUnderRoot: true},
 			ExpectedItems: mapstr.M{"a": mapstr.M{"b": mapstr.M{"c": "c", "d": "d"}}},
+		},
+		"key collision with expanded keys": {
+			Data: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+			JSONConfig: Config{ExpandKeys: true},
+			ExpectedItems: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+		},
+		"key collision without expanded keys": {
+			Data: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+			JSONConfig: Config{ExpandKeys: false},
+			ExpectedItems: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+		},
+		"key collision with overwrite": {
+			Data: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
+			JSONConfig: Config{OverwriteKeys: true, AddErrorKey: true, IgnoreDecodingError: true},
+			ExpectedItems: mapstr.M{
+				"log.level": "info",
+				"log": mapstr.M{
+					"logger": "agent_component.cli",
+				},
+			},
 		},
 	}
 

@@ -181,7 +181,6 @@ func (c *config) Validate() error {
 	}
 
 	if c.ScanSort != "" {
-		cfgwarn.Experimental("scan_sort is used.")
 
 		// Check input type
 		if _, ok := ValidScanSort[c.ScanSort]; !ok {
@@ -197,14 +196,21 @@ func (c *config) Validate() error {
 	return nil
 }
 
+// checkUnsupportedParams checks if unsupported/deprecated/discouraged paramaters are set and logs a warning
+func (c config) checkUnsupportedParams(logger *logp.Logger) {
+	if c.ScanSort != "" {
+		logger.Warn(cfgwarn.Experimental("scan_sort is used."))
+	}
+}
+
 // resolveRecursiveGlobs expands `**` from the globs in multiple patterns
-func (c *config) resolveRecursiveGlobs() error {
+func (c *config) resolveRecursiveGlobs(logger *logp.Logger) error {
 	if !c.RecursiveGlob {
-		logp.Debug("input", "recursive glob disabled")
+		logger.Named("input").Debug("recursive glob disabled")
 		return nil
 	}
 
-	logp.Debug("input", "recursive glob enabled")
+	logger.Named("input").Debug("recursive glob enabled")
 	var paths []string
 	for _, path := range c.Paths {
 		patterns, err := file.GlobPatterns(path, recursiveGlobDepth)
@@ -212,7 +218,7 @@ func (c *config) resolveRecursiveGlobs() error {
 			return err
 		}
 		if len(patterns) > 1 {
-			logp.Debug("input", "%q expanded to %#v", path, patterns)
+			logger.Named("input").Debugf("%q expanded to %#v", path, patterns)
 		}
 		paths = append(paths, patterns...)
 	}
@@ -232,4 +238,16 @@ func (c *config) normalizeGlobPatterns() error {
 	}
 	c.Paths = paths
 	return nil
+}
+
+// IsConfigValid is meant to be used by logv2 to validate whether cfg is
+// a valid Log input configuration.
+// It avoids exporting [config] and [defaultConfig]
+func IsConfigValid(cfg *conf.C) error {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return fmt.Errorf("cannot unpack config: %w", err)
+	}
+
+	return c.Validate()
 }

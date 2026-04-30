@@ -20,9 +20,9 @@ package cursor
 import (
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -127,16 +127,18 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
+func openStore(log *logp.Logger, statestore statestore.States, prefix string, inputID string, fullInit bool) (*store, error) {
 	ok := false
 
-	persistentStore, err := statestore.Access()
+	log.Debugf("input-cursor::openStore: prefix: %v inputID: %s", prefix, inputID)
+	persistentStore, err := statestore.StoreFor(prefix)
 	if err != nil {
 		return nil, err
 	}
 	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
+	persistentStore.SetID(inputID)
 
-	states, err := readStates(log, persistentStore, prefix)
+	states, err := readStates(log, persistentStore, prefix, fullInit)
 	if err != nil {
 		return nil, err
 	}
@@ -235,14 +237,14 @@ func (r *resource) IsNew() bool {
 // Retain is used to indicate that 'resource' gets an additional 'owner'.
 // Owners of an resource can be active inputs or pending update operations
 // not yet written to disk.
-func (r *resource) Retain() { r.pending.Inc() }
+func (r *resource) Retain() { r.pending.Add(1) }
 
 // Release reduced the owner ship counter of the resource.
-func (r *resource) Release() { r.pending.Dec() }
+func (r *resource) Release() { r.pending.Add(^uint64(0)) }
 
 // UpdatesReleaseN is used to release ownership of N pending update operations.
 func (r *resource) UpdatesReleaseN(n uint) {
-	r.pending.Sub(uint64(n))
+	r.pending.Add(^uint64(n - 1))
 }
 
 // Finished returns true if the resource is not in use and if there are no pending updates
@@ -283,41 +285,44 @@ func (r *resource) stateSnapshot() state {
 	}
 }
 
-func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*states, error) {
+func readStates(log *logp.Logger, store *statestore.Store, prefix string, fullInit bool) (*states, error) {
 	keyPrefix := prefix + "::"
 	states := &states{
 		table: map[string]*resource{},
 	}
 
-	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
+	if fullInit {
+		err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
+			if !strings.HasPrefix(key, keyPrefix) {
+				return true, nil
+			}
+
+			var st state
+			if err := dec.Decode(&st); err != nil {
+				log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
+					key, err)
+				return true, nil
+			}
+
+			resource := &resource{
+				key:            key,
+				stored:         true,
+				lock:           unison.MakeMutex(),
+				internalInSync: true,
+				internalState: stateInternal{
+					TTL:     st.TTL,
+					Updated: st.Updated,
+				},
+				cursor: st.Cursor,
+			}
+			states.table[resource.key] = resource
+
 			return true, nil
+		})
+		log.Debugf("input-cursor store read %d keys", len(states.table))
+		if err != nil {
+			return nil, err
 		}
-
-		var st state
-		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
-				key, err)
-			return true, nil
-		}
-
-		resource := &resource{
-			key:            key,
-			stored:         true,
-			lock:           unison.MakeMutex(),
-			internalInSync: true,
-			internalState: stateInternal{
-				TTL:     st.TTL,
-				Updated: st.Updated,
-			},
-			cursor: st.Cursor,
-		}
-		states.table[resource.key] = resource
-
-		return true, nil
-	})
-	if err != nil {
-		return nil, err
 	}
 	return states, nil
 }

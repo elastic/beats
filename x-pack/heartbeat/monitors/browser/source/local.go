@@ -32,3 +32,7 @@ func (l *LocalSource) Workdir() string {
 func (l *LocalSource) Close() error {
 	return ecserr.NewUnsupportedMonitorTypeError(ErrLocalUnsupportedType)
 }
+
+func (l *LocalSource) Decode() error {
+	return nil
+}

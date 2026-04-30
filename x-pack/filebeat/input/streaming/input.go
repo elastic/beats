@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package streaming
 
 import (
@@ -20,6 +22,8 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/mito/lib"
@@ -42,7 +46,7 @@ const (
 	root      string = "state"
 )
 
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Experimental,
@@ -53,7 +57,7 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-func PluginWebsocketAlias(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func PluginWebsocketAlias(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       "websocket",
 		Stability:  feature.Experimental,
@@ -73,10 +77,13 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks as long as websocket connections are alive. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
+	env.UpdateStatus(status.Starting, "")
 	var cursor map[string]interface{}
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
+		env.UpdateStatus(status.Configuring, "")
 		err := crsr.Unpack(&cursor)
 		if err != nil {
+			env.UpdateStatus(status.Failed, "failed to unpack cursor: "+err.Error())
 			return err
 		}
 	}
@@ -96,19 +103,25 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// want to be a registry. Until then, let's keep this simple.
 	switch cfg.Type {
 	case "", "websocket":
-		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewWebsocketFollower(ctx, env, cfg, cursor, pub, env, log, i.time)
 	case "crowdstrike":
-		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewFalconHoseFollower(ctx, env, cfg, cursor, pub, env, log, i.time)
 	}
 	if err != nil {
 		return err
 	}
 	defer s.Close()
 
-	return s.FollowStream(ctx)
+	err = s.FollowStream(ctx)
+	env.UpdateStatus(status.Stopped, "")
+	return err
 }
 
-// getURL initializes the input URL with the help of the url_program.
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
+
+// getURL evaluates the url_program to compute the input URL from the current state.
 func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {
 	if src == "" {
 		return url, nil
@@ -164,10 +177,10 @@ type processor struct {
 }
 
 // process processes the data in state, updates the cursor and publishes it to
-// the reciever's publisher. The CEL program here only executes a single time,
+// the receiver's publisher. The CEL program here only executes a single time,
 // since the connection is persistent and events are received and processed in
-// real time.
-func (p processor) process(ctx context.Context, state, cursor map[string]any, start time.Time) error {
+// real time. It returns the last known good cursor after publication.
+func (p processor) process(ctx context.Context, state, cursor map[string]any, start time.Time) (map[string]any, error) {
 	goodCursor := cursor
 	p.log.Debugw("cel engine state before eval", logp.Namespace(p.ns), "state", redactor{state: state, cfg: p.redact})
 	state, err := evalWith(ctx, p.prg, p.ast, state, start)
@@ -176,7 +189,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 		p.metrics.celEvalErrors.Add(1)
 		switch {
 		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-			return err
+			return goodCursor, err
 		default:
 			p.metrics.errorsTotal.Inc()
 		}
@@ -192,17 +205,17 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 	switch e := e.(type) {
 	case []any:
 		if len(e) == 0 {
-			return nil
+			return goodCursor, nil
 		}
 		events = e
 	case map[string]any:
 		if e == nil {
-			return nil
+			return goodCursor, nil
 		}
 		p.log.Debugw("single event object returned by evaluation", "event", e)
 		events = []any{e}
 	default:
-		return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+		return goodCursor, fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 	}
 
 	// We have a non-empty batch of events to process.
@@ -242,7 +255,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 	for i, e := range events {
 		event, ok := e.(map[string]any)
 		if !ok {
-			return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+			return goodCursor, fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 		}
 		var pubCursor any
 		if cursors != nil {
@@ -253,7 +266,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 					goodCursor = cursor
 					cursor, ok = cursors[0].(map[string]any)
 					if !ok {
-						return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+						return goodCursor, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 					}
 					pubCursor = cursor
 				}
@@ -261,7 +274,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 				goodCursor = cursor
 				cursor, ok = cursors[i].(map[string]any)
 				if !ok {
-					return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+					return goodCursor, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 				}
 				pubCursor = cursor
 			}
@@ -288,7 +301,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 
 		err = ctx.Err()
 		if err != nil {
-			return err
+			return goodCursor, err
 		}
 	}
 	// calculate batch processing time
@@ -309,7 +322,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 		p.log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
-	return err
+	return goodCursor, err
 }
 
 func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
@@ -378,12 +391,14 @@ func errorMessage(msg string) map[string]interface{} {
 func formHeader(cfg config) map[string][]string {
 	header := make(map[string][]string)
 	switch {
-	case cfg.Auth.CustomAuth != nil:
-		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
+	case cfg.Auth.OAuth2.accessToken != "":
+		header["Authorization"] = []string{"Bearer " + cfg.Auth.OAuth2.accessToken}
 	case cfg.Auth.BearerToken != "":
 		header["Authorization"] = []string{"Bearer " + cfg.Auth.BearerToken}
 	case cfg.Auth.BasicToken != "":
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
+	case cfg.Auth.CustomAuth != nil:
+		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
 	}
 	return header
 }

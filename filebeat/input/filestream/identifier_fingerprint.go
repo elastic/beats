@@ -24,13 +24,10 @@ import (
 )
 
 type fingerprintIdentifier struct {
-	log *logp.Logger
 }
 
-func newFingerprintIdentifier(cfg *conf.C) (fileIdentifier, error) {
-	return &fingerprintIdentifier{
-		log: logp.NewLogger("fingerprint_identifier"),
-	}, nil
+func newFingerprintIdentifier(cfg *conf.C, _ *logp.Logger) (fileIdentifier, error) {
+	return &fingerprintIdentifier{}, nil
 }
 
 func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {

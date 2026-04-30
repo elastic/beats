@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -31,31 +32,96 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+// PackageArgs defines runtime configuration for package builds.
+type PackageArgs struct {
+	Platforms    BuildPlatformList
+	PackageTypes []PackageType
+	Snapshot     bool
+}
+
+// DefaultPackageArgsFromEnv returns package args based on current globals and
+// runtime env var overrides (PLATFORMS, PACKAGES, SNAPSHOT, DEV).
+func DefaultPackageArgsFromEnv() (PackageArgs, error) {
+	snapshot, err := parseBoolEnvOverride("SNAPSHOT", Snapshot)
+	if err != nil {
+		return PackageArgs{},
+			fmt.Errorf("cannot parse env var SNAPSHOT as boolean: %w", err)
+	}
+
+	args := PackageArgs{
+		Platforms: append(BuildPlatformList(nil), Platforms...),
+		Snapshot:  snapshot,
+	}
+
+	if expression := os.Getenv("PLATFORMS"); len(expression) > 0 {
+		args.Platforms = NewPlatformList(expression)
+	}
+	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
+		args.PackageTypes = ParsePackageTypes(packageTypes)
+	}
+
+	return args, nil
+}
+
+func parseBoolEnvOverride(name string, fallback bool) (bool, error) {
+	value, found := os.LookupEnv(name)
+	if !found || value == "" {
+		return fallback, nil
+	}
+
+	parsed, err := strconv.ParseBool(value)
+	if err != nil {
+		return fallback, fmt.Errorf("failed to parse %s env value: %w", name, err)
+	}
+	return parsed, nil
+}
+
+// PackageWithArgs returns a package build function configured with args.
+func PackageWithArgs(args PackageArgs) func() error {
+	return func() error {
+		return packageWithArgs(args)
+	}
+}
+
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
-	if len(Platforms) == 0 {
+	args, err := DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	return packageWithArgs(args)
+}
+
+func packageWithArgs(args PackageArgs) error {
+	platforms := args.Platforms
+	packageTypes := args.PackageTypes
+	snapshot := args.Snapshot
+
+	if len(platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
 		return nil
 	}
 
 	if len(Packages) == 0 {
 		return errors.New("no package specs are registered. Call " +
-			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
+			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first")
 	}
-
-	// platforms := updateWithDarwinUniversal(Platforms)
-	platforms := Platforms
 
 	var tasks []interface{}
 	for _, target := range platforms {
 		for _, pkg := range Packages {
+
+			if mg.Verbose() {
+				log.Printf("Evaluating package %v for target %s", pkg.Spec, target)
+			}
+
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
 			}
 
 			for _, pkgType := range pkg.Types {
-				if !isPackageTypeSelected(pkgType) {
+				if !isPackageTypeSelected(pkgType, packageTypes) {
 					log.Printf("Skipping %s package type because it is not selected", pkgType)
 					continue
 				}
@@ -82,12 +148,24 @@ func Package() error {
 					continue
 				}
 
+				// Filter out non fips-enabled beats
+				if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS-capable %v", BeatName, pkgType, FIPSConfig.Beats)
+					continue
+				}
+
+				// Filter out non fips specs
+				if pkg.Spec.FIPS != FIPSBuild {
+					log.Printf("Skipping creation for package type %v because spec.FIPS = %v and FIPSBuild = %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
+					continue
+				}
+
 				agentPackageDrop, _ := os.LookupEnv("AGENT_DROP_PATH")
 
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
-				spec.Snapshot = Snapshot
+				spec.Snapshot = snapshot
 				spec.evalContext = map[string]interface{}{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
@@ -120,6 +198,11 @@ func Package() error {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
+	if FIPSBuild {
+		fmt.Println(">> IronBank images are not supported for FIPS builds")
+		return nil
+	}
+
 	if runtime.GOARCH != "amd64" {
 		fmt.Printf(">> IronBank images are only supported for amd64 arch (%s is not supported)\n", runtime.GOARCH)
 		return nil
@@ -172,7 +255,6 @@ func prepareIronbankBuild() error {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return fmt.Errorf("cannot create templates for the IronBank: %w", err)
 	}
@@ -206,7 +288,7 @@ func saveIronbank() error {
 
 	distributionsDir := "build/distributions"
 	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
-		err := os.MkdirAll(distributionsDir, 0750)
+		err := os.MkdirAll(distributionsDir, 0o750)
 		if err != nil {
 			return fmt.Errorf("cannot create folder for docker artifacts: %w", err)
 		}
@@ -225,14 +307,14 @@ func saveIronbank() error {
 	return nil
 }
 
-// isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
-// pkgType is present on SelectedPackageTypes. It returns false otherwise.
-func isPackageTypeSelected(pkgType PackageType) bool {
-	if len(SelectedPackageTypes) == 0 {
+// isPackageTypeSelected returns true if selected is empty or if pkgType is
+// present on selected. It returns false otherwise.
+func isPackageTypeSelected(pkgType PackageType, selected []PackageType) bool {
+	if len(selected) == 0 {
 		return true
 	}
 
-	for _, t := range SelectedPackageTypes {
+	for _, t := range selected {
 		if t == pkgType {
 			return true
 		}
@@ -247,11 +329,11 @@ type packageBuilder struct {
 }
 
 func (b packageBuilder) Build() error {
-	fmt.Printf(">> package: Building %v type=%v for platform=%v\n", b.Spec.Name, b.Type, b.Platform.Name)
+	fmt.Printf(">> package: Building %v type=%v for platform=%v fips=%v\n", b.Spec.Name, b.Type, b.Platform.Name, b.Spec.FIPS)
 	log.Printf("Package spec: %+v", b.Spec)
 	if err := b.Type.Build(b.Spec); err != nil {
-		return fmt.Errorf("failed building %v type=%v for platform=%v: %w",
-			b.Spec.Name, b.Type, b.Platform.Name, err)
+		return fmt.Errorf("failed building %v type=%v for platform=%v fips=%v: %w",
+			b.Spec.Name, b.Type, b.Platform.Name, b.Spec.FIPS, err)
 	}
 	return nil
 }
@@ -319,7 +401,7 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "-v")
 	}
 
-	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"))
+	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/..."))
 
 	if params.HasModules {
 		args = append(args, "--modules")
@@ -348,9 +430,7 @@ func TestPackages(options ...TestPackagesOption) error {
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {
-		if !mg.Verbose() {
-			fmt.Println(out)
-		}
+		fmt.Println(out)
 		return err
 	}
 

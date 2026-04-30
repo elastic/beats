@@ -34,12 +34,19 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
+
+// HBRunnerFactory is used for validating generated configurations and creating
+// of new Runners
+type HBRunnerFactory interface {
+	cfgfile.RunnerFactory
+	GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error)
+}
 
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
@@ -112,8 +119,28 @@ func (NoopRunner) Start() {
 func (NoopRunner) Stop() {
 }
 
+func (NoopRunner) Update(c *conf.C) error {
+	return nil
+}
+
+func (f *RunnerFactory) GetHashFunc(c *conf.C) (plugin.HashConfigFunc, error) {
+	sf, err := stdfields.ConfigToStdMonitorFields(c)
+	if err != nil {
+		return nil, fmt.Errorf("could not load stdfields in factory: %w", err)
+	}
+
+	pluginFactory, found := f.pluginsReg.Get(sf.Type)
+	if !found {
+		return nil, fmt.Errorf("monitor type %v does not exist, valid types are %v", sf.Type, f.pluginsReg.MonitorNames())
+	}
+
+	f.logger.Debugf("returning plugin custom hash function")
+	return pluginFactory.HashConfig, nil
+}
+
 // Create makes a new Runner for a new monitor with the given Config.
 func (f *RunnerFactory) Create(p beat.Pipeline, c *conf.C) (cfgfile.Runner, error) {
+	// Only for backwards-compatible monitors.d loading
 	c, err := stdfields.UnnestStream(c)
 	if err != nil {
 		return nil, err
@@ -234,7 +261,7 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 		return nil, err
 	}
 
-	userProcessors, err := processors.New(settings.Processors)
+	userProcessors, err := processors.New(settings.Processors, info.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +274,7 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 			_, _ = meta.Put("pipeline", settings.Pipeline)
 		}
 
-		procs := processors.NewList(nil)
+		procs := processors.NewList(info.Logger)
 
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
@@ -272,7 +299,7 @@ var geoErrOnce = &sync.Once{}
 
 // preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
 func preProcessors(info beat.Info, location *config.LocationWithID, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
-	procs = processors.NewList(nil)
+	procs = processors.NewList(info.Logger)
 
 	var dataset string
 	if settings.DataStream != nil && settings.DataStream.Dataset != "" {
@@ -282,7 +309,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 	}
 
 	// Always set event.dataset
-	procs.AddProcessor(actions.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
+	procs.AddProcessor(addfields.NewAddFields(mapstr.M{"event": mapstr.M{"dataset": dataset}}, true, true))
 
 	// If we have a location to add, use the add_observer_metadata processor
 	if location != nil {
@@ -291,7 +318,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		geoM, err := util.GeoConfigToMap(location.Geo)
 		if err != nil {
 			geoErrOnce.Do(func() {
-				logp.L().Warnf("could not add heartbeat geo info: %w", err)
+				logp.L().Warnf("could not add heartbeat geo info: %v", err)
 			})
 		}
 
@@ -302,7 +329,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 			},
 		}
 
-		procs.AddProcessor(actions.NewAddFields(obsFields, true, true))
+		procs.AddProcessor(addfields.NewAddFields(obsFields, true, true))
 	}
 
 	// always use synthetics data streams for browser monitors, there is no good reason not to

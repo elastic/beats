@@ -20,14 +20,17 @@ package helper
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
+
+	"k8s.io/client-go/transport"
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
@@ -47,6 +50,7 @@ type HTTP struct {
 	uri        string
 	method     string
 	body       []byte
+	logger     *logp.Logger
 }
 
 // NewHTTP creates new http helper
@@ -56,25 +60,17 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return NewHTTPFromConfig(config, base.HostData())
+	return NewHTTPFromConfig(config, base.HostData(), base.Logger())
 }
 
 // NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
-func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
 	}
 	for k, v := range config.Headers {
 		headers.Set(k, v)
-	}
-
-	if config.BearerTokenFile != "" {
-		header, err := getAuthHeaderFromToken(config.BearerTokenFile)
-		if err != nil {
-			return nil, err
-		}
-		headers.Set("Authorization", header)
 	}
 
 	// Ensure backward compatibility
@@ -89,10 +85,21 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	}
 
 	client, err := config.Transport.Client(
+		// also sets a local logger for use by http transport
+		httpcommon.WithLogger(logger),
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Apply the token refreshing roundtripper. We can't do this in a transport option because we need to handle the
+	// error it can return at creation
+	if config.BearerTokenFile != "" {
+		client.Transport, err = transport.NewBearerAuthWithRefreshRoundTripper("", config.BearerTokenFile, client.Transport)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -105,6 +112,7 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		method:     "GET",
 		uri:        hostData.SanitizedURI,
 		body:       nil,
+		logger:     logger,
 	}, nil
 }
 
@@ -118,7 +126,8 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 		reader = bytes.NewReader(h.body)
 	}
 
-	req, err := http.NewRequest(h.method, h.uri, reader)
+	h.logger.Debugf("Making HTTP request: %s %s", h.method, h.uri)
+	req, err := http.NewRequestWithContext(context.Background(), h.method, h.uri, reader) // TODO: get context from caller
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -129,7 +138,16 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 	resp, err := h.client.Do(req)
 	if err != nil {
+		h.logger.Debugf("%s %s request failed: %v", h.method, h.uri, err)
 		return nil, fmt.Errorf("error making http request: %w", err)
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 399 {
+		h.logger.Debugf("%s %s request failed with status code: %d", h.method, h.uri, resp.StatusCode)
+	}
+
+	if resp.ContentLength == 0 {
+		h.logger.Debugf("%s %s request returned empty body", h.method, h.uri)
 	}
 
 	return resp, nil
@@ -211,35 +229,4 @@ func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
 	}
 
 	return data, nil
-}
-
-func (h *HTTP) RefreshAuthorizationHeader() (bool, error) {
-	if h.bearerFile != "" {
-		header, err := getAuthHeaderFromToken(h.bearerFile)
-		if err != nil {
-			return false, err
-		}
-		h.headers.Set("Authorization", header)
-		return true, nil
-	}
-	return false, nil
-}
-
-// getAuthHeaderFromToken reads a bearer authorization token from the given file
-func getAuthHeaderFromToken(path string) (string, error) {
-	var token string
-
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return "", fmt.Errorf("reading bearer token file: %w", err)
-	}
-
-	if len(b) != 0 {
-		if b[len(b)-1] == '\n' {
-			b = b[0 : len(b)-1]
-		}
-		token = fmt.Sprintf("Bearer %s", string(b))
-	}
-
-	return token, nil
 }

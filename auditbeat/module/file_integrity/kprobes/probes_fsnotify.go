@@ -22,8 +22,11 @@ package kprobes
 import (
 	"errors"
 	"fmt"
+	"math"
 
 	tkbtf "github.com/elastic/tk-btf"
+
+	"github.com/cilium/ebpf/btf"
 )
 
 type fsNotifySymbol struct {
@@ -35,48 +38,112 @@ type fsNotifySymbol struct {
 	seenSpecs         map[*tkbtf.Spec]struct{}
 }
 
-func loadFsNotifySymbol(s *probeManager) error {
-	symbolInfo, err := s.getSymbolInfoRuntime("fsnotify")
+func loadFsNotifySymbol(probeMgr *probeManager) error {
+	symbolInfo, err := probeMgr.getSymbolInfoRuntime("fsnotify")
 	if err != nil {
-		return err
+		return fmt.Errorf("fsnotify symbol does not exist: %w", err)
 	}
 
 	if symbolInfo.isOptimised {
 		return fmt.Errorf("symbol %s is optimised", symbolInfo.symbolName)
 	}
 
-	s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
+	probeMgr.buildChecks = append(probeMgr.buildChecks, func(spec *tkbtf.Spec) bool {
 		return spec.ContainsSymbol(symbolInfo.symbolName)
 	})
 
 	// default filters for all three fsnotify probes enable mask_create, mask_delete, mask_attrib, mask_modify,
 	// mask_moved_to, and mask_moved_from events.
-	s.symbols = append(s.symbols, &fsNotifySymbol{
+	probeMgr.symbols = append(probeMgr.symbols, &fsNotifySymbol{
 		symbolName: symbolInfo.symbolName,
 	})
 
 	return nil
 }
 
-func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, error) {
+// setKprobeFiltersFromBTF fetches the enum values of the fsnotify_data_type enum from the BTF,
+// and uses them to construct the probe filters, so that each of the three fsnotify probes only forwards
+// events from the matching data type.
+func (sym *fsNotifySymbol) setKprobeFiltersFromBTF(spec *tkbtf.Spec) error {
+	types, err := spec.AnyTypesByName("fsnotify_data_type")
+	if err != nil {
+		// Kernels pre-5.7 do not have the fsnotify_data_type enum and instead code the data types as #define statements.
+		// These do not show up in the BTF output, and thus we need a manual fallback.
+		if errors.Is(err, btf.ErrNotFound) {
+			// TODO: log
+			sym.setKprobeFilters(1, 2, 3)
+			return nil
+		}
+		return fmt.Errorf("error fetching fsnotify_data_type from BTF: %w", err)
+	}
+	btfEnum := &btf.Enum{}
+	found := false
+
+	for _, foundType := range types {
+		btfEnum, found = foundType.(*btf.Enum)
+		if found {
+			break
+		}
+	}
+
+	if !found || btfEnum == nil {
+		return fmt.Errorf("fsnotify_data_type not an enum, this may be a kernel support issue")
+	}
+
+	var dentry, path, inode uint64 = math.MaxUint64, math.MaxUint64, math.MaxUint64
+	for _, enumType := range btfEnum.Values {
+		switch enumType.Name {
+		case "FSNOTIFY_EVENT_PATH":
+			path = enumType.Value
+		case "FSNOTIFY_EVENT_INODE":
+			inode = enumType.Value
+		case "FSNOTIFY_EVENT_DENTRY":
+			dentry = enumType.Value
+		}
+	}
+
+	if dentry == math.MaxUint64 || inode == math.MaxUint64 || path == math.MaxUint64 {
+		return fmt.Errorf("values missing from fsnotify_data_type struct, may be a kernel support issue: %v", btfEnum.Values)
+	}
+
+	sym.setKprobeFilters(path, inode, dentry)
+	return nil
+}
+
+func (sym *fsNotifySymbol) setKprobeFilters(eventPath uint64, eventInode uint64, eventDentry uint64) {
+	sym.pathProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d", eventPath)
+	sym.inodeProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d && nptr!=0", eventInode)
+	sym.dentryProbeFilter = fmt.Sprintf("(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==%d", eventDentry)
+}
+
+func (sym *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, error) {
 	allocFunc := allocProbeEvent
 
-	_, seen := f.seenSpecs[spec]
+	_, seen := sym.seenSpecs[spec]
 	if !seen {
 
-		if f.seenSpecs == nil {
-			f.seenSpecs = make(map[*tkbtf.Spec]struct{})
+		if sym.seenSpecs == nil {
+			sym.seenSpecs = make(map[*tkbtf.Spec]struct{})
 		}
 
-		f.lastOnErr = nil
+		sym.lastOnErr = nil
 		// reset probe filters for each new spec
 		// this probes shouldn't cause any ErrVerifyOverlappingEvents or ErrVerifyMissingEvents
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
 		// linux kernels filter variation check OnErr() method.
-		f.seenSpecs[spec] = struct{}{}
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
+		sym.seenSpecs[spec] = struct{}{}
+		// ***************** TO WHOEVER IS DEBUGGING THIS CODE IN THE FUTURE: *****************
+		// the kprobe filters work by giving each of the three fsnotify kprobes (one each for dentry,
+		// inode and path-based events) filtering rules based on the presence
+		// of mask values, and the value of the fsnotify() data_type field.
+		// If for some reason those mask/data_type fields become invalid (changes in the kernel, kprobe bug on our end)
+		// the events that get get through the filters might look strange or corrupted with no apparent pattern.
+		// Your first debugging step should be to disable these filters so you can see events as they arrive.
+		// NOTE: in the future we may want to investigate alternatives to these filters (doing the filtering in userland, etc).
+		err := sym.setKprobeFiltersFromBTF(spec)
+		if err != nil {
+			return nil, fmt.Errorf("error creating kprobe filters from BTF: %w", err)
+		}
 	}
 
 	pathProbe := tkbtf.NewKProbe().SetRef("fsnotify_path").AddFetchArgs(
@@ -95,7 +162,7 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		tkbtf.NewFetchArg("pdmj", tkbtf.BitFieldTypeMask(devMajor)).FuncParamWithCustomType("data", tkbtf.WrapPointer, "path", "dentry", "d_parent", "d_inode", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("pdmn", tkbtf.BitFieldTypeMask(devMinor)).FuncParamWithCustomType("data", tkbtf.WrapPointer, "path", "dentry", "d_parent", "d_inode", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("fn", "string").FuncParamWithCustomType("data", tkbtf.WrapPointer, "path", "dentry", "d_name", "name"),
-	).SetFilter(f.pathProbeFilter)
+	).SetFilter(sym.pathProbeFilter)
 
 	inodeProbe := tkbtf.NewKProbe().SetRef("fsnotify_inode").AddFetchArgs(
 		tkbtf.NewFetchArg("pi", "u64").FuncParamWithName("dir", "i_ino").FuncParamWithName("to_tell", "i_ino"),
@@ -114,7 +181,7 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		tkbtf.NewFetchArg("pdmj", tkbtf.BitFieldTypeMask(devMajor)).FuncParamWithName("dir", "i_sb", "s_dev").FuncParamWithName("to_tell", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("pdmn", tkbtf.BitFieldTypeMask(devMinor)).FuncParamWithName("dir", "i_sb", "s_dev").FuncParamWithName("to_tell", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("fn", "string").FuncParamWithName("file_name", "name").FuncParamWithName("file_name"),
-	).SetFilter(f.inodeProbeFilter)
+	).SetFilter(sym.inodeProbeFilter)
 
 	dentryProbe := tkbtf.NewKProbe().SetRef("fsnotify_dentry").AddFetchArgs(
 		tkbtf.NewFetchArg("mc", tkbtf.BitFieldTypeMask(fsEventCreate)).FuncParamWithName("mask"),
@@ -132,16 +199,16 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 		tkbtf.NewFetchArg("pdmj", tkbtf.BitFieldTypeMask(devMajor)).FuncParamWithCustomType("data", tkbtf.WrapPointer, "dentry", "d_parent", "d_inode", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("pdmn", tkbtf.BitFieldTypeMask(devMinor)).FuncParamWithCustomType("data", tkbtf.WrapPointer, "dentry", "d_parent", "d_inode", "i_sb", "s_dev"),
 		tkbtf.NewFetchArg("fn", "string").FuncParamWithCustomType("data", tkbtf.WrapPointer, "dentry", "d_name", "name"),
-	).SetFilter(f.dentryProbeFilter)
+	).SetFilter(sym.dentryProbeFilter)
 
-	btfSymbol := tkbtf.NewSymbol(f.symbolName).AddProbes(
+	btfSymbol := tkbtf.NewSymbol(sym.symbolName).AddProbes(
 		inodeProbe,
 		dentryProbe,
 		pathProbe,
 	)
 
 	if err := spec.BuildSymbol(btfSymbol); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error building fsnotify probes: %w", err)
 	}
 
 	return []*probeWithAllocFunc{
@@ -160,12 +227,12 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 	}, nil
 }
 
-func (f *fsNotifySymbol) onErr(err error) bool {
-	if f.lastOnErr != nil && errors.Is(err, f.lastOnErr) {
+func (sym *fsNotifySymbol) onErr(err error) bool {
+	if sym.lastOnErr != nil && errors.Is(err, sym.lastOnErr) {
 		return false
 	}
 
-	f.lastOnErr = err
+	sym.lastOnErr = err
 
 	switch {
 	case errors.Is(err, ErrVerifyOverlappingEvents):
@@ -173,9 +240,9 @@ func (f *fsNotifySymbol) onErr(err error) bool {
 		// on ErrVerifyOverlappingEvents for linux kernel versions < 5.7 the __fsnotify_parent
 		// probe is capturing and sending the modify events as well, thus disable them for
 		// fsnotify and return true to signal a retry.
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==3"
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==1"
+		sym.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==2 && nptr!=0"
+		sym.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==3"
+		sym.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mmt==1 || mmf==1) && dt==1"
 
 		return true
 	case errors.Is(err, ErrVerifyMissingEvents):
@@ -184,9 +251,9 @@ func (f *fsNotifySymbol) onErr(err error) bool {
 		// probe is not capturing and sending the modify attributes events for directories, thus
 		// we adjust the filters to allow them flowing through fsnotify and return true to signal
 		// a retry.
-		f.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
-		f.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && (nptr!=0 || (mid==1 && ma==1))"
-		f.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
+		sym.pathProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==1"
+		sym.inodeProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==2 && (nptr!=0 || (mid==1 && ma==1))"
+		sym.dentryProbeFilter = "(mc==1 || md==1 || ma==1 || mm==1 || mmt==1 || mmf==1) && dt==3"
 
 		return true
 	default:

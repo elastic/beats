@@ -33,6 +33,10 @@ type Publisher struct {
 
 	// client for osquery_manager.action.responses
 	actionResponsesClient beat.Client
+
+	// client for osquery_manager.query_profile
+	queryProfileClient    beat.Client
+	profileDropWarnLogged bool
 }
 
 func New(b *beat.Beat, log *logp.Logger) *Publisher {
@@ -109,15 +113,52 @@ func (p *Publisher) Configure(inputs []config.InputConfig) error {
 			p.actionResponsesClient = nil
 		}
 	}
+
+	// Attach optional query profiling stream if present, identified by dataset.
+	// For query profile events to be published, the integration (e.g. Fleet policy) must include
+	// an input stream with dataset osquery_manager.query_profile. Otherwise profile events are dropped.
+	var profileInput *config.InputConfig
+	for i := range inputs {
+		if inputs[i].Datastream.Dataset == config.DefaultQueryProfileDataset {
+			profileInput = &inputs[i]
+			break
+		}
+	}
+	if profileInput != nil {
+		processors, err := p.processorsForInputConfig(*profileInput, config.DefaultQueryProfileDataset)
+		if err != nil {
+			return err
+		}
+		p.log.Debugf("Connect publisher for %s with processors: %d", config.DefaultQueryProfileDataset, len(processors.All()))
+		client, err := p.b.Publisher.ConnectWith(beat.ClientConfig{
+			Processing: beat.ProcessingConfig{
+				Processor: processors,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		oldClient := p.queryProfileClient
+		p.queryProfileClient = client
+		p.profileDropWarnLogged = false
+		if oldClient != nil {
+			oldClient.Close()
+		}
+	} else {
+		if p.queryProfileClient != nil {
+			p.queryProfileClient.Close()
+			p.queryProfileClient = nil
+		}
+	}
 	return nil
 }
 
-func (p *Publisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *Publisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
 	for _, hit := range hits {
-		event := hitToEvent(index, p.b.Info.Name, actionID, responseID, meta, hit, ecsm, reqData)
+		event := hitToEvent(index, p.b.Info.Name, idValue, idFieldKey, responseID, spaceID, packID, meta, hit, ecsm, reqData)
 		p.client.Publish(event)
 	}
 	p.log.Infof("%d events sent to index %s", len(hits), index)
@@ -131,6 +172,14 @@ func (p *Publisher) Close() {
 		p.client.Close()
 		p.client = nil
 	}
+	if p.actionResponsesClient != nil {
+		p.actionResponsesClient.Close()
+		p.actionResponsesClient = nil
+	}
+	if p.queryProfileClient != nil {
+		p.queryProfileClient.Close()
+		p.queryProfileClient = nil
+	}
 }
 
 func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {
@@ -143,14 +192,102 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 	}
 
 	fields := actionResultToEvent(req, res)
+
+	p.log.Debugf("Action response event is sent, fields: %#v", fields)
+
+	p.publishActionResponseEvent(fields, time.Now())
+}
+
+// PublishScheduledResponse publishes a synthetic response document for a scheduled query run (no action).
+// Includes schedule_execution_count;
+// native uses 1 + (run_time - start_date) / interval).
+func (p *Publisher) PublishScheduledResponse(scheduleID, packID, spaceID, responseID string, startedAt, completedAt, plannedScheduleTime time.Time, resultCount int, scheduleExecutionCount int64) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+
+	if p.actionResponsesClient == nil {
+		p.log.Debug("Action responses stream is not configured. Scheduled response is dropped.")
+		return
+	}
+
+	fields := map[string]interface{}{
+		"schedule_id":              scheduleID,
+		"response_id":              responseID,
+		"action_input_type":        "osquery_scheduled",
+		"started_at":               startedAt.Format(time.RFC3339Nano),
+		"completed_at":             completedAt.Format(time.RFC3339Nano),
+		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
+		"schedule_execution_count": scheduleExecutionCount,
+		"action_response": map[string]interface{}{
+			"osquery": map[string]interface{}{
+				"count": resultCount,
+			},
+		},
+	}
+	if packID != "" {
+		fields["pack_id"] = packID
+	}
+	if spaceID != "" {
+		fields["space_id"] = spaceID
+	}
+
+	p.log.Debugf("Scheduled response event sent, schedule_id=%s, schedule_execution_count=%d", scheduleID, scheduleExecutionCount)
+	p.publishActionResponseEvent(fields, completedAt)
+}
+
+func (p *Publisher) publishActionResponseEvent(fields map[string]interface{}, timestamp time.Time) {
+	event := beat.Event{
+		Timestamp: timestamp,
+		Fields:    fields,
+	}
+	p.actionResponsesClient.Publish(event)
+}
+
+func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+
+	if p.queryProfileClient == nil {
+		if !p.profileDropWarnLogged {
+			p.log.Info("Query profile stream is not configured. Query profile events will be dropped.")
+			p.profileDropWarnLogged = true
+		}
+		return
+	}
+
+	fields := mapstr.M{
+		"type": "osquery_profile",
+		"event": map[string]interface{}{
+			"module": eventModule,
+		},
+		"osquery_profile": profile,
+	}
+	if queryName != "" {
+		fields["query"] = map[string]interface{}{
+			"name": queryName,
+		}
+	}
+	if actionID != "" {
+		fields["action_id"] = actionID
+	}
+	if responseID != "" {
+		fields["response_id"] = responseID
+	}
+	if reqData != nil {
+		fields["action_data"] = reqData
+	}
+
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields:    fields,
 	}
+	if index != "" {
+		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}
+	}
 
-	p.log.Debugf("Action response event is sent, fields: %#v", fields)
+	p.log.Debugf("Query profile event is sent, fields: %#v", fields)
 
-	p.actionResponsesClient.Publish(event)
+	p.queryProfileClient.Publish(event)
 }
 
 func actionResultToEvent(req, res map[string]interface{}) map[string]interface{} {
@@ -190,9 +327,11 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 }
 
 func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDataset string) (procs *processors.Processors, err error) {
-	procs = processors.NewList(nil)
+	procs = processors.NewList(p.log)
 
-	// Use only first input processor
+	// Use only first input processor.
+	// When Processors is empty, the data_stream processor is not added; Fleet-managed inputs
+	// typically supply processors so the data stream is set correctly.
 	// Every input will have a processor that adds the elastic_agent info, we need only one
 	// Not expecting other processors at the moment and this needs to work for 7.13
 	if len(inCfg.Processors) > 0 {
@@ -215,7 +354,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 
 		procs.AddProcessor(add_data_stream.New(ds))
 
-		userProcs, err := processors.New(inCfg.Processors)
+		userProcs, err := processors.New(inCfg.Processors, p.log)
 		if err != nil {
 			return nil, err
 		}
@@ -224,7 +363,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 	return procs, nil
 }
 
-func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
+func hitToEvent(index, eventType, idValue, idFieldKey, responseID, spaceID, packID string, meta, hit map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) beat.Event {
 	var fields mapstr.M
 
 	if len(ecsm) > 0 {
@@ -248,7 +387,9 @@ func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[str
 	fields["event"] = evf
 
 	fields["type"] = eventType
-	fields["action_id"] = actionID
+	if idFieldKey != "" {
+		fields[idFieldKey] = idValue
+	}
 	fields["osquery"] = hit
 	if meta != nil {
 		fields["osquery_meta"] = meta
@@ -265,6 +406,12 @@ func hitToEvent(index, eventType, actionID, responseID string, meta, hit map[str
 
 	if responseID != "" {
 		event.Fields["response_id"] = responseID
+	}
+	if spaceID != "" {
+		event.Fields["space_id"] = spaceID
+	}
+	if packID != "" {
+		event.Fields["pack_id"] = packID
 	}
 	if index != "" {
 		event.Meta = mapstr.M{events.FieldMetaRawIndex: index}

@@ -34,14 +34,17 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestData(t *testing.T) {
+	pullBusyboxImage(t)
+
 	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2WithContext(10*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2WithContext(30*time.Second, 1, ms)
 		close(done)
 	}()
 
@@ -70,18 +73,11 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer c.Close()
-
-	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	io.Copy(os.Stdout, reader)
-	reader.Close()
 
 	resp, err := c.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
@@ -91,7 +87,28 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+	err = c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func pullBusyboxImage(t *testing.T) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	reader, err := c.ImagePull(t.Context(), "busybox", image.PullOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = io.Copy(os.Stdout, reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reader.Close()
 }
 
 func getConfig() map[string]interface{} {

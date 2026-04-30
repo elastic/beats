@@ -1,0 +1,55 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "created"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "creation"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:29:50.0107043Z",
+        "attributes": [
+          "archive",
+          "reparse_point"
+        ],
+        "created": "2025-09-01T10:29:50.0107043Z",
+        "ctime": "2025-09-01T10:29:50.0107043Z",
+        "drive_letter": "C",
+        "inode": "8444249302227445",
+        "mtime": "2025-09-01T10:29:50.0107043Z",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-symlink1313900954\\001\\symlink.txt",
+        "target_path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwcreate-symlink1313900954\\001\\mainfile.txt",
+        "type": "symlink",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 17884,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:29:50.0157395Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1635200,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -211,7 +211,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test")}
+	p := &prometheus{mockFetcher{response: promMetrics}, logptest.NewTestingLogger(t, "test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -530,7 +530,7 @@ func TestPrometheus(t *testing.T) {
 			sort.Slice(res, func(i, j int) bool {
 				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 			})
-			assert.Equal(t, len(test.expected), len(res))
+			assert.Len(t, res, len(test.expected))
 			for j, ev := range res {
 				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
 			}
@@ -543,7 +543,7 @@ func TestPrometheus(t *testing.T) {
 // correctly processed
 func TestInfoMetricPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promInfoMetrics}, logp.NewLogger("test")}
+	p := &prometheus{mockFetcher{response: promInfoMetrics}, logptest.NewTestingLogger(t, "test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -593,7 +593,7 @@ func TestInfoMetricPrometheus(t *testing.T) {
 			sort.Slice(res, func(i, j int) bool {
 				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 			})
-			assert.Equal(t, len(test.expected), len(res))
+			assert.Len(t, res, len(test.expected))
 			for j, ev := range res {
 				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
 			}
@@ -1042,7 +1042,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test")}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logptest.NewTestingLogger(t, "test")}
 		_ = p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {
@@ -1050,7 +1050,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 		}
 
 		events := r.GetEvents()
-		if !assert.Equal(t, len(tc.expectedEvents), len(events),
+		if !assert.Len(t, events, len(tc.expectedEvents),
 			"number of returned events doesn't match expected, at %q", tc.testName) {
 			continue
 		}

@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register input module and metricset
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -17,5 +18,5 @@ import (
 func init() {
 	// To be moved to some kind of helper
 	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource(logp.NewNopLogger(), "../../../module"))
 }

@@ -18,32 +18,32 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 
-	"go.uber.org/multierr"
-
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type lookupFunc func(string) *monitoring.Namespace
+type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, mon beatmonitoring.Monitoring) (*Server, error) {
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
 	}
 
-	err = multierr.Combine(
-		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(ns("info")))),
-		api.AttachHandler("/state", makeAPIHandler(ns("state"))),
-		api.AttachHandler("/stats", makeAPIHandler(ns("stats"))),
-		api.AttachHandler("/dataset", makeAPIHandler(ns("dataset"))),
+	err = errors.Join(
+		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(mon.InfoRegistry()))),
+		api.AttachHandler("/state", makeAPIHandler(mon.StateRegistry())),
+		api.AttachHandler("/stats", makeAPIHandler(mon.StatsRegistry())),
+		api.AttachHandler("/dataset", makeAPIHandler(mon.InputsRegistry())),
 	)
 	if err != nil {
 		return nil, err
@@ -62,12 +62,12 @@ func makeRootAPIHandler(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func makeAPIHandler(ns *monitoring.Namespace) http.HandlerFunc {
+func makeAPIHandler(registry *monitoring.Registry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		data := monitoring.CollectStructSnapshot(
-			ns.GetRegistry(),
+			registry,
 			monitoring.Full,
 			false,
 		)

@@ -21,6 +21,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Use journald to collect system logs
+    #var.use_journald: false
+
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -32,6 +35,9 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Use journald to collect auth logs
+    #var.use_journald: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -101,6 +107,12 @@ filebeat.modules:
   slowlog:
     enabled: false
     # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+  querylog:
+    enabled: false
+    # Set custom paths for the query log (NDJSON) files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
@@ -237,7 +249,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------- Mongodb Module -------------------------------
+#------------------------------- MongoDB Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -386,7 +398,7 @@ filebeat.modules:
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
 
 #------------------------------- Traefik Module -------------------------------
@@ -658,7 +670,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -710,7 +722,7 @@ filebeat.inputs:
   # If enabled, instead of relying on the device ID and inode values when comparing files,
   # compare hashes of the given byte ranges in files. A file becomes an ingest target
   # when its size grows larger than offset+length (see below). Until then it's ignored.
-  #prospector.scanner.fingerprint.enabled: false
+  #prospector.scanner.fingerprint.enabled: true
 
   # If fingerprint mode is enabled, sets the offset from the beginning of the file
   # for the byte range used for computing the fingerprint value.
@@ -753,7 +765,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -839,14 +851,25 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
-  # the Beat considers two files the same if their inode and device id are the same.
-  #file_identity.native: ~
+  # a fingerprint is generated using the first 1024 bytes of the file,
+  # if the fingerprints match, then the files are considered equal.
+  #file_identity.fingerprint: ~
+
+  # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
+  #include_file_owner_name: false
+  #include_file_owner_group_name: false
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -872,10 +895,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When `take_over.enabled` is set to `true` this `filestream` input
+  # will take over files from `log` or `filestream` (need to set `from_ids`) inputs.
+  # Taking over states of active `log` or `filestream` inputs is not
+  # supported and will lead to inconsistent data ingestion (data
+  # duplication or data loss).
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  If `from_ids` is set, then the files are taken over
+  #  from `filestream` inputs that were assigned these IDs.
+  #  Taking over from `log` inputs is disabled when `from_ids` is set.
+  #  from_ids: ["foo", "bar"]
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -921,7 +952,8 @@ filebeat.inputs:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  #close.on_state_change.removed: true
+  # By default, it's `true` on Windows and `false` on the rest of the platforms.
+  #close.on_state_change.removed: false
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
@@ -933,6 +965,20 @@ filebeat.inputs:
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
+
+  ### File deleting options
+  # Filestream cam delete the file after it has been acknowledged by the output,
+  # has reached EOF or became inactive.
+
+  # Enable deleting the file after the reader is closed
+  # and all events have been ingested.
+  #delete.enabled: false
+
+  # Grace period to wait before trying to remove a file.
+  # If data is added during the grace, deletion is cancelled.
+  # The grace period will re-start next time the close condition
+  # is reached.
+  #delete.grace_period: 30m
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
@@ -966,6 +1012,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -983,6 +1032,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
@@ -1177,25 +1229,80 @@ filebeat.inputs:
 # Journald input is experimental.
 #- type: journald
   #enabled: true
-  #id: service-foo
 
-  # You may wish to have separate inputs for each service. You can use
-  # include_matches.or to specify a list of filter expressions that are
-  # applied as a logical OR. You may specify filter
-  #include_matches.match:
-    #- _SYSTEMD_UNIT=foo.service
+  # Unique ID among all inputs, if the ID changes, all entries
+  # will be re-ingested
+  id: my-journald-id
+
+  # Specify paths to read from custom journal files.
+  # Leave it unset to read the system's journal
+  # Glob based paths.
+  #paths:
+    #- /var/log/custom.journal
+
+  # Specify a folder to be used as chroot when calling the journalctl binary
+  #chroot:
+
+  # The path for the `journalctl` binary. If not set, Filebeat will look for
+  # `journalctl` in PATH (defaults to `journalctl`). When using `chroot`, if
+  # `journalctl_path` is not explicitly set, it automatically defaults to
+  # `/usr/bin/journalctl`. If `journalctl_path` is explicitly set when `chroot`
+  # is configured, it must be an absolute path from within the chroot directory.
+  #journalctl_path:
+
+
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
+  #merge: false
+
+  # The position to start reading from the journal, valid options are:
+  #  - head: Starts reading at the beginning of the journal.
+  #  - tail: Starts reading at the end of the journal.
+  #    This means that no events will be sent until a new message is written.
+  #  - since: Use also the `since` option to determine when to start reading from.
+  #seek: head
+
+  # A time offset from the current time to start reading from.
+  # To use since, seek option must be set to since.
+  #since: -24h
+
+  # Collect events from the service and messages about the service,
+  # including coredumps.
+  #units:
+    #- docker.service
 
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
 
-  # Collect events from the service and messages about the service,
-  # including coredumps.
-  #units: ["docker.service"]
-
   # The list of transports (_TRANSPORT field of journald entries)
   #transports: ["audit"]
 
-  # Parsers are also supported, here is an example of the multiline
+  # Filter logs by facilities, they must be specified using their numeric code.
+  #facilities:
+    #- 1
+    #- 2
+
+  # You may wish to have separate inputs for each service. You can use
+  # include_matches.match to define a list of filters, each event needs
+  # to match all filters defined.
+  #include_matches.match:
+    #- _SYSTEMD_UNIT=foo.service
+
+  # To create a disjunction (logical OR) use the `+` character between
+  # the filters
+  #include_matches:
+    #match:
+      #- "systemd.transport=kernel"
+      #- "+"
+      #- "journald.process.name=systemd"
+
+  # Uses the original hostname of the entry instead of the one
+  # from the host running jounrald
+  #save_remote_hostname: false
+
+  # Parsers are also supported, the possible parsers are:
+  # container, include_message, multiline, ndjson, syslog.
+  # Here is an example of the multiline
   # parser.
   #parsers:
   #- multiline:
@@ -1260,6 +1367,8 @@ filebeat.inputs:
 # batch of events has been published successfully. The default value is 1s.
 #filebeat.registry.flush: 1s
 
+# The interval which to run the registry clean up
+#filebeat.registry.cleanup_interval: 5m
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
 # Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
@@ -1267,6 +1376,57 @@ filebeat.inputs:
 # filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
+
+# The storage backend for the registry. Supported values are "memlog" and
+# "bbolt". The default is "memlog", which uses an in-memory log with periodic
+# disk flushing. The "bbolt" backend uses a bbolt (BoltDB) database for
+# persistent on-disk storage with support for compaction and TTL-based cleanup.
+#filebeat.registry.backend: memlog
+
+# ----------------------- Bbolt backend settings -------------------------------
+# WARNING: The bbolt backend is EXPERIMENTAL and may change or be removed in
+# future releases. Do not use in production without understanding the risks.
+#
+# These settings apply only when filebeat.registry.backend is set to "bbolt".
+# The database files are stored under the registry.path directory.
+# Configuration parameter names are aligned with the OpenTelemetry
+# filestorage extension for future compatibility.
+
+# Timeout for obtaining a file lock on the bbolt database file. Default: 1s.
+#filebeat.registry.bbolt.timeout: 1s
+
+# Controls whether fdatasync is called after each write transaction commit.
+# When false (the default), writes are buffered by the OS and flushed lazily.
+# This is faster but recent writes can be lost on an unclean shutdown (power
+# failure, kernel panic). A normal Filebeat shutdown is not affected.
+# When true, every write is synced to disk before returning, guaranteeing
+# durability at the cost of reduced write throughput. Default: false.
+#filebeat.registry.bbolt.fsync: false
+
+# If true, database compaction runs on every start. Compaction rewrites the
+# database to reclaim unused disk space. Default: false.
+#filebeat.registry.bbolt.compaction.on_start: false
+
+# Maximum number of items processed per transaction during compaction and
+# retention cleanup. A value of 0 disables batching, processing all items
+# in a single transaction. Default: 65536.
+#filebeat.registry.bbolt.compaction.max_transaction_size: 65536
+
+# If true, leftover temporary files from a previous compaction that was
+# interrupted (e.g. by a crash) are removed on start. Default: false.
+#filebeat.registry.bbolt.compaction.cleanup_on_start: false
+
+# How long entries are kept before being removed. A zero value disables
+# TTL-based removal. Expired entries become invisible to reads immediately,
+# but are only physically deleted from disk when retention.interval is also
+# set to a positive value. Default: 0 (disabled).
+#filebeat.registry.bbolt.retention.ttl: 0
+
+# How often to remove expired entries from disk. Only effective when
+# retention.ttl is also set to a positive value. A zero value disables
+# periodic removal.
+# Default: 0 (disabled).
+#filebeat.registry.bbolt.retention.interval: 0
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -2110,7 +2270,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -2687,7 +2847,7 @@ logging.files:
   #path: /var/log/filebeat
 
   # The name of the files where the logs are written to.
-  #name: filebeat-event-data
+  #name: filebeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

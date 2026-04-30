@@ -22,7 +22,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // startPosition and endPosition are absolute byte offsets into the segment
@@ -51,6 +53,7 @@ type readerLoopResponse struct {
 type readerLoop struct {
 	// The settings for the queue that created this loop.
 	settings Settings
+	paths    *paths.Path
 
 	// When there is a block available for reading, it will be sent to
 	// requestChan. When the reader loop has finished processing it, it
@@ -73,12 +76,13 @@ type readerLoop struct {
 	// If set, this encoding helper is called on events after loading
 	// them from disk, to convert them to their final output serialization
 	// format.
-	outputEncoder queue.Encoder
+	outputEncoder queue.Encoder[publisher.Event]
 }
 
-func newReaderLoop(settings Settings, outputEncoder queue.Encoder) *readerLoop {
+func newReaderLoop(settings Settings, outputEncoder queue.Encoder[publisher.Event], paths *paths.Path) *readerLoop {
 	return &readerLoop{
 		settings: settings,
+		paths:    paths,
 
 		requestChan:   make(chan readerLoopRequest, 1),
 		responseChan:  make(chan readerLoopResponse),
@@ -107,12 +111,12 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 	nextFrameID := request.startFrameID
 
 	// Open the file and seek to the starting position.
-	handle, err := request.segment.getReader(rl.settings)
-	rl.decoder.serializationFormat = handle.serializationFormat
+	handle, err := request.segment.getReader(rl.settings, rl.paths)
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}
 	defer handle.Close()
+	rl.decoder.serializationFormat = handle.serializationFormat
 
 	_, err = handle.Seek(int64(request.startPosition), io.SeekStart)
 	if err != nil {

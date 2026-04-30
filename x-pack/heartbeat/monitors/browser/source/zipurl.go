@@ -32,3 +32,7 @@ func (z *ZipURLSource) Workdir() string {
 func (z *ZipURLSource) Close() error {
 	return ecserr.NewUnsupportedMonitorTypeError(ErrZipURLUnsupportedType)
 }
+
+func (z *ZipURLSource) Decode() error {
+	return nil
+}

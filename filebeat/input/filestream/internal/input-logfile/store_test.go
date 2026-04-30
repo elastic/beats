@@ -20,6 +20,7 @@ package input_logfile
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -27,18 +28,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
-
-type testStateStore struct {
-	Store    *statestore.Store
-	GCPeriod time.Duration
-}
 
 func TestResource_CopyInto(t *testing.T) {
 	src := resource{lock: unison.MakeMutex()}
@@ -70,15 +67,15 @@ func TestStore_OpenClose(t *testing.T) {
 	})
 
 	t.Run("fail if persistent store can not be accessed", func(t *testing.T) {
-		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test")
+		_, err := openStore(logptest.NewTestingLogger(t, ""), testStateStore{}, "test")
 		require.Error(t, err)
 	})
 
 	t.Run("load from empty", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		require.Equal(t, 0, len(storeMemorySnapshot(store)))
-		require.Equal(t, 0, len(storeInSyncSnapshot(store)))
+		require.Empty(t, storeMemorySnapshot(store))
+		require.Empty(t, storeInSyncSnapshot(store))
 	})
 
 	t.Run("already available state is loaded", func(t *testing.T) {
@@ -138,7 +135,7 @@ func TestStore_Get(t *testing.T) {
 		defer res.Release()
 
 		// new resource has empty state
-		require.Equal(t, state{}, res.stateSnapshot())
+		require.Equal(t, state{TTL: -1}, res.stateSnapshot())
 	})
 
 	t.Run("same resource is returned", func(t *testing.T) {
@@ -260,9 +257,9 @@ func TestStore_ResetCursor(t *testing.T) {
 		res := store.Get("test::key")
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
-		require.Equal(t, nil, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.cursor)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 10})
 
@@ -290,8 +287,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
@@ -335,30 +332,34 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, uint(0), res.activeCursorOperations)
 		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursorValue)
-		require.Equal(t, nil, res.pendingUpdate)
+		require.Nil(t, res.pendingCursorValue)
+		require.Nil(t, res.pendingUpdate)
 	})
 }
 
 type testMeta struct {
-	IdentifierName string
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
 
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": {
+			"test::key1": { // Active resource
 				TTL:  60 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
-			"test::key2": {
-				TTL:  0 * time.Second,
-				Meta: testMeta{IdentifierName: "method"},
+			"test::key2": { // Deleted resource
+				TTL:     0,
+				Meta:    testMeta{IdentifierName: "method"},
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
 			var m testMeta
@@ -372,28 +373,180 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			return "", nil
 		})
 
-		var newState state
-		s.persistentStore.Get("test::key1::updated", &newState)
+		// The persistentStore is a mock that does not consider if a state has
+		// been removed before returning it, thus allowing us to get Updated
+		// timestamp from when the resource was deleted.
+		var deletedState state
+		s.persistentStore.Get("test::key1", &deletedState)
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
-			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
-				TTL:     60 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
-			},
-			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+			"test::key2": { // Unchanged
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
+				Meta:    map[string]interface{}{"identifier_name": "method"},
 			},
-			"test::key1::updated": {
-				Updated: newState.Updated,
+			"test::key1::updated": { // Updated resource
+				Updated: s.ephemeralStore.table["test::key1::updated"].internalState.Updated,
 				TTL:     60 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "something"},
+				Meta:    map[string]interface{}{"identifier_name": "something"},
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, backend.snapshot())
+	})
+}
+
+func TestSourceStoreTakeOver(t *testing.T) {
+	backend := createSampleStore(t, map[string]state{
+		"filestream::previous-id::key1": { // Active resource
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::another-input::key2": { // Active resource from another input
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+	})
+	s := testOpenStore(t, "filestream", backend)
+	defer s.Release()
+	store := &sourceStore{
+		identifier:            &SourceIdentifier{"filestream::current-id::"},
+		identifiersToTakeOver: []*SourceIdentifier{{"filestream::previous-id::"}},
+		store:                 s,
+	}
+
+	store.TakeOver(func(v TakeOverState) (string, any) {
+		m := testMeta{
+			IdentifierName: v.IdentifierName,
+		}
+
+		newID := strings.ReplaceAll(v.Key, "previous-id", "current-id")
+
+		return newID, m
+	})
+
+	// The persistentStore is a mock that does not consider if a state has
+	// been removed before returning it, thus allowing us to get Updated
+	// timestamp from when the resource was deleted.
+	var deletedState state
+	s.persistentStore.Get("filestream::previous-id::key1", &deletedState)
+
+	s.ephemeralStore.mu.Lock()
+	want := map[string]state{
+		"filestream::another-input::key2": { // Unchanged
+			TTL:  60 * time.Second,
+			Meta: map[string]interface{}{"identifier_name": "test-file-identity"},
+		},
+		"filestream::current-id::key1": { // Updated resource
+			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
+			TTL:     60 * time.Second,
+			Meta:    map[string]interface{}{"identifier_name": "test-file-identity"},
+		},
+	}
+	s.ephemeralStore.mu.Unlock()
+
+	checkEqualStoreState(t, want, backend.snapshot())
+}
+
+func TestSourceStoreTakeOverFromLogInput(t *testing.T) {
+	const (
+		logKey           = "filebeat::logs::native::inode:device"
+		filestreamNewKey = "filestream::input-id::native::inode:device"
+	)
+
+	// fn simulates what takeOverFn does: map the log key to a new Filestream key.
+	takeover := func(v TakeOverState) (string, any) {
+		if v.Key == logKey {
+			return filestreamNewKey, testMeta{IdentifierName: "native"}
+		}
+		return "", nil
+	}
+
+	t.Run("log input state is left untouched", func(t *testing.T) {
+		backend := createSampleStore(t, nil)
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -1,
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		assert.NotNil(t, s.Get(filestreamNewKey), "Log input state must have been migrated to Filestream")
+		assert.NotNil(t, s.Get(logKey), "Log input state must left untouched")
+	})
+
+	t.Run("state with TTL=-2 is migrated", func(t *testing.T) {
+		backend := createSampleStore(t, nil)
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -2, // previously this caused the state to be skipped
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		s.ephemeralStore.mu.Lock()
+		_, migrated := s.ephemeralStore.table[filestreamNewKey]
+		s.ephemeralStore.mu.Unlock()
+
+		assert.True(t, migrated, "state with TTL=-2 must be migrated to Filestream")
+	})
+
+	t.Run("state is skipped when Filestream key already exists", func(t *testing.T) {
+		const existingOffset = int64(9999)
+
+		backend := createSampleStore(t, map[string]state{
+			filestreamNewKey: {
+				TTL:    60 * time.Second,
+				Cursor: map[string]any{"offset": existingOffset},
+			},
+		})
+		require.NoError(t, backend.Store.Set(logKey, inpFile.State{
+			Source:         "/path/to/file",
+			Offset:         1234,
+			TTL:            -1,
+			IdentifierName: "native",
+		}), "populating test store")
+
+		s := testOpenStore(t, "filestream", backend)
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"filestream::input-id::"},
+			store:      s,
+		}
+
+		store.TakeOver(takeover)
+
+		// The pre-existing Filestream state must be unchanged.
+		s.ephemeralStore.mu.Lock()
+		res, exists := s.ephemeralStore.table[filestreamNewKey]
+		s.ephemeralStore.mu.Unlock()
+
+		require.True(t, exists, "Filestream key must still exist after TakeOver")
+		var cur struct {
+			Offset int64 `json:"offset"`
+		}
+		require.NoError(t, res.UnpackCursor(&cur), "unpacking cursor")
+		assert.Equal(t, existingOffset, cur.Offset, "existing Filestream cursor must not be overwritten by Log input state")
 	})
 }
 
@@ -405,27 +558,33 @@ func TestSourceStore_CleanIf(t *testing.T) {
 				TTL: 60 * time.Second,
 			},
 			"test::key2": {
-				TTL: 0 * time.Second,
+				TTL:     0 * time.Second,
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.CleanIf(func(_ Value) bool {
 			return true
 		})
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
 			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
@@ -437,27 +596,33 @@ func TestSourceStore_CleanIf(t *testing.T) {
 				TTL: 60 * time.Second,
 			},
 			"test::key2": {
-				TTL: 0 * time.Second,
+				TTL:     0 * time.Second,
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.CleanIf(func(v Value) bool {
 			return false
 		})
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
 			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1"].internalState.Updated,
 				TTL:     60 * time.Second,
 			},
 			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
@@ -473,12 +638,12 @@ func closeStoreWith(fn func(s *store)) func() {
 }
 
 //nolint:unparam // It's a test helper
-func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
+func testOpenStore(t *testing.T, prefix string, persistentStore statestore.States) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix)
+	store, err := openStore(logptest.NewTestingLogger(t, ""), persistentStore, prefix)
 	if err != nil {
 		t.Fatalf("failed to open the store")
 	}
@@ -503,9 +668,16 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 	}
 }
 
+var _ statestore.States = testStateStore{}
+
+type testStateStore struct {
+	Store    *statestore.Store
+	GCPeriod time.Duration
+}
+
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access() (*statestore.Store, error) {
+func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}

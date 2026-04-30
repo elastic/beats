@@ -11,6 +11,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,7 +40,7 @@ func TestWatchTicks(t *testing.T) {
 			defer lock.Unlock()
 
 			stopUUIDs = append(stopUUIDs, uuid)
-		})
+		}, logptest.NewTestingLogger(t, ""))
 	defer watcher.stop()
 
 	// Run through 10 ticks
@@ -52,7 +54,7 @@ func TestWatchTicks(t *testing.T) {
 
 	// Test that we've seen one ec2 start, but none stop
 	assert.Equal(t, instanceIDs, startUUIDs)
-	assert.Len(t, stopUUIDs, 0)
+	assert.Empty(t, stopUUIDs)
 	assert.Equal(t, instances, startEC2s)
 
 	// Stop the ec2 and test that we see a single stop

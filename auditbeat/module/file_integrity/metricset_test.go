@@ -18,7 +18,6 @@
 package file_integrity
 
 import (
-	"crypto/sha1"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -33,14 +32,12 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	go func() {
@@ -69,9 +66,7 @@ func TestActions(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,12 +103,18 @@ func TestActions(t *testing.T) {
 	}
 
 	// Insert fake file event into db to simulate when a file has changed
-	digest := sha1.New().Sum([]byte("different string"))
 	updatedFileEvent := &Event{
 		Timestamp: time.Now().UTC(),
 		Path:      updatedFilepath,
 		Action:    Created,
-		Hashes:    map[HashType]Digest{SHA1: digest},
+		Hashes:    map[HashType]Digest{},
+	}
+	for _, h := range defaultHashes {
+		fn, ok := hashTypes[h]
+		require.Truef(t, ok, "missing hash type %s", h)
+
+		digest := fn().Sum([]byte("different string"))
+		updatedFileEvent.Hashes[h] = digest
 	}
 	if err = store(bucket, updatedFileEvent); err != nil {
 		t.Fatal(err)
@@ -139,7 +140,7 @@ func TestActions(t *testing.T) {
 			// depending on whether the scanner or the platform-dependent
 			// filesystem event listener reported it. The subset of actions we test
 			// for here should be consistent across all cases though.
-			switch path.(string) {
+			switch path.(string) { //nolint:errcheck // err already checked above
 			case newDir:
 				assert.Contains(t, actions, "initial_scan")
 			case dir:
@@ -166,9 +167,7 @@ func TestExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +203,7 @@ func TestExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err) {
-			_, ok := wanted[path.(string)]
+			_, ok := wanted[path.(string)] //nolint:errcheck // err already checked above
 			assert.True(t, ok)
 		}
 	}
@@ -218,9 +217,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -264,7 +261,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err, "Failed to read file.path field") {
-			got[path.(string)] = true
+			got[path.(string)] = true //nolint:errcheck // err already checked above
 		}
 	}
 	assert.Equal(t, wanted, got)
@@ -282,8 +279,6 @@ func TestErrorReporting(t *testing.T) {
 		// in UNIX/Linux OS.
 		t.Skip("This test can't be run as root")
 	}
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
@@ -472,12 +467,12 @@ func (e expectedEvents) validate(t *testing.T) {
 	}
 	defer bucket.Close()
 	config := getConfig("somepath")
-	config["hash_types"] = []string{"sha1"}
+	config["hash_types"] = []string{"sha256"}
 	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 	for _, ev := range e {
 		ev.validate(t, ms)
 	}
@@ -500,13 +495,13 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("11111111111111111111"),
+						SHA256: []byte("11111111111111111111"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": Digest("11111111111111111111"),
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": Digest("11111111111111111111"),
 				},
 			},
 			expectedEvent{
@@ -522,13 +517,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 			expectedEvent{
@@ -546,9 +541,9 @@ func TestEventFailedHash(t *testing.T) {
 					hashFailed: true,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": nil,
 				},
 			},
 			expectedEvent{
@@ -564,13 +559,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("33333333333333333333"),
+						SHA256: []byte("33333333333333333333"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("33333333333333333333"),
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("33333333333333333333"),
 				},
 			},
 			expectedEvent{
@@ -586,13 +581,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("33333333333333333333"),
+						SHA256: []byte("33333333333333333333"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"attributes_modified"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("33333333333333333333"),
+					"event.action":     []string{"attributes_modified"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("33333333333333333333"),
 				},
 			},
 		}.validate(t)
@@ -614,9 +609,9 @@ func TestEventFailedHash(t *testing.T) {
 					hashFailed: true,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": nil,
 				},
 			},
 			expectedEvent{
@@ -632,13 +627,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated", "attributes_modified"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"updated", "attributes_modified"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 		}.validate(t)
@@ -658,13 +653,13 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 			expectedEvent{
@@ -678,9 +673,9 @@ func TestEventFailedHash(t *testing.T) {
 					Hashes:    nil,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"deleted"},
-					"event.type":     []string{"deletion"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"deleted"},
+					"event.type":       []string{"deletion"},
+					"file.hash.sha256": nil,
 				},
 			},
 		}.validate(t)
@@ -700,13 +695,13 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 			expectedEvent{
@@ -721,9 +716,9 @@ func TestEventFailedHash(t *testing.T) {
 					Hashes: nil,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"moved"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"moved"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": nil,
 				},
 			},
 		}.validate(t)
@@ -745,12 +740,12 @@ func TestEventDelete(t *testing.T) {
 	}
 	defer bucket.Close()
 	config := getConfig("somepath")
-	config["hash_types"] = []string{"sha1"}
+	config["hash_types"] = []string{"sha256"}
 	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 
 	baseTime := time.Now()
 	sha := Digest("22222222222222222222")
@@ -769,13 +764,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 			expectedEvent{
@@ -804,13 +799,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 		}.validate(t)
@@ -834,13 +829,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 			expectedEvent{
@@ -856,13 +851,13 @@ func TestEventDelete(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Deleted,
 					Hashes: map[HashType]Digest{
-						SHA1: shaNext,
+						SHA256: shaNext,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": shaNext,
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": shaNext,
 				},
 			},
 			expectedEvent{
@@ -878,7 +873,7 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: shaNext,
+						SHA256: shaNext,
 					},
 				},
 				expected: nil, // Already observed during handling of previous event.
@@ -901,13 +896,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 			expectedEvent{
@@ -923,7 +918,7 @@ func TestEventDelete(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Deleted,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				// No event because it has the same contents as before.
@@ -942,7 +937,7 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				// No event because it has the same contents as before.

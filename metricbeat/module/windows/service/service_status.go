@@ -97,7 +97,7 @@ func (state ServiceState) String() string {
 	return ""
 }
 
-func GetServiceStates(handle windows.Handle, state uint32, protectedServices map[string]struct{}) ([]Status, error) {
+func GetServiceStates(log *logp.Logger, handle Handle, state ServiceEnumState, protectedServices map[string]struct{}) ([]Status, error) {
 	var servicesReturned uint32
 	var bytesNeeded uint32
 
@@ -124,10 +124,20 @@ func GetServiceStates(handle windows.Handle, state uint32, protectedServices map
 	processes := unsafe.Slice((*windows.ENUM_SERVICE_STATUS_PROCESS)(unsafe.Pointer(&buffer[0])), int(servicesReturned))
 
 	var services []Status
-	for _, proc := range processes {
-		service, err := getServiceInformation(proc, handle, protectedServices)
+	var sizeStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
+	for i := 0; i < int(servicesReturned); i++ {
+		rawService := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeStatusProcess]))
+
+		service, err := getRawServiceStatus(rawService, servicesBuffer)
 		if err != nil {
-			return nil, err
+			log.Errorf("could not parse raw service information for PID %d: %v", rawService.ServiceStatusProcess.DwProcessId, err)
+			continue
+		}
+
+		err = getServiceHandleInformation(log, &service, rawService, handle, protectedServices)
+		if err != nil {
+			log.Errorf("could not get information for the service (name: %s, pid: %d): %v", service.DisplayName, service.PID, err)
+			continue
 		}
 
 		services = append(services, service)
@@ -136,13 +146,18 @@ func GetServiceStates(handle windows.Handle, state uint32, protectedServices map
 	return services, nil
 }
 
-func getServiceInformation(rawService windows.ENUM_SERVICE_STATUS_PROCESS, handle windows.Handle, protectedServices map[string]struct{}) (Status, error) {
+func getRawServiceStatus(rawService *EnumServiceStatusProcess, servicesBuffer []byte) (Status, error) {
 	service := Status{
 		PID: rawService.ServiceStatusProcess.ProcessId,
 	}
 
 	service.DisplayName = windows.UTF16PtrToString(rawService.DisplayName)
 	service.ServiceName = windows.UTF16PtrToString(rawService.ServiceName)
+
+	return service, nil
+}
+
+func getServiceHandleInformation(log *logp.Logger, service *Status, rawService *EnumServiceStatusProcess, handle Handle, protectedServices map[string]struct{}) error {
 
 	var state string
 
@@ -161,36 +176,38 @@ func getServiceInformation(rawService windows.ENUM_SERVICE_STATUS_PROCESS, handl
 
 	serviceHandle, err := windows.OpenService(handle, rawService.ServiceName, windows.SERVICE_QUERY_CONFIG)
 	if err != nil {
-		return service, fmt.Errorf("error while opening service %s: %w", service.ServiceName, err)
+		return fmt.Errorf("error while opening service %s: %w", service.ServiceName, err)
 	}
 
 	defer windows.CloseHandle(serviceHandle)
 
 	// Get detailed information
-	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
-		return service, err
+	if err := getAdditionalServiceInfo(serviceHandle, service); err != nil {
+		return err
 	}
 
 	// Get optional information
-	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
-		return service, err
+	if err := getOptionalServiceInfo(serviceHandle, service); err != nil {
+		return err
 	}
 
 	//Get uptime for service
 	if ServiceState(rawService.ServiceStatusProcess.CurrentState) != ServiceStopped {
 		processUpTime, err := getServiceUptime(rawService.ServiceStatusProcess.ProcessId)
 		if err != nil {
-			if _, ok := protectedServices[service.ServiceName]; errors.Is(err, os.ErrPermission) && !ok {
+			if !errors.Is(err, os.ErrPermission) {
+				// if we have faced any other error, pass it to the caller
+				return err
+			}
+			if _, ok := protectedServices[service.ServiceName]; !ok {
 				protectedServices[service.ServiceName] = struct{}{}
-				logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
-			} else {
-				return service, err
+				log.Warnf("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
 			}
 		}
 		service.Uptime = processUpTime / time.Millisecond
 	}
 
-	return service, nil
+	return nil
 }
 
 func getAdditionalServiceInfo(serviceHandle windows.Handle, service *Status) error {

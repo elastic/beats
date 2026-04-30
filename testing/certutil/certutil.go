@@ -19,9 +19,12 @@ package certutil
 
 import (
 	"bytes"
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -68,6 +71,8 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 		BasicConstraintsValid: true,
 		IsCA:                  true,
 	}
+
+	rootTemplate.SubjectKeyId = generateSubjectKeyID(rootKey.Public())
 
 	rootCertRawBytes, err := x509.CreateCertificate(
 		rand.Reader, &rootTemplate, &rootTemplate, &rootKey.PublicKey, rootKey)
@@ -183,4 +188,21 @@ func GenerateChildCert(name string, caPrivKey *ecdsa.PrivateKey, caCert *x509.Ce
 	}
 
 	return privateKeyPemBytes, certPemBytes, &tlsCert, nil
+}
+
+func generateSubjectKeyID(pub crypto.PublicKey) []byte {
+	// SubjectKeyId generated using method 1 in RFC 7093, Section 2:
+	//   1) The keyIdentifier is composed of the leftmost 160-bits of the
+	//   SHA-256 hash of the value of the BIT STRING subjectPublicKey
+	//   (excluding the tag, length, and number of unused bits).
+	var publicKeyBytes []byte
+	switch publicKey := pub.(type) {
+	case *rsa.PublicKey:
+		publicKeyBytes = x509.MarshalPKCS1PublicKey(publicKey)
+	case *ecdsa.PublicKey:
+		//nolint:staticcheck // no alternative
+		publicKeyBytes = elliptic.Marshal(publicKey.Curve, publicKey.X, publicKey.Y)
+	}
+	h := sha256.Sum256(publicKeyBytes)
+	return h[:20]
 }

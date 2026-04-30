@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
+//go:build (linux || darwin || windows) && integration
 
 package docker
 
@@ -31,15 +31,15 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test docker start emits an autodiscover event
 func TestDockerStart(t *testing.T) {
-	log := logp.NewLogger("docker")
+	log := logptest.NewTestingLogger(t, "docker")
 
-	d, err := dk.NewClient()
+	d, err := dk.NewClient(log)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestDockerStart(t *testing.T) {
 	s := &template.MapperSettings{nil, nil}
 	config.Templates = *s
 	k, _ := keystore.NewFileKeystore("test")
-	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k)
+	provider, err := AutodiscoverBuilder("mockBeat", bus, UUID, conf.MustNewConfigFrom(config), k, log, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,13 +106,13 @@ func checkEvent(t *testing.T, listener bus.Listener, id string, start bool) {
 				continue
 			}
 			if start {
-				assert.Equal(t, getValue(e, "start"), true)
+				assert.Equal(t, true, getValue(e, "start"))
 				assert.Nil(t, getValue(e, "stop"))
 			} else {
-				assert.Equal(t, getValue(e, "stop"), true)
+				assert.Equal(t, true, getValue(e, "stop"))
 				assert.Nil(t, getValue(e, "start"))
 			}
-			assert.Equal(t, getValue(e, "container.image.name"), "busybox:latest")
+			assert.Equal(t, "busybox:latest", getValue(e, "container.image.name"))
 			// labels.dedot=true by default
 			assert.Equal(t,
 				mapstr.M{

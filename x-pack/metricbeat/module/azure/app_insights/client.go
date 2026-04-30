@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
@@ -23,8 +25,8 @@ type Client struct {
 }
 
 // NewClient instantiates the an Azure monitoring client
-func NewClient(config Config) (*Client, error) {
-	service, err := NewService(config)
+func NewClient(config Config, logger *logp.Logger) (*Client, error) {
+	service, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}

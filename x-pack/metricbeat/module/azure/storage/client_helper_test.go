@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package storage
 
 import (
@@ -14,6 +16,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 var (
@@ -116,7 +119,8 @@ func TestMapMetric(t *testing.T) {
 
 	metricConfig := azure.MetricConfig{Name: []string{"*"}}
 	resourceConfig := azure.ResourceConfig{Metrics: []azure.MetricConfig{metricConfig}, ServiceType: []string{"blob"}}
-	client := azure.NewMockClient()
+	client := azure.NewMockClient(logptest.NewTestingLogger(t, ""))
+
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
@@ -162,7 +166,7 @@ func TestFilterOnTimeGrain(t *testing.T) {
 		{MetricAvailabilities: availability2},
 		{MetricAvailabilities: availability3},
 	}
-	response := groupOnTimeGrain(list)
+	response := groupOnTimeGrain(list, "PT5M")
 	assert.Equal(t, len(response), 2)
 	result := [][]armmonitor.MetricDefinition{
 		{
@@ -180,11 +184,11 @@ func TestFilterOnTimeGrain(t *testing.T) {
 }
 
 func TestRetrieveSupportedMetricAvailability(t *testing.T) {
-	response := retrieveSupportedMetricAvailability(availability1)
+	response := retrieveSupportedMetricAvailability(availability1, "PT5M")
 	assert.Equal(t, response, time2)
-	response = retrieveSupportedMetricAvailability(availability2)
+	response = retrieveSupportedMetricAvailability(availability2, "PT5M")
 	assert.Equal(t, response, time3)
-	response = retrieveSupportedMetricAvailability(availability3)
+	response = retrieveSupportedMetricAvailability(availability3, "PT5M")
 	assert.Equal(t, response, time3)
 }
 

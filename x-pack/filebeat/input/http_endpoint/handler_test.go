@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"io"
@@ -20,14 +19,17 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var withTraces = flag.Bool("log-traces", false, "specify logging request traces during tests")
@@ -38,13 +40,12 @@ func Test_httpReadJSON(t *testing.T) {
 	log := logp.NewLogger("http_endpoint_test")
 
 	tests := []struct {
-		name           string
-		body           string
-		program        string
-		wantObjs       []mapstr.M
-		wantStatus     int
-		wantErr        bool
-		wantRawMessage []json.RawMessage
+		name       string
+		body       string
+		program    string
+		wantObjs   []mapstr.M
+		wantStatus int
+		wantErr    bool
 	}{
 		{
 			name:       "single object",
@@ -82,10 +83,6 @@ func Test_httpReadJSON(t *testing.T) {
 			name: "sequence of objects accepted (LF)",
 			body: `{"a":"1"}
 									{"a":"2"}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":"1"}`),
-				[]byte(`{"a":"2"}`),
-			},
 			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}},
 			wantStatus: http.StatusOK,
 		},
@@ -110,26 +107,14 @@ func Test_httpReadJSON(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name: "array of objects in stream",
-			body: `{"a":"1"} [{"a":"2"},{"a":"3"}] {"a":"4"}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":"1"}`),
-				[]byte(`{"a":"2"}`),
-				[]byte(`{"a":"3"}`),
-				[]byte(`{"a":"4"}`),
-			},
+			name:       "array of objects in stream",
+			body:       `{"a":"1"} [{"a":"2"},{"a":"3"}] {"a":"4"}`,
 			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
 			wantStatus: http.StatusOK,
 		},
 		{
 			name: "numbers",
 			body: `{"a":1} [{"a":false},{"a":3.14}] {"a":-4}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":1}`),
-				[]byte(`{"a":false}`),
-				[]byte(`{"a":3.14}`),
-				[]byte(`{"a":-4}`),
-			},
 			wantObjs: []mapstr.M{
 				{"a": int64(1)},
 				{"a": false},
@@ -171,13 +156,6 @@ func Test_httpReadJSON(t *testing.T) {
 				"timestamp": string(obj.timestamp), // leave timestamp in unix milli for ingest to handle.
 				"event": r,
 			})`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"event":{"data":"aGVsbG8=","number":1},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"c21hbGwgd29ybGQ=","number":9007199254740991},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"aGVsbG8gd29ybGQ=","number":"9007199254740992"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"YmlnIHdvcmxk","number":"9223372036854775808"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"d2lsbCBpdCBiZSBmcmllbmRzIHdpdGggbWU=","number":3.14},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-			},
 			wantObjs: []mapstr.M{
 				{"event": map[string]any{"data": "aGVsbG8=", "number": int64(1)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
 				{"event": map[string]any{"data": "c21hbGwgd29ybGQ=", "number": int64(9007199254740991)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
@@ -194,7 +172,7 @@ func Test_httpReadJSON(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to compile program: %v", err)
 			}
-			gotObjs, rawMessages, gotStatus, err := httpReadJSON(strings.NewReader(tt.body), prg)
+			gotObjs, gotStatus, err := httpReadJSON(strings.NewReader(tt.body), prg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("httpReadJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -205,10 +183,6 @@ func Test_httpReadJSON(t *testing.T) {
 			if gotStatus != tt.wantStatus {
 				t.Errorf("httpReadJSON() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
 			}
-			if tt.wantRawMessage != nil {
-				assert.Equal(t, tt.wantRawMessage, rawMessages)
-			}
-			assert.Equal(t, len(gotObjs), len(rawMessages))
 		})
 	}
 }
@@ -221,6 +195,9 @@ type publisher struct {
 func (p *publisher) Publish(e beat.Event) {
 	p.mu.Lock()
 	p.events = append(p.events, e)
+	if ack, ok := e.Private.(*batchACKTracker); ok {
+		ack.ACK()
+	}
 	p.mu.Unlock()
 }
 
@@ -236,12 +213,13 @@ func Test_apiResponse(t *testing.T) {
 		}
 	}
 	testCases := []struct {
-		name         string        // Sub-test name.
-		conf         config        // Load configuration.
-		request      *http.Request // Input request.
-		events       []mapstr.M    // Expected output events.
-		wantStatus   int           // Expected response code.
-		wantResponse string        // Expected response message.
+		name         string             // Sub-test name.
+		setup        func(t *testing.T) // setup function
+		conf         config             // Load configuration.
+		request      *http.Request      // Input request.
+		events       []mapstr.M         // Expected output events.
+		wantStatus   int                // Expected response code.
+		wantResponse string             // Expected response message.
 	}{
 		{
 			name: "single_event",
@@ -282,7 +260,54 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_hex",
+			name: "options_with_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{
+					"optional-response-header": {"Optional-response-value"},
+				}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_empty_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_no_header",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"OPTIONS requests are only allowed with options_headers set"}`,
+		},
+		{
+			name:  "hmac_hex",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -307,7 +332,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_base64",
+			name:  "hmac_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -332,7 +358,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_raw_base64",
+			name:  "hmac_raw_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -355,6 +382,81 @@ func Test_apiResponse(t *testing.T) {
 			},
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "hmac_header_not_present",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"missing HMAC header"}`,
+		},
+		{
+			name: "hmac_header_value_is_empty",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_only_contains_prefix",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 ")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_bad_encoding",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 not-hex-or-base64")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: encoding/hex: invalid byte: U+006E 'n'\nillegal base64 data at input byte 3\nillegal base64 data at input byte 3"}`,
 		},
 		{
 			name: "single_event_gzip",
@@ -492,10 +594,12 @@ func Test_apiResponse(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
+			if tc.setup != nil {
+				tc.setup(t)
+			}
 			pub := new(publisher)
-			metrics := newInputMetrics("")
-			defer metrics.Close()
-			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
+			metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, nil, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()
@@ -521,4 +625,269 @@ func newTracerConfig(name string, cfg config, withTrace bool) config {
 		Filename: filepath.Join(traceLogsDir, name+".ndjson"),
 	}}
 	return cfg
+}
+
+func TestHysteresisAdmissionControl(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("accepts_requests_below_high_water", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 3000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		h := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics)
+
+		// Small request should be accepted.
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		h.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+	})
+
+	t.Run("rejects_requests_at_high_water", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 100 // Very low threshold.
+		c.LowWaterInFlight = 50
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate existing in-flight bytes above high water mark and
+		// set reject mode.
+		handler.inFlight.Store(150)
+		handler.accepting.Store(false)
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusServiceUnavailable, respRec.Code)
+		assert.Contains(t, respRec.Body.String(), "high water mark")
+	})
+
+	t.Run("resumes_accepting_below_low_water", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 1000
+		c.LowWaterInFlight = 500
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate having been in rejecting mode but now below low water.
+		handler.inFlight.Store(100)
+		handler.accepting.Store(false)
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		// Should be accepted because we're below low water.
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// Should have transitioned to accepting.
+		assert.True(t, handler.accepting.Load())
+	})
+
+	t.Run("hysteresis_prevents_oscillation", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 1000
+		c.LowWaterInFlight = 500
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate being in rejecting mode at a level between low and high water.
+		handler.inFlight.Store(700) // Between 500 and 1000.
+		handler.accepting.Store(false)
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		// Should still be rejecting because we're not below low water.
+		assert.Equal(t, http.StatusServiceUnavailable, respRec.Code)
+		assert.False(t, handler.accepting.Load())
+	})
+}
+
+func TestInFlightByteTracking(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("tracks_bytes_correctly_during_request", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 2000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Request with known body size.
+		body := `{"id":12345}`
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+
+		// Capture in-flight before (should be 0).
+		assert.Equal(t, int64(0), handler.inFlight.Load())
+
+		handler.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// After request completes, in-flight should return to 0.
+		assert.Equal(t, int64(0), handler.inFlight.Load())
+	})
+
+	t.Run("in_flight_returns_to_baseline_after_request", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 2000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate pre-existing in-flight from other requests.
+		handler.inFlight.Store(1000)
+
+		body := `{"data":"test"}`
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// After request completes, in-flight should return to pre-existing baseline.
+		assert.Equal(t, int64(1000), handler.inFlight.Load())
+	})
+}
+
+func TestCountReaderWithCompression(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("counts_decompressed_bytes", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 3000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Create gzip compressed body.
+		body := `{"id":1,"data":"test"}`
+		var compressedBody bytes.Buffer
+		gzWriter := gzip.NewWriter(&compressedBody)
+		_, err := gzWriter.Write([]byte(body))
+		require.NoError(t, err)
+		require.NoError(t, gzWriter.Close())
+
+		req := httptest.NewRequest(http.MethodPost, "/", &compressedBody)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Content-Encoding", "gzip")
+		respRec := httptest.NewRecorder()
+
+		inFlightBefore := handler.inFlight.Load()
+		handler.ServeHTTP(respRec, req)
+		inFlightAfter := handler.inFlight.Load()
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// After request completes, in-flight should return to original.
+		assert.Equal(t, inFlightBefore, inFlightAfter)
+	})
+}
+
+// slowReader wraps an io.Reader and adds a delay after each read.
+// It also limits the number of bytes read per call to ensure multiple reads.
+type slowReader struct {
+	r         io.Reader
+	delay     time.Duration
+	chunkSize int
+}
+
+func (s *slowReader) Read(p []byte) (int, error) {
+	// Limit read size to force multiple reads
+	if len(p) > s.chunkSize {
+		p = p[:s.chunkSize]
+	}
+	n, err := s.r.Read(p)
+	if n > 0 {
+		time.Sleep(s.delay)
+	}
+	return n, err
+}
+
+func TestConcurrentRequestsExceedHighWater(t *testing.T) {
+	ctx := context.Background()
+
+	c := defaultConfig()
+	c.MaxInFlight = 1000
+	c.HighWaterInFlight = 30 // Lower threshold to ensure we exceed it.
+	c.LowWaterInFlight = 15
+
+	pub := new(publisher)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics)
+
+	// Create a slow request body that will hold in-flight bytes while reading.
+	// The body is large enough to exceed high water mark (50 bytes).
+	// Using small chunks and delays ensures the bytes accumulate slowly.
+	bodyContent := `{"data":"` + strings.Repeat("x", 100) + `"}`
+	slowBody := &slowReader{
+		r:         bytes.NewReader([]byte(bodyContent)),
+		delay:     50 * time.Millisecond,
+		chunkSize: 20,
+	}
+
+	var wg sync.WaitGroup
+	var slowReqStatus, fastReqStatus int
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		req := httptest.NewRequest(http.MethodPost, "/", slowBody)
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		h.ServeHTTP(respRec, req)
+		slowReqStatus = respRec.Code
+	}()
+
+	// Give the slow request time to read a few chunks and accumulate in-flight bytes.
+	// After ~150ms, it should have read at least 60 bytes, exceeding high water (30).
+	time.Sleep(150 * time.Millisecond)
+
+	// Send a fast request while the slow one is still reading.
+	// This should be rejected because in-flight is above high water mark (30).
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		h.ServeHTTP(respRec, req)
+		fastReqStatus = respRec.Code
+	}()
+
+	wg.Wait()
+
+	// The slow request should succeed (it started when in-flight was 0).
+	assert.Equal(t, http.StatusOK, slowReqStatus)
+	// The fast request should be rejected with 503 (in-flight was above high water).
+	assert.Equal(t, http.StatusServiceUnavailable, fastReqStatus)
 }

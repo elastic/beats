@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -125,8 +124,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			LegacySanitizeOptions: tc.sanitizationOption,
 		}
 
-		reg := monitoring.NewRegistry()
-		metrics := newInputMetrics("test", reg)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
 		fakeClient := fakeClient{}
 
@@ -181,7 +179,5 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 
 		// Processor
 		assert.Equal(t, tc.processorRestarts, metrics.processorRestarts.Get())
-
-		metrics.Close() // Stop the metrics collection.
 	}
 }

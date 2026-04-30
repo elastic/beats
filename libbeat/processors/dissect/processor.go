@@ -23,15 +23,17 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const flagParsingError = "dissect_parsing_error"
 
 type processor struct {
-	config config
+	config     config
+	prefixKeys map[string]string // pre-computed prefix+key for each dissect field
 }
 
 func init() {
@@ -40,7 +42,7 @@ func init() {
 }
 
 // NewProcessor constructs a new dissect processor.
-func NewProcessor(c *cfg.C) (beat.Processor, error) {
+func NewProcessor(c *cfg.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -55,6 +57,16 @@ func NewProcessor(c *cfg.C) (beat.Processor, error) {
 		}
 	}
 	p := &processor{config: config}
+
+	// Pre-compute prefixed target keys so mapper() doesn't
+	// allocate a new string per field per event.
+	if config.TargetPrefix != "" {
+		prefix := config.TargetPrefix + "."
+		p.prefixKeys = make(map[string]string, len(config.Tokenizer.parser.fields))
+		for _, f := range config.Tokenizer.parser.fields {
+			p.prefixKeys[f.Key()] = prefix + f.Key()
+		}
+	}
 
 	return p, nil
 }
@@ -104,39 +116,67 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		return event, err
 	}
 
-	backup := event.Clone()
-
 	if convertDataType {
 		event, err = p.mapper(event, mapInterfaceToMapStr(mc))
 	} else {
-		event, err = p.mapper(event, mapToMapStr(m))
-	}
-	if err != nil {
-		return backup, err
+		event, err = p.mapFields(event, m)
 	}
 
-	return event, nil
+	return event, err
+}
+
+// prefixedKey returns the pre-computed prefix+key string when available,
+// falling back to runtime concatenation for dynamic keys (e.g. indirect fields).
+func (p *processor) prefixedKey(k string) string {
+	if p.prefixKeys != nil {
+		if pk, ok := p.prefixKeys[k]; ok {
+			return pk
+		}
+		// Dynamic key not in the pre-computed set — fall back to concatenation.
+		return p.config.TargetPrefix + "." + k
+	}
+	return k
 }
 
 func (p *processor) mapper(event *beat.Event, m mapstr.M) (*beat.Event, error) {
-	prefix := ""
-	if p.config.TargetPrefix != "" {
-		prefix = p.config.TargetPrefix + "."
-	}
-	var prefixKey string
-	for k, v := range m {
-		prefixKey = prefix + k
-		if _, err := event.GetValue(prefixKey); errors.Is(err, mapstr.ErrKeyNotFound) || p.config.OverwriteKeys {
-			_, _ = event.PutValue(prefixKey, v)
-		} else {
-			// When the target key exists but is a string instead of a map.
-			if err != nil {
+	// Check all keys before writing any so we never need a clone for rollback.
+	if !p.config.OverwriteKeys {
+		for k := range m {
+			prefixKey := p.prefixedKey(k)
+			found, err := event.HasKey(prefixKey)
+			if found {
+				return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
+			}
+			if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
 				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
 			}
-			return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
 		}
 	}
+	for k, v := range m {
+		_, _ = event.PutValue(p.prefixedKey(k), v)
+	}
+	return event, nil
+}
 
+// mapFields is a typed variant of mapper for Map (map[string]string),
+// avoiding the intermediate map[string]interface{} allocation from mapToMapStr.
+func (p *processor) mapFields(event *beat.Event, m Map) (*beat.Event, error) {
+	// Check all keys before writing any so we never need a clone for rollback.
+	if !p.config.OverwriteKeys {
+		for k := range m {
+			prefixKey := p.prefixedKey(k)
+			found, err := event.HasKey(prefixKey)
+			if found {
+				return event, fmt.Errorf("cannot override existing key with `%s`", prefixKey)
+			}
+			if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+				return event, fmt.Errorf("cannot override existing key with `%s`: %w", prefixKey, err)
+			}
+		}
+	}
+	for k, v := range m {
+		_, _ = event.PutValue(p.prefixedKey(k), v)
+	}
 	return event, nil
 }
 
@@ -144,14 +184,6 @@ func (p *processor) String() string {
 	return "dissect=" + p.config.Tokenizer.Raw() +
 		",field=" + p.config.Field +
 		",target_prefix=" + p.config.TargetPrefix
-}
-
-func mapToMapStr(m Map) mapstr.M {
-	newMap := make(mapstr.M, len(m))
-	for k, v := range m {
-		newMap[k] = v
-	}
-	return newMap
 }
 
 func mapInterfaceToMapStr(m MapConverted) mapstr.M {

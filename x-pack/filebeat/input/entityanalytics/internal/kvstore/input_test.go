@@ -147,11 +147,15 @@ func TestInput_Test(t *testing.T) {
 func TestInput_Run(t *testing.T) {
 	tmpDataDir := t.TempDir()
 
-	paths.Paths = &paths.Path{Data: tmpDataDir}
+	tempPath := paths.New()
+	tempPath.Data = tmpDataDir
 
 	t.Run("run-ok", func(t *testing.T) {
 		called := false
 		inp := input{
+			manager: &Manager{
+				Path: tempPath,
+			},
 			managedInput: &testInput{
 				runFn: func(inputCtx v2.Context, store *Store, client beat.Client) error {
 					called = true
@@ -175,6 +179,9 @@ func TestInput_Run(t *testing.T) {
 	t.Run("run-err", func(t *testing.T) {
 		called := false
 		inp := input{
+			manager: &Manager{
+				Path: tempPath,
+			},
 			managedInput: &testInput{
 				runFn: func(inputCtx v2.Context, store *Store, client beat.Client) error {
 					called = true
@@ -198,6 +205,9 @@ func TestInput_Run(t *testing.T) {
 	t.Run("run-panic", func(t *testing.T) {
 		called := false
 		inp := input{
+			manager: &Manager{
+				Path: tempPath,
+			},
 			managedInput: &testInput{
 				runFn: func(inputCtx v2.Context, store *Store, client beat.Client) error {
 					called = true

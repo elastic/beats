@@ -66,7 +66,7 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 	log := logp.NewLogger("winlogbeat")
 
 	// resolve registry file path
-	config.RegistryFile = paths.Resolve(paths.Data, config.RegistryFile)
+	config.RegistryFile = b.Info.Paths.Resolve(paths.Data, config.RegistryFile)
 	log.Infof("State will be read from and persisted to %s",
 		config.RegistryFile)
 
@@ -108,7 +108,9 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 	}
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		overwritePipelines := config.OverwritePipelines
-		esClient, err := eslegclient.NewConnectedClient(esConfig, "Winlogbeat")
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Winlogbeat", b.Info.Logger)
 		if err != nil {
 			return err
 		}
@@ -140,7 +142,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	}
 
 	if b.Config.Output.Name() == "elasticsearch" {
-		callback := func(esClient *eslegclient.Connection) error {
+		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 			_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
 			return err
 		}
@@ -158,7 +160,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	// Initialize metrics.
 	initMetrics("total")
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router())
+		err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry())
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
@@ -167,7 +169,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
 					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())

@@ -47,6 +47,7 @@ type kProbesReader struct {
 
 func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
 	processor, err := add_process_metadata.NewWithConfig(
+		l,
 		add_process_metadata.ConfigOverwriteKeys(true),
 		add_process_metadata.ConfigMatchPIDs([]string{"process.pid"}),
 	)
@@ -68,7 +69,7 @@ func (r kProbesReader) Processor() beat.Processor {
 }
 
 func (r kProbesReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := kprobes.New(r.config.Recursive)
+	watcher, err := kprobes.New(r.config.Recursive, r.log)
 	if err != nil {
 		return nil, err
 	}

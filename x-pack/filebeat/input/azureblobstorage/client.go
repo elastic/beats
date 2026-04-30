@@ -6,6 +6,7 @@ package azureblobstorage
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -95,7 +96,7 @@ func fetchBlobClient(url string, credential *blobCredentials, cfg config, log *l
 func fetchBlobClientWithSharedKey(url string, credential *azblob.SharedKeyCredential, log *logp.Logger) (*blob.Client, error) {
 	blobClient, err := blob.NewClientWithSharedKeyCredential(url, credential, nil)
 	if err != nil {
-		log.Errorf("Error fetching blob client for url : %s, error : %v", url, err)
+		log.Errorf("Error fetching blob client for url: %s, error: %v", url, err)
 		return nil, err
 	}
 
@@ -105,11 +106,27 @@ func fetchBlobClientWithSharedKey(url string, credential *azblob.SharedKeyCreden
 func fetchBlobClientWithConnectionString(connectionString string, containerName string, blobName string, log *logp.Logger) (*blob.Client, error) {
 	blobClient, err := blob.NewClientFromConnectionString(connectionString, containerName, blobName, nil)
 	if err != nil {
-		log.Errorf("Error fetching blob client for connectionString : %s, error : %v", connectionString, err)
+		log.Errorf("Error fetching blob client for connectionString: %s, error: %v", stripKey(connectionString), err)
 		return nil, err
 	}
 
 	return blobClient, nil
+}
+
+// stripKey returns the URI part only of a connection string to remove
+// sensitive information. A connection string should look like this:
+//
+//	sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=
+//
+// so return only the text before the first semi-colon.
+func stripKey(s string) string {
+	uri, _, ok := strings.Cut(s, ";")
+	if !ok {
+		// We expect the string to have the documented format if we reach
+		// here something is wrong, so let's stay on the safe side.
+		return "(redacted)"
+	}
+	return uri
 }
 
 func fetchBlobClientWithOAuth2(url string, credential *azidentity.ClientSecretCredential, oauth2Cfg *OAuth2Config) (*blob.Client, error) {

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package oracle
 
 import (
@@ -40,7 +42,7 @@ func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
 	}
 
 	if params.Password.Secret() == "" {
-		params.StandaloneConnection = true
+		params.StandaloneConnection = godror.Bool(true)
 		params.Password = dsn.NewPassword(config.Password)
 	}
 

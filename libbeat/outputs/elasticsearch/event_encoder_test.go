@@ -42,6 +42,12 @@ func TestEncodeEntry(t *testing.T) {
 
 	encoder := newEventEncoder(true, indexSelector, nil)
 
+	metaFields := mapstr.M{
+		events.FieldMetaOpType:   "create",
+		events.FieldMetaPipeline: "TEST_PIPELINE",
+		events.FieldMetaID:       "test_id",
+	}
+
 	timestamp := time.Date(1980, time.January, 1, 0, 0, 0, 0, time.UTC)
 	pubEvent := publisher.Event{
 		Content: beat.Event{
@@ -53,19 +59,13 @@ func TestEncodeEntry(t *testing.T) {
 					"nested_field": "nested_value",
 				},
 			},
-			Meta: mapstr.M{
-				events.FieldMetaOpType:   "create",
-				events.FieldMetaPipeline: "TEST_PIPELINE",
-				events.FieldMetaID:       "test_id",
-			},
+			Meta: metaFields,
 		},
 	}
 
-	encoded, encodedSize := encoder.EncodeEntry(pubEvent)
-	encPubEvent, ok := encoded.(publisher.Event)
+	encPubEvent, encodedSize := encoder.EncodeEntry(pubEvent)
 
 	// Check the resulting publisher.Event
-	require.True(t, ok, "EncodeEntry must return a publisher.Event")
 	require.NotNil(t, encPubEvent.EncodedEvent, "EncodeEntry must set EncodedEvent")
 	assert.Nil(t, encPubEvent.Content.Fields, "EncodeEntry should clear event.Content")
 
@@ -81,6 +81,7 @@ func TestEncodeEntry(t *testing.T) {
 	assert.Equal(t, timestamp, encBeatEvent.timestamp, "encodedEvent.timestamp should match the original event")
 	assert.Equal(t, events.OpTypeCreate, encBeatEvent.opType, "encoded opType should match the original metadata")
 	assert.False(t, encBeatEvent.deadLetter, "encoded event shouldn't have deadLetter flag set")
+	assert.Equal(t, encBeatEvent.meta, metaFields, "encoded event struct should include original event's meta fields")
 
 	// Check encoded fields
 	var eventContent struct {
@@ -97,6 +98,9 @@ func TestEncodeEntry(t *testing.T) {
 	assert.Equal(t, "test_value", eventContent.TestField, "Encoded field should match original")
 	assert.Equal(t, 5, eventContent.NumberField, "Encoded field should match original")
 	assert.Equal(t, "nested_value", eventContent.Nested.NestedField, "Encoded field should match original")
+
+	// Check string representation includes meta fields
+	assert.Contains(t, encBeatEvent.String(), `"pipeline":"TEST_PIPELINE"`, "String representation of encoded event should include the original event's meta fields")
 }
 
 // encodeBatch encodes a publisher.Batch so it can be provided to
@@ -123,14 +127,14 @@ func encodeEvents(client *Client, events []publisher.Event) []publisher.Event {
 	for i := range events {
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
-			encoded, _ := encoder.EncodeEntry(events[i])
-			event := encoded.(publisher.Event)
+			event, _ := encoder.EncodeEntry(events[i])
 			events[i] = event
 		}
 	}
 	return events
 }
 
+//nolint:unused // False positive caused by varying build tags, this is used in client_test
 func encodeEvent(client *Client, event publisher.Event) publisher.Event {
 	encoder := newEventEncoder(
 		client.conn.EscapeHTML,
@@ -138,5 +142,5 @@ func encodeEvent(client *Client, event publisher.Event) publisher.Event {
 		client.pipelineSelector,
 	)
 	encoded, _ := encoder.EncodeEntry(event)
-	return encoded.(publisher.Event)
+	return encoded
 }

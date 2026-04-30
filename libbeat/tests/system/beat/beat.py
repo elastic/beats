@@ -269,10 +269,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + "-" + self.today + ".ndjson"
 
-        args = [cmd, "-systemTest"]
+        args = [cmd, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
@@ -281,7 +281,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             path_home = home
 
         args += [
-            "-path.home", path_home,
+            "--path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
@@ -444,8 +444,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
                 print("Test has failed, here are the Beat logs")
-                for l in self.get_log_lines():
-                    print(l)
+                if self.output_lines() == 0:
+                    print("\n\nBeat had no output file")
+                else:
+                    print("\n\nHere is the beat's output file:")
+                    for entry in self.read_output():
+                        print(entry)
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)
@@ -477,8 +481,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + "-" + self.today + ".ndjson"
 
-        with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
-            data = f.readlines()
+        data = []
+        try:
+            with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
+                data = f.readlines()
+        except IOError:
+            pass
 
         return data
 
@@ -851,7 +859,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 is_documented_aliases.append(key)
 
         if undocumented_keys:
-            raise Exception(f"Keys {undocumented_keys} not documented in event {str(evt)}")
+            raise Exception(f"Keys:\n\n{undocumented_keys}\n\nnot documented in event:\n\n{str(evt)}\n")
 
         if is_documented_aliases:
             raise Exception(f"Keys {is_documented_aliases} documented as aliases!")
@@ -939,7 +947,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if security:
             username = user or os.getenv("ES_USER", "")
             password = os.getenv("ES_PASS", "")
-            es_instance = Elasticsearch([url], http_auth=(username, password))
+            es_instance = Elasticsearch([url], basic_auth=(username, password))
         else:
             es_instance = Elasticsearch([url])
         return es_instance

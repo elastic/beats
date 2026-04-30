@@ -9,6 +9,8 @@ filebeat.registry:
 
 filebeat.overwrite_pipelines: true
 
+path.logs: {{ beat.working_dir }}
+
 filebeat.config.modules:
   path: {{ beat.working_dir + '/modules.d/*.yml' }}
 
@@ -20,6 +22,7 @@ output.elasticsearch.password: {{ elasticsearch.pass }}
 setup.template.name: {{ index_name }}
 setup.template.pattern: {{ index_name }}*
 
+queue.mem.flush.timeout: 0s
 setup.kibana.host: {{ kibana_url }}
 
 {% if kibana_path %}

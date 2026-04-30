@@ -19,10 +19,6 @@ package file_integrity
 
 import (
 	"bytes"
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -36,10 +32,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/cespare/xxhash/v2"
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -67,6 +59,8 @@ const (
 	SourceFSNotify
 	// SourceEBPF identifies events triggered by an eBPF program.
 	SourceEBPF
+	// SourceETW identifies events triggered by ETW.
+	SourceETW
 	// SourceKProbes identifies events triggered by KProbes.
 	SourceKProbes
 )
@@ -75,6 +69,7 @@ var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
 	SourceEBPF:     "ebpf",
+	SourceETW:      "etw",
 	SourceKProbes:  "kprobes",
 }
 
@@ -134,7 +129,7 @@ type Event struct {
 	Action        Action              `json:"action"`                 // Action (like created, updated).
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`         // File hashes.
 	ParserResults mapstr.M            `json:"file,omitempty"`         // Results from running file parsers.
-	Process       *Process            `json:"process,omitempty"`      // Process data. Available only on Linux when using the eBPF backend.
+	Process       *Process            `json:"process,omitempty"`      // Process data. Available only on Linux when using the eBPF backend and on Windows when using ETW.
 	ContainerID   string              `json:"container_id,omitempty"` // Unique container ID. Available only on Linux when using the eBPF backend.
 
 	// Metadata
@@ -156,6 +151,8 @@ type Process struct {
 	User struct {
 		// Unique identifier of the user.
 		ID string `json:"id,omitempty"`
+		// User domain.
+		Domain string `json:"domain,omitempty"`
 		// Short name or login of the user.
 		Name string `json:"name,omitempty"`
 	} `json:"user,omitempty"`
@@ -163,6 +160,8 @@ type Process struct {
 	Group struct {
 		// Unique identifier for the group on the system/platform.
 		ID string `json:"id,omitempty"`
+		// Group domain.
+		Domain string `json:"domain,omitempty"`
 		// Name of the group.
 		Name string `json:"name,omitempty"`
 	} `json:"group,omitempty"`
@@ -172,22 +171,26 @@ type Process struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode          uint64      `json:"inode"`
-	UID            uint32      `json:"uid"`
-	GID            uint32      `json:"gid"`
-	SID            string      `json:"sid"`
-	Owner          string      `json:"owner"`
-	Group          string      `json:"group"`
-	Size           uint64      `json:"size"`
-	MTime          time.Time   `json:"mtime"`            // Last modification time.
-	CTime          time.Time   `json:"ctime"`            // Last metadata change time.
-	Type           Type        `json:"type"`             // File type (dir, file, symlink).
-	Mode           os.FileMode `json:"mode"`             // Permissions
-	SetUID         bool        `json:"setuid"`           // setuid bit (POSIX only)
-	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
-	Origin         []string    `json:"origin"`           // External origin info for the file (macOS only)
-	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
-	POSIXACLAccess []byte      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
+	Attributes         []string          `json:"attributes,omitempty"` // File attributes (Windows only, e.g. "hidden", "system").
+	Inode              uint64            `json:"inode"`                // Inode number (unique identifier for the file).
+	UID                uint32            `json:"uid"`
+	GID                uint32            `json:"gid"`
+	SID                string            `json:"sid"`
+	Owner              string            `json:"owner"`
+	Group              string            `json:"group"`
+	Size               uint64            `json:"size"`
+	MTime              time.Time         `json:"mtime"`                         // Last modification time.
+	CTime              time.Time         `json:"ctime"`                         // Last metadata change time.
+	Accessed           *time.Time        `json:"accessed,omitempty"`            // Last access time.
+	Created            *time.Time        `json:"created,omitempty"`             // Creation time.
+	Type               Type              `json:"type"`                          // File type (dir, file, symlink).
+	Mode               os.FileMode       `json:"mode"`                          // Permissions
+	SetUID             bool              `json:"setuid"`                        // setuid bit (POSIX only)
+	SetGID             bool              `json:"setgid"`                        // setgid bit (POSIX only)
+	Origin             []string          `json:"origin"`                        // External origin info for the file (macOS only)
+	SELinux            string            `json:"selinux"`                       // security.selinux xattr value (Linux only)
+	POSIXACLAccess     []byte            `json:"posix_acl_access"`              // system.posix_acl_access xattr value (Linux only)
+	ExtendedAttributes map[string]string `json:"extended_attributes,omitempty"` // Extended attributes of the file (Windows only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -329,10 +332,25 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		file["inode"] = strconv.FormatUint(info.Inode, 10)
 		file["mtime"] = info.MTime
 		file["ctime"] = info.CTime
+		if info.Created != nil {
+			file["created"] = *info.Created
+		}
+		if info.Accessed != nil {
+			file["accessed"] = *info.Accessed
+		}
+		if len(info.Attributes) > 0 {
+			file["attributes"] = info.Attributes
+		}
 
 		if e.Info.Type == FileType {
-			if extension := filepath.Ext(e.Path); extension != "" {
-				file["extension"] = strings.TrimLeft(extension, ".")
+			if filename := filepath.Base(e.Path); filename != "" && filename != "." {
+				// Identify ADS from the extension. Only windows supports ADS.
+				filename, forkName, found := strings.Cut(filename, ":")
+				if found {
+					file["fork_name"] = forkName
+				}
+				file["name"] = filename
+				file["extension"] = strings.TrimLeft(filepath.Ext(filename), ".")
 			}
 			if mimeType := getMimeType(e.Path); mimeType != "" {
 				file["mime_type"] = mimeType
@@ -381,23 +399,22 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["posix_acl_access"] = a
 			}
 		}
+		if len(info.ExtendedAttributes) > 0 {
+			file["extended_attributes"] = info.ExtendedAttributes
+		}
 	}
 
 	if e.Process != nil {
-		process := mapstr.M{
-			"pid":       e.Process.PID,
-			"name":      e.Process.Name,
-			"entity_id": e.Process.EntityID,
-			"user": mapstr.M{
-				"id":   e.Process.User.ID,
-				"name": e.Process.User.Name,
-			},
-			"group": mapstr.M{
-				"id":   e.Process.Group.ID,
-				"name": e.Process.Group.Name,
-			},
-		}
-
+		process := mapstr.M{}
+		setIfValid(process, "pid", e.Process.PID)
+		setIfValid(process, "name", e.Process.Name)
+		setIfValid(process, "entity_id", e.Process.EntityID)
+		setIfValid(process, "user.id", e.Process.User.ID)
+		setIfValid(process, "user.domain", e.Process.User.Domain)
+		setIfValid(process, "user.name", e.Process.User.Name)
+		setIfValid(process, "group.id", e.Process.Group.ID)
+		setIfValid(process, "group.domain", e.Process.Group.Domain)
+		setIfValid(process, "group.name", e.Process.Group.Name)
 		out.MetricSetFields.Put("process", process)
 	}
 
@@ -583,43 +600,9 @@ func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map
 
 	var hashes []hash.Hash
 	for _, name := range hashType {
-		switch name {
-		case BLAKE2B_256:
-			h, _ := blake2b.New256(nil)
-			hashes = append(hashes, h)
-		case BLAKE2B_384:
-			h, _ := blake2b.New384(nil)
-			hashes = append(hashes, h)
-		case BLAKE2B_512:
-			h, _ := blake2b.New512(nil)
-			hashes = append(hashes, h)
-		case MD5:
-			hashes = append(hashes, md5.New())
-		case SHA1:
-			hashes = append(hashes, sha1.New())
-		case SHA224:
-			hashes = append(hashes, sha256.New224())
-		case SHA256:
-			hashes = append(hashes, sha256.New())
-		case SHA384:
-			hashes = append(hashes, sha512.New384())
-		case SHA3_224:
-			hashes = append(hashes, sha3.New224())
-		case SHA3_256:
-			hashes = append(hashes, sha3.New256())
-		case SHA3_384:
-			hashes = append(hashes, sha3.New384())
-		case SHA3_512:
-			hashes = append(hashes, sha3.New512())
-		case SHA512:
-			hashes = append(hashes, sha512.New())
-		case SHA512_224:
-			hashes = append(hashes, sha512.New512_224())
-		case SHA512_256:
-			hashes = append(hashes, sha512.New512_256())
-		case XXH64:
-			hashes = append(hashes, xxhash.New())
-		default:
+		if fn, ok := hashTypes[name]; ok {
+			hashes = append(hashes, fn())
+		} else {
 			return nil, 0, fmt.Errorf("unknown hash type '%v'", name)
 		}
 	}
@@ -662,4 +645,27 @@ func multiWriter(hash []hash.Hash) io.Writer {
 		writers = append(writers, h)
 	}
 	return io.MultiWriter(writers...)
+}
+
+// isValidValue checks if a value should be included in the event (not empty).
+func isValidValue(value any) bool {
+	switch v := value.(type) {
+	case string:
+		return v != ""
+	case []string:
+		return len(v) > 0
+	case []byte:
+		return len(v) > 0
+	case nil:
+		return false
+	default:
+		return true
+	}
+}
+
+// setIfValid sets a field in the map only if the value is valid (not empty).
+func setIfValid(m mapstr.M, key string, value any) {
+	if isValidValue(value) {
+		m.Put(key, value)
+	}
 }

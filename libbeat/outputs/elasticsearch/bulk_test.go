@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build !integration
 
 package elasticsearch
@@ -23,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -72,16 +75,19 @@ func TestBulkReadToItems(t *testing.T) {
 
 func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
+	logger := logptest.NewTestingLogger(t, "")
 
 	reader := newJSONReader(response)
-	code, _, err := bulkReadItemStatus(logp.L(), reader)
+	code, _, _, err := bulkReadItemStatus(logger, reader)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 }
 
 func TestESNoErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
-	code, msg, err := readStatusItem(response)
+	logger := logptest.NewTestingLogger(t, "")
+
+	code, msg, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
@@ -90,7 +96,9 @@ func TestESNoErrorStatus(t *testing.T) {
 
 func TestES1StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
-	code, msg, err := readStatusItem(response)
+	logger := logptest.NewTestingLogger(t, "")
+
+	code, msg, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
@@ -99,7 +107,9 @@ func TestES1StyleErrorStatus(t *testing.T) {
 
 func TestES2StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
-	code, msg, err := readStatusItem(response)
+	logger := logptest.NewTestingLogger(t, "")
+
+	code, msg, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
@@ -118,14 +128,69 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
         }
       }
     }`)
-	code, _, err := readStatusItem(response)
+	logger := logptest.NewTestingLogger(t, "")
+	code, _, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
 }
 
-func readStatusItem(in []byte) (int, string, error) {
+func readStatusItem(in []byte, logger *logp.Logger) (int, string, error) {
 	reader := newJSONReader(in)
-	code, msg, err := bulkReadItemStatus(logp.L(), reader)
+	code, msg, _, err := bulkReadItemStatus(logger, reader)
 	return code, string(msg), err
+}
+
+func TestBulkReadItemStatusWithFailureStore(t *testing.T) {
+	tests := []struct {
+		name            string
+		response        []byte
+		expectedStatus  int
+		expectedFailure bool
+	}{
+		{
+			name:            "failure_store used",
+			response:        []byte(`{"create": {"status": 200, "failure_store": "used"}}`),
+			expectedStatus:  200,
+			expectedFailure: true,
+		},
+		{
+			name:            "no failure_store field",
+			response:        []byte(`{"create": {"status": 200}}`),
+			expectedStatus:  200,
+			expectedFailure: false,
+		},
+		{
+			name:            "failure_store not used",
+			response:        []byte(`{"create": {"status": 200, "failure_store": "not_used"}}`),
+			expectedStatus:  200,
+			expectedFailure: false,
+		},
+		{
+			name:            "failure_store used with error",
+			response:        []byte(`{"create": {"status": 400, "error": "mapping error", "failure_store": "used"}}`),
+			expectedStatus:  400,
+			expectedFailure: true,
+		},
+		{
+			name:            "failure_store used with index operation",
+			response:        []byte(`{"index": {"status": 201, "failure_store": "used"}}`),
+			expectedStatus:  201,
+			expectedFailure: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logger := logptest.NewTestingLogger(t, "")
+			reader := newJSONReader(tt.response)
+			status, msg, failureStoreUsed, err := bulkReadItemStatus(logger, reader)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedStatus, status)
+			assert.Equal(t, tt.expectedFailure, failureStoreUsed)
+			if tt.expectedStatus >= 400 {
+				assert.NotEmpty(t, msg)
+			}
+		})
+	}
 }

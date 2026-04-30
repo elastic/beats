@@ -75,9 +75,10 @@ func newClient(
 	pass string,
 	db int, key outil.Selector, dt redisDataType,
 	index string, codec codec.Codec,
+	logger *logp.Logger,
 ) *client {
 	return &client{
-		log:      logp.NewLogger("redis"),
+		log:      logger.Named("redis"),
 		Client:   tc,
 		observer: observer,
 		timeout:  timeout,
@@ -90,7 +91,7 @@ func newClient(
 	}
 }
 
-func (c *client) Connect() error {
+func (c *client) Connect(_ context.Context) error {
 	c.log.Debug("connect")
 	err := c.Client.Connect()
 	if err != nil {
@@ -321,7 +322,7 @@ func serializeEvents(
 		d := d
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
+			log.Errorf("Encoding event failed with error: %+v. Check the event_data log (configured by logging.event_data.files.path) to view the event", err)
 			log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
 			goto failLoop
 		}
@@ -340,7 +341,7 @@ failLoop:
 		d := d
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
+			log.Errorf("Encoding event failed with error: %+v. Check the event_data log (configured by logging.event_data.files.path) to view the event", err)
 			log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
 			i++
 			continue

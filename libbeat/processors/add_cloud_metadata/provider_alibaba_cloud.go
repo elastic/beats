@@ -27,7 +27,7 @@ import (
 var alibabaCloudMetadataFetcher = provider{
 	Name: "alibaba-ecs",
 
-	Local: false,
+	DefaultEnabled: false,
 
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		ecsMetadataHost := "100.100.100.200"

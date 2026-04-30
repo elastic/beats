@@ -25,12 +25,13 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDataNameFilter(t *testing.T) {
-	sysinit.InitModule("./_meta/testdata")
+	sysinit.InitModule("./_meta/testdata", logptest.NewTestingLogger(t, ""))
 	conf := map[string]interface{}{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},
@@ -41,7 +42,7 @@ func TestDataNameFilter(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
 	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.Equal(t, 3, len(data))
+	assert.Len(t, data, 3)
 }
 
 func TestDataEmptyFilter(t *testing.T) {
@@ -54,7 +55,7 @@ func TestDataEmptyFilter(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
 	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.Equal(t, 10, len(data))
+	assert.Len(t, data, 10)
 
 }
 

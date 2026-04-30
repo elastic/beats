@@ -1,8 +1,11 @@
+import base64
 import re
 import unittest
 import os
 import shutil
 import time
+
+from elasticsearch import Elasticsearch
 
 from filebeat import BaseTest
 from beat.beat import INTEGRATION_TESTS
@@ -26,7 +29,11 @@ class Test(BaseTest):
     def setUp(self):
         super(BaseTest, self).setUp()
         if INTEGRATION_TESTS:
-            self.es = self.get_elasticsearch_instance()
+            self.es: Elasticsearch = self.get_elasticsearch_instance()
+            self.username = os.getenv("ES_USER", "")
+            self.password = os.getenv("ES_PASS", "")
+            self.auth_value = base64.b64encode(f"{self.username}:{self.password}".encode()).decode()
+            self.headers = {"Authorization": f"Basic {self.auth_value}"}
 
         # Copy system module
         shutil.copytree(os.path.join(self.beat_path, "tests", "system", "module", "test"),
@@ -90,7 +97,7 @@ class Test(BaseTest):
 
         # Check pipeline is present
         self.wait_until(lambda: any(re.match("filebeat-.*-test-test-default", key)
-                                    for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/").keys()))
+                                    for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/", headers=self.headers).body.keys()))
         proc.check_kill_and_wait()
 
     def test_no_es_connection(self):
@@ -217,6 +224,7 @@ class Test(BaseTest):
         self.render_config_template(
             reload=False,
             reload_path=self.working_dir + "/configs/*.yml",
+            reload_type="modules",
             inputs=False,
         )
         os.mkdir(self.working_dir + "/configs/")
@@ -227,6 +235,7 @@ class Test(BaseTest):
   test:
     enabled: true
     wrong_field: error
+    var.paths: []
     input:
       scan_frequency: 1s
 """
@@ -235,9 +244,8 @@ class Test(BaseTest):
 
         exit_code = self.run_beat()
 
-        # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("No paths were defined for input accessing"),
+            lambda: self.log_contains("No paths were defined for input accessing config"),
             max_timeout=10)
 
         assert exit_code == 1

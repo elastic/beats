@@ -20,201 +20,113 @@
 package eventlog
 
 import (
-	"encoding/xml"
 	"errors"
-	"expvar"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"sync"
-	"syscall"
-	"time"
 
-	"github.com/joeshaw/multierror"
-	"github.com/rcrowley/go-metrics"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
-	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
-var (
-	detailSelector = "eventlog_detail"
-	detailf        = logp.MakeDebug(detailSelector)
+var errRecordIDGap = errors.New("record ID gap detected")
+var errRenderNoEvent = errors.New("rendering error without partial event")
 
-	// dropReasons contains counters for the number of dropped events for each
-	// reason.
-	dropReasons = expvar.NewMap("drop_reasons")
+const renderNoEventRetryLimit = 3
+const recordIDGapRetryLimit = 3
 
-	// readErrors contains counters for the read error types that occur.
-	readErrors = expvar.NewMap("read_errors")
-)
+type gapDetectedError struct {
+	channel  string
+	previous uint64
+	current  uint64
+	bookmark string
+}
 
-const (
-	// renderBufferSize is the size in bytes of the buffer used to render events.
-	renderBufferSize = 1 << 14
+func (e *gapDetectedError) Error() string {
+	return fmt.Sprintf("%v in channel %q (previous=%d current=%d)",
+		errRecordIDGap, e.channel, e.previous, e.current)
+}
 
-	// winEventLogApiName is the name used to identify the Windows Event Log API
-	// as both an event type and an API.
-	winEventLogAPIName = "wineventlog"
+func (e *gapDetectedError) Unwrap() error { return errRecordIDGap }
+func (e *gapDetectedError) Bookmark() string {
+	return e.bookmark
+}
 
-	// eventLoggingAPIName is the name used to identify the Event Logging API
-	// as both an event type and an API.
-	eventLoggingAPIName = "eventlogging"
+func (e *gapDetectedError) RetryKey() string {
+	return fmt.Sprintf("%s:%d:%d", e.channel, e.previous, e.current)
+}
 
-	// metaTTL is the length of time a WinMeta value is valid in the cache.
-	metaTTL = time.Hour
-)
+type renderNoEventError struct {
+	cause    error
+	bookmark string
+}
 
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
-		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
+func (e *renderNoEventError) Error() string {
+	if e.cause == nil {
+		return errRenderNoEvent.Error()
+	}
+	return fmt.Sprintf("%v: %v", errRenderNoEvent, e.cause)
+}
+
+func (e *renderNoEventError) Unwrap() error { return errRenderNoEvent }
+func (e *renderNoEventError) Bookmark() string {
+	return e.bookmark
+}
+
+func (e *renderNoEventError) RetryKey() string {
+	if e.bookmark != "" {
+		return e.bookmark
+	}
+	return fmt.Sprintf("no-bookmark:%v", e.cause)
+}
+
+func (l *winEventLog) newRenderNoEventError(handle win.EvtHandle, cause error) *renderNoEventError {
+	bookmark, bookmarkErr := l.createBookmarkFromEvent(handle)
+	return &renderNoEventError{
+		cause:    errors.Join(cause, bookmarkErr),
+		bookmark: bookmark,
 	}
 }
-
-type winEventLogConfig struct {
-	ConfigCommon  `config:",inline"`
-	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool               `config:"include_xml"`
-	Forwarded     *bool              `config:"forwarded"`
-	SimpleQuery   query              `config:",inline"`
-	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
-	EventLanguage uint32             `config:"language"`
-}
-
-// query contains parameters used to customize the event log data that is
-// queried from the log.
-type query struct {
-	IgnoreOlder time.Duration `config:"ignore_older"` // Ignore records older than this period of time.
-	EventID     string        `config:"event_id"`     // White-list and black-list of events.
-	Level       string        `config:"level"`        // Severity level.
-	Provider    []string      `config:"provider"`     // Provider (source name).
-}
-
-// NoMoreEventsAction defines what action for the reader to take when
-// ERROR_NO_MORE_ITEMS is returned by the Windows API.
-type NoMoreEventsAction uint8
-
-const (
-	// Wait for new events.
-	Wait NoMoreEventsAction = iota
-	// Stop the reader.
-	Stop
-)
-
-var noMoreEventsActionNames = map[NoMoreEventsAction]string{
-	Wait: "wait",
-	Stop: "stop",
-}
-
-// Unpack sets the action based on the string value.
-func (a *NoMoreEventsAction) Unpack(v string) error {
-	v = strings.ToLower(v)
-	for action, name := range noMoreEventsActionNames {
-		if v == name {
-			*a = action
-			return nil
-		}
-	}
-	return fmt.Errorf("invalid no_more_events action: %v", v)
-}
-
-// String returns the name of the action.
-func (a NoMoreEventsAction) String() string { return noMoreEventsActionNames[a] }
-
-// defaultWinEventLogConfig is the default configuration for new wineventlog readers.
-var defaultWinEventLogConfig = winEventLogConfig{
-	BatchReadSize: 100,
-}
-
-// Validate validates the winEventLogConfig data and returns an error describing
-// any problems or nil.
-func (c *winEventLogConfig) Validate() error {
-	var errs multierror.Errors
-
-	if c.XMLQuery != "" {
-		if c.ID == "" {
-			errs = append(errs, fmt.Errorf("event log is missing an 'id'"))
-		}
-
-		// Check for XML syntax errors. This does not check the validity of the query itself.
-		if err := xml.Unmarshal([]byte(c.XMLQuery), &struct{}{}); err != nil {
-			errs = append(errs, fmt.Errorf("invalid xml_query: %w", err))
-		}
-
-		switch {
-		case c.Name != "":
-			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'name'"))
-		case c.SimpleQuery.IgnoreOlder != 0:
-			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'ignore_older'"))
-		case c.SimpleQuery.Level != "":
-			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'level'"))
-		case c.SimpleQuery.EventID != "":
-			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'event_id'"))
-		case len(c.SimpleQuery.Provider) != 0:
-			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'provider'"))
-		}
-	} else if c.Name == "" {
-		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
-	}
-
-	return errs.Err()
-}
-
-// Validate that winEventLog implements the EventLog interface.
-var _ EventLog = &winEventLog{}
 
 // winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
 type winEventLog struct {
-	config       winEventLogConfig
-	query        string
-	id           string                   // Identifier of this event log.
-	channelName  string                   // Name of the channel from which to read.
-	file         bool                     // Reading from file rather than channel.
-	subscription win.EvtHandle            // Handle to the subscription.
-	maxRead      int                      // Maximum number returned in one Read.
-	lastRead     checkpoint.EventLogState // Record number of the last read event.
+	config      config
+	query       string
+	filter      *recordFilter
+	id          string                   // Identifier of this event log.
+	channelName string                   // Name of the channel from which to read.
+	file        bool                     // Reading from file rather than channel.
+	maxRead     int                      // Maximum number returned in one Read.
+	lastRead    checkpoint.EventLogState // Record number of the last read event.
+	log         *logp.Logger
 
-	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
-	message   func(event win.EvtHandle) (string, error)      // Message fallback function.
-	renderBuf []byte                                         // Buffer used for rendering event.
-	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
-	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
-
-	winMetaCache // Cached WinMeta tables by provider.
-
-	logPrefix string // String to prefix on log messages.
+	iterator *win.EventIterator
+	renderer win.EventRenderer
 
 	metrics *inputMetrics
-}
 
-func newEventLogging(options *conf.C) (EventLog, error) {
-	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
-	return newWinEventLog(options)
+	renderNoEventKey   string
+	renderNoEventCount int
+	gapRetryKey        string
+	gapRetryCount      int
 }
 
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options *conf.C) (EventLog, error) {
-	var xmlQuery string
 	var err error
 
-	c := defaultWinEventLogConfig
-	if err = readConfig(options, &c); err != nil {
+	c := defaultConfig()
+	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
 
@@ -223,69 +135,51 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		id = c.Name
 	}
 
+	l := &winEventLog{
+		config:      c,
+		id:          id,
+		channelName: c.Name,
+		maxRead:     c.BatchReadSize,
+		log:         logp.NewLogger("wineventlog").With("id", id),
+	}
+
 	if c.XMLQuery != "" {
-		xmlQuery = c.XMLQuery
+		if l.hasWin2025ForwardedBugRisk() {
+			l.log.Warn("using a custom XML query with Windows Server 2025 forwarded events can hit a known Event Log API issue")
+		}
+		l.query = c.XMLQuery
 	} else {
-		xmlQuery, err = win.Query{
-			Log:         c.Name,
-			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
-			Level:       c.SimpleQuery.Level,
-			EventID:     c.SimpleQuery.EventID,
-			Provider:    c.SimpleQuery.Provider,
-		}.Build()
+		l.log = l.log.With("channel", c.Name)
+		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
+			path, err := filepath.Abs(c.Name)
+			if err != nil {
+				return nil, err
+			}
+			l.file = true
+			l.channelName = path
+		}
+
+		l.filter, err = newRecordFilter(c.SimpleQuery)
 		if err != nil {
 			return nil, err
 		}
+
+		// Always use an unfiltered query and apply configured filters in Go.
+		l.query = "*"
 	}
 
-	eventMetadataHandle := func(providerName, sourceName string) sys.MessageFiles {
-		mf := sys.MessageFiles{SourceName: sourceName}
-		h, err := win.OpenPublisherMetadata(0, sourceName, c.EventLanguage)
+	switch c.IncludeXML || l.isForwarded() {
+	case true:
+		l.renderer = win.NewXMLRenderer(
+			c.EventLanguage,
+			l.isForwarded(),
+			win.NilHandle, l.log)
+	case false:
+		l.renderer, err = win.NewRenderer(
+			c.EventLanguage,
+			win.NilHandle, l.log)
 		if err != nil {
-			mf.Err = err
-			return mf
-		}
-
-		mf.Handles = []sys.FileHandle{{Handle: uintptr(h)}}
-		return mf
-	}
-
-	freeHandle := func(handle uintptr) error {
-		return win.Close(win.EvtHandle(handle))
-	}
-
-	if filepath.IsAbs(c.Name) {
-		c.Name = filepath.Clean(c.Name)
-	}
-
-	l := &winEventLog{
-		id:           id,
-		config:       c,
-		query:        xmlQuery,
-		channelName:  c.Name,
-		file:         filepath.IsAbs(c.Name),
-		maxRead:      c.BatchReadSize,
-		renderBuf:    make([]byte, renderBufferSize),
-		outputBuf:    sys.NewByteBuffer(renderBufferSize),
-		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
-		winMetaCache: newWinMetaCache(metaTTL),
-		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
-	}
-
-	// Forwarded events should be rendered using RenderEventXML. It is more
-	// efficient and does not attempt to use local message files for rendering
-	// the event's message.
-	switch {
-	case l.isForwarded():
-		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEventXML(event, l.renderBuf, out)
-		}
-	default:
-		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
-		}
-		l.message = func(event win.EvtHandle) (string, error) {
-			return win.Message(event, l.renderBuf, l.cache.get)
+			return nil, err
 		}
 	}
 
@@ -295,6 +189,25 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 func (l *winEventLog) isForwarded() bool {
 	c := l.config
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
+}
+
+func (l *winEventLog) shouldDetectGap(prevRecordID, currentRecordID uint64) bool {
+	if l.file || l.isForwarded() || prevRecordID == 0 {
+		return false
+	}
+	return currentRecordID > prevRecordID+1
+}
+
+func (l *winEventLog) hasWin2025ForwardedBugRisk() bool {
+	if !l.isForwarded() {
+		return false
+	}
+	osinfo, err := wininfo.OperatingSystem()
+	if err != nil {
+		l.log.Warnf("failed to get OS info while checking known issue conditions: %v", err)
+		return false
+	}
+	return strings.Contains(osinfo.Name, "2025")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -312,24 +225,38 @@ func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
-	var bookmark win.EvtHandle
-	var err error
+// IgnoreMissingChannel returns true if missing channels should be ignored.
+func (l *winEventLog) IgnoreMissingChannel() bool {
+	return !l.file && (l.config.IgnoreMissingChannel == nil || *l.config.IgnoreMissingChannel)
+}
+
+func (l *winEventLog) Open(state checkpoint.EventLogState, metricsRegistry *monitoring.Registry) error {
+	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	if l.metrics == nil {
-		l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil && l.id != "" {
+		l.metrics = newInputMetrics(l.channelName, metricsRegistry, l.log)
 	}
+
+	var err error
+	l.iterator, err = win.NewEventIterator(
+		win.WithSubscriptionFactory(func() (handle win.EvtHandle, err error) {
+			return l.open(l.lastRead)
+		}),
+		win.WithBatchSize(l.maxRead))
+	return err
+}
+
+func (l *winEventLog) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
+	var bookmark win.Bookmark
 	if len(state.Bookmark) > 0 {
-		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
-	} else if state.RecordNumber > 0 && l.channelName != "" {
-		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
+		var err error
+		bookmark, err = win.NewBookmarkFromXML(state.Bookmark)
+		if err != nil {
+			return win.NilHandle, err
+		}
+		defer bookmark.Close()
 	}
-	if err != nil {
-		l.metrics.logError(err)
-		return err
-	}
-	defer win.Close(bookmark)
 
 	if l.file {
 		return l.openFile(state, bookmark)
@@ -337,54 +264,49 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	return l.openChannel(bookmark)
 }
 
-func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
+func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
 	path := l.channelName
 
 	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
-		l.metrics.logError(err)
-		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
+		return win.NilHandle, fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
 
 	if bookmark > 0 {
-		debugf("%s Seeking to bookmark. timestamp=%v bookmark=%v",
-			l.logPrefix, state.Timestamp, state.Bookmark)
+		l.log.Debugf("Seeking to bookmark. timestamp=%v bookmark=%v",
+			state.Timestamp, state.Bookmark)
 
 		// This seeks to the last read event and strictly validates that the
 		// bookmarked record number exists.
-		if err = win.EvtSeek(h, 0, bookmark, win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
+		if err = win.EvtSeek(h, 0, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
 			// Then we advance past the last read event to avoid sending that
 			// event again. This won't fail if we're at the end of the file.
-			if seekErr := win.EvtSeek(h, 1, bookmark, win.EvtSeekRelativeToBookmark); seekErr != nil {
+			if seekErr := win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark); seekErr != nil {
 				err = fmt.Errorf("failed to seek past bookmarked position: %w", seekErr)
 			}
 		} else {
-			logp.Warn("%s Failed to seek to bookmarked location in %v (error: %v). "+
+			l.log.Warnf("s Failed to seek to bookmarked location in %v (error: %v). "+
 				"Recovering by reading the log from the beginning. (Did the file "+
-				"change since it was last read?)", l.logPrefix, path, err)
-			l.metrics.logError(err)
+				"change since it was last read?)", path, err)
 			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
 				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
 			}
 		}
 
 		if err != nil {
-			l.metrics.logError(err)
-			return err
+			return win.NilHandle, err
 		}
 	}
 
-	l.subscription = h
-	return nil
+	return h, err
 }
 
-func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
+func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
-		l.metrics.logError(err)
-		return err
+		return win.NilHandle, err
 	}
 	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
@@ -400,356 +322,299 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
 
-	debugf("%s using subscription query=%s", l.logPrefix, l.query)
-	subscriptionHandle, err := win.Subscribe(
+	l.log.Debugw("Using subscription query.", "winlog.query", l.query)
+	channelPath := ""
+	if l.config.XMLQuery == "" {
+		channelPath = l.channelName
+	}
+	h, err := win.Subscribe(
 		0, // Session - nil for localhost
 		signalEvent,
-		"",       // Channel - empty b/c channel is in the query
-		l.query,  // Query - nil means all events
-		bookmark, // Bookmark - for resuming from a specific event
+		channelPath,
+		l.query,                 // Query - nil means all events
+		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
 
-	switch {
-	case errors.Is(err, win.ERROR_NOT_FOUND), errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE),
-		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION):
-		debugf("%s error subscribing (first chance): %v", l.logPrefix, err)
+	if err == nil {
+		return h, nil
+	}
+	if errors.Is(err, win.ERROR_NOT_FOUND) ||
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE) ||
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION) {
 		// The bookmarked event was not found, we retry the subscription from the start.
-		l.metrics.logError(err)
 		incrementMetric(readErrors, err)
-		subscriptionHandle, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+		// Clear persisted checkpoint fields before restarting at oldest so stale
+		// state does not produce synthetic gap checks on the next records.
+		l.resetLastRead()
+		return win.Subscribe(0, signalEvent, channelPath, l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	}
-
-	if err != nil {
-		l.metrics.logError(err)
-		debugf("%s error subscribing (final): %v", l.logPrefix, err)
-		return err
-	}
-
-	l.subscription = subscriptionHandle
-	return nil
+	return 0, err
 }
 
 func (l *winEventLog) Read() ([]Record, error) {
-	handles, _, err := l.eventHandles(l.maxRead)
-	if err != nil || len(handles) == 0 {
-		return nil, err
-	}
-
 	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 	var records []Record
 	defer func() {
 		l.metrics.log(records)
-		for _, h := range handles {
-			win.Close(h)
-		}
 	}()
-	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
-	for _, h := range handles {
-		l.outputBuf.Reset()
-		err := l.render(h, l.outputBuf)
-		var bufErr sys.InsufficientBufferError
-		if errors.As(err, &bufErr) {
-			detailf("%s Increasing render buffer size to %d", l.logPrefix,
-				bufErr.RequiredSize)
-			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			l.outputBuf.Reset()
-			err = l.render(h, l.outputBuf)
-		}
-		l.metrics.logError(err)
-		if err != nil && l.outputBuf.Len() == 0 {
-			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
-			l.metrics.logDropped(err)
-			incrementMetric(dropReasons, err)
+	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
+		record, err := l.processHandle(h)
+		if err != nil {
+			if returnErr := l.handleProcessError(err); returnErr != nil {
+				return records, returnErr
+			}
 			continue
 		}
+		l.resetRenderNoEventRetry()
+		// Any successfully processed event breaks a previous gap retry streak.
+		l.resetGapRetry()
+		if l.filter != nil && !l.filter.match(record) {
+			continue
+		}
+		records = append(records, *record)
 
-		r := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
-		r.Offset = checkpoint.EventLogState{
-			Name:         l.id,
-			RecordNumber: r.RecordID,
-			Timestamp:    r.TimeCreated.SystemTime,
+		// It has read the maximum requested number of events.
+		if len(records) >= l.maxRead {
+			return records, nil
 		}
-		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
-			l.metrics.logError(err)
-			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
-		}
-		if r.Message == "" && l.message != nil {
-			r.Message, err = l.message(h)
-			if err != nil {
-				l.metrics.logError(err)
-				logp.Warn("%s error salvaging message (event id=%d qualifier=%d provider=%q created at %s will be included without a message): %v",
-					l.logPrefix, r.EventIdentifier.ID, r.EventIdentifier.Qualifiers, r.Provider.Name, r.TimeCreated.SystemTime, err)
-			}
-		}
-		records = append(records, r)
-		l.lastRead = r.Offset
 	}
 
-	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
+	// An error occurred while retrieving more events.
+	if err := l.iterator.Err(); err != nil {
+		l.metrics.logError(err)
+		return records, err
+	}
+
+	// Reader is configured to stop when there are no more events.
+	if Stop == l.config.NoMoreEvents {
+		return records, io.EOF
+	}
+
 	return records, nil
 }
 
-func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
-	handles, err := win.EventHandles(l.subscription, maxRead)
-	switch err { //nolint:errorlint // This is an errno or nil.
-	case nil:
-		if l.maxRead > maxRead {
-			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
-				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
-		}
-		return handles, maxRead, nil
-	case win.ERROR_NO_MORE_ITEMS:
-		detailf("%s No more events", l.logPrefix)
-		if l.config.NoMoreEvents == Stop {
-			return nil, maxRead, io.EOF
-		}
-		return nil, maxRead, nil
-	case win.RPC_S_INVALID_BOUND:
-		incrementMetric(readErrors, err)
+func (l *winEventLog) handleProcessError(err error) error {
+	var renderErr *renderNoEventError
+	if errors.As(err, &renderErr) {
+		// Render-no-event and gap retries are independent counters; reset gap
+		// state while handling render failures to avoid cross-error pollution.
+		l.resetGapRetry()
 		l.metrics.logError(err)
-		if err := l.Close(); err != nil {
-			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
+		retryCount := l.incrementRenderNoEventRetry(renderErr.RetryKey())
+		if retryCount <= renderNoEventRetryLimit {
+			return err
 		}
-		if err := l.Open(l.lastRead); err != nil {
-			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
+
+		l.log.Errorw("Dropping poison event after repeated render failures.",
+			"channel", l.channelName,
+			"retry_count", retryCount,
+			"retry_limit", renderNoEventRetryLimit)
+		l.metrics.logDropped(err)
+		incrementMetric(dropReasons, errRenderNoEvent.Error())
+		if bookmark := renderErr.Bookmark(); bookmark != "" {
+			l.lastRead.Bookmark = bookmark
+		} else {
+			l.log.Errorw("Dropping poison event without bookmark after repeated render failures.",
+				"channel", l.channelName,
+				"retry_count", retryCount,
+				"retry_limit", renderNoEventRetryLimit)
+			l.resetRenderNoEventRetry()
+			return nil
 		}
-		return l.eventHandles(maxRead / 2)
-	default:
-		l.metrics.logError(err)
-		incrementMetric(readErrors, err)
-		logp.Warn("%s EventHandles returned error %v", l.logPrefix, err)
-		return nil, 0, err
+		// We advanced by bookmark only; clear record number so gap detection
+		// does not compare against stale numeric state.
+		l.lastRead.RecordNumber = 0
+		l.resetRenderNoEventRetry()
+		return nil
 	}
+
+	l.resetRenderNoEventRetry()
+	var gapErr *gapDetectedError
+	if errors.As(err, &gapErr) {
+		// Gap errors are retried first (runner reset + backoff) because in-flight
+		// events can arrive and fill the gap shortly after detection.
+		l.metrics.logError(err)
+		retryCount := l.incrementGapRetry(gapErr.RetryKey())
+		if retryCount <= recordIDGapRetryLimit {
+			return err
+		}
+
+		// After repeated retries on the same gap boundary, accept the gap and
+		// advance state to avoid an infinite reset loop.
+		l.log.Errorw("Accepting record ID gap after repeated retries.",
+			"channel", l.channelName,
+			"retry_count", retryCount,
+			"retry_limit", recordIDGapRetryLimit,
+			"previous_record_id", gapErr.previous,
+			"current_record_id", gapErr.current,
+			"missing", gapErr.current-gapErr.previous-1)
+		l.metrics.logDropped(err)
+		incrementMetric(dropReasons, errRecordIDGap.Error())
+		if bookmark := gapErr.Bookmark(); bookmark != "" {
+			l.lastRead.Bookmark = bookmark
+		}
+		l.lastRead.RecordNumber = gapErr.current
+		// Gap was handled (accepted/dropped), so clear retry state for the next boundary.
+		l.resetGapRetry()
+		return nil
+	}
+
+	// Different/non-gap error path; discard any stale gap retry context.
+	l.resetGapRetry()
+	if errors.Is(err, errRecordIDGap) || errors.Is(err, errRenderNoEvent) {
+		l.metrics.logError(err)
+		return err
+	}
+
+	l.metrics.logError(err)
+	l.log.Warnw("Dropping event due to rendering error.", "error", err)
+	l.metrics.logDropped(err)
+	incrementMetric(dropReasons, err)
+	return nil
 }
 
-func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
-	includeXML := l.config.IncludeXML
-	e, err := winevent.UnmarshalXML(x)
+func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
+	defer h.Close()
+
+	// NOTE: Render can return an error and a partial event.
+	evt, xml, err := l.renderer.Render(h)
+	if evt == nil {
+		return nil, l.newRenderNoEventError(h, err)
+	}
 	if err != nil {
-		e.RenderErr = append(e.RenderErr, err.Error())
-		// Add raw XML to event.original when decoding fails
-		includeXML = true
+		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
-	err = winevent.PopulateAccount(&e.User)
-	if err != nil {
-		debugf("%s SID %s account lookup failed. %v", l.logPrefix,
-			e.User.Identifier, err)
+	r := &Record{
+		Event: *evt,
 	}
 
-	if e.RenderErrorCode != 0 {
-		// Convert the render error code to an error message that can be
-		// included in the "error.message" field.
-		e.RenderErr = append(e.RenderErr, syscall.Errno(e.RenderErrorCode).Error())
-	} else if recoveredErr != nil {
-		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
-	}
-
-	// Get basic string values for raw fields.
-	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name), &e)
-	if e.Level == "" {
-		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
-		e.Level = win.EventLevel(e.LevelRaw).String()
-	}
-
-	if logp.IsDebug(detailSelector) {
-		detailf("%s XML=%s Event=%+v", l.logPrefix, x, e)
-	}
-
-	r := Record{
-		API:   winEventLogAPIName,
-		Event: e,
+	if l.config.IncludeXML {
+		r.XML = xml
 	}
 
 	if l.file {
 		r.File = l.id
 	}
 
-	if includeXML {
-		r.XML = string(x)
+	prevRecordID := l.lastRead.RecordNumber
+	if l.shouldDetectGap(prevRecordID, r.RecordID) {
+		// Gap detection is channel-only. File reads can legitimately contain
+		// non-contiguous record IDs and should not trigger recovery. Forwarded
+		// events can also be non-contiguous.
+		l.log.Warnw("Record ID gap detected, resetting subscription.",
+			"channel", l.channelName,
+			"previous_record_id", prevRecordID,
+			"current_record_id", r.RecordID,
+			"missing", r.RecordID-prevRecordID-1)
+		return nil, l.newGapDetectedError(h, prevRecordID, r.RecordID)
 	}
 
-	return r
+	r.Offset = checkpoint.EventLogState{
+		Name:         l.id,
+		RecordNumber: r.RecordID,
+		Timestamp:    r.TimeCreated.SystemTime,
+	}
+	if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
+		l.metrics.logError(err)
+		l.log.Warnw("Failed creating bookmark.", "error", err)
+	}
+	l.lastRead = r.Offset
+	return r, nil
+}
+
+func (l *winEventLog) newGapDetectedError(handle win.EvtHandle, previousRecordID, currentRecordID uint64) *gapDetectedError {
+	// Capture the current event bookmark so the gap circuit-breaker can skip
+	// this boundary if retries are exhausted.
+	bookmark, err := l.createBookmarkFromEvent(handle)
+	if err != nil {
+		l.metrics.logError(err)
+		l.log.Warnw("Failed creating bookmark for record ID gap recovery.", "error", err)
+	}
+
+	return &gapDetectedError{
+		channel:  l.channelName,
+		previous: previousRecordID,
+		current:  currentRecordID,
+		bookmark: bookmark,
+	}
 }
 
 func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
-	bmHandle, err := win.CreateBookmarkFromEvent(evtHandle)
+	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create new bookmark from event handle: %w", err)
 	}
-	l.outputBuf.Reset()
-	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
-	win.Close(bmHandle)
-	return string(l.outputBuf.Bytes()), err
+	defer bookmark.Close()
+
+	return bookmark.XML()
 }
 
 func (l *winEventLog) Reset() error {
-	debugf("%s Closing handle for reset", l.logPrefix)
-	return win.Close(l.subscription)
+	l.log.Debug("Closing event log reader handles for reset.")
+	// Only close the iterator, keep the renderer alive to avoid
+	// unnecessarily recreating render contexts. The renderer's
+	// systemContext and userContext should remain valid across
+	// session resets since they were created independently.
+	if l.iterator == nil {
+		return nil
+	}
+	err := l.iterator.Close()
+	l.iterator = nil
+	return err
 }
 
 func (l *winEventLog) Close() error {
-	debugf("%s Closing handle", l.logPrefix)
+	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
-	return win.Close(l.subscription)
+	return l.close()
 }
 
-// winMetaCache retrieves and caches WinMeta tables by provider name.
-// It is a cut down version of the PublisherMetadataStore caching in wineventlog.Renderer.
-type winMetaCache struct {
-	ttl    time.Duration
-	logger *logp.Logger
-
-	mu    sync.RWMutex
-	cache map[string]winMetaCacheEntry
+func (l *winEventLog) close() error {
+	if l.iterator == nil {
+		return l.renderer.Close()
+	}
+	return errors.Join(
+		l.iterator.Close(),
+		l.renderer.Close(),
+	)
 }
 
-type winMetaCacheEntry struct {
-	expire time.Time
-	*winevent.WinMeta
+func (l *winEventLog) incrementRenderNoEventRetry(bookmark string) int {
+	if bookmark == l.renderNoEventKey && l.renderNoEventCount > 0 {
+		l.renderNoEventCount++
+		return l.renderNoEventCount
+	}
+
+	l.renderNoEventKey = bookmark
+	l.renderNoEventCount = 1
+	return l.renderNoEventCount
 }
 
-func newWinMetaCache(ttl time.Duration) winMetaCache {
-	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
+func (l *winEventLog) resetRenderNoEventRetry() {
+	l.renderNoEventKey = ""
+	l.renderNoEventCount = 0
 }
 
-func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
-	c.mu.RLock()
-	e, ok := c.cache[provider]
-	c.mu.RUnlock()
-	if ok && time.Until(e.expire) > 0 {
-		return e.WinMeta
+func (l *winEventLog) incrementGapRetry(key string) int {
+	if key == l.gapRetryKey && l.gapRetryCount > 0 {
+		l.gapRetryCount++
+		return l.gapRetryCount
 	}
 
-	// Upgrade lock.
-	defer c.mu.Unlock()
-	c.mu.Lock()
-
-	// Did the cache get updated during lock upgrade?
-	// No need to check expiry here since we must have a new entry
-	// if there is an entry at all.
-	if e, ok := c.cache[provider]; ok {
-		return e.WinMeta
-	}
-
-	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
-	if err != nil {
-		// Return an empty store on error (can happen in cases where the
-		// log was forwarded and the provider doesn't exist on collector).
-		s = win.NewEmptyPublisherMetadataStore(provider, c.logger)
-		logp.Warn("failed to load publisher metadata for %v (returning an empty metadata store): %v", provider, err)
-	}
-	s.Close()
-	c.cache[provider] = winMetaCacheEntry{expire: time.Now().Add(c.ttl), WinMeta: &s.WinMeta}
-	return &s.WinMeta
+	l.gapRetryKey = key
+	l.gapRetryCount = 1
+	return l.gapRetryCount
 }
 
-// incrementMetric increments a value in the specified expvar.Map. The key
-// should be a windows syscall.Errno or a string. Any other types will be
-// reported under the "other" key.
-func incrementMetric(v *expvar.Map, key interface{}) {
-	switch t := key.(type) {
-	default:
-		v.Add("other", 1)
-	case string:
-		v.Add(t, 1)
-	case syscall.Errno:
-		v.Add(strconv.Itoa(int(t)), 1)
-	}
+func (l *winEventLog) resetGapRetry() {
+	l.gapRetryKey = ""
+	l.gapRetryCount = 0
 }
 
-// inputMetrics handles event log metric reporting.
-type inputMetrics struct {
-	unregister func()
-
-	lastBatch time.Time
-
-	name        *monitoring.String // name of the provider being read
-	events      *monitoring.Uint   // total number of events received
-	dropped     *monitoring.Uint   // total number of discarded events
-	errors      *monitoring.Uint   // total number of errors
-	batchSize   metrics.Sample     // histogram of the number of events in each non-zero batch
-	sourceLag   metrics.Sample     // histogram of the difference between timestamped event's creation and reading
-	batchPeriod metrics.Sample     // histogram of the elapsed time between non-zero batch reads
-}
-
-// newInputMetrics returns an input metric for windows event logs. If id is empty
-// a nil inputMetric is returned.
-func newInputMetrics(name, id string) *inputMetrics {
-	if id == "" {
-		return nil
-	}
-	reg, unreg := inputmon.NewInputRegistry("winlog", id, nil)
-	out := &inputMetrics{
-		unregister:  unreg,
-		name:        monitoring.NewString(reg, "provider"),
-		events:      monitoring.NewUint(reg, "received_events_total"),
-		dropped:     monitoring.NewUint(reg, "discarded_events_total"),
-		errors:      monitoring.NewUint(reg, "errors_total"),
-		batchSize:   metrics.NewUniformSample(1024),
-		sourceLag:   metrics.NewUniformSample(1024),
-		batchPeriod: metrics.NewUniformSample(1024),
-	}
-	out.name.Set(name)
-	_ = adapter.NewGoMetrics(reg, "received_events_count", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.batchSize))
-	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.sourceLag))
-	_ = adapter.NewGoMetrics(reg, "batch_read_period", adapter.Accept).
-		Register("histogram", metrics.NewHistogram(out.batchPeriod))
-
-	return out
-}
-
-// log logs metric for the given batch.
-func (m *inputMetrics) log(batch []Record) {
-	if m == nil {
-		return
-	}
-	if len(batch) == 0 {
-		return
-	}
-
-	now := time.Now()
-	if !m.lastBatch.IsZero() {
-		m.batchPeriod.Update(now.Sub(m.lastBatch).Nanoseconds())
-	}
-	m.lastBatch = now
-
-	m.events.Add(uint64(len(batch)))
-	m.batchSize.Update(int64(len(batch)))
-	for _, r := range batch {
-		m.sourceLag.Update(now.Sub(r.TimeCreated.SystemTime).Nanoseconds())
-	}
-}
-
-// logError logs error metrics. Nil errors do not increment the error
-// count but the err value is currently otherwise not used. It is included
-// to allow easier extension of the metrics to include error stratification.
-func (m *inputMetrics) logError(err error) {
-	if m == nil {
-		return
-	}
-	if err == nil {
-		return
-	}
-	m.errors.Inc()
-}
-
-// logDropped logs dropped event metrics. Nil errors *do* increment the dropped
-// count; the value is currently otherwise not used, but is included to allow
-// easier extension of the metrics to include error stratification.
-func (m *inputMetrics) logDropped(_ error) {
-	if m == nil {
-		return
-	}
-	m.dropped.Inc()
-}
-
-func (m *inputMetrics) close() {
-	if m == nil {
-		return
-	}
-	m.unregister()
+func (l *winEventLog) resetLastRead() {
+	// Keep this scoped to fields used by resubscribe/gap logic.
+	l.lastRead.Bookmark = ""
+	l.lastRead.RecordNumber = 0
 }

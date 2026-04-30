@@ -1,0 +1,220 @@
+type: view
+name: elastic_amcache_applications_view
+description: Combined view of amcache applications and application files (apps with optional file rows, plus file-only rows)
+platforms:
+  - windows
+group: amcache
+
+required_tables:
+  - elastic_amcache_application
+  - elastic_amcache_application_file
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+  - name: program_id
+    type: TEXT
+    description: Program identifier
+  - name: file_id
+    type: TEXT
+    description: File identifier
+  - name: lower_case_long_path
+    type: TEXT
+    description: Lowercase long path
+  - name: name
+    type: TEXT
+    description: Application or file name
+  - name: original_file_name
+    type: TEXT
+    description: Original file name
+  - name: publisher
+    type: TEXT
+    description: Publisher
+  - name: version
+    type: TEXT
+    description: Version
+  - name: bin_file_version
+    type: TEXT
+    description: Binary file version
+  - name: binary_type
+    type: TEXT
+    description: Binary type
+  - name: product_name
+    type: TEXT
+    description: Product name
+  - name: product_version
+    type: TEXT
+    description: Product version
+  - name: link_date
+    type: TEXT
+    description: Link date
+  - name: bin_product_version
+    type: TEXT
+    description: Binary product version
+  - name: size
+    type: BIGINT
+    description: File size
+  - name: language
+    type: BIGINT
+    description: Language ID
+  - name: usn
+    type: BIGINT
+    description: Update sequence number
+  - name: appx_package_full_name
+    type: TEXT
+    description: AppX package full name
+  - name: is_os_component
+    type: TEXT
+    description: Is OS component flag
+  - name: appx_package_relative_id
+    type: TEXT
+    description: AppX package relative ID
+  - name: file_sha1
+    type: TEXT
+    description: File SHA1 hash
+  - name: program_instance_id
+    type: TEXT
+    description: Program instance identifier
+  - name: install_date
+    type: TEXT
+    description: Install date
+  - name: source
+    type: TEXT
+    description: Source
+  - name: root_dir_path
+    type: TEXT
+    description: Root directory path
+  - name: hidden_arp
+    type: BIGINT
+    description: Hidden ARP flag
+  - name: uninstall_string
+    type: TEXT
+    description: Uninstall command string
+  - name: registry_key_path
+    type: TEXT
+    description: Registry key path
+  - name: store_app_type
+    type: TEXT
+    description: Store app type
+  - name: inbox_modern_app
+    type: TEXT
+    description: Inbox modern app flag
+  - name: manifest_path
+    type: TEXT
+    description: Manifest path
+  - name: package_full_name
+    type: TEXT
+    description: Package full name
+  - name: msi_package_code
+    type: TEXT
+    description: MSI package code
+  - name: msi_product_code
+    type: TEXT
+    description: MSI product code
+  - name: msi_install_date
+    type: TEXT
+    description: MSI install date
+  - name: bundle_manifest_path
+    type: TEXT
+    description: Bundle manifest path
+  - name: user_sid
+    type: TEXT
+    description: User SID
+  - name: app_sha1
+    type: TEXT
+    description: Application SHA1 hash
+
+query: |
+  SELECT
+    COALESCE(file.timestamp, app.timestamp) AS timestamp,
+    COALESCE(file.date_time, app.date_time) AS date_time,
+    app.program_id,
+    file.file_id,
+    file.lower_case_long_path,
+    COALESCE(file.name, app.name) AS name,
+    file.original_file_name,
+    COALESCE(file.publisher, app.publisher) AS publisher,
+    COALESCE(file.version, app.version) AS version,
+    file.bin_file_version,
+    file.binary_type,
+    file.product_name,
+    file.product_version,
+    file.link_date,
+    file.bin_product_version,
+    file.size,
+    COALESCE(file.language, app.language) AS language,
+    file.usn,
+    file.appx_package_full_name,
+    file.is_os_component,
+    file.appx_package_relative_id,
+    file.sha1 AS file_sha1,
+    app.program_instance_id,
+    app.install_date,
+    app.source,
+    app.root_dir_path,
+    app.hidden_arp,
+    app.uninstall_string,
+    app.registry_key_path,
+    app.store_app_type,
+    app.inbox_modern_app,
+    app.manifest_path,
+    app.package_full_name,
+    app.msi_package_code,
+    app.msi_product_code,
+    app.msi_install_date,
+    app.bundle_manifest_path,
+    app.user_sid,
+    app.sha1 AS app_sha1
+  FROM elastic_amcache_application AS app
+  LEFT JOIN elastic_amcache_application_file AS file ON app.program_id = file.program_id
+  UNION ALL
+  SELECT
+    file.timestamp,
+    file.date_time,
+    file.program_id,
+    file.file_id,
+    file.lower_case_long_path,
+    file.name,
+    file.original_file_name,
+    file.publisher,
+    file.version,
+    file.bin_file_version,
+    file.binary_type,
+    file.product_name,
+    file.product_version,
+    file.link_date,
+    file.bin_product_version,
+    file.size,
+    file.language,
+    file.usn,
+    file.appx_package_full_name,
+    file.is_os_component,
+    file.appx_package_relative_id,
+    file.sha1 AS file_sha1,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL AS app_sha1
+  FROM elastic_amcache_application_file AS file
+  LEFT JOIN elastic_amcache_application AS app ON file.program_id = app.program_id
+  WHERE app.program_id IS NULL;
+
+documentation:
+  description: |
+    Combined view of Windows Amcache application and application file inventory.
+    Part 1: all application rows with optional matching file rows (LEFT JOIN on program_id).
+    Part 2: all file rows that have no matching application (file-only rows with NULL app columns).
+    Use for listing every app and/or file record from Amcache with a single query.
+  examples:
+    - title: Query the combined applications view
+      query: |
+        SELECT * FROM elastic_amcache_applications_view;
+    - title: Find entries by name
+      query: |
+        SELECT program_id, name, publisher, version FROM elastic_amcache_applications_view WHERE name LIKE '%Microsoft%';
+  notes:
+    - "Windows only. Depends on elastic_amcache_application and elastic_amcache_application_file."
+  related_tables:
+    - elastic_amcache_application
+    - elastic_amcache_application_file

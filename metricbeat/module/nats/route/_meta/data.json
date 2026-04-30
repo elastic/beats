@@ -1,35 +1,36 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "nats.route",
+        "duration": 115000,
+        "module": "nats"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"nats",
-        "name":"routes",
-        "rtt":44269
+    "metricset": {
+        "name": "route",
+        "period": 10000
     },
-    "nats":{
-        "server": {
-            "id": "bUAdpRFtMWddIBWw80Yd9D",
-            "time": "2018-12-28T12:33:53.026865597Z"
-        },
-        "routes": {
+    "nats": {
+        "route": {
             "in": {
-                "bytes": 0,
-                "messages": 0
+                "bytes": 112330,
+                "messages": 1669
             },
-            "ip": "172.25.255.2",
+            "ip": "172.19.0.3",
             "out": {
-                "bytes": 0,
-                "messages": 0
+                "bytes": 76865,
+                "messages": 1258
             },
             "pending_size": 0,
-            "port": 60736,
-            "remote_id": "NCYX4P3ZCXZT3UF4BBZUG46S7EU224XXXLUTUBUDOIAUAIR5WJV73BV5",
-            "subscriptions": 0,
+            "port": 35808,
+            "remote_id": "NCLTOCCWWFT55ANXSNIMXTP2Q4CEL42V2K2BNDXGM5YNMTBMULQO5V7L",
+            "subscriptions": 42
+        },
+        "server": {
+            "id": "NBND4PX5S47JXJZYEWSDE2KYOTEK2SM6MBMSQQ5ZUA5URNULLFFMTFJH"
         }
     },
-    "type":"metricsets"
+    "service": {
+        "address": "localhost:60202",
+        "type": "nats"
+    }
 }

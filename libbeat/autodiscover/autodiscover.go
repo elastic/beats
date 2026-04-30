@@ -24,12 +24,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -67,15 +69,8 @@ type Autodiscover struct {
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(
-	name string,
-	pipeline beat.PipelineConnector,
-	factory cfgfile.RunnerFactory,
-	configurer EventConfigurer,
-	c *Config,
-	keystore keystore.Keystore,
-) (*Autodiscover, error) {
-	logger := logp.NewLogger("autodiscover")
+func NewAutodiscover(name string, pipeline beat.PipelineConnector, factory cfgfile.RunnerFactory, configurer EventConfigurer, c *Config, keystore keystore.Keystore, logger *logp.Logger, path *paths.Path) (*Autodiscover, error) {
+	logger = logger.Named("autodiscover")
 
 	// Init Event bus
 	bus := bus.New(logger, name)
@@ -83,7 +78,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range c.Providers {
-		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
+		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore, path)
 		if err != nil {
 			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}
@@ -97,7 +92,7 @@ func NewAutodiscover(
 		factory:         factory,
 		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline, logger),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
@@ -165,11 +160,17 @@ func (a *Autodiscover) worker() {
 				a.logger.Debugf("calling reload with %d config(s)", len(configs))
 				err := a.runners.Reload(configs)
 
+				// Cleanup metadata no longer in use
+				a.cleanupMetadata()
+
 				// reset updated status
 				updated = false
 
 				// On error, make sure the next run also updates because some runners were not properly loaded
-				retry = err != nil
+				retry = common.IsInputReloadable(err)
+				if err != nil && !retry {
+					a.logger.Errorw("all new inputs failed to start with a non-retriable error", err)
+				}
 				if retry {
 					// The recoverable errors that can lead to retry are related
 					// to the harvester state, so we need to give the publishing
@@ -288,6 +289,30 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 	return updated
 }
 
+// cleanupMetadata removes metadata for config hashes that are no longer active
+func (a *Autodiscover) cleanupMetadata() {
+	activeHashes := make(map[uint64]struct{})
+	for _, configs := range a.configs {
+		for hash := range configs {
+			activeHashes[hash] = struct{}{}
+		}
+	}
+
+	storedHashes := a.meta.Keys()
+	removedCount := 0
+	for _, hash := range storedHashes {
+		if _, ok := activeHashes[hash]; ok {
+			continue
+		}
+
+		a.meta.Remove(hash)
+		removedCount++
+	}
+
+	a.logger.Debugf("Metadata cleanup: %d before, %d after, %d removed",
+		len(storedHashes), len(activeHashes), removedCount)
+}
+
 func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
 	m := event["meta"]
 	if m == nil {
@@ -300,7 +325,7 @@ func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
 		a.logger.Errorf("Got a wrong meta field for event %v", event)
 		return nil
 	}
-	return meta
+	return meta.Clone()
 }
 
 // getID returns the event "id" field string if present

@@ -20,10 +20,14 @@ package pipeline
 import (
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -74,31 +78,57 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 	}
 }
 
+func TestPipelineWaitCloseThenForce(t *testing.T) {
+	closed := make(chan struct{})
+	forceClosed := make(chan struct{})
+	queueDone := make(chan struct{})
+	mockQueue := &testQueue{
+		close: func(force bool) error {
+			if force {
+				close(forceClosed)
+				close(queueDone)
+			} else {
+				close(closed)
+			}
+			return nil
+		},
+		done: queueDone,
+	}
+	settings := Settings{
+		WaitCloseMode: WaitOnPipelineCloseThenForce,
+		WaitClose:     time.Millisecond,
+	}
+	pipeline := makePipeline(t, settings, mockQueue)
+	require.NoError(t, pipeline.Close())
+	<-closed
+	<-forceClosed
+}
+
 // makeDiscardQueue returns a queue that always discards all events
 // the producers are assigned an unique incremental ID, when their
 // close method is called, this ID is returned
-func makeDiscardQueue() queue.Queue {
+func makeDiscardQueue() queue.Queue[publisher.Event] {
 	var wg sync.WaitGroup
-	producerID := atomic.NewInt(0)
+	var producerID atomic.Int64
 
 	return &testQueue{
-		close: func() error {
+		close: func(_ bool) error {
 			//  Wait for all producers to finish
 			wg.Wait()
 			return nil
 		},
-		get: func(count int) (queue.Batch, error) {
+		get: func(count int) (queue.Batch[publisher.Event], error) {
 			return nil, nil
 		},
 
-		producer: func(cfg queue.ProducerConfig) queue.Producer {
-			producerID.Inc()
+		producer: func(cfg queue.ProducerConfig) queue.Producer[publisher.Event] {
+			producerID.Add(1)
 
 			// count is a counter that increments on every published event
 			// it's also the returned Event ID
 			count := uint64(0)
 			producer := &testProducer{
-				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+				publish: func(try bool, event publisher.Event) (queue.EntryID, bool) {
 					count++
 					return queue.EntryID(count), true
 				},
@@ -114,26 +144,27 @@ func makeDiscardQueue() queue.Queue {
 }
 
 type testQueue struct {
-	close        func() error
+	close        func(bool) error
 	bufferConfig func() queue.BufferConfig
-	producer     func(queue.ProducerConfig) queue.Producer
-	get          func(sz int) (queue.Batch, error)
+	producer     func(queue.ProducerConfig) queue.Producer[publisher.Event]
+	get          func(sz int) (queue.Batch[publisher.Event], error)
+	done         chan struct{}
 }
 
 type testProducer struct {
-	publish func(try bool, event queue.Entry) (queue.EntryID, bool)
+	publish func(try bool, event publisher.Event) (queue.EntryID, bool)
 	cancel  func()
 }
 
-func (q *testQueue) Close() error {
+func (q *testQueue) Close(force bool) error {
 	if q.close != nil {
-		return q.close()
+		return q.close(force)
 	}
 	return nil
 }
 
 func (q *testQueue) Done() <-chan struct{} {
-	return nil
+	return q.done
 }
 
 func (q *testQueue) QueueType() string {
@@ -147,28 +178,28 @@ func (q *testQueue) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{}
 }
 
-func (q *testQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
+func (q *testQueue) Producer(cfg queue.ProducerConfig) queue.Producer[publisher.Event] {
 	if q.producer != nil {
 		return q.producer(cfg)
 	}
 	return nil
 }
 
-func (q *testQueue) Get(sz int) (queue.Batch, error) {
+func (q *testQueue) Get(sz int) (queue.Batch[publisher.Event], error) {
 	if q.get != nil {
 		return q.get(sz)
 	}
 	return nil, nil
 }
 
-func (p *testProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+func (p *testProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(false, event)
 	}
 	return 0, false
 }
 
-func (p *testProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+func (p *testProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(true, event)
 	}
@@ -181,13 +212,13 @@ func (p *testProducer) Close() {
 	}
 }
 
-func makeTestQueue() queue.Queue {
+func makeTestQueue() queue.Queue[publisher.Event] {
 	var mux sync.Mutex
 	var wg sync.WaitGroup
-	producers := map[queue.Producer]struct{}{}
+	producers := map[queue.Producer[publisher.Event]]struct{}{}
 
 	return &testQueue{
-		close: func() error {
+		close: func(_ bool) error {
 			mux.Lock()
 			for producer := range producers {
 				producer.Close()
@@ -197,16 +228,16 @@ func makeTestQueue() queue.Queue {
 			wg.Wait()
 			return nil
 		},
-		get: func(count int) (queue.Batch, error) {
+		get: func(count int) (queue.Batch[publisher.Event], error) {
 			//<-done
 			return nil, nil
 		},
 
-		producer: func(cfg queue.ProducerConfig) queue.Producer {
+		producer: func(cfg queue.ProducerConfig) queue.Producer[publisher.Event] {
 			var producer *testProducer
 			p := blockingProducer(cfg)
 			producer = &testProducer{
-				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+				publish: func(try bool, event publisher.Event) (queue.EntryID, bool) {
 					if try {
 						return p.TryPublish(event)
 					}
@@ -229,13 +260,13 @@ func makeTestQueue() queue.Queue {
 	}
 }
 
-func blockingProducer(_ queue.ProducerConfig) queue.Producer {
+func blockingProducer(_ queue.ProducerConfig) queue.Producer[publisher.Event] {
 	sig := make(chan struct{})
-	waiting := atomic.MakeInt(0)
+	var waiting atomic.Int64
 
 	return &testProducer{
-		publish: func(_ bool, _ queue.Entry) (queue.EntryID, bool) {
-			waiting.Inc()
+		publish: func(_ bool, _ publisher.Event) (queue.EntryID, bool) {
+			waiting.Add(1)
 			<-sig
 			return 0, false
 		},

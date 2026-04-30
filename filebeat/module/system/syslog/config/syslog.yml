@@ -1,4 +1,22 @@
+{{ if .use_journald }}
+type: journald
+id: system-syslog
+facilities:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 11
+  - 12
+  - 15
+{{ else }}
 type: log
+id: system-syslog
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
@@ -7,6 +25,9 @@ exclude_files: [".gz$"]
 multiline:
   pattern: "^\\s"
   match: after
+{{ end }}
+
+# Common configuration
 processors:
   - add_locale: ~
   - add_fields:

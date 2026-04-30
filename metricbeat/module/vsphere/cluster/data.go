@@ -25,6 +25,7 @@ import (
 
 func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *metricData) mapstr.M {
 	event := mapstr.M{
+		"id": cl.Self.Value,
 		"host": mapstr.M{
 			"count": len(data.assetNames.outputHostNames),
 			"names": data.assetNames.outputHostNames,
@@ -38,6 +39,12 @@ func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *metricDa
 			"names": data.assetNames.outputNetworkNames,
 		},
 		"name": cl.Name,
+	}
+
+	if cl.ResourcePool != nil {
+		event["resourcepool"] = mapstr.M{
+			"id": cl.ResourcePool.Value,
+		}
 	}
 
 	if len(data.triggeredAlarms) > 0 {

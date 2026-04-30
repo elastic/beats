@@ -27,12 +27,12 @@ import (
 
 func TestHostsNumWorkers(t *testing.T) {
 	tests := map[string]struct {
-		hwc                hostWorkerCfg
+		hwc                HostWorkerCfg
 		expectedNumWorkers int
 	}{
-		"worker_set":  {hwc: hostWorkerCfg{Worker: 17}, expectedNumWorkers: 17},
-		"workers_set": {hwc: hostWorkerCfg{Workers: 23}, expectedNumWorkers: 23},
-		"both_set":    {hwc: hostWorkerCfg{Worker: 17, Workers: 23}, expectedNumWorkers: 17},
+		"worker_set":  {hwc: HostWorkerCfg{Worker: 17}, expectedNumWorkers: 17},
+		"workers_set": {hwc: HostWorkerCfg{Workers: 23}, expectedNumWorkers: 23},
+		"both_set":    {hwc: HostWorkerCfg{Worker: 17, Workers: 23}, expectedNumWorkers: 17},
 	}
 
 	for name, test := range tests {

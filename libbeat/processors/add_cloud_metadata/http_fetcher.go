@@ -26,6 +26,7 @@ import (
 	"net/http"
 
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -64,7 +65,7 @@ func newMetadataFetcher(
 // fetchMetadata queries metadata from a hosting provider's metadata service.
 // Some providers require multiple HTTP requests to gather the whole metadata,
 // len(f.responseHandlers)  > 1 indicates that multiple requests are needed.
-func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
+func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client, _ *logp.Logger) result {
 	res := result{provider: f.provider, metadata: mapstr.M{}}
 	for url, responseHandler := range f.responseHandlers {
 		f.fetchRaw(ctx, client, url, responseHandler, &res)

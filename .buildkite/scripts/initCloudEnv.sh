@@ -2,23 +2,6 @@
 set -euo pipefail
 
 REPO_DIR=$(pwd)
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_ingest_ci"
-
-exportAwsSecrets() {
-  local awsSecretKey
-  local awsAccessKey
-
-  awsSecretKey=$(retry -t 5 -- vault kv get -field secret_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-  awsAccessKey=$(retry -t 5 -- vault kv get -field access_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-
-  echo "~~~ Exporting AWS secrets"
-  export AWS_ACCESS_KEY_ID=$awsAccessKey
-  export AWS_SECRET_ACCESS_KEY=$awsSecretKey
-
-  # AWS_REGION is not set here, since AWS region is taken from beat corresponding *.tf file:
-  # - x-pack/metricbeat/module/aws/terraform.tf
-  # - x-pack/filebeat/input/awscloudwatch/_meta/terraform/variables.tf
-}
 
 terraformApply() {
   echo "~~~ Exporting Terraform Env Vars"
@@ -54,13 +37,13 @@ terraformDestroy() {
 }
 
 dockerUp() {
-  echo "~~~ Run docker-compose services for emulated cloud env"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml up -d
+  echo "~~~ Run docker compose services for emulated cloud env"
+  docker compose -f .buildkite/deploy/docker/docker-compose.yml up -d
 }
 
 dockerTeardown() {
   echo "~~~ Docker Compose Teardown"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
+  docker compose -f .buildkite/deploy/docker/docker-compose.yml down -v
 }
 
 terraformSetup() {
@@ -70,10 +53,8 @@ terraformSetup() {
 
   while true; do
     echo "~~~ Setting up Terraform"
-    out=$(terraformApply 2>&1)
+    terraformApply 2>&1
     exit_code=$?
-
-    echo "$out"
 
     if [ $exit_code -eq 0 ]; then
       break
@@ -82,7 +63,7 @@ terraformSetup() {
 
       if [ $retries -gt $max_retries ]; then
         teardown
-        echo "+++ Terraform init & apply failed: $out"
+        echo "+++ Terraform init & apply failed: check the logs above for details."
         exit 1
       fi
 
@@ -102,6 +83,5 @@ teardown() {
 
 trap 'teardown' EXIT
 
-exportAwsSecrets
 dockerUp
 terraformSetup

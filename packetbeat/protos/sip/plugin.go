@@ -65,7 +65,8 @@ func New(
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
-	cfgwarn.Beta("packetbeat SIP protocol is used")
+	// TODO: https://github.com/elastic/ingest-dev/issues/6000
+	logp.NewLogger("").Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
 
 	isDebug = logp.IsDebug("sip")
 	isDetailed = logp.IsDebug("sipdetailed")
@@ -607,34 +608,33 @@ func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *Prot
 
 var constSDPContentType = []byte("application/sdp")
 
-func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
-	if !m.hasContentLength {
+func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields) {
+	if !msg.hasContentLength {
 		return
 	}
 
-	if !bytes.Equal(m.contentType, constSDPContentType) {
+	if !bytes.Equal(msg.contentType, constSDPContentType) {
 		if isDebug {
-			debugf("body content-type: %s is not supported", m.contentType)
+			debugf("body content-type: %s is not supported", msg.contentType)
 		}
 		return
 	}
 
-	if _, found := m.headers["content-encoding"]; found {
+	if _, found := msg.headers["content-encoding"]; found {
 		if isDebug {
-			debugf("body decoding is not supported yet if content-endcoding is present")
+			debugf("body decoding is not supported yet if content-encoding is present")
 		}
 		return
 	}
 
-	fields.SDPBodyOriginal = m.body
+	fields.SDPBodyOriginal = msg.body
 
 	var isInMedia bool
-	for _, line := range bytes.Split(m.body, []byte("\r\n")) {
+	for _, line := range bytes.Split(msg.body, []byte("\r\n")) {
 		kv := bytes.SplitN(line, []byte("="), 2)
 		if len(kv) != 2 {
 			continue
 		}
-
 		kv[1] = bytes.TrimSpace(kv[1])
 		ch := string(bytes.ToLower(bytes.TrimSpace(kv[0])))
 		switch ch {
@@ -642,8 +642,17 @@ func populateBodyFields(m *message, pbf *pb.Fields, fields *ProtocolFields) {
 			fields.SDPVersion = string(kv[1])
 		case "o":
 			var pos int
+			if len(kv[1]) < 1 {
+				// invalid key/value pair (i.e "o=")
+				continue
+			}
 			if kv[1][pos] == '"' {
+
 				endUserPos := bytes.IndexByte(kv[1][pos+1:], '"')
+				if endUserPos == -1 {
+					// unquoted key/value pair
+					continue
+				}
 				if !bytes.Equal(kv[1][pos+1:endUserPos], []byte("-")) {
 					fields.SDPOwnerUsername = kv[1][pos+1 : endUserPos]
 				}
@@ -726,8 +735,9 @@ func parseFromToContact(fromTo common.NetString) (displayInfo, uri common.NetStr
 		return bytes.IndexByte(fromTo, ';')
 	}()
 
-	// not wrapped and no header params
-	if endURIPos == -1 {
+	// not wrapped and no header params,
+	// or URL malformed
+	if endURIPos == -1 || pos > endURIPos {
 		uri = fromTo[pos:]
 		return displayInfo, uri, params
 	}

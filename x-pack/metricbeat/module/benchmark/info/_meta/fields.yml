@@ -1,0 +1,10 @@
+- name: info
+  type: group
+  release: beta
+  description: >
+    info
+  fields:
+    - name: counter
+      type: keyword
+      description: >
+        The nth info metric emitted by the benchmark module

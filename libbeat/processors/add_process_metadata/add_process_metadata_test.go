@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -54,25 +55,40 @@ func newCGHandlerBuilder(handler testCGRsolver) processors.InitCgroupHandler {
 	}
 }
 
+func TestNilProcessor(t *testing.T) {
+	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return &processors.NilCGReader{}, nil
+	}
+
+	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false, logptest.NewTestingLogger(t, ""))
+	require.NoError(t, err)
+
+	// make sure a nil cgroup reader doesn't blow anything up
+	unwrapped, _ := proc.(*addProcessMetadata)
+	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
+	require.NoError(t, err)
+	require.NotNil(t, metadata)
+
+}
+
 func TestDefaultProcessorStartup(t *testing.T) {
 	// set initCgroupPaths to system non-test defaults
 	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
 		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
 	}
 
-	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false)
+	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	// ensure the underlying provider has been initialized properly
 	unwrapped, _ := proc.(*addProcessMetadata)
 	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
 	require.NoError(t, err)
-	require.NotNil(t, metadata)
+	require.NotNil(t, metadata.fields)
 }
 
 func TestAddProcessMetadata(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors(processorName))
-
+	logger := logptest.NewTestingLogger(t, processorName)
 	capMock, err := capabilities.FromUint64(0xabacabb)
 	if err != nil {
 		t.Fatalf("could not instantiate capabilities: %s", err)
@@ -842,7 +858,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				return
 			}
 
-			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
+			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true, logger)
 			if err != nil {
 				if test.initErr == nil {
 					t.Fatal(err)
@@ -884,7 +900,7 @@ func TestAddProcessMetadata(t *testing.T) {
 		err = configC.Unpack(&config)
 		assert.NoError(t, err)
 
-		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
+		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true, logger)
 		assert.NoError(t, err)
 
 		event := &beat.Event{
@@ -952,7 +968,7 @@ func TestUsingCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := New(config)
+	proc, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1030,7 +1046,7 @@ func TestSelf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := New(config)
+	proc, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1064,7 +1080,7 @@ func TestBadProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	proc, err := New(config)
+	proc, err := New(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1245,7 +1261,7 @@ func TestV2CID(t *testing.T) {
 	}
 	resolver := testCGRsolver{res: processCgroupPaths}
 	initCgroupPaths = newCGHandlerBuilder(resolver)
-	provider := newCidProvider(nil, defaultCgroupRegex, resolver, nil)
+	provider := newCidProvider(nil, defaultCgroupRegex, resolver, nil, logptest.NewTestingLogger(t, ""))
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)

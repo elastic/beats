@@ -20,12 +20,15 @@ package pipeline
 import (
 	"errors"
 	"io"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -37,20 +40,25 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
-	p, err := New(beat.Info{},
+func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
+	t.Helper()
+	logger := logptest.NewTestingLogger(t, "")
+	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
 		conf.Namespace{},
 		outputs.Group{},
 		settings,
 	)
 	require.NoError(t, err)
-	// Inject a test queue so the outputController doesn't create one
-	p.outputController.queue = qu
+	if outputController, ok := p.outputController.(*processOutputController); ok {
+		// Inject a test queue so the outputController doesn't create one
+		outputController.queue = qu
+	}
 
 	return p
 }
@@ -60,7 +68,6 @@ func TestClient(t *testing.T) {
 		// Note: no asserts. If closing fails we have a deadlock, because Publish
 		// would block forever
 
-		logp.TestingSetup()
 		routinesChecker := resources.NewGoroutinesChecker()
 		defer routinesChecker.Check(t)
 
@@ -84,18 +91,24 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("no infinite loop when processing fails", func(t *testing.T) {
-		logp.TestingSetup()
-		l := logp.L()
+		l := logptest.NewTestingLogger(t, "")
 
 		// a small in-memory queue with a very short flush interval
-		q := memqueue.NewQueue(l, nil, memqueue.Settings{
+		q := memqueue.NewQueue[publisher.Event](l, nil, memqueue.Settings{
 			Events:        5,
 			MaxGetRequest: 1,
 			FlushTimeout:  time.Millisecond,
 		}, 5, nil)
 
 		// model a processor that we're going to make produce errors after
-		p := &testProcessor{}
+		processorAddField := func(in *beat.Event) (event *beat.Event, err error) {
+			_, err = in.Fields.Put("test", "value")
+			return in, err
+		}
+		processorsErr := func(in *beat.Event) (event *beat.Event, err error) {
+			return nil, errors.New("test error")
+		}
+		p := &testProcessor{processorFn: processorAddField}
 		ps := testProcessorSupporter{Processor: p}
 
 		// now we create a pipeline that makes sure that all
@@ -123,7 +136,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
-					e := batch.Entry(i).(publisher.Event)
+					e := batch.Entry(i)
 					received = append(received, e.Content)
 				}
 				batch.Done()
@@ -165,17 +178,17 @@ func TestClient(t *testing.T) {
 		client.PublishAll(sent[:2]) // first 2
 
 		// this causes our processor to malfunction and produce errors for all events
-		p.ErrorSwitch()
+		p.processorFn = processorsErr
 
 		client.PublishAll(sent[2:3]) // number 3
 
 		// back to normal
-		p.ErrorSwitch()
+		p.processorFn = processorAddField
 
 		client.PublishAll(sent[3:]) // number 4
 
-		client.Close()
-		pipeline.Close()
+		require.NoError(t, client.Close(), "failed closing pipeline client")
+		require.NoError(t, pipeline.Close(), "failed closing pipeline")
 
 		// waiting for all events to be consumed from the queue
 		<-done
@@ -184,25 +197,9 @@ func TestClient(t *testing.T) {
 }
 
 func TestClientWaitClose(t *testing.T) {
-	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
-		p, err := New(beat.Info{},
-			Monitors{},
-			conf.Namespace{},
-			outputs.Group{},
-			settings,
-		)
-		if err != nil {
-			panic(err)
-		}
-		// Inject a test queue so the outputController doesn't create one
-		p.outputController.queue = qu
-
-		return p
-	}
-	logp.TestingSetup()
-
-	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0, nil)
-	pipeline := makePipeline(Settings{}, q)
+	logger := logptest.NewTestingLogger(t, "")
+	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
+	pipeline := makePipeline(t, Settings{}, q)
 	defer pipeline.Close()
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
@@ -256,8 +253,18 @@ func TestClientWaitClose(t *testing.T) {
 			return nil
 		})
 		defer output.Close()
-		pipeline.outputController.Set(outputs.Group{Clients: []outputs.Client{output}})
-		defer pipeline.outputController.Set(outputs.Group{})
+
+		reloader := pipeline.OutputReloader()
+		err = reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+			return outputs.Group{Clients: []outputs.Client{output}}, nil
+		})
+		require.NoError(t, err, "Reload of output group should succeed")
+		defer func() {
+			err := reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+				return outputs.Group{}, nil
+			})
+			assert.NoError(t, err, "Reload to empty output group should succeed")
+		}()
 
 		client.Publish(beat.Event{})
 
@@ -276,65 +283,189 @@ func TestClientWaitClose(t *testing.T) {
 }
 
 func TestMonitoring(t *testing.T) {
-	const (
-		maxEvents  = 123
-		batchSize  = 456
-		numClients = 42
-	)
+	t.Run("output metrics", func(t *testing.T) {
+		const (
+			maxEvents  = 123
+			batchSize  = 456
+			numClients = 42
+		)
+		var config Config
+		err := conf.MustNewConfigFrom(map[string]interface{}{
+			"queue.mem.events":           maxEvents,
+			"queue.mem.flush.min_events": 1,
+		}).Unpack(&config)
+		require.NoError(t, err)
+
+		metrics := monitoring.NewRegistry()
+		telemetry := monitoring.NewRegistry()
+		beatInfo := beat.Info{Logger: logptest.NewTestingLogger(t, "")}
+		pipeline, err := Load(
+			beatInfo,
+			Monitors{
+				Metrics:   metrics,
+				Telemetry: telemetry,
+				Logger:    logp.NewNopLogger(),
+			},
+			config,
+			processing.Supporter(nil),
+			func(outputs.Observer) (string, outputs.Group, error) {
+				clients := make([]outputs.Client, numClients)
+				for i := range clients {
+					clients[i] = newMockClient(func(publisher.Batch) error {
+						return nil
+					})
+				}
+				return "output_name", outputs.Group{
+					BatchSize: batchSize,
+					Clients:   clients,
+				}, nil
+			},
+		)
+
+		require.NoError(t, err)
+		defer pipeline.Close()
+
+		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
+		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
+		assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
+		assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
+	})
+
+	t.Run("input metrics", func(t *testing.T) {
+		testInputMetrics(t,
+			beat.Info{},
+			beat.ClientConfig{ClientListener: &mockClientListener{}})
+	})
+
+	t.Run("no input metrics - nil ClientConfig", func(t *testing.T) {
+		testInputMetrics(
+			t, beat.Info{}, beat.ClientConfig{})
+	})
+}
+
+func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
+
 	var config Config
 	err := conf.MustNewConfigFrom(map[string]interface{}{
-		"queue.mem.events":           maxEvents,
+		"queue.mem.events":           32,
 		"queue.mem.flush.min_events": 1,
+		"queue.mem.flush.timeout":    time.Millisecond,
 	}).Unpack(&config)
-	require.NoError(t, err)
+	require.NoError(t, err, "failed creating config")
+
+	filterMeKey := "filter_me"
 
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
+	logger := logptest.NewTestingLogger(t, "")
 	pipeline, err := Load(
-		beat.Info{},
+		beat.Info{
+			Logger: logger,
+		},
 		Monitors{
 			Metrics:   metrics,
 			Telemetry: telemetry,
+			Logger:    logger,
 		},
 		config,
-		processing.Supporter(nil),
+		testProcessorSupporter{
+			Processor: processorList{
+				processors: []beat.Processor{
+					&testProcessor{
+						name: "filterProcessor",
+						processorFn: func(in *beat.Event) (*beat.Event, error) {
+							rawFilterMe, err := in.Fields.GetValue(filterMeKey)
+							if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+								require.NoError(t, err, "could not get filter_me from Fields")
+							}
+
+							filterMe, ok := rawFilterMe.(bool)
+							if filterMe && ok {
+								return nil, nil
+							}
+							return in, nil
+						},
+					},
+				},
+			},
+		},
 		func(outputs.Observer) (string, outputs.Group, error) {
-			clients := make([]outputs.Client, numClients)
-			for i := range clients {
-				clients[i] = newMockClient(func(publisher.Batch) error {
-					return nil
-				})
-			}
-			return "output_name", outputs.Group{
-				BatchSize: batchSize,
-				Clients:   clients,
+			return "output_name", outputs.Group{Clients: []outputs.Client{
+				newMockClient(func(publisher.Batch) error { return nil })},
 			}, nil
 		},
 	)
 	require.NoError(t, err)
-	defer pipeline.Close()
 
-	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
-	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
-	assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
-	assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
+	c, err := pipeline.ConnectWith(clientCfg)
+	require.NoError(t, err, "pipeline.ConnectWith failed")
+
+	cc, ok := c.(*client)
+	require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
+	cc.producer = &testProducer{publish: func(try bool, event publisher.Event) (queue.EntryID, bool) {
+		return queue.EntryID(1), true
+	}}
+
+	c.PublishAll([]beat.Event{
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+	})
+	c.Publish(beat.Event{Meta: mapstr.M{}})
+	require.NoError(t, c.Close())
+
+	if clientCfg.ClientListener != nil {
+		got, ok := clientCfg.ClientListener.(*mockClientListener)
+		require.Truef(t, ok, "ClientListener must be of type %T, but got %T",
+			&mockClientListener{},
+			clientCfg.ClientListener)
+		assert.Equal(t,
+			got.eventsTotal,
+			got.eventsFiltered+got.eventsPublished,
+			"total events should be them sum of filtered, dropped and published"+
+				"events")
+		assert.Equal(t, 3, got.eventsFiltered,
+			"should have 3 filtered events")
+		assert.Equal(t, 1, got.eventsPublished,
+			"should have 1 published event")
+	}
 }
 
-type testProcessor struct{ error bool }
+type testProcessor struct {
+	name        string
+	processorFn func(in *beat.Event) (event *beat.Event, err error)
+}
 
 func (p *testProcessor) String() string {
-	return "testProcessor"
-}
-func (p *testProcessor) Run(in *beat.Event) (event *beat.Event, err error) {
-	if p.error {
-		return nil, errors.New("test error")
-	}
-	_, err = in.Fields.Put("test", "value")
-	return in, err
+	return "testProcessor-" + p.name
 }
 
-func (p *testProcessor) ErrorSwitch() {
-	p.error = !p.error
+func (p *testProcessor) Run(in *beat.Event) (event *beat.Event, err error) {
+	return p.processorFn(in)
+}
+
+type processorList struct {
+	processors []beat.Processor
+}
+
+func (p processorList) String() string {
+	var names []string
+	for _, processor := range p.processors {
+		names = append(names, processor.String())
+	}
+
+	return strings.Join(names, ", ")
+}
+
+func (p processorList) Run(in *beat.Event) (event *beat.Event, err error) {
+	for _, processor := range p.processors {
+		in, err = processor.Run(in)
+		if in == nil {
+			return nil, err
+		}
+	}
+
+	return in, nil
 }
 
 type testProcessorSupporter struct {
@@ -342,16 +473,38 @@ type testProcessorSupporter struct {
 }
 
 // Create a running processor interface based on the given config
-func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
+func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
 	return p.Processor, nil
 }
 
 // Processors returns a list of config strings for the given processor, for debug purposes
 func (p testProcessorSupporter) Processors() []string {
-	return []string{p.Processor.String()}
+	return []string{p.String()}
 }
 
 // Close the processor supporter
 func (p testProcessorSupporter) Close() error {
 	return processors.Close(p.Processor)
+}
+
+type mockClientListener struct {
+	eventsTotal            int
+	eventsFiltered         int
+	eventsPublished        int
+	eventsDroppedOnPublish int
+}
+
+func (m *mockClientListener) Closing() {}
+func (m *mockClientListener) Closed()  {}
+func (m *mockClientListener) NewEvent() {
+	m.eventsTotal++
+}
+func (m *mockClientListener) Filtered() {
+	m.eventsFiltered++
+}
+func (m *mockClientListener) Published() {
+	m.eventsPublished++
+}
+func (m *mockClientListener) DroppedOnPublish(beat.Event) {
+	m.eventsDroppedOnPublish++
 }

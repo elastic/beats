@@ -8,7 +8,7 @@
       "action": "Engine Lifecycle",
       "category": "process",
       "code": "400",
-      "ingested": "2022-06-08T06:07:25.791038Z",
+      "ingested": "2025-01-15T10:02:22.041691914Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -16,7 +16,11 @@
       "type": "start"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -44,14 +48,12 @@
       "title": "ServerRemoteHost"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "400",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1492",
       "task": "Engine Lifecycle"
@@ -66,7 +68,7 @@
       "action": "Engine Lifecycle",
       "category": "process",
       "code": "400",
-      "ingested": "2022-06-08T06:07:25.791068400Z",
+      "ingested": "2025-01-15T10:02:22.042381068Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -74,7 +76,11 @@
       "type": "start"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -104,14 +110,12 @@
       "title": "ConsoleHost"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "400",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1511",
       "task": "Engine Lifecycle"
@@ -126,7 +130,7 @@
       "action": "Engine Lifecycle",
       "category": "process",
       "code": "400",
-      "ingested": "2022-06-08T06:07:25.791084400Z",
+      "ingested": "2025-01-15T10:02:22.042395560Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -134,7 +138,11 @@
       "type": "start"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -162,14 +170,12 @@
       "title": "Windows PowerShell ISE Host"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "400",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1579",
       "task": "Engine Lifecycle"
@@ -184,7 +190,7 @@
       "action": "Engine Lifecycle",
       "category": "process",
       "code": "400",
-      "ingested": "2022-06-08T06:07:25.791099600Z",
+      "ingested": "2025-01-15T10:02:22.042402302Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -192,7 +198,11 @@
       "type": "start"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -214,14 +224,12 @@
       "title": "ConsoleHost"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "400",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "18591",
       "task": "Engine Lifecycle"

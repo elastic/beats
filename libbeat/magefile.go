@@ -21,6 +21,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/magefile/mage/mg"
 
@@ -46,8 +47,12 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Go integration tests now build the binary automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target is only needed for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 
@@ -75,8 +80,8 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(Fields, devtools.BuildSystemTestBinary)
-	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	mg.Deps(Fields)
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]

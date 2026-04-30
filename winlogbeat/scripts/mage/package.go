@@ -19,6 +19,7 @@ package mage
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -43,9 +44,9 @@ func init() {
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
-func Package() {
+func Package() error {
 	start := time.Now()
-	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+	defer func() { log.Println("package ran for", time.Since(start)) }()
 
 	switch SelectLogic {
 	case devtools.OSSProject:
@@ -56,9 +57,29 @@ func Package() {
 	}
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
+	args, err := winlogbeatPackageArgs()
+	if err != nil {
+		return err
+	}
+
 	mg.Deps(Update.All)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package, pkg.PackageTest)
+	mg.Deps(build.CrossBuild)
+	mg.SerialDeps(devtools.PackageWithArgs(args), pkg.PackageTest)
+
+	return nil
+}
+
+func winlogbeatPackageArgs() (devtools.PackageArgs, error) {
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return devtools.PackageArgs{}, err
+	}
+
+	// Winlogbeat ships Windows-only artifacts even when CI passes a broader
+	// PLATFORMS expression shared by other beats.
+	args.Platforms = args.Platforms.Filter("windows")
+
+	return args, nil
 }
 
 func customizePackaging() {

@@ -1,0 +1,46 @@
+{
+    "name": "detailed-response",
+    "component_template": {
+        "version": 123456,
+        "template": {
+            "settings": {
+                "index": {
+                    "lifecycle": {
+                        "name": "operator",
+                        "rollover_alias": "rolloveralias"
+                    }
+                }
+            },
+            "mappings": {
+                "dynamic": false,
+                "properties": {
+                    "@timestamp": {
+                        "type": "date"
+                    },
+                    "message": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "metadata": {
+                        "properties": {
+                            "count": {
+                                "type": "long"
+                            }
+                        }
+                    }
+                }
+            },
+            "aliases": {
+                "alias1": {},
+                "alias2": {}
+            }
+        },
+        "_meta": {
+            "property1": 456
+        }
+    }
+}

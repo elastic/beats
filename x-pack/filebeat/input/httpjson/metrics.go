@@ -9,6 +9,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -19,9 +20,11 @@ type inputMetrics struct {
 	intervalPages             metrics.Sample   // histogram of pages per interval
 	intervals                 *monitoring.Uint // total number of intervals executed
 	intervalErrs              *monitoring.Uint // total number of interval errors
+	eventsPublished           *monitoring.Uint // number of events published
+	pagesPublished            *monitoring.Uint // number of pages of event published
 }
 
-func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
+func newInputMetrics(reg *monitoring.Registry, logger *logp.Logger) *inputMetrics {
 	if reg == nil {
 		return nil
 	}
@@ -29,19 +32,28 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	out := &inputMetrics{
 		intervals:                 monitoring.NewUint(reg, "httpjson_interval_total"),
 		intervalErrs:              monitoring.NewUint(reg, "httpjson_interval_errors_total"),
+		eventsPublished:           monitoring.NewUint(reg, "events_published_total"),
+		pagesPublished:            monitoring.NewUint(reg, "pages_published_total"),
 		intervalExecutionTime:     metrics.NewUniformSample(1024),
 		intervalPageExecutionTime: metrics.NewUniformSample(1024),
 		intervalPages:             metrics.NewUniformSample(1024),
 	}
 
-	_ = adapter.GetGoMetrics(reg, "httpjson_interval_execution_time", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "httpjson_interval_execution_time", logger, adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.intervalExecutionTime))
-	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages_execution_time", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages_execution_time", logger, adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.intervalPageExecutionTime))
-	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages", logger, adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.intervalPages))
 
 	return out
+}
+
+func (m *inputMetrics) addEventsPublished(n uint64) {
+	if m == nil {
+		return
+	}
+	m.eventsPublished.Add(n)
 }
 
 func (m *inputMetrics) updateIntervalMetrics(err error, t time.Time) {
@@ -59,6 +71,7 @@ func (m *inputMetrics) updatePageExecutionTime(t time.Time) {
 	if m == nil {
 		return
 	}
+	m.pagesPublished.Add(1)
 	m.intervalPageExecutionTime.Update(time.Since(t).Nanoseconds())
 }
 

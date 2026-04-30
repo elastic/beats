@@ -21,11 +21,13 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Fail helper can be used by output factories, to create a failure response when
@@ -36,8 +38,14 @@ func Fail(err error) (Group, error) { return Group{}, err }
 // instances.  The first argument is expected to contain a queue
 // config.Namespace.  The queue config is passed to assign the queue
 // factory when elastic-agent reloads the output.
-func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.EncoderFactory, clients ...Client) (Group, error) {
-	var q queue.QueueFactory
+func Success(
+	cfg config.Namespace,
+	batchSize, retry int,
+	encoderFactory queue.EncoderFactory[publisher.Event],
+	logger *logp.Logger,
+	beatPaths *paths.Path,
+	clients ...Client) (Group, error) {
+	var q queue.QueueFactory[publisher.Event]
 	if cfg.IsSet() && cfg.Config().Enabled() {
 		switch cfg.Name() {
 		case memqueue.QueueType:
@@ -45,17 +53,17 @@ func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.En
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get memory queue settings: %w", err)
 			}
-			q = memqueue.FactoryForSettings(settings)
+			q = memqueue.FactoryForSettings[publisher.Event](settings)
 		case diskqueue.QueueType:
 			if management.UnderAgent() {
-				logger := logp.NewLogger("output")
+				logger = logger.Named("output")
 				logger.Warn("Disk queue configuration found while running under agent: this configuration is unsupported and in technical preview.")
 			}
 			settings, err := diskqueue.SettingsForUserConfig(cfg.Config())
 			if err != nil {
 				return Group{}, fmt.Errorf("unable to get disk queue settings: %w", err)
 			}
-			q = diskqueue.FactoryForSettings(settings)
+			q = diskqueue.FactoryForSettings(settings, beatPaths)
 		default:
 			return Group{}, fmt.Errorf("unknown queue type: %s", cfg.Name())
 		}
@@ -82,12 +90,12 @@ func NetworkClients(netclients []NetworkClient) []Client {
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory[publisher.Event], logger *logp.Logger, beatPaths *paths.Path, netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, encoderFactory, NewFailoverClient(netclients))
+		return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, NewFailoverClient(netclients))
 	}
 
 	clients := NetworkClients(netclients)
-	return Success(cfg, batchSize, retry, encoderFactory, clients...)
+	return Success(cfg, batchSize, retry, encoderFactory, logger, beatPaths, clients...)
 }

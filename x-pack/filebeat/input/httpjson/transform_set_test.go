@@ -9,11 +9,14 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -87,7 +90,7 @@ func TestNewSet(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tc.config)
-			gotSet, gotErr := tc.constructor(cfg, nil)
+			gotSet, gotErr := tc.constructor(cfg, noopReporter{}, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 				assert.Equal(t, tc.expectedTarget, (gotSet.(*set)).targetInfo)
@@ -164,6 +167,109 @@ func TestSetFunctions(t *testing.T) {
 	}
 }
 
+var setTemplateTests = []struct {
+	name     string
+	cfg      map[string]any
+	ctx      *transformContext
+	new      func(*conf.C, status.StatusReporter, *logp.Logger) (transform, error)
+	in       map[string]any
+	want     transformable
+	wantErr  error
+	wantStat []string
+}{
+	{
+		name: "hello",
+		new:  newSetRequestPagination,
+		cfg: map[string]any{
+			"target":     "body.dst",
+			"value":      `[[printf "hello"]]`,
+			"value_type": "string",
+		},
+		in: map[string]any{},
+		want: transformable{
+			"body": mapstr.M{"dst": "hello"},
+		},
+	},
+	{
+		name: "empty_no_default",
+		new:  newSetRequestPagination,
+		cfg: map[string]any{
+			"target":             "body.dst",
+			"value":              ``,
+			"value_type":         "string",
+			"do_not_log_failure": true,
+		},
+		in:   map[string]any{},
+		want: transformable{},
+	},
+	{
+		name: "empty_no_default_fail_on_error",
+		new:  newSetRequestPagination,
+		cfg: map[string]any{
+			"target":                 "body.dst",
+			"value":                  ``,
+			"value_type":             "string",
+			"fail_on_template_error": true,
+			"do_not_log_failure":     true,
+		},
+		in:       map[string]any{},
+		want:     transformable{},
+		wantErr:  errEmptyTemplateResult,
+		wantStat: nil,
+	},
+	{
+		name: "empty_no_default_fail_on_error_empty_not_ok",
+		new:  newSetRequestPagination,
+		cfg: map[string]any{
+			"target":                 "body.dst",
+			"value":                  ``,
+			"value_type":             "string",
+			"fail_on_template_error": true,
+			"do_not_log_failure":     false,
+		},
+		in:      map[string]any{},
+		want:    transformable{},
+		wantErr: errEmptyTemplateResult,
+		wantStat: []string{
+			"Degraded: failed to execute template dst: the template result is empty",
+		},
+	},
+}
+
+func TestSetTemplate(t *testing.T) {
+	for _, test := range setTemplateTests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(test.cfg)
+			if err != nil {
+				t.Fatalf("invalid template config: %v", err)
+			}
+			var stat testStatus
+			tx, err := test.new(cfg, &stat, logp.NewLogger("test:"+test.name))
+			if err != nil {
+				t.Fatalf("failed to make append: %v", err)
+			}
+			btx, ok := tx.(basicTransform) // wat‽
+			if !ok {
+				t.Fatalf("transform is not a basicTransform: %T", tx)
+			}
+			ctx := test.ctx
+			if ctx == nil {
+				ctx = emptyTransformContext()
+			}
+			got, err := btx.run(ctx, test.in)
+			if !sameError(err, test.wantErr) {
+				t.Errorf("unexpected error: got=%q want=%q", err, test.wantErr)
+			}
+			if !cmp.Equal(stat.updates, test.wantStat) {
+				t.Errorf("unexpected status updates: got=%q want=%q", stat.updates, test.wantStat)
+			}
+			if !cmp.Equal(got, test.want) {
+				t.Errorf("unexpected status updates: got + want -\n%s", cmp.Diff(test.want, got))
+			}
+		})
+	}
+}
+
 func TestDifferentSetValueTypes(t *testing.T) {
 	c1 := map[string]interface{}{
 		"target":     "body.p1",
@@ -174,7 +280,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err := conf.NewConfigFrom(c1)
 	require.NoError(t, err)
 
-	transform, err := newSetResponse(cfg, logp.NewLogger("test"))
+	transform, err := newSetResponse(cfg, noopReporter{}, logptest.NewTestingLogger(t, "test"))
 	require.NoError(t, err)
 
 	testAppend := transform.(*set)
@@ -202,7 +308,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
+	transform, err = newSetResponse(cfg, noopReporter{}, logptest.NewTestingLogger(t, "test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*set)
@@ -223,7 +329,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
-	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
+	transform, err = newSetResponse(cfg, noopReporter{}, logptest.NewTestingLogger(t, "test"))
 	require.NoError(t, err)
 
 	testAppend = transform.(*set)

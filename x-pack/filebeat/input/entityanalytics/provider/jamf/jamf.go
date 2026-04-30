@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 // Package jamf provides a computer asset provider for Jamf.
 package jamf
 
@@ -25,6 +27,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
@@ -32,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -65,7 +69,7 @@ type jamfInput struct {
 }
 
 // New creates a new instance of an Jamf entity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := jamfInput{
 		cfg: defaultConfig(),
 	}
@@ -73,6 +77,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -96,9 +101,9 @@ func (*jamfInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+	inputCtx.UpdateStatus(status.Starting, "")
 	p.logger = inputCtx.Logger.With("provider", Name, "tenant", p.cfg.JamfTenant)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, p.logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
@@ -108,9 +113,17 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
-	if p.cfg.Tracer != nil {
+	if p.cfg.Tracer.enabled() {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
-		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, Name))
+		}
+		p.cfg.Tracer.Filename = resolved
 	}
 
 	var err error
@@ -119,18 +132,26 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
+	inputCtx.UpdateStatus(status.Running, "")
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				return inputCtx.Cancelation.Err()
+				err := inputCtx.Cancelation.Err()
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
+				return err
 			}
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				p.logger.Errorw("Error running full sync", "error", err)
+				msg := "Error running full sync"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -149,8 +170,12 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				p.logger.Errorw("Error running incremental update", "error", err)
+				msg := "Error running incremental update"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -161,7 +186,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 }
 
 func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
-	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings())...)
+	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings(), log)...)
 	if err != nil {
 		return nil, err
 	}
@@ -228,9 +253,8 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	)
 	traceLogger := zap.New(core)
 
-	const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-	maxSize := cfg.Tracer.MaxSize * 1e6
-	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, max(0, maxSize-margin), log)
+	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
 }
 
@@ -246,8 +270,9 @@ func sanitizeFileName(name string) string {
 
 // clientOption returns constructed client configuration options, including
 // setting up http+unix and http+npipe transports if requested.
-func clientOptions(keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+func clientOptions(keepalive httpcommon.WithKeepaliveSettings, log *logp.Logger) []httpcommon.TransportOption {
 	return []httpcommon.TransportOption{
+		httpcommon.WithLogger(log),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		keepalive,
 	}

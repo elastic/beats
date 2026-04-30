@@ -37,6 +37,8 @@ filebeat.inputs:
   - type: filestream
     id: filestream-input-id
     enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     parsers:
       - ndjson:
           target: ""
@@ -104,7 +106,7 @@ func TestEventsLoggerESOutput(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains(msg)
 	}, time.Minute, 100*time.Millisecond,
-		fmt.Sprintf("String '%s' not found on Filebeat logs", msg))
+		"String '%s' not found on Filebeat logs", msg)
 
 	// The glob here matches the configured value for the filename
 	glob := filepath.Join(filebeat.TempDir(), "filebeat-my-event-log*.ndjson")

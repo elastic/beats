@@ -6,8 +6,12 @@ package lumberjack
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -68,6 +72,7 @@ func generateCertData(t testing.TB) (rootCA, client, server Cert) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	ca.SubjectKeyId = generateSubjectKeyID(rootCA.key.Public())
 
 	rootCA.signedCertDER, err = x509.CreateCertificate(rand.Reader, ca, ca, &rootCA.key.PublicKey, rootCA.key)
 	if err != nil {
@@ -150,4 +155,21 @@ func pemEncode(t testing.TB, certBytes []byte, certType string) []byte {
 	}
 
 	return pemData.Bytes()
+}
+
+func generateSubjectKeyID(pub crypto.PublicKey) []byte {
+	// SubjectKeyId generated using method 1 in RFC 7093, Section 2:
+	//   1) The keyIdentifier is composed of the leftmost 160-bits of the
+	//   SHA-256 hash of the value of the BIT STRING subjectPublicKey
+	//   (excluding the tag, length, and number of unused bits).
+	var publicKeyBytes []byte
+	switch publicKey := pub.(type) {
+	case *rsa.PublicKey:
+		publicKeyBytes = x509.MarshalPKCS1PublicKey(publicKey)
+	case *ecdsa.PublicKey:
+		//nolint:staticcheck // ignore SA1019, warning for deprecated method as no alternative is present
+		publicKeyBytes = elliptic.Marshal(publicKey.Curve, publicKey.X, publicKey.Y)
+	}
+	h := sha256.Sum256(publicKeyBytes)
+	return h[:20]
 }

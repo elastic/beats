@@ -21,20 +21,20 @@ type subscribe struct {
 
 // String returns the printable representation of a subscribe transaction.
 func (s subscribe) String() string {
-	return fmt.Sprintf("subscribe tenant:%s contentType:%s", s.TenantID, s.ContentType)
+	return fmt.Sprintf("subscribe tenant:%s contentType:%s", s.tenantID, s.contentType)
 }
 
 // RequestDecorators returns the decorators used to perform a request.
 func (s subscribe) RequestDecorators() []autorest.PrepareDecorator {
 	return []autorest.PrepareDecorator{
 		autorest.AsPost(),
-		autorest.WithBaseURL(s.Config.Resource),
+		autorest.WithBaseURL(s.config.Resource),
 		autorest.WithPath("api/v1.0"),
-		autorest.WithPath(s.TenantID),
+		autorest.WithPath(s.tenantID),
 		autorest.WithPath("activity/feed/subscriptions/start"),
 		autorest.WithQueryParameters(
 			map[string]interface{}{
-				"contentType": s.ContentType,
+				"contentType": s.contentType,
 			}),
 	}
 }

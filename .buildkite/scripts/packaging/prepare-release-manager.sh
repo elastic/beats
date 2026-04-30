@@ -8,6 +8,7 @@
 set -ueo pipefail
 
 readonly TYPE=${1:-snapshot}
+readonly VERSION_QUALIFIER="${VERSION_QUALIFIER:-""}"
 
 # rename dependencies.csv to the name expected by release-manager.
 VERSION=$(make get-version)
@@ -15,6 +16,13 @@ FINAL_VERSION=$VERSION-SNAPSHOT
 if [ "$TYPE" != "snapshot" ] ; then
   FINAL_VERSION=$VERSION
 fi
+
+set +e
+if [[ -n "$VERSION_QUALIFIER" ]]; then
+  FINAL_VERSION="$FINAL_VERSION-${VERSION_QUALIFIER}"
+fi
+set -e
+
 echo "Rename dependencies to $FINAL_VERSION"
 mv build/distributions/dependencies.csv \
    build/distributions/dependencies-"$FINAL_VERSION".csv

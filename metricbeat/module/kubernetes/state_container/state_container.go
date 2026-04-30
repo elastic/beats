@@ -45,7 +45,7 @@ var (
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
 			"kube_pod_info":           p.InfoMetric(),
-			"kube_pod_container_info": p.InfoMetric(),
+			"kube_pod_container_info": p.ExtendedInfoMetric(p.Configuration{ExtraFields: mapstr.M{"type": "container"}}),
 			"kube_pod_container_resource_requests": p.Metric("", p.OpFilterMap(
 				"resource", map[string]string{
 					"cpu":    "cpu.request.cores",
@@ -68,6 +68,31 @@ var (
 			"kube_pod_container_status_waiting_reason":            p.LabelMetric("status.reason", "reason"),
 			"kube_pod_container_status_last_terminated_reason":    p.LabelMetric("status.last_terminated_reason", "reason"),
 			"kube_pod_container_status_last_terminated_timestamp": p.Metric("status.last_terminated_timestamp"),
+			"kube_pod_container_status_last_terminated_exitcode":  p.Metric("status.last_terminated_exitcode"),
+
+			// Init container metrics
+			"kube_pod_init_container_info": p.ExtendedInfoMetric(p.Configuration{ExtraFields: mapstr.M{"type": "init"}}),
+			"kube_pod_init_container_resource_requests": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"cpu":    "cpu.request.cores",
+					"memory": "memory.request.bytes",
+				},
+			)),
+			"kube_pod_init_container_resource_limits": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"cpu":    "cpu.limit.cores",
+					"memory": "memory.limit.bytes",
+				},
+			)),
+			"kube_pod_init_container_status_ready":                    p.BooleanMetric("status.ready"),
+			"kube_pod_init_container_status_restarts_total":           p.Metric("status.restarts"),
+			"kube_pod_init_container_status_running":                  p.KeywordMetric("status.phase", "running"),
+			"kube_pod_init_container_status_terminated":               p.KeywordMetric("status.phase", "terminated"),
+			"kube_pod_init_container_status_waiting":                  p.KeywordMetric("status.phase", "waiting"),
+			"kube_pod_init_container_status_terminated_reason":        p.LabelMetric("status.reason", "reason"),
+			"kube_pod_init_container_status_waiting_reason":           p.LabelMetric("status.reason", "reason"),
+			"kube_pod_init_container_status_last_terminated_reason":   p.LabelMetric("status.last_terminated_reason", "reason"),
+			"kube_pod_init_container_status_last_terminated_exitcode": p.Metric("status.last_terminated_exitcode"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -147,7 +172,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// empty string
 			cID, ok := (containerID).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerID: %s", ok)
+				m.Logger().Debugf("Error while casting containerID, got %T", containerID)
 			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
@@ -162,7 +187,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage, ok := (containerImage).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+				m.Logger().Debugf("Error while casting containerImage, got %T", containerImage)
 			}
 
 			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())

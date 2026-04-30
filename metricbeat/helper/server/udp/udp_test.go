@@ -20,8 +20,8 @@
 package udp
 
 import (
-	"fmt"
 	"net"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,18 +31,23 @@ import (
 )
 
 func GetTestUdpServer(host string, port int) (server.Server, error) {
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", host, port))
+	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, strconv.Itoa(int(port))))
 
 	if err != nil {
 		return nil, err
 	}
 
-	logp.Info("Started listening for UDP on: %s:%d", host, port)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		return nil, err
+	}
+	logger.Infof("Started listening for UDP on: %s", net.JoinHostPort(host, strconv.Itoa(port)))
 	return &UdpServer{
 		udpaddr:           addr,
 		receiveBufferSize: 1024,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
+		logger:            logger,
 	}, nil
 }
 
@@ -73,7 +78,7 @@ func TestUdpServer(t *testing.T) {
 }
 
 func writeToServer(t *testing.T, message, host string, port int) {
-	servAddr := fmt.Sprintf("%s:%d", host, port)
+	servAddr := net.JoinHostPort(host, strconv.Itoa(int(port)))
 	conn, err := net.Dial("udp", servAddr)
 	if err != nil {
 		t.Error(err)
