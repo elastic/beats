@@ -62,16 +62,16 @@ func RunTests(
 
 	log := logp.L()
 
+	info.Paths = paths.New()
+	info.Paths.Home = "."
+	info.Paths.Config = "."
+	info.Paths.Data = "."
+	info.Paths.Logs = "."
+
 	processing, err := processing.MakeDefaultSupport(false, nil)(info, log, cfg)
 	if err != nil {
 		return err
 	}
-
-	beatPaths := paths.New()
-	beatPaths.Home = "."
-	beatPaths.Config = "."
-	beatPaths.Data = "."
-	beatPaths.Logs = "."
 
 	pipelineSettings := pipeline.Settings{
 		WaitClose:     0,
