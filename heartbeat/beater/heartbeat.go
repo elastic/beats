@@ -329,11 +329,7 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 	)
 
 	// ES client backoff
-	connectDelay := backoff.NewEqualJitterBackoff(
-		context.Background().Done(),
-		wait,
-		wait,
-	)
+	connectDelay := backoff.NewEqualJitterBackoff(wait, wait)
 
 	// Overriding the default ES request timeout:
 	// Higher values of timeouts cannot be applied on the SAAS Service
@@ -357,7 +353,7 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 			connectDelay.Reset()
 			return esClient, nil
 		} else {
-			connectDelay.Wait()
+			connectDelay.Wait(ctx)
 		}
 	}
 
