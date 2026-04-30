@@ -31,6 +31,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/pipeline"
 	"go.opentelemetry.io/collector/receiver"
 	"go.opentelemetry.io/collector/receiver/receivertest"
@@ -722,6 +723,29 @@ func TestReceiverHook(t *testing.T) {
 	// For filebeatreceiver, we expect 3 hooks to be registered:
 	// 	one for beat metrics, one for input metrics and one for getting the registry.
 	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 3)
+}
+
+func TestStartShouldFailWhenStorageExtensionMissing(t *testing.T) {
+	cfg := &Config{Beatconfig: map[string]any{
+		"filebeat": map[string]any{"inputs": []map[string]any{{
+			"type": "benchmark", "enabled": true, "message": "x", "count": 1,
+		}}},
+		"storage":   "elasticsearch_storage",
+		"path.home": t.TempDir(),
+	}}
+
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
+	set := receiver.Settings{
+		ID:                component.NewIDWithName(factory.Type(), "r1"),
+		TelemetrySettings: component.TelemetrySettings{Logger: zap.NewNop()},
+	}
+
+	r, err := factory.CreateLogs(t.Context(), set, cfg, consumertest.NewNop())
+	require.NoError(t, err)
+
+	err = r.Start(t.Context(), &oteltest.MockHost{})
+	require.Error(t, err, "expected Start to fail when storage extension is configured but missing")
+	_ = r.Shutdown(t.Context())
 }
 
 func hostFromSocket(socket string) string {
