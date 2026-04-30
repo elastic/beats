@@ -94,6 +94,7 @@ processors:
 
 	otelConfig := fmt.Sprintf(`receivers:
   filebeatreceiver:
+    include_metadata: true
     filebeat:
       inputs:
         - type: filestream
@@ -196,6 +197,7 @@ func TestLogstashExporterProxyURL(t *testing.T) {
 
 	otelConfig := fmt.Sprintf(`receivers:
   filebeatreceiver:
+    include_metadata: true  
     filebeat:
       inputs:
         - type: filestream
