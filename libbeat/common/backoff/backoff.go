@@ -38,10 +38,10 @@ type Backoff interface {
 
 // WaitOnError is a convenience method, if an error is received it will block, if not errors is
 // received, the backoff will be resetted.
-func WaitOnError(b Backoff, err error) bool {
+func WaitOnError(ctx context.Context, b Backoff, err error) bool {
 	if err == nil {
 		b.Reset()
 		return true
 	}
-	return b.Wait()
+	return b.Wait(ctx)
 }

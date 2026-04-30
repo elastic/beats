@@ -18,6 +18,7 @@
 package backoff
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -25,32 +26,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type factory func(<-chan struct{}) Backoff
+type factory func() Backoff
 
 func TestBackoff(t *testing.T) {
-	t.Run("test close channel", testCloseChannel)
+	t.Run("test cancelled context", testCancelledContext)
 	t.Run("test unblock after some time", testUnblockAfterInit)
 }
 
-func testCloseChannel(t *testing.T) {
+func testCancelledContext(t *testing.T) {
 	init := 2 * time.Second
 	max := 5 * time.Minute
 
 	tests := map[string]factory{
-		"ExpBackoff": func(done <-chan struct{}) Backoff {
-			return NewExpBackoff(done, init, max)
+		"ExpBackoff": func() Backoff {
+			return NewExpBackoff(init, max)
 		},
-		"EqualJitterBackoff": func(done <-chan struct{}) Backoff {
-			return NewEqualJitterBackoff(done, init, max)
+		"EqualJitterBackoff": func() Backoff {
+			return NewEqualJitterBackoff(init, max)
 		},
 	}
 
 	for name, f := range tests {
 		t.Run(name, func(t *testing.T) {
-			c := make(chan struct{})
-			b := f(c)
-			close(c)
-			assert.False(t, b.Wait())
+			ctx, cancel := context.WithCancel(context.Background())
+			b := f()
+			cancel()
+			assert.False(t, b.Wait(ctx))
 		})
 	}
 }
@@ -60,24 +61,21 @@ func testUnblockAfterInit(t *testing.T) {
 	max := 5 * time.Minute
 
 	tests := map[string]factory{
-		"ExpBackoff": func(done <-chan struct{}) Backoff {
-			return NewExpBackoff(done, init, max)
+		"ExpBackoff": func() Backoff {
+			return NewExpBackoff(init, max)
 		},
-		"EqualJitterBackoff": func(done <-chan struct{}) Backoff {
-			return NewEqualJitterBackoff(done, init, max)
+		"EqualJitterBackoff": func() Backoff {
+			return NewEqualJitterBackoff(init, max)
 		},
 	}
 
 	for name, f := range tests {
 		t.Run(name, func(t *testing.T) {
-			c := make(chan struct{})
-			defer close(c)
-
-			b := f(c)
+			b := f()
 
 			startedAt := time.Now()
-			assert.True(t, WaitOnError(b, errors.New("bad bad")))
-			assert.GreaterOrEqual(t, time.Now().Sub(startedAt), init)
+			assert.True(t, WaitOnError(context.Background(), b, errors.New("bad bad")))
+			assert.GreaterOrEqual(t, time.Since(startedAt), init)
 		})
 	}
 }
