@@ -136,7 +136,6 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	// If the consumer fails to connect, we use exponential backoff with
 	// jitter up to 8 * the initial backoff interval.
 	connectDelay := backoff.NewEqualJitterBackoff(
-		ctx.Cancelation.Done(),
 		input.config.ConnectBackoff,
 		8*input.config.ConnectBackoff,
 	)
@@ -150,7 +149,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		)
 		if err != nil {
 			log.Errorw("Error initializing kafka consumer group", "error", err)
-			connectDelay.Wait()
+			connectDelay.Wait(goContext)
 			continue
 		}
 		// We've successfully connected, reset the backoff timer.
