@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage"
 	"go.opentelemetry.io/collector/extension/xextension/storage"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -32,15 +31,6 @@ import (
 )
 
 var errKeyUnknown = errors.New("key unknown")
-
-// ErrStopIteration is returned to upstream Each callbacks to stop iteration early.
-// It matches the sentinel used by common contrib storage clients that implement Each.
-var ErrStopIteration = filestorage.ErrStopIteration
-
-// iterativeClient is an optional extension of [storage.Client] used when [backend.Store.Each] is called.
-type iterativeClient interface {
-	Each(ctx context.Context, fn func(key string, value []byte) ([]*storage.Operation, error)) error
-}
 
 // storeFromClient implements [backend.Store] on top of an OpenTelemetry [storage.Client].
 // Values are JSON objects (maps) matching memlog statestore semantics.
@@ -103,18 +93,18 @@ func (s *storeFromClient) Remove(key string) error {
 }
 
 func (s *storeFromClient) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
-	iter, ok := s.client.(iterativeClient)
+	walker, ok := s.client.(storage.Walker)
 	if !ok {
-		return errors.New("otelstorage: storage client does not support Each")
+		return errors.New("otelstorage: storage client does not support Walk")
 	}
-	return iter.Each(context.Background(), func(key string, value []byte) ([]*storage.Operation, error) {
+	return walker.Walk(context.Background(), func(key string, value []byte) ([]*storage.Operation, error) {
 		dec := &jsonValueDecoder{raw: value}
 		cont, err := fn(key, dec)
 		if err != nil {
 			return nil, err
 		}
 		if !cont {
-			return nil, ErrStopIteration
+			return nil, storage.SkipAll
 		}
 		return nil, nil
 	})

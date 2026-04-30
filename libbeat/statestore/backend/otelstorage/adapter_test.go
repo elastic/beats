@@ -126,7 +126,7 @@ func (f *fakeStorageClient) Batch(ctx context.Context, ops ...*storage.Operation
 
 func (f *fakeStorageClient) Close(ctx context.Context) error { return nil }
 
-func (f *fakeStorageClient) Each(ctx context.Context, fn func(key string, value []byte) ([]*storage.Operation, error)) error {
+func (f *fakeStorageClient) Walk(ctx context.Context, fn storage.WalkFunc) error {
 	f.mu.RLock()
 	defer f.mu.RUnlock()
 	var keys []string
@@ -139,15 +139,13 @@ func (f *fakeStorageClient) Each(ctx context.Context, fn func(key string, value 
 		v := append([]byte(nil), f.m[k]...)
 		ops, err := fn(k, v)
 		if err != nil {
-			if errors.Is(err, ErrStopIteration) {
+			if errors.Is(err, storage.SkipAll) {
 				batch = append(batch, ops...)
 				return f.Batch(ctx, batch...)
 			}
 			return err
 		}
-		if len(ops) > 0 {
-			batch = append(batch, ops...)
-		}
+		batch = append(batch, ops...)
 	}
 	if len(batch) > 0 {
 		return f.Batch(ctx, batch...)
