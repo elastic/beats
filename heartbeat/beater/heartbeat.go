@@ -143,7 +143,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if parsedConfig.RunFrom != nil {
 		runFromID = parsedConfig.RunFrom.ID
 	}
-	logp.L().Infof("heartbeat starting, running from: %v", runFromID)
+	logp.L().Infof("heartbeat starting, running from: %v", runFromID) //nolint:forbidigo // no logger available yet at beat creation time
 	return bt, nil
 }
 
@@ -162,9 +162,9 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		pipelineWrapper = sync
 	}
 
-	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
+	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.") //nolint:forbidigo // no logger available yet at beat creation time
 	groups, _ := syscall.Getgroups()
-	logp.L().Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+	logp.L().Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups) //nolint:forbidigo // no logger available yet at beat creation time
 
 	waitMonitors := monitors.NewSignalWait()
 
@@ -216,7 +216,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	waitMonitors.AddChan(bt.done)
 	waitMonitors.Wait()
 
-	logp.L().Info("Shutting down, waiting for output to complete")
+	logp.L().Info("Shutting down, waiting for output to complete") //nolint:forbidigo // no logger available yet at beat creation time
 
 	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
 	// located _after_ b.Manager.Stop() or else it will exit early
@@ -227,7 +227,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	waitPublished.AddChan(bt.done)
 	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
 	if bt.config.PublishTimeout > 0 {
-		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
+		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout) //nolint:forbidigo // no logger available yet at beat creation time
 		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
 			"shutdown: timed out waiting for pipeline to publish events."))
 	}
@@ -242,8 +242,8 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (st
 		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
-				logp.L().Infof("skipping disabled monitor: %s", err)
-				continue // don't stop loading monitors just because they're disabled
+				logp.L().Infof("skipping disabled monitor: %s", err) //nolint:forbidigo // no logger available yet at beat creation time
+				continue                                             // don't stop loading monitors just because they're disabled
 			}
 
 			return nil, fmt.Errorf("could not create monitor: %w", err)
@@ -278,7 +278,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		// Backoff panics with 0 duration, set to smallest unit
 		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
-			logp.L().Warnf("skipping monitor state management during managed reload: %v", err)
+			logp.L().Warnf("skipping monitor state management during managed reload: %v", err) //nolint:forbidigo // no logger available yet at beat creation time
 		} else {
 			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}
@@ -294,7 +294,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.monitorFactory); err != nil {
-		logp.L().Error(fmt.Errorf("error loading reloadable monitors: %w", err))
+		logp.L().Error(fmt.Errorf("error loading reloadable monitors: %w", err)) //nolint:forbidigo // no logger available yet at beat creation time
 	}
 
 	// Execute the monitor
