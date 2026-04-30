@@ -35,25 +35,27 @@ var errKeyUnknown = errors.New("key unknown")
 // storeFromClient implements [backend.Store] on top of an OpenTelemetry [storage.Client].
 // Values are JSON objects (maps) matching memlog statestore semantics.
 type storeFromClient struct {
+	ctx    context.Context
 	client storage.Client
 }
 
 // NewStoreFromClient adapts an OpenTelemetry [storage.Client] to [backend.Store].
-// If the client implements ordered iteration (Each), [backend.Store.Each] is supported; otherwise Each returns an error.
-func NewStoreFromClient(client storage.Client) backend.Store {
+// The provided context is used for all underlying storage operations since the
+// [backend.Store] interface does not carry context per call.
+// If the client implements [storage.Walker], [backend.Store.Each] is supported; otherwise Each returns an error.
+func NewStoreFromClient(ctx context.Context, client storage.Client) backend.Store {
 	if client == nil {
 		return nil
 	}
-	return &storeFromClient{client: client}
+	return &storeFromClient{ctx: ctx, client: client}
 }
 
 func (s *storeFromClient) Close() error {
-	return s.client.Close(context.Background())
+	return s.client.Close(s.ctx)
 }
 
 func (s *storeFromClient) Has(key string) (bool, error) {
-	ctx := context.Background()
-	b, err := s.client.Get(ctx, key)
+	b, err := s.client.Get(s.ctx, key)
 	if err != nil {
 		return false, err
 	}
@@ -61,8 +63,7 @@ func (s *storeFromClient) Has(key string) (bool, error) {
 }
 
 func (s *storeFromClient) Get(key string, to any) error {
-	ctx := context.Background()
-	b, err := s.client.Get(ctx, key)
+	b, err := s.client.Get(s.ctx, key)
 	if err != nil {
 		return err
 	}
@@ -85,11 +86,11 @@ func (s *storeFromClient) Set(key string, value any) error {
 	if err != nil {
 		return err
 	}
-	return s.client.Set(context.Background(), key, b)
+	return s.client.Set(s.ctx, key, b)
 }
 
 func (s *storeFromClient) Remove(key string) error {
-	return s.client.Delete(context.Background(), key)
+	return s.client.Delete(s.ctx, key)
 }
 
 func (s *storeFromClient) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
@@ -97,7 +98,7 @@ func (s *storeFromClient) Each(fn func(string, backend.ValueDecoder) (bool, erro
 	if !ok {
 		return errors.New("otelstorage: storage client does not support Walk")
 	}
-	return walker.Walk(context.Background(), func(key string, value []byte) ([]*storage.Operation, error) {
+	return walker.Walk(s.ctx, func(key string, value []byte) ([]*storage.Operation, error) {
 		dec := &jsonValueDecoder{raw: value}
 		cont, err := fn(key, dec)
 		if err != nil {

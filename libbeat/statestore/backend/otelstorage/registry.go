@@ -55,6 +55,7 @@ func DefaultFileStorageConfig() *filestorage.Config {
 }
 
 type registry struct {
+	ctx    context.Context
 	ext    xstorage.Extension
 	recvID component.ID
 }
@@ -93,24 +94,24 @@ func NewFileStorage(ctx context.Context, s Settings) (backend.Registry, error) {
 		_ = storExt.Shutdown(ctx)
 		return nil, err
 	}
-	return &registry{ext: storExt, recvID: s.ReceiverID}, nil
+	return &registry{ctx: ctx, ext: storExt, recvID: s.ReceiverID}, nil
 }
 
 func (r *registry) Access(storeName string) (backend.Store, error) {
-	cli, err := r.ext.GetClient(context.Background(), component.KindReceiver, r.recvID, storeName)
+	cli, err := r.ext.GetClient(r.ctx, component.KindReceiver, r.recvID, storeName)
 	if err != nil {
 		return nil, err
 	}
-	return NewStoreFromClient(cli), nil
+	return NewStoreFromClient(r.ctx, cli), nil
 }
 
 // NewRegistryFromExtension wraps a storage.Extension already started by the
 // collector (e.g. the contrib file_storage extension). Each Access call obtains
 // a storage.Client via GetClient and adapts it with NewStoreFromClient.
-func NewRegistryFromExtension(ext xstorage.Extension, recvID component.ID) backend.Registry {
-	return &registry{ext: ext, recvID: recvID}
+func NewRegistryFromExtension(ctx context.Context, ext xstorage.Extension, recvID component.ID) backend.Registry {
+	return &registry{ctx: ctx, ext: ext, recvID: recvID}
 }
 
 func (r *registry) Close() error {
-	return r.ext.Shutdown(context.Background())
+	return r.ext.Shutdown(r.ctx)
 }

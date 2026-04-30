@@ -32,7 +32,7 @@ import (
 
 func TestRoundTrip_StoreFromClient_Mock(t *testing.T) {
 	f := &fakeStorageClient{m: map[string][]byte{}}
-	st := NewStoreFromClient(f)
+	st := NewStoreFromClient(t.Context(), f)
 
 	require.NoError(t, st.Set("k", map[string]any{"x": "hello"}))
 
@@ -57,7 +57,7 @@ func TestStoreFromClient_Each(t *testing.T) {
 		"a": []byte(`{"z":"one"}`),
 		"b": []byte(`{"z":"two"}`),
 	}}
-	st := NewStoreFromClient(f)
+	st := NewStoreFromClient(t.Context(), f)
 
 	var keys []string
 	err := st.Each(func(k string, dec backend.ValueDecoder) (bool, error) {
