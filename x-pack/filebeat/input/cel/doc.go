@@ -14,9 +14,13 @@ Each export captures metrics for that interval only; counters reset between expo
 
 Metrics export is disabled by default. Enable export to a OTLP/gRPC endpoint by setting environment variables:
 
+  - OTEL_METRICS_EXPORTER: Required. Set to "otlp".
   - OTEL_EXPORTER_OTLP_ENDPOINT: Required. The OTLP endpoint URL.
   - OTEL_EXPORTER_OTLP_HEADERS: Required if endpoint is authenticated.
   - OTEL_RESOURCE_ATTRIBUTES: Optional but recommended
+  - OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: Optional. Set to "explicit_bucket_histogram" to use
+    explicit bucket histograms instead of the default exponential histograms. This is required for backends that
+    do not support exponential histograms (e.g. Elastic APM Server).
 
 See [otel.ExportFactory] for environment settings to run console or http/protobuf output.
 
@@ -57,24 +61,25 @@ https://github.com/elastic/beats/tree/main/x-pack/filebeat/input/cel/cel_metric_
 
 CEL Metrics exported for each periodic run:
 
-	Name                                        Description                                                                              Metric Type
+		Name                                        Description                                                                              Metric Type
 
-	input.cel.periodic.run                      the number of times a periodic run was started.                                          Int64Counter
-	input.cel.periodic.program.run.started      the number of times a program was started in a periodic run.                             Int64counter
-	input.cel.periodic.program.run.success      the number of times a program terminated without an error in a periodic run.             Int64counter
-	input.cel.periodic.batch.received           the number of the number of batches generated in a periodic run.                         Int64counter
-	input.cel.periodic.batch.published          the number of the number of batches successfully published in a periodic run.            Int64counter
-	input.cel.periodic.event.received           the number of the number of events generated in a periodic run.                          Int64counter
-	input.cel.periodic.event.published          the number of the number of events published in a periodic run.                          Int64counter
-	input.cel.periodic.run.duration             the total duration of time in seconds spent in a periodic run.                           Float64Counter
-	input.cel.periodic.cel.duration             the total duration of time in seconds spent processing CEL programs in a periodic run.   Float64Histogram
-	input.cel.periodic.event.publish.duration   the total duration of time in seconds publishing events in a periodic run.               Float64Histogram
-	input.cel.program.batch.received            the number of batches the program has generated.                                         Int64Histogram
-	input.cel.program.event.published           the number of events the program has published.                                          Int64Histogram
-	input.cel.program.batch.published           the number of batched the program has published.                                         Int64Histogram
-	input.cel.program.run.duration              the total time in seconds spent executing the program.                                   Float64Histogram
-	input.cel.program.cel.duration              the total time in seconds spent processing the CEL program.                              Float64Histogram
-	input.cel.program.publish.duration          the total time in seconds spent publishing in the program.                               Float64Histogram
+		input.cel.periodic.run.count                the number of times a periodic run was started.                                          Int64Counter
+		input.cel.periodic.program.run.started      the number of times a program was started in a periodic run.                             Int64Counter
+		input.cel.periodic.program.run.success      the number of times a program terminated without an error in a periodic run.             Int64Counter
+		input.cel.periodic.batch.received           the number of the number of batches generated in a periodic run.                         Int64Counter
+		input.cel.periodic.batch.published          the number of the number of batches successfully published in a periodic run.            Int64Counter
+		input.cel.periodic.event.received           the number of the number of events generated in a periodic run.                          Int64Counter
+		input.cel.periodic.event.published          the number of the number of events published in a periodic run.                          Int64Counter
+		input.cel.periodic.run.duration             the total duration of time in seconds spent in a periodic run.                           Float64Counter
+		input.cel.periodic.cel.duration             the total duration of time in seconds spent processing CEL programs in a periodic run.   Float64Counter
+		input.cel.periodic.event.publish.duration   the total duration of time in seconds publishing events in a periodic run.               Float64Counter
+		input.cel.program.batch.received            the number of batches the program has generated.                                         Int64Histogram
+	    input.cel.program.event.received            the number of events the program has generated.                                          Int64Histogram
+	    input.cel.program.batch.published           the number of batches the program has published.                                         Int64Histogram
+		input.cel.program.event.published           the number of events the program has published.                                          Int64Histogram
+		input.cel.program.run.duration              the time in seconds spent executing the program.                                         Float64Histogram
+		input.cel.program.cel.duration              the time in seconds spent processing the CEL program.                                    Float64Histogram
+		input.cel.program.publish.duration          the time in seconds spent publishing in the program.                                     Float64Histogram
 
 HTTP metrics are generated by the OTEL SDK through wrapping the transport and are scoped in the OTEL metrics as
 ' go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp'.
@@ -105,5 +110,42 @@ Cumulative HTTP metrics are collected through a wrapper on the HTTP transport.
 See https://www.elastic.co/guide/en/beats/filebeat/current/http-endpoint.html
 and https://www.elastic.co/docs/reference/fleet/monitor-elastic-agent for details
 on agent monitoring.
+
+# OpenTelemetry Traces
+
+The CEL Input can export OTel traces. This is off by default and can be
+activated and configured using OTel-standard environment variables.
+
+The trace root typically represents a CEL periodic run, with child spans for
+individual program executions, HTTP requests, publishing, and so forth.
+
+Trace and span ID values are included in relevant logging, including in
+regular request tracing logs, so that spans and traces can be correlated.
+
+The values of HTTP headers and query string parameters will be redacted
+if their names contain certain words. Specific names can be configured as
+redacted or unredacted in the input settings documented elsewhere.
+
+Setting OTEL_TRACES_EXPORTER="otlp" will activate export. Alternatively, a
+"console" exporter is available.
+
+Further configuration can be done as in the following example:
+
+	OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="grpc"
+	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://otlp-receiver.example.com:4317/v1/traces"
+	OTEL_EXPORTER_OTLP_TRACES_HEADERS="Authorization=Bearer abc123"
+	OTEL_EXPORTER_OTLP_TRACES_TIMEOUT="5000"
+	OTEL_EXPORTER_OTLP_TRACES_INSECURE="false"
+
+If any of those trace-specific environment variables are not set, the generic
+equivalent (with "_TRACES" removed from the name) will be checked.
+
+Span resource attributes will include any values set in the
+OTEL_RESOURCE_ATTRIBUTES environment variable, as is done for OTel metrics.
+
+A special setting environment variable is available to override other settings
+and disable trace export for a whole input:
+
+	BEATS_OTEL_TRACES_DISABLE="cel"
 */
 package cel

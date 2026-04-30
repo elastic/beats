@@ -906,9 +906,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]any{
-					"message": `failed eval: ERROR: <input>:3:21: response body too big
- |   "events": [string(body)]
- | ....................^`,
+					"message": `failed eval: ERROR: <input>:2:5: response body too big
+ |  get(state.url).Body.as(body, {
+ | ....^`,
 				},
 			},
 		},
@@ -1368,7 +1368,7 @@ var inputTests = []struct {
 		},
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1404,7 +1404,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -1416,7 +1416,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1452,7 +1452,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -1464,7 +1464,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1500,7 +1500,66 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	{
+		name: "tracer_escaping_logs",
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.url":             "https://example.com/",
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+			"state":                    map[string]interface{}{},
+			"program":                  "{}",
+		},
+		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
+	},
+	{
+		name: "tracer_disabled_escaping_logs",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  false,
+			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -2104,13 +2163,11 @@ var inputTests = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
-			// Loss of location information here is a result of changes in the runtime.
-			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					"message": `failed eval: ERROR: <input>:5:14: no such overload
- |    "events": events,
- | .............^`,
+					"message": `failed eval: ERROR: <input>:3:20: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | ...................^`,
 				},
 			},
 		},
@@ -2363,8 +2420,20 @@ func TestInput(t *testing.T) {
 			}
 
 			var tempDir string
-			if conf.Resource.Tracer != nil {
-				tempDir = t.TempDir()
+			if conf.Resource.Tracer.enabled() {
+				err := os.MkdirAll("cel", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("cel", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
@@ -2395,7 +2464,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
+			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
@@ -2924,6 +2993,68 @@ var redactorTests = []struct {
 		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"other":"data"},{"other":"data"}],"other":"data"}`,
+	},
+	{
+		name: "secret_flat_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_flat_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: true,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data"}`,
+	},
+	{
+		name: "secret_nested_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"auth": mapstr.M{
+					"user":     "admin",
+					"password": "p@ss",
+				},
+				"token": "bearer_xyz",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"auth":{"password":"p@ss","user":"admin"},"token":"bearer_xyz"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_absent_no_op",
+		state: mapstr.M{
+			"other":   "data",
+			"another": "value",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"another":"value","other":"data"}`,
+		wantRedact: `{"another":"value","other":"data"}`,
 	},
 }
 

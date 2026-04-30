@@ -93,6 +93,12 @@ var (
 				"hit_count":            c.Int("hit_count", s.IgnoreAllErrors),
 				"miss_count":           c.Int("miss_count", s.IgnoreAllErrors),
 			}, c.DictOptional),
+			"dense_vector": c.Dict("dense_vector", s.Schema{
+				"count": c.Int("value_count", s.IgnoreAllErrors),
+				"off_heap": c.Dict("off_heap", s.Schema{
+					"total_size_bytes": c.Int("total_size_bytes", s.IgnoreAllErrors),
+				}, c.DictOptional),
+			}, c.DictOptional),
 		}, c.DictOptional),
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
@@ -236,7 +242,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	timestampDiff := int64(0)
 	enrichedStats := map[string]mapstr.M{}
-	transactionId := utils.NewUUIDV4()
+	transactionId := utils.NewUUID()
 	metricSets := []mapstr.M{}
 	nodesList := make(map[string]string, len(nodeStats.Nodes))
 

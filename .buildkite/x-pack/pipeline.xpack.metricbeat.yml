@@ -3,19 +3,21 @@ name: "beats-xpack-metricbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1776781006"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips"
-  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
-  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
-  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
-  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1776781006"
+  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1776781006"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
+  IMAGE_WIN_10_VERSION: "1.0.1776781006"
+  IMAGE_WIN_11_VERSION: "1.0.1776781006"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1776781006"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1776781006"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1776781006"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -32,6 +34,16 @@ env:
   # Platforms to be used for FIPS packaging nodes
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
   PLATFORMS_ARM64_FIPS: "+all linux/arm64"
+
+# This section is used to define the plugins that will be used in the pipeline.
+# See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
+common:
+  - dockerhub_login_plugin: &dockerhub_login_plugin
+      elastic/vault-docker-login#v0.6.4:
+        secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
+  - docker_elastic_login_plugin: &docker_elastic_login_plugin
+      elastic/vault-docker-login#v0.6.4:
+        secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
 
 steps:
   - group: "Check/Update"
@@ -246,12 +258,17 @@ steps:
               context: "x-pack/metricbeat: Go fips140=only Integration Tests (Module)"
 
       - label: ":ubuntu: x-pack/metricbeat: FIPS ECH Integration Tests"
+        skip: "https://github.com/elastic/beats/issues/50269: ssh keys not FIPS"
         env:
           ASDF_TERRAFORM_VERSION: "1.9.3"
           ASDF_PYTHON_VERSION: "3.9.13" # Not needed by ECH tests, but needed by VM
-          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
-          TF_VAR_ech_region: "us-gov-east-1"
-          TF_VAR_deployment_template_id: "aws-general-purpose"
+# We are temporarily using the Production CFT environment instead of the Staging GovCloud
+# one.  This is being done until issues with creating deployments in Staging GovCloud are
+# fixed. Once this happens, uncomment the lines below and delete the gcp-us-west2 line.
+#          EC_ENDPOINT: "https://api.staging.elastic-gov.com"
+#          TF_VAR_ech_region: "us-gov-east-1"
+#          TF_VAR_deployment_template_id: "aws-general-purpose"
+          TF_VAR_ech_region: "gcp-us-west2"
         command: |
           .buildkite/scripts/custom_fips_ech_test.sh x-pack/metricbeat
         retry:
@@ -259,7 +276,7 @@ steps:
             - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_X86_64_FIPS}"
+          image: "${IMAGE_UBUNTU_X86_64_FIPS}"
           instanceType: "m5.xlarge"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
@@ -274,7 +291,12 @@ steps:
               branches: "main"
               debug: true
           - elastic/vault-secrets#v0.1.0:
-              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
+# We are temporarily using the Production CFT environment API key instead of the
+# Staging GovCloud one.  This is being done until issues with creating deployments in
+# Staging GovCloud are fixed. Once this happens, uncomment the line below and delete
+# the vault_ec_key_prod line.
+#              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-staging-gov"
+              path: "kv/ci-shared/platform-ingest/platform-ingest-ec-prod"
               field: "apiKey"
               env_var: "EC_API_KEY"
         notify:
@@ -379,11 +401,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          imageVersion: "${IMAGE_WIN_10_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
@@ -406,11 +428,11 @@ steps:
           automatic:
             - limit: 1
         agents:
-          provider: "gcp"
+          provider: "azure"
           image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          imageVersion: "${IMAGE_WIN_11_VERSION}"
+          vmSize: "Standard_D8s_v5"
+          diskSizeGb: "256"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
@@ -472,7 +494,7 @@ steps:
           mage build test goIntegTest
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
@@ -512,6 +534,9 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -532,9 +557,12 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
@@ -551,6 +579,9 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -572,9 +603,12 @@ steps:
           automatic:
             - limit: 1
         timeout_in_minutes: 20
+        plugins:
+          - *dockerhub_login_plugin
+          - *docker_elastic_login_plugin
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:

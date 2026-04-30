@@ -15,13 +15,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/exportertest"
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
 	"github.com/elastic/elastic-agent-libs/transport"
@@ -383,7 +385,7 @@ func TestProcessBatchResultHandlesCancelledContext(t *testing.T) {
 
 	exp := newExporterWithDefaults(t)
 	logs := newTestLogs()
-	batch, err := internal.NewLogBatch(cancelledCtx, logs)
+	batch, err := internal.NewLogBatch(logs)
 	require.NoError(t, err)
 
 	ok, err := runWithTimeout(t.Context(), func(context.Context) error {
@@ -479,6 +481,10 @@ func (m *mockClientWorker) String() string {
 	return "mockClientWorker"
 }
 
+func (m *mockClientWorker) Connected() error {
+	return nil
+}
+
 func (m *mockClientWorker) run(ctx context.Context, exp *logstashExporter) {
 	go func() {
 		for {
@@ -496,4 +502,74 @@ func (m *mockClientWorker) run(ctx context.Context, exp *logstashExporter) {
 func (m *mockClientWorker) Close() error {
 	m.Closed = true
 	return m.CloseErr
+}
+
+func TestStatusReporting(t *testing.T) {
+
+	t.Run("test recoverable error status on connectivity issue", func(t *testing.T) {
+		exp := newExporterWithDefaults(t)
+		clientCtx := newTestBeatsClientContext(t.Context())
+		statusChan := make(chan *componentstatus.Event, 1)
+		require.NoError(t, exp.Start(t.Context(), &testReporter{statusChan: statusChan}))
+
+		_, err := runWithTimeout(clientCtx, func(timeoutCtx context.Context) error {
+			return exp.ConsumeLogs(timeoutCtx, newTestLogs())
+		})
+
+		require.Error(t, err)
+		select {
+		case event := <-statusChan:
+			require.Equal(t, componentstatus.StatusRecoverableError, event.Status())
+			require.Contains(t, event.Err().Error(), "logstash request failed")
+		default:
+			t.Errorf("did not receive component status, expected degraded health")
+		}
+
+		require.NoError(t, exp.Shutdown(t.Context()))
+	})
+
+	t.Run("test status OK when batch is ACKed", func(t *testing.T) {
+		exp := newExporterWithDefaults(t)
+		clientCtx := newTestBeatsClientContext(t.Context())
+		statusChan := make(chan *componentstatus.Event, 1)
+		require.NoError(t, exp.Start(t.Context(), &testReporter{statusChan: statusChan}))
+
+		worker := &mockClientWorker{PublishFn: func(ctx context.Context, batch publisher.Batch) error {
+			batch.ACK()
+			return nil
+		}}
+
+		exp.workers = append(exp.workers, worker)
+
+		workerCtx, workerCtxCancel := context.WithCancel(t.Context())
+		t.Cleanup(workerCtxCancel)
+		worker.run(workerCtx, exp)
+
+		ok, _ := runWithTimeout(clientCtx, func(timeoutCtx context.Context) error {
+			return exp.ConsumeLogs(timeoutCtx, newTestLogs())
+		})
+
+		require.True(t, ok, "test timed out")
+		select {
+		case event := <-statusChan:
+			require.Equal(t, componentstatus.StatusOK, event.Status())
+		default:
+			t.Errorf("did not receive component status, expected status OK")
+		}
+
+		require.NoError(t, exp.Shutdown(t.Context()))
+	})
+
+}
+
+type testReporter struct {
+	statusChan chan *componentstatus.Event
+}
+
+func (t *testReporter) Report(event *componentstatus.Event) {
+	t.statusChan <- event
+}
+
+func (t *testReporter) GetExtensions() map[component.ID]component.Component {
+	return make(map[component.ID]component.Component)
 }

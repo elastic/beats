@@ -15,16 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journalctl
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -55,7 +59,7 @@ type JournalEntry struct {
 
 // JctlFactory is a function that returns an instance of journalctl ready to use.
 // It exists to allow testing
-type JctlFactory func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error)
+type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error)
 
 // Jctl abstracts the call to journalctl, it exists only for testing purposes
 //
@@ -67,6 +71,10 @@ type Jctl interface {
 	// If cancel is cancelled, Next returns a zero value JournalEntry
 	// and ErrCancelled.
 	Next(input.Canceler) (data []byte, err error)
+
+	// Kill terminates the journalctl process and blocks until all
+	// background goroutines (stdout/stderr readers and the process-wait
+	// goroutine) have exited.
 	Kill() error
 }
 
@@ -106,29 +114,77 @@ type Reader struct {
 	jctl        Jctl
 	jctlFactory JctlFactory
 
+	// supportsBootAll indicates whether the running journalctl supports
+	// `--boot all` (introduced in systemd/journalctl v242).
+	supportsBootAll bool
+
 	backoff backoff.Backoff
+}
+
+// maybeAddBootAll appends "--boot", "all" to args only when boot-all is
+// supported by the running journalctl.
+func maybeAddBootAll(args []string, supportsBootAll bool) []string {
+	if !supportsBootAll {
+		return args
+	}
+
+	return append(args, "--boot", "all")
+}
+
+// journalctlSupportsBootAll reports whether `--boot all` should be used.
+// On any detection failure, it safely falls back to false.
+func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	jctl, err := factory(ctx, logger, "--version")
+	if err != nil {
+		logger.Warnf("cannot call journalctl to get its version: %s. Omitting '--boot all'", err)
+		return false
+	}
+
+	defer jctl.Kill() //nolint:errcheck // there is nothing we can do with this error
+
+	out, err := jctl.Next(ctx)
+	if err != nil {
+		logger.Warnf("cannot read journalctl output: %s", err)
+		return false
+	}
+	// first line: "systemd 239 (239-82.el8_10.2)"
+	firstLine := strings.SplitN(string(out), "\n", 2)[0]
+	fields := strings.Fields(firstLine)
+	if len(fields) < 2 {
+		logger.Warnf("journalctl version invalid format: %q", strings.TrimSpace(string(out)))
+		return false
+	}
+
+	version, err := strconv.Atoi(fields[1])
+	if err != nil {
+		logger.Warnf("cannot convert journalctl version to int: %s", err)
+		return false
+	}
+
+	logger.Debugf("journalctl version: %d", version)
+	return version >= 242
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
 // If there is a cursor, only the cursor is used, seek is ignored.
-// If there is no cursor, then seek is used
-// The bool parameter indicates whether there might be messages from
-// the previous boots
-func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string) []string {
+// If there is no cursor, then seek is used.
+// --boot all is only added when the journalctl version supports it (>= 242).
+func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, supportsBootAll bool) []string {
 	if cursor != "" {
-		return []string{"--after-cursor", cursor, "--boot", "all"}
+		return maybeAddBootAll([]string{"--after-cursor", cursor}, supportsBootAll)
 	}
 
 	switch mode {
 	case SeekSince:
-		return []string{
+		return maybeAddBootAll([]string{
 			"--since", time.Now().Add(since).Format(sinceTimeFormat),
-			"--boot", "all",
-		}
+		}, supportsBootAll)
 	case SeekTail:
 		return []string{"--since", "now"}
 	case SeekHead:
-		return []string{"--no-tail", "--boot", "all"}
+		return maybeAddBootAll([]string{"--no-tail"}, supportsBootAll)
 	default:
 		// That should never happen
 		return []string{}
@@ -217,17 +273,19 @@ func New(
 		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
-	extraArgs := handleSeekAndCursor(mode, since, cursor)
+	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
+	extraArgs := handleSeekAndCursor(mode, since, cursor, supportsBootAll)
 
 	r := Reader{
-		logger:      logger,
-		jctlLogger:  logger.Named("journalctl-runner"),
-		args:        args,
-		extraArgs:   extraArgs,
-		cursor:      cursor,
-		canceler:    canceler,
-		jctlFactory: newJctl,
-		backoff:     backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+		logger:          logger,
+		jctlLogger:      logger.Named("journalctl-runner"),
+		args:            args,
+		extraArgs:       extraArgs,
+		cursor:          cursor,
+		canceler:        canceler,
+		jctlFactory:     newJctl,
+		supportsBootAll: supportsBootAll,
+		backoff:         backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
 	}
 
 	if err := r.newJctl(extraArgs...); err != nil {
@@ -240,15 +298,15 @@ func New(
 func (r *Reader) newJctl(extraArgs ...string) error {
 	args := append(r.args, extraArgs...)
 
-	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, "journalctl", args...)
+	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, args...)
 	r.jctl = jctl
 
 	return err
 }
 
-// Close stops the `journalctl` process and waits for all
-// goroutines to return, the canceller passed to `New` should
-// be cancelled before `Close` is called
+// Close stops the `journalctl` process and waits for all goroutines to
+// return. The canceller passed to `New` should be cancelled before `Close`
+// is called so that the reader goroutines can drain.
 func (r *Reader) Close() error {
 	r.logger.Infof("shutting down journalctl, waiting up to: %s", time.Minute)
 
@@ -306,7 +364,7 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 		// We have a cursor, set it instead of the other options that select
 		// where in the journal to start reading because they are incompatible
 		// with setting the cursor.
-		extraArgs = []string{"--after-cursor", r.cursor}
+		extraArgs = maybeAddBootAll([]string{"--after-cursor", r.cursor}, r.supportsBootAll)
 	}
 
 	if err := r.newJctl(extraArgs...); err != nil {

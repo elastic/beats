@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
 func TestLeak(t *testing.T) {
@@ -61,7 +61,7 @@ func TestLeak(t *testing.T) {
 		},
 	}
 
-	factory := NewFactory()
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 
 	t.Run("healthy consumer", func(t *testing.T) {
 		defer oteltest.VerifyNoLeaks(t)

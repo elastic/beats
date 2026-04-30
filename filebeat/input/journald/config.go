@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journald
@@ -36,6 +38,16 @@ import (
 // includeMatchesWarnOnce allow for a config deprecation warning to be
 // logged only once if an old config format is detected.
 var includeMatchesWarnOnce sync.Once
+
+// defaultJournalCtlPath is the default journalctl binary path for the normal
+// operation of the input. It requires that the jouranlctl binary is in the
+// PATH.
+var defaultJournalCtlPath = "journalctl"
+
+// defaultJournalCtlPathChroot is the default journalctl binary path when
+// using a chroot, which requires absolute paths.
+// See https://github.com/golang/go/issues/39341
+var defaultJournalCtlPathChroot = "/usr/bin/journalctl"
 
 // Config stores the options of a journald input.
 type config struct {
@@ -76,6 +88,18 @@ type config struct {
 	// Allow ingesting log entries interleaved from all available journals,
 	// including remote ones.
 	Merge bool `config:"merge"`
+
+	// Chroot is the chroot folder used to call journalctl
+	Chroot string `config:"chroot"`
+
+	// JournalctlPath specifies the path to the `journalctl` binary.
+	// This field is required only if the Chroot option is set, as the
+	// input needs to locate the binary within the chroot environment.
+	// If Chroot is set, JournalctlPath must be an absolute path within
+	// the chroot environment. If JournalctlPath is not explicitly set,
+	// it defaults to `journalctl`, which assumes that the `journalctl`
+	// binary is available in the system's `PATH` environment variable.
+	JournalctlPath string `config:"journalctl_path"`
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration
@@ -107,5 +131,6 @@ func defaultConfig() config {
 	return config{
 		Seek:               journalctl.SeekHead,
 		SaveRemoteHostname: false,
+		JournalctlPath:     defaultJournalCtlPath,
 	}
 }

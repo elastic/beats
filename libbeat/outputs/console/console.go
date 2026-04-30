@@ -86,7 +86,7 @@ func makeConsole(
 		}
 	}
 
-	return outputs.Success(config.Queue, config.BatchSize, 0, nil, beat.Logger, c)
+	return outputs.Success(config.Queue, config.BatchSize, 0, nil, beat.Logger, beat.Paths, c)
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec, logger *logp.Logger) (*console, error) {

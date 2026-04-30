@@ -32,14 +32,12 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	go func() {
@@ -68,9 +66,7 @@ func TestActions(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +140,7 @@ func TestActions(t *testing.T) {
 			// depending on whether the scanner or the platform-dependent
 			// filesystem event listener reported it. The subset of actions we test
 			// for here should be consistent across all cases though.
-			switch path.(string) {
+			switch path.(string) { //nolint:errcheck // err already checked above
 			case newDir:
 				assert.Contains(t, actions, "initial_scan")
 			case dir:
@@ -171,9 +167,7 @@ func TestExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,7 +203,7 @@ func TestExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err) {
-			_, ok := wanted[path.(string)]
+			_, ok := wanted[path.(string)] //nolint:errcheck // err already checked above
 			assert.True(t, ok)
 		}
 	}
@@ -223,9 +217,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
 	skipOnBuildkiteDarwinArm(t)
 
-	defer abtest.SetupDataDir(t)()
-
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -269,7 +261,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 		event := e.MetricSetFields
 		path, err := event.GetValue("file.path")
 		if assert.NoError(t, err, "Failed to read file.path field") {
-			got[path.(string)] = true
+			got[path.(string)] = true //nolint:errcheck // err already checked above
 		}
 	}
 	assert.Equal(t, wanted, got)
@@ -287,8 +279,6 @@ func TestErrorReporting(t *testing.T) {
 		// in UNIX/Linux OS.
 		t.Skip("This test can't be run as root")
 	}
-	defer abtest.SetupDataDir(t)()
-
 	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
@@ -482,7 +472,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 	for _, ev := range e {
 		ev.validate(t, ms)
 	}
@@ -755,7 +745,7 @@ func TestEventDelete(t *testing.T) {
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
-	ms.bucket = bucket.(datastore.BoltBucket)
+	ms.bucket = bucket.(datastore.BoltBucket) //nolint:errcheck // type is guaranteed by OpenBucket
 
 	baseTime := time.Now()
 	sha := Digest("22222222222222222222")

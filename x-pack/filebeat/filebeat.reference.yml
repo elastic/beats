@@ -818,6 +818,12 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  querylog:
+    enabled: false
+    # Set custom paths for the query log (NDJSON) files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
   deprecation:
     enabled: false
     # Set custom paths for the log files. If left empty,
@@ -1494,6 +1500,7 @@ filebeat.modules:
 # - enabled: Set to true to enable ingestion of Salesforce module fileset
 # - initial_interval: Initial interval for log collection. This setting determines the time period for which the logs will be initially collected when the ingestion process starts, i.e. 1d/h/m/s
 # - api_version: API version for Salesforce, version should be greater than 46.0
+# - url: URL for Salesforce instance
 
 # Authentication Configurations:
 # User-Password Authentication:
@@ -1510,6 +1517,7 @@ filebeat.modules:
 # - client.username: Username for JWT authentication
 # - client.key_path: Path to client key for JWT authentication
 # - url: Audience URL for JWT authentication
+# - token_url: Token URL for JWT authentication
 
 # Event Monitoring:
 # - real_time: Set to true to enable real-time logging using object type data collection
@@ -1541,6 +1549,7 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -1567,6 +1576,7 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -1596,6 +1606,7 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -1625,17 +1636,19 @@ filebeat.modules:
         client.username: "<YourClientUsernameHere>"
         client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
+        # token_url: "<YourTokenURLHere>"
 
     var.url: "https://instance_id.my.salesforce.com"
 
     var.real_time: true
     var.real_time_interval: 5m
+
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
 
 #--------------------------------- Snyk Module ---------------------------------
@@ -1789,6 +1802,9 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -1801,6 +1817,9 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -1812,6 +1831,9 @@ filebeat.modules:
 
     # The URL used for Threat Intel API calls.
     var.url: https://mb-api.abuse.ch/api/v1/
+
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
 
     # The interval to poll the API for updates.
     var.interval: 10m
@@ -2348,7 +2370,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -2443,7 +2465,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -2918,6 +2940,17 @@ filebeat.inputs:
   #paths:
     #- /var/log/custom.journal
 
+  # Specify a folder to be used as chroot when calling the journalctl binary
+  #chroot:
+
+  # The path for the `journalctl` binary. If not set, Filebeat will look for
+  # `journalctl` in PATH (defaults to `journalctl`). When using `chroot`, if
+  # `journalctl_path` is not explicitly set, it automatically defaults to
+  # `/usr/bin/journalctl`. If `journalctl_path` is explicitly set when `chroot`
+  # is configured, it must be an absolute path from within the chroot directory.
+  #journalctl_path:
+
+
   # When enabled, log entries will be ingested interleaved from all
   # available journals, including remote ones.
   #merge: false
@@ -3084,6 +3117,7 @@ filebeat.inputs:
   #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
 
   # Bucket Name used for polling non-AWS S3 buckets
+  # Note: `region` is required when non_aws_bucket_name is given.
   #non_aws_bucket_name: test-s3-bucket
 
   # Configures the AWS S3 API to use path style instead of virtual host style (default)
@@ -3288,6 +3322,57 @@ filebeat.inputs:
 # filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
+
+# The storage backend for the registry. Supported values are "memlog" and
+# "bbolt". The default is "memlog", which uses an in-memory log with periodic
+# disk flushing. The "bbolt" backend uses a bbolt (BoltDB) database for
+# persistent on-disk storage with support for compaction and TTL-based cleanup.
+#filebeat.registry.backend: memlog
+
+# ----------------------- Bbolt backend settings -------------------------------
+# WARNING: The bbolt backend is EXPERIMENTAL and may change or be removed in
+# future releases. Do not use in production without understanding the risks.
+#
+# These settings apply only when filebeat.registry.backend is set to "bbolt".
+# The database files are stored under the registry.path directory.
+# Configuration parameter names are aligned with the OpenTelemetry
+# filestorage extension for future compatibility.
+
+# Timeout for obtaining a file lock on the bbolt database file. Default: 1s.
+#filebeat.registry.bbolt.timeout: 1s
+
+# Controls whether fdatasync is called after each write transaction commit.
+# When false (the default), writes are buffered by the OS and flushed lazily.
+# This is faster but recent writes can be lost on an unclean shutdown (power
+# failure, kernel panic). A normal Filebeat shutdown is not affected.
+# When true, every write is synced to disk before returning, guaranteeing
+# durability at the cost of reduced write throughput. Default: false.
+#filebeat.registry.bbolt.fsync: false
+
+# If true, database compaction runs on every start. Compaction rewrites the
+# database to reclaim unused disk space. Default: false.
+#filebeat.registry.bbolt.compaction.on_start: false
+
+# Maximum number of items processed per transaction during compaction and
+# retention cleanup. A value of 0 disables batching, processing all items
+# in a single transaction. Default: 65536.
+#filebeat.registry.bbolt.compaction.max_transaction_size: 65536
+
+# If true, leftover temporary files from a previous compaction that was
+# interrupted (e.g. by a crash) are removed on start. Default: false.
+#filebeat.registry.bbolt.compaction.cleanup_on_start: false
+
+# How long entries are kept before being removed. A zero value disables
+# TTL-based removal. Expired entries become invisible to reads immediately,
+# but are only physically deleted from disk when retention.interval is also
+# set to a positive value. Default: 0 (disabled).
+#filebeat.registry.bbolt.retention.ttl: 0
+
+# How often to remove expired entries from disk. Only effective when
+# retention.ttl is also set to a positive value. A zero value disables
+# periodic removal.
+# Default: 0 (disabled).
+#filebeat.registry.bbolt.retention.interval: 0
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -4131,7 +4216,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 

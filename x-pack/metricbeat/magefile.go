@@ -10,17 +10,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	//mage:import
@@ -113,30 +111,13 @@ func PythonUnitTest() error {
 
 // BuildSystemTestBinary build a system test binary depending on the runner.
 func BuildSystemTestBinary() error {
-	binArgs := devtools.DefaultTestBinaryArgs()
-	args := []string{
-		"test", "-c",
-		"-o", binArgs.Name + ".test",
+	var opts []testbin.Option
+	// On Windows 7 32-bit we run out of memory if we enable DWARF.
+	if isWindows32bitRunner() {
+		opts = append(opts, testbin.WithExtraFlags("-ldflags=-w"))
 	}
-
-	// On Windows 7 32-bit we run out of memory if we enable coverage and DWARF
-	isWin32Runner := isWindows32bitRunner()
-	if isWin32Runner {
-		args = append(args, "-ldflags=-w")
-	}
-	if devtools.TestCoverage && !isWin32Runner {
-		args = append(args, "-coverpkg", "./...")
-	}
-
-	if len(binArgs.InputFiles) > 0 {
-		args = append(args, binArgs.InputFiles...)
-	}
-
-	start := time.Now()
-	defer func() {
-		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
-	}()
-	return sh.RunV("go", args...)
+	_, err := testbin.Build(devtools.BeatName, ".", opts...)
+	return err
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -241,7 +222,6 @@ func GoIntegTest(ctx context.Context) error {
 	}
 
 	if !devtools.IsInIntegTestEnv() {
-		devtools.BuildSystemTestBinary()
 		args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 		// ES_USER must be admin in order for the Go Integration tests to function because they require
 		// indices:data/read/search
@@ -267,7 +247,12 @@ func GoIntegTest(ctx context.Context) error {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	os.Setenv("GODEBUG", "fips140=only")
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	os.Setenv("GODEBUG", "fips140=only,tlsmlkem=0")
 	return GoIntegTest(ctx)
 }
 

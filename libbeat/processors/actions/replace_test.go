@@ -313,6 +313,92 @@ func TestReplaceRun(t *testing.T) {
 
 func ptr[T any](v T) *T { return &v }
 
+// TestReplaceFailOnErrorSafety verifies that when FailOnError=true and the
+// field is missing, the event fields are unchanged.
+func TestReplaceFailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name  string
+		input mapstr.M
+	}{
+		{
+			name:  "missing field",
+			input: mapstr.M{"other": "value"},
+		},
+		{
+			name:  "non-string field value",
+			input: mapstr.M{"f": 42},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &replaceString{
+				log: logptest.NewTestingLogger(t, "replace"),
+				config: replaceStringConfig{
+					Fields: []replaceConfig{
+						{
+							Field:       "f",
+							Pattern:     regexp.MustCompile(`abc`),
+							Replacement: ptr("xyz"),
+						},
+					},
+					FailOnError: true,
+				},
+			}
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := f.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
+}
+
+// TestReplaceMultiFieldBackup verifies that when multiple fields are configured
+// and a later field fails, the changes from earlier fields are rolled back via backup.
+func TestReplaceMultiFieldBackup(t *testing.T) {
+	f := &replaceString{
+		log: logptest.NewTestingLogger(t, "replace"),
+		config: replaceStringConfig{
+			Fields: []replaceConfig{
+				{
+					Field:       "f1",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: ptr("X"),
+				},
+				{
+					Field:       "f2",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: ptr("X"),
+				},
+			},
+			FailOnError: true,
+		},
+	}
+
+	// f1 is a string (replaces "abc" → "Xbc" on first iteration),
+	// f2 is an int (will fail the string type check on second iteration).
+	input := mapstr.M{"f1": "abc", "f2": 42}
+	event := &beat.Event{Fields: input.Clone()}
+	original := input.Clone()
+
+	result, err := f.Run(event)
+	require.Error(t, err)
+
+	// Multi-field: backup was taken and restored; result is the backup pointer.
+	// f1 change must be undone.
+	result.Fields.Delete("error")
+	assert.Equal(t, original, result.Fields,
+		"first field's replacement must be rolled back when second field fails")
+}
+
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
 		Field         string
@@ -390,7 +476,7 @@ func TestReplaceField(t *testing.T) {
 
 			err := f.replaceField(test.Field, test.Pattern, test.Replacement, &beat.Event{Fields: test.Input})
 			if err != nil {
-				assert.Equal(t, test.error, true)
+				assert.True(t, test.error)
 			}
 
 			assert.True(t, reflect.DeepEqual(test.Input, test.Output))

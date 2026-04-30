@@ -22,9 +22,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -54,8 +56,12 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Go integration tests now build the binary automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target is only needed for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 
@@ -81,7 +87,16 @@ func AssembleDarwinUniversal() error {
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
-func Package() {
+func Package() error {
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	packageWithArgs(args)
+	return nil
+}
+
+func packageWithArgs(args devtools.PackageArgs) {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
@@ -89,9 +104,12 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	filebeat.CustomizePackaging()
 
-	mg.Deps(Update)
-	mg.Deps(CrossBuild)
-	mg.SerialDeps(devtools.Package, TestPackages)
+	mg.SerialDeps(
+		Update,
+		filebeat.CrossBuildWithArgs(args),
+		devtools.PackageWithArgs(args),
+		TestPackages,
+	)
 }
 
 // Package packages the Beat for IronBank distribution.
@@ -193,15 +211,48 @@ func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
 }
 
+func packageDockerImageForGoIntegTest() error {
+	var dockerPlatform string
+	switch runtime.GOARCH {
+	case "amd64", "arm64":
+		dockerPlatform = fmt.Sprintf("linux/%s", runtime.GOARCH)
+	default:
+		return fmt.Errorf(
+			"goIntegTest docker packaging requires GOARCH=amd64 or GOARCH=arm64 (got %q)",
+			runtime.GOARCH,
+		)
+	}
+
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	args.Platforms = devtools.NewPlatformList(dockerPlatform)
+	args.PackageTypes = []devtools.PackageType{devtools.Docker}
+	args.Snapshot = true
+
+	packageWithArgs(args)
+
+	return nil
+}
+
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
+	mg.Deps(packageDockerImageForGoIntegTest)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs(ctx))
 }
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	mg.Deps(BuildSystemTestBinary)
+	// We pre-cache go module dependencies before running the unit tests with
+	// GODEBUG=fips140=only.  Otherwise, the command that runs the unit tests
+	// will try to download the dependencies and could fail because the TLS
+	// negotiation with the Go module proxy could use a non-FIPS compliant
+	// key exchange protocol, e.g. X25519.
+	if err := sh.RunV(mg.GoCmd(), "mod", "download"); err != nil {
+		return err
+	}
+
 	return devtools.GoIntegTestFromHost(ctx, devtools.FIPSOnlyGoTestIntegrationFromHostArgs(ctx))
 }
 

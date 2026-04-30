@@ -248,14 +248,14 @@ func parseResponseStatus(s []byte) (uint16, []byte, error) {
 	}
 	statusCode, err := parseInt(s[0:p])
 	if err != nil {
-		return 0, nil, fmt.Errorf("Unable to parse status code from [%s]", s)
+		return 0, nil, fmt.Errorf("unable to parse status code from [%s]", s)
 	}
-	return uint16(statusCode), phrase, nil
+	return uint16(statusCode), phrase, nil //nolint: gosec // error is defined as a u16
 }
 
 func parseVersion(s []byte) (uint8, uint8, error) {
 	if len(s) < 3 {
-		return 0, 0, errors.New("Invalid version")
+		return 0, 0, errors.New("invalid version")
 	}
 
 	major := s[0] - '0'
@@ -281,7 +281,13 @@ func parseHeaders(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 		return true, true, true
 	}
 
-	m.size = uint64(pi.parseOffset + 2)
+	sizeOffset := pi.parseOffset + 2
+	if sizeOffset < 0 {
+		m.size = 0
+	} else {
+		m.size = uint64(sizeOffset)
+	}
+
 	m.rawHeaders = pi.data[:m.size]
 	pi.data = pi.data[m.size:]
 	pi.parseOffset = 0
@@ -396,9 +402,9 @@ func parseCommaSeparatedList(s common.NetString) (list []string) {
 }
 
 func parseBody(pi *parsingInfo, m *message) (ok, complete bool) {
-	nbytes := len(pi.data)
-	if nbytes >= m.contentLength-pi.bodyReceived {
-		wanted := m.contentLength - pi.bodyReceived
+	numBytes := len(pi.data)
+	wanted := m.contentLength - pi.bodyReceived
+	if numBytes >= wanted && wanted > 0 {
 		m.body = append(m.body, pi.data[:wanted]...)
 		pi.bodyReceived = m.contentLength
 		m.size += uint64(wanted)
@@ -407,8 +413,8 @@ func parseBody(pi *parsingInfo, m *message) (ok, complete bool) {
 	}
 	m.body = append(m.body, pi.data...)
 	pi.data = nil
-	pi.bodyReceived += nbytes
-	m.size += uint64(nbytes)
+	pi.bodyReceived += numBytes
+	m.size += uint64(numBytes)
 	if isDebug {
 		debugf("bodyReceived: %d", pi.bodyReceived)
 	}

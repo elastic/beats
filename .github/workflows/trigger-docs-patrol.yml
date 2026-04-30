@@ -1,0 +1,22 @@
+name: Docs Patrol
+on:
+  schedule:
+    - cron: "0 14 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-docs-patrol.lock.yml@v0
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
+        make mage
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

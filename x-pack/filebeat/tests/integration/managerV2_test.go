@@ -283,7 +283,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 			Id:             "input-unit",
 			Type:           proto.UnitType_INPUT,
 			ConfigStateIdx: 1,
-			State:          proto.State_STARTING,
+			State:          proto.State_HEALTHY,
 			LogLevel:       proto.UnitLogLevel_DEBUG,
 			Config: &proto.UnitExpectedConfig{
 				Id:   "log-input",
@@ -331,7 +331,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return finalStateReached.Load()
-	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy")
+	}, 30*time.Second, 100*time.Millisecond, "Output unit did not report unhealthy or input did not report health")
 
 	t.Cleanup(server.Stop)
 }
@@ -793,8 +793,12 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		"-E", "management.restart_on_output_change=true",
 	)
 
+	// With deferred store creation for ES-backed inputs, openStore is called
+	// from Create() which may run before or after the ES store is configured
+	// (depending on input vs output unit processing order). Check openStore
+	// first since it always appears at the start of Create(), then the read
+	// counts which have a guaranteed order.
 	for _, contains := range []string{
-		"Configuring ES store",
 		"input-cursor::openStore: prefix: httpjson inputID: " + inputID,
 		"input-cursor store read 0 keys", // first, no previous data exists
 		"input-cursor store read 1 keys", // after the restart, previous key is read
@@ -890,7 +894,7 @@ func checkFilebeatLogs(t *testing.T, filebeat *integration.BeatProc, contains st
 		func() bool { return filebeat.LogContains(contains) },
 		waitDeadlineOr5Min(t),
 		tick,
-		fmt.Sprintf("String '%s' not found on Filebeat logs", contains),
+		"String '%s' not found on Filebeat logs", contains,
 	)
 }
 

@@ -103,7 +103,7 @@ func TestLogStatusReporter(t *testing.T) {
 		},
 		{
 			proto.State_DEGRADED,
-			&inputStream,
+			&inputStreamIrregular,
 		},
 		{
 			proto.State_HEALTHY,
@@ -131,7 +131,7 @@ func TestLogStatusReporter(t *testing.T) {
 			}
 			// always ensure that output is healthy
 			outputState := extractState(observed.GetUnits(), unitOutID)
-			require.Equal(t, outputState, proto.State_HEALTHY)
+			require.Equal(t, proto.State_HEALTHY, outputState)
 
 			timer.Reset(2 * time.Minute)
 			id++
@@ -159,7 +159,7 @@ func getInputStream(id string, path string, stateIdx int) proto.UnitExpected {
 	return proto.UnitExpected{
 		Id:             id,
 		Type:           proto.UnitType_INPUT,
-		ConfigStateIdx: uint64(stateIdx),
+		ConfigStateIdx: uint64(stateIdx), //nolint:gosec // stateIdx is always positive
 		State:          proto.State_HEALTHY,
 		Config: &proto.UnitExpectedConfig{
 			Streams: []*proto.Stream{{

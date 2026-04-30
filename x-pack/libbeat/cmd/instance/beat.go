@@ -7,12 +7,13 @@ package instance
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -24,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/otelmanager"
+	"github.com/elastic/beats/v7/x-pack/otel/otelmanager"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -37,6 +38,18 @@ import (
 // requires flushing the event queue, and if this doesn't happen within the timeout, data may be lost depending on
 // input type.
 const receiverPublisherCloseTimeout = 5 * time.Second
+
+var fqdnOnce = sync.OnceValues(func() (string, error) {
+	h, err := sysinfo.Host()
+	if err != nil {
+		return "", fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	return h.FQDNWithContext(ctx)
+})
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
 func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
@@ -51,6 +64,13 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
+
+	if v, ok := receiverConfig["include_metadata"]; ok {
+		if include, ok := v.(bool); ok {
+			b.Info.IncludeMetadata = include
+		}
+		delete(receiverConfig, "include_metadata")
+	}
 
 	// begin code similar to configure
 	if err = plugin.Initialize(); err != nil {
@@ -73,14 +93,8 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	// extracting it here for ease of use
 	logger := b.Info.Logger
 
-	// if output is set and if output is not otelconsumer, inform users
-	if receiverConfig["output"] != nil && receiverConfig["output"].(map[string]any)["otelconsumer"] == nil { //nolint: errcheck // output will always be of map type
-		logger.Debugf("configured output does not work with beatreceiver, please use appropriate exporter instead")
-	}
-
-	// all beatreceivers will use otelconsumer output by default
-	receiverConfig["output"] = map[string]any{
-		"otelconsumer": map[string]any{},
+	if receiverConfig["output"] != nil {
+		logger.Warnf("Output configuration is not supported by Beats receivers. Configure output behavior via exporter settings.")
 	}
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
@@ -101,17 +115,17 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		if err := p.InitPaths(&partialConfig.Path); err != nil {
 			return nil, fmt.Errorf("error initializing default paths: %w", err)
 		}
-		b.Paths = p
+		b.Info.Paths = p
 	} else {
 		if err := instance.InitPaths(cfg); err != nil {
 			return nil, fmt.Errorf("error initializing paths: %w", err)
 		}
-		b.Paths = paths.Paths
+		b.Info.Paths = paths.Paths
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Paths)
+	store, err := instance.LoadKeystore(cfg, b.Info.Beat, b.Info.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -132,7 +146,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		})
 	}
 
-	b.Monitoring = beat.NewMonitoring()
+	b.Monitoring = beatmonitoring.NewMonitoring()
 
 	b.SetKeystore(store)
 	b.Beat.Keystore = store
@@ -169,9 +183,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", b.Paths.String())
+	logger.Infof("%s", b.Info.Paths.String())
 
-	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Info.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return nil, fmt.Errorf("error loading meta data: %w", err)
@@ -180,15 +194,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
-	h, err := sysinfo.Host()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get host information: %w", err)
-	}
-
-	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+	fqdn, err := fqdnOnce()
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
@@ -264,20 +270,26 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
-	outputFactory := b.MakeOutputFactory(b.Config.Output)
+	var intakeQueueID string
+	if queueID, ok := receiverConfig["shared_intake_queue"]; ok {
+		if queueStrID, ok := queueID.(string); ok {
+			intakeQueueID = queueStrID
+		} else {
+			return nil, fmt.Errorf("shared_intake_queue must be a string")
+		}
+	}
 
 	pipelineSettings := pipeline.Settings{
 		Processors:     b.GetProcessors(),
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
-		Paths:          b.Paths,
+		Paths:          b.Info.Paths,
 	}
-	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
+	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
-	b.Registry.MustRegisterOutput(b.MakeOutputReloader(publisher.OutputReloader()))
 	b.Publisher = publisher
 
 	return b, nil
@@ -285,7 +297,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 // setLogger configures a logp logger and sets it on b.Info.Logger
 func setLogger(b *instance.Beat, receiverConfig map[string]any, core zapcore.Core) error {
-
 	var err error
 	logpConfig := logp.Config{}
 	logpConfig.AddCaller = true

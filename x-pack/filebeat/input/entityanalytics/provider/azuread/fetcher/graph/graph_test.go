@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -140,6 +141,40 @@ var deviceUserResponses = map[string]apiUserResponse{
 	},
 }
 
+var mfaResponse1 = apiMFAResponse{
+	Details: []mfaDetails{
+		{
+			ID:                    "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+			IsMFACapable:          true,
+			IsMFARegistered:       true,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{"microsoftAuthenticatorPush", "softwareOneTimePasscode"},
+			UserPreferredMethodForSecondaryAuthentication: "push",
+			UserType: "member",
+		},
+	},
+}
+
+var mfaResponse2 = apiMFAResponse{
+	Details: []mfaDetails{
+		{
+			ID:                    "d897d560-3d17-4dae-81b3-c898fe82bf84",
+			IsMFACapable:          false,
+			IsMFARegistered:       false,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{},
+			UserPreferredMethodForSecondaryAuthentication: "",
+			UserType: "member",
+		},
+	},
+}
+
 var groupsResponse1 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
@@ -263,6 +298,29 @@ func (s *testServer) setup(t *testing.T) {
 		case "test":
 			groupsResponse2.DeltaLink = "http://" + s.addr + "/groups/delta?$deltatoken=test"
 			data, err = json.Marshal(&groupsResponse2)
+		default:
+			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
+		}
+		require.NoError(t, err)
+
+		_, err = w.Write(data)
+		require.NoError(t, err)
+	})
+
+	mux.HandleFunc("/reports/authenticationMethods/userRegistrationDetails", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		var data []byte
+		var err error
+
+		skipToken := r.URL.Query().Get("$skiptoken")
+		switch skipToken {
+		case "":
+			mfaResponse1.NextLink = "http://" + s.addr + "/reports/authenticationMethods/userRegistrationDetails?$skiptoken=test"
+			data, err = json.Marshal(&mfaResponse1)
+		case "test":
+			mfaResponse2.NextLink = ""
+			data, err = json.Marshal(&mfaResponse2)
 		default:
 			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
 		}
@@ -522,6 +580,59 @@ func TestGraph_Devices(t *testing.T) {
 	}
 }
 
+func TestGraph_UserMFADetails(t *testing.T) {
+	var testSrv testServer
+	testSrv.setup(t)
+	defer testSrv.srv.Close()
+
+	wantMFA := map[uuid.UUID]*fetcher.MFARegistrationDetails{
+		uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+			IsMFACapable:          true,
+			IsMFARegistered:       true,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{"microsoftAuthenticatorPush", "softwareOneTimePasscode"},
+			UserPreferredMethodForSecondaryAuthentication: "push",
+			UserType: "member",
+		},
+		uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+			IsMFACapable:          false,
+			IsMFARegistered:       false,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{},
+			UserPreferredMethodForSecondaryAuthentication: "",
+			UserType: "member",
+		},
+	}
+
+	rawConf := graphConf{
+		APIEndpoint: "http://" + testSrv.addr,
+	}
+	if *trace {
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
+	c, err := config.NewConfigFrom(&rawConf)
+	require.NoError(t, err)
+	auth := mock.New(mock.DefaultTokenValue)
+
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	gotMFA, gotErr := f.UserMFADetails(ctx)
+
+	require.NoError(t, gotErr)
+	require.Equal(t, wantMFA, gotMFA)
+}
+
 var formatQueryTests = []struct {
 	name   string
 	query  []string
@@ -598,5 +709,63 @@ func TestFormatQuery(t *testing.T) {
 				t.Errorf("unexpected query string: got=%q want=%q", got, test.want)
 			}
 		})
+	}
+}
+
+var validateConfigTests = []struct {
+	name    string
+	config  map[string]any
+	wantErr error
+}{
+	{
+		name:   "no_tracer",
+		config: map[string]any{},
+	},
+	{
+		name: "tracer_disabled",
+		config: map[string]any{
+			"tracer.enabled":  false,
+			"tracer.filename": "/var/logs/path.log",
+		},
+		wantErr: nil,
+	},
+	{
+		name: "valid_path",
+		config: map[string]any{
+			"tracer.enabled":  true,
+			"tracer.filename": "azure-ad/logs/path.log",
+		},
+	},
+	{
+		name: "invalid_path",
+		config: map[string]any{
+			"tracer.enabled":  true,
+			"tracer.filename": "/var/logs/path.log",
+		},
+		wantErr: errors.New(`request tracer path must be within "azure-ad" path accessing 'tracer'`),
+	},
+}
+
+func TestConfigValidation(t *testing.T) {
+	for _, test := range validateConfigTests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(test.config)
+			var c graphConf
+			err := cfg.Unpack(&c)
+			if !sameError(err, test.wantErr) {
+				t.Fatalf("unexpected error from config validation: got:%v want:%v", err, test.wantErr)
+			}
+		})
+	}
+}
+
+func sameError(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
 	}
 }

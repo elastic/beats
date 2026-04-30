@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // load pipeline starts up a new pipeline with the given config
@@ -60,10 +61,17 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 
 	idxMgr := newIndexSupporter(info)
 
+	// dockerlogbeat runs as a Docker plugin inside a minimal container with
+	// no configurable data directory — all paths are hardcoded (/tmp for
+	// metadata, /var/log/docker/containers for logs). There is no
+	// paths.InitPaths() call and no CLI flags to set path.home/data/etc.
+	beatPaths := paths.New()
+
 	settings := pipeline.Settings{
 		WaitClose:     time.Second * 10,
 		WaitCloseMode: pipeline.WaitOnPipelineClose,
 		Processors:    processing,
+		Paths:         beatPaths,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
@@ -134,7 +142,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	//return the UUID if it exists
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
 			return uuid.Nil, fmt.Errorf("error reading %s: %w", metaPath, err)
 		}

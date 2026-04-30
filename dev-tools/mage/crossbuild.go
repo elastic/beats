@@ -44,9 +44,24 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// SelectedPackageTypes is the list of package types. If empty, all packages types
-// are considered to be selected (see isPackageTypeSelected).
-var SelectedPackageTypes []PackageType
+// ParsePackageTypes parses a comma-separated list of package types. Invalid
+// values are ignored.
+func ParsePackageTypes(packageTypes string) []PackageType {
+	var parsed []PackageType
+	for _, packageType := range strings.Split(packageTypes, ",") {
+		packageType = strings.TrimSpace(packageType)
+		if packageType == "" {
+			continue
+		}
+
+		var p PackageType
+		if err := p.UnmarshalText([]byte(packageType)); err != nil {
+			continue
+		}
+		parsed = append(parsed, p)
+	}
+	return parsed
+}
 
 func init() {
 	// Allow overriding via PLATFORMS.
@@ -54,17 +69,6 @@ func init() {
 		Platforms = NewPlatformList(expression)
 	}
 
-	// Allow overriding via PACKAGES.
-	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
-		for _, pkgtype := range strings.Split(packageTypes, ",") {
-			var p PackageType
-			err := p.UnmarshalText([]byte(pkgtype))
-			if err != nil {
-				continue
-			}
-			SelectedPackageTypes = append(SelectedPackageTypes, p)
-		}
-	}
 }
 
 // CrossBuildOption defines an option to the CrossBuild target.
@@ -77,6 +81,13 @@ type ImageSelectorFunc func(platform string) (string, error)
 func ForPlatforms(expr string) func(params *crossBuildParams) {
 	return func(params *crossBuildParams) {
 		params.Platforms = params.Platforms.Filter(expr)
+	}
+}
+
+// WithPlatforms sets the exact platforms list to use for cross-building.
+func WithPlatforms(platforms BuildPlatformList) func(params *crossBuildParams) {
+	return func(params *crossBuildParams) {
+		params.Platforms = append(BuildPlatformList(nil), platforms...)
 	}
 }
 
@@ -250,7 +261,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case strings.HasPrefix(platform, "linux/ppc"):
 		tagSuffix = "ppc-debian11"
 	case platform == "linux/s390x":
-		tagSuffix = "s390x-debian11"
+		tagSuffix = "s390x-debian12"
 	case strings.HasPrefix(platform, "linux"):
 		tagSuffix = "main-debian11"
 	case platform == "windows/arm64":
@@ -343,7 +354,7 @@ func (b GolangCrossBuilder) Build() error {
 
 	args = append(args,
 		"--rm",
-		"--env", "GOFLAGS=-mod=readonly -buildvcs=false",
+		"--env", "GOFLAGS=-mod=readonly",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),

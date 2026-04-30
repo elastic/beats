@@ -19,14 +19,14 @@ package beat
 
 import (
 	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
@@ -61,7 +61,7 @@ type Beat struct {
 	Info      Info     // beat metadata.
 	Publisher Pipeline // Publisher pipeline
 
-	Monitoring Monitoring
+	Monitoring beatmonitoring.Monitoring
 
 	InSetupCmd bool // this is set to true when the `setup` command is called
 
@@ -89,7 +89,6 @@ type Beat struct {
 
 	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
-	Paths    *paths.Path      // per beat paths definition
 }
 
 func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
@@ -102,9 +101,9 @@ func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
 
 	info := beat.Manager.AgentInfo()
 	switch info.ManagedMode {
-	case proto.AgentManagedMode_MANAGED:
+	case management.AgentManagedMode_MANAGED:
 		return useragent.AgentManagementModeManaged
-	case proto.AgentManagedMode_STANDALONE:
+	case management.AgentManagedMode_STANDALONE:
 		return useragent.AgentManagementModeUnmanaged
 	}
 	// this is probably not reachable
@@ -131,8 +130,12 @@ func (beat *Beat) GenerateUserAgent() {
 	mode := beat.userAgentMode()
 	unprivileged := beat.userAgentUnprivilegedMode()
 
+	var uaOpts []string
+	if features.IsElasticsearchStateStoreEnabled() {
+		uaOpts = append(uaOpts, "agentless")
+	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
-		mode, unprivileged, beat.Info.FIPSDistribution)
+		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
 }
 
 // BeatConfig struct contains the basic configuration of every beat

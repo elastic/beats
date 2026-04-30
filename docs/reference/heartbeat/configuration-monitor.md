@@ -3,29 +3,47 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-monitor.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Settings for internal collection [configuration-monitor]
 
 Use the following settings to configure internal collection when you are not using {{metricbeat}} to collect monitoring data.
 
-You specify these settings in the X-Pack monitoring section of the `heartbeat.yml` config file:
+You specify these settings in the X-Pack monitoring section of the `heartbeat.yml` config file.
+
+This example shows the expected structure for `monitoring` settings:
+
+```yaml
+monitoring:
+  enabled: true
+  cluster_uuid: ES_CLUSTER_UUID
+  elasticsearch:
+    hosts: ["<HOST_URL_1>:<PORT_1>", "<HOST_URL_2>:<PORT_2>"]
+    api_key: "id:api_key"
+    # Or use username/password instead of api_key.
+    # username: "YOUR_USERNAME"
+    # password: "YOUR_PASSWORD"
+```
+
+Refer to [Use internal collection to send monitoring data](/reference/heartbeat/monitoring-internal-collection.md) for usage examples.
 
 ## `monitoring.enabled` [_monitoring_enabled]
 
-The `monitoring.enabled` config is a boolean setting to enable or disable {{monitoring}}. If set to `true`, monitoring is enabled.
+The `monitoring.enabled` config is a boolean setting that controls whether {{monitoring}} is enabled. If set to `true`, monitoring is enabled.
 
 The default value is `false`.
+
+
+## `monitoring.cluster_uuid` [_monitoring_cluster_uuid]
+
+The `monitoring.cluster_uuid` config identifies the {{es}} cluster under which the monitoring data will appear in the Stack Monitoring UI.
 
 
 ## `monitoring.elasticsearch` [_monitoring_elasticsearch]
 
 The {{es}} instances that you want to ship your Heartbeat metrics to. This configuration option contains the following fields:
 
-
-## `monitoring.cluster_uuid` [_monitoring_cluster_uuid]
-
-The `monitoring.cluster_uuid` config identifies the {{es}} cluster under which the monitoring data will appear in the Stack Monitoring UI.
 
 ### `api_key` [_api_key_3]
 

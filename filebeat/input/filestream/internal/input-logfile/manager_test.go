@@ -53,6 +53,10 @@ func (m noopProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {
 	return nil
 }
 
+func (m noopProspector) TakeOver(_ StoreUpdater, _ func(Source) string) error {
+	return nil
+}
+
 func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {}
 
 func (m noopProspector) Test() error {
@@ -332,14 +336,14 @@ paths:
 				err,
 				"'/**/**' is not supported, input creation must fail")
 
-			require.Len(t, cim.ids, 0, "no ID must be present in cim.ids")
+			require.Empty(t, cim.ids, "no ID must be present in cim.ids")
 			// Attempt to create the second input with the valid configuration
 			_, err = cim.Create(validCfg)
 			require.NoError(
 				t,
 				err,
 				"The same ID can be re-used after an input fails to start")
-			require.EqualValues(
+			require.Equal(
 				t,
 				map[string]struct{}{"t-wing": {}},
 				cim.ids,
@@ -367,7 +371,7 @@ paths:
 			_, err = cim.Create(invalidCfg)
 			require.Error(t, err, "'/**/**' is not supported, input creation must fail")
 			// The ID of the valid input must still be in the ids list
-			require.EqualValues(
+			require.Equal(
 				t,
 				map[string]struct{}{"t-wing": {}},
 				cim.ids,
@@ -479,6 +483,16 @@ take_over:
 			expected: TakeOverConfig{
 				Enabled: true,
 				FromIDs: []string{"foo", "bar"},
+			},
+		},
+		"stream set": {
+			cfgYAML: `
+take_over:
+  enabled: true
+  stream: foo`,
+			expected: TakeOverConfig{
+				Enabled: true,
+				Stream:  "foo",
 			},
 		},
 		"take_over not defined": {

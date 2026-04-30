@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-aws-s3.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # AWS S3 input [filebeat-input-aws-s3]
@@ -333,7 +334,7 @@ URL of the AWS SQS queue that messages will be received from. (Required when `bu
 
 ### `region` [_region]
 
-The name of the AWS region of the end point. If this option is given it takes precedence over the region name obtained from the `queue_url` value.
+The name of the AWS region of the end point. If this option is given it takes precedence over the region name obtained from the `queue_url` value. This parameter is required when `non_aws_bucket_name` is defined.
 
 
 ### `visibility_timeout` [_visibility_timeout]
@@ -432,7 +433,6 @@ The duration that an SQS message processor will wait for a messages to arrive in
 
 ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url`, `access_point_arn, and `non_aws_bucket_name` are not set).
 
-
 ### `access_point_arn` [_access_point_arn]
 
 ARN of the AWS S3 Access Point that will be polled for list operation. (Required when `queue_url`, `bucket_arn`, and `non_aws_bucket_name` are not set).
@@ -441,7 +441,7 @@ ARN of the AWS S3 Access Point that will be polled for list operation. (Required
 ### `non_aws_bucket_name` [_non_aws_bucket_name]
 
 Name of the S3 bucket that will be polled for list operation. Required for third-party S3 compatible services. (Required when `queue_url` and `bucket_arn` are not set).
-
+Note: `region` is required when `non_aws_bucket_name` is defined
 
 ### `bucket_list_interval` [_bucket_list_interval]
 
@@ -451,6 +451,40 @@ Time interval for polling listing of the S3 bucket: default to `120s`.
 ### `bucket_list_prefix` [_bucket_list_prefix]
 
 Prefix to apply for the list request to the S3 bucket. Default empty.
+
+
+### `lexicographical_ordering` [_lexicographical_ordering]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+When set to `true`, enables lexicographical ordering mode for S3 bucket polling. In this mode, the input uses the S3 `StartAfter` parameter to resume listing from the last processed object key, which can significantly reduce the number of objects listed in each polling cycle. This is particularly useful for buckets with many objects where object keys are naturally ordered (for example, timestamp-prefixed keys such as `CloudTrail/us-east-1/2025/01/15/log-001.json.gz`).
+
+When enabled, the input maintains a state of processed object keys and uses the key which is _lexicographically least_ as the starting point for subsequent list operations. The number of keys tracked is controlled by `lexicographical_lookback_keys`.
+
+Default: `false`
+
+::::{note}
+This option is only applicable when using S3 bucket polling (`bucket_arn` or `non_aws_bucket_name`). It has no effect when using SQS notifications. Using lexicographical ordering mode assumes that objects written to the bucket are immutable, and any changes to the object remains undetected.
+::::
+
+
+### `lexicographical_lookback_keys` [_lexicographical_lookback_keys]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Specifies the maximum number of S3 object keys to track in memory when `lexicographical_ordering` is enabled. This value determines how many recently processed object keys are retained to support the `StartAfter` functionality. The lookback buffer ensures objects that arrive out of lexicographical order (due to late delivery, clock skew, or retries) are still detected and processed.
+
+A higher value provides more resilience against reprocessing objects when new objects with older keys arrive, but consumes more memory. A lower value reduces memory usage but can cause more objects to be re-listed if objects with older keys are added to the bucket.
+
+Default: `100`
+
+::::{note}
+This option only takes effect when `lexicographical_ordering` is set to `true`.
+::::
 
 
 ### `number_of_workers` [_number_of_workers_2]
@@ -1152,5 +1186,8 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `s3_events_created_total` | Number of events created from processing S3 data. |
 | `s3_objects_inflight_gauge` | Number of S3 objects inflight (gauge). |
 | `s3_object_processing_time` | Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing). |
+| `s3_polling_run_time` | Histogram of the elapsed time for each S3 polling run in nanoseconds. Only applicable when using S3 bucket polling. |
+| `s3_polling_run_time_total` | Cumulative time spent in S3 polling runs in nanoseconds. Only applicable when using S3 bucket polling. |
+| `s3_objects_listed_per_run` | Histogram of the number of S3 objects listed in each polling run. Only applicable when using S3 bucket polling. |
 
 

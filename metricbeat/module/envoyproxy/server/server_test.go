@@ -193,5 +193,5 @@ func TestFetchTimeout(t *testing.T) {
 		assert.Failf(t, "", "expected an error containing 'context deadline exceeded' or 'Client.Timeout exceeded'. Got %v", errs)
 	}
 
-	assert.True(t, elapsed < 5*time.Second, "elapsed time: %s", elapsed.String())
+	assert.Less(t, elapsed, 5*time.Second, "elapsed time: %s", elapsed.String())
 }

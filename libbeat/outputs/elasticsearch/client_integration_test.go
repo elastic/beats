@@ -86,7 +86,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":    "libbeat",
@@ -112,8 +112,8 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	assert.Equal(t, 1, resp.Count)
 
 	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
-	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
-	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
+	assert.Positive(t, outputSnapshot.Ints["write.bytes"], "output.events.write.bytes must be greater than 0")
+	assert.Positive(t, outputSnapshot.Ints["read.bytes"], "output.events.read.bytes must be greater than 0")
 	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
 	assert.Equal(t, int64(0), outputSnapshot.Ints["read.errors"])
 }
@@ -136,7 +136,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		batch := encodeBatch[*outest.Batch](client, outest.NewBatch(event))
+		batch := encodeBatch(client, outest.NewBatch(event))
 		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
@@ -216,7 +216,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 	_, _, _ = client.conn.Delete(deadletterIndex, "", "", nil)
 
-	batch := encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
@@ -229,7 +229,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	batch = encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
+	batch = encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
@@ -276,7 +276,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
-		batch := encodeBatch[*outest.Batch](client, outest.NewBatch(events...))
+		batch := encodeBatch(client, outest.NewBatch(events...))
 		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
@@ -349,7 +349,7 @@ func TestClientPublishTracer(t *testing.T) {
 
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := encodeBatch[*outest.Batch](client, outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"message": "Hello world",
@@ -370,7 +370,7 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "publishEvents", firstSpan.Name)
 	assert.Equal(t, "output", firstSpan.Type)
 	assert.Equal(t, [8]byte(firstSpan.TransactionID), [8]byte(tx.ID))
-	assert.True(t, len(firstSpan.Context.Tags) > 0, "no tags found")
+	assert.NotEmpty(t, firstSpan.Context.Tags, "no tags found")
 
 	secondSpan := spans[0]
 	assert.Contains(t, secondSpan.Name, "POST")

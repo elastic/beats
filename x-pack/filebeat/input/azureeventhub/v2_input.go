@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 //go:build !aix
 
 package azureeventhub
@@ -18,8 +20,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2/checkpoints"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
@@ -94,7 +96,7 @@ func (in *eventHubInputV2) Run(
 	var err error
 
 	// Setting up the status reporter helper
-	in.status = statusreporterhelper.New(inputContext.StatusReporter, in.log, "Azure Event Hub")
+	in.status = statusreporterhelper.New(inputContext, in.log, "Azure Event Hub")
 
 	// When the input is initializing before attempting to connect to Azure Event Hub.
 	in.status.UpdateStatus(status.Starting, "Input starting")
@@ -559,8 +561,10 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 
 		// Update input metrics.
 		in.metrics.processedMessages.Inc()
-		in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 	}
+
+	// Update input metrics.
+	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 
 	return nil
 }

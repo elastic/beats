@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package azureblobstorage
 
 import (
@@ -194,12 +196,8 @@ func (input *azurebsInput) Run(inputCtx v2.Context, src cursor.Source, cursor cu
 func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state, publisher cursor.Publisher) error {
 	currentSource := src.(*Source)
 
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
-	stat.UpdateStatus(status.Configuring, "")
+	inputCtx.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Configuring, "")
 
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
@@ -210,27 +208,23 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		<-inputCtx.Cancelation.Done()
-		stat.UpdateStatus(status.Stopping, "")
+		inputCtx.UpdateStatus(status.Stopping, "")
 		cancel()
 	}()
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
-		stat.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())
+		inputCtx.UpdateStatus(status.Failed, "failed to get service client: "+err.Error())
 		return err
 	}
 	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
-		stat.UpdateStatus(status.Failed, "failed to get container client: "+err.Error())
+		inputCtx.UpdateStatus(status.Failed, "failed to get container client: "+err.Error())
 		return err
 	}
 
-	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, stat, metrics, log)
+	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, inputCtx, metrics, log)
 	return scheduler.schedule(ctx)
 }
-
-type noopReporter struct{}
-
-func (noopReporter) UpdateStatus(status.Status, string) {}

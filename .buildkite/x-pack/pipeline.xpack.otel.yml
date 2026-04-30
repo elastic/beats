@@ -3,9 +3,9 @@ name: "beats-xpack-otel"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1776781006"
 
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1776781006"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -33,7 +33,9 @@ steps:
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
-          memory: "8Gi"
+          memory: "12Gi"
+          # 10GB storage was not enough for check/update.
+          ephemeralStorage: "50G"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
@@ -50,6 +52,29 @@ steps:
     key: "x-pack-otel-mandatory-tests"
 
     steps:
+      - label: ":ubuntu: x-pack/otel: Build OTel Collector Distribution"
+        key: "x-pack-otel-mandatory-build-distro"
+        command: |
+          go install go.opentelemetry.io/collector/cmd/builder@v0.150.0
+          mv $(go env GOPATH)/bin/builder $(go env GOPATH)/bin/ocb
+          cd x-pack/otel
+          mage buildOtelDistro
+          timeout 30s mage runOtelDistro > /tmp/collector.log 2>&1 || true
+          echo "--- Collector output (errors below are expected if external services are unavailable)"
+          cat /tmp/collector.log
+          echo "---"
+          grep -q "Starting beats-otel-collector" /tmp/collector.log
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/otel: Build OTel Collector Distribution"
+
       - label: ":ubuntu: x-pack/otel: Ubuntu x86_64 Unit Tests"
         key: "x-pack-otel-mandatory-linux-unit-test"
         command: |
@@ -90,7 +115,7 @@ steps:
             - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          image: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "x-pack/otel/build/*.xml"

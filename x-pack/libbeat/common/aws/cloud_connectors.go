@@ -87,11 +87,7 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 				func(aro *stscreds.AssumeRoleOptions) {
 					aro.Duration = config.AssumeRoleDuration
 					if config.ExternalID != "" {
-						aro.ExternalID = awssdk.String(config.ExternalID)
-
-						// The source identity is set by the system (env var) rather than user input (package policy).
-						// It should be required by the remote role (the role to assume) as a condition for assuming it.
-						aro.SourceIdentity = awssdk.String(cloudConnectorsConfig.CloudResourceID)
+						aro.ExternalID = awssdk.String(cloudConnectorsExternalID(cloudConnectorsConfig.CloudResourceID, config.ExternalID))
 					}
 				},
 			)
@@ -102,6 +98,10 @@ func addCloudConnectorsCredentials(config ConfigAWS, cloudConnectorsConfig Cloud
 			})
 		},
 	)
+}
+
+func cloudConnectorsExternalID(resourceID, externalIDPart string) string {
+	return fmt.Sprintf("%s-%s", resourceID, externalIDPart)
 }
 
 func addCredentialsChain(awsConfig *awssdk.Config, chain ...func(awssdk.Config) awssdk.CredentialsProvider) {

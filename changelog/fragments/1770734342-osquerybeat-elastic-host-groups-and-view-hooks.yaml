@@ -1,0 +1,10 @@
+kind: enhancement
+summary: Add elastic_host_groups table, host_groups view, and default view hooks in generator
+
+description: |
+  - Renamed host_groups table to elastic_host_groups; implementation moved to pkg/hostgroups.
+  - host_groups is now a deprecated view (SELECT * FROM elastic_host_groups) for backward compatibility.
+  - View generator now produces create/delete hooks by default and RegisterDefaultViewHook(hm); custom
+    hooks can still be registered via RegisterHooksFunc (e.g. default + extra, like amcache).
+
+component: osquerybeat

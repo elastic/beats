@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-autodiscover.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Autodiscover [configuration-autodiscover]
@@ -41,7 +42,7 @@ It has the following settings:
 :   (Optional) Specify the time of inactivity before stopping the running configuration for a container, 60s by default.
 
 `labels.dedot`
-:   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+:   (Optional) Defaults to true. When true, replaces dots (`.`) in labels with underscores (`_`).
 
 These are the fields available within config templating. The `docker.*` fields will be available on each emitted event. event:
 
@@ -124,6 +125,29 @@ filebeat.autodiscover:
                     - container: ~
                   paths:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
+```
+
+Here is an example of how a configuration using Kubernetes secrets would look:
+
+```yaml
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: false
+      templates:
+        - condition:
+            and:
+            - equals:
+                kubernetes.labels.app: "redis"
+          config:
+            - module: redis
+              log:
+                enabled: true
+                var.paths: ["/var/log/containers/*-${data.kubernetes.container.id}.log"]
+              slowlog:
+                enabled: true
+                var.hosts: ["${data.host}:6379"]
+                var.password: "${kubernetes.default.somesecret.value}"
 ```
 
 ::::{warning}

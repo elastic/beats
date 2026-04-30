@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/decoder"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -27,6 +28,11 @@ import (
 
 // all test files are read from the "testdata" directory
 const testDataPath = "testdata"
+
+type noopReporter struct{}
+
+// UpdateStatus is no-op
+func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 func TestDecoding(t *testing.T) {
 	logp.TestingSetup()
@@ -67,6 +73,20 @@ func TestDecoding(t *testing.T) {
 					CSV: &decoder.CSVCodecConfig{
 						Enabled: true,
 						Comma:   ptr[decoder.Rune](' '),
+					},
+				},
+			},
+		},
+		{
+			name:          "csv_quoted_values",
+			file:          "txn_quoted.csv",
+			content:       "text/csv",
+			numEvents:     2,
+			assertAgainst: "txn_quoted.json",
+			config: decoder.Config{
+				Codec: &decoder.CodecConfig{
+					CSV: &decoder.CSVCodecConfig{
+						Enabled: true,
 					},
 				},
 			},

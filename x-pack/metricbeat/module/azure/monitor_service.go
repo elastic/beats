@@ -79,14 +79,14 @@ func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
-	metricsClient, err := armmonitor.NewMetricsClient(credential, &arm.ClientOptions{
+	metricsClient, err := armmonitor.NewMetricsClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metrics client: %w", err)
 	}
 
-	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
+	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: clientOptions,
 	})
 	if err != nil {
@@ -460,25 +460,4 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 	}
 
 	return metrics, interval, nil
-}
-
-// getResourceNameFormId maps resource group from resource ID
-func getResourceNameFromId(path string) string {
-	params := strings.Split(path, "/")
-	if strings.HasSuffix(path, "/") {
-		return params[len(params)-2]
-	}
-	return params[len(params)-1]
-
-}
-
-// getResourceTypeFromId maps resource group from resource ID
-func getResourceTypeFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "providers" {
-			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
-		}
-	}
-	return ""
 }
