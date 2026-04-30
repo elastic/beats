@@ -76,12 +76,12 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if stConfig != nil {
 		// Note this, intentionally, blocks until connected to the trace endpoint
 		var err error
-		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
+		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait) //nolint:forbidigo // no logger available yet at beat creation time
 		sockTrace, err := tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
 		if err == nil {
 			trace = sockTrace
 		} else {
-			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %v", stConfig.Path, stConfig.Wait, err)
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %v", stConfig.Path, stConfig.Wait, err) //nolint:forbidigo // no logger available yet at beat creation time
 		}
 	}
 
@@ -96,7 +96,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 				trace.Abort()
 				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
 			} else {
-				logp.L().Warnf("skipping monitor state management: %v", err)
+				logp.L().Warnf("skipping monitor state management: %v", err) //nolint:forbidigo // no logger available yet at beat creation time
 			}
 		} else {
 			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom))
@@ -196,7 +196,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 	// Configure the beats Manager to start after all the reloadable hooks are initialized
 	// and shutdown when the function return.
-	if err := b.Manager.Start(); err != nil {
+	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // will migrate to PreInit/PostInit separately
 		return err
 	}
 
@@ -348,7 +348,7 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 
 	for i := 0; i < attempts; i++ {
 		// TODO: use local logger here
-		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger(""))
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger("")) //nolint:forbidigo // standalone helper, no logger to thread through
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil

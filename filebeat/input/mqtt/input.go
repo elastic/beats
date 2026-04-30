@@ -187,7 +187,6 @@ func doneChannelContext(ctx *input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
-	//nolint:nakedret // omitting the return gives a build error
 	return
 }
 

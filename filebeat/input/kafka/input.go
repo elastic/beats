@@ -100,7 +100,7 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 	}
 
 	if len(missingTopics) > 0 {
-		return fmt.Errorf("Of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
+		return fmt.Errorf("of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
 	}
 
 	return nil
@@ -252,7 +252,6 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
-	//nolint:nakedret // omitting the return gives a build error
 	return
 }
 
