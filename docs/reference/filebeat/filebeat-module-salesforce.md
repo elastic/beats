@@ -22,7 +22,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/s
 ::::::
 
 :::::{note}
-The Salesforce module has been completely revamped to use a new dedicated Salesforce input for event collection, replacing the previous HTTPJSON input method. This change brings improved performance and reliability. However, be aware that this update introduces a breaking change. We believe this is the right time to make this necessary improvement as the previous module was in beta.
+The Salesforce module has been completely revamped to use a new dedicated Salesforce input for event collection, replacing the previous HTTPJSON input method. This change brings improved performance and reliability. However, please be aware that this update introduces a breaking change. We believe this is the right time to make this necessary improvement as the previous module was in beta.
 :::::
 
 
@@ -47,7 +47,7 @@ The default interval for collecting logs (`var.real_time_interval` or `var.elf_i
 
 :::::
 
-For high-volume `login` and `logout` real-time collection, the module uses bounded `EventDate` windows during catch-up instead of one large object query. Each run processes up to 12 windows of size `var.real_time_interval`, resumes from persisted progress after restarts, and keeps the SQL ordering aligned with Salesforce's `EventDate DESC` limitation. If `var.initial_interval` is not set, the first bounded object window falls back to `var.real_time_interval`. Set `var.initial_interval` explicitly when you want a deeper first-run catch-up window.
+For high-volume `login` and `logout` real-time collection, the module uses bounded `EventDate` windows during catch-up instead of one large object query. Each run processes up to 12 windows of size `var.real_time_interval`, resumes from persisted progress after restarts, and keeps the SOQL ordering aligned with Salesforce's `EventDate DESC` limitation. If `var.initial_interval` is not set, the first bounded object window falls back to `var.real_time_interval`; set `var.initial_interval` explicitly when you want a deeper first-run catch-up window.
 
 For EventLogFile collection, the built-in filesets keep the initial filter, incremental cursor, and `ORDER BY` aligned on `CreatedDate`. Downloaded CSV payloads are streamed row by row to reduce memory pressure. If you override the generated queries, keep those three values aligned on the same field to avoid gaps or duplicates.
 
