@@ -17,13 +17,17 @@
 
 package backoff
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 // Backoff defines the interface for backoff strategies.
 type Backoff interface {
 	// Wait blocks for a duration of time governed by the backoff strategy.
-	// If the timer is completed, Wait returns true, otherwise it returns false.
-	Wait() bool
+	// Wait returns true when the backoff timer completes, or false if the
+	// context is cancelled before the timer expires.
+	Wait(ctx context.Context) bool
 
 	// Reset resets the backoff duration to an initial value governed by the backoff strategy.
 	Reset()
