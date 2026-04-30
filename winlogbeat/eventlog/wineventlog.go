@@ -192,7 +192,7 @@ func (l *winEventLog) isForwarded() bool {
 }
 
 func (l *winEventLog) shouldDetectGap(prevRecordID, currentRecordID uint64) bool {
-	if l.file || l.isForwarded() || prevRecordID == 0 {
+	if l.file || l.isForwarded() || prevRecordID == 0 || l.config.XMLQuery != "" {
 		return false
 	}
 	return currentRecordID > prevRecordID+1
@@ -502,7 +502,7 @@ func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	if l.shouldDetectGap(prevRecordID, r.RecordID) {
 		// Gap detection is channel-only. File reads can legitimately contain
 		// non-contiguous record IDs and should not trigger recovery. Forwarded
-		// events can also be non-contiguous.
+		// events and custom XML queries can also be non-contiguous.
 		l.log.Warnw("Record ID gap detected, resetting subscription.",
 			"channel", l.channelName,
 			"previous_record_id", prevRecordID,
