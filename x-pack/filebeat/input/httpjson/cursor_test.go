@@ -5,14 +5,17 @@
 package httpjson
 
 import (
+	"fmt"
+	"net/http"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -141,12 +144,74 @@ func TestCursorUpdate(t *testing.T) {
 			require.NoError(t, cfg.Unpack(&conf))
 
 			var stat testStatus
-			c := newCursor(conf, &stat, logp.NewLogger("cursor-test"))
+			c := newCursor(conf, &stat, logptest.NewTestingLogger(t, "cursor-test"))
 			c.state = tc.initialState
 			c.update(tc.trCtx)
 			assert.Equal(t, tc.expectedState, c.state)
 			sort.Strings(stat.updates) // Can happen out of order.
 			assert.Equal(t, tc.wantStatus, stat.updates)
+		})
+	}
+}
+
+// BenchmarkCursorUpdate measures the per-event cost of updateCursor(),
+// which drives template evaluation clones of lastEvent, firstEvent,
+// lastResponse, and firstResponse. The response body size is varied
+// to show how the clone cost scales with page size.
+func BenchmarkCursorUpdate(b *testing.B) {
+	for _, nItems := range []int{100, 1000, 5000} {
+		b.Run(fmt.Sprintf("response_%d_items", nItems), func(b *testing.B) {
+			items := make([]interface{}, nItems)
+			for i := range items {
+				items[i] = map[string]interface{}{
+					"id":    i,
+					"name":  fmt.Sprintf("item-%d", i),
+					"value": strings.Repeat("x", 100),
+				}
+			}
+			responseBody := mapstr.M{
+				"items":         items,
+				"nextPageToken": "abc123",
+			}
+
+			lastEvent := mapstr.M{
+				"id":        map[string]interface{}{"time": "2025-01-01T00:00:00Z"},
+				"name":      "some-event",
+				"important": "data",
+			}
+
+			cursorCfg := conf.MustNewConfigFrom(map[string]interface{}{
+				"updated": map[string]interface{}{
+					"value": "[[ .last_event.id.time ]]",
+				},
+			})
+			cc := cursorConfig{}
+			if err := cursorCfg.Unpack(&cc); err != nil {
+				b.Fatal(err)
+			}
+
+			trCtx := &transformContext{
+				cursor:     &cursor{},
+				firstEvent: &lastEvent,
+				lastEvent:  &lastEvent,
+				lastResponse: &response{
+					header: http.Header{"Content-Type": {"application/json"}},
+					body:   responseBody,
+				},
+				firstResponse: &response{
+					header: http.Header{"Content-Type": {"application/json"}},
+					body:   responseBody,
+				},
+			}
+
+			var stat testStatus
+			c := newCursor(cc, &stat, logptest.NewTestingLogger(b, "cursor-bench"))
+
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				c.update(trCtx)
+			}
 		})
 	}
 }
