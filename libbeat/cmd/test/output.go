@@ -41,11 +41,7 @@ func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
 			}
 
 			im, _ := idxmgmt.DefaultSupport(b.Info, nil)
-<<<<<<< HEAD
-			output, err := outputs.Load(im, b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config(), b.Paths)
-=======
 			output, err := outputs.Load(im, b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
->>>>>>> c37cfcf33 (outputs: remove redundant beatPaths parameter from Factory (#49839))
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
 				os.Exit(1)
