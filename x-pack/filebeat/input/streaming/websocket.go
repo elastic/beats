@@ -322,9 +322,6 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 					}
 				}
-<<<<<<< HEAD
-				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
-=======
 				// Re-evaluate url_program before reconnecting so that cursor
 				// changes since the last connection are reflected in the URL.
 				updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
@@ -336,7 +333,6 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				}
 				// Since c is already a pointer, we can reassign it to the new connection
 				// and the defer func will still handle it.
->>>>>>> 1f2cf8dc9 (x-pack/filebeat/input/streaming: re-evaluate url_program on reconnect (#50383))
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
