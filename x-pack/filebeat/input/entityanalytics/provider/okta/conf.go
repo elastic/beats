@@ -12,6 +12,7 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -87,6 +88,100 @@ type conf struct {
 	Tracer *tracerConfig `config:"tracer"`
 }
 
+<<<<<<< HEAD
+=======
+// oAuth2Config holds OAuth2 configuration for Okta authentication.
+type oAuth2Config struct {
+	Enabled      *bool    `config:"enabled"`
+	ClientID     string   `config:"client.id" validate:"required"`
+	ClientSecret string   `config:"client.secret"`
+	Scopes       []string `config:"scopes" validate:"required"`
+	TokenURL     string   `config:"token_url" validate:"required"`
+
+	// JWT-based authentication (private key)
+	OktaJWKFile string          `config:"jwk_file"`
+	OktaJWKJSON common.JSONBlob `config:"jwk_json"`
+	OktaJWKPEM  string          `config:"jwk_pem"`
+}
+
+func (o *oAuth2Config) isEnabled() bool {
+	return o != nil && (o.Enabled == nil || *o.Enabled)
+}
+
+// Validate validates the OAuth2 configuration.
+func (o *oAuth2Config) Validate() error {
+	if o.ClientID == "" {
+		return errors.New("oauth2 validation error: client.id is required")
+	}
+	if len(o.Scopes) == 0 {
+		return errors.New("oauth2 validation error: scopes are required")
+	}
+	if o.TokenURL == "" {
+		return errors.New("oauth2 validation error: token_url is required")
+	}
+
+	// Determine authentication method based on provided credentials
+	hasClientSecret := o.ClientSecret != ""
+	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != ""
+
+	if hasClientSecret && hasJWTKeys {
+		return errors.New("oauth2 validation error: cannot use both client secret and JWT private keys")
+	}
+
+	if !hasClientSecret && !hasJWTKeys {
+		return errors.New("oauth2 validation error: must provide either client.secret or one of jwk_file, jwk_json, or jwk_pem")
+	}
+
+	// Validate JWT key format if using JWT authentication
+	if hasJWTKeys {
+		// Check that exactly one JWT key is provided
+		n := 0
+		if o.OktaJWKFile != "" {
+			n++
+		}
+		if o.OktaJWKJSON != nil {
+			n++
+		}
+		if o.OktaJWKPEM != "" {
+			n++
+		}
+		if n > 1 {
+			return errors.New("oauth2 validation error: only one of jwk_file, jwk_json, or jwk_pem should be provided")
+		}
+
+		// Validate JWT key format
+		if o.OktaJWKFile != "" {
+			if _, err := os.Stat(o.OktaJWKFile); errors.Is(err, os.ErrNotExist) {
+				return fmt.Errorf("oauth2 validation error: jwk file %q does not exist", o.OktaJWKFile)
+			}
+		}
+		if o.OktaJWKJSON != nil {
+			// Validate JWK format by attempting to parse it
+			var jwkData struct {
+				N    interface{} `json:"n"`
+				E    interface{} `json:"e"`
+				D    interface{} `json:"d"`
+				P    interface{} `json:"p"`
+				Q    interface{} `json:"q"`
+				Dp   interface{} `json:"dp"`
+				Dq   interface{} `json:"dq"`
+				Qinv interface{} `json:"qi"`
+			}
+			if err := json.Unmarshal(o.OktaJWKJSON, &jwkData); err != nil {
+				return fmt.Errorf("oauth2 validation error: invalid JWK JSON format: %w", err)
+			}
+		}
+		if o.OktaJWKPEM != "" {
+			if _, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM)); err != nil {
+				return fmt.Errorf("oauth2 validation error: %w", err)
+			}
+		}
+	}
+
+	return nil
+}
+
+>>>>>>> 67fb09d26 (x-pack/filebeat/input/entityanalytics/provider/okta: fix config unpacking for jwk_json and jwk_pem (#50406))
 type tracerConfig struct {
 	Enabled           *bool `config:"enabled"`
 	lumberjack.Logger `config:",inline"`
@@ -238,3 +333,39 @@ func (c *conf) wantDevices() bool {
 		return false
 	}
 }
+<<<<<<< HEAD
+=======
+
+// populateJSONFromFile reads a JSON file and populates the destination.
+func populateJSONFromFile(file string, dst *common.JSONBlob) error {
+	_, err := os.Stat(file)
+	if errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("the file %q cannot be found", file)
+	}
+
+	b, err := os.ReadFile(file)
+	if err != nil {
+		return fmt.Errorf("the file %q cannot be read", file)
+	}
+
+	if !json.Valid(b) {
+		return fmt.Errorf("the file %q does not contain valid JSON", file)
+	}
+
+	*dst = b
+
+	return nil
+}
+
+// pemPKCS8PrivateKey parses a PKCS8 private key from PEM data.
+func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
+	blk, rest := pem.Decode(pemdata)
+	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+	if blk == nil {
+		return nil, errors.New("no PEM data")
+	}
+	return x509.ParsePKCS8PrivateKey(blk.Bytes)
+}
+>>>>>>> 67fb09d26 (x-pack/filebeat/input/entityanalytics/provider/okta: fix config unpacking for jwk_json and jwk_pem (#50406))
