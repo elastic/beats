@@ -5,8 +5,12 @@
 ## Components Included
 
 ### Receivers
+- **auditbeatreceiver** - Auditbeat receiver
 - **filebeatreceiver** - Filebeat receiver
+- **heartbeatreceiver** - Heartbeat receiver
 - **metricbeatreceiver** - Metricbeat receiver
+- **osquerybeatreceiver** - Osquerybeat receiver
+- **packetbeatreceiver** - Packetbeat receiver
 - **filelogreceiver** - File log receiver
 - **hostmetricsreceiver** - Host metrics receiver
 - **httpcheckreceiver** - HTTP check receiver
@@ -31,6 +35,7 @@
 ### Exporters
 - **logstash** - Logstash exporter
 - **elasticsearch** - Elasticsearch exporter
+- **kafka** - Kafka exporter
 - **debug** - Debug exporter
 - **file** - File exporter
 - **nop** - No-op exporter
@@ -40,6 +45,7 @@
 ### Extensions
 - **beatsauth** - Beats authentication extension
 - **elasticsearch_storage** - Elasticsearch storage extension
+- **kafkapartitioner** - Kafka partitioner extension
 - **basicauth** - Basic auth extension
 - **bearertokenauth** - Bearer token auth extension
 - **file_storage** - File storage extension
@@ -73,17 +79,24 @@ Then add the component to the example [configuration file](./config.yaml).
 
 ## Building
 
-This distribution can be built using the [OpenTelemetry Collector Builder (OCB)](https://opentelemetry.io/docs/collector/extend/ocb/):
+From the `x-pack/otel` directory, use the mage target:
 
 ```bash
-ocb --config manifest.yaml
+mage buildOtelDistro
 ```
 
-## Testing
+This requires [ocb](https://opentelemetry.io/docs/collector/extend/ocb/) to be installed and available on `PATH`.
 
-The components can be tested using the configuration in [config.yaml](./config.yaml).
+## Running
 
+Run the collector with the example [config.yaml](./config.yaml):
+
+```bash
+mage runOtelDistro
 ```
-cd _build
-./beats-otel-collector --config ../config.yaml
+
+To use a custom config file, pass it via `OTEL_ARGS`:
+
+```bash
+OTEL_ARGS="--config /path/to/config.yaml" mage runOtelDistro
 ```

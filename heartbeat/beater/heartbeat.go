@@ -58,6 +58,8 @@ type Heartbeat struct {
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
+
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 // New creates a new heartbeat.
@@ -184,7 +186,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors, b.Paths)
+		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors, b.Info.Paths)
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()
@@ -197,7 +199,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop()
 
 	if bt.config.Autodiscover != nil {
 		bt.autodiscover, err = bt.makeAutodiscover(b)
@@ -314,6 +315,10 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
+}
+
+func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state

@@ -9,9 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 
 	"go.uber.org/zap/zapcore"
@@ -65,9 +63,6 @@ type BeatV2Manager struct {
 
 	logger *logp.Logger
 
-	// handles client errors
-	errCanceller context.CancelFunc
-
 	// track individual units given to us by the V2 API
 	mx          sync.Mutex
 	units       map[unitKey]*agentUnit
@@ -81,18 +76,24 @@ type BeatV2Manager struct {
 	payload map[string]interface{}
 
 	// stop callback must be registered by libbeat, as with the V1 callback
-	stopFunc           func()
+	stopFunc    func()
+	stopFuncMut sync.Mutex
+
 	stopOnOutputReload bool
 	stopOnEmptyUnits   bool
-	stopMut            sync.Mutex
-	beatStop           sync.Once
 
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
-	stopChan chan struct{}
-	stopOnce sync.Once
-	// waits for manager goroutines started in PreInit() to exit
-	stopWait sync.WaitGroup
+	stopChan      chan struct{}
+	stopOnce      sync.Once
+	stopWaitGroup sync.WaitGroup
+
+	// We need a separate channel to notify when the Agent client has actually
+	// stopped: watchErrChan needs to keep running for a while after the
+	// manager shutdown signal, because if the error channel is not drained it
+	// can deadlock the client.Close() call. This channel is closed after
+	// client.Close() has completed, so the error handler can also shutdown.
+	clientStoppedChan chan struct{}
 
 	isRunning bool
 
@@ -217,6 +218,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		status:             status.Running,
 		message:            "Healthy",
 		stopChan:           make(chan struct{}),
+		clientStoppedChan:  make(chan struct{}),
 		changeDebounce:     time.Second,
 		// forceReloadDebounce is greater than changeDebounce because it is only
 		// used when an input has not reached its finished state, this means some events
@@ -278,9 +280,15 @@ func (cm *BeatV2Manager) Enabled() bool {
 
 // SetStopCallback sets the callback to run when the manager want to shut down the beats gracefully.
 func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
-	cm.stopMut.Lock()
-	defer cm.stopMut.Unlock()
+	cm.stopFuncMut.Lock()
+	defer cm.stopFuncMut.Unlock()
 	cm.stopFunc = stopFunc
+}
+
+func (cm *BeatV2Manager) getStopCallback() func() {
+	cm.stopFuncMut.Lock()
+	defer cm.stopFuncMut.Unlock()
+	return cm.stopFunc
 }
 
 // PreInit starts the unitListen loop, so the manager can already
@@ -291,10 +299,6 @@ func (cm *BeatV2Manager) PreInit() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
-	if cm.errCanceller != nil {
-		cm.errCanceller()
-		cm.errCanceller = nil
-	}
 
 	cm.logger.Debug("Manager starting")
 	ctx := context.Background()
@@ -302,12 +306,6 @@ func (cm *BeatV2Manager) PreInit() error {
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
-	ctx, canceller := context.WithCancel(ctx)
-	cm.errCanceller = canceller
-
-	cm.stopWait.Go(func() {
-		cm.watchErrChan(ctx)
-	})
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
 		"the rendered config used by the beat",
@@ -317,7 +315,9 @@ func (cm *BeatV2Manager) PreInit() error {
 
 	cm.UpdateStatus(status.Starting, "Starting")
 
-	cm.stopWait.Go(cm.unitListen)
+	cm.stopWaitGroup.Go(cm.watchErrChan)
+	cm.stopWaitGroup.Go(cm.unitListen)
+
 	cm.isRunning = true
 	return nil
 }
@@ -348,36 +348,16 @@ func (cm *BeatV2Manager) Start() error {
 }
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
+// It waits for the manager goroutines to terminate before returning.
 func (cm *BeatV2Manager) Stop() {
+	cm.stop()
+	cm.stopWaitGroup.Wait()
+}
+
+func (cm *BeatV2Manager) stop() {
 	cm.stopOnce.Do(func() {
 		close(cm.stopChan)
 	})
-}
-
-// WaitForStop blocks until the manager has fully stopped, or timeout elapses.
-// It returns true if the manager stopped before timeout, false otherwise.
-// A non-positive timeout means wait indefinitely.
-func (cm *BeatV2Manager) WaitForStop(timeout time.Duration) bool {
-	cm.Stop()
-	done := make(chan struct{})
-	go func() {
-		cm.stopWait.Wait()
-		close(done)
-	}()
-
-	if timeout <= 0 {
-		<-done
-		return true
-	}
-
-	t := time.NewTimer(timeout)
-
-	select {
-	case <-done:
-		return true
-	case <-t.C:
-		return false
-	}
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -534,10 +514,13 @@ func (cm *BeatV2Manager) softDeleteUnit(unit *client.Unit) {
 // Private V2 implementation
 // ================================
 
-func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
+func (cm *BeatV2Manager) watchErrChan() {
 	for {
 		select {
-		case <-ctx.Done():
+		case <-cm.clientStoppedChan:
+			// We can't end this loop until the associated client has fully
+			// stopped, otherwise we might deadlock its shutdown, so we
+			// wait on clientStoppedChan instead of just stopChan.
 			return
 		case err := <-cm.client.Errors():
 			// Don't print the context cancelled errors that happen normally during shutdown, restart, etc
@@ -549,10 +532,6 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 }
 
 func (cm *BeatV2Manager) unitListen() {
-	// register signal handler
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-
 	// timer is used to provide debounce on unit changes
 	// this allows multiple changes to come in and only a single reload be performed
 	t := time.NewTimer(cm.changeDebounce)
@@ -564,20 +543,6 @@ func (cm *BeatV2Manager) unitListen() {
 		// The stopChan channel comes from the Manager interface Stop() method
 		case <-cm.stopChan:
 			cm.stopBeat()
-			return
-		case sig := <-sigc:
-			// we can't duplicate the same logic used by stopChan here.
-			// A beat will also watch for sigint and shut down, if we call the stopFunc
-			// callback, either the V2 client or the beat will get a panic,
-			// as the stopFunc sent by the beats is usually unsafe.
-			switch sig {
-			case syscall.SIGINT, syscall.SIGTERM:
-				cm.logger.Debug("Received sigterm/sigint, stopping")
-			case syscall.SIGHUP:
-				cm.logger.Debug("Received sighup, stopping")
-			}
-			cm.isRunning = false
-			cm.UpdateStatus(status.Stopping, "Stopping")
 			return
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
@@ -629,7 +594,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.mx.Unlock()
 
 			if len(cm.units) == 0 && cm.stopOnEmptyUnits {
-				cm.stopBeat()
+				cm.stop()
 			}
 
 			cm.reload(units)
@@ -645,23 +610,16 @@ func (cm *BeatV2Manager) stopBeat() {
 	if !cm.isRunning {
 		return
 	}
+	cm.isRunning = false
 	cm.logger.Debugf("Stopping beat")
 	cm.UpdateStatus(status.Stopping, "Stopping")
 
-	cm.isRunning = false
-	cm.stopMut.Lock()
-	defer cm.stopMut.Unlock()
-	if cm.stopFunc != nil {
-		// I'm not 100% sure the once here is needed,
-		// but various beats tend to handle this in a not-quite-safe way
-		cm.beatStop.Do(cm.stopFunc)
+	if stopFunc := cm.getStopCallback(); stopFunc != nil {
+		stopFunc()
 	}
 	cm.client.Stop()
+	close(cm.clientStoppedChan)
 	cm.UpdateStatus(status.Stopped, "Stopped")
-	if cm.errCanceller != nil {
-		cm.errCanceller()
-		cm.errCanceller = nil
-	}
 }
 
 func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
@@ -894,7 +852,7 @@ func (cm *BeatV2Manager) reloadOutput(unit *agentUnit) (bool, error) {
 	if cm.stopOnOutputReload && cm.lastOutputCfg != nil {
 		cm.logger.Info("beat is restarting because output changed")
 		_ = unit.UpdateState(status.Stopping, "Restarting", nil)
-		cm.stopBeat()
+		cm.stop()
 		return true, nil
 	}
 
