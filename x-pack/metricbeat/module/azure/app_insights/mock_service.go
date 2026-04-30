@@ -35,5 +35,8 @@ func NewMockClient(logger *logp.Logger) *Client {
 // GetMetricValues records the call and returns the configured response.
 func (service *MockService) GetMetricValues(applicationId string, bodyMetrics []MetricsBatchRequestItem) (ListMetricsResultsItem, error) {
 	args := service.Called(applicationId, bodyMetrics)
-	return args.Get(0).(ListMetricsResultsItem), args.Error(1)
+	// Tests always stub this with a ListMetricsResultsItem; the comma-ok
+	// form is used purely to satisfy errcheck.check-type-assertions.
+	res, _ := args.Get(0).(ListMetricsResultsItem)
+	return res, args.Error(1)
 }

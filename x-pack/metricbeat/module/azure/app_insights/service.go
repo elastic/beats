@@ -114,6 +114,8 @@ func (c *metricsClient) GetMultiple(ctx context.Context, applicationID string, b
 	if err != nil {
 		return result, fmt.Errorf("calling app insights metrics endpoint: %w", err)
 	}
+	defer resp.Body.Close()
+
 	if !runtime.HasStatusCode(resp, http.StatusOK) {
 		return result, runtime.NewResponseError(resp)
 	}

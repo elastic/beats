@@ -40,7 +40,7 @@ func TestAPIKeyPolicy_SetsHeader(t *testing.T) {
 	require.NoError(t, err, "creating azcore request should not fail")
 	resp, err := pipeline.Do(req)
 	require.NoError(t, err, "pipeline call should succeed")
-	_ = resp.Body.Close()
+	defer resp.Body.Close()
 
 	assert.Equal(t, "key-123", gotAPIKey, "apiKeyPolicy must set the x-api-key header")
 }
@@ -156,6 +156,11 @@ func TestMetricsClient_GetMultiple_NonOKStatus(t *testing.T) {
 
 	_, err := c.GetMultiple(context.Background(), "app", nil)
 	require.Error(t, err, "non-200 responses must surface as an error")
-	assert.True(t, strings.Contains(err.Error(), "BadRequest") || strings.Contains(err.Error(), "400"),
+	// azcore's runtime.NewResponseError embeds the upstream error code into
+	// the error message; matching on either the code or the HTTP status keeps
+	// the assertion robust against minor format changes across azcore versions.
+	errMsg := err.Error()
+	assert.True(t,
+		strings.Contains(errMsg, "BadRequest") || strings.Contains(errMsg, "400"),
 		"error should reference the upstream failure (got: %v)", err)
 }

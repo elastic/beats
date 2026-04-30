@@ -240,18 +240,18 @@ func TestEventMapping(t *testing.T) {
 	}
 	applicationId := "abc"
 	events := EventsMapping(result, applicationId, "")
-	assert.Equal(t, len(events), 1)
+	assert.Len(t, events, 1)
 	for _, event := range events {
 		val1, _ := event.MetricSetFields.GetValue("start_date")
-		assert.Equal(t, val1, startDate)
+		assert.Equal(t, startDate, val1)
 		val2, _ := event.MetricSetFields.GetValue("end_date")
-		assert.Equal(t, val2, startDate)
+		assert.Equal(t, startDate, val2)
 		val3, _ := event.ModuleFields.GetValue("metrics.requests_count")
-		assert.Equal(t, val3, mapstr.M{"sum": 12})
+		assert.Equal(t, mapstr.M{"sum": 12}, val3)
 		val5, _ := event.ModuleFields.GetValue("metrics.requests_failed")
-		assert.Equal(t, val5, mapstr.M{"sum": 10})
+		assert.Equal(t, mapstr.M{"sum": 10}, val5)
 		val4, _ := event.ModuleFields.GetValue("application_id")
-		assert.Equal(t, val4, applicationId)
+		assert.Equal(t, applicationId, val4)
 
 	}
 
@@ -520,18 +520,18 @@ func TestEventMappingGrouping(t *testing.T) {
 	}
 
 	events := EventsMapping(result, "2c944c0d-5231-43bb-a59a-dba54894c8d9", "")
-	assert.Equal(t, len(events), 2)
+	assert.Len(t, events, 2)
 	assert.ElementsMatch(t, expectedEvents, events)
 }
 
 func TestCleanMetricNames(t *testing.T) {
 	ex := "customDimensions/ExecutingAssemblyFileVersion"
 	result := cleanMetricNames(ex)
-	assert.Equal(t, result, "custom_dimensions_executing_assembly_file_version")
+	assert.Equal(t, "custom_dimensions_executing_assembly_file_version", result)
 	ex = "customDimensions/_MS.AggregationIntervalMs"
 	result = cleanMetricNames(ex)
-	assert.Equal(t, result, "custom_dimensions__ms_aggregation_interval_ms")
+	assert.Equal(t, "custom_dimensions__ms_aggregation_interval_ms", result)
 	ex = "customDimensions/_MS.IsAutocollected"
 	result = cleanMetricNames(ex)
-	assert.Equal(t, result, "custom_dimensions__ms_is_autocollected")
+	assert.Equal(t, "custom_dimensions__ms_is_autocollected", result)
 }
