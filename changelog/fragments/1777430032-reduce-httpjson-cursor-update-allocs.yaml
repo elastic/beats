@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Reduce allocation pressure in httpjson cursor update and split paths.
+component: filebeat
