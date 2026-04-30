@@ -25,7 +25,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlsutil"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -82,9 +81,6 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 	}
 	if tlsConfig != nil {
 		httpServer.TLSConfig = tlsConfig.BuildServerConfig(config.Host)
-		if err := tlsutil.SetupCertReload(httpServer.TLSConfig, config.TLS); err != nil {
-			return nil, err
-		}
 	}
 	h.server = httpServer
 	return h, nil
