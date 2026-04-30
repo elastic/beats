@@ -58,9 +58,11 @@ type otelOutputControllerHandle struct {
 	beatInfo beat.Info
 }
 
-var allOutputControllers struct {
+var allOutputControllers = struct {
 	sync.Mutex
 	lookup map[string]*otelOutputController
+}{
+	lookup: make(map[string]*otelOutputController),
 }
 
 func newOTelOutputController(
