@@ -22,6 +22,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// lazyLog wraps a *logp.Logger and defers attaching FS-event fields until a message is actually emitted.
+// This avoids cloning the underlying zap logger for events that never log, which happens when Debug logging is disabled.
+// Not safe for concurrent use: callers must construct one lazyLog per FS event.
 type lazyLog struct {
 	log      *logp.Logger
 	event    loginp.FSEvent
