@@ -29,10 +29,11 @@ import (
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // For more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource.
 type oktaTokenSource struct {
-	ctx     context.Context
-	conf    *oauth2.Config
-	oktaJWK []byte
-	client  *http.Client
+	ctx         context.Context
+	conf        *oauth2.Config
+	oktaJWK     []byte
+	oktaJWKPEM  string
+	client      *http.Client
 
 	mu    sync.Mutex
 	token *oauth2.Token
@@ -78,23 +79,29 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 		}
 	case hasJWTKeys:
 		// Use JWT-based authentication
-		var oktaJWT string
+		var (
+			oktaJWT    string
+			jwkData    []byte
+			jwkPEMData string
+		)
 		switch {
 		case o.OktaJWKFile != "":
-			oktaJWK, err := os.ReadFile(o.OktaJWKFile)
+			jwkData, err = os.ReadFile(o.OktaJWKFile)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read JWK file: %w", err)
 			}
-			oktaJWT, err = generateOktaJWT(oktaJWK, oauthConfig)
+			oktaJWT, err = generateOktaJWT(jwkData, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
 		case o.OktaJWKJSON != nil:
+			jwkData = o.OktaJWKJSON
 			oktaJWT, err = generateOktaJWT(o.OktaJWKJSON, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
 		case o.OktaJWKPEM != "":
+			jwkPEMData = o.OktaJWKPEM
 			oktaJWT, err = generateOktaJWTPEM(o.OktaJWKPEM, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
@@ -110,11 +117,12 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 		}
 
 		tokenSource = &oktaTokenSource{
-			ctx:     ctx,
-			conf:    oauthConfig,
-			oktaJWK: o.OktaJWKJSON,
-			client:  client,
-			token:   token,
+			ctx:        ctx,
+			conf:       oauthConfig,
+			oktaJWK:    jwkData,
+			oktaJWKPEM: jwkPEMData,
+			client:     client,
+			token:      token,
 		}
 	default:
 		return nil, errors.New("no authentication credentials provided")
@@ -189,7 +197,13 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
-	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
+	var oktaJWT string
+	var err error
+	if ts.oktaJWKPEM != "" {
+		oktaJWT, err = generateOktaJWTPEM(ts.oktaJWKPEM, ts.conf)
+	} else {
+		oktaJWT, err = generateOktaJWT(ts.oktaJWK, ts.conf)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)
 	}
