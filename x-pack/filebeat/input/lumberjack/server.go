@@ -14,6 +14,7 @@ import (
 	"golang.org/x/net/netutil"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlsutil"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -153,6 +154,9 @@ func newLumberjack(c config, logger *logp.Logger) (lj lumber.Server, bindAddress
 		// NOTE: Passing an empty string disables checking the client certificate for a
 		// specific hostname.
 		tlsConfig = elasticTLSConfig.BuildServerConfig("")
+		if err := tlsutil.SetupCertReload(tlsConfig, c.TLS); err != nil {
+			return nil, "", err
+		}
 	}
 
 	// Start listener.
