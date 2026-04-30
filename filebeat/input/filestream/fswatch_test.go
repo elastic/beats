@@ -583,7 +583,7 @@ func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
 }
 
 // newFileWatcherForCopyTruncateTests returns a file watcher configured to
-// harvester rotated files and two file names used for rotation.
+// harvest rotated files and two file paths used for rotation.
 func newFileWatcherForCopyTruncateTests(t *testing.T) (*fileWatcher, string, string) {
 	dir := fs.TempDir(t, "..", "..", "build")
 	activePath := filepath.Join(dir, "foo.log")
@@ -635,7 +635,7 @@ func requireEventSignatures(t *testing.T, events []loginp.FSEvent, expected []fs
 		expectedKeys = append(expectedKeys, e.String())
 	}
 
-	require.ElementsMatch(t, expectedKeys, actualKeys, "unexpected file watcher event sequence")
+	require.ElementsMatch(t, expectedKeys, actualKeys, "unexpected file watcher events (order ignored)")
 }
 
 func findEvent(events []loginp.FSEvent, expected fsEventSignature) loginp.FSEvent {
