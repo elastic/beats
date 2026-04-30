@@ -1127,6 +1127,117 @@ func TestRunObjectSetupAuditTrailResumeWithoutLastEventIDUsesLegacyBoundary(t *t
 	require.Len(t, client.published, 1, "expected legacy-compatible resume to still publish returned setup audit trail rows")
 }
 
+// TestRunObjectUnbatchedRestoresCursorOnMidStreamFailure verifies that the
+// unbatched Object path snapshots the in-memory cursor before issuing the
+// query and reverts it when runObjectQuery fails mid-stream. Without the
+// revert, partial per-row mutations made before a transient publish/query
+// failure would leak into the next ticker tick and skip rows that were
+// never durably ACKed.
+func TestRunObjectUnbatchedRestoresCursorOnMidStreamFailure(t *testing.T) {
+	const (
+		resumeQuery       = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2024-01-01T11:00:00.000+0000"
+		firstPageJSON     = `{ "totalSize": 2, "done": false, "nextRecordsUrl": "/nextRecords/LoginEvents/UNBATCHEDFAIL", "records": [ { "attributes": { "type": "LoginEvent", "url": "/services/data/v58.0/sobjects/LoginEvent/NEW0000000001AAA" }, "Id": "NEW0000000001AAA", "EventDate": "2024-01-01T11:30:00.000+0000" } ] }`
+		preFirstEventTime = "2024-01-01T11:00:00.000+0000"
+		preLastEventTime  = "2024-01-01T11:00:00.000+0000"
+		preLastEventID    = "OLD0000000001AAA"
+	)
+
+	var (
+		queryCount    int
+		nextPageCount int
+		server        *httptest.Server
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == resumeQuery:
+			queryCount++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(firstPageJSON))
+		case r.RequestURI == "/nextRecords/LoginEvents/UNBATCHEDFAIL":
+			nextPageCount++
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte(`{"error":"boom"}`))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":                         server.URL,
+		"version":                     56,
+		"resource.retry.max_attempts": 1,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultLoginObjectQuery,
+					"value":   valueLoginObjectQuery,
+				},
+				"cursor": map[string]interface{}{
+					"field": "EventDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "unbatched object config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor: &state{
+			Object: dateTimeCursor{
+				FirstEventTime: preFirstEventTime,
+				LastEventTime:  preLastEventTime,
+				LastEventID:    preLastEventID,
+			},
+		},
+		srcConfig: &cfg,
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunObject()
+	require.Error(t, err, "expected mid-stream pagination failure on the unbatched path to bubble up")
+	assert.Equal(t, 1, queryCount, "expected the unbatched query to run once before the next page failure")
+	assert.Equal(t, 1, nextPageCount, "expected the next page to be attempted once before failing")
+	assert.Len(t, client.published, 1, "expected the first page row to publish before the next page failure")
+
+	assert.Equal(t, preFirstEventTime, s.cursor.Object.FirstEventTime, "expected failed unbatched run to restore first_event_time so the next tick does not skip rows past the last durable ACK")
+	assert.Equal(t, preLastEventTime, s.cursor.Object.LastEventTime, "expected failed unbatched run to restore last_event_time so the next tick does not skip rows past the last durable ACK")
+	assert.Equal(t, preLastEventID, s.cursor.Object.LastEventID, "expected failed unbatched run to restore last_event_id so the next tick does not skip same-timestamp rows past the last durable ACK")
+}
+
 // TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows verifies that
 // once a user switches to a custom SOQL query that no longer SELECTs Id, any
 // previously persisted last_event_id is reset even when the query succeeds but

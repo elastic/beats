@@ -425,8 +425,16 @@ func (s *salesforceInput) RunObject() error {
 		return s.runObjectBatches()
 	}
 
+	// Snapshot the in-memory object cursor and revert on error, mirroring
+	// runObjectBatches. runObjectQuery mutates first_event_time /
+	// last_event_time / last_event_id per row before publish, so a transient
+	// publish/query failure mid-stream would otherwise leave the cursor
+	// advanced past rows that were never durably ACKed and the next tick
+	// would skip them.
+	prevCursor := s.cursor.Object
 	totalEvents, err := s.runObjectQuery(s.objectCursor(nil))
 	if err != nil {
+		s.cursor.Object = prevCursor
 		return err
 	}
 	s.log.Infof("Total events: %d", totalEvents)
