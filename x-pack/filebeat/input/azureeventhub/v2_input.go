@@ -243,7 +243,6 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 	// transient errors (network failures) and we need to
 	// restart it.
 	processorRunBackoff := backoff.NewEqualJitterBackoff(
-		ctx.Done(),
 		processorRestartBackoff,    // initial backoff
 		processorRestartMaxBackoff, // max backoff
 	)
@@ -299,7 +298,7 @@ func (in *eventHubInputV2) run(ctx context.Context) error {
 			// unrecoverable.
 			//
 			// We wait before retrying to start the processor.
-			processorRunBackoff.Wait()
+			processorRunBackoff.Wait(ctx)
 
 			// Update input metrics.
 			in.metrics.processorRestarts.Inc()
