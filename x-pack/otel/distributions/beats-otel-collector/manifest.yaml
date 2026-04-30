@@ -15,8 +15,6 @@ extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.149.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage
 
 connectors:
 
@@ -57,9 +55,6 @@ exporters:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.149.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.149.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.149.0
-  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
-    import: github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter
-
 providers:
   - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.55.0
   - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.55.0
