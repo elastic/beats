@@ -96,11 +96,11 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 			if idErr != nil {
 				return nil, idErr
 			}
-			reg, err = otelstorage.NewFileStorage(otelstorage.Settings{
-				Config:     fsCfg,
-				ReceiverID: recvID,
-				Logger:     logger,
-			})
+		reg, err = otelstorage.NewFileStorage(ctx, otelstorage.Settings{
+			Config:     fsCfg,
+			ReceiverID: recvID,
+			Logger:     logger,
+		})
 		case "memlog", "":
 			reg, err = memlog.New(logger, memlog.Settings{
 				Root:     resolvedPath,

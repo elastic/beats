@@ -61,7 +61,7 @@ type registry struct {
 
 // NewFileStorage builds a [backend.Registry] using the configured file storage extension factory.
 // Config must be populated by the caller.
-func NewFileStorage(s Settings) (backend.Registry, error) {
+func NewFileStorage(ctx context.Context, s Settings) (backend.Registry, error) {
 	if s.Config == nil {
 		return nil, fmt.Errorf("otelstorage: Config is required")
 	}
@@ -80,7 +80,6 @@ func NewFileStorage(s Settings) (backend.Registry, error) {
 		TelemetrySettings: ts,
 		BuildInfo:         component.NewDefaultBuildInfo(),
 	}
-	ctx := context.Background()
 	extAny, err := filestorage.NewFactory().Create(ctx, set, cfg)
 	if err != nil {
 		return nil, err

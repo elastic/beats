@@ -34,7 +34,7 @@ func TestCompliance(t *testing.T) {
 		cfg.CreateDirectory = true
 		cfg.DirectoryPermissions = "0750"
 
-		return NewFileStorage(Settings{
+		return NewFileStorage(t.Context(), Settings{
 			Config:     cfg,
 			ReceiverID: component.MustNewID("test"),
 			Logger:     logptest.NewTestingLogger(t, ""),

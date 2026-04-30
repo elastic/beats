@@ -18,6 +18,7 @@
 package backend_test
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"path/filepath"
@@ -55,7 +56,7 @@ var factories = []registryFactory{
 			cfg := otelstorage.DefaultFileStorageConfig()
 			cfg.Directory = dir
 			cfg.CreateDirectory = true
-			return otelstorage.NewFileStorage(otelstorage.Settings{
+			return otelstorage.NewFileStorage(context.Background(), otelstorage.Settings{
 				Config:     cfg,
 				ReceiverID: component.MustNewID("bench"),
 				Logger:     logp.NewNopLogger(),
