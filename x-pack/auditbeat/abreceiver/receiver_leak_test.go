@@ -25,6 +25,7 @@ import (
 )
 
 func TestLeak(t *testing.T) {
+	t.Skip("See https://github.com/elastic/beats/issues/50381")
 	monitorSocket := genSocketPath()
 	var monitorHost string
 	if runtime.GOOS == "windows" {
