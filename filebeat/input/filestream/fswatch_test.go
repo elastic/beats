@@ -286,7 +286,17 @@ scanner:
 		defer cancel()
 
 		fw := createWatcherWithConfig(t, logptest.NewTestingLogger(t, ""), paths, cfgStr)
-		go fw.Run(ctx)
+		// Wait for the watcher goroutine to exit before the subtest returns.
+		// logptest.NewTestingLogger writes via t.Log, which is unsafe to call
+		// after the subtest finishes and triggers a data race in
+		// testing.(*common).destination. The deferred cancel above runs
+		// before t.Cleanup, so this only needs to wait for Run to return.
+		runDone := make(chan struct{})
+		go func() {
+			defer close(runDone)
+			fw.Run(ctx)
+		}()
+		t.Cleanup(func() { <-runDone })
 
 		basename := "created.log"
 		filename := filepath.Join(dir, basename)
@@ -381,10 +391,18 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		fileLogger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
-		fw := createWatcherWithConfig(t, fileLogger.Logger, paths, cfgStr)
+		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
+		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
 
-		go fw.Run(ctx)
+		// Wrap Run so we can wait for the watcher goroutine to exit before
+		// inspecting the in-memory log buffer. The buffer returned by
+		// logp.NewInMemoryLocal is goroutine safe for writes only — reading
+		// it concurrently with watcher logging triggers the race detector.
+		runDone := make(chan struct{})
+		go func() {
+			defer close(runDone)
+			fw.Run(ctx)
+		}()
 
 		expectedEvents := []loginp.FSEvent{
 			{
@@ -427,9 +445,13 @@ scanner:
 			requireEqualEvents(t, expectedEvents[i], actualEvent)
 		}
 
-		warnFound, err := fileLogger.FindInLogs("WARN")
-		require.NoError(t, err, "cannot read log file")
-		require.False(t, warnFound, "must be no warning messages")
+		// Stop the watcher and wait for its goroutine to return so the buffer
+		// is no longer being written to before we read from it.
+		cancel()
+		<-runDone
+
+		require.NotContainsf(t, buff.String(), "WARN",
+			"must be no warning messages")
 	})
 }
 

@@ -698,9 +698,14 @@ func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return m.c
 }
 
+// mockMetadataUpdater is a test implementation of loginp.MetadataUpdater whose
+// methods may be invoked from the prospector's goroutines while the test
+// goroutine inspects the stored state (e.g. via assert.Eventually). Read paths
+// dominate (assert.Eventually polls), so an RWMutex is used to allow
+// concurrent reads.
 type mockMetadataUpdater struct {
-	mutex sync.Mutex
-	table map[string]interface{}
+	mu    sync.RWMutex
+	table map[string]any
 }
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
@@ -710,23 +715,37 @@ func newMockMetadataUpdater() *mockMetadataUpdater {
 }
 
 func (mu *mockMetadataUpdater) set(id string) {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
-
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	mu.table[id] = struct{}{}
 }
-func (mu *mockMetadataUpdater) has(id string) bool {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
 
+// setRaw stores an arbitrary value under id. Used by tests that pre-populate
+// the store before running the prospector.
+func (mu *mockMetadataUpdater) setRaw(id string, v any) {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
+	mu.table[id] = v
+}
+
+// get returns the raw value stored under id. Used by tests that need to
+// inspect the stored value after the prospector has run.
+func (mu *mockMetadataUpdater) get(id string) any {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
+	return mu.table[id]
+}
+
+func (mu *mockMetadataUpdater) has(id string) bool {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	_, ok := mu.table[id]
 	return ok
 }
 
 func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
-
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	c, ok := mu.table[id]
 	if !ok {
 		return false
@@ -738,10 +757,9 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 	return cursor.Offset == offset
 }
 
-func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
-
+func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v any) error {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	meta, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id [%q]", s.Name())
@@ -749,26 +767,23 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 	return typeconv.Convert(v, meta)
 }
 
-func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
-
+func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur any) error {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	mu.table[s.Name()] = cur
 	return nil
 }
 
-func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
-
+func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v any) error {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	mu.table[s.Name()] = v
 	return nil
 }
 
 func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
-	mu.mutex.Lock()
-	defer mu.mutex.Unlock()
-
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	delete(mu.table, s.Name())
 	return nil
 }
@@ -888,13 +903,13 @@ func TestOnRenameFileIdentity(t *testing.T) {
 
 			testStore := newMockMetadataUpdater()
 			if tc.populateStore {
-				testStore.table[id] = fileMeta{Source: path, IdentifierName: expectedIdentifier}
+				testStore.setRaw(id, fileMeta{Source: path, IdentifierName: expectedIdentifier})
 			}
 
 			hg := newTestHarvesterGroup()
 			p.Run(ctx, testStore, hg)
 
-			got := testStore.table[id]
+			got := testStore.get(id)
 			meta := fileMeta{}
 			typeconv.Convert(&meta, got)
 
