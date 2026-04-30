@@ -27,8 +27,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/dropfields"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -409,7 +409,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		if err != nil {
 			return nil, fmt.Errorf("failed creating drop_fields processor config for host.name field: %w", err)
 		}
-		proc, err := processors.NewConditional(actions.NewDropFields)(drop_hostname_cfg, b.log)
+		proc, err := processors.NewConditional(dropfields.NewDropFields)(drop_hostname_cfg, b.log)
 		if err != nil {
 			return nil, fmt.Errorf("failed creating drop_fields processor for host.name field: %w", err)
 		}
