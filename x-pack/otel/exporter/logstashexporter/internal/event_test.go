@@ -11,13 +11,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/client"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 )
 
 func TestParseEvent(t *testing.T) {
@@ -29,17 +27,6 @@ func TestParseEvent(t *testing.T) {
 	}{
 		{
 			name: "valid beats event with timestamp",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
 				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
@@ -54,17 +41,6 @@ func TestParseEvent(t *testing.T) {
 		},
 		{
 			name: "valid beats event without timestamp",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
 				observedTime := time.Now()
@@ -78,62 +54,7 @@ func TestParseEvent(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "invalid beats event metadata - missing beat name",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatVersionCtxKey: {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			setupLog: func() plog.LogRecord {
-				lr := plog.NewLogRecord()
-				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
-
-				bodyMap := lr.Body().SetEmptyMap()
-				bodyMap.PutStr("message", "test message")
-
-				return lr
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid beats event metadata - empty beat name",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatIndexPrefixCtxKey: {""},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			setupLog: func() plog.LogRecord {
-				lr := plog.NewLogRecord()
-				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
-
-				bodyMap := lr.Body().SetEmptyMap()
-				bodyMap.PutStr("message", "test message")
-
-				return lr
-			},
-			wantErr: true,
-		},
-		{
 			name: "invalid event body - not a map",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:    {"filebeat"},
-						otelctx.BeatVersionCtxKey: {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setupLog: func() plog.LogRecord {
 				lr := plog.NewLogRecord()
 				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now()))
@@ -147,22 +68,16 @@ func TestParseEvent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.setupCtx()
 			log := tt.setupLog()
 
-			event, err := parseEvent(ctx, &log)
+			event, err := parseEvent(&log)
 
 			if tt.wantErr {
 				require.Error(t, err)
 				assert.True(t, consumererror.IsPermanent(err))
 			} else {
-				ctxData := client.FromContext(ctx)
 
 				require.NoError(t, err)
-
-				// Verify metadata from context
-				assert.Equal(t, ctxData.Metadata.Get("beat_name")[0], event.Meta["beat"])
-				assert.Equal(t, ctxData.Metadata.Get("beat_version")[0], event.Meta["version"])
 
 				// Verify fields match original log record body
 				originalBody := log.Body().Map().AsRaw()
@@ -283,129 +198,6 @@ func TestParseEventTimestamp(t *testing.T) {
 
 			assert.Equal(t, tt.wantOk, ok)
 			assert.Equal(t, tt.expectedTime, timestamp)
-		})
-	}
-}
-
-func TestIsBeatsEvent(t *testing.T) {
-	tests := []struct {
-		name     string
-		metadata map[string]any
-		expected bool
-	}{
-		{
-			name: "valid beats event",
-			metadata: map[string]any{
-				otelctx.MetadataBeatKey:    "filebeat",
-				otelctx.MetadataVersionKey: "8.0.0",
-			},
-			expected: true,
-		},
-		{
-			name: "missing beat field",
-			metadata: map[string]any{
-				otelctx.MetadataVersionKey: "8.0.0",
-			},
-			expected: false,
-		},
-		{
-			name: "nil beat field",
-			metadata: map[string]any{
-				otelctx.MetadataBeatKey:    nil,
-				otelctx.MetadataVersionKey: "8.0.0",
-			},
-			expected: false,
-		},
-		{
-			name: "empty beat field",
-			metadata: map[string]any{
-				otelctx.MetadataBeatKey:    "",
-				otelctx.MetadataVersionKey: "8.0.0",
-			},
-			expected: false,
-		},
-		{
-			name:     "empty metadata",
-			metadata: map[string]any{},
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := isBeatsEvent(tt.metadata)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
-
-func TestGetEventMeta(t *testing.T) {
-	tests := []struct {
-		name     string
-		setupCtx func() context.Context
-		expected map[string]any
-	}{
-		{
-			name: "index prefix exists",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"something"},
-						otelctx.BeatVersionCtxKey:     {"8.0.0"},
-						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			expected: map[string]any{
-				otelctx.MetadataBeatKey:    "filebeat",
-				otelctx.MetadataVersionKey: "8.0.0",
-			},
-		},
-		{
-			name: "index prefix missing",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:    {"something"},
-						otelctx.BeatVersionCtxKey: {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			expected: map[string]any{
-				otelctx.MetadataBeatKey:    "",
-				otelctx.MetadataVersionKey: "8.0.0",
-			},
-		},
-		{
-			name: "no client info",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:    {""},
-						otelctx.BeatVersionCtxKey: {""},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			expected: map[string]any{
-				otelctx.MetadataBeatKey:    "",
-				otelctx.MetadataVersionKey: "",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.setupCtx()
-
-			metadata := getEventMeta(ctx)
-
-			assert.Equal(t, tt.expected, metadata)
 		})
 	}
 }

@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix Okta entity analytics OAuth2 config unpacking for jwk_json and jwk_pem fields.
+component: filebeat
