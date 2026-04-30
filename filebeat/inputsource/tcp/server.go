@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlsutil"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -74,6 +75,9 @@ func (s *Server) createServer() (net.Listener, error) {
 	network := s.network()
 	if s.tlsConfig != nil {
 		t := s.tlsConfig.BuildServerConfig(s.config.Host)
+		if err := tlsutil.SetupCertReload(t, s.config.TLS); err != nil {
+			return nil, err
+		}
 		l, err = tls.Listen(network, s.config.Host, t)
 		if err != nil {
 			return nil, err

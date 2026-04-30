@@ -35,6 +35,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlsutil"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
@@ -90,6 +91,9 @@ func newHTTPEndpoint(config config, logger *logp.Logger) (*httpEndpoint, error) 
 	}
 	if tlsConfigBuilder != nil {
 		tlsConfig = tlsConfigBuilder.BuildServerConfig(addr)
+		if err := tlsutil.SetupCertReload(tlsConfig, config.TLS); err != nil {
+			return nil, err
+		}
 	}
 
 	return &httpEndpoint{
