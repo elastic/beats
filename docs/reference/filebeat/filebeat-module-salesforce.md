@@ -22,7 +22,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/s
 ::::::
 
 :::::{note}
-The Salesforce module has been completely revamped to use a new dedicated Salesforce input for event collection, replacing the previous HTTPJSON input method. This change brings improved performance and reliability. However, please be aware that this update introduces a breaking change. We believe this is the right time to make this necessary improvement as the previous module was in beta.
+The Salesforce module has been completely revamped to use a new dedicated Salesforce input for event collection, replacing the previous HTTPJSON input method. This change brings improved performance and reliability. However, be aware that this update introduces a breaking change. We believe this is the right time to make this necessary improvement as the previous module was in beta.
 :::::
 
 
