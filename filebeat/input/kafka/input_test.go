@@ -24,6 +24,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/sarama"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -38,6 +40,19 @@ func TestNewInputDone(t *testing.T) {
 	})
 
 	AssertNotStartedInputCanBeDone(t, config)
+}
+
+// TestNoPanicOnClientError checks that the context of an input can be
+// done before starting the input, and it doesn't leak goroutines. This is
+// important to confirm that leaks don't happen with CheckConfig.
+func TestNoPanicOnClientError(t *testing.T) {
+	k := &kafkaInput{
+		config:       kafkaInputConfig{Hosts: []string{"127.0.0.1:1"}, Topics: []string{"topic-a"}},
+		saramaConfig: sarama.NewConfig(),
+	}
+
+	err := k.Test(input.TestContext{Logger: logp.NewLogger("kafka-repro")})
+	require.Error(t, err)
 }
 
 // AssertNotStartedInputCanBeDone checks that the context of an input can be

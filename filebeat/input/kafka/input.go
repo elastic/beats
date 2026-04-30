@@ -85,7 +85,7 @@ func (input *kafkaInput) Name() string { return pluginName }
 func (input *kafkaInput) Test(ctx input.TestContext) error {
 	client, err := sarama.NewClient(input.config.Hosts, input.saramaConfig)
 	if err != nil {
-		ctx.Logger.Error(err)
+		return err
 	}
 	topics, err := client.Topics()
 	if err != nil {
