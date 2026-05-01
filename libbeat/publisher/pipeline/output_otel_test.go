@@ -107,10 +107,10 @@ func TestSharedQueue(t *testing.T) {
 	assert.Same(t, c1.otelOutputController, c2.otelOutputController, "output controller handles with the same intake queue ID should reference the same output controller")
 
 	// Close the otelconsumer workers, we will check the batches manually from the worker input channel
-	for _, worker := range c1.otelOutputController.workers {
+	for _, worker := range c1.workers {
 		_ = worker.Close()
 	}
-	batchChan := c1.otelOutputController.workerChan
+	batchChan := c1.workerChan
 
 	ackChan1 := make(chan int, 1)
 	prod1 := c1.queueProducer(queue.ProducerConfig{
