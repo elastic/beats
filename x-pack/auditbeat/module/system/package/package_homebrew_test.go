@@ -15,13 +15,11 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestHomebrew(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
 
 	oldPath := homebrewCellarPath
 	defer func() {
@@ -79,7 +77,6 @@ func checkFieldValue(t *testing.T, event beat.Event, fieldName string, fieldValu
 }
 
 func TestHomebrewNotExist(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
 
 	oldPath := homebrewCellarPath
 	defer func() {
