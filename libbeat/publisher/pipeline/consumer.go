@@ -85,21 +85,8 @@ func newEventConsumer(
 		done:       make(chan struct{}),
 	}
 
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
-		c.run()
-	}()
-
-	// Even though we start a goroutine here, we don't include it in the
-	// waitGroup used for shutdown: if the queue itself is not closed yet,
-	// then the queueReader may be blocked in a read call to the queue,
-	// and waiting on it would deadlock. (This scenario is common; the
-	// queue is rarely closed properly on shutdown.) The queueReader itself
-	// has no independent state to clean up, and can safely shut down
-	// after the eventConsumer is already gone, so nothing is lost by
-	// letting it happen asynchronously.
-	go c.queueReader.run(c.logger)
+	c.wg.Go(c.run)
+	c.wg.Go(func() { c.queueReader.run(c.logger) })
 
 	return c
 }
