@@ -20,11 +20,13 @@
 package integration
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
@@ -64,12 +66,12 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	logPaths := []string{filepath.Join(tempDir, "*.log")}
 
 	nextCounter := map[string]int{}
-	nextCounter[logFile1] = integration.WriteLogFileFrom(t, logFile1, 0, initialLinesPerFile, false)
-	nextCounter[logFile2] = integration.WriteLogFileFrom(t, logFile2, 0, initialLinesPerFile, false)
+	nextCounter[logFile1] = integration.WriteLogFileFrom(t, logFile1, 0, initialLinesPerFile, false, filepath.Base(logFile1))
+	nextCounter[logFile2] = integration.WriteLogFileFrom(t, logFile2, 0, initialLinesPerFile, false, filepath.Base(logFile2))
 
 	appendLogsToFiles := func(n int) {
 		for _, path := range logFiles {
-			nextCounter[path] = integration.WriteLogFileFrom(t, path, nextCounter[path], n, true)
+			nextCounter[path] = integration.WriteLogFileFrom(t, path, nextCounter[path], n, true, filepath.Base(path))
 		}
 	}
 
@@ -116,7 +118,13 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 		}
 	}
 
-	// Steps 9+ will continue from this baseline.
+	// Step 9: disable all inputs, wait for stop, and snapshot output.
+	snapshotIdx := 0
+	disableActiveInput(t, inputsDir, filebeat, "log")
+	snapshotIdx++
+	copyOutputSnapshot(t, tempDir, snapshotIdx, "log-1")
+
+	// Steps 10+ will continue from this baseline and first snapshot.
 }
 
 func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
@@ -141,4 +149,39 @@ func counterFromMessage(t *testing.T, msg string) int {
 	}
 
 	return counter
+}
+
+func disableActiveInput(t *testing.T, inputsDir string, filebeat *integration.BeatProc, runner string) {
+	activeCfg := filepath.Join(inputsDir, "active.yml")
+
+	if err := os.Rename(activeCfg, activeCfg+".disabled"); err != nil {
+		t.Fatalf("failed to disable active config %q: %s", activeCfg, err)
+	}
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("Runner: 'input [type=%s]' has stopped", runner),
+		2*time.Minute,
+		"input runner did not stop after disabling active config",
+	)
+}
+
+func copyOutputSnapshot(t *testing.T, tempDir string, snapshotIdx int, phase string) {
+	matches, err := filepath.Glob(filepath.Join(tempDir, "output-file-*.ndjson"))
+	if err != nil {
+		t.Fatalf("failed to resolve output file glob: %s", err)
+	}
+	if len(matches) != 1 {
+		t.Fatalf("expected exactly one output file, got %d", len(matches))
+	}
+	source := matches[0]
+	snapshotPath := filepath.Join(tempDir, fmt.Sprintf("%02d-output-phase-%s.ndjson", snapshotIdx, phase))
+
+	data, err := os.ReadFile(source)
+	if err != nil {
+		t.Fatalf("failed to read output file %q: %s", source, err)
+	}
+
+	if err := os.WriteFile(snapshotPath, data, 0o644); err != nil {
+		t.Fatalf("failed to write snapshot file %q: %s", snapshotPath, err)
+	}
 }
