@@ -59,9 +59,11 @@ func TestOTelQueueMetrics(t *testing.T) {
 }
 
 func TestSharedQueue(t *testing.T) {
-	const flushTimeout = time.Second
 	logger := logptest.NewTestingLogger(t, "")
 
+	// The shared queue holds at most 5 events, and when read will wait up to
+	// 1sec to return a "full" batch with 2 events.
+	const flushTimeout = time.Second
 	queueSettings := memqueue.Settings{
 		Events:        5,
 		MaxGetRequest: 2,
@@ -87,6 +89,8 @@ func TestSharedQueue(t *testing.T) {
 		"queueID",
 	)
 	require.NoError(t, err, "output controller creation should succeed")
+	defer c1.waitClose(cancelledContext(), false)
+
 	c2, err := newOTelOutputController(
 		beat.Info{Logger: logger},
 		Monitors{
@@ -98,6 +102,7 @@ func TestSharedQueue(t *testing.T) {
 		"queueID",
 	)
 	require.NoError(t, err, "output controller creation should succeed")
+	defer c2.waitClose(cancelledContext(), false)
 
 	assert.Same(t, c1.otelOutputController, c2.otelOutputController, "output controller handles with the same intake queue ID should reference the same output controller")
 
@@ -130,12 +135,12 @@ func TestSharedQueue(t *testing.T) {
 	prod2.Publish(events[1])
 
 	// Two events published with a two-event batch size should make a batch
-	// ~immediately available on the worker channel
+	// ~immediately available on the worker channel.
 	var ackFirstBatch func()
 	select {
 	case batch := <-batchChan:
 		batchEvents := batch.Events()
-		require.Equal(t, 2, len(batchEvents), "batch should contain 2 events")
+		require.Len(t, batchEvents, 2, "batch should contain 2 events")
 		assert.Equal(t, events[0], batchEvents[0])
 		assert.Equal(t, events[1], batchEvents[1])
 
@@ -178,4 +183,10 @@ func testEvent(i int) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{Private: i},
 	}
+}
+
+func cancelledContext() context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	return ctx
 }
