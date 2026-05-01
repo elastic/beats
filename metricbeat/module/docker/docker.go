@@ -139,7 +139,7 @@ func FetchStats(cli *dockerclient.Client, timeout time.Duration, stream bool, lo
 func exportContainerStats(ctx context.Context, cli *dockerclient.Client, cont *container.Summary, stream bool, logger *logp.Logger) Stat {
 	var event Stat
 	event.Container = cont
-	containerStats, err := cli.ContainerStats(ctx, cont.ID, dockerclient.ContainerStatsOptions{Stream: stream})
+	containerStats, err := cli.ContainerStats(ctx, cont.ID, dockerclient.ContainerStatsOptions{Stream: stream, IncludePreviousSample: !stream})
 	if err != nil {
 		logger.Debugf("Failed fetching container stats: %v", err)
 		return event
