@@ -119,7 +119,7 @@ func TestSharedQueue(t *testing.T) {
 		},
 	})
 	ackChan2 := make(chan int, 1)
-	prod2 := c1.queueProducer(queue.ProducerConfig{
+	prod2 := c2.queueProducer(queue.ProducerConfig{
 		ACK: func(count int) {
 			ackChan2 <- count
 		},
