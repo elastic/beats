@@ -135,7 +135,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
 	if profileCfg.EnabledOrDefault() {
-		profileDir := b.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
+		profileDir := b.Info.Paths.Resolve(paths.Data, filepath.Join("osquerybeat", "live_query_profiles"))
 		store, err := newLiveProfileStore(log, profileDir, profileCfg.MaxProfilesOrDefault())
 		if err != nil {
 			log.Warnw("failed to initialize live query profile storage", "error", err)
