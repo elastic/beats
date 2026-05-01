@@ -1,0 +1,8 @@
+- type: log
+  enabled: true
+  allow_deprecated_use: true
+  scan_frequency: 0.1s
+  paths:
+{{ range .paths }}
+    - {{ . }}
+{{ end }}
