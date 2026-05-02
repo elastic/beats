@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix spelling typos in community-beats docs (`recurssively`, `synchonisation`) and in the metricbeat Kubernetes remote-debugger README (`buld`).
+component: docs
