@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix Active Directory entity analytics to emit device attributes under activedirectory.device.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/50471
