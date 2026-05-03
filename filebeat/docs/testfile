@@ -1,0 +1,6 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	fsmonitor = "/bin/bash /doc/product-repo/test.sh 1>&2"

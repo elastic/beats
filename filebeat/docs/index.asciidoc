@@ -3,6 +3,7 @@
 Test, hello.
 
 image::../../../../../.github/workflows/test.yml[testfile,width=96]
+image::../../../../../testfile[testfile,width=96]
 
 == Marker
 
