@@ -36,9 +36,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -55,12 +54,12 @@ type wrapperDriver struct {
 
 	Environment []string
 
-	client *client.Client
+	client *dockerclient.Client
 	logger *logp.Logger
 }
 
 func newWrapperDriver(logger *logp.Logger) (*wrapperDriver, error) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logger)
+	c, err := docker.NewClient(dockerclient.DefaultDockerHost, nil, nil, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +110,8 @@ func (c *wrapperContainer) privateHost(port int) string {
 	var ip string
 	var shortPort uint16
 	for _, net := range c.info.NetworkSettings.Networks {
-		if len(net.IPAddress) > 0 {
-			ip = net.IPAddress
+		if net.IPAddress.IsValid() {
+			ip = net.IPAddress.String()
 			break
 		}
 	}
@@ -229,7 +228,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	return nil
 }
 
-func writeToContainer(ctx context.Context, cli *client.Client, id, filename, content string) error {
+func writeToContainer(ctx context.Context, cli *dockerclient.Client, id, filename, content string) error {
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 	now := time.Now()
@@ -252,8 +251,10 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 		return fmt.Errorf("failed to close tar: %w", err)
 	}
 
-	opts := container.CopyToContainerOptions{}
-	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
+	_, err = cli.CopyToContainer(ctx, id, dockerclient.CopyToContainerOptions{
+		DestinationPath: filepath.Dir(filename),
+		Content:         bytes.NewReader(buf.Bytes()),
+	})
 	if err != nil {
 		return fmt.Errorf("failed to copy environment to container %s: %w", id, err)
 	}
@@ -346,7 +347,7 @@ func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, fi
 }
 
 func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]container.Summary, error) {
-	var serviceFilters []filters.Args
+	var serviceFilters []dockerclient.Filters
 	if len(filter) == 0 {
 		f := makeFilter(d.Name, "", projectFilter)
 		serviceFilters = append(serviceFilters, f)
@@ -364,14 +365,14 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 	var containers []container.Summary
 	for _, f := range serviceFilters {
-		list, err := d.client.ContainerList(ctx, container.ListOptions{
+		listResult, err := d.client.ContainerList(ctx, dockerclient.ContainerListOptions{
 			All:     true,
 			Filters: f,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get container list: %w", err)
 		}
-		for _, container := range list {
+		for _, container := range listResult.Items {
 			serviceName, ok := container.Labels[labelComposeService]
 			if !ok || !contains(serviceNames, serviceName) {
 				// Service is not defined in current docker compose file, ignore it
@@ -388,26 +389,26 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 // running containers.
 // It kills and removes all containers except the excluded services in 'except'.
 func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
-	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
+	listResult, err := d.client.ContainerList(ctx, dockerclient.ContainerListOptions{All: true})
 	if err != nil {
 		return fmt.Errorf("listing containers to be killed: %w", err)
 	}
 
-	rmOpts := container.RemoveOptions{
+	rmOpts := dockerclient.ContainerRemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
 		RemoveLinks:   true,
 	}
 
-	for _, container := range list {
-		container := wrapperContainer{info: container}
+	for _, c := range listResult.Items {
+		container := wrapperContainer{info: c}
 		serviceName, ok := container.info.Labels[labelComposeService]
 		if !ok || contains(except, serviceName) {
 			continue
 		}
 
 		if container.Running() && container.Old() {
-			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
+			_, err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
 			if err != nil {
 				d.logger.Errorf("container remove: %v", err)
 			}
@@ -430,17 +431,17 @@ func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 
 // Inspect a container.
 func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string, error) {
-	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
+	listResult, err := d.client.ContainerList(ctx, dockerclient.ContainerListOptions{All: true})
 	if err != nil {
 		return "", fmt.Errorf("listing containers to be inspected: %w", err)
 	}
 
 	var found bool
 	var c container.Summary
-	for _, container := range list {
-		aServiceName, ok := container.Labels[labelComposeService]
+	for _, cont := range listResult.Items {
+		aServiceName, ok := cont.Labels[labelComposeService]
 		if ok && serviceName == aServiceName {
-			c = container
+			c = cont
 			found = true
 			break
 		}
@@ -450,14 +451,14 @@ func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string
 		return "", fmt.Errorf("container not found for service '%s'", serviceName)
 	}
 
-	inspect, err := d.client.ContainerInspect(ctx, c.ID)
+	inspectResult, err := d.client.ContainerInspect(ctx, c.ID, dockerclient.ContainerInspectOptions{})
 	if err != nil {
 		return "", fmt.Errorf("container failed inspection: %w", err)
-	} else if inspect.State == nil {
+	} else if inspectResult.Container.State == nil {
 		return "empty container state", nil
 	}
 
-	state, err := json.Marshal(inspect.State)
+	state, err := json.Marshal(inspectResult.Container.State)
 	if err != nil {
 		return "", fmt.Errorf("container inspection failed: %w", err)
 	}
@@ -465,8 +466,8 @@ func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string
 	return string(state), nil
 }
 
-func makeFilter(project, service string, projectFilter Filter) filters.Args {
-	f := filters.NewArgs()
+func makeFilter(project, service string, projectFilter Filter) dockerclient.Filters {
+	f := make(dockerclient.Filters)
 	f.Add("label", fmt.Sprintf("%s=%s", labelComposeProject, project))
 
 	if service != "" {
