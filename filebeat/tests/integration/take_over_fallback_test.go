@@ -136,7 +136,31 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	// 4. Ensure Filestream did not replay data already ingested by Log input
 	assertNoDuplicationFromPreviousInput(t, events, logFiles, lastSeen["log"], "filestream")
 
-	// Steps 13+ continue from this state.
+	// 5. Capture Filestream baseline, disable all inputs and snapshot.
+	lastSeen["filestream"] = map[string]int{}
+	for _, event := range events {
+		if event.Input.Type != "filestream" {
+			continue
+		}
+
+		counter := counterFromMessage(t, event.Message)
+		prev, exists := lastSeen["filestream"][event.Log.File.Path]
+		if !exists || counter > prev {
+			lastSeen["filestream"][event.Log.File.Path] = counter
+		}
+	}
+
+	for _, path := range logFiles {
+		if _, exists := lastSeen["filestream"][path]; !exists {
+			t.Fatalf("no filestream lastSeen value captured for path %q", path)
+		}
+	}
+
+	disableActiveInput(t, inputsDir, filebeat, "filestream")
+	snapshotIdx++
+	copyOutputSnapshot(t, tempDir, snapshotIdx, "filestream-1")
+
+	// Steps 14+ continue from this state.
 }
 
 func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
@@ -174,18 +198,19 @@ func counterFromMessage(t *testing.T, msg string) int {
 	return counter
 }
 
-func disableActiveInput(t *testing.T, inputsDir string, filebeat *integration.BeatProc, runner string) {
+func disableActiveInput(t *testing.T, inputsDir string, filebeat *integration.BeatProc, input string) {
 	activeCfg := filepath.Join(inputsDir, "active.yml")
 
 	if err := os.Rename(activeCfg, activeCfg+".disabled"); err != nil {
 		t.Fatalf("failed to disable active config %q: %s", activeCfg, err)
 	}
 
-	filebeat.WaitLogsContains(
-		fmt.Sprintf("Runner: 'input [type=%s]' has stopped", runner),
-		2*time.Minute,
-		"input runner did not stop after disabling active config",
-	)
+	stopLogLine := fmt.Sprintf("Runner: 'input [type=%s]' has stopped", input)
+	if input == "filestream" {
+		stopLogLine = "Runner: 'filestream' has stopped"
+	}
+
+	filebeat.WaitLogsContains(stopLogLine, 2*time.Minute, "input runner did not stop after disabling active config")
 }
 
 func copyOutputSnapshot(t *testing.T, tempDir string, snapshotIdx int, phase string) {
