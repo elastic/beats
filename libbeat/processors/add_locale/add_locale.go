@@ -32,10 +32,8 @@ import (
 
 type addLocale struct {
 	TimezoneFormat TimezoneFormat
-	// cache holds the last formatted timezone, refreshed when the underlying
-	// zone or offset changes (e.g. on DST transitions). Stores race benignly:
-	// Format is deterministic, so repeated computation by concurrent
-	// goroutines is harmless.
+	// cache holds the last formatted timezone, updated on zone/offset changes (e.g., DST).
+    // Benign data race: deterministic formatting makes concurrent recomputation harmless.
 	cache atomic.Pointer[tzEntry]
 }
 
