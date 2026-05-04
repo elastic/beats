@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
@@ -117,4 +118,65 @@ func TestLoadSpecs(t *testing.T) {
 			t.Log("Packaging flavor:", flavor, "\n", string(out))
 		}
 	}
+}
+
+func TestParsePackageTypes(t *testing.T) {
+	parsed := ParsePackageTypes("docker, tgz,invalid,tar.gz")
+	assert.Equal(
+		t,
+		[]PackageType{Docker, TarGz, TarGz},
+		parsed,
+		"expected parser to keep only valid package types in order",
+	)
+}
+
+func TestDefaultPackageArgsFromEnv(t *testing.T) {
+	originalPlatforms := append(BuildPlatformList(nil), Platforms...)
+	originalSnapshot := Snapshot
+	originalDevBuild := DevBuild
+	t.Cleanup(func() {
+		Platforms = originalPlatforms
+		Snapshot = originalSnapshot
+		DevBuild = originalDevBuild
+	})
+
+	Platforms = NewPlatformList("linux/amd64")
+	Snapshot = false
+	DevBuild = false
+
+	t.Setenv("PLATFORMS", "")
+	t.Setenv("PACKAGES", "")
+	t.Setenv("SNAPSHOT", "")
+	t.Setenv("DEV", "")
+	args, err := DefaultPackageArgsFromEnv()
+	require.NoError(t, err, "DefaultPackageArgsFromEnv must not fail")
+
+	assert.Equal(
+		t,
+		NewPlatformList("linux/amd64"),
+		args.Platforms,
+		"expected default args to include current platforms when env is empty",
+	)
+	assert.Empty(t, args.PackageTypes, "expected all package types to be selected when PACKAGES is empty")
+	assert.False(t, args.Snapshot, "expected snapshot to default to current global value")
+
+	t.Setenv("PLATFORMS", "linux/arm64")
+	t.Setenv("PACKAGES", "tgz")
+	t.Setenv("SNAPSHOT", "true")
+	t.Setenv("DEV", "true")
+	args, err = DefaultPackageArgsFromEnv()
+	require.NoError(t, err, "DefaultPackageArgsFromEnv must not fail")
+	assert.Equal(
+		t,
+		NewPlatformList("linux/arm64"),
+		args.Platforms,
+		"expected PLATFORMS env var to override default package platforms",
+	)
+	assert.Equal(
+		t,
+		[]PackageType{TarGz},
+		args.PackageTypes,
+		"expected PACKAGES env var to override default package types",
+	)
+	assert.True(t, args.Snapshot, "expected SNAPSHOT env var to override default snapshot value")
 }
