@@ -2282,8 +2282,8 @@ logging.files:
 # inspector allows reading and deleting state entries, which may cause data
 # loss or duplicate processing.
 # When enabled, the following endpoints become available:
-#   http://localhost:5066/store-inspector/states      - JSON dump of all states
-#   http://localhost:5066/store-inspector/states.html  - Web UI for browsing and deleting states
+#   http://localhost:5066/debug/state-inspector/states      - JSON dump of all states
+#   http://localhost:5066/debug/state-inspector/states.html  - Web UI for browsing and deleting states
 #http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================

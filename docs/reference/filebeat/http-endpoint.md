@@ -215,18 +215,18 @@ stack: preview 9.5
 The state inspector is a debugging tool intended for development and troubleshooting only. **Do not enable in production.** It allows reading and deleting state entries, which may cause data loss or duplicate processing.
 ::::
 
-`/store-inspector/states` returns a JSON array of all key-value pairs in Filebeat's internal state store. `/store-inspector/states.html` serves a web UI for browsing and deleting individual state entries.
+`/debug/state-inspector/states` returns a JSON array of all key-value pairs in Filebeat's internal state store. `/debug/state-inspector/states.html` serves a web UI for browsing and deleting individual state entries.
 
 These endpoints are only available when `http.debug.state_inspector.enabled` is set to `true`.
 
 ```sh
-curl -XGET 'localhost:5066/store-inspector/states?pretty'
+curl -XGET 'localhost:5066/debug/state-inspector/states?pretty'
 ```
 
 To delete a specific state entry:
 
 ```sh
-curl -XDELETE 'localhost:5066/store-inspector/states/<key>'
+curl -XDELETE 'localhost:5066/debug/state-inspector/states/<key>'
 ```
 
 Filebeat exposes its input registry through this endpoint.

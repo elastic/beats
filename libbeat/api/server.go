@@ -161,7 +161,7 @@ func (s *Server) AttachStateInspector() error {
 		return nil
 	}
 	s.inspector = inspector.New()
-	return s.AttachHandler("/store-inspector/", http.StripPrefix("/store-inspector", s.inspector))
+	return s.AttachHandler("/debug/state-inspector/", http.StripPrefix("/debug/state-inspector", s.inspector))
 }
 
 // StateInspectorEnabled reports whether the state inspector has been attached.
