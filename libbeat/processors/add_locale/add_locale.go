@@ -33,7 +33,7 @@ import (
 type addLocale struct {
 	TimezoneFormat TimezoneFormat
 	// cache holds the last formatted timezone, updated on zone/offset changes (e.g., DST).
-    // Benign data race: deterministic formatting makes concurrent recomputation harmless.
+	// Benign data race: deterministic formatting makes concurrent recomputation harmless.
 	cache atomic.Pointer[tzEntry]
 }
 
