@@ -44,10 +44,7 @@ type fallbackEvent struct {
 }
 
 func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
-	const (
-		initialLinesPerFile = 15
-		logPhaseBatchSize   = 20
-	)
+	const batchSize = 25
 
 	filebeat := integration.NewBeat(
 		t,
@@ -66,12 +63,17 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	logPaths := []string{filepath.Join(tempDir, "*.log")}
 
 	nextCounter := map[string]int{}
-	nextCounter[logFile1] = integration.WriteLogFileFrom(t, logFile1, 0, initialLinesPerFile, false, filepath.Base(logFile1))
-	nextCounter[logFile2] = integration.WriteLogFileFrom(t, logFile2, 0, initialLinesPerFile, false, filepath.Base(logFile2))
 
 	appendLogsToFiles := func(n int) {
 		for _, path := range logFiles {
-			nextCounter[path] = integration.WriteLogFileFrom(t, path, nextCounter[path], n, true, filepath.Base(path))
+			nextCounter[path] = integration.WriteLogFileFrom(
+				t,
+				path,
+				nextCounter[path],
+				n,
+				true,
+				"================"+filepath.Base(path),
+			)
 		}
 	}
 
@@ -88,9 +90,9 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 
 	// 1. Add data to the log files and run the Log input
 	writeLogInputConfig(t, inputsDir, logPaths)
-	appendLogsToFiles(logPhaseBatchSize)
+	appendLogsToFiles(batchSize)
 
-	expectedEvents := (initialLinesPerFile + logPhaseBatchSize) * len(logFiles)
+	expectedEvents := batchSize * len(logFiles)
 	events := integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 
 	lastSeen := map[string]map[string]int{
@@ -117,11 +119,11 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 
 	// 3. Enable Filestream with take_over and ingest one deterministic batch
 	writeFilestreamConfig(t, inputsDir, "take-over-from-log-input", logPaths)
-	filebeat.WaitLogsContains("Input 'filestream' starting", 2*time.Minute, "filestream runner did not start")
-	appendLogsToFiles(logPhaseBatchSize)
+	filebeat.WaitLogsContains("Input 'filestream' starting", 30*time.Second, "filestream runner did not start")
+	appendLogsToFiles(batchSize)
 
-	expectedEvents += logPhaseBatchSize * len(logFiles)
-	filebeat.WaitPublishedEvents(2*time.Minute, expectedEvents)
+	expectedEvents += batchSize * len(logFiles)
+	filebeat.WaitPublishedEvents(30*time.Second, expectedEvents)
 	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 
 	// 4. Ensure Filestream did not duplicate data already ingested by Log input
@@ -136,9 +138,16 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	snapshotIdx++
 	copyOutputSnapshot(t, tempDir, snapshotIdx, "filestream-1")
 
+	// ========================= output "status" =========================
+	// At this point, each input has ingested 25 events per file, and Filestream
+	// correctly continued from where the log input stopped.
+	// For each file:
+	//   - events 00 ~ 24: Log input
+	//   - events 25 ~ 49: Filestream input
+
 	// 6. Re-enable Log input, ingest one deterministic batch and assert continuity.
 	writeLogInputConfig(t, inputsDir, logPaths)
-	appendLogsToFiles(logPhaseBatchSize)
+	appendLogsToFiles(batchSize)
 
 	prevExpectedEvents := expectedEvents
 	newLogEvents := 0
@@ -147,7 +156,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 		newLogEvents += latestWrittenCounter - lastSeen["log"][path]
 	}
 	expectedEvents += newLogEvents
-	filebeat.WaitPublishedEvents(2*time.Minute, expectedEvents)
+	filebeat.WaitPublishedEvents(30*time.Second, expectedEvents)
 	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["log"], "log")
 
@@ -159,6 +168,14 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	disableActiveInput(t, inputsDir, filebeat, "log")
 	snapshotIdx++
 	copyOutputSnapshot(t, tempDir, snapshotIdx, "log-2")
+
+	// ========================= output "status" =========================
+	// At this point, there was "one fallback", for the Log input, and only
+	// the log input ingested the last batch of events.
+	// For each file (in the order they appear in the output):
+	//   - events 00 ~ 24: Log input
+	//   - events 25 ~ 49: Filestream input
+	//   - events 25 ~ 74: Log input
 
 	// Steps 17+ continue from this state.
 }
@@ -220,7 +237,7 @@ func disableActiveInput(t *testing.T, inputsDir string, filebeat *integration.Be
 		stopLogLine = "Runner: 'filestream' has stopped"
 	}
 
-	filebeat.WaitLogsContains(stopLogLine, 2*time.Minute, "input runner did not stop after disabling active config")
+	filebeat.WaitLogsContains(stopLogLine, 30*time.Second, "input runner did not stop after disabling active config")
 }
 
 // copyOutputSnapshot copies the current output file to a phase snapshot name
