@@ -31,9 +31,9 @@ func TestRedact(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		input  map[any]any
+		input  map[string]any
 		opts   []RedactOption
-		expect map[any]any
+		expect map[string]any
 	}{
 		{
 			name:   "nil map",
@@ -42,17 +42,17 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name:   "empty map",
-			input:  map[any]any{},
-			expect: map[any]any{},
+			input:  map[string]any{},
+			expect: map[string]any{},
 		},
 		{
 			name: "no redactions",
-			input: map[any]any{
+			input: map[string]any{
 				"type":      "elasticsearch",
 				"namespace": "default",
 				"count":     int64(5),
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"type":      "elasticsearch",
 				"namespace": "default",
 				"count":     int64(5),
@@ -60,7 +60,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "sensitive keys are redacted",
-			input: map[any]any{
+			input: map[string]any{
 				"api_key":     "secret",
 				"password":    "secret",
 				"passphrase":  "secret",
@@ -70,7 +70,7 @@ func TestRedact(t *testing.T) {
 				"X-App-Auth":  "secret",
 				"safe":        "value",
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"api_key":     REDACTED,
 				"password":    REDACTED,
 				"passphrase":  REDACTED,
@@ -83,14 +83,14 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "keys are matched case insensitively",
-			input: map[any]any{
+			input: map[string]any{
 				"API_KEY":     "secret",
 				"PassWord":    "secret",
 				"PASSPHRASE":  "secret",
 				"tOkEn":       "secret",
 				"Certificate": "secret",
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"API_KEY":     REDACTED,
 				"PassWord":    REDACTED,
 				"PASSPHRASE":  REDACTED,
@@ -101,12 +101,12 @@ func TestRedact(t *testing.T) {
 		{
 			name: "URL credentials are redacted",
 			//nolint:gosec // this test is meant to redact sensitive values
-			input: map[any]any{
+			input: map[string]any{
 				"url":       "https://user:pass@example.com/path",
 				"other_url": "https://example.com/path",
 				"plain":     "not a url",
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"url":       "https://" + redactedURL + "@example.com/path",
 				"other_url": "https://example.com/path",
 				"plain":     "not a url",
@@ -114,14 +114,14 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "URL credentials in slice elements are redacted",
-			input: map[any]any{
+			input: map[string]any{
 				"urls": []any{
 					"https://user:pass@my-url1",
 					"https://user:pass@my-url2",
 					"https://my-url3",
 				},
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"urls": []any{
 					"https://" + redactedURL + "@my-url1",
 					"https://" + redactedURL + "@my-url2",
@@ -132,16 +132,16 @@ func TestRedact(t *testing.T) {
 		{
 			name: "sensitive key wins over URL redaction",
 			//nolint:gosec // this test is meant to redact sensitive values
-			input: map[any]any{
+			input: map[string]any{
 				"secret_url": "https://user:pass@example.com",
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"secret_url": REDACTED,
 			},
 		},
 		{
 			name: "nested map[string]any is redacted recursively",
-			input: map[any]any{
+			input: map[string]any{
 				"outputs": map[string]any{
 					"default": map[string]any{
 						"type":     "elasticsearch",
@@ -151,7 +151,7 @@ func TestRedact(t *testing.T) {
 					},
 				},
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"outputs": map[string]any{
 					"default": map[string]any{
 						"type":     "elasticsearch",
@@ -164,7 +164,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "nested map[any]any is redacted recursively",
-			input: map[any]any{
+			input: map[string]any{
 				"outputs": map[any]any{
 					"default": map[any]any{
 						"type":    "elasticsearch",
@@ -172,7 +172,7 @@ func TestRedact(t *testing.T) {
 					},
 				},
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"outputs": map[any]any{
 					"default": map[any]any{
 						"type":    "elasticsearch",
@@ -183,7 +183,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "slice items that are maps are redacted recursively",
-			input: map[any]any{
+			input: map[string]any{
 				"inputs": []any{
 					map[string]any{
 						"type":    "test",
@@ -195,7 +195,7 @@ func TestRedact(t *testing.T) {
 					},
 				},
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"inputs": []any{
 					map[string]any{
 						"type":    "test",
@@ -210,7 +210,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "deeply nested ssl key in inputs is redacted",
-			input: map[any]any{
+			input: map[string]any{
 				"inputs": []any{
 					map[string]any{
 						"ssl": map[string]any{
@@ -234,7 +234,7 @@ func TestRedact(t *testing.T) {
 					},
 				},
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"inputs": []any{
 					map[string]any{
 						"ssl": map[string]any{
@@ -261,7 +261,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "name/value entries are redacted when name indicates a secret",
-			input: map[any]any{
+			input: map[string]any{
 				"headers": []any{
 					map[string]any{
 						"name":  "Authorization",
@@ -273,7 +273,7 @@ func TestRedact(t *testing.T) {
 					},
 				},
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"headers": []any{
 					map[string]any{
 						"name":  "Authorization",
@@ -288,7 +288,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "redaction markers are processed when prefix is configured",
-			input: map[any]any{
+			input: map[string]any{
 				"inputs": []any{
 					map[string]any{
 						"type":                     "test_input",
@@ -306,7 +306,7 @@ func TestRedact(t *testing.T) {
 				},
 			},
 			opts: []RedactOption{WithMarkerPrefix(markerPrefix)},
-			expect: map[any]any{
+			expect: map[string]any{
 				"inputs": []any{
 					map[string]any{
 						"type":      "test_input",
@@ -324,7 +324,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "redaction markers in nested slice items are processed",
-			input: map[any]any{
+			input: map[string]any{
 				"id": "test-policy",
 				"inputs": []any{
 					map[string]any{
@@ -362,7 +362,7 @@ func TestRedact(t *testing.T) {
 				},
 			},
 			opts: []RedactOption{WithMarkerPrefix(markerPrefix)},
-			expect: map[any]any{
+			expect: map[string]any{
 				"id": "test-policy",
 				"inputs": []any{
 					map[string]any{
@@ -400,12 +400,12 @@ func TestRedact(t *testing.T) {
 			// continue) removes the marker key so it does not survive in the
 			// output. Without the continue, the trailing obj[key] = val would
 			// re-add the marker before the post-loop cleanup.
-			input: map[any]any{
+			input: map[string]any{
 				"redactKey":                "secretValue",
 				markerPrefix + "redactKey": true,
 			},
 			opts: []RedactOption{WithMarkerPrefix(markerPrefix)},
-			expect: map[any]any{
+			expect: map[string]any{
 				"redactKey": REDACTED,
 			},
 		},
@@ -413,35 +413,35 @@ func TestRedact(t *testing.T) {
 			name: "redaction marker without matching target is still deleted",
 			// The marker points to a key that does not exist in the map; the
 			// marker itself must still be removed from the output.
-			input: map[any]any{
+			input: map[string]any{
 				"safe":                   "value",
 				markerPrefix + "missing": true,
 			},
 			opts: []RedactOption{WithMarkerPrefix(markerPrefix)},
-			expect: map[any]any{
+			expect: map[string]any{
 				"safe": "value",
 			},
 		},
 		{
 			name: "redaction markers are ignored when no prefix is configured",
-			input: map[any]any{
+			input: map[string]any{
 				"benign":                "value",
 				markerPrefix + "benign": true,
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"benign":                "value",
 				markerPrefix + "benign": true,
 			},
 		},
 		{
 			name: "ignored keys are not redacted",
-			input: map[any]any{
+			input: map[string]any{
 				"routekey":      "should-not-redact",
 				"my_secret_key": "redact-me",
 				"safe":          "value",
 			},
 			opts: []RedactOption{WithIgnoreKeys("routekey")},
-			expect: map[any]any{
+			expect: map[string]any{
 				"routekey":      "should-not-redact",
 				"my_secret_key": REDACTED,
 				"safe":          "value",
@@ -449,7 +449,7 @@ func TestRedact(t *testing.T) {
 		},
 		{
 			name: "ignored keys and markers coexist",
-			input: map[any]any{
+			input: map[string]any{
 				"routekey":              "should-not-redact",
 				"keepme":                "value",
 				markerPrefix + "keepme": true,
@@ -459,7 +459,7 @@ func TestRedact(t *testing.T) {
 				WithIgnoreKeys("routekey"),
 				WithMarkerPrefix(markerPrefix),
 			},
-			expect: map[any]any{
+			expect: map[string]any{
 				"routekey": "should-not-redact",
 				"keepme":   REDACTED,
 				"api_key":  REDACTED,

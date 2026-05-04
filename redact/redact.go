@@ -64,7 +64,7 @@ func WithIgnoreKeys(keys ...string) RedactOption {
 // Redact walks obj and replaces values of sensitive keys with a redacted
 // placeholder. It mutates obj in place; nested maps and slice elements are
 // modified directly and no copy is returned.
-func Redact(obj map[any]any, opts ...RedactOption) {
+func Redact(obj map[string]any, opts ...RedactOption) {
 	ro := &redactOptions{
 		errOut:       io.Discard,
 		markerPrefix: "",
