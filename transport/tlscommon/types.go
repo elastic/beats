@@ -382,10 +382,11 @@ func (r TLSRenegotiationSupport) MarshalYAML() (any, error) {
 
 // CertificateConfig define a common set of fields for a certificate.
 type CertificateConfig struct {
-	Certificate    string `config:"certificate" yaml:"certificate,omitempty"`
-	Key            string `config:"key" yaml:"key,omitempty"`
-	Passphrase     string `config:"key_passphrase" yaml:"key_passphrase,omitempty"`
-	PassphrasePath string `config:"key_passphrase_path" yaml:"key_passphrase_path,omitempty"`
+	Certificate             string `config:"certificate" yaml:"certificate,omitempty"`
+	Key                     string `config:"key" yaml:"key,omitempty"`
+	Passphrase              string `config:"key_passphrase" yaml:"key_passphrase,omitempty"`
+	PassphrasePath          string `config:"key_passphrase_path" yaml:"key_passphrase_path,omitempty"`
+	DisableLegacyPEMSupport bool   `config:"disable_legacy_pem_support" yaml:"disable_legacy_pem_support,omitempty"`
 }
 
 // Validate validates the CertificateConfig

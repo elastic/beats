@@ -35,7 +35,6 @@ import (
 // TestNoFIPSCertificateAndKeys tests that encrypted private keys are supported in none FIPS mode
 func TestNoFIPSCertificateAndKeys(t *testing.T) {
 	t.Run("embed encrypted PKCS#1 key", func(t *testing.T) {
-		// Create a dummy configuration and append the CA after.
 		password := "abcd1234"
 		keyFile, err := os.Open(filepath.Join("testdata", "key.pkcs1encrypted.pem"))
 		require.NoError(t, err)
@@ -48,6 +47,7 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 		defer certFile.Close()
 		rawCert, err := io.ReadAll(certFile)
 		require.NoError(t, err)
+
 		cfg, err := load(`enabled: true`)
 		require.NoError(t, err)
 		cfg.Certificate.Certificate = string(rawCert)
@@ -57,6 +57,44 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 		assert.NotNil(t, tlsC)
+	})
+
+	t.Run("encrypted PKCS#1 key logs deprecation warning", func(t *testing.T) {
+		password := "abcd1234"
+		rawKey, err := os.ReadFile(filepath.Join("testdata", "key.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+
+		logger := logptest.NewFileLogger(t, "")
+		_, err = ReadPEMFile(logger.Logger, string(rawKey), password)
+		require.NoError(t, err)
+		logger.LogContains(t, "deprecated and insecure")
+	})
+
+	t.Run("embed encrypted PKCS#1 key with legacy support disabled", func(t *testing.T) {
+		password := "abcd1234"
+		keyFile, err := os.Open(filepath.Join("testdata", "key.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+		defer keyFile.Close()
+		rawKey, err := io.ReadAll(keyFile)
+		require.NoError(t, err)
+
+		certFile, err := os.Open(filepath.Join("testdata", "cert.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+		defer certFile.Close()
+		rawCert, err := io.ReadAll(certFile)
+		require.NoError(t, err)
+
+		cfg, err := load(`enabled: true`)
+		require.NoError(t, err)
+		cfg.Certificate.Certificate = string(rawCert)
+		cfg.Certificate.Key = string(rawKey)
+		cfg.Certificate.Passphrase = password
+		cfg.Certificate.DisableLegacyPEMSupport = true
+
+		tlsC, err := LoadTLSConfig(cfg, logptest.NewTestingLogger(t, ""))
+		require.Error(t, err)
+		assert.Nil(t, tlsC)
+		assert.ErrorContains(t, err, "encrypted PKCS#1 PEM keys are not supported")
 	})
 
 	t.Run("embed PKCS#8 key", func(t *testing.T) {
@@ -77,13 +115,12 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 
 func TestEncryptedKeyPassphrase(t *testing.T) {
 	const passphrase = "Abcd1234!" // passphrase for testdata/ca.encrypted.key
-	logger := logptest.NewTestingLogger(t, "")
 	t.Run("no passphrase", func(t *testing.T) {
 		_, err := LoadTLSConfig(mustLoad(t, `
     enabled: true
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
-    `), logger)
+    `), logptest.NewTestingLogger(t, ""))
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will generate an internal "no passphrase available" error that is logged and the no PEM blocks error is returned instead
 	})
 
@@ -93,31 +130,70 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
     key_passphrase: "abcd1234!"
-    `), logger)
+    `), logptest.NewTestingLogger(t, ""))
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will fail decrypting with x509.IncorrectPasswordError that will be logged and a no PEM blocks error is returned instead
 	})
 
 	t.Run("passphrase value", func(t *testing.T) {
 		cfg, err := LoadTLSConfig(mustLoad(t, `
-    enabled: true
-    certificate: testdata/ca.crt
-    key: testdata/ca.encrypted.key
-    key_passphrase: Abcd1234!
-    `), logger)
+        enabled: true
+        certificate: testdata/ca.crt
+        key: testdata/ca.encrypted.key
+        key_passphrase: Abcd1234!
+        `), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
-		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
+		require.NotNil(t, cfg)
+		assert.Len(t, cfg.Certificates, 1)
+	})
+
+	t.Run("passphrase value with legacy support disabled", func(t *testing.T) {
+		tlsCfg := mustLoad(t, `
+        enabled: true
+        certificate: testdata/ca.crt
+        key: testdata/ca.encrypted.key
+        key_passphrase: Abcd1234!
+        disable_legacy_pem_support: true
+        `)
+		cfg, err := LoadTLSConfig(tlsCfg, logptest.NewTestingLogger(t, ""))
+		require.Error(t, err)
+		assert.Nil(t, cfg)
+		assert.ErrorContains(t, err, "encrypted PKCS#1 PEM keys are not supported")
 	})
 
 	t.Run("passphrase file", func(t *testing.T) {
 		fileName := writeTestFile(t, passphrase)
 		cfg, err := LoadTLSConfig(mustLoad(t, fmt.Sprintf(`
-    enabled: true
-    certificate: testdata/ca.crt
-    key: testdata/ca.encrypted.key
-    key_passphrase_path: %s
-    `, fileName)), logger)
+        enabled: true
+        certificate: testdata/ca.crt
+        key: testdata/ca.encrypted.key
+        key_passphrase_path: %s
+        `, fileName)), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
-		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
+		assert.NotNil(t, cfg)
+	})
+
+	t.Run("logs deprecation warning", func(t *testing.T) {
+		logger := logptest.NewFileLogger(t, "")
+		rawKey, err := os.ReadFile(filepath.Join("testdata", "ca.encrypted.key"))
+		require.NoError(t, err)
+		_, err = ReadPEMFile(logger.Logger, string(rawKey), passphrase)
+		require.NoError(t, err)
+		logger.LogContains(t, "deprecated and insecure")
+	})
+
+	t.Run("passphrase file with legacy support disabled", func(t *testing.T) {
+		fileName := writeTestFile(t, passphrase)
+		tlsCfg := mustLoad(t, fmt.Sprintf(`
+        enabled: true
+        certificate: testdata/ca.crt
+        key: testdata/ca.encrypted.key
+        key_passphrase_path: %s
+        disable_legacy_pem_support: true
+        `, fileName))
+		cfg, err := LoadTLSConfig(tlsCfg, logptest.NewTestingLogger(t, ""))
+		require.Error(t, err)
+		assert.Nil(t, cfg)
+		assert.ErrorContains(t, err, "encrypted PKCS#1 PEM keys are not supported")
 	})
 
 	t.Run("passphrase file empty", func(t *testing.T) {
@@ -127,7 +203,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
     certificate: testdata/ca.crt
     key: testdata/ca.encrypted.key
     key_passphrase_path: %s
-    `, fileName)), logger)
+    `, fileName)), logptest.NewTestingLogger(t, ""))
 		assert.ErrorContains(t, err, "no PEM blocks") // ReadPEMFile will generate an internal "no passphrase available" error that is logged and the no PEM blocks error is returned instead
 	})
 }

@@ -25,9 +25,10 @@ import (
 	"fmt"
 )
 
-func decryptPKCS1Key(block pem.Block, passphrase []byte) (pem.Block, error) {
-	return block, fmt.Errorf("encrypted private keys are unsupported in FIPS mode: %w", errors.ErrUnsupported)
+func decryptPKCS1Key(block pem.Block, _ []byte) (pem.Block, error) {
+	return block, fmt.Errorf("encrypted PKCS#1 keys are unsupported in FIPS mode: %w", errors.ErrUnsupported)
 }
+
 func decryptPKCS8Key(block pem.Block, passphrase []byte) (pem.Block, error) {
 	return block, fmt.Errorf("encrypted private keys are unsupported in FIPS mode: %w", errors.ErrUnsupported)
 }

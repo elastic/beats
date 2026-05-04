@@ -34,19 +34,16 @@ func decryptPKCS1Key(block pem.Block, passphrase []byte) (pem.Block, error) {
 	if len(passphrase) == 0 {
 		return block, errors.New("no passphrase available")
 	}
-
-	// Note, decrypting pem might succeed even with wrong password, but
-	// only noise will be stored in buffer in this case.
-	buffer, err := x509.DecryptPEMBlock(&block, passphrase) //nolint: staticcheck // deprecated, we have to get rid of it
+	decrypted, err := x509.DecryptPEMBlock(&block, passphrase) //nolint:staticcheck // intentional legacy support path
 	if err != nil {
-		return block, fmt.Errorf("failed to decrypt pem: %w", err)
+		return block, fmt.Errorf("failed to decrypt PKCS#1 key: %w", err)
 	}
-
-	// DEK-Info contains encryption info. Remove header to mark block as
-	// unencrypted.
-	delete(block.Headers, "DEK-Info")
-	block.Bytes = buffer
-
+	block.Bytes = decrypted
+	// x509.IsEncryptedPEMBlock checks only for DEK-Info, so removing just
+	// that header prevents re-detection. However, x509.EncryptPEMBlock also
+	// sets Proc-Type, which would falsely appear as "4,ENCRYPTED" in the
+	// re-encoded PEM output if left in place. Nil the whole map to remove both.
+	block.Headers = nil
 	return block, nil
 }
 

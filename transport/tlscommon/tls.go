@@ -55,13 +55,13 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 		passphrase = string(p)
 	}
 
-	certPEM, err := ReadPEMFile(log, certificate, passphrase)
+	certPEM, err := readPEMFile(log, certificate, passphrase, config.DisableLegacyPEMSupport)
 	if err != nil {
 		log.Errorf("Failed reading certificate file %v: %+v", certificate, err)
 		return nil, fmt.Errorf("%w %v", err, certificate)
 	}
 
-	keyPEM, err := ReadPEMFile(log, key, passphrase)
+	keyPEM, err := readPEMFile(log, key, passphrase, config.DisableLegacyPEMSupport)
 	if err != nil {
 		log.Errorf("Failed reading key file: %+v", err)
 		return nil, fmt.Errorf("%w %v", err, key)
@@ -85,8 +85,14 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 }
 
 // ReadPEMFile reads a PEM formatted string either from disk or passed as a plain text starting with a "-"
-// and decrypt it with the provided password and  return the raw content.
+// and decrypt it with the provided password and return the raw content.
+// Encrypted PKCS#1 PEM blocks are decrypted with a deprecation warning. To treat them as an error,
+// use LoadCertificate with DisableLegacyPEMSupport set on the CertificateConfig.
 func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
+	return readPEMFile(log, s, passphrase, false)
+}
+
+func readPEMFile(log *logp.Logger, s, passphrase string, disableLegacy bool) ([]byte, error) {
 	pass := []byte(passphrase)
 	var blocks []*pem.Block
 
@@ -114,14 +120,18 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 		}
 
 		switch {
-		case x509.IsEncryptedPEMBlock(block): //nolint: staticcheck // deprecated, we have to get rid of it
-			block, err := decryptPKCS1Key(*block, pass)
-			if err != nil {
-				log.Errorf("Dropping encrypted pem block with private key, block type '%s': %s", block.Type, err)
-				errs = errors.Join(errs, err)
+		case x509.IsEncryptedPEMBlock(block): //nolint: staticcheck // deprecated PKCS#1 PEM encryption
+			if disableLegacy {
+				return nil, fmt.Errorf("encrypted PKCS#1 PEM keys are not supported; convert to PKCS#8")
+			}
+			log.Warnf("Encrypted PKCS#1 PEM keys are deprecated and insecure, support will be removed in a future release; please convert the key to encrypted PKCS#8")
+			decBlock, decErr := decryptPKCS1Key(*block, pass)
+			if decErr != nil {
+				log.Errorf("Dropping encrypted pem block with private key, block type '%s', could not decrypt PKCS#1: %s", block.Type, decErr)
+				errs = errors.Join(errs, decErr)
 				continue
 			}
-			blocks = append(blocks, &block)
+			blocks = append(blocks, &decBlock)
 		case block.Type == "ENCRYPTED PRIVATE KEY":
 			block, err := decryptPKCS8Key(*block, pass)
 			if err != nil {
