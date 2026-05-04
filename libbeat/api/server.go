@@ -157,7 +157,7 @@ func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 // handler if enabled in config. Calling it more than once or when the
 // inspector is disabled is a no-op.
 func (s *Server) AttachStateInspector() error {
-	if !s.config.StateInspector.Enabled || s.inspector != nil {
+	if !s.config.Debug.StateInspector.Enabled || s.inspector != nil {
 		return nil
 	}
 	s.inspector = inspector.New()

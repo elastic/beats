@@ -24,14 +24,19 @@ type StateInspectorConfig struct {
 	Enabled bool `config:"enabled"`
 }
 
+// DebugConfig holds the configuration for debugging endpoints.
+type DebugConfig struct {
+	StateInspector StateInspectorConfig `config:"state_inspector"`
+}
+
 // Config is the configuration for the API endpoint.
 type Config struct {
-	Enabled            bool                 `config:"enabled"`
-	Host               string               `config:"host"`
-	Port               int                  `config:"port"`
-	User               string               `config:"named_pipe.user"`
-	SecurityDescriptor string               `config:"named_pipe.security_descriptor"`
-	StateInspector     StateInspectorConfig `config:"state_inspector"`
+	Enabled            bool        `config:"enabled"`
+	Host               string      `config:"host"`
+	Port               int         `config:"port"`
+	User               string      `config:"named_pipe.user"`
+	SecurityDescriptor string      `config:"named_pipe.security_descriptor"`
+	Debug              DebugConfig `config:"debug"`
 }
 
 // DefaultConfig is the default configuration used by the API endpoint.

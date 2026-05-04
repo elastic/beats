@@ -46,7 +46,7 @@ The HTTP endpoint has the following configuration settings:
 `http.pprof.mutex_profile_rate`
 :   (Optional) `mutex_profile_rate` controls the fraction of mutex contention events that are reported in the mutex profile available from `/debug/pprof/mutex`. On average 1/rate events are reported. To turn off profiling entirely, pass rate 0. The default value is 0.
 
-`http.state_inspector.enabled`
+`http.debug.state_inspector.enabled`
 :   (Optional) Enable the state store inspector. This is a debugging tool intended for development and troubleshooting only. **Do not enable in production:** the inspector allows reading and deleting state entries, which may cause data loss or duplicate processing. When enabled, the internal state store used by the beat is exposed via HTTP for inspection and manipulation. Default is `false`. See [State Inspector](#state-inspector) for details.
 
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
@@ -217,7 +217,7 @@ The state inspector is a debugging tool intended for development and troubleshoo
 
 `/store-inspector/states` returns a JSON array of all key-value pairs in Filebeat's internal state store. `/store-inspector/states.html` serves a web UI for browsing and deleting individual state entries.
 
-These endpoints are only available when `http.state_inspector.enabled` is set to `true`.
+These endpoints are only available when `http.debug.state_inspector.enabled` is set to `true`.
 
 ```sh
 curl -XGET 'localhost:5066/store-inspector/states?pretty'

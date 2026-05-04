@@ -2784,7 +2784,7 @@ logging.files:
 # When enabled, the following endpoints become available:
 #   http://localhost:5066/store-inspector/states      - JSON dump of all states
 #   http://localhost:5066/store-inspector/states.html  - Web UI for browsing and deleting states
-#http.state_inspector.enabled: false
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 
