@@ -177,7 +177,7 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
-	github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06
+	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
 	github.com/elastic/mito v1.25.1
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
@@ -187,7 +187,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0
 	github.com/go-resty/resty/v2 v2.17.1
 	github.com/gofrs/uuid/v5 v5.3.2
-	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/cel-go v0.28.0
 	github.com/googleapis/gax-go/v2 v2.15.0
 	github.com/gorilla/handlers v1.5.1
