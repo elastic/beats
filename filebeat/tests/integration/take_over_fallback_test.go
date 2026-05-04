@@ -177,7 +177,23 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	//   - events 25 ~ 49: Filestream input
 	//   - events 25 ~ 74: Log input
 
-	// Steps 17+ continue from this state.
+	// 8. Re-enable Filestream input, ingest one deterministic batch and assert continuity.
+	writeFilestreamConfig(t, inputsDir, "take-over-from-log-input", logPaths)
+	filebeat.WaitLogsContains("Input 'filestream' starting", 30*time.Second, "filestream runner did not start")
+	appendLogsToFiles(batchSize)
+
+	prevExpectedEvents = expectedEvents
+	newFilestreamEvents := 0
+	for _, path := range logFiles {
+		latestWrittenCounter := nextCounter[path] - 1
+		newFilestreamEvents += latestWrittenCounter - lastSeen["filestream"][path]
+	}
+	expectedEvents += newFilestreamEvents
+	filebeat.WaitPublishedEvents(30*time.Second, expectedEvents)
+	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
+	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["filestream"], "filestream")
+
+	// Step 19+ continues from this state.
 }
 
 // writeLogInputConfig renders and writes the active log input configuration file.
