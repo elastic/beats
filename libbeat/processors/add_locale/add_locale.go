@@ -42,9 +42,8 @@ type addLocale struct {
 type tzEntry struct {
 	zone   string
 	offset int
-	// boxedFormat holds the formatted string already wrapped in an interface{}
-	// so passing it to event.PutValue does not box (and heap-allocate) on
-	// every event. The boxing happens once, when the cache entry is built.
+	// boxedFormat holds the formatted string pre-wrapped in an interface{}.
+	// Optimization: avoids boxing and heap allocation per event.PutValue call.
 	boxedFormat any
 }
 
