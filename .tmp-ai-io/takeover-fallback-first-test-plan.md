@@ -23,7 +23,7 @@ Implementation:
 - Keep per-file counters:
   - `nextCounter[file1]`, `nextCounter[file2]` initialized to `0`.
 - Implement helper `appendBatch(path string, n int)`:
-  - calls `nextCounter[path] = integration.WriteLogFileFrom(t, path, n, nextCounter[path], true)`.
+  - calls `nextCounter[path] = integration.WriteLogFileFrom(t, path, nextCounter[path], n, true)`.
 - Seed files once with `append=true` by calling `WriteLogFileFrom(..., count=initialCount, startAt=0, append=false)` and storing returned next counters.
 - During each run phase, append fixed-size batches (for example, 20 lines per file) instead of sleeping blindly; this reduces flakiness.
 
@@ -50,10 +50,10 @@ Implementation:
 
 ### Block D: Stop all inputs + copy output file snapshot
 Implementation:
-- Disable current input by renaming/removing `inputs.d/active.yml` (e.g., to `.disabled`).
+- Disable current input by renaming `inputs.d/active.yml` to `inputs.d/active.yml.disabled` (no pre-delete step; rely on `os.Rename` overwrite behavior).
 - Wait for stop signal in logs (by input type):
   - `Runner: 'input [type=<input_type>]' has stopped`
-- Copy current output file (`output-file-*.ndjson`) to `<NNN>-output-phase-<phase>.ndjson` in temp dir, where `NNN` is a strictly increasing counter (`001`, `002`, ...).
+- Copy current output file (`output-file-*.ndjson`) to `<NN>-output-phase-<phase>.ndjson` in temp dir, where `NN` is a strictly increasing counter (`01`, `02`, ...).
 - Snapshot helper:
   - resolve single output file path with `filepath.Glob`,
   - `io.Copy` to copy the file.
@@ -63,8 +63,9 @@ Implementation:
 - Write new `inputs.d/active.yml` with:
   - `type: filestream`
   - stable `id` (for example `take-over-from-log-input`)
-  - `take_over.enabled: true`
-  - scanner check interval small (0.1s)
+  - takeover enabled (`take_over: true` or equivalent supported form)
+  - do not set explicit fingerprint options; use filestream defaults
+  - scanner check interval can be small (0.1s) if needed for test speed
   - same file paths.
 - Append deterministic batches while filestream is active.
 - Wait for expected total events in output file.
@@ -108,7 +109,7 @@ Implementation:
 - `copyOutputSnapshot(t *testing.T, tempDir string, snapshotIdx int, phase string) string`
 - `readOutputEvents(t *testing.T, path string) []event`
 - `counterFromMessage(t *testing.T, msg string) int`
-- `assertContinuesFromLast(t *testing.T, events []event, inputType string, lastSeen map[string]int)`
+- `assertNoDuplicationFromPreviousInput(t *testing.T, events []event, inputType string, lastSeen map[string]int)`
 
 Helper rules:
 - Error-handling helpers fail internally and do not return `error`.
@@ -124,14 +125,14 @@ Helper rules:
 6. Activate log input, append a batch, wait for expected event count.
 7. Implement event parsing helpers (`readOutputEvents`, `counterFromMessage`).
 8. Record baseline `lastSeen` for `input.type=log` and both files.
-9. Disable all inputs, wait for runner stop, increment `snapshotIdx`, copy phase snapshot (`001-output-phase-log-1.ndjson`).
-10. Add helper to write active `filestream + take_over.enabled` config.
+9. Disable all inputs, wait for runner stop, increment `snapshotIdx`, copy phase snapshot (`01-output-phase-log-1.ndjson`).
+10. Add helper to write active `filestream + take_over` config.
 11. Activate filestream, append batch, wait for expected total.
 12. Assert filestream handoff did not re-read old log-ingested lines.
-13. Update filestream `lastSeen`, then disable all inputs, increment `snapshotIdx`, and snapshot (`002-output-phase-filestream-1.ndjson`).
+13. Update filestream `lastSeen`, then disable all inputs, increment `snapshotIdx`, and snapshot (`02-output-phase-filestream-1.ndjson`).
 14. Re-activate log input, append batch, wait for expected total.
 15. Assert log resumed from previous log `lastSeen` values (fallback continuity).
-16. Update log `lastSeen`, disable all inputs, increment `snapshotIdx`, snapshot (`003-output-phase-log-2.ndjson`).
+16. Update log `lastSeen`, disable all inputs, increment `snapshotIdx`, snapshot (`03-output-phase-log-2.ndjson`).
 17. Re-activate filestream input, append batch, wait for expected total.
 18. Assert filestream resumed from previous filestream `lastSeen` values.
 19. Final sanity assertions:

@@ -1,6 +1,7 @@
 filebeat.config.inputs:
   path: {{.inputsDir}}/*.yml
   reload.enabled: true
+  reload.period: 1s
 
 path.home: {{.homePath}}
 

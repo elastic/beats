@@ -1,0 +1,10 @@
+- type: filestream
+  enabled: true
+  id: {{.inputID}}
+  take_over: true
+  prospector:
+      check_interval: 0.1s
+  paths:
+{{ range .paths }}
+    - {{ . }}
+{{ end }}

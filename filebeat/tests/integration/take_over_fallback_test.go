@@ -86,8 +86,8 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
+	// 1. Add data to the log files and run the Log input
 	writeLogInputConfig(t, inputsDir, logPaths)
-
 	appendLogsToFiles(logPhaseBatchSize)
 
 	expectedEvents := (initialLinesPerFile + logPhaseBatchSize) * len(logFiles)
@@ -118,13 +118,25 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 		}
 	}
 
-	// Step 9: disable all inputs, wait for stop, and snapshot output.
+	// 2. Disable Log input and snapshot output file for debugging
 	snapshotIdx := 0
 	disableActiveInput(t, inputsDir, filebeat, "log")
 	snapshotIdx++
 	copyOutputSnapshot(t, tempDir, snapshotIdx, "log-1")
 
-	// Steps 10+ will continue from this baseline and first snapshot.
+	// 3. Enable Filestream with take_over and ingest one deterministic batch
+	writeFilestreamTakeOverConfig(t, inputsDir, "take-over-from-log-input", logPaths)
+	filebeat.WaitLogsContains("Input 'filestream' starting", 2*time.Minute, "filestream runner did not start")
+	appendLogsToFiles(logPhaseBatchSize)
+
+	expectedEvents += logPhaseBatchSize * len(logFiles)
+	filebeat.WaitPublishedEvents(2*time.Minute, expectedEvents)
+	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
+
+	// 4. Ensure Filestream did not replay data already ingested by Log input
+	assertNoDuplicationFromPreviousInput(t, events, logFiles, lastSeen["log"], "filestream")
+
+	// Steps 13+ continue from this state.
 }
 
 func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
@@ -134,6 +146,17 @@ func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
 
 	if err := os.WriteFile(filepath.Join(inputsDir, "active.yml"), []byte(content), 0o666); err != nil {
 		t.Fatalf("failed to write log input config: %s", err)
+	}
+}
+
+func writeFilestreamTakeOverConfig(t *testing.T, inputsDir, inputID string, paths []string) {
+	content := getConfig(t, map[string]any{
+		"inputID": inputID,
+		"paths":   paths,
+	}, "take-over-fallback", "filestream-input.yml")
+
+	if err := os.WriteFile(filepath.Join(inputsDir, "active.yml"), []byte(content), 0o666); err != nil {
+		t.Fatalf("failed to write filestream input config: %s", err)
 	}
 }
 
@@ -183,5 +206,51 @@ func copyOutputSnapshot(t *testing.T, tempDir string, snapshotIdx int, phase str
 
 	if err := os.WriteFile(snapshotPath, data, 0o644); err != nil {
 		t.Fatalf("failed to write snapshot file %q: %s", snapshotPath, err)
+	}
+}
+
+func assertNoDuplicationFromPreviousInput(
+	t *testing.T,
+	events []fallbackEvent,
+	logFiles []string,
+	lastSeen map[string]int,
+	inputType string,
+) {
+	t.Helper()
+
+	minCounterByPath := map[string]int{}
+	seenByPath := map[string]bool{}
+	for _, event := range events {
+		if event.Input.Type != inputType {
+			continue
+		}
+
+		path := event.Log.File.Path
+		counter := counterFromMessage(t, event.Message)
+		if prev, ok := minCounterByPath[path]; !ok || counter < prev {
+			minCounterByPath[path] = counter
+		}
+		seenByPath[path] = true
+	}
+
+	for _, path := range logFiles {
+		if !seenByPath[path] {
+			t.Fatalf("did not find %s events for %q", inputType, path)
+		}
+
+		boundary, exists := lastSeen[path]
+		if !exists {
+			t.Fatalf("missing previous input boundary for %q", path)
+		}
+
+		if minCounterByPath[path] <= boundary {
+			t.Fatalf(
+				"%s replayed previously ingested data for %q: first counter=%d previous max=%d",
+				inputType,
+				path,
+				minCounterByPath[path],
+				boundary,
+			)
+		}
 	}
 }
