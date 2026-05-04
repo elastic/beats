@@ -370,8 +370,8 @@ func TestLiveSalesforceValidation(t *testing.T) {
 				Enabled:  pointer(true),
 				Interval: time.Hour,
 				Query: &QueryConfig{
-					Default: getValueTpl(`SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
-					Value:   getValueTpl(`SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
+					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
+					Value:   getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
 				},
 				Cursor: &cursorConfig{Field: "CreatedDate"},
 			},
@@ -394,7 +394,9 @@ func TestLiveSalesforceValidation(t *testing.T) {
 		require.NoError(t, s.RunEventLogFile(), "expected live login EventLogFile run to succeed")
 		require.NoError(t, requirePositiveHistoricalLiveRows("login EventLogFile first run", len(first.published)))
 		firstCursor := s.cursor.EventLogFile.LastEventTime
+		firstID := s.cursor.EventLogFile.LastEventID
 		require.NotEmpty(t, firstCursor, "expected live login EventLogFile first run to persist last_event_time")
+		require.NotEmpty(t, firstID, "expected live login EventLogFile first run to persist last_event_id")
 
 		var second publisher
 		second.done = func() {}
@@ -413,8 +415,8 @@ func TestLiveSalesforceValidation(t *testing.T) {
 				Enabled:  pointer(true),
 				Interval: time.Hour,
 				Query: &QueryConfig{
-					Default: getValueTpl(`SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND EventType = 'Logout' ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
-					Value:   getValueTpl(`SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Logout' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
+					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND EventType = 'Logout' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
+					Value:   getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Logout' AND (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
 				},
 				Cursor: &cursorConfig{Field: "CreatedDate"},
 			},
@@ -436,7 +438,9 @@ func TestLiveSalesforceValidation(t *testing.T) {
 		require.NoError(t, s.RunEventLogFile(), "expected live logout EventLogFile run to succeed")
 		require.NoError(t, requirePositiveHistoricalLiveRows("logout EventLogFile first run", len(first.published)))
 		firstCursor := s.cursor.EventLogFile.LastEventTime
+		firstID := s.cursor.EventLogFile.LastEventID
 		require.NotEmpty(t, firstCursor, "expected live logout EventLogFile first run to persist last_event_time")
+		require.NotEmpty(t, firstID, "expected live logout EventLogFile first run to persist last_event_id")
 
 		var second publisher
 		second.done = func() {}
@@ -455,8 +459,8 @@ func TestLiveSalesforceValidation(t *testing.T) {
 				Enabled:  pointer(true),
 				Interval: time.Hour,
 				Query: &QueryConfig{
-					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
-					Value:   getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ .cursor.event_log_file.last_event_time ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY CreatedDate ASC NULLS FIRST LIMIT 1`),
+					Default: getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-720h")) "2006-01-02T15:04:05.000Z0700") ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
+					Value:   getValueTpl(`SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY CreatedDate ASC NULLS FIRST, Id ASC LIMIT 1`),
 				},
 				Cursor: &cursorConfig{Field: "CreatedDate"},
 			},
@@ -477,7 +481,9 @@ func TestLiveSalesforceValidation(t *testing.T) {
 		s.publisher = &first
 		require.NoError(t, s.RunEventLogFile(), "expected live apex EventLogFile run to succeed")
 		firstCursor := s.cursor.EventLogFile.LastEventTime
+		firstID := s.cursor.EventLogFile.LastEventID
 		require.NotEmpty(t, firstCursor, "expected live apex EventLogFile run to persist last_event_time")
+		require.NotEmpty(t, firstID, "expected live apex EventLogFile run to persist last_event_id")
 		require.NoError(t, requirePositiveHistoricalLiveRows("apex EventLogFile first run", len(first.published)))
 
 		var second publisher

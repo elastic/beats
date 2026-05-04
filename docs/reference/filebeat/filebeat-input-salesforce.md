@@ -218,7 +218,7 @@ The client secret for the user-password flow.
 
 ## `auth.oauth2.user_password_flow.token_url` [_auth_oauth2_user_password_flow_token_url]
 
-The Salesforce OAuth login host or token endpoint for the user-password flow. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`.
+The Salesforce OAuth host or canonical token endpoint for the user-password flow. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value.
 
 
 ## `auth.oauth2.user_password_flow.username` [_auth_oauth2_user_password_flow_username]
@@ -263,7 +263,7 @@ The URL for the JWT bearer flow.
 
 ## `auth.oauth2.jwt_bearer_flow.token_url` [_auth_oauth2_jwt_bearer_flow_token_url]
 
-Optional Salesforce OAuth login host or token endpoint override for the JWT bearer flow. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`. If omitted, `auth.oauth2.jwt_bearer_flow.url` is used.
+Optional Salesforce OAuth host or canonical token endpoint override for the JWT bearer flow. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value. If omitted, `auth.oauth2.jwt_bearer_flow.url` is used.
 
 
 ## `url` [_url_2]

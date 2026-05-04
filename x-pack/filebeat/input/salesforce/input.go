@@ -704,6 +704,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 		if !isZero(s.cursor.EventLogFile.LastEventTime) {
 			eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
 		}
+		eventLogFile.Put("last_event_id", s.cursor.EventLogFile.LastEventID)
 		cursor = mapstr.M{"event_log_file": eventLogFile}
 	}
 
@@ -747,6 +748,10 @@ func (s *salesforceInput) RunEventLogFile() error {
 					s.cursor.EventLogFile.FirstEventTime = timestamp
 				}
 				s.cursor.EventLogFile.LastEventTime = timestamp
+				s.cursor.EventLogFile.LastEventID = ""
+				if id, ok := rec.Record().Fields()["Id"].(string); ok {
+					s.cursor.EventLogFile.LastEventID = id
+				}
 			}
 
 			totalEvents += published
@@ -847,9 +852,10 @@ func (s *salesforceInput) downloadLogFileOnce(logfile string) (*http.Response, e
 	return resp, nil
 }
 
-// normalizeOAuthTokenURL accepts either a Salesforce login host
-// ("https://login.salesforce.com") or a full token endpoint
-// ("https://login.salesforce.com/services/oauth2/token") and returns the base
+// normalizeOAuthTokenURL accepts either a Salesforce OAuth host
+// ("https://login.salesforce.com" or "https://your-domain.my.salesforce.com")
+// or the canonical token endpoint without query parameters or fragments
+// ("https://login.salesforce.com/services/oauth2/token"), and returns the base
 // URL shape expected by go-sfdc before it appends "/services/oauth2/token".
 func normalizeOAuthTokenURL(rawURL string) string {
 	trimmed := strings.TrimRight(strings.TrimSpace(rawURL), "/")

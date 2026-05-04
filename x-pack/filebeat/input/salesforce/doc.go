@@ -32,6 +32,22 @@
 // cursor field (for example, EventDate or LogDate) that the input reads from
 // each returned record to advance its watermark.
 //
+// # Authentication notes
+//
+// The underlying go-sfdc client always appends "/services/oauth2/token" when it
+// opens a Salesforce session. To keep configuration ergonomic without producing
+// a doubled token path, this input accepts token_url as either:
+//
+//   - a Salesforce OAuth host such as https://login.salesforce.com,
+//     https://test.salesforce.com, or a custom My Domain host, or
+//   - the canonical full token endpoint ending exactly in
+//     /services/oauth2/token.
+//
+// Non-canonical variants such as token endpoints with query parameters or
+// fragments are not normalized and should be avoided. For JWT auth, the
+// jwt_bearer_flow.url setting still supplies the JWT audience claim; token_url,
+// when present, only overrides where the token POST is sent.
+//
 // # Collection lifecycle
 //
 // Run is the input entry point required by the v2 input framework. On first
@@ -118,16 +134,15 @@
 // windows that batching already drained, while still letting subsequent
 // unbatched runs move beyond the old batched watermark naturally.
 //
-// SetupAuditTrail is the current motivating example for last_event_id:
-// CreatedDate is not unique, so its shipped unbatched resume query uses
-// last_event_id as a same-timestamp tie-breaker. The underlying cursor field
-// is generic, though: any ascending object query that orders by a non-unique
-// timestamp and also selects Id can use the same pattern. Older persisted
-// state does not have last_event_id, so the first post-upgrade run keeps the
-// legacy CreatedDate > last_event_time boundary and starts recording
-// last_event_id for subsequent runs. This is additive and backward compatible:
-// it does not change existing resume semantics until the new field has been
-// observed.
+// SetupAuditTrail and EventLogFile are the current motivating examples for
+// last_event_id: CreatedDate is not unique, so their shipped resume queries use
+// last_event_id as a same-timestamp tie-breaker. The underlying cursor field is
+// generic, though: any ascending query that orders by a non-unique timestamp and
+// also selects Id can use the same pattern. Older persisted state does not have
+// last_event_id, so the first post-upgrade run keeps the legacy
+// CreatedDate > last_event_time boundary and starts recording last_event_id for
+// subsequent runs. This is additive and backward compatible: it does not change
+// existing resume semantics until the new field has been observed.
 //
 // # Fault tolerance
 //

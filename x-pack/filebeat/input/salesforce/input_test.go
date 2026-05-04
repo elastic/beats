@@ -51,8 +51,8 @@ const (
 	defaultLoginObjectQueryWithCursor = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > 2023-12-06T05:44:24.973+0000"
 	valueBatchedLoginObjectQuery      = "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.batch_start_time ]] AND EventDate <= [[ .cursor.object.batch_end_time ]] ORDER BY EventDate DESC"
 
-	defaultLoginEventLogFileQuery = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-	valueLoginEventLogFileQuery   = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST"
+	defaultLoginEventLogFileQuery = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+	valueLoginEventLogFileQuery   = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
 
 	invalidDefaultLoginEventObjectQuery  = "SELECT FIELDS(STANDARD) FROM LoginEvnt"
 	invalidDefaultLoginEventLogFileQuery = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY ASC NULLS FIRST"
@@ -1549,6 +1549,125 @@ func TestRunEventLogFileReopensSessionOnUnauthorizedDownload(t *testing.T) {
 	assert.Equal(t, "2023-12-19T21:04:35.000+0000", s.cursor.EventLogFile.LastEventTime, "expected successful retry to advance last_event_time")
 }
 
+func TestRunEventLogFileResumesWithinSameCreatedDateBucket(t *testing.T) {
+	const (
+		createdDate       = "2024-01-02T03:04:05.000+0000"
+		firstLogFileID    = "0AT000000000001AAA"
+		secondLogFileID   = "0AT000000000002AAA"
+		defaultQuery      = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+		resumeQueryTmpl   = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+		expectedResumeQ   = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2024-01-02T03:04:05.000+0000 OR (CreatedDate = 2024-01-02T03:04:05.000+0000 AND Id > '0AT000000000001AAA')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+		firstLogFilePath  = "/services/data/v58.0/sobjects/EventLogFile/0AT000000000001AAA/LogFile"
+		secondLogFilePath = "/services/data/v58.0/sobjects/EventLogFile/0AT000000000002AAA/LogFile"
+	)
+
+	var (
+		server        *httptest.Server
+		defaultHits   int
+		resumeHits    int
+		firstCSVHits  int
+		secondCSVHits int
+	)
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "application/json")
+
+		switch {
+		case r.RequestURI == "/services/oauth2/token" && r.Method == http.MethodPost:
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"access_token":"abcd","instance_url":"` + server.URL + `","token_type":"Bearer","id_token":"abcd","refresh_token":"abcd"}`))
+		case r.FormValue("q") == defaultQuery:
+			defaultHits++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(fmt.Sprintf(`{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "EventLogFile", "url": "/services/data/v58.0/sobjects/EventLogFile/%[1]s" }, "Id": "%[1]s", "CreatedDate": "%[2]s", "LogDate": "2024-01-02T00:00:00.000+0000", "LogFile": "%[3]s" } ] }`, firstLogFileID, createdDate, firstLogFilePath)))
+		case r.FormValue("q") == expectedResumeQ:
+			resumeHits++
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(fmt.Sprintf(`{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "EventLogFile", "url": "/services/data/v58.0/sobjects/EventLogFile/%[1]s" }, "Id": "%[1]s", "CreatedDate": "%[2]s", "LogDate": "2024-01-02T00:00:00.000+0000", "LogFile": "%[3]s" } ] }`, secondLogFileID, createdDate, secondLogFilePath)))
+		case r.RequestURI == firstLogFilePath:
+			firstCSVHits++
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		case r.RequestURI == secondLogFilePath:
+			secondCSVHits++
+			w.Header().Set("content-type", "text/csv")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(oneEventLogfileSecondResponseCSV))
+		default:
+			t.Fatalf("unexpected request: uri=%s query=%q", r.RequestURI, r.FormValue("q"))
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL,
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"event_log_file": map[string]interface{}{
+				"interval": "5s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": defaultQuery,
+					"value":   resumeQueryTmpl,
+				},
+				"cursor": map[string]interface{}{
+					"field": "CreatedDate",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "same-timestamp EventLogFile config should unpack")
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+
+	var client publisher
+	client.done = func() {}
+
+	s := &salesforceInput{
+		config:    cfg,
+		ctx:       ctx,
+		cancel:    cancel,
+		publisher: &client,
+		cursor:    &state{},
+		srcConfig: &cfg,
+		log:       logptest.NewTestingLogger(t, "salesforceInput"),
+	}
+
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected Salesforce auth config to succeed")
+
+	s.soqlr, err = s.SetupSFClientConnection()
+	require.NoError(t, err, "expected Salesforce query client setup to succeed")
+
+	err = s.RunEventLogFile()
+	require.NoError(t, err, "expected initial EventLogFile run to succeed")
+	require.NotNil(t, s.cursor, "expected event log file cursor state to remain initialized after initial run")
+	assert.Equal(t, firstLogFileID, s.cursor.EventLogFile.LastEventID, "expected initial run to persist the EventLogFile Id as a same-CreatedDate resume tie-breaker")
+
+	err = s.RunEventLogFile()
+	require.NoError(t, err, "expected resumed EventLogFile run to continue within the same CreatedDate bucket")
+
+	assert.Equal(t, 1, defaultHits, "expected initial query to run once")
+	assert.Equal(t, 1, resumeHits, "expected resume query to include the last_event_id tie-breaker")
+	assert.Equal(t, 1, firstCSVHits, "expected first EventLogFile CSV to be downloaded once")
+	assert.Equal(t, 1, secondCSVHits, "expected second EventLogFile CSV to be downloaded once after same-CreatedDate resume")
+	require.Len(t, client.published, 2, "expected both same-CreatedDate EventLogFile CSV rows to publish across runs")
+	require.NotNil(t, s.cursor, "expected event log file cursor state to remain initialized after resumed run")
+	assert.Equal(t, secondLogFileID, s.cursor.EventLogFile.LastEventID, "expected resumed run to advance the EventLogFile Id tie-breaker")
+}
+
 func TestRunObjectWithBatchingResumesFromProgressTime(t *testing.T) {
 	mockTimeNow(time.Date(2024, time.January, 1, 12, 0, 0, 0, time.UTC))
 	t.Cleanup(resetTimeNow)
@@ -2871,9 +2990,9 @@ func TestUserPasswordFlowTokenURLAcceptsFullTokenEndpoint(t *testing.T) {
 	assert.Equal(t, 1, tokenHits, "expected exactly one OAuth request to the canonical token endpoint")
 }
 
-// TestJWTBearerFlowTokenURL verifies that the salesforce input correctly passes
-// the token_url configuration to the underlying go-sfdc library, which handles
-// the fallback logic (use token_url if set, otherwise fall back to url).
+// TestJWTBearerFlowTokenURL verifies that the salesforce input routes JWT OAuth
+// requests to url when token_url is empty, to token_url when it is set, and
+// normalizes the canonical full token endpoint before go-sfdc appends its path.
 func TestJWTBearerFlowTokenURL(t *testing.T) {
 	t.Parallel()
 
@@ -3109,7 +3228,7 @@ func TestRunWithMixedMonitoringMethodsStartsEventLogFileBeforeObject(t *testing.
 func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) {
 	logptest.NewTestingLogger(t, "")
 
-	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
 
 	var (
 		requestKinds []string
@@ -3283,7 +3402,7 @@ func TestRunWithMixedMonitoringMethodsRunsBothTickersAfterStartup(t *testing.T) 
 func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
 	logptest.NewTestingLogger(t, "")
 
-	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
 
 	var (
 		cancel           context.CancelCauseFunc
@@ -3421,7 +3540,7 @@ func TestRunEventLogFileSkipsQueuedTickerAfterFailure(t *testing.T) {
 func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFailure(t *testing.T) {
 	logptest.NewTestingLogger(t, "")
 
-	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
 
 	var (
 		requestKinds []string
@@ -3601,7 +3720,7 @@ func TestRunWithMixedMonitoringMethodsContinuesObjectAfterEventLogFileTickerFail
 func TestRunWithMixedMonitoringMethodsContinuesEventLogFileAfterObjectTickerFailure(t *testing.T) {
 	logptest.NewTestingLogger(t, "")
 
-	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > 2023-12-19T21:04:35.000+0000 ORDER BY CreatedDate ASC NULLS FIRST"
+	const valueLoginEventLogFileQueryWithCursor = "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > 2023-12-19T21:04:35.000+0000 OR (CreatedDate = 2023-12-19T21:04:35.000+0000 AND Id > '0AT5j00002LqQTxGAN')) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
 
 	var (
 		requestKinds []string
