@@ -104,19 +104,10 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 				event.Input.Type,
 			)
 		}
-
-		counter := counterFromMessage(t, event.Message)
-		prev, exists := lastSeen["log"][event.Log.File.Path]
-		if !exists || counter > prev {
-			lastSeen["log"][event.Log.File.Path] = counter
-		}
 	}
-
-	for _, path := range logFiles {
-		if _, exists := lastSeen["log"][path]; !exists {
-			t.Fatalf("no baseline lastSeen value captured for path %q", path)
-		}
-	}
+	_, logMaxByPath := countExtremesByPath(t, events, "log")
+	lastSeen["log"] = logMaxByPath
+	assertPathsPresent(t, lastSeen["log"], logFiles, "log baseline")
 
 	// 2. Disable Log input and snapshot output file for debugging
 	snapshotIdx := 0
@@ -125,7 +116,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	copyOutputSnapshot(t, tempDir, snapshotIdx, "log-1")
 
 	// 3. Enable Filestream with take_over and ingest one deterministic batch
-	writeFilestreamTakeOverConfig(t, inputsDir, "take-over-from-log-input", logPaths)
+	writeFilestreamConfig(t, inputsDir, "take-over-from-log-input", logPaths)
 	filebeat.WaitLogsContains("Input 'filestream' starting", 2*time.Minute, "filestream runner did not start")
 	appendLogsToFiles(logPhaseBatchSize)
 
@@ -133,28 +124,13 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	filebeat.WaitPublishedEvents(2*time.Minute, expectedEvents)
 	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 
-	// 4. Ensure Filestream did not replay data already ingested by Log input
+	// 4. Ensure Filestream did not duplicate data already ingested by Log input
 	assertNoDuplicationFromPreviousInput(t, events, logFiles, lastSeen["log"], "filestream")
 
 	// 5. Capture Filestream baseline, disable all inputs and snapshot.
-	lastSeen["filestream"] = map[string]int{}
-	for _, event := range events {
-		if event.Input.Type != "filestream" {
-			continue
-		}
-
-		counter := counterFromMessage(t, event.Message)
-		prev, exists := lastSeen["filestream"][event.Log.File.Path]
-		if !exists || counter > prev {
-			lastSeen["filestream"][event.Log.File.Path] = counter
-		}
-	}
-
-	for _, path := range logFiles {
-		if _, exists := lastSeen["filestream"][path]; !exists {
-			t.Fatalf("no filestream lastSeen value captured for path %q", path)
-		}
-	}
+	_, filestreamMaxByPath := countExtremesByPath(t, events, "filestream")
+	lastSeen["filestream"] = filestreamMaxByPath
+	assertPathsPresent(t, lastSeen["filestream"], logFiles, "filestream baseline")
 
 	disableActiveInput(t, inputsDir, filebeat, "filestream")
 	snapshotIdx++
@@ -176,17 +152,9 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["log"], "log")
 
 	// 7. Update Log baseline, disable all inputs and snapshot.
-	for _, event := range events {
-		if event.Input.Type != "log" {
-			continue
-		}
-
-		counter := counterFromMessage(t, event.Message)
-		prev, exists := lastSeen["log"][event.Log.File.Path]
-		if !exists || counter > prev {
-			lastSeen["log"][event.Log.File.Path] = counter
-		}
-	}
+	_, updatedLogMaxByPath := countExtremesByPath(t, events, "log")
+	lastSeen["log"] = updatedLogMaxByPath
+	assertPathsPresent(t, lastSeen["log"], logFiles, "updated log baseline")
 
 	disableActiveInput(t, inputsDir, filebeat, "log")
 	snapshotIdx++
@@ -195,6 +163,8 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	// Steps 17+ continue from this state.
 }
 
+// writeLogInputConfig renders and writes the active log input configuration file.
+// It replaces inputs.d/active.yml with a config that reads the given paths.
 func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
 	content := getConfig(t, map[string]any{
 		"paths": paths,
@@ -205,7 +175,9 @@ func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
 	}
 }
 
-func writeFilestreamTakeOverConfig(t *testing.T, inputsDir, inputID string, paths []string) {
+// writeFilestreamConfig renders and writes the active filestream configuration
+// file with takeover enabled for the provided input ID and paths.
+func writeFilestreamConfig(t *testing.T, inputsDir, inputID string, paths []string) {
 	content := getConfig(t, map[string]any{
 		"inputID": inputID,
 		"paths":   paths,
@@ -216,6 +188,9 @@ func writeFilestreamTakeOverConfig(t *testing.T, inputsDir, inputID string, path
 	}
 }
 
+// counterFromMessage parses the trailing integer counter from a generated log
+// message line. The helper fails the test when the message does not end with an
+// integer token.
 func counterFromMessage(t *testing.T, msg string) int {
 	fields := strings.Fields(msg)
 	if len(fields) == 0 {
@@ -230,6 +205,9 @@ func counterFromMessage(t *testing.T, msg string) int {
 	return counter
 }
 
+// disableActiveInput deactivates the current reload config by renaming
+// inputs.d/active.yml to inputs.d/active.yml.disabled and waits until the
+// corresponding runner stop message appears in Filebeat logs.
 func disableActiveInput(t *testing.T, inputsDir string, filebeat *integration.BeatProc, input string) {
 	activeCfg := filepath.Join(inputsDir, "active.yml")
 
@@ -245,6 +223,8 @@ func disableActiveInput(t *testing.T, inputsDir string, filebeat *integration.Be
 	filebeat.WaitLogsContains(stopLogLine, 2*time.Minute, "input runner did not stop after disabling active config")
 }
 
+// copyOutputSnapshot copies the current output file to a phase snapshot name
+// prefixed with a zero-padded incremental counter (for lexical sortability).
 func copyOutputSnapshot(t *testing.T, tempDir string, snapshotIdx int, phase string) {
 	matches, err := filepath.Glob(filepath.Join(tempDir, "output-file-*.ndjson"))
 	if err != nil {
@@ -266,6 +246,51 @@ func copyOutputSnapshot(t *testing.T, tempDir string, snapshotIdx int, phase str
 	}
 }
 
+// countExtremesByPath scans events from inputType and returns, per file path,
+// the minimum and maximum counters found in message payloads. The two returned
+// maps share the same key space and are used to validate handoff/continuation
+// boundaries between test phases.
+func countExtremesByPath(
+	t *testing.T,
+	events []fallbackEvent,
+	inputType string,
+) (minCounter map[string]int, maxCounter map[string]int) {
+	minCounter = map[string]int{}
+	maxCounter = map[string]int{}
+	for _, event := range events {
+		if event.Input.Type != inputType {
+			continue
+		}
+
+		path := event.Log.File.Path
+		counter := counterFromMessage(t, event.Message)
+		if prev, ok := minCounter[path]; !ok || counter < prev {
+			minCounter[path] = counter
+		}
+		if prev, ok := maxCounter[path]; !ok || counter > prev {
+			maxCounter[path] = counter
+		}
+	}
+
+	return minCounter, maxCounter
+}
+
+// assertPathsPresent verifies that valuesByPath has an entry for every file in
+// logFiles. It is used to ensure each expected source file produced at least one
+// event for the evaluated phase/input before deeper counter assertions run.
+func assertPathsPresent(t *testing.T, valuesByPath map[string]int, logFiles []string, context string) {
+	t.Helper()
+
+	for _, path := range logFiles {
+		if _, exists := valuesByPath[path]; !exists {
+			t.Fatalf("missing %s value for path %q", context, path)
+		}
+	}
+}
+
+// assertNoDuplicationFromPreviousInput verifies that the first counter observed
+// for each file in inputType is strictly greater than the previously recorded
+// boundary in lastSeen, ensuring no duplication from prior phases.
 func assertNoDuplicationFromPreviousInput(
 	t *testing.T,
 	events []fallbackEvent,
@@ -275,26 +300,10 @@ func assertNoDuplicationFromPreviousInput(
 ) {
 	t.Helper()
 
-	minCounterByPath := map[string]int{}
-	seenByPath := map[string]bool{}
-	for _, event := range events {
-		if event.Input.Type != inputType {
-			continue
-		}
-
-		path := event.Log.File.Path
-		counter := counterFromMessage(t, event.Message)
-		if prev, ok := minCounterByPath[path]; !ok || counter < prev {
-			minCounterByPath[path] = counter
-		}
-		seenByPath[path] = true
-	}
+	minCounterByPath, _ := countExtremesByPath(t, events, inputType)
+	assertPathsPresent(t, minCounterByPath, logFiles, inputType)
 
 	for _, path := range logFiles {
-		if !seenByPath[path] {
-			t.Fatalf("did not find %s events for %q", inputType, path)
-		}
-
 		boundary, exists := lastSeen[path]
 		if !exists {
 			t.Fatalf("missing previous input boundary for %q", path)
@@ -302,7 +311,7 @@ func assertNoDuplicationFromPreviousInput(
 
 		if minCounterByPath[path] <= boundary {
 			t.Fatalf(
-				"%s replayed previously ingested data for %q: first counter=%d previous max=%d",
+				"%s duplicated data for %q: first counter=%d previous max=%d",
 				inputType,
 				path,
 				minCounterByPath[path],
@@ -326,28 +335,12 @@ func assertContinuesFromLast(
 
 	// Pass 1: inspect only events from the target input type and capture
 	// the first counter value observed per file in this phase.
-	minCounterByPath := map[string]int{}
-	seenByPath := map[string]bool{}
-	for _, event := range events {
-		if event.Input.Type != inputType {
-			continue
-		}
-
-		path := event.Log.File.Path
-		counter := counterFromMessage(t, event.Message)
-		if prev, ok := minCounterByPath[path]; !ok || counter < prev {
-			minCounterByPath[path] = counter
-		}
-		seenByPath[path] = true
-	}
+	minCounterByPath, _ := countExtremesByPath(t, events, inputType)
+	assertPathsPresent(t, minCounterByPath, logFiles, inputType)
 
 	// Pass 2: each file must have events and must continue exactly from the
 	// previous boundary (first counter == lastSeen + 1).
 	for _, path := range logFiles {
-		if !seenByPath[path] {
-			t.Fatalf("did not find %s events for %q after re-enable", inputType, path)
-		}
-
 		boundary, exists := lastSeen[path]
 		if !exists {
 			t.Fatalf("missing previous %s boundary for %q", inputType, path)
