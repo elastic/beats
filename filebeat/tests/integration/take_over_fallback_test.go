@@ -193,7 +193,20 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["filestream"], "filestream")
 
-	// Step 19+ continues from this state.
+	// ========================= output "status" =========================
+	// At this point, there was "one fallback", for the each input, and only
+	// the Filestream input ingested the last batch of events.
+	// For each file (in the order they appear in the output):
+	//   - events 00 ~ 24: Log input
+	//   - events 25 ~ 49: Filestream input
+	//   - events 25 ~ 74: Log input
+	//   - events 75 ~ 99: Filestream input
+	// For a total of:
+	// - 75 events ingested by Filestream (count: 25 ~ 99)
+	// - 75 events ingested by the Log input (count: 0 ~ 74)
+
+	// 9. Final check: ensure each input never duplicated data
+	assertPerInputCountersStrictlyIncrease(t, events, []string{"log", "filestream"})
 }
 
 // writeLogInputConfig renders and writes the active log input configuration file.
@@ -388,5 +401,38 @@ func assertContinuesFromLast(
 				boundary+1,
 			)
 		}
+	}
+}
+
+// assertPerInputCountersStrictlyIncrease verifies counters never regress or
+// duplicate for the same (input.type, log.file.path) stream.
+func assertPerInputCountersStrictlyIncrease(t *testing.T, events []fallbackEvent, inputTypes []string) {
+	t.Helper()
+
+	allowed := map[string]bool{}
+	lastCounter := map[string]map[string]int{}
+	for _, inputType := range inputTypes {
+		allowed[inputType] = true
+		lastCounter[inputType] = map[string]int{}
+	}
+
+	for _, event := range events {
+		inputType := event.Input.Type
+		if !allowed[inputType] {
+			continue
+		}
+
+		path := event.Log.File.Path
+		counter := counterFromMessage(t, event.Message)
+		if prev, ok := lastCounter[inputType][path]; ok && counter <= prev {
+			t.Fatalf(
+				"counter duplication for input=%q path=%q: prev=%d current=%d",
+				inputType,
+				path,
+				prev,
+				counter,
+			)
+		}
+		lastCounter[inputType][path] = counter
 	}
 }
