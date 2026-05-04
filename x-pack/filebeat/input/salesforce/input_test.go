@@ -1578,11 +1578,11 @@ func TestRunEventLogFileResumesWithinSameCreatedDateBucket(t *testing.T) {
 		case r.FormValue("q") == defaultQuery:
 			defaultHits++
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(fmt.Sprintf(`{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "EventLogFile", "url": "/services/data/v58.0/sobjects/EventLogFile/%[1]s" }, "Id": "%[1]s", "CreatedDate": "%[2]s", "LogDate": "2024-01-02T00:00:00.000+0000", "LogFile": "%[3]s" } ] }`, firstLogFileID, createdDate, firstLogFilePath)))
+			_, _ = fmt.Fprintf(w, `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "EventLogFile", "url": "/services/data/v58.0/sobjects/EventLogFile/%[1]s" }, "Id": "%[1]s", "CreatedDate": "%[2]s", "LogDate": "2024-01-02T00:00:00.000+0000", "LogFile": "%[3]s" } ] }`, firstLogFileID, createdDate, firstLogFilePath)
 		case r.FormValue("q") == expectedResumeQ:
 			resumeHits++
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(fmt.Sprintf(`{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "EventLogFile", "url": "/services/data/v58.0/sobjects/EventLogFile/%[1]s" }, "Id": "%[1]s", "CreatedDate": "%[2]s", "LogDate": "2024-01-02T00:00:00.000+0000", "LogFile": "%[3]s" } ] }`, secondLogFileID, createdDate, secondLogFilePath)))
+			_, _ = fmt.Fprintf(w, `{ "totalSize": 1, "done": true, "records": [ { "attributes": { "type": "EventLogFile", "url": "/services/data/v58.0/sobjects/EventLogFile/%[1]s" }, "Id": "%[1]s", "CreatedDate": "%[2]s", "LogDate": "2024-01-02T00:00:00.000+0000", "LogFile": "%[3]s" } ] }`, secondLogFileID, createdDate, secondLogFilePath)
 		case r.RequestURI == firstLogFilePath:
 			firstCSVHits++
 			w.Header().Set("content-type", "text/csv")
