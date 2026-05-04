@@ -1,0 +1,1110 @@
+version: 9.4.0
+entries:
+    - kind: feature
+      summary: jumplists table for osquery extension
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1763767091
+      file:
+        name: 1763767091-jumplists.yaml
+        checksum: e56b9d9f97f89db15473e873f69f856582d4e15d
+    - kind: enhancement
+      summary: Add switchport_statuses config option to filter Meraki switchports by status
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1765285675
+      file:
+        name: 1765285675-add-meraki-switchport-status-filtering.yaml
+        checksum: 446565f121b68c4fd15641724a9cd69367cead24
+    - kind: enhancement
+      summary: Add the subexpiry field to the Redis INFO Keyspace (Redis ≥ 7.4)
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47971
+      issue:
+        - https://github.com/elastic/enhancements/issues/26555
+      impact: ""
+      action: ""
+      timestamp: 1765367674
+      file:
+        name: 1765367674-add-subexpiry-key-to-redis-keyspace-metrics.yaml
+        checksum: 3613fd73f1bfa27942cb0cd83d7483c00c7dea3d
+    - kind: enhancement
+      summary: Add Redis 6.0/7.0 info fields and deprecate used_memory_lua
+      description: |
+        Updates the Redis info metricset to support fields from Redis 6.0 and 7.0:
+
+        Redis 7.0 memory fields:
+        - Added memory.vm.eval, vm.functions, vm.total (VM memory not counted in used_memory)
+        - Added memory.used.scripts, used.scripts_eval, used.functions (script memory overhead)
+        - Added memory.total_system (total system memory)
+        - Added server.number_of_cached_scripts, number_of_functions, number_of_libraries
+
+        Redis 6.0 fields:
+        - Added stats.tracking.total_keys, total_items, total_prefixes (client-side caching stats)
+
+        Other changes:
+        - Marked used_memory_lua as deprecated (replaced by vm.eval in Redis 7.0)
+        - Made used_memory_lua and used_memory_dataset optional for older Redis compatibility
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48246
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1766622343
+      file:
+        name: 1766622343-add-update-redis-fields.yaml
+        checksum: 6f67921f3cfd7df9c3b49e9d816bce7527f34b80
+    - kind: bug-fix
+      summary: Support abuse.ch auth key usage in the Threat Intel module.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/45206
+      impact: ""
+      action: ""
+      timestamp: 1766657245
+      file:
+        name: 1766657245-file-auth-abuse-ch.yaml
+        checksum: 0ed3e44d493869e162cbca3239341fd5e267b65f
+    - kind: feature
+      summary: Add lexicographical polling mode to AWS-S3 input
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/47926
+      impact: ""
+      action: ""
+      timestamp: 1767727700
+      file:
+        name: 1767727700-lexicographical-polling-mode-to-AWS-S3.yaml
+        checksum: 95738aea61e238ce94e96d3b949fddb42a1f5b50
+    - kind: enhancement
+      summary: Add `state` field to IPSec tunnel metrics in panw module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1768219693
+      file:
+        name: 1768219693-add-ipsec-tunnel-state.yaml
+        checksum: 2dbed87dca9b971c37dc33c791e60a7fb80106a5
+    - kind: feature
+      summary: optimize opening files in filestream for better performance
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48506
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769096629
+      file:
+        name: 1769096629-filestream-scanner-open-file-if-needed.yaml
+        checksum: a5e2699ebfaaab1f08e393e84d61b6d2f1ad8eb8
+    - kind: feature
+      summary: Add gentables code generator for creating typed Go packages from YAML specs
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1769422964
+      file:
+        name: 1769422964-add-gentables-code-generator.yaml
+        checksum: 58e43d00fe668beb7b505a47272a7c271e682b80
+    - kind: enhancement
+      summary: updates osquerybeat filters to avoid reliance on type assertion
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1769449233
+      file:
+        name: 1769449233-osquerybeat_update_filters.yaml
+        checksum: 499de15902c19993ba02e29ca2992012043efc51
+    - kind: enhancement
+      summary: allow for passing of osqueryd client to extension tables
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1769462716
+      file:
+        name: 1769462716-osquerybeat_pass_connection_socket.yaml
+        checksum: f6195f85a61be583a9123d3d0fc95e3faac60e70
+    - kind: feature
+      summary: adding automatic jumplists to elastic_jumplists table
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1769728484
+      file:
+        name: 1769728484-automatic_jumplists.yaml
+        checksum: f57608e14c492e337708746668855681391cda3a
+    - kind: bug-fix
+      summary: Fix max_body_bytes setting not working without HMAC and add missing documentation configuration options in HTTP Endpoint input.
+      description: |
+        Previously, the max_body_bytes setting was only applied during HMAC validation, meaning it had no effect on requests that didn't use HMAC authentication.
+        This fix ensures that body size limiting is applied to all incoming requests regardless of authentication method.
+        Additionally, restored missing documentation for the max_body_bytes setting in the HTTP Endpoint input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48550
+      issue:
+        - https://github.com/elastic/beats/issues/48512
+      impact: ""
+      action: ""
+      timestamp: 1770015799
+      file:
+        name: 1770015799-fix-max-body-bytes-functionality-and-documentation.yaml
+        checksum: f6765700ac7ec72cc9133b48a6146e82d22e2631
+    - kind: feature
+      summary: Instruments the CEL Input with OpenTelemetry tracing.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48440
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770046509
+      file:
+        name: 1770046509-cel-otel-tracing.yaml
+        checksum: cf863d7ebff0fcbb1bef54c5296fa90cfce44ba4
+    - kind: enhancement
+      summary: Map Docker network metrics to different types for better usability
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770300862
+      file:
+        name: 1770300862-remap-docker-network-metrics.yaml
+        checksum: b2bfe78124d8ae83e55fa6f5d9662ec60c3a3b06
+    - kind: feature
+      summary: Add cursor-based incremental data fetching to the SQL module query metricset.
+      description: |
+        Add a cursor feature to the SQL query metricset that enables incremental data
+        fetching by tracking the last fetched row value. Supports integer, timestamp,
+        date, float, and decimal cursor types with ascending and descending scan
+        directions. State is persisted via libbeat statestore (memlog backend).
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48722
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1770358526
+      file:
+        name: 1770358526-add-cursor-based-incremental-fetching-to-sql-module.yaml
+        checksum: ecdd68f57fed01c6ccac3b949777054f574a8faa
+    - kind: enhancement
+      summary: Gentables improvements and elastic_browser_history spec with registry integration
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770600000
+      file:
+        name: 1770600000-osquery-extension-gentables-and-elastic-browser-history.yaml
+        checksum: 43adce1187cb61a5347a58ef98504545f5cd6813
+    - kind: enhancement
+      summary: Migrate elastic_file_analysis table to osquery table spec and dedicated package
+      description: |
+        The elastic_file_analysis osquery table (macOS) is now defined by the unified YAML spec
+        in ext/osquery-extension/specs/elastic_file_analysis.yaml. Implementation lives in
+        pkg/fileanalysis with generated table code in pkg/tables/generated/elastic_file_analysis.
+        Registration is via the generated darwin registry; no behavior change.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770730981
+      file:
+        name: 1770730981-migrate-elastic-file-analysis-to-spec.yaml
+        checksum: edafadb0a35a26ea1421cb7e26121d768870e6f3
+    - kind: enhancement
+      summary: Add elastic_host_groups table, host_groups view, and default view hooks in generator
+      description: |
+        - Renamed host_groups table to elastic_host_groups; implementation moved to pkg/hostgroups.
+        - host_groups is now a deprecated view (SELECT * FROM elastic_host_groups) for backward compatibility.
+        - View generator now produces create/delete hooks by default and RegisterDefaultViewHook(hm); custom
+          hooks can still be registered via RegisterHooksFunc (e.g. default + extra, like amcache).
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770734342
+      file:
+        name: 1770734342-osquerybeat-elastic-host-groups-and-view-hooks.yaml
+        checksum: 97341d3179a1b7a4c292ec4940d9b51b4bcd02e8
+    - kind: feature
+      summary: Add elastic_host_processes and elastic_host_users tables and host_processes, host_users views
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770801932
+      file:
+        name: 1770801932-host-processes-host-users.yaml
+        checksum: c1d30f2be5ce881f3a698c1b7ce79df96b813df0
+    - kind: enhancement
+      summary: Add amcache table and view specs and generated tables/view for osquery extension
+      description: |
+        Amcache tables and the elastic_amcache_applications view are now defined by YAML specs
+        (ext/osquery-extension/specs/elastic_amcache_*.yaml) with group amcache. Generated table
+        and view code live in pkg/tables/generated/amcache and pkg/views/generated/amcache.
+        Glue (generate funcs, view hooks, cleanup) is in pkg/amcache/register_generated.go.
+        Unused methods and non-generated docs were removed.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770820565
+      file:
+        name: 1770820565-amcache-spec-and-generated-tables.yaml
+        checksum: e95c9757b1f123a536651346d43e23e7da2c7f31
+    - kind: enhancement
+      summary: Add observer hostname field to panw module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1770911871
+      file:
+        name: 1770911871-add-panw-observer-hostname.yaml
+        checksum: 525e09471f5b1e4ca698560c0d9d84195de091de
+    - kind: bug-fix
+      summary: Fix janitor goroutine leaks and decoder cleanup lifecycle on route changes
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48836
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771343134
+      file:
+        name: 1771343134-packetbeat-libbeat-janitor-cleanup-lifecycle-fix.yaml
+        checksum: 3d26a29ec837a2f230c5e8e1ef521e08cadf6188
+    - kind: feature
+      summary: Add ES state store routing for lexicographical mode
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1771483846
+      file:
+        name: 1771483846-add-es-state-store-for-aws-s3-lexical-mode.yaml
+        checksum: 0d160dde5dcc845885baa29e9df8bf68b419912e
+    - kind: feature
+      summary: Add experimental bbolt-based registry backend for Filebeat
+      description: |
+        Add a new bbolt (BoltDB) storage backend for the Filebeat registry,
+        configurable via `filebeat.registry.backend: bbolt`. The bbolt backend
+        provides persistent on-disk storage with support for database compaction
+        and TTL-based entry cleanup.
+        This feature is experimental and may change or be removed in future releases.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1771601358
+      file:
+        name: 1771601358-add-bbolt-registry-backend.yaml
+        checksum: 4d1e5cebfc00b2b476f3b7bfdddf70adc9a3c679
+    - kind: bug-fix
+      summary: Fix no_more_events stop losing final batch of events when io.EOF is returned alongside records.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/47388
+      impact: ""
+      action: ""
+      timestamp: 1771606501
+      file:
+        name: 1771606501-fix-no_more_events-stop-losing-final-batch-of-events.yaml
+        checksum: 79f7d28b3166595f61a85c63fa6628aabccba85c
+    - kind: enhancement
+      summary: Optimize filestream to allocate less memory when applying include/exclude line filters.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49013
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771609453
+      file:
+        name: 1771609453-filestream-optimise-readFromSource.yaml
+        checksum: 908457883a8d3189119317b970e8bbc1c75c397d
+    - kind: enhancement
+      summary: add native scheduled query metadata and schedule_id correlation fields
+      description: |
+        Native scheduled query outputs now include deterministic scheduling metadata:
+        `schedule_execution_count` and `planned_schedule_time`.
+
+        Scheduled query outputs also use `schedule_id` for correlation, while live
+        action query outputs continue to use `action_id`.
+
+        Scheduled response documents include `pack_id` for pack queries when present
+        in the configuration.
+
+        Native scheduler option defaults remain available through `osquery.options`
+        (`schedule_splay_percent` and `schedule_max_drift`).
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1771844078
+      file:
+        name: 1771844078-osquerybeat-native-schedule-metadata.yaml
+        checksum: 6f80eb30f6979ac94351b890c2c2625657890000
+    - kind: enhancement
+      summary: Add elastic_jumplists spec integration and harden osquerybeat generation workflow
+      description: |
+        - Added elastic_jumplists table spec and shared types, generated table/docs wiring, and
+          migrated jumplists glue to generated RegisterGenerateFunc/GetGenerateFunc flow.
+        - Extended generated table registry/getter signatures to pass ResilientClient and wired it
+          through osquery-extension table registration.
+        - Added generated osquery-extension README support in gentables to keep tables/views docs in sync.
+        - Added osquerybeat mage Generate target and made Check depend on it for generation consistency.
+        - Updated jumplists generator to use local cached source files by default, with on-demand refresh
+          via `-refresh-sources` (and `JUMPLISTS_REFRESH_SOURCES=true mage generate`), plus enforced
+          gofmt/goimports formatting of generated jumplists files.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1771927691
+      file:
+        name: 1771927691-osquerybeat-jumplists-spec-and-generator-hardening.yaml
+        checksum: 7dad3fe4a9e44987475d070ea4647e477bbac332
+    - kind: enhancement
+      summary: Add capacity to collect empty Active Directory groups to entity analytics input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1771988494
+      file:
+        name: 1771988494-i16519-entityanalytics_ad.yaml
+        checksum: d2b011f9974bf77ae3ee99cec7e270dc0e9a91fd
+    - kind: enhancement
+      summary: Logstash exporter now reports accurate error status to EDOT
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1772192816
+      file:
+        name: 1772192816-logstash-status-reporting.yaml
+        checksum: fd658d5f1bc54f724b3c68b0e0d685a9dc0b7b80
+    - kind: enhancement
+      summary: add support for per-platform custom osqueryd artifact install in osquerybeat
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/48955
+      impact: ""
+      action: ""
+      timestamp: 1772708517
+      file:
+        name: 1772708517-osquerybeat-custom-artifact-install.yaml
+        checksum: 6ac102309414d3b16976200c8cb6b09fc9dda0ce
+    - kind: feature
+      summary: Export all beat receiver metrics to OTel telemetry
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1772811667
+      file:
+        name: 1772811667-beat-metrics-to-otel-telemetry.yaml
+        checksum: 02546c4385f1a33f4ab48a5df59c972768a4f54d
+    - kind: feature
+      summary: Add NewFactoryWithSettings for Beat receivers to provide default home and path directories
+      description: ""
+      component: filebeat, metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49327
+      issue:
+        - https://github.com/elastic/elastic-agent/issues/11734
+      impact: ""
+      action: ""
+      timestamp: 1773087971
+      file:
+        name: 1773087971-change-beat-receiver-factory-to-have-default-home-and-path-directories.yaml
+        checksum: 9088df45a2f533f54c23c448c5031b7f338902d7
+    - kind: bug-fix
+      summary: Fix http_endpoint input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs.
+      description: |
+        Decouple the shared HTTP server lifetime from any single input. Previously,
+        the server context was derived from the creator input, so cancelling a joiner
+        blocked forever (deadlock) and cancelling the creator shut down all inputs on
+        the same port. The server now lives until the last input deregisters.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1773273969
+      file:
+        name: 1773273969-fix-http-endpoint-shared-server-lifecycle.yaml
+        checksum: 31eb4e6a175dca923b403f112d8b7feadf7dc7c2
+    - kind: unknown
+      summary: Filestream only reports degraded status for permanent harvester errors.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49451
+      impact: ""
+      action: ""
+      timestamp: 1773680180
+      file:
+        name: 1773680180-filestream-permanent-harvester-errors.yaml
+        checksum: 4c6a27ae6b870bb028c42ed93107e0d99b60ff71
+    - kind: feature
+      summary: Add optional query profiling for scheduled and live osquery runs
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1773741293
+      file:
+        name: 1773741293-osquerybeat-query-profiling.yaml
+        checksum: b7d914bc1c029abb8326a350d8a2d3783f649d30
+    - kind: enhancement
+      summary: heartbeat-custom-policy-reload
+      description: Add custom policy hashing and live-update functionality to integrations
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49326
+      issue:
+        - https://github.com/elastic/beats/issues/47511
+      impact: ""
+      action: ""
+      timestamp: 1773744215
+      file:
+        name: 1773744215-heartbeat-custom-policy-reload.yaml
+        checksum: 6c5c69d4034a1b808989db01e91fd452b15c016a
+    - kind: enhancement
+      summary: Add input redirection support through a new Redirector mechanism.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774300895
+      file:
+        name: 1774300895-id6318-filebeat-director.yaml
+        checksum: 5f1adae73505f60b2dcfca3c69dfafee3ebaf974
+    - kind: enhancement
+      summary: Allow HTTP JSON input redirection to the CEL input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774301037
+      file:
+        name: 1774301037-id6318-director-httpjson.yaml
+        checksum: 7fecf3109f52046d720581c660b45f144c9e5da1
+    - kind: bug-fix
+      summary: fix jumplist table to ensure embedded fields are exported
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774388782
+      file:
+        name: 1774388782-fix-jumplist-filters.yaml
+        checksum: 6880f6da753a582dad265f2119c69409e57eb84f
+    - kind: enhancement
+      summary: Update mito CEL library to v1.25.1 and cel-go runtime to v0.27.0.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774506670
+      file:
+        name: 1774506670-cel0_25_1.yaml
+        checksum: d5e59f33a7db4d920a56a63492268b4556384dfe
+    - kind: feature
+      summary: Add add_agent_metadata processor to inject agent metadata efficiently
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774509616
+      file:
+        name: 1774509616-add-multiple-processors.yaml
+        checksum: d3cc2e678e56ae0207efbfc2fa00dbea9c00a98c
+    - kind: bug-fix
+      summary: Fix typo in CEL input OTel tracing logging
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49692
+      issue:
+        - https://github.com/elastic/beats/issues/49625
+      impact: ""
+      action: ""
+      timestamp: 1774529050
+      file:
+        name: 1774529050-cel-otel-tracing-typo-fix.yaml
+        checksum: 15e26b54fd43c8025673c34e95fb099dfb821747
+    - kind: bug-fix
+      summary: Fix container input not respecting max bytes when parsing CRI partial lines
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49259
+      impact: ""
+      action: ""
+      timestamp: 1774630083
+      file:
+        name: 1774630083-fix-container-max-bytes.yaml
+        checksum: e921cc97dd26ae458f81bff611e4d501074dd20d
+    - kind: upgrade
+      summary: upgrade osquery version to 5.22.1
+      description: osquery 5.22.1 changes escapeNonPrintableBytes to be UTF-8 aware, which can alter some query results that previously returned raw unicode bytes.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774861942
+      file:
+        name: 1774861942-upgrade-osquery-5.22.1.yaml
+        checksum: 57cd25bbc71de314b6df86b81bf81d59dbf70884
+    - kind: enhancement
+      summary: Add `perms` enrichment option to the Okta entity analytics provider to collect permissions for custom roles.
+      description: |
+        A new `perms` value is available in the `enrich_with` configuration option of
+        the Okta entity analytics input. When enabled, role permissions are fetched from
+        the Okta IAM API for each custom role assigned to a user and stored under
+        `roles[].permissions` in the published event. Because permissions depend on role
+        data, including `perms` implicitly enables role enrichment. Only custom roles
+        (type `CUSTOM`) are queried; standard built-in roles are skipped. This option
+        requires the `okta.roles.read` OAuth2 scope and introduces additional API calls
+        per user, so it should be enabled with care on large tenants.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49779
+      impact: ""
+      action: ""
+      timestamp: 1774954711
+      file:
+        name: 1774954711-okta-entity-analytics-role-permissions.yaml
+        checksum: e5ebd64b6788229a5345de21df5a85412ab62e81
+    - kind: bug-fix
+      summary: avoid mutating osquery install config during validation to prevent races
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1774957519
+      file:
+        name: 1774957519-fix-osquery-install-config-race.yaml
+        checksum: 34ac7bda7a1ea68e2365cc1dc44bba8b9063837e
+    - kind: enhancement
+      summary: Add devices enrichment option to Okta entity analytics provider.
+      description: |
+        Adds devices as a new optional value for the enrich_with configuration
+        option in the Okta entity analytics provider. When enabled, each user is enriched
+        with the list of devices enrolled for that user via the List User Devices Okta API
+        endpoint. The enrichment is opt-in and excluded from the default configuration to
+        avoid the extra per-user API call that would increase Okta rate limit consumption.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49813
+      issue:
+        - https://github.com/elastic/beats/issues/49780
+      impact: ""
+      action: ""
+      timestamp: 1774968309
+      file:
+        name: 1774968309-okta-enrich-enrolled-devices.yaml
+        checksum: 8ffd2dfdd569bce77b9436eed16614c3ed7e7e19
+    - kind: enhancement
+      summary: Add supervises enrichment option to the Okta entity analytics provider.
+      description: |
+        Add a new "supervises" value to the enrich_with option of the Okta entity analytics
+        provider. When enabled, each user document is enriched with a supervises field containing
+        the list of users they manage. Each entry includes the managed user's id, profile.email,
+        and profile.login (the Okta username). The list is derived by querying the Okta API for
+        users whose profile.managerId matches the manager's user ID. The option is disabled by
+        default because it requires one additional API call per user, which may exceed Okta rate
+        limits in large deployments.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49781
+      impact: ""
+      action: ""
+      timestamp: 1774978179
+      file:
+        name: 1774978179-okta-supervises-enrichment.yaml
+        checksum: 3fa9cfad1a6c2820ad8600df5c007049730d3285
+    - kind: feature
+      summary: Add MFA enrichment support to the azure-ad entity analytics provider.
+      description: |
+        A new optional enrich_with setting has been added to the azure-ad entity analytics
+        input. When set to ["mfa"], the provider fetches MFA registration details for all
+        users from the Microsoft Graph API endpoint
+        /reports/authenticationMethods/userRegistrationDetails and merges them into each
+        user document under the azure_ad.mfa field. This requires the AuditLog.Read.All
+        application permission in Azure.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1775042631
+      file:
+        name: 1775042631-azuread-mfa-enrichment.yaml
+        checksum: d4818b81846e640e843f6dfde23381cc7c4ca6fd
+    - kind: bug-fix
+      summary: Fix internal processing time metric for azureeventhub input.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/40547
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775074566
+      file:
+        name: 1775074566-fix-processing-time-metric.yaml
+        checksum: 1bdc99004d7e25d45dc325bd388fc6a8f934ae99
+    - kind: enhancement
+      summary: Bump azure-sdk-for-go armmonitor from v0.8.0 to v0.11.0
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49866
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775076983
+      file:
+        name: 1775076983-bump-armmonitor-v0.11.0.yaml
+        checksum: a61638624ed987a04e3792aa923dcc0000649ee3
+    - kind: upgrade
+      summary: Upgrade Azure Event Hubs SDK (azeventhubs) from v1.3.1 to v2.0.2.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49867
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775080204
+      file:
+        name: 1775080204-upgrade-azeventhubs-v2.yaml
+        checksum: 6973de89004201a09638ad86aa60a7e11141850e
+    - kind: feature
+      summary: Add a querylog fileset to the Filebeat elasticsearch module for NDJSON query logs.
+      description: |
+        Adds a dedicated `querylog` fileset that tails Elasticsearch query log files (`*_querylog.json`),
+        one JSON object per line, using the filestream input with an NDJSON parser (`expand_keys`).
+
+        The fileset collects structured query events for DSL, ES|QL, EQL, and SQL (timings, shard
+        information, optional ES|QL profile phases, remote-cluster metadata where present, and related
+        ECS fields such as user and trace). Module field definitions cover `elasticsearch.querylog.*` plus
+        `elasticsearch.task.id`, `elasticsearch.parent.task.id`, and `elasticsearch.parent.node.id`.
+
+        Default log paths follow the usual Elasticsearch layout on Linux, macOS, and Windows; users can
+        override them with `var.paths`. The fileset is disabled by default in the module reference config.
+        Documentation describes how to enable it and set paths.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49914
+      issue:
+        - https://github.com/elastic/beats/issues/43622
+      impact: ""
+      action: ""
+      timestamp: 1775202537
+      file:
+        name: 1775202537-add-elasticsearch-module-querylog-fileset.yaml
+        checksum: f06904e5766a2a0c0bd98430421937e8cc621727
+    - kind: security
+      summary: Update transient dependency github.com/go-jose/go-jose/v4 to v4.1.4
+      description: ""
+      component: agentbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1775581390
+      file:
+        name: 1775581390-Update-transient-dependency-go-jose-go-jose-v4.yaml
+        checksum: ee86a4059eaafb2615f1500a174be77e8cbe7482
+    - kind: enhancement
+      summary: Update OTel Collector components to v0.149.0/v1.55.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1775823713
+      file:
+        name: 1775823713-bump-otel-01490.yaml
+        checksum: 0fd200ad7ce24c1676acbbcf0d7c1d4c6410c368
+    - kind: bug-fix
+      summary: AutoOps ES module update to use UUID v7 without dashes to reduce payloads
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1775859655
+      file:
+        name: 1775859655-autoops-uuid-v7.yaml
+        checksum: a0b3306487adfe16e47942301ad46fc7777b3331
+    - kind: bug-fix
+      summary: Fix CSV decoder producing malformed JSON when field values contain double quotes in azure-blob-storage input.
+      description: |
+        The azure-blob-storage input's decode path only matched the decoder.Decoder
+        interface, which builds JSON via string concatenation without escaping field
+        values. CSV values containing double quotes (e.g. RFC 2045 MIME type
+        parameters) produce malformed JSON, causing downstream ingest pipeline
+        failures. Add a decoder.ValueDecoder switch case which uses json.Marshal
+        for correct escaping, matching the pattern already used by the GCS input.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/50097
+      impact: ""
+      action: ""
+      timestamp: 1776095974
+      file:
+        name: 1776095974-fix-csv-decoder-json-escaping-abs-input.yaml
+        checksum: f9bbca433ed05d910190ff7cf088b7a7acfcafaf
+    - kind: security
+      summary: Update to Go 1.25.9.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1776193328
+      file:
+        name: 1776193328-update-to-go-1.25.9.yaml
+        checksum: 786f0aff8e9a5de23d56e4e14808f0387c51084d
+    - kind: bug-fix
+      summary: Update cel-go to v0.28.0, fixing runtime error location reporting.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1776378677
+      file:
+        name: 1776378677-update-cel-go-v0.28.0.yaml
+        checksum: 6d77deb30d44ad24863ef54fcbaf907ec66ba540
+    - kind: security
+      summary: Bump aws-sdk-go-v2/service/cloudwatchlogs to v1.65.0 to fix GHSA-xmrv-pmrh-hhx2
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50215
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776709378
+      file:
+        name: 1776709378-bump-aws-sdk-go-v2-cloudwatchlogs-s3-ghsa-xmrv-pmrh-hhx2.yaml
+        checksum: 53709575a81b91898bfebaa50c962f57facfa7ee
+    - kind: bug-fix
+      summary: Fix conversion of time duration fields such as event.duration when using Beats receivers
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1777045487
+      file:
+        name: 1777045487-fix-otel-duration-conversion.yaml
+        checksum: 8dadb6a1a3fac8348a2072a056f446075b31234b
+    - kind: bug-fix
+      summary: Re-evaluate url_program on each websocket reconnect using evolved cursor state.
+      description: |
+        The streaming input now re-evaluates url_program before each websocket
+        reconnection (both error recovery and OAuth2 token refresh), allowing
+        cursor state accumulated during the session to influence the reconnect URL.
+        Previously url_program was evaluated once at startup and the result was
+        reused for all subsequent connections. The process function also now returns
+        the evolved cursor so that callers can propagate it into the shared state.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1777418848
+      file:
+        name: 1777418848-streaming-url-program-reconnect.yaml
+        checksum: 134b2968b3260a8467665d246fa9b92ccffcabff
+    - kind: bug-fix
+      summary: Reduce allocation pressure in httpjson cursor update and split paths.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49992
+        - https://github.com/elastic/beats/pull/49993
+        - https://github.com/elastic/beats/pull/49874
+      issue:
+        - https://github.com/elastic/beats/issues/49462
+      impact: ""
+      action: ""
+      timestamp: 1777430032
+      file:
+        name: 1777430032-reduce-httpjson-cursor-update-allocs.yaml
+        checksum: 7764eb80d8a6d3ac85de042d2ac886d1d61d2052
