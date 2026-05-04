@@ -307,6 +307,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
 				b.Manager.UpdateStatus(status.Configuring, "Received updated configuration")
+				if len(inputConfigs) == 0 {
+					bt.log.Warn("Osquery input unit was removed; osquery actions (live queries, scheduled packs) will not be available until an osquery input unit is received from Fleet. If the agent was moved to a new policy, ensure the destination policy includes Osquery Manager and that the policy was fully applied.")
+				}
 				err = bt.pub.Configure(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
@@ -438,6 +441,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.handleQueryResult(ctx, cli, configPlugin, res)
 	})
 
+	// Create recurrence query handler for scheduling queries with RRULE expressions
+	var rruleHandler *recurrenceQueryHandler
+
 	// Run main loop
 	g.Go(func() error {
 		// Connect to osqueryd
@@ -448,6 +454,24 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.setDiagnosticsQueryExecutor(cli)
 		defer cli.Close()
 		defer bt.setDiagnosticsQueryExecutor(nil)
+
+		// Initialize and start RRULE query handler after osqueryd connection is established
+		rruleHandler = newRecurrenceQueryHandler(bt.log, cli, configPlugin, bt.pub, bt.liveProfiles)
+		rruleHandler.Start(ctx)
+		defer rruleHandler.Stop()
+
+		// Drive RRULE updates from the same moment native osqueryd applies policy: GenerateConfig
+		// promotes staged query metadata after osqueryd pulls config (see ConfigPlugin.GenerateConfig).
+		configPlugin.SetOnGenerateConfigApplied(func() {
+			if rruleHandler != nil {
+				if err := rruleHandler.UpdateFromConfig(configPlugin.EffectiveOsqueryConfig()); err != nil {
+					bt.log.Errorf("failed to update RRULE scheduled queries: %v", err)
+					if clearErr := rruleHandler.UpdateFromConfig(nil); clearErr != nil {
+						bt.log.Errorf("failed to clear RRULE scheduled queries after update error: %v", clearErr)
+					}
+				}
+			}
+		})
 
 		// Start osqueryd health monitoring after connection is established
 		g.Go(func() error {
@@ -464,7 +488,9 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq osqd.Ru
 		bt.registerActionHandler(b, cli, configPlugin, rah)
 		defer bt.unregisterActionHandler(b, rah)
 
-		// Process input
+		// Process Elastic Agent/Fleet input. A failed Set means the policy cannot be applied
+		// safely (invalid ECS mapping, schedule rules, and so on); we exit this runner so the beat
+		// surfaces the error instead of continuing with stale or partial osquery extension state.
 		for {
 			select {
 			case <-ctx.Done():
