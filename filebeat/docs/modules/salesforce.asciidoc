@@ -53,6 +53,10 @@ The Salesforce module contains the following filesets for collecting different t
 The default interval for collecting logs (`var.real_time_interval` or `var.elf_interval`) is 5m/1h. Exercise caution when reducing this interval, as it directly impacts the Salesforce API rate limit of ~1000 calls per hour. Exceeding the limit will result in errors from the Salesforce API. Refer to the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit] documentation for more details.
 ====
 
+For high-volume `login` and `logout` real-time collection, the module uses bounded `EventDate` windows during catch-up instead of one large object query. Each run processes up to 12 windows of size `var.real_time_interval`, resumes from persisted progress after restarts, and keeps the SOQL ordering aligned with Salesforce's `EventDate DESC` limitation. If `var.initial_interval` is not set, the first bounded object window falls back to `var.real_time_interval`; set `var.initial_interval` explicitly when you want a deeper first-run catch-up window.
+
+For EventLogFile collection, the built-in filesets keep the initial filter, incremental cursor, and `ORDER BY` aligned on `CreatedDate`, with `Id` as a same-timestamp tie-breaker. Downloaded CSV payloads are streamed row by row to reduce memory pressure. If you override the generated queries, keep those values aligned to avoid gaps or duplicates.
+
 === Set up the OAuth App in the Salesforce
 
 In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:

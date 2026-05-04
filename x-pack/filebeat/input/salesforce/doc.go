@@ -76,9 +76,9 @@
 //     recent successful query. Retained so templates that can sort ascending
 //     (EventLogFile, ApiEvent, ...) can resume from there.
 //   - last_event_id - optional record Id of the last event seen during the
-//     most recent successful query. Unbatched object templates can use it as
-//     a same-timestamp tie-breaker when the cursor field itself is not
-//     unique, as with SetupAuditTrail ordered by CreatedDate ASC.
+//     most recent successful query. Templates can use it as a same-timestamp
+//     tie-breaker when the cursor field itself is not unique, as with
+//     SetupAuditTrail and EventLogFile ordered by CreatedDate ASC.
 //   - progress_time - bounded-batch watermark, written only by the batched
 //     object collection path. Records how far into the backlog the input has
 //     advanced, independent of individual event timestamps.

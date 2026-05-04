@@ -37,7 +37,7 @@ Here are some key points about how cursors are used in the Salesforce input:
 * On subsequent runs, the `query.value` template is populated with the cursor state to fetch events since the last execution.
 * If the input is restarted, it will resume from the last persisted cursor state rather than starting over from scratch.
 
-Using cursors allows the Salesforce input to reliably keep track of its progress and avoid missing or duplicating events across executions. Choose cursor inputs that advance predictably between runs. For EventLogFile this usually means a monotonically increasing field such as `CreatedDate`. For bounded object catch-up, use `object.progress_time` together with `object.batch_start_time` and `object.batch_end_time`.
+Using cursors allows the Salesforce input to reliably keep track of its progress and avoid missing or duplicating events across executions. Choose cursor inputs that advance predictably between runs. For EventLogFile this usually means a monotonically increasing field such as `CreatedDate`, with `Id` as a same-timestamp tie-breaker. For bounded object catch-up, use `object.progress_time` together with `object.batch_start_time` and `object.batch_end_time`.
 
 Event Monitoring methods are highly configurable and can be used to monitor any supported object or event log file. The input can be configured to monitor multiple objects or event log files at the same time.
 
@@ -68,8 +68,8 @@ filebeat.inputs:
         enabled: true
         interval: 1h
         query:
-          default: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
-          value: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST"
+          default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
+          value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC"
         cursor:
           field: "CreatedDate"
       object:
@@ -139,7 +139,7 @@ When multiple event monitoring methods are enabled, they run in the same input l
 
 There are two methods to fetch the events from the Salesforce instance:
 
-* `event_log_file`: [EventLogFile](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm) is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org’s operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce’s query language SOQL to query the object. Keep the query filter, sort order, and `cursor.field` aligned on the same watermark field. The built-in module templates use `CreatedDate`, and downloaded CSV rows are processed as a stream to reduce memory pressure.
+* `event_log_file`: [EventLogFile](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm) is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org’s operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce’s query language SOQL to query the object. Keep the query filter, sort order, and `cursor.field` aligned on the same watermark field. The built-in module templates use `CreatedDate`, with `Id` as a same-timestamp tie-breaker, and downloaded CSV rows are processed as a stream to reduce memory pressure.
 * `object`: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for monitoring [objects](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_list.htm) in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. With this method, we query the object using Salesforce’s query language ([SOQL](https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql.htm)). The collection happens at the configured scrape `interval`. For high-volume objects, enable bounded batching so one large catch-up query does not have to process the full backlog at once.
 
 ::::{note}
@@ -151,9 +151,11 @@ When collecting data over time using cursors, the following persisted cursor inp
 
 * `object.first_event_time`: This cursor input stores the cursor value from the first event encountered during data collection using the object method.
 * `object.last_event_time`: This cursor input stores the cursor value from the last event encountered during data collection using the object method.
+* `object.last_event_id`: This cursor input stores the Salesforce record Id from the last object event encountered during data collection. Queries ordered by a non-unique timestamp can use it as a same-timestamp tie-breaker.
 * `object.progress_time`: This cursor input stores the end of the last successfully processed object batch window. It is the durable batching watermark for restart-safe catch-up.
 * `event_log_file.first_event_time`: This cursor input stores the cursor value from the first event encountered during data collection using the event log file method.
 * `event_log_file.last_event_time`: This cursor input stores the cursor value from the last event encountered during data collection using the event log file method.
+* `event_log_file.last_event_id`: This cursor input stores the Salesforce EventLogFile Id from the last downloaded log file. Queries ordered by `CreatedDate` can use it as a same-timestamp tie-breaker.
 
 When object batching is enabled, the `query.value` template also receives two derived inputs for the current run:
 
@@ -325,9 +327,9 @@ In case the cursor state is not available, the default query will be used to fet
 
 The SOQL query to fetch the events from the Salesforce instance using the EventLogFile API but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query.
 
-In case of restarts or subsequent executions, the cursor state will be used to fetch the events from the Salesforce instance. The cursor state is the last event time of the last event fetched from the Salesforce instance. The cursor state is taken from `event_monitoring_method.event_log_file.cursor.field` field for the last event fetched from the Salesforce instance.
+In case of restarts or subsequent executions, the cursor state will be used to fetch the events from the Salesforce instance. The cursor state is the last event time of the last event fetched from the Salesforce instance, optionally paired with `event_log_file.last_event_id` as a same-timestamp tie-breaker. The cursor state is taken from `event_monitoring_method.event_log_file.cursor.field` field for the last event fetched from the Salesforce instance.
 
-The default and value queries should keep their filter field, sort field, and `cursor.field` aligned. For example, if `cursor.field` is `CreatedDate`, both queries should filter on `CreatedDate` and use `ORDER BY CreatedDate`.
+The default and value queries should keep their filter field, sort field, and `cursor.field` aligned. For example, if `cursor.field` is `CreatedDate`, both queries should filter on `CreatedDate` and use `ORDER BY CreatedDate`. If multiple records can share the same cursor value, select `Id`, add it as a secondary sort, and compare it with `event_log_file.last_event_id` in the value query.
 
 
 ## `event_monitoring_method.event_log_file.cursor.field` [_event_monitoring_method_event_log_file_cursor_field]
