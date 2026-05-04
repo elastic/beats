@@ -47,7 +47,7 @@ The HTTP endpoint has the following configuration settings:
 :   (Optional) `mutex_profile_rate` controls the fraction of mutex contention events that are reported in the mutex profile available from `/debug/pprof/mutex`. On average 1/rate events are reported. To turn off profiling entirely, pass rate 0. The default value is 0.
 
 `http.debug.state_inspector.enabled`
-:   (Optional) Enable the state store inspector. This is a debugging tool intended for development and troubleshooting only. **Do not enable in production:** the inspector allows reading and deleting state entries, which may cause data loss or duplicate processing. When enabled, the internal state store used by the beat is exposed via HTTP for inspection and manipulation. Default is `false`. See [State Inspector](#state-inspector) for details.
+:   (Optional) Enable the state store inspector. **This is an internal debugging tool for Elastic engineers, not a supported product feature.** It has no authentication, may expose sensitive data (file paths, S3 object keys, AWS account identifiers, hostnames), and may be changed or removed in any release without notice. Deleting state entries can cause duplicate processing, gaps in ingestion, or data loss. If you must enable it, bind `http.host` to a loopback address, Unix socket, or Windows named pipe, and disable it again when done. Default is `false`. See [State Inspector](#state-inspector) for details.
 
 This is the list of paths you can access. For pretty JSON output append `?pretty` to the URL.
 
@@ -212,21 +212,23 @@ stack: preview 9.5
 ```
 
 ::::{warning}
-The state inspector is a debugging tool intended for development and troubleshooting only. **Do not enable in production.** It allows reading and deleting state entries, which may cause data loss or duplicate processing.
+**Internal debugging tool — not a supported product feature.** This is intended for use by Elastic engineers during development and troubleshooting. It has no authentication and may be changed or removed in any release without notice.
+
+The state store may contain sensitive information such as source file paths, S3 object keys, AWS account identifiers, and source hostnames, all of which will be returned to any client that can reach the endpoint. Deleting state entries can cause duplicate processing, gaps in ingestion, or data loss; for active inputs, deletes may be transient and silently overwritten by the in-memory registrar.
+
+If you must enable this for troubleshooting, bind `http.host` to a loopback address (`127.0.0.1`), a Unix socket, or a Windows named pipe, and disable it again as soon as you are done.
 ::::
 
-`/debug/state-inspector/states` returns a JSON array of all key-value pairs in Filebeat's internal state store. `/debug/state-inspector/states.html` serves a web UI for browsing and deleting individual state entries.
+These endpoints are only available when `http.debug.state_inspector.enabled` is set to `true`. Filebeat exposes its input registry through this endpoint.
 
-These endpoints are only available when `http.debug.state_inspector.enabled` is set to `true`.
+`/debug/state-inspector/states` returns a JSON array of all key-value pairs in the internal state store. `/debug/state-inspector/states.html` serves a browser UI for the same data.
 
 ```sh
 curl -XGET 'localhost:5066/debug/state-inspector/states?pretty'
 ```
 
-To delete a specific state entry:
+To permanently delete a specific state entry:
 
 ```sh
 curl -XDELETE 'localhost:5066/debug/state-inspector/states/<key>'
 ```
-
-Filebeat exposes its input registry through this endpoint.

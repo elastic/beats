@@ -1280,14 +1280,28 @@ logging.files:
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
 
-# Enables the state store inspector that exposes the beat's internal state
-# store via the HTTP endpoint. This is a debugging tool intended for
-# development and troubleshooting only. Do not enable in production: the
-# inspector allows reading and deleting state entries, which may cause data
-# loss or duplicate processing.
-# When enabled, the following endpoints become available:
-#   http://localhost:5066/debug/state-inspector/states      - JSON dump of all states
-#   http://localhost:5066/debug/state-inspector/states.html  - Web UI for browsing and deleting states
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
 #http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
