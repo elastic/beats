@@ -180,7 +180,7 @@ func Test(t *testing.T) {
 
 	var times []time.Time
 	t.Run("full", func(t *testing.T) {
-		users, err := GetDetails("(&(objectCategory=person)(objectClass=user))", url, user, pass, base, time.Time{}, nil, nil, 0, nil, nil)
+		users, err := GetDetails("(&(objectCategory=person)(objectClass=user))", url, user, pass, base, time.Time{}, nil, nil, 0, nil, nil, "user")
 		if err != nil {
 			t.Fatalf("unexpected error from GetDetails: %v", err)
 		}
@@ -226,7 +226,7 @@ func Test(t *testing.T) {
 				want++
 			}
 		}
-		users, err := GetDetails("(&(objectCategory=person)(objectClass=user))", url, user, pass, base, since, nil, nil, 0, nil, nil)
+		users, err := GetDetails("(&(objectCategory=person)(objectClass=user))", url, user, pass, base, since, nil, nil, 0, nil, nil, "user")
 		if err != nil {
 			t.Fatalf("unexpected error from GetDetails: %v", err)
 		}
@@ -271,5 +271,105 @@ func Test(t *testing.T) {
 			t.Errorf("failed to marshal groups for logging: %v", err)
 		}
 		t.Logf("empty groups: %s", b)
+	})
+}
+
+func TestGetDetailsInvalidEntTyp(t *testing.T) {
+	base, err := ldap.ParseDN("DC=example,DC=com")
+	if err != nil {
+		t.Fatalf("failed to parse DN: %v", err)
+	}
+	_, err = GetDetails("(objectClass=*)", "ldap://localhost", "", "", base, time.Time{}, nil, nil, 0, nil, nil, "bogus")
+	if err == nil {
+		t.Fatal("expected error for invalid entTyp")
+	}
+	if got := err.Error(); got != `invalid entity type: "bogus"` {
+		t.Errorf("unexpected error message: %s", got)
+	}
+}
+
+func TestEntryDeviceFieldJSON(t *testing.T) {
+	e := Entry{
+		ID:     "cn=host1,dc=example,dc=com",
+		Device: map[string]any{"cn": "host1"},
+		Groups: []any{map[string]any{"cn": "Admins"}},
+	}
+	b, err := json.Marshal(e)
+	if err != nil {
+		t.Fatalf("unexpected marshal error: %v", err)
+	}
+	var m map[string]any
+	if err := json.Unmarshal(b, &m); err != nil {
+		t.Fatalf("unexpected unmarshal error: %v", err)
+	}
+	if _, ok := m["device"]; !ok {
+		t.Error("expected 'device' key in marshaled Entry")
+	}
+	if _, ok := m["user"]; ok {
+		t.Error("unexpected 'user' key in marshaled Entry with nil User")
+	}
+}
+
+func TestCollateEntityKey(t *testing.T) {
+	groups := entries{
+		"cn=Admins,dc=example,dc=com": map[string]any{
+			"cn": "Admins",
+		},
+	}
+
+	resp := &ldap.SearchResult{
+		Entries: []*ldap.Entry{
+			{
+				DN: "cn=host1,dc=example,dc=com",
+				Attributes: []*ldap.EntryAttribute{
+					{Name: "cn", Values: []string{"host1"}},
+					{Name: "memberOf", Values: []string{"cn=Admins,dc=example,dc=com"}},
+				},
+			},
+		},
+	}
+
+	t.Run("user", func(t *testing.T) {
+		dir := collate(resp, groups, "user")
+		entry, ok := dir.Entries["cn=host1,dc=example,dc=com"]
+		if !ok {
+			t.Fatal("expected entry for cn=host1")
+		}
+		if _, ok := entry["user"]; !ok {
+			t.Error("expected 'user' key in collated entry")
+		}
+		if _, ok := entry["device"]; ok {
+			t.Error("unexpected 'device' key in collated entry")
+		}
+	})
+
+	t.Run("device", func(t *testing.T) {
+		dir := collate(resp, groups, "device")
+		entry, ok := dir.Entries["cn=host1,dc=example,dc=com"]
+		if !ok {
+			t.Fatal("expected entry for cn=host1")
+		}
+		if _, ok := entry["device"]; !ok {
+			t.Error("expected 'device' key in collated entry")
+		}
+		if _, ok := entry["user"]; ok {
+			t.Error("unexpected 'user' key in collated entry")
+		}
+	})
+
+	t.Run("groups_resolved", func(t *testing.T) {
+		dir := collate(resp, groups, "device")
+		entry := dir.Entries["cn=host1,dc=example,dc=com"]
+		grps, ok := entry["groups"]
+		if !ok {
+			t.Fatal("expected 'groups' key in collated entry")
+		}
+		grpSlice, ok := grps.([]any)
+		if !ok {
+			t.Fatalf("expected groups to be []any, got %T", grps)
+		}
+		if len(grpSlice) != 1 {
+			t.Fatalf("expected 1 group, got %d", len(grpSlice))
+		}
 	})
 }
