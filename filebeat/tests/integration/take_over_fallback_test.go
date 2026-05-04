@@ -160,7 +160,39 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	snapshotIdx++
 	copyOutputSnapshot(t, tempDir, snapshotIdx, "filestream-1")
 
-	// Steps 14+ continue from this state.
+	// 6. Re-enable Log input, ingest one deterministic batch and assert continuity.
+	writeLogInputConfig(t, inputsDir, logPaths)
+	appendLogsToFiles(logPhaseBatchSize)
+
+	prevExpectedEvents := expectedEvents
+	newLogEvents := 0
+	for _, path := range logFiles {
+		latestWrittenCounter := nextCounter[path] - 1
+		newLogEvents += latestWrittenCounter - lastSeen["log"][path]
+	}
+	expectedEvents += newLogEvents
+	filebeat.WaitPublishedEvents(2*time.Minute, expectedEvents)
+	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
+	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["log"], "log")
+
+	// 7. Update Log baseline, disable all inputs and snapshot.
+	for _, event := range events {
+		if event.Input.Type != "log" {
+			continue
+		}
+
+		counter := counterFromMessage(t, event.Message)
+		prev, exists := lastSeen["log"][event.Log.File.Path]
+		if !exists || counter > prev {
+			lastSeen["log"][event.Log.File.Path] = counter
+		}
+	}
+
+	disableActiveInput(t, inputsDir, filebeat, "log")
+	snapshotIdx++
+	copyOutputSnapshot(t, tempDir, snapshotIdx, "log-2")
+
+	// Steps 17+ continue from this state.
 }
 
 func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
@@ -275,6 +307,59 @@ func assertNoDuplicationFromPreviousInput(
 				path,
 				minCounterByPath[path],
 				boundary,
+			)
+		}
+	}
+}
+
+// assertContinuesFromLast verifies that, for each file, events produced by
+// inputType in the current phase continue exactly after the previous boundary.
+// It expects the first observed counter in this phase to be lastSeen[path] + 1.
+func assertContinuesFromLast(
+	t *testing.T,
+	events []fallbackEvent,
+	logFiles []string,
+	lastSeen map[string]int,
+	inputType string,
+) {
+	t.Helper()
+
+	// Pass 1: inspect only events from the target input type and capture
+	// the first counter value observed per file in this phase.
+	minCounterByPath := map[string]int{}
+	seenByPath := map[string]bool{}
+	for _, event := range events {
+		if event.Input.Type != inputType {
+			continue
+		}
+
+		path := event.Log.File.Path
+		counter := counterFromMessage(t, event.Message)
+		if prev, ok := minCounterByPath[path]; !ok || counter < prev {
+			minCounterByPath[path] = counter
+		}
+		seenByPath[path] = true
+	}
+
+	// Pass 2: each file must have events and must continue exactly from the
+	// previous boundary (first counter == lastSeen + 1).
+	for _, path := range logFiles {
+		if !seenByPath[path] {
+			t.Fatalf("did not find %s events for %q after re-enable", inputType, path)
+		}
+
+		boundary, exists := lastSeen[path]
+		if !exists {
+			t.Fatalf("missing previous %s boundary for %q", inputType, path)
+		}
+
+		if minCounterByPath[path] != boundary+1 {
+			t.Fatalf(
+				"%s did not continue from previous boundary for %q: first counter=%d expected=%d",
+				inputType,
+				path,
+				minCounterByPath[path],
+				boundary+1,
 			)
 		}
 	}
