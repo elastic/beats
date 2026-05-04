@@ -13,17 +13,18 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Fix conflicting CEL periodic OTel metric field names.
+summary: Re-evaluate url_program on each websocket reconnect using evolved cursor state.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: |
-  Rename the CEL periodic run counter from input.cel.periodic.run to
-  input.cel.periodic.run.count so the run namespace stays consistent
-  alongside input.cel.periodic.run.duration in Elasticsearch mappings.
-  Also correct related metric documentation and instrument creation
-  error messages.
+  The streaming input now re-evaluates url_program before each websocket
+  reconnection (both error recovery and OAuth2 token refresh), allowing
+  cursor state accumulated during the session to influence the reconnect URL.
+  Previously url_program was evaluated once at startup and the result was
+  reused for all subsequent connections. The process function also now returns
+  the evolved cursor so that callers can propagate it into the shared state.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -41,10 +42,10 @@ component: filebeat
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-pr: https://github.com/elastic/beats/50135
+# pr: https://github.com/owner/repo/1234
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-issue: https://github.com/elastic/beats/issues/49180
+# issue: https://github.com/owner/repo/1234
