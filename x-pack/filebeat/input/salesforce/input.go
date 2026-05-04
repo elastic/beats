@@ -418,6 +418,11 @@ func (s *salesforceInput) RunObject() error {
 	if err != nil {
 		return err
 	}
+	if s.cursor == nil {
+		// Defensive initialization for tests/callers that invoke RunObject
+		// directly without going through the full setup path.
+		s.cursor = &state{}
+	}
 
 	s.log.Infof("Running Object collection with interval: %s", objectCfg.Interval)
 
@@ -679,6 +684,11 @@ func (s *salesforceInput) RunEventLogFile() error {
 	if err != nil {
 		return err
 	}
+	if s.cursor == nil {
+		// Defensive initialization for tests/callers that invoke RunEventLogFile
+		// directly without going through the full setup path.
+		s.cursor = &state{}
+	}
 	if eventLogFileCfg.Query == nil || eventLogFileCfg.Cursor == nil || eventLogFileCfg.Cursor.Field == "" {
 		return errors.New("internal error: event log file query/cursor configuration is not set")
 	}
@@ -837,6 +847,16 @@ func (s *salesforceInput) downloadLogFileOnce(logfile string) (*http.Response, e
 	return resp, nil
 }
 
+// normalizeOAuthTokenURL accepts either a Salesforce login host
+// ("https://login.salesforce.com") or a full token endpoint
+// ("https://login.salesforce.com/services/oauth2/token") and returns the base
+// URL shape expected by go-sfdc before it appends "/services/oauth2/token".
+func normalizeOAuthTokenURL(rawURL string) string {
+	trimmed := strings.TrimRight(strings.TrimSpace(rawURL), "/")
+	trimmed = strings.TrimSuffix(trimmed, "/services/oauth2/token")
+	return strings.TrimRight(trimmed, "/")
+}
+
 // getSFDCConfig returns a new Salesforce configuration based on the configuration.
 func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	var (
@@ -866,7 +886,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 		passCreds := credentials.JwtCredentials{
 			URL:            cfg.Auth.OAuth2.JWTBearerFlow.URL,
-			TokenURL:       cfg.Auth.OAuth2.JWTBearerFlow.TokenURL,
+			TokenURL:       normalizeOAuthTokenURL(cfg.Auth.OAuth2.JWTBearerFlow.TokenURL),
 			ClientId:       cfg.Auth.OAuth2.JWTBearerFlow.ClientID,
 			ClientUsername: cfg.Auth.OAuth2.JWTBearerFlow.ClientUsername,
 			ClientKey:      signKey,
@@ -880,7 +900,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		s.log.Info("Using User Password Flow for authentication")
 		passCreds := credentials.PasswordCredentials{
-			URL:          cfg.Auth.OAuth2.UserPasswordFlow.TokenURL,
+			URL:          normalizeOAuthTokenURL(cfg.Auth.OAuth2.UserPasswordFlow.TokenURL),
 			Username:     cfg.Auth.OAuth2.UserPasswordFlow.Username,
 			Password:     cfg.Auth.OAuth2.UserPasswordFlow.Password,
 			ClientID:     cfg.Auth.OAuth2.UserPasswordFlow.ClientID,

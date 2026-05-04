@@ -171,7 +171,7 @@ The audience URL for JWT authentication.
 
 *`var.authentication.jwt_bearer_flow.token_url`*::
 
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
+Optional Salesforce OAuth login host or token endpoint override for JWT authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -187,7 +187,7 @@ The client secret for user-password authentication.
 
 *`var.authentication.user_password_flow.token_url`*::
 
-The Salesforce token URL for user-password authentication.
+The Salesforce OAuth login host or token endpoint for user-password authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`.
 
 *`var.authentication.user_password_flow.username`*::
 
@@ -294,7 +294,7 @@ The audience URL for JWT authentication.
 
 *`var.authentication.jwt_bearer_flow.token_url`*::
 
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
+Optional Salesforce OAuth login host or token endpoint override for JWT authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -310,7 +310,7 @@ The client secret for user-password authentication.
 
 *`var.authentication.user_password_flow.token_url`*::
 
-The Salesforce token URL for user-password authentication.
+The Salesforce OAuth login host or token endpoint for user-password authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`.
 
 *`var.authentication.user_password_flow.username`*::
 
@@ -413,7 +413,7 @@ The audience URL for JWT authentication.
 
 *`var.authentication.jwt_bearer_flow.token_url`*::
 
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
+Optional Salesforce OAuth login host or token endpoint override for JWT authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -429,7 +429,7 @@ The client secret for user-password authentication.
 
 *`var.authentication.user_password_flow.token_url`*::
 
-The Salesforce token URL for user-password authentication.
+The Salesforce OAuth login host or token endpoint for user-password authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`.
 
 *`var.authentication.user_password_flow.username`*::
 
@@ -522,7 +522,7 @@ The audience URL for JWT authentication.
 
 *`var.authentication.jwt_bearer_flow.token_url`*::
 
-The Salesforce OAuth token endpoint for JWT authentication. This endpoint is used for JWT Bearer flow and defaults to `var.authentication.jwt_bearer_flow.url` if empty. Only use a custom value if you have a custom domain and don't allow default endpoints such as `https://login.salesforce.com` or `https://test.salesforce.com`.
+Optional Salesforce OAuth login host or token endpoint override for JWT authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
 
 *`var.authentication.user_password_flow.enabled`*::
 
@@ -538,7 +538,7 @@ The client secret for user-password authentication.
 
 *`var.authentication.user_password_flow.token_url`*::
 
-The Salesforce token URL for user-password authentication.
+The Salesforce OAuth login host or token endpoint for user-password authentication. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`.
 
 *`var.authentication.user_password_flow.username`*::
 

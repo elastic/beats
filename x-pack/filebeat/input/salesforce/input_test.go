@@ -1233,6 +1233,7 @@ func TestRunObjectUnbatchedRestoresCursorOnMidStreamFailure(t *testing.T) {
 	assert.Equal(t, 1, nextPageCount, "expected the next page to be attempted once before failing")
 	assert.Len(t, client.published, 1, "expected the first page row to publish before the next page failure")
 
+	require.NotNil(t, s.cursor, "expected object cursor state to remain initialized after a failed run")
 	assert.Equal(t, preFirstEventTime, s.cursor.Object.FirstEventTime, "expected failed unbatched run to restore first_event_time so the next tick does not skip rows past the last durable ACK")
 	assert.Equal(t, preLastEventTime, s.cursor.Object.LastEventTime, "expected failed unbatched run to restore last_event_time so the next tick does not skip rows past the last durable ACK")
 	assert.Equal(t, preLastEventID, s.cursor.Object.LastEventID, "expected failed unbatched run to restore last_event_id so the next tick does not skip same-timestamp rows past the last durable ACK")
@@ -1326,6 +1327,7 @@ func TestRunObjectClearsStaleLastEventIDWhenQueryDropsIDWithoutRows(t *testing.T
 	require.NoError(t, err, "expected custom setup audit trail run without Id to succeed even when it returns no rows")
 
 	require.Empty(t, client.published, "expected no events to be published when the custom query returns no rows")
+	require.NotNil(t, s.cursor, "expected object cursor state to remain initialized after a successful run")
 	assert.Empty(t, s.cursor.Object.LastEventID, "expected a successful no-row run to clear any stale last_event_id rather than carry it into a future last_event_time bucket")
 	assert.Equal(t, "2024-01-01T00:00:00.000+0000", s.cursor.Object.LastEventTime, "expected last_event_time to remain unchanged when the custom query returns no rows")
 }
@@ -1542,6 +1544,7 @@ func TestRunEventLogFileReopensSessionOnUnauthorizedDownload(t *testing.T) {
 	assert.Equal(t, 1, queryRequests, "expected the SOQL query itself to succeed without retry in this scenario")
 	assert.Equal(t, 2, downloadHits, "expected the EventLogFile download to be attempted once before and once after session re-open")
 	assert.Len(t, client.published, 1, "expected exactly one CSV row to be published after the re-auth retry succeeded")
+	require.NotNil(t, s.cursor, "expected event log file cursor state to remain initialized after re-auth success")
 	assert.Equal(t, "2023-12-19T21:04:35.000+0000", s.cursor.EventLogFile.FirstEventTime, "expected successful retry to advance first_event_time")
 	assert.Equal(t, "2023-12-19T21:04:35.000+0000", s.cursor.EventLogFile.LastEventTime, "expected successful retry to advance last_event_time")
 }
@@ -2017,6 +2020,7 @@ func TestRunObjectWithBatchingPaginationFailureRetriesSameWindow(t *testing.T) {
 	err = s.RunObject()
 	require.Error(t, err, "expected paginated batch failure to bubble up")
 	assert.Len(t, firstPublisher.published, 1, "expected the first page to publish before the next page failure")
+	require.NotNil(t, s.cursor, "expected object cursor state to remain initialized after a failed batched run")
 	assert.Empty(t, s.cursor.Object.ProgressTime, "expected failed paginated batch to leave progress_time unset so the same window can be retried")
 	assert.Equal(t, 1, batchQueryCount, "expected the failed run to execute the batch window once")
 	assert.Equal(t, 1, nextPageCount, "expected the failed run to attempt the next page once")
@@ -2152,6 +2156,7 @@ func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFai
 	assert.Len(t, firstPublisher.published, 1, "expected the first successful window to publish before the later window fails")
 	assert.Equal(t, 1, firstBatchCount, "expected the first window to run once")
 	assert.Equal(t, 1, secondBatchCount, "expected the second window to fail on its first attempt")
+	require.NotNil(t, s.cursor, "expected object cursor state to remain initialized after a partial batched run")
 	assert.Equal(t, "2024-01-01T11:50:00.000Z", s.cursor.Object.ProgressTime, "expected progress_time to remain at the end of the last successful window")
 
 	retryPublisher := publisher{}
@@ -2164,6 +2169,7 @@ func TestRunObjectWithBatchingResumesFromLastSuccessfulWindowAfterLaterWindowFai
 	assert.Equal(t, 2, secondBatchCount, "expected retry to re-run only the failed second window")
 	assert.Equal(t, 1, thirdBatchCount, "expected retry to continue into the next available window once the failed window succeeds")
 	assert.Len(t, retryPublisher.published, 1, "expected retry to publish only the remaining failed window")
+	require.NotNil(t, s.cursor, "expected object cursor state to remain initialized after retry")
 	assert.Equal(t, "2024-01-01T12:00:00.000Z", s.cursor.Object.ProgressTime, "expected progress_time to advance through the remaining available windows in the retry run")
 }
 
@@ -2491,6 +2497,7 @@ func TestRunEventLogFileReturnsProcessingErrors(t *testing.T) {
 	require.Error(t, err, "expected publisher failures to bubble out of ELF processing")
 	assert.ErrorContains(t, err, "error processing log file CSV", "expected RunEventLogFile to describe ELF processing errors generically")
 	assert.ErrorContains(t, err, "error publishing event: publisher exploded", "expected the wrapped error to preserve the publisher failure")
+	require.NotNil(t, s.cursor, "expected event log file cursor state to remain initialized after failed processing")
 	assert.Empty(t, s.cursor.EventLogFile.FirstEventTime, "expected failed ELF stream processing to not advance first_event_time")
 	assert.Empty(t, s.cursor.EventLogFile.LastEventTime, "expected failed ELF stream processing to not advance last_event_time")
 }
@@ -2808,6 +2815,62 @@ func TestPlugin(t *testing.T) {
 	_ = Plugin(logptest.NewTestingLogger(t, "salesforce_test"), stateStore{})
 }
 
+func TestUserPasswordFlowTokenURLAcceptsFullTokenEndpoint(t *testing.T) {
+	t.Parallel()
+
+	var tokenHits int
+	var server *httptest.Server
+	server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/services/oauth2/token" {
+			http.NotFound(w, r)
+			return
+		}
+		tokenHits++
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"access_token":"token","instance_url":%q,"token_type":"Bearer"}`, server.URL)
+	}))
+	t.Cleanup(server.Close)
+
+	cfg := defaultConfig()
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"url":     server.URL,
+		"version": 56,
+		"auth.oauth2": map[string]interface{}{
+			"user_password_flow": map[string]interface{}{
+				"enabled":       true,
+				"client.id":     "clientid",
+				"client.secret": "clientsecret",
+				"token_url":     server.URL + "/services/oauth2/token",
+				"username":      "username",
+				"password":      "password",
+			},
+		},
+		"event_monitoring_method": map[string]interface{}{
+			"object": map[string]interface{}{
+				"interval": "1s",
+				"enabled":  true,
+				"query": map[string]interface{}{
+					"default": "SELECT Id FROM Account",
+					"value":   "SELECT Id FROM Account WHERE Id > [[ .cursor.object.first_event_time ]]",
+				},
+				"cursor": map[string]interface{}{
+					"field": "Id",
+				},
+			},
+		},
+	}).Unpack(&cfg)
+	require.NoError(t, err, "user password config should unpack")
+
+	input := &salesforceInput{config: cfg, log: logptest.NewTestingLogger(t, "test")}
+	sfdcCfg, err := input.getSFDCConfig(&cfg)
+	require.NoError(t, err, "expected getSFDCConfig to accept a full token endpoint URL")
+
+	input.sfdcConfig = sfdcCfg
+	_, err = input.SetupSFClientConnection()
+	require.NoError(t, err, "expected a full user_password_flow.token_url endpoint to be normalized before go-sfdc appends its path")
+	assert.Equal(t, 1, tokenHits, "expected exactly one OAuth request to the canonical token endpoint")
+}
+
 // TestJWTBearerFlowTokenURL verifies that the salesforce input correctly passes
 // the token_url configuration to the underlying go-sfdc library, which handles
 // the fallback logic (use token_url if set, otherwise fall back to url).
@@ -2823,9 +2886,14 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 		Bytes: x509.MarshalPKCS1PrivateKey(key),
 	}), 0o600))
 
-	// oauthHandler returns a handler that tracks hits and responds with valid OAuth tokens
+	// oauthHandler only accepts the canonical token path so tests can distinguish
+	// a base host from a full token endpoint URL.
 	oauthHandler := func(hits *int) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/services/oauth2/token" {
+				http.NotFound(w, r)
+				return
+			}
 			*hits++
 			w.Header().Set("Content-Type", "application/json")
 			fmt.Fprintf(w, `{"access_token":"token","instance_url":%q,"token_type":"Bearer"}`, "http://"+r.Host)
@@ -2897,6 +2965,29 @@ func TestJWTBearerFlowTokenURL(t *testing.T) {
 
 		assert.Equal(t, 0, urlHits, "url should NOT receive requests when token_url is set")
 		assert.Equal(t, 1, tokenURLHits, "token_url should receive the OAuth request")
+	})
+
+	t.Run("full token_url endpoint is normalized before request", func(t *testing.T) {
+		t.Parallel()
+
+		var urlHits, tokenURLHits int
+		urlSrv := httptest.NewServer(oauthHandler(&urlHits))
+		tokenURLSrv := httptest.NewServer(oauthHandler(&tokenURLHits))
+		t.Cleanup(urlSrv.Close)
+		t.Cleanup(tokenURLSrv.Close)
+
+		cfg := newConfig(urlSrv.URL, tokenURLSrv.URL+"/services/oauth2/token", keyPath)
+
+		input := &salesforceInput{config: *cfg, log: logptest.NewTestingLogger(t, "test")}
+		sfdcCfg, err := input.getSFDCConfig(cfg)
+		require.NoError(t, err)
+
+		input.sfdcConfig = sfdcCfg
+		_, err = input.SetupSFClientConnection()
+		require.NoError(t, err, "expected a full jwt_bearer_flow.token_url endpoint to be normalized before go-sfdc appends its path")
+
+		assert.Equal(t, 0, urlHits, "url should NOT receive requests when token_url is set")
+		assert.Equal(t, 1, tokenURLHits, "token_url should receive the OAuth request on the canonical path")
 	})
 }
 

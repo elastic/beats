@@ -218,7 +218,7 @@ The client secret for the user-password flow.
 
 ## `auth.oauth2.user_password_flow.token_url` [_auth_oauth2_user_password_flow_token_url]
 
-The token URL for the user-password flow.
+The Salesforce OAuth login host or token endpoint for the user-password flow. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`.
 
 
 ## `auth.oauth2.user_password_flow.username` [_auth_oauth2_user_password_flow_username]
@@ -259,6 +259,11 @@ The path to the private key file for the JWT bearer flow. The file must be PEM e
 ## `auth.oauth2.jwt_bearer_flow.url` [_auth_oauth2_jwt_bearer_flow_url]
 
 The URL for the JWT bearer flow.
+
+
+## `auth.oauth2.jwt_bearer_flow.token_url` [_auth_oauth2_jwt_bearer_flow_token_url]
+
+Optional Salesforce OAuth login host or token endpoint override for the JWT bearer flow. You can provide either a base URL such as `https://login.salesforce.com` or a full endpoint such as `https://login.salesforce.com/services/oauth2/token`. If omitted, `auth.oauth2.jwt_bearer_flow.url` is used.
 
 
 ## `url` [_url_2]
