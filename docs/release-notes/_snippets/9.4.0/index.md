@@ -91,40 +91,18 @@
   This fix ensures that body size limiting is applied to all incoming requests regardless of authentication method.
   Additionally, restored missing documentation for the max_body_bytes setting in the HTTP Endpoint input.
   
-* Fix http_endpoint input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. [#49415](https://github.com/elastic/beats/pull/49415) 
-
-  Decouple the shared HTTP server lifetime from any single input. Previously,
-  the server context was derived from the creator input, so cancelling a joiner
-  blocked forever (deadlock) and cancelling the creator shut down all inputs on
-  the same port. The server now lives until the last input deregisters.
-  
-* Fix typo in CEL input OTel tracing logging. [#49692](https://github.com/elastic/beats/pull/49692) [#49625](https://github.com/elastic/beats/issues/49625)
-* Fix container input not respecting max bytes when parsing CRI partial lines. [#49743](https://github.com/elastic/beats/pull/49743) [#49259](https://github.com/elastic/beats/issues/49259)
-* Fix internal processing time metric for azureeventhub input. [#40547](https://github.com/elastic/beats/pull/40547) 
-* Fix CSV decoder producing malformed JSON when field values contain double quotes in azure-blob-storage input. [#50097](https://github.com/elastic/beats/pull/50097) 
-
-  The azure-blob-storage input&#39;s decode path only matched the decoder.Decoder
-  interface, which builds JSON via string concatenation without escaping field
-  values. CSV values containing double quotes (e.g. RFC 2045 MIME type
-  parameters) produce malformed JSON, causing downstream ingest pipeline
-  failures. Add a decoder.ValueDecoder switch case which uses json.Marshal
-  for correct escaping, matching the pattern already used by the GCS input.
-  
-* Update cel-go to v0.28.0, fixing runtime error location reporting. [#50176](https://github.com/elastic/beats/pull/50176) 
-* Re-evaluate url_program on each websocket reconnect using evolved cursor state. [#50383](https://github.com/elastic/beats/pull/50383) 
-
-  The streaming input now re-evaluates url_program before each websocket
-  reconnection (both error recovery and OAuth2 token refresh), allowing
-  cursor state accumulated during the session to influence the reconnect URL.
-  Previously url_program was evaluated once at startup and the result was
-  reused for all subsequent connections. The process function also now returns
-  the evolved cursor so that callers can propagate it into the shared state.
-  
-* Reduce allocation pressure in httpjson cursor update and split paths. [#50384](https://github.com/elastic/beats/pull/50384) 
+* Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. [#49415](https://github.com/elastic/beats/pull/49415) 
+* Fix a typo in CEL input OTel tracing logging. [#49692](https://github.com/elastic/beats/pull/49692) [#49625](https://github.com/elastic/beats/issues/49625)
+* Fix the `container` input not respecting `max_bytes` when parsing CRI partial lines. [#49743](https://github.com/elastic/beats/pull/49743) [#49259](https://github.com/elastic/beats/issues/49259)
+* Fix internal processing time metric for `azureeventhub` input. [#40547](https://github.com/elastic/beats/pull/40547) 
+* Fix CSV decoder producing malformed JSON when field values contain double quotes in `azure-blob-storage` input. [#50097](https://github.com/elastic/beats/pull/50097) 
+* Update `cel-go` to v0.28.0, fixing runtime error location reporting. [#50176](https://github.com/elastic/beats/pull/50176) 
+* Re-evaluate `url_program` on each websocket reconnect using evolved cursor state. [#50383](https://github.com/elastic/beats/pull/50383) 
+* Reduce allocation pressure in `httpjson` cursor update and split paths. [#50384](https://github.com/elastic/beats/pull/50384) 
 
 **Libbeat**
 
-* Fix conversion of time duration fields such as event.duration when using Beats receivers. [#50302](https://github.com/elastic/beats/pull/50302) 
+* Fix conversion of time duration fields such as `event.duration` when using Beat receivers. [#50302](https://github.com/elastic/beats/pull/50302) 
 
 **Metricbeat**
 
@@ -141,5 +119,5 @@
 
 **Winlogbeat**
 
-* Fix no_more_events stop losing final batch of events when io.EOF is returned alongside records. [#49012](https://github.com/elastic/beats/pull/49012) [#47388](https://github.com/elastic/beats/issues/47388)
+* Fix `no_more_events` stop losing final batch of events when `io.EOF` is returned alongside records. [#49012](https://github.com/elastic/beats/pull/49012) [#47388](https://github.com/elastic/beats/issues/47388)
 
