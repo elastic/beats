@@ -86,11 +86,6 @@
 
 * Support `abuse.ch` auth key usage in the Threat Intel module. [#45212](https://github.com/elastic/beats/pull/45212) [#45206](https://github.com/elastic/beats/issues/45206)
 * Fix `max_body_bytes` setting not working without HMAC and add missing documentation configuration options in HTTP Endpoint input. [#48550](https://github.com/elastic/beats/pull/48550) [#48512](https://github.com/elastic/beats/issues/48512)
-
-  Previously, the max_body_bytes setting was only applied during HMAC validation, meaning it had no effect on requests that didn&#39;t use HMAC authentication.
-  This fix ensures that body size limiting is applied to all incoming requests regardless of authentication method.
-  Additionally, restored missing documentation for the max_body_bytes setting in the HTTP Endpoint input.
-  
 * Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. [#49415](https://github.com/elastic/beats/pull/49415) 
 * Fix a typo in CEL input OTel tracing logging. [#49692](https://github.com/elastic/beats/pull/49692) [#49625](https://github.com/elastic/beats/issues/49625)
 * Fix the `container` input not respecting `max_bytes` when parsing CRI partial lines. [#49743](https://github.com/elastic/beats/pull/49743) [#49259](https://github.com/elastic/beats/issues/49259)
