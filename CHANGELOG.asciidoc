@@ -20,7 +20,7 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
 [[new-features-8.19.15]]
-=== New features
+==== New features
 
 **Filebeat**
 
@@ -28,7 +28,7 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
 [[enhancements-8.19.15]]
-=== Enhancements
+==== Enhancements
 
 **All**
 
@@ -40,7 +40,7 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
 [[upgrades-8.19.15]]
-=== Upgrades
+==== Upgrades
 
 **Filebeat**
 
@@ -48,7 +48,7 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
 [discrete]
 [[bug-fixes-8.19.15]]
-=== Bug fixes
+==== Bug fixes
 
 **Filebeat**
 
