@@ -3,20 +3,20 @@ name: "beats-libbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64-1772337686"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64-1777608114"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1777608114"
   IMAGE_WIN_10: "platform-ingest-beats-windows-10-pro"
   IMAGE_WIN_11: "platform-ingest-beats-windows-11-pro"
-  IMAGE_WIN_10_VERSION: "1.0.1776697195"
-  IMAGE_WIN_11_VERSION: "1.0.1776697195"
-  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1772337686"
-  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1772337686"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
-  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1772337686"
+  IMAGE_WIN_10_VERSION: "1.0.1777608114"
+  IMAGE_WIN_11_VERSION: "1.0.1777608114"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1777608114"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1777608114"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1777608114"
+  IMAGE_UBUNTU_X86_64_FIPS: "platform-ingest-beats-ubuntu-2204-fips-1777608114"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -97,6 +97,7 @@ steps:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: Libbeat: Ubuntu x86_64 Go Unit Tests with fips provider and requirefips build tag"
+        skip: "https://github.com/elastic/beats/issues/50269: ssh keys not FIPS"
         key: "mandatory-linux-unit-test-fips-tag"
         command: |
           cd libbeat

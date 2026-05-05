@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Fix bulk indexing failures that could occur when using the Elasticsearch output with some non-Elastic backends.
+
+component: libbeat
+
+pr: https://github.com/elastic/beats/pull/49557

@@ -9,25 +9,17 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: feature
 
-# REQUIRED for all kinds
-# Change summary; a 80ish characters long description of the change.
-summary: Fix container input not respecting max bytes when parsing CRI partial lines
+summary: Add entcollect adapter for entity analytics minimal state providers.
 
-# REQUIRED for breaking-change, deprecation, known-issue
-# Long description; in case the summary is not enough to describe the change
-# this field accommodate a description without length limits.
-# description:
+description: |
+  Add adapter infrastructure to bridge the entcollect library into the
+  entity analytics input. This includes a kvstore transaction-to-store
+  adapter, a document-to-beat.Event publisher closure, a minimal state
+  provider registry, and a generic sync loop with timer, buffering, and
+  ACK-then-commit semantics.
 
-# REQUIRED for breaking-change, deprecation, known-issue
-# impact:
-
-# REQUIRED for breaking-change, deprecation, known-issue
-# action:
-
-# REQUIRED for all kinds
-# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: filebeat
 
 # AUTOMATED
@@ -42,4 +34,4 @@ component: filebeat
 # OPTIONAL to manually add other issue URLs
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
 # If not present is automatically filled by the tooling with the issue linked to the PR number.
-issue: https://github.com/elastic/beats/issues/49259
+# issue: https://github.com/owner/repo/1234
