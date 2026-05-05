@@ -284,7 +284,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {
