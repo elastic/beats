@@ -283,6 +283,15 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			s.cfg.Auth.OAuth2.accessToken = token.AccessToken
 			// set the new token expiry channel with 2 mins buffer
 			s.tokenExpiry = time.After(time.Until(token.Expiry) - s.cfg.Auth.OAuth2.TokenExpiryBuffer)
+			// Re-evaluate url_program before reconnecting so that cursor
+			// changes since the last connection are reflected in the URL.
+			updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to re-evaluate url_program on token refresh, using previous url", "error", err)
+			} else {
+				url = updatedURL
+			}
 			// establish a new connection with the new token
 			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 			handleConnectionResponse(resp, s.metrics, s.log)
@@ -319,6 +328,15 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 					}
 				}
+				// Re-evaluate url_program before reconnecting so that cursor
+				// changes since the last connection are reflected in the URL.
+				updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("failed to re-evaluate url_program on reconnect, using previous url", "error", err)
+				} else {
+					url = updatedURL
+				}
 				// Since c is already a pointer, we can reassign it to the new connection
 				// and the defer func will still handle it.
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
@@ -340,7 +358,14 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
 			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
-			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
+			currentCursor, ok := state["cursor"].(map[string]any)
+			if !ok {
+				currentCursor = s.cursor
+			}
+			newCursor, err := s.process(ctx, state, currentCursor, s.now().In(time.UTC))
+			if newCursor != nil {
+				state["cursor"] = newCursor
+			}
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
