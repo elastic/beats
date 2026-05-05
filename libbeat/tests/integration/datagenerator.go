@@ -37,7 +37,7 @@ import (
 // Prefix is added instead of current time if it exists.
 // If no prefix is passed, each line is 50 bytes long
 func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
-	_ = writeLogFileWithStartCounter(t, path, count, 0, append, prefix...)
+	_ = writeLogFileWithStartCounter(t, path, 0, count, append, prefix...)
 }
 
 // WriteLogFileFrom writes count lines to path, starting from startAt.
