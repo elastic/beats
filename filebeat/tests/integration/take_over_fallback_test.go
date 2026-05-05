@@ -141,7 +141,6 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 
 	_, logMaxByPath := countExtremesByPath(t, events, "log")
 	lastSeen["log"] = logMaxByPath
-	assertFilesIngested(t, lastSeen["log"], logFiles, "1st Log input run")
 
 	// 2. Disable Log input and snapshot output file for debugging
 	snapshotIdx := 0
@@ -169,7 +168,6 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	// 5. Stop Filestream input and snapshot output file for debugging
 	_, filestreamMaxByPath := countExtremesByPath(t, events, "filestream")
 	lastSeen["filestream"] = filestreamMaxByPath
-	assertFilesIngested(t, lastSeen["filestream"], logFiles, "filestream baseline")
 
 	snapshotIdx++
 	disableActiveInput(t, inputsDir, filebeat, "filestream")
@@ -195,7 +193,6 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	// 7. Update Log baseline, disable all inputs and snapshot.
 	_, updatedLogMaxByPath := countExtremesByPath(t, events, "log")
 	lastSeen["log"] = updatedLogMaxByPath
-	assertFilesIngested(t, lastSeen["log"], logFiles, "updated log baseline")
 
 	snapshotIdx++
 	disableActiveInput(t, inputsDir, filebeat, "log")
@@ -359,19 +356,6 @@ func countExtremesByPath(
 	return minCounter, maxCounter
 }
 
-// assertFilesIngested verifies that valuesByPath has an entry for every file in
-// logFiles. It is used to ensure each expected source file produced at least one
-// event for the evaluated phase/input.
-func assertFilesIngested(t *testing.T, valuesByPath map[string]int, logFiles []string, context string) {
-	t.Helper()
-
-	for _, path := range logFiles {
-		if _, exists := valuesByPath[path]; !exists {
-			t.Fatalf("missing %s value for path %q", context, path)
-		}
-	}
-}
-
 // assertNoDuplicationFromPreviousInput verifies that the first counter observed
 // for each file in inputType is strictly greater than the previously recorded
 // boundary in lastSeen, ensuring no duplication from prior phases.
@@ -385,7 +369,6 @@ func assertNoDuplicationFromPreviousInput(
 	t.Helper()
 
 	minCounterByPath, _ := countExtremesByPath(t, events, inputType)
-	assertFilesIngested(t, minCounterByPath, logFiles, inputType)
 
 	for _, path := range logFiles {
 		boundary, exists := lastSeen[path]
@@ -420,7 +403,6 @@ func assertContinuesFromLast(
 	// Pass 1: inspect only events from the target input type and capture
 	// the first counter value observed per file in this phase.
 	minCounterByPath, _ := countExtremesByPath(t, events, inputType)
-	assertFilesIngested(t, minCounterByPath, logFiles, inputType)
 
 	// Pass 2: each file must have events and must continue exactly from the
 	// previous boundary (first counter == lastSeen + 1).
