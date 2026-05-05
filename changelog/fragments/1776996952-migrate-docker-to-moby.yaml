@@ -1,0 +1,7 @@
+kind: enhancement
+
+summary: Migrate from deprecated github.com/docker/docker to github.com/moby/moby split modules
+
+component: all
+
+pr: https://github.com/elastic/beats/pull/50300
