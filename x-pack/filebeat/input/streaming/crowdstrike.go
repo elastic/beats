@@ -396,7 +396,14 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			}
 			state["response"] = []byte(msg)
 			s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
-			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
+			currentCursor, ok := state["cursor"].(map[string]any)
+			if !ok {
+				currentCursor = s.cursor
+			}
+			newCursor, err := s.process(ctx, state, currentCursor, s.now().In(time.UTC))
+			if newCursor != nil {
+				state["cursor"] = newCursor
+			}
 			if err != nil {
 				s.log.Errorw("failed to process and publish data", "error", err)
 				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
