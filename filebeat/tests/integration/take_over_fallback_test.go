@@ -91,6 +91,20 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	// Which matches the number of lines in the file.
 	nextCounter := map[string]int{}
 
+	// lastSeen holds the last event count seen by each input for each file
+	lastSeen := map[string]map[string]int{}
+
+	// newEventsCount calculates the number of new events ingested by an input
+	// since it last run.
+	newEventsCount := func(input string) int {
+		newEvents := 0
+		for path, counter := range nextCounter {
+			newEvents += counter - 1 - lastSeen[input][path]
+		}
+
+		return newEvents
+	}
+
 	// Create a helper to add data to the log files.
 	// Each line contains: padding, filename and a counter.
 	// Lines are 50 bytes long.
@@ -124,8 +138,6 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 
 	expectedEvents := batchSize * len(logFiles)
 	events := integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
-
-	lastSeen := map[string]map[string]int{}
 
 	_, logMaxByPath := countExtremesByPath(t, events, "log")
 	lastSeen["log"] = logMaxByPath
@@ -175,12 +187,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	appendLogsToFiles(batchSize)
 
 	prevExpectedEvents := expectedEvents
-	newLogEvents := 0
-	for _, path := range logFiles {
-		latestWrittenCounter := nextCounter[path] - 1
-		newLogEvents += latestWrittenCounter - lastSeen["log"][path]
-	}
-	expectedEvents += newLogEvents
+	expectedEvents += newEventsCount("log")
 	filebeat.WaitPublishedEvents(30*time.Second, expectedEvents)
 	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["log"], "log")
@@ -208,12 +215,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	appendLogsToFiles(batchSize)
 
 	prevExpectedEvents = expectedEvents
-	newFilestreamEvents := 0
-	for _, path := range logFiles {
-		latestWrittenCounter := nextCounter[path] - 1
-		newFilestreamEvents += latestWrittenCounter - lastSeen["filestream"][path]
-	}
-	expectedEvents += newFilestreamEvents
+	expectedEvents += newEventsCount("filestream")
 	filebeat.WaitPublishedEvents(30*time.Second, expectedEvents)
 	events = integration.GetEventsFromFileOutput[fallbackEvent](filebeat, expectedEvents, true)
 	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["filestream"], "filestream")
