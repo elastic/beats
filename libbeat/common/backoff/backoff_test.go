@@ -48,7 +48,7 @@ func testCancelledContext(t *testing.T) {
 
 	for name, f := range tests {
 		t.Run(name, func(t *testing.T) {
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(t.Context())
 			b := f()
 			cancel()
 			assert.False(t, b.Wait(ctx))
@@ -74,7 +74,7 @@ func testUnblockAfterInit(t *testing.T) {
 			b := f()
 
 			startedAt := time.Now()
-			assert.True(t, WaitOnError(context.Background(), b, errors.New("bad bad")))
+			assert.True(t, WaitOnError(t.Context(), b, errors.New("bad bad")))
 			assert.GreaterOrEqual(t, time.Since(startedAt), init)
 		})
 	}
