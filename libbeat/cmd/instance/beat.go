@@ -68,7 +68,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/filewatcher"
+
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -1206,65 +1206,10 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	if !extendedTLSCfg.Reload.Enabled {
 		return nil
 	}
-	logger.Debug("exit on CA certs change enabled")
 
-	possibleFilesToWatch := append(
-		extendedTLSCfg.CAs,
-		extendedTLSCfg.Certificate.Certificate,
-		extendedTLSCfg.Certificate.Key,
-	)
-
-	filesToWatch := []string{}
-	for _, f := range possibleFilesToWatch {
-		if f == "" {
-			continue
-		}
-		if tlscommon.IsPEMString(f) {
-			// That's an embedded cert, we're only interested in files
-			continue
-		}
-
-		logger.Debugf("watching '%s' for changes", f)
-		filesToWatch = append(filesToWatch, f)
-	}
-
-	// If there are no files to watch, don't do anything.
-	if len(filesToWatch) == 0 {
-		logger.Debug("no files to watch, filewatcher will not be started")
-		return nil
-	}
-
-	watcher := filewatcher.New(filesToWatch...)
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	_, _, _ = watcher.Scan()
-
-	// Watch for file changes while the Beat is alive
-	go func() {
-		ticker := time.Tick(extendedTLSCfg.Reload.Period)
-
-		for {
-			<-ticker
-			files, changed, err := watcher.Scan()
-			if err != nil {
-				logger.Warnf("could not scan certificate files: %s", err.Error())
-			}
-
-			if changed {
-				logger.Infof(
-					"some of the following files have been modified: %v, restarting %s.",
-					files, b.Info.Beat)
-
-				b.shouldReexec = true
-				b.Manager.Stop()
-
-				// we're done, finish the goroutine just for the sake of it
-				return
-			}
-		}
-	}()
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded via 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
 }

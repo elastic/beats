@@ -102,7 +102,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s.Close()
 }
 
-func TestReloadCA(t *testing.T) {
+func TestRestartOnCertChangeDeprecation(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 
 	s, esAddr, _, _ := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
@@ -127,33 +127,10 @@ logging.level: debug
 
 	mockbeat.Start()
 
-	// 1. wait mockbeat to start
 	mockbeat.WaitLogsContains(
-		fmt.Sprint("mockbeat start running"),
+		"'ssl.restart_on_cert_change' is deprecated",
 		10*time.Second,
-		"did not find 'mockbeat start running' log")
-
-	// 2. "rotate" the CA. Just write it again
-	err = os.WriteFile(caPath, pair.Cert, 0644)
-	require.NoError(t, err, "could not rotate CA")
-
-	// 3. Wait for cert change detection logs
-	mockbeat.WaitLogsContains(
-		fmt.Sprintf("some of the following files have been modified: [%s]", caPath),
-		10*time.Second,
-		"did not detect CA rotation")
-
-	// 4. Wait for CA load log
-	mockbeat.WaitLogsContains(
-		fmt.Sprintf("Successfully loaded CA certificate: %s", caPath),
-		10*time.Second,
-		"did not find 'Successfully loaded CA' log")
-
-	// 5. wait mockbeat to start again
-	mockbeat.WaitLogsContains(
-		fmt.Sprint("mockbeat start running"),
-		10*time.Second,
-		"did not find 'mockbeat start running' log again")
+		"did not find deprecation warning for 'ssl.restart_on_cert_change'")
 }
 
 // waitForEventToBePublished waits for at least one event published
