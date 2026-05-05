@@ -53,7 +53,7 @@ https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 **Filebeat**
 
 * Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. https://github.com/elastic/beats/pull/49415[#49415] https://github.com/elastic/beats/issues/47770[#47770]
-* Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. ttps://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
+* Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. https://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
 * Fix CSV decoder producing malformed JSON when field values contain double quotes in `azure-blob-storage` input. https://github.com/elastic/beats/pull/50097[#50097] https://github.com/elastic/beats/issues/50097[#50097]
 * Update mito to v1.23.2, fixing runtime error location reporting. https://github.com/elastic/beats/pull/50221[#50221]
 
