@@ -3,6 +3,66 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.15 relnotes
+
+[[release-notes-8.19.15]]
+=== Beats version 8.19.15
+
+https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
+
+[discrete]
+[[security-updates-8.19.15]]
+==== Security updates
+
+**Agentbeat**
+
+* Update transient dependency `github.com/go-jose/go-jose/v4` to v4.1.4. https://github.com/elastic/beats/pull/49975[#49975]
+
+[discrete]
+[[new-features-8.19.15]]
+==== New features
+
+**Filebeat**
+
+* Add AWS auth method for CEL and HTTP JSON inputs. https://github.com/elastic/beats/pull/47260[#47260] 
+
+[discrete]
+[[enhancements-8.19.15]]
+==== Enhancements
+
+**All**
+
+* Update OTel Collector components to v0.149.0/v1.55.0. https://github.com/elastic/beats/pull/50057[#50057]
+
+**Metricbeat**
+
+* Bump azure-sdk-for-go `armmonitor` from v0.8.0 to v0.11.0. https://github.com/elastic/beats/pull/49866[#49866] 
+
+[discrete]
+[[upgrades-8.19.15]]
+==== Upgrades
+
+**Filebeat**
+
+* Upgrade Azure Event Hubs SDK (`azeventhubs`) from v1.3.1 to v2.0.2. https://github.com/elastic/beats/pull/49867[#49867] 
+
+[discrete]
+[[bug-fixes-8.19.15]]
+==== Bug fixes
+
+**Filebeat**
+
+* Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. https://github.com/elastic/beats/pull/49415[#49415] https://github.com/elastic/beats/issues/47770[#47770]
+* Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. https://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
+* Fix CSV decoder producing malformed JSON when field values contain double quotes in `azure-blob-storage` input. https://github.com/elastic/beats/pull/50097[#50097] https://github.com/elastic/beats/issues/50097[#50097]
+* Update mito to v1.23.2, fixing runtime error location reporting. https://github.com/elastic/beats/pull/50221[#50221]
+
+**Libbeat**
+
+* Fix `otelconsumer` logging hundreds of errors per second when queue is full. https://github.com/elastic/beats/pull/48807[#48807] https://github.com/elastic/beats/issues/48803[#48803] 
+
+// end 8.19.15 relnotes
+
 // begin 8.19.14 relnotes
 
 [[release-notes-8.19.14]]
