@@ -9,29 +9,28 @@ package ntfs
 import (
 	"os"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
 var (
-	gLogger *logger.Logger
-	setLogOnce sync.Once
-	logOnce    sync.Once
+	gLogger  atomic.Pointer[logger.Logger]
+	initOnce sync.Once
 )
 
-func setLogger(log *logger.Logger) {
-	setLogOnce.Do(func() {
-		gLogger = log
-	})
+func SetLogger(log *logger.Logger) {
+	gLogger.Store(log)
 }
 
 func getLogger() *logger.Logger {
-	if gLogger != nil {
-		return gLogger
-	} else {
-		logOnce.Do(func() {
-			gLogger = logger.New(os.Stderr, true)
-		})
-		return gLogger
+	if l := gLogger.Load(); l != nil {
+		return l
 	}
+	initOnce.Do(func() {
+		if gLogger.Load() == nil {
+			gLogger.Store(logger.New(os.Stderr, true))
+		}
+	})
+	return gLogger.Load()
 }
