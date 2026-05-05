@@ -27,9 +27,8 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 )
 
 // Client for Docker
@@ -51,16 +50,18 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 	}
 
 	ctx := context.Background()
-	resp, err := c.cli.ContainerCreate(ctx, &container.Config{
-		Image:  image,
-		Cmd:    cmd,
-		Labels: labels,
-	}, nil, nil, nil, "")
+	resp, err := c.cli.ContainerCreate(ctx, client.ContainerCreateOptions{
+		Config: &container.Config{
+			Image:  image,
+			Cmd:    cmd,
+			Labels: labels,
+		},
+	})
 	if err != nil {
 		return "", fmt.Errorf("creating container: %w", err)
 	}
 
-	if err := c.cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+	if _, err := c.cli.ContainerStart(ctx, resp.ID, client.ContainerStartOptions{}); err != nil {
 		return "", fmt.Errorf("starting container: %w", err)
 	}
 
@@ -77,7 +78,7 @@ func (c Client) imagePull(img string) (err error) {
 	}
 	for retry := 0; retry < 3; retry++ {
 		err = func() error {
-			respBody, err := c.cli.ImagePull(ctx, img, image.PullOptions{})
+			respBody, err := c.cli.ImagePull(ctx, img, client.ImagePullOptions{})
 			if err != nil {
 				return fmt.Errorf("pullling image %s: %w", img, err)
 			}
@@ -100,10 +101,10 @@ func (c Client) imagePull(img string) (err error) {
 // ContainerWait waits for a container to finish
 func (c Client) ContainerWait(ID string) error {
 	ctx := context.Background()
-	waitC, errC := c.cli.ContainerWait(ctx, ID, container.WaitConditionNotRunning)
+	waitResult := c.cli.ContainerWait(ctx, ID, client.ContainerWaitOptions{Condition: container.WaitConditionNotRunning})
 	select {
-	case <-waitC:
-	case err := <-errC:
+	case <-waitResult.Result:
+	case err := <-waitResult.Error:
 		return err
 	}
 	return nil
@@ -112,22 +113,28 @@ func (c Client) ContainerWait(ID string) error {
 // ContainerInspect recovers information of the container
 func (c Client) ContainerInspect(ID string) (container.InspectResponse, error) {
 	ctx := context.Background()
-	return c.cli.ContainerInspect(ctx, ID)
+	result, err := c.cli.ContainerInspect(ctx, ID, client.ContainerInspectOptions{})
+	if err != nil {
+		return container.InspectResponse{}, err
+	}
+	return result.Container, nil
 }
 
 // ContainerKill kills the given container
 func (c Client) ContainerKill(ID string) error {
 	ctx := context.Background()
-	return c.cli.ContainerKill(ctx, ID, "KILL")
+	_, err := c.cli.ContainerKill(ctx, ID, client.ContainerKillOptions{Signal: "KILL"})
+	return err
 }
 
 // ContainerRemove kills and removes the given container
 func (c Client) ContainerRemove(ID string) error {
 	ctx := context.Background()
-	return c.cli.ContainerRemove(ctx, ID, container.RemoveOptions{
+	_, err := c.cli.ContainerRemove(ctx, ID, client.ContainerRemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
 	})
+	return err
 }
 
 // Close closes the underlying client

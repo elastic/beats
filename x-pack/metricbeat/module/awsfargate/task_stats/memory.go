@@ -5,7 +5,7 @@
 package task_stats
 
 import (
-	dcontainer "github.com/docker/docker/api/types/container"
+	dcontainer "github.com/moby/moby/api/types/container"
 )
 
 type memoryStats struct {
