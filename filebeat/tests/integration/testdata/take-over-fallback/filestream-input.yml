@@ -1,6 +1,6 @@
 - type: filestream
   enabled: true
-  id: {{.inputID}}
+  id: "test-id"
   take_over: true
   prospector:
       check_interval: 1s
