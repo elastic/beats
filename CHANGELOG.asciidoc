@@ -6,7 +6,7 @@
 // begin 8.19.15 relnotes
 
 [[release-notes-8.19.15]]
-== Beats version 8.19.15
+=== Beats version 8.19.15
 
 https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
 
