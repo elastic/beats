@@ -15,18 +15,23 @@ import (
 
 var (
 	gLogger *logger.Logger
-	logOnce sync.Once
+	setLogOnce sync.Once
+	logOnce    sync.Once
 )
 
 func setLogger(log *logger.Logger) {
-	logOnce.Do(func() {
+	setLogOnce.Do(func() {
 		gLogger = log
 	})
 }
 
 func getLogger() *logger.Logger {
-	logOnce.Do(func() {
-		gLogger = logger.New(os.Stderr, true)
-	})
-	return gLogger
+	if gLogger != nil {
+		return gLogger
+	} else {
+		logOnce.Do(func() {
+			gLogger = logger.New(os.Stderr, true)
+		})
+		return gLogger
+	}
 }

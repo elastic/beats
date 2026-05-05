@@ -19,7 +19,7 @@ Returns all volumes detected on the system
 | Column | Type | Description |
 |--------|------|-------------|
 | `device` | `TEXT` | Volume device path (e.g. \\.\C:) |
-| `device_type` | `TEXT` | Volume device type (e.g. "Fixed", "Removable", "CD-ROM") |
+| `device_type` | `TEXT` | Volume device type (e.g. "CD_ROM", "DISK", "MASS_STORAGE", "VIRTUAL_DISK", "DVD") |
 | `drive_letter` | `TEXT` | Volume drive letter (e.g. C:) |
 | `volume_label` | `TEXT` | Volume label (e.g. "OS") |
 | `file_system_name` | `TEXT` | Volume file system name (e.g. "NTFS") |

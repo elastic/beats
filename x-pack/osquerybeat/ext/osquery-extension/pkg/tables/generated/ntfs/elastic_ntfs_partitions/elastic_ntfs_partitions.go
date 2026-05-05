@@ -64,7 +64,7 @@ type Result struct {
 	Device         string `osquery:"device"`          // Device name (e.g. "\\.\PHYSICALDRIVE0")
 	DriveLetter    string `osquery:"drive_letter"`    // Drive letter assigned to the partition (e.g. "C:")
 	Id             string `osquery:"id"`              // Partition id
-	Number         int32  `osquery:"number"`          // Partition number (e.g. 1)
+	Number         int64  `osquery:"number"`          // Partition number (e.g. 1)
 	Style          string `osquery:"style"`           // Partition style (e.g. MBR, GPT, RAW)
 	Type           string `osquery:"type"`            // Partition type (e.g. "System", "Basic", "Recovery")
 	StartingOffset int64  `osquery:"starting_offset"` // Starting offset of the partition in bytes

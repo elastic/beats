@@ -47,11 +47,9 @@ type DRIVE_LAYOUT_INFORMATION_EX_HEADER struct {
 	_                    [4]byte // padding to 48 bytes; aligns struct to int64 boundary
 }
 
-var partitionStyleNames = map[uint32]string{
-	0: "MBR",
-	1: "GPT",
-	2: "RAW",
-}
+const MBRPartitionStyle = 0
+const GPTPartitionStyle = 1
+const RAWPartitionStyle = 2
 
 var partitionTypeNames = map[string]string{
 	"C12A7328-F81F-11D2-BA4B-00A0C93EC93B": "System",
@@ -173,25 +171,20 @@ func guidStringFromBytes(b [16]byte) string {
 	return fmt.Sprintf("%08X-%04X-%04X-%04X-%012X", d1, d2, d3, b[8:10], b[10:16])
 }
 
-func NewPartition(partitionInfo *PARTITION_INFORMATION_EX, mbrDiskSignature uint32) (*Partition, error) {
+func newPartition(partitionInfo *PARTITION_INFORMATION_EX, mbrDiskSignature uint32) (*Partition, error) {
 	if partitionInfo == nil {
 		return nil, fmt.Errorf("partitionInfo is nil")
 	}
-
-	styleName := "Unknown"
-	if name, ok := partitionStyleNames[partitionInfo.PartitionStyle]; ok {
-		styleName = name
-	}
-
+	
 	p := &Partition{
 		Number:         partitionInfo.PartitionNumber,
-		Style:          styleName,
 		StartingOffset: partitionInfo.StartingOffset,
 		Length:         partitionInfo.PartitionLength,
 	}
 
-	switch styleName {
-	case "GPT":
+	switch partitionInfo.PartitionStyle {
+	case GPTPartitionStyle:
+		p.Style = "GPT"
 		partitionType := guidStringFromBytes(partitionInfo.Gpt.PartitionType)
 		if name, ok := partitionTypeNames[partitionType]; ok {
 			partitionType = name
@@ -209,7 +202,8 @@ func NewPartition(partitionInfo *PARTITION_INFORMATION_EX, mbrDiskSignature uint
 		p.AttributesMask = fmt.Sprintf("0x%016X", partitionInfo.Gpt.Attributes)
 		p.Attributes = attributes
 		p.Name = windows.UTF16ToString(partitionInfo.Gpt.Name[:])
-	case "MBR":
+	case MBRPartitionStyle:
+		p.Style = "MBR"
 		mbr := partitionInfo.Mbr()
 		typeName := fmt.Sprintf("0x%02X", mbr.PartitionType)
 		if name, ok := mbrPartitionTypeNames[mbr.PartitionType]; ok {
@@ -223,13 +217,17 @@ func NewPartition(partitionInfo *PARTITION_INFORMATION_EX, mbrDiskSignature uint
 		} else {
 			p.Attributes = "None"
 		}
+	case RAWPartitionStyle:
+		p.Style = "RAW"
+	default:
+		p.Style = "Unknown"
 	}
 
 	return p, nil
 }
 
-func GetPartitions(physicalDrive string) ([]*Partition, error) {
-	if partitions, found := GetCachedPartitions(physicalDrive); found {
+func getPartitions(physicalDrive string) ([]*Partition, error) {
+	if partitions, found := getCachedPartitions(physicalDrive); found {
 		return partitions, nil
 	}
 
@@ -252,7 +250,7 @@ func GetPartitions(physicalDrive string) ([]*Partition, error) {
 		return nil, err
 	}
 
-	// Defer with a funcion to bypass errcheck on the CloseHandle since it is ignored intentionally
+	// Defer with a function to bypass errcheck on the CloseHandle since it is ignored intentionally
 	defer func() { _ = windows.CloseHandle(handle) }()
 
 	// Allocate enough for the header plus up to 128 partitions, which should
@@ -300,7 +298,7 @@ func GetPartitions(physicalDrive string) ([]*Partition, error) {
 	// meaningful when the drive layout is MBR; it's used to build stable MBR
 	// partition ids.
 	var mbrDiskSignature uint32
-	if partitionStyleNames[header.PartitionStyle] == "MBR" {
+	if header.PartitionStyle == MBRPartitionStyle {
 		mbrDiskSignature = header.MbrSignature()
 	}
 
@@ -309,14 +307,14 @@ func GetPartitions(physicalDrive string) ([]*Partition, error) {
 	for i := range partitionCount {
 		offset := headerSize + i*partitionSize
 		partitionInfo := (*PARTITION_INFORMATION_EX)(unsafe.Pointer(&buf[offset]))
-		partition, err := NewPartition(partitionInfo, mbrDiskSignature)
+		partition, err := newPartition(partitionInfo, mbrDiskSignature)
 		if err != nil {
 			log.Errorf("Failed to parse partition %d: %v", i, err)
 			continue
 		}
 		partitions = append(partitions, partition)
 	}
-	CachePartitions(physicalDrive, partitions)
+	cachePartitions(physicalDrive, partitions)
 	return partitions, nil
 }
 
@@ -328,12 +326,12 @@ func uint32ToInt32(value uint32) int32 {
 	return int32(value)
 }
 
-// GetPhysicalDrives enumerates \\.\PhysicalDriveN devices exposed by the
+// getPhysicalDrives enumerates \\.\PhysicalDriveN devices exposed by the
 // Windows storage stack, independent of drive-letter mounts. Probing by
 // path catches raw, offline, hidden, and otherwise unmounted disks that
 // getVolumes() cannot see (it only enumerates letters from
 // GetLogicalDrives).
-func GetPhysicalDrives() []string {
+func getPhysicalDrives() []string {
 	log := getLogger()
 	var drives []string
 	for i := range maxPhysicalDrives {
@@ -385,8 +383,8 @@ func partitionsGenerateFunc(_ context.Context, queryContext table.QueryContext, 
 	}
 
 	var results []elasticntfspartitions.Result
-	for _, d := range GetPhysicalDrives() {
-		partitions, err := GetPartitions(d)
+	for _, d := range getPhysicalDrives() {
+		partitions, err := getPartitions(d)
 		if err != nil {
 			log.Errorf("Failed to get partitions for drive %s: %v", d, err)
 			continue
@@ -396,7 +394,7 @@ func partitionsGenerateFunc(_ context.Context, queryContext table.QueryContext, 
 				Device:         d,
 				DriveLetter:    driveLetterByPartition[d][p.Number],
 				Id:             p.Id,
-				Number:         uint32ToInt32(p.Number),
+				Number:         int64(p.Number),
 				Style:          p.Style,
 				Type:           p.Type,
 				StartingOffset: p.StartingOffset,

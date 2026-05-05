@@ -21,7 +21,7 @@ Returns all partitions detected on the system
 | `device` | `TEXT` | Device name (e.g. "\\.\PHYSICALDRIVE0") |
 | `drive_letter` | `TEXT` | Drive letter assigned to the partition (e.g. "C:") |
 | `id` | `TEXT` | Partition id |
-| `number` | `INTEGER` | Partition number (e.g. 1) |
+| `number` | `BIGINT` | Partition number (e.g. 1) |
 | `style` | `TEXT` | Partition style (e.g. MBR, GPT, RAW) |
 | `type` | `TEXT` | Partition type (e.g. "System", "Basic", "Recovery") |
 | `starting_offset` | `BIGINT` | Starting offset of the partition in bytes |

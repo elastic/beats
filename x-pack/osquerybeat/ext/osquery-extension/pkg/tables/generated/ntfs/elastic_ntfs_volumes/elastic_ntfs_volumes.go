@@ -62,7 +62,7 @@ func GetGenerateFunc(log *logger.Logger, client *client.ResilientClient) (table.
 // Result represents a row from the elastic_ntfs_volumes table.
 type Result struct {
 	Device         string `osquery:"device"`           // Volume device path (e.g. \\.\C:)
-	DeviceType     string `osquery:"device_type"`      // Volume device type (e.g. "Fixed", "Removable", "CD-ROM")
+	DeviceType     string `osquery:"device_type"`      // Volume device type (e.g. "CD_ROM", "DISK", "MASS_STORAGE", "VIRTUAL_DISK", "DVD")
 	DriveLetter    string `osquery:"drive_letter"`     // Volume drive letter (e.g. C:)
 	VolumeLabel    string `osquery:"volume_label"`     // Volume label (e.g. "OS")
 	FileSystemName string `osquery:"file_system_name"` // Volume file system name (e.g. "NTFS")

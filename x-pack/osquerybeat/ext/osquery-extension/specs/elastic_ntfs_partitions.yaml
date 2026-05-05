@@ -18,7 +18,7 @@ columns:
     type: TEXT
     description: Partition id
   - name: number
-    type: INTEGER
+    type: BIGINT
     description: Partition number (e.g. 1)
   - name: style
     type: TEXT

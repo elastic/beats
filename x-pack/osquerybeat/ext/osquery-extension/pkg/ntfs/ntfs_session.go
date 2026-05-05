@@ -20,6 +20,7 @@ type NTFSSession struct {
 func (s *NTFSSession) Close() {
 	if s.reader != nil {
 		s.reader.Close()
+		s.reader = nil
 	}
 }
 
@@ -35,13 +36,13 @@ func (s *NTFSSession) RawReader() io.ReaderAt {
 	return s.reader
 }
 
-func NewNTFSSession(driveLetter string) (*NTFSSession, error) {
+func newNTFSSession(driveLetter string) (*NTFSSession, error) {
 	driveLetter, err := normalizeDriveLetter(driveLetter)
 	if err != nil {
 		return nil, err
 	}
 
-	reader, err := NewVolumeReader(driveLetter)
+	reader, err := newVolumeReader(driveLetter)
 	if err != nil {
 		return nil, err
 	}

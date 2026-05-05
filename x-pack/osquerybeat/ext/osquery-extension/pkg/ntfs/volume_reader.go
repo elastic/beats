@@ -45,9 +45,9 @@ func (r *windowsVolumeReader) Close() {
 	}
 }
 
-// NewVolumeReader opens a handle to the specified drive letter (e.g. "C") and returns a windowsVolumeReader for it.
+// newVolumeReader opens a handle to the specified drive letter (e.g. "C") and returns a windowsVolumeReader for it.
 // The drive letter is normalized and validated  (e.g. "C", "c", "C:", "c:", "C:\", "c:\" are all accepted and normalized to "C").
-func NewVolumeReader(driveLetter string) (*windowsVolumeReader, error) {
+func newVolumeReader(driveLetter string) (*windowsVolumeReader, error) {
 	driveLetter, err := normalizeDriveLetter(driveLetter)
 	if err != nil {
 		return nil, err

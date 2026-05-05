@@ -133,7 +133,7 @@ func newVolume(driveLetter string) (*Volume, error) {
 		return nil, fmt.Errorf("failed to create file: %w", err)
 	}
 
-	// Defer with a funcion to bypass errcheck on the CloseHandle since it is ignored intentionally
+	// Defer with a function to bypass errcheck on the CloseHandle since it is ignored intentionally
 	defer func() { _ = windows.CloseHandle(handle) }()
 
 	// Query the device number
@@ -189,7 +189,7 @@ func newVolume(driveLetter string) (*Volume, error) {
 		if volumeInfo.FileSystemName != "NTFS" {
 			return nil, fmt.Errorf("volume %s is not NTFS", volumeInfo.DriveLetter)
 		}
-		session, err := NewNTFSSession(volumeInfo.DriveLetter)
+		session, err := newNTFSSession(volumeInfo.DriveLetter)
 		if err != nil {
 			return nil, err
 		}
@@ -212,7 +212,7 @@ func getVolumes() ([]*Volume, error) {
 
 	for _, driveLetter := range driveLetters {
 		// Check the cache first to avoid expensive volume initialization if we've already seen this drive letter recently.
-		if volume, found := GetCachedVolumes(driveLetter); found {
+		if volume, found := getCachedVolumes(driveLetter); found {
 			volumes = append(volumes, volume)
 			continue
 		}
@@ -222,7 +222,7 @@ func getVolumes() ([]*Volume, error) {
 			log.Infof("failed to get volume information for drive %s: %v", driveLetter, err)
 			continue
 		}
-		CacheVolume(driveLetter, volume)
+		cacheVolume(driveLetter, volume)
 		volumes = append(volumes, volume)
 	}
 	return volumes, nil

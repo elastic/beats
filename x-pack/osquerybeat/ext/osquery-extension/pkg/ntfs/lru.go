@@ -16,7 +16,7 @@ import (
 const (
 	DefaultLRUCacheSize = 100
 	// DefaultLRUCacheTTL defines the default time-to-live for entries in the LRU cache.
-	DefaultLRUCacheTTL = 1 * time.Minute
+	DefaultLRUCacheTTL = 2 * time.Minute
 )
 
 // A Simple LRU cache implementation for ntfs tables.
@@ -40,40 +40,40 @@ func newNtfsCache() *NtfsCache {
 	}
 	cache := &NtfsCache{
 		// volumes cache is small since we typically have a limited number of mounted volumes, and we want to ensure timely cleanup of NTFS sessions when volumes are evicted.
-		volumes: expirable.NewLRU[string, *Volume](DefaultLRUCacheSize, closeVolume, 2*time.Minute),
+		volumes: expirable.NewLRU[string, *Volume](DefaultLRUCacheSize, closeVolume, DefaultLRUCacheTTL),
 
 		// partitions cache can be larger since we may have many physical drives with multiple partitions, and the data is less expensive to keep around.
-		partitions: expirable.NewLRU[string, []*Partition](DefaultLRUCacheSize, nil, 2*time.Minute),
+		partitions: expirable.NewLRU[string, []*Partition](DefaultLRUCacheSize, nil, DefaultLRUCacheTTL),
 	}
 	return cache
 }
 
-// GetNtfsCache returns the singleton NtfsCache instance.
-func GetNtfsCache() *NtfsCache {
+// getNtfsCache returns the singleton NtfsCache instance.
+func getNtfsCache() *NtfsCache {
 	once.Do(func() {
 		ntfsCache = newNtfsCache()
 	})
 	return ntfsCache
 }
 
-func CacheVolume(driveLetter string, volume *Volume) {
-	cache := GetNtfsCache()
+func cacheVolume(driveLetter string, volume *Volume) {
+	cache := getNtfsCache()
 	cache.volumes.Add(driveLetter, volume)
 }
 
-func GetCachedVolumes(driveLetter string) (*Volume, bool) {
-	cache := GetNtfsCache()
+func getCachedVolumes(driveLetter string) (*Volume, bool) {
+	cache := getNtfsCache()
 	volume, found := cache.volumes.Get(driveLetter)
 	return volume, found
 }
 
-func GetCachedPartitions(physicalDrive string) ([]*Partition, bool) {
-	cache := GetNtfsCache()
+func getCachedPartitions(physicalDrive string) ([]*Partition, bool) {
+	cache := getNtfsCache()
 	partitions, found := cache.partitions.Get(physicalDrive)
 	return partitions, found
 }
 
-func CachePartitions(physicalDrive string, partitions []*Partition) {
-	cache := GetNtfsCache()
+func cachePartitions(physicalDrive string, partitions []*Partition) {
+	cache := getNtfsCache()
 	cache.partitions.Add(physicalDrive, partitions)
 }

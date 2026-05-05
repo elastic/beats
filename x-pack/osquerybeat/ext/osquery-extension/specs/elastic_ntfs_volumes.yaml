@@ -13,7 +13,7 @@ columns:
     description: Volume device path (e.g. \\.\C:)
   - name: device_type
     type: TEXT
-    description: Volume device type (e.g. "Fixed", "Removable", "CD-ROM")
+    description: Volume device type (e.g. "CD_ROM", "DISK", "MASS_STORAGE", "VIRTUAL_DISK", "DVD")
   - name: drive_letter
     type: TEXT
     description: Volume drive letter (e.g. C:)
