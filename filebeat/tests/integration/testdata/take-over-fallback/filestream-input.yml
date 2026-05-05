@@ -5,6 +5,4 @@
   prospector:
       check_interval: 1s
   paths:
-{{ range .paths }}
-    - {{ . }}
-{{ end }}
+    - {{ .glob }}

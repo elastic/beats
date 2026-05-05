@@ -85,7 +85,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	logFile1 := filepath.Join(tempDir, "log-1.log")
 	logFile2 := filepath.Join(tempDir, "log-2.log")
 	logFiles := []string{logFile1, logFile2}
-	logPaths := []string{filepath.Join(tempDir, "*.log")}
+	logFilesGlob := filepath.Join(tempDir, "*.log")
 
 	// nextCounter holds the next counter that should go into the log file.
 	// Which matches the number of lines in the file.
@@ -133,7 +133,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	filebeat.Start()
 
 	// 1. Add data to the log files and run the Log input
-	writeLogInputConfig(t, inputsDir, logPaths)
+	writeLogInputConfig(t, inputsDir, logFilesGlob)
 	appendLogsToFiles(batchSize)
 
 	expectedEvents := batchSize * len(logFiles)
@@ -154,7 +154,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	//   - events: 00 ~ 24: Log input
 
 	// 3. Enable Filestream with take_over and ingest one deterministic batch
-	writeFilestreamConfig(t, inputsDir, logPaths)
+	writeFilestreamConfig(t, inputsDir, logFilesGlob)
 	filebeat.WaitLogsContains("Input 'filestream' starting", 30*time.Second, "filestream runner did not start")
 	appendLogsToFiles(batchSize)
 
@@ -181,7 +181,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	//   - events 25 ~ 49: Filestream input
 
 	// 6. Re-enable Log input, ingest one deterministic batch and assert continuity.
-	writeLogInputConfig(t, inputsDir, logPaths)
+	writeLogInputConfig(t, inputsDir, logFilesGlob)
 	appendLogsToFiles(batchSize)
 
 	prevExpectedEvents := expectedEvents
@@ -207,7 +207,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	//   - events 25 ~ 74: Log input
 
 	// 8. Re-enable Filestream input, ingest one deterministic batch and assert continuity.
-	writeFilestreamConfig(t, inputsDir, logPaths)
+	writeFilestreamConfig(t, inputsDir, logFilesGlob)
 	filebeat.WaitLogsContains("Input 'filestream' starting", 30*time.Second, "filestream runner did not start")
 	appendLogsToFiles(batchSize)
 
@@ -235,28 +235,28 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 
 // writeLogInputConfig renders and writes the active log input configuration file.
 // It replaces inputs.d/active.yml with a config that reads the given paths.
-func writeLogInputConfig(t *testing.T, inputsDir string, paths []string) {
+func writeLogInputConfig(t *testing.T, inputsDir string, logFilesGlob string) {
 	writeInputConfigFromTemplate(
 		t,
 		inputsDir,
 		"take-over-fallback",
 		"log-input.yml",
 		map[string]any{
-			"paths": paths,
+			"glob": logFilesGlob,
 		},
 	)
 }
 
 // writeFilestreamConfig renders and writes the active filestream configuration
 // file with takeover enabled for the provided input ID and paths.
-func writeFilestreamConfig(t *testing.T, inputsDir string, paths []string) {
+func writeFilestreamConfig(t *testing.T, inputsDir string, logFilesGlob string) {
 	writeInputConfigFromTemplate(
 		t,
 		inputsDir,
 		"take-over-fallback",
 		"filestream-input.yml",
 		map[string]any{
-			"paths": paths,
+			"glob": logFilesGlob,
 		})
 }
 
