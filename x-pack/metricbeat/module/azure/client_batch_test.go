@@ -47,6 +47,21 @@ func TestInitResourcesForBatch(t *testing.T) {
 		assert.Error(t, err, "failed to retrieve resources: invalid resource query")
 		m.AssertExpectations(t)
 	})
+	t.Run("does not panic when all resource configs return an empty list", func(t *testing.T) {
+		client := NewMockBatchClient(logger)
+		client.Config = resourceQueryConfig
+		m := &MockService{}
+		// empty list + nil error: the "no resources of this type exist" path
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*armresources.GenericResourceExpanded{}, nil)
+		client.AzureMonitorService = m
+
+		err := client.InitResources(mockConcurrentMapResourceMetrics)
+		require.NoError(t, err)
+
+		// The closer goroutine launched by InitResources runs asynchronously and
+		// will panic on close(nil) if the channels were never initialized.
+		time.Sleep(100 * time.Millisecond)
+	})
 }
 
 func TestGetMetricsInBatch(t *testing.T) {
