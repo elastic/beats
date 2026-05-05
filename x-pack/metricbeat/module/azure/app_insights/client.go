@@ -8,6 +8,7 @@ package app_insights
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -41,11 +42,10 @@ func (client *Client) GetMetricValues() (ListMetricsResultsItem, error) {
 	var result ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
 		metrics := metrics
-		// Copy the slices so each batch entry holds its own pointer; sharing
-		// the same backing array across requests would couple unrelated metric
-		// configs together.
-		aggregations := append([]string(nil), metrics.Aggregation...)
-		segments := append([]string(nil), metrics.Segment...)
+		// Clone so each batch entry owns its slices; sharing the same backing
+		// array across requests would couple unrelated metric configs together.
+		aggregations := slices.Clone(metrics.Aggregation)
+		segments := slices.Clone(metrics.Segment)
 		for _, metric := range metrics.ID {
 			params := MetricsBatchParameters{
 				MetricID:    metric,

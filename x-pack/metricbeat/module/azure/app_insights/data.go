@@ -162,7 +162,17 @@ func EventsMapping(metricValues ListMetricsResultsItem, applicationId string, na
 	groupedByDimensions := groupMetricsByDimension(mValues)
 
 	for _, group := range groupedByDimensions {
-		event := createGroupEvent(group, newMetricTimeKey(*group[0].Start, *group[0].End), applicationId, namespace)
+		// Guard against nil Start/End: the SDK can return null timestamps,
+		// and the IsZero() safety check inside createGroupEvent will then
+		// correctly drop the event instead of us panicking on a nil deref.
+		var start, end time.Time
+		if group[0].Start != nil {
+			start = *group[0].Start
+		}
+		if group[0].End != nil {
+			end = *group[0].End
+		}
+		event := createGroupEvent(group, newMetricTimeKey(start, end), applicationId, namespace)
 
 		// Only add events that have metric values.
 		if len(event.MetricSetFields) > 0 {
@@ -202,8 +212,17 @@ func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 		// Generate a sorted key from the segment names to ensure consistent dimension keys
 		sortedSegmentsKey := getSortedKeys(metric.SegmentName)
 
-		// Construct a dimension key using the default times and sorted segment names
-		dimensionKey := createDimensionKey(firstStart.Unix(), firstEnd.Unix(), sortedSegmentsKey)
+		// Construct a dimension key using the default times and sorted segment names.
+		// Guard against nil firstStart/firstEnd to avoid a nil-pointer panic when
+		// the very first metric (and any subsequent one) has no Start/End set.
+		var startUnix, endUnix int64
+		if firstStart != nil {
+			startUnix = firstStart.Unix()
+		}
+		if firstEnd != nil {
+			endUnix = firstEnd.Unix()
+		}
+		dimensionKey := createDimensionKey(startUnix, endUnix, sortedSegmentsKey)
 
 		// If the metric has child segments, process them
 		// This is usually the case for segments that don't have actual metric values
