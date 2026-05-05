@@ -1,7 +1,7 @@
 - type: filestream
   enabled: true
   id: "test-id"
-  take_over: true
+  take_over.enabled: true
   prospector:
       check_interval: 1s
   paths:

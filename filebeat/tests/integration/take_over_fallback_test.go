@@ -43,6 +43,31 @@ type fallbackEvent struct {
 	} `json:"log"`
 }
 
+// TestFilebeatTakeOverFallbackWithInputReload performs an extensive test
+// of the Take Over fallback. This test ensures that once the Take Over
+// from the Log input takes place, the Log input states are left untouched
+// and if Filestream is disabled and the Log input re-enabled, it continues
+// from where it left off.
+//
+// The steps of the test:
+//  1. Add 25 lines to the target files
+//  2. Start the Log input
+//  3. Assert the files are in the output
+//  4. Stop the Log input
+//  5. Start the Filestream input with Take Over enabled
+//  6. Append 25 lines to the files
+//  7. Assert Filestream continues reading from where the Log input stopped
+//  8. Stop the Filestream input
+//  9. Start the Log input
+//  10. Append 25 lines to the files
+//  11. Assert the Log input continues from where it stopped
+//  12. Stop the Log input
+//  13. Append 25 lines to the files
+//  14. Start the Filestream input
+//  15. Assert the Filestream input continues from where it left off
+//
+// Before a new input is started, a snapshot of the output is taken for
+// debugging purposes.
 func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	const batchSize = 25
 
