@@ -32,10 +32,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
 	"github.com/gofrs/uuid/v5"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -394,7 +393,7 @@ func startFlogDocker(t *testing.T) string {
 	}
 
 	// Pull the image first
-	reader, err := cli.ImagePull(ctx, img, image.PullOptions{})
+	reader, err := cli.ImagePull(ctx, img, client.ImagePullOptions{})
 	if err != nil {
 		t.Fatalf("cannot pull image %q: %s", img, err)
 	}
@@ -408,25 +407,27 @@ func startFlogDocker(t *testing.T) string {
 
 	resp, err := cli.ContainerCreate(
 		ctx,
-		&container.Config{
-			Image: img,
-			Cmd:   []string{"-l", "-d", "1", "-s", "1"},
-		}, nil, nil, nil, "")
+		client.ContainerCreateOptions{
+			Config: &container.Config{
+				Image: img,
+				Cmd:   []string{"-l", "-d", "1", "-s", "1"},
+			},
+		})
 	if err != nil {
 		t.Fatalf("cannot create container for %q: %s", img, err)
 	}
 
-	err = cli.ContainerStart(ctx, resp.ID, container.StartOptions{})
+	_, err = cli.ContainerStart(ctx, resp.ID, client.ContainerStartOptions{})
 	if err != nil {
 		t.Fatalf("cannot start container: %s", err)
 	}
 
 	t.Cleanup(func() {
 		ctx := context.Background()
-		if err := cli.ContainerStop(ctx, resp.ID, container.StopOptions{}); err != nil {
+		if _, err := cli.ContainerStop(ctx, resp.ID, client.ContainerStopOptions{}); err != nil {
 			t.Errorf("cannot stop container: %s", err)
 		}
-		if err := cli.ContainerRemove(ctx, resp.ID, container.RemoveOptions{}); err != nil {
+		if _, err := cli.ContainerRemove(ctx, resp.ID, client.ContainerRemoveOptions{}); err != nil {
 			t.Errorf("cannot remove container: %s", err)
 		}
 	})
@@ -485,15 +486,15 @@ func kindNodeGatewayIP(t *testing.T, nodeName string) string {
 		t.Fatalf("cannot create Docker client: %s", err)
 	}
 
-	inspect, err := cli.ContainerInspect(context.Background(), nodeName)
+	inspectResult, err := cli.ContainerInspect(context.Background(), nodeName, client.ContainerInspectOptions{})
 	if err != nil {
 		t.Fatalf("cannot inspect Kind node %q: %s", nodeName, err)
 	}
 
-	if inspect.NetworkSettings != nil {
-		for _, networkSettings := range inspect.NetworkSettings.Networks {
-			if networkSettings != nil && networkSettings.Gateway != "" {
-				return networkSettings.Gateway
+	if inspectResult.Container.NetworkSettings != nil {
+		for _, networkSettings := range inspectResult.Container.NetworkSettings.Networks {
+			if networkSettings != nil && networkSettings.Gateway.IsValid() {
+				return networkSettings.Gateway.String()
 			}
 		}
 	}
