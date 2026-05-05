@@ -222,6 +222,8 @@ func NewQueue(
 		encoder = encoderFactory()
 	}
 
+	initialReadFrameID := frameID(nextReadPosition.frameIndex)
+
 	queue := &diskQueue{
 		logger:   logger,
 		observer: observer,
@@ -232,6 +234,7 @@ func NewQueue(
 			reading:          initialSegments,
 			acked:            ackedSegments,
 			nextID:           nextSegmentID,
+			nextReadFrameID:  initialReadFrameID,
 			nextReadPosition: nextReadPosition.byteIndex,
 		},
 
@@ -246,6 +249,7 @@ func NewQueue(
 		close: make(chan struct{}),
 		done:  make(chan struct{}),
 	}
+	queue.acks.nextFrameID = initialReadFrameID
 
 	// Start the goroutines and return the queue!
 	go queue.readerLoop.run()
