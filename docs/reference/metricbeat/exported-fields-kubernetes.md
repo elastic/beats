@@ -309,13 +309,13 @@ CPU usage metrics
 **`kubernetes.container.cpu.limit.cores`**
 :   CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
 
-    type: double
+    type: float
 
 
 **`kubernetes.container.cpu.request.cores`**
 :   Requested CPU cores for the container. Not emitted if the container has no CPU request defined.
 
-    type: double
+    type: float
 
 
 ## logs [_logs]
@@ -407,7 +407,7 @@ Logs info
 **`kubernetes.container.memory.limit.bytes`**
 :   Memory limit bytes for the container. Not emitted if the container has no memory limit defined.
 
-    type: double
+    type: long
 
     format: bytes
 
@@ -415,7 +415,7 @@ Logs info
 **`kubernetes.container.memory.request.bytes`**
 :   Requested memory bytes for the container. Not emitted if the container has no memory request defined.
 
-    type: double
+    type: long
 
     format: bytes
 
@@ -1073,13 +1073,13 @@ CPU usage metrics
 **`kubernetes.pod.cpu.limit.cores`**
 :   CPU cores limit sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
-    type: double
+    type: float
 
 
 **`kubernetes.pod.cpu.request.cores`**
 :   Requested CPU cores sum of the pod containers. If any container is missing a request the metric is not emitted.
 
-    type: double
+    type: float
 
 
 **`kubernetes.pod.memory.usage.bytes`**
@@ -1149,7 +1149,7 @@ CPU usage metrics
 **`kubernetes.pod.memory.limit.bytes`**
 :   Memory limit bytes sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
-    type: double
+    type: long
 
     format: bytes
 
@@ -1157,7 +1157,7 @@ CPU usage metrics
 **`kubernetes.pod.memory.request.bytes`**
 :   Requested memory bytes sum of the pod containers. If any container is missing a request the metric is not emitted.
 
-    type: double
+    type: long
 
     format: bytes
 

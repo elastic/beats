@@ -66,14 +66,14 @@
           type: group
           fields:
             - name: cores
-              type: double
+              type: float
               description: >
                 CPU cores limit sum of the pod containers. If any container is missing a limit the metric is not emitted.
         - name: request
           type: group
           fields:
             - name: cores
-              type: double
+              type: float
               description: >
                 Requested CPU cores sum of the pod containers. If any container is missing a request the metric is not emitted.
     - name: memory
@@ -132,7 +132,7 @@
           type: group
           fields:
             - name: bytes
-              type: double
+              type: long
               format: bytes
               description: >
                 Memory limit bytes sum of the pod containers. If any container is missing a limit the metric is not emitted.
@@ -140,7 +140,7 @@
           type: group
           fields:
             - name: bytes
-              type: double
+              type: long
               format: bytes
               description: >
                 Requested memory bytes sum of the pod containers. If any container is missing a request the metric is not emitted.

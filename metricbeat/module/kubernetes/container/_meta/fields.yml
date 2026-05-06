@@ -46,14 +46,14 @@
           type: group
           fields:
             - name: cores
-              type: double
+              type: float
               description: >
                 CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
         - name: request
           type: group
           fields:
             - name: cores
-              type: double
+              type: float
               description: >
                 Requested CPU cores for the container. Not emitted if the container has no CPU request defined.
     - name: logs
@@ -138,7 +138,7 @@
           type: group
           fields:
             - name: bytes
-              type: double
+              type: long
               format: bytes
               description: >
                 Memory limit bytes for the container. Not emitted if the container has no memory limit defined.
@@ -146,7 +146,7 @@
           type: group
           fields:
             - name: bytes
-              type: double
+              type: long
               format: bytes
               description: >
                 Requested memory bytes for the container. Not emitted if the container has no memory request defined.
