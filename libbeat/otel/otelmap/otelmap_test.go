@@ -74,6 +74,18 @@ func TestFromMapstrDuration(t *testing.T) {
 	assert.Equal(t, want, input)
 }
 
+func TestFromMapstrSliceDuration(t *testing.T) {
+	input := mapstr.M{"durations": []time.Duration{1500 * time.Millisecond, 2 * time.Second}}
+	want := mapstr.M{"durations": []any{int64(1500 * time.Millisecond), int64(2 * time.Second)}}
+
+	ConvertNonPrimitive(input)
+	assert.Equal(t, want, input)
+
+	pm := pcommon.NewMap()
+	err := pm.FromRaw(map[string]any(input))
+	assert.NoError(t, err, "unexpected error converting duration slice to pcommon map")
+}
+
 func TestFromMapstrString(t *testing.T) {
 	tests := map[string]struct {
 		mapstr_val  interface{}
