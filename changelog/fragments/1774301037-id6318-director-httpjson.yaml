@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Allow HTTP JSON input redirection to the CEL input.
-component: filebeat
