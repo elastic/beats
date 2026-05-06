@@ -549,6 +549,45 @@ When you use `close.reader.after_interval` for logs that contain multiline event
 
 This option is set to 0 by default which means it is disabled.
 
+### `read_until_eof` [filebeat-input-filestream-read-until-eof]
+```{applies_to}
+stack: beta 9.5.0
+```
+
+When `read_until_eof.enabled` is set to `true`, the input keeps reading the
+current file until EOF after a shutdown signal is received, instead of stopping
+immediately. The shutdown signal can come from {{filebeat}} reloading its
+configuration (for example, an autodiscover provider removing the input when a
+Kubernetes pod terminates) or from any other path that cancels the input.
+
+Without this option, an input that is stopped while still reading a file leaves
+unread bytes behind. With this option, the harvester reads to EOF (or until
+`read_until_eof.timeout` elapses) and only then exits.
+
+```yaml
+- type: filestream
+  id: my-filestream-id
+  paths:
+    - /var/log/some-app/*.log
+  read_until_eof:
+    enabled: true
+    timeout: 1m
+```
+
+`read_until_eof.enabled` defaults to `false`. `read_until_eof.timeout` defaults
+to `1m` and must be greater than zero.
+
+This option works alongside the `close.*` options. While the input is draining
+to EOF, the close-on-state-change checks (`close.on_state_change.removed`,
+`close.on_state_change.renamed`) and `close.reader.after_interval` are
+suspended for that file so they cannot cut the drain short. Once the file is
+fully read (or the timeout fires), the input shuts down normally.
+
+This option does not change {{filebeat}}'s event delivery guarantees. The 
+guarantee is at the input level: the input does not exit while there are still
+bytes to read on the open file.
+
+
 ### `clean_*` [filebeat-input-filestream-clean-options]
 
 The `clean_*` options are used to clean up the state entries in the registry file. These settings help to reduce the size of the registry file and can prevent a potential [inode reuse issue](/reference/filebeat/inode-reuse-issue.md).

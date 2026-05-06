@@ -53,6 +53,7 @@ type inputTestingEnvironment struct {
 	t          *testing.T
 	workingDir string
 	stateStore statestore.States
+
 	pipeline   *mockPipelineConnector
 	monitoring beatmonitoring.Monitoring
 
@@ -393,20 +394,10 @@ func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
-	msg := &strings.Builder{}
-	require.Eventuallyf(e.t, func() bool {
-		msg.Reset()
-
+	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		events := e.pipeline.GetAllEvents()
-		sum := len(events)
-		if sum == count {
-			return true
-		}
-		fmt.Fprintf(msg, "unexpected number of events; expected: %d, actual: %d\n",
-			count, sum)
-
-		return false
-	}, 2*time.Minute, 10*time.Millisecond, "%s", msg)
+		require.Equal(t, count, len(events), "unexpected number of events")
+	}, 2*time.Minute, 10*time.Millisecond)
 }
 
 // waitUntilEventCountCtx calls waitUntilEventCount, but fails if ctx is cancelled.
@@ -598,12 +589,79 @@ type mockClient struct {
 	// mockPipelineConnector.cancelAllClients.
 	done       chan struct{}
 	cancelOnce sync.Once
+
+	allowedEventsSet bool          // make the zero value unblocked
+	allowedEvents    int           // Maximum number of events to accept before blocking
+	eventsAccepted   int           // Current number of events accepted
+	blocked          bool          // Whether the client is currently blocked
+	blockChan        chan struct{} // Channel to signal when blocking should be released
+}
+
+// SetAllowedEvents sets the maximum number of events the client will accept
+// before blocking.
+func (c *mockClient) SetAllowedEvents(limit int) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.allowedEventsSet = true
+	c.allowedEvents = limit
+	c.eventsAccepted = 0
+	c.blocked = false
+	c.blockChan = make(chan struct{}, 1)
+}
+
+// AllowMoreEvents allows the client to accept more n events.
+func (c *mockClient) AllowMoreEvents(n int) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.allowedEventsSet = true
+	c.allowedEvents += n
+	if c.blocked && c.eventsAccepted < c.allowedEvents {
+		c.blocked = false
+		select {
+		case c.blockChan <- struct{}{}:
+		default:
+		}
+	}
+}
+
+// Unblock removes all event count restrictions and unblocks the client
+func (c *mockClient) Unblock() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.allowedEventsSet = false
+	c.allowedEvents = 0
+
+	c.blocked = false
+	select {
+	case c.blockChan <- struct{}{}:
+	default:
+	}
 }
 
 // cancel releases a blocked ack handler. Safe to call from multiple goroutines
 // and idempotent.
 func (c *mockClient) cancel() {
 	c.cancelOnce.Do(func() { close(c.done) })
+}
+
+// waitIfBlocked acquires c.mtx.
+func (c *mockClient) waitIfBlocked() {
+	c.mtx.Lock()
+	unlock := sync.OnceFunc(func() {
+		c.mtx.Unlock()
+	})
+	defer unlock()
+
+	if c.allowedEventsSet &&
+		c.eventsAccepted >= c.allowedEvents {
+
+		c.blocked = true
+		unlock()
+		<-c.blockChan
+	}
 }
 
 // GetEvents returns the published events
@@ -621,8 +679,12 @@ func (c *mockClient) Publish(e beat.Event) {
 
 // PublishAll mocks the Client PublishAll method
 func (c *mockClient) PublishAll(events []beat.Event) {
+	c.waitIfBlocked()
+
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
+
+	c.eventsAccepted += len(events)
 
 	c.publishing = append(c.publishing, events...)
 	if len(events) > 0 {
@@ -663,6 +725,9 @@ type mockPipelineConnector struct {
 	blocking bool
 	clients  []*mockClient
 	mtx      sync.Mutex
+
+	allowedEventsSet bool // make the zero value unblocked
+	allowedEvents    int
 }
 
 // GetAllEvents returns all events associated with a pipeline
@@ -690,7 +755,9 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 
 	c := newMockClient(pc.blocking, config)
 	pc.clients = append(pc.clients, c)
-
+	if pc.allowedEventsSet {
+		c.SetAllowedEvents(pc.allowedEvents)
+	}
 	return c, nil
 }
 
@@ -699,6 +766,7 @@ func newMockClient(blocking bool, config beat.ClientConfig) *mockClient {
 	return &mockClient{
 		done:       done,
 		ackHandler: newMockACKHandler(done, blocking, config),
+		blockChan:  make(chan struct{}, 1),
 	}
 }
 
@@ -708,6 +776,43 @@ func (pc *mockPipelineConnector) cancelAllClients() {
 
 	for _, client := range pc.clients {
 		client.cancel()
+	}
+}
+
+// SetAllowedEvents sets the maximum number of events the client will accept
+// before blocking. The limit is propagated to every existing client and to
+// any client that connects afterward.
+func (pc *mockPipelineConnector) SetAllowedEvents(limit int) {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.allowedEventsSet = true
+	pc.allowedEvents = limit
+	for _, client := range pc.clients {
+		client.SetAllowedEvents(limit)
+	}
+}
+
+// AllowMoreEvents allows the client to accept more n events.
+func (pc *mockPipelineConnector) AllowMoreEvents(n int) {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.allowedEventsSet = true
+	pc.allowedEvents += n
+	for _, client := range pc.clients {
+		client.AllowMoreEvents(n)
+	}
+}
+
+// UnblockClients removes all event count restrictions and unblocks the client
+func (pc *mockPipelineConnector) UnblockClients() {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.allowedEventsSet = false
+	for _, client := range pc.clients {
+		client.Unblock()
 	}
 }
 

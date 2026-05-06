@@ -24,6 +24,7 @@ import (
 	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sync/atomic"
@@ -35,6 +36,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -487,4 +489,117 @@ func (c *testClient) PublishAll(events []beat.Event) {
 }
 func (c *testClient) Close() error {
 	return nil
+}
+
+// TestFilestream_handleReadError_ErrClosed verifies the contract
+// handleReadError must uphold for ErrClosed: the readUntilEOF
+// drain must happen *only* when the input is being cancelled. A plain
+// ErrClosed from any other source (close.reader.after_interval,
+// close.on_state_change.removed, close.on_state_change.renamed, explicit
+// Close) must close the reader.
+func TestFilestream_handleReadError_ErrClosed(t *testing.T) {
+	newCtx := func(t *testing.T, cancelled bool) v2.Context {
+		t.Helper()
+		ctx, cancel := context.WithCancel(context.Background())
+		t.Cleanup(cancel)
+		if cancelled {
+			cancel()
+		}
+		return v2.Context{
+			Cancelation: ctx,
+			Logger:      logptest.NewTestingLogger(t, ""),
+		}
+	}
+
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	t.Run("read_until_eof=false: always close", func(t *testing.T) {
+		inp := &filestream{
+			readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: false},
+		}
+		for _, cancelled := range []bool{false, true} {
+			ctx := newCtx(t, cancelled)
+			gotErr, shouldContinue := inp.handleReadError(
+				ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
+			assert.NoError(t, gotErr,
+				"ErrClosed with read_until_eof=false must not propagate")
+			assert.False(t, shouldContinue,
+				"ErrClosed with read_until_eof=false must end the loop (cancelled=%v)",
+				cancelled)
+		}
+	})
+
+	t.Run("read_until_eof=true + input not cancelled: exit immediately", func(t *testing.T) {
+		inp := &filestream{
+			readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: true},
+		}
+		ctx := newCtx(t, false)
+		gotErr, shouldContinue := inp.handleReadError(
+			ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
+		assert.NoError(t, gotErr,
+			"ErrClosed must not propagate when input isn't closed")
+		assert.False(t, shouldContinue,
+			"ErrClosed with input not cancelled must close the reader")
+	})
+
+	t.Run("read_until_eof=true + input cancelled: triggers readUntilEOF", func(t *testing.T) {
+		inp := &filestream{
+			readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: true},
+		}
+		ctx := newCtx(t, true)
+		gotErr, shouldContinue := inp.handleReadError(
+			ctx, ErrClosed, ctx.Logger, "/path", metrics, false)
+		assert.NoError(t, gotErr,
+			"handleReadError must return returning nil")
+		assert.True(t, shouldContinue,
+			"handleReadError must return true so readFromSource falls through to "+
+				"the readUntilEOF block")
+	})
+}
+
+// TestFilestream_handleReadError_OtherErrors ensures EOF / ErrInactive /
+// ErrFileTruncate / unknown errors behave the same regardless of
+// whether ctx is cancelled or read_until_eof is enabled.
+func TestFilestream_handleReadError_OtherErrors(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	logger := logptest.NewTestingLogger(t, "")
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	for _, readUntilEOF := range []bool{false, true} {
+		name := fmt.Sprintf("read_until_eof=%v", readUntilEOF)
+		t.Run(name, func(t *testing.T) {
+			inp := &filestream{
+				readUntilEOF: loginp.ReadUntilEOFConfig{Enabled: readUntilEOF},
+			}
+			inpCtx := v2.Context{Cancelation: ctx, Logger: logger}
+
+			t.Run("EOF", func(t *testing.T) {
+				gotErr, shouldContinue := inp.handleReadError(
+					inpCtx, io.EOF, logger, "/p", metrics, false)
+				if readUntilEOF {
+					assert.ErrorIs(t, gotErr, io.EOF,
+						"read_until_eof=true: EOF must propagate so readFromSource "+
+							"ends without entering readUntilEOF")
+				} else {
+					assert.NoError(t, gotErr)
+				}
+				assert.False(t, shouldContinue, "want shouldContinue == false")
+			})
+
+			t.Run("ErrInactive", func(t *testing.T) {
+				gotErr, shouldContinue := inp.handleReadError(
+					inpCtx, ErrInactive, logger, "/p", metrics, false)
+				assert.ErrorIs(t, gotErr, ErrInactive)
+				assert.False(t, shouldContinue, "want shouldContinue == false")
+			})
+
+			t.Run("ErrFileTruncate", func(t *testing.T) {
+				gotErr, shouldContinue := inp.handleReadError(
+					inpCtx, ErrFileTruncate, logger, "/p", metrics, false)
+				assert.NoError(t, gotErr, "ErrFileTruncate shouldn't propagate")
+				assert.False(t, shouldContinue, "want shouldContinue == false")
+			})
+		})
+	}
 }

@@ -42,6 +42,7 @@ type managedInput struct {
 	harvester              Harvester
 	cleanTimeout           time.Duration
 	harvesterLimit         uint64
+	readUntilEOF           ReadUntilEOFConfig
 }
 
 // Name is required to implement the v2.Input interface
@@ -72,18 +73,24 @@ func (inp *managedInput) Run(
 	ctx.Cancelation = cancelCtx
 
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
-
+	harvesterGroupStopTimeout := time.Minute // magic number
+	if inp.readUntilEOF.Enabled {
+		// keep the magic alive
+		harvesterGroupStopTimeout +=
+			inp.readUntilEOF.Timeout + 100*time.Millisecond
+	}
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      newReaderGroup(),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
+		readUntilEOF: inp.readUntilEOF,
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
 		tg: task.NewGroup(
 			inp.harvesterLimit,
-			time.Minute, // magic number
+			harvesterGroupStopTimeout,
 			ctx.Logger,
 			"harvester:"),
 		metrics: metrics,
