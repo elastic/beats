@@ -348,7 +348,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	// wait for kubernetes metadata processor to be initialized before processing any events
 	k.wg.Wait()
 
-	// if initalization fails then K8's will not be available
+	// if initialization fails then K8's will not be available
 	// in that case return event as is
 	if !k.kubernetesAvailable {
 		return event, nil
