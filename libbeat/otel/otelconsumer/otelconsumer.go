@@ -418,7 +418,7 @@ func encodeUnsignedSliceDirect[T unsigned](dest pcommon.Slice, src []T) error {
 }
 
 func maskUnsignedInt(value uint64) int64 {
-	return int64(value & uint64(math.MaxInt64))
+	return int64(value & uint64(math.MaxInt64)) //nolint:gosec // mask clears bit 63, conversion is safe
 }
 
 func encodeValueDirect(dest pcommon.Value, value any) error {
