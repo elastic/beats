@@ -29,11 +29,11 @@ import (
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // For more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource.
 type oktaTokenSource struct {
-	ctx         context.Context
-	conf        *oauth2.Config
-	oktaJWK     []byte
-	oktaJWKPEM  string
-	client      *http.Client
+	ctx        context.Context
+	conf       *oauth2.Config
+	oktaJWK    []byte
+	oktaJWKPEM string
+	client     *http.Client
 
 	mu    sync.Mutex
 	token *oauth2.Token
