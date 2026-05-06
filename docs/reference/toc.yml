@@ -204,6 +204,7 @@ toc:
           - file: filebeat/configuration-filebeat-options.md
             children:
               - file: filebeat/multiline-examples.md
+              - file: filebeat/filebeat-input-akamai.md
               - file: filebeat/filebeat-input-aws-cloudwatch.md
               - file: filebeat/filebeat-input-aws-s3.md
               - file: filebeat/filebeat-input-azure-eventhub.md

@@ -2,6 +2,7 @@
 /.vagrant
 /.idea
 /.vscode
+/.cursor
 /build
 /*/*.template*.json
 **/html_docs
