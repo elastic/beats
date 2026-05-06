@@ -25,7 +25,7 @@ import (
 // MergeEventFields merges the given mapstr.M into the given Event's Fields.
 func MergeEventFields(e *beat.Event, merge mapstr.M) {
 	if e.Fields != nil {
-		e.Fields.DeepUpdate(merge.Clone())
+		e.Fields.DeepCloneUpdate(merge)
 	} else {
 		e.Fields = merge.Clone()
 	}
