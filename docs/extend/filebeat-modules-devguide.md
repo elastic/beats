@@ -428,7 +428,7 @@ In order to test the filesets with the sample logs and/or generate the expected 
     * `GENERATE`: if set to 1, the expected documents will be generated.
 
 
-The filebeat logs are writen to the `build` directory. It may be useful to tail them in another terminal using `tail -F build/system-tests/run/test_modules.Test.*/output.log`.
+The filebeat logs are written to the `build` directory. It may be useful to tail them in another terminal using `tail -F build/system-tests/run/test_modules.Test.*/output.log`.
 
 For example if there’s a syntax error in an ingest pipeline, the test will probably just hang. The filebeat log output will contain the error message from elasticsearch.
 
