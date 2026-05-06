@@ -19,7 +19,7 @@ var (
 	initOnce sync.Once
 )
 
-func SetLogger(log *logger.Logger) {
+func setLogger(log *logger.Logger) {
 	gLogger.Store(log)
 }
 
