@@ -352,14 +352,14 @@ func TestCertificateHotReload(t *testing.T) {
 		cfg := &Config{
 			BeatAuthConfig: map[string]any{
 				"ssl": map[string]any{
-					"enabled":     "true",
-					"certificate": certPath,
-					"key":         keyPath,
+					"enabled":                 "true",
+					"certificate":             certPath,
+					"key":                     keyPath,
 					"certificate_authorities": []string{string(caPEM)},
-				},
-				"certificate_reload": map[string]any{
-					"enabled":         true,
-					"reload_interval": "100ms",
+					"certificate_reload": map[string]any{
+						"enabled":         true,
+						"reload_interval": "100ms",
+					},
 				},
 			},
 		}
@@ -386,6 +386,47 @@ func TestCertificateHotReload(t *testing.T) {
 		require.NoError(t, err)
 		_ = resp.Body.Close()
 		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert")
+	})
+
+	t.Run("cert reload defaults to enabled when block omits enabled", func(t *testing.T) {
+		serverURL, receivedSerial := startMTLSServer(t, caCert)
+
+		cfg := &Config{
+			BeatAuthConfig: map[string]any{
+				"ssl": map[string]any{
+					"enabled":                 "true",
+					"certificate":             certPath,
+					"key":                     keyPath,
+					"certificate_authorities": []string{string(caPEM)},
+					"certificate_reload": map[string]any{
+						"reload_interval": "100ms",
+					},
+				},
+			},
+		}
+
+		settings := componenttest.NewNopTelemetrySettings()
+		settings.Logger = zaptest.NewLogger(t)
+		auth, err := newAuthenticator(cfg, settings)
+		require.NoError(t, err)
+
+		host := &mockHost{
+			extensions:       extensionsMap{component.NewID(Type): auth},
+			reportStatusFunc: func(*componentstatus.Event) {},
+		}
+		require.NoError(t, auth.Start(context.Background(), host))
+
+		httpClientCfg := confighttp.NewDefaultClientConfig()
+		httpClientCfg.Auth = configoptional.Some(configauth.Config{
+			AuthenticatorID: component.NewID(Type),
+		})
+		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
+		require.NoError(t, err)
+
+		resp, err := client.Get(serverURL) //nolint:noctx // test
+		require.NoError(t, err)
+		_ = resp.Body.Close()
+		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert when enabled defaults to true")
 	})
 
 	t.Run("restart_on_cert_change alias: client presents certificate via GetClientCertificate", func(t *testing.T) {

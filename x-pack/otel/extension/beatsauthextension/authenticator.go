@@ -135,13 +135,11 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
-	// ssl.restart_on_cert_change is an alias for certificate_reload.
-	// When present it enables hot reload without restarting the process.
-	applyRestartOnCertChangeAlias(parsedCfg, &beatAuthConfig)
+	reload := resolveCertificateReload(parsedCfg)
 
 	httpOpts := a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)
 
-	reloaderOpt, err := certReloaderTransportOption(beatAuthConfig, a.logger)
+	reloaderOpt, err := certReloaderTransportOption(reload, beatAuthConfig.Transport.TLS, a.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -165,33 +163,54 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	return &httpClientProvider{client: client}, nil
 }
 
-// applyRestartOnCertChangeAlias reads ssl.restart_on_cert_change from cfg and
-// maps it onto beatAuthConfig.CertificateReload for backwards compatibility.
-func applyRestartOnCertChangeAlias(cfg *config.C, beatAuthConfig *BeatsAuthConfig) {
+// resolveCertificateReload reads ssl.certificate_reload (the primary key) and
+// the legacy ssl.restart_on_cert_change alias, returning the effective reload
+// settings.
+//
+// Semantics:
+//   - When the ssl.certificate_reload block is present, Enabled defaults to
+//     true; users opt out by setting enabled: false.
+//   - When the block is absent, the legacy ssl.restart_on_cert_change.enabled
+//     can still turn hot reload on (it never restarted the process here, but
+//     the field is honored for backwards compatibility with existing Beats
+//     configs).
+//   - The legacy period field seeds reload_interval only if the new key did
+//     not set it.
+func resolveCertificateReload(cfg *config.C) CertificateReloadConfig {
+	var result CertificateReloadConfig
+
 	sslConfig, err := cfg.Child("ssl", -1)
 	if err != nil {
-		return
-	}
-	rocc, err := sslConfig.Child("restart_on_cert_change", -1)
-	if err != nil {
-		return
+		return result
 	}
 
-	type restartOnCertChange struct {
-		Enabled bool          `config:"enabled"`
-		Period  time.Duration `config:"period"`
-	}
-	var alias restartOnCertChange
-	if err := rocc.Unpack(&alias); err != nil {
-		return
+	if reloadCfg, err := sslConfig.Child("certificate_reload", -1); err == nil {
+		_ = reloadCfg.Unpack(&result)
+		// Block is present: enabled defaults to true unless explicitly disabled.
+		if result.Enabled == nil {
+			t := true
+			result.Enabled = &t
+		}
 	}
 
-	if alias.Enabled {
-		beatAuthConfig.CertificateReload.Enabled = true
+	if rocc, err := sslConfig.Child("restart_on_cert_change", -1); err == nil {
+		type restartOnCertChange struct {
+			Enabled bool          `config:"enabled"`
+			Period  time.Duration `config:"period"`
+		}
+		var alias restartOnCertChange
+		if err := rocc.Unpack(&alias); err == nil {
+			if result.Enabled == nil && alias.Enabled {
+				t := true
+				result.Enabled = &t
+			}
+			if alias.Period > 0 && result.ReloadInterval == 0 {
+				result.ReloadInterval = alias.Period
+			}
+		}
 	}
-	if alias.Period > 0 && beatAuthConfig.CertificateReload.ReloadInterval == 0 {
-		beatAuthConfig.CertificateReload.ReloadInterval = alias.Period
-	}
+
+	return result
 }
 
 // certReloaderTransportOption returns an httpcommon.TransportOption that wires a
@@ -200,12 +219,11 @@ func applyRestartOnCertChangeAlias(cfg *config.C, beatAuthConfig *BeatsAuthConfi
 // Returns nil (no option) when hot reload is not applicable.
 // Encrypted keys (key_passphrase) are not supported by CertReloader; a warning
 // is logged and nil is returned in that case.
-func certReloaderTransportOption(beatAuthConfig BeatsAuthConfig, logger *logp.Logger) (httpcommon.TransportOption, error) {
-	if !beatAuthConfig.CertificateReload.Enabled {
+func certReloaderTransportOption(reload CertificateReloadConfig, tlsCfg *tlscommon.Config, logger *logp.Logger) (httpcommon.TransportOption, error) {
+	if reload.Enabled == nil || !*reload.Enabled {
 		return nil, nil
 	}
 
-	tlsCfg := beatAuthConfig.Transport.TLS
 	if tlsCfg == nil || tlsCfg.Certificate.Certificate == "" || tlsCfg.Certificate.Key == "" {
 		return nil, nil
 	}
@@ -216,8 +234,8 @@ func certReloaderTransportOption(beatAuthConfig BeatsAuthConfig, logger *logp.Lo
 	}
 
 	var opts []tlscommon.CertReloaderOption
-	if beatAuthConfig.CertificateReload.ReloadInterval > 0 {
-		opts = append(opts, tlscommon.WithReloadInterval(beatAuthConfig.CertificateReload.ReloadInterval))
+	if reload.ReloadInterval > 0 {
+		opts = append(opts, tlscommon.WithReloadInterval(reload.ReloadInterval))
 	}
 
 	reloader, err := tlscommon.NewCertReloader(tlsCfg.Certificate.Certificate, tlsCfg.Certificate.Key, opts...)
