@@ -217,7 +217,7 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	log := ctx.Logger.With("path", fs.newPath, "state-id", src.Name())
 	state := initState(log, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
@@ -756,7 +756,7 @@ func (inp *filestream) readFromSource(
 		if isGZIP {
 			metrics.MessagesGZIPRead.Inc()
 		}
-		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
+		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(message.Content)) {
 			continue
 		}
 
@@ -797,16 +797,14 @@ func (inp *filestream) readFromSource(
 
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
-func (inp *filestream) isDroppedLine(log *logp.Logger, line []byte) bool {
+func (inp *filestream) isDroppedLine(line []byte) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
-			log.Debugf("Drop line as it does not match any of the include patterns %s", line)
 			return true
 		}
 	}
 	if len(inp.readerConfig.ExcludeLines) > 0 {
 		if matchAny(inp.readerConfig.ExcludeLines, line) {
-			log.Debugf("Drop line as it does match one of the exclude patterns %s", line)
 			return true
 		}
 	}
