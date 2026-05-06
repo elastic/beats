@@ -159,14 +159,16 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                  string         `config:"id"`
-		CleanInactive       time.Duration  `config:"clean_inactive" validate:"min=-1"`
-		HarvesterLimit      uint64         `config:"harvester_limit"`
-		AllowIDDuplication  bool           `config:"allow_deprecated_id_duplication"`
-		TakeOver            TakeOverConfig `config:"take_over"`
-		LegacyCleanInactive bool           `config:"legacy_clean_inactive"`
+		ID                  string             `config:"id"`
+		CleanInactive       time.Duration      `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64             `config:"harvester_limit"`
+		AllowIDDuplication  bool               `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig     `config:"take_over"`
+		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
+		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
+		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
 	}
 
 	if err := config.Unpack(&settings); err != nil {
@@ -282,11 +284,19 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		id:                     settings.ID,
 		prospector:             prospector,
 		harvester:              harvester,
+		readUntilEOF:           settings.ReadUntilEOF,
 		sourceIdentifier:       srcIdentifier,
 		previousSrcIdentifiers: previousSrcIdentifiers,
 		cleanTimeout:           settings.CleanInactive,
 		harvesterLimit:         settings.HarvesterLimit,
 	}, nil
+}
+
+func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
+	return ReadUntilEOFConfig{
+		Enabled: false,
+		Timeout: time.Minute,
+	}
 }
 
 func (cim *InputManager) Delete(cfg *conf.C) error {
@@ -407,4 +417,13 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 
 func (t *TakeOverConfig) FromFilestream() bool {
 	return len(t.FromIDs) != 0
+}
+
+// ReadUntilEOFConfig configures the behaviour to keep reading the current
+// file until EOF before the input shuts down. If Timeout elapses before EOF
+// is reached, the input shuts down anyway.
+type ReadUntilEOFConfig struct {
+	Enabled bool `config:"enabled"`
+	// Timeout is the maximum time to wait for EOF to be reached.
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
 }
