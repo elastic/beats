@@ -437,6 +437,16 @@ func addEventHandlersToWatcher(
 					metrics.MemoryLimit = NewFloat64Metric(float64(q.Value()))
 				}
 			}
+			if cpu, ok := container.Resources.Requests["cpu"]; ok {
+				if q, err := k8sresource.ParseQuantity(cpu.String()); err == nil {
+					metrics.CoresRequest = NewFloat64Metric(float64(q.MilliValue()) / 1000)
+				}
+			}
+			if memory, ok := container.Resources.Requests["memory"]; ok {
+				if q, err := k8sresource.ParseQuantity(memory.String()); err == nil {
+					metrics.MemoryRequest = NewFloat64Metric(float64(q.Value()))
+				}
+			}
 
 			containerStore, _ := podStore.AddContainerStore(container.Name)
 			containerStore.SetContainerMetrics(metrics)

@@ -63,7 +63,10 @@ func (s *ContainerTestSuite) SetupTest() {
 	s.NodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
 
 	s.ContainerMetrics = util.NewContainerMetrics()
+	s.ContainerMetrics.CoresLimit = util.NewFloat64Metric(0.5)
 	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+	s.ContainerMetrics.CoresRequest = util.NewFloat64Metric(0.1)
+	s.ContainerMetrics.MemoryRequest = util.NewFloat64Metric(7311360)
 }
 
 func (s *ContainerTestSuite) ReadTestFile(testFile string) []byte {
@@ -99,11 +102,18 @@ func (s *ContainerTestSuite) TestEventMapping() {
 		"memory.majorpagefaults":  0,
 
 		// calculated pct fields:
-		"cpu.usage.node.pct":          0.005631997,
-		"cpu.usage.limit.pct":         0.005631997,
-		"memory.usage.node.pct":       0.01,
-		"memory.usage.limit.pct":      0.1,
-		"memory.workingset.limit.pct": 0.09943977591036414,
+		"cpu.usage.node.pct":            0.005631997,
+		"cpu.usage.limit.pct":           0.022527988,
+		"cpu.limit.cores":               0.5,
+		"cpu.request.cores":             0.1,
+		"cpu.usage.request.pct":         0.11263994,
+		"memory.usage.node.pct":         0.01,
+		"memory.usage.limit.pct":        0.1,
+		"memory.workingset.limit.pct":   0.09943977591036414,
+		"memory.limit.bytes":            14622720.0,
+		"memory.request.bytes":          7311360.0,
+		"memory.usage.request.pct":      0.2,
+		"memory.workingset.request.pct": 0.19887955182072828,
 	}
 
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)

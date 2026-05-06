@@ -57,6 +57,25 @@
               format: percent
               description: >
                 CPU usage as a percentage of the defined cpu limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
+            - name: request.pct
+              type: scaled_float
+              format: percent
+              description: >
+                CPU usage as a percentage of the defined cpu requests sum of the pod containers. If any container is missing a request the metric is not emitted.
+        - name: limit
+          type: group
+          fields:
+            - name: cores
+              type: float
+              description: >
+                CPU cores limit sum of the pod containers. If any container is missing a limit the metric is not emitted.
+        - name: request
+          type: group
+          fields:
+            - name: cores
+              type: float
+              description: >
+                Requested CPU cores sum of the pod containers. If any container is missing a request the metric is not emitted.
     - name: memory
       type: group
       fields:
@@ -78,6 +97,11 @@
               format: percent
               description: >
                 Memory usage as a percentage of the defined memory limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
+            - name: request.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Memory usage as a percentage of the defined memory requests sum of the pod containers. If any container is missing a request the metric is not emitted.
         - name: available
           type: group
           fields:
@@ -99,6 +123,27 @@
               format: percent
               description: >
                 Working set memory usage as a percentage of the defined limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
+            - name: request.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Working set memory usage as a percentage of the defined requests sum of the pod containers. If any container is missing a request the metric is not emitted.
+        - name: limit
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Memory limit bytes sum of the pod containers. If any container is missing a limit the metric is not emitted.
+        - name: request
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Requested memory bytes sum of the pod containers. If any container is missing a request the metric is not emitted.
         - name: rss
           type: group
           fields:

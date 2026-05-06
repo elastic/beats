@@ -37,6 +37,25 @@
               format: percent
               description: >
                 CPU usage as a percentage of the defined limit for the container (or total node allocatable CPU if unlimited). If the container CPU limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
+            - name: request.pct
+              type: scaled_float
+              format: percent
+              description: >
+                CPU usage as a percentage of the defined request for the container. Not emitted if the container has no CPU request defined.
+        - name: limit
+          type: group
+          fields:
+            - name: cores
+              type: float
+              description: >
+                CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
+        - name: request
+          type: group
+          fields:
+            - name: cores
+              type: float
+              description: >
+                Requested CPU cores for the container. Not emitted if the container has no CPU request defined.
     - name: logs
       type: group
       description: >
@@ -110,6 +129,27 @@
               format: percent
               description: >
                 Memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited). If the container Memory limits are missing and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
+            - name: request.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Memory usage as a percentage of the defined request for the container. Not emitted if the container has no memory request defined.
+        - name: limit
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Memory limit bytes for the container. Not emitted if the container has no memory limit defined.
+        - name: request
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                Requested memory bytes for the container. Not emitted if the container has no memory request defined.
         - name: rss
           type: group
           fields:
@@ -131,6 +171,11 @@
               format: percent
               description: >
                 Working set memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+            - name: request.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Working set memory usage as a percentage of the defined request for the container. Not emitted if the container has no memory request defined.
         - name: pagefaults
           type: double
           description: >

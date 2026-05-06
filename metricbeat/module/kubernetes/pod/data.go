@@ -54,12 +54,15 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 	for _, pod := range summary.Pods {
 		var usageNanoCores, usageMem, availMem, rss, workingSet, pageFaults, majorPageFaults uint64
 		var podCoreLimit, podMemLimit float64
+		var podCoreRequest, podMemRequest float64
 
 		podId := util.NewPodId(pod.PodRef.Namespace, pod.PodRef.Name)
 		podStore := nodeStore.GetPodStore(podId)
 
 		allContainersCPULimitsDefined := true
 		allContainersMemoryLimitsDefined := true
+		allContainersCPURequestsDefined := true
+		allContainersMemoryRequestsDefined := true
 
 		for _, container := range pod.Containers {
 			usageNanoCores += container.CPU.UsageNanoCores
@@ -88,6 +91,24 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			}
 			if allContainersMemoryLimitsDefined {
 				podMemLimit += containerMetrics.MemoryLimit.Value
+			}
+
+			// podCoreRequest and podMemRequest are defined only if all Pod containers have a request defined.
+			// If any container is missing a request, the pod-level request is undefined.
+			if allContainersCPURequestsDefined {
+				if containerMetrics.CoresRequest == nil {
+					allContainersCPURequestsDefined = false
+				} else {
+					podCoreRequest += containerMetrics.CoresRequest.Value
+				}
+			}
+
+			if allContainersMemoryRequestsDefined {
+				if containerMetrics.MemoryRequest == nil {
+					allContainersMemoryRequestsDefined = false
+				} else {
+					podMemRequest += containerMetrics.MemoryRequest.Value
+				}
 			}
 		}
 
@@ -149,6 +170,25 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			kubernetes2.ShouldPut(podEvent, "cpu.usage.limit.pct", float64(usageNanoCores)/1e9/podCoreLimit, logger)
 		}
 
+		if allContainersCPULimitsDefined {
+			kubernetes2.ShouldPut(podEvent, "cpu.limit.cores", podCoreLimit, logger)
+		}
+
+		if allContainersMemoryLimitsDefined {
+			kubernetes2.ShouldPut(podEvent, "memory.limit.bytes", podMemLimit, logger)
+		}
+
+		if allContainersCPURequestsDefined {
+			kubernetes2.ShouldPut(podEvent, "cpu.request.cores", podCoreRequest, logger)
+			if podCoreRequest > 0 {
+				kubernetes2.ShouldPut(podEvent, "cpu.usage.request.pct", float64(usageNanoCores)/1e9/podCoreRequest, logger)
+			}
+		}
+
+		if allContainersMemoryRequestsDefined {
+			kubernetes2.ShouldPut(podEvent, "memory.request.bytes", podMemRequest, logger)
+		}
+
 		if usageMem > 0 {
 			// `nodeMem` can be 0 if `state_node` and/or `node` metricsets are disabled
 			if nodeMem > 0 {
@@ -158,6 +198,10 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(usageMem)/podMemLimit, logger)
 				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
 			}
+			if allContainersMemoryRequestsDefined && podMemRequest > 0 {
+				kubernetes2.ShouldPut(podEvent, "memory.usage.request.pct", float64(usageMem)/podMemRequest, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.working_set.request.pct", float64(workingSet)/podMemRequest, logger)
+			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
@@ -166,8 +210,11 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			}
 			if podMemLimit > 0 {
 				kubernetes2.ShouldPut(podEvent, "memory.usage.limit.pct", float64(workingSet)/podMemLimit, logger)
-
 				kubernetes2.ShouldPut(podEvent, "memory.working_set.limit.pct", float64(workingSet)/podMemLimit, logger)
+			}
+			if allContainersMemoryRequestsDefined && podMemRequest > 0 {
+				kubernetes2.ShouldPut(podEvent, "memory.usage.request.pct", float64(workingSet)/podMemRequest, logger)
+				kubernetes2.ShouldPut(podEvent, "memory.working_set.request.pct", float64(workingSet)/podMemRequest, logger)
 			}
 		}
 
