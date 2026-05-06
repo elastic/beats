@@ -7,22 +7,24 @@ package aws
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
-
-	"github.com/aws/aws-sdk-go-v2/service/sts"
-
-	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+
+	identityfederationaws "github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation/aws"
 )
 
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
@@ -53,8 +55,9 @@ type ConfigAWS struct {
 	// actually expiring. If expiry_window is less than or equal to zero, the setting is ignored.
 	AssumeRoleExpiryWindow time.Duration `config:"assume_role.expiry_window"`
 
-	// UseCloudConnectors indicates whether the cloud connectors flow is used.
-	// If this is true, the InitializeAWSConfig should initialize the AWS cloud connector role chaining flow.
+	// UseCloudConnectors enables the Identity Federation flow. When true,
+	// InitializeAWSConfig sets up the OIDC role-chaining credentials using
+	// environment variables provided by the agentless controller.
 	UseCloudConnectors bool `config:"use_cloud_connectors"`
 }
 
@@ -74,13 +77,11 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
 	}
 
-	// If cloud connectors method is selected from config, initialize the role chaining.
+	// If identity federation is enabled, set up the OIDC role-chaining credentials.
 	if beatsConfig.UseCloudConnectors {
-		cloudConnectorsConfig, err := parseCloudConnectorsConfigFromEnv()
-		if err != nil {
+		if err := applyIdentityFederationChain(beatsConfig, &awsConfig, logger); err != nil {
 			return awsConfig, err
 		}
-		addCloudConnectorsCredentials(beatsConfig, cloudConnectorsConfig, &awsConfig, logger)
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)
@@ -181,4 +182,74 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 			options.ExpiryWindow = config.AssumeRoleExpiryWindow
 		}
 	})
+}
+
+// defaultIntermediateDuration is the session duration for the intermediate Elastic Global Role.
+// It is intentionally short because it is only used as a stepping stone to the customer's remote role.
+const defaultIntermediateDuration = 20 * time.Minute
+
+// applyIdentityFederationChain configures awsConfig with Identity Federation role-chaining
+// credentials. It reads the three required env vars set by the agentless controller and
+// builds a two-step STS chain:
+//
+//  1. AssumeRoleWithWebIdentity → Elastic Global Role (using the OIDC JWT from IDTokenFileEnvVar)
+//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
+func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) error {
+	logger = logger.Named("applyIdentityFederationChain")
+	logger.Debug("Switching credentials provider to Identity Federation")
+
+	globalRoleARN := os.Getenv(identityfederationaws.GlobalRoleARNEnvVar)
+	idTokenPath := os.Getenv(identityfederationaws.IDTokenFileEnvVar)
+	cloudResourceID := os.Getenv(identityfederationaws.CloudResourceIDEnvVar)
+
+	var errs []error
+	if globalRoleARN == "" {
+		errs = append(errs, errors.New("elastic global role arn is not configured"))
+	}
+	if idTokenPath == "" {
+		errs = append(errs, errors.New("id token path is not configured"))
+	}
+	if cloudResourceID == "" {
+		errs = append(errs, errors.New("cloud resource id is not configured"))
+	}
+	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
+	// called using credentials from another assumed role (role chaining).
+	if config.AssumeRoleDuration > time.Hour {
+		errs = append(errs, errors.New("assume role duration cannot exceed 1h for identity federation role chaining"))
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("identity federation config is invalid: %w", errors.Join(errs...))
+	}
+
+	chain := []identityfederationaws.AWSRoleChainingStep{
+		// Step 1: Assume the Elastic Global Role with web identity using the ID token
+		// provided by the agentless OIDC issuer.
+		&identityfederationaws.WebIdentityRoleStep{
+			RoleARN:              globalRoleARN,
+			WebIdentityTokenFile: idTokenPath,
+			Options: func(opt *stscreds.WebIdentityRoleOptions) {
+				opt.Duration = defaultIntermediateDuration
+			},
+		},
+		// Step 2: Assume the remote role (the user's configured role), using the
+		// previously assumed Elastic Global Role credentials.
+		&identityfederationaws.AssumeRoleStep{
+			RoleARN: config.RoleArn,
+			Options: func(aro *stscreds.AssumeRoleOptions) {
+				aro.Duration = config.AssumeRoleDuration
+				if config.ExternalID != "" {
+					aro.ExternalID = awssdk.String(identityfederationaws.FormatExternalID(cloudResourceID, config.ExternalID))
+				}
+			},
+			CacheOptions: func(options *awssdk.CredentialsCacheOptions) {
+				if config.AssumeRoleExpiryWindow > 0 {
+					options.ExpiryWindow = config.AssumeRoleExpiryWindow
+				}
+			},
+		},
+	}
+
+	result := identityfederationaws.AWSConfigRoleChaining(*awsConfig, chain)
+	awsConfig.Credentials = result.Credentials
+	return nil
 }
