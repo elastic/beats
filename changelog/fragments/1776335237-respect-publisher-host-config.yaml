@@ -13,7 +13,7 @@ kind: bug-fix
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Respect publisher_pipeline.disable_host configuration to drop host.name field
+summary: Respect publisher_pipeline.disable_host configuration to drop host.name field while running under elastic-agent
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
