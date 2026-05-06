@@ -154,9 +154,9 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	// Wrap to detect S3 body streaming errors so we can retry them
 	wrappedReader := s3DownloadFailedWrappedReader{r: mReader}
 
-	streamReader, err := x_reader.AddGzipDecoderIfNeeded(wrappedReader)
+	streamReader, err := x_reader.AddDecoderIfNeeded(wrappedReader)
 	if err != nil {
-		return fmt.Errorf("failed checking for gzip content: %w", err)
+		return fmt.Errorf("failed to detect compression: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
