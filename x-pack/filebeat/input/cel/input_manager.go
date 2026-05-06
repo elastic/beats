@@ -51,7 +51,7 @@ func (c config) checkUnsupportedParams(logger *logp.Logger) {
 			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
 	}
 	if c.Redact == nil {
-		if len(c.SecretState) > 0 {
+		if len(c.SecretState.m) > 0 {
 			logger.Named("cel").Warn("state.secret is automatically redacted, but 'redact' configuration is recommended if other state fields contain sensitive values: " +
 				"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
 		} else {
