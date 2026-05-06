@@ -1,0 +1,19 @@
+filebeat.config.inputs:
+  path: {{.inputsDir}}/*.yml
+  reload.enabled: true
+  reload.period: 0.1s
+
+path.home: {{.homePath}}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+filebeat.registry.flush: 0s
+
+queue.mem:
+  flush:
+    min_events: 25
+
+logging.level: debug
