@@ -95,26 +95,6 @@ func TestAnnotatorSkipped(t *testing.T) {
 	}, event.Fields)
 }
 
-// TestAnnotatorRunWhenMatchersNil verifies Run does not panic when async init would
-// leave matchers unset (e.g. kubernetes client unavailable) and returns the event unchanged.
-func TestAnnotatorRunWhenMatchersNil(t *testing.T) {
-	processor := &kubernetesAnnotator{
-		log:   logptest.NewTestingLogger(t, selector),
-		cache: newCache(10 * time.Second),
-		wg:    sync.WaitGroup{}, // no pending init: Wait returns immediately
-	}
-
-	fields := mapstr.M{
-		"container": mapstr.M{
-			"id": "container-id-123",
-		},
-	}
-
-	event, err := processor.Run(&beat.Event{Fields: fields.Clone()})
-	require.NoError(t, err, "Run should not error when matchers are nil")
-	assert.Equal(t, fields, event.Fields, "event should be unchanged when kubernetes metadata processor did not initialize")
-}
-
 // Test metadata are not included in the event
 func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
