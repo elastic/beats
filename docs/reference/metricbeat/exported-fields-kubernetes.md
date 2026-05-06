@@ -306,6 +306,12 @@ CPU usage metrics
     format: percent
 
 
+**`kubernetes.container.cpu.limit.cores`**
+:   CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
+
+    type: double
+
+
 **`kubernetes.container.cpu.request.cores`**
 :   Requested CPU cores for the container. Not emitted if the container has no CPU request defined.
 
@@ -396,6 +402,14 @@ Logs info
     type: scaled_float
 
     format: percent
+
+
+**`kubernetes.container.memory.limit.bytes`**
+:   Memory limit bytes for the container. Not emitted if the container has no memory limit defined.
+
+    type: double
+
+    format: bytes
 
 
 **`kubernetes.container.memory.request.bytes`**
@@ -1056,6 +1070,12 @@ CPU usage metrics
     format: percent
 
 
+**`kubernetes.pod.cpu.limit.cores`**
+:   CPU cores limit sum of the pod containers. If any container is missing a limit the metric is not emitted.
+
+    type: double
+
+
 **`kubernetes.pod.cpu.request.cores`**
 :   Requested CPU cores sum of the pod containers. If any container is missing a request the metric is not emitted.
 
@@ -1124,6 +1144,14 @@ CPU usage metrics
     type: scaled_float
 
     format: percent
+
+
+**`kubernetes.pod.memory.limit.bytes`**
+:   Memory limit bytes sum of the pod containers. If any container is missing a limit the metric is not emitted.
+
+    type: double
+
+    format: bytes
 
 
 **`kubernetes.pod.memory.request.bytes`**

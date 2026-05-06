@@ -42,6 +42,13 @@
               format: percent
               description: >
                 CPU usage as a percentage of the defined request for the container. Not emitted if the container has no CPU request defined.
+        - name: limit
+          type: group
+          fields:
+            - name: cores
+              type: double
+              description: >
+                CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
         - name: request
           type: group
           fields:
@@ -127,6 +134,14 @@
               format: percent
               description: >
                 Memory usage as a percentage of the defined request for the container. Not emitted if the container has no memory request defined.
+        - name: limit
+          type: group
+          fields:
+            - name: bytes
+              type: double
+              format: bytes
+              description: >
+                Memory limit bytes for the container. Not emitted if the container has no memory limit defined.
         - name: request
           type: group
           fields:

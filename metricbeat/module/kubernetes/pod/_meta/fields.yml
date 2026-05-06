@@ -62,6 +62,13 @@
               format: percent
               description: >
                 CPU usage as a percentage of the defined cpu requests sum of the pod containers. If any container is missing a request the metric is not emitted.
+        - name: limit
+          type: group
+          fields:
+            - name: cores
+              type: double
+              description: >
+                CPU cores limit sum of the pod containers. If any container is missing a limit the metric is not emitted.
         - name: request
           type: group
           fields:
@@ -121,6 +128,14 @@
               format: percent
               description: >
                 Working set memory usage as a percentage of the defined requests sum of the pod containers. If any container is missing a request the metric is not emitted.
+        - name: limit
+          type: group
+          fields:
+            - name: bytes
+              type: double
+              format: bytes
+              description: >
+                Memory limit bytes sum of the pod containers. If any container is missing a limit the metric is not emitted.
         - name: request
           type: group
           fields:
