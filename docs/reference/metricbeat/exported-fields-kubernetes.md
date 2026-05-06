@@ -1610,6 +1610,12 @@ kubernetes container metrics
     type: keyword
 
 
+**`kubernetes.container.type`**
+:   Container type (container or init)
+
+    type: keyword
+
+
 **`kubernetes.container.status.phase`**
 :   Container phase (running, waiting, terminated)
 

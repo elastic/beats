@@ -1,3 +1,6 @@
+:::{include} /release-notes/_snippets/breaking-changes/9.4.md
+:::
+
 :::{include} /release-notes/_snippets/breaking-changes/9.3.md
 :::
 
