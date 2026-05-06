@@ -1,0 +1,27 @@
+kind: bug-fix
+summary: Harden Salesforce input batching compatibility and auth-failure recovery.
+description: |
+  Preserve Salesforce object cursor continuity across bounded-batch upgrades
+  and toggles. Existing installs now seed batched windows from legacy
+  first_event_time / last_event_time state, and disabling batching resumes
+  unbatched queries from the latest safe watermark instead of replaying quiet
+  windows that batching already drained.
+
+  Tighten batching safety by rejecting object configs that enable batching
+  without referencing both batch_start_time and batch_end_time, or that still
+  reference those placeholders after batching is disabled.
+
+  Prevent same-timestamp resume gaps for SetupAuditTrail and EventLogFile
+  collection by persisting the last seen record Id as a tie-breaker. Existing
+  installs remain compatible: older cursor state keeps the legacy resume boundary
+  until the next successful run records the new field.
+
+  Normalize Salesforce OAuth token_url handling for user-password and JWT flows.
+  The input now accepts either a Salesforce OAuth host or the canonical
+  /services/oauth2/token endpoint and avoids constructing doubled token URLs.
+
+  Improve resilience by propagating input cancellation into Salesforce HTTP
+  requests, retrying the initial SOQL request once after Salesforce auth errors,
+  retrying EventLogFile downloads once after a 401, and surfacing consecutive
+  collection failures in Elastic Agent status.
+component: filebeat

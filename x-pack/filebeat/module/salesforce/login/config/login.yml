@@ -13,16 +13,21 @@ event_monitoring_method:
     enabled: {{ if .event_log_file }}true{{ else }}false{{ end }}
     interval: {{ .elf_interval }}
     query:
-      default: SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST
-      value: SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY LogDate ASC NULLS FIRST
+      default: SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}CreatedDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST, Id ASC
+      value: SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND EventType = 'Login' AND (CreatedDate > [[ .cursor.event_log_file.last_event_time ]][[ if .cursor.event_log_file.last_event_id ]] OR (CreatedDate = [[ .cursor.event_log_file.last_event_time ]] AND Id > '[[ .cursor.event_log_file.last_event_id ]]')[[ end ]]) ORDER BY CreatedDate ASC NULLS FIRST, Id ASC
     cursor:
       field: "CreatedDate"
   object:
     enabled: {{ if .real_time }}true{{ else }}false{{ end }}
     interval: {{ .real_time_interval }}
+    batch:
+      enabled: {{ if .real_time }}true{{ else }}false{{ end }}
+      initial_interval: {{ if .initial_interval }}{{ .initial_interval }}{{ else }}{{ .real_time_interval }}{{ end }}
+      max_windows_per_run: 12
+      window: {{ .real_time_interval }}
     query:
-      default: SELECT FIELDS(STANDARD) FROM LoginEvent{{ if .initial_interval }} WHERE EventDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]]{{ end }}
-      value: SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]
+      default: SELECT FIELDS(STANDARD) FROM LoginEvent ORDER BY EventDate DESC
+      value: SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.batch_start_time ]] AND EventDate <= [[ .cursor.object.batch_end_time ]] ORDER BY EventDate DESC
     cursor:
       field: "EventDate"
 

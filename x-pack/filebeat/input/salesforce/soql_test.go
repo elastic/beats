@@ -31,7 +31,7 @@ func TestFormat(t *testing.T) {
 			if !assert.Equal(t, tc.wantErr, gotErr) {
 				t.FailNow()
 			}
-			if !assert.EqualValues(t, tc.wantStr, got) {
+			if !assert.Equal(t, tc.wantStr, got) {
 				t.FailNow()
 			}
 		})
