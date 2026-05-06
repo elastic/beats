@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.25.9
+go 1.26
 
 require (
 	cloud.google.com/go/bigquery v1.73.1
@@ -197,7 +197,7 @@ require (
 	github.com/klauspost/compress v1.18.5
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.9.5
-	github.com/microsoft/wmi v0.38.3
+	github.com/microsoft/wmi v0.41.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.150.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
 	github.com/pierrec/lz4/v4 v4.1.26
