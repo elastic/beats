@@ -190,6 +190,65 @@ func TestDeepCloneUpdateNoOverwriteNoAliasing(t *testing.T) {
 	assert.Equal(t, srcCopy, src, "source must not be affected")
 }
 
+// TestDeepCloneUpdateNoOverwriteDeepNested is the specific regression test for
+// the scenario CodeRabbit flagged as critical: an optimization in add_fields
+// short-circuited on top-level key presence, silently dropping enrichment for
+// partially-populated nested objects. This test verifies that
+// DeepCloneUpdateNoOverwrite descends into existing sub-maps and adds missing
+// leaves at any depth rather than stopping at the first level.
+func TestDeepCloneUpdateNoOverwriteDeepNested(t *testing.T) {
+	// Three levels deep: dst has host.os.type, src has host.os.version.
+	// The correct behavior is to add host.os.version without touching host.os.type.
+	dst := M{
+		"host": M{
+			"os": M{"type": "linux"},
+		},
+	}
+	src := M{
+		"host": M{
+			"os": M{"version": "22.04", "type": "windows"},
+		},
+	}
+
+	dst.DeepCloneUpdateNoOverwrite(src)
+
+	// Existing leaf at depth 3 must not be overwritten.
+	v, err := dst.GetValue("host.os.type")
+	require.NoError(t, err)
+	assert.Equal(t, "linux", v)
+
+	// Missing leaf at depth 3 must be added.
+	v, err = dst.GetValue("host.os.version")
+	require.NoError(t, err)
+	assert.Equal(t, "22.04", v)
+}
+
+// TestDeepCloneUpdateNoOverwriteNewSubMapNoAliasing verifies that when
+// DeepCloneUpdateNoOverwrite adds a new sub-map inside an existing sub-map,
+// the newly inserted map is a fresh copy and not aliased to the source.
+func TestDeepCloneUpdateNoOverwriteNewSubMapNoAliasing(t *testing.T) {
+	src := M{
+		"agent": M{
+			"id":      "existing",
+			"details": M{"version": "8.12.0"},
+		},
+	}
+	srcCopy := src.Clone()
+
+	dst := M{"agent": M{"id": "existing"}}
+	dst.DeepCloneUpdateNoOverwrite(src)
+
+	// Mutate the newly-inserted sub-map in the destination.
+	details, err := dst.GetValue("agent.details")
+	require.NoError(t, err)
+	detailsMap, ok := details.(M)
+	require.True(t, ok)
+	detailsMap["version"] = "MUTATED"
+
+	// Source must be unchanged.
+	assert.Equal(t, srcCopy, src, "source must not be affected by mutations to destination")
+}
+
 func TestDeepCloneUpdateNoOverwriteEquivalence(t *testing.T) {
 	src := M{
 		"agent": M{"id": "new", "version": "8.12.0"},
@@ -205,6 +264,132 @@ func TestDeepCloneUpdateNoOverwriteEquivalence(t *testing.T) {
 	assert.Equal(t, dst1, dst2)
 }
 
+// TestDeepCloneUpdateMapStringInterfaceDst is the regression test for the bug
+// where DeepCloneUpdate overwrote a map[string]interface{} destination subtree
+// instead of merging into it. This caused event fields like @timestamp,
+// event.start, and process.start to be silently dropped or replaced with
+// empty maps when processors merged their metadata into events whose fields
+// contained map[string]interface{} values (e.g. decoded from JSON).
+func TestDeepCloneUpdateMapStringInterfaceDst(t *testing.T) {
+	// Simulates an event where "event" subtree is map[string]interface{} (as
+	// decoded from JSON/wire), and a processor adds "event.dataset".
+	dst := M{
+		"event": map[string]interface{}{
+			"start": "2024-01-01T00:00:00Z",
+			"end":   "2024-01-01T01:00:00Z",
+		},
+	}
+	src := M{
+		"event": M{"dataset": "mydata"},
+	}
+
+	dst.DeepCloneUpdate(src)
+
+	// Existing fields in the map[string]interface{} subtree must be preserved.
+	v, err := dst.GetValue("event.start")
+	require.NoError(t, err)
+	assert.Equal(t, "2024-01-01T00:00:00Z", v)
+
+	v, err = dst.GetValue("event.end")
+	require.NoError(t, err)
+	assert.Equal(t, "2024-01-01T01:00:00Z", v)
+
+	// New field from source must be added.
+	v, err = dst.GetValue("event.dataset")
+	require.NoError(t, err)
+	assert.Equal(t, "mydata", v)
+}
+
+func TestDeepCloneUpdateNoOverwriteMapStringInterfaceDst(t *testing.T) {
+	dst := M{
+		"process": map[string]interface{}{
+			"start": "2024-01-01T00:00:00Z",
+			"pid":   1234,
+		},
+	}
+	src := M{
+		"process": M{"start": "SHOULD-NOT-OVERWRITE", "name": "myapp"},
+	}
+
+	dst.DeepCloneUpdateNoOverwrite(src)
+
+	// Existing field must not be overwritten.
+	v, err := dst.GetValue("process.start")
+	require.NoError(t, err)
+	assert.Equal(t, "2024-01-01T00:00:00Z", v)
+
+	// Existing field from original map preserved.
+	v, err = dst.GetValue("process.pid")
+	require.NoError(t, err)
+	assert.Equal(t, 1234, v)
+
+	// New field added.
+	v, err = dst.GetValue("process.name")
+	require.NoError(t, err)
+	assert.Equal(t, "myapp", v)
+}
+
+// TestDeepCloneUpdateMapStringInterfaceDstEquivalence is the oracle test for
+// the map[string]interface{} destination fix: verifies DeepCloneUpdate
+// produces bit-for-bit the same result as DeepUpdate(src.Clone()) when the
+// destination tree contains map[string]interface{} nodes (as commonly occurs
+// with JSON-decoded event data).
+func TestDeepCloneUpdateMapStringInterfaceDstEquivalence(t *testing.T) {
+	makeDst := func() M {
+		return M{
+			"event": map[string]interface{}{
+				"start": "2024-01-01T00:00:00Z",
+				"end":   "2024-01-01T01:00:00Z",
+			},
+			"process": map[string]interface{}{
+				"start": "2024-01-01T00:00:00Z",
+				"pid":   1234,
+			},
+			"host": M{"name": "server1"},
+		}
+	}
+	src := M{
+		"event":   M{"dataset": "mydata"},
+		"process": M{"name": "myapp"},
+		"host":    M{"os": M{"type": "linux"}},
+	}
+
+	dst1 := makeDst()
+	dst1.DeepUpdate(src.Clone())
+
+	dst2 := makeDst()
+	dst2.DeepCloneUpdate(src)
+
+	assert.Equal(t, dst1, dst2, "DeepCloneUpdate must be equivalent to DeepUpdate(src.Clone()) for map[string]interface{} destinations")
+}
+
+func TestDeepCloneUpdateNoOverwriteMapStringInterfaceDstEquivalence(t *testing.T) {
+	makeDst := func() M {
+		return M{
+			"event": map[string]interface{}{
+				"start":   "2024-01-01T00:00:00Z",
+				"dataset": "original",
+			},
+			"process": map[string]interface{}{
+				"start": "2024-01-01T00:00:00Z",
+				"pid":   1234,
+			},
+		}
+	}
+	src := M{
+		"event":   M{"dataset": "new-dataset", "end": "2024-01-01T01:00:00Z"},
+		"process": M{"start": "SHOULD-NOT-OVERWRITE", "name": "myapp"},
+	}
+
+	dst1 := makeDst()
+	dst1.DeepUpdateNoOverwrite(src.Clone())
+
+	dst2 := makeDst()
+	dst2.DeepCloneUpdateNoOverwrite(src)
+
+	assert.Equal(t, dst1, dst2, "DeepCloneUpdateNoOverwrite must be equivalent to DeepUpdateNoOverwrite(src.Clone()) for map[string]interface{} destinations")
+}
+
 func TestDeepCloneUpdateNilSource(t *testing.T) {
 	dst := M{"key": "value"}
 	dst.DeepCloneUpdate(nil)
@@ -215,6 +400,75 @@ func TestDeepCloneUpdateEmptySource(t *testing.T) {
 	dst := M{"key": "value"}
 	dst.DeepCloneUpdate(M{})
 	assert.Equal(t, M{"key": "value"}, dst)
+}
+
+// TestDeepCloneUpdateNoOverwriteNilMapDst verifies that when the destination
+// holds a nil map[string]interface{} value, DeepCloneUpdateNoOverwrite does not
+// panic and instead replaces it with a fresh copy of the source map.
+func TestDeepCloneUpdateNoOverwriteNilMapDst(t *testing.T) {
+	var nilMap map[string]interface{}
+	dst := M{"host": nilMap}
+	src := M{"host": M{"name": "server1"}}
+
+	assert.NotPanics(t, func() {
+		dst.DeepCloneUpdateNoOverwrite(src)
+	})
+
+	v, err := dst.GetValue("host.name")
+	require.NoError(t, err)
+	assert.Equal(t, "server1", v)
+}
+
+// TestDeepCloneUpdateNilDsts verifies that DeepCloneUpdate and
+// DeepCloneUpdateNoOverwrite never panic on nil destination sub-maps —
+// neither for typed-nil map[string]interface{} nor for nil M — and that
+// the result matches the DeepUpdate(src.Clone()) oracle in every case.
+func TestDeepCloneUpdateNilDsts(t *testing.T) {
+	cases := []struct {
+		name string
+		dst  func() M
+	}{
+		{
+			name: "nil map[string]interface{}",
+			dst: func() M {
+				var nilMap map[string]interface{}
+				return M{"host": nilMap}
+			},
+		},
+		{
+			name: "nil M",
+			dst: func() M {
+				var nilM M
+				return M{"host": nilM}
+			},
+		},
+	}
+
+	src := M{"host": M{"name": "server1"}}
+
+	for _, tc := range cases {
+		t.Run(tc.name+"/DeepCloneUpdate", func(t *testing.T) {
+			dst := tc.dst()
+			oracle := tc.dst()
+			oracle.DeepUpdate(src.Clone())
+
+			assert.NotPanics(t, func() {
+				dst.DeepCloneUpdate(src)
+			})
+			assert.Equal(t, oracle, dst)
+		})
+
+		t.Run(tc.name+"/DeepCloneUpdateNoOverwrite", func(t *testing.T) {
+			dst := tc.dst()
+			oracle := tc.dst()
+			oracle.DeepUpdateNoOverwrite(src.Clone())
+
+			assert.NotPanics(t, func() {
+				dst.DeepCloneUpdateNoOverwrite(src)
+			})
+			assert.Equal(t, oracle, dst)
+		})
+	}
 }
 
 func TestDeepCloneUpdateMapStringInterface(t *testing.T) {
@@ -397,6 +651,67 @@ func BenchmarkHeavyPipeline(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			dst := M{"message": "test", "agent": M{"type": "filebeat"}}
 			for _, src := range manyShared {
+				dst.DeepCloneUpdate(src)
+			}
+			benchSinkM = dst
+		}
+	})
+}
+
+// BenchmarkMixedTypePipeline benchmarks merging into an event whose field tree
+// contains map[string]interface{} subtrees — the common case when events are
+// decoded from JSON before processors run. This exercises the map[string]interface{}
+// destination branch added to fix the v0.36.0 regression.
+func BenchmarkMixedTypePipeline(b *testing.B) {
+	// Processor metadata: pure mapstr.M (as built by add_fields, add_cloud_metadata, etc.)
+	sharedMeta := []M{
+		{"elastic_agent": M{"id": "agent-uuid", "snapshot": false, "version": "8.12.0"}},
+		{"agent": M{"id": "agent-uuid"}},
+		{"data_stream": M{"type": "logs", "dataset": "system.syslog", "namespace": "default"}},
+		{"event": M{"dataset": "system.syslog"}},
+		{"cloud": M{
+			"provider": "aws", "region": "us-east-1",
+			"account": M{"id": "123456789012"}, "instance": M{"id": "i-0abcdef"},
+		}},
+	}
+
+	// makeDst returns an event whose subtrees are map[string]interface{} —
+	// simulating JSON-decoded input where the decoder returns native Go maps.
+	makeDst := func() M {
+		return M{
+			"message": "request completed in 42ms",
+			"event": map[string]interface{}{
+				"start": "2024-01-01T00:00:00Z",
+				"end":   "2024-01-01T00:00:01Z",
+			},
+			"process": map[string]interface{}{
+				"start": "2024-01-01T00:00:00Z",
+				"pid":   1234,
+				"name":  "myapp",
+			},
+			"host": map[string]interface{}{
+				"name": "prod-server-01",
+				"os":   map[string]interface{}{"type": "linux", "version": "22.04"},
+			},
+		}
+	}
+
+	b.Run("clone_and_deep_update", func(b *testing.B) {
+		b.ReportAllocs()
+		for b.Loop() {
+			dst := makeDst()
+			for _, src := range sharedMeta {
+				dst.DeepUpdate(src.Clone())
+			}
+			benchSinkM = dst
+		}
+	})
+
+	b.Run("deep_clone_update", func(b *testing.B) {
+		b.ReportAllocs()
+		for b.Loop() {
+			dst := makeDst()
+			for _, src := range sharedMeta {
 				dst.DeepCloneUpdate(src)
 			}
 			benchSinkM = dst

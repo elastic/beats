@@ -94,28 +94,7 @@ func (m M) DeepUpdateNoOverwrite(d M) {
 // merge in a single pass, avoiding the intermediate allocation of a full
 // clone.
 func (m M) DeepCloneUpdate(d M) {
-	for k, v := range d {
-		switch srcVal := v.(type) {
-		case M:
-			if dstMap, ok := m[k].(M); ok {
-				dstMap.DeepCloneUpdate(srcVal)
-			} else {
-				fresh := make(M, len(srcVal))
-				fresh.DeepCloneUpdate(srcVal)
-				m[k] = fresh
-			}
-		case map[string]interface{}:
-			if dstMap, ok := m[k].(M); ok {
-				dstMap.DeepCloneUpdate(M(srcVal))
-			} else {
-				fresh := make(M, len(srcVal))
-				fresh.DeepCloneUpdate(M(srcVal))
-				m[k] = fresh
-			}
-		default:
-			m[k] = v
-		}
-	}
+	m.deepCloneUpdateMap(d, true)
 }
 
 // DeepCloneUpdateNoOverwrite is like DeepCloneUpdate but skips keys that
@@ -128,29 +107,40 @@ func (m M) DeepCloneUpdate(d M) {
 // This matches deepUpdateValue semantics where a map always wins over
 // a non-map, regardless of the overwrite flag.
 func (m M) DeepCloneUpdateNoOverwrite(d M) {
+	m.deepCloneUpdateMap(d, false)
+}
+
+// deepCloneUpdateMap is the shared body of DeepCloneUpdate and
+// DeepCloneUpdateNoOverwrite. The overwrite flag controls scalar replacement;
+// a map source always wins over a non-map destination, matching
+// deepUpdateValue semantics.
+func (m M) deepCloneUpdateMap(d M, overwrite bool) {
 	for k, v := range d {
-		switch srcVal := v.(type) {
-		case M:
-			if dstMap, ok := m[k].(M); ok {
-				dstMap.DeepCloneUpdateNoOverwrite(srcVal)
-			} else {
-				fresh := make(M, len(srcVal))
-				fresh.DeepCloneUpdate(srcVal)
-				m[k] = fresh
-			}
-		case map[string]interface{}:
-			if dstMap, ok := m[k].(M); ok {
-				dstMap.DeepCloneUpdateNoOverwrite(M(srcVal))
-			} else {
-				fresh := make(M, len(srcVal))
-				fresh.DeepCloneUpdate(M(srcVal))
-				m[k] = fresh
-			}
-		default:
-			if _, exists := m[k]; !exists {
+		srcMap, srcIsMap := tryToMapStr(v)
+		if !srcIsMap {
+			if overwrite {
+				m[k] = v
+			} else if _, exists := m[k]; !exists {
 				m[k] = v
 			}
+			continue
 		}
+
+		// Recurse into an existing non-nil destination sub-map. tryToMapStr only
+		// type-asserts/converts; the explicit assignment back to m[k] below is
+		// what normalizes a raw map[string]interface{} slot to M, matching
+		// deepUpdateValue.
+		if dstMap, ok := tryToMapStr(m[k]); ok && dstMap != nil {
+			dstMap.deepCloneUpdateMap(srcMap, overwrite)
+			m[k] = dstMap
+			continue
+		}
+
+		// Destination is missing, nil, or a scalar — substitute a fresh clone of
+		// src. Overwrite is irrelevant here since fresh has no keys to preserve.
+		fresh := make(M, len(srcMap))
+		fresh.deepCloneUpdateMap(srcMap, true)
+		m[k] = fresh
 	}
 }
 
