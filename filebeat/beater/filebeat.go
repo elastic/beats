@@ -74,6 +74,7 @@ type Filebeat struct {
 	stopOnce                 sync.Once // wraps the Stop() method
 	pipeline                 beat.PipelineConnector
 	logger                   *logp.Logger
+	otelFileStorageExtension backend.BackupStore
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
@@ -223,6 +224,10 @@ func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Regi
 	fb.config.Registry.ESStorageExtension = esStateStoreExtension
 }
 
+func (fb *Filebeat) WithFileStoreExtension(client backend.BackupStore) {
+	fb.otelFileStorageExtension = client
+}
+
 // loadModulesPipelines is called when modules are configured to do the initial
 // setup.
 func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
@@ -318,7 +323,33 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
+	backupStore := fb.otelFileStorageExtension
+	if backupStore == nil {
+		fallbackBackupStore, err := openFallbackBackupStore(fb.logger.Named("backup"), config.Registry, b.Info.Paths)
+		if err != nil {
+			return fmt.Errorf("failed to open fallback backup store: %w", err)
+		}
+
+		defer func() {
+			if err := fallbackBackupStore.Close(); err != nil {
+				fb.logger.Errorf("error closing fallback backup store: %v", err)
+			}
+		}()
+		backupStore = fallbackBackupStore
+	}
+
+	if err := handleBackup(
+		ctx,
+		b.Info.Logger,
+		backupStore,
+		config.Registry,
+		b.Info.Paths,
+	); err != nil {
+		return err
+	}
+
 	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
+
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err

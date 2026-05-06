@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -28,6 +29,7 @@ import (
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/extension/xextension/storage"
 	"go.opentelemetry.io/collector/receiver"
 )
 
@@ -39,6 +41,7 @@ type BeatReceiver struct {
 	Logger              *logp.Logger
 	bridge              *oteltelemetry.RegistryBridge
 	releaseSystemBridge func()
+	id                  component.ID
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -111,6 +114,7 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		Logger:              b.Info.Logger,
 		bridge:              bridge,
 		releaseSystemBridge: releaseSystem,
+		id:                  receiverID,
 	}, nil
 }
 
@@ -146,17 +150,44 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
-	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
-		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
-			storageID, err := br.beat.RawConfig.String("storage", -1)
-			if err != nil {
-				return fmt.Errorf("error reading storage extension from config: %w", err)
+	if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
+		storageID, err := br.beat.RawConfig.String("storage", -1)
+		if err != nil {
+			return fmt.Errorf("error reading storage extension from config: %w", err)
+		}
+
+		if strings.HasPrefix(storageID, "elasticsearch_storage") {
+			if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
+				esStorageExtension, err := br.getESStateStoreExtension(host, storageID)
+				if err != nil {
+					return fmt.Errorf("error getting ES state store extension: %w", err)
+				}
+				w.WithESStateStoreExtension(esStorageExtension)
 			}
-			esStorageExtension, err := br.getESStateStoreExtension(host, storageID)
-			if err != nil {
-				return fmt.Errorf("error getting ES state store extension: %w", err)
+		}
+
+		if strings.HasPrefix(storageID, "file_storage") {
+			type withFileStorageExtension interface {
+				WithFileStoreExtension(backend.BackupStore)
 			}
-			w.WithESStateStoreExtension(esStorageExtension)
+			if w, ok := br.beater.(withFileStorageExtension); ok {
+				ext, err := br.getFileStoreExtension(host, storageID)
+				if err != nil {
+					return fmt.Errorf("cannot get file storage extension: %w", err)
+				}
+
+				c, err := ext.GetClient(context.TODO(), component.KindReceiver, br.id, "backup-store")
+				if err != nil {
+					return fmt.Errorf("cannot get storage extension client: %w", err)
+				}
+				w.WithFileStoreExtension(c)
+				defer func() {
+					if err := c.Close(context.TODO()); err != nil {
+						br.Logger.Errorf("storage extension returned error when closing: %s", err)
+					}
+				}()
+				br.Logger.Info("==================== Otel File Storage Extension enabled")
+			}
 		}
 	}
 
@@ -243,7 +274,8 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 	componentID := component.ID{}
 	err := componentID.UnmarshalText([]byte(storageExtension))
 	if err != nil {
-		return nil, fmt.Errorf("invalid component id for ES state store extension (%v): %w", []byte(storageExtension), err)
+		return nil,
+			fmt.Errorf("invalid component id for ES state store extension (%v): %w", []byte(storageExtension), err)
 	}
 	extension, ok := host.GetExtensions()[componentID]
 	if !ok {
@@ -254,4 +286,28 @@ func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExt
 		return nil, fmt.Errorf("extension '%s' is not a backend.Registry", componentID.String())
 	}
 	return reg, nil
+}
+
+func (br *BeatReceiver) getFileStoreExtension(
+	host component.Host,
+	storageExtension string,
+) (storage.Extension, error) {
+
+	componentID := component.ID{}
+	err := componentID.UnmarshalText([]byte(storageExtension))
+	if err != nil {
+		return nil,
+			fmt.Errorf("invalid component id for ES state store extension (%v): %w", []byte(storageExtension), err)
+	}
+	extension, ok := host.GetExtensions()[componentID]
+	if !ok {
+		return nil, fmt.Errorf("extension with id %s not found", componentID.String())
+	}
+
+	st, ok := extension.(storage.Extension)
+	if !ok {
+		return nil, fmt.Errorf("extension '%s' is not a storage.Extension", componentID.String())
+	}
+
+	return st, nil
 }

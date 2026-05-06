@@ -156,6 +156,13 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 func (s *store) Close() error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
+
+	// Write a checkpoint at the end for testing
+	// TODO: remove me
+	if err := s.disk.WriteCheckpoint(s.mem.table); err != nil {
+		s.disk.log.Warnf("could not write debug checkpoint: %s", err)
+	}
+
 	s.mem = memstore{}
 	return s.disk.Close()
 }
