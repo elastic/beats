@@ -177,7 +177,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	defer client.Close()
 	defer acks.Close()
 
-	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
+	rateLimitWaiter := backoff.NewEqualJitterBackoff(1, 120)
 	for _state := range workChan {
 		state := _state
 
@@ -215,7 +215,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			if err := in.registry.UnmarkObjectInFlight(state.Key); err != nil {
 				in.log.Errorf("failed to unmark object in-flight: %v", err)
 			}
-			rateLimitWaiter.Wait()
+			rateLimitWaiter.Wait(ctx)
 			continue
 		}
 		// Reset the rate limit delay on results that aren't download errors.
@@ -260,7 +260,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 
 	isStateValid := in.filterProvider.getApplierFunc()
 
-	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
+	errorBackoff := backoff.NewEqualJitterBackoff(1, 120)
 	circuitBreaker := 0
 
 	startAfterKey := in.registry.GetStartAfterKey()
@@ -283,7 +283,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 				}
 			}
 			// add a backoff delay and try again
-			errorBackoff.Wait()
+			errorBackoff.Wait(ctx)
 			continue
 		}
 		// Reset the circuit breaker and the error backoff if a read is successful

@@ -35,6 +35,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -65,7 +66,7 @@ func TestPublish(t *testing.T) {
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
-			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+			retryBackoff: backoff.NewEqualJitterBackoff(1*time.Millisecond, 2*time.Millisecond),
 		}
 	}
 
@@ -275,7 +276,7 @@ func TestPublish(t *testing.T) {
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(initBackoff, maxBackoff)
 
 		// Measure the duration of each Publish call. Each call blocks during
 		// backoff Wait(), so elapsed time reflects the actual backoff delay.
@@ -308,7 +309,7 @@ func TestPublish(t *testing.T) {
 			}
 			return errors.New("retryable error")
 		})
-		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(initBackoff, maxBackoff)
 
 		// Two failures grow the backoff past init level.
 		batch1 := outest.NewBatch(event1)
@@ -347,7 +348,7 @@ func TestPublish(t *testing.T) {
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			return errors.New("retryable error")
 		})
-		otelConsumer.retry = retryConfig{init: 10 * time.Second, max: 10 * time.Second}
+		otelConsumer.retryBackoff = backoff.NewEqualJitterBackoff(10*time.Second, 10*time.Second)
 
 		publishDone := make(chan struct{})
 		go func() {

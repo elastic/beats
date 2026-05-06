@@ -18,6 +18,7 @@
 package backoff
 
 import (
+	"context"
 	"time"
 )
 
@@ -26,7 +27,6 @@ import (
 // timer to the initial backoff duration.
 type ExpBackoff struct {
 	duration time.Duration
-	done     <-chan struct{}
 
 	init time.Duration
 	max  time.Duration
@@ -35,10 +35,9 @@ type ExpBackoff struct {
 }
 
 // NewExpBackoff returns a new exponential backoff.
-func NewExpBackoff(done <-chan struct{}, init, max time.Duration) Backoff {
+func NewExpBackoff(init, max time.Duration) Backoff {
 	return &ExpBackoff{
 		duration: init,
-		done:     done,
 		init:     init,
 		max:      max,
 	}
@@ -49,8 +48,8 @@ func (b *ExpBackoff) Reset() {
 	b.duration = b.init
 }
 
-// Wait block until either the timer is completed or channel is done.
-func (b *ExpBackoff) Wait() bool {
+// Wait blocks until either the timer is completed or the context is cancelled.
+func (b *ExpBackoff) Wait(ctx context.Context) bool {
 	backoff := b.duration
 	b.duration *= 2
 	if b.duration > b.max {
@@ -58,7 +57,7 @@ func (b *ExpBackoff) Wait() bool {
 	}
 
 	select {
-	case <-b.done:
+	case <-ctx.Done():
 		return false
 	case <-time.After(backoff):
 		b.last = time.Now()

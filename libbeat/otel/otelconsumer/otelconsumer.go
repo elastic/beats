@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -52,11 +51,6 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-type retryConfig struct {
-	init time.Duration
-	max  time.Duration
-}
-
 type otelConsumer struct {
 	observer       outputs.Observer
 	logsConsumer   consumer.Logs
@@ -64,17 +58,15 @@ type otelConsumer struct {
 	log            *logp.Logger
 	isReceiverTest bool // whether we are running in receivertest context
 
-	retry        retryConfig
 	retryBackoff backoff.Backoff
-	backoffInit  sync.Once
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
 
-	retry := retryConfig{init: retryBackoffInit, max: retryBackoffMax}
+	retryInit, retryMax := retryBackoffInit, retryBackoffMax
 	if isReceiverTest {
-		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
+		retryInit, retryMax = 1*time.Millisecond, 2*time.Millisecond
 	}
 
 	// Default to runtime.NumCPU() workers
@@ -86,7 +78,7 @@ func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group,
 			beatInfo:       beat,
 			log:            beat.Logger.Named("otelconsumer"),
 			isReceiverTest: isReceiverTest,
-			retry:          retry,
+			retryBackoff:   backoff.NewEqualJitterBackoff(retryInit, retryMax),
 		})
 	}
 
@@ -211,10 +203,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
-	out.backoffInit.Do(func() {
-		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
-	})
-
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Queue full errors are expected backpressure signals, not true errors.
@@ -234,7 +222,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
-			if !out.retryBackoff.Wait() {
+			if !out.retryBackoff.Wait(ctx) {
 				batch.Cancelled()
 				return nil
 			}
