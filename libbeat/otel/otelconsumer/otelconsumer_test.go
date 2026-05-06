@@ -210,7 +210,6 @@ func TestPublish(t *testing.T) {
 		}
 
 		batch := outest.NewBatch(eventWithDuration)
-
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
 			body := record.Body().Map().AsRaw()
@@ -480,6 +479,42 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
+	t.Run("includes metadata in the body without mutating the source event", func(t *testing.T) {
+		beatInfo.IncludeMetadata = true
+
+		eventWithMetadata := beat.Event{
+			Meta: mapstr.M{
+				"raw_index": "logs-test",
+				"input_id":  "input-123",
+			},
+			Fields: mapstr.M{
+				"message": "hello world",
+			},
+		}
+
+		batch := outest.NewBatch(eventWithMetadata)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+
+			metadata, ok := body["@metadata"].(map[string]any)
+			require.True(t, ok, "@metadata should be present in the log body")
+			assert.Equal(t, "logs-test", metadata["raw_index"])
+			assert.Equal(t, "input-123", metadata["input_id"])
+			assert.Equal(t, beatInfo.Beat, metadata["beat"])
+			assert.Equal(t, beatInfo.Version, metadata["version"])
+			assert.Equal(t, "_doc", metadata["type"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, mapstr.M{"message": "hello world"}, eventWithMetadata.Fields)
+		assert.Equal(t, mapstr.M{"raw_index": "logs-test", "input_id": "input-123"}, eventWithMetadata.Meta)
 	})
 }
 
