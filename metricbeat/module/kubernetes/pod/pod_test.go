@@ -237,6 +237,50 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 	s.assertFieldAbsent(events[0], "memory.working_set.request.pct")
 }
 
+// Scenario:
+// Node metrics are defined,
+// Pod contains 2 containers, both with cpu and memory limits and requests defined.
+// Verifies that pod-level limit and request fields are emitted as the sum across containers.
+func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllLimitsAndRequests() {
+	s.MetricsRepo.DeleteAllNodeStore()
+
+	// Override AnotherContainerMetrics to have all four fields (same values as ContainerMetrics)
+	// so that the pod-level sums are exercised.
+	s.AnotherContainerMetrics.CoresLimit = util.NewFloat64Metric(0.5)
+	s.AnotherContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
+	s.AnotherContainerMetrics.CoresRequest = util.NewFloat64Metric(0.25)
+	s.AnotherContainerMetrics.MemoryRequest = util.NewFloat64Metric(7311360)
+
+	s.addNodeMetric(s.NodeMetrics)
+	s.addContainerMetric(s.ContainerName, s.ContainerMetrics)
+	s.addContainerMetric(s.AnotherContainerName, s.AnotherContainerMetrics)
+
+	body := s.ReadTestFile(testFileWithMultipleContainers)
+	events, err := eventMapping(body, s.MetricsRepo, s.Logger)
+
+	s.basicTests(events, err)
+
+	cpuMemoryTestCases := map[string]interface{}{
+		"cpu.usage.nanocores":   22527988,    // 2x usage since 2 containers
+		"cpu.usage.node.pct":    0.011263994, // 2x usage since 2 containers
+		"cpu.usage.limit.pct":   0.022527988, // 2x usage / 2x limit = same as single-container value
+		"cpu.limit.cores":       1.0,         // 0.5 + 0.5
+		"cpu.usage.request.pct": 0.045055976, // 2x usage / 2x request = same as single-container value
+		"cpu.request.cores":     0.5,         // 0.25 + 0.25
+
+		"memory.usage.bytes":             2924544,             // 2x since 2 containers
+		"memory.usage.node.pct":          0.02,                // 2x usage since 2 containers
+		"memory.usage.limit.pct":         0.1,                 // 2x usage / 2x limit
+		"memory.working_set.limit.pct":   0.09943977591036414, // 2x workingset / 2x limit
+		"memory.limit.bytes":             29245440.0,          // 14622720 + 14622720
+		"memory.usage.request.pct":       0.2,                 // 2x usage / 2x request
+		"memory.working_set.request.pct": 0.19887955182072828, // 2x workingset / 2x request
+		"memory.request.bytes":           14622720.0,          // 7311360 + 7311360
+	}
+
+	s.RunMetricsTests(events[0], cpuMemoryTestCases)
+}
+
 func (s *PodTestSuite) testValue(event mapstr.M, field string, expected interface{}) {
 	data, err := event.GetValue(field)
 	s.NoError(err, "Could not read field "+field)
