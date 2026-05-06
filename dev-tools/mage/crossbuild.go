@@ -363,6 +363,17 @@ func (b GolangCrossBuilder) Build() error {
 		"-w", workDir,
 	)
 
+	// When building from a git worktree the .git entry in the repo root is
+	// a file (not a directory) that contains an absolute path to the real
+	// git metadata on the host.  Mount both the worktree-specific git dir
+	// and the shared common git dir at their original host paths so that
+	// git can follow the reference chain inside the container.
+	gitVolumes, err := gitWorktreeVolumes(repoInfo.RootDir)
+	if err != nil {
+		return fmt.Errorf("failed to determine git worktree volumes: %w", err)
+	}
+	args = append(args, gitVolumes...)
+
 	args = append(args,
 		image,
 
@@ -373,6 +384,52 @@ func (b GolangCrossBuilder) Build() error {
 	)
 
 	return dockerRun(args...)
+}
+
+// gitWorktreeVolumes returns Docker volume flags (-v) needed to make git work
+// inside a container when the host repo is a git worktree.  In a worktree the
+// .git entry is a file pointing to the real git metadata elsewhere on the host.
+// We mount both the worktree-specific git dir and the shared common git dir at
+// their original absolute paths so the reference chain is preserved.
+//
+// Returns nil (no extra volumes) when the repo is not a worktree.
+func gitWorktreeVolumes(repoRoot string) ([]string, error) {
+	dotGit := filepath.Join(repoRoot, ".git")
+	info, err := os.Lstat(dotGit)
+	if err != nil {
+		return nil, err
+	}
+	if info.IsDir() {
+		// Regular repository, no extra mounts needed.
+		return nil, nil
+	}
+
+	// .git is a file -> we are in a worktree.
+	gitDir, err := sh.Output("git", "rev-parse", "--git-dir")
+	if err != nil {
+		return nil, fmt.Errorf("failed to determine git dir: %w", err)
+	}
+	gitCommonDir, err := sh.Output("git", "rev-parse", "--git-common-dir")
+	if err != nil {
+		return nil, fmt.Errorf("failed to determine git common dir: %w", err)
+	}
+
+	// Resolve to absolute paths so the mounts are unambiguous.
+	gitDir, err = filepath.Abs(gitDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve git dir absolute path: %w", err)
+	}
+	gitCommonDir, err = filepath.Abs(gitCommonDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve git common dir absolute path: %w", err)
+	}
+
+	var volumes []string
+	volumes = append(volumes, "-v", gitDir+":"+gitDir+":ro")
+	if gitCommonDir != gitDir {
+		volumes = append(volumes, "-v", gitCommonDir+":"+gitCommonDir+":ro")
+	}
+	return volumes, nil
 }
 
 // DockerChown chowns files generated during build. EXEC_UID and EXEC_GID must
