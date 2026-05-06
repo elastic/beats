@@ -19,12 +19,14 @@ package multiline
 
 import (
 	"io"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 )
 
 type counterReader struct {
 	reader     reader.Reader
+	stateMu    sync.Mutex
 	state      func(*counterReader) (reader.Message, error)
 	linesCount int // number of lines to collect
 	msgBuffer  *messageBuffer
@@ -51,7 +53,13 @@ func newMultilineCountReader(
 
 // Next returns next multi-line event.
 func (cr *counterReader) Next() (reader.Message, error) {
-	return cr.state(cr)
+	return cr.loadState()(cr)
+}
+
+func (cr *counterReader) loadState() func(*counterReader) (reader.Message, error) {
+	cr.stateMu.Lock()
+	defer cr.stateMu.Unlock()
+	return cr.state
 }
 
 func (cr *counterReader) readFirst() (reader.Message, error) {
@@ -131,6 +139,8 @@ func (cr *counterReader) resetState() {
 
 // setState sets state to the given function
 func (cr *counterReader) setState(next func(cr *counterReader) (reader.Message, error)) {
+	cr.stateMu.Lock()
+	defer cr.stateMu.Unlock()
 	cr.state = next
 }
 
