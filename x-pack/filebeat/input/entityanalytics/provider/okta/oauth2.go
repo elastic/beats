@@ -94,7 +94,6 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
 		case o.OktaJWKJSON != nil:
-			jwkData = o.OktaJWKJSON
 			oktaJWT, err = generateOktaJWT(o.OktaJWKJSON, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
