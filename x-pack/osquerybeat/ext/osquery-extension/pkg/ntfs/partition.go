@@ -11,7 +11,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"math"
 	"strings"
 	"unsafe"
 
@@ -175,7 +174,7 @@ func newPartition(partitionInfo *PARTITION_INFORMATION_EX, mbrDiskSignature uint
 	if partitionInfo == nil {
 		return nil, fmt.Errorf("partitionInfo is nil")
 	}
-	
+
 	p := &Partition{
 		Number:         partitionInfo.PartitionNumber,
 		StartingOffset: partitionInfo.StartingOffset,
@@ -316,14 +315,6 @@ func getPartitions(physicalDrive string) ([]*Partition, error) {
 	}
 	cachePartitions(physicalDrive, partitions)
 	return partitions, nil
-}
-
-func uint32ToInt32(value uint32) int32 {
-	if value > uint32(math.MaxInt32) {
-		getLogger().Errorf("Value %d exceeds max int32, capping to %d", value, math.MaxInt32)
-		return math.MaxInt32
-	}
-	return int32(value)
 }
 
 // getPhysicalDrives enumerates \\.\PhysicalDriveN devices exposed by the
