@@ -20,6 +20,7 @@
 package add_kubernetes_metadata
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -49,6 +50,7 @@ func TestAnnotatorSkipped(t *testing.T) {
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
 		},
+		wg:                  sync.WaitGroup{},
 		kubernetesAvailable: true,
 	}
 
@@ -108,6 +110,7 @@ func TestAnnotatorWithNoKubernetesAvailable(t *testing.T) {
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
 		},
+		wg:                  sync.WaitGroup{},
 		kubernetesAvailable: false,
 	}
 
@@ -249,6 +252,7 @@ func newAnnotatorForTest(t *testing.T, cacheKey string, meta mapstr.M) *kubernet
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
 		},
+		wg:                  sync.WaitGroup{},
 		kubernetesAvailable: true,
 	}
 	processor.cache.set(cacheKey, meta)
@@ -406,6 +410,7 @@ func TestAnnotatorRunNoContainerSubMap(t *testing.T) {
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
 		},
+		wg:                  sync.WaitGroup{},
 		kubernetesAvailable: true,
 	}
 	processor.cache.set("mypod", meta)
@@ -557,6 +562,7 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 		matchers: &Matchers{
 			matchers: []Matcher{matcher},
 		},
+		wg:                  sync.WaitGroup{},
 		kubernetesAvailable: true,
 	}
 
