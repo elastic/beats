@@ -26,6 +26,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/inspector"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -49,6 +51,7 @@ type Server struct {
 	mutex      sync.Mutex
 	httpServer *http.Server
 	state      serverState
+	inspector  *inspector.Handler
 }
 
 // New creates a new API Server with no routes attached.
@@ -148,6 +151,31 @@ func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	}
 	s.log.Debugf("Attached handler at %q to server.", route)
 	return nil
+}
+
+// AttachStateInspector creates and registers the state store inspector
+// handler if enabled in config. Calling it more than once or when the
+// inspector is disabled is a no-op.
+func (s *Server) AttachStateInspector() error {
+	if !s.config.Debug.StateInspector.Enabled || s.inspector != nil {
+		return nil
+	}
+	s.inspector = inspector.New()
+	return s.AttachHandler("/debug/state-inspector/", http.StripPrefix("/debug/state-inspector", s.inspector))
+}
+
+// StateInspectorEnabled reports whether the state inspector has been attached.
+func (s *Server) StateInspectorEnabled() bool {
+	return s.inspector != nil
+}
+
+// SetStateInspectorRegistry provides the backing registry and store name to
+// the state inspector. Each HTTP request will obtain its own Store instance
+// via registry.Get(name). This is a no-op when the inspector is not enabled.
+func (s *Server) SetStateInspectorRegistry(registry *statestore.Registry, name string) {
+	if s.inspector != nil {
+		s.inspector.SetRegistry(registry, name)
+	}
 }
 
 // Router returns the mux.Router that handles all request to the server.
