@@ -57,6 +57,7 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 	initOnce            sync.Once
+	wg                  sync.WaitGroup
 }
 
 func init() {
@@ -98,7 +99,8 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 
 // kubernetesMetadataExist checks whether an event is already enriched with kubernetes metadata
 func kubernetesMetadataExist(event *beat.Event) bool {
-	if _, err := event.GetValue("kubernetes"); err != nil {
+	v, err := event.GetValue("kubernetes")
+	if err != nil || v == nil {
 		return false
 	}
 	return true
@@ -112,15 +114,21 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
+
 	processor := &kubernetesAnnotator{
-		log:                 log,
-		cache:               newCache(config.CleanupTimeout),
-		kubernetesAvailable: false,
+		log:   log,
+		cache: newCache(config.CleanupTimeout),
+		wg:    sync.WaitGroup{},
 	}
 
 	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
-	go processor.init(config, cfg)
+	processor.wg.Add(1)
+	go func() {
+		defer processor.wg.Done()
+		log.Debug("Initializing kubernetes metadata processor")
+		processor.init(config, cfg)
+	}()
 
 	return processor, nil
 }
@@ -333,10 +341,16 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 // contains a map with various Kubernetes metadata.
 // This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
-	if !k.kubernetesAvailable {
+	if kubernetesMetadataExist(event) {
 		return event, nil
 	}
-	if kubernetesMetadataExist(event) {
+
+	// wait for kubernetes metadata processor to be initialized before processing any events
+	k.wg.Wait()
+
+	// if initalization fails then K8's will not be available
+	// in that case return event as is
+	if !k.kubernetesAvailable {
 		return event, nil
 	}
 
@@ -359,8 +373,15 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	// much cheaper than cloning the full metadata. Transform it in place:
 	// drop container.name and rewrite container.image -> container.image.name.
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
-		if cm, ok := containerVal.(mapstr.M); ok {
-			ociContainer := cm.Clone()
+		var containerMap mapstr.M
+		switch cm := containerVal.(type) {
+		case mapstr.M:
+			containerMap = cm
+		case map[string]interface{}:
+			containerMap = mapstr.M(cm)
+		}
+		if containerMap != nil {
+			ociContainer := containerMap.Clone()
 			_ = ociContainer.Delete("name")
 			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
 				_ = ociContainer.Delete("image")
