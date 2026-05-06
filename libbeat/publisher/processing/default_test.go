@@ -192,7 +192,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		"with client processor": {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
-					g := newGroup("test", logp.L())
+					g := newGroup("test", logptest.NewTestingLogger(t, ""))
 					g.add(addfields.NewAddFields(mapstr.M{"custom": "value"}, true, true))
 					return g
 				}(),
@@ -267,6 +267,24 @@ func TestProcessorsConfigs(t *testing.T) {
 				"tags":   []string{"tag"},
 			},
 		},
+		"with beat default fields and disable host": {
+			factory: MakeDefaultBeatSupport(true),
+			local: beat.ProcessingConfig{
+				DisableHost: true,
+			},
+			event: `{"value": "abc"}`,
+			want: mapstr.M{
+				"ecs": ecsFields,
+				"agent": mapstr.M{
+					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
+					"name":         "test.host.name",
+					"id":           "123e4567-e89b-12d3-a456-426655440001",
+					"type":         "test",
+					"version":      "0.1",
+				},
+				"value": "abc",
+			},
+		},
 	}
 
 	for name, test := range cases {
@@ -287,7 +305,7 @@ func TestProcessorsConfigs(t *testing.T) {
 				factory = MakeDefaultSupport(true, nil)
 			}
 
-			support, err := factory(info, logp.L(), cfg)
+			support, err := factory(info, logptest.NewTestingLogger(t, ""), cfg)
 			require.NoError(t, err)
 
 			prog, err := support.Create(test.local, test.drop, tmpPaths(t))
@@ -370,7 +388,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logp.L(), config.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false, tmpPaths(t))
@@ -391,7 +409,7 @@ func TestNormalization(t *testing.T) {
 }
 
 func BenchmarkNormalization(b *testing.B) {
-	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(b, ""), config.NewConfig())
 	require.NoError(b, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, false, tmpPaths(b))
@@ -405,7 +423,7 @@ func BenchmarkNormalization(b *testing.B) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true, tmpPaths(t))
@@ -420,7 +438,7 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	dynFields := mapstr.NewPointer(mapstr.M{})
@@ -443,7 +461,7 @@ func TestDynamicFields(t *testing.T) {
 }
 
 func TestProcessingClose(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	// Inject a processor in the builder that we can check if has been closed.
@@ -451,12 +469,12 @@ func TestProcessingClose(t *testing.T) {
 	b, ok := factory.(*builder)
 	require.True(t, ok)
 	if b.processors == nil {
-		b.processors = newGroup("global", logp.L())
+		b.processors = newGroup("global", logptest.NewTestingLogger(t, ""))
 	}
 	b.processors.add(factoryProcessor)
 
 	clientProcessor := &processorWithClose{}
-	g := newGroup("test", logp.L())
+	g := newGroup("test", logptest.NewTestingLogger(t, ""))
 	g.add(clientProcessor)
 
 	prog, err := factory.Create(beat.ProcessingConfig{
@@ -487,11 +505,151 @@ func TestProcessingClose(t *testing.T) {
 }
 
 func TestProcessingDiagnostics(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logptest.NewTestingLogger(t, ""), config.NewConfig())
 	require.NoError(t, err)
 
 	p := factory.Processors()
 	assert.Empty(t, p)
+}
+
+func TestDisableHost(t *testing.T) {
+	defaultInfo := beat.Info{
+		Beat:        "test",
+		EphemeralID: uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440000")),
+		Hostname:    "test.host.name",
+		ID:          uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440001")),
+		Name:        "test.host.name",
+		Version:     "0.1",
+	}
+
+	t.Run("removes host.name builtin field added via WithHost modifier", func(t *testing.T) {
+		// MakeDefaultBeatSupport includes WithHost which adds host.name as a builtin field.
+		// DisableHost must drop it from the final event.
+		factory := MakeDefaultBeatSupport(true)
+		support, err := factory(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		prog, err := support.Create(beat.ProcessingConfig{DisableHost: true}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+
+		assert.NotContains(t, actual.Fields, "host",
+			"host field should be removed when DisableHost is true")
+		assert.Contains(t, actual.Fields, "ecs",
+			"ecs field should not be affected by DisableHost")
+		assert.Contains(t, actual.Fields, "agent",
+			"agent field should not be affected by DisableHost")
+	})
+
+	t.Run("removes host.name fields added via client processor", func(t *testing.T) {
+		// The old implementation only deleted host from builtin; it could not drop
+		// host.* fields that a processor adds during event processing. The new
+		// implementation appends a drop_fields processor at the end of the pipeline.
+		support, err := MakeDefaultSupport(true, nil)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		// Client processor that injects a richer host object (mimicking add_host_metadata).
+		hostProc := newGroup("test", logptest.NewTestingLogger(t, ""))
+		hostProc.add(addfields.NewAddFields(mapstr.M{
+			"host": mapstr.M{
+				"name":     "injected-host",
+				"hostname": "injected-host.example.com",
+				"os":       mapstr.M{"name": "Linux"},
+			},
+		}, true, true))
+
+		prog, err := support.Create(beat.ProcessingConfig{
+			DisableHost: true,
+			Processor:   hostProc,
+		}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+
+		assert.NotContains(t, actual.Fields.Flatten(), "host.name",
+			"host.name field added by a processor should be dropped when DisableHost is true")
+		assert.Contains(t, actual.Fields.Flatten(), "host.hostname",
+			"host.hostname field added by a processor should not be dropped when DisableHost is true")
+		assert.Contains(t, actual.Fields.Flatten(), "host.os.name",
+			"host.os.name field added by a processor should not be dropped when DisableHost is true")
+		assert.Equal(t, "abc", actual.Fields["value"])
+	})
+
+	t.Run("no error when host field is absent", func(t *testing.T) {
+		// The drop_fields processor is configured with ignore_missing: true so
+		// it must not error when no host field exists.
+		support, err := MakeDefaultSupport(true, nil, WithECS)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		prog, err := support.Create(beat.ProcessingConfig{DisableHost: true}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+		require.NotNil(t, actual)
+		assert.NotContains(t, actual.Fields, "host")
+	})
+
+	t.Run("host.name fields preserved when DisableHost is false", func(t *testing.T) {
+		factory := MakeDefaultBeatSupport(true)
+		support, err := factory(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		prog, err := support.Create(beat.ProcessingConfig{DisableHost: false}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc"},
+		})
+		require.NoError(t, err)
+
+		assert.Equal(t, mapstr.M{"name": "test.host.name"}, actual.Fields["host"],
+			"host field should be present when DisableHost is false")
+	})
+
+	t.Run("doesn't removes host.name field for forwarded events", func(t *testing.T) {
+		support, err := MakeDefaultSupport(true, nil)(defaultInfo, logptest.NewTestingLogger(t, ""), config.NewConfig())
+		require.NoError(t, err)
+
+		// Client processor that injects a richer host object (mimicking add_host_metadata).
+		hostProc := newGroup("test", logptest.NewTestingLogger(t, ""))
+		hostProc.add(addfields.NewAddFields(mapstr.M{
+			"host": mapstr.M{
+				"name":     "injected-host",
+				"hostname": "injected-host.example.com",
+				"os":       mapstr.M{"name": "Linux"},
+			},
+		}, true, true))
+
+		prog, err := support.Create(beat.ProcessingConfig{
+			DisableHost: true,
+			Processor:   hostProc,
+		}, false, tmpPaths(t))
+		require.NoError(t, err)
+
+		actual, err := prog.Run(&beat.Event{
+			Timestamp: time.Now(),
+			Fields:    mapstr.M{"value": "abc", "tags": []string{"forwarded"}},
+		})
+		require.NoError(t, err)
+
+		assert.Contains(t, actual.Fields.Flatten(), "host.name",
+			"host.name field should not be removed for forwarded events")
+		assert.Equal(t, "abc", actual.Fields["value"])
+	})
 }
 
 func fromJSON(in string) mapstr.M {
