@@ -80,9 +80,8 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 	case hasJWTKeys:
 		// Use JWT-based authentication
 		var (
-			oktaJWT    string
-			jwkData    []byte
-			jwkPEMData string
+			oktaJWT string
+			jwkData []byte
 		)
 		switch {
 		case o.OktaJWKFile != "":
@@ -101,7 +100,6 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
 		case o.OktaJWKPEM != "":
-			jwkPEMData = o.OktaJWKPEM
 			oktaJWT, err = generateOktaJWTPEM(o.OktaJWKPEM, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
@@ -120,7 +118,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 			ctx:        ctx,
 			conf:       oauthConfig,
 			oktaJWK:    jwkData,
-			oktaJWKPEM: jwkPEMData,
+			oktaJWKPEM: o.OktaJWKPEM,
 			client:     client,
 			token:      token,
 		}

@@ -1,4 +1,4 @@
 kind: bug-fix
-summary: Fix Okta OAuth2 token refresh when using jwk_pem or jwk_file credentials. Previously, token refresh failed with "error decoding JWK" because the token source incorrectly stored empty JWK data for PEM and file-based authentication.
+summary: Fix token refresh for jwk_pem/jwk_file in cel, httpjson, okta inputs
 component: filebeat
 issue: https://github.com/elastic/beats/issues/50426
