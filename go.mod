@@ -177,8 +177,13 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
 	github.com/elastic/go-quark v0.3.0
+<<<<<<< HEAD
 	github.com/elastic/go-sfdc v0.0.0-20251207194532-c5aadd4a4e06
 	github.com/elastic/mito v1.24.2
+=======
+	github.com/elastic/go-sfdc v0.0.0-20260504130806-a46e22d049d9
+	github.com/elastic/mito v1.25.1
+>>>>>>> 9860cceb4 (x-pack/filebeat/input/salesforce: bump go-sfdc for session auth refresh (#50477))
 	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20260310070522-abae92ca1603
 	github.com/elastic/tk-btf v0.2.0
