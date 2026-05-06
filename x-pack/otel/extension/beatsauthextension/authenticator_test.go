@@ -12,6 +12,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -298,6 +300,185 @@ func startTestServer(t *testing.T, serverCerts []tls.Certificate) string {
 	server.StartTLS()
 	t.Cleanup(func() { server.Close() })
 	return server.URL
+}
+
+// TestCertificateHotReload verifies that enabling certificate_reload causes the
+// client to present a certificate via GetClientCertificate on each handshake.
+func TestCertificateHotReload(t *testing.T) {
+	caCert, err := tlscommontest.GenCA()
+	require.NoError(t, err)
+
+	clientCert, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageDigitalSignature, false, "", []string{}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	require.NoError(t, err)
+
+	serverCert, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "", []string{}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	require.NoError(t, err)
+
+	tmpDir := t.TempDir()
+	certPath := filepath.Join(tmpDir, "client.crt")
+	keyPath := filepath.Join(tmpDir, "client.key")
+	writeCertKeyFiles(t, certPath, keyPath, clientCert)
+
+	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert.Leaf.Raw})
+
+	// startMTLSServer starts an HTTPS server that requires client certificates
+	// signed by the given CA, and records the presented client cert serial.
+	startMTLSServer := func(t *testing.T, ca tls.Certificate) (serverURL string, receivedSerial func() string) {
+		t.Helper()
+		caPool := x509.NewCertPool()
+		caPool.AddCert(ca.Leaf)
+
+		var lastSerial string
+		srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if len(r.TLS.PeerCertificates) > 0 {
+				lastSerial = r.TLS.PeerCertificates[0].SerialNumber.String()
+			}
+			w.WriteHeader(http.StatusOK)
+		}))
+		srv.TLS = &tls.Config{
+			MinVersion:   tls.VersionTLS12,
+			Certificates: []tls.Certificate{serverCert},
+			ClientAuth:   tls.RequireAndVerifyClientCert,
+			ClientCAs:    caPool,
+		}
+		srv.StartTLS()
+		t.Cleanup(srv.Close)
+		return srv.URL, func() string { return lastSerial }
+	}
+
+	t.Run("cert reload enabled: client presents certificate via GetClientCertificate", func(t *testing.T) {
+		serverURL, receivedSerial := startMTLSServer(t, caCert)
+
+		cfg := &Config{
+			BeatAuthConfig: map[string]any{
+				"ssl": map[string]any{
+					"enabled":     "true",
+					"certificate": certPath,
+					"key":         keyPath,
+					"certificate_authorities": []string{string(caPEM)},
+				},
+				"certificate_reload": map[string]any{
+					"enabled":         true,
+					"reload_interval": "100ms",
+				},
+			},
+		}
+
+		settings := componenttest.NewNopTelemetrySettings()
+		settings.Logger = zaptest.NewLogger(t)
+		auth, err := newAuthenticator(cfg, settings)
+		require.NoError(t, err)
+
+		host := &mockHost{
+			extensions:       extensionsMap{component.NewID(Type): auth},
+			reportStatusFunc: func(*componentstatus.Event) {},
+		}
+		require.NoError(t, auth.Start(context.Background(), host))
+
+		httpClientCfg := confighttp.NewDefaultClientConfig()
+		httpClientCfg.Auth = configoptional.Some(configauth.Config{
+			AuthenticatorID: component.NewID(Type),
+		})
+		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
+		require.NoError(t, err)
+
+		resp, err := client.Get(serverURL) //nolint:noctx // test
+		require.NoError(t, err)
+		_ = resp.Body.Close()
+		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert")
+	})
+
+	t.Run("restart_on_cert_change alias: client presents certificate via GetClientCertificate", func(t *testing.T) {
+		serverURL, receivedSerial := startMTLSServer(t, caCert)
+
+		cfg := &Config{
+			BeatAuthConfig: map[string]any{
+				"ssl": map[string]any{
+					"enabled":     "true",
+					"certificate": certPath,
+					"key":         keyPath,
+					"certificate_authorities": []string{string(caPEM)},
+					"restart_on_cert_change": map[string]any{
+						"enabled": true,
+						"period":  "200ms",
+					},
+				},
+			},
+		}
+
+		settings := componenttest.NewNopTelemetrySettings()
+		settings.Logger = zaptest.NewLogger(t)
+		auth, err := newAuthenticator(cfg, settings)
+		require.NoError(t, err)
+
+		host := &mockHost{
+			extensions:       extensionsMap{component.NewID(Type): auth},
+			reportStatusFunc: func(*componentstatus.Event) {},
+		}
+		require.NoError(t, auth.Start(context.Background(), host))
+
+		httpClientCfg := confighttp.NewDefaultClientConfig()
+		httpClientCfg.Auth = configoptional.Some(configauth.Config{
+			AuthenticatorID: component.NewID(Type),
+		})
+		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
+		require.NoError(t, err)
+
+		resp, err := client.Get(serverURL) //nolint:noctx // test
+		require.NoError(t, err)
+		_ = resp.Body.Close()
+		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert via restart_on_cert_change alias")
+	})
+
+	t.Run("cert reload disabled: static cert presented without GetClientCertificate", func(t *testing.T) {
+		serverURL, receivedSerial := startMTLSServer(t, caCert)
+
+		cfg := &Config{
+			BeatAuthConfig: map[string]any{
+				"ssl": map[string]any{
+					"enabled":     "true",
+					"certificate": certPath,
+					"key":         keyPath,
+					"certificate_authorities": []string{string(caPEM)},
+				},
+			},
+		}
+
+		settings := componenttest.NewNopTelemetrySettings()
+		settings.Logger = zaptest.NewLogger(t)
+		auth, err := newAuthenticator(cfg, settings)
+		require.NoError(t, err)
+
+		host := &mockHost{
+			extensions:       extensionsMap{component.NewID(Type): auth},
+			reportStatusFunc: func(*componentstatus.Event) {},
+		}
+		require.NoError(t, auth.Start(context.Background(), host))
+
+		httpClientCfg := confighttp.NewDefaultClientConfig()
+		httpClientCfg.Auth = configoptional.Some(configauth.Config{
+			AuthenticatorID: component.NewID(Type),
+		})
+		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
+		require.NoError(t, err)
+
+		resp, err := client.Get(serverURL) //nolint:noctx // test
+		require.NoError(t, err)
+		_ = resp.Body.Close()
+		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert via static config")
+	})
+}
+
+// writeCertKeyFiles writes a tls.Certificate's PEM-encoded cert and key to disk.
+func writeCertKeyFiles(t *testing.T, certPath, keyPath string, cert tls.Certificate) {
+	t.Helper()
+	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Leaf.Raw})
+	require.NoError(t, os.WriteFile(certPath, certPEM, 0o600))
+
+	keyDER, err := x509.MarshalPKCS8PrivateKey(cert.PrivateKey)
+	require.NoError(t, err)
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: keyDER})
+	require.NoError(t, os.WriteFile(keyPath, keyPEM, 0o600))
 }
 
 type extensionsMap map[component.ID]component.Component

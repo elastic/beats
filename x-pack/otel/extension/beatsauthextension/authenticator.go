@@ -6,6 +6,7 @@ package beatsauthextension
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var (
@@ -133,7 +135,21 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
-	client, err := beatAuthConfig.Transport.Client(a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)...)
+	// ssl.restart_on_cert_change is an alias for certificate_reload.
+	// When present it enables hot reload without restarting the process.
+	applyRestartOnCertChangeAlias(parsedCfg, &beatAuthConfig)
+
+	httpOpts := a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)
+
+	reloaderOpt, err := certReloaderTransportOption(beatAuthConfig, a.logger)
+	if err != nil {
+		return nil, err
+	}
+	if reloaderOpt != nil {
+		httpOpts = append(httpOpts, reloaderOpt)
+	}
+
+	client, err := beatAuthConfig.Transport.Client(httpOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating http client: %w", err)
 	}
@@ -147,6 +163,80 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	}
 
 	return &httpClientProvider{client: client}, nil
+}
+
+// applyRestartOnCertChangeAlias reads ssl.restart_on_cert_change from cfg and
+// maps it onto beatAuthConfig.CertificateReload for backwards compatibility.
+func applyRestartOnCertChangeAlias(cfg *config.C, beatAuthConfig *BeatsAuthConfig) {
+	sslConfig, err := cfg.Child("ssl", -1)
+	if err != nil {
+		return
+	}
+	rocc, err := sslConfig.Child("restart_on_cert_change", -1)
+	if err != nil {
+		return
+	}
+
+	type restartOnCertChange struct {
+		Enabled bool          `config:"enabled"`
+		Period  time.Duration `config:"period"`
+	}
+	var alias restartOnCertChange
+	if err := rocc.Unpack(&alias); err != nil {
+		return
+	}
+
+	if alias.Enabled {
+		beatAuthConfig.CertificateReload.Enabled = true
+	}
+	if alias.Period > 0 && beatAuthConfig.CertificateReload.ReloadInterval == 0 {
+		beatAuthConfig.CertificateReload.ReloadInterval = alias.Period
+	}
+}
+
+// certReloaderTransportOption returns an httpcommon.TransportOption that wires a
+// CertReloader into the *http.Transport's TLSClientConfig when certificate hot
+// reload is enabled and cert/key paths are configured.
+// Returns nil (no option) when hot reload is not applicable.
+// Encrypted keys (key_passphrase) are not supported by CertReloader; a warning
+// is logged and nil is returned in that case.
+func certReloaderTransportOption(beatAuthConfig BeatsAuthConfig, logger *logp.Logger) (httpcommon.TransportOption, error) {
+	if !beatAuthConfig.CertificateReload.Enabled {
+		return nil, nil
+	}
+
+	tlsCfg := beatAuthConfig.Transport.TLS
+	if tlsCfg == nil || tlsCfg.Certificate.Certificate == "" || tlsCfg.Certificate.Key == "" {
+		return nil, nil
+	}
+
+	if tlsCfg.Certificate.Passphrase != "" || tlsCfg.Certificate.PassphrasePath != "" {
+		logger.Warn("ssl.certificate_reload is not supported with encrypted keys; hot reload disabled")
+		return nil, nil
+	}
+
+	var opts []tlscommon.CertReloaderOption
+	if beatAuthConfig.CertificateReload.ReloadInterval > 0 {
+		opts = append(opts, tlscommon.WithReloadInterval(beatAuthConfig.CertificateReload.ReloadInterval))
+	}
+
+	reloader, err := tlscommon.NewCertReloader(tlsCfg.Certificate.Certificate, tlsCfg.Certificate.Key, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating cert reloader: %w", err)
+	}
+
+	opt := httpcommon.WithTransportFunc(func(t *http.Transport) {
+		if t.TLSClientConfig == nil {
+			t.TLSClientConfig = &tls.Config{} //nolint:gosec // min version set by beats defaults
+		}
+		t.TLSClientConfig.GetClientCertificate = func(_ *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+			return reloader.GetCertificate(nil)
+		}
+		// Clear the static certificate list; the reloader's callback takes over.
+		t.TLSClientConfig.Certificates = nil
+	})
+
+	return opt, nil
 }
 
 // httpClientProvider provides a RoundTripper from an http.Client
