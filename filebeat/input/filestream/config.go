@@ -83,6 +83,11 @@ type config struct {
 	// TakeOver is also independently parsed by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	TakeOver loginp.TakeOverConfig `config:"take_over"`
+	// IncludeFileIdentity controls whether file identity metadata is included
+	// in published events and in logger context. Disabled by default to
+	// reduce allocation pressure at scale.
+	IncludeFileIdentity bool `config:"include_file_identity"`
+
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`

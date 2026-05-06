@@ -83,6 +83,7 @@ type fileProspector struct {
 	takeOver              loginp.TakeOverConfig
 	filestreamIdentifiers map[string]fileIdentifier
 	logIdentifiers        map[string]file.StateIdentifier
+	includeFileIdentity   bool
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -338,7 +339,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe, src, p.includeFileIdentity), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -361,7 +362,10 @@ func (p *fileProspector) onFSEvent(
 	ignoreSince time.Time,
 ) {
 
-	log = log.With("source_file", event.SrcID)
+	if p.includeFileIdentity {
+		log = log.With("source_file", event.SrcID)
+	}
+
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {

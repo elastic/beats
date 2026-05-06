@@ -871,6 +871,12 @@ filebeat.inputs:
   #include_file_owner_name: false
   #include_file_owner_group_name: false
 
+  # Include file identity metadata in published events and logger context.
+  # When true, identity-related fields are added to published events and
+  # to the logger context. Defaults to false. The file path (log.file.path)
+  # is always present in events regardless of this setting.
+  #include_file_identity: false
+
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
   #fields:

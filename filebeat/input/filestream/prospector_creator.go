@@ -133,6 +133,7 @@ func newProspector(
 		takeOver:              config.TakeOver,
 		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
 		logIdentifiers:        logFileIdentifiers(logger),
+		includeFileIdentity:   config.IncludeFileIdentity,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil
