@@ -36,12 +36,12 @@ func TestLoadConfig2(t *testing.T) {
 	assert.NotNil(t, absPath)
 	assert.NoError(t, err)
 
-	config := &Config{}
+	config := DefaultConfig
 
 	// Reads second config file
 	cfg, err := cfgfile.Load(absPath+"/config2.yml", nil)
 	assert.NoError(t, err)
-	err = cfg.Unpack(config)
+	err = cfg.Unpack(&config)
 	assert.NoError(t, err)
 }
 
