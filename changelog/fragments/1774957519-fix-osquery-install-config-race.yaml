@@ -1,5 +1,0 @@
-kind: bug-fix
-
-summary: avoid mutating osquery install config during validation to prevent races
-
-component: osquerybeat
