@@ -114,7 +114,7 @@ func TestGetMetricsInBatch(t *testing.T) {
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
 		results := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr)
-		assert.Equal(t, len(results), 0)
+		assert.Empty(t, results, "expected no metric values when QueryResources returns an error")
 		m.AssertExpectations(t)
 	})
 
@@ -184,12 +184,12 @@ func TestGetMetricsInBatch(t *testing.T) {
 		mr := MockReporterV2{}
 
 		metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr)
-		require.Equal(t, len(metricValues), 1)
-		require.Equal(t, len(metricValues[0].Values), 1)
+		require.Equal(t, 1, len(metricValues), "expected exactly one metric value group")
+		require.Equal(t, 1, len(metricValues[0].Values), "expected exactly one value in the metric group")
 
-		assert.Equal(t, *metricValues[0].Values[0].avg, 1.0)
-		assert.Equal(t, *metricValues[0].Values[0].max, 2.0)
-		assert.Equal(t, *metricValues[0].Values[0].min, 3.0)
+		assert.InDelta(t, 1.0, *metricValues[0].Values[0].avg, 0.0001)
+		assert.InDelta(t, 2.0, *metricValues[0].Values[0].max, 0.0001)
+		assert.InDelta(t, 3.0, *metricValues[0].Values[0].min, 0.0001)
 
 		m.AssertExpectations(t)
 	})
