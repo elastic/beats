@@ -843,7 +843,7 @@ func TestConcurrentRequestsExceedHighWater(t *testing.T) {
 
 	pub := new(publisher)
 	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
-	h := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics)
+	h := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler) //nolint:errcheck // newHandler is statically known to return a *handler.
 
 	// Create a slow request body that will hold in-flight bytes while reading.
 	// The body is large enough to exceed high water mark (50 bytes).
@@ -868,9 +868,11 @@ func TestConcurrentRequestsExceedHighWater(t *testing.T) {
 		slowReqStatus = respRec.Code
 	}()
 
-	// Give the slow request time to read a few chunks and accumulate in-flight bytes.
-	// After ~150ms, it should have read at least 60 bytes, exceeding high water (30).
-	time.Sleep(150 * time.Millisecond)
+	// Wait until the slow request has accumulated enough in-flight bytes
+	// to cross the high-water mark before sending the second request.
+	require.Eventually(t, func() bool {
+		return h.inFlight.Load() >= c.HighWaterInFlight
+	}, 5*time.Second, 5*time.Millisecond)
 
 	// Send a fast request while the slow one is still reading.
 	// This should be rejected because in-flight is above high water mark (30).
