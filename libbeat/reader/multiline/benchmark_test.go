@@ -34,33 +34,7 @@ import (
 
 // BenchmarkPatternReaderRabbitMQLike benchmarks the multiline reader.
 // This benchmark was added to assess the cost of adding a mutex to protect
-// the multiline reader's state field. The results:
-//
-// goos: linux
-// goarch: amd64
-// pkg: github.com/elastic/beats/v7/libbeat/reader/multiline
-// cpu: Intel(R) Core(TM) Ultra 9 285H
-//
-//	│ before-10.txt │            after-10.txt            │
-//	│    sec/op     │   sec/op     vs base               │
-//
-// PatternReaderRabbitMQLike-16     750.5µ ± 7%   714.8µ ± 5%  -4.75% (p=0.035 n=10)
-//
-//	│ before-10.txt │            after-10.txt             │
-//	│      B/s      │     B/s       vs base               │
-//
-// PatternReaderRabbitMQLike-16    63.11Mi ± 7%   66.26Mi ± 5%  +4.99% (p=0.035 n=10)
-//
-//	│ before-10.txt │          after-10.txt          │
-//	│     B/op      │     B/op      vs base          │
-//
-// PatternReaderRabbitMQLike-16    557.6Ki ± 0%   557.8Ki ± 0%  ~ (p=0.579 n=10)
-//
-//	│ before-10.txt │          after-10.txt           │
-//	│   allocs/op   │  allocs/op   vs base            │
-//
-// PatternReaderRabbitMQLike-16     5.680k ± 0%   5.680k ± 0%  ~ (p=1.000 n=10) ¹
-// ¹ all samples are equal
+// the multiline reader's state field.
 func BenchmarkPatternReaderRabbitMQLike(b *testing.B) {
 	const (
 		eventCount = 256
