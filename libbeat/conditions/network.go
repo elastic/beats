@@ -158,17 +158,31 @@ func (c *Network) Check(event ValuesMap) bool {
 			return false
 		}
 
-		ipList := extractIP(value)
-		if len(ipList) == 0 {
+		switch v := value.(type) {
+		case string:
+			ip := net.ParseIP(v)
+			if ip == nil || !network.Contains(ip) {
+				return false
+			}
+		case net.IP:
+			if v == nil || !network.Contains(v) {
+				return false
+			}
+		case []net.IP:
+			if !slices.ContainsFunc(v, network.Contains) {
+				return false
+			}
+		case []string:
+			if !slices.ContainsFunc(v, func(s string) bool {
+				ip := net.ParseIP(s)
+				return ip != nil && network.Contains(ip)
+			}) {
+				return false
+			}
+		default:
 			c.log.Debugf("Invalid IP address in field=%v for network condition", field)
 			return false
 		}
-		// match on an "any" basis when we find multiple IPs in the event;
-		// if the network matcher returns true for any seen IP, consider it a match
-		if !slices.ContainsFunc(ipList, network.Contains) {
-			return false
-		}
-
 	}
 
 	return true
@@ -201,27 +215,6 @@ func parseCIDR(value string) (*net.IPNet, error) {
 			"'2001:db8::/32', as defined in RFC 4632 and RFC 4291: %w", err)
 	}
 	return mask, nil
-}
-
-// extractIP return an IP address if unk is an IP address string or a net.IP.
-// Otherwise it returns nil.
-func extractIP(unk interface{}) []net.IP {
-	switch v := unk.(type) {
-	case string:
-		return []net.IP{net.ParseIP(v)}
-	case []net.IP:
-		return v
-	case net.IP:
-		return []net.IP{v}
-	case []string:
-		parsed := make([]net.IP, len(v))
-		for i, rawIP := range v {
-			parsed[i] = net.ParseIP(rawIP)
-		}
-		return parsed
-	default:
-		return nil
-	}
 }
 
 func isPrivateNetwork(ip net.IP) bool {
