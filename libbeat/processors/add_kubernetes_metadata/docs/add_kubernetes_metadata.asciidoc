@@ -133,6 +133,9 @@ It is unset by default.
  The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
  - `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
  - `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
+`wait_for_processor_ready` :: (false) This specifies if events should be blocked from processing until the processsor is ready.
+`wait_for_processor_ready_timeout` :: (10s) This specifies the maximum time the processor will block the pipeline until it is ready. 
+
 +
 Example:
 ["source","yaml",subs="attributes"]

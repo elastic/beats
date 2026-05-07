@@ -43,8 +43,8 @@ type kubeAnnotatorConfig struct {
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
-	WaitReady           bool                                `config:"wait_for_metadata"`
-	WaitReadyTimeout    time.Duration                       `config:"wait_for_metadata_timeout"`
+	WaitReady           bool                                `config:"wait_for_processor_ready"`
+	WaitReadyTimeout    time.Duration                       `config:"wait_for_processor_ready_timeout"`
 }
 
 type Enabled struct {
