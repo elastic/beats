@@ -31,8 +31,27 @@ type equalsValue func(interface{}) bool
 func equalsIntValue(i uint64, log *logp.Logger) equalsValue {
 	logger := log.Named(logName)
 	return func(value interface{}) bool {
-		if sValue, err := ExtractInt(value); err == nil {
-			return sValue == i
+		switch v := value.(type) {
+		case int64:
+			return uint64(v) == i
+		case int32:
+			return uint64(v) == i
+		case int16:
+			return uint64(v) == i
+		case int8:
+			return uint64(v) == i
+		case uint64:
+			return v == i
+		case uint32:
+			return uint64(v) == i
+		case uint16:
+			return uint64(v) == i
+		case uint8:
+			return uint64(v) == i
+		case int:
+			return uint64(v) == i
+		case uint:
+			return uint64(v) == i
 		}
 		logger.Warnf("expected int but got type %T in equals condition.", value)
 		return false
@@ -42,7 +61,7 @@ func equalsIntValue(i uint64, log *logp.Logger) equalsValue {
 func equalsStringValue(s string, log *logp.Logger) equalsValue {
 	logger := log.Named(logName)
 	return func(value interface{}) bool {
-		if sValue, err := ExtractString(value); err == nil {
+		if sValue, ok := value.(string); ok {
 			return sValue == s
 		}
 		logger.Warnf("expected string but got type %T in equals condition.", value)
@@ -53,7 +72,7 @@ func equalsStringValue(s string, log *logp.Logger) equalsValue {
 func equalsBoolValue(b bool, log *logp.Logger) equalsValue {
 	logger := log.Named(logName)
 	return func(value interface{}) bool {
-		if sValue, err := ExtractBool(value); err == nil {
+		if sValue, ok := value.(bool); ok {
 			return sValue == b
 		}
 		logger.Warnf("expected bool but got type %T in equals condition.", value)
