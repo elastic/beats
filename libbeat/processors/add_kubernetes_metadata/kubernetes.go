@@ -130,7 +130,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		wg:    sync.WaitGroup{},
 	}
 
-	if config.WaitReady {
+	if config.WaitReady && config.WaitReadyTimeout > 0 {
 		processor.init(config, cfg)
 		if !processor.kubernetesAvailable {
 			log.Info("Kubernetes environment is not available after waiting for metadata")
