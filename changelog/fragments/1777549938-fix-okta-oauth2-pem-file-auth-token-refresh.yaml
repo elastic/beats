@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Fix token refresh for jwk_pem/jwk_file in cel, httpjson, okta inputs
+component: filebeat
+issue: https://github.com/elastic/beats/issues/50426
