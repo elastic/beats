@@ -65,7 +65,7 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 
 	// Determine authentication method based on provided credentials
 	hasClientSecret := o.ClientSecret != ""
-	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != nil
+	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != ""
 
 	switch {
 	case hasClientSecret:
@@ -94,8 +94,8 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, client *http.Cl
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}
-		case o.OktaJWKPEM != nil:
-			oktaJWT, err = generateOktaJWTPEM(string(o.OktaJWKPEM), oauthConfig)
+		case o.OktaJWKPEM != "":
+			oktaJWT, err = generateOktaJWTPEM(o.OktaJWKPEM, oauthConfig)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate Okta JWT: %w", err)
 			}

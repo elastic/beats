@@ -35,7 +35,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/filebeat/features"
+	"github.com/elastic/beats/v7/libbeat/features"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
@@ -2026,6 +2026,70 @@ service:
 				FilterMessageSnippet("Publish event").Len() == numReceivers
 		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
 		col.Shutdown()
+	}
+}
+
+func BenchmarkOTelConsumerIncludeMetadata(b *testing.B) {
+	const eventCount = 1000
+
+	for _, tc := range []struct {
+		name            string
+		includeMetadata bool
+	}{
+		{name: "WithoutMetadata", includeMetadata: false},
+		{name: "WithMetadata", includeMetadata: true},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			for b.Loop() {
+				b.StopTimer()
+				tmpDir := b.TempDir()
+
+				cfg := renderOtelConfig(b, `receivers:
+  filebeatreceiver:
+    include_metadata: {{.IncludeMetadata}}
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: {{.EventCount}}
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`, struct {
+					PathHome        string
+					EventCount      int
+					IncludeMetadata bool
+				}{
+					PathHome:        tmpDir,
+					EventCount:      eventCount,
+					IncludeMetadata: tc.includeMetadata,
+				})
+
+				b.StartTimer()
+
+				col := oteltestcol.New(b, cfg)
+				require.NotNil(b, col)
+				require.Eventually(b, func() bool {
+					return col.ObservedLogs().
+						FilterMessageSnippet("Publish event").Len() == eventCount
+				}, 30*time.Second, 1*time.Millisecond, "expected all events to be published")
+				col.Shutdown()
+			}
+		})
 	}
 }
 

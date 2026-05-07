@@ -13,7 +13,7 @@ import (
 	"os"
 	"time"
 
-	dcontainer "github.com/docker/docker/api/types/container"
+	dcontainer "github.com/moby/moby/api/types/container"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
