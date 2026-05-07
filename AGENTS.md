@@ -41,13 +41,10 @@ script/stresstest.sh [--tags integration] [--race] ./path/to/package ^TestName$ 
 
 ### Integration Tests
 
-Integration tests require building the test binary and some need external dependencies
-that can be started with mage or manually.
+Integration tests may need external dependencies that can be started with mage
+or manually. The Go test binary is built automatically via `TestMain`.
 
 ```bash
-# Build the system test binary if the beat defines it
-mage buildSystemTestBinary
-
 # Run integration tests for a specific package
 go test -v -race -run TestName -tags integration ./path/to/package/...
 ```

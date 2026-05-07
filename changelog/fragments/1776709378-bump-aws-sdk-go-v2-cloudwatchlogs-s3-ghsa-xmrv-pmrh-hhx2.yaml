@@ -1,7 +1,0 @@
-kind: security
-
-summary: Bump aws-sdk-go-v2/service/cloudwatchlogs to v1.65.0 to fix GHSA-xmrv-pmrh-hhx2
-
-component: all
-
-pr: https://github.com/elastic/beats/pull/50215

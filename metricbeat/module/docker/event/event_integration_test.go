@@ -26,9 +26,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -79,15 +78,17 @@ func createEvent(t *testing.T) {
 	}
 	defer c.Close()
 
-	resp, err := c.ContainerCreate(context.Background(), &container.Config{
-		Image: "busybox",
-		Cmd:   []string{"echo", "foo"},
-	}, nil, nil, nil, "")
+	resp, err := c.ContainerCreate(context.Background(), client.ContainerCreateOptions{
+		Config: &container.Config{
+			Image: "busybox",
+			Cmd:   []string{"echo", "foo"},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
+	_, err = c.ContainerRemove(context.Background(), resp.ID, client.ContainerRemoveOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +101,7 @@ func pullBusyboxImage(t *testing.T) {
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(t.Context(), "busybox", image.PullOptions{})
+	reader, err := c.ImagePull(t.Context(), "busybox", client.ImagePullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}

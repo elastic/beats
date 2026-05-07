@@ -121,7 +121,7 @@ type noopReporter struct{}
 
 func (noopReporter) UpdateStatus(status.Status, string) {}
 
-// getURL initializes the input URL with the help of the url_program.
+// getURL evaluates the url_program to compute the input URL from the current state.
 func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {
 	if src == "" {
 		return url, nil
@@ -177,10 +177,10 @@ type processor struct {
 }
 
 // process processes the data in state, updates the cursor and publishes it to
-// the reciever's publisher. The CEL program here only executes a single time,
+// the receiver's publisher. The CEL program here only executes a single time,
 // since the connection is persistent and events are received and processed in
-// real time.
-func (p processor) process(ctx context.Context, state, cursor map[string]any, start time.Time) error {
+// real time. It returns the last known good cursor after publication.
+func (p processor) process(ctx context.Context, state, cursor map[string]any, start time.Time) (map[string]any, error) {
 	goodCursor := cursor
 	p.log.Debugw("cel engine state before eval", logp.Namespace(p.ns), "state", redactor{state: state, cfg: p.redact})
 	state, err := evalWith(ctx, p.prg, p.ast, state, start)
@@ -189,7 +189,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 		p.metrics.celEvalErrors.Add(1)
 		switch {
 		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-			return err
+			return goodCursor, err
 		default:
 			p.metrics.errorsTotal.Inc()
 		}
@@ -205,17 +205,17 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 	switch e := e.(type) {
 	case []any:
 		if len(e) == 0 {
-			return nil
+			return goodCursor, nil
 		}
 		events = e
 	case map[string]any:
 		if e == nil {
-			return nil
+			return goodCursor, nil
 		}
 		p.log.Debugw("single event object returned by evaluation", "event", e)
 		events = []any{e}
 	default:
-		return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+		return goodCursor, fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 	}
 
 	// We have a non-empty batch of events to process.
@@ -255,7 +255,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 	for i, e := range events {
 		event, ok := e.(map[string]any)
 		if !ok {
-			return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+			return goodCursor, fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 		}
 		var pubCursor any
 		if cursors != nil {
@@ -266,7 +266,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 					goodCursor = cursor
 					cursor, ok = cursors[0].(map[string]any)
 					if !ok {
-						return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+						return goodCursor, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 					}
 					pubCursor = cursor
 				}
@@ -274,7 +274,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 				goodCursor = cursor
 				cursor, ok = cursors[i].(map[string]any)
 				if !ok {
-					return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+					return goodCursor, fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 				}
 				pubCursor = cursor
 			}
@@ -301,7 +301,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 
 		err = ctx.Err()
 		if err != nil {
-			return err
+			return goodCursor, err
 		}
 	}
 	// calculate batch processing time
@@ -322,7 +322,7 @@ func (p processor) process(ctx context.Context, state, cursor map[string]any, st
 		p.log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
-	return err
+	return goodCursor, err
 }
 
 func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
