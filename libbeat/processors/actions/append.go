@@ -14,11 +14,13 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// This file was contributed to by generative AI
 
 package actions
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -103,12 +105,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 	if err != nil {
 		f.logger.Debugf("could not fetch value for key: '%s'. Therefore, all the values will be appended in a new key %s.", target, target)
 	} else {
-		targetArr, ok := targetVal.([]interface{})
-		if ok {
-			arr = append(arr, targetArr...)
-		} else {
-			arr = append(arr, targetVal)
-		}
+		arr = append(arr, valueToArray(targetVal)...)
 	}
 
 	// append the values of all the fields listed under 'fields' section
@@ -120,12 +117,7 @@ func (f *appendProcessor) appendValues(target string, fields []string, values []
 			}
 			return fmt.Errorf("could not fetch value for key: %s, Error: %w", field, err)
 		}
-		valArr, ok := val.([]interface{})
-		if ok {
-			arr = append(arr, valArr...)
-		} else {
-			arr = append(arr, val)
-		}
+		arr = append(arr, valueToArray(val)...)
 	}
 
 	// append all the static values from 'values' section
@@ -171,10 +163,58 @@ func cleanEmptyValues(dirtyArr []interface{}) (cleanArr []interface{}) {
 func removeDuplicates(dirtyArr []interface{}) (cleanArr []interface{}) {
 	set := make(map[interface{}]bool, 0)
 	for _, val := range dirtyArr {
-		if _, ok := set[val]; !ok {
+		valType := reflect.TypeOf(val)
+		if valType == nil || valType.Comparable() {
+			if _, ok := set[val]; ok {
+				continue
+			}
 			set[val] = true
+			cleanArr = append(cleanArr, val)
+			continue
+		}
+
+		isDuplicate := false
+		for _, existingVal := range cleanArr {
+			if reflect.DeepEqual(existingVal, val) {
+				isDuplicate = true
+				break
+			}
+		}
+
+		if !isDuplicate {
 			cleanArr = append(cleanArr, val)
 		}
 	}
 	return cleanArr
+}
+
+// valueToArray normalizes a value to []any so callers can append values
+// regardless of whether the input is a scalar, slice, or array.
+func valueToArray(val any) []any {
+	// Fast-path: keep []any as-is to avoid extra allocation/copy.
+	switch value := val.(type) {
+	case []any:
+		return value
+	}
+
+	v := reflect.ValueOf(val)
+	// Invalid reflect values (for example nil interface values) are treated as
+	// a single entry to keep behavior consistent with scalar inputs.
+	// This should never happen
+	if !v.IsValid() {
+		return []any{val}
+	}
+
+	// Normalize any concrete slice/array type (e.g. []string, []int, [N]T)
+	// into []any by copying each element in order.
+	if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
+		arr := make([]any, 0, v.Len())
+		for i := 0; i < v.Len(); i++ {
+			arr = append(arr, v.Index(i).Interface())
+		}
+		return arr
+	}
+
+	// Scalar values become a one-element array so callers can always append(...).
+	return []any{val}
 }

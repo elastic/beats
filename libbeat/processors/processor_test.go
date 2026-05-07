@@ -771,7 +771,7 @@ func BenchmarkEventBackups(b *testing.B) {
 
 	require.Equal(b, fmt.Sprintf("%p", clone), fmt.Sprintf("%p", result), "should be the same event")
 	for key := range expFields {
-		require.Equal(b, expFields[key], clone.Fields[key], fmt.Sprintf("%s does not match", key))
+		require.Equal(b, expFields[key], clone.Fields[key], "%s does not match", key)
 	}
 }
 

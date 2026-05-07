@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type config struct {
@@ -66,19 +67,32 @@ func RunTests(
 		return err
 	}
 
-	pipeline, err := pipeline.Load(info,
+	beatPaths := paths.New()
+	beatPaths.Home = "."
+	beatPaths.Config = "."
+	beatPaths.Data = "."
+	beatPaths.Logs = "."
+
+	pipelineSettings := pipeline.Settings{
+		WaitClose:     0,
+		WaitCloseMode: pipeline.NoWaitOnClose,
+		Processors:    processing,
+		Paths:         beatPaths,
+	}
+
+	pipeline, err := pipeline.LoadWithSettings(info,
 		pipeline.Monitors{
 			Metrics:   nil,
 			Telemetry: nil,
 			Logger:    log,
 		},
 		config.Pipeline,
-		processing,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
+			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config(), beatPaths)
 			return cfg.Name(), out, err
 		},
+		pipelineSettings,
 	)
 	if err != nil {
 		return fmt.Errorf("loading pipeline failed: %w", err)

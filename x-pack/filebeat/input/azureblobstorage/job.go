@@ -194,6 +194,22 @@ func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
 	}
 	var evtOffset int64
 	switch dec := dec.(type) {
+	case valueDecoder:
+		defer dec.close()
+
+		for dec.next() {
+			msg, _, err := dec.decodeValue()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+				j.status.UpdateStatus(status.Degraded, err.Error())
+				return err
+			}
+			evt := j.createEvent(string(msg), evtOffset)
+			j.publish(evt, !dec.more(), id)
+		}
+
 	case decoder:
 		defer dec.close()
 

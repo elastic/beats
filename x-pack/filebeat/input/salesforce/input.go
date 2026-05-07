@@ -439,6 +439,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 		passCreds := credentials.JwtCredentials{
 			URL:            cfg.Auth.OAuth2.JWTBearerFlow.URL,
+			TokenURL:       cfg.Auth.OAuth2.JWTBearerFlow.TokenURL,
 			ClientId:       cfg.Auth.OAuth2.JWTBearerFlow.ClientID,
 			ClientUsername: cfg.Auth.OAuth2.JWTBearerFlow.ClientUsername,
 			ClientKey:      signKey,

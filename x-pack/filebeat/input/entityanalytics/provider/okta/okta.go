@@ -118,7 +118,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	// Allow a single fetch operation to obtain limits from the API.
 	p.lim = okta.NewRateLimiter(p.cfg.LimitWindow, p.cfg.LimitFixed)
 
-	if p.cfg.Tracer != nil {
+	if p.cfg.Tracer.enabled() {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
 		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)

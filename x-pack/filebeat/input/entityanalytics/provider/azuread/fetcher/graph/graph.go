@@ -391,7 +391,7 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
 	}
 
-	if c.Tracer != nil {
+	if c.Tracer.enabled() {
 		id = sanitizeFileName(id)
 		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)

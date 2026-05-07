@@ -48,7 +48,7 @@ func (resp *response) clone() *response {
 	return clone
 }
 
-func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger) []transformable {
+func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Logger, allowStringArray bool) []transformable {
 	var ts []transformable
 
 	convertAndAppend := func(m map[string]interface{}) {
@@ -61,15 +61,23 @@ func (resp *response) asTransformables(stat status.StatusReporter, log *logp.Log
 
 	switch tresp := resp.body.(type) {
 	case []interface{}:
+		var scalars int
 		for _, v := range tresp {
-			m, ok := v.(map[string]interface{})
-			if !ok {
+			switch v := v.(type) {
+			case string, float64:
+				scalars++
+			case map[string]interface{}:
+				convertAndAppend(v)
+			default:
 				msg := fmt.Sprintf("events must be JSON objects, but got %T: skipping", v)
 				log.Debug(msg)
 				stat.UpdateStatus(status.Degraded, msg)
-				continue
 			}
-			convertAndAppend(m)
+		}
+		if scalars > 0 && (scalars != len(tresp) || !allowStringArray) {
+			msg := fmt.Sprintf("events must be JSON objects, but got %d scalar values in array of length %d", scalars, len(tresp))
+			log.Debug(msg)
+			stat.UpdateStatus(status.Degraded, msg)
 		}
 	case map[string]interface{}:
 		convertAndAppend(tresp)
@@ -194,7 +202,7 @@ type handler interface {
 	handleError(error)
 }
 
-func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate bool, h handler) {
+func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transformContext, resps []*http.Response, paginate, allowStringArray bool, h handler) {
 	trCtx.clearIntervalData()
 
 	var npages int64
@@ -215,7 +223,7 @@ func (rp *responseProcessor) startProcessing(ctx context.Context, trCtx *transfo
 				return
 			}
 
-			respTrs := page.asTransformables(rp.status, rp.log)
+			respTrs := page.asTransformables(rp.status, rp.log, allowStringArray)
 
 			if len(respTrs) == 0 {
 				return

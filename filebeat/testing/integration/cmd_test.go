@@ -92,7 +92,7 @@ filebeat.config.modules:
 		_, err := os.Stat(filepath.Join(modules, "disabled-module.yml.disabled"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "disabled-module.yml"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("enable multiple module at once", func(t *testing.T) {
@@ -103,9 +103,9 @@ filebeat.config.modules:
 		})
 
 		_, err := os.Create(filepath.Join(modules, "disabled2.yml.disabled"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		_, err = os.Create(filepath.Join(modules, "disabled3.yml.disabled"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		test.ExpectOutput("Enabled disabled2")
 		test.ExpectOutput("Enabled disabled3")
@@ -118,11 +118,11 @@ filebeat.config.modules:
 		_, err = os.Stat(filepath.Join(modules, "disabled2.yml.disabled"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "disabled2.yml"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		_, err = os.Stat(filepath.Join(modules, "disabled3.yml.disabled"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "disabled3.yml"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("test disable command ", func(t *testing.T) {
@@ -142,7 +142,7 @@ filebeat.config.modules:
 		_, err := os.Stat(filepath.Join(modules, "enabled-module.yml"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "enabled-module.yml.disabled"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 	})
 
@@ -154,9 +154,9 @@ filebeat.config.modules:
 		})
 
 		_, err := os.Create(filepath.Join(modules, "enabled2.yml"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		_, err = os.Create(filepath.Join(modules, "enabled3.yml"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 
 		test.ExpectOutput("Disabled enabled2")
 		test.ExpectOutput("Disabled enabled3")
@@ -169,11 +169,11 @@ filebeat.config.modules:
 		_, err = os.Stat(filepath.Join(modules, "enabled2.yml"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "enabled2.yml.disabled"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		_, err = os.Stat(filepath.Join(modules, "enabled3.yml"))
 		assert.True(t, os.IsNotExist(err))
 		_, err = os.Stat(filepath.Join(modules, "enabled3.yml.disabled"))
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	})
 
 }

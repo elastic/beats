@@ -166,6 +166,7 @@ func (r *runner) Start() {
 			ctx.UpdateStatus(status.Failed, errMsg)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
+			ctx.UpdateStatus(status.Stopped, "")
 		}
 	}()
 }

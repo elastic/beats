@@ -138,7 +138,7 @@ func TestPublish(t *testing.T) {
 		subFields := []string{"dataset", "namespace", "type"}
 		for _, subField := range subFields {
 			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
+			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
 			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
 		}
 	})
@@ -176,12 +176,38 @@ func TestPublish(t *testing.T) {
 		dynamicAttributeKey := "elasticsearch.ingest_pipeline"
 		gotValue, ok := attributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "dynamic pipeline attribute was not set")
-		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
+		assert.Equal(t, "error_pipeline", gotValue.AsString())
 
 		dynamicAttributeKey = "elastic.mapping.mode"
 		gotValue, ok = scopeAttributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "elastic mapping mode was not set")
-		assert.EqualValues(t, "bodymap", gotValue.AsString())
+		assert.Equal(t, "bodymap", gotValue.AsString())
+	})
+
+	t.Run("preserves time.Duration fields as nanoseconds", func(t *testing.T) {
+		eventWithDuration := beat.Event{
+			Fields: mapstr.M{
+				"event": mapstr.M{
+					"duration": 1500 * time.Millisecond,
+				},
+			},
+		}
+
+		batch := outest.NewBatch(eventWithDuration)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+			eventBody, ok := body["event"].(map[string]any)
+			require.True(t, ok, "event body should be encoded as a map")
+			assert.EqualValues(t, 1500*time.Millisecond, eventBody["duration"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {

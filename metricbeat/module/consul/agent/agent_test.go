@@ -244,7 +244,7 @@ func TestEventMapping(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 2, len(events))
+	assert.Len(t, events, 2)
 
 	//2 events should be here, one with runtime.heap_objects only and one with everything else
 	heapObjectsFound := false
@@ -267,7 +267,7 @@ func TestEventMapping(t *testing.T) {
 				heapObjectsFloat64, ok := heapObjects.(float64)
 				assert.True(t, ok)
 
-				assert.True(t, heapObjectsFloat64 > 0)
+				assert.Positive(t, heapObjectsFloat64)
 			}
 		}
 
@@ -278,7 +278,7 @@ func TestEventMapping(t *testing.T) {
 				goroutinesFloat64, ok := goroutines.(float64)
 				assert.True(t, ok)
 
-				assert.True(t, goroutinesFloat64 > 0)
+				assert.Positive(t, goroutinesFloat64)
 			}
 		}
 	}
@@ -339,6 +339,6 @@ func TestUniqueKeyForLabelMap(t *testing.T) {
 	}
 
 	for i := 1; i < len(keys); i++ {
-		assert.True(t, keys[i-1] == keys[i])
+		assert.Equal(t, keys[i-1], keys[i])
 	}
 }

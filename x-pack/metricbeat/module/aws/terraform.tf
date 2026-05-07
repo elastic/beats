@@ -12,6 +12,7 @@ provider "aws" {
       org          = "obs"
       team         = "cloud-monitoring"
       project      = "metricbeat_aws-ci"
+      ephemeral    = "true"
     }
   }
 }

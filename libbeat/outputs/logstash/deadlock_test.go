@@ -53,7 +53,7 @@ func TestDeadlockListener(t *testing.T) {
 		dl.ack(1)
 		dl.runIteration()
 		assert.Equal(t, currentTime, dl.lastTime)
-		assert.Nil(t, dl.ctx.Err(), "Deadlock listener context shouldn't expire until the timeout is reached")
+		assert.NoError(t, dl.ctx.Err(), "Deadlock listener context shouldn't expire until the timeout is reached")
 	}
 
 	// Verify that the listener does trigger when the acks stop

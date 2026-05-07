@@ -1,0 +1,72 @@
+// begin 8.19.12 relnotes
+
+[[release-notes-8.19.12]]
+==  8.19.12
+
+Review important information about the 8.19.12 release.
+
+[discrete]
+[[security-updates-8.19.12]]
+=== Security updates
+
+**All**
+
+* Update `elastic-agent-autodiscover` to v0.10.2. https://github.com/elastic/beats/pull/48817[#48817]
+
+[discrete]
+[[new-features-8.19.12]]
+=== New features
+
+The 8.19.12 release adds the following new and notable features.
+
+**Filebeat**
+
+* Add support for managed identity authentication to the `azure-eventhub` input. https://github.com/elastic/beats/pull/48655[#48655] https://github.com/elastic/beats/issues/48680[#48680]
+
+
+[discrete]
+[[enhancements-8.19.12]]
+=== Enhancements
+
+**Filebeat**
+
+* Don't print warning about small files on each file system scan. https://github.com/elastic/beats/pull/48704[#48704] https://github.com/elastic/beats/issues/45642[#45642]
+
+
+[discrete]
+[[bug-fixes-8.19.12]]
+=== Bug fixes
+
+**Elastic Agent**
+
+* Fix a bug which could report an invalid number of active `otelconsumer` events. https://github.com/elastic/beats/pull/48720[#48720] https://github.com/elastic/elastic-agent/issues/12515[#12515]
+
+
+**Filebeat**
+
+* Enforce region configuration when `non_aws_bucket_name` is defined for the `awss3` input. https://github.com/elastic/beats/pull/48534[#48534] https://github.com/elastic/beats/issues/47847[#47847]
+* Fix an issue where the `azure-blob-storage` input was failing with the Storage Blob Data Reader RBAC role. https://github.com/elastic/beats/pull/48886[#48886] https://github.com/elastic/beats/issues/48890[#48890]
+
+
+**Heartbeat**
+
+* Add a missing dependency for Synthetics on Wolfi Docker image. https://github.com/elastic/beats/pull/48569[#48569]
+
+
+**Metricbeat**
+
+* Enforce configurable size limits on incoming requests for `remote_write` metricset (`max_compressed_body_bytes`, `max_decoded_body_bytes`). https://github.com/elastic/beats/pull/48218[#48218]
+
+
+**Osquerybeat**
+
+* Fix differential results using wrong data source for removed events. https://github.com/elastic/beats/pull/48438[#48438] https://github.com/elastic/beats/issues/48427[#48427]
+
+
+**Packetbeat**
+
+* Refactor the DHCPv4 parsers and fix parsing issues. The DHCP `router` field is now a list, as is specified in RFC2132. https://github.com/elastic/beats/pull/48414[#48414]
+* Clean up `int` overflows and array access issues in MySQL parsers. https://github.com/elastic/beats/pull/48543[#48543]
+* Add `int` overflow checks to the `http` parser. https://github.com/elastic/beats/pull/48563[#48563]
+
+// end 8.19.12 relnotes

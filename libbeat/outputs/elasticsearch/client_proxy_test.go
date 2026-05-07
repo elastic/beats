@@ -185,7 +185,7 @@ func execClient(t *testing.T, env ...string) {
 
 func doClientPing(t *testing.T) {
 	serverURL := os.Getenv("TEST_SERVER_URL")
-	require.NotEqual(t, serverURL, "")
+	require.NotEmpty(t, serverURL)
 	proxy := os.Getenv("TEST_PROXY_URL")
 	// if TEST_PROXY_DISABLE is nonempty, set ClientSettings.ProxyDisable.
 	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")

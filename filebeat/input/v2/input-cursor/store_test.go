@@ -54,8 +54,8 @@ func TestStore_OpenClose(t *testing.T) {
 	t.Run("load from empty", func(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
-		require.Equal(t, 0, len(storeMemorySnapshot(store)))
-		require.Equal(t, 0, len(storeInSyncSnapshot(store)))
+		require.Empty(t, storeMemorySnapshot(store))
+		require.Empty(t, storeInSyncSnapshot(store))
 	})
 
 	t.Run("already available state is loaded", func(t *testing.T) {

@@ -214,7 +214,7 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	time.Sleep((retryPeriod + leaseDuration) * 2)
 
 	// waitForNewLeader channel should be empty, because we removed it just before ending the for cycle.
-	require.Equalf(t, 0, len(waitForNewLeader), "waitForNewLeader channel should be empty.")
+	require.Emptyf(t, waitForNewLeader, "waitForNewLeader channel should be empty.")
 
 	for _, le := range les {
 		(*le).Stop()

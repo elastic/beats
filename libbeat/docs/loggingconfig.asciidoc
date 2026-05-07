@@ -87,6 +87,10 @@ endif::serverless[]
 You can specify the following options in the `logging` section of the
 +{beatname_lc}.yml+ config file:
 
+WARNING: The `logging.to_*` options are mutually exclusive. If multiple are
+set to `true`, only the first one takes effect, following the precedence order
+of the options listed below.
+
 ifndef::serverless[]
 [float]
 ==== `logging.to_stderr`

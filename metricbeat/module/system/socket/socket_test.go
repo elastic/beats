@@ -129,7 +129,7 @@ func TestFetch(t *testing.T) {
 		if !ok {
 			t.Fatal("user.id is not a string")
 		}
-		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), uid)
+		assert.Equal(t, strconv.Itoa(os.Geteuid()), uid)
 
 		dir, ok := getRequiredValue(t, "network.direction", root).(string)
 		if !ok {

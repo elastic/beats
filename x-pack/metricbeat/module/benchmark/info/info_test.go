@@ -36,7 +36,7 @@ func TestFetch(t *testing.T) {
 			f := mbtest.NewFetcher(t, config)
 			events, errs := f.FetchEvents()
 			assert.Emptyf(t, errs, "errs should be empty, err: %v", errs)
-			assert.Equalf(t, int(tc.count), len(events), "events should have %d events not %d, events: %v", int(tc.count), len(events), events)
+			assert.Lenf(t, events, int(tc.count), "events should have %d events not %d, events: %v", int(tc.count), len(events), events)
 
 			for i, event := range events {
 				msf := event.MetricSetFields

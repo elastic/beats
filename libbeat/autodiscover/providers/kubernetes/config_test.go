@@ -26,6 +26,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -124,7 +125,7 @@ func TestConfigLeaseFields(t *testing.T) {
 type mockBuilder struct {
 }
 
-func newMockBuilder(_ *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
+func newMockBuilder(_ *conf.C, logger *logp.Logger, _ *paths.Path) (autodiscover.Builder, error) {
 	return &mockBuilder{}, nil
 }
 

@@ -54,9 +54,9 @@ func TestConfigValidate(t *testing.T) {
 
 		err := cfg.Unpack(&c)
 		if test.error {
-			require.NotNil(t, err)
+			require.Error(t, err)
 		} else {
-			require.Nil(t, err)
+			require.NoError(t, err)
 		}
 	}
 }
@@ -127,9 +127,9 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 		}
 		err := c.Validate()
 		if test.error {
-			require.NotNil(t, err)
+			require.Error(t, err)
 		} else {
-			require.Nil(t, err)
+			require.NoError(t, err)
 		}
 	}
 }

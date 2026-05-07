@@ -188,7 +188,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	require.NoError(t, err)
 
 	lst := clientCfg.Processing.Processor
-	assert.Equal(t, 2, len(lst.(*processors.Processors).List)) //nolint:errcheck //Safe to ignore in tests
+	assert.Len(t, lst.(*processors.Processors).List, 2) //nolint:errcheck //Safe to ignore in tests
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a

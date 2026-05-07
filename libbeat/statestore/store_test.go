@@ -147,7 +147,7 @@ func TestStore_Remove(t *testing.T) {
 
 		err := store.Remove("key")
 		assert.NoError(t, err)
-		assert.Equal(t, 0, len(data))
+		assert.Empty(t, data)
 	})
 }
 

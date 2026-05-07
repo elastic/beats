@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -181,7 +180,7 @@ logging:
 	var m IndexTemplateResult
 	err = json.Unmarshal(body, &m)
 	require.NoError(t, err)
-	require.Equal(t, len(m.IndexTemplates), 1)
+	require.Len(t, m.IndexTemplates, 1)
 }
 
 // Test run cmd with default settings for template
@@ -236,7 +235,7 @@ logging:
 	err = json.Unmarshal(body, &m)
 	require.NoError(t, err)
 
-	require.Equal(t, len(m.IndexTemplates), 1)
+	require.Len(t, m.IndexTemplates, 1)
 	require.Equal(t, datastream, m.IndexTemplates[0].Name)
 
 	refreshURL := FormatRefreshURL(t, esUrl)
@@ -253,7 +252,7 @@ logging:
 	err = json.Unmarshal(body, &results)
 	require.NoError(t, err)
 
-	require.True(t, results.Hits.Total.Value > 0)
+	require.Positive(t, results.Hits.Total.Value)
 }
 
 // Test run cmd does not load template when disabled in config
@@ -377,9 +376,9 @@ logging:
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+	require.Containsf(t, string(body), "max_primary_shard_size\":\"50gb", "primary shard not found in %s", string(body))
 
-	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+	require.Containsf(t, string(body), "max_age\":\"30d", "max_age not found in %s", string(body))
 }
 
 func TestSetupCmdTemplateDisabled(t *testing.T) {
@@ -441,8 +440,8 @@ setup:
 	status, body, err := HttpDo(t, http.MethodGet, policyURL)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
-	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
-	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+	require.Containsf(t, string(body), "max_primary_shard_size\":\"50gb", "primary shard not found in %s", string(body))
+	require.Containsf(t, string(body), "max_age\":\"30d", "max_age not found in %s", string(body))
 }
 
 func TestSetupCmdTemplateWithOpts(t *testing.T) {
@@ -497,7 +496,7 @@ logging:
 	status, body, err := HttpDo(t, http.MethodGet, templateURL)
 	require.NoError(t, err)
 	require.Equalf(t, http.StatusOK, status, "incorrect status code for :%s", templateURL.String())
-	require.Truef(t, strings.Contains(string(body), "number_of_shards\":\"2"), "number of shards not found in %s", string(body))
+	require.Containsf(t, string(body), "number_of_shards\":\"2", "number of shards not found in %s", string(body))
 }
 
 func TestTemplateCreatedOnIlmPolicyCreated(t *testing.T) {
@@ -579,9 +578,9 @@ logging:
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, status, "incorrect status code")
 
-	require.Truef(t, strings.Contains(string(body), "max_primary_shard_size\":\"50gb"), "primary shard not found in %s", string(body))
+	require.Containsf(t, string(body), "max_primary_shard_size\":\"50gb", "primary shard not found in %s", string(body))
 
-	require.Truef(t, strings.Contains(string(body), "max_age\":\"30d"), "max_age not found in %s", string(body))
+	require.Containsf(t, string(body), "max_age\":\"30d", "max_age not found in %s", string(body))
 }
 
 func TestExportTemplate(t *testing.T) {

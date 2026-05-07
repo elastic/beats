@@ -82,14 +82,14 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	assert.EqualValues(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-		trCtx.firstEventClone(),
+		trCtx.firstEvent,
 	)
 	assert.EqualValues(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-		trCtx.lastEventClone(),
+		trCtx.lastEvent,
 	)
-	lastResp := trCtx.lastResponseClone()
+	lastResp := trCtx.lastResponse.clone()
 	// ignore since has dynamic date and content length values
 	// and is not relevant
 	lastResp.header = nil
@@ -114,16 +114,16 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	assert.EqualValues(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-		trCtx.firstEventClone(),
+		trCtx.firstEvent,
 	)
 
 	assert.EqualValues(
 		t,
 		&mapstr.M{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-		trCtx.lastEventClone(),
+		trCtx.lastEvent,
 	)
 
-	lastResp = trCtx.lastResponseClone()
+	lastResp = trCtx.lastResponse.clone()
 	lastResp.header = nil
 	assert.EqualValues(t,
 		&response{

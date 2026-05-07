@@ -39,6 +39,6 @@ func TestInputSettings(t *testing.T) {
 
 	f, err := NewFilesetConfig(c)
 	if assert.NoError(t, err) {
-		assert.Equal(t, f.Input["close_eof"], true)
+		assert.Equal(t, true, f.Input["close_eof"])
 	}
 }

@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
@@ -88,7 +87,6 @@ type Beat struct {
 
 	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
-	Paths    *paths.Path      // per beat paths definition
 }
 
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct

@@ -56,8 +56,8 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)
 
 	responseCount, _ := event.MetricSetFields.GetValue("response.count")
-	assert.True(t, responseCount.(int64) >= 1)
+	assert.GreaterOrEqual(t, responseCount.(int64), int64(1))
 
 	badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
-	assert.True(t, badResponseCount.(float64) >= 1)
+	assert.GreaterOrEqual(t, badResponseCount.(float64), float64(1))
 }

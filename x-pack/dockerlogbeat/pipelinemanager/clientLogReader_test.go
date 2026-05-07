@@ -55,7 +55,7 @@ func TestNewClient(t *testing.T) {
 
 	event := testReturn(t, client)
 	assert.Equal(t, event.Fields["message"], logString)
-	assert.Equal(t, event.Fields["container"].(mapstr.M)["name"], "testContainer")
+	assert.Equal(t, "testContainer", event.Fields["container"].(mapstr.M)["name"])
 }
 
 // setupTestReader sets up the "read side" of the pipeline, spawing a goroutine to read and event and send it back to the test.

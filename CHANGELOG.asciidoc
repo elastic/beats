@@ -3,6 +3,281 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.15 relnotes
+
+[[release-notes-8.19.15]]
+=== Beats version 8.19.15
+
+https://github.com/elastic/beats/compare/v8.19.14\...v8.19.15[View commits]
+
+[discrete]
+[[security-updates-8.19.15]]
+==== Security updates
+
+**Agentbeat**
+
+* Update transient dependency `github.com/go-jose/go-jose/v4` to v4.1.4. https://github.com/elastic/beats/pull/49975[#49975]
+
+[discrete]
+[[new-features-8.19.15]]
+==== New features
+
+**Filebeat**
+
+* Add AWS auth method for CEL and HTTP JSON inputs. https://github.com/elastic/beats/pull/47260[#47260] 
+
+[discrete]
+[[enhancements-8.19.15]]
+==== Enhancements
+
+**All**
+
+* Update OTel Collector components to v0.149.0/v1.55.0. https://github.com/elastic/beats/pull/50057[#50057]
+
+**Metricbeat**
+
+* Bump azure-sdk-for-go `armmonitor` from v0.8.0 to v0.11.0. https://github.com/elastic/beats/pull/49866[#49866] 
+
+[discrete]
+[[upgrades-8.19.15]]
+==== Upgrades
+
+**Filebeat**
+
+* Upgrade Azure Event Hubs SDK (`azeventhubs`) from v1.3.1 to v2.0.2. https://github.com/elastic/beats/pull/49867[#49867] 
+
+[discrete]
+[[bug-fixes-8.19.15]]
+==== Bug fixes
+
+**Filebeat**
+
+* Fix `http_endpoint` input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs. https://github.com/elastic/beats/pull/49415[#49415] https://github.com/elastic/beats/issues/47770[#47770]
+* Fix `container` input not respecting `max_bytes` when parsing CRI partial lines. https://github.com/elastic/beats/pull/49743[#49743] https://github.com/elastic/beats/issues/49259[#49259]
+* Fix CSV decoder producing malformed JSON when field values contain double quotes in `azure-blob-storage` input. https://github.com/elastic/beats/pull/50097[#50097] https://github.com/elastic/beats/issues/50097[#50097]
+* Update mito to v1.23.2, fixing runtime error location reporting. https://github.com/elastic/beats/pull/50221[#50221]
+
+**Libbeat**
+
+* Fix `otelconsumer` logging hundreds of errors per second when queue is full. https://github.com/elastic/beats/pull/48807[#48807] https://github.com/elastic/beats/issues/48803[#48803] 
+
+// end 8.19.15 relnotes
+
+// begin 8.19.14 relnotes
+
+[[release-notes-8.19.14]]
+=== Beats version 8.19.14
+
+https://github.com/elastic/beats/compare/v8.19.13\...v8.19.14[View commits]
+
+[discrete]
+[[new-features-8.19.14]]
+==== New features
+
+**Filebeat**
+
+* Add retry back-off logic to streaming input CrowdStrike follower. https://github.com/elastic/beats/pull/48542[#48542] https://github.com/elastic/beats/issues/46072[#46072]
+* Add `secret_state` config to CEL input for encrypted storage of secrets accessible as `state.secret`. https://github.com/elastic/beats/pull/49207[#49207]
++
+Add a `secret_state` configuration field to the CEL input. When configured in a
+Fleet integration package with `secret: true`, the values are stored encrypted by
+Fleet. At runtime, the contents are placed at `state.secret` and unconditionally
+redacted in debug logs. The key `secret` in the plain-text state configuration
+is reserved and rejected by validation to prevent accidental unencrypted storage
+of values intended to be secret.
+
+**Metricbeat**
+
+* Add client secret authentication support to Azure App Insights module. https://github.com/elastic/beats/pull/48880[#48880]
+
+
+[discrete]
+[[enhancements-8.19.14]]
+==== Enhancements
+
+
+**All**
+
+* Update OTel Collector components to v0.148.0. https://github.com/elastic/beats/pull/49578[#49578]
+
+
+**Filebeat**
+
+* Allow string and number arrays in httpjson chained configurations. https://github.com/elastic/beats/pull/49391[#49391] https://github.com/elastic/beats/issues/48254[#48254]
+* Add support for URL and URL query parsing and formatting in the Streaming input CEL environment. https://github.com/elastic/beats/pull/49653[#49653]
+
+
+**Metricbeat**
+
+* Update monitor mappings to include new TBS metrics. https://github.com/elastic/beats/pull/48432[#48432]
+
+
+[discrete]
+[[bug-fixes-8.19.14]]
+==== Bug fixes
+
+**Elastic Agent**
+
+* Fix an issue that could delay reporting shutdown of Agent components. https://github.com/elastic/beats/pull/49796[#49796] https://github.com/elastic/beats/issues/49512[#49512]
+
+
+**Filebeat**
+
+* Fix compatibility of the Journald input with journald/systemd versions &lt; 242. https://github.com/elastic/beats/pull/49445[#49445]
+* Add rate-limit backoff to CrowdStrike streaming input oauth2 transport. https://github.com/elastic/beats/pull/49453[#49453]
+* Skip request tracer path validation when tracing is disabled to prevent input startup failures. https://github.com/elastic/beats/pull/49655[#49655]
+* Fix Filebeat crash loop when running under Elastic Agent and taking too long to initialise. https://github.com/elastic/beats/pull/49796[#49796] https://github.com/elastic/beats/issues/49512[#49512]
+
+
+**Libbeat**
+
+* Fix a bug where escaped characters in syslog structured data caused an EOF error. https://github.com/elastic/beats/pull/49392[#49392] https://github.com/elastic/beats/issues/43944[#43944]
+
+
+**Metricbeat**
+
+* Fix unnecessary Windows filesystem metricset errors from non-existent volumes. https://github.com/elastic/beats/pull/49553[#49553]
+
+// end 8.19.14 relnotes
+
+// begin 8.19.13 relnotes
+
+[[release-notes-8.19.13]]
+=== Beats version 8.19.13
+
+https://github.com/elastic/beats/compare/v8.19.12\...v8.19.13[View commits]
+
+[discrete]
+[[security-updates-8.19.13]]
+==== Security updates
+
+**All**
+
+* Update `elastic-agent-system-metrics` to v0.14.0. https://github.com/elastic/beats/pull/48816[#48816] 
+* Update `elastic-agent-libs` to v0.32.2. https://github.com/elastic/beats/pull/48857[#48857] 
+* Update OpenTelemetry SDK to v1.40.0. https://github.com/elastic/beats/pull/49126[#49126] 
+
+**Osquerybeat**
+
+* Update `osquery-go` dependency to v0.0.0-20260226222546-0cc22f415e57. https://github.com/elastic/beats/pull/49280[#49280]
+
+[discrete]
+[[new-features-8.19.13]]
+==== New features
+
+**Elastic Agent**
+
+* Fix a bug that could report stopped inputs as still running. https://github.com/elastic/beats/pull/49285[#49285]
+
+**Metricbeat**
+
+* Add zswap compressed swap cache metrics to system memory metricset. https://github.com/elastic/beats/pull/49098[#49098]
+* Add Elasticsearch index mode and codec settings in Metricbeat index stats module. https://github.com/elastic/beats/pull/49237[#49237]
+* Add cgroupv2 CPU metrics to `system.process` dataset. https://github.com/elastic/beats/pull/49098[#49098]
+
+[discrete]
+[[enhancements-8.19.13]]
+==== Enhancements
+
+**Filebeat**
+
+* Add optional `token_url` support for JWT Bearer Flow in Salesforce input. https://github.com/elastic/beats/pull/43933[#43933] https://github.com/elastic/beats/issues/43963[#43963]
+* Empty files are excluded from processing in filestream as early as possible. https://github.com/elastic/beats/pull/49196[#49196] 
+
+**Metricbeat**
+
+* Report memory pressure stall information (PSI) for cgroup v2. https://github.com/elastic/beats/pull/48054[#48054] 
+* Add swap field to `system.process.memory` metricset in Metricbeat. https://github.com/elastic/beats/pull/48334[#48334] 
+* Add a config to improve wildcard handling to report actual object names. https://github.com/elastic/beats/pull/48644[#48644] 
+
+**Packetbeat**
+
+* Improves resiliency of the AMQP parser against invalid or corrupt data frames. https://github.com/elastic/beats/pull/48033[#48033] 
+* Bump bundled Windows Npcap OEM installer to v1.87. https://github.com/elastic/beats/pull/49167[#49167] 
+
+[discrete]
+[[bug-fixes-8.19.13]]
+==== Bug fixes
+
+**All**
+
+* Improve `append` processor behavior when merging values and removing duplicates. https://github.com/elastic/beats/pull/49021[#49021]
+* Kafka client will avoid having more than a single metadata request to each broker in-flight at any given time. https://github.com/elastic/beats/pull/49307[#49307]
+
+
+**Filebeat**
+
+* Fix Kubernetes secret variable resolution in Filebeat autodiscover hints. https://github.com/elastic/beats/pull/48787[#48787] 
+* Fix Active Directory entity analytics to resolve nested group membership and escape DN filter values. https://github.com/elastic/beats/pull/48815[#48815] 
+* Fix handling of Crowdstrike streaming input state in retryable errors. https://github.com/elastic/beats/pull/49077[#49077] 
+* Fix memory leak when `harvester_limit` is set. https://github.com/elastic/beats/pull/49114[#49114] 
+* Demote missing user/device state lookup to debug log in Azure entity analytics provider. https://github.com/elastic/beats/pull/49127[#49127] 
+* Fix CrowdStrike streaming session refresh scheduling to avoid tight refresh loops. https://github.com/elastic/beats/pull/49175[#49175] https://github.com/elastic/beats/issues/49158[#49158]
+
+**Winlogbeat**
+
+* Restore suppression of repeated channel-not-found open errors in Winlogbeat eventlog runner. https://github.com/elastic/beats/pull/48999[#48999] https://github.com/elastic/beats/issues/48979[#48979]
+
+// end 8.19.13 relnotes
+
+// begin 8.19.12 relnotes
+
+[[release-notes-8.19.12]]
+=== Beats version 8.19.12
+
+https://github.com/elastic/beats/compare/v8.19.11\...v8.19.12[View commits]
+
+[discrete]
+[[security-updates-8.19.12]]
+==== Security updates
+
+**All**
+
+* Update `elastic-agent-autodiscover` to v0.10.2. https://github.com/elastic/beats/pull/48817[#48817]
+
+[discrete]
+[[features-enhancements-8.19.12]]
+==== New features and enhancements
+
+**Filebeat**
+
+* Add support for managed identity authentication to the `azure-eventhub` input. https://github.com/elastic/beats/pull/48655[#48655] https://github.com/elastic/beats/issues/48680[#48680]
+* Don't print warning about small files on each file system scan. https://github.com/elastic/beats/pull/48704[#48704] https://github.com/elastic/beats/issues/45642[#45642]
+
+[discrete]
+[[bug-fixes-8.19.12]]
+==== Bug fixes
+
+**Elastic Agent**
+
+* Fix a bug which could report an invalid number of active `otelconsumer` events. https://github.com/elastic/beats/pull/48720[#48720] https://github.com/elastic/elastic-agent/issues/12515[#12515]
+
+**Filebeat**
+
+* Enforce region configuration when `non_aws_bucket_name` is defined for the `awss3` input. https://github.com/elastic/beats/pull/48534[#48534] https://github.com/elastic/beats/issues/47847[#47847]
+* Fix an issue where the `azure-blob-storage` input was failing with the Storage Blob Data Reader RBAC role. https://github.com/elastic/beats/pull/48886[#48886] https://github.com/elastic/beats/issues/48890[#48890]
+
+**Heartbeat**
+
+* Add a missing dependency for Synthetics on Wolfi Docker image. https://github.com/elastic/beats/pull/48569[#48569]
+
+**Metricbeat**
+
+* Added `mode` and `codec` fields to the `elasticsearch.index` metricset.
+* Enforce configurable size limits on incoming requests for `remote_write` metricset (`max_compressed_body_bytes`, `max_decoded_body_bytes`). https://github.com/elastic/beats/pull/48218[#48218]
+
+**Osquerybeat**
+
+* Fix differential results using wrong data source for removed events. https://github.com/elastic/beats/pull/48438[#48438] https://github.com/elastic/beats/issues/48427[#48427]
+
+**Packetbeat**
+
+* Refactor the DHCPv4 parsers and fix parsing issues. The DHCP `router` field is now a list, as is specified in RFC2132. https://github.com/elastic/beats/pull/48414[#48414]
+* Clean up `int` overflows and array access issues in MySQL parsers. https://github.com/elastic/beats/pull/48543[#48543]
+* Add `int` overflow checks to the `http` parser. https://github.com/elastic/beats/pull/48563[#48563]
+
+// end 8.19.12 relnotes
+
 // begin 8.19.11 relnotes
 
 [[release-notes-8.19.11]]

@@ -218,6 +218,32 @@
                         "workingset_refault_file": 0,
                         "workingset_restore_anon": 0,
                         "workingset_restore_file": 0
+                    },
+                    "pressure": {
+                        "full": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 0
+                        },
+                        "some": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 0
+                        }
                     }
                 },
                 "path": "/user.slice/user-1000.slice/session-426.scope"
@@ -262,7 +288,8 @@
                     "pct": 0.0008
                 },
                 "share": 16252928,
-                "size": 1886003200
+                "size": 1886003200,
+                "swap": 1302528
             },
             "num_threads": 9,
             "state": "sleeping"
