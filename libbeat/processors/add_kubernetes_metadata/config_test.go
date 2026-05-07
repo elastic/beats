@@ -18,6 +18,7 @@
 package add_kubernetes_metadata
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -46,6 +47,27 @@ func TestConfigValidate(t *testing.T) {
 			cfg:   map[string]interface{}{},
 			error: false,
 		},
+		{
+			cfg: map[string]interface{}{
+				"wait_for_processor_ready_timeout": "invalid_duration",
+				"wait_for_processor_ready":         true,
+			},
+			error: true,
+		},
+		{
+			cfg: map[string]interface{}{
+				"wait_for_processor_ready_timeout": "20s",
+				"wait_for_processor_ready":         true,
+			},
+			error: false,
+		},
+		{
+			cfg: map[string]interface{}{
+				"wait_for_processor_ready_timeout": "0s",
+				"wait_for_processor_ready":         true,
+			},
+			error: true,
+		},
 	}
 
 	for _, test := range tests {
@@ -54,6 +76,7 @@ func TestConfigValidate(t *testing.T) {
 
 		err := cfg.Unpack(&c)
 		if test.error {
+			fmt.Printf("%+v", c)
 			require.Error(t, err)
 		} else {
 			require.NoError(t, err)

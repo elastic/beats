@@ -72,6 +72,9 @@ func (k *kubeAnnotatorConfig) Validate() error {
 		k.Node = ""
 	}
 
+	if k.WaitReady && k.WaitReadyTimeout <= 0 {
+		return fmt.Errorf("wait_for_processor_ready_timeout must be a positive duration")
+	}
 	// Checks below were added to warn the users early on and avoid initialising the processor in case the `logs_path`
 	// matcher config is not valid: supported paths defined as a `logs_path` configuration setting are strictly defined
 	// if `resource_type` is set

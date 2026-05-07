@@ -133,7 +133,8 @@ It is unset by default.
  The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
  - `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
  - `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
-`wait_for_processor_ready` :: (false) If `true`, processor initialization is performed synchronously and event processing waits until initialization completes. If Kubernetes cannot be reached within `wait_for_processor_ready_timeout`, the processor is initialized as unavailable and events pass through without Kubernetes metadata enrichment. If `false`, initialization runs asynchronously and some early events can be processed without Kubernetes metadata enrichment.
+`wait_for_processor_ready` :: (false) This specifies if startup should wait for processor initialization. If Kubernetes cannot be reached within `wait_for_processor_ready_timeout`, the processor is marked unavailable. 
+If `false`, initialization runs asynchronously and some early events could be processed without Kubernetes metadata enrichment.
 `wait_for_processor_ready_timeout` :: (10s) Maximum time to wait for Kubernetes connectivity when `wait_for_processor_ready` is enabled.
 
 +

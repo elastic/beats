@@ -72,20 +72,24 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
-func isKubernetesAvailable(client k8sclient.Interface) (bool, error) {
+func isKubernetesAvailable(client k8sclient.Interface, logger *logp.Logger) (bool, error) {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
 		return false, err
 	}
-	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
+	logger.Infof("add_kubernetes_metadata: kubernetes env detected, with version: %v", server)
 	return true, nil
 }
 
-func isKubernetesAvailableWithTimeout(client k8sclient.Interface, waitReady bool, waitReadyTimeout time.Duration) bool {
+func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
+	waitReady bool,
+	waitReadyTimeout time.Duration,
+	logger *logp.Logger,
+) bool {
 	var timer *time.Timer
 	var err error
 	var kubernetesAvailable bool
-	if waitReady && waitReadyTimeout > 0 {
+	if waitReady {
 		timer = time.NewTimer(waitReadyTimeout)
 	} else {
 		// hard coding a 5 minutes timeout in case the function is called without waiting for metadata, to avoid infinite loops
@@ -95,10 +99,10 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface, waitReady bool
 	for {
 		select {
 		case <-timer.C:
-			logp.Info("%v: could not detect kubernetes env within the configured wait_for_metadata_timeout of %v: %v", "add_kubernetes_metadata", waitReadyTimeout, err)
+			logger.Infof("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
 			return false
 		default:
-			kubernetesAvailable, err = isKubernetesAvailable(client)
+			kubernetesAvailable, err = isKubernetesAvailable(client, logger)
 			if kubernetesAvailable {
 				return true
 			}
@@ -130,7 +134,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		wg:    sync.WaitGroup{},
 	}
 
-	if config.WaitReady && config.WaitReadyTimeout > 0 {
+	if config.WaitReady {
 		processor.init(config, cfg)
 		if !processor.kubernetesAvailable {
 			log.Info("Kubernetes environment is not available after waiting for metadata")
@@ -192,7 +196,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		if !isKubernetesAvailableWithTimeout(client, config.WaitReady, config.WaitReadyTimeout) {
+		if !isKubernetesAvailableWithTimeout(client, config.WaitReady, config.WaitReadyTimeout, k.log) {
 			return
 		}
 
