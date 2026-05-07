@@ -98,7 +98,7 @@ func (t testQueue) Close(force bool) error {
 	return err
 }
 
-func TestQueueDoesNotReplyLastEventAfterRestart(t *testing.T) {
+func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 	workDir := fs.TempDir(t, "..", "..", "..", "build", "integration-tests")
 	diskQueuePath := filepath.Join(workDir, "queue")
 	settings := DefaultSettings()
@@ -136,11 +136,15 @@ func TestQueueDoesNotReplyLastEventAfterRestart(t *testing.T) {
 
 	replayedBatch := readBatch(t, run3Queue, 3*time.Second)
 	if replayedBatch != nil {
-		msg, _ := replayedBatch.Entry(0).Content.Fields.GetValue("message")
+		count := replayedBatch.Count()
+		var msg interface{}
+		if count > 0 {
+			msg, _ = replayedBatch.Entry(0).Content.Fields.GetValue("message")
+		}
 		replayedBatch.Done()
 		t.Fatalf("unexpected replayed event after restart"+
-			"found replayed batch with count=%d and first message=%q",
-			replayedBatch.Count(),
+			"found replayed batch with count=%d and first message=%v",
+			count,
 			msg,
 		)
 	}
