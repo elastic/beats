@@ -147,6 +147,7 @@ func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, curs
 	}
 	s.authTransport = &rateLimitTransport{
 		base:     authClient.Transport,
+		timeout:  authClient.Timeout,
 		maxRetry: 3,
 		wait:     60 * time.Second,
 		log:      log,
