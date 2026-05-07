@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -29,8 +28,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	defer abtest.SetupDataDir(t)()
-
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
@@ -48,9 +45,7 @@ func TestData(t *testing.T) {
 }
 
 func TestDpkg(t *testing.T) {
-	logp.TestingSetup()
-
-	defer abtest.SetupDataDir(t)()
+	logp.TestingSetup() //nolint:staticcheck // TODO: replace with logptest.NewTestingLogger once MetricSet accepts an injected logger
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
@@ -107,9 +102,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"python2.7-minimal": 0,
 	}
 
-	logp.TestingSetup()
-
-	defer abtest.SetupDataDir(t)()
+	logp.TestingSetup() //nolint:staticcheck // TODO: replace with logptest.NewTestingLogger once MetricSet accepts an injected logger
 
 	// Disable all except dpkg
 	rpmPathOld := rpmPath
@@ -154,7 +147,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		if !assert.IsType(t, uint64(0), size) {
 			t.Fatal("uint64 expected")
 		}
-		got[name.(string)] = size.(uint64)
+		got[name.(string)] = size.(uint64) //nolint:errcheck // types checked above
 	}
 	assert.Equal(t, expected, got)
 }
@@ -284,7 +277,7 @@ func copyFile(old, new string) error {
 // prevents test side effects. The tests should be refactored to support
 // true isolation with different data stores in different temp dirs.
 func deleteBucket(t *testing.T, metricSet mb.ReportingMetricSetV2) {
-	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil {
+	if err := metricSet.(*MetricSet).bucket.DeleteBucket(); err != nil { //nolint:errcheck // unchecked type assertion
 		t.Fatal(err)
 	}
 }

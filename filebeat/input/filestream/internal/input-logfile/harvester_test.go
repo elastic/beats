@@ -397,6 +397,39 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		assert.Contains(t, testLog.String(), errHarvester.Error())
 	})
 
+	t.Run("assert non-permanent harvester errors do not report degraded status", func(t *testing.T) {
+		mockHarvester := &mockHarvester{onRun: errorOnRun}
+		hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
+		statusReporter := &recordingStatusReporter{}
+
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(statusReporter)
+		hg.Start(ctx, source)
+
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
+			"source should be removed from bookkeeper after error")
+		require.NoError(t, hg.StopHarvesters())
+
+		assert.Zero(t, statusReporter.countWithStatus(status.Degraded))
+	})
+
+	t.Run("assert ConnectWith errors report degraded status", func(t *testing.T) {
+		hg := testDefaultHarvesterGroup(t, &mockHarvester{onRun: correctOnRun}, 0)
+		hg.pipeline = &MockPipeline{connectErr: errPipelineConnect}
+		statusReporter := &recordingStatusReporter{}
+
+		ctx := input.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: t.Context()}.WithStatusReporter(statusReporter)
+		hg.Start(ctx, source)
+
+		requireEventually(t,
+			func() bool { return !hg.readers.hasID(hg.identifier.ID(source)) },
+			"source should be removed from bookkeeper after connect error")
+		require.NoError(t, hg.StopHarvesters())
+
+		require.Equal(t, 1, statusReporter.countWithStatus(status.Degraded))
+		assert.Contains(t, statusReporter.lastMessage(), errPipelineConnect.Error())
+	})
+
 	t.Run("assert already locked resource has to wait", func(t *testing.T) {
 		var wg sync.WaitGroup
 		mockHarvester := &mockHarvester{onRun: correctOnRun, wg: &wg}
@@ -670,6 +703,7 @@ func blockUntilCancelOnRun(c input.Context, _ Source, _ Cursor, _ Publisher) err
 }
 
 var errHarvester = fmt.Errorf("harvester error")
+var errPipelineConnect = fmt.Errorf("pipeline connect error")
 
 func errorOnRun(_ input.Context, _ Source, _ Cursor, _ Publisher) error {
 	return errHarvester
@@ -753,12 +787,17 @@ type MockPipeline struct {
 	c               beat.Client        // Client used by the pipeline
 	mu              sync.Mutex         // Mutex to synchronize access to the client
 	publishCallback func(e beat.Event) // Callback called when the client is publishing the event, but before acknowledging it
+	connectErr      error
 }
 
 // ConnectWith connects the mock pipeline with a client using the provided configuration.
 func (mp *MockPipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error) {
 	mp.mu.Lock()
 	defer mp.mu.Unlock()
+
+	if mp.connectErr != nil {
+		return nil, mp.connectErr
+	}
 
 	c := &MockClient{}
 	if mp.publishCallback != nil {
@@ -779,6 +818,46 @@ type mockStatusReporter struct{}
 
 // UpdateStatus is a no-op
 func (m mockStatusReporter) UpdateStatus(status status.Status, msg string) {
+}
+
+type statusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+type recordingStatusReporter struct {
+	mu      sync.Mutex
+	updates []statusUpdate
+}
+
+func (r *recordingStatusReporter) UpdateStatus(st status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.updates = append(r.updates, statusUpdate{status: st, msg: msg})
+}
+
+func (r *recordingStatusReporter) countWithStatus(st status.Status) int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	count := 0
+	for _, update := range r.updates {
+		if update.status == st {
+			count++
+		}
+	}
+	return count
+}
+
+func (r *recordingStatusReporter) lastMessage() string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if len(r.updates) == 0 {
+		return ""
+	}
+	return r.updates[len(r.updates)-1].msg
 }
 
 func isClosed(done chan struct{}) bool {
