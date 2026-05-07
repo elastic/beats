@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Reduce allocations in equals condition checks by using direct type assertions in hot-path comparators
-component: libbeat
