@@ -60,7 +60,7 @@ func (k *kubeAnnotatorConfig) InitDefaults() {
 	k.DefaultIndexers = Enabled{true}
 	k.Scope = "node"
 	k.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
-	k.WaitReadyTimeout = 10 * time.Second
+	k.WaitReadyTimeout = 30 * time.Second
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
