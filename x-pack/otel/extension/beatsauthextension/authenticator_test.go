@@ -14,7 +14,9 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -24,7 +26,10 @@ import (
 	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configoptional"
 	"go.uber.org/goleak"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
@@ -302,211 +307,223 @@ func startTestServer(t *testing.T, serverCerts []tls.Certificate) string {
 	return server.URL
 }
 
-// TestCertificateHotReload verifies that enabling certificate_reload causes the
-// client to present a certificate via GetClientCertificate on each handshake.
+// TestCertificateHotReload verifies that the beatsauth extension picks up a
+// rotated client certificate from disk without restarting the process.
 func TestCertificateHotReload(t *testing.T) {
 	caCert, err := tlscommontest.GenCA()
 	require.NoError(t, err)
 
-	clientCert, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageDigitalSignature, false, "", []string{}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	// Two distinct client certs, both signed by the same CA so the server
+	// trusts both. Rotation = swap A's PEM files for B's on disk. Distinct
+	// CommonNames are the most reliable way to tell them apart on the wire,
+	// since tlscommontest.GenSignedCert hardcodes the serial number.
+	const (
+		clientACN = "beatsauth-client-a"
+		clientBCN = "beatsauth-client-b"
+	)
+	clientCertA, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageDigitalSignature, false, clientACN, []string{}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	require.NoError(t, err)
+	clientCertB, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageDigitalSignature, false, clientBCN, []string{}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
+	require.NoError(t, err)
+	require.NotEqual(t, clientCertA.Leaf.Subject.CommonName, clientCertB.Leaf.Subject.CommonName,
+		"test setup expects two distinct client certs")
 
 	serverCert, err := tlscommontest.GenSignedCert(caCert, x509.KeyUsageCertSign, false, "", []string{}, []net.IP{net.IPv4(127, 0, 0, 1)}, false)
 	require.NoError(t, err)
 
-	tmpDir := t.TempDir()
-	certPath := filepath.Join(tmpDir, "client.crt")
-	keyPath := filepath.Join(tmpDir, "client.key")
-	writeCertKeyFiles(t, certPath, keyPath, clientCert)
-
 	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert.Leaf.Raw})
 
 	// startMTLSServer starts an HTTPS server that requires client certificates
-	// signed by the given CA, and records the presented client cert serial.
-	startMTLSServer := func(t *testing.T, ca tls.Certificate) (serverURL string, receivedSerial func() string) {
+	// signed by the test CA and records the most recently presented client
+	// cert CommonName. Session tickets are disabled so every fresh TCP
+	// connection triggers a full handshake (and re-invokes
+	// GetClientCertificate).
+	startMTLSServer := func(t *testing.T) (serverURL string, lastCommonName func() string) {
 		t.Helper()
 		caPool := x509.NewCertPool()
-		caPool.AddCert(ca.Leaf)
+		caPool.AddCert(caCert.Leaf)
 
-		var lastSerial string
+		var mu sync.Mutex
+		var commonName string
 		srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mu.Lock()
 			if len(r.TLS.PeerCertificates) > 0 {
-				lastSerial = r.TLS.PeerCertificates[0].SerialNumber.String()
+				commonName = r.TLS.PeerCertificates[0].Subject.CommonName
 			}
+			mu.Unlock()
 			w.WriteHeader(http.StatusOK)
 		}))
 		srv.TLS = &tls.Config{
-			MinVersion:   tls.VersionTLS12,
-			Certificates: []tls.Certificate{serverCert},
-			ClientAuth:   tls.RequireAndVerifyClientCert,
-			ClientCAs:    caPool,
+			MinVersion:             tls.VersionTLS12,
+			Certificates:           []tls.Certificate{serverCert},
+			ClientAuth:             tls.RequireAndVerifyClientCert,
+			ClientCAs:              caPool,
+			SessionTicketsDisabled: true,
 		}
 		srv.StartTLS()
 		t.Cleanup(srv.Close)
-		return srv.URL, func() string { return lastSerial }
+		return srv.URL, func() string {
+			mu.Lock()
+			defer mu.Unlock()
+			return commonName
+		}
 	}
 
-	t.Run("cert reload enabled: client presents certificate via GetClientCertificate", func(t *testing.T) {
-		serverURL, receivedSerial := startMTLSServer(t, caCert)
+	// idleConnTimeout is short so the http.Transport's idle pool drops the
+	// connection between requests (after a small sleep in doGET), forcing a
+	// fresh TLS handshake — which re-invokes the cert reloader's
+	// GetClientCertificate callback. confighttp's wrapping hides
+	// CloseIdleConnections from us, so we lean on idle eviction instead.
+	const idleConnTimeout = 10 * time.Millisecond
+	const interReqSleep = 50 * time.Millisecond
 
-		cfg := &Config{
-			BeatAuthConfig: map[string]any{
-				"ssl": map[string]any{
-					"enabled":                 "true",
-					"certificate":             certPath,
-					"key":                     keyPath,
-					"certificate_authorities": []string{string(caPEM)},
-					"certificate_reload": map[string]any{
-						"enabled":         true,
-						"reload_interval": "100ms",
-					},
-				},
-			},
-		}
+	// startAuthClient boots the beatsauth extension with the given config and
+	// returns an http.Client wired through it, plus an observed-logs handle
+	// for asserting on warnings.
+	startAuthClient := func(t *testing.T, beatAuthConfig map[string]any) (*http.Client, *observer.ObservedLogs) {
+		t.Helper()
+		core, observed := observer.New(zapcore.WarnLevel)
+
+		// Always inject the short idle timeout so the connection pool is
+		// drained between requests in doGET.
+		beatAuthConfig["idle_connection_timeout"] = idleConnTimeout.String()
 
 		settings := componenttest.NewNopTelemetrySettings()
-		settings.Logger = zaptest.NewLogger(t)
-		auth, err := newAuthenticator(cfg, settings)
+		settings.Logger = zap.New(core)
+		auth, err := newAuthenticator(&Config{BeatAuthConfig: beatAuthConfig}, settings)
 		require.NoError(t, err)
 
 		host := &mockHost{
 			extensions:       extensionsMap{component.NewID(Type): auth},
 			reportStatusFunc: func(*componentstatus.Event) {},
 		}
-		require.NoError(t, auth.Start(context.Background(), host))
+		require.NoError(t, auth.Start(t.Context(), host))
 
 		httpClientCfg := confighttp.NewDefaultClientConfig()
 		httpClientCfg.Auth = configoptional.Some(configauth.Config{
 			AuthenticatorID: component.NewID(Type),
 		})
-		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
+		client, err := httpClientCfg.ToClient(t.Context(), host.GetExtensions(), settings)
 		require.NoError(t, err)
+		return client, observed
+	}
 
-		resp, err := client.Get(serverURL) //nolint:noctx // test
+	// doGET issues a request and then waits past idleConnTimeout so the
+	// underlying TCP connection is evicted before the next call.
+	doGET := func(t *testing.T, client *http.Client, url string) {
+		t.Helper()
+		resp, err := client.Get(url) //nolint:noctx // test
 		require.NoError(t, err)
 		_ = resp.Body.Close()
-		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert")
+		time.Sleep(interReqSleep)
+	}
+
+	sslCfg := func(certPath, keyPath string, extras map[string]any) map[string]any {
+		ssl := map[string]any{
+			"enabled":                 "true",
+			"certificate":             certPath,
+			"key":                     keyPath,
+			"certificate_authorities": []string{string(caPEM)},
+		}
+		for k, v := range extras {
+			ssl[k] = v
+		}
+		return map[string]any{"ssl": ssl}
+	}
+
+	t.Run("rotates the presented cert when reload is on (default)", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		certPath := filepath.Join(tmpDir, "client.crt")
+		keyPath := filepath.Join(tmpDir, "client.key")
+		writeCertKeyFiles(t, certPath, keyPath, clientCertA)
+
+		serverURL, lastCN := startMTLSServer(t)
+
+		client, _ := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
+			"certificate_reload": map[string]any{
+				"reload_interval": "100ms",
+			},
+		}))
+
+		doGET(t, client, serverURL)
+		require.Equal(t, clientACN, lastCN(), "server should initially see cert A")
+
+		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
+
+		// Drive requests until the reloader picks up cert B or we time out.
+		// Using a plain loop instead of require.Eventually keeps all I/O on
+		// the test goroutine — no orphaned poller for goleak to catch.
+		deadline := time.Now().Add(5 * time.Second)
+		for time.Now().Before(deadline) && lastCN() != clientBCN {
+			doGET(t, client, serverURL)
+		}
+		require.Equal(t, clientBCN, lastCN(),
+			"server should see cert B after the reload interval elapses")
 	})
 
-	t.Run("cert reload defaults to enabled when block omits enabled", func(t *testing.T) {
-		serverURL, receivedSerial := startMTLSServer(t, caCert)
+	t.Run("does not rotate when reload is explicitly disabled", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		certPath := filepath.Join(tmpDir, "client.crt")
+		keyPath := filepath.Join(tmpDir, "client.key")
+		writeCertKeyFiles(t, certPath, keyPath, clientCertA)
 
-		cfg := &Config{
-			BeatAuthConfig: map[string]any{
-				"ssl": map[string]any{
-					"enabled":                 "true",
-					"certificate":             certPath,
-					"key":                     keyPath,
-					"certificate_authorities": []string{string(caPEM)},
-					"certificate_reload": map[string]any{
-						"reload_interval": "100ms",
-					},
-				},
+		serverURL, lastCN := startMTLSServer(t)
+
+		client, _ := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
+			"certificate_reload": map[string]any{
+				"enabled": false,
 			},
+		}))
+
+		doGET(t, client, serverURL)
+		require.Equal(t, clientACN, lastCN(), "server should initially see cert A")
+
+		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
+
+		// With reload disabled the lib loads the cert once at startup, so
+		// after rotation the in-memory cert stays at A. Drive several
+		// round-trips well past any plausible reload window.
+		deadline := time.Now().Add(1 * time.Second)
+		for time.Now().Before(deadline) {
+			doGET(t, client, serverURL)
+			require.Equal(t, clientACN, lastCN(),
+				"server should keep seeing cert A when reload is disabled")
 		}
-
-		settings := componenttest.NewNopTelemetrySettings()
-		settings.Logger = zaptest.NewLogger(t)
-		auth, err := newAuthenticator(cfg, settings)
-		require.NoError(t, err)
-
-		host := &mockHost{
-			extensions:       extensionsMap{component.NewID(Type): auth},
-			reportStatusFunc: func(*componentstatus.Event) {},
-		}
-		require.NoError(t, auth.Start(context.Background(), host))
-
-		httpClientCfg := confighttp.NewDefaultClientConfig()
-		httpClientCfg.Auth = configoptional.Some(configauth.Config{
-			AuthenticatorID: component.NewID(Type),
-		})
-		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
-		require.NoError(t, err)
-
-		resp, err := client.Get(serverURL) //nolint:noctx // test
-		require.NoError(t, err)
-		_ = resp.Body.Close()
-		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert when enabled defaults to true")
 	})
 
-	t.Run("restart_on_cert_change alias: client presents certificate via GetClientCertificate", func(t *testing.T) {
-		serverURL, receivedSerial := startMTLSServer(t, caCert)
+	t.Run("deprecated restart_on_cert_change emits warning and reload still works", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		certPath := filepath.Join(tmpDir, "client.crt")
+		keyPath := filepath.Join(tmpDir, "client.key")
+		writeCertKeyFiles(t, certPath, keyPath, clientCertA)
 
-		cfg := &Config{
-			BeatAuthConfig: map[string]any{
-				"ssl": map[string]any{
-					"enabled":     "true",
-					"certificate": certPath,
-					"key":         keyPath,
-					"certificate_authorities": []string{string(caPEM)},
-					"restart_on_cert_change": map[string]any{
-						"enabled": true,
-						"period":  "200ms",
-					},
-				},
+		serverURL, lastCN := startMTLSServer(t)
+
+		client, observed := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
+			"restart_on_cert_change": map[string]any{
+				"enabled": true,
+				"period":  "200ms",
 			},
-		}
-
-		settings := componenttest.NewNopTelemetrySettings()
-		settings.Logger = zaptest.NewLogger(t)
-		auth, err := newAuthenticator(cfg, settings)
-		require.NoError(t, err)
-
-		host := &mockHost{
-			extensions:       extensionsMap{component.NewID(Type): auth},
-			reportStatusFunc: func(*componentstatus.Event) {},
-		}
-		require.NoError(t, auth.Start(context.Background(), host))
-
-		httpClientCfg := confighttp.NewDefaultClientConfig()
-		httpClientCfg.Auth = configoptional.Some(configauth.Config{
-			AuthenticatorID: component.NewID(Type),
-		})
-		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
-		require.NoError(t, err)
-
-		resp, err := client.Get(serverURL) //nolint:noctx // test
-		require.NoError(t, err)
-		_ = resp.Body.Close()
-		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert via restart_on_cert_change alias")
-	})
-
-	t.Run("cert reload disabled: static cert presented without GetClientCertificate", func(t *testing.T) {
-		serverURL, receivedSerial := startMTLSServer(t, caCert)
-
-		cfg := &Config{
-			BeatAuthConfig: map[string]any{
-				"ssl": map[string]any{
-					"enabled":     "true",
-					"certificate": certPath,
-					"key":         keyPath,
-					"certificate_authorities": []string{string(caPEM)},
-				},
+			// Force a short interval so the rotation half of this test runs
+			// quickly; restart_on_cert_change is no longer aliased onto it.
+			"certificate_reload": map[string]any{
+				"reload_interval": "100ms",
 			},
+		}))
+
+		warnings := observed.FilterMessageSnippet("'ssl.restart_on_cert_change' is deprecated").All()
+		require.Len(t, warnings, 1, "expected one deprecation warning for ssl.restart_on_cert_change")
+
+		doGET(t, client, serverURL)
+		require.Equal(t, clientACN, lastCN())
+
+		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
+		deadline := time.Now().Add(5 * time.Second)
+		for time.Now().Before(deadline) && lastCN() != clientBCN {
+			doGET(t, client, serverURL)
 		}
-
-		settings := componenttest.NewNopTelemetrySettings()
-		settings.Logger = zaptest.NewLogger(t)
-		auth, err := newAuthenticator(cfg, settings)
-		require.NoError(t, err)
-
-		host := &mockHost{
-			extensions:       extensionsMap{component.NewID(Type): auth},
-			reportStatusFunc: func(*componentstatus.Event) {},
-		}
-		require.NoError(t, auth.Start(context.Background(), host))
-
-		httpClientCfg := confighttp.NewDefaultClientConfig()
-		httpClientCfg.Auth = configoptional.Some(configauth.Config{
-			AuthenticatorID: component.NewID(Type),
-		})
-		client, err := httpClientCfg.ToClient(context.Background(), host.GetExtensions(), settings)
-		require.NoError(t, err)
-
-		resp, err := client.Get(serverURL) //nolint:noctx // test
-		require.NoError(t, err)
-		_ = resp.Body.Close()
-		require.Equal(t, clientCert.Leaf.SerialNumber.String(), receivedSerial(), "server should see the client cert via static config")
+		require.Equal(t, clientBCN, lastCN(),
+			"reload should still work via the default-on certificate_reload")
 	})
 }
 

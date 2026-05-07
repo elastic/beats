@@ -6,7 +6,6 @@ package beatsauthextension
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -29,7 +28,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var (
@@ -135,19 +133,9 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
-	reload := resolveCertificateReload(parsedCfg)
+	warnOnRestartOnCertChange(parsedCfg, a.logger)
 
-	httpOpts := a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)
-
-	reloaderOpt, err := certReloaderTransportOption(reload, beatAuthConfig.Transport.TLS, a.logger)
-	if err != nil {
-		return nil, err
-	}
-	if reloaderOpt != nil {
-		httpOpts = append(httpOpts, reloaderOpt)
-	}
-
-	client, err := beatAuthConfig.Transport.Client(httpOpts...)
+	client, err := beatAuthConfig.Transport.Client(a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)...)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating http client: %w", err)
 	}
@@ -163,98 +151,26 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	return &httpClientProvider{client: client}, nil
 }
 
-// resolveCertificateReload reads ssl.certificate_reload (the primary key) and
-// the legacy ssl.restart_on_cert_change alias, returning the effective reload
-// settings.
-//
-// Semantics:
-//   - When the ssl.certificate_reload block is present, Enabled defaults to
-//     true; users opt out by setting enabled: false.
-//   - When the block is absent, the legacy ssl.restart_on_cert_change.enabled
-//     can still turn hot reload on (it never restarted the process here, but
-//     the field is honored for backwards compatibility with existing Beats
-//     configs).
-//   - The legacy period field seeds reload_interval only if the new key did
-//     not set it.
-func resolveCertificateReload(cfg *config.C) CertificateReloadConfig {
-	var result CertificateReloadConfig
-
+// warnOnRestartOnCertChange emits a deprecation warning when the legacy
+// ssl.restart_on_cert_change.* keys are set. The keys are no longer honored
+// here: TLS certificate hot reload is now handled natively by tlscommon via
+// ssl.certificate_reload (enabled by default). This mirrors the deprecation
+// path taken in libbeat (see elastic/beats#50444).
+func warnOnRestartOnCertChange(cfg *config.C, logger *logp.Logger) {
 	sslConfig, err := cfg.Child("ssl", -1)
 	if err != nil {
-		return result
+		return
 	}
-
-	if reloadCfg, err := sslConfig.Child("certificate_reload", -1); err == nil {
-		_ = reloadCfg.Unpack(&result)
-		// Block is present: enabled defaults to true unless explicitly disabled.
-		if result.Enabled == nil {
-			t := true
-			result.Enabled = &t
-		}
-	}
-
-	if rocc, err := sslConfig.Child("restart_on_cert_change", -1); err == nil {
-		type restartOnCertChange struct {
-			Enabled bool          `config:"enabled"`
-			Period  time.Duration `config:"period"`
-		}
-		var alias restartOnCertChange
-		if err := rocc.Unpack(&alias); err == nil {
-			if result.Enabled == nil && alias.Enabled {
-				t := true
-				result.Enabled = &t
-			}
-			if alias.Period > 0 && result.ReloadInterval == 0 {
-				result.ReloadInterval = alias.Period
-			}
-		}
-	}
-
-	return result
-}
-
-// certReloaderTransportOption returns an httpcommon.TransportOption that wires a
-// CertReloader into the *http.Transport's TLSClientConfig when certificate hot
-// reload is enabled and cert/key paths are configured.
-// Returns nil (no option) when hot reload is not applicable.
-// Encrypted keys (key_passphrase) are not supported by CertReloader; a warning
-// is logged and nil is returned in that case.
-func certReloaderTransportOption(reload CertificateReloadConfig, tlsCfg *tlscommon.Config, logger *logp.Logger) (httpcommon.TransportOption, error) {
-	if reload.Enabled == nil || !*reload.Enabled {
-		return nil, nil
-	}
-
-	if tlsCfg == nil || tlsCfg.Certificate.Certificate == "" || tlsCfg.Certificate.Key == "" {
-		return nil, nil
-	}
-
-	if tlsCfg.Certificate.Passphrase != "" || tlsCfg.Certificate.PassphrasePath != "" {
-		logger.Warn("ssl.certificate_reload is not supported with encrypted keys; hot reload disabled")
-		return nil, nil
-	}
-
-	var opts []tlscommon.CertReloaderOption
-	if reload.ReloadInterval > 0 {
-		opts = append(opts, tlscommon.WithReloadInterval(reload.ReloadInterval))
-	}
-
-	reloader, err := tlscommon.NewCertReloader(tlsCfg.Certificate.Certificate, tlsCfg.Certificate.Key, opts...)
+	rocc, err := sslConfig.Child("restart_on_cert_change", -1)
 	if err != nil {
-		return nil, fmt.Errorf("failed creating cert reloader: %w", err)
+		return
 	}
-
-	opt := httpcommon.WithTransportFunc(func(t *http.Transport) {
-		if t.TLSClientConfig == nil {
-			t.TLSClientConfig = &tls.Config{} //nolint:gosec // min version set by beats defaults
-		}
-		t.TLSClientConfig.GetClientCertificate = func(_ *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			return reloader.GetCertificate(nil)
-		}
-		// Clear the static certificate list; the reloader's callback takes over.
-		t.TLSClientConfig.Certificates = nil
-	})
-
-	return opt, nil
+	if !rocc.HasField("enabled") && !rocc.HasField("period") {
+		return
+	}
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded via 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 }
 
 // httpClientProvider provides a RoundTripper from an http.Client
