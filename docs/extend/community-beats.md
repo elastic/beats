@@ -119,7 +119,7 @@ Elastic provides no warranty or support for community-sourced {{beats}}.
 :   Collects GPFS metric and quota information.
 
 [hackerbeat](https://github.com/ullaakut/hackerbeat)
-:   Indexes the top stories of HackerNews into an ElasticSearch instance.
+:   Indexes the top stories of HackerNews into an Elasticsearch instance.
 
 [hsbeat](https://github.com/YaSuenag/hsbeat)
 :   Reads all performance counters in Java HotSpot VM.
