@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -290,6 +291,84 @@ func TestBridgeDoubleShutdown(t *testing.T) {
 
 	bridge.Shutdown()
 	bridge.Shutdown()
+}
+
+// TestBridgeShutdownDoesNotDeadlockWithInFlightCallback exercises the AB-BA
+// deadlock between b.mu and the OTel SDK's pipeline lock. Shutdown calls
+// Unregister, which blocks until any in-flight callback returns; the callback
+// in turn takes b.mu.RLock in collectStats. If Shutdown holds b.mu.Lock across
+// Unregister, the two deadlock.
+func TestBridgeShutdownDoesNotDeadlockWithInFlightCallback(t *testing.T) {
+	reader := metric.NewManualReader()
+	statsReg := monitoring.NewRegistry()
+	pipelineReg := statsReg.GetOrCreateRegistry("pipeline")
+	monitoring.NewUint(pipelineReg, "clients").Set(5)
+
+	// A Func metric that pauses the bridge callback while it is still inside
+	// CollectFlatSnapshot — i.e. in flight from the SDK's perspective but not
+	// yet holding b.mu.RLock. That is the exact window where Shutdown can
+	// acquire b.mu.Lock and call Unregister before the callback returns.
+	//
+	// The Func is dormant until armed, so it doesn't block the initial
+	// snapshot inside NewRegistryBridge.
+	armed := make(chan struct{})
+	callbackInSnapshot := make(chan struct{})
+	callbackCanResume := make(chan struct{})
+	var once sync.Once
+	monitoring.NewFunc(pipelineReg, "blocking", func(_ monitoring.Mode, v monitoring.Visitor) {
+		v.OnRegistryStart()
+		defer v.OnRegistryFinished()
+		select {
+		case <-armed:
+			once.Do(func() { close(callbackInSnapshot) })
+			<-callbackCanResume
+		default:
+		}
+	})
+
+	bridge := newTestBridge(t, reader, statsReg, nil)
+	close(armed)
+
+	// Trigger the bridge callback. It will block in our Func during snapshot
+	// collection, before collectStats acquires b.mu.RLock.
+	collectDone := make(chan struct{})
+	go func() {
+		defer close(collectDone)
+		var rm metricdata.ResourceMetrics
+		_ = reader.Collect(t.Context(), &rm)
+	}()
+
+	<-callbackInSnapshot
+
+	// Now run Shutdown. Without the fix it takes b.mu.Lock and parks in
+	// Unregister waiting for the in-flight callback; the callback, when
+	// resumed, blocks on b.mu.RLock — deadlock.
+	shutdownDone := make(chan struct{})
+	go func() {
+		defer close(shutdownDone)
+		bridge.Shutdown()
+	}()
+
+	// Give Shutdown time to enter Unregister. 50ms is overkill on any
+	// realistic scheduler — the call is just a function entry plus one
+	// channel send into the SDK.
+	time.Sleep(50 * time.Millisecond)
+
+	// Resume the callback. With the fix b.mu is no longer held, so the
+	// callback can acquire RLock, finish, and let Unregister return.
+	close(callbackCanResume)
+
+	select {
+	case <-shutdownDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Shutdown deadlocked: b.mu held across Unregister while callback waits for RLock")
+	}
+
+	select {
+	case <-collectDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Collect goroutine did not return")
+	}
 }
 
 func TestBridgePerInputFloatMetrics(t *testing.T) {
