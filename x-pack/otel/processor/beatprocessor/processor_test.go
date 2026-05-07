@@ -144,6 +144,87 @@ func TestCreateProcessor(t *testing.T) {
 		require.NotNil(t, processor)
 		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
 	})
+
+	t.Run("when condition is honored and processor is skipped when condition is false", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_fields": map[string]any{
+				"target": "",
+				"fields": map[string]any{
+					"enriched": "yes",
+				},
+				"when": map[string]any{
+					"contains": map[string]any{
+						"tags": "forwarded",
+					},
+				},
+			},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Contains(t, processor.String(), "condition=", "expected processor to be wrapped with a condition")
+
+		event := &beat.Event{Fields: mapstr.M{"message": "hello"}}
+		out, err := processor.Run(event)
+		require.NoError(t, err)
+		_, lookupErr := out.Fields.GetValue("enriched")
+		assert.Error(t, lookupErr, "expected 'enriched' field to be absent when condition is not met")
+	})
+
+	t.Run("when condition is honored and processor runs when condition is true", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_fields": map[string]any{
+				"target": "",
+				"fields": map[string]any{
+					"enriched": "yes",
+				},
+				"when": map[string]any{
+					"contains": map[string]any{
+						"tags": "forwarded",
+					},
+				},
+			},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+
+		event := &beat.Event{Fields: mapstr.M{"message": "hello", "tags": []string{"forwarded"}}}
+		out, err := processor.Run(event)
+		require.NoError(t, err)
+		val, err := out.Fields.GetValue("enriched")
+		require.NoError(t, err, "expected 'enriched' field to be added when condition is met")
+		assert.Equal(t, "yes", val)
+	})
+
+	t.Run("when.not.contains skips processor when matching tag is present", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_fields": map[string]any{
+				"target": "",
+				"fields": map[string]any{
+					"enriched": "yes",
+				},
+				"when.not.contains.tags": "forwarded",
+			},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+
+		event := &beat.Event{Fields: mapstr.M{"message": "hello", "tags": []string{"forwarded"}}}
+		out, err := processor.Run(event)
+		require.NoError(t, err)
+		_, lookupErr := out.Fields.GetValue("enriched")
+		assert.Error(t, lookupErr, "expected 'enriched' field to be absent when 'forwarded' tag is present")
+	})
+
+	t.Run("invalid when condition returns error", func(t *testing.T) {
+		_, err := createProcessor(map[string]any{
+			"add_host_metadata": map[string]any{
+				"when": map[string]any{
+					"not_a_real_condition": map[string]any{},
+				},
+			},
+		}, testLogger())
+		require.Error(t, err)
+	})
 }
 
 func testLogger() *logp.Logger {

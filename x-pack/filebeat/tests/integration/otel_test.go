@@ -2174,3 +2174,72 @@ exporters:
 	processorInstanceCount := col.ObservedLogs().FilterMessageSnippet("Configured Beat processor").Len()
 	assert.Equal(t, 1, processorInstanceCount, "expected beat processor to be configured once (shared instance), but got %d", processorInstanceCount)
 }
+
+// TestBeatProcessorWhenCondition verifies that `when` conditions configured on
+// Beat processors inside the OTel `beat` processor are honored. Without this
+// support, the `when` field is silently dropped and processors run
+// unconditionally — see https://github.com/elastic/beats/issues/50549.
+//
+// The test configures two add_fields processors with opposite conditions
+// against the event `message` field and sends a single event whose message
+// matches the first condition. Only the field gated by the matching condition
+// must appear in the exporter output.
+func TestBeatProcessorWhenCondition(t *testing.T) {
+	cfg := `service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      processors:
+        - beat
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: debug
+    metrics:
+      level: none
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "marker test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_fields:
+          target: ""
+          fields:
+            should_be_added: "yes"
+          when.contains.message: "marker"
+      - add_fields:
+          target: ""
+          fields:
+            should_not_be_added: "yes"
+          when.not.contains.message: "marker"
+exporters:
+  debug:
+    verbosity: detailed
+`
+	col := oteltestcol.New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"marker test message"`).
+			FilterMessageSnippet(`"should_be_added":"yes"`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "expected event to be enriched when the `when` condition matches")
+
+	// The processor whose condition does not match must not enrich the event.
+	matchingNotAdded := col.ObservedLogs().
+		FilterMessageSnippet("Body: Map({").
+		FilterMessageSnippet(`"should_not_be_added"`).
+		Len()
+	assert.Equal(t, 0, matchingNotAdded, "expected `should_not_be_added` field to be absent — `when.not.contains` condition was not honored")
+}
