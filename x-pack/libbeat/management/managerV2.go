@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"go.uber.org/zap/zapcore"
+	"go.yaml.in/yaml/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	gproto "google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
