@@ -386,15 +386,8 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	// much cheaper than cloning the full metadata. Transform it in place:
 	// drop container.name and rewrite container.image -> container.image.name.
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
-		var containerMap mapstr.M
-		switch cm := containerVal.(type) {
-		case mapstr.M:
-			containerMap = cm
-		case map[string]interface{}:
-			containerMap = mapstr.M(cm)
-		}
-		if containerMap != nil {
-			ociContainer := containerMap.Clone()
+		if cm, ok := containerVal.(mapstr.M); ok {
+			ociContainer := cm.Clone()
 			_ = ociContainer.Delete("name")
 			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
 				_ = ociContainer.Delete("image")

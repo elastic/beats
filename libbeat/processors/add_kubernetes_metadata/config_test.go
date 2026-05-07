@@ -18,7 +18,6 @@
 package add_kubernetes_metadata
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -76,7 +75,6 @@ func TestConfigValidate(t *testing.T) {
 
 		err := cfg.Unpack(&c)
 		if test.error {
-			fmt.Printf("%+v", c)
 			require.Error(t, err)
 		} else {
 			require.NoError(t, err)
