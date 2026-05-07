@@ -81,26 +81,45 @@ func isKubernetesAvailable(client k8sclient.Interface) (bool, error) {
 	return true, nil
 }
 
-func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
-	connectionAttempts := 1
-	for {
-		kubernetesAvailable, err := isKubernetesAvailable(client)
-		if kubernetesAvailable {
-			return true
+func isKubernetesAvailableWithTimeout(client k8sclient.Interface, waitForMetadata bool, waitForMetadataTimeout time.Duration) bool {
+	if waitForMetadata {
+		var timer *time.Timer
+		var err error
+		var kubernetesAvailable bool
+		timer = time.NewTimer(waitForMetadataTimeout)
+		for {
+			select {
+			case <-timer.C:
+				logp.Info("%v: could not detect kubernetes env within the configured wait_for_metadata_timeout of %v: %v", "add_kubernetes_metadata", waitForMetadataTimeout, err)
+				return false
+			default:
+				kubernetesAvailable, err = isKubernetesAvailable(client)
+				if kubernetesAvailable {
+					return true
+				}
+			}
 		}
-		if connectionAttempts > checkNodeReadyAttempts {
-			logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
-			return false
+	} else {
+		connectionAttempts := 1
+		for {
+			kubernetesAvailable, err := isKubernetesAvailable(client)
+			if kubernetesAvailable {
+				return true
+			}
+			if connectionAttempts > checkNodeReadyAttempts {
+				logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+				return false
+			}
+			time.Sleep(3 * time.Second)
+			connectionAttempts += 1
 		}
-		time.Sleep(3 * time.Second)
-		connectionAttempts += 1
 	}
+
 }
 
 // kubernetesMetadataExist checks whether an event is already enriched with kubernetes metadata
 func kubernetesMetadataExist(event *beat.Event) bool {
-	v, err := event.GetValue("kubernetes")
-	if err != nil || v == nil {
+	if _, err := event.GetValue("kubernetes"); err != nil {
 		return false
 	}
 	return true
@@ -121,14 +140,19 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		wg:    sync.WaitGroup{},
 	}
 
-	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
-	// the k8s node is not yet ready.
-	processor.wg.Add(1)
-	go func() {
-		defer processor.wg.Done()
-		log.Debug("Initializing kubernetes metadata processor")
+	if config.WaitForMetadata {
 		processor.init(config, cfg)
-	}()
+		if !processor.kubernetesAvailable {
+			log.Info("Kubernetes environment is not available after waiting for metadata")
+			return processor, nil
+		}
+	} else {
+		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
+		// the k8s node is not yet ready.
+		go func() {
+			processor.init(config, cfg)
+		}()
+	}
 
 	return processor, nil
 }
@@ -178,7 +202,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		if !isKubernetesAvailableWithRetry(client) {
+		if !isKubernetesAvailableWithTimeout(client, config.WaitForMetadata, config.WaitForMetadataTimeout) {
 			return
 		}
 
@@ -345,11 +369,6 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// wait for kubernetes metadata processor to be initialized before processing any events
-	k.wg.Wait()
-
-	// if initialization fails then K8's will not be available
-	// in that case return event as is
 	if !k.kubernetesAvailable {
 		return event, nil
 	}

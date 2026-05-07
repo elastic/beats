@@ -42,7 +42,9 @@ type kubeAnnotatorConfig struct {
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
-	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	AddResourceMetadata    *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	WaitForMetadata        bool                                `config:"wait_for_metadata"`
+	WaitForMetadataTimeout time.Duration                       `config:"wait_for_metadata_timeout"`
 }
 
 type Enabled struct {
@@ -58,6 +60,7 @@ func (k *kubeAnnotatorConfig) InitDefaults() {
 	k.DefaultIndexers = Enabled{true}
 	k.Scope = "node"
 	k.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
+	k.WaitForMetadataTimeout = 10 * time.Second
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
