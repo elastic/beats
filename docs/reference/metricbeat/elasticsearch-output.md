@@ -472,7 +472,7 @@ stack: deprecated 9.5.0+, beta 9.0-9.4
 ```
 
 ::::{warning}
-:applies_to: { stack: deprecated 9.5.0+, beta 9.0-9.4 }
+:applies_to: {"stack": "deprecated 9.5.0+, beta 9.0-9.4" }
 
 Starting in version 9.5.0, this functionality is deprecated.
 
