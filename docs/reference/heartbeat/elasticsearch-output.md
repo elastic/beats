@@ -109,7 +109,7 @@ The default value is `1`.
 ### `escape_html` [_escape_html]
 
 ```{applies_to}
-stack: deprecated 9.4.0+
+stack: deprecated 9.5.0+
 ```
 
 Configure escaping of HTML in strings. Set to `true` to enable escaping.
@@ -292,10 +292,6 @@ See [Index lifecycle management (ILM)](/reference/heartbeat/ilm.md) for more inf
 
 ### `pipeline` [pipeline-option-es]
 
-```{applies_to}
-stack: deprecated 9.4.0+
-```
-
 A format string value that specifies the ingest pipeline to write events to.
 
 ```yaml
@@ -330,10 +326,6 @@ See the [`pipelines`](#pipelines-option-es) setting for other ways to set the in
 
 
 ### `pipelines` [pipelines-option-es]
-
-```{applies_to}
-stack: deprecated 9.4.0+
-```
 
 An array of pipeline selector rules. Each rule specifies the ingest pipeline to use for events that match the rule. During publishing, Heartbeat uses the first matching rule in the array. Rules can contain conditionals, format string-based fields, and name mappings. If the `pipelines` setting is missing or no rule matches, the [`pipeline`](#pipeline-option-es) setting is used.
 
@@ -426,7 +418,7 @@ The http request timeout in seconds for the Elasticsearch request. The default i
 ### `allow_older_versions` [_allow_older_versions]
 
 ```{applies_to}
-stack: deprecated 9.4.0+
+stack: deprecated 9.5.0+
 ```
 
 By default, Heartbeat expects the Elasticsearch instance to be on the same or newer version to provide optimal experience. We suggest you connect to the same version to make sure all features Heartbeat is using are available in your Elasticsearch instance.
@@ -474,11 +466,17 @@ output.elasticsearch:
 #### `dead_letter_index` [_dead_letter_index]
 
 ```{applies_to}
-stack: deprecated 9.4.0+, beta 9.0-9.3
+stack: deprecated 9.5.0+, beta 9.0-9.4
 ```
 
-::::{note}
-This setting is not supported when using [Beat receivers](docs-content://reference/fleet/elastic-agent-as-otel-collector.md#beat-receivers). To handle documents that fail to index, use the data stream [failure store](docs-content://manage-data/data-store/data-streams/failure-store.md#use-failure-store).
+::::{warning}
+:applies_to: { stack: deprecated 9.5.0+, beta 9.0-9.4 }
+
+Starting in version 9.5.0, this functionality is deprecated.
+
+In versions 9.0-9.4, it is in beta. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
+
+To handle documents that fail to index, use the data stream [failure store](docs-content://manage-data/data-store/data-streams/failure-store.md#use-failure-store).
 ::::
 
 
