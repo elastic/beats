@@ -557,8 +557,6 @@ func TestProspectorRenamedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
 				logger:            logp.L(),
