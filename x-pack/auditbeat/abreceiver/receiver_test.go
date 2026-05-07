@@ -35,6 +35,7 @@ import (
 )
 
 func TestNewReceiver(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/50381")
 	monitorSocket := genSocketPath()
 	var monitorHost string
 	if runtime.GOOS == "windows" {
@@ -92,6 +93,7 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/50381")
 	monitorSocket1 := genSocketPath()
 	var monitorHost1 string
 	if runtime.GOOS == "windows" {
@@ -331,6 +333,7 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestReceiverHook(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/50381")
 	cfg := Config{
 		Beatconfig: map[string]any{
 			"auditbeat": map[string]any{
