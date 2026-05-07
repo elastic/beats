@@ -1,0 +1,3 @@
+kind: upgrade
+summary: Update github.com/prometheus/prometheus to v0.311.3
+component: all
