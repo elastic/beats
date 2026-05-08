@@ -179,6 +179,9 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
+	sourceName := hg.identifier.ID(src)
+	ctx.Logger = ctx.Logger.With("source_file", sourceName)
+
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
 	if fn == nil {
 		return
@@ -195,6 +198,9 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
+	sourceName := hg.identifier.ID(src)
+
+	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
@@ -232,7 +238,7 @@ func startHarvester(
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
-				ctx.Logger.Errorf("Harvester for '%s' crashed with: %+v", srcID, err)
+				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
 				hg.readers.remove(srcID)
 			}
 
