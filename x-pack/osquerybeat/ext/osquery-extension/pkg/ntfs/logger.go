@@ -14,10 +14,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-var (
-	gLogger  atomic.Pointer[logger.Logger]
-	initOnce sync.Once
-)
+var gLogger  atomic.Pointer[logger.Logger]
 
 func setLogger(log *logger.Logger) {
 	gLogger.Store(log)
@@ -27,10 +24,9 @@ func getLogger() *logger.Logger {
 	if l := gLogger.Load(); l != nil {
 		return l
 	}
-	initOnce.Do(func() {
-		if gLogger.Load() == nil {
-			gLogger.Store(logger.New(os.Stderr, true))
-		}
-	})
+	l := logger.New(os.Stderr, true)
+	if gLogger.CompareAndSwap(nil, l) {
+		return l
+	}
 	return gLogger.Load()
 }
