@@ -199,9 +199,9 @@ filebeat.inputs:
     prospector.scanner:
       check_interval: %s
       fingerprint:
-        growing: true
         max_length: 100
-    file_identity.fingerprint: ~
+    file_identity.fingerprint:
+      growing: true
 
 queue.mem:
   flush.timeout: 0s

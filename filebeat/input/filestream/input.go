@@ -169,6 +169,12 @@ func configure(
 // normalizeConfig reconciles filestream defaults with file_identity semantics.
 // In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
 // identities should turn it off unless the user explicitly sets it.
+//
+// For the fingerprint identity it reads the user-facing
+// `file_identity.fingerprint.growing` flag — the only public knob for growing
+// mode — and propagates it to the scanner's fingerprint config so the
+// scanner-side computation honours growing mode. Any value set under
+// `prospector.scanner.fingerprint.growing` in YAML is silently ignored.
 func normalizeConfig(cfg *conf.C, c *config) error {
 	if c.FileIdentity == nil {
 		return nil
@@ -176,6 +182,17 @@ func normalizeConfig(cfg *conf.C, c *config) error {
 
 	name := c.FileIdentity.Name()
 	if name == fingerprintName {
+		var fingerprintCfg fingerprintIdentityConfig
+		if sub := c.FileIdentity.Config(); sub != nil {
+			if err := sub.Unpack(&fingerprintCfg); err != nil {
+				return fmt.Errorf("cannot read 'file_identity.fingerprint' config: %w", err)
+			}
+		}
+		// file_identity.fingerprint is the ONLY user-facing config. Set the
+		// scanner config accordingly.
+		if fingerprintCfg.Growing {
+			c.FileWatcher.Scanner.Fingerprint.Growing = true
+		}
 		return nil
 	}
 

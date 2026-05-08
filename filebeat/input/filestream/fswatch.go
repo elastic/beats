@@ -451,7 +451,11 @@ type fingerprintConfig struct {
 	Length  int64 `config:"length"`
 	// Growing enables the growing fingerprint mode where the fingerprint
 	// is the raw bytes (not a hash) and can grow as the file grows.
-	Growing bool `config:"growing"`
+	//
+	// Not user-configurable: the YAML key under prospector.scanner.fingerprint
+	// is silently ignored. The user-facing knob is file_identity.fingerprint.growing;
+	// normalizeConfig in input.go propagates it here.
+	Growing bool `config:"-"`
 	// MaxLength is the maximum number of bytes to use for the growing fingerprint.
 	// Default is 1000 bytes (same as OTEL's filelog receiver).
 	MaxLength int64 `config:"max_length"`

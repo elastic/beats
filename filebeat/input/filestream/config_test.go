@@ -190,6 +190,7 @@ func TestNormalizeConfig(t *testing.T) {
 		name        string
 		cfg         map[string]interface{}
 		wantEnabled bool
+		wantGrowing bool
 	}{
 		{
 			name: "path identity disables prospector.scanner.fingerprint by default",
@@ -250,6 +251,47 @@ func TestNormalizeConfig(t *testing.T) {
 			cfg:         map[string]interface{}{},
 			wantEnabled: true,
 		},
+		{
+			name: "file_identity.fingerprint.growing true propagates to scanner growing",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": true},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "file_identity.fingerprint.growing false leaves scanner growing default",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": false},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "file_identity.fingerprint with no growing field defaults to false",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"fingerprint": nil},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "scanner-level growing in YAML is silently ignored",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"fingerprint": nil},
+				"prospector": map[string]interface{}{
+					"scanner": map[string]interface{}{
+						"fingerprint": map[string]interface{}{"growing": true},
+					},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
 	}
 
 	for _, tc := range tcs {
@@ -267,7 +309,12 @@ func TestNormalizeConfig(t *testing.T) {
 			err := normalizeConfig(raw, &c)
 			require.NoError(t, err)
 
-			assert.Equal(t, tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled)
+			assert.Equal(t,
+				tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled,
+				"FileWatcher.Scanner.Fingerprint.Enabled did not match")
+			assert.Equal(t,
+				tc.wantGrowing, c.FileWatcher.Scanner.Fingerprint.Growing,
+				"FileWatcher.Scanner.Fingerprint.Growing did not match")
 		})
 	}
 }
