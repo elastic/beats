@@ -18,7 +18,7 @@ For more information, refer to [#47292](https://github.com/elastic/beats/pull/47
 **Action**<br>
 
 - To continue using v1 temporarily, set `processor_version: "v1"` in your configuration. Processor v1 is planned for removal in 9.4.0.
-- Refer to the [Migrating from processor v1 to v2](/reference/beats/filebeat/filebeat-input-azure-eventhub#_migrating_from_processor_v1_to_v2) guide for full details.
+- Refer to the [Migrating from processor v1 to v2](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-azure-eventhub#_migrating_from_processor_v1_to_v2) guide for full details.
 
 ::::
 

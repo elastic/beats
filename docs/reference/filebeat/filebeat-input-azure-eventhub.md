@@ -26,10 +26,10 @@ Use the [`processor_version`](#_processor_version) setting to select which proce
 
 ## Migrating from processor v1 to v2 [_migrating_from_processor_v1_to_v2]
 
-Processor v2 is a drop-in replacement for v1. In most cases, existing v1 configurations work with v2 without any changes. This section describes what happens during the migration and the adjustments you may need to make.
+Processor v2 is a drop-in replacement for v1. Usually, existing v1 configurations work with v2 without any changes. This section describes what happens during the migration and the adjustments you might need to make.
 
 :::{important}
-Processor v1 is deprecated since 9.3.0 and is planned for removal in 9.4.0. Users should migrate to v2 before upgrading to 9.4.0.
+Processor v1 is deprecated as of 9.3.0 and is planned for removal in 9.4.0. Users should migrate to v2 before upgrading to 9.4.0.
 :::
 
 ### Checkpoint migration [_checkpoint_migration]
@@ -54,7 +54,7 @@ However, you should plan to make the following adjustments:
 | v1 setting | v2 replacement | Notes |
 | --- | --- | --- |
 | `storage_account_key` | `storage_account_connection_string` | v2 prefers a full connection string. The key still works (auto-constructed) but is deprecated for v2. |
-| `resource_manager_endpoint` | `authority_host` | For sovereign clouds (China, Government, etc.). |
+| `resource_manager_endpoint` | `authority_host` | For sovereign clouds (China, Government, and so on). |
 
 ### New capabilities in v2 [_new_capabilities_in_v2]
 
@@ -362,7 +362,7 @@ This option is used by processor v1 only. Processor v2 uses [`authority_host`](#
 stack: ga 8.15.1
 ```
 
-Controls which processor version to use. Valid values are `v1` and `v2`. Default was `v1` in 8.15.1–9.2.x; changed to `v2` in 9.3.0.
+Controls which processor version to use. Valid values are `v1` and `v2`. Default was `v1` in 8.15.1–9.2.x. The default changed to `v2` in 9.3.0.
 
 Processor v1 is deprecated and planned for removal in 9.4.0. Refer to [Migrating from processor v1 to v2](#_migrating_from_processor_v1_to_v2) for details.
 
