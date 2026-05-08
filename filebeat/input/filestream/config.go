@@ -234,10 +234,9 @@ func (c *config) Validate() error {
 		// no validation needed
 	case CompressionGZIP, CompressionAuto:
 		if c.FileIdentity != nil &&
-			!(c.FileIdentity.Name() == fingerprintName ||
-				c.FileIdentity.Name() == growingFingerprintName) {
+			c.FileIdentity.Name() != fingerprintName {
 			return fmt.Errorf(
-				"compression='%s' requires 'file_identity' to be 'fingerprint' or 'growing_fingerprint'. Current file_identity is '%s'",
+				"compression='%s' requires 'file_identity' to be 'fingerprint'. Current file_identity is '%s'",
 				c.Compression, c.FileIdentity.Name())
 		}
 	default:
