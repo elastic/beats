@@ -175,6 +175,7 @@ service:
 		"log.file.path",
 		// only present in beats receivers
 		"log.file.device_id",
+		"log.file.fingerprint",
 	}
 
 	compareOutputFiles(t, fbFilePath, otelFilePath, ignoredFields)
