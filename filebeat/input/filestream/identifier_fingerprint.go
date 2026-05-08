@@ -18,15 +18,38 @@
 package filestream
 
 import (
+	"fmt"
+
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// fingerprintIdentityConfig holds the user-facing configuration for the
+// fingerprint file identity. The fields are propagated to the scanner's
+// fingerprint config via normalizeConfig before the prospector is created.
+type fingerprintIdentityConfig struct {
+	// Growing opts into the growing-fingerprint mode: files smaller than the
+	// configured fingerprint size are tracked using the raw bytes available
+	// instead of being skipped as too small.
+	Growing bool `config:"growing"`
+}
+
 type fingerprintIdentifier struct {
 }
 
 func newFingerprintIdentifier(cfg *conf.C, _ *logp.Logger) (fileIdentifier, error) {
+	// Parse the sub-config to validate the fields users may set on the
+	// fingerprint identity (e.g. growing). The values themselves are read
+	// later in normalizeConfig and propagated to the scanner config; the
+	// identifier itself does not currently need them at runtime, but
+	// unpacking here surfaces config errors at the right point.
+	var fpCfg fingerprintIdentityConfig
+	if cfg != nil {
+		if err := cfg.Unpack(&fpCfg); err != nil {
+			return nil, fmt.Errorf("invalid file_identity.fingerprint config: %w", err)
+		}
+	}
 	return &fingerprintIdentifier{}, nil
 }
 
