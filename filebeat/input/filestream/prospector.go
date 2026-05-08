@@ -187,7 +187,36 @@ func (p *fileProspector) Init(
 			return "", fm
 		}
 
+		oldIdentifier, ok := identifiersMap[fm.IdentifierName]
+		if !ok {
+			p.logger.Errorf(
+				"old file identity '%s' not found while migrating global entry to "+
+					"new input ID. If the file still exists, it will be re-ingested",
+				fm.IdentifierName,
+			)
+			return "", nil
+		}
+
+		registryKey := v.Key()
+		split := strings.Split(registryKey, identitySep)
+		// Wrong key format
+		if len(split) != 4 {
+			return "", fm
+		}
+
+		registryFileIdentity := split[2] + identitySep + split[3]
+		fileIdentity := oldIdentifier.GetSource(loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}).Name()
+
+		// Same paths, different file, do not migrate ID
+		if registryFileIdentity != fileIdentity {
+			return "", fm
+		}
+
 		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+		fm.IdentifierName = p.identifier.Name()
 		return newKey, fm
 	})
 
