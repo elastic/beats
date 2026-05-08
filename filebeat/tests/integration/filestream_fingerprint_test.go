@@ -201,7 +201,7 @@ filebeat.inputs:
       fingerprint:
         growing: true
         max_length: 100
-    file_identity.growing_fingerprint: ~
+    file_identity.fingerprint: ~
 
 queue.mem:
   flush.timeout: 0s

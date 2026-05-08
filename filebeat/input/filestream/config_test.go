@@ -120,11 +120,6 @@ func TestConfigValidate(t *testing.T) {
 				fileIdentity: fingerprintName,
 			},
 			{
-				name:         "gzip with growing_fingerprint is valid",
-				compression:  CompressionGZIP,
-				fileIdentity: growingFingerprintName,
-			},
-			{
 				name:         "gzip with native errors",
 				compression:  CompressionGZIP,
 				fileIdentity: nativeName,

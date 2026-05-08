@@ -1380,37 +1380,37 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"valid prefix match": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
 			currentPath:        currentPath,
-			expectedKey:        "filestream::my-input::growing_fingerprint::aabb",
+			expectedKey:        "filestream::my-input::fingerprint::aabb",
 			expectedFound:      true,
 		},
 		"prefix match among entries for different paths": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::aa": fileMeta{
+				"filestream::my-input::fingerprint::aa": fileMeta{
 					Source:         "/other/file.log",
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
-				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccddee",
 			currentPath:        currentPath,
-			expectedKey:        "filestream::my-input::growing_fingerprint::aabb",
+			expectedKey:        "filestream::my-input::fingerprint::aabb",
 			expectedFound:      true,
 		},
-		"skips non-growing_fingerprint identity": {
+		"skips non-fingerprint identity": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::fingerprint::aabb": fileMeta{
+				"filestream::my-input::native::abc123": fileMeta{
 					Source:         currentPath,
-					IdentifierName: fingerprintName,
+					IdentifierName: nativeName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
@@ -1419,9 +1419,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips key with too many separators": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::aabb::extra": fileMeta{
+				"filestream::my-input::fingerprint::aabb::extra": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
@@ -1430,9 +1430,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips key with too few separators": {
 			storeEntries: map[string]interface{}{
-				"filestream::growing_fingerprint": fileMeta{
+				"filestream::malformed": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
@@ -1441,9 +1441,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips empty stored fingerprint": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::": fileMeta{
+				"filestream::my-input::fingerprint::": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
@@ -1452,9 +1452,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips stored fingerprint longer than current": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::aabbccddee": fileMeta{
+				"filestream::my-input::fingerprint::aabbccddee": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabb",
@@ -1463,9 +1463,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips stored fingerprint equal length to current": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabb",
@@ -1474,9 +1474,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips non-prefix fingerprint": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::xxxx": fileMeta{
+				"filestream::my-input::fingerprint::xxxx": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
@@ -1485,9 +1485,9 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"skips path mismatch": {
 			storeEntries: map[string]interface{}{
-				"filestream::my-input::growing_fingerprint::aabb": fileMeta{
+				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:         "/other/file.log",
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
@@ -1496,14 +1496,14 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		},
 		"single colon in input ID is not a separator": {
 			storeEntries: map[string]interface{}{
-				"filestream::my:input::growing_fingerprint::aabb": fileMeta{
+				"filestream::my:input::fingerprint::aabb": fileMeta{
 					Source:         currentPath,
-					IdentifierName: growingFingerprintName,
+					IdentifierName: fingerprintName,
 				},
 			},
 			currentFingerprint: "aabbccdd",
 			currentPath:        currentPath,
-			expectedKey:        "filestream::my:input::growing_fingerprint::aabb",
+			expectedKey:        "filestream::my:input::fingerprint::aabb",
 			expectedFound:      true,
 		},
 	}
@@ -1532,12 +1532,12 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 	const currentFingerprint = "aabbccdd"
 	const currentPath = "/var/log/app.log"
 
-	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	identifier, err := newFingerprintIdentifier(nil, nil)
 	require.NoError(t, err)
 
 	event := loginp.FSEvent{
 		NewPath: currentPath,
-		SrcID:   "filestream::my-input::growing_fingerprint::" + currentFingerprint,
+		SrcID:   "filestream::my-input::fingerprint::" + currentFingerprint,
 		Descriptor: loginp.FileDescriptor{
 			Fingerprint: currentFingerprint,
 		},
@@ -1550,14 +1550,14 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		// The store already has an entry for the exact current fingerprint key.
 		store.table[event.SrcID] = fileMeta{
 			Source:         currentPath,
-			IdentifierName: growingFingerprintName,
+			IdentifierName: fingerprintName,
 		}
 
 		// Also add an entry that would be a prefix match (the slow path).
 		// If the fast path works, it should never reach findGrowingFingerprintMatch.
-		store.table["filestream::my-input::growing_fingerprint::aabb"] = fileMeta{
+		store.table["filestream::my-input::fingerprint::aabb"] = fileMeta{
 			Source:         currentPath,
-			IdentifierName: growingFingerprintName,
+			IdentifierName: fingerprintName,
 		}
 
 		p := &fileProspector{
@@ -1573,9 +1573,9 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 	t.Run("slow path: key does not exist falls through to scan", func(t *testing.T) {
 		store := newMockMetadataUpdater()
 		// Only a prefix match exists, not the exact key.
-		store.table["filestream::my-input::growing_fingerprint::aabb"] = fileMeta{
+		store.table["filestream::my-input::fingerprint::aabb"] = fileMeta{
 			Source:         currentPath,
-			IdentifierName: growingFingerprintName,
+			IdentifierName: fingerprintName,
 		}
 
 		p := &fileProspector{
@@ -1601,10 +1601,10 @@ func TestOnFSEvent_GrowingFingerprintMaxLen(t *testing.T) {
 		inputID        = "my-input"
 	)
 
-	oldKey := "filestream::" + inputID + "::growing_fingerprint::" + oldFingerprint
-	newKey := "filestream::" + inputID + "::growing_fingerprint::" + newFingerprint
+	oldKey := "filestream::" + inputID + "::fingerprint::" + oldFingerprint
+	newKey := "filestream::" + inputID + "::fingerprint::" + newFingerprint
 
-	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	identifier, err := newFingerprintIdentifier(nil, nil)
 	require.NoError(t, err)
 
 	event := loginp.FSEvent{
@@ -1621,13 +1621,14 @@ func TestOnFSEvent_GrowingFingerprintMaxLen(t *testing.T) {
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = fileMeta{
 			Source:         currentPath,
-			IdentifierName: growingFingerprintName,
+			IdentifierName: fingerprintName,
 		}
 
 		p := &fileProspector{
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: len(newFingerprint) + 1,
+			growingFingerprint:       true,
 		}
 
 		hg := newTestHarvesterGroup()
@@ -1642,13 +1643,14 @@ func TestOnFSEvent_GrowingFingerprintMaxLen(t *testing.T) {
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = fileMeta{
 			Source:         currentPath,
-			IdentifierName: growingFingerprintName,
+			IdentifierName: fingerprintName,
 		}
 
 		p := &fileProspector{
 			logger:                   logp.L(),
 			identifier:               identifier,
 			maxEncodedFingerprintLen: len(newFingerprint),
+			growingFingerprint:       true,
 		}
 
 		hg := newTestHarvesterGroup()
@@ -1664,30 +1666,30 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 	const maxEncLen = 100 // 50-byte fingerprint = 100 hex chars
 
 	store := newMockMetadataUpdater()
-	// Short growing_fingerprint entry — should be included
-	store.table["filestream::input::growing_fingerprint::aabb"] = fileMeta{
-		Source:         "/a.log",
-		IdentifierName: growingFingerprintName,
-	}
-	// Max-length growing_fingerprint entry — should be excluded
-	store.table["filestream::input::growing_fingerprint::"+strings.Repeat("ab", 50)] = fileMeta{
-		Source:         "/b.log",
-		IdentifierName: growingFingerprintName,
-	}
-	// Empty fingerprint — should be excluded
-	store.table["filestream::input::growing_fingerprint::"] = fileMeta{
-		Source:         "/c.log",
-		IdentifierName: growingFingerprintName,
-	}
-	// Non-growing_fingerprint entry — should be excluded
+	// Short fingerprint entry — should be included
 	store.table["filestream::input::fingerprint::aabb"] = fileMeta{
-		Source:         "/d.log",
+		Source:         "/a.log",
 		IdentifierName: fingerprintName,
 	}
+	// Max-length fingerprint entry — should be excluded
+	store.table["filestream::input::fingerprint::"+strings.Repeat("ab", 50)] = fileMeta{
+		Source:         "/b.log",
+		IdentifierName: fingerprintName,
+	}
+	// Empty fingerprint — should be excluded
+	store.table["filestream::input::fingerprint::"] = fileMeta{
+		Source:         "/c.log",
+		IdentifierName: fingerprintName,
+	}
+	// Non-fingerprint entry (e.g. native or path identity) — should be excluded
+	store.table["filestream::input::native::abc123"] = fileMeta{
+		Source:         "/d.log",
+		IdentifierName: nativeName,
+	}
 	// Malformed key (too few separators) — should be excluded
-	store.table["filestream::growing_fingerprint"] = fileMeta{
+	store.table["filestream::malformed"] = fileMeta{
 		Source:         "/e.log",
-		IdentifierName: growingFingerprintName,
+		IdentifierName: fingerprintName,
 	}
 
 	p := &fileProspector{
@@ -1697,7 +1699,7 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 	p.buildShortFingerprintSet(store)
 
 	require.Len(t, p.shortFingerprintIdx.entries, 1)
-	entry, ok := p.shortFingerprintIdx.entries["filestream::input::growing_fingerprint::aabb"]
+	entry, ok := p.shortFingerprintIdx.entries["filestream::input::fingerprint::aabb"]
 	require.True(t, ok, "expected short entry to be in set")
 	assert.Equal(t, "aabb", entry.Fingerprint)
 	assert.Equal(t, "/a.log", entry.Source)
@@ -1706,7 +1708,7 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 	const maxEncLen = 100
 
-	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	identifier, err := newFingerprintIdentifier(nil, nil)
 	require.NoError(t, err)
 
 	makeEvent := func(op loginp.Operation, path, srcID, fp string) loginp.FSEvent {
@@ -1729,7 +1731,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			maxEncodedFingerprintLen: maxEncLen,
 			shortFingerprintIdx:      newShortFingerprintIndex(maxEncLen),
 		}
-		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::growing_fingerprint::aabb", "aabb")
+		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::fingerprint::aabb", "aabb")
 		src := identifier.GetSource(event)
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
@@ -1737,7 +1739,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 
 		require.Len(t, p.shortFingerprintIdx.entries, 1)
-		entry, ok := p.shortFingerprintIdx.entries["filestream::input::growing_fingerprint::aabb"]
+		entry, ok := p.shortFingerprintIdx.entries["filestream::input::fingerprint::aabb"]
 		require.True(t, ok)
 		assert.Equal(t, "aabb", entry.Fingerprint)
 		assert.Equal(t, "/a.log", entry.Source)
@@ -1751,7 +1753,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			maxEncodedFingerprintLen: maxEncLen,
 			shortFingerprintIdx:      newShortFingerprintIndex(maxEncLen),
 		}
-		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::growing_fingerprint::"+maxFP, maxFP)
+		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::fingerprint::"+maxFP, maxFP)
 		src := identifier.GetSource(event)
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
@@ -1762,7 +1764,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 	})
 
 	t.Run("OpDelete removes entry", func(t *testing.T) {
-		srcID := "filestream::input::growing_fingerprint::aabb"
+		srcID := "filestream::input::fingerprint::aabb"
 		p := &fileProspector{
 			logger:                   logp.L(),
 			identifier:               identifier,
@@ -1784,7 +1786,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 	})
 
 	t.Run("OpRename updates source path", func(t *testing.T) {
-		srcID := "filestream::input::growing_fingerprint::aabb"
+		srcID := "filestream::input::fingerprint::aabb"
 		p := &fileProspector{
 			logger:                   logp.L(),
 			identifier:               identifier,
@@ -1816,9 +1818,9 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 	})
 
 	t.Run("OpTruncate removes stale entry by path", func(t *testing.T) {
-		oldSrcID := "filestream::input::growing_fingerprint::aabb"
+		oldSrcID := "filestream::input::fingerprint::aabb"
 		// After truncation, the SrcID is based on the NEW (truncated) fingerprint
-		truncatedSrcID := "filestream::input::growing_fingerprint::xx"
+		truncatedSrcID := "filestream::input::fingerprint::xx"
 		p := &fileProspector{
 			logger:                   logp.L(),
 			identifier:               identifier,
@@ -1841,7 +1843,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 	const maxEncLen = 20 // fingerprints >= 20 chars are "at max"
 
-	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	identifier, err := newFingerprintIdentifier(nil, nil)
 	require.NoError(t, err)
 
 	t.Run("short to short: old removed, new added", func(t *testing.T) {
@@ -1850,11 +1852,11 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 			newFP = "aabbccdd" // 8 chars, still short (< 20)
 			path  = "/a.log"
 		)
-		oldKey := "filestream::input::growing_fingerprint::" + oldFP
-		newSrcID := "filestream::input::growing_fingerprint::" + newFP
+		oldKey := "filestream::input::fingerprint::" + oldFP
+		newSrcID := "filestream::input::fingerprint::" + newFP
 
 		store := newMockMetadataUpdater()
-		store.table[oldKey] = fileMeta{Source: path, IdentifierName: growingFingerprintName}
+		store.table[oldKey] = fileMeta{Source: path, IdentifierName: fingerprintName}
 
 		p := &fileProspector{
 			logger:                   logp.L(),
@@ -1889,11 +1891,11 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 			path  = "/a.log"
 		)
 		newFP := "aabb" + strings.Repeat("0", maxEncLen-4) // starts with oldFP, len = maxEncLen
-		oldKey := "filestream::input::growing_fingerprint::" + oldFP
-		newSrcID := "filestream::input::growing_fingerprint::" + newFP
+		oldKey := "filestream::input::fingerprint::" + oldFP
+		newSrcID := "filestream::input::fingerprint::" + newFP
 
 		store := newMockMetadataUpdater()
-		store.table[oldKey] = fileMeta{Source: path, IdentifierName: growingFingerprintName}
+		store.table[oldKey] = fileMeta{Source: path, IdentifierName: fingerprintName}
 
 		p := &fileProspector{
 			logger:                   logp.L(),
@@ -1920,17 +1922,57 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		assert.NotContains(t, p.shortFingerprintIdx.entries, newSrcID, "max-length entry should NOT be added")
 		assert.Len(t, p.shortFingerprintIdx.entries, 0)
 	})
+
+	t.Run("input ID containing 'fingerprint' substring: migration succeeds", func(t *testing.T) {
+		const (
+			inputID = "test-fingerprint"
+			oldFP   = "aabb"
+			newFP   = "aabbccdd"
+			path    = "/a.log"
+		)
+		oldKey := "filestream::" + inputID + "::fingerprint::" + oldFP
+		newSrcID := "filestream::" + inputID + "::fingerprint::" + newFP
+
+		store := newMockMetadataUpdater()
+		store.table[oldKey] = fileMeta{Source: path, IdentifierName: fingerprintName}
+
+		p := &fileProspector{
+			logger:                   logp.L(),
+			identifier:               identifier,
+			maxEncodedFingerprintLen: maxEncLen,
+			shortFingerprintIdx: &shortFingerprintIndex{maxLen: maxEncLen, entries: map[string]shortFingerprintEntry{
+				oldKey: {Fingerprint: oldFP, Source: path},
+			}},
+		}
+
+		event := loginp.FSEvent{
+			NewPath: path,
+			SrcID:   newSrcID,
+			Descriptor: loginp.FileDescriptor{
+				Fingerprint: newFP,
+				Info:        file.ExtendFileInfo(&testFileInfo{path, 100, time.Now(), nil}),
+			},
+		}
+		src := identifier.GetSource(event)
+
+		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+
+		assert.False(t, store.has(oldKey), "old key should be removed by migration")
+		assert.True(t, store.has(newSrcID), "new key should exist after migration")
+		assert.NotContains(t, p.shortFingerprintIdx.entries, oldKey, "old entry should be removed from short FP set")
+		require.Contains(t, p.shortFingerprintIdx.entries, newSrcID, "new entry should be added to short FP set")
+	})
 }
 
 func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	// maxEncLen=20: fingerprints with len >= 20 are "at max"
 	const maxEncLen = 20
 
-	identifier, err := newGrowingFingerprintIdentifier(nil, nil)
+	identifier, err := newFingerprintIdentifier(nil, nil)
 	require.NoError(t, err)
 
 	makeKey := func(fp string) string {
-		return "filestream::input::growing_fingerprint::" + fp
+		return "filestream::input::fingerprint::" + fp
 	}
 
 	p := &fileProspector{
@@ -1938,6 +1980,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		identifier:               identifier,
 		maxEncodedFingerprintLen: maxEncLen,
 		shortFingerprintIdx:      newShortFingerprintIndex(maxEncLen),
+		growingFingerprint:       true,
 	}
 	store := newMockMetadataUpdater()
 	hg := newTestHarvesterGroup()
@@ -1966,7 +2009,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 		// Also seed the store with full-format keys so migration can find them
-		store.table[makeKey(initFP)] = fileMeta{Source: path, IdentifierName: growingFingerprintName}
+		store.table[makeKey(initFP)] = fileMeta{Source: path, IdentifierName: fingerprintName}
 		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
 	}
 	assert.Equal(t, map[string]shortFingerprintEntry{
