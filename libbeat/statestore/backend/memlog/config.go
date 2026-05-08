@@ -15,26 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package filestream
+package memlog
 
-import (
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/elastic-agent-libs/logp"
-)
+// Config defines the user-facing configuration for the memlog storage backend.
+type Config struct {
+	// CheckpointSize is the registry file size threshold (in bytes) that
+	// triggers a checkpoint. Larger values reduce checkpoint frequency at the
+	// cost of a larger registry file. Default: 10 MB.
+	CheckpointSize uint64 `config:"checkpoint_size"`
+}
 
-func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) *logp.Logger {
-	log := logger.With("operation", event.Op.String())
-	if event.Descriptor.Info != nil {
-		osID := event.Descriptor.Info.GetOSState().Identifier()
-		if osID != "" {
-			log = log.With("os_id", osID)
-		}
-	}
-	if event.NewPath != "" {
-		log = log.With("new_path", event.NewPath)
-	}
-	if event.OldPath != "" {
-		log = log.With("old_path", event.OldPath)
-	}
-	return log
+// DefaultConfig returns the default memlog configuration.
+func DefaultConfig() Config {
+	return Config{}
 }

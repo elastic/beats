@@ -133,6 +133,8 @@ func newProspector(
 		takeOver:              config.TakeOver,
 		filestreamIdentifiers: filestreamFileIdentifiers(logger, config.Reader.Parsers.Suffix),
 		logIdentifiers:        logFileIdentifiers(logger),
+		// *2 because hex encoding doubles the byte length. Update if the fingerprint encoding changes.
+		maxEncodedFingerprintLen: int(config.FileWatcher.Scanner.Fingerprint.MaxLength) * 2,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil

@@ -221,7 +221,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(log, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 
 		}
 		return nil
@@ -264,7 +264,6 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		// check if the event belongs to a rotated file
 		if p.isRotated(event) {
 			log.Debugf("File %s is rotated", event.NewPath)
-
 			p.onRotatedFile(log, ctx, event, src, group)
 
 		} else {
