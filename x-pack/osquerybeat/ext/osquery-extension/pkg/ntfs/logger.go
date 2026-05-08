@@ -8,7 +8,6 @@ package ntfs
 
 import (
 	"os"
-	"sync"
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
