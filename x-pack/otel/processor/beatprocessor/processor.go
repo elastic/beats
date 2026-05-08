@@ -12,11 +12,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-<<<<<<< HEAD
-=======
-	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
->>>>>>> 7bbe8ee6d (fix(otel): fix beatprocessor to honor `when` conditions (#50555))
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
