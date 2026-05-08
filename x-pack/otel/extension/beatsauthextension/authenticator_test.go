@@ -314,9 +314,8 @@ func TestCertificateHotReload(t *testing.T) {
 	require.NoError(t, err)
 
 	// Two distinct client certs, both signed by the same CA so the server
-	// trusts both. Rotation = swap A's PEM files for B's on disk. Distinct
-	// CommonNames are the most reliable way to tell them apart on the wire,
-	// since tlscommontest.GenSignedCert hardcodes the serial number.
+	// trusts both. Rotation = swap A's PEM files for B's on disk.
+	// Using CommonName to assert on the presented cert.
 	const (
 		clientACN = "beatsauth-client-a"
 		clientBCN = "beatsauth-client-b"
@@ -333,11 +332,6 @@ func TestCertificateHotReload(t *testing.T) {
 
 	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert.Leaf.Raw})
 
-	// startMTLSServer starts an HTTPS server that requires client certificates
-	// signed by the test CA and records the most recently presented client
-	// cert CommonName. Session tickets are disabled so every fresh TCP
-	// connection triggers a full handshake (and re-invokes
-	// GetClientCertificate).
 	startMTLSServer := func(t *testing.T) (serverURL string, lastCommonName func() string) {
 		t.Helper()
 		caPool := x509.NewCertPool()
@@ -369,17 +363,9 @@ func TestCertificateHotReload(t *testing.T) {
 		}
 	}
 
-	// idleConnTimeout is short so the http.Transport's idle pool drops the
-	// connection between requests (after a small sleep in doGET), forcing a
-	// fresh TLS handshake — which re-invokes the cert reloader's
-	// GetClientCertificate callback. confighttp's wrapping hides
-	// CloseIdleConnections from us, so we lean on idle eviction instead.
 	const idleConnTimeout = 10 * time.Millisecond
 	const interReqSleep = 50 * time.Millisecond
 
-	// startAuthClient boots the beatsauth extension with the given config and
-	// returns an http.Client wired through it, plus an observed-logs handle
-	// for asserting on warnings.
 	startAuthClient := func(t *testing.T, beatAuthConfig map[string]any) (*http.Client, *observer.ObservedLogs) {
 		t.Helper()
 		core, observed := observer.New(zapcore.WarnLevel)
@@ -408,8 +394,6 @@ func TestCertificateHotReload(t *testing.T) {
 		return client, observed
 	}
 
-	// doGET issues a request and then waits past idleConnTimeout so the
-	// underlying TCP connection is evicted before the next call.
 	doGET := func(t *testing.T, client *http.Client, url string) {
 		t.Helper()
 		resp, err := client.Get(url) //nolint:noctx // test
@@ -450,9 +434,6 @@ func TestCertificateHotReload(t *testing.T) {
 
 		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
 
-		// Drive requests until the reloader picks up cert B or we time out.
-		// Using a plain loop instead of require.Eventually keeps all I/O on
-		// the test goroutine — no orphaned poller for goleak to catch.
 		deadline := time.Now().Add(5 * time.Second)
 		for time.Now().Before(deadline) && lastCN() != clientBCN {
 			doGET(t, client, serverURL)
@@ -491,7 +472,7 @@ func TestCertificateHotReload(t *testing.T) {
 		}
 	})
 
-	t.Run("deprecated restart_on_cert_change emits warning and reload still works", func(t *testing.T) {
+	t.Run("legacy restart_on_cert_change.enabled=true aliases reload on", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		certPath := filepath.Join(tmpDir, "client.crt")
 		keyPath := filepath.Join(tmpDir, "client.key")
@@ -499,20 +480,18 @@ func TestCertificateHotReload(t *testing.T) {
 
 		serverURL, lastCN := startMTLSServer(t)
 
+		// Only the legacy key is set and no ssl.certificate_reload block. The
+		// alias must enable reload and seed reload_interval from .period so
+		// the rotation finishes within the test deadline.
 		client, observed := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
 			"restart_on_cert_change": map[string]any{
 				"enabled": true,
-				"period":  "200ms",
-			},
-			// Force a short interval so the rotation half of this test runs
-			// quickly; restart_on_cert_change is no longer aliased onto it.
-			"certificate_reload": map[string]any{
-				"reload_interval": "100ms",
+				"period":  "100ms",
 			},
 		}))
 
 		warnings := observed.FilterMessageSnippet("'ssl.restart_on_cert_change' is deprecated").All()
-		require.Len(t, warnings, 1, "expected one deprecation warning for ssl.restart_on_cert_change")
+		require.Len(t, warnings, 1, "expected one deprecation warning")
 
 		doGET(t, client, serverURL)
 		require.Equal(t, clientACN, lastCN())
@@ -523,7 +502,39 @@ func TestCertificateHotReload(t *testing.T) {
 			doGET(t, client, serverURL)
 		}
 		require.Equal(t, clientBCN, lastCN(),
-			"reload should still work via the default-on certificate_reload")
+			"alias should enable reload with the legacy period as reload_interval")
+	})
+
+	t.Run("legacy restart_on_cert_change.enabled=false aliases reload off", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		certPath := filepath.Join(tmpDir, "client.crt")
+		keyPath := filepath.Join(tmpDir, "client.key")
+		writeCertKeyFiles(t, certPath, keyPath, clientCertA)
+
+		serverURL, lastCN := startMTLSServer(t)
+
+		// Users who explicitly disabled the legacy key must still get reload
+		// disabled, even though ssl.certificate_reload defaults to enabled
+		// upstream.
+		client, observed := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
+			"restart_on_cert_change": map[string]any{
+				"enabled": false,
+			},
+		}))
+
+		warnings := observed.FilterMessageSnippet("'ssl.restart_on_cert_change' is deprecated").All()
+		require.Len(t, warnings, 1, "expected one deprecation warning")
+
+		doGET(t, client, serverURL)
+		require.Equal(t, clientACN, lastCN())
+
+		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
+		deadline := time.Now().Add(1 * time.Second)
+		for time.Now().Before(deadline) {
+			doGET(t, client, serverURL)
+			require.Equal(t, clientACN, lastCN(),
+				"alias enabled=false should keep the reloader off")
+		}
 	})
 }
 

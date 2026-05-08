@@ -64,7 +64,7 @@ ssl:
 
 	})
 
-	t.Run("when restart_on_cert_change.enabled is set it is no longer rejected", func(t *testing.T) {
+	t.Run("when restart_on_cert_change.enabled is set", func(t *testing.T) {
 		input := `
 ssl:
   verification_mode: none

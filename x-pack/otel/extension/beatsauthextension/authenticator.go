@@ -133,7 +133,7 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 		return nil, fmt.Errorf("failed unpacking config: %w", err)
 	}
 
-	warnOnRestartOnCertChange(parsedCfg, a.logger)
+	applyRestartOnCertChangeAlias(parsedCfg, &beatAuthConfig, a.logger)
 
 	client, err := beatAuthConfig.Transport.Client(a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)...)
 	if err != nil {
@@ -151,12 +151,11 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	return &httpClientProvider{client: client}, nil
 }
 
-// warnOnRestartOnCertChange emits a deprecation warning when the legacy
-// ssl.restart_on_cert_change.* keys are set. The keys are no longer honored
-// here: TLS certificate hot reload is now handled natively by tlscommon via
-// ssl.certificate_reload (enabled by default). This mirrors the deprecation
-// path taken in libbeat (see elastic/beats#50444).
-func warnOnRestartOnCertChange(cfg *config.C, logger *logp.Logger) {
+// applyRestartOnCertChangeAlias maps the legacy ssl.restart_on_cert_change.*
+// keys onto ssl.certificate_reload.*. Reloading the certificates now happens
+// in-process via tlscommon instead of whole-process restarts,so the alias
+// just enables the same hot-reload behavior.
+func applyRestartOnCertChangeAlias(cfg *config.C, beatAuthConfig *BeatsAuthConfig, logger *logp.Logger) {
 	sslConfig, err := cfg.Child("ssl", -1)
 	if err != nil {
 		return
@@ -168,9 +167,31 @@ func warnOnRestartOnCertChange(cfg *config.C, logger *logp.Logger) {
 	if !rocc.HasField("enabled") && !rocc.HasField("period") {
 		return
 	}
-	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
-		"TLS certificates and CAs are now automatically reloaded via 'ssl.certificate_reload'. " +
-		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
+
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated; please switch to " +
+		"'ssl.certificate_reload'. The legacy values are still honored as an " +
+		"alias and TLS certificates are now hot-reloaded without a process restart")
+
+	if beatAuthConfig.Transport.TLS == nil {
+		return
+	}
+
+	type aliasShape struct {
+		Enabled *bool         `config:"enabled"`
+		Period  time.Duration `config:"period"`
+	}
+	var alias aliasShape
+	if err := rocc.Unpack(&alias); err != nil {
+		return
+	}
+
+	reload := &beatAuthConfig.Transport.TLS.CertificateReload
+	if reload.Enabled == nil && alias.Enabled != nil {
+		reload.Enabled = alias.Enabled
+	}
+	if reload.ReloadInterval == 0 && alias.Period > 0 {
+		reload.ReloadInterval = alias.Period
+	}
 }
 
 // httpClientProvider provides a RoundTripper from an http.Client
