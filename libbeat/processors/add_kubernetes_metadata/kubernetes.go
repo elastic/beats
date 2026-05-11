@@ -93,19 +93,20 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 		// hard coding a 5 minutes timeout to avoid retrying indefinitely
 		timer = time.NewTimer(5 * time.Minute)
 	}
+	defer timer.Stop()
 
+	ticker := time.NewTicker(timeout) // existing 3s constant
+	defer ticker.Stop()
 	for {
+		kubernetesAvailable, err = isKubernetesAvailable(client, logger)
+		if kubernetesAvailable {
+			return true
+		}
 		select {
 		case <-timer.C:
 			logger.Infof("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
 			return false
-		default:
-			kubernetesAvailable, err = isKubernetesAvailable(client, logger)
-			if kubernetesAvailable {
-				return true
-			}
-			// to avoid burst of API requests
-			time.Sleep(3 * time.Second)
+		case <-ticker.C:
 		}
 	}
 
