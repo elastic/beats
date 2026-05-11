@@ -131,6 +131,57 @@ func TestRegistryDeleteBucketReleasesRef(t *testing.T) {
 	assert.False(t, ok, "DeleteBucket on the only outstanding bucket must drive refCount to 0 and remove the entry")
 }
 
+// TestDoubleCloseDoesNotStealSiblingRef: closing one bucket twice must
+// not drive the shared refCount past 0 and invalidate a sibling bucket
+// holding the same path's DB handle.
+func TestDoubleCloseDoesNotStealSiblingRef(t *testing.T) {
+	p := pathsAt(t)
+	path := resolvedDBPath(p)
+
+	b1, err := OpenBucket("a", p)
+	require.NoError(t, err, "first OpenBucket")
+	t.Cleanup(func() { _ = b1.Close() })
+	b2, err := OpenBucket("b", p)
+	require.NoError(t, err, "second OpenBucket on the same path")
+
+	require.NoError(t, b2.Close(), "first Close on b2 must succeed")
+	require.NoError(t, b2.Close(), "second Close on b2 must be a no-op and must not decrement the shared refcount")
+
+	rc, ok := snapshotEntry(defaultRegistry, path)
+	require.True(t, ok, "entry must persist while b1 is still open")
+	assert.Equal(t, 1, rc, "double-Close on b2 must leave b1's reference intact (refCount=1, not 0)")
+
+	assert.NoError(t, b1.Store("x", []byte("still alive")),
+		"b1 must remain usable; its DB handle must not have been closed by b2's double-Close")
+}
+
+// TestDeleteBucketThenDeferredCloseDoesNotStealSiblingRef: DeleteBucket
+// already calls Close internally, so a deferred Close after it must be a
+// no-op and must not invalidate a sibling bucket on the same path.
+func TestDeleteBucketThenDeferredCloseDoesNotStealSiblingRef(t *testing.T) {
+	p := pathsAt(t)
+	path := resolvedDBPath(p)
+
+	sibling, err := OpenBucket("keep", p)
+	require.NoError(t, err, "OpenBucket for sibling")
+	t.Cleanup(func() { assert.NoError(t, sibling.Close(), "sibling Close") })
+
+	victim, err := OpenBucket("drop", p)
+	require.NoError(t, err, "OpenBucket for victim")
+
+	assert.NoError(t, victim.DeleteBucket(), "DeleteBucket on victim")
+	assert.NoError(t, victim.Close(),
+		"deferred Close after DeleteBucket must be a no-op (not a refcount decrement)")
+
+	rc, ok := snapshotEntry(defaultRegistry, path)
+	require.True(t, ok, "registry entry must persist while sibling is still open")
+	assert.Equal(t, 1, rc,
+		"DeleteBucket+deferred Close on victim must leave sibling's refcount untouched")
+
+	assert.NoError(t, sibling.Store("x", []byte("still alive")),
+		"sibling must remain usable after victim's DeleteBucket+deferred Close")
+}
+
 // TestRegistryConcurrentOpenClose stresses the locking on the path-keyed
 // registry. Run with -race; the post-condition is that no entries are
 // leaked, i.e. the registry has no entry for the contended path once all

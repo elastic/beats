@@ -78,18 +78,13 @@ func TestDistinctPathsAreIsolated(t *testing.T) {
 		"second bucket must read its own write, not the first bucket's")
 }
 
-// TestDoubleCloseReturnsError documents the public-API contract of the
-// defensive guard against double-close. Without it, refCount would
-// underflow silently.
-func TestDoubleCloseReturnsError(t *testing.T) {
+// TestDoubleCloseIsNoop documents the public-API contract: Close is
+// idempotent. Refcount safety is covered by TestDoubleCloseDoesNotStealSiblingRef.
+func TestDoubleCloseIsNoop(t *testing.T) {
 	b, err := OpenBucket("k", pathsAt(t))
 	require.NoError(t, err, "OpenBucket")
 	assert.NoError(t, b.Close(), "first Close should succeed")
-
-	err = b.Close()
-	assert.Error(t, err, "second Close on the same bucket must return an error")
-	assert.Contains(t, err.Error(), "no outstanding references",
-		"error should identify the cause as a missing reference")
+	assert.NoError(t, b.Close(), "second Close on the same bucket must be a no-op")
 }
 
 // TestOpenBucketWithMigrationVisible verifies the migration callback runs

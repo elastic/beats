@@ -19,6 +19,7 @@ package datastore
 
 import (
 	"io"
+	"sync/atomic"
 
 	bolt "go.etcd.io/bbolt"
 
@@ -64,8 +65,9 @@ type BoltBucket interface {
 // boltBucket implements Bucket and BoltBucket. It holds exactly one
 // reference on db that Close releases.
 type boltBucket struct {
-	db   *boltDB
-	name []byte
+	db     *boltDB
+	name   []byte
+	closed atomic.Bool
 }
 
 func (b *boltBucket) Load(key string, f func(blob []byte) error) error {
@@ -127,5 +129,8 @@ func (b *boltBucket) Update(f func(*bolt.Bucket) error) error {
 }
 
 func (b *boltBucket) Close() error {
+	if !b.closed.CompareAndSwap(false, true) {
+		return nil
+	}
 	return defaultRegistry.releaseBucket(b.db)
 }
