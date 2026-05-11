@@ -144,11 +144,11 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 			ticker := time.Tick(config.ConnectionRetryInterval)
 			for range ticker {
 				dm.log.Debug("Trying to connect to docker...")
-				dockerAvailable := false
+				dockerAvailable := false //nolint:wastedassign // Initialised here and used in the next if block
 				watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
 				if err != nil {
 					dockerAvailable = false
-					log.Debugf("%v: docker environment not detected: %+v", processorName, err) // here
+					log.Debugf("%v: docker environment not detected: %+v", processorName, err)
 				} else {
 					dockerAvailable = true
 					log.Debugf("%v: docker environment detected", processorName)
