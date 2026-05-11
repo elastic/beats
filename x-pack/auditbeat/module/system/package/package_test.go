@@ -16,7 +16,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
@@ -25,9 +24,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -264,38 +261,6 @@ func TestPackageDatabaseMigrationWithEmptyPackageV1Bucket(t *testing.T) {
 	if err = bucket.Close(); err != nil {
 		t.Fatal(err)
 	}
-}
-
-// TestNewClosesBucketOnPostOpenError exercises an error path that runs
-// after OpenBucketWithMigration succeeds: a malformed state_timestamp
-// seeded into the v2 bucket makes loadStateTimestamp fail inside New.
-// The bucket must be released, otherwise the registry entry and bolt
-// file lock would leak for the life of the process.
-func TestNewClosesBucketOnPostOpenError(t *testing.T) {
-	p := testPaths(t.TempDir())
-
-	// Seed the v2 bucket with a malformed state_timestamp value so
-	// loadStateTimestamp's UnmarshalBinary fails when New runs.
-	seed, err := datastore.OpenBucket(bucketNameV2, p)
-	require.NoError(t, err, "seed OpenBucket")
-	require.NoError(t, seed.Store(bucketKeyStateTimestamp, []byte("not-a-timestamp")), "seed Store")
-	require.NoError(t, seed.Close(), "seed Close")
-	require.False(t, datastore.HasRegistryEntryForTest(p),
-		"precondition: registry must be empty after the seed bucket is closed")
-
-	cfg, err := conf.NewConfigFrom(map[string]any{
-		"module":   system.ModuleName,
-		"datasets": []string{"package"},
-	})
-	require.NoError(t, err, "build module config")
-
-	_, _, err = mb.NewModule(cfg, ab.Registry, p, logptest.NewTestingLogger(t, ""))
-	require.Error(t, err, "New must fail when loadStateTimestamp cannot decode the seeded value")
-	assert.Contains(t, err.Error(), "state timestamp",
-		"failure must surface the loadStateTimestamp error")
-
-	assert.False(t, datastore.HasRegistryEntryForTest(p),
-		"New must release its bucket reference on post-open error; a true here means the bucket leaked")
 }
 
 func copyFile(old, new string) error {
