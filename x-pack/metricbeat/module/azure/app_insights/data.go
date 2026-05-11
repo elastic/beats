@@ -50,40 +50,43 @@ type MetricValue struct {
 func mapMetricValues(metricValues ListMetricsResultsItem) []MetricValue {
 	var mapped []MetricValue
 	for _, item := range *metricValues.Value {
+		// The API can omit body or value entirely; skip such items rather
+		// than panic on a nil deref while reading Start/End/etc.
+		if item.Body == nil || item.Body.Value == nil {
+			continue
+		}
+		info := item.Body.Value
 		metricValue := MetricValue{
-			Start:       item.Body.Value.Start,
-			End:         item.Body.Value.End,
+			Start:       info.Start,
+			End:         info.End,
 			Value:       map[string]interface{}{},
 			SegmentName: map[string]string{},
+			Interval:    formatInterval(info.Start, info.End),
 		}
-		metricValue.Interval = formatInterval(item.Body.Value.Start, item.Body.Value.End)
-		if item.Body != nil && item.Body.Value != nil {
-			if item.Body.Value.AdditionalProperties != nil {
-				metrics := getAdditionalPropMetric(item.Body.Value.AdditionalProperties)
-				for key, metric := range metrics {
-					if isSegment(key) {
-						// The App Insights API may return non-string scalars
-						// (or null) for segment fields; skip those rather
-						// than panic on a failed type assertion.
-						s, ok := metric.(string)
-						if !ok {
-							continue
-						}
-						metricValue.SegmentName[key] = s
-					} else {
-						metricValue.Value[key] = metric
+		if info.AdditionalProperties != nil {
+			metrics := getAdditionalPropMetric(info.AdditionalProperties)
+			for key, metric := range metrics {
+				if isSegment(key) {
+					// The App Insights API may return non-string scalars
+					// (or null) for segment fields; skip those rather
+					// than panic on a failed type assertion.
+					s, ok := metric.(string)
+					if !ok {
+						continue
 					}
+					metricValue.SegmentName[key] = s
+				} else {
+					metricValue.Value[key] = metric
 				}
 			}
-			if item.Body.Value.Segments != nil {
-				for _, segment := range *item.Body.Value.Segments {
-					metVal := mapSegment(segment, metricValue.SegmentName)
-					metricValue.Segments = append(metricValue.Segments, metVal)
-				}
-			}
-			mapped = append(mapped, metricValue)
 		}
-
+		if info.Segments != nil {
+			for _, segment := range *info.Segments {
+				metVal := mapSegment(segment, metricValue.SegmentName)
+				metricValue.Segments = append(metricValue.Segments, metVal)
+			}
+		}
+		mapped = append(mapped, metricValue)
 	}
 	return mapped
 }
@@ -185,6 +188,13 @@ func EventsMapping(metricValues ListMetricsResultsItem, applicationId string, na
 // groupMetricsByDimension groups the given metrics by their dimension keys.
 func groupMetricsByDimension(metrics []MetricValue) map[string][]MetricValue {
 	keys := make(map[string][]MetricValue)
+
+	// Empty input is valid (e.g. the API returned "value": [] for a window
+	// with no data, or every item was filtered out upstream). Return an
+	// empty map rather than panicking on metrics[0].
+	if len(metrics) == 0 {
+		return keys
+	}
 
 	var stack []MetricValue
 	stack = append(stack, metrics...)
