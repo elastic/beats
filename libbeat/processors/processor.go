@@ -21,12 +21,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -66,37 +63,6 @@ func Close(p beat.Processor) error {
 // Additional processors can be added to the List field.
 func NewList(log *logp.Logger) *Processors {
 	return &Processors{log: log}
-}
-
-var sharedProcessorMu sync.Mutex
-var sharedProcessors map[uint64]beat.Processor = make(map[uint64]beat.Processor)
-
-// LoadOrStoreProcessor returns a shared instance of Processors for the given config, or creates a new one if it doesn't exist.
-func LoadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Constructor) (beat.Processor, error) {
-	sharedProcessorMu.Lock()
-	defer sharedProcessorMu.Unlock()
-	hash, err := cfgfile.HashConfig(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to hash processor config: %w", err)
-	}
-	if p, ok := sharedProcessors[hash]; ok {
-		if sharedProcessor, ok := p.(*SharedProcessor); ok {
-			sharedProcessor.refCount++
-			return sharedProcessor, nil
-		}
-		return nil, fmt.Errorf("unexpected non-shared processor found for hash %d", hash)
-	}
-
-	proc, err := constructor(config, logger)
-	if err != nil {
-		return nil, err
-	}
-	sharedProcessors[hash] = &SharedProcessor{
-		proc:     proc,
-		cfg:      hash,
-		refCount: 1,
-	}
-	return sharedProcessors[hash], nil
 }
 
 // New creates a list of processors from a list of free user configurations.
@@ -190,19 +156,6 @@ func (procs *Processors) All() []beat.Processor {
 func (procs *Processors) Close() error {
 	var errs []error
 	for _, p := range procs.List {
-		if sharedProc, ok := p.(*SharedProcessor); ok {
-			sharedProcessorMu.Lock()
-			sharedProc.refCount--
-			if sharedProc.refCount == 0 {
-				delete(sharedProcessors, sharedProc.cfg)
-				err := Close(sharedProc.proc)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			}
-			sharedProcessorMu.Unlock()
-			continue
-		}
 		err := Close(p)
 		if err != nil {
 			errs = append(errs, err)
