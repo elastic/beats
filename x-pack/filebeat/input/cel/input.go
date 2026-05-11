@@ -262,8 +262,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	} else {
 		state = cfg.State
 	}
-	if len(cfg.SecretState) > 0 {
-		state["secret"] = cfg.SecretState
+	if len(cfg.SecretState.m) > 0 {
+		state["secret"] = cfg.SecretState.m
 	}
 	if cfg.Redact == nil {
 		cfg.Redact = &redact{}
