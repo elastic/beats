@@ -1,0 +1,148 @@
+version: 8.19.15
+entries:
+    - kind: feature
+      summary: Add AWS auth method for CEL and HTTP JSON inputs.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/47260
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1761377900
+      file:
+        name: 1761377900-input-auth-method-aws.yaml
+        checksum: f17f75cfd1b34bc4238985d61c888eac75f80eb7
+    - kind: bug-fix
+      summary: Fix otelconsumer logging hundreds of errors per second when queue is full
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48807
+      issue:
+        - https://github.com/elastic/beats/issues/48803
+      impact: ""
+      action: ""
+      timestamp: 1770830279
+      file:
+        name: 1770830279-fix-otelconsumer-error-log.yaml
+        checksum: cbc43ef01276322bfe9d344e32b58033a716c2eb
+    - kind: bug-fix
+      summary: Fix http_endpoint input shared server lifecycle causing joiner deadlock and creator killing unrelated inputs.
+      description: |
+        Decouple the shared HTTP server lifetime from any single input. Previously,
+        the server context was derived from the creator input, so cancelling a joiner
+        blocked forever (deadlock) and cancelling the creator shut down all inputs on
+        the same port. The server now lives until the last input deregisters.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49415
+      issue:
+        - https://github.com/elastic/beats/issues/47770
+      impact: ""
+      action: ""
+      timestamp: 1773273969
+      file:
+        name: 1773273969-fix-http-endpoint-shared-server-lifecycle.yaml
+        checksum: 31eb4e6a175dca923b403f112d8b7feadf7dc7c2
+    - kind: bug-fix
+      summary: Fix container input not respecting max bytes when parsing CRI partial lines
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49743
+      issue:
+        - https://github.com/elastic/beats/issues/49259
+      impact: ""
+      action: ""
+      timestamp: 1774630083
+      file:
+        name: 1774630083-fix-container-max-bytes.yaml
+        checksum: e921cc97dd26ae458f81bff611e4d501074dd20d
+    - kind: enhancement
+      summary: Bump azure-sdk-for-go armmonitor from v0.8.0 to v0.11.0
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49866
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775076983
+      file:
+        name: 1775076983-bump-armmonitor-v0.11.0.yaml
+        checksum: a61638624ed987a04e3792aa923dcc0000649ee3
+    - kind: upgrade
+      summary: Upgrade Azure Event Hubs SDK (azeventhubs) from v1.3.1 to v2.0.2.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49867
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775080204
+      file:
+        name: 1775080204-upgrade-azeventhubs-v2.yaml
+        checksum: 6973de89004201a09638ad86aa60a7e11141850e
+    - kind: security
+      summary: Update transient dependency github.com/go-jose/go-jose/v4 to v4.1.4
+      description: ""
+      component: agentbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49975
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775581390
+      file:
+        name: 1775581390-Update-transient-dependency-go-jose-go-jose-v4.yaml
+        checksum: ee86a4059eaafb2615f1500a174be77e8cbe7482
+    - kind: enhancement
+      summary: Update OTel Collector components to v0.149.0/v1.55.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50057
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775823713
+      file:
+        name: 1775823713-bump-otel-01490.yaml
+        checksum: 0fd200ad7ce24c1676acbbcf0d7c1d4c6410c368
+    - kind: bug-fix
+      summary: Fix CSV decoder producing malformed JSON when field values contain double quotes in azure-blob-storage input.
+      description: |
+        The azure-blob-storage input's CSV decode path builds JSON via string
+        concatenation without escaping field values. CSV values containing double
+        quotes (e.g. RFC 2045 MIME type parameters) produce malformed JSON, causing
+        downstream ingest pipeline failures. Add a valueDecoder switch case ahead of
+        the plain decoder case so the CSV decoder's decodeValue() method is used,
+        which serializes via json.Marshal for correct escaping. Also fix decodeValue()
+        itself, which previously cleared its state then called decode(), causing a
+        "decode called before next" error.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50097
+      issue:
+        - https://github.com/elastic/beats/issues/50097
+      impact: ""
+      action: ""
+      timestamp: 1776095974
+      file:
+        name: 1776095974-fix-csv-decoder-json-escaping-abs-input.yaml
+        checksum: e0b09564ffa2403edf9ab3195aa2fa9c0c15812a
+    - kind: bug-fix
+      summary: Update mito to v1.23.2, fixing runtime error location reporting.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50221
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776722545
+      file:
+        name: 1776722545-mito1_23_2.yaml
+        checksum: ed7c7d5484978addb404b47f04cf1605b35babf5
