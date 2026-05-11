@@ -141,7 +141,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	if !dockerAvailable && config.ConnectionRetryInterval > 0 {
 		go func() {
 			dm.log.Debugf("connection_retry_interval set, trying to reconnect every %s.", config.ConnectionRetryInterval)
-			ticker := time.Tick(time.Second * 1)
+			ticker := time.Tick(config.ConnectionRetryInterval)
 			for range ticker {
 				dm.log.Debug("Trying to connect to docker...")
 				dockerAvailable := false
