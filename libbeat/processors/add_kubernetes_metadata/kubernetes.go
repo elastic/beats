@@ -40,9 +40,8 @@ import (
 )
 
 const (
-	timeout                = time.Second * 5
-	selector               = "kubernetes"
-	checkNodeReadyAttempts = 10
+	timeout  = time.Second * 5
+	selector = "kubernetes"
 )
 
 type kubernetesAnnotator struct {
@@ -57,7 +56,6 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 	initOnce            sync.Once
-	wg                  sync.WaitGroup
 }
 
 func init() {
@@ -106,6 +104,8 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 			if kubernetesAvailable {
 				return true
 			}
+			// to avoid burst of API requests
+			time.Sleep(3 * time.Second)
 		}
 	}
 
@@ -131,7 +131,6 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	processor := &kubernetesAnnotator{
 		log:   log,
 		cache: newCache(config.CleanupTimeout),
-		wg:    sync.WaitGroup{},
 	}
 
 	if config.WaitMetadata {
