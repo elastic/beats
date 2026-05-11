@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-var gLogger  atomic.Pointer[logger.Logger]
+var gLogger atomic.Pointer[logger.Logger]
 
 func setLogger(log *logger.Logger) {
 	gLogger.Store(log)
