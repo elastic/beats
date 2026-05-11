@@ -88,6 +88,11 @@ type TLSConfig struct {
 	time func() time.Time
 
 	Logger *logp.Logger
+
+	// certReloader, when set, provides dynamic certificate reloading from disk.
+	// ToConfig will use it to set GetCertificate and GetClientCertificate on
+	// the resulting tls.Config instead of populating Certificates statically.
+	certReloader *CertReloader
 }
 
 var (
@@ -129,7 +134,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		c.Logger.Named("tls").Warn("SSL/TLS verifications disabled.")
 	}
 
-	return &tls.Config{
+	cfg := &tls.Config{
 		MinVersion:         minVersion,
 		MaxVersion:         maxVersion,
 		Certificates:       c.Certificates,
@@ -143,6 +148,13 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Time:               c.time,
 		VerifyConnection:   makeVerifyConnection(c, c.Logger),
 	}
+
+	if c.certReloader != nil {
+		cfg.GetCertificate = c.certReloader.GetCertificate
+		cfg.GetClientCertificate = c.certReloader.GetClientCertificate
+	}
+
+	return cfg
 }
 
 // BuildModuleClientConfig takes the TLSConfig and transform it into a `tls.Config`.

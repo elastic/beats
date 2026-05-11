@@ -36,6 +36,7 @@ type Config struct {
 	Renegotiation        TLSRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
 	CASha256             []string                `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
 	CATrustedFingerprint string                  `config:"ca_trusted_fingerprint" yaml:"ca_trusted_fingerprint,omitempty"`
+	CertificateReload    CertificateReload       `config:"certificate_reload" yaml:"certificate_reload,omitempty"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
@@ -61,20 +62,33 @@ func LoadTLSConfig(config *Config, logger *logp.Logger) (*TLSConfig, error) {
 		curves[idx] = tls.CurveID(id)
 	}
 
-	cert, err := LoadCertificate(&config.Certificate)
-	logFail(err)
-
 	cas, errs := LoadCertificateAuthorities(config.CAs)
 	logFail(errs...)
+
+	var certs []tls.Certificate
+	var reloader *CertReloader
+
+	// Skip cert reloading when inline PEMs are used; reloading only makes sense with file paths.
+	if config.Certificate.Certificate != "" && config.CertificateReload.IsEnabled() &&
+		!IsPEMString(config.Certificate.Certificate) && !IsPEMString(config.Certificate.Key) {
+		reloadOpts, err := config.Certificate.reloaderOptions()
+		logFail(err)
+		if config.CertificateReload.ReloadInterval > 0 {
+			reloadOpts = append(reloadOpts, WithReloadInterval(config.CertificateReload.ReloadInterval))
+		}
+		reloader, err = NewCertReloader(config.Certificate.Certificate, config.Certificate.Key, reloadOpts...)
+		logFail(err)
+	} else {
+		cert, err := LoadCertificate(&config.Certificate)
+		logFail(err)
+		if cert != nil {
+			certs = []tls.Certificate{*cert}
+		}
+	}
 
 	// fail, if any error occurred when loading certificate files
 	if len(fail) != 0 {
 		return nil, errors.Join(fail...)
-	}
-
-	certs := make([]tls.Certificate, 0)
-	if cert != nil {
-		certs = []tls.Certificate{*cert}
 	}
 
 	// return config if no error occurred
@@ -89,6 +103,7 @@ func LoadTLSConfig(config *Config, logger *logp.Logger) (*TLSConfig, error) {
 		CASha256:             config.CASha256,
 		CATrustedFingerprint: config.CATrustedFingerprint,
 		Logger:               logger,
+		certReloader:         reloader,
 	}, nil
 }
 

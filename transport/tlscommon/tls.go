@@ -46,13 +46,9 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 	}
 
 	log := logp.NewLogger(logSelector)
-	passphrase := config.Passphrase
-	if passphrase == "" && config.PassphrasePath != "" {
-		p, err := os.ReadFile(config.PassphrasePath)
-		if err != nil {
-			return nil, fmt.Errorf("unable to read passphrase_file: %w", err)
-		}
-		passphrase = string(p)
+	passphrase, err := config.resolvePassphrase()
+	if err != nil {
+		return nil, err
 	}
 
 	certPEM, err := readPEMFile(log, certificate, passphrase, config.DisableLegacyPEMSupport)

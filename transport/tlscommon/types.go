@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
+	"strings"
 )
 
 var (
@@ -387,6 +389,39 @@ type CertificateConfig struct {
 	Passphrase              string `config:"key_passphrase" yaml:"key_passphrase,omitempty"`
 	PassphrasePath          string `config:"key_passphrase_path" yaml:"key_passphrase_path,omitempty"`
 	DisableLegacyPEMSupport bool   `config:"disable_legacy_pem_support" yaml:"disable_legacy_pem_support,omitempty"`
+}
+
+// resolvePassphrase returns the passphrase for decrypting private keys,
+// reading it from a file if PassphrasePath is set.
+func (c *CertificateConfig) resolvePassphrase() (string, error) {
+	if c.Passphrase != "" {
+		return c.Passphrase, nil
+	}
+	if c.PassphrasePath != "" {
+		p, err := os.ReadFile(c.PassphrasePath)
+		if err != nil {
+			return "", fmt.Errorf("unable to read key passphrase file: %w", err)
+		}
+		return strings.TrimSpace(string(p)), nil
+	}
+	return "", nil
+}
+
+// reloaderOptions returns the CertReloaderOption values derived from this config.
+func (c *CertificateConfig) reloaderOptions() ([]CertReloaderOption, error) {
+	passphrase, err := c.resolvePassphrase()
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve TLS key passphrase: %w", err)
+	}
+
+	var opts []CertReloaderOption
+	if passphrase != "" {
+		opts = append(opts, WithPassphrase(passphrase))
+	}
+	if c.DisableLegacyPEMSupport {
+		opts = append(opts, WithDisableLegacyPEMSupport(true))
+	}
+	return opts, nil
 }
 
 // Validate validates the CertificateConfig

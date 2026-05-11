@@ -142,8 +142,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
         key_passphrase: Abcd1234!
         `), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
-		require.NotNil(t, cfg)
-		assert.Len(t, cfg.Certificates, 1)
+		assert.NotNil(t, cfg.certReloader, "expected cert reloader to be active")
 	})
 
 	t.Run("passphrase value with legacy support disabled", func(t *testing.T) {
@@ -169,7 +168,7 @@ func TestEncryptedKeyPassphrase(t *testing.T) {
         key_passphrase_path: %s
         `, fileName)), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
-		assert.NotNil(t, cfg)
+		assert.NotNil(t, cfg.certReloader, "expected cert reloader to be active")
 	})
 
 	t.Run("logs deprecation warning", func(t *testing.T) {

@@ -136,7 +136,9 @@ func TestApplyWithConfig(t *testing.T) {
 
 	cfg := tmp.BuildModuleClientConfig("")
 	assert.NotNil(t, cfg)
-	assert.Len(t, cfg.Certificates, 1)
+	assert.NotNil(t, cfg.GetCertificate, "expected GetCertificate callback from cert reloader")
+	assert.NotNil(t, cfg.GetClientCertificate, "expected GetClientCertificate callback from cert reloader")
+	assert.Empty(t, cfg.Certificates, "expected Certificates to be empty when cert reloader is active")
 	assert.NotNil(t, cfg.RootCAs)
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
@@ -240,7 +242,9 @@ func TestApplyWithServerConfig(t *testing.T) {
 
 	cfg := tmp.BuildModuleClientConfig("")
 	assert.NotNil(t, cfg)
-	assert.Len(t, cfg.Certificates, 1)
+	assert.NotNil(t, cfg.GetCertificate, "expected GetCertificate callback from cert reloader")
+	assert.NotNil(t, cfg.GetClientCertificate, "expected GetClientCertificate callback from cert reloader")
+	assert.Empty(t, cfg.Certificates, "expected Certificates to be empty when cert reloader is active")
 	assert.NotNil(t, cfg.ClientCAs)
 	assert.Equal(t, true, cfg.InsecureSkipVerify)
 	assert.Len(t, cfg.CipherSuites, 2)
@@ -423,6 +427,99 @@ func TestKeyPassphrase(t *testing.T) {
     key_passphrase: Abcd1234!
     `), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
-		assert.Equal(t, 1, len(cfg.Certificates), "expected 1 certificate to be loaded")
+		assert.NotNil(t, cfg.certReloader, "expected cert reloader to be active")
+	})
+}
+
+func TestCertReloadWiring(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	t.Run("client config enables cert reload by default", func(t *testing.T) {
+		cfg, err := LoadTLSConfig(mustLoad(t, `
+    certificate: testdata/ca_test.pem
+    key: testdata/ca_test.key
+    `), logger)
+		require.NoError(t, err)
+		require.NotNil(t, cfg.certReloader)
+
+		tlsCfg := cfg.BuildModuleClientConfig("")
+		assert.NotNil(t, tlsCfg.GetCertificate)
+		assert.NotNil(t, tlsCfg.GetClientCertificate)
+		assert.Empty(t, tlsCfg.Certificates)
+
+		cert, err := tlsCfg.GetClientCertificate(nil)
+		require.NoError(t, err)
+		assert.NotEmpty(t, cert.Certificate)
+	})
+
+	t.Run("client config disables cert reload explicitly", func(t *testing.T) {
+		cfg, err := LoadTLSConfig(mustLoad(t, `
+    certificate: testdata/ca_test.pem
+    key: testdata/ca_test.key
+    certificate_reload:
+      enabled: false
+    `), logger)
+		require.NoError(t, err)
+		assert.Nil(t, cfg.certReloader)
+		assert.Len(t, cfg.Certificates, 1)
+
+		tlsCfg := cfg.BuildModuleClientConfig("")
+		assert.Nil(t, tlsCfg.GetCertificate)
+		assert.Nil(t, tlsCfg.GetClientCertificate)
+		assert.Len(t, tlsCfg.Certificates, 1)
+	})
+
+	t.Run("client config without certificate skips reloader", func(t *testing.T) {
+		cfg, err := LoadTLSConfig(mustLoad(t, `
+    certificate_authorities: [testdata/ca_test.pem]
+    `), logger)
+		require.NoError(t, err)
+		assert.Nil(t, cfg.certReloader)
+		assert.Empty(t, cfg.Certificates)
+	})
+
+	t.Run("server config enables cert reload by default", func(t *testing.T) {
+		var c ServerConfig
+		ucfg, err := config.NewConfigWithYAML([]byte(`
+    certificate: testdata/ca_test.pem
+    key: testdata/ca_test.key
+    `), "")
+		require.NoError(t, err)
+		require.NoError(t, ucfg.Unpack(&c))
+
+		cfg, err := LoadTLSServerConfig(&c, logger)
+		require.NoError(t, err)
+		require.NotNil(t, cfg.certReloader)
+
+		tlsCfg := cfg.BuildServerConfig("localhost")
+		assert.NotNil(t, tlsCfg.GetCertificate)
+		assert.NotNil(t, tlsCfg.GetClientCertificate)
+		assert.Empty(t, tlsCfg.Certificates)
+
+		cert, err := tlsCfg.GetCertificate(nil)
+		require.NoError(t, err)
+		assert.NotEmpty(t, cert.Certificate)
+	})
+
+	t.Run("server config disables cert reload explicitly", func(t *testing.T) {
+		var c ServerConfig
+		ucfg, err := config.NewConfigWithYAML([]byte(`
+    certificate: testdata/ca_test.pem
+    key: testdata/ca_test.key
+    certificate_reload:
+      enabled: false
+    `), "")
+		require.NoError(t, err)
+		require.NoError(t, ucfg.Unpack(&c))
+
+		cfg, err := LoadTLSServerConfig(&c, logger)
+		require.NoError(t, err)
+		assert.Nil(t, cfg.certReloader)
+		assert.Len(t, cfg.Certificates, 1)
+
+		tlsCfg := cfg.BuildServerConfig("localhost")
+		assert.Nil(t, tlsCfg.GetCertificate)
+		assert.Nil(t, tlsCfg.GetClientCertificate)
+		assert.Len(t, tlsCfg.Certificates, 1)
 	})
 }

@@ -90,20 +90,33 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 		curves[idx] = tls.CurveID(id)
 	}
 
-	cert, err := LoadCertificate(&config.Certificate)
-	logFail(err)
-
 	cas, errs := LoadCertificateAuthorities(config.CAs)
 	logFail(errs...)
+
+	var certs []tls.Certificate
+	var reloader *CertReloader
+
+	// Skip cert reloading when inline PEMs are used; reloading only makes sense with file paths.
+	if config.Certificate.Certificate != "" && config.CertificateReload.IsEnabled() &&
+		!IsPEMString(config.Certificate.Certificate) && !IsPEMString(config.Certificate.Key) {
+		reloadOpts, err := config.Certificate.reloaderOptions()
+		logFail(err)
+		if config.CertificateReload.ReloadInterval > 0 {
+			reloadOpts = append(reloadOpts, WithReloadInterval(config.CertificateReload.ReloadInterval))
+		}
+		reloader, err = NewCertReloader(config.Certificate.Certificate, config.Certificate.Key, reloadOpts...)
+		logFail(err)
+	} else {
+		cert, err := LoadCertificate(&config.Certificate)
+		logFail(err)
+		if cert != nil {
+			certs = []tls.Certificate{*cert}
+		}
+	}
 
 	// fail, if any error occurred when loading certificate files
 	if len(fail) != 0 {
 		return nil, errors.Join(fail...)
-	}
-
-	certs := make([]tls.Certificate, 0)
-	if cert != nil {
-		certs = []tls.Certificate{*cert}
 	}
 
 	clientAuth := TLSClientAuthNone
@@ -122,6 +135,7 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 		ClientAuth:       tls.ClientAuthType(clientAuth),
 		CASha256:         config.CASha256,
 		Logger:           logger,
+		certReloader:     reloader,
 	}, nil
 }
 
