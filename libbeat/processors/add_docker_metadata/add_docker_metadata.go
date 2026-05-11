@@ -159,8 +159,8 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 					}
 				}
 
-				log.Debug("successfully connected to docker")
 				if dockerAvailable {
+					log.Debug("successfully connected to docker")
 					dm.watcher = watcher
 					dm.dockerAvailable.Store(true)
 					return
