@@ -18,6 +18,8 @@
 package otelmap
 
 import (
+	"encoding/json"
+	"math"
 	"testing"
 	"time"
 
@@ -25,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )
 
@@ -38,12 +41,10 @@ func TestFromMapstrTime(t *testing.T) {
 	}
 	for _, tc := range tests {
 		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
-		assert.NoError(t, err, "Error parsing time")
-		a := mapstr.M{"test": origTime}
-		want := mapstr.M{}
-		want["test"] = tc.pcommon_val
-		ConvertNonPrimitive(a)
-		assert.Equal(t, want, a)
+		require.NoError(t, err)
+		dst := pcommon.NewMap()
+		require.NoError(t, FromMapstr(dst, mapstr.M{"test": origTime}))
+		assert.Equal(t, map[string]any{"test": tc.pcommon_val}, dst.AsRaw())
 	}
 }
 
@@ -57,33 +58,23 @@ func TestFromMapstrCommonTime(t *testing.T) {
 	}
 	for _, tc := range tests {
 		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
-		assert.NoError(t, err, "Error parsing time")
-		a := mapstr.M{"test": common.Time(origTime)}
-		want := mapstr.M{}
-		want["test"] = tc.pcommon_val
-		ConvertNonPrimitive(a)
-		assert.Equal(t, want, a)
+		require.NoError(t, err)
+		dst := pcommon.NewMap()
+		require.NoError(t, FromMapstr(dst, mapstr.M{"test": common.Time(origTime)}))
+		assert.Equal(t, map[string]any{"test": tc.pcommon_val}, dst.AsRaw())
 	}
 }
 
 func TestFromMapstrDuration(t *testing.T) {
-	input := mapstr.M{"duration": 1500 * time.Millisecond}
-	want := mapstr.M{"duration": int64(1500 * time.Millisecond)}
-
-	ConvertNonPrimitive(input)
-	assert.Equal(t, want, input)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"duration": 1500 * time.Millisecond}))
+	assert.Equal(t, map[string]any{"duration": int64(1500 * time.Millisecond)}, dst.AsRaw())
 }
 
 func TestFromMapstrSliceDuration(t *testing.T) {
-	input := mapstr.M{"durations": []time.Duration{1500 * time.Millisecond, 2 * time.Second}}
-	want := mapstr.M{"durations": []any{int64(1500 * time.Millisecond), int64(2 * time.Second)}}
-
-	ConvertNonPrimitive(input)
-	assert.Equal(t, want, input)
-
-	pm := pcommon.NewMap()
-	err := pm.FromRaw(map[string]any(input))
-	assert.NoError(t, err, "unexpected error converting duration slice to pcommon map")
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"durations": []time.Duration{1500 * time.Millisecond, 2 * time.Second}}))
+	assert.Equal(t, map[string]any{"durations": []any{int64(1500 * time.Millisecond), int64(2 * time.Second)}}, dst.AsRaw())
 }
 
 func TestFromMapstrString(t *testing.T) {
@@ -96,73 +87,36 @@ func TestFromMapstrString(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			a := mapstr.M{"test": tc.mapstr_val}
-			want := mapstr.M{}
-			want["test"] = tc.pcommon_val
-			ConvertNonPrimitive(a)
-			assert.Equal(t, want, a)
+			dst := pcommon.NewMap()
+			require.NoError(t, FromMapstr(dst, mapstr.M{"test": tc.mapstr_val}))
+			assert.Equal(t, map[string]any{"test": tc.pcommon_val}, dst.AsRaw())
 		})
 	}
 }
 
 func TestFromMapstrSliceString(t *testing.T) {
-	inputSlice := []string{"1", "2", "3"}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := mapstr.M{}
-	slice := make([]any, 0)
-	for _, i := range inputSlice {
-		slice = append(slice, i)
-	}
-	want["slice"] = slice
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": []string{"1", "2", "3"}}))
+	assert.Equal(t, map[string]any{"slice": []any{"1", "2", "3"}}, dst.AsRaw())
 }
 
 func TestFromMapstrSliceInt(t *testing.T) {
-	inputSlice := []int{42, 43, 44}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := mapstr.M{}
-	slice := make([]any, 0)
-	for _, i := range inputSlice {
-		slice = append(slice, i)
-	}
-	want["slice"] = slice
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": []int{42, 43, 44}}))
+	assert.Equal(t, map[string]any{"slice": []any{int64(42), int64(43), int64(44)}}, dst.AsRaw())
 }
 
 func TestFromMapstrSliceAny(t *testing.T) {
-	inputSlice := []any{42, "forty-three", true}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := mapstr.M{
-		"slice": inputSlice,
-	}
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": []any{42, "forty-three", true}}))
+	assert.Equal(t, map[string]any{"slice": []any{int64(42), "forty-three", true}}, dst.AsRaw())
 }
 
 func TestFromMapstrSliceDouble(t *testing.T) {
-	inputSlice := []float32{4.2, 4.3, 4.4}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := mapstr.M{}
-	slice := make([]any, 0)
-	for _, i := range inputSlice {
-		slice = append(slice, i)
-	}
-	want["slice"] = slice
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": []float32{4.2, 4.3, 4.4}}))
+	want := []any{float64(float32(4.2)), float64(float32(4.3)), float64(float32(4.4))}
+	assert.Equal(t, map[string]any{"slice": want}, dst.AsRaw())
 }
 
 func TestFromMapstrBool(t *testing.T) {
@@ -175,29 +129,17 @@ func TestFromMapstrBool(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			a := mapstr.M{"test": tc.mapstr_val}
-			want := mapstr.M{}
-			want["test"] = tc.pcommon_val
-			ConvertNonPrimitive(a)
-			assert.Equal(t, want, a)
+			dst := pcommon.NewMap()
+			require.NoError(t, FromMapstr(dst, mapstr.M{"test": tc.mapstr_val}))
+			assert.Equal(t, map[string]any{"test": tc.pcommon_val}, dst.AsRaw())
 		})
 	}
 }
 
 func TestFromMapstrSliceBool(t *testing.T) {
-	inputSlice := []bool{true, false, true}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := mapstr.M{}
-	slice := make([]any, 0)
-	for _, i := range inputSlice {
-		slice = append(slice, i)
-	}
-	want["slice"] = slice
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": []bool{true, false, true}}))
+	assert.Equal(t, map[string]any{"slice": []any{true, false, true}}, dst.AsRaw())
 }
 
 func TestFromMapstrMapstr(t *testing.T) {
@@ -207,36 +149,31 @@ func TestFromMapstrMapstr(t *testing.T) {
 			"inner_string_slice": []string{"string"},
 		},
 	}
-	want := mapstr.M{}
-	want["inner"] = map[string]any{
-		"inner_int":          42,
-		"inner_string_slice": []any{"string"},
+	want := map[string]any{
+		"inner": map[string]any{
+			"inner_int":          int64(42),
+			"inner_string_slice": []any{"string"},
+		},
 	}
-
-	ConvertNonPrimitive(input)
-	assert.Equal(t, want, input)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, input))
+	assert.Equal(t, want, dst.AsRaw())
 }
 
 func TestFromMapstrSliceMapstr(t *testing.T) {
-	inputSlice := []mapstr.M{{"item": 1}, {"item": 1}, {"item": 1}}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
+	input := mapstr.M{
+		"slice": []mapstr.M{{"item": 1}, {"item": 1}, {"item": 1}},
 	}
-	want := mapstr.M{}
-	want["slice"] = []any{
-		map[string]any{
-			"item": 1,
-		},
-		map[string]any{
-			"item": 1,
-		},
-		map[string]any{
-			"item": 1,
+	want := map[string]any{
+		"slice": []any{
+			map[string]any{"item": int64(1)},
+			map[string]any{"item": int64(1)},
+			map[string]any{"item": int64(1)},
 		},
 	}
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, input))
+	assert.Equal(t, want, dst.AsRaw())
 }
 
 func TestFromMapstrSliceTime(t *testing.T) {
@@ -251,19 +188,13 @@ func TestFromMapstrSliceTime(t *testing.T) {
 	var sliceTimesStr []any
 	for _, tc := range times {
 		targetTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
-		assert.NoError(t, err, "Error parsing time")
+		require.NoError(t, err)
 		sliceTimes = append(sliceTimes, targetTime)
 		sliceTimesStr = append(sliceTimesStr, tc.pcommon_val)
 	}
-	inputMap := mapstr.M{
-		"slice": sliceTimes,
-	}
-	want := mapstr.M{
-		"slice": sliceTimesStr,
-	}
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": sliceTimes}))
+	assert.Equal(t, map[string]any{"slice": sliceTimesStr}, dst.AsRaw())
 }
 
 func TestFromMapstrSliceCommonTime(t *testing.T) {
@@ -278,19 +209,13 @@ func TestFromMapstrSliceCommonTime(t *testing.T) {
 	var sliceTimesStr []any
 	for _, tc := range times {
 		targetTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
-		assert.NoError(t, err, "Error parsing time")
+		require.NoError(t, err)
 		sliceTimes = append(sliceTimes, common.Time(targetTime))
 		sliceTimesStr = append(sliceTimesStr, tc.pcommon_val)
 	}
-	inputMap := mapstr.M{
-		"slice": sliceTimes,
-	}
-	want := mapstr.M{
-		"slice": sliceTimesStr,
-	}
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, want, inputMap)
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": sliceTimes}))
+	assert.Equal(t, map[string]any{"slice": sliceTimesStr}, dst.AsRaw())
 }
 
 type structWithTextMarshaler struct {
@@ -319,7 +244,7 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 			{
 				"inner_int":       42,
 				"inner_map_slice": [1]any{nil},
-				"inner_slice": []map[string]any{ // slice -> slice
+				"inner_slice": []map[string]any{
 					{"string": "string"},
 					{"number": 12.3},
 				},
@@ -338,15 +263,15 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 					map[string]any{"string": "string3"},
 					mapstr.M{"number": 12.4},
 				},
-				"inner_slice": [2]map[string]any{ // array -> slice
+				"inner_slice": [2]map[string]any{
 					{"string": "string2"},
 					{"number": 12.4},
 				},
 			},
 		},
 	}
-	want := mapstr.M{
-		"any_array":  []any{1, "string", 3},
+	want := map[string]any{
+		"any_array":  []any{int64(1), "string", int64(3)},
 		"any_slice":  []any{5.1, 6.2},
 		"bool_array": []any{true, false},
 		"bool_slice": []any{false, true},
@@ -356,7 +281,7 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 		"struct_with_text_marshaler": "marshalled:string",
 		"inner": []any{
 			map[string]any{
-				"inner_int":       42,
+				"inner_int":       int64(42),
 				"inner_map_slice": []any{nil},
 				"inner_slice": []any{
 					map[string]any{"string": "string"},
@@ -368,7 +293,7 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 				"inner_struct_with_text_marshaler": "marshalled:string",
 			},
 			map[string]any{
-				"inner_int": 43,
+				"inner_int": int64(43),
 				"inner_map_slice": []any{
 					map[string]any{"string": "string3"},
 					map[string]any{"number": 12.4},
@@ -380,9 +305,26 @@ func TestFromMapstrWithNestedData(t *testing.T) {
 			},
 		},
 	}
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, input))
+	assert.Equal(t, want, dst.AsRaw())
+}
 
-	ConvertNonPrimitive(input)
-	assert.Equal(t, want, input)
+// TestFromMapstrMasksLargeUnsignedInts pins down the masking behavior for
+// uint values that exceed math.MaxInt64. pcommon.Value has no unsigned slot,
+// so we clear bit 63 instead of letting the conversion wrap to a negative.
+func TestFromMapstrMasksLargeUnsignedInts(t *testing.T) {
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{
+		"max_uint64":    ^uint64(0),
+		"max_uint":      ^uint(0),
+		"uint64_values": []uint64{0, 1, ^uint64(0)},
+	}))
+	assert.Equal(t, map[string]any{
+		"max_uint64":    int64(math.MaxInt64),
+		"max_uint":      int64(math.MaxInt64),
+		"uint64_values": []any{int64(0), int64(1), int64(math.MaxInt64)},
+	}, dst.AsRaw())
 }
 
 func TestToMapstr(t *testing.T) {
@@ -415,15 +357,65 @@ func TestToMapstr(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
+// TestFromMapstrNamedPrimitives covers values whose static type is a defined
+// type with a primitive underlying kind (e.g. type Severity string,
+// json.Number). The typed switch in FromValue matches on exact static types,
+// so these names fall through to fromReflective; that path must still encode
+// them as their underlying primitive instead of "unknown type".
+func TestFromMapstrNamedPrimitives(t *testing.T) {
+	type Severity string
+	type Method string
+	type Port uint16
+	type Score float64
+	type Count int32
+	type Enabled bool
+
+	input := mapstr.M{
+		"severity":    Severity("warn"),
+		"method":      Method("GET"),
+		"json_number": json.Number("9223372036854775808"),
+		"port":        Port(8080),
+		"score":       Score(0.75),
+		"count":       Count(-7),
+		"enabled":     Enabled(true),
+	}
+	want := map[string]any{
+		"severity":    "warn",
+		"method":      "GET",
+		"json_number": "9223372036854775808",
+		"port":        int64(8080),
+		"score":       0.75,
+		"count":       int64(-7),
+		"enabled":     true,
+	}
+
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, input))
+	assert.Equal(t, want, dst.AsRaw())
+}
+
+func TestFromMapstrNamedPrimitivesInSlice(t *testing.T) {
+	type Severity string
+	type Port uint16
+
+	input := mapstr.M{
+		"severities": []Severity{"info", "warn", "error"},
+		"ports":      []Port{80, 443, 8080},
+	}
+	want := map[string]any{
+		"severities": []any{"info", "warn", "error"},
+		"ports":      []any{int64(80), int64(443), int64(8080)},
+	}
+
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, input))
+	assert.Equal(t, want, dst.AsRaw())
+}
+
 func TestUnknownType(t *testing.T) {
-	inputMap := mapstr.M{
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{
 		"unknown_map": map[string]int{"key": 42},
-	}
-
-	expected := mapstr.M{
-		"unknown_map": "unknown type: map[string]int",
-	}
-
-	ConvertNonPrimitive(inputMap)
-	assert.Equal(t, expected, inputMap)
+	}))
+	assert.Equal(t, map[string]any{"unknown_map": "unknown type: map[string]int"}, dst.AsRaw())
 }

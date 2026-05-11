@@ -38,6 +38,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -521,4 +523,19 @@ func TestPublish(t *testing.T) {
 func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
+}
+
+func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+
+	for _, tc := range benchmarkEventCases() {
+		t.Run(tc.name, func(t *testing.T) {
+			pubEvent := publisher.Event{Content: tc.event}
+			logRecord := plog.NewLogRecord()
+			if err := fillLogRecordFromEvent(logRecord, pubEvent, beatInfo, logger, false); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		})
+	}
 }
