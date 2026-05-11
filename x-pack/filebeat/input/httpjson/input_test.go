@@ -20,11 +20,13 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var testCases = []struct {
@@ -444,18 +446,10 @@ var testCases = []struct {
 		},
 		expectedNoFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
 	},
-	{
-		name:        "tracer_escaping_logs",
-		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {},
-		baseConfig: map[string]interface{}{
-			"interval":                1,
-			"request.method":          http.MethodGet,
-			"request.url":             "https://example.com/",
-			"request.tracer.enabled":  true,
-			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'request'`, inputName),
-	},
+	// Path containment for enabled tracers is tested in
+	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
+	// The input-level test only verifies that a disabled tracer does
+	// not reject an out-of-tree path (next case below).
 	{
 		name: "tracer_disabled_escaping_logs",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
@@ -1912,11 +1906,13 @@ func newChainPaginationTestServer(
 
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	cwd, _ := os.Getwd()
 	return v2.Context{
 		Logger:          logp.NewLogger("httpjson_test"),
 		ID:              id,
 		IDWithoutName:   id,
 		Cancelation:     ctx,
+		Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 		MetricsRegistry: monitoring.NewRegistry(),
 	}, cancel
 }

@@ -121,12 +121,12 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	if p.cfg.Tracer.enabled() {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
 		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputCtx.Agent.Paths, Name, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, Name))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, inputCtx.Agent.Paths.Resolve(paths.Logs, Name))
 		}
 		p.cfg.Tracer.Filename = resolved
 	}

@@ -166,13 +166,6 @@ func (c *tracerConfig) Validate() error {
 		// which is the minimum.
 		c.MaxSize = 1
 	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
-	}
 	return nil
 }
 
@@ -464,7 +457,7 @@ func (f *graph) doRequest(ctx context.Context, method, url string, body io.Reade
 }
 
 // New creates a new instance of the graph fetcher.
-func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (fetcher.Fetcher, error) {
+func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator, p *paths.Path) (fetcher.Fetcher, error) {
 	var c graphConf
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
@@ -473,12 +466,12 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	if c.Tracer.enabled() {
 		id = sanitizeFileName(id)
 		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(p, inputName, path)
 		if err != nil {
 			return nil, err
 		}
 		if !ok {
-			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, p.Resolve(paths.Logs, inputName))
 		}
 		c.Tracer.Filename = resolved
 	}

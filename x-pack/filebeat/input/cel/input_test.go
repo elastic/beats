@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -1502,18 +1503,10 @@ var inputTests = []struct {
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
-	{
-		name: "tracer_escaping_logs",
-		config: map[string]interface{}{
-			"interval":                 1,
-			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state":                    map[string]interface{}{},
-			"program":                  "{}",
-		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
-	},
+	// Path containment for enabled tracers is tested in
+	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
+	// The input-level test only verifies that a disabled tracer does
+	// not reject an out-of-tree path (next case below).
 	{
 		name: "tracer_disabled_escaping_logs",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
@@ -2451,11 +2444,16 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			id := "test_id:" + test.name
+			cwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
 			v2Ctx := v2.Context{
 				Logger:          logp.NewLogger("cel_test"),
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
