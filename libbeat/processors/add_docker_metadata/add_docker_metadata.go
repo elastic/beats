@@ -26,6 +26,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -69,7 +70,7 @@ type addDockerMetadata struct {
 	pidFields       []string      // Field names that contain PIDs.
 	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
 	dedot           bool          // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	dockerAvailable atomic.Bool   // If Docker exists in env, then it is set to true
 	cgreader        processors.CGReader
 }
 
@@ -124,16 +125,51 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
 	}
 
-	return &addDockerMetadata{
+	dm := addDockerMetadata{
 		log:             log,
 		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		dedot:           config.DeDot,
-		dockerAvailable: dockerAvailable,
+		dockerAvailable: atomic.Bool{},
 		cgreader:        reader,
-	}, nil
+	}
+	dm.dockerAvailable.Store(dockerAvailable)
+
+	// If docker is not available, try reconnecting at set intervals
+	if !dockerAvailable && config.ConnectionRetryInterval > 0 {
+		go func() {
+			dm.log.Debugf("connection_retry_interval set, trying to reconnect every %s.", config.ConnectionRetryInterval)
+			ticker := time.Tick(time.Second * 1)
+			for range ticker {
+				dm.log.Debug("Trying to connect to docker...")
+				dockerAvailable := false
+				watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
+				if err != nil {
+					dockerAvailable = false
+					log.Debugf("%v: docker environment not detected: %+v", processorName, err) // here
+				} else {
+					dockerAvailable = true
+					log.Debugf("%v: docker environment detected", processorName)
+					if err = watcher.Start(); err != nil {
+						// mark dockerAvailable as false because watcher creation failed
+						dockerAvailable = false
+						log.Infof("unable to start the docker watcher: %v", err)
+					}
+				}
+
+				log.Debug("successfully connected to docker")
+				if dockerAvailable {
+					dm.watcher = watcher
+					dm.dockerAvailable.Store(true)
+					return
+				}
+			}
+		}()
+	}
+
+	return &dm, nil
 }
 
 func lazyCgroupCacheInit(d *addDockerMetadata) {
@@ -148,7 +184,7 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	if !d.dockerAvailable {
+	if !d.dockerAvailable.Load() {
 		return event, nil
 	}
 	var cid string
