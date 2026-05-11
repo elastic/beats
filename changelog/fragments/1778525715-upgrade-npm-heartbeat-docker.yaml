@@ -11,7 +11,7 @@
 kind: security
 
 # Change summary; a 80ish characters long description of the change.
-summary: Upgrade Node.js to v24 LTS in non-wolfi heartbeat Docker images
+summary: Upgrade npm to v11 in non-wolfi heartbeat Docker images
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.

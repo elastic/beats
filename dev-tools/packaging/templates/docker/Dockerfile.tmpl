@@ -198,7 +198,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=24.15.0
+ENV NODE_VERSION=22.22.2
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -222,6 +222,9 @@ RUN cd /usr/share/heartbeat/.node \
     && mkdir -p node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
+
+# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 11.14.0
+RUN npm install -g npm@11.14.1
 
 # Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH
