@@ -43,8 +43,8 @@ type kubeAnnotatorConfig struct {
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
-	WaitReady           bool                                `config:"wait_for_processor_ready"`
-	WaitReadyTimeout    time.Duration                       `config:"wait_for_processor_ready_timeout"`
+	WaitMetadata        bool                                `config:"wait_for_metadata"`
+	WaitMetadataTimeout time.Duration                       `config:"wait_for_metadata_timeout"`
 }
 
 type Enabled struct {
@@ -60,7 +60,8 @@ func (k *kubeAnnotatorConfig) InitDefaults() {
 	k.DefaultIndexers = Enabled{true}
 	k.Scope = "node"
 	k.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
-	k.WaitReadyTimeout = 30 * time.Second
+	k.WaitMetadata = true
+	k.WaitMetadataTimeout = 30 * time.Second
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
@@ -72,8 +73,8 @@ func (k *kubeAnnotatorConfig) Validate() error {
 		k.Node = ""
 	}
 
-	if k.WaitReady && k.WaitReadyTimeout <= 0 {
-		return fmt.Errorf("wait_for_processor_ready_timeout must be a positive duration")
+	if k.WaitMetadata && k.WaitMetadataTimeout <= 0 {
+		return fmt.Errorf("wait_for_metadata_timeout must be a positive duration")
 	}
 	// Checks below were added to warn the users early on and avoid initialising the processor in case the `logs_path`
 	// matcher config is not valid: supported paths defined as a `logs_path` configuration setting are strictly defined
