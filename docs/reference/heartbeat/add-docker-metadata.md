@@ -10,7 +10,7 @@ applies_to:
 # Add Docker metadata [add-docker-metadata]
 
 
-The `add_docker_metadata` processor annotates each event with relevant metadata from Docker containers. At startup it detects a docker environment and caches the metadata. The events are annotated with Docker metadata, only if a valid configuration is detected and the processor is able to reach Docker API.
+The `add_docker_metadata` processor annotates each event with relevant metadata from Docker containers. At startup it detects a docker environment and caches the metadata. The events are annotated with Docker metadata, only if a valid configuration is detected and the processor is able to reach Docker API. If Docker is unavailable at startup, the processor retries the connection at the configured `connection_retry_interval` until it succeeds.
 
 Each event is annotated with:
 
@@ -45,6 +45,7 @@ processors:
       #match_short_id: true
       #cleanup_timeout: 60
       #labels.dedot: false
+      #connection_retry_interval: 10s
       # To connect to Docker over TLS you must specify a client and CA certificate.
       #ssl:
       #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -83,4 +84,7 @@ It has the following settings:
 
 `labels.dedot`
 :   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+
+`connection_retry_interval`
+:   (Optional) Retry interval used when Docker is not reachable during processor initialization. Defaults to `10s`. Set to `0` to disable retries after an initial connection failure.
 
