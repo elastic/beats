@@ -80,7 +80,7 @@ func TestActionFromMap(t *testing.T) {
 				"id": "123456789",
 				"data": map[string]interface{}{
 					"query":    "select * from foo",
-					"platform": " linux ",
+					"platform": " linux , windows ",
 				},
 			},
 		},
@@ -168,7 +168,7 @@ func TestActionFromMap(t *testing.T) {
 				}
 			}
 			if tc.Name == "valid platform" {
-				if diff := cmp.Diff([]string{"linux"}, a.Platforms); diff != "" {
+				if diff := cmp.Diff([]string{"linux", "windows"}, a.Platforms); diff != "" {
 					t.Errorf("unexpected platforms (-want +got):\n%s", diff)
 				}
 			}

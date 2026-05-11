@@ -65,7 +65,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 			if !ok {
 				return a, fmt.Errorf("invalid platform: %w", ErrActionRequest)
 			}
-			platforms = strings.Split(platform, ",")
+			platforms = splitPlatforms(platform)
 		}
 		// Parse optional ECS Mapping
 		if v, ok := data["ecs_mapping"]; ok && v != nil {
@@ -116,6 +116,17 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 	}
 
 	return a, nil
+}
+
+func splitPlatforms(platform string) []string {
+	platforms := strings.Split(platform, ",")
+	for i := range platforms {
+		platforms[i] = strings.TrimSpace(platforms[i])
+	}
+	if len(platforms) == 1 && platforms[0] == "" {
+		return nil
+	}
+	return platforms
 }
 
 // MatchesPlatform reports whether the action is allowed to run on this host.
