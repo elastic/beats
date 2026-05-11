@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: respect osquery pack query platform filters for Live Query actions
+
+component: osquerybeat
