@@ -48,22 +48,22 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			cfg: map[string]interface{}{
-				"wait_for_processor_ready_timeout": "invalid_duration",
-				"wait_for_processor_ready":         true,
+				"wait_for_metadata_timeout": "invalid_duration",
+				"wait_for_metadata":         true,
 			},
 			error: true,
 		},
 		{
 			cfg: map[string]interface{}{
-				"wait_for_processor_ready_timeout": "20s",
-				"wait_for_processor_ready":         true,
+				"wait_for_metadata_timeout": "20s",
+				"wait_for_metadata":         true,
 			},
 			error: false,
 		},
 		{
 			cfg: map[string]interface{}{
-				"wait_for_processor_ready_timeout": "0s",
-				"wait_for_processor_ready":         true,
+				"wait_for_metadata_timeout": "0s",
+				"wait_for_metadata":         true,
 			},
 			error: true,
 		},
