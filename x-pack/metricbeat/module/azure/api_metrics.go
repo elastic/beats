@@ -119,7 +119,18 @@ func (m *azureAPIMetrics) addMetric(operation apiOperation, result apiResult, er
 	counterName := apiMetricName(operation, result, errorKind, "total")
 	histogramName := apiMetricName(operation, result, errorKind, "duration")
 
-	duration := metrics.NewUniformSample(1024)
+	// Exponentially decaying reservoir so the histogram reflects recent API
+	// behaviour rather than weighting hours-old observations equally with fresh
+	// ones. Values are the Dropwizard ExponentiallyDecayingReservoir defaults:
+	//   - 1028: reservoir size — enough samples for stable p50/p95/p99.
+	//   - 0.015: decay rate — a sample weighs e^(-α·Δt), so one ~46s old is
+	//     about half as important as one that just arrived, and anything older
+	//     than ~10 min is effectively invisible.
+	//
+	// This fits Azure metricsets, which typically poll every 60s–5min: the
+	// percentile histograms reflect the last few polling cycles, which is what
+	// an operator asking "is Azure throttling us right now?" wants to see.
+	duration := metrics.NewExpDecaySample(1028, 0.015)
 
 	met := &apiMetric{
 		count:    monitoring.NewUint(m.reg, counterName),
