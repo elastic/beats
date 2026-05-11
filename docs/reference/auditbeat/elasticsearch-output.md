@@ -108,10 +108,6 @@ The default value is `1`.
 
 ### `escape_html` [_escape_html]
 
-```{applies_to}
-stack: deprecated 9.5.0+
-```
-
 Configure escaping of HTML in strings. Set to `true` to enable escaping.
 
 The default value is `false`.
@@ -418,10 +414,6 @@ The http request timeout in seconds for the Elasticsearch request. The default i
 
 
 ### `allow_older_versions` [_allow_older_versions]
-
-```{applies_to}
-stack: deprecated 9.5.0+
-```
 
 By default, Auditbeat expects the Elasticsearch instance to be on the same or newer version to provide optimal experience. We suggest you connect to the same version to make sure all features Auditbeat is using are available in your Elasticsearch instance.
 
