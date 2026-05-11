@@ -24,7 +24,9 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -459,6 +461,76 @@ func TestWatcherError(t *testing.T) {
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
 	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
+}
+
+func TestInitializationRetriesConnectionToDocker(t *testing.T) {
+	var attempts atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		attempt := attempts.Add(1)
+		if attempt == 1 {
+			return nil, errors.New("docker unavailable")
+		}
+
+		return &mockWatcher{
+			containers: map[string]*docker.Container{
+				"container_id": {
+					ID:    "container_id",
+					Image: "image",
+					Name:  "name",
+				},
+			},
+		}, nil
+	}
+
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
+		"match_fields":              []string{"foo"},
+		"connection_retry_interval": "1ms",
+	})
+	require.NoError(t, err, "build retry-enabled config")
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
+
+	assert.Eventually(t, func() bool {
+		result, runErr := p.Run(&beat.Event{Fields: mapstr.M{"foo": "container_id"}})
+		if runErr != nil {
+			return false
+		}
+
+		containerID, getErr := result.Fields.GetValue("container.id")
+		return getErr == nil && containerID == "container_id"
+	}, time.Second, 5*time.Millisecond, "processor should enrich events after retry connects to docker")
+	assert.GreaterOrEqual(t, attempts.Load(), int32(2), "watcher constructor should be called more than once")
+}
+
+func TestInitializationDoesNotRetryWhenDisabled(t *testing.T) {
+	var attempts atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		attempts.Add(1)
+		return nil, errors.New("docker unavailable")
+	}
+
+	testConfig, err := config.NewConfigFrom(map[string]interface{}{
+		"match_fields":              []string{"foo"},
+		"connection_retry_interval": 0,
+	})
+	require.NoError(t, err, "build retry-disabled config")
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
+
+	time.Sleep(20 * time.Millisecond)
+	assert.Equal(t, int32(1), attempts.Load(), "watcher constructor should not be retried when interval is disabled")
+
+	result, runErr := p.Run(&beat.Event{Fields: mapstr.M{"foo": "container_id"}})
+	require.NoError(t, runErr, "processing an event")
+	assert.Equal(t, mapstr.M{"foo": "container_id"}, result.Fields, "event must remain unchanged without docker connection")
 }
 
 // Mock container watcher
