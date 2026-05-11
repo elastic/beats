@@ -36,13 +36,6 @@ func newObservedAzureMonitorService(next Service, registry *monitoring.Registry,
 	return newObservedService(next, newAzureAPIMetrics(registry, logger))
 }
 
-func optionalMetricsRegistry(registries []*monitoring.Registry) *monitoring.Registry {
-	if len(registries) == 0 {
-		return nil
-	}
-	return registries[0]
-}
-
 func (s *observedService) GetResourceDefinitionById(id string) (resp armresources.GenericResource, err error) {
 	start := time.Now()
 	defer func() {

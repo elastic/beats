@@ -46,13 +46,14 @@ type Client struct {
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
 type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
-// NewClient instantiates the Azure monitoring client
-func NewClient(config Config, logger *logp.Logger, registries ...*monitoring.Registry) (*Client, error) {
+// NewClient instantiates the Azure monitoring client. Pass nil for metrics
+// to disable API instrumentation (e.g. in tests).
+func NewClient(config Config, logger *logp.Logger, metrics *monitoring.Registry) (*Client, error) {
 	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
-	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, optionalMetricsRegistry(registries), logger)
+	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, metrics, logger)
 
 	logger = logger.Named("azure monitor client")
 

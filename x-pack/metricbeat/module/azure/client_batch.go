@@ -41,13 +41,14 @@ type ResDefGroupingCriteria struct {
 // concurrentMapResourceMetrics function type will map the configuration options to Batch Client metrics (depending on the metricset)
 type concurrentMapResourceMetrics func(client *BatchClient, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig, wg *sync.WaitGroup)
 
-// NewBatchClient instantiates the Azure monitoring batch client
-func NewBatchClient(config Config, logger *logp.Logger, registries ...*monitoring.Registry) (*BatchClient, error) {
+// NewBatchClient instantiates the Azure monitoring batch client. Pass nil
+// for metrics to disable API instrumentation (e.g. in tests).
+func NewBatchClient(config Config, logger *logp.Logger, metrics *monitoring.Registry) (*BatchClient, error) {
 	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
-	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, optionalMetricsRegistry(registries), logger)
+	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, metrics, logger)
 
 	logger = logger.Named("azure monitor client")
 
