@@ -24,13 +24,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var projectLogger = logp.NewLogger("browser.project")
-
 type ProjectSource struct {
 	Content         string `config:"content" json:"content"`
 	TargetDirectory string
 	fetched         bool
 	mtx             sync.Mutex
+	log             *logp.Logger
 }
 
 var ErrNoContent = fmt.Errorf("no 'content' value specified for project monitor source")
@@ -48,7 +47,9 @@ func (p *ProjectSource) Fetch() error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 	if p.fetched {
-		projectLogger.Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
+		if p.log != nil {
+			p.log.Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
+		}
 		return nil
 	}
 
@@ -74,7 +75,9 @@ func (p *ProjectSource) Fetch() error {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
 
-	projectLogger.Debugf("browser project: unpack source: %s", p.Workdir())
+	if p.log != nil {
+		p.log.Debugf("browser project: unpack source: %s", p.Workdir())
+	}
 
 	err = os.Chmod(p.TargetDirectory, defaultMod)
 	if err != nil {
@@ -91,7 +94,7 @@ func (p *ProjectSource) Fetch() error {
 	// to the globally installed agent, but useful for testing purposes
 	if !Offline() {
 		// set up npm project and ensure synthetics is installed
-		err = setupProjectDir(context.Background(), p.Workdir())
+		err = setupProjectDir(context.Background(), p.log, p.Workdir())
 		if err != nil {
 			return fmt.Errorf("setting up project dir failed: %w", err)
 		}
@@ -112,7 +115,7 @@ type PackageJSON struct {
 // links the synthetics dependency to the globally installed one that is
 // baked in to the Heartbeat image to maintain compatibility and
 // allows us to control the synthetics agent version
-func setupProjectDir(ctx context.Context, workdir string) error {
+func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) error {
 	out, err := exec.CommandContext(ctx, "npm", "root", "-g").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("cannot resolve global npm root: %w: %s", err, strings.TrimSpace(string(out)))
@@ -146,7 +149,7 @@ func setupProjectDir(ctx context.Context, workdir string) error {
 	}
 
 	// setup the project linking to the global synthetics library
-	return runSimpleCommand(
+	return runSimpleCommand(log,
 		exec.CommandContext(
 			ctx,
 			"npm", "install",
@@ -163,7 +166,9 @@ func (p *ProjectSource) Workdir() string {
 }
 
 func (p *ProjectSource) Close() error {
-	projectLogger.Debugf("browser project: close project source: %s", p.Workdir())
+	if p.log != nil {
+		p.log.Debugf("browser project: close project source: %s", p.Workdir())
+	}
 
 	if p.TargetDirectory != "" {
 		return os.RemoveAll(p.TargetDirectory)
@@ -171,11 +176,15 @@ func (p *ProjectSource) Close() error {
 	return nil
 }
 
-func runSimpleCommand(cmd *exec.Cmd, dir string) error {
+func runSimpleCommand(log *logp.Logger, cmd *exec.Cmd, dir string) error {
 	cmd.Dir = dir
-	projectLogger.Infof("Running %s in %s", cmd, dir)
+	if log != nil {
+		log.Infof("Running %s in %s", cmd, dir)
+	}
 	output, err := cmd.CombinedOutput()
-	projectLogger.Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+	if log != nil {
+		log.Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+	}
 	return err
 }
 
