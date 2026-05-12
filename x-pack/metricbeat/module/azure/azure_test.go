@@ -50,7 +50,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 5 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:51:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -63,7 +63,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 1 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -76,7 +76,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 5 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:51:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -89,7 +89,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 60 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T17:56:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -101,7 +101,7 @@ func TestCalculateTimespan(t *testing.T) {
 		cfg := Config{
 			Period: 5 * time.Minute,
 		}
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T17:56:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -118,7 +118,7 @@ func TestCalculateTimespanWithLatency(t *testing.T) {
 			Latency: 1 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:50:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:55:00Z", endTime.Format(time.RFC3339))
@@ -132,9 +132,43 @@ func TestCalculateTimespanWithLatency(t *testing.T) {
 			Latency: 1 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg)
+		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:54:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:55:00Z", endTime.Format(time.RFC3339))
+	})
+}
+
+func TestCalculateTimespanWithLookback(t *testing.T) {
+	referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T19:00:00Z")
+	cfg := Config{Period: 5 * time.Minute}
+
+	t.Run("nil lookbackStart uses normal window", func(t *testing.T) {
+		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, nil)
+		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
+		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
+	})
+
+	t.Run("lookbackStart before normalStart expands window", func(t *testing.T) {
+		// 7 minutes ago — older than the 5-minute normal window
+		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:53:00Z")
+		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
+		require.Equal(t, "2024-07-30T18:53:00Z", startTime.Format(time.RFC3339))
+		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
+	})
+
+	t.Run("lookbackStart after normalStart does not expand window", func(t *testing.T) {
+		// 3 minutes ago — within the 5-minute normal window, no expansion needed
+		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:57:00Z")
+		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
+		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
+		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
+	})
+
+	t.Run("lookbackStart equal to normalStart does not expand window", func(t *testing.T) {
+		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:55:00Z")
+		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
+		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
+		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
 }
