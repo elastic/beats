@@ -402,8 +402,6 @@ func (s *runSession) runCycle(ctx context.Context) error {
 		budget    = *s.cfg.MaxExecutions
 		waitUntil time.Time
 	)
-	// Keep track of whether CEL is degraded for this periodic run.
-	var isDegraded bool
 	if s.doCov {
 		defer func() {
 			// If doCov is true, log the updated coverage details.
@@ -424,378 +422,33 @@ func (s *runSession) runCycle(ctx context.Context) error {
 		}
 
 		runSpanExecutionCount++
-		execCtx, execSpan := s.tracer.Start(runCtx, "cel.program.execution")
-		execSpan.SetAttributes(
-			attribute.Int("cel.program.execution_number", runSpanExecutionCount),
-			attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
-		)
-		execLog := logWithTracingIds(s.log, execSpan)
-
-		// Process a set of event requests.
-		if s.trace != nil {
-			execLog.Debugw("previous transaction", "transaction.id", s.trace.TxID())
-		}
-		execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: s.state, cfg: s.cfg.Redact})
-		s.metrics.AddProgramExecution(execCtx)
-		start := s.now().In(time.UTC)
-
-		var err error
-		s.state, err = evalWith(execCtx, s.injector, s.prg, s.ast, s.state, start, s.wantDump, budget-1)
-		s.metrics.AddCELDuration(execCtx, time.Since(start))
-		execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: s.state, cfg: s.cfg.Redact})
+		result, err := s.execute(runCtx, runSpanExecutionCount, budget)
+		runSpanEventCount += result.eventCount
+		waitUntil = result.waitUntil
 		if err != nil {
-			var dump dumpError
-			switch {
-			case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-				s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
-				errorSpans(err, runSpan, end{execSpan})
-				return err
-			case errors.As(err, &dump):
-				path := strings.ReplaceAll(s.cfg.FailureDump.Filename, "*", sanitizeFileName(s.env.IDWithoutName))
-				dir := filepath.Dir(path)
-				base := filepath.Base(path)
-				ext := filepath.Ext(base)
-				prefix := strings.TrimSuffix(base, ext)
-				path = filepath.Join(dir, prefix+"-"+s.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
-				execLog.Debugw("writing failure dump file", "path", path)
-				err := dump.writeToFile(path)
-				if err != nil {
-					execLog.Errorw("failed to write failure dump", "path", path, "error", err)
-				}
-			}
-			execLog.Errorw("failed evaluation", "error", err)
-			s.health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
+			errorSpans(err, runSpan)
+			return err
 		}
-		isDegraded = err != nil
-		if s.trace != nil {
-			execLog.Debugw("final transaction", "transaction.id", s.trace.TxID())
-		}
-
-		// On exit, state is expected to be in the shape:
-		//
-		// {
-		//     "cursor": [
-		//         {...},
-		//         ...
-		//     ],
-		//     "events": [
-		//         {...},
-		//         ...
-		//     ],
-		//     "url": <resource address>,
-		//     "status_code": <HTTP request status code if a network request>,
-		//     "header": <HTTP response headers if a network request>,
-		//     "rate_limit": <HTTP rate limit map if required by API>,
-		//     "want_more": bool
-		// }
-		//
-		// The "events" array must be present, but may be empty or null.
-		// In the case of an error condition in the CEL program it is
-		// acceptable to return a single object which will be wrapped as
-		// an array below. It is the responsibility of the downstream
-		// processor to handle this object correctly (which may be to drop
-		// the event). The error event will also be logged.
-		// If it is not empty, it must only have objects as elements.
-		// Additional fields may be present at the root of the object.
-		// The evaluation is repeated with the new state, after removing
-		// the events field, if the "want_more" field is present and true
-		// and a non-zero events array is returned.
-		//
-		// If cursor is present it must be either a single object or an
-		// array with the same length as events; each element i of the
-		// cursor array will be the details for obtaining the events at or
-		// beyond event i in events. If the cursor is a single object it
-		// is will be the details for obtaining events after the last
-		// event in the events array and will only be retained on
-		// successful publication of all the events in the array.
-		//
-		// If rate_limit is present it should be a map with numeric fields
-		// rate and burst. It may also have a string error field and
-		// other fields which will be logged. If it has an error field
-		// the rate and burst will not be used to set rate limit behaviour.
-		//
-		// The status code and rate_limit values may be omitted if they do
-		// not contribute to control.
-		//
-		// The following details how a cursor array works:
-		//
-		// Result after request resulting in 5 events. Each c obtained with
-		// an e points to the ~next e.
-		//
-		//    +----+   +----+        +----+
-		//    | e1 |   | c1 |        | e1 |
-		//    +----+   +----+        +----+   +----+
-		//    | e2 |   | c2 |        | e2 | < | c1 |
-		//    +----+   +----+        +----+   +----+
-		//    | e3 |   | c3 |        | e3 | < | c2 |
-		//    +----+   +----+   =>   +----+   +----+
-		//    | e4 |   | c4 |        | e4 | < | c3 |
-		//    +----+   +----+        +----+   +----+
-		//    | e5 |   | c5 |        | e5 | < | c4 |
-		//    +----+   +----+        +----+   +----+
-		//                           |next| < | c5 |
-		//                           +----+   +----+
-		//
-		// After a successful publication this will leave a single c and
-		// and empty events array. So the next evaluation has a boot.
-		//
-		// If the publication fails or execution is terminated at some
-		// point during the events array, we may end up with, e.g.
-		//
-		//    +----+  +----+        +----+   +----+
-		//    | e3 |  | c3 |        |next| < | c3 |
-		//    +----+  +----+        +----+   +----+
-		//    | e4 |  | c4 |   =>
-		//    +----+  +----+          lost events
-		//    | e5 |  | c5 |
-		//    +----+  +----+
-		//
-		// At this point, the c3 cursor (or at worst the c2 cursor) has
-		// been stored and we can continue from that point, recovering
-		// the lost events and potentially re-requesting e3.
-
-		var ok bool
-		ok, waitUntil, err = handleResponse(execLog, s.state, s.limiter)
-		if err != nil || !ok {
-			s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
-			if err != nil {
-				errorSpans(err, end{execSpan}, runSpan)
-				return err
-			}
-			errorSpans(errors.New("invalid response"), end{execSpan})
+		if result.action.retry() {
 			continue
 		}
 
-		_, ok = s.state["url"]
-		if !ok && s.goodURL != "" {
-			s.state["url"] = s.goodURL
-			execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", s.goodURL)
-		}
-
-		e, ok := s.state["events"]
-		if !ok {
-			s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
-			err := errors.New("unexpected missing events array from evaluation")
-			errorSpans(err, end{execSpan}, runSpan)
-			return err
-		}
-		var events []any
-		switch e := e.(type) {
-		case []any:
-			if len(e) == 0 {
-				s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
-				s.metrics.AddProgramSuccessExecution(execCtx)
-				okSpans(end{execSpan})
-				return nil
-			}
-			events = e
-		case map[string]any:
-			if e == nil {
-				s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
-				s.metrics.AddProgramSuccessExecution(execCtx)
-				okSpans(end{execSpan})
-				return nil
-			}
-			if _, ok := e["error"]; ok {
-				// If we have an error, log the complete object on the basis
-				// that it is ECS-conformant.
-				if execLog.Core().Enabled(zapcore.ErrorLevel) {
-					kv := make([]any, 0, 2*len(e))
-					for k := range maps.Keys(e) {
-						kv = append(kv, k, e[k])
-					}
-					execLog.Errorw("single event object returned by evaluation", kv...)
-				}
-			} else {
-				// Otherwise, be consistent with the existing documented
-				// behaviour and log the entire object as the error.
-				execLog.Errorw("single event object returned by evaluation", "error", e)
-			}
-			if err, ok := e["error"]; ok {
-				s.health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
-			} else {
-				s.health.UpdateStatus(status.Degraded, "single event object returned by evaluation")
-			}
-			isDegraded = true
-			events = []any{e}
-			// Make sure the cursor is not updated.
-			delete(s.state, "cursor")
-		default:
-			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-			s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
-			errorSpans(err, end{execSpan}, runSpan)
-			return err
-		}
-
-		// We have a non-empty batch of events to process.
-		s.metrics.AddReceivedBatch(execCtx, 1)
-		s.metrics.AddReceivedEvents(execCtx, uint(len(events)))
-		runSpanEventCount += len(events)
-		execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
-		// Drop events from state. If we fail during the publication,
-		// we will re-request these events.
-		delete(s.state, "events")
-
-		// Get cursors if they exist.
-		var (
-			cursors      []any
-			singleCursor bool
-		)
-		if c, ok := s.state["cursor"]; ok {
-			cursors, ok = c.([]any)
-			if ok {
-				if len(cursors) != len(events) {
-					execLog.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
-					s.health.UpdateStatus(status.Degraded, "unexpected cursor list length")
-					isDegraded = true
-					// But try to continue.
-					if len(cursors) < len(events) {
-						cursors = nil
-					}
-				}
-			} else {
-				cursors = []any{c}
-				singleCursor = true
-			}
-		}
-		// Drop old cursor from state. This will be replaced with
-		// the current cursor object below; it is an array now.
-		delete(s.state, "cursor")
-
-		pubStart := time.Now()
-		var hadPublicationError bool
-
-		pubCtx, pubSpan := s.tracer.Start(execCtx, "cel.program.publish")
-		pubSpanEventCount := 0
-		pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
-		pubLog := logWithTracingIds(s.log, pubSpan)
-	loop:
-		for i, e := range events {
-			event, ok := e.(map[string]any)
-			if !ok {
-				err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-				errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-				return err
-			}
-			var pubCursor any
-			if cursors != nil {
-				if singleCursor {
-					// Only set the cursor for publication at the last event
-					// when a single cursor object has been provided.
-					if i == len(events)-1 {
-						s.goodCursor = s.cursor
-						s.cursor, ok = cursors[0].(map[string]any)
-						if !ok {
-							err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
-							s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-							errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-							return err
-						}
-						pubCursor = s.cursor
-					}
-				} else {
-					s.goodCursor = s.cursor
-					s.cursor, ok = cursors[i].(map[string]any)
-					if !ok {
-						err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
-						s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-						errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-						return err
-					}
-					pubCursor = s.cursor
-				}
-			}
-			// This is checked prior to the publish attempt since the
-			// cursor.Publisher interface does not document the behaviour
-			// related to context cancellation and the context is not
-			// explicitly passed in, so favour this explicit clarity.
-			switch err := pubCtx.Err(); {
-			case err == nil:
-			case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-				pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
-				// Don't update status, since we are about to pass
-				// through the Running state and then fall through
-				// to the input exit with a change to Stopped.
-				break loop
-			default:
-				// This should never happen.
-				pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
-				s.health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
-				isDegraded = true
-				break loop
-			}
-			err = s.pub.Publish(beat.Event{
-				Timestamp: time.Now(),
-				Fields:    event,
-			}, pubCursor)
-			if err != nil {
-				hadPublicationError = true
-				pubLog.Errorw("error publishing event", "error", err)
-				s.health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
-				errorSpans(err, pubSpan)
-				isDegraded = true
-				cursors = nil // We are lost, so retry with this event's cursor,
-				continue      // but continue with the events that we have without
-				// advancing the cursor. This allows us to potentially publish the
-				// events we have now, with a fallback to the last guaranteed
-				// correctly published cursor.
-			}
-			if i == 0 {
-				s.metrics.AddPublishedBatch(pubCtx, 1)
-			}
-			s.metrics.AddPublishedEvents(pubCtx, 1)
-			pubSpanEventCount++
-			pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
-
-			err = pubCtx.Err()
-			if err != nil {
-				s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-				errorSpans(err, end{pubSpan}, end{execSpan}, runSpan)
-				return err
-			}
-		}
-
-		if !isDegraded {
-			s.health.UpdateStatus(status.Running, "")
-		}
-
-		s.metrics.AddPublishDuration(pubCtx, time.Since(pubStart))
-		// Advance the cursor to the final state if there was no error during
-		// publications. This is needed to transition to the next set of events.
-		if !hadPublicationError && !isDegraded {
-			s.goodCursor = s.cursor
-			s.metrics.AddProgramSuccessExecution(pubCtx)
-			okSpans(pubSpan)
-		}
-		pubSpan.End()
-
-		// Replace the last known good cursor.
-		s.state["cursor"] = s.goodCursor
-		s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-		if more, _ := s.state["want_more"].(bool); !more {
-			execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
-			okSpans(end{execSpan}, runSpan)
+		// Empty or nil events finish the execution without setting runSpan status.
+		if result.eventCount == 0 {
 			return nil
 		}
-		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
 
-		// Check we have a remaining execution budget.
+		if more, _ := s.state["want_more"].(bool); !more {
+			okSpans(runSpan)
+			return nil
+		}
 		budget--
 		if budget <= 0 {
 			msg := "reached maximum number of CEL executions"
-			execLog.Warnw(msg+": will continue at next periodic evaluation",
-				"limit", *s.cfg.MaxExecutions,
-				"next_eval_time", start.Add(s.cfg.Interval),
-			)
-			s.health.UpdateStatus(status.Degraded, msg)
-			execSpan.SetStatus(codes.Unset, msg)
-			execSpan.End()
 			runSpan.SetAttributes(attribute.Bool("cel.periodic.max_execution_limited", true))
 			runSpan.SetStatus(codes.Unset, msg)
 			return nil
 		}
-
-		okSpans(end{execSpan})
 	}
 }
 
@@ -823,6 +476,398 @@ func waitForRateLimit(ctx context.Context, runSpan trace.Span, tracer trace.Trac
 	case <-time.After(wait):
 	}
 	return nil
+}
+
+type action bool
+
+const (
+	contAction     action = false
+	retry429Action action = true
+)
+
+func (a action) retry() bool { return a == retry429Action }
+
+type executeResult struct {
+	action     action
+	waitUntil  time.Time
+	eventCount int
+}
+
+func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (executeResult, error) {
+	result := executeResult{
+		action: contAction,
+	}
+
+	execCtx, execSpan := s.tracer.Start(ctx, "cel.program.execution")
+	defer execSpan.End()
+	execSpan.SetAttributes(
+		attribute.Int("cel.program.execution_number", executionNumber),
+		attribute.Int("cel.program.event_count", 0), // to be overridden if there are events
+	)
+	execLog := logWithTracingIds(s.log, execSpan)
+
+	// Process a set of event requests.
+	if s.trace != nil {
+		execLog.Debugw("previous transaction", "transaction.id", s.trace.TxID())
+	}
+	execLog.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: s.state, cfg: s.cfg.Redact})
+	s.metrics.AddProgramExecution(execCtx)
+	start := s.now().In(time.UTC)
+
+	var err error
+	s.state, err = evalWith(execCtx, s.injector, s.prg, s.ast, s.state, start, s.wantDump, budget-1)
+	s.metrics.AddCELDuration(execCtx, time.Since(start))
+	execLog.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: s.state, cfg: s.cfg.Redact})
+	isDegraded := err != nil
+	if err != nil {
+		var dump dumpError
+		switch {
+		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+			s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
+			errorSpans(err, execSpan)
+			return result, err
+		case errors.As(err, &dump):
+			path := strings.ReplaceAll(s.cfg.FailureDump.Filename, "*", sanitizeFileName(s.env.IDWithoutName))
+			dir := filepath.Dir(path)
+			base := filepath.Base(path)
+			ext := filepath.Ext(base)
+			prefix := strings.TrimSuffix(base, ext)
+			path = filepath.Join(dir, prefix+"-"+s.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
+			execLog.Debugw("writing failure dump file", "path", path)
+			err := dump.writeToFile(path)
+			if err != nil {
+				execLog.Errorw("failed to write failure dump", "path", path, "error", err)
+			}
+		}
+		execLog.Errorw("failed evaluation", "error", err)
+		s.health.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
+	}
+	if s.trace != nil {
+		execLog.Debugw("final transaction", "transaction.id", s.trace.TxID())
+	}
+
+	// On exit, state is expected to be in the shape:
+	//
+	// {
+	//     "cursor": [
+	//         {...},
+	//         ...
+	//     ],
+	//     "events": [
+	//         {...},
+	//         ...
+	//     ],
+	//     "url": <resource address>,
+	//     "status_code": <HTTP request status code if a network request>,
+	//     "header": <HTTP response headers if a network request>,
+	//     "rate_limit": <HTTP rate limit map if required by API>,
+	//     "want_more": bool
+	// }
+	//
+	// The "events" array must be present, but may be empty or null.
+	// In the case of an error condition in the CEL program it is
+	// acceptable to return a single object which will be wrapped as
+	// an array below. It is the responsibility of the downstream
+	// processor to handle this object correctly (which may be to drop
+	// the event). The error event will also be logged.
+	// If it is not empty, it must only have objects as elements.
+	// Additional fields may be present at the root of the object.
+	// The evaluation is repeated with the new state, after removing
+	// the events field, if the "want_more" field is present and true
+	// and a non-zero events array is returned.
+	//
+	// If cursor is present it must be either a single object or an
+	// array with the same length as events; each element i of the
+	// cursor array will be the details for obtaining the events at or
+	// beyond event i in events. If the cursor is a single object it
+	// is will be the details for obtaining events after the last
+	// event in the events array and will only be retained on
+	// successful publication of all the events in the array.
+	//
+	// If rate_limit is present it should be a map with numeric fields
+	// rate and burst. It may also have a string error field and
+	// other fields which will be logged. If it has an error field
+	// the rate and burst will not be used to set rate limit behaviour.
+	//
+	// The status code and rate_limit values may be omitted if they do
+	// not contribute to control.
+	//
+	// The following details how a cursor array works:
+	//
+	// Result after request resulting in 5 events. Each c obtained with
+	// an e points to the ~next e.
+	//
+	//    +----+   +----+        +----+
+	//    | e1 |   | c1 |        | e1 |
+	//    +----+   +----+        +----+   +----+
+	//    | e2 |   | c2 |        | e2 | < | c1 |
+	//    +----+   +----+        +----+   +----+
+	//    | e3 |   | c3 |        | e3 | < | c2 |
+	//    +----+   +----+   =>   +----+   +----+
+	//    | e4 |   | c4 |        | e4 | < | c3 |
+	//    +----+   +----+        +----+   +----+
+	//    | e5 |   | c5 |        | e5 | < | c4 |
+	//    +----+   +----+        +----+   +----+
+	//                           |next| < | c5 |
+	//                           +----+   +----+
+	//
+	// After a successful publication this will leave a single c and
+	// and empty events array. So the next evaluation has a boot.
+	//
+	// If the publication fails or execution is terminated at some
+	// point during the events array, we may end up with, e.g.
+	//
+	//    +----+  +----+        +----+   +----+
+	//    | e3 |  | c3 |        |next| < | c3 |
+	//    +----+  +----+        +----+   +----+
+	//    | e4 |  | c4 |   =>
+	//    +----+  +----+          lost events
+	//    | e5 |  | c5 |
+	//    +----+  +----+
+	//
+	// At this point, the c3 cursor (or at worst the c2 cursor) has
+	// been stored and we can continue from that point, recovering
+	// the lost events and potentially re-requesting e3.
+
+	var ok bool
+	ok, result.waitUntil, err = handleResponse(execLog, s.state, s.limiter)
+	if err != nil || !ok {
+		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
+		if err != nil {
+			errorSpans(err, execSpan)
+			return result, err
+		}
+		result.action = retry429Action
+		errorSpans(errors.New("invalid response"), execSpan)
+		return result, nil
+	}
+
+	_, ok = s.state["url"]
+	if !ok && s.goodURL != "" {
+		s.state["url"] = s.goodURL
+		execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", s.goodURL)
+	}
+
+	e, ok := s.state["events"]
+	if !ok {
+		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
+		err := errors.New("unexpected missing events array from evaluation")
+		errorSpans(err, execSpan)
+		return result, err
+	}
+	var events []any
+	switch e := e.(type) {
+	case []any:
+		if len(e) == 0 {
+			s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
+			s.metrics.AddProgramSuccessExecution(execCtx)
+			okSpans(execSpan)
+			return result, nil
+		}
+		events = e
+	case map[string]any:
+		if e == nil {
+			s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
+			s.metrics.AddProgramSuccessExecution(execCtx)
+			okSpans(execSpan)
+			return result, nil
+		}
+		if _, ok := e["error"]; ok {
+			// If we have an error, log the complete object on the basis
+			// that it is ECS-conformant.
+			if execLog.Core().Enabled(zapcore.ErrorLevel) {
+				kv := make([]any, 0, 2*len(e))
+				for k := range maps.Keys(e) {
+					kv = append(kv, k, e[k])
+				}
+				execLog.Errorw("single event object returned by evaluation", kv...)
+			}
+		} else {
+			// Otherwise, be consistent with the existing documented
+			// behaviour and log the entire object as the error.
+			execLog.Errorw("single event object returned by evaluation", "error", e)
+		}
+		if err, ok := e["error"]; ok {
+			s.health.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
+		} else {
+			s.health.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+		}
+		isDegraded = true
+		events = []any{e}
+		// Make sure the cursor is not updated.
+		delete(s.state, "cursor")
+	default:
+		err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
+		errorSpans(err, execSpan)
+		return result, err
+	}
+
+	// We have a non-empty batch of events to process.
+	s.metrics.AddReceivedBatch(execCtx, 1)
+	s.metrics.AddReceivedEvents(execCtx, uint(len(events)))
+	result.eventCount = len(events)
+	execSpan.SetAttributes(attribute.Int("cel.program.event_count", len(events)))
+	// Drop events from state. If we fail during the publication,
+	// we will re-request these events.
+	delete(s.state, "events")
+
+	// Get cursors if they exist.
+	var (
+		cursors      []any
+		singleCursor bool
+	)
+	if c, ok := s.state["cursor"]; ok {
+		cursors, ok = c.([]any)
+		if ok {
+			if len(cursors) != len(events) {
+				execLog.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
+				s.health.UpdateStatus(status.Degraded, "unexpected cursor list length")
+				isDegraded = true
+				// But try to continue.
+				if len(cursors) < len(events) {
+					cursors = nil
+				}
+			}
+		} else {
+			cursors = []any{c}
+			singleCursor = true
+		}
+	}
+	// Drop old cursor from state. This will be replaced with
+	// the current cursor object below; it is an array now.
+	delete(s.state, "cursor")
+
+	pubStart := time.Now()
+	var hadPublicationError bool
+
+	pubCtx, pubSpan := s.tracer.Start(execCtx, "cel.program.publish")
+	pubSpanEventCount := 0
+	pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
+	pubLog := logWithTracingIds(s.log, pubSpan)
+loop:
+	for i, e := range events {
+		event, ok := e.(map[string]any)
+		if !ok {
+			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+			errorSpans(err, end{pubSpan}, execSpan)
+			return result, err
+		}
+		var pubCursor any
+		if cursors != nil {
+			if singleCursor {
+				// Only set the cursor for publication at the last event
+				// when a single cursor object has been provided.
+				if i == len(events)-1 {
+					s.goodCursor = s.cursor
+					s.cursor, ok = cursors[0].(map[string]any)
+					if !ok {
+						err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+						s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+						errorSpans(err, end{pubSpan}, execSpan)
+						return result, err
+					}
+					pubCursor = s.cursor
+				}
+			} else {
+				s.goodCursor = s.cursor
+				s.cursor, ok = cursors[i].(map[string]any)
+				if !ok {
+					err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+					s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+					errorSpans(err, end{pubSpan}, execSpan)
+					return result, err
+				}
+				pubCursor = s.cursor
+			}
+		}
+		// This is checked prior to the publish attempt since the
+		// cursor.Publisher interface does not document the behaviour
+		// related to context cancellation and the context is not
+		// explicitly passed in, so favour this explicit clarity.
+		switch err := pubCtx.Err(); {
+		case err == nil:
+		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+			pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
+			// Don't update status, since we are about to pass
+			// through the Running state and then fall through
+			// to the input exit with a change to Stopped.
+			break loop
+		default:
+			// This should never happen.
+			pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
+			s.health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
+			isDegraded = true
+			break loop
+		}
+		err = s.pub.Publish(beat.Event{
+			Timestamp: time.Now(),
+			Fields:    event,
+		}, pubCursor)
+		if err != nil {
+			hadPublicationError = true
+			pubLog.Errorw("error publishing event", "error", err)
+			s.health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
+			errorSpans(err, pubSpan)
+			isDegraded = true
+			cursors = nil // We are lost, so retry with this event's cursor,
+			continue      // but continue with the events that we have without
+			// advancing the cursor. This allows us to potentially publish the
+			// events we have now, with a fallback to the last guaranteed
+			// correctly published cursor.
+		}
+		if i == 0 {
+			s.metrics.AddPublishedBatch(pubCtx, 1)
+		}
+		s.metrics.AddPublishedEvents(pubCtx, 1)
+		pubSpanEventCount++
+		pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
+
+		err = pubCtx.Err()
+		if err != nil {
+			s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+			errorSpans(err, end{pubSpan}, execSpan)
+			return result, err
+		}
+	}
+
+	if !isDegraded {
+		s.health.UpdateStatus(status.Running, "")
+	}
+
+	s.metrics.AddPublishDuration(pubCtx, time.Since(pubStart))
+	// Advance the cursor to the final state if there was no error during
+	// publications. This is needed to transition to the next set of events.
+	if !hadPublicationError && !isDegraded {
+		s.goodCursor = s.cursor
+		s.metrics.AddProgramSuccessExecution(pubCtx)
+		okSpans(pubSpan)
+	}
+	pubSpan.End()
+
+	// Replace the last known good cursor.
+	s.state["cursor"] = s.goodCursor
+	s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+	if more, _ := s.state["want_more"].(bool); !more {
+		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
+		okSpans(execSpan)
+		return result, nil
+	}
+	execSpan.SetAttributes(attribute.Bool("cel.program.want_more", true))
+
+	if budget <= 1 {
+		msg := "reached maximum number of CEL executions"
+		execLog.Warnw(msg+": will continue at next periodic evaluation",
+			"limit", *s.cfg.MaxExecutions,
+			"next_eval_time", start.Add(s.cfg.Interval),
+		)
+		s.health.UpdateStatus(status.Degraded, msg)
+		execSpan.SetStatus(codes.Unset, msg)
+		return result, nil
+	}
+
+	okSpans(execSpan)
+	return result, nil
 }
 
 // end is a tag type indicating spans in errorSpans and okSpans should be ended.
