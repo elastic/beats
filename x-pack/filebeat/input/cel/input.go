@@ -629,20 +629,18 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	// been stored and we can continue from that point, recovering
 	// the lost events and potentially re-requesting e3.
 
-	var ok bool
-	ok, result.waitUntil, err = handleResponse(execLog, s.state, s.limiter)
-	if err != nil || !ok {
+	result.waitUntil, result.action, err = handleResponse(s.state, s.limiter, execLog)
+	if err != nil || result.action.retry() {
 		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
 		if err != nil {
 			errorSpans(err, execSpan)
 			return result, err
 		}
-		result.action = retry429Action
 		errorSpans(errors.New("invalid response"), execSpan)
 		return result, nil
 	}
 
-	_, ok = s.state["url"]
+	_, ok := s.state["url"]
 	if !ok && s.goodURL != "" {
 		s.state["url"] = s.goodURL
 		execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", s.goodURL)
@@ -915,8 +913,8 @@ func periodically(ctx context.Context, each time.Duration, fn func(context.Conte
 }
 
 // handleResponse checks the response status code and handles rate limit changes.
-// It returns ok=true if the response is valid, otherwise false for a retry.
-func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rate.Limiter) (ok bool, waitUntil time.Time, err error) {
+func handleResponse(state map[string]any, limiter *rate.Limiter, log *logp.Logger) (time.Time, action, error) {
+	var waitUntil time.Time
 	var header http.Header
 	h, ok := state["header"]
 	if ok {
@@ -937,16 +935,16 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 					for i, e := range v {
 						vals[i], ok = e.(string)
 						if !ok {
-							return false, time.Time{}, fmt.Errorf("unexpected type returned for response header value: %T", v)
+							return time.Time{}, contAction, fmt.Errorf("unexpected type returned for response header value: %T", v)
 						}
 					}
 					header[k] = vals
 				default:
-					return false, waitUntil, fmt.Errorf("unexpected type returned for response header value set: %T", v)
+					return waitUntil, contAction, fmt.Errorf("unexpected type returned for response header value set: %T", v)
 				}
 			}
 		default:
-			return false, waitUntil, fmt.Errorf("unexpected type returned for response header: %T", h)
+			return waitUntil, contAction, fmt.Errorf("unexpected type returned for response header: %T", h)
 		}
 	}
 
@@ -963,7 +961,7 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 			// path.
 			waitUntil = handleRateLimit(log, r, header, limiter)
 		default:
-			return false, waitUntil, fmt.Errorf("unexpected type returned for response header: %T", h)
+			return waitUntil, contAction, fmt.Errorf("unexpected type returned for response header: %T", h)
 		}
 	}
 
@@ -979,11 +977,11 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 		case float64:
 			statusCode = int(sc)
 		default:
-			return false, waitUntil, fmt.Errorf("unexpected type returned for request status code: %T", sc)
+			return waitUntil, contAction, fmt.Errorf("unexpected type returned for request status code: %T", sc)
 		}
 		switch statusCode {
 		case http.StatusOK:
-			return true, time.Time{}, nil
+			return time.Time{}, contAction, nil
 		case http.StatusTooManyRequests:
 			// https://datatracker.ietf.org/doc/html/rfc6585#page-3
 			retry := header.Get("Retry-After")
@@ -997,17 +995,17 @@ func handleResponse(log *logp.Logger, state map[string]interface{}, limiter *rat
 					waitUntil = t
 				}
 			}
-			return false, waitUntil, nil
+			return waitUntil, retry429Action, nil
 		default:
 			status := http.StatusText(statusCode)
 			if status == "" {
 				status = "unknown status code"
 			}
 			state["events"] = errorMessage(fmt.Sprintf("failed http request with %s: %d", status, statusCode))
-			return true, time.Time{}, nil
+			return time.Time{}, contAction, nil
 		}
 	}
-	return true, waitUntil, nil
+	return waitUntil, contAction, nil
 }
 
 // handleRateLimit performs two related functions dealing with rate limits. The
