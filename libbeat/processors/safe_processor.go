@@ -23,6 +23,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -43,6 +44,9 @@ const (
 	stateClosed
 )
 
+var sharedProcessorMu sync.Mutex
+var sharedProcessors map[uint64]beat.Processor = make(map[uint64]beat.Processor)
+
 // SafeProcessor wraps a beat.Processor to provide thread-safe state management.
 // It ensures SetPaths is called only once and prevents Run after Close.
 // Use safeProcessorWithClose for processors that also implement Closer.
@@ -52,6 +56,9 @@ type SafeProcessor struct {
 	mu    sync.RWMutex
 	state state
 	paths *paths.Path
+
+	refCount int
+	hash     uint64
 }
 
 // safeProcessorWithClose extends SafeProcessor to also handle Close.
@@ -82,11 +89,16 @@ func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *safeProcessorWithClose) Close() (err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if p.state != stateClosed {
+	p.refCount--
+	if p.refCount == 0 && p.state != stateClosed {
+		sharedProcessorMu.Lock()
+		defer sharedProcessorMu.Unlock()
+		delete(sharedProcessors, p.hash)
 		p.state = stateClosed
 		return Close(p.Processor)
+	} else if p.state == stateClosed {
+		logp.L().Warnf("tried to close already closed %q processor", p.String())
 	}
-	logp.L().Warnf("tried to close already closed %q processor", p.String())
 	return nil
 }
 
@@ -132,21 +144,51 @@ func (p *SafeProcessor) SetPaths(paths *paths.Path) error {
 // or similar mechanisms. SafeWrap is automatically applied by RegisterPlugin.
 func SafeWrap(constructor Constructor) Constructor {
 	return func(config *config.C, log *logp.Logger) (beat.Processor, error) {
-		processor, err := constructor(config, log)
+		sharedProcessorMu.Lock()
+		defer sharedProcessorMu.Unlock()
+		hash, err := cfgfile.HashConfig(config)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash processor config: %w", err)
+		}
+		if p, ok := sharedProcessors[hash]; ok {
+			switch proc := p.(type) {
+			case *safeProcessorWithClose:
+				proc.mu.Lock()
+				defer proc.mu.Unlock()
+				proc.refCount++
+				return proc, nil
+			case *SafeProcessor:
+				proc.mu.Lock()
+				defer proc.mu.Unlock()
+				proc.refCount++
+				return proc, nil
+			}
+			return p, nil
+		}
+		safeProcessor, err := newSafeProcessor(log, constructor, config, hash)
 		if err != nil {
 			return nil, err
 		}
-		// if the processor does not implement `Closer` it does not need a wrap
-		if _, ok := processor.(Closer); !ok {
-			// if SetPaths is implemented, ensure single call of SetPaths
-			if _, ok = processor.(PathSetter); ok {
-				return &SafeProcessor{Processor: processor}, nil
-			}
-			return processor, nil
-		}
-
-		return &safeProcessorWithClose{
-			SafeProcessor: SafeProcessor{Processor: processor},
-		}, nil
+		sharedProcessors[hash] = safeProcessor
+		return safeProcessor, nil
 	}
+}
+
+func newSafeProcessor(log *logp.Logger, constructor Constructor, config *config.C, hash uint64) (beat.Processor, error) {
+	processor, err := constructor(config, log)
+	if err != nil {
+		return nil, err
+	}
+	// if the processor does not implement `Closer` it does not need a wrap
+	if _, ok := processor.(Closer); !ok {
+		// if SetPaths is implemented, ensure single call of SetPaths
+		if _, ok = processor.(PathSetter); ok {
+			return &SafeProcessor{Processor: processor, hash: hash}, nil
+		}
+		return processor, nil
+	}
+
+	return &safeProcessorWithClose{
+		SafeProcessor: SafeProcessor{Processor: processor, hash: hash},
+	}, nil
 }
