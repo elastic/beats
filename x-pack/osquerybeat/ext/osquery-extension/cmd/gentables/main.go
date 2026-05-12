@@ -30,7 +30,7 @@ import (
 	// See: https://github.com/pingcap/parser/issues/43
 	_ "github.com/pingcap/parser/test_driver"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // spec represents a unified specification for both tables and views
@@ -524,7 +524,7 @@ type readmeEntry struct {
 	Linux       string
 	Darwin      string
 	Windows     string
-	DocPath      string
+	DocPath     string
 }
 
 type readmeTemplateData struct {
