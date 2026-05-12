@@ -108,12 +108,30 @@ type PackageJSON struct {
 	Dependencies mapstr.M `json:"dependencies"`
 }
 
+// findNPMPath locates npm, checking common macOS paths because launchd services omit /usr/local/bin and /opt/homebrew/bin from PATH.
+func findNPMPath() (string, error) {
+	if path, err := exec.LookPath("npm"); err == nil {
+		return path, nil
+	}
+	for _, candidate := range []string{"/usr/local/bin/npm", "/opt/homebrew/bin/npm"} {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("npm not found in PATH or common locations (/usr/local/bin, /opt/homebrew/bin)")
+}
+
 // setupProjectDir sets ups the required package.json file and
 // links the synthetics dependency to the globally installed one that is
 // baked in to the Heartbeat image to maintain compatibility and
 // allows us to control the synthetics agent version
 func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) error {
-	out, err := exec.CommandContext(ctx, "npm", "root", "-g").CombinedOutput()
+	npmPath, err := findNPMPath()
+	if err != nil {
+		return err
+	}
+
+	out, err := exec.CommandContext(ctx, npmPath, "root", "-g").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("cannot resolve global npm root: %w: %s", err, strings.TrimSpace(string(out)))
 	}
@@ -152,7 +170,7 @@ func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) erro
 	return runSimpleCommand(log,
 		exec.CommandContext(
 			ctx,
-			"npm", "install",
+			npmPath, "install",
 			"--no-audit",           // Prevent audit checks that require internet
 			"--no-update-notifier", // Prevent update checks that require internet
 			"--no-fund",            // No need for package funding messages here
