@@ -482,11 +482,10 @@ func TestInitializationRetriesConnectionToDocker(t *testing.T) {
 		}, nil
 	}
 
-	testConfig, err := config.NewConfigFrom(map[string]interface{}{
+	testConfig := config.MustNewConfigFrom(map[string]any{
 		"match_fields":              []string{"foo"},
 		"connection_retry_interval": "1ms",
 	})
-	require.NoError(t, err, "build retry-enabled config")
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
 	require.NoError(t, err, "initializing add_docker_metadata processor")
@@ -513,11 +512,10 @@ func TestInitializationDoesNotRetryWhenDisabled(t *testing.T) {
 		return nil, errors.New("docker unavailable")
 	}
 
-	testConfig, err := config.NewConfigFrom(map[string]interface{}{
+	testConfig := config.MustNewConfigFrom(map[string]any{
 		"match_fields":              []string{"foo"},
 		"connection_retry_interval": 0,
 	})
-	require.NoError(t, err, "build retry-disabled config")
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
 	require.NoError(t, err, "initializing add_docker_metadata processor")
@@ -526,7 +524,7 @@ func TestInitializationDoesNotRetryWhenDisabled(t *testing.T) {
 	})
 
 	time.Sleep(20 * time.Millisecond)
-	assert.Equal(t, int32(1), attempts.Load(), "watcher constructor should not be retried when interval is disabled")
+	assert.EqualValues(t, 1, attempts.Load(), "watcher constructor should not be retried when interval is disabled")
 
 	result, runErr := p.Run(&beat.Event{Fields: mapstr.M{"foo": "container_id"}})
 	require.NoError(t, runErr, "processing an event")
