@@ -107,7 +107,7 @@ func mockCloserConstructor(config *config.C, log *logp.Logger) (beat.Processor, 
 func TestSafeWrap(t *testing.T) {
 	t.Run("does not wrap a non-closer processor", func(t *testing.T) {
 		nonCloser := mockConstructor
-		wrappedNonCloser := SafeWrap(nonCloser)
+		wrappedNonCloser := SafeWrap("non-closer processor", nonCloser)
 		wp, err := wrappedNonCloser(nil, nil)
 		require.NoError(t, err)
 		assert.IsType(t, &mockProcessor{}, wp)
@@ -116,7 +116,7 @@ func TestSafeWrap(t *testing.T) {
 
 	t.Run("wraps a closer processor", func(t *testing.T) {
 		closer := mockCloserConstructor
-		wrappedCloser := SafeWrap(closer)
+		wrappedCloser := SafeWrap("closer processor", closer)
 		wcp, err := wrappedCloser(nil, nil)
 		require.NoError(t, err)
 		assert.IsType(t, &safeProcessorWithClose{}, wcp)
@@ -131,7 +131,7 @@ func TestSafeProcessor(t *testing.T) {
 		err error
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
-		sw := SafeWrap(cons)
+		sw := SafeWrap("", cons)
 		sp, err = sw(nil, nil)
 		require.NoError(t, err)
 	})
@@ -177,7 +177,7 @@ func TestSafeProcessorSetPathsClose(t *testing.T) {
 		err error
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
-		sw := SafeWrap(cons)
+		sw := SafeWrap("", cons)
 		bp, err = sw(nil, nil)
 		require.NoError(t, err)
 		assert.Equal(t, 0, p.setPathsCount)
@@ -261,7 +261,7 @@ func TestSafeProcessorSetPaths(t *testing.T) {
 		err error
 	)
 	t.Run("creates a wrapped processor", func(t *testing.T) {
-		sw := SafeWrap(cons)
+		sw := SafeWrap("", cons)
 		bp, err = sw(nil, nil)
 		require.NoError(t, err)
 		assert.Equal(t, 0, p.setPathsCount)
