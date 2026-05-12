@@ -1,0 +1,96 @@
+- name: field_stats
+  type: group
+  description: >
+    `field_stats` contains per-field, per-shard usage statistics from the Field Usage Stats API.
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The field name.
+    - name: shard
+      type: group
+      description: >
+        Shard information for this field usage observation.
+      fields:
+        - name: tracking_id
+          type: keyword
+          description: >
+            The tracking ID of the shard.
+        - name: tracking_started_at_millis
+          type: long
+          description: >
+            The timestamp in milliseconds when tracking started for this shard.
+        - name: routing.state
+          type: keyword
+          description: >
+            The state of the shard (e.g. STARTED, INITIALIZING).
+        - name: routing.primary
+          type: boolean
+          description: >
+            Whether this shard is a primary shard.
+        - name: routing.node
+          type: keyword
+          description: >
+            The node ID where this shard is allocated.
+    - name: any
+      type: long
+      description: >
+        Total number of times any usage has been tracked for this field.
+    - name: inverted_index
+      type: group
+      description: >
+        Inverted index usage statistics.
+      fields:
+        - name: terms
+          type: long
+          description: >
+            Number of times the terms component of the inverted index was used.
+        - name: postings
+          type: long
+          description: >
+            Number of times the postings component of the inverted index was used.
+        - name: proximity
+          type: long
+          description: >
+            Number of times the proximity component of the inverted index was used.
+        - name: positions
+          type: long
+          description: >
+            Number of times the positions component of the inverted index was used.
+        - name: term_frequencies
+          type: long
+          description: >
+            Number of times the term frequencies component of the inverted index was used.
+        - name: offsets
+          type: long
+          description: >
+            Number of times the offsets component of the inverted index was used.
+        - name: payloads
+          type: long
+          description: >
+            Number of times the payloads component of the inverted index was used.
+    - name: stored_fields
+      type: long
+      description: >
+        Number of times stored fields were used for this field.
+    - name: doc_values
+      type: long
+      description: >
+        Number of times doc values were used for this field.
+    - name: points
+      type: long
+      description: >
+        Number of times points (e.g. for range queries on numeric/date fields) were used for this field.
+    - name: norms
+      type: long
+      description: >
+        Number of times norms were used for this field.
+    - name: term_vectors
+      type: long
+      description: >
+        Number of times term vectors were used for this field.
+    - name: knn_vectors
+      type: long
+      description: >
+        Number of times KNN vectors were used for this field.

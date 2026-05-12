@@ -1334,6 +1334,138 @@ Enrich stats
     type: long
 
 
+## field_stats [_field_stats]
+
+`field_stats` contains per-field, per-shard usage statistics from the Field Usage Stats API.
+
+**`elasticsearch.field_stats.name`**
+:   The field name.
+
+    type: keyword
+
+
+## shard [_shard]
+
+Shard information for this field usage observation.
+
+**`elasticsearch.field_stats.shard.tracking_id`**
+:   The tracking ID of the shard.
+
+    type: keyword
+
+
+**`elasticsearch.field_stats.shard.tracking_started_at_millis`**
+:   The timestamp in milliseconds when tracking started for this shard.
+
+    type: long
+
+
+**`elasticsearch.field_stats.shard.routing.state`**
+:   The state of the shard (e.g. STARTED, INITIALIZING).
+
+    type: keyword
+
+
+**`elasticsearch.field_stats.shard.routing.primary`**
+:   Whether this shard is a primary shard.
+
+    type: boolean
+
+
+**`elasticsearch.field_stats.shard.routing.node`**
+:   The node ID where this shard is allocated.
+
+    type: keyword
+
+
+**`elasticsearch.field_stats.any`**
+:   Total number of times any usage has been tracked for this field.
+
+    type: long
+
+
+## inverted_index [_inverted_index]
+
+Inverted index usage statistics.
+
+**`elasticsearch.field_stats.inverted_index.terms`**
+:   Number of times the terms component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.inverted_index.postings`**
+:   Number of times the postings component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.inverted_index.proximity`**
+:   Number of times the proximity component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.inverted_index.positions`**
+:   Number of times the positions component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.inverted_index.term_frequencies`**
+:   Number of times the term frequencies component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.inverted_index.offsets`**
+:   Number of times the offsets component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.inverted_index.payloads`**
+:   Number of times the payloads component of the inverted index was used.
+
+    type: long
+
+
+**`elasticsearch.field_stats.stored_fields`**
+:   Number of times stored fields were used for this field.
+
+    type: long
+
+
+**`elasticsearch.field_stats.doc_values`**
+:   Number of times doc values were used for this field.
+
+    type: long
+
+
+**`elasticsearch.field_stats.points`**
+:   Number of times points (e.g. for range queries on numeric/date fields) were used for this field.
+
+    type: long
+
+
+**`elasticsearch.field_stats.norms`**
+:   Number of times norms were used for this field.
+
+    type: long
+
+
+**`elasticsearch.field_stats.term_vectors`**
+:   Number of times term vectors were used for this field.
+
+    type: long
+
+
+**`elasticsearch.field_stats.knn_vectors`**
+:   Number of times KNN vectors were used for this field.
+
+    type: long
+
+
 ## index [_index]
 
 index

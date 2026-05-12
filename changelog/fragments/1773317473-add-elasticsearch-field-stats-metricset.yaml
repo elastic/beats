@@ -1,0 +1,4 @@
+kind: feature
+summary: Add field_stats metricset to the Elasticsearch module
+component: "metricbeat"
+pr: https://github.com/elastic/beats/pull/49421

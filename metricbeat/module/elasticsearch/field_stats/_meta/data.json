@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2024-03-10T12:00:00.000Z",
+    "metricset": {
+        "name": "field_stats",
+        "module": "elasticsearch",
+        "host": "localhost:9200"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "abc123",
+            "name": "my-cluster"
+        },
+        "index": {
+            "name": "my-index-000001"
+        },
+        "field_stats": {
+            "name": "message",
+            "shard": {
+                "tracking_id": "A_LkEJn8TYWkWJn0Fq-xhA",
+                "tracking_started_at_millis": 1710000000000,
+                "routing": {
+                    "state": "STARTED",
+                    "primary": true,
+                    "node": "node-1"
+                }
+            },
+            "any": 80,
+            "inverted_index": {
+                "terms": 30,
+                "postings": 25,
+                "proximity": 5,
+                "positions": 4,
+                "term_frequencies": 20,
+                "offsets": 3,
+                "payloads": 0
+            },
+            "stored_fields": 40,
+            "doc_values": 0,
+            "points": 0,
+            "norms": 10,
+            "term_vectors": 0,
+            "knn_vectors": 0
+        }
+    },
+    "agent": {
+        "name": "host.example.com",
+        "hostname": "host.example.com"
+    }
+}

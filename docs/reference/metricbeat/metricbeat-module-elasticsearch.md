@@ -104,6 +104,7 @@ The following metricsets are available:
 * [ccr](/reference/metricbeat/metricbeat-metricset-elasticsearch-ccr.md)
 * [cluster_stats](/reference/metricbeat/metricbeat-metricset-elasticsearch-cluster_stats.md)
 * [enrich](/reference/metricbeat/metricbeat-metricset-elasticsearch-enrich.md)
+* [field_stats](/reference/metricbeat/metricbeat-metricset-elasticsearch-field_stats.md)
 * [index](/reference/metricbeat/metricbeat-metricset-elasticsearch-index.md)
 * [index_recovery](/reference/metricbeat/metricbeat-metricset-elasticsearch-index_recovery.md)
 * [index_summary](/reference/metricbeat/metricbeat-metricset-elasticsearch-index_summary.md)
