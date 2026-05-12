@@ -6,6 +6,7 @@ paths:
 exclude_files: [".gz$"]
 exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines\n
 processors:
+  - add_locale: ~
   - add_fields:
       target: ''
       fields:
