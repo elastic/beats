@@ -120,7 +120,7 @@ func newDiskQueueACKs(
 ) *diskQueueACKs {
 	return &diskQueueACKs{
 		logger:            logger,
-		nextFrameID:       0,
+		nextFrameID:       frameID(position.frameIndex),
 		nextPosition:      position,
 		frameSize:         make(map[frameID]uint64),
 		segmentBoundaries: make(map[frameID]*queueSegment),
