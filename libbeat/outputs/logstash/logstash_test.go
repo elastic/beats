@@ -188,7 +188,7 @@ func newTestLumberjackOutput(
 
 	logger := logptest.NewTestingLogger(t, "")
 	cfg, _ := conf.NewConfigFrom(config)
-	grp, err := outputs.Load(nil, beat.Info{Logger: logger}, nil, "logstash", cfg, paths.New())
+	grp, err := outputs.Load(nil, beat.Info{Logger: logger, Paths: paths.New()}, nil, "logstash", cfg)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}
