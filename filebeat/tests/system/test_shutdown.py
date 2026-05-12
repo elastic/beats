@@ -36,7 +36,6 @@ class Test(BaseTest):
                 time.sleep(.5)
             proc.check_kill_and_wait()
 
-    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/14647")
     def test_shutdown_wait_ok(self):
         """
         Test stopping filebeat under load: wait for all events being published.
@@ -48,6 +47,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="10s",
+            rotate_every_kb=10000,
         )
         filebeat = self.start_beat()
 
