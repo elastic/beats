@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -125,11 +126,16 @@ func TestProcessorsForConfig(t *testing.T) {
 			continue
 		}
 
-		editor, err := newCommonConfigEditor(test.beatInfo, config)
+		editor, sharedProcs, err := newCommonConfigEditor(test.beatInfo, config)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
+		t.Cleanup(func() {
+			if sharedProcs != nil {
+				_ = sharedProcs.Close()
+			}
+		})
 
 		clientCfg, err := editor(test.clientCfg)
 		require.NoError(t, err)
@@ -181,10 +187,15 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	editor, err := newCommonConfigEditor(beat.Info{}, config)
+	editor, sharedProcs, err := newCommonConfigEditor(beat.Info{}, config)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() {
+		if sharedProcs != nil {
+			_ = sharedProcs.Close()
+		}
+	})
 
 	clientCfg, err := editor(beat.ClientConfig{})
 	require.NoError(t, err)
@@ -256,8 +267,155 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 
 	// create a wrapped runner, our mock runner will
 	// create the given amount of clients here using the wrapped pipeline connector.
-	_, err = rfwc.Create(pcm, cfg)
+	runner, err := rfwc.Create(pcm, cfg)
 	require.NoError(t, err)
+	t.Cleanup(runner.Stop)
 
 	rf.Assert(t)
 }
+
+// TestSharedProcessorsAcrossClients verifies that, after the hoisting fix,
+// the user-configured processors and the index processor are constructed
+// once per input and shared across all clients connected to the wrapped
+// pipeline — instead of being instantiated per client/harvester (the
+// blow-up reported in elastic/beats#50376).
+func TestSharedProcessorsAcrossClients(t *testing.T) {
+	configYAML := `
+processors:
+  - add_fields: {fields: {testField: a}}
+  - add_fields: {fields: {testField2: b}}
+index: "static-index"
+`
+	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
+	require.NoError(t, err)
+
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, "")}
+
+	editor, sharedProcs, err := newCommonConfigEditor(b, cfg)
+	require.NoError(t, err)
+	require.NotNil(t, sharedProcs)
+	t.Cleanup(func() { _ = sharedProcs.Close() })
+
+	// 2 add_fields + 1 index processor = 3
+	require.Len(t, sharedProcs.List, 3)
+
+	const numClients = 4
+	collected := make([][]beat.Processor, 0, numClients)
+	for i := 0; i < numClients; i++ {
+		clientCfg, err := editor(beat.ClientConfig{})
+		require.NoError(t, err)
+		collected = append(collected, clientCfg.Processing.Processor.All())
+	}
+
+	// All client lists should have the same length and reference the same
+	// underlying instances via noCloseProcessor wrappers — wrappers differ
+	// per call (cheap), but the inner pointer must be identical.
+	require.NotEmpty(t, collected[0])
+	for i := 1; i < numClients; i++ {
+		require.Len(t, collected[i], len(collected[0]))
+		for j := range collected[i] {
+			w0, ok := collected[0][j].(*noCloseProcessor)
+			require.Truef(t, ok, "client 0 processor[%d] must be *noCloseProcessor, got %T", j, collected[0][j])
+			wi, ok := collected[i][j].(*noCloseProcessor)
+			require.Truef(t, ok, "client %d processor[%d] must be *noCloseProcessor, got %T", i, j, collected[i][j])
+			require.NotSamef(t, w0, wi, "wrapper objects must be distinct (cheap per-client allocation)")
+			require.Samef(t, w0.inner, wi.inner, "underlying shared processor instance must be identical across clients (processor[%d])", j)
+		}
+	}
+}
+
+// TestNoCloseProcessor verifies that the per-client wrapper:
+//   - does NOT propagate Close to the shared inner processor
+//   - DOES forward SetPaths so lazy-init processors (cache, script,
+//     conditional processors with path-aware children) work correctly.
+func TestNoCloseProcessor(t *testing.T) {
+	inner := &recordingProcessor{}
+	w := &noCloseProcessor{inner: inner}
+
+	// Close path: a per-client list closing the wrapper must not close inner.
+	require.NoError(t, processors.Close(w))
+	require.Falsef(t, inner.closed, "inner processor must not be closed via the wrapper")
+
+	// SetPaths forwarding: the wrapper must implement PathSetter and delegate.
+	ps, ok := any(w).(processors.PathSetter)
+	require.Truef(t, ok, "noCloseProcessor must implement PathSetter so the publisher pipeline's group.SetPaths reaches the inner processor")
+	require.NoError(t, ps.SetPaths(nil))
+	require.Equal(t, 1, inner.setPathsCalls)
+
+	// Run forwarding: events flow through to inner.
+	ev := &beat.Event{Fields: mapstr.M{}}
+	out, err := w.Run(ev)
+	require.NoError(t, err)
+	require.Same(t, ev, out)
+	require.Equal(t, 1, inner.runCalls)
+}
+
+// recordingProcessor implements beat.Processor, processors.Closer, and
+// processors.PathSetter to observe what the wrapper forwards or suppresses.
+type recordingProcessor struct {
+	closed        bool
+	runCalls      int
+	setPathsCalls int
+}
+
+func (r *recordingProcessor) Run(ev *beat.Event) (*beat.Event, error) {
+	r.runCalls++
+	return ev, nil
+}
+
+func (r *recordingProcessor) String() string { return "recordingProcessor" }
+
+func (r *recordingProcessor) Close() error {
+	r.closed = true
+	return nil
+}
+
+// SetPaths is intentionally permissive (any *paths.Path, including nil).
+func (r *recordingProcessor) SetPaths(_ *paths.Path) error {
+	r.setPathsCalls++
+	return nil
+}
+
+// TestRunnerWithSharedProcessorsClosesProcessorsAtStop verifies the new
+// runner.Stop() ordering: the wrapped Runner stops first (draining all
+// pipeline clients), THEN the shared processors are closed. Stop is also
+// safe to call more than once.
+func TestRunnerWithSharedProcessorsClosesProcessorsAtStop(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	inner1 := &recordingProcessor{}
+	inner2 := &recordingProcessor{}
+
+	procs := processors.NewList(logger)
+	procs.AddProcessor(inner1)
+	procs.AddProcessor(inner2)
+
+	stopped := 0
+	r := &runnerWithSharedProcessors{
+		Runner: &stopOrderRunner{onStop: func() {
+			stopped++
+			// Inner must still be live when the underlying Runner is
+			// stopping — clients may still be flushing on Stop().
+			require.Falsef(t, inner1.closed, "shared processor closed before Runner.Stop returned")
+			require.Falsef(t, inner2.closed, "shared processor closed before Runner.Stop returned")
+		}},
+		procs: procs,
+	}
+
+	r.Stop()
+	require.Equal(t, 1, stopped)
+	require.True(t, inner1.closed, "shared processor must be closed after Runner.Stop returns")
+	require.True(t, inner2.closed, "shared processor must be closed after Runner.Stop returns")
+
+	// Idempotent: a second Stop must not call the underlying Stop again
+	// and must not error.
+	r.Stop()
+	require.Equal(t, 1, stopped, "Stop must be idempotent")
+}
+
+type stopOrderRunner struct {
+	onStop func()
+}
+
+func (s *stopOrderRunner) Start()         {}
+func (s *stopOrderRunner) Stop()          { s.onStop() }
+func (s *stopOrderRunner) String() string { return "stopOrderRunner" }

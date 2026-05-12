@@ -1,0 +1,12 @@
+kind: bug-fix
+summary: Build input-level processors once per input instead of once per filestream harvester
+description: |
+  Filebeat's channel runner previously instantiated the user-configured
+  `processors:` list (and the index processor) inside the per-client editor
+  closure. For filestream inputs each harvester opens its own pipeline client,
+  so every matched file got a fresh processor list — including a fresh
+  `add_kubernetes_metadata`, `add_cloud_metadata`, etc. with their watchers,
+  caches, and goroutines. At ~1K files this multiplied goroutines ~12x, RSS
+  ~2x, and CPU ~6x. Processors are now built once per input and shared across
+  clients via no-close wrappers; lifecycle is owned by the input runner.
+component: filebeat
