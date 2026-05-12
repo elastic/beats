@@ -40,7 +40,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -352,7 +351,7 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion, Logger: logger}, outputs.NewNilObserver(), config, paths.New())
+	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion, Logger: logger}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}
