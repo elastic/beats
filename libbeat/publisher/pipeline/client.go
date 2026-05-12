@@ -139,7 +139,7 @@ func (c *client) Close() error {
 		// signalClose. Without this, signalClose could see zero pending
 		// events while a Publish is between the isOpen check and AddEvent.
 		c.mutex.Lock()
-		c.mutex.Unlock()
+		c.mutex.Unlock() //nolint:staticcheck // SA2001 empty critical section is intentional as a synchronization barrier
 
 		c.logger.Debug("client: closing acker")
 		c.waiter.signalClose()
@@ -209,7 +209,7 @@ func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
 }
 
 func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Add(^uint32(n - 1))
+	value := w.events.Add(^uint32(n - 1)) //nolint:gosec // G115 n is always a small positive count
 	if value != 0 {
 		return
 	}
