@@ -66,6 +66,10 @@ type Settings struct {
 
 	// UseCompression enables or disables LZ4 compression
 	UseCompression bool
+
+	// DisableSegmentCleanup disables deletion of fully ACKed segment files.
+	// This is intended for tests that need deterministic on-disk segment state.
+	DisableSegmentCleanup bool
 }
 
 // userConfig holds the parameters for a disk queue that are configurable

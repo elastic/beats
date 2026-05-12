@@ -1017,6 +1017,32 @@ func TestObserverDeleteSegment(t *testing.T) {
 	assertRegistryUint(t, reg, "queue.removed.bytes", 1234+567, "Deleted bytes should be reported")
 }
 
+func TestMaybeDeleteACKedCanBeDisabled(t *testing.T) {
+	dq := diskQueue{
+		settings: Settings{
+			DisableSegmentCleanup: true,
+		},
+		segments: diskQueueSegments{
+			acked: []*queueSegment{{id: 1}},
+		},
+		deleterLoop: &deleterLoop{
+			requestChan: make(chan deleterLoopRequest, 1),
+		},
+	}
+
+	dq.maybeDeleteACKed()
+
+	select {
+	case <-dq.deleterLoop.requestChan:
+		t.Fatal("segment deletion request should not be sent when cleanup is disabled")
+	default:
+	}
+
+	if dq.deleting {
+		t.Fatal("deleting flag should remain false when cleanup is disabled")
+	}
+}
+
 func boolRef(b bool) *bool {
 	return &b
 }

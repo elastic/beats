@@ -106,6 +106,7 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 	settings.Path = diskQueuePath
 	// Keep segment size small enough to produce multiple segments quickly.
 	settings.MaxSegmentSize = 4 * 1024
+	settings.DisableSegmentCleanup = true
 
 	fileLogger := logptest.NewFileLogger(t, workDir)
 

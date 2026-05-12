@@ -402,6 +402,10 @@ func (dq *diskQueue) maybeReadPending() {
 // If the acked list is nonempty, and there are no outstanding deletion
 // requests, send one.
 func (dq *diskQueue) maybeDeleteACKed() {
+	if dq.settings.DisableSegmentCleanup {
+		return
+	}
+
 	if !dq.deleting && len(dq.segments.acked) > 0 {
 		dq.deleterLoop.requestChan <- deleterLoopRequest{
 			segments: dq.segments.acked}
