@@ -58,6 +58,11 @@ func formatBatchCursorTime(t time.Time) string {
 func parseBatchCursorTime(raw string) (time.Time, error) {
 	for _, layout := range supportedBatchTimeLayouts {
 		if ts, err := time.Parse(layout, raw); err == nil {
+			// .UTC() is a timezone normalization, not a monotonic-clock
+			// strip: time.Parse never sets a monotonic reading, so there
+			// is nothing to strip here. Normalizing to UTC keeps every
+			// downstream comparison and re-format in a single zone
+			// regardless of which supportedBatchTimeLayouts matched.
 			return ts.UTC(), nil
 		}
 	}

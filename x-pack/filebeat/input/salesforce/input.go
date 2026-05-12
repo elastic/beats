@@ -554,6 +554,14 @@ func (s *salesforceInput) runObjectBatches() error {
 		return err
 	}
 
+	// .UTC() intentionally strips the monotonic clock reading set by
+	// timeNow(). runEnd is only ever compared against window.End (derived
+	// from persisted cursor strings via parseBatchCursorTime, which carry
+	// no monotonic reading) and persisted via formatBatchCursorTime, so
+	// every use is wall-clock by construction. Keeping the monotonic
+	// reading would be misleading rather than useful — the time.Before
+	// comparison would fall back to wall-clock anyway because the other
+	// operand lacks one.
 	runEnd := timeNow().UTC()
 	totalEvents := 0
 
