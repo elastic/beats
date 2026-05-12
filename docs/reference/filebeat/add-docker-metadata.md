@@ -86,5 +86,5 @@ It has the following settings:
 :   (Optional) Defaults to true. When true, replaces dots (`.`) in labels with underscores (`_`).
 
 `connection_retry_interval`
-:   (Optional) Retry interval used when Docker is not reachable during processor initialization. Defaults to `10s`. Set to `0` to disable retries after an initial connection failure.
+:   (Optional) Retry interval used when Docker is not reachable during processor initialization. Defaults to `10s`. Set to `0` to deactivate retries after an initial connection failure.
 
