@@ -452,6 +452,94 @@ func (s *runSession) runCycle(ctx context.Context) error {
 	}
 }
 
+// execute runs one CEL evaluation and publishes any returned events.
+//
+// When it has the new state from the CEL evaluation, execute consumes
+// response-control fields, validates events and cursors, publishes events, and
+// leaves s.state ready for the next evaluation.
+//
+// The evaluated CEL state is expected to have this shape:
+//
+//	{
+//	    "cursor": [
+//	        {...},
+//	        ...
+//	    ],
+//	    "events": [
+//	        {...},
+//	        ...
+//	    ],
+//	    "url": <resource address>,
+//	    "status_code": <HTTP request status code if a network request>,
+//	    "header": <HTTP response headers if a network request>,
+//	    "rate_limit": <HTTP rate limit map if required by API>,
+//	    "want_more": bool
+//	}
+//
+// The "events" array must be present, but may be empty or null.
+// In the case of an error condition in the CEL program it is
+// acceptable to return a single object which will be wrapped as
+// an array below. It is the responsibility of the downstream
+// processor to handle this object correctly (which may be to drop
+// the event). The error event will also be logged.
+// If it is not empty, it must only have objects as elements.
+// Additional fields may be present at the root of the object.
+// The evaluation is repeated with the new state, after removing
+// the events field, if the "want_more" field is present and true
+// and a non-zero events array is returned.
+//
+// If cursor is present it must be either a single object or an
+// array with the same length as events; each element i of the
+// cursor array will be the details for obtaining the events at or
+// beyond event i in events. If the cursor is a single object it
+// will be the details for obtaining events after the last
+// event in the events array and will only be retained on
+// successful publication of all the events in the array.
+//
+// If rate_limit is present it should be a map with numeric fields
+// rate and burst. It may also have a string error field and
+// other fields which will be logged. If it has an error field
+// the rate and burst will not be used to set rate limit behaviour.
+//
+// The status code and rate_limit values may be omitted if they do
+// not contribute to control.
+//
+// Cursor arrays work as follows:
+//
+// Result after request resulting in 5 events. Each c obtained with
+// an e points to the ~next e.
+//
+//	+----+   +----+        +----+
+//	| e1 |   | c1 |        | e1 |
+//	+----+   +----+        +----+   +----+
+//	| e2 |   | c2 |        | e2 | < | c1 |
+//	+----+   +----+        +----+   +----+
+//	| e3 |   | c3 |        | e3 | < | c2 |
+//	+----+   +----+   =>   +----+   +----+
+//	| e4 |   | c4 |        | e4 | < | c3 |
+//	+----+   +----+        +----+   +----+
+//	| e5 |   | c5 |        | e5 | < | c4 |
+//	+----+   +----+        +----+   +----+
+//	                       |next| < | c5 |
+//	                       +----+   +----+
+//
+// After a successful publication this will leave a single c and
+// an empty events array. So the next evaluation has a boot.
+//
+// If the publication fails or execution is terminated at some
+// point during the events array, we may end up with, e.g.
+//
+//	+----+  +----+        +----+   +----+
+//	| e3 |  | c3 |        |next| < | c3 |
+//	+----+  +----+        +----+   +----+
+//	| e4 |  | c4 |   =>
+//	+----+  +----+          lost events
+//	| e5 |  | c5 |
+//	+----+  +----+
+//
+// At this point, the c3 cursor (or at worst the c2 cursor) has
+// been stored and we can continue from that point, recovering
+// the lost events and potentially re-requesting e3.
 func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (executeResult, error) {
 	result := executeResult{
 		action: contAction,
@@ -504,89 +592,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	if s.trace != nil {
 		execLog.Debugw("final transaction", "transaction.id", s.trace.TxID())
 	}
-
-	// On exit, state is expected to be in the shape:
-	//
-	// {
-	//     "cursor": [
-	//         {...},
-	//         ...
-	//     ],
-	//     "events": [
-	//         {...},
-	//         ...
-	//     ],
-	//     "url": <resource address>,
-	//     "status_code": <HTTP request status code if a network request>,
-	//     "header": <HTTP response headers if a network request>,
-	//     "rate_limit": <HTTP rate limit map if required by API>,
-	//     "want_more": bool
-	// }
-	//
-	// The "events" array must be present, but may be empty or null.
-	// In the case of an error condition in the CEL program it is
-	// acceptable to return a single object which will be wrapped as
-	// an array below. It is the responsibility of the downstream
-	// processor to handle this object correctly (which may be to drop
-	// the event). The error event will also be logged.
-	// If it is not empty, it must only have objects as elements.
-	// Additional fields may be present at the root of the object.
-	// The evaluation is repeated with the new state, after removing
-	// the events field, if the "want_more" field is present and true
-	// and a non-zero events array is returned.
-	//
-	// If cursor is present it must be either a single object or an
-	// array with the same length as events; each element i of the
-	// cursor array will be the details for obtaining the events at or
-	// beyond event i in events. If the cursor is a single object it
-	// is will be the details for obtaining events after the last
-	// event in the events array and will only be retained on
-	// successful publication of all the events in the array.
-	//
-	// If rate_limit is present it should be a map with numeric fields
-	// rate and burst. It may also have a string error field and
-	// other fields which will be logged. If it has an error field
-	// the rate and burst will not be used to set rate limit behaviour.
-	//
-	// The status code and rate_limit values may be omitted if they do
-	// not contribute to control.
-	//
-	// The following details how a cursor array works:
-	//
-	// Result after request resulting in 5 events. Each c obtained with
-	// an e points to the ~next e.
-	//
-	//    +----+   +----+        +----+
-	//    | e1 |   | c1 |        | e1 |
-	//    +----+   +----+        +----+   +----+
-	//    | e2 |   | c2 |        | e2 | < | c1 |
-	//    +----+   +----+        +----+   +----+
-	//    | e3 |   | c3 |        | e3 | < | c2 |
-	//    +----+   +----+   =>   +----+   +----+
-	//    | e4 |   | c4 |        | e4 | < | c3 |
-	//    +----+   +----+        +----+   +----+
-	//    | e5 |   | c5 |        | e5 | < | c4 |
-	//    +----+   +----+        +----+   +----+
-	//                           |next| < | c5 |
-	//                           +----+   +----+
-	//
-	// After a successful publication this will leave a single c and
-	// and empty events array. So the next evaluation has a boot.
-	//
-	// If the publication fails or execution is terminated at some
-	// point during the events array, we may end up with, e.g.
-	//
-	//    +----+  +----+        +----+   +----+
-	//    | e3 |  | c3 |        |next| < | c3 |
-	//    +----+  +----+        +----+   +----+
-	//    | e4 |  | c4 |   =>
-	//    +----+  +----+          lost events
-	//    | e5 |  | c5 |
-	//    +----+  +----+
-	//
-	// At this point, the c3 cursor (or at worst the c2 cursor) has
-	// been stored and we can continue from that point, recovering
-	// the lost events and potentially re-requesting e3.
 
 	result.waitUntil, result.action, err = handleResponse(s.state, s.limiter, execLog)
 	if err != nil || result.action.retry() {
