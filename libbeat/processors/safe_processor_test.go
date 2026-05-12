@@ -253,6 +253,93 @@ func TestSafeProcessorSetPathsClose(t *testing.T) {
 	})
 }
 
+func TestSafeWrapSharedInstanceByNameAndHash(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	sw := SafeWrap("test-shared-instance", cons)
+
+	proc1, err := sw(nil, nil)
+	require.NoError(t, err, "first SafeWrap call should succeed")
+
+	proc2, err := sw(nil, nil)
+	require.NoError(t, err, "second SafeWrap call should succeed")
+
+	assert.Same(t, proc1, proc2, "same name+config should return the same processor pointer")
+
+	_, err = proc1.Run(nil)
+	require.NoError(t, err, "Run via proc1 should succeed")
+	assert.Equal(t, 1, p.runCount, "run should be reflected in the underlying mock")
+
+	require.NoError(t, Close(proc1), "first Close should not error")
+	assert.Equal(t, 0, p.closeCount, "underlying processor should not be closed while a ref remains")
+
+	require.NoError(t, Close(proc2), "second Close should not error")
+	assert.Equal(t, 1, p.closeCount, "underlying processor should be closed once all refs are released")
+}
+
+func TestSafeWrapDifferentNamesNotShared(t *testing.T) {
+	cons1, p1 := newMockCloserConstructor()
+	cons2, p2 := newMockCloserConstructor()
+
+	proc1, err := SafeWrap("test-name-a", cons1)(nil, nil)
+	require.NoError(t, err, "SafeWrap for name-a should succeed")
+
+	proc2, err := SafeWrap("test-name-b", cons2)(nil, nil)
+	require.NoError(t, err, "SafeWrap for name-b should succeed")
+
+	assert.NotSame(t, proc1, proc2, "different names must produce separate processor instances")
+
+	_, err = proc1.Run(nil)
+	require.NoError(t, err, "Run on proc1 should succeed")
+	assert.Equal(t, 1, p1.runCount, "run should only increment p1.runCount")
+	assert.Equal(t, 0, p2.runCount, "p2.runCount must remain 0")
+
+	require.NoError(t, Close(proc1))
+	require.NoError(t, Close(proc2))
+	assert.Equal(t, 1, p1.closeCount, "p1 should be closed exactly once")
+	assert.Equal(t, 1, p2.closeCount, "p2 should be closed exactly once")
+}
+
+func TestSafeWrapRefCountingPreventsEarlyClose(t *testing.T) {
+	cons, p := newMockCloserConstructor()
+	sw := SafeWrap("test-refcount", cons)
+
+	proc1, err := sw(nil, nil)
+	require.NoError(t, err)
+	proc2, err := sw(nil, nil)
+	require.NoError(t, err)
+	proc3, err := sw(nil, nil)
+	require.NoError(t, err)
+
+	require.NoError(t, Close(proc1))
+	assert.Equal(t, 0, p.closeCount, "should not close after first of three Close calls")
+
+	require.NoError(t, Close(proc2))
+	assert.Equal(t, 0, p.closeCount, "should not close after second of three Close calls")
+
+	require.NoError(t, Close(proc3))
+	assert.Equal(t, 1, p.closeCount, "should close exactly once after last ref is released")
+}
+
+func TestSafeWrapNewInstanceAfterAllRefsClosed(t *testing.T) {
+	sw := SafeWrap("test-recreate-after-close", mockCloserConstructor)
+
+	proc1, err := sw(nil, nil)
+	require.NoError(t, err, "initial SafeWrap call should succeed")
+
+	require.NoError(t, Close(proc1), "closing the only reference should succeed")
+
+	// Entry is removed from sharedProcessors; next call must build a fresh instance.
+	proc2, err := sw(nil, nil)
+	require.NoError(t, err, "SafeWrap after full close should succeed")
+
+	assert.NotSame(t, proc1, proc2, "a new instance must be created after all refs are closed")
+
+	_, err = proc2.Run(nil)
+	assert.NoError(t, err, "newly created processor must be runnable")
+
+	require.NoError(t, Close(proc2))
+}
+
 func TestSafeProcessorSetPaths(t *testing.T) {
 	cons, p := newMockPathSetterProcessor()
 	var (

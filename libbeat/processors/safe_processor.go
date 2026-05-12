@@ -91,7 +91,7 @@ func (p *safeProcessorWithClose) Close() (err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.refCount--
-	if p.refCount <= 0 && p.state != stateClosed {
+	if p.refCount == 0 && p.state != stateClosed {
 		sharedProcessorMu.Lock()
 		defer sharedProcessorMu.Unlock()
 		delete(sharedProcessors[p.name], p.hash)
