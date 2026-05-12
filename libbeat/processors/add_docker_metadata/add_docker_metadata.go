@@ -26,6 +26,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -71,6 +72,8 @@ type addDockerMetadata struct {
 	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
 	dedot           bool          // If set to true, replace dots in labels with `_`.
 	dockerAvailable atomic.Bool   // If Docker exists in env, then it is set to true
+	closeRetry      chan struct{} // Channel to signal the connection retry goroutine to stop
+	waitRetry       sync.WaitGroup
 	cgreader        processors.CGReader
 }
 
@@ -87,24 +90,9 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	var dockerAvailable bool
-
-	watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
-	if err != nil {
-		dockerAvailable = false
-		log.Debugf("%v: docker environment not detected: %+v", processorName, err)
-	} else {
-		dockerAvailable = true
-		log.Debugf("%v: docker environment detected", processorName)
-		if err = watcher.Start(); err != nil {
-			// mark dockerAvailable as false because watcher creation failed
-			dockerAvailable = false
-			log.Infof("unable to start the docker watcher: %v", err)
-		}
-	}
-
 	// Use extract_field processor to get container ID from source file path.
 	var sourceProcessor beat.Processor
+	var err error
 	if config.MatchSource {
 		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",
@@ -127,46 +115,58 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 
 	dm := addDockerMetadata{
 		log:             log,
-		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		dedot:           config.DeDot,
-		dockerAvailable: atomic.Bool{},
 		cgreader:        reader,
+		closeRetry:      make(chan struct{}),
 	}
-	dm.dockerAvailable.Store(dockerAvailable)
 
-	// If docker is not available, try reconnecting at set intervals
-	if !dockerAvailable && config.ConnectionRetryInterval > 0 {
-		go func() {
-			dm.log.Debugf("connection_retry_interval set, trying to reconnect every %s.", config.ConnectionRetryInterval)
+	constructAndStartWatcher := func() docker.Watcher {
+		watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
+		if err != nil {
+			log.Debugf("%v: docker environment not detected: %+v", processorName, err)
+			return nil
+		} else {
+			log.Debugf("%v: docker environment detected", processorName)
+			if err = watcher.Start(); err != nil {
+				// mark dockerAvailable as false because watcher creation failed
+				log.Infof("unable to start the docker watcher: %v", err)
+				return nil
+			}
+		}
+
+		log.Debug("successfully connected to docker")
+		return watcher
+	}
+
+	if watcher := constructAndStartWatcher(); watcher != nil {
+		dm.watcher = watcher
+		dm.dockerAvailable.Store(true)
+	} else if config.ConnectionRetryInterval > 0 {
+		// If docker is not available, try reconnecting at set intervals
+		dm.waitRetry.Go(func() {
+			defer dm.log.Debug("retry goroutine done")
+			dm.log.Debugf(
+				"connection_retry_interval set, trying to reconnect every %s.",
+				config.ConnectionRetryInterval,
+			)
 			ticker := time.Tick(config.ConnectionRetryInterval)
-			for range ticker {
-				dm.log.Debug("Trying to connect to docker...")
-				dockerAvailable := false //nolint:wastedassign // Initialised here and used in the next if block
-				watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
-				if err != nil {
-					dockerAvailable = false
-					log.Debugf("%v: docker environment not detected: %+v", processorName, err)
-				} else {
-					dockerAvailable = true
-					log.Debugf("%v: docker environment detected", processorName)
-					if err = watcher.Start(); err != nil {
-						// mark dockerAvailable as false because watcher creation failed
-						dockerAvailable = false
-						log.Infof("unable to start the docker watcher: %v", err)
-					}
-				}
 
-				if dockerAvailable {
-					log.Debug("successfully connected to docker")
-					dm.watcher = watcher
-					dm.dockerAvailable.Store(true)
+			for {
+				select {
+				case <-ticker:
+					if watcher := constructAndStartWatcher(); watcher != nil {
+						dm.watcher = watcher
+						dm.dockerAvailable.Store(true)
+						return
+					}
+				case <-dm.closeRetry:
 					return
 				}
 			}
-		}()
+		})
 	}
 
 	return &dm, nil
@@ -269,10 +269,16 @@ func (d *addDockerMetadata) Close() error {
 	if d.cgroups != nil {
 		d.cgroups.StopJanitor()
 	}
-	// Watcher can be nil if processor failed on creation
-	if d.watcher != nil {
+
+	// If the watcher is running, stop it
+	if d.dockerAvailable.Load() {
 		d.watcher.Stop()
+	} else {
+		// if the watcher is not running, stop the retry goroutine
+		close(d.closeRetry)
+		d.waitRetry.Wait()
 	}
+
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
 		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
