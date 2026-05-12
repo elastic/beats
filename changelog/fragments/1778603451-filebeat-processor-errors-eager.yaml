@@ -1,0 +1,3 @@
+kind: breaking-change
+summary: Broken processor config on a Filebeat input is now surfaced when the input is created, not when its first harvester connects
+component: filebeat
