@@ -88,9 +88,11 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 	var kubernetesAvailable bool
 
 	timer = time.NewTimer(waitMetadataTimeout)
+	defer timer.Stop()
 
-	ticker := time.NewTicker(timeout) // existing 5s constant
+	ticker := time.NewTicker(timeout) // existing 5s backoff
 	defer ticker.Stop()
+
 	for {
 		kubernetesAvailable, err = isKubernetesAvailable(client, logger)
 		if kubernetesAvailable {
