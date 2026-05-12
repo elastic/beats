@@ -51,6 +51,11 @@ type Config struct {
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
 	// Use BatchApi for metric values collection
 	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
+	// LookbackWindow is the maximum duration the module will backfill on restart.
+	// When the agent restarts, the module queries from the last persisted cursor
+	// time (bounded by this window) to cover any gap in collection.
+	// Set to 0 to disable lookback and preserve current behavior.
+	LookbackWindow time.Duration `config:"lookback_window"`
 	// DefaultTimeGrain sets the default time interval when the resource config
 	// doesn't specify one. If no time grain is configured, this value will be
 	// used whenever possible.
@@ -66,6 +71,7 @@ type Config struct {
 func createDefaultConfig() Config {
 	return Config{
 		DefaultTimeGrain: "PT5M",
+		LookbackWindow:   10 * time.Minute,
 	}
 }
 
