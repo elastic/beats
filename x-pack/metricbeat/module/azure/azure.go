@@ -17,15 +17,9 @@ import (
 
 func init() {
 	// Register the ModuleFactory function for the "azure" module.
-	if err := mb.Registry.AddModule("azure", newModule); err != nil {
+	if err := mb.Registry.AddModule("azure", ModuleBuilder()); err != nil {
 		panic(err)
 	}
-}
-
-// newModule adds validation that hosts is non-empty, a requirement to use the
-// azure module.
-func newModule(base mb.BaseModule) (mb.Module, error) {
-	return &base, nil
 }
 
 // MetricStore holds the accumulated metric definitions with a mutex for synchronization.
