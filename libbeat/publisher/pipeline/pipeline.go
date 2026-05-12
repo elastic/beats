@@ -163,48 +163,7 @@ func New(
 		return nil, err
 	}
 
-<<<<<<< HEAD
 	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
-=======
-	outputController, err := newProcessOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
-	if err != nil {
-		return nil, err
-	}
-	outputController.Set(out)
-	p.outputController = outputController
-
-	return p, nil
-}
-
-func NewForReceiver(
-	beatInfo beat.Info,
-	monitors Monitors,
-	userQueueConfig conf.Namespace,
-	settings Settings,
-	intakeQueueID string,
-) (*Pipeline, error) {
-	p := &Pipeline{
-		beatInfo:         beatInfo,
-		monitors:         monitors,
-		observer:         newMetricsObserver(monitors.Metrics),
-		waitCloseTimeout: settings.WaitClose,
-		processors:       settings.Processors,
-	}
-
-	// Convert the raw queue config to a parsed Settings object that will
-	// be used during queue creation. This lets us fail immediately on startup
-	// if there's a configuration problem.
-	queueType := defaultQueueType
-	if b := userQueueConfig.Name(); b != "" {
-		queueType = b
-	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
-	if err != nil {
-		return nil, err
-	}
-
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
->>>>>>> 3712f9bc7 (pipeline: remove redundant Paths from Settings and Supporter (#49841))
 	if err != nil {
 		return nil, err
 	}
