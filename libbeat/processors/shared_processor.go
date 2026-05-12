@@ -27,19 +27,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type SharedProcessor struct {
+type sharedProcessor struct {
 	proc     beat.Processor
 	cfg      uint64
 	refCount int
 }
 
-var _ beat.Processor = (*SharedProcessor)(nil)
+var _ beat.Processor = (*sharedProcessor)(nil)
 
 var sharedProcessorMu sync.Mutex
 var sharedProcessors map[uint64]beat.Processor = make(map[uint64]beat.Processor)
 
-// LoadOrStoreProcessor returns a shared instance of Processors for the given config, or creates a new one if it doesn't exist.
-func LoadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Constructor) (beat.Processor, error) {
+// loadOrStoreProcessor returns a shared instance of Processors for the given config, or creates a new one if it doesn't exist.
+func loadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Constructor) (beat.Processor, error) {
 	sharedProcessorMu.Lock()
 	defer sharedProcessorMu.Unlock()
 	hash, err := cfgfile.HashConfig(config)
@@ -47,7 +47,7 @@ func LoadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Con
 		return nil, fmt.Errorf("failed to hash processor config: %w", err)
 	}
 	if p, ok := sharedProcessors[hash]; ok {
-		if sharedProcessor, ok := p.(*SharedProcessor); ok {
+		if sharedProcessor, ok := p.(*sharedProcessor); ok {
 			sharedProcessor.refCount++
 			return sharedProcessor, nil
 		}
@@ -58,7 +58,7 @@ func LoadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Con
 	if err != nil {
 		return nil, err
 	}
-	sharedProcessors[hash] = &SharedProcessor{
+	sharedProcessors[hash] = &sharedProcessor{
 		proc:     proc,
 		cfg:      hash,
 		refCount: 1,
@@ -66,15 +66,15 @@ func LoadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Con
 	return sharedProcessors[hash], nil
 }
 
-func (p *SharedProcessor) Run(event *beat.Event) (*beat.Event, error) {
+func (p *sharedProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return p.proc.Run(event)
 }
 
-func (p *SharedProcessor) String() string {
+func (p *sharedProcessor) String() string {
 	return p.proc.String()
 }
 
-func (p *SharedProcessor) Close() error {
+func (p *sharedProcessor) Close() error {
 	sharedProcessorMu.Lock()
 	defer sharedProcessorMu.Unlock()
 	p.refCount--

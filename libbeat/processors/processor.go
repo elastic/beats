@@ -108,7 +108,7 @@ func New(config PluginConfig, logger *logp.Logger) (*Processors, error) {
 
 		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
-		plugin, err := LoadOrStoreProcessor(logger, actionCfg, constructor)
+		plugin, err := loadOrStoreProcessor(logger, actionCfg, constructor)
 		if err != nil {
 			return nil, err
 		}
