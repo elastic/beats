@@ -110,15 +110,16 @@ type PackageJSON struct {
 // baked in to the Heartbeat image to maintain compatibility and
 // allows us to control the synthetics agent version
 func setupProjectDir(workdir string) error {
-	fname, err := exec.LookPath("elastic-synthetics")
-	if err == nil {
-		fname, err = filepath.Abs(fname)
-	}
+	out, err := exec.Command("npm", "root", "-g").CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("cannot resolve global synthetics library: %w", err)
+		return fmt.Errorf("cannot resolve global npm root: %w: %s", err, strings.TrimSpace(string(out)))
 	}
 
-	globalPath := strings.Replace(fname, "bin/elastic-synthetics", "lib/node_modules/@elastic/synthetics", 1)
+	globalPath := filepath.Join(strings.TrimSpace(string(out)), "@elastic", "synthetics")
+	if _, err := os.Stat(globalPath); err != nil {
+		return fmt.Errorf("global synthetics package not found at %s: %w", globalPath, err)
+	}
+
 	symlinkPath := fmt.Sprintf("file:%s", globalPath)
 	pkgJson := PackageJSON{
 		Name:    "project-journey",
@@ -131,11 +132,12 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, defaultMod)
+	pkgFile := filepath.Join(workdir, "package.json")
+	err = os.WriteFile(pkgFile, pkgJsonContent, defaultMod)
 	if err != nil {
 		return err
 	}
-	err = os.Chmod(filepath.Join(workdir, "package.json"), defaultMod) // Double tap because of umask
+	err = os.Chmod(pkgFile, defaultMod) // Double tap because of umask
 	if err != nil {
 		return fmt.Errorf("failed assigning default mode %s to package.json: %w", defaultMod, err)
 	}
