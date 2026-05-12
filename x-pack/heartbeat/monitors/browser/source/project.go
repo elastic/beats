@@ -90,14 +90,11 @@ func (p *ProjectSource) Fetch() error {
 		return err
 	}
 
-	// Offline is not required for project resources as we are only linking
-	// to the globally installed agent, but useful for testing purposes
-	if !Offline() {
-		// set up npm project and ensure synthetics is installed
-		err = setupProjectDir(context.Background(), p.log, p.Workdir())
-		if err != nil {
-			return fmt.Errorf("setting up project dir failed: %w", err)
-		}
+	// set up npm project and ensure synthetics is installed;
+	// npm install is skipped in offline mode (testing) but package.json is always created
+	err = setupProjectDir(context.Background(), p.log, p.Workdir())
+	if err != nil {
+		return fmt.Errorf("setting up project dir failed: %w", err)
 	}
 
 	// We've succeeded, mark the fetch as a success
@@ -148,7 +145,10 @@ func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) erro
 		return fmt.Errorf("failed assigning default mode %s to package.json: %w", defaultMod, err)
 	}
 
-	// setup the project linking to the global synthetics library
+	if Offline() {
+		return nil
+	}
+	// link the project to the globally installed synthetics library
 	return runSimpleCommand(log,
 		exec.CommandContext(
 			ctx,
