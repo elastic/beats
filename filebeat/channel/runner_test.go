@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
@@ -419,3 +420,50 @@ type stopOrderRunner struct {
 func (s *stopOrderRunner) Start()         {}
 func (s *stopOrderRunner) Stop()          { s.onStop() }
 func (s *stopOrderRunner) String() string { return "stopOrderRunner" }
+
+// TestRunnerWithSharedProcessorsForwardsStatusReporter verifies the wrapper
+// exposes SetStatusReporter to runtime type-assertion callers (e.g.
+// libbeat/cfgfile/list.go does `runner.(status.WithStatusReporter)` to wire
+// elastic-agent-client status reporting). Embedding cfgfile.Runner — an
+// interface — only promotes Start/Stop/String, so SetStatusReporter must be
+// declared on the wrapper explicitly.
+func TestRunnerWithSharedProcessorsForwardsStatusReporter(t *testing.T) {
+	inner := &statusReporterRunner{}
+	r := &runnerWithSharedProcessors{
+		Runner: inner,
+		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
+	}
+
+	sr, ok := any(r).(status.WithStatusReporter)
+	require.Truef(t, ok, "runnerWithSharedProcessors must implement status.WithStatusReporter so the cfgfile runner list can wire status reporting through it")
+
+	reporter := &recordingStatusReporter{}
+	sr.SetStatusReporter(reporter)
+	require.Same(t, reporter, inner.lastReporter, "SetStatusReporter must reach the inner runner")
+}
+
+// TestRunnerWithSharedProcessorsSetStatusReporterOnInnerWithoutSupport
+// verifies the wrapper degrades gracefully when the inner runner doesn't
+// implement status.WithStatusReporter — no panic, no allocation, no error.
+func TestRunnerWithSharedProcessorsSetStatusReporterOnInnerWithoutSupport(t *testing.T) {
+	r := &runnerWithSharedProcessors{
+		Runner: &stopOrderRunner{onStop: func() {}},
+		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
+	}
+	r.SetStatusReporter(&recordingStatusReporter{}) // must not panic
+}
+
+type statusReporterRunner struct {
+	lastReporter status.StatusReporter
+}
+
+func (s *statusReporterRunner) Start()         {}
+func (s *statusReporterRunner) Stop()          {}
+func (s *statusReporterRunner) String() string { return "statusReporterRunner" }
+func (s *statusReporterRunner) SetStatusReporter(reporter status.StatusReporter) {
+	s.lastReporter = reporter
+}
+
+type recordingStatusReporter struct{}
+
+func (*recordingStatusReporter) UpdateStatus(status.Status, string) {}

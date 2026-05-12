@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -113,6 +114,13 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 // runnerWithSharedProcessors wraps a Runner so its Stop() also closes the
 // per-input shared processors built once by newCommonConfigEditor. Stop is
 // safe to call more than once.
+//
+// Embedding cfgfile.Runner (an interface) only promotes Start/Stop/String —
+// methods of the inner concrete type that aren't on the cfgfile.Runner
+// interface (e.g. SetStatusReporter) would be hidden from callers doing
+// runtime type assertions on the wrapper. SetStatusReporter is forwarded
+// explicitly so libbeat/cfgfile/list.go can still wire status reporting to
+// the underlying input runner.
 type runnerWithSharedProcessors struct {
 	cfgfile.Runner
 	procs    *processors.Processors
@@ -125,6 +133,12 @@ func (r *runnerWithSharedProcessors) Stop() {
 		_ = r.procs.Close()
 		r.procs = nil
 	})
+}
+
+func (r *runnerWithSharedProcessors) SetStatusReporter(reporter status.StatusReporter) {
+	if sr, ok := r.Runner.(status.WithStatusReporter); ok {
+		sr.SetStatusReporter(reporter)
+	}
 }
 
 // noCloseProcessor wraps a beat.Processor whose lifecycle is owned by the
