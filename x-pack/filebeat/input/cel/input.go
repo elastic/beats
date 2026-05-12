@@ -414,21 +414,9 @@ func (s *runSession) runCycle(ctx context.Context) error {
 	}
 	for {
 		if wait := time.Until(waitUntil); wait > 0 {
-			waitCtx, waitSpan := s.tracer.Start(runCtx, "cel.periodic.run.ratelimitwait")
-			// We have a special-case wait for when we have a zero limit.
-			// x/time/rate allow a burst through even when the limit is zero
-			// so in order to ensure that we don't try until we are out of
-			// purgatory we calculate how long we should wait according to
-			// the retry after for a 429 and rate limit headers if we have
-			// a zero rate quota. See handleResponse below.
-			select {
-			case <-waitCtx.Done():
-				runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
-				waitSpan.End()
-				return waitCtx.Err()
-			case <-time.After(wait):
+			if err := waitForRateLimit(runCtx, runSpan, s.tracer, wait); err != nil {
+				return err
 			}
-			waitSpan.End()
 		} else if err := runCtx.Err(); err != nil {
 			// Otherwise exit if we have been cancelled.
 			runSpan.SetStatus(codes.Unset, runCtx.Err().Error())
@@ -817,6 +805,24 @@ func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
 		"trace.id", ctx.TraceID().String(),
 		"span.id", ctx.SpanID().String(),
 	)
+}
+
+func waitForRateLimit(ctx context.Context, runSpan trace.Span, tracer trace.Tracer, wait time.Duration) error {
+	waitCtx, waitSpan := tracer.Start(ctx, "cel.periodic.run.ratelimitwait")
+	defer waitSpan.End()
+	// We have a special-case wait for when we have a zero limit.
+	// x/time/rate allow a burst through even when the limit is zero
+	// so in order to ensure that we don't try until we are out of
+	// purgatory we calculate how long we should wait according to
+	// the retry after for a 429 and rate limit headers if we have
+	// a zero rate quota. See handleResponse below.
+	select {
+	case <-waitCtx.Done():
+		runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
+		return waitCtx.Err()
+	case <-time.After(wait):
+	}
+	return nil
 }
 
 // end is a tag type indicating spans in errorSpans and okSpans should be ended.
