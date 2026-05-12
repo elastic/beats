@@ -20,6 +20,7 @@ import (
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 
+	azureidentity "github.com/elastic/beats/v7/x-pack/libbeat/common/azure/identity"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -56,6 +57,10 @@ type ConfigAWS struct {
 	// UseCloudConnectors indicates whether the cloud connectors flow is used.
 	// If this is true, the InitializeAWSConfig should initialize the AWS cloud connector role chaining flow.
 	UseCloudConnectors bool `config:"use_cloud_connectors"`
+
+	// AzureAD enables Azure AD federated authentication via STS AssumeRoleWithWebIdentity.
+	// Requires role_arn to be set.
+	AzureAD azureidentity.Config `config:"azure_ad"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
@@ -69,8 +74,13 @@ func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Con
 		}
 	}
 
-	// Assume IAM role if iam_role config parameter is given
-	if beatsConfig.RoleArn != "" && !beatsConfig.UseCloudConnectors {
+	// Azure AD federated authentication via STS AssumeRoleWithWebIdentity.
+	if beatsConfig.AzureAD.Enabled() && beatsConfig.RoleArn != "" {
+		if err := addAzureADWebIdentityCredentials(beatsConfig, &awsConfig, logger); err != nil {
+			return awsConfig, fmt.Errorf("failed to initialize Azure AD web identity credentials: %w", err)
+		}
+	} else if beatsConfig.RoleArn != "" && !beatsConfig.UseCloudConnectors {
+		// Assume IAM role if iam_role config parameter is given
 		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
 	}
 
