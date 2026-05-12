@@ -41,11 +41,11 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, data *map[string]in
 
 	if err != nil {
 		err = fmt.Errorf("failed applying cluster health schema %w", err)
-		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, ClusterHealthMetricSet, ClusterHealthPath)
+		events.LogAndSendErrorEventWithoutTransactionId(err, info, r, ClusterHealthMetricSet, ClusterHealthPath)
 		return nil
 	}
 
-	r.Event(events.CreateEventWithRandomTransactionId(info, metricSetFields))
+	r.Event(events.CreateEventWithoutTransactionId(info, metricSetFields))
 
 	return nil
 }

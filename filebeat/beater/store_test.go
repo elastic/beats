@@ -36,11 +36,11 @@ func testOpenStore(t *testing.T, dir string) *filebeatStore {
 	beatPaths := paths.New()
 	beatPaths.Data = dir
 
-	store, err := openStateStore(t.Context(), beat.Info{Beat: "test"}, logp.NewNopLogger(), config.Registry{
+	store, err := openStateStore(t.Context(), beat.Info{Beat: "test", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
 		Path:          "",
 		Permissions:   0600,
 		CleanInterval: 5 * time.Second,
-	}, beatPaths)
+	})
 	require.NoError(t, err)
 	return store
 }

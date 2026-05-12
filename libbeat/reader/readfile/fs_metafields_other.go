@@ -28,33 +28,30 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// platformFileFields is the number of fields setFileSystemMetadata always writes
+// into the log.file submap on this platform (device_id and inode).
+// Optional fields (owner, group) are counted separately in metafields.go.
+const platformFileFields = 2
+
+// Keys written into the log.file submap by setFileSystemMetadata.
 const (
-	deviceIDKey = "log.file.device_id"
-	inodeKey    = "log.file.inode"
-	ownerKey    = "log.file.owner"
-	groupKey    = "log.file.group"
+	deviceIDKey = "device_id"
+	inodeKey    = "inode"
+	ownerKey    = "owner"
+	groupKey    = "group"
 )
 
-func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwner bool, includeGroup bool) error {
+func setFileSystemMetadata(fi file.ExtendedFileInfo, fileMap mapstr.M, includeOwner bool, includeGroup bool) error {
 	osstate := fi.GetOSState()
-	_, err := fields.Put(deviceIDKey, strconv.FormatUint(osstate.Device, 10))
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", deviceIDKey, err)
-	}
-	_, err = fields.Put(inodeKey, osstate.InodeString())
-	if err != nil {
-		return fmt.Errorf("failed to set %q: %w", inodeKey, err)
-	}
+	fileMap[deviceIDKey] = strconv.FormatUint(osstate.Device, 10)
+	fileMap[inodeKey] = osstate.InodeString()
 
 	if includeOwner {
 		o, err := user.LookupId(strconv.FormatUint(osstate.UID, 10))
 		if err != nil {
 			return fmt.Errorf("failed to lookup uid %q: %w", osstate.UID, err)
 		}
-		_, err = fields.Put(ownerKey, o.Username)
-		if err != nil {
-			return fmt.Errorf("failed to set %q: %w", ownerKey, err)
-		}
+		fileMap[ownerKey] = o.Username
 	}
 
 	if includeGroup {
@@ -62,10 +59,7 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwn
 		if err != nil {
 			return fmt.Errorf("failed to lookup gid %q: %w", osstate.GID, err)
 		}
-		_, err = fields.Put(groupKey, g.Name)
-		if err != nil {
-			return fmt.Errorf("failed to set %q: %w", groupKey, err)
-		}
+		fileMap[groupKey] = g.Name
 	}
 	return nil
 }

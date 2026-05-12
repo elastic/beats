@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
+	"github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter"
@@ -111,6 +112,7 @@ func getComponent() (otelcol.Factories, error) {
 		hbreceiver.NewFactory(),
 		mbreceiver.NewFactory(),
 		osqreceiver.NewFactory(),
+		pbreceiver.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error

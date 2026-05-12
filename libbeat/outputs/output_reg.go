@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var outputReg = map[string]Factory{}
@@ -35,7 +34,6 @@ type Factory func(
 	beat beat.Info,
 	stats Observer,
 	cfg *config.C,
-	paths *paths.Path,
 ) (Group, error)
 
 // IndexManager provides additional index related services to the outputs.
@@ -101,7 +99,6 @@ func Load(
 	stats Observer,
 	name string,
 	config *config.C,
-	paths *paths.Path,
 ) (Group, error) {
 	factory := FindFactory(name)
 	if factory == nil {
@@ -111,5 +108,5 @@ func Load(
 	if stats == nil {
 		stats = NewNilObserver()
 	}
-	return factory(im, info, stats, config, paths)
+	return factory(im, info, stats, config)
 }
