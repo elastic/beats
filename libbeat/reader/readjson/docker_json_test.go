@@ -422,6 +422,7 @@ func TestDockerJSONMaxBytesFirstChunkAlreadyTooLarge(t *testing.T) {
 	require.NoError(t, err)
 	// convert message.Content to string to make it more human-readable
 	require.Len(t, string(message.Content), maxBytes, "content should be capped at maxBytes")
+	require.EqualValues(t, cap(message.Content), maxBytes, "slice should have capacity equal to maxBytes")
 
 	flags, err := message.Fields.GetValue("log.flags")
 	require.NoError(t, err, "'log.flags' not present in event")
