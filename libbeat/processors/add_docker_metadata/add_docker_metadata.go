@@ -270,13 +270,14 @@ func (d *addDockerMetadata) Close() error {
 		d.cgroups.StopJanitor()
 	}
 
-	// If the watcher is running, stop it
+	// Stop the retry goroutine, this is safe to call even if
+	// the goroutine is not running
+	close(d.closeRetry)
+	d.waitRetry.Wait()
+
+	// If the watcher is running, stop it.
 	if d.dockerAvailable.Load() {
 		d.watcher.Stop()
-	} else {
-		// if the watcher is not running, stop the retry goroutine
-		close(d.closeRetry)
-		d.waitRetry.Wait()
 	}
 
 	err := processors.Close(d.sourceProcessor)
