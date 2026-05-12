@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/cursor"
 )
 
 func init() {
@@ -62,6 +63,9 @@ type MetricSet struct {
 	MapMetrics     mapResourceMetrics
 	BatchClient    *BatchClient
 	ConcMapMetrics concurrentMapResourceMetrics // In combination with BatchClient only
+	cursorStore    *cursor.Store                // nil when lookback_window == 0
+	cursorKey      string
+	lookbackWindow time.Duration
 }
 
 var supportedMonitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account", "storage"}
@@ -125,11 +129,31 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		}
 	}
 
-	return &MetricSet{
-		BaseMetricSet: base,
-		Client:        monitorClient,
-		BatchClient:   monitorBatchClient,
-	}, nil
+	ms := &MetricSet{
+		BaseMetricSet:  base,
+		Client:         monitorClient,
+		BatchClient:    monitorBatchClient,
+		lookbackWindow: config.LookbackWindow,
+	}
+
+	if config.LookbackWindow > 0 {
+		if azMod, ok := base.Module().(Module); ok {
+			registry, regErr := azMod.GetCursorRegistry()
+			if regErr != nil {
+				base.Logger().Warnw("azure cursor registry unavailable, lookback disabled", "error", regErr)
+			} else {
+				store, storeErr := cursor.NewStoreFromRegistry(registry, base.Logger())
+				if storeErr != nil {
+					base.Logger().Warnw("azure cursor store unavailable, lookback disabled", "error", storeErr)
+				} else {
+					ms.cursorStore = store
+					ms.cursorKey = cursor.GenerateStateKey(metricsetName, config.SubscriptionId)
+				}
+			}
+		}
+	}
+
+	return ms, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right metricset
@@ -437,4 +461,49 @@ func calculateTimespan(referenceTime time.Time, timeGrain string, config Config,
 		return *lookbackStart, endTime
 	}
 	return normalStart, endTime
+}
+
+// Close implements mb.Closer. Releases the cursor store handle.
+func (m *MetricSet) Close() error {
+	if m.cursorStore != nil {
+		return m.cursorStore.Close()
+	}
+	return nil
+}
+
+// computeLookbackStart returns the start time for a lookback query, or nil if
+// no lookback is needed (disabled, no cursor, or cursor too old).
+func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
+	if m.cursorStore == nil {
+		return nil
+	}
+	state, err := m.cursorStore.Load(m.cursorKey)
+	if err != nil {
+		m.Logger().Warnw("failed to load azure cursor, using normal window", "error", err)
+		return nil
+	}
+	if state == nil {
+		return nil
+	}
+	minStart := referenceTime.Add(-m.lookbackWindow)
+	if state.LastCollectionEnd.Before(minStart) {
+		return nil
+	}
+	return &state.LastCollectionEnd
+}
+
+// updateCursor persists the collection end time so it can be used as a lookback
+// start on the next restart. Failures are logged but do not abort the fetch.
+func (m *MetricSet) updateCursor(endTime time.Time) {
+	if m.cursorStore == nil {
+		return
+	}
+	state := &cursor.State{
+		Version:           cursor.StateVersion,
+		LastCollectionEnd: endTime,
+		UpdatedAt:         time.Now().UTC(),
+	}
+	if err := m.cursorStore.Save(m.cursorKey, state); err != nil {
+		m.Logger().Warnw("failed to persist azure cursor", "error", err)
+	}
 }
