@@ -57,6 +57,7 @@ type Metricbeat struct {
 
 	// Options
 	moduleOptions []module.Option
+	batchedMode   bool
 	logger        *logp.Logger
 }
 
@@ -73,6 +74,15 @@ func WithModuleOptions(options ...module.Option) Option {
 }
 
 // WithLightModules enables light modules support
+// WithBatchedMode enables batched runner mode where periodic metricsets in a
+// module are synchronized on a single ticker and their events are sent via
+// client.PublishAll per metricset per cycle instead of one event at a time.
+func WithBatchedMode() Option {
+	return func(mb *Metricbeat) {
+		mb.batchedMode = true
+	}
+}
+
 func WithLightModules() Option {
 	return func(m *Metricbeat) {
 		path := m.paths.Resolve(paths.Home, "module")
@@ -204,7 +214,12 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		[]module.Option{module.WithMaxStartDelay(bt.config.MaxStartDelay)},
 		bt.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
+	var factory cfgfile.RunnerFactory
+	if bt.batchedMode {
+		factory = module.NewBatchedFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
+	} else {
+		factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, moduleOptions...)
+	}
 
 	if bt.otelStatusFactoryWrapper != nil {
 		factory = bt.otelStatusFactoryWrapper(factory)
@@ -263,7 +278,11 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	if bt.batchedMode {
+		factory = module.NewBatchedFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	} else {
+		factory = module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
+	}
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)

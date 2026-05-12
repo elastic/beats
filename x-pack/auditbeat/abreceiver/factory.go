@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/cmd"
 	"github.com/elastic/beats/v7/auditbeat/core"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
@@ -46,7 +47,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core(), pipeline.DirectQueue)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
@@ -56,6 +57,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
+		beater.WithBatchedMode(),
 	)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {

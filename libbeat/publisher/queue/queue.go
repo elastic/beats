@@ -102,6 +102,14 @@ type Producer[T any] interface {
 	Close()
 }
 
+// BatchProducer is an optional interface that a Producer may implement to
+// support publishing multiple entries as a single batch. This allows the
+// pipeline client's PublishAll to send all events in one output call rather
+// than one at a time.
+type BatchProducer[T any] interface {
+	PublishAll(entries []T) (EntryID, bool)
+}
+
 // Batch of entries (usually publisher.Event) to be returned to Consumers.
 // The `Done` method will tell the queue that the batch has been consumed and
 // its entries can be acknowledged and discarded.

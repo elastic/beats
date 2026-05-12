@@ -12,9 +12,11 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	// Import OSS modules.
 	"github.com/elastic/beats/v7/metricbeat/include"
@@ -46,12 +48,19 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core(), pipeline.DirectQueue)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
-	beatCreator := beater.DefaultCreator()
+	beatCreator := beater.Creator(
+		beater.WithLightModules(),
+		beater.WithModuleOptions(
+			module.WithMetricSetInfo(),
+			module.WithServiceName(),
+		),
+		beater.WithBatchedMode(),
+	)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)

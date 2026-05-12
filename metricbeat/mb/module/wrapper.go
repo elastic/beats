@@ -377,41 +377,85 @@ type reporterV2 struct {
 func (r reporterV2) Done() <-chan struct{} { return r.done }
 func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}) }
 func (r reporterV2) Event(event mb.Event) bool {
-	if event.Took == 0 && !r.start.IsZero() {
-		// ensure elapsed time is always > 0
-		event.Took = max(time.Since(r.start), time.Microsecond)
-	}
-	if r.msw.periodic {
-		event.Period = r.msw.Module().Config().Period
-	}
-
-	if event.Timestamp.IsZero() {
-		if !r.start.IsZero() {
-			event.Timestamp = r.start
-		} else {
-			event.Timestamp = time.Now().UTC()
-		}
-	}
-
-	if event.Host == "" {
-		event.Host = r.msw.HostData().SanitizedURI
-	}
-
-	if event.Error == nil {
-		r.msw.stats.success.Add(1)
-	} else {
-		r.msw.stats.failures.Add(1)
-	}
-
-	if event.Namespace == "" {
-		event.Namespace = r.msw.Registration().Namespace
-	}
-	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.Name(), r.msw.module.eventModifiers...)
+	beatEvent := r.msw.toPublishEvent(event, r.start)
 	if !writeEvent(r.done, r.out, beatEvent) {
 		return false
 	}
 	r.msw.stats.events.Add(1)
+	return true
+}
 
+// toPublishEvent enriches an mb.Event with timing, host, namespace, and stats
+// metadata, then converts it to a beat.Event ready for publishing. This is
+// shared by both the channel-based reporter and the buffering reporter.
+func (msw *metricSetWrapper) toPublishEvent(event mb.Event, start time.Time) beat.Event {
+	if event.Took == 0 && !start.IsZero() {
+		event.Took = max(time.Since(start), time.Microsecond)
+	}
+	if msw.periodic {
+		event.Period = msw.Module().Config().Period
+	}
+	if event.Timestamp.IsZero() {
+		if !start.IsZero() {
+			event.Timestamp = start
+		} else {
+			event.Timestamp = time.Now().UTC()
+		}
+	}
+	if event.Host == "" {
+		event.Host = msw.HostData().SanitizedURI
+	}
+	if event.Error == nil {
+		msw.stats.success.Add(1)
+	} else {
+		msw.stats.failures.Add(1)
+	}
+	if event.Namespace == "" {
+		event.Namespace = msw.Registration().Namespace
+	}
+	return event.BeatEvent(msw.module.Name(), msw.Name(), msw.module.eventModifiers...)
+}
+
+// isPush returns true if the metricset is a push-based type that runs
+// indefinitely and cannot be synchronized with a batched fetch cycle.
+func (msw *metricSetWrapper) isPush() bool {
+	switch msw.MetricSet.(type) {
+	case mb.PushMetricSetV2, mb.PushMetricSetV2WithContext:
+		return true
+	default:
+		return false
+	}
+}
+
+// bufferingReporter collects events into a slice instead of writing them
+// to a channel. Used by the batched runner to accumulate events during a
+// fetch cycle, then flush them all via client.PublishAll.
+type bufferingReporter struct {
+	msw   *metricSetWrapper
+	done  <-chan struct{}
+	start time.Time
+	buf   []beat.Event
+}
+
+func (r *bufferingReporter) StartFetchTimer()      { r.start = time.Now() }
+func (r *bufferingReporter) V2() mb.PushReporterV2 { return &bufferingReporterV2{r} }
+
+func (r *bufferingReporter) flush() []beat.Event {
+	events := r.buf
+	r.buf = nil
+	return events
+}
+
+type bufferingReporterV2 struct {
+	*bufferingReporter
+}
+
+func (r *bufferingReporterV2) Done() <-chan struct{} { return r.done }
+func (r *bufferingReporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}) }
+func (r *bufferingReporterV2) Event(event mb.Event) bool {
+	beatEvent := r.msw.toPublishEvent(event, r.start)
+	r.buf = append(r.buf, beatEvent)
+	r.msw.stats.events.Add(1)
 	return true
 }
 

@@ -61,8 +61,46 @@ func (c *client) PublishAll(events []beat.Event) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
+	// Run processors on each event and collect survivors.
+	var batch []publisher.Event
 	for _, e := range events {
-		c.publish(e)
+		event, ok := c.processEvent(e)
+		if ok {
+			batch = append(batch, publisher.Event{
+				Content: *event,
+				Flags:   c.eventFlags,
+			})
+		}
+	}
+	if len(batch) == 0 {
+		return
+	}
+
+	// If the producer supports batch publishing, send all events in one
+	// call. Otherwise fall back to publishing one at a time.
+	if bp, ok := c.producer.(queue.BatchProducer[publisher.Event]); ok {
+		if _, published := bp.PublishAll(batch); published {
+			c.onPublishedAll(len(batch))
+		} else {
+			for _, e := range batch {
+				c.onDroppedOnPublish(e.Content)
+			}
+		}
+		return
+	}
+
+	for _, e := range batch {
+		var published bool
+		if c.canDrop {
+			_, published = c.producer.TryPublish(e)
+		} else {
+			_, published = c.producer.Publish(e)
+		}
+		if published {
+			c.onPublished()
+		} else {
+			c.onDroppedOnPublish(e.Content)
+		}
 	}
 }
 
@@ -73,45 +111,53 @@ func (c *client) Publish(e beat.Event) {
 	c.publish(e)
 }
 
-func (c *client) publish(e beat.Event) {
-	var (
-		event   = &e
-		publish = true
-	)
-
+// processEvent runs processors on a single event, notifies the event
+// listener, and returns the processed event. Returns (event, true) if the
+// event should be published, or (nil, false) if it was filtered out or the
+// client is closed.
+func (c *client) processEvent(e beat.Event) (*beat.Event, bool) {
 	c.onNewEvent()
 
 	if !c.isOpen.Load() {
-		// client is closing down -> report event as dropped and return
 		c.onDroppedOnPublish(e)
-		return
+		return nil, false
 	}
 
+	event := &e
 	if c.processors != nil {
 		var err error
-
 		event, err = c.processors.Run(event)
-		publish = event != nil
 		if err != nil {
-			// If we introduce a dead-letter queue, this is where we should
-			// route the event to it.
 			c.logger.Errorf("Failed to publish event: %v", err)
 		}
 	}
 
+	publish := event != nil
 	if event != nil {
 		e = *event
 	}
-
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
 		c.onFilteredOut()
+		return nil, false
+	}
+	return event, true
+}
+
+func (c *client) onPublishedAll(count int) {
+	for range count {
+		c.onPublished()
+	}
+}
+
+func (c *client) publish(e beat.Event) {
+	event, ok := c.processEvent(e)
+	if !ok {
 		return
 	}
 
-	e = *event
 	pubEvent := publisher.Event{
-		Content: e,
+		Content: *event,
 		Flags:   c.eventFlags,
 	}
 
@@ -125,7 +171,7 @@ func (c *client) publish(e beat.Event) {
 	if published {
 		c.onPublished()
 	} else {
-		c.onDroppedOnPublish(e)
+		c.onDroppedOnPublish(*event)
 	}
 }
 

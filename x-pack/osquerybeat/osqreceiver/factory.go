@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
 
@@ -42,7 +43,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		ElasticLicensed: true,
 	}
 
-	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core(), pipeline.DefaultQueue)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
