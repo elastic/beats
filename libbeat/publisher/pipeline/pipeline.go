@@ -73,9 +73,6 @@ type Pipeline struct {
 	forceCloseQueue bool
 
 	processors processing.Supporter
-
-	// paths contains the paths configuration for processor initialization.
-	paths *paths.Path
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -89,9 +86,6 @@ type Settings struct {
 	Processors processing.Supporter
 
 	InputQueueSize int
-
-	// Paths contains the paths configuration used for processor initialization.
-	Paths *paths.Path
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -143,7 +137,6 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
-		paths:            settings.Paths,
 	}
 	switch settings.WaitCloseMode {
 	case WaitOnPipelineClose, WaitOnPipelineCloseThenForce:
@@ -166,7 +159,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +174,44 @@ func New(
 	return p, nil
 }
 
+<<<<<<< HEAD
+=======
+func NewForReceiver(
+	beatInfo beat.Info,
+	monitors Monitors,
+	userQueueConfig conf.Namespace,
+	settings Settings,
+	intakeQueueID string,
+) (*Pipeline, error) {
+	p := &Pipeline{
+		beatInfo:         beatInfo,
+		monitors:         monitors,
+		observer:         newMetricsObserver(monitors.Metrics),
+		waitCloseTimeout: settings.WaitClose,
+		processors:       settings.Processors,
+	}
+
+	// Convert the raw queue config to a parsed Settings object that will
+	// be used during queue creation. This lets us fail immediately on startup
+	// if there's a configuration problem.
+	queueType := defaultQueueType
+	if b := userQueueConfig.Name(); b != "" {
+		queueType = b
+	}
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	if err != nil {
+		return nil, err
+	}
+
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}
+
+>>>>>>> 3712f9bc7 (pipeline: remove redundant Paths from Settings and Supporter (#49841))
 // Close stops the pipeline, outputs and queue.
 // If WaitClose with WaitOnPipelineClose mode is configured, Close will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
@@ -293,7 +324,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish, p.paths)
+	return p.processors.Create(cfg, noPublish)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
