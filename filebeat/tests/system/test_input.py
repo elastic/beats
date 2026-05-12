@@ -12,6 +12,7 @@ from beat.beat import Proc
 Tests for the input functionality.
 """
 
+
 class Test(BaseTest):
     def test_ignore_older_files(self):
         """
