@@ -157,11 +157,11 @@ func (client *BatchClient) InitResources(fn concurrentMapResourceMetrics) error 
 }
 
 // GetMetricsInBatch will query the batch API for each group
-func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteria][]Metric, referenceTime time.Time, reporter mb.ReporterV2) []Metric {
+func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteria][]Metric, referenceTime time.Time, reporter mb.ReporterV2, lookbackStart *time.Time) []Metric {
 	var result []Metric
 	for criteria, metricsDefinitions := range groupedMetrics {
 		// Same end time for all metrics in the same batch.
-		startTime, endTime := calculateTimespan(referenceTime, criteria.TimeGrain, client.Config, nil)
+		startTime, endTime := calculateTimespan(referenceTime, criteria.TimeGrain, client.Config, lookbackStart)
 
 		// Limit batch size to 50 resources (if you have more, you can split the batch)
 		filter := ""

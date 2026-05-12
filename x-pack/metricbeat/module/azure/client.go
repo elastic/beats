@@ -142,11 +142,11 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 }
 
 // GetMetricValues returns the metric values for the given cloud resources.
-func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2) []Metric {
+func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2, lookbackStart *time.Time) []Metric {
 	var result []Metric
 
 	for _, metric := range metrics {
-		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, nil)
+		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, lookbackStart)
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		//
