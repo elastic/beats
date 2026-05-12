@@ -1259,6 +1259,87 @@ func TestGlobalIDCannotBeUsed(t *testing.T) {
 	}
 }
 
+// test_fixup_registry_entries_with_global_id from test_input.py
+func TestFixupRegistryEntriesWithGlobalID(t *testing.T) {
+	firstRunEnv := newInputTestingEnvironment(t)
+
+	const (
+		testlogName = "test.log"
+		fixedID     = "test-fix-global-id"
+	)
+
+	testlines := []byte(strings.Repeat("hello world\n", 5))
+	firstRunEnv.mustWriteToFile(testlogName, testlines)
+
+	// First run: no input ID is set, so Filestream uses the legacy `.global` ID.
+	firstRunInput := firstRunEnv.mustCreateInput(map[string]any{
+		"paths":                                  []string{firstRunEnv.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "100ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+	})
+
+	firstRunCtx, cancelFirstRun := context.WithCancel(context.Background())
+	firstRunEnv.startInput(firstRunCtx, "no-id-first-run", firstRunInput)
+	firstRunEnv.waitUntilEventCount(5)
+	firstRunEnv.requireOffsetInRegistry(testlogName, ".global", len(testlines))
+
+	cancelFirstRun()
+	firstRunEnv.waitUntilInputStops()
+
+	secondRunEnv := newInputTestingEnvironment(t)
+	secondRunEnv.workingDir = firstRunEnv.workingDir
+	secondRunEnv.stateStore = firstRunEnv.stateStore
+
+	// Second run: same file, but now with an explicit input ID.
+	// The `.global` registry state must be migrated to this ID.
+	secondRunInput := secondRunEnv.mustCreateInput(map[string]any{
+		"id":                                     fixedID,
+		"paths":                                  []string{secondRunEnv.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "100ms",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+	})
+
+	secondRunCtx, cancelSecondRun := context.WithCancel(context.Background())
+	secondRunEnv.startInput(secondRunCtx, fixedID, secondRunInput)
+	msg := fmt.Sprintf("End of file reached: %s; Backoff now.", secondRunEnv.abspath(testlogName))
+	// Escape Windows path separator
+	msg = strings.ReplaceAll(msg, `\`, `\\`)
+
+	// Wait the input to reach EOF
+	secondRunEnv.WaitLogsContains(msg, 2*time.Second, "Input did not reach end of file")
+
+	if published := len(secondRunEnv.getOutputMessages()); published != 0 {
+		t.Fatalf("data duplicated, %d messages published, expecting 0", published)
+	}
+
+	appendedLines := []byte("new line 1\nnew line 2\n")
+	secondRunEnv.mustAppendToFile(testlogName, appendedLines)
+	// Wait the input to reach EOF
+	secondRunEnv.WaitLogsContains(msg, 5*time.Second, "Input did not reach end of file")
+	// Wait for publish to finish
+	secondRunEnv.waitUntilEventCount(2)
+
+	require.Equal(
+		t,
+		[]string{
+			"new line 1",
+			"new line 2",
+		},
+		secondRunEnv.getOutputMessages(),
+		"second run must only ingest newly appended lines",
+	)
+
+	cancelSecondRun()
+	secondRunEnv.waitUntilInputStops()
+
+	expectedOffset := len(testlines) + len(appendedLines)
+	secondRunEnv.requireNoEntryInRegistry(testlogName, ".global")
+	secondRunEnv.requireRegistryEntryCount(1)
+	secondRunEnv.requireOffsetInRegistry(testlogName, fixedID, expectedOffset)
+}
+
 // test_rotating_close_inactive_larger_write_rate from test_input.py
 func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	env := newInputTestingEnvironment(t)
