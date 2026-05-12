@@ -134,6 +134,13 @@ func (c *client) Close() error {
 		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 
+		// Acquire and release the mutex to ensure any in-progress Publish
+		// call completes before we check the pending event count in
+		// signalClose. Without this, signalClose could see zero pending
+		// events while a Publish is between the isOpen check and AddEvent.
+		c.mutex.Lock()
+		c.mutex.Unlock()
+
 		c.logger.Debug("client: closing acker")
 		c.waiter.signalClose()
 		c.waiter.wait()
