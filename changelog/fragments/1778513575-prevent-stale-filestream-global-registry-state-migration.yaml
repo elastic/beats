@@ -14,7 +14,7 @@ kind: bug-fix
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
 summary: |
-  When Filestream is migrating the registry key from inputsthat did
+  When Filestream is migrating the registry key from inputs that did
   not have an ID, match files by path and file identity instead of
   only path.
 
