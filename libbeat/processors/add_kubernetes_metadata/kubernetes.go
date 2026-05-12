@@ -80,22 +80,16 @@ func isKubernetesAvailable(client k8sclient.Interface, logger *logp.Logger) (boo
 }
 
 func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
-	waitMetadata bool,
 	waitMetadataTimeout time.Duration,
 	logger *logp.Logger,
 ) bool {
 	var timer *time.Timer
 	var err error
 	var kubernetesAvailable bool
-	if waitMetadata {
-		timer = time.NewTimer(waitMetadataTimeout)
-	} else {
-		// hard coding a 5 minutes timeout to avoid retrying indefinitely
-		timer = time.NewTimer(5 * time.Minute)
-	}
-	defer timer.Stop()
 
-	ticker := time.NewTicker(timeout) // existing 3s constant
+	timer = time.NewTimer(waitMetadataTimeout)
+
+	ticker := time.NewTicker(timeout) // existing 5s constant
 	defer ticker.Stop()
 	for {
 		kubernetesAvailable, err = isKubernetesAvailable(client, logger)
@@ -137,8 +131,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	if config.WaitMetadata {
 		processor.init(config, cfg)
 		if !processor.kubernetesAvailable {
-			log.Info("Kubernetes environment is not available after waiting for metadata")
-			return processor, nil
+			return nil, fmt.Errorf("Kubernetes environment is not available after waiting for metadata")
 		}
 	} else {
 		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
@@ -196,7 +189,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		if !isKubernetesAvailableWithTimeout(client, config.WaitMetadata, config.WaitMetadataTimeout, k.log) {
+		if !isKubernetesAvailableWithTimeout(client, config.WaitMetadataTimeout, k.log) {
 			return
 		}
 

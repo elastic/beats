@@ -60,7 +60,7 @@ func (k *kubeAnnotatorConfig) InitDefaults() {
 	k.DefaultIndexers = Enabled{true}
 	k.Scope = "node"
 	k.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
-	k.WaitMetadata = true
+	k.WaitMetadata = false
 	k.WaitMetadataTimeout = 30 * time.Second
 }
 
