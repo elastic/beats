@@ -164,11 +164,6 @@ func (s *Server) AttachStateInspector() error {
 	return s.AttachHandler("/debug/state-inspector/", http.StripPrefix("/debug/state-inspector", s.inspector))
 }
 
-// StateInspectorEnabled reports whether the state inspector has been attached.
-func (s *Server) StateInspectorEnabled() bool {
-	return s.inspector != nil
-}
-
 // SetStateInspectorRegistry provides the backing registry and store name to
 // the state inspector. Each HTTP request will obtain its own Store instance
 // via registry.Get(name). This is a no-op when the inspector is not enabled.

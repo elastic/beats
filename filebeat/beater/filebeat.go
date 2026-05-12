@@ -326,7 +326,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	defer stateStore.Close()
 
-	if b.API != nil && b.API.StateInspectorEnabled() {
+	if b.API != nil {
 		b.API.SetStateInspectorRegistry(stateStore.shared.registry, stateStore.storeName)
 	}
 
