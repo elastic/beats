@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type sharedProcessor struct {
@@ -33,7 +34,13 @@ type sharedProcessor struct {
 	refCount int
 }
 
+type sharedProcessorWithClose struct {
+	sharedProcessor
+}
+
 var _ beat.Processor = (*sharedProcessor)(nil)
+var _ beat.Processor = (*sharedProcessorWithClose)(nil)
+var _ Closer = (*sharedProcessorWithClose)(nil)
 
 var sharedProcessorMu sync.Mutex
 var sharedProcessors map[uint64]beat.Processor = make(map[uint64]beat.Processor)
@@ -58,12 +65,30 @@ func loadOrStoreProcessor(logger *logp.Logger, config *config.C, constructor Con
 	if err != nil {
 		return nil, err
 	}
-	sharedProcessors[hash] = &sharedProcessor{
-		proc:     proc,
-		cfg:      hash,
-		refCount: 1,
+	if _, ok := proc.(Closer); ok {
+		sharedProcessors[hash] = &sharedProcessorWithClose{
+			sharedProcessor{
+				proc:     proc,
+				cfg:      hash,
+				refCount: 1,
+			},
+		}
+	} else {
+		sharedProcessors[hash] = &sharedProcessor{
+			proc:     proc,
+			cfg:      hash,
+			refCount: 1,
+		}
 	}
+
 	return sharedProcessors[hash], nil
+}
+
+func (p *sharedProcessor) SetPaths(paths *paths.Path) error {
+	if setter, ok := p.proc.(PathSetter); ok {
+		return setter.SetPaths(paths)
+	}
+	return nil
 }
 
 func (p *sharedProcessor) Run(event *beat.Event) (*beat.Event, error) {
@@ -74,7 +99,7 @@ func (p *sharedProcessor) String() string {
 	return p.proc.String()
 }
 
-func (p *sharedProcessor) Close() error {
+func (p *sharedProcessorWithClose) Close() error {
 	sharedProcessorMu.Lock()
 	defer sharedProcessorMu.Unlock()
 	p.refCount--
