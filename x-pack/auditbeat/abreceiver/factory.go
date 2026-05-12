@@ -57,6 +57,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
+		beater.WithBatchedMode(),
 	)
 	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {
