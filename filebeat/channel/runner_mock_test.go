@@ -47,7 +47,7 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 
 		// storing the config that the client was created with
 		// it's needed for the `Assert` later
-		r.cfgs = append(r.cfgs, client.(*clientMock).cfg)
+		r.cfgs = append(r.cfgs, client.(*clientMock).cfg) //nolint:errcheck //Safe to ignore in tests
 	}
 	return &noopRunner{}, nil
 }
