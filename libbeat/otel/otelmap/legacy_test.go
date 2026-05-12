@@ -115,9 +115,9 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 		case nil, string, int, int8, int16, int32, int64, uint8, uint16, uint32, float32, float64, bool:
 			// FromRaw handles these primitives directly.
 		case uint:
-			m[key] = int64(uint64(x) & uint64(math.MaxInt64))
+			m[key] = int64(uint64(x) & uint64(math.MaxInt64)) //nolint:gosec // mask clears bit 63, conversion is safe
 		case uint64:
-			m[key] = int64(x & uint64(math.MaxInt64))
+			m[key] = int64(x & uint64(math.MaxInt64)) //nolint:gosec // mask clears bit 63, conversion is safe
 		default:
 			ref := reflect.ValueOf(x)
 			switch ref.Kind() {
@@ -128,7 +128,7 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 				m[key] = ref.Int()
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-				m[key] = int64(ref.Uint() & uint64(math.MaxInt64))
+				m[key] = int64(ref.Uint() & uint64(math.MaxInt64)) //nolint:gosec // mask clears bit 63, conversion is safe
 			case reflect.Float32, reflect.Float64:
 				m[key] = ref.Float()
 			case reflect.Struct:
