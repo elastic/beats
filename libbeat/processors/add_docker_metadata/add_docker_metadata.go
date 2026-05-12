@@ -132,12 +132,12 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 			log.Debugf("%v: docker environment detected", processorName)
 			if err = watcher.Start(); err != nil {
 				// mark dockerAvailable as false because watcher creation failed
-				log.Infof("unable to start the docker watcher: %v", err)
+				log.Debugf("unable to start the docker watcher: %v", err)
 				return nil
 			}
 		}
 
-		log.Debug("successfully connected to docker")
+		log.Info("successfully connected to docker")
 		return watcher
 	}
 
@@ -146,12 +146,13 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		dm.dockerAvailable.Store(true)
 	} else if config.ConnectionRetryInterval > 0 {
 		// If docker is not available, try reconnecting at set intervals
+		dm.log.Warn(
+			"could not connect to docker, trying to reconnect every %s.",
+			config.ConnectionRetryInterval,
+		)
 		dm.waitRetry.Go(func() {
 			defer dm.log.Debug("retry goroutine done")
-			dm.log.Debugf(
-				"connection_retry_interval set, trying to reconnect every %s.",
-				config.ConnectionRetryInterval,
-			)
+
 			ticker := time.Tick(config.ConnectionRetryInterval)
 
 			for {
