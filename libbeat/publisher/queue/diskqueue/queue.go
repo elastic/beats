@@ -231,6 +231,7 @@ func NewQueue(
 			reading:          initialSegments,
 			acked:            ackedSegments,
 			nextID:           nextSegmentID,
+			nextReadFrameID:  frameID(nextReadPosition.frameIndex),
 			nextReadPosition: nextReadPosition.byteIndex,
 		},
 
