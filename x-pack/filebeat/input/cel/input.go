@@ -119,7 +119,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	dataStreamName := src.(*source).cfg.DataStream //nolint:errcheck // If this assertion fails, the program is incorrect and should panic. datastreamName may be empty
 
-	var cursor map[string]interface{}
+	var cursor map[string]any
 	env.UpdateStatus(status.Starting, dataStreamName)
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
 		err := crsr.Unpack(&cursor)
@@ -173,7 +173,7 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher, health status.StatusReporter) error {
+func (i input) run(env v2.Context, src *source, cursor map[string]any, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
@@ -256,9 +256,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		return err
 	}
 
-	var state map[string]interface{}
+	var state map[string]any
 	if cfg.State == nil {
-		state = make(map[string]interface{})
+		state = make(map[string]any)
 	} else {
 		state = cfg.State
 	}
@@ -274,7 +274,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	if cursor != nil {
 		state["cursor"] = cursor
 	}
-	goodCursor := cursor
+	safeCursor := cursor
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metricsRecorder.SetResourceURL(goodURL)
@@ -336,7 +336,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 		state:      state,
 		cursor:     cursor,
-		goodCursor: goodCursor,
+		safeCursor: safeCursor,
 		goodURL:    goodURL,
 	}
 
@@ -374,7 +374,7 @@ type runSession struct {
 
 	state      map[string]any
 	cursor     map[string]any
-	goodCursor map[string]any
+	safeCursor map[string]any
 	goodURL    string
 }
 
@@ -450,47 +450,6 @@ func (s *runSession) runCycle(ctx context.Context) error {
 			return nil
 		}
 	}
-}
-
-func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
-	ctx := span.SpanContext()
-	return log.With(
-		"trace.id", ctx.TraceID().String(),
-		"span.id", ctx.SpanID().String(),
-	)
-}
-
-func waitForRateLimit(ctx context.Context, runSpan trace.Span, tracer trace.Tracer, wait time.Duration) error {
-	waitCtx, waitSpan := tracer.Start(ctx, "cel.periodic.run.ratelimitwait")
-	defer waitSpan.End()
-	// We have a special-case wait for when we have a zero limit.
-	// x/time/rate allow a burst through even when the limit is zero
-	// so in order to ensure that we don't try until we are out of
-	// purgatory we calculate how long we should wait according to
-	// the retry after for a 429 and rate limit headers if we have
-	// a zero rate quota. See handleResponse below.
-	select {
-	case <-waitCtx.Done():
-		runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
-		return waitCtx.Err()
-	case <-time.After(wait):
-	}
-	return nil
-}
-
-type action bool
-
-const (
-	contAction     action = false
-	retry429Action action = true
-)
-
-func (a action) retry() bool { return a == retry429Action }
-
-type executeResult struct {
-	action     action
-	waitUntil  time.Time
-	eventCount int
 }
 
 func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (executeResult, error) {
@@ -746,8 +705,8 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		s.health.UpdateStatus(status.Running, "")
 	}
 
-	// Replace the last known good cursor.
-	s.state["cursor"] = s.goodCursor
+	// Replace the last cursor known to be safe to persist.
+	s.state["cursor"] = s.safeCursor
 	s.metrics.AddProgramRunDuration(pubResult.pubCtx, time.Since(start))
 	if more, _ := s.state["want_more"].(bool); !more {
 		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
@@ -769,11 +728,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 
 	okSpans(execSpan)
 	return result, nil
-}
-
-type publishResult struct {
-	pubCtx   context.Context
-	degraded bool
 }
 
 func (s *runSession) publish(ctx context.Context, events, cursors []any, singleCursor bool, start time.Time, degraded bool) (publishResult, error) {
@@ -805,7 +759,7 @@ loop:
 				// Only set the cursor for publication at the last event
 				// when a single cursor object has been provided.
 				if i == len(events)-1 {
-					s.goodCursor = s.cursor
+					s.safeCursor = s.cursor
 					s.cursor, ok = cursors[0].(map[string]any)
 					if !ok {
 						err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
@@ -816,7 +770,7 @@ loop:
 					pubCursor = s.cursor
 				}
 			} else {
-				s.goodCursor = s.cursor
+				s.safeCursor = s.cursor
 				s.cursor, ok = cursors[i].(map[string]any)
 				if !ok {
 					err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
@@ -881,12 +835,58 @@ loop:
 	// Advance the cursor to the final state if there was no error during
 	// publications. This is needed to transition to the next set of events.
 	if !hadPublicationError && !result.degraded {
-		s.goodCursor = s.cursor
+		s.safeCursor = s.cursor
 		s.metrics.AddProgramSuccessExecution(pubCtx)
 		okSpans(pubSpan)
 	}
 
 	return result, nil
+}
+
+func logWithTracingIds(log *logp.Logger, span trace.Span) *logp.Logger {
+	ctx := span.SpanContext()
+	return log.With(
+		"trace.id", ctx.TraceID().String(),
+		"span.id", ctx.SpanID().String(),
+	)
+}
+
+func waitForRateLimit(ctx context.Context, runSpan trace.Span, tracer trace.Tracer, wait time.Duration) error {
+	waitCtx, waitSpan := tracer.Start(ctx, "cel.periodic.run.ratelimitwait")
+	defer waitSpan.End()
+	// We have a special-case wait for when we have a zero limit.
+	// x/time/rate allow a burst through even when the limit is zero
+	// so in order to ensure that we don't try until we are out of
+	// purgatory we calculate how long we should wait according to
+	// the retry after for a 429 and rate limit headers if we have
+	// a zero rate quota. See handleResponse below.
+	select {
+	case <-waitCtx.Done():
+		runSpan.SetStatus(codes.Unset, waitCtx.Err().Error())
+		return waitCtx.Err()
+	case <-time.After(wait):
+	}
+	return nil
+}
+
+type action bool
+
+const (
+	contAction     action = false
+	retry429Action action = true
+)
+
+func (a action) retry() bool { return a == retry429Action }
+
+type executeResult struct {
+	action     action
+	waitUntil  time.Time
+	eventCount int
+}
+
+type publishResult struct {
+	pubCtx   context.Context
+	degraded bool
 }
 
 func errorSpans(err error, spans ...trace.Span) {
@@ -924,13 +924,13 @@ func handleResponse(state map[string]any, limiter *rate.Limiter, log *logp.Logge
 			header = h
 		case map[string][]string:
 			header = h
-		case map[string]interface{}:
+		case map[string]any:
 			header = make(http.Header)
 			for k, v := range h {
 				switch v := v.(type) {
 				case []string:
 					header[k] = v
-				case []interface{}:
+				case []any:
 					vals := make([]string, len(v))
 					for i, e := range v {
 						vals[i], ok = e.(string)
@@ -952,7 +952,7 @@ func handleResponse(state map[string]any, limiter *rate.Limiter, log *logp.Logge
 	if ok {
 		delete(state, "rate_limit")
 		switch r := r.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			// The state of rate-limit headers is a disaster. This needs to be
 			// more robust, but there is no real consensus and the RFC is not
 			// past draft yet. The draft is more sane than what we have now, but
@@ -1021,7 +1021,7 @@ func handleResponse(state map[string]any, limiter *rate.Limiter, log *logp.Logge
 // A caveat here is that if a CEL program interacts with two API endpoints that
 // do not share the same overall rate limit budget, there will be confusion if
 // rate_limit is used, so rate limiting is not supported in that situation.
-func handleRateLimit(log *logp.Logger, rateLimit map[string]interface{}, header http.Header, limiter *rate.Limiter) (waitUntil time.Time) {
+func handleRateLimit(log *logp.Logger, rateLimit map[string]any, header http.Header, limiter *rate.Limiter) (waitUntil time.Time) {
 	if e, ok := rateLimit["error"]; ok {
 		// The error field should be a string, but we won't quibble here.
 		log.Errorw("rate limit error", "error", e, "rate_limit", mapstr.M(rateLimit), "header", header)
@@ -1093,7 +1093,7 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]interface{}, header 
 	return waitUntil
 }
 
-func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) (limit rate.Limit, ok bool) {
+func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit rate.Limit, ok bool) {
 	r, ok := rateLimit[which]
 	if !ok {
 		log.Errorw("rate limit missing "+which, "rate_limit", mapstr.M(rateLimit))
