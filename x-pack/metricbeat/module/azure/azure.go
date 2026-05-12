@@ -428,35 +428,13 @@ func hasConfigOptions(config []string) bool {
 //	  │                                                        │              |
 //	Start                                                     End             |
 //	  │                                                        │              |
-func calculateTimespan(referenceTime time.Time, timeGrain string, config Config) (time.Time, time.Time) {
-	// The timespan duration is the maximum of the time grain and the
-	// collection period.
-	//
-	// This is to ensure that we always collect all the metric values
-	// for the given time grain.
-	//
-	// For example, if the time grain is 1 minute and the collection
-	// period is 5 minutes, we will collect five PT1M metric values
-	// per collection.
-	//
-	// If the time grain is 5 minutes and the collection period is
-	// 5 minutes, we will collect one PT5M metric value per collection.
-	//
-	// If the time grain is 5 minutes and the collection period is
-	// 1 minute, we will collect one PT5M metric in five collections.
+func calculateTimespan(referenceTime time.Time, timeGrain string, config Config, lookbackStart *time.Time) (time.Time, time.Time) {
 	timespanDuration := max(asDuration(timeGrain), config.Period)
-
-	// The end time is equal to the reference time in most cases.
-	//
-	// However, if the Azure service publishes the metric values with
-	// a delay, we can translate the reference time to compensate
-	// for the latency.
-	//
-	// For example, if the Azure service publishes the metric values
-	// with a delay of 30s / 1m, we can set the delay to one minute
-	// to always collect the latest metric values.
 	endTime := referenceTime.Add(config.Latency * -1)
-	startTime := endTime.Add(timespanDuration * -1)
+	normalStart := endTime.Add(timespanDuration * -1)
 
-	return startTime, endTime
+	if lookbackStart != nil && lookbackStart.Before(normalStart) {
+		return *lookbackStart, endTime
+	}
+	return normalStart, endTime
 }

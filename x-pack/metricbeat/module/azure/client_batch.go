@@ -161,7 +161,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 	var result []Metric
 	for criteria, metricsDefinitions := range groupedMetrics {
 		// Same end time for all metrics in the same batch.
-		startTime, endTime := calculateTimespan(referenceTime, criteria.TimeGrain, client.Config)
+		startTime, endTime := calculateTimespan(referenceTime, criteria.TimeGrain, client.Config, nil)
 
 		// Limit batch size to 50 resources (if you have more, you can split the batch)
 		filter := ""

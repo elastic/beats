@@ -146,7 +146,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	var result []Metric
 
 	for _, metric := range metrics {
-		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config)
+		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, nil)
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		//
