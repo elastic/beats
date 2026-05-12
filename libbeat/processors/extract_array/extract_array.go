@@ -115,31 +115,31 @@ func isEmpty(v reflect.Value) bool {
 }
 
 func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	iValue, err := event.GetValue(f.config.Field)
+	iValue, err := event.GetValue(f.Field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+		if f.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return event, nil
 		}
-		return event, fmt.Errorf("could not fetch value for field %s: %w", f.config.Field, err)
+		return event, fmt.Errorf("could not fetch value for field %s: %w", f.Field, err)
 	}
 
 	array := reflect.ValueOf(iValue)
 	if t := array.Type(); t.Kind() != reflect.Slice {
-		if !f.config.FailOnError {
+		if !f.FailOnError {
 			return event, nil
 		}
-		return event, fmt.Errorf("unsupported type for field %s: got: %s needed: array", f.config.Field, t.String())
+		return event, fmt.Errorf("unsupported type for field %s: got: %s needed: array", f.Field, t.String())
 	}
 
 	saved := event
-	if f.config.FailOnError {
+	if f.FailOnError && len(f.mappings) > 1 {
 		saved = event.Clone()
 	}
 
 	n := array.Len()
 	for _, mapping := range f.mappings {
 		if mapping.from >= n {
-			if !f.config.FailOnError {
+			if !f.FailOnError {
 				continue
 			}
 			return saved, fmt.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
@@ -148,19 +148,19 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		// checking for CanInterface() here is done to prevent .Interface() from
 		// panicking, but it can only happen when value points to a private
 		// field inside a struct.
-		if !cell.IsValid() || !cell.CanInterface() || (f.config.OmitEmpty && isEmpty(cell)) {
+		if !cell.IsValid() || !cell.CanInterface() || (f.OmitEmpty && isEmpty(cell)) {
 			continue
 		}
-		if !f.config.OverwriteKeys {
+		if !f.OverwriteKeys {
 			if _, err = event.GetValue(mapping.to); err == nil {
-				if !f.config.FailOnError {
+				if !f.FailOnError {
 					continue
 				}
 				return saved, fmt.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
 			}
 		}
 		if _, err = event.PutValue(mapping.to, clone(cell.Interface())); err != nil {
-			if !f.config.FailOnError {
+			if !f.FailOnError {
 				continue
 			}
 			return saved, fmt.Errorf("failed setting field %s: %w", mapping.to, err)
@@ -170,7 +170,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (f *extractArrayProcessor) String() (r string) {
-	return fmt.Sprintf("extract_array={field=%s, mappings=%v}", f.config.Field, f.mappings)
+	return fmt.Sprintf("extract_array={field=%s, mappings=%v}", f.Field, f.mappings)
 }
 
 func clone(value interface{}) interface{} {

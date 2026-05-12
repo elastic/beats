@@ -25,7 +25,7 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 
 	event := data.Reporter.GetEvents()[0]
 
-	auto_ops_testing.CheckEventWithRandomTransactionId(t, event, data.ClusterInfo)
+	auto_ops_testing.CheckEventWithoutTransactionId(t, event, data.ClusterInfo)
 
 	// metrics exist
 	require.True(t, len(*event.MetricSetFields.FlattenKeys()) > 2)

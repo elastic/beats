@@ -20,8 +20,7 @@ package container
 import (
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -72,15 +71,15 @@ func eventMapping(r mb.ReporterV2, cont *container.Summary, dedot bool, logger *
 	})
 }
 
-func extractIPAddresses(networks *types.SummaryNetworkSettings) []string {
+func extractIPAddresses(networks *container.NetworkSettingsSummary) []string {
 	// Handle alternate platforms like VMWare's VIC that might not have this data.
 	if networks == nil {
 		return []string{}
 	}
 	ipAddresses := make([]string, 0, len(networks.Networks))
 	for _, network := range networks.Networks {
-		if len(network.IPAddress) > 0 {
-			ipAddresses = append(ipAddresses, network.IPAddress)
+		if network.IPAddress.IsValid() {
+			ipAddresses = append(ipAddresses, network.IPAddress.String())
 		}
 	}
 	return ipAddresses

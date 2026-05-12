@@ -24,6 +24,7 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Info stores a beats instance meta data.
@@ -42,9 +43,11 @@ type Info struct {
 	UserAgent        string    // A string of the user-agent that can be passed to any outputs or network connections
 	FIPSDistribution bool      // If the beat was compiled as a FIPS distribution.
 
-	LogConsumer consumer.Logs // otel log consumer
-	ComponentID string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
-	Logger      *logp.Logger
+	LogConsumer     consumer.Logs // otel log consumer
+	ComponentID     string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
+	IncludeMetadata bool          // when true, otelconsumer includes @metadata in the log record body
+	Logger          *logp.Logger
+	Paths           *paths.Path // per beat paths definition
 }
 
 func (i Info) FQDNAwareHostname(useFQDN bool) string {

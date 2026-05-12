@@ -74,7 +74,7 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 
 func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
-	if p.config.FailOnError {
+	if p.config.FailOnError && len(p.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
@@ -85,7 +85,9 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 			p.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
 
 			if p.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
