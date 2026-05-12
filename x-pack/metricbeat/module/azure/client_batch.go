@@ -18,6 +18,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // BatchClient represents the azure batch client which will make use of the azure sdk go metrics related clients
@@ -40,18 +41,20 @@ type ResDefGroupingCriteria struct {
 // concurrentMapResourceMetrics function type will map the configuration options to Batch Client metrics (depending on the metricset)
 type concurrentMapResourceMetrics func(client *BatchClient, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig, wg *sync.WaitGroup)
 
-// NewBatchClient instantiates the Azure monitoring batch client
-func NewBatchClient(config Config, logger *logp.Logger) (*BatchClient, error) {
+// NewBatchClient instantiates the Azure monitoring batch client. Pass nil
+// for metrics to disable API instrumentation (e.g. in tests).
+func NewBatchClient(config Config, logger *logp.Logger, metrics *monitoring.Registry) (*BatchClient, error) {
 	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
+	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, metrics, logger)
 
 	logger = logger.Named("azure monitor client")
 
 	client := &BatchClient{
 		BaseClient: &BaseClient{
-			AzureMonitorService: azureMonitorService,
+			AzureMonitorService: observedAzureMonitorService,
 			Config:              config,
 			Log:                 logger,
 			MetricRegistry:      NewMetricRegistry(logger),
@@ -137,13 +140,19 @@ func (client *BatchClient) InitResources(fn concurrentMapResourceMetrics) error 
 		fn(client, resourceList, resourceConfig, &wg)
 		client.Log.Infof("Finished collection with %d metric definitions", len(resourceList))
 	}
-	go func() {
-		wg.Wait() // Wait for all the resource collection goroutines to finish
-		// Once all the goroutines are done, close the channels
-		client.Log.Debug("All collections finished. Closing channels ")
-		close(client.ResourceConfigurations.MetricDefinitionsChan)
-		close(client.ResourceConfigurations.ErrorChan)
-	}()
+	// Only launch the closer goroutine if at least one resource config produced
+	// results and created the channels. When every config returns an empty
+	// list the channels stay nil and the consumer will surface the
+	// "no resources were found" error via its own nil-check.
+	if client.ResourceConfigurations.MetricDefinitionsChan != nil && client.ResourceConfigurations.ErrorChan != nil {
+		go func() {
+			wg.Wait() // Wait for all the resource collection goroutines to finish
+			// Once all the goroutines are done, close the channels
+			client.Log.Debug("All collections finished. Closing channels ")
+			close(client.ResourceConfigurations.MetricDefinitionsChan)
+			close(client.ResourceConfigurations.ErrorChan)
+		}()
+	}
 	return nil
 }
 
