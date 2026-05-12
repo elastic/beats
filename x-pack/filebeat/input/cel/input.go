@@ -738,116 +738,19 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	// the current cursor object below; it is an array now.
 	delete(s.state, "cursor")
 
-	pubStart := time.Now()
-	var hadPublicationError bool
-
-	pubCtx, pubSpan := s.tracer.Start(execCtx, "cel.program.publish")
-	pubSpanEventCount := 0
-	pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
-	pubLog := logWithTracingIds(s.log, pubSpan)
-loop:
-	for i, e := range events {
-		event, ok := e.(map[string]any)
-		if !ok {
-			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
-			errorSpans(err, end{pubSpan}, execSpan)
-			return result, err
-		}
-		var pubCursor any
-		if cursors != nil {
-			if singleCursor {
-				// Only set the cursor for publication at the last event
-				// when a single cursor object has been provided.
-				if i == len(events)-1 {
-					s.goodCursor = s.cursor
-					s.cursor, ok = cursors[0].(map[string]any)
-					if !ok {
-						err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
-						s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-						errorSpans(err, end{pubSpan}, execSpan)
-						return result, err
-					}
-					pubCursor = s.cursor
-				}
-			} else {
-				s.goodCursor = s.cursor
-				s.cursor, ok = cursors[i].(map[string]any)
-				if !ok {
-					err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
-					s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-					errorSpans(err, end{pubSpan}, execSpan)
-					return result, err
-				}
-				pubCursor = s.cursor
-			}
-		}
-		// This is checked prior to the publish attempt since the
-		// cursor.Publisher interface does not document the behaviour
-		// related to context cancellation and the context is not
-		// explicitly passed in, so favour this explicit clarity.
-		switch err := pubCtx.Err(); {
-		case err == nil:
-		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-			pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
-			// Don't update status, since we are about to pass
-			// through the Running state and then fall through
-			// to the input exit with a change to Stopped.
-			break loop
-		default:
-			// This should never happen.
-			pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
-			s.health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
-			isDegraded = true
-			break loop
-		}
-		err = s.pub.Publish(beat.Event{
-			Timestamp: time.Now(),
-			Fields:    event,
-		}, pubCursor)
-		if err != nil {
-			hadPublicationError = true
-			pubLog.Errorw("error publishing event", "error", err)
-			s.health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
-			errorSpans(err, pubSpan)
-			isDegraded = true
-			cursors = nil // We are lost, so retry with this event's cursor,
-			continue      // but continue with the events that we have without
-			// advancing the cursor. This allows us to potentially publish the
-			// events we have now, with a fallback to the last guaranteed
-			// correctly published cursor.
-		}
-		if i == 0 {
-			s.metrics.AddPublishedBatch(pubCtx, 1)
-		}
-		s.metrics.AddPublishedEvents(pubCtx, 1)
-		pubSpanEventCount++
-		pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
-
-		err = pubCtx.Err()
-		if err != nil {
-			s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
-			errorSpans(err, end{pubSpan}, execSpan)
-			return result, err
-		}
+	pubResult, err := s.publish(execCtx, events, cursors, singleCursor, start, isDegraded)
+	if err != nil {
+		errorSpans(err, execSpan)
+		return result, err
 	}
 
-	if !isDegraded {
+	if !pubResult.degraded {
 		s.health.UpdateStatus(status.Running, "")
 	}
 
-	s.metrics.AddPublishDuration(pubCtx, time.Since(pubStart))
-	// Advance the cursor to the final state if there was no error during
-	// publications. This is needed to transition to the next set of events.
-	if !hadPublicationError && !isDegraded {
-		s.goodCursor = s.cursor
-		s.metrics.AddProgramSuccessExecution(pubCtx)
-		okSpans(pubSpan)
-	}
-	pubSpan.End()
-
 	// Replace the last known good cursor.
 	s.state["cursor"] = s.goodCursor
-	s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+	s.metrics.AddProgramRunDuration(pubResult.pubCtx, time.Since(start))
 	if more, _ := s.state["want_more"].(bool); !more {
 		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
 		okSpans(execSpan)
@@ -870,27 +773,134 @@ loop:
 	return result, nil
 }
 
-// end is a tag type indicating spans in errorSpans and okSpans should be ended.
-type end struct {
-	trace.Span
+type publishResult struct {
+	pubCtx   context.Context
+	degraded bool
+}
+
+func (s *runSession) publish(ctx context.Context, events, cursors []any, singleCursor bool, start time.Time, degraded bool) (publishResult, error) {
+	result := publishResult{
+		degraded: degraded,
+	}
+
+	pubStart := time.Now()
+
+	pubCtx, pubSpan := s.tracer.Start(ctx, "cel.program.publish")
+	result.pubCtx = pubCtx
+	defer pubSpan.End()
+
+	pubSpanEventCount := 0
+	pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount)) // to be overridden if there are events
+	pubLog := logWithTracingIds(s.log, pubSpan)
+	var hadPublicationError bool
+loop:
+	for i, e := range events {
+		event, ok := e.(map[string]any)
+		if !ok {
+			err := fmt.Errorf("unexpected type returned for evaluation events: %T", e)
+			errorSpans(err, pubSpan)
+			return result, err
+		}
+		var pubCursor any
+		if cursors != nil {
+			if singleCursor {
+				// Only set the cursor for publication at the last event
+				// when a single cursor object has been provided.
+				if i == len(events)-1 {
+					s.goodCursor = s.cursor
+					s.cursor, ok = cursors[0].(map[string]any)
+					if !ok {
+						err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
+						s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+						errorSpans(err, pubSpan)
+						return result, err
+					}
+					pubCursor = s.cursor
+				}
+			} else {
+				s.goodCursor = s.cursor
+				s.cursor, ok = cursors[i].(map[string]any)
+				if !ok {
+					err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
+					s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+					errorSpans(err, pubSpan)
+					return result, err
+				}
+				pubCursor = s.cursor
+			}
+		}
+		// This is checked prior to the publish attempt since the
+		// cursor.Publisher interface does not document the behaviour
+		// related to context cancellation and the context is not
+		// explicitly passed in, so favour this explicit clarity.
+		switch err := pubCtx.Err(); {
+		case err == nil:
+		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+			pubLog.Infow("context cancelled with unpublished events", "unpublished", len(events)-i)
+			// Don't update status, since we are about to pass
+			// through the Running state and then fall through
+			// to the input exit with a change to Stopped.
+			break loop
+		default:
+			// This should never happen.
+			pubLog.Warnw("failed with unpublished events", "error", err, "unpublished", len(events)-i)
+			s.health.UpdateStatus(status.Degraded, "error publishing events: "+err.Error())
+			result.degraded = true
+			break loop
+		}
+		err := s.pub.Publish(beat.Event{
+			Timestamp: time.Now(),
+			Fields:    event,
+		}, pubCursor)
+		if err != nil {
+			hadPublicationError = true
+			pubLog.Errorw("error publishing event", "error", err)
+			s.health.UpdateStatus(status.Degraded, "error publishing event: "+err.Error())
+			errorSpans(err, pubSpan)
+			result.degraded = true
+			cursors = nil // We are lost, so retry with this event's cursor,
+			continue      // but continue with the events that we have without
+			// advancing the cursor. This allows us to potentially publish the
+			// events we have now, with a fallback to the last guaranteed
+			// correctly published cursor.
+		}
+		if i == 0 {
+			s.metrics.AddPublishedBatch(pubCtx, 1)
+		}
+		s.metrics.AddPublishedEvents(pubCtx, 1)
+		pubSpanEventCount++
+		pubSpan.SetAttributes(attribute.Int("cel.publish.event_count", pubSpanEventCount))
+
+		err = pubCtx.Err()
+		if err != nil {
+			s.metrics.AddProgramRunDuration(pubCtx, time.Since(start))
+			errorSpans(err, pubSpan)
+			return result, err
+		}
+	}
+
+	s.metrics.AddPublishDuration(pubCtx, time.Since(pubStart))
+	// Advance the cursor to the final state if there was no error during
+	// publications. This is needed to transition to the next set of events.
+	if !hadPublicationError && !result.degraded {
+		s.goodCursor = s.cursor
+		s.metrics.AddProgramSuccessExecution(pubCtx)
+		okSpans(pubSpan)
+	}
+
+	return result, nil
 }
 
 func errorSpans(err error, spans ...trace.Span) {
 	for _, sp := range spans {
 		sp.RecordError(err)
 		sp.SetStatus(codes.Error, err.Error())
-		if e, ok := sp.(end); ok {
-			e.End()
-		}
 	}
 }
 
 func okSpans(spans ...trace.Span) {
 	for _, sp := range spans {
 		sp.SetStatus(codes.Ok, "")
-		if e, ok := sp.(end); ok {
-			e.End()
-		}
 	}
 }
 
