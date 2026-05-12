@@ -26,6 +26,8 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"os"
+	"regexp"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -477,6 +479,85 @@ func TestTest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestKafkaTopicFilters(t *testing.T) {
+	topics := []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c", "Filebeat-TestRegex-d"}
+	filters := map[string][]string{
+		"Filebeat-TestRegex-(.*)":    []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c", "Filebeat-TestRegex-d"},
+		"Filebeat-TestRegex-(a|b)":   []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b"},
+		"Filebeat-TestRegex-[^c]":    []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-d"},
+		"Filebeat-TestRegex-d":       []string{"Filebeat-TestRegex-d"},
+		"Filebeat-TestRegex-e":       []string{},
+		"Filebeat-TestRegex-[a-c]":   []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c"},
+		"Filebeat-TestRegex-(a|b|c)": []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c"},
+		"Filebeat-TestRegex-.*":      []string{"Filebeat-TestRegex-a", "Filebeat-TestRegex-b", "Filebeat-TestRegex-c", "Filebeat-TestRegex-d"},
+		"^Filebeat-TestRegex-a":      []string{"Filebeat-TestRegex-a"},
+		"Filebeat-TestRegex-$":       []string{},
+		"Filebeat-TestRegex-a$":      []string{"Filebeat-TestRegex-a"},
+	}
+	logger := logptest.NewTestingLogger(t, "kafka_regex_test")
+
+	for _, topic := range topics {
+		ensureKafkaTopicReadyForWrites(t, topic)
+	}
+
+	config := sarama.NewConfig()
+	config.Version = sarama.V1_0_0_0
+	hosts := []string{getTestKafkaHost()}
+	client, err := sarama.NewClient(hosts, config)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, client.Close())
+	})
+
+	for fil, exp := range filters {
+		t.Run(fmt.Sprintf("filter: %s", fil), func(t *testing.T) {
+			client.RefreshMetadata()
+			reg, err := regexp.Compile(fil)
+			require.NoError(t, err, "regex %s should compile", fil)
+			output := filterKafkaTopics(client, logger, []*regexp.Regexp{reg})
+			if !slices.Equal(output, exp) {
+				t.Errorf("Slices for regex %s not equal, got: %v | expected: %v", fil, output, exp)
+			}
+		})
+	}
+}
+
+func TestKafkaTopicFiltersMultiple(t *testing.T) {
+
+	logger := logptest.NewTestingLogger(t, "kafka_regex_test_multiple")
+
+	topics := []string{"Filebeat-MultiRegex-a", "Filebeat-MultiRegex-b", "Filebeat-MultiRegex-c", "Filebeat-MultiRegex-d", "Filebeat-MultiRegex-e"}
+	for _, topic := range topics {
+		ensureKafkaTopicReadyForWrites(t, topic)
+	}
+
+	// Test multiple filters that might match the same topic
+
+	filters := []*regexp.Regexp{
+		regexp.MustCompile("Filebeat-MultiRegex-a"),
+		regexp.MustCompile("Filebeat-MultiRegex-(b|c)"),
+		regexp.MustCompile("Filebeat-MultiRegex-d"),
+	}
+	config := sarama.NewConfig()
+	config.Version = sarama.V1_0_0_0
+	hosts := []string{getTestKafkaHost()}
+	client, err := sarama.NewClient(hosts, config)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, client.Close())
+	})
+
+	t.Run("multiple filters", func(t *testing.T) {
+		client.RefreshMetadata()
+		output := filterKafkaTopics(client, logger, filters)
+		expected := []string{"Filebeat-MultiRegex-a", "Filebeat-MultiRegex-b", "Filebeat-MultiRegex-c", "Filebeat-MultiRegex-d"}
+
+		if !slices.Equal(output, expected) {
+			t.Errorf("Multiple filters test failed, got: %v | expected: %v", output, expected)
+		}
+	})
 }
 
 func createReadyTestTopic(t *testing.T) string {
