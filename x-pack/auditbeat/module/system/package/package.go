@@ -207,49 +207,50 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
-	if err := datastore.Update(migrateDatastoreSchema, base.GetPath()); err != nil {
-		return nil, fmt.Errorf("datastore schema migration failed: %w", err)
+	// Validate config before opening the datastore
+	if config.PackageSuidDrop != nil && os.Getuid() != 0 && *config.PackageSuidDrop != int64(os.Getuid()) {
+		return nil, fmt.Errorf("package.rpm_drop_to_suid is set to %d, but we're running as a different non-root user", *config.PackageSuidDrop)
 	}
 
-	bucket, err := datastore.OpenBucket(bucketNameV2, base.GetPath())
+	log := base.Logger().Named(metricsetName)
+
+	bucket, err := datastore.OpenBucketWithMigration(bucketNameV2, base.GetPath(), migrateDatastoreSchema)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
-	ms := &MetricSet{
-		SystemMetricSet: system.NewSystemMetricSet(base),
-		config:          config,
-		log:             base.Logger().Named(metricsetName),
-		cache:           cache.New[*Package](),
-		bucket:          bucket,
-	}
-
-	ms.lastState, err = loadStateTimestamp(bucket)
+	lastState, err := loadStateTimestamp(bucket)
 	if err != nil {
+		_ = bucket.Close()
 		return nil, fmt.Errorf("failed to load state timestamp from bucket %v: %w", bucketNameV2, err)
 	}
-	if !ms.lastState.IsZero() {
-		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	if !lastState.IsZero() {
+		log.Debugf("Last state was sent at %v. Next state update by %v.", lastState, lastState.Add(config.effectiveStatePeriod()))
 	} else {
-		ms.log.Debug("No state timestamp found.")
+		log.Debug("No state timestamp found.")
 	}
-
 	if config.PackageSuidDrop != nil {
-		if os.Getuid() != 0 && int(*ms.config.PackageSuidDrop) != os.Getuid() {
-			return nil, fmt.Errorf("package.rpm_drop_to_suid is set to %d, but we're running as a different non-root user", *config.PackageSuidDrop)
-		}
-		ms.log.Debugf("Dropping to EUID %d from UID %d for RPM API calls", *ms.config.PackageSuidDrop, os.Getuid())
+		log.Debugf("Dropping to EUID %d from UID %d for RPM API calls", *config.PackageSuidDrop, os.Getuid())
 	}
 
-	packages, err := loadPackages(ms.bucket)
+	packages, err := loadPackages(bucket)
 	if err != nil {
+		_ = bucket.Close()
 		return nil, fmt.Errorf("failed to load persisted package metadata from disk: %w", err)
 	}
-	ms.log.Debugf("Loaded %d packages from disk", len(packages))
+	log.Debugf("Loaded %d packages from disk", len(packages))
 
-	ms.cache.DiffAndUpdateCache(packages)
+	pkgCache := cache.New[*Package]()
+	pkgCache.DiffAndUpdateCache(packages)
 
-	return ms, nil
+	return &MetricSet{
+		SystemMetricSet: system.NewSystemMetricSet(base),
+		config:          config,
+		log:             log,
+		cache:           pkgCache,
+		bucket:          bucket,
+		lastState:       lastState,
+	}, nil
 }
 
 // Close cleans up the MetricSet when it finishes.
