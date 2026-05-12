@@ -130,37 +130,34 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	if c.isOpen.Swap(false) {
-		// Only do shutdown handling the first time Close is called
-		c.onClosing()
+	// Hold the mutex so any in-progress Publish finishes before
+	// signalClose checks the pending event count.
+	c.mutex.Lock()
+	if !c.isOpen.Swap(false) {
+		c.mutex.Unlock()
+		return nil
+	}
+	c.onClosing()
+	c.waiter.signalClose()
+	c.mutex.Unlock()
 
-		// Acquire and release the mutex to ensure any in-progress Publish
-		// call completes before we check the pending event count in
-		// signalClose. Without this, signalClose could see zero pending
-		// events while a Publish is between the isOpen check and AddEvent.
-		c.mutex.Lock()
-		c.mutex.Unlock() //nolint:staticcheck // SA2001 empty critical section is intentional as a synchronization barrier
+	c.waiter.wait()
 
-		c.logger.Debug("client: closing acker")
-		c.waiter.signalClose()
-		c.waiter.wait()
+	c.eventListener.ClientClosed()
+	c.logger.Debug("client: done closing acker")
 
-		c.eventListener.ClientClosed()
-		c.logger.Debug("client: done closing acker")
+	c.logger.Debug("client: close queue producer")
+	c.producer.Close()
+	c.onClosed()
+	c.logger.Debug("client: done producer close")
 
-		c.logger.Debug("client: close queue producer")
-		c.producer.Close()
-		c.onClosed()
-		c.logger.Debug("client: done producer close")
-
-		if c.processors != nil {
-			c.logger.Debug("client: closing processors")
-			err := processors.Close(c.processors)
-			if err != nil {
-				c.logger.Errorf("client: error closing processors: %v", err)
-			}
-			c.logger.Debug("client: done closing processors")
+	if c.processors != nil {
+		c.logger.Debug("client: closing processors")
+		err := processors.Close(c.processors)
+		if err != nil {
+			c.logger.Errorf("client: error closing processors: %v", err)
 		}
+		c.logger.Debug("client: done closing processors")
 	}
 	return nil
 }
