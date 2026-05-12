@@ -183,7 +183,11 @@ func runSimpleCommand(log *logp.Logger, cmd *exec.Cmd, dir string) error {
 	}
 	output, err := cmd.CombinedOutput()
 	if log != nil {
-		log.Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+		exitCode := -1
+		if cmd.ProcessState != nil {
+			exitCode = cmd.ProcessState.ExitCode()
+		}
+		log.Infof("Ran %s (%d) got '%s': (%v) as (%d/%d)", cmd, exitCode, string(output), err, syscall.Getuid(), syscall.Geteuid())
 	}
 	return err
 }
