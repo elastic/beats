@@ -52,7 +52,7 @@ var fqdnOnce = sync.OnceValues(func() (string, error) {
 })
 
 // NewBeatForReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core) (*instance.Beat, error) {
+func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]any, consumer consumer.Logs, componentID string, core zapcore.Core, queueMode pipeline.QueueMode) (*instance.Beat, error) {
 	b, err := instance.NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -285,6 +285,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
 		Paths:          b.Info.Paths,
+		QueueMode:      queueMode,
 	}
 	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {

@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 
 	// Import OSS monitor types.
@@ -45,7 +46,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	settings.Processing = processing.MakeDefaultSupport(true, nil, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 
-	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, consumer, set.ID.String(), set.Logger.Core(), pipeline.DefaultQueue)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}

@@ -97,7 +97,27 @@ type Settings struct {
 
 	// Paths contains the paths configuration used for processor initialization.
 	Paths *paths.Path
+
+	// QueueMode controls how events are delivered from the publisher pipeline
+	// to the output. Only applicable when running as a beatreceiver.
+	// Processors always run before events reach the output regardless of mode.
+	QueueMode QueueMode
 }
+
+// QueueMode controls how the publisher pipeline delivers events to the output.
+type QueueMode uint8
+
+const (
+	// DefaultQueue uses the standard queue (memqueue/diskqueue) between the
+	// publisher pipeline and the output. Events are batched by the queue
+	// consumer before being sent to the output workers.
+	DefaultQueue QueueMode = iota
+
+	// DirectQueue bypasses the queue entirely. Each event is forwarded
+	// synchronously to the output inline in the Publish call, matching
+	// the OTel receiver contract where Consume* calls are blocking.
+	DirectQueue
+)
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
 type WaitCloseMode uint8
@@ -222,7 +242,7 @@ func NewForReceiver(
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID, settings.QueueMode)
 	if err != nil {
 		return nil, err
 	}

@@ -45,7 +45,8 @@ func TestOTelQueueMetrics(t *testing.T) {
 		},
 		nilObserver,
 		memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1000}),
-		"")
+		"",
+		DefaultQueue)
 	require.NoError(t, err, "creating OTel output controller should succeed")
 	defer controller.waitClose(context.Background(), true)
 	entry := reg.Get("pipeline.queue.max_events")
