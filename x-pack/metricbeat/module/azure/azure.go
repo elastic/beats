@@ -183,6 +183,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 	// See "Round outer limits" and "Round inner limits" tests in
 	// the metric_registry_test.go for more information.
 	referenceTime := time.Now().UTC()
+	lookbackStart := m.computeLookbackStart(referenceTime)
 
 	// Initialize cloud resources and monitor metrics
 	// information.
@@ -213,7 +214,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 
 	for _, metricsDefinition := range metricsByResourceId {
 		// Fetch metric values for each resource.
-		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report, lookbackStart)
 
 		// Turns metric values into events and sends them to Elasticsearch.
 		if err := m.Client.MapToEvents(metricValues, report); err != nil {
@@ -221,6 +222,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 		}
 	}
 
+	m.updateCursor(referenceTime.Add(-m.Client.Config.Latency))
 	return nil
 }
 
@@ -242,6 +244,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 	// See "Round outer limits" and "Round inner limits" tests in
 	// the metric_registry_test.go for more information.
 	referenceTime := time.Now().UTC()
+	lookbackStart := m.computeLookbackStart(referenceTime)
 
 	// Initialize cloud resources and monitor metrics
 	// information.
@@ -275,7 +278,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				}
 				// process all stores in case there are remaining metricstores for which values are not collected.
 				m.BatchClient.Log.Debug("processAllStores")
-				metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
+				metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report, lookbackStart)
 				if len(metricValues) > 0 {
 					if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
 						m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
@@ -299,7 +302,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				for criteria, store := range metricStores {
 					if store.Size() >= BatchApiResourcesLimit {
 						m.BatchClient.Log.Debugf("Store %+v size is %d. Process the Store", criteria, store.Size())
-						metricValues = append(metricValues, processStore(m.BatchClient, criteria, store, referenceTime, report)...)
+						metricValues = append(metricValues, processStore(m.BatchClient, criteria, store, referenceTime, report, lookbackStart)...)
 					}
 				}
 				// Map the collected metric values into events and publish them.
@@ -326,12 +329,13 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 		}
 	}
 	// process all stores in case there are remaining metricstores for which values are not collected.
-	metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
+	metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report, lookbackStart)
 	if len(metricValues) > 0 {
 		if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
 			m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
 		}
 	}
+	m.updateCursor(referenceTime.Add(-m.BatchClient.Config.Latency))
 	return nil
 }
 
