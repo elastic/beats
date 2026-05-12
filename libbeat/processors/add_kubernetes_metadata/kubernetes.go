@@ -98,7 +98,7 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 		}
 		select {
 		case <-timer.C:
-			logger.Infof("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
+			logger.Errorf("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
 			return false
 		case <-ticker.C:
 		}
@@ -131,7 +131,7 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	if config.WaitMetadata {
 		processor.init(config, cfg)
 		if !processor.kubernetesAvailable {
-			return nil, fmt.Errorf("Kubernetes environment is not available after waiting for metadata")
+			return nil, fmt.Errorf("add_kubernetes_metadata: could not detect kubernetes env")
 		}
 	} else {
 		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
