@@ -69,11 +69,7 @@ func newLogHints(cfg *conf.C, logger *logp.Logger, paths *paths.Path) (autodisco
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-<<<<<<< HEAD
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger, Paths: paths.Paths}, false, fileset.FilesetOverrides{})
-=======
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths)
->>>>>>> 31d1c309a (Autodiscover: pass paths through builders instead of global paths (#49537))
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger, Paths: paths}, false, fileset.FilesetOverrides{})
 	if err != nil {
 		return nil, err
 	}
