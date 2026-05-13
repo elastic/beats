@@ -290,6 +290,7 @@ logging:
 		"Filebeat did not log a validation error")
 }
 
+// migrated from test_fixup_registry_entries_with_global_id in test_input.py
 func TestFixupRegistryEntriesWithGlobalID(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
