@@ -518,6 +518,30 @@ func TestPublish(t *testing.T) {
 		assert.Equal(t, mapstr.M{"message": "hello world"}, eventWithMetadata.Fields)
 		assert.Equal(t, mapstr.M{"raw_index": "logs-test", "input_id": "input-123"}, eventWithMetadata.Meta)
 	})
+
+	t.Run("includes metadata with no source meta fields", func(t *testing.T) {
+		beatInfo.IncludeMetadata = true
+
+		eventNoMeta := beat.Event{
+			Fields: mapstr.M{"message": "hello"},
+		}
+
+		batch := outest.NewBatch(eventNoMeta)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+
+			metadata, ok := body["@metadata"].(map[string]any)
+			require.True(t, ok, "@metadata should be present even with nil source meta")
+			assert.Equal(t, beatInfo.Beat, metadata["beat"])
+			assert.Equal(t, beatInfo.Version, metadata["version"])
+			assert.Equal(t, "_doc", metadata["type"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+	})
 }
 
 func checkEventsActive(reg *monitoring.Registry) int64 {

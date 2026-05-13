@@ -207,10 +207,8 @@ func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, 
 	}
 
 	// if pipeline field is set on event metadata
-	if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
-		if s, ok := pipeline.(string); ok {
-			logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
-		}
+	if s, ok := event.Content.Meta["pipeline"].(string); ok {
+		logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
 	}
 
 	beatEvent := event.Content.Fields
@@ -221,12 +219,14 @@ func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, 
 
 	// Set the timestamp for when the event was first seen by the pipeline.
 	observedTimestamp := logRecord.Timestamp()
-	if created, err := beatEvent.GetValue("event.created"); err == nil {
-		switch created := created.(type) {
+	if eventMap, ok := beatEvent["event"].(mapstr.M); ok {
+		switch created := eventMap["created"].(type) {
 		case time.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(created)
 		case common.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case nil:
+			// not set
 		default:
 			log.Warnf("Invalid 'event.created' type (%T); using log timestamp as observed timestamp.", created)
 		}
@@ -234,14 +234,9 @@ func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, 
 	logRecord.SetObservedTimestamp(observedTimestamp)
 
 	// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
-	if val, _ := beatEvent.GetValue("data_stream"); val != nil {
-		// If the below sub fields do not exist, it will return empty string.
-		subFields := []string{"dataset", "namespace", "type"}
-
-		for _, subField := range subFields {
-			value, err := beatEvent.GetValue("data_stream." + subField)
-			if vStr, ok := value.(string); ok && err == nil {
-				// set log record attribute only if value is non empty
+	if ds, ok := beatEvent["data_stream"].(mapstr.M); ok {
+		for _, subField := range []string{"dataset", "namespace", "type"} {
+			if vStr, ok := ds[subField].(string); ok {
 				logRecord.Attributes().PutStr("data_stream."+subField, vStr)
 			}
 		}
@@ -256,9 +251,6 @@ func logBodyMetadata(event publisher.Event, beatInfo beat.Info) mapstr.M {
 	}
 
 	meta := event.Content.Meta.Clone()
-	if meta == nil {
-		meta = mapstr.M{}
-	}
 	meta["beat"] = beatInfo.Beat
 	meta["version"] = beatInfo.Version
 	meta["type"] = "_doc"
