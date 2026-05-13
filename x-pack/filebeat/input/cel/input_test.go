@@ -3088,7 +3088,7 @@ func TestGetResourceAttributesIncludesInputType(t *testing.T) {
 	attrsMap := toResourceAttributeMap(attrs)
 
 	if got, want := attrsMap["input_type"], "cel"; got != want {
-		t.Fatalf("input_type should be set from input name: got %q, want %q", got, want)
+		t.Errorf("input_type should be set from input name: got %q, want %q", got, want)
 	}
 }
 
@@ -3108,10 +3108,10 @@ func TestGetResourceAttributesInputTypeCannotBeOverridden(t *testing.T) {
 	attrsMap := toResourceAttributeMap(attrs)
 
 	if got, want := attrsMap["input_type"], "cel"; got != want {
-		t.Fatalf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
+		t.Errorf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
 	}
 	if got, want := attrsMap["deployment.environment"], "production"; got != want {
-		t.Fatalf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
+		t.Errorf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
 	}
 }
 

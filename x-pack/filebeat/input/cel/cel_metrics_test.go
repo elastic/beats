@@ -239,7 +239,7 @@ func TestCreateOTELMetricsSetsInputTypeResourceAttribute(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	otelMetrics, _, err := createOTELMetrics(ctx, cfg, logp.NewLogger("cel_metrics_test"), env, http.DefaultTransport, nil)
+	otelMetrics, _, err := createOTELMetrics(ctx, cfg, logptest.NewTestingLogger(t, "cel_metrics_test"), env, http.DefaultTransport, nil)
 	if err != nil {
 		t.Fatalf("failed to create OTEL metrics collector: %v", err)
 	}
@@ -257,16 +257,12 @@ func TestCreateOTELMetricsSetsInputTypeResourceAttribute(t *testing.T) {
 		t.Fatalf("expected OTEL metrics to be exported, got %d", got)
 	}
 
-	hasInputType := false
 	for _, rm := range exporter.getMetrics() {
 		if rm.Resource != nil && strings.Contains(rm.Resource.String(), "input_type=cel") {
-			hasInputType = true
-			break
+			return
 		}
 	}
-	if got, want := hasInputType, true; got != want {
-		t.Fatalf("expected exported OTEL metrics resource attributes to include input_type=cel, got %v", got)
-	}
+	t.Error("expected exported OTEL metrics resource attributes to include input_type=cel")
 }
 
 // testPublisher is a publisher that signals when events are published.
