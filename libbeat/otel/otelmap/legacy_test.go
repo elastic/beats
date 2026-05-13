@@ -45,7 +45,7 @@ func TestFromMapstrMatchesLegacy(t *testing.T) {
 			directMap := pcommon.NewMap()
 			require.NoError(t, FromMapstr(directMap, tc.src))
 
-			assert.Equal(t, legacyMap.AsRaw(), directMap.AsRaw())
+			assert.True(t, legacyMap.Equal(directMap))
 		})
 	}
 }
