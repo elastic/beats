@@ -140,7 +140,7 @@ jobs:
           # Windows integration tests
           - name: "Go Windows Integration Tests"
             os: windows-2022
-            mage-target: "goWindowsIntegTest"
+            mage-target: "build goWindowsIntegTest"
             fips: ""
 
     steps:
