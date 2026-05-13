@@ -69,7 +69,7 @@ func (c *cache) set(key string, data mapstr.M) {
 }
 
 func (c *cache) cleanup() {
-	if c.timeout <= 0 {
+	if timeout <= 0 {
 		return
 	}
 
