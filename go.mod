@@ -305,15 +305,9 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.31.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.54.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.54.0 // indirect
-<<<<<<< HEAD
-	github.com/IBM/sarama v1.47.0 // indirect
-=======
 	github.com/IBM/sarama v1.48.0 // indirect
-	github.com/Velocidex/json v0.0.0-20220224052537-92f3c0326e5a // indirect
-	github.com/Velocidex/ordereddict v0.0.0-20230909174157-2aa49cc5d11d // indirect
-	github.com/Velocidex/yaml/v2 v2.2.8 // indirect
->>>>>>> 79a048584 ( chore: update OTel Collector dependencies to `v0.151.0`/`v1.57.0` (#50563))
 	github.com/VictoriaMetrics/easyproto v0.1.4 // indirect
+	github.com/alecthomas/repr v0.1.1 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
