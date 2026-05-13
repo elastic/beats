@@ -167,6 +167,16 @@ func (l *Logger) With(args ...interface{}) *Logger {
 	return &Logger{sugar.Desugar(), sugar, l.selectors}
 }
 
+// WithLazy creates a child logger and adds structured context to it lazily.
+// Semantics match [zap.Logger.WithLazy]: the fields are encoded into the
+// underlying core only when the child is first written to (or further
+// chained with [Logger.With]). Useful on hot paths where a logger is always
+// built but only rarely emits.
+func (l *Logger) WithLazy(fields ...zapcore.Field) *Logger {
+	zapLog := l.logger.WithLazy(fields...)
+	return &Logger{zapLog, zapLog.Sugar(), l.selectors}
+}
+
 // Name returns the Logger's underlying name, or an empty string if the
 // logger is unnamed.
 func (l *Logger) Name() string {

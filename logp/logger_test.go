@@ -80,6 +80,46 @@ func TestNewInMemory(t *testing.T) {
 	assert.Contains(t, logs[3], "error_val")
 }
 
+func TestLoggerWithLazy(t *testing.T) {
+	core, observed := observer.New(zapcore.DebugLevel)
+	root, err := NewZapLogger(zap.New(core))
+	require.NoError(t, err, "constructing zap logger")
+
+	child := root.WithLazy(
+		zap.String("operation", "create"),
+		zap.String("source_file", "src-1"),
+	)
+	child.Infof("hello %s", "world")
+
+	entries := observed.All()
+	require.Len(t, entries, 1, "expected one emitted entry")
+	fields := map[string]string{}
+	for _, f := range entries[0].Context {
+		if f.Type == zapcore.StringType {
+			fields[f.Key] = f.String
+		}
+	}
+	assert.Equal(t, "create", fields["operation"], "operation field")
+	assert.Equal(t, "src-1", fields["source_file"], "source_file field")
+	assert.Equal(t, "hello world", entries[0].Message, "formatted message")
+}
+
+func TestLoggerWithLazyBelowLevelEmitsNothing(t *testing.T) {
+	// A Debugf call against an Info-level logger should produce no observer
+	// entries, even when the logger was built via WithLazy.
+	core, observed := observer.New(zapcore.InfoLevel)
+	root, err := NewZapLogger(zap.New(core))
+	require.NoError(t, err, "constructing zap logger")
+
+	child := root.WithLazy(
+		zap.String("operation", "create"),
+		zap.String("source_file", "src-1"),
+	)
+	child.Debugf("debugf below configured level")
+
+	assert.Empty(t, observed.All(), "no entries should be emitted below the configured level")
+}
+
 func TestLoggerHasSelector(t *testing.T) {
 	logger := newLogger(zap.NewNop(), map[string]struct{}{
 		"config": {},
