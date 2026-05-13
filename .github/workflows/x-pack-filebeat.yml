@@ -23,8 +23,16 @@ on:
   push:
     branches:
       - main
-      - master
   workflow_dispatch:
+
+## Concurrency only allowed in the main branch.
+## So old builds running for old commits within the same Pull Request are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
 
 jobs:
   check-update:
@@ -42,18 +50,10 @@ jobs:
           make -C x-pack/filebeat check update
           make check-no-changes
 
-  pre-commit:
-    name: "Pre-commit"
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: elastic/oblt-actions/pre-commit@v1
-
   unit-tests:
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
-    needs: [check-update]
+    #needs: [check-update]
     env:
       RACE_DETECTOR: "true"
       TEST_COVERAGE: "true"
@@ -92,23 +92,35 @@ jobs:
             mage-target: "build unitTest"
             fips: ""
 
+          - name: "Windows 11 ARM Unit Tests"
+            os: windows-11-arm
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "macos-15-intel Unit Tests"
+            os: macos-15-intel
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "macos-15 Unit Tests"
+            os: macos-15
+            mage-target: "build unitTest"
+            fips: ""
+
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v6
+      - uses: ./.github/actions/unit-test
         with:
-          go-version-file: .go-version
-
-      - name: Run unit tests
-        working-directory: x-pack/filebeat
+          beat: x-pack/filebeat
+          command: "mage ${{ matrix.mage-target }}"
         env:
           FIPS: ${{ matrix.fips }}
-        run: mage ${{ matrix.mage-target }}
 
   integration-tests:
     name: "${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
-    needs: [check-update]
+    #needs: [check-update]
     strategy:
       fail-fast: false
       matrix:
@@ -139,12 +151,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v6
+      # TODO: rename actions
+      - uses: ./.github/actions/unit-test
         with:
-          go-version-file: .go-version
-
-      - name: Run integration tests
-        working-directory: x-pack/filebeat
+          beat: x-pack/filebeat
+          command: "mage ${{ matrix.mage-target }}"
         env:
           FIPS: ${{ matrix.fips }}
-        run: mage ${{ matrix.mage-target }}
