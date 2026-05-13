@@ -79,9 +79,9 @@ func createDefaultConfig() Config {
 type ResourceConfig struct {
 	Id          []string       `config:"resource_id"`
 	Group       []string       `config:"resource_group"`
-	Metrics     []MetricConfig `config:"metrics"`
 	Type        string         `config:"resource_type"`
 	Query       string         `config:"resource_query"`
+	Metrics     []MetricConfig `config:"metrics"`
 	ServiceType []string       `config:"service_type"`
 }
 

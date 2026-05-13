@@ -11,6 +11,7 @@
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
   refresh_list_interval: 600s
+  # lookback_window: 10m
   resources:
 #  - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
 #    metrics:

@@ -141,7 +141,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		if azMod, ok := base.Module().(Module); !ok {
 			base.Logger().Warn("azure module does not implement Module interface, lookback disabled")
 		} else {
-			registry, regErr := azMod.GetCursorRegistry()
+			registry, regErr := azMod.GetCursorRegistry(base.GetPath(), base.Logger())
 			if regErr != nil {
 				base.Logger().Warnw("azure cursor registry unavailable, lookback disabled", "error", regErr)
 			} else {
@@ -498,6 +498,9 @@ func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
 	}
 	minStart := referenceTime.Add(-m.lookbackWindow)
 	if state.LastCollectionEnd.Before(minStart) {
+		// The last collection end time is too old and outside the lookback window,
+		// so we ignore it to avoid querying a very large timespan on the first
+		// collection after a long downtime.
 		return nil
 	}
 	return &state.LastCollectionEnd

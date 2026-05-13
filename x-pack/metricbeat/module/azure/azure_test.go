@@ -37,8 +37,8 @@ func TestGroupMetricsDefinitionsByResourceId(t *testing.T) {
 
 		metricsByResourceId := groupMetricsDefinitionsByResourceId(metrics)
 
-		assert.Equal(t, 1, len(metricsByResourceId))
-		assert.Equal(t, 3, len(metricsByResourceId["resource-1"]))
+		assert.Len(t, metricsByResourceId, 1)
+		assert.Len(t, metricsByResourceId["resource-1"], 3)
 	})
 }
 
@@ -170,5 +170,76 @@ func TestCalculateTimespanWithLookback(t *testing.T) {
 		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
 		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
+	})
+}
+
+func TestResourcesFingerprint(t *testing.T) {
+	vmNS := "Microsoft.Compute/virtualMachines"
+	stNS := "Microsoft.Storage/storageAccounts"
+
+	vm := func(ns string) ResourceConfig {
+		return ResourceConfig{Metrics: []MetricConfig{{Namespace: ns}}}
+	}
+	vmWithGroup := func(ns, group string) ResourceConfig {
+		return ResourceConfig{Group: []string{group}, Metrics: []MetricConfig{{Namespace: ns}}}
+	}
+	vmWithType := func(ns, rtype string) ResourceConfig {
+		return ResourceConfig{Type: rtype, Metrics: []MetricConfig{{Namespace: ns}}}
+	}
+	vmWithID := func(ns, id string) ResourceConfig {
+		return ResourceConfig{Id: []string{id}, Metrics: []MetricConfig{{Namespace: ns}}}
+	}
+	vmWithQuery := func(ns, query string) ResourceConfig {
+		return ResourceConfig{Query: query, Metrics: []MetricConfig{{Namespace: ns}}}
+	}
+
+	t.Run("same config produces same fingerprint", func(t *testing.T) {
+		a := resourcesFingerprint([]ResourceConfig{vm(vmNS)})
+		b := resourcesFingerprint([]ResourceConfig{vm(vmNS)})
+		assert.Equal(t, a, b)
+	})
+
+	t.Run("order of resource entries does not matter", func(t *testing.T) {
+		a := resourcesFingerprint([]ResourceConfig{vm(vmNS), vm(stNS)})
+		b := resourcesFingerprint([]ResourceConfig{vm(stNS), vm(vmNS)})
+		assert.Equal(t, a, b)
+	})
+
+	t.Run("different namespace produces different fingerprint", func(t *testing.T) {
+		assert.NotEqual(t,
+			resourcesFingerprint([]ResourceConfig{vm(vmNS)}),
+			resourcesFingerprint([]ResourceConfig{vm(stNS)}))
+	})
+
+	t.Run("different resource group produces different fingerprint", func(t *testing.T) {
+		assert.NotEqual(t,
+			resourcesFingerprint([]ResourceConfig{vmWithGroup(vmNS, "prod")}),
+			resourcesFingerprint([]ResourceConfig{vmWithGroup(vmNS, "staging")}))
+	})
+
+	t.Run("different resource type produces different fingerprint", func(t *testing.T) {
+		assert.NotEqual(t,
+			resourcesFingerprint([]ResourceConfig{vmWithType(vmNS, "Microsoft.Compute/virtualMachines")}),
+			resourcesFingerprint([]ResourceConfig{vmWithType(vmNS, "Microsoft.Storage/storageAccounts")}))
+	})
+
+	t.Run("different resource id produces different fingerprint", func(t *testing.T) {
+		assert.NotEqual(t,
+			resourcesFingerprint([]ResourceConfig{vmWithID(vmNS, "/subscriptions/sub1/resourceGroups/rg/providers/Microsoft.Compute/virtualMachines/vm1")}),
+			resourcesFingerprint([]ResourceConfig{vmWithID(vmNS, "/subscriptions/sub1/resourceGroups/rg/providers/Microsoft.Compute/virtualMachines/vm2")}))
+	})
+
+	t.Run("different resource query produces different fingerprint", func(t *testing.T) {
+		assert.NotEqual(t,
+			resourcesFingerprint([]ResourceConfig{vmWithQuery(vmNS, "resourceType eq 'Microsoft.Compute/virtualMachines'")}),
+			resourcesFingerprint([]ResourceConfig{vmWithQuery(vmNS, "resourceType eq 'Microsoft.Storage/storageAccounts'")}))
+	})
+
+	t.Run("service_type does not affect fingerprint", func(t *testing.T) {
+		withSvc := ResourceConfig{ServiceType: []string{"blob"}, Metrics: []MetricConfig{{Namespace: vmNS}}}
+		withoutSvc := ResourceConfig{Metrics: []MetricConfig{{Namespace: vmNS}}}
+		assert.Equal(t,
+			resourcesFingerprint([]ResourceConfig{withSvc}),
+			resourcesFingerprint([]ResourceConfig{withoutSvc}))
 	})
 }

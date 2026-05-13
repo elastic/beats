@@ -25,7 +25,7 @@ type Module interface {
 	// GetCursorRegistry returns the shared statestore registry for cursor
 	// persistence. Created lazily on first call — no disk I/O if lookback
 	// is disabled. Returns an error if the registry cannot be created.
-	GetCursorRegistry() (*statestore.Registry, error)
+	GetCursorRegistry(p *paths.Path, logger *logp.Logger) (*statestore.Registry, error)
 }
 
 // sharedRegistryState holds the lazily-created statestore registry shared across
@@ -62,19 +62,18 @@ func ModuleBuilder() mb.ModuleFactory {
 
 // GetCursorRegistry returns the shared statestore.Registry for cursor persistence.
 // Thread-safe; created lazily on first call.
-func (m *module) GetCursorRegistry() (*statestore.Registry, error) {
+func (m *module) GetCursorRegistry(p *paths.Path, logger *logp.Logger) (*statestore.Registry, error) {
 	s := m.shared
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	dataPath := paths.Resolve(paths.Data, "azure-cursor")
+	dataPath := p.Resolve(paths.Data, "azure-cursor")
 
 	if s.registry != nil && s.dataPath == dataPath {
 		return s.registry, s.err
 	}
 
-	logger := logp.NewLogger("azure.cursor")
-	reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
+	reg, err := memlog.New(logger.Named("azure.cursor").Named("memlog"), memlog.Settings{
 		Root:     dataPath,
 		FileMode: 0o600,
 	})
