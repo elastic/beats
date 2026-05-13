@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
