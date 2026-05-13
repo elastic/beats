@@ -390,7 +390,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
