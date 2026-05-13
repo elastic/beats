@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -60,6 +61,7 @@ type Provider struct {
 	stoppers      map[string]*time.Timer
 	stopTrigger   chan *dockerContainerMetadata
 	logger        *logp.Logger
+	stopWg        sync.WaitGroup
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -127,17 +129,19 @@ func AutodiscoverBuilder(
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
 		logger:        logger,
+		stopWg:        sync.WaitGroup{},
 	}, nil
 }
 
 // Start the autodiscover process
 func (d *Provider) Start() {
-	go func() {
+	d.stopWg.Go(func() {
 		for {
 			select {
 			case <-d.stop:
 				d.startListener.Stop()
 				d.stopListener.Stop()
+				d.watcher.Stop()
 
 				// Stop all timers before closing the channel
 				for _, stopper := range d.stoppers {
@@ -156,7 +160,7 @@ func (d *Provider) Start() {
 				d.stopContainer(target.container, target.metadata)
 			}
 		}
-	}()
+	})
 }
 
 type dockerContainerMetadata struct {
@@ -397,6 +401,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 // Stop the autodiscover process
 func (d *Provider) Stop() {
 	close(d.stop)
+	d.stopWg.Wait()
 }
 
 func (d *Provider) String() string {
