@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type testOutput struct {
@@ -56,7 +55,7 @@ func init() {
 	outputs.RegisterType("test", makeTestOutput)
 }
 
-func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C, beatPaths *paths.Path) (outputs.Group, error) {
+func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C) (outputs.Group, error) {
 	config := defaultTestOutputConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)
@@ -68,7 +67,7 @@ func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Obs
 		clients[i] = client
 	}
 
-	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, nil, beat.Logger, beatPaths, clients...)
+	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, nil, beat.Logger, beat.Paths, clients...)
 }
 
 func (*testOutput) Close() error { return nil }
