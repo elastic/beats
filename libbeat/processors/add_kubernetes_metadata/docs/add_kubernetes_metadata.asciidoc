@@ -127,16 +127,15 @@ level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
+`wait_for_metadata` :: (false) When `true`, startup will be blocked until processor is initialized. Startup will fail if processor is unable to connect to Kubernetes API within `wait_for_metadata_timeout` and the process will exit.
+If `false`, processor initialization will occur asynchronously. 
+`wait_for_metadata_timeout` :: (30s) The maximum time the processor should spend trying to fetch metadata before giving up. Applies regardless of the value of `wait_for_metadata`. To attempt connecting to Kubernetes API indefinitely, set this option to 0. 
 `add_resource_metadata`:: (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
  - `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output.
  Note: wildcards are not supported for those settings.
  The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
  - `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
  - `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
-`wait_for_metadata` :: (false) When `true`, startup will be blocked until processor is initialized. Startup will fail if processor is unable to connect to Kubernetes API within `wait_for_metadata_timeout` and the process will exit.
-If `false`, processor initialization will occur asynchronously. 
-`wait_for_metadata_timeout` :: (30s) The maximum time the processor should spend trying to fetch metadata before giving up. Applies regardless of the value of `wait_for_metadata`. To attempt connecting to Kubernetes API indefinitely, set this option to 0. 
-
 +
 Example:
 ["source","yaml",subs="attributes"]
