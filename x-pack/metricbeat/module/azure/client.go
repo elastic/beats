@@ -146,9 +146,6 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	var result []Metric
 
 	for _, metric := range metrics {
-		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, lookbackStart)
-		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.
@@ -171,6 +168,9 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
 			continue
 		}
+
+		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, lookbackStart)
+		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured
 		var filter string

@@ -271,16 +271,6 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 // GroupAndStoreMetrics groups received metricsDefinitions and stores them in a in memory store
 func (client *BatchClient) GroupAndStoreMetrics(metricsDefinitions []Metric, referenceTime time.Time, store map[ResDefGroupingCriteria]*MetricStore) {
 	for _, metric := range metricsDefinitions {
-
-		criteria := ResDefGroupingCriteria{
-			Namespace:      metric.Namespace,
-			SubscriptionID: metric.SubscriptionId,
-			Location:       metric.Location,
-			Names:          strings.Join(metric.Names, ","),
-			TimeGrain:      metric.TimeGrain,
-			Dimensions:     getDimensionKey(metric.Dimensions),
-		}
-
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.
@@ -302,6 +292,15 @@ func (client *BatchClient) GroupAndStoreMetrics(metricsDefinitions []Metric, ref
 		//
 		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
 			continue
+		}
+
+		criteria := ResDefGroupingCriteria{
+			Namespace:      metric.Namespace,
+			SubscriptionID: metric.SubscriptionId,
+			Location:       metric.Location,
+			Names:          strings.Join(metric.Names, ","),
+			TimeGrain:      metric.TimeGrain,
+			Dimensions:     getDimensionKey(metric.Dimensions),
 		}
 		if _, exists := store[criteria]; !exists {
 			store[criteria] = &MetricStore{}
