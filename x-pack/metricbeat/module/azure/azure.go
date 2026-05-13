@@ -151,8 +151,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 					ms.cursorKey = cursor.GenerateStateKey(
 						metricsetName,
 						config.SubscriptionId,
-						config.Period.String(),
-						config.Latency.String(),
 						resourcesFingerprint(config.Resources),
 					)
 				}
@@ -503,29 +501,60 @@ func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
 	return &state.LastCollectionEnd
 }
 
-// resourcesFingerprint returns a stable, sorted string representation of the
-// resource filter config. Two configs that cover different resources will
-// produce different fingerprints, ensuring they get separate cursor keys.
-// Each resource entry is sorted internally and the slice is sorted overall so
-// the result is order-independent.
+// resourcesFingerprint returns a stable string that captures the collection
+// scope of a []ResourceConfig. Two configs that differ in either what metrics
+// they collect (namespace) or which Azure resources they target (resource_id,
+// resource_group, resource_type, resource_query) will produce different
+// fingerprints and therefore get separate cursor keys.
+//
+// service_type is intentionally excluded — it is a post-listing filter that
+// selects metric namespaces within already-discovered storage resources, not a
+// resource-listing filter.
+//
+// Values within each set are deduplicated and sorted so the result is
+// order-independent across resource entries.
 func resourcesFingerprint(resources []ResourceConfig) string {
-	parts := make([]string, 0, len(resources))
+	ns := make(map[string]struct{})
+	ids := make(map[string]struct{})
+	groups := make(map[string]struct{})
+	types := make(map[string]struct{})
+	queries := make(map[string]struct{})
+
 	for _, r := range resources {
-		ids := slices.Clone(r.Id)
-		slices.Sort(ids)
-		groups := slices.Clone(r.Group)
-		slices.Sort(groups)
-		svcTypes := slices.Clone(r.ServiceType)
-		slices.Sort(svcTypes)
-		parts = append(parts, fmt.Sprintf("type=%s ids=%s groups=%s query=%s svc=%s",
-			r.Type,
-			strings.Join(ids, ","),
-			strings.Join(groups, ","),
-			r.Query,
-			strings.Join(svcTypes, ",")))
+		for _, m := range r.Metrics {
+			if m.Namespace != "" {
+				ns[m.Namespace] = struct{}{}
+			}
+		}
+		for _, id := range r.Id {
+			if id != "" {
+				ids[id] = struct{}{}
+			}
+		}
+		for _, g := range r.Group {
+			if g != "" {
+				groups[g] = struct{}{}
+			}
+		}
+		if r.Type != "" {
+			types[r.Type] = struct{}{}
+		}
+		if r.Query != "" {
+			queries[r.Query] = struct{}{}
+		}
 	}
-	slices.Sort(parts)
-	return strings.Join(parts, ";")
+
+	sorted := func(m map[string]struct{}) string {
+		keys := make([]string, 0, len(m))
+		for k := range m {
+			keys = append(keys, k)
+		}
+		slices.Sort(keys)
+		return strings.Join(keys, ",")
+	}
+
+	return fmt.Sprintf("ns=%s|ids=%s|groups=%s|types=%s|queries=%s",
+		sorted(ns), sorted(ids), sorted(groups), sorted(types), sorted(queries))
 }
 
 // updateCursor persists the collection end time so it can be used as a lookback
