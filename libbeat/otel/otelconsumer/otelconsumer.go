@@ -181,8 +181,7 @@ func (out *otelConsumer) String() string {
 
 func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) error {
 	beatEvent := prepareLogRecordFromEvent(logRecord, event, log, isReceiverTest)
-	metadata := logBodyMetadata(event, beatInfo)
-	return encodeLogRecordBody(logRecord, beatEvent, event.Content.Timestamp, metadata)
+	return encodeLogRecordBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo)
 }
 
 func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, log *logp.Logger, isReceiverTest bool) mapstr.M {
@@ -249,38 +248,27 @@ func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, 
 	return beatEvent
 }
 
-func logBodyMetadata(event publisher.Event, beatInfo beat.Info) mapstr.M {
-	if !beatInfo.IncludeMetadata {
-		return nil
-	}
-
-	meta := event.Content.Meta.Clone()
-	meta["beat"] = beatInfo.Beat
-	meta["version"] = beatInfo.Version
-	meta["type"] = "_doc"
-	return meta
-}
-
-func encodeLogRecordBody(logRecord plog.LogRecord, beatEvent mapstr.M, timestamp time.Time, metadata mapstr.M) error {
+func encodeLogRecordBody(logRecord plog.LogRecord, beatEvent mapstr.M, timestamp time.Time, meta mapstr.M, beatInfo beat.Info) error {
 	bodyMap := logRecord.Body().SetEmptyMap()
 	capacity := len(beatEvent) + 1
-	if metadata != nil {
+	if beatInfo.IncludeMetadata {
 		capacity++
 	}
 	bodyMap.EnsureCapacity(capacity)
-	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(timestamp))
-	if metadata != nil {
-		if err := otelmap.FromValue(bodyMap.PutEmpty("@metadata"), metadata); err != nil {
-			return err
-		}
+	if err := otelmap.FromMapstr(bodyMap, beatEvent); err != nil {
+		return err
 	}
-	for key, value := range beatEvent {
-		if key == "@timestamp" || (metadata != nil && key == "@metadata") {
-			continue
-		}
-		if err := otelmap.FromValue(bodyMap.PutEmpty(key), value); err != nil {
+
+	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(timestamp))
+	if beatInfo.IncludeMetadata {
+		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
+		pmeta.EnsureCapacity(len(meta) + 3)
+		if err := otelmap.FromMapstr(pmeta, meta); err != nil {
 			return err
 		}
+		pmeta.PutStr("beat", beatInfo.Beat)
+		pmeta.PutStr("version", beatInfo.Version)
+		pmeta.PutStr("type", "_doc")
 	}
 	return nil
 }
