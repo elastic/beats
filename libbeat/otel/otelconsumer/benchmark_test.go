@@ -146,6 +146,52 @@ func benchmarkEventCases() []benchmarkEventCase {
 			},
 		},
 		{
+			name: "filebeat_filestream_like",
+			event: beat.Event{
+				Timestamp: timestamp,
+				Meta: mapstr.M{
+					"_id":  "6ff14ac5abc123",
+					"beat": "filebeat",
+				},
+				Fields: mapstr.M{
+					"message": "2026-04-23T12:34:56.789Z INFO  GET /api/orders 200 12ms",
+					"input": mapstr.M{
+						"type": "filestream",
+					},
+					"log": mapstr.M{
+						"offset": int64(2048),
+						"file": mapstr.M{
+							"path":        "/var/log/app/service.log",
+							"device_id":   "64513",
+							"inode":       "8783591",
+							"fingerprint": "3e3fbde0bb3afbaff84342527dee2cfa071b2e4c7058911ec83269cc74e0ba51",
+						},
+					},
+					"host": mapstr.M{
+						"name": "prod-node-01",
+					},
+					"agent": mapstr.M{
+						"type":         "filebeat",
+						"version":      "9.2.0",
+						"name":         "prod-node-01",
+						"id":           "6ff14ac5-c923-4fc1-8c16-41d76598cd77",
+						"ephemeral_id": "85624209-5081-4fb9-9eb6-693c99a44af9",
+					},
+					"ecs": mapstr.M{
+						"version": "8.0.0",
+					},
+					"data_stream": mapstr.M{
+						"type":      "logs",
+						"dataset":   "generic",
+						"namespace": "default",
+					},
+					"event": mapstr.M{
+						"created": created,
+					},
+				},
+			},
+		},
+		{
 			name: "metricbeat_sql_like",
 			event: beat.Event{
 				Timestamp: timestamp,
