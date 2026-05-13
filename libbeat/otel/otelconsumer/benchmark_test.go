@@ -190,20 +190,26 @@ func makeBenchmarkBatch(event beat.Event, size int) []beat.Event {
 // BenchmarkFillLogRecordFromEvent measures the cost of filling a single
 // pdata log record from a beats event.
 func BenchmarkFillLogRecordFromEvent(b *testing.B) {
-	for _, tc := range benchmarkEventCases() {
-		b.Run(tc.name, func(b *testing.B) {
-			b.ReportAllocs()
-			pubEvent := publisher.Event{Content: tc.event}
-			logger := logp.NewNopLogger()
-			beatInfo := beat.Info{}
+	for _, includeMetadata := range []bool{false, true} {
+		beatInfo := beat.Info{IncludeMetadata: includeMetadata}
+		suffix := ""
+		if includeMetadata {
+			suffix = "/with_metadata"
+		}
+		for _, tc := range benchmarkEventCases() {
+			b.Run(tc.name+suffix, func(b *testing.B) {
+				b.ReportAllocs()
+				pubEvent := publisher.Event{Content: tc.event}
+				logger := logp.NewNopLogger()
 
-			for b.Loop() {
-				logRecord := plog.NewLogRecord()
-				if err := fillLogRecordFromEvent(logRecord, pubEvent, beatInfo, logger, false); err != nil {
-					b.Fatal(err)
+				for b.Loop() {
+					logRecord := plog.NewLogRecord()
+					if err := fillLogRecordFromEvent(logRecord, pubEvent, beatInfo, logger, false); err != nil {
+						b.Fatal(err)
+					}
 				}
-			}
-		})
+			})
+		}
 	}
 }
 
