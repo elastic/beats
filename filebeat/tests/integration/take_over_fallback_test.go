@@ -49,22 +49,25 @@ type fallbackEvent struct {
 // and if Filestream is disabled and the Log input re-enabled, it continues
 // from where it left off.
 //
-// The steps of the test:
-//  1. Add 25 lines to the target files
+// The flow tested is:
+//  1. Add 25 lines to each target file
 //  2. Start the Log input
-//  3. Assert the files are in the output
+//  3. Assert the log lines are in the output
 //  4. Stop the Log input
 //  5. Start the Filestream input with Take Over enabled
-//  6. Append 25 lines to the files
+//  6. Append 25 lines to each file
 //  7. Assert Filestream continues reading from where the Log input stopped
 //  8. Stop the Filestream input
 //  9. Start the Log input
-//  10. Append 25 lines to the files
+//  10. Append 25 lines to each target file
 //  11. Assert the Log input continues from where it stopped
 //  12. Stop the Log input
-//  13. Append 25 lines to the files
+//  13. Append 25 lines to each target file
 //  14. Start the Filestream input
 //  15. Assert the Filestream input continues from where it left off
+//
+// The test itself is divided in sections, each section may contain more
+// than one of the steps listed above, hence the numbers will not match.
 //
 // Before a new input is started, a snapshot of the output is taken for
 // debugging purposes.
