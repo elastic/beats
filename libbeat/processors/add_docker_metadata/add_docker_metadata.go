@@ -156,10 +156,6 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 
 	if !connectToDocker() {
 		if config.WaitMetadata {
-			dm.log.Warnf(
-				"could not connect to docker, retrying using wait_for_metadata_timeout=%s",
-				waitForMetadataTimeoutLabel(config.WaitMetadataTimeout),
-			)
 			connected, _ := dm.retryConnectToDocker(connectToDocker, config.WaitMetadataTimeout)
 			if !connected {
 				if err := processors.Close(dm.sourceProcessor); err != nil {
@@ -169,22 +165,11 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 			}
 		} else {
 			// If docker is not available, try reconnecting asynchronously until the timeout expires.
-			dm.log.Warnf(
-				"could not connect to docker, retrying asynchronously using wait_for_metadata_timeout=%s",
-				waitForMetadataTimeoutLabel(config.WaitMetadataTimeout),
-			)
 			dm.startDockerConnectionRetry(connectToDocker, config.WaitMetadataTimeout)
 		}
 	}
 
 	return &dm, nil
-}
-
-func waitForMetadataTimeoutLabel(timeout time.Duration) string {
-	if timeout == 0 {
-		return "0 (retrying indefinitely)"
-	}
-	return timeout.String()
 }
 
 func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bool, timeout time.Duration) {
@@ -194,13 +179,19 @@ func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bo
 		if !connected && !stopped {
 			d.log.Warnf(
 				"stopped retrying docker connection before metadata became available; wait_for_metadata_timeout=%s elapsed",
-				waitForMetadataTimeoutLabel(timeout),
+				timeout,
 			)
 		}
 	})
 }
 
 func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool, timeout time.Duration) (connected bool, stopped bool) {
+	d.log.Warnf(
+		"could not connect to docker, retrying asynchronously using "+
+			"wait_for_metadata_timeout=%s (0 means indefinitely)",
+		timeout,
+	)
+
 	retryInterval := dockerMetadataRetryInterval
 	if retryInterval <= 0 {
 		retryInterval = 10 * time.Second
@@ -210,11 +201,8 @@ func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool, ti
 	defer ticker.Stop()
 
 	var timeoutC <-chan time.Time
-	var timeoutTimer *time.Timer
 	if timeout > 0 {
-		timeoutTimer = time.NewTimer(timeout)
-		timeoutC = timeoutTimer.C
-		defer timeoutTimer.Stop()
+		timeoutC = time.Tick(timeout)
 	}
 
 	for {
