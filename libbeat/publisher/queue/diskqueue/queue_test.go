@@ -25,13 +25,10 @@ import (
 	"testing"
 	"time"
 
-<<<<<<< HEAD
-=======
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
->>>>>>> c37e79474 (Initialise disk queue frame IDs from persisted state (#50534))
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -143,7 +140,9 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 		count := replayedBatch.Count()
 		var msg interface{}
 		if count > 0 {
-			msg, _ = replayedBatch.Entry(0).Content.Fields.GetValue("message")
+			if ev, ok := replayedBatch.Entry(0).(publisher.Event); ok {
+				msg, _ = ev.Content.Fields.GetValue("message")
+			}
 		}
 		replayedBatch.Done()
 		t.Fatalf("unexpected replayed event after restart"+
@@ -158,7 +157,7 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 func publishAndACKSingleEvent(
 	t *testing.T,
 	queueInstance *diskQueue,
-	producer queue.Producer[publisher.Event],
+	producer queue.Producer,
 	msg string,
 ) {
 	_, ok := producer.Publish(makeDiskQueueTestEvent(msg))
@@ -171,9 +170,9 @@ func publishAndACKSingleEvent(
 	batch.Done()
 }
 
-func readBatch(t *testing.T, queueInstance *diskQueue, timeout time.Duration) queue.Batch[publisher.Event] {
+func readBatch(t *testing.T, queueInstance *diskQueue, timeout time.Duration) queue.Batch {
 	type getResult struct {
-		batch queue.Batch[publisher.Event]
+		batch queue.Batch
 		err   error
 	}
 
@@ -203,8 +202,10 @@ func closeQueueAndWait(t *testing.T, queueInstance *diskQueue) {
 	}
 }
 
-func assertEventMessage(t *testing.T, event publisher.Event, expectedMsg string) {
-	msg, _ := event.Content.Fields.GetValue("message")
+func assertEventMessage(t *testing.T, event queue.Entry, expectedMsg string) {
+	ev, ok := event.(publisher.Event)
+	require.True(t, ok, "queue entry should be a publisher.Event")
+	msg, _ := ev.Content.Fields.GetValue("message")
 	assert.Equal(t, expectedMsg, msg, "unexpected message in consumed event")
 }
 
