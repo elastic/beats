@@ -36,6 +36,7 @@ These Resource Attributes are included for every CEL input instance:
 	agent.version        version of agent
 	agent.id             the id of the agent
 	service.instance.id  id of the cel input instance
+	input_type           input type name emitting metrics, for example "cel"
 	package.name         name of the integration package
 	package.version      version of the integration package
 	package.data_stream  the datastream name in the integration package

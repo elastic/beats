@@ -220,6 +220,55 @@ func (e *inMemoryExporter) getMetrics() []metricdata.ResourceMetrics {
 	return e.metrics
 }
 
+func TestCreateOTELMetricsSetsInputTypeResourceAttribute(t *testing.T) {
+	exporter := &inMemoryExporter{}
+	otel.GetGlobalMetricsExporterFactory().SetGlobalMetricsExporter(exporter)
+	defer otel.GetGlobalMetricsExporterFactory().SetGlobalMetricsExporter(nil)
+
+	cfg := defaultConfig()
+	cfg.DataStream = "foo.bar"
+	cfg.Package = map[string]string{
+		"name":    "foo",
+		"version": "1.2.3",
+	}
+	env := v2.Context{
+		IDWithoutName: "test_input",
+		Agent: beat.Info{
+			Version: "9.0.0",
+		},
+	}
+
+	ctx := context.Background()
+	otelMetrics, _, err := createOTELMetrics(ctx, cfg, logp.NewLogger("cel_metrics_test"), env, http.DefaultTransport, nil)
+	if err != nil {
+		t.Fatalf("failed to create OTEL metrics collector: %v", err)
+	}
+	defer otelMetrics.Shutdown(ctx)
+
+	otelMetrics.StartPeriodic(ctx)
+	otelMetrics.AddProgramExecutionStarted(ctx, 1)
+	otelMetrics.EndPeriodic(ctx)
+
+	deadline := time.Now().Add(5 * time.Second)
+	for len(exporter.getMetrics()) == 0 && time.Now().Before(deadline) {
+		time.Sleep(10 * time.Millisecond)
+	}
+	if got := len(exporter.getMetrics()); got == 0 {
+		t.Fatalf("expected OTEL metrics to be exported, got %d", got)
+	}
+
+	hasInputType := false
+	for _, rm := range exporter.getMetrics() {
+		if rm.Resource != nil && strings.Contains(rm.Resource.String(), "input_type=cel") {
+			hasInputType = true
+			break
+		}
+	}
+	if got, want := hasInputType, true; got != want {
+		t.Fatalf("expected exported OTEL metrics resource attributes to include input_type=cel, got %v", got)
+	}
+}
+
 // testPublisher is a publisher that signals when events are published.
 type testPublisher struct {
 	mu        sync.Mutex
