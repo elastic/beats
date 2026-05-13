@@ -9,6 +9,7 @@ package azure
 import (
 	"fmt"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -147,7 +148,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 					base.Logger().Warnw("azure cursor store unavailable, lookback disabled", "error", storeErr)
 				} else {
 					ms.cursorStore = store
-					ms.cursorKey = cursor.GenerateStateKey(metricsetName, config.SubscriptionId)
+					ms.cursorKey = cursor.GenerateStateKey(
+						metricsetName,
+						config.SubscriptionId,
+						config.Period.String(),
+						config.Latency.String(),
+						resourcesFingerprint(config.Resources),
+					)
 				}
 			}
 		}
@@ -494,6 +501,31 @@ func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
 		return nil
 	}
 	return &state.LastCollectionEnd
+}
+
+// resourcesFingerprint returns a stable, sorted string representation of the
+// resource filter config. Two configs that cover different resources will
+// produce different fingerprints, ensuring they get separate cursor keys.
+// Each resource entry is sorted internally and the slice is sorted overall so
+// the result is order-independent.
+func resourcesFingerprint(resources []ResourceConfig) string {
+	parts := make([]string, 0, len(resources))
+	for _, r := range resources {
+		ids := slices.Clone(r.Id)
+		slices.Sort(ids)
+		groups := slices.Clone(r.Group)
+		slices.Sort(groups)
+		svcTypes := slices.Clone(r.ServiceType)
+		slices.Sort(svcTypes)
+		parts = append(parts, fmt.Sprintf("type=%s ids=%s groups=%s query=%s svc=%s",
+			r.Type,
+			strings.Join(ids, ","),
+			strings.Join(groups, ","),
+			r.Query,
+			strings.Join(svcTypes, ",")))
+	}
+	slices.Sort(parts)
+	return strings.Join(parts, ";")
 }
 
 // updateCursor persists the collection end time so it can be used as a lookback
