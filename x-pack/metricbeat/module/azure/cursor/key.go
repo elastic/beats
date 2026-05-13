@@ -14,14 +14,23 @@ import (
 )
 
 // GenerateStateKey returns a stable, opaque key for storing cursor state.
-// The key is derived from the metricset name and subscription ID, length-prefixed
-// and hashed so no secrets appear in the stored key.
+// Each argument is length-prefixed before hashing so no part can bleed into
+// the next (e.g. "ab"+"c" ≠ "a"+"bc"), and no secrets appear in the stored key.
 //
-// Key reset: changing subscriptionID resets the cursor (different Azure env).
-// Changing lookback_window alone does NOT reset the cursor.
-func GenerateStateKey(metricsetName, subscriptionID string) string {
+// Key reset triggers — changing any of the following resets the cursor:
+//   - metricsetName   — different metricset, different data stream
+//   - subscriptionID  — different Azure environment
+//   - period          — different collection cadence means a different window
+//   - latency         — shifts endTime, so two configs targeting the same
+//     resources but with different latency produce different cursors
+//   - resourcesKey    — fingerprint of the resource filters; two configs that
+//     cover different resources must not share a cursor
+//
+// Changing lookback_window alone does NOT reset the cursor — it is a
+// query-time bound enforced in computeLookbackStart, not part of key identity.
+func GenerateStateKey(metricsetName, subscriptionID, period, latency, resourcesKey string) string {
 	var b strings.Builder
-	for _, p := range []string{metricsetName, subscriptionID} {
+	for _, p := range []string{metricsetName, subscriptionID, period, latency, resourcesKey} {
 		fmt.Fprintf(&b, "%d:%s|", len(p), p)
 	}
 	hash := xxhash.Sum64String(b.String())
