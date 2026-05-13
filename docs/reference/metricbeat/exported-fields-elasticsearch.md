@@ -983,7 +983,7 @@ Elasticsearch module
 
 
 **`elasticsearch.node.version`**
-:   Elasticsearch version reported by the node (e.g. `9.2.0`).
+:   Elasticsearch version reported by the node (for example, `9.2.0`).
 
     type: keyword
 
