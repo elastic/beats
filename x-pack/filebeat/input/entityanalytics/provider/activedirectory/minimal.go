@@ -28,7 +28,7 @@ func init() {
 }
 
 func minimalProvider(cfg *config.C, log *logp.Logger) (entcollect.Provider, time.Duration, time.Duration, error) {
-	// localConf mirrors ecad.Config with config:"" tags for UCF Unpack.
+	// localConf mirrors ecad.Config with config:"" tags for ucfg Unpack.
 	// If ecad.Config gains a new field, add it here and in the mapping
 	// below; TestMinimalConfigRoundTrip (minimal_test.go) will catch any drift.
 	type localConf struct {

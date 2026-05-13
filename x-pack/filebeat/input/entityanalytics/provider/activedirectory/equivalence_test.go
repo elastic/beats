@@ -107,6 +107,57 @@ func runLegacyFetch(t *testing.T, url string) (users, devices []json.RawMessage)
 	return users, devices
 }
 
+// TestMinimalFullSync_ConfiguredAttrs verifies that when user_attributes
+// is set, the minimal-state provider still produces entries with non-empty
+// IDs and advances the whenChanged cursor. The gldap mock returns all
+// attributes regardless of the request list, so this test exercises the
+// entcollect withMandatory logic rather than the LDAP server filtering.
+func TestMinimalFullSync_ConfiguredAttrs(t *testing.T) {
+	url := startEquivLDAPServer(t)
+
+	cfg := ecad.DefaultConfig()
+	cfg.URL = url
+	cfg.BaseDN = "DC=example,DC=com"
+	cfg.User = "cn=admin,dc=example,dc=com"
+	cfg.Password = "pass"
+	cfg.Dataset = "users"
+	cfg.UserAttrs = []string{"cn", "mail"}
+
+	p, err := ecad.New(cfg)
+	if err != nil {
+		t.Fatalf("ecad.New: %v", err)
+	}
+
+	store := newEquivMemStore()
+	var docs []entcollect.Document
+	pub := func(_ context.Context, doc entcollect.Document) error {
+		docs = append(docs, doc)
+		return nil
+	}
+
+	log := slog.New(slog.NewTextHandler(&testWriter{t}, nil))
+	if err := p.FullSync(context.Background(), store, pub, log); err != nil {
+		t.Fatalf("FullSync: %v", err)
+	}
+
+	if len(docs) == 0 {
+		t.Fatal("expected at least one document")
+	}
+	for _, doc := range docs {
+		if doc.ID == "" {
+			t.Errorf("document has empty ID; distinguishedName must be requested even with custom user_attributes")
+		}
+	}
+
+	var cursor time.Time
+	if err := store.Get("ad.cursor.when_changed", &cursor); err != nil {
+		t.Fatalf("cursor not written: %v", err)
+	}
+	if cursor.IsZero() {
+		t.Error("cursor is zero; whenChanged must be requested even with custom user_attributes")
+	}
+}
+
 func runMinimalFullSync(t *testing.T, url string) []entcollect.Document {
 	t.Helper()
 	cfg := ecad.DefaultConfig()
