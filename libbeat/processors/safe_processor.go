@@ -88,19 +88,29 @@ func (p *SafeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 // Close makes sure the underlying `Close` function is called only once.
 func (p *safeProcessorWithClose) Close() (err error) {
+	sharedProcessorMu.Lock()
+	defer sharedProcessorMu.Unlock()
 	p.mu.Lock()
 	defer p.mu.Unlock()
+	if p.state == stateClosed {
+		logp.L().Warnf("tried to close already closed %q processor", p.String())
+		return
+	}
 	p.refCount--
-	if p.refCount == 0 && p.state != stateClosed {
-		sharedProcessorMu.Lock()
-		defer sharedProcessorMu.Unlock()
-		delete(sharedProcessors[p.name], p.hash)
+	if p.refCount == 0 {
+		p.deleteFromSharedMap()
 		p.state = stateClosed
 		return Close(p.Processor)
-	} else if p.state == stateClosed {
-		logp.L().Warnf("tried to close already closed %q processor", p.String())
 	}
 	return nil
+}
+
+// NOTE: To be called while holding the sharedProcessorMu lock to ensure.
+func (p *SafeProcessor) deleteFromSharedMap() {
+	if _, ok := sharedProcessors[p.name]; !ok {
+		return
+	}
+	delete(sharedProcessors[p.name], p.hash)
 }
 
 // SetPaths delegates to the underlying processor if it implements PathSetter.
