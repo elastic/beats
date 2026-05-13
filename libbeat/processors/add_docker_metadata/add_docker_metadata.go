@@ -49,8 +49,6 @@ const (
 	cgroupCacheExpiration = 5 * time.Minute
 )
 
-var dockerMetadataRetryInterval = 10 * time.Second
-
 // initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
 var initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
@@ -77,6 +75,8 @@ type addDockerMetadata struct {
 	closeRetry      chan struct{} // Channel to signal the connection retry goroutine to stop
 	waitRetry       sync.WaitGroup
 	cgreader        processors.CGReader
+	retryPeriod     time.Duration // Period to wait when reconnecting to Docker
+	retryTimeout    time.Duration // Maximum time to wait when connecting to Docker, 0 means wait forever.
 }
 
 const selector = "add_docker_metadata"
@@ -123,6 +123,8 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		dedot:           config.DeDot,
 		cgreader:        reader,
 		closeRetry:      make(chan struct{}),
+		retryPeriod:     config.WaitMetadataRetry,
+		retryTimeout:    config.WaitMetadataTimeout,
 	}
 
 	constructAndStartWatcher := func() docker.Watcher {
@@ -156,7 +158,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 
 	if !connectToDocker() {
 		if config.WaitMetadata {
-			connected, _ := dm.retryConnectToDocker(connectToDocker, config.WaitMetadataTimeout)
+			connected, _ := dm.retryConnectToDocker(connectToDocker)
 			if !connected {
 				if err := processors.Close(dm.sourceProcessor); err != nil {
 					dm.log.Debugf("error closing source processor after docker connection timeout: %v", err)
@@ -165,44 +167,39 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 			}
 		} else {
 			// If docker is not available, try reconnecting asynchronously until the timeout expires.
-			dm.startDockerConnectionRetry(connectToDocker, config.WaitMetadataTimeout)
+			dm.startDockerConnectionRetry(connectToDocker)
 		}
 	}
 
 	return &dm, nil
 }
 
-func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bool, timeout time.Duration) {
+func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bool) {
 	d.waitRetry.Go(func() {
 		defer d.log.Debug("retry goroutine done")
-		connected, stopped := d.retryConnectToDocker(connectToDocker, timeout)
+		connected, stopped := d.retryConnectToDocker(connectToDocker)
 		if !connected && !stopped {
 			d.log.Warnf(
 				"stopped retrying docker connection before metadata became available; wait_for_metadata_timeout=%s elapsed",
-				timeout,
+				d.retryTimeout,
 			)
 		}
 	})
 }
 
-func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool, timeout time.Duration) (connected bool, stopped bool) {
+func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool) (connected bool, stopped bool) {
 	d.log.Warnf(
 		"could not connect to docker, retrying asynchronously using "+
 			"wait_for_metadata_timeout=%s (0 means indefinitely)",
-		timeout,
+		d.retryTimeout,
 	)
 
-	retryInterval := dockerMetadataRetryInterval
-	if retryInterval <= 0 {
-		retryInterval = 10 * time.Second
-	}
-
-	ticker := time.NewTicker(retryInterval)
+	ticker := time.NewTicker(d.retryPeriod)
 	defer ticker.Stop()
 
 	var timeoutC <-chan time.Time
-	if timeout > 0 {
-		timeoutC = time.Tick(timeout)
+	if d.retryTimeout > 0 {
+		timeoutC = time.Tick(d.retryTimeout)
 	}
 
 	for {

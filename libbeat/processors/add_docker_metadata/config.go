@@ -28,17 +28,18 @@ import (
 
 // Config for docker processor.
 type Config struct {
-	Host                string            `config:"host"`                      // Docker socket (UNIX or TCP socket).
-	TLS                 *docker.TLSConfig `config:"ssl"`                       // TLS settings for connecting to Docker.
-	Fields              []string          `config:"match_fields"`              // A list of fields to match a container ID.
-	MatchSource         bool              `config:"match_source"`              // Match container ID from a log path present in source field.
-	MatchShortID        bool              `config:"match_short_id"`            // Match to container short ID from a log path present in source field.
-	SourceIndex         int               `config:"match_source_index"`        // Index in the source path split by / to look for container ID.
-	MatchPIDs           []string          `config:"match_pids"`                // A list of fields containing process IDs (PIDs).
-	HostFS              string            `config:"hostfs"`                    // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
-	DeDot               bool              `config:"labels.dedot"`              // If set to true, replace dots in labels with `_`.
-	WaitMetadata        bool              `config:"wait_for_metadata"`         // Block initialization until Docker metadata is available.
-	WaitMetadataTimeout time.Duration     `config:"wait_for_metadata_timeout"` // Maximum time to wait for Docker metadata.
+	Host                string            `config:"host"`                           // Docker socket (UNIX or TCP socket).
+	TLS                 *docker.TLSConfig `config:"ssl"`                            // TLS settings for connecting to Docker.
+	Fields              []string          `config:"match_fields"`                   // A list of fields to match a container ID.
+	MatchSource         bool              `config:"match_source"`                   // Match container ID from a log path present in source field.
+	MatchShortID        bool              `config:"match_short_id"`                 // Match to container short ID from a log path present in source field.
+	SourceIndex         int               `config:"match_source_index"`             // Index in the source path split by / to look for container ID.
+	MatchPIDs           []string          `config:"match_pids"`                     // A list of fields containing process IDs (PIDs).
+	HostFS              string            `config:"hostfs"`                         // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+	DeDot               bool              `config:"labels.dedot"`                   // If set to true, replace dots in labels with `_`.
+	WaitMetadata        bool              `config:"wait_for_metadata"`              // Block initialization until Docker metadata is available.
+	WaitMetadataTimeout time.Duration     `config:"wait_for_metadata_timeout"`      // Maximum time to wait for Docker metadata.
+	WaitMetadataRetry   time.Duration     `config:"wait_for_metadata_retry_period"` // How long to wait between retries.
 
 	// Annotations are kept after container is killed, until they haven't been
 	// accessed for a full `cleanup_timeout`:
@@ -54,6 +55,7 @@ func defaultConfig() Config {
 		DeDot:               true,
 		WaitMetadata:        false,
 		WaitMetadataTimeout: 30 * time.Second,
+		WaitMetadataRetry:   10 * time.Second,
 	}
 }
 

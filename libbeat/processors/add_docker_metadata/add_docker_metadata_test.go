@@ -526,19 +526,7 @@ func TestConfigValidate(t *testing.T) {
 	}
 }
 
-func withDockerMetadataRetryInterval(t *testing.T, interval time.Duration) {
-	t.Helper()
-
-	previous := dockerMetadataRetryInterval
-	dockerMetadataRetryInterval = interval
-	t.Cleanup(func() {
-		dockerMetadataRetryInterval = previous
-	})
-}
-
 func TestInitializationRetriesConnectionToDocker(t *testing.T) {
-	withDockerMetadataRetryInterval(t, time.Millisecond)
-
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempt := attempts.Add(1)
@@ -558,8 +546,9 @@ func TestInitializationRetriesConnectionToDocker(t *testing.T) {
 	}
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
-		"match_fields":              []string{"foo"},
-		"wait_for_metadata_timeout": "1s",
+		"match_fields":                   []string{"foo"},
+		"wait_for_metadata_retry_period": "1ms",
+		"wait_for_metadata_timeout":      "1s",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
@@ -581,8 +570,6 @@ func TestInitializationRetriesConnectionToDocker(t *testing.T) {
 }
 
 func TestInitializationRetriesUntilTimeout(t *testing.T) {
-	withDockerMetadataRetryInterval(t, time.Millisecond)
-
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempts.Add(1)
@@ -590,8 +577,9 @@ func TestInitializationRetriesUntilTimeout(t *testing.T) {
 	}
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
-		"match_fields":              []string{"foo"},
-		"wait_for_metadata_timeout": "10ms",
+		"match_fields":                   []string{"foo"},
+		"wait_for_metadata_retry_period": "1ms",
+		"wait_for_metadata_timeout":      "10ms",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
@@ -616,8 +604,6 @@ func TestInitializationRetriesUntilTimeout(t *testing.T) {
 }
 
 func TestInitializationRetriesIndefinitelyWithZeroTimeout(t *testing.T) {
-	withDockerMetadataRetryInterval(t, time.Millisecond)
-
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempts.Add(1)
@@ -625,7 +611,8 @@ func TestInitializationRetriesIndefinitelyWithZeroTimeout(t *testing.T) {
 	}
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
-		"wait_for_metadata_timeout": "0s",
+		"wait_for_metadata_retry_period": "1ms",
+		"wait_for_metadata_timeout":      "0s",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
@@ -642,8 +629,6 @@ func TestInitializationRetriesIndefinitelyWithZeroTimeout(t *testing.T) {
 }
 
 func TestInitializationWaitsForMetadata(t *testing.T) {
-	withDockerMetadataRetryInterval(t, time.Millisecond)
-
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempt := attempts.Add(1)
@@ -663,9 +648,10 @@ func TestInitializationWaitsForMetadata(t *testing.T) {
 	}
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
-		"match_fields":              []string{"foo"},
-		"wait_for_metadata":         true,
-		"wait_for_metadata_timeout": "1s",
+		"match_fields":                   []string{"foo"},
+		"wait_for_metadata":              true,
+		"wait_for_metadata_retry_period": "1ms",
+		"wait_for_metadata_timeout":      "1s",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
@@ -683,8 +669,6 @@ func TestInitializationWaitsForMetadata(t *testing.T) {
 }
 
 func TestInitializationWaitForMetadataReturnsErrorOnTimeout(t *testing.T) {
-	withDockerMetadataRetryInterval(t, time.Millisecond)
-
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempts.Add(1)
@@ -692,8 +676,9 @@ func TestInitializationWaitForMetadataReturnsErrorOnTimeout(t *testing.T) {
 	}
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
-		"wait_for_metadata":         true,
-		"wait_for_metadata_timeout": "10ms",
+		"wait_for_metadata":              true,
+		"wait_for_metadata_retry_period": "1ms",
+		"wait_for_metadata_timeout":      "10ms",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
