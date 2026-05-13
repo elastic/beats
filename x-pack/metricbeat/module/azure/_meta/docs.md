@@ -80,6 +80,9 @@ The azure credentials keys can be used if configured `AZURE_CLIENT_ID`, `AZURE_C
 `resource_manager_audience`
 :   *string* Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager audience in order to use a different azure environment. Ex: [https://management.chinacloudapi.cn/](https://management.chinacloudapi.cn/) for azure ChinaCloud [https://management.microsoftazure.de/](https://management.microsoftazure.de/) for azure GermanCloud [https://management.azure.com/](https://management.azure.com/) for azure PublicCloud [https://management.usgovcloudapi.net/](https://management.usgovcloudapi.net/) for azure USGovernmentCloud Users can also use this in case of a Hybrid Cloud model, where one may define their own audiences.
 
+`lookback_window`
+:   *duration* Optional, default `10m`. On restart, the module will backfill metrics from the last successful collection end time up to this duration. This prevents gaps in metric data caused by agent restarts or brief downtime. Set to `0` to disable lookback and preserve the previous behavior of always querying from `now - period`. Any overlap with already-indexed data is handled by Elasticsearch document ID deduplication.
+
 
 ## Metricsets [_metricsets_10]
 
