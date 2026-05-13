@@ -551,6 +551,12 @@ func checkSkip(t *testing.T, metricset string, ver *version.V) {
 		checkSkipFeature("Enrich", elasticsearch.EnrichStatsAPIAvailableVersion)
 	case "security_stats":
 		checkSkipFeature("Security Stats", elasticsearch.SecurityStatsAPIAvailableVersion)
+		// /_security/stats is only served when xpack.security.enabled=true,
+		// and the shared metricbeat compose stack runs with security
+		// disabled. Skip unconditionally until a follow-up PR introduces
+		// an x-pack-security-enabled compose stack to exercise this
+		// metricset's live response shape end-to-end.
+		t.Skip("/_security/stats requires xpack.security.enabled=true on the test cluster (deferred to a follow-up compose change)")
 	}
 }
 

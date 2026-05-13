@@ -24,28 +24,7 @@ services:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
-      # Security is enabled so the /_security/stats endpoint exists.
-      # Two auth paths are configured so existing tests keep working
-      # without code changes while Kibana and the existing healthchecks
-      # have real users to authenticate as:
-      #   - Credential-less requests (used by the elasticsearch
-      #     integration tests) hit the anonymous realm and get superuser.
-      #   - Credentialed requests (Kibana -> ES, plus the kibana
-      #     healthcheck's `curl -u beats:testing`) authenticate against
-      #     the file realm users provisioned in the startup command.
-      - "xpack.security.enabled=true"
-      - "xpack.security.transport.ssl.enabled=false"
-      - "xpack.security.http.ssl.enabled=false"
-      - "xpack.security.authc.anonymous.username=anonymous"
-      - "xpack.security.authc.anonymous.roles=superuser"
-      - "xpack.security.authc.anonymous.authz_exception=false"
-    command: >
-      bash -c "
-      bin/elasticsearch-users useradd beats -r superuser -p testing &&
-      bin/elasticsearch-users useradd kibana_system_user -r kibana_system -p testing &&
-      bin/elasticsearch-users useradd myelastic -r superuser -p changeme &&
-      /usr/local/bin/docker-entrypoint.sh eswrapper
-      "
+      - "xpack.security.enabled=false"
     ports:
       - 9200:9200
 
@@ -62,12 +41,6 @@ services:
       context: ./module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-9.2.2}
-    environment:
-      # Authenticate to the now-secured Elasticsearch as the standard
-      # Kibana service account so saved-object migrations succeed and
-      # Kibana skips its interactive setup preboot.
-      - "ELASTICSEARCH_USERNAME=kibana_system_user"
-      - "ELASTICSEARCH_PASSWORD=testing"
     healthcheck:
       test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600

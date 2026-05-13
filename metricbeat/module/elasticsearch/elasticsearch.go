@@ -340,6 +340,9 @@ type XPack struct {
 		ML struct {
 			Enabled bool `json:"enabled"`
 		} `json:"ml"`
+		Security struct {
+			Enabled bool `json:"enabled"`
+		} `json:"security"`
 	} `json:"features"`
 }
 

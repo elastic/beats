@@ -72,7 +72,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	unavailableMessage := m.checkAvailability(info.Version.Number)
+	unavailableMessage, err := m.checkAvailability(info.Version.Number)
+	if err != nil {
+		return fmt.Errorf("error determining if %s is available: %w", m.FullyQualifiedName(), err)
+	}
 	if unavailableMessage != "" {
 		// Throttle the warning so we don't spam logs every collection interval.
 		if time.Since(m.lastUnavailableMessageTimestamp) > 10*time.Minute {
@@ -106,22 +109,38 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return errors.Join(fetchErrs...)
 }
 
-// checkAvailability returns a non-empty message when the target cluster
-// predates the introduction of /_security/stats. The endpoint is fail-closed
-// across mixed-version clusters during a rolling upgrade, so we prefer to
-// avoid issuing the request at all on older versions.
+// checkAvailability returns a non-empty message when the metricset has nothing
+// to report against the target cluster, either because the cluster predates
+// the introduction of /_security/stats or because the security feature is
+// turned off (xpack.security.enabled=false unregisters the /_security/*
+// routes entirely, so the endpoint would 400).
+//
+// The version check is a pure comparison against info we already have, so it
+// runs first to short-circuit any HTTP work on too-old clusters. The feature
+// check that follows mirrors the pattern used by ccr and ml_job: probe the
+// state proactively via /_xpack rather than discover it reactively from a
+// failed stats request, so the operator-facing log message can be specific
+// and so we don't keep hitting an endpoint we know won't answer.
 //
 // Unlike ccr and ml_job, we don't gate on license: /_security/stats returns
 // the DLS bitset cache structure (zeroed) even on a basic license. DLS as a
 // feature is gold+, but the stats endpoint itself isn't license-gated. If a
 // future security subsystem surfaced here is license-gated, this function is
-// the right place to add the corresponding elasticsearch.GetLicense check
-// (which would also reintroduce the error return).
-func (m *MetricSet) checkAvailability(currentElasticsearchVersion *version.V) string {
-	if elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.SecurityStatsAPIAvailableVersion) {
-		return ""
+// the right place to add the corresponding elasticsearch.GetLicense check.
+func (m *MetricSet) checkAvailability(currentElasticsearchVersion *version.V) (string, error) {
+	if !elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.SecurityStatsAPIAvailableVersion) {
+		return "the " + m.FullyQualifiedName() + " is only supported with Elasticsearch >= " +
+			elasticsearch.SecurityStatsAPIAvailableVersion.String() + ". " +
+			"You are currently running Elasticsearch " + currentElasticsearchVersion.String() + ".", nil
 	}
-	return "the " + m.FullyQualifiedName() + " is only supported with Elasticsearch >= " +
-		elasticsearch.SecurityStatsAPIAvailableVersion.String() + ". " +
-		"You are currently running Elasticsearch " + currentElasticsearchVersion.String() + "."
+
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return "", fmt.Errorf("error determining xpack features: %w", err)
+	}
+	if !xpack.Features.Security.Enabled {
+		return "the security feature is not enabled on your Elasticsearch cluster.", nil
+	}
+
+	return "", nil
 }
