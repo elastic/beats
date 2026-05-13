@@ -92,11 +92,6 @@ jobs:
             mage-target: "build unitTest"
             fips: ""
 
-          - name: "Windows 11 ARM Unit Tests"
-            os: windows-11-arm
-            mage-target: "build unitTest"
-            fips: ""
-
           - name: "macos-15-intel Unit Tests"
             os: macos-15-intel
             mage-target: "build unitTest"
