@@ -47,7 +47,9 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -127,7 +129,9 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -152,7 +156,9 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -394,6 +400,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"metricbeat": map[string]any{
 						"max_start_delay": "0s",
 						"modules": []map[string]any{
