@@ -45,7 +45,9 @@ processors:
       #match_short_id: true
       #cleanup_timeout: 60
       #labels.dedot: false
-      #connection_retry_interval: 10s
+      #wait_for_metadata: false
+      #wait_for_metadata_timeout: 30s
+      #wait_for_metadata_retry_period: 10s
       # To connect to Docker over TLS you must specify a client and CA certificate.
       #ssl:
       #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -85,6 +87,11 @@ It has the following settings:
 `labels.dedot`
 :   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
 
-`connection_retry_interval`
-:   (Optional) Retry interval used when Docker is not reachable during processor initialization. Defaults to `10s`. Set to `0` to deactivate retries after an initial connection failure.
+`wait_for_metadata`
+:   (Optional) When `true`, startup is blocked until the processor connects to Docker and metadata is available. If the processor can't connect to Docker within the duration set in `wait_for_metadata_timeout`, startup fails and the process exits. When `false`, the processor retries the connection asynchronously. Defaults to `false`.
 
+`wait_for_metadata_timeout`
+:   (Optional) The maximum time allowed for the processor to connect to Docker and fetch metadata. Applies regardless of `wait_for_metadata`. To retry the connection indefinitely, set to `0`. Defaults to `30s`.
+
+`wait_for_metadata_retry_period`
+:   (Optional) How long to wait between Docker connection retry attempts. Defaults to `10s`.
