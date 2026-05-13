@@ -6,10 +6,16 @@ package salesforce
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sync"
 	"testing"
@@ -17,6 +23,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/go-sfdc"
 	"github.com/elastic/go-sfdc/soql"
@@ -811,4 +818,96 @@ func newTestServerBasedOnConfig(newServer func(http.Handler) *httptest.Server) f
 
 func TestPlugin(t *testing.T) {
 	_ = Plugin(logp.NewLogger("salesforce_test"), stateStore{})
+}
+
+// TestJWTBearerFlowTokenURL verifies that the salesforce input correctly passes
+// the token_url configuration to the underlying go-sfdc library, which handles
+// the fallback logic (use token_url if set, otherwise fall back to url).
+func TestJWTBearerFlowTokenURL(t *testing.T) {
+	t.Parallel()
+
+	// Create a test RSA key for JWT signing
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+	keyPath := filepath.Join(t.TempDir(), "key.pem")
+	require.NoError(t, os.WriteFile(keyPath, pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(key),
+	}), 0o600))
+
+	// oauthHandler returns a handler that tracks hits and responds with valid OAuth tokens
+	oauthHandler := func(hits *int) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			*hits++
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprintf(w, `{"access_token":"token","instance_url":%q,"token_type":"Bearer"}`, "http://"+r.Host)
+		}
+	}
+
+	// newConfig creates a minimal JWT auth config for testing
+	newConfig := func(url, tokenURL, keyPath string) *config {
+		return &config{
+			Version: 56,
+			URL:     url,
+			Auth: &authConfig{OAuth2: &OAuth2{JWTBearerFlow: &JWTBearerFlow{
+				Enabled:        pointer(true),
+				URL:            url,
+				TokenURL:       tokenURL,
+				ClientID:       "test-client",
+				ClientUsername: "test@example.com",
+				ClientKeyPath:  keyPath,
+			}}},
+			EventMonitoringMethod: &eventMonitoringMethod{Object: EventMonitoringConfig{
+				Enabled:  pointer(true),
+				Interval: time.Second,
+				Query:    &QueryConfig{Default: getValueTpl("SELECT Id FROM Account")},
+				Cursor:   &cursorConfig{Field: "Id"},
+			}},
+			Resource: &resourceConfig{
+				Retry:     retryConfig{MaxAttempts: pointer(1), WaitMin: pointer(time.Second), WaitMax: pointer(time.Second)},
+				Transport: httpcommon.DefaultHTTPTransportSettings(),
+			},
+		}
+	}
+
+	t.Run("token_url empty - requests go to url", func(t *testing.T) {
+		t.Parallel()
+
+		var hits int
+		srv := httptest.NewServer(oauthHandler(&hits))
+		t.Cleanup(srv.Close)
+
+		cfg := newConfig(srv.URL, "", keyPath) // token_url is empty
+
+		input := &salesforceInput{config: *cfg, log: logp.NewLogger("test")}
+		sfdcCfg, err := input.getSFDCConfig(cfg)
+		require.NoError(t, err)
+
+		input.sfdcConfig = sfdcCfg
+		_, _ = input.SetupSFClientConnection()
+
+		assert.Equal(t, 1, hits, "url should receive the OAuth request when token_url is empty")
+	})
+
+	t.Run("token_url set - requests go to token_url", func(t *testing.T) {
+		t.Parallel()
+
+		var urlHits, tokenURLHits int
+		urlSrv := httptest.NewServer(oauthHandler(&urlHits))
+		tokenURLSrv := httptest.NewServer(oauthHandler(&tokenURLHits))
+		t.Cleanup(urlSrv.Close)
+		t.Cleanup(tokenURLSrv.Close)
+
+		cfg := newConfig(urlSrv.URL, tokenURLSrv.URL, keyPath) // token_url is set
+
+		input := &salesforceInput{config: *cfg, log: logp.NewLogger("test")}
+		sfdcCfg, err := input.getSFDCConfig(cfg)
+		require.NoError(t, err)
+
+		input.sfdcConfig = sfdcCfg
+		_, _ = input.SetupSFClientConnection()
+
+		assert.Equal(t, 0, urlHits, "url should NOT receive requests when token_url is set")
+		assert.Equal(t, 1, tokenURLHits, "token_url should receive the OAuth request")
+	})
 }

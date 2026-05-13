@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
@@ -107,6 +108,25 @@ func TestParseFromTo(t *testing.T) {
 	assert.Equal(t, common.NetString(nil), displayInfo)
 	assert.Equal(t, common.NetString("sip:test@10.0.2.15:5060"), uri)
 	assert.Equal(t, common.NetString("udp"), params["transport"])
+
+	// url is malformed (ensure we don't crash)
+	parseFromToContact(common.NetString(" \"Mr. Watson\" >mailto:watson@bell-telephone.com< ;q=0.1"))
+}
+
+func TestMalformedBodyFiends(t *testing.T) {
+	cases := []struct {
+		msg *message
+	}{
+		{msg: &message{body: []byte("\r\no="), contentType: []byte("application/sdp"), hasContentLength: true}},
+		{msg: &message{body: []byte("\r\no=\"00000000"), contentType: []byte("application/sdp"), hasContentLength: true}},
+	}
+
+	// test is mostly that we don't crash
+	for _, test := range cases {
+		bpf := &pb.Fields{}
+		fields := &ProtocolFields{}
+		populateBodyFields(test.msg, bpf, fields)
+	}
 }
 
 func TestParseUDP(t *testing.T) {

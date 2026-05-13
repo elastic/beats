@@ -102,6 +102,14 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 	}
 }
 
+// SetGlobalMetricsExporter sets the global metrics exporter.
+// This is used for testing.
+func (ef *MetricsExporterFactory) SetGlobalMetricsExporter(exporter sdkmetric.Exporter) {
+	ef.lock.Lock()
+	ef.globalMetricsExporter = exporter
+	ef.lock.Unlock()
+}
+
 // GetExporter returns a metrics exporter based on the current environment
 // configuration.
 //
@@ -111,12 +119,21 @@ func NewMetricsExporterFactory(exporterOptions MetricExporterOptions) *MetricsEx
 func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) (sdkmetric.Exporter, ExporterType, error) {
 	exporterType := GetExporterTypeFromEnv()
 	var err error
-	if global && ef.globalMetricsExporter != nil {
-		return ef.globalMetricsExporter, exporterType, nil
-	}
+
 	if global {
 		ef.lock.Lock()
 	}
+
+	defer func() {
+		if global {
+			ef.lock.Unlock()
+		}
+	}()
+
+	if global && ef.globalMetricsExporter != nil {
+		return ef.globalMetricsExporter, exporterType, nil
+	}
+
 	var exporter sdkmetric.Exporter
 	switch exporterType {
 	case console:
@@ -134,7 +151,6 @@ func (ef *MetricsExporterFactory) GetExporter(ctx context.Context, global bool) 
 
 	if global {
 		ef.globalMetricsExporter = exporter
-		ef.lock.Unlock()
 	}
 	return exporter, exporterType, err
 }

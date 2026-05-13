@@ -219,7 +219,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 
 	eventGeoField, err := newEvent.GetValue("host.geo")
 	assert.Error(t, err)
-	assert.Equal(t, nil, eventGeoField)
+	assert.Nil(t, eventGeoField)
 }
 
 func TestEventWithReplaceFieldsFalse(t *testing.T) {
@@ -296,7 +296,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1) //nolint:errcheck // already checked
 			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)  //nolint:errcheck // already checked
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M))) //nolint:errcheck // already checked
+				assert.Len(t, v.(mapstr.M), c.expectedHostFieldLength) //nolint:errcheck // already checked
 			}
 		})
 	}
@@ -574,7 +574,7 @@ func TestDataReload(t *testing.T) {
 
 	// Wait until at least some events have gone through.
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-		assert.Greater(collect, eventCount.Load(), int32(0))
+		assert.Positive(collect, eventCount.Load())
 	}, time.Second*5, time.Millisecond)
 
 	// we should still have a single data reload since any requests should

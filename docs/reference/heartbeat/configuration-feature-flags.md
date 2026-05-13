@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-feature-flags.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure feature flags [configuration-feature-flags]

@@ -30,7 +30,7 @@ set +x
 release_manager_login
 
 # required by the release-manager docker image, otherwise we hit:
-# > java.io.FileNotFoundException: /artifacts/build/distributions/agentbeat/agentbeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
+# > java.io.FileNotFoundException: /artifacts/build/distributions/filebeat/filebeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
 chmod -R a+r build/*
 chmod -R a+w build
 

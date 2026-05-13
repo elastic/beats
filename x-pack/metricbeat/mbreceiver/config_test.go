@@ -35,10 +35,10 @@ func TestValidate(t *testing.T) {
 	for name, tc := range tests {
 		err := tc.c.Validate()
 		if tc.hasError {
-			assert.NotNilf(t, err, "%s failed, should have had error", name)
+			assert.Errorf(t, err, "%s failed, should have had error", name)
 			assert.Equalf(t, err.Error(), tc.errorString, "%s failed, error not equal", name)
 		} else {
-			assert.Nilf(t, err, "%s failed, should not have error", name)
+			assert.NoErrorf(t, err, "%s failed, should not have error", name)
 		}
 	}
 }

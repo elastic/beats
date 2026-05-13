@@ -45,7 +45,7 @@ func TestConfig(t *testing.T) {
 				}
 
 				assert.Equal(t, expectedConfig, actual)
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			},
 		},
 		"config given with posix path": {
@@ -58,15 +58,15 @@ func TestConfig(t *testing.T) {
 			assertion: func(t *testing.T, actual *fileOutConfig, err error) {
 				assert.Equal(t, uint(10), actual.NumberOfFiles)
 				assert.Equal(t, uint(5*1024), actual.RotateEveryKb)
-				assert.Equal(t, true, actual.RotateOnStartup)
+				assert.True(t, actual.RotateOnStartup)
 				assert.Equal(t, uint32(0600), actual.Permissions)
 				assert.Equal(t, "pb", actual.Filename)
 
 				path, runErr := actual.Path.Run(time.Date(2024, 1, 2, 3, 4, 5, 67890, time.UTC))
-				assert.Nil(t, runErr)
+				assert.NoError(t, runErr)
 
 				assert.Equal(t, "/tmp/packetbeat/2024-01-02-04-05-000067", path)
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			},
 		},
 		"config given with windows path": {
@@ -80,15 +80,15 @@ func TestConfig(t *testing.T) {
 			assertion: func(t *testing.T, actual *fileOutConfig, err error) {
 				assert.Equal(t, uint(10), actual.NumberOfFiles)
 				assert.Equal(t, uint(5*1024), actual.RotateEveryKb)
-				assert.Equal(t, true, actual.RotateOnStartup)
+				assert.True(t, actual.RotateOnStartup)
 				assert.Equal(t, uint32(0600), actual.Permissions)
 				assert.Equal(t, "pb", actual.Filename)
 
 				path, runErr := actual.Path.Run(time.Date(2024, 1, 2, 3, 4, 5, 67890, time.UTC))
-				assert.Nil(t, runErr)
+				assert.NoError(t, runErr)
 
 				assert.Equal(t, "c:\\tmp\\packetbeat\\2024-01-02-04-05-000067", path)
-				assert.Nil(t, err)
+				assert.NoError(t, err)
 			},
 		},
 	} {

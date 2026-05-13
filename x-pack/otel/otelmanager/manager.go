@@ -5,10 +5,12 @@
 package otelmanager
 
 import (
+	"sync"
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -35,6 +37,8 @@ func NewOtelManager(cfg *config.C, registry *reload.Registry, logger *logp.Logge
 type OtelManager struct {
 	ext          DiagnosticExtension
 	receiverName string
+	stopFn       func()
+	stopOnce     sync.Once
 }
 
 func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
@@ -42,21 +46,28 @@ func (n *OtelManager) UpdateStatus(_ status.Status, _ string) {
 	// TODO(@VihasMakwana): Explore the option to tidy and refactor the status reporting for beatsreceivers.
 }
 
-func (n *OtelManager) SetStopCallback(func()) {
+func (n *OtelManager) SetStopCallback(fn func()) {
+	n.stopFn = fn
 }
 
-func (n *OtelManager) Stop() {}
+func (n *OtelManager) Stop() {
+	if n.stopFn != nil {
+		n.stopOnce.Do(n.stopFn)
+	}
+}
 
 // Enabled returns false because many places inside beats call manager.Enabled() for various purposes
 // Returning true might lead to side effects.
-func (n *OtelManager) Enabled() bool                         { return false }
-func (n *OtelManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
-func (n *OtelManager) Start() error                          { return nil }
-func (n *OtelManager) CheckRawConfig(cfg *config.C) error    { return nil }
-func (n *OtelManager) RegisterAction(action client.Action)   {}
-func (n *OtelManager) UnregisterAction(action client.Action) {}
-func (n *OtelManager) SetPayload(map[string]interface{})     {}
-func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook client.DiagnosticHook) {
+func (n *OtelManager) Enabled() bool                             { return false }
+func (n *OtelManager) AgentInfo() management.AgentInfo           { return management.AgentInfo{} }
+func (n *OtelManager) PreInit() error                            { return nil }
+func (n *OtelManager) PostInit()                                 {}
+func (n *OtelManager) Start() error                              { return nil }
+func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
+func (n *OtelManager) RegisterAction(action management.Action)   {}
+func (n *OtelManager) UnregisterAction(action management.Action) {}
+func (n *OtelManager) SetPayload(map[string]interface{})         {}
+func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filename string, contentType string, hook management.DiagnosticHook) {
 	if n.ext != nil {
 		n.ext.RegisterDiagnosticHook(n.receiverName, description, filename, contentType, hook)
 	}
@@ -64,4 +75,8 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
 	n.receiverName = receiverName
+}
+func (n *OtelManager) WaitForStop(_ time.Duration) bool {
+	n.Stop()
+	return true
 }

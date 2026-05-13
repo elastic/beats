@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !integration
+// +build !integration
+
 package events
 
 import (
@@ -10,7 +13,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/auto_ops_testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 
 	"github.com/stretchr/testify/assert"
@@ -80,6 +85,7 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			inputError: &utils.HTTPResponse{
 				StatusCode: 404,
 				Body:       "Not Found",
+				Err:        errors.New("Not Found"),
 			},
 			expectedStatus: 404,
 			expectedCode:   "HTTP_404",
@@ -109,14 +115,14 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			inputError:     errors.New("some other error"),
 			expectedStatus: 0,
 			expectedCode:   "UNKNOWN_ERROR",
-			expectedBody:   "",
+			expectedBody:   "some other error",
 		},
 		{
 			name:           "Error is nil",
 			inputError:     nil,
 			expectedStatus: 0,
-			expectedCode:   "UNKNOWN_ERROR",
-			expectedBody:   "",
+			expectedCode:   "UNEXPECTED_ERROR",
+			expectedBody:   "unknown error",
 		},
 	}
 
@@ -212,16 +218,23 @@ func TestLogAndSendErrorEventWithoutClusterInfoDefaultValues(t *testing.T) {
 	LogAndSendErrorEventWithoutClusterInfo(err, mockReporter, metricSetName)
 
 	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
-		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		errorField, ok := event.RootFields["error"].(mapstr.M)
 		require.True(t, ok)
-		require.Equal(t, "UNKNOWN_ERROR", errorField.ErrorCode)
-		require.Equal(t, "test error", errorField.ErrorMessage)
-		require.Equal(t, "/", errorField.URLPath)
-		require.Equal(t, "", errorField.Query)
-		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
-		require.Equal(t, 0, errorField.HTTPStatusCode)
-		require.Equal(t, "", errorField.HTTPResponse)
-		require.Equal(t, metricSetName, errorField.MetricSet)
+		require.Equal(t, "UNKNOWN_ERROR", auto_ops_testing.GetObjectValue(errorField, "code"))
+		require.Equal(t, "test error", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		require.Equal(t, "/", auto_ops_testing.GetObjectValue(urlField, "path"))
+		require.Equal(t, "", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		require.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		require.Equal(t, 0, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.NotEmpty(t, auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
 		return true
 	}))
 }
@@ -241,16 +254,23 @@ func TestLogAndSendErrorEventWithoutClusterInfoNonDefaultValues(t *testing.T) {
 	LogAndSendErrorEventWithoutClusterInfo(err, mockReporter, metricSetName)
 
 	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
-		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		errorField, ok := event.RootFields["error"].(mapstr.M)
 		require.True(t, ok)
-		assert.Equal(t, "HTTP_500", errorField.ErrorCode)
-		assert.Equal(t, "server encountered an unexpected condition", errorField.ErrorMessage)
-		assert.Equal(t, "/", errorField.URLPath)
-		assert.Equal(t, "", errorField.Query)
-		assert.Equal(t, http.MethodGet, errorField.HTTPMethod)
-		assert.Equal(t, 500, errorField.HTTPStatusCode)
-		assert.Equal(t, "Internal Server Error", errorField.HTTPResponse)
-		assert.Equal(t, metricSetName, errorField.MetricSet)
+		assert.Equal(t, "HTTP_500", auto_ops_testing.GetObjectValue(errorField, "code"))
+		assert.Equal(t, "server encountered an unexpected condition", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "/", auto_ops_testing.GetObjectValue(urlField, "path"))
+		assert.Equal(t, "", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		assert.Equal(t, 500, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.NotEmpty(t, auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
 		return true
 	}))
 }
@@ -264,26 +284,32 @@ func TestLogAndSendErrorEventDefaultValues(t *testing.T) {
 		ClusterName: "",
 		ClusterID:   "test-cluster-id",
 		Version: utils.ClusterInfoVersion{
-			Number:       version.MustNew("8.0.0"),
-			Distribution: "",
+			Number: version.MustNew("8.0.0"),
 		},
 	}
 	metricSetName := "test_metricset"
-	path := "/test/path"
+	path := "/test/path?query=string&other=param"
 
 	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "test-transaction-id")
 
 	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
-		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		errorField, ok := event.RootFields["error"].(mapstr.M)
 		require.True(t, ok)
-		require.Equal(t, "UNKNOWN_ERROR", errorField.ErrorCode)
-		require.Equal(t, "test error", errorField.ErrorMessage)
-		require.Equal(t, "/test/path", errorField.URLPath)
-		require.Equal(t, "", errorField.Query)
-		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
-		require.Equal(t, 0, errorField.HTTPStatusCode)
-		require.Equal(t, "", errorField.HTTPResponse)
-		require.Equal(t, metricSetName, errorField.MetricSet)
+		assert.Equal(t, "UNKNOWN_ERROR", auto_ops_testing.GetObjectValue(errorField, "code"))
+		assert.Equal(t, "test error", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "/test/path", auto_ops_testing.GetObjectValue(urlField, "path"))
+		assert.Equal(t, "query=string&other=param", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		assert.Equal(t, 0, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.Equal(t, "test-transaction-id", auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
 		return true
 	}))
 }
@@ -293,17 +319,16 @@ func TestLogAndSendErrorEventNonDefaultValues(t *testing.T) {
 	mockReporter.On("Event", mock.Anything).Return(true)
 
 	err := &utils.HTTPResponse{
-		StatusCode: 500,
-		Status:     "HTTP_500",
-		Body:       "Internal Server Error",
-		Err:        errors.New("server encountered an unexpected condition"),
+		StatusCode: 404,
+		Status:     "HTTP_404",
+		Body:       "Page Not Found",
+		Err:        errors.New("error message is passed through"),
 	}
 	clusterInfo := &utils.ClusterInfo{
-		ClusterName: "",
-		ClusterID:   "test-cluster-id",
+		ClusterName: "custom-name",
+		ClusterID:   "custom-cluster-id",
 		Version: utils.ClusterInfoVersion{
-			Number:       version.MustNew("8.0.0"),
-			Distribution: "",
+			Number: version.MustNew("8.0.0"),
 		},
 	}
 	metricSetName := "custom_metricset"
@@ -312,16 +337,29 @@ func TestLogAndSendErrorEventNonDefaultValues(t *testing.T) {
 	LogAndSendErrorEvent(err, clusterInfo, mockReporter, metricSetName, path, "custom-transaction-id")
 
 	mockReporter.AssertCalled(t, "Event", mock.MatchedBy(func(event mb.Event) bool {
-		errorField, ok := event.MetricSetFields["error"].(ErrorEvent)
+		clusterField, ok := event.ModuleFields["cluster"].(mapstr.M)
 		require.True(t, ok)
-		assert.Equal(t, "HTTP_500", errorField.ErrorCode)
-		assert.Equal(t, "server encountered an unexpected condition", errorField.ErrorMessage)
-		assert.Equal(t, "/custom/path", errorField.URLPath)
-		assert.Equal(t, "param=value", errorField.Query)
-		assert.Equal(t, http.MethodGet, errorField.HTTPMethod)
-		assert.Equal(t, 500, errorField.HTTPStatusCode)
-		assert.Equal(t, "Internal Server Error", errorField.HTTPResponse)
-		assert.Equal(t, metricSetName, errorField.MetricSet)
+		assert.Equal(t, "custom-cluster-id", auto_ops_testing.GetObjectValue(clusterField, "id"))
+		assert.Equal(t, "custom-name", auto_ops_testing.GetObjectValue(clusterField, "name"))
+		assert.Equal(t, "8.0.0", auto_ops_testing.GetObjectValue(clusterField, "version"))
+
+		errorField, ok := event.RootFields["error"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "HTTP_404", auto_ops_testing.GetObjectValue(errorField, "code"))
+		assert.Equal(t, "error message is passed through", auto_ops_testing.GetObjectValue(errorField, "message"))
+
+		urlField, ok := event.RootFields["url"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, "/custom/path", auto_ops_testing.GetObjectValue(urlField, "path"))
+		assert.Equal(t, "param=value", auto_ops_testing.GetObjectValue(urlField, "query"))
+
+		httpField, ok := event.RootFields["http"].(mapstr.M)
+		require.True(t, ok)
+		assert.Equal(t, http.MethodGet, auto_ops_testing.GetObjectValue(httpField, "request.method"))
+		assert.Equal(t, 404, auto_ops_testing.GetObjectValue(httpField, "response.status_code"))
+
+		assert.Equal(t, "custom-transaction-id", auto_ops_testing.GetObjectValue(event.ModuleFields, "transaction_id"))
+
 		return true
 	}))
 }

@@ -16,7 +16,7 @@ In general there are two major test suites:
 
 The tests written in Go use the [Go Testing package](https://golang.org/pkg/testing/). The tests written in Python depend on [pytest](https://docs.pytest.org/en/latest/) and require a compiled and executable binary from the Go code. The python test run a beat with a specific config and params and either check if the output is as expected or if the correct things show up in the logs.
 
-For both of the above test suites so called integration tests exists. Integration tests in Beats are tests which require an external system like Elasticsearch to test if the integration with this service works as expected. Beats provides in its testsuite docker containers and docker-compose files to start these environments but a developer can run the required services also locally.
+For both of the above test suites so called integration tests exists. Integration tests in Beats are tests which require an external system like Elasticsearch to test if the integration with this service works as expected. Beats provides in its testsuite docker containers and docker compose files to start these environments but a developer can run the required services also locally.
 
 ## Running Go Tests [_running_go_tests]
 
@@ -28,11 +28,11 @@ All Go tests are in the same package as the tested code itself and have the suff
 
 Integration tests are labelled with the `//go:build integration` build tag and use the `_integration_test.go` suffix.
 
-To run the integration tests use the `mage goIntegTest` target, which will start the required services using [docker-compose](https://docs.docker.com/compose/) and run all integration tests.
+To run the integration tests use the `mage goIntegTest` target, which will start the required services using [docker compose](https://docs.docker.com/compose/) and run all integration tests.
 
 It is also possible to run module specific integration tests. For example, to run kafka only tests use `MODULE=kafka mage integTest -v`
 
-It is possible to start the `docker-compose` services manually to allow selecting which specific tests should be run. The default credentials for Elasticsearch and Kibana are `user: admin`, `password: testing`. An example follows for filebeat:
+It is possible to start the `docker compose` services manually to allow selecting which specific tests should be run. The default credentials for Elasticsearch and Kibana are `user: admin`, `password: testing`. An example follows for filebeat:
 
 ```bash
 cd filebeat
@@ -71,7 +71,7 @@ The system tests are defined in the `tests/system` (for legacy Python test) and 
 
 To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To set up the Python testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the [virtualenv documentation](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment).
 
-To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using [docker-compose](https://docs.docker.com/compose/) and run all integration tests. The default credentials for Elasticsearch and Kibana are `user: admin`, `password: testing`. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
+To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using [docker compose](https://docs.docker.com/compose/) and run all integration tests. The default credentials for Elasticsearch and Kibana are `user: admin`, `password: testing`. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
 
 ```bash
 # Create and activate the system test virtual environment (assumes a Unix system).

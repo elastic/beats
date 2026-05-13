@@ -4,13 +4,16 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-azure-eventhub.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Azure eventhub input [filebeat-input-azure-eventhub]
 
-Users can make use of the `azure-eventhub` input in order to read messages from an azure eventhub. The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here [https://github.com/Azure/azure-event-hubs-go#event-processor-host](https://github.com/Azure/azure-event-hubs-go#event-processor-host), [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host)). State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.
+Use the `azure-eventhub` input to read messages from an Azure EventHub. The azure-eventhub input implementation is based on the event processor host. EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here [https://github.com/Azure/azure-event-hubs-go#event-processor-host](https://github.com/Azure/azure-event-hubs-go#event-processor-host), [https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host). 
 
-Users can enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
+State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, you must create or use an existing storage account.
+
+Enable internal logs tracing for this input by setting the environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled, this input will log additional information to the logs. Additional information includes partition ownership, blob lease information, and other internal state.
 
 ## Example configurations
 
@@ -48,7 +51,11 @@ filebeat.inputs:
   storage_account_container: "your-storage-container"
 ```
 
-{applies_to}`stack: ga 9.3.0` ### Client secret authentication (processor v2)
+### Client secret authentication (processor v2)
+
+```{applies_to}
+stack: ga 9.3.0+
+```
 
 Example configuration using Azure Active Directory service principal authentication with processor v2:
 
@@ -66,7 +73,52 @@ filebeat.inputs:
   storage_account_container: "your-storage-container"
 ```
 
-**Note:** When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See [Required permissions](#_required_permissions) for details.
+:::{note}
+When using `client_secret` authentication, the service principal must have the appropriate Azure RBAC permissions. See [Required permissions](#_required_permissions) for details.
+:::
+
+### Managed identity authentication (processor v2)
+
+```{applies_to}
+stack: ga 9.2.6+
+```
+
+Example configuration using Azure Managed Identity authentication with processor v2. This is ideal for workloads running on Azure VMs, Azure Container Apps, Azure Kubernetes Service (AKS), or other Azure services that support managed identities.
+
+:::{important}
+Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
+:::
+
+**System-assigned managed identity:**
+
+```yaml
+filebeat.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "managed_identity"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+```
+
+**User-assigned managed identity:**
+
+```yaml
+filebeat.inputs:
+- type: azure-eventhub
+  eventhub: "insights-operational-logs"
+  consumer_group: "$Default"
+  auth_type: "managed_identity"
+  eventhub_namespace: "your-namespace.servicebus.windows.net"
+  managed_identity_client_id: "your-user-assigned-identity-client-id"
+  storage_account: "your-storage-account"
+  storage_account_container: "your-storage-container"
+```
+
+:::{note}
+When using `managed_identity` authentication, the managed identity must have the appropriate Azure RBAC permissions. Refer to [Required permissions](#_required_permissions) for details.
+:::
 
 ## Authentication [_authentication]
 
@@ -78,10 +130,11 @@ The following authentication types are supported:
 
 - **`connection_string`** (default if `auth_type` is not specified): Uses Azure Event Hubs and Storage Account connection strings.
 - {applies_to}`stack: ga 9.3.0` **`client_secret`**: Uses Azure Active Directory service principal with client secret credentials.
+- {applies_to}`stack: ga 9.2.6+` {applies_to}`stack: ga 8.19.12+` **`managed_identity`**: Uses Azure Managed Identity. Supports both system-assigned and user-assigned managed identities. Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
 
 ### Required permissions [_required_permissions]
 
-When using `client_secret` authentication, the service principal needs the following Azure RBAC permissions:
+When using `client_secret` or `managed_identity` authentication, the identity (service principal or managed identity) needs the following Azure RBAC permissions:
 
 **For Azure Event Hubs:**
 - `Azure Event Hubs Data Receiver` role on the Event Hubs namespace or Event Hub
@@ -128,6 +181,7 @@ Specifies the authentication method to use for both Event Hub and Storage Accoun
 Valid values include:
 - `connection_string` (default): Uses connection string authentication. You _must_ provide a [`connection_string`](#_connection_string).
 - `client_secret`: Uses Azure Active Directory service principal with client secret credentials.
+- {applies_to}`stack: ga 9.2.6+` {applies_to}`stack: ga 8.19.12+` `managed_identity`: Uses Azure Managed Identity. Ideal for workloads running on Azure infrastructure. Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
 
 ### `connection_string` [_connection_string]
 
@@ -146,7 +200,7 @@ A Blob Storage account is required to store, retrieve, or update the offset or s
 stack: ga 9.3.0
 ```
 
-The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
+The fully qualified namespace for the Event Hub. Required when using credential-based authentication methods (such as `client_secret` or `managed_identity`). Not required when using `connection_string` authentication, as the namespace is embedded in the connection string. Format: `your-eventhub-namespace.servicebus.windows.net`
 
 ### `tenant_id` [_tenant_id]
 
@@ -178,12 +232,28 @@ The Azure Active Directory application client secret. Required when using `clien
 stack: ga 9.3.0
 ```
 
-The Azure Active Directory authority host. Optional when using `client_secret` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
+The Azure Active Directory authority host. Optional when using `client_secret` or `managed_identity` authentication. Defaults to Azure Public Cloud (`https://login.microsoftonline.com`).
 
 Supported values:
 - `https://login.microsoftonline.com` (Azure Public Cloud - default)
 - `https://login.microsoftonline.us` (Azure Government)
 - `https://login.chinacloudapi.cn` (Azure China)
+
+### `managed_identity_client_id` [_managed_identity_client_id]
+
+```{applies_to}
+stack: ga 9.2.6+
+```
+
+The client ID of a user-assigned managed identity. Optional when using `managed_identity` authentication. If not specified, the system-assigned managed identity is used.
+
+Use this option when:
+- Your Azure resource has multiple user-assigned managed identities and you need to specify which one to use.
+- You want to use a user-assigned managed identity instead of the system-assigned managed identity.
+
+:::{important}
+Available starting from {{filebeat}} 9.2.6 and later, 9.3.1 and later, 9.4.0 and later, and {{stack}} 8.19.12 and later.
+:::
 
 ### `storage_account` [_storage_account]
 

@@ -40,7 +40,7 @@ func TestManager(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
 		// it should fallback to FallbackManager if key is missing
-		assert.IsType(t, beat.Manager, &management.FallbackManager{})
+		assert.IsType(t, &management.FallbackManager{}, beat.Manager)
 		assert.False(t, management.UnderAgent())
 	})
 	t.Run("otel management enabled", func(t *testing.T) {
@@ -53,7 +53,7 @@ func TestManager(t *testing.T) {
 		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
-		assert.IsType(t, beat.Manager, &otelmanager.OtelManager{})
+		assert.IsType(t, &otelmanager.OtelManager{}, beat.Manager)
 		assert.True(t, management.UnderAgent())
 
 		// test if log input is enabled
@@ -72,7 +72,7 @@ type: "log"`)
 		beat, err := NewBeatForReceiver(cmd.FilebeatSettings("filebeat"), tmpCfg, consumertest.NewNop(), "testcomponent", zapcore.NewNopCore())
 		assert.NoError(t, err)
 		assert.NotNil(t, beat.Manager)
-		assert.IsType(t, beat.Manager, &management.FallbackManager{})
+		assert.IsType(t, &management.FallbackManager{}, beat.Manager)
 		assert.False(t, management.UnderAgent())
 
 		// test if log input is disabled

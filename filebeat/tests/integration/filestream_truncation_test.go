@@ -203,7 +203,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 
 		// Skips registry log entries containing the operation ID like:
 		// '{"op":"set","id":46}'
-		if e.Key == "" {
+		if e.Op != "" {
 			lastOperation = e.Op
 			continue
 		}

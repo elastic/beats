@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/monitor-icmp-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # ICMP options [monitor-icmp-options]

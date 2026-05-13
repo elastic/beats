@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/index.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Auditbeat

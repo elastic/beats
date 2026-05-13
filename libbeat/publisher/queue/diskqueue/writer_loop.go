@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // A segmentedFrame is a data frame waiting to be written to disk along with
@@ -67,6 +68,7 @@ type writerLoopResponse struct {
 type writerLoop struct {
 	// The settings for the queue that created this loop.
 	settings Settings
+	paths    *paths.Path
 
 	// The logger for the writer loop, assigned when the queue creates it.
 	logger *logp.Logger
@@ -99,11 +101,13 @@ type writerLoop struct {
 func newWriterLoop(
 	logger *logp.Logger,
 	settings Settings,
+	paths *paths.Path,
 ) *writerLoop {
 	buffer := &bytes.Buffer{}
 	return &writerLoop{
 		logger:   logger,
 		settings: settings,
+		paths:    paths,
 
 		requestChan:  make(chan writerLoopRequest, 1),
 		responseChan: make(chan writerLoopResponse),
@@ -175,7 +179,7 @@ outerLoop:
 			}
 			wl.currentSegment = frameRequest.segment
 			file, err := wl.currentSegment.getWriterWithRetry(
-				wl.settings, wl.retryCallback)
+				wl.settings, wl.paths, wl.retryCallback)
 			if err != nil {
 				// This can only happen if the queue is being closed; abort.
 				break

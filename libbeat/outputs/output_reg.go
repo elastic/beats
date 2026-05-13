@@ -32,7 +32,8 @@ type Factory func(
 	im IndexManager,
 	beat beat.Info,
 	stats Observer,
-	cfg *config.C) (Group, error)
+	cfg *config.C,
+) (Group, error)
 
 // IndexManager provides additional index related services to the outputs.
 type IndexManager interface {

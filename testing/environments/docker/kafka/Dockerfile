@@ -2,7 +2,7 @@ FROM debian:bookworm
 
 ENV KAFKA_HOME=/kafka
 # Controls the hostname advertised within the Docker network, should generally match the container
-# name in a docker-compose file.
+# name in a docker compose file.
 ENV KAFKA_ADVERTISED_HOST=kafka
 
 ENV KAFKA_LOGS_DIR="/kafka-logs"

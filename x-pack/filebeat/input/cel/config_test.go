@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -51,6 +52,114 @@ func TestRegexpConfig(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed to validate config with regexps: %v", err)
 	}
+}
+
+func TestSecretStateUnpack(t *testing.T) {
+	t.Run("map", func(t *testing.T) {
+		var s secretState
+		err := s.Unpack(map[string]interface{}{"api_key": "secret"})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if s.m["api_key"] != "secret" {
+			t.Fatalf("unexpected value: got %v, want %q", s.m["api_key"], "secret")
+		}
+	})
+
+	t.Run("string", func(t *testing.T) {
+		var s secretState
+		err := s.Unpack("api_key: secret")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if s.m["api_key"] != "secret" {
+			t.Fatalf("unexpected value: got %v, want %q", s.m["api_key"], "secret")
+		}
+	})
+
+	t.Run("nested_string", func(t *testing.T) {
+		var s secretState
+		err := s.Unpack("headers:\n  auth: token\n  key: secret")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		headers, ok := s.m["headers"].(map[string]interface{})
+		if !ok {
+			t.Fatalf("expected map[string]interface{} for nested map, got %T", s.m["headers"])
+		}
+		if headers["auth"] != "token" {
+			t.Fatalf("unexpected value: got %v, want %q", headers["auth"], "token")
+		}
+	})
+
+	t.Run("invalid_type", func(t *testing.T) {
+		var s secretState
+		err := s.Unpack(42)
+		if err == nil {
+			t.Fatal("expected error for int value")
+		}
+	})
+
+	t.Run("invalid_yaml", func(t *testing.T) {
+		var s secretState
+		err := s.Unpack(":\ninvalid:\n  :\n")
+		if err == nil {
+			t.Fatal("expected error for invalid YAML")
+		}
+	})
+}
+
+func TestSecretStateValidation(t *testing.T) {
+	base := config{
+		Interval: time.Minute,
+		Program:  `{}`,
+		Resource: &ResourceConfig{URL: &urlConfig{URL: &url.URL{}}},
+	}
+
+	t.Run("state_with_secret_key_rejected", func(t *testing.T) {
+		cfg := base
+		cfg.State = map[string]interface{}{
+			"secret": map[string]interface{}{"api_key": "hidden"},
+		}
+		err := cfg.Validate()
+		if err == nil {
+			t.Fatal("expected error for state containing \"secret\" key")
+		}
+		const want = `state must not contain a "secret" key`
+		if !strings.HasPrefix(err.Error(), want) {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("state_with_secret_key_rejected_without_secret_state", func(t *testing.T) {
+		cfg := base
+		cfg.State = map[string]interface{}{
+			"secret": "value",
+		}
+		err := cfg.Validate()
+		if err == nil {
+			t.Fatal("expected error for state containing \"secret\" key even without secret_state")
+		}
+	})
+
+	t.Run("state_without_secret_key_accepted", func(t *testing.T) {
+		cfg := base
+		cfg.State = map[string]interface{}{
+			"token": "not_actually_secret",
+		}
+		err := cfg.Validate()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("nil_state_accepted", func(t *testing.T) {
+		cfg := base
+		err := cfg.Validate()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
 }
 
 func TestIsEnabled(t *testing.T) {

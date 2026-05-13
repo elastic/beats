@@ -59,17 +59,17 @@ type logHints struct {
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	_ = autodiscover.Registry.AddBuilder("hints", newLogHints)
 }
 
-// NewLogHints builds a log hints builder
-func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
+// newLogHints builds a log hints builder
+func newLogHints(cfg *conf.C, logger *logp.Logger, paths *paths.Path) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{}, paths.Paths)
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger, Paths: paths}, false, fileset.FilesetOverrides{})
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 		l.log.Debugf("Generated %d input configs from hint.", len(configs))
 		// Apply information in event to the template to generate the final config
-		return template.ApplyConfigTemplate(event, configs, l.log)
+		return template.ApplyConfigTemplate(event, configs, l.log, options...)
 	}
 
 	var configs []*conf.C //nolint:prealloc //breaks tests
@@ -199,7 +199,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		configs = append(configs, config)
 	}
 	// Apply information in event to the template to generate the final config
-	return template.ApplyConfigTemplate(event, configs, l.log)
+	return template.ApplyConfigTemplate(event, configs, l.log, options...)
 }
 
 func (l *logHints) getMultiline(hints mapstr.M) mapstr.M {

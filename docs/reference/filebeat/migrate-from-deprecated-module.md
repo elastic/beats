@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/migrate-from-deprecated-module.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Migrating from a Deprecated Filebeat Module [migrate-from-deprecated-module]

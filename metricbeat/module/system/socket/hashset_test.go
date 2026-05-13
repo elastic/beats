@@ -31,5 +31,5 @@ func TestHashSet(t *testing.T) {
 	assert.False(t, set.Contains(0))
 
 	set.Reset()
-	assert.Len(t, set, 0)
+	assert.Empty(t, set)
 }

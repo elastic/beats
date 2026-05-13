@@ -440,7 +440,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		updatedUsers.ForEach(func(userID uuid.UUID) {
 			u, ok := state.users[userID]
 			if !ok {
-				p.logger.Errorf("Unable to find user %q in state", userID)
+				p.logger.Debugf("Unable to find user %q in state", userID)
 				return
 			}
 			u.Modified = true
@@ -461,7 +461,7 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		updatedDevices.ForEach(func(devID uuid.UUID) {
 			d, ok := state.devices[devID]
 			if !ok {
-				p.logger.Errorf("Unable to find device %q in state", devID)
+				p.logger.Debugf("Unable to find device %q in state", devID)
 				return
 			}
 			d.Modified = true

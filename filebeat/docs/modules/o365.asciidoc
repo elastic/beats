@@ -104,7 +104,7 @@ right away.
 ===== Alternative endpoints
 
 This module supports custom endpoints for on-prem deployments as well as
-alternative endpoints (GCC High endponts, U.S. DoD, European Union, etc). In
+alternative endpoints (GCC High endpoints, U.S. DoD, European Union, etc). In
 order to point the module to an alternative endpoint, you need to adjust the
 `authentication_endpoint` and `resource` variables accordingly. For example:
 
@@ -163,7 +163,7 @@ known content-types:
 [float]
 ===== Advanced configuration options
 
-The following configuration options are only recomended in case of problems.
+The following configuration options are only recommended in case of problems.
 They must be nested under a single `var.api` key, like this:
 
 [source,yaml]

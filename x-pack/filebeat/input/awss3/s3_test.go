@@ -550,3 +550,59 @@ func Test_S3StateHandling(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateS3API(t *testing.T) {
+	t.Run("non-AWS bucket with configured region", func(t *testing.T) {
+		ctx := context.Background()
+		cfg := config{
+			NonAWSBucketName: "my-bucket",
+			RegionName:       "cn-shenzhen",
+		}
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{},
+		}
+
+		api, err := input.createS3API(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
+	})
+
+	// "non-AWS bucket without region" is invalid and rejected by config.Validate();
+	t.Run("non-AWS bucket with configured region, aws region and configured region mismatch", func(t *testing.T) {
+		ctx := context.Background()
+		cfg := config{
+			NonAWSBucketName: "my-bucket",
+			RegionName:       "us-west-2",
+		}
+		input := &s3PollerInput{
+			config: cfg,
+			awsConfig: aws.Config{
+				Region: "ap-southeast-1",
+			},
+		}
+
+		api, err := input.createS3API(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		require.Equal(t, cfg.RegionName, input.awsConfig.Region)
+	})
+
+	t.Run("access point ARN extracts region correctly", func(t *testing.T) {
+		ctx := context.Background()
+		cfg := config{
+			AccessPointARN: "arn:aws:s3:eu-west-1:1234567890:accesspoint/my-bucket",
+		}
+		input := &s3PollerInput{
+			config:    cfg,
+			awsConfig: aws.Config{},
+		}
+
+		api, err := input.createS3API(ctx)
+		require.NoError(t, err)
+		require.NotNil(t, api)
+		// Region should be extracted from ARN
+		require.Equal(t, "eu-west-1", input.awsConfig.Region)
+	})
+}

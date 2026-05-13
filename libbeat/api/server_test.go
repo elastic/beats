@@ -307,3 +307,62 @@ func genSocketPath() string {
 	socketDir := os.TempDir()
 	return filepath.Join(socketDir, socketName)
 }
+
+func TestParse(t *testing.T) {
+	tests := []struct {
+		name        string
+		host        string
+		port        int
+		wantNetwork string
+		wantAddr    string
+		errContains string
+	}{
+		{
+			name:        "bare host uses tcp with port",
+			host:        "localhost",
+			port:        5066,
+			wantNetwork: "tcp",
+			wantAddr:    "localhost:5066",
+		},
+		{
+			name:        "http scheme uses tcp with provided address",
+			host:        "http://127.0.0.1:9200",
+			port:        5066,
+			wantNetwork: "tcp",
+			wantAddr:    "127.0.0.1:9200",
+		},
+		{
+			name:        "unix scheme uses socket path",
+			host:        "unix:///tmp/beats.sock",
+			port:        5066,
+			wantNetwork: "unix",
+			wantAddr:    "/tmp/beats.sock",
+		},
+		{
+			name:        "unknown scheme returns error",
+			host:        "ftp://localhost",
+			port:        5066,
+			errContains: "unknown scheme ftp",
+		},
+		{
+			name:        "invalid URL returns parse error",
+			host:        "http://[::1",
+			port:        5066,
+			errContains: "missing ']'",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			network, addr, err := parse(tc.host, tc.port)
+			if tc.errContains != "" {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errContains)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.wantNetwork, network)
+			assert.Equal(t, tc.wantAddr, addr)
+		})
+	}
+}

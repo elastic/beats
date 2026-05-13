@@ -106,9 +106,9 @@ func TestUnpackLogstashConfig(t *testing.T) {
 		hostWorkerCfg := result.HostWorkerCfg
 		assert.Equal(t, []string{"localhost:5044"}, hostWorkerCfg.Hosts)
 		assert.Equal(t, 1, hostWorkerCfg.Workers)
-		assert.Equal(t, true, resultConfig.LoadBalance)
+		assert.True(t, resultConfig.LoadBalance)
 		assert.Equal(t, 100, resultConfig.BulkMaxSize)
-		assert.Equal(t, true, resultConfig.SlowStart)
+		assert.True(t, resultConfig.SlowStart)
 	})
 
 	t.Run("EmptyConfig", func(t *testing.T) {
@@ -208,7 +208,7 @@ func TestParseLogstashConfigEdgeCases(t *testing.T) {
 		hostWorkerCfg := logstashConfig.HostWorkerCfg
 		assert.Equal(t, []string{"host1:5044", "host2:5044"}, hostWorkerCfg.Hosts)
 		assert.Equal(t, 2, hostWorkerCfg.Workers)
-		assert.Equal(t, true, resultConfig.LoadBalance)
+		assert.True(t, resultConfig.LoadBalance)
 		assert.Equal(t, 500, resultConfig.BulkMaxSize)
 	})
 }

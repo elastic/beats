@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-reference-yml.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # filebeat.reference.yml [filebeat-reference-yml]
@@ -411,7 +412,7 @@ filebeat.modules:
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
 
 #------------------------------- Traefik Module -------------------------------

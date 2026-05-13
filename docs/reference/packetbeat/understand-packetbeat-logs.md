@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/understand-packetbeat-logs.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Understand metrics in Packetbeat logs [understand-packetbeat-logs]

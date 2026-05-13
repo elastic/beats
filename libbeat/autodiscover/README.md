@@ -178,10 +178,10 @@ spec:
 Everything works the same as Autodiscover without LeaderElection until step 8.
 
 8. If there is no conditions in the template set by the user, the configs will be generated from [hints](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L186).
-9. Wether hints are enabled or not is part of the [Kubernetes Provider struct](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L121) builders field.
+9. Whether hints are enabled or not is part of the [Kubernetes Provider struct](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L121) builders field.
 10. [GenerateHints](https://github.com/elastic/beats/blob/eff92354db783001880f4bade9f59942fca747ba/libbeat/autodiscover/builder/helper.go#L213) function looks into the event's annotations. A [hints map](https://github.com/elastic/beats/blob/eff92354db783001880f4bade9f59942fca747ba/libbeat/autodiscover/builder/helper.go#L226) is created with all hints and returned.
 11. From those hints, configs are [created](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/builder.go#L97) in the same form as in `Autodiscover without LeaderElection` step 8.
-    They contain the same information as if they where set explicitly in the metricbeat configureation but actually derive from the pod annotations.
+    They contain the same information as if they were set explicitly in the Metricbeat configuration but actually derive from the pod annotations.
 12. Those configs are then [added](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L197) in the event and gets published.
 13. The process after that is same as in `Autodiscover without LeaderElection` step 9 and onward.
 

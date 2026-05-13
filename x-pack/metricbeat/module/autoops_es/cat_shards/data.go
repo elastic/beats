@@ -88,7 +88,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	if err != nil {
 		m.Logger().Errorf("failed to load resolved index details %v", err)
-		events.LogAndSendErrorEvent(err, info, r, CatShardsMetricSet, CatShardsPath, transactionID)
+		events.LogAndSendErrorEvent(err, info, r, catShardsMetricSet, catShardsPath, transactionID)
 		return nil
 	}
 

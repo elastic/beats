@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/setting-up-and-running.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Set up and run Metricbeat [setting-up-and-running]

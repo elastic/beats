@@ -7,14 +7,18 @@ package remote_write
 import (
 	"errors"
 	"time"
+
+	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 )
 
 type config struct {
-	MetricsCount  bool          `config:"metrics_count"`
-	UseTypes      bool          `config:"use_types"`
-	RateCounters  bool          `config:"rate_counters"`
-	TypesPatterns TypesPatterns `config:"types_patterns" yaml:"types_patterns,omitempty"`
-	Period        time.Duration `config:"period"     validate:"positive"`
+	MetricsCount           bool          `config:"metrics_count"`
+	UseTypes               bool          `config:"use_types"`
+	RateCounters           bool          `config:"rate_counters"`
+	TypesPatterns          TypesPatterns `config:"types_patterns" yaml:"types_patterns,omitempty"`
+	Period                 time.Duration `config:"period"     validate:"positive"`
+	MaxCompressedBodyBytes int64         `config:"max_compressed_body_bytes"`
+	MaxDecodedBodyBytes    int64         `config:"max_decoded_body_bytes"`
 }
 
 type TypesPatterns struct {
@@ -26,7 +30,9 @@ var defaultConfig = config{
 	TypesPatterns: TypesPatterns{
 		CounterPatterns:   nil,
 		HistogramPatterns: nil},
-	Period: time.Second * 60,
+	Period:                 time.Second * 60,
+	MaxCompressedBodyBytes: rw.DefaultMaxCompressedBodyBytes,
+	MaxDecodedBodyBytes:    rw.DefaultMaxDecodedBodyBytes,
 }
 
 func (c *config) Validate() error {

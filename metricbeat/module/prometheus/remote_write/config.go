@@ -19,16 +19,27 @@ package remote_write
 
 import "github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
+const (
+	// DefaultMaxCompressedBodyBytes is the default maximum size of compressed request body (2MB)
+	DefaultMaxCompressedBodyBytes int64 = 2 * 1024 * 1024
+	// DefaultMaxDecodedBodyBytes is the default maximum size of decoded request body (10MB)
+	DefaultMaxDecodedBodyBytes int64 = 10 * 1024 * 1024
+)
+
 type Config struct {
-	MetricsCount bool                    `config:"metrics_count"`
-	Host         string                  `config:"host"`
-	Port         int                     `config:"port"`
-	TLS          *tlscommon.ServerConfig `config:"ssl"`
+	MetricsCount           bool                    `config:"metrics_count"`
+	Host                   string                  `config:"host"`
+	Port                   int                     `config:"port"`
+	TLS                    *tlscommon.ServerConfig `config:"ssl"`
+	MaxCompressedBodyBytes int64                   `config:"max_compressed_body_bytes"`
+	MaxDecodedBodyBytes    int64                   `config:"max_decoded_body_bytes"`
 }
 
 func defaultConfig() Config {
 	return Config{
-		Host: "localhost",
-		Port: 9201,
+		Host:                   "localhost",
+		Port:                   9201,
+		MaxCompressedBodyBytes: DefaultMaxCompressedBodyBytes,
+		MaxDecodedBodyBytes:    DefaultMaxDecodedBodyBytes,
 	}
 }

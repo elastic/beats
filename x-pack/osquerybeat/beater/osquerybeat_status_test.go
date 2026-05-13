@@ -14,9 +14,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -74,15 +75,18 @@ func (m *testManager) Start() error {
 	m.started = true
 	return m.startErr
 }
+func (m *testManager) PreInit() error                      { return nil }
+func (m *testManager) PostInit()                           {}
 func (m *testManager) Stop()                               { m.stopped = true }
+func (m *testManager) WaitForStop(_ time.Duration) bool    { return true }
 func (m *testManager) SetPayload(map[string]any)           {}
 func (m *testManager) Enabled() bool                       { return true }
-func (m *testManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
+func (m *testManager) AgentInfo() management.AgentInfo     { return management.AgentInfo{} }
 func (m *testManager) SetStopCallback(func())              {}
 func (m *testManager) CheckRawConfig(*agentconfig.C) error { return nil }
-func (m *testManager) RegisterAction(client.Action)        {}
-func (m *testManager) UnregisterAction(client.Action)      {}
-func (m *testManager) RegisterDiagnosticHook(string, string, string, string, client.DiagnosticHook) {
+func (m *testManager) RegisterAction(management.Action)    {}
+func (m *testManager) UnregisterAction(management.Action)  {}
+func (m *testManager) RegisterDiagnosticHook(string, string, string, string, management.DiagnosticHook) {
 }
 
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
@@ -92,7 +96,7 @@ func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -196,7 +200,7 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -233,7 +237,7 @@ func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()
@@ -270,7 +274,7 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 	b := &beat.Beat{
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
-		Monitoring: beat.NewMonitoring(),
+		Monitoring: beatmonitoring.NewMonitoring(),
 	}
 
 	cfg := agentconfig.NewConfig()

@@ -332,7 +332,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	}
 
 	ms := &MetricSet{
-		BaseMetricSet: mb.BaseMetricSet{},
+		BaseMetricSet: mb.BaseMetricSet{}, //nolint:exhaustruct // test only needs filter fields, not a fully initialized metricset
 	}
 
 	// test with no filters

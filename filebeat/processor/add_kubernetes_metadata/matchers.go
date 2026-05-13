@@ -88,7 +88,11 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 		return ""
 	}
 
-	source := value.(string)
+	source, ok := value.(string)
+	if !ok {
+		f.logger.Debugf("Error extracting log.file.path from the event: value is not a string.")
+		return ""
+	}
 	f.logger.Debugf("Incoming log.file.path value: %s", source)
 
 	if !strings.Contains(source, f.LogsPath) {
@@ -128,7 +132,7 @@ func (f *LogPathMatcher) MetadataIndex(event mapstr.M) string {
 				}
 			}
 
-			f.logger.Error("Error extracting pod uid - source value does not contains matcher's logs_path")
+			f.logger.Error("Error extracting pod UID - source value does not contain matcher's logs_path")
 			return ""
 		}
 	} else {

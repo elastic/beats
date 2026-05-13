@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-crowdstrike.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # CrowdStrike module [filebeat-module-crowdstrike]
 
@@ -64,7 +65,7 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 ### `falcon` fileset settings [_falcon_fileset_settings]
 
-The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
+The fileset is by default configured to collect JSON formatted event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
 
 ```yaml
 var:

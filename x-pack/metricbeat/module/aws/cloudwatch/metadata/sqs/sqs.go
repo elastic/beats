@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata"
 )
 
 const metadataPrefix = "aws.sqs.queue"
@@ -39,8 +40,8 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
 		for eventIdentifier := range events {
-			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
-			potentialQueueName := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			// Extract queue name, stripping account ID prefix if present
+			potentialQueueName := metadata.ExtractResourceID(eventIdentifier)
 			if queueName != potentialQueueName {
 				continue
 			}

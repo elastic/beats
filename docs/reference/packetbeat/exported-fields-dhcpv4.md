@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-dhcpv4.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # DHCPv4 fields [exported-fields-dhcpv4]
 
@@ -148,7 +149,7 @@ DHCPv4 event fields
 
 
 **`dhcpv4.option.subnet_mask`**
-:   The subnet mask that the client should use on the currnet network.
+:   The subnet mask that the client should use on the current network.
 
     type: ip
 

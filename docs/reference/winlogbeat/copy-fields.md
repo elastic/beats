@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/copy-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Copy fields [copy-fields]

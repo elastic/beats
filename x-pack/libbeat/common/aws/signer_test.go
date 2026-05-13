@@ -168,7 +168,7 @@ func TestSignerTransportRoundTrip(t *testing.T) {
 			for k := range m.req.Header {
 				gotHeaders[k] = m.req.Header.Get(k)
 			}
-			assert.EqualValues(t, tc.expectedRequestHeaders, gotHeaders)
+			assert.Equal(t, tc.expectedRequestHeaders, gotHeaders)
 
 			// ensure that request's body is readable (and not consumed) after the hash operation.
 			b, err := io.ReadAll(req.Body)

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-logging.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure logging [configuration-logging]
@@ -32,6 +33,11 @@ In addition to setting logging options in the config file, you can modify the lo
 ## Configuration options [_configuration_options_16]
 
 You can specify the following options in the `logging` section of the `winlogbeat.yml` config file:
+
+
+::::{warning}
+The `logging.to_*` options are mutually exclusive. If multiple are set to `true`, only the first one takes effect, following the precedence order of the options listed below.
+::::
 
 
 ### `logging.to_stderr` [_logging_to_stderr]

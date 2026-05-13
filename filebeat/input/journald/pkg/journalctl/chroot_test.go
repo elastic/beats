@@ -30,6 +30,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -135,6 +136,8 @@ func TestNewFactoryChroot(t *testing.T) {
 		}
 	case err := <-waitErrChan:
 		t.Fatalf("error waiting for container to finish: %s", err)
+	case <-time.After(30 * time.Second):
+		t.Fatal("Container is stuck, stopping the test. Look at the container logs for more information.")
 	}
 }
 
@@ -162,7 +165,7 @@ func TestInDockerNewFactory(t *testing.T) {
 	// without the need of any messages in the journal
 	jctl, err := factory(jctlCtx, logger.Logger, "--version")
 	require.NoError(t, err, "failed to create journalctl with chroot")
-	defer jctl.Kill() // nolint: deadcode // It's a test, there is nothing to do
+	defer jctl.Kill() //nolint: deadcode,errcheck // It's a test, there is nothing to do
 
 	data, err := jctl.Next(jctlCtx)
 	require.NoError(t, err, "failed to read from journalctl")

@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -61,6 +62,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
@@ -86,7 +88,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, nil, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}

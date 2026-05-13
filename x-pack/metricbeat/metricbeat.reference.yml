@@ -407,6 +407,11 @@ metricbeat.modules:
   enabled: true
   period: 300s
   application_id: ''
+  # auth_type: "api_key" (default) or "client_secret"
+  #auth_type: "api_key"
+  #client_id: '${AZURE_CLIENT_ID:""}'
+  #client_secret: '${AZURE_CLIENT_SECRET:""}'
+  #tenant_id: '${AZURE_TENANT_ID:""}'
   api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]
@@ -2617,7 +2622,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 

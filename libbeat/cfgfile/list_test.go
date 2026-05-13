@@ -141,7 +141,7 @@ func TestNewConfigs(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Len(t, list.copyRunnerList(), 3)
 }
 
 func TestReloadSameConfigs(t *testing.T) {
@@ -158,7 +158,7 @@ func TestReloadSameConfigs(t *testing.T) {
 	require.NoError(t, err)
 
 	state := list.copyRunnerList()
-	assert.Equal(t, len(state), 3)
+	assert.Len(t, state, 3)
 
 	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -182,7 +182,7 @@ func TestReloadDuplicateConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	state := list.copyRunnerList()
-	assert.Equal(t, len(state), 1)
+	assert.Len(t, state, 1)
 
 	// This can happen in Autodiscover when a container if getting restarted
 	// but the previous one is not cleaned yet.
@@ -208,7 +208,7 @@ func TestReloadStopConfigs(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Len(t, list.copyRunnerList(), 3)
 
 	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -216,7 +216,7 @@ func TestReloadStopConfigs(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, len(list.copyRunnerList()), 2)
+	assert.Len(t, list.copyRunnerList(), 2)
 }
 
 func TestReloadStartStopConfigs(t *testing.T) {
@@ -233,7 +233,7 @@ func TestReloadStartStopConfigs(t *testing.T) {
 	require.NoError(t, err)
 
 	state := list.copyRunnerList()
-	assert.Equal(t, len(state), 3)
+	assert.Len(t, state, 3)
 
 	err = list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -242,7 +242,7 @@ func TestReloadStartStopConfigs(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Len(t, list.copyRunnerList(), 3)
 	assert.NotEqual(t, state, list.copyRunnerList())
 }
 
@@ -259,9 +259,9 @@ func TestStopAll(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Len(t, list.copyRunnerList(), 3)
 	list.Stop()
-	assert.Equal(t, len(list.copyRunnerList()), 0)
+	assert.Empty(t, list.copyRunnerList())
 
 	for _, r := range list.runners {
 		assert.False(t, r.(*runner).stopped) //nolint:errcheck //false positive

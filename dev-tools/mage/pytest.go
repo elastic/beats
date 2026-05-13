@@ -90,7 +90,7 @@ type PythonTestArgs struct {
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
-	fileName := fmt.Sprintf("build/TEST-python-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
+	fileName := fmt.Sprintf("build/TEST-python-%s", strings.ReplaceAll(strings.ToLower(name), " ", "_"))
 
 	params := PythonTestArgs{
 		TestName:        name,
@@ -222,7 +222,7 @@ func PythonVirtualenv(forceCreate bool) (string, error) {
 	defer pythonVirtualenvLock.Unlock()
 
 	// Certain docker requirements simply won't build on AIX
-	// Skipping them here will obviously break the components that require docker-compose,
+	// Skipping them here will obviously break the components that require docker compose,
 	// But at least the components that don't require it will still run
 	if runtime.GOOS == "aix" {
 		VirtualenvReqs[0] = aixLibbeatRequirements

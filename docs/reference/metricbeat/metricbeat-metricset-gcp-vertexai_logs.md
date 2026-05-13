@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-vertexai_logs.html
 applies_to:
   stack: beta 9.2.0
+  serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Google Cloud Platform vertexai_logs metricset [metricbeat-metricset-gcp-vertexai_logs]
 

@@ -9,6 +9,7 @@
                     "enable": "true"
                 }
             },
+            "max_shards_per_node": "2000",
             "metadata": {
                 "display_name": "my-cluster"
             }
@@ -17,6 +18,9 @@
     "transient": {
         "action": {
             "auto_create_index": "false"
+        },
+        "cluster": {
+            "max_shards_per_node": "4000"
         }
     },
     "defaults": {
@@ -196,6 +200,11 @@
             "default_keep_alive": "5m",
             "aggs": {
                 "rewrite_to_filter_by_filter": "true"
+            }
+        },
+        "serverless": {
+            "search": {
+                "search_power_min": "3"
             }
         },
         "path": {

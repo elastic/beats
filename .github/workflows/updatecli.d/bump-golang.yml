@@ -65,14 +65,22 @@ sources:
     spec:
       command: echo {{ source "latestGoVersion" }}
 
+  golangImageVersion:
+    dependson:
+      - latestGoVersion
+    name: Get the golang image version for Dockerfiles
+    kind: shell
+    spec:
+      command: echo {{ source "latestGoVersion" }}-bookworm
+
 conditions:
   dockerTag:
-    name: Is docker image golang:{{ source "latestGoVersion" }} published
+    name: Is docker image golang:{{ source "golangImageVersion" }} published
     kind: dockerimage
     spec:
       image: golang
-      tag: '{{ source "latestGoVersion" }}'
-    sourceid: latestGoVersion
+      tag: '{{ source "golangImageVersion" }}'
+    sourceid: golangImageVersion
 
   goDefaultVersion-check:
     name: Check if defined golang version differs
@@ -120,7 +128,7 @@ targets:
       matchpattern: 'go:1-\d+.\d+'
   update-auditbeat-dockerfile:
     name: "Update Auditbeat Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -130,7 +138,7 @@ targets:
       file: ./auditbeat/Dockerfile
   update-heartbeat-dockerfile:
     name: "Update Heartbeat Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -140,7 +148,7 @@ targets:
       file: ./heartbeat/Dockerfile
   update-metricbeat-dockerfile:
     name: "Update Metricbeat Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -150,7 +158,7 @@ targets:
       file: ./metricbeat/Dockerfile
   update-packetbeat-dockerfile:
     name: "Update Packetbeat Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -160,7 +168,7 @@ targets:
       file: ./packetbeat/Dockerfile
   update-http-module-dockerfile:
     name: "Update HTTP module Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -170,7 +178,7 @@ targets:
       file: ./metricbeat/module/http/_meta/Dockerfile
   update-vsphere-module-dockerfile:
     name: "Update from vsphere Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -180,7 +188,7 @@ targets:
       file: ./metricbeat/module/vsphere/_meta/Dockerfile
   update-metricbeat-debug-dockerfile:
     name: "Update Metricbeat debug Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -190,7 +198,7 @@ targets:
       file: ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
   update-dockerfiles-filebeat-debug:
     name: "Update Filebeat debug Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -200,7 +208,7 @@ targets:
       file: ./dev-tools/kubernetes/filebeat/Dockerfile.debug
   update-heartbeat-debug-dockerfile:
     name: "Update Heartbeat debug Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:
@@ -210,7 +218,7 @@ targets:
       file: ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
   update-stan-module-dockerfile:
     name: "Update stan Dockerfile"
-    sourceid: latestGoVersion
+    sourceid: golangImageVersion
     scmid: githubConfig
     kind: dockerfile
     spec:

@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/error-event-structure.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Error event structure [error-event-structure]

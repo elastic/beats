@@ -509,7 +509,7 @@ func TestManager_InputsRun(t *testing.T) {
 		wgSend.Wait()
 
 		// 1. No cursor state in store yet, all operations are still pending
-		require.Equal(t, nil, store.snapshot()["test::key"].Cursor)
+		require.Nil(t, store.snapshot()["test::key"].Cursor)
 
 		// ACK first 2 events and check snapshot state
 		acker.ACKEvents(2)

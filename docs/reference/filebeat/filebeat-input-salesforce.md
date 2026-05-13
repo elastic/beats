@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-salesforce.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Salesforce input [filebeat-input-salesforce]
@@ -84,6 +85,15 @@ filebeat.inputs:
 ## Set up the OAuth App in the Salesforce [_set_up_the_oauth_app_in_the_salesforce]
 
 In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:
+
+::::{note}
+**OAuth token limit**
+
+Salesforce enforces a limit of [5 concurrent access tokens](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_request_manage.htm&type=5) per user, per connected app. If you configure more than 5 inputs using the same connected app credentials, generating a new token will automatically revoke the oldest one, causing errors.
+
+To avoid this, you must distribute your inputs across multiple connected apps. We recommend assigning a maximum of 5 inputs to each connected app to ensure stability.
+
+::::
 
 1. Login to [Salesforce](https://login.salesforce.com/) with the same user credentials that the user wants to collect data with.
 2. Click on Setup on the top right menu bar. On the Setup page, search for `App Manager` in the `Search Setup` search box at the top of the page, then select `App Manager`.

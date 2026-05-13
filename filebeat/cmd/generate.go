@@ -27,10 +27,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/generator/fileset"
 	"github.com/elastic/beats/v7/filebeat/generator/module"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
-
-var defaultHomePath = paths.Resolve(paths.Home, "")
 
 func genGenerateCmd() *cobra.Command {
 	generateCmd := cobra.Command{
@@ -62,8 +59,8 @@ func genGenerateModuleCmd() *cobra.Command {
 		}),
 	}
 
-	genModuleCmd.Flags().String("modules-path", defaultHomePath, "Path to modules directory")
-	genModuleCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
+	genModuleCmd.Flags().String("modules-path", ".", "Path to modules directory")
+	genModuleCmd.Flags().String("es-beats", ".", "Path to Elastic Beats")
 
 	return genModuleCmd
 }
@@ -87,8 +84,8 @@ func genGenerateFilesetCmd() *cobra.Command {
 		}),
 	}
 
-	genFilesetCmd.Flags().String("modules-path", defaultHomePath, "Path to modules directory")
-	genFilesetCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
+	genFilesetCmd.Flags().String("modules-path", ".", "Path to modules directory")
+	genFilesetCmd.Flags().String("es-beats", ".", "Path to Elastic Beats")
 
 	return genFilesetCmd
 }
@@ -112,7 +109,7 @@ func genGenerateFieldsCmd() *cobra.Command {
 		}),
 	}
 
-	genFieldsCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
+	genFieldsCmd.Flags().String("es-beats", ".", "Path to Elastic Beats")
 	genFieldsCmd.Flags().Bool("without-documentation", false, "Do not add description fields")
 
 	return genFieldsCmd

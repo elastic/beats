@@ -1,5 +1,5 @@
 # Module: icinga
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-icinga.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/9.3/filebeat-module-icinga.html
 
 - module: icinga
   # Main logs

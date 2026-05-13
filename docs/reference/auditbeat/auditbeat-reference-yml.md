@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-reference-yml.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # auditbeat.reference.yml [auditbeat-reference-yml]

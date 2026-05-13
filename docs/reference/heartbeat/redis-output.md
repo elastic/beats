@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/redis-output.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure the Redis output [redis-output]

@@ -20,26 +20,68 @@
 package translate_ldap_attribute
 
 import (
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/go-ldap/ldap/v3/gssapi"
 )
 
+// sspiBindTimeout is the maximum time to wait for SSPI bind operations.
+// SSPI can hang indefinitely when credentials are unavailable (e.g., local user accounts).
+const sspiBindTimeout = 10 * time.Second
+
+var errSSPITimeout = errors.New("SSPI bind timed out - this may indicate the process is running as a local user without Kerberos credentials")
+
 func (client *ldapClient) bindPlatformSpecific(conn *ldap.Conn, spn string) error {
-	client.log.Info("Attempting Windows SSPI Bind")
-
-	sspiClient, err := gssapi.NewSSPIClient()
-	if err != nil {
-		return fmt.Errorf("failed to create SSPI client: %w", err)
-	}
-	defer sspiClient.DeleteSecContext()
-
-	err = conn.GSSAPIBind(sspiClient, spn, "")
-	if err != nil {
-		return fmt.Errorf("SSPI bind failed: %w", err)
+	// Circuit breaker: if SSPI previously timed out, skip it to prevent goroutine leaks.
+	if client.sspiTimedout.Load() {
+		client.log.Debug("SSPI bind previously timed out, skipping automatic authentication")
+		return errSSPITimeout
 	}
 
-	client.log.Info("Windows SSPI Bind Successful")
-	return nil
+	client.log.Infow("Attempting Windows SSPI Bind", "spn", spn)
+
+	resultCh := make(chan error, 1)
+
+	go func() {
+		defer close(resultCh)
+		defer client.sspiTimedout.Store(false)
+
+		client.log.Debug("Creating SSPI client")
+		sspiClient, err := gssapi.NewSSPIClient()
+		if err != nil {
+			resultCh <- fmt.Errorf("failed to create SSPI client: %w", err)
+			return
+		}
+		defer sspiClient.DeleteSecContext()
+
+		client.log.Debug("SSPI client created, performing GSSAPIBind")
+		err = conn.GSSAPIBind(sspiClient, spn, "")
+		if err != nil {
+			resultCh <- fmt.Errorf("SSPI bind failed: %w", err)
+			return
+		}
+
+		resultCh <- nil
+	}()
+
+	select {
+	case err := <-resultCh:
+		if err != nil {
+			client.log.Errorw("SSPI bind failed", "error", err)
+			return err
+		}
+		client.log.Info("Windows SSPI Bind Successful")
+		return nil
+	case <-time.After(sspiBindTimeout):
+		client.log.Warnw("SSPI bind timed out - a goroutine may remain active", "timeout", sspiBindTimeout, "spn", spn)
+		client.sspiTimedout.Store(true)
+		// Note: The goroutine may still complete and write to resultCh after timeout.
+		// The buffered channel (capacity 1) prevents the goroutine from blocking on send.
+		// If SSPI hangs forever, we accept one leaked goroutine rather than attempting
+		// cleanup that would create a second leaked goroutine.
+		return errSSPITimeout
+	}
 }

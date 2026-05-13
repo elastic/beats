@@ -46,7 +46,7 @@ func TestFetch(t *testing.T) {
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
-	assert.Equal(t, events[0].MetricSetFields["available_bits"], 2801)
+	assert.Equal(t, 2801, events[0].MetricSetFields["available_bits"])
 }
 
 func getConfig() map[string]interface{} {

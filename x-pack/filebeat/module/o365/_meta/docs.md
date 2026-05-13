@@ -101,7 +101,7 @@ Once the required permissions are added, click the *Grant admin consent* button.
 
 #### Alternative endpoints [_alternative_endpoints]
 
-This module supports custom endpoints for on-prem deployments as well as alternative endpoints (GCC High endponts, U.S. DoD, European Union, etc). In order to point the module to an alternative endpoint, you need to adjust the `authentication_endpoint` and `resource` variables accordingly. For example:
+This module supports custom endpoints for on-prem deployments as well as alternative endpoints (GCC High endpoints, U.S. DoD, European Union, etc). In order to point the module to an alternative endpoint, you need to adjust the `authentication_endpoint` and `resource` variables accordingly. For example:
 
 ```yaml
     var.api:
@@ -145,7 +145,7 @@ This module supports custom endpoints for on-prem deployments as well as alterna
 
 #### Advanced configuration options [_advanced_configuration_options]
 
-The following configuration options are only recomended in case of problems. They must be nested under a single `var.api` key, like this:
+The following configuration options are only recommended in case of problems. They must be nested under a single `var.api` key, like this:
 
 ```yaml
     var.api:

@@ -54,14 +54,14 @@ func TestFieldMatcher(t *testing.T) {
 	}
 
 	out := matcher.MetadataIndex(input)
-	assert.Equal(t, out, "bar")
+	assert.Equal(t, "bar", out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
 	}
 
 	out = matcher.MetadataIndex(nonMatchInput)
-	assert.Equal(t, out, "")
+	assert.Empty(t, out)
 }
 
 func TestFieldMatcherRegex(t *testing.T) {
@@ -95,7 +95,7 @@ func TestFieldMatcherRegex(t *testing.T) {
 	}
 
 	out := matcher.MetadataIndex(input)
-	assert.Equal(t, out, "keyvalue")
+	assert.Equal(t, "keyvalue", out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
@@ -103,7 +103,7 @@ func TestFieldMatcherRegex(t *testing.T) {
 	}
 
 	out = matcher.MetadataIndex(nonMatchInput)
-	assert.Equal(t, out, "")
+	assert.Empty(t, out)
 }
 
 func TestFieldFormatMatcher(t *testing.T) {

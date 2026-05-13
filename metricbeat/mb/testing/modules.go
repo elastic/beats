@@ -58,6 +58,7 @@ package testing
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
@@ -67,6 +68,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type TestModule struct {
@@ -126,7 +128,7 @@ func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Re
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, metricsets, err := mb.NewModule(c, registry, logptest.NewTestingLogger(t, ""))
+	m, metricsets, err := mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to create new MetricSet", err)
 	}
@@ -198,31 +200,42 @@ func NewReportingMetricSetV2WithContext(t testing.TB, config interface{}) mb.Rep
 	return reportingMetricSet
 }
 
-// CapturingReporterV2 is a reporter used for testing which stores all events and errors
+// CapturingReporterV2 is a reporter used for testing which stores all events and errors.
+// It is safe for concurrent use by multiple goroutines (e.g. metricsets that fetch from
+// multiple servers in parallel).
 type CapturingReporterV2 struct {
+	mu     sync.Mutex
 	events []mb.Event
 	errs   []error
 }
 
 // Event is used to report an event
 func (r *CapturingReporterV2) Event(event mb.Event) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.events = append(r.events, event)
 	return true
 }
 
 // Error is used to report an error
 func (r *CapturingReporterV2) Error(err error) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.errs = append(r.errs, err)
 	return true
 }
 
 // GetEvents returns all reported events
 func (r *CapturingReporterV2) GetEvents() []mb.Event {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return r.events
 }
 
 // GetErrors returns all reported errors
 func (r *CapturingReporterV2) GetErrors() []error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	return r.errs
 }
 
@@ -231,7 +244,7 @@ func (r *CapturingReporterV2) GetErrors() []error {
 func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
 	r := &CapturingReporterV2{}
 	metricSet.Fetch(r)
-	return r.events, r.errs
+	return r.GetEvents(), r.GetErrors()
 }
 
 // ReportingFetchV2Error runs the given reporting metricset and returns all of the
@@ -240,9 +253,9 @@ func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, 
 	r := &CapturingReporterV2{}
 	err := metricSet.Fetch(r)
 	if err != nil {
-		r.errs = append(r.errs, err)
+		r.Error(err)
 	}
-	return r.events, r.errs
+	return r.GetEvents(), r.GetErrors()
 }
 
 // PeriodicReportingFetchV2Error runs the given metricset and returns
@@ -262,11 +275,11 @@ func PeriodicReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error, perio
 		// Fetch the metrics and store them in the
 		// reporter.
 		if err := metricSet.Fetch(r); err != nil {
-			r.errs = append(r.errs, err)
+			r.Error(err)
 			return err
 		}
 
-		if len(r.events) > 0 {
+		if len(r.GetEvents()) > 0 {
 			// We have metrics, stop the periodic
 			// and return the metrics.
 			cancel()
@@ -277,7 +290,7 @@ func PeriodicReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error, perio
 		return nil
 	})
 
-	return r.events, r.errs
+	return r.GetEvents(), r.GetErrors()
 }
 
 // ReportingFetchV2WithContext runs the given reporting metricset and returns all of the
@@ -286,9 +299,9 @@ func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) (
 	r := &CapturingReporterV2{}
 	err := metricSet.Fetch(context.Background(), r)
 	if err != nil {
-		r.errs = append(r.errs, err)
+		r.Error(err)
 	}
-	return r.events, r.errs
+	return r.GetEvents(), r.GetErrors()
 }
 
 // NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given

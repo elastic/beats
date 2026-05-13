@@ -23,6 +23,10 @@
       type: date
     - name: version
       type: keyword
+    - name: mode
+      type: keyword
+    - name: codec
+      type: keyword
     - name: name
       type: keyword
       description: >

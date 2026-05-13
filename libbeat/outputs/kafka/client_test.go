@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/sarama"
 )
 
@@ -51,7 +52,8 @@ func TestClientShutdownPanic(t *testing.T) {
 		beat.Info{
 			Beat:        "libbeat",
 			IndexPrefix: "testbeat",
-			Logger:      logger},
+			Logger:      logger,
+			Paths:       paths.New()},
 		outputs.NewStats(monitoring.NewRegistry(), logger), cfg)
 	require.NoError(t, err, "could not create kafka output")
 

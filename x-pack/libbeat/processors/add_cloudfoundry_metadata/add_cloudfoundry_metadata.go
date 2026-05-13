@@ -7,6 +7,7 @@
 package add_cloudfoundry_metadata
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
@@ -17,10 +18,15 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
 	processorName = "add_cloudfoundry_metadata"
+)
+
+var (
+	errClientNotInitialized = errors.New("add_cloudfoundry_metadata processor client not initialized: SetPaths must be called before Run")
 )
 
 func init() {
@@ -30,6 +36,7 @@ func init() {
 type addCloudFoundryMetadata struct {
 	log    *logp.Logger
 	client cloudfoundry.Client
+	config cloudfoundry.Config
 }
 
 const selector = "add_cloudfoundry_metadata"
@@ -47,22 +54,30 @@ func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	log = log.Named(selector)
-	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
-	client, err := hub.ClientWithCache()
-	if err != nil {
-		return nil, fmt.Errorf("%s: creating cloudfoundry client: %w", processorName, err)
-	}
 
 	return &addCloudFoundryMetadata{
 		log:    log,
-		client: client,
+		config: config,
 	}, nil
+}
+
+// SetPaths configures the processor with beat-specific paths so persistent caches don't collide.
+func (d *addCloudFoundryMetadata) SetPaths(beatPaths *paths.Path) error {
+	hub := cloudfoundry.NewHub(&d.config, processorName, d.log)
+	client, err := hub.ClientWithCache(beatPaths.Resolve(paths.Data, "cache"))
+	if err != nil {
+		return fmt.Errorf("%s: creating cloudfoundry client: %w", processorName, err)
+	}
+
+	d.client = client
+	return nil
 }
 
 func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if d.client == nil {
-		return event, nil
+		return event, errClientNotInitialized
 	}
+
 	valI, err := event.GetValue("cloudfoundry.app.id")
 	if err != nil {
 		//nolint:nilerr // doesn't have the required cloudfoundry.app.id value to add more information

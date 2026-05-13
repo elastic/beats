@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/refresh-index-pattern.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Fields show up as nested JSON in Kibana [refresh-index-pattern]

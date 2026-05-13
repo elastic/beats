@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/extract-array.html
 applies_to:
   stack: preview
+  serverless: preview
 ---
 
 # Extract array [extract-array]

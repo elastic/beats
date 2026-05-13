@@ -406,10 +406,6 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 		return
 	}
 
-	var (
-		hits []map[string]interface{}
-	)
-
 	responseID := uuid.Must(uuid.NewV4()).String()
 
 	if res.Action == "snapshot" {
@@ -418,9 +414,8 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
 			return
 		}
-		hits = append(hits, snapshot...)
 		meta := queryResultMeta("snapshot", "", res)
-		bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+		bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, snapshot, qi.ECSMapping, nil)
 	} else {
 		if len(res.DiffResults.Added) > 0 {
 			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
@@ -428,19 +423,17 @@ func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Clien
 				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
 				return
 			}
-			hits = append(hits, added...)
 			meta := queryResultMeta("diff", "added", res)
-			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, added, qi.ECSMapping, nil)
 		}
 		if len(res.DiffResults.Removed) > 0 {
-			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
+			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Removed)
 			if err != nil {
 				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
 				return
 			}
-			hits = append(hits, removed...)
 			meta := queryResultMeta("diff", "removed", res)
-			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, removed, qi.ECSMapping, nil)
 		}
 	}
 

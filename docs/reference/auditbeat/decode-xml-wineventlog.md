@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/decode-xml-wineventlog.html
 applies_to:
   stack: preview
+  serverless: preview
 ---
 
 # Decode XML Wineventlog [decode-xml-wineventlog]

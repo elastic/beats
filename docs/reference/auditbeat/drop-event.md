@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/drop-event.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Drop events [drop-event]

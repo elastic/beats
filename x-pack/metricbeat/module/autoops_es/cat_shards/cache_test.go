@@ -700,13 +700,13 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Equal(t, *indexToShardsList["my-index"][0].search_query_time, *myIndexNode1.SearchQueryTime)
 	require.Equal(t, *indexToShardsList["my-index"][0].merges_total, *myIndexNode1.TotalMergesTotal)
 	require.Equal(t, *indexToShardsList["my-index"][0].merges_total_time, *myIndexNode1.TotalMergesTotalTime)
-	require.EqualValues(t, 10000, *myIndexNode1.TimestampDiff)
-	require.EqualValues(t, 5, *myIndexNode1.IndexFailedRatePerSecond)
+	require.InDelta(t, 10000, *myIndexNode1.TimestampDiff, 1)
+	require.InDelta(t, 5, *myIndexNode1.IndexFailedRatePerSecond, 0.01)
 	require.EqualValues(t, 0.25, *myIndexNode1.IndexLatencyInMillis)
-	require.EqualValues(t, 4, *myIndexNode1.IndexRatePerSecond)
-	require.EqualValues(t, 10.9, *myIndexNode1.GetMissingDocRatePerSecond)
+	require.InDelta(t, 4, *myIndexNode1.IndexRatePerSecond, 0.01)
+	require.InDelta(t, 10.9, *myIndexNode1.GetMissingDocRatePerSecond, 0.01)
 	require.EqualValues(t, 0.6, *myIndexNode1.MergeLatencyInMillis)
-	require.EqualValues(t, 5, *myIndexNode1.MergeRatePerSecond)
+	require.InDelta(t, 5, *myIndexNode1.MergeRatePerSecond, 0.01)
 	// note: these are examples of restarted values, so we blank them out rather than calculate negative or massive values
 	// if you're interested: compare the `search_query_total` and `search_query_time` values from the cache and this value
 	require.Nil(t, myIndexNode1.SearchLatencyInMillis)

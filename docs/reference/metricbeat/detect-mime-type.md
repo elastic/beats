@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/detect-mime-type.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Detect mime type [detect-mime-type]

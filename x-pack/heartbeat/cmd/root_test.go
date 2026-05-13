@@ -15,7 +15,7 @@ import (
 )
 
 // Test all required plugins are exported by this module, since it's the
-// one imported by agentbeat: https://github.com/elastic/beats/pull/39818
+// one imported by elastic-otel-collector beats bundle: https://github.com/elastic/beats/pull/39818
 func TestRootCmdPlugins(t *testing.T) {
 	t.Parallel()
 	plugins := []string{"http", "tcp", "icmp", "browser"}

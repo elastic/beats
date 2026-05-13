@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestPublish(t *testing.T) {
@@ -46,13 +47,13 @@ func TestPublish(t *testing.T) {
 		logger := logptest.NewTestingLogger(t, "")
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
-		consumer := &otelConsumer{
+		return &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beatInfo,
 			log:          logger.Named("otelconsumer"),
+			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
 		}
-		return consumer
 	}
 
 	t.Run("ack batch on consumer success", func(t *testing.T) {
@@ -69,6 +70,40 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 		assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+	})
+
+	t.Run("batches with errors report correct active event count", func(t *testing.T) {
+		blockChan := make(chan struct{})
+		defer close(blockChan)
+		publishDone := make(chan struct{})
+		batch := outest.NewBatch(event1, event2, event3)
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			// Read from the channel twice: once to synchronize with the testing code so
+			// we know the Publish call is waiting on the consume callback, then once
+			// more to unblock it and allow Publish to resume.
+			<-blockChan
+			<-blockChan
+			return fmt.Errorf("Some kind of error")
+		})
+		reg := monitoring.NewRegistry()
+		otelConsumer.observer = outputs.NewStats(reg, logptest.NewTestingLogger(t, "testing"))
+		assert.EqualValues(t, 0, checkEventsActive(reg), "initial total events should be zero")
+		// Run Publish asynchronously so we can check the metrics while it is still in progress
+		go func() {
+			_ = otelConsumer.Publish(ctx, batch)
+			// Signal that Publish has completed
+			publishDone <- struct{}{}
+		}()
+
+		// Wait until Publish has called consume
+		blockChan <- struct{}{}
+		assert.EqualValues(t, 3, checkEventsActive(reg), "total event count should be 3 while Publish is waiting on downstream consumer")
+
+		// Allow Publish to resume, and wait for it to finish
+		blockChan <- struct{}{}
+		<-publishDone
+
+		assert.EqualValues(t, 0, checkEventsActive(reg), "final total events should be zero")
 	})
 
 	t.Run("data_stream fields are set on logrecord.Attribute", func(t *testing.T) {
@@ -106,18 +141,19 @@ func TestPublish(t *testing.T) {
 		subFields := []string{"dataset", "namespace", "type"}
 		for _, subField := range subFields {
 			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
+			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
 			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
 		}
 	})
 
-	t.Run("elasticsearch.ingest_pipeline fields are set on logrecord.Attribute", func(t *testing.T) {
+	t.Run("Test elasticsearch.ingest_pipeline and elastic.mapping.mode fields are set", func(t *testing.T) {
 		event1.Meta = mapstr.M{}
 		event1.Meta["pipeline"] = "error_pipeline"
 
 		batch := outest.NewBatch(event1)
 
 		var countLogs int
+		var scopeAttributes pcommon.Map
 		var attributes pcommon.Map
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			countLogs = countLogs + ld.LogRecordCount()
@@ -125,6 +161,7 @@ func TestPublish(t *testing.T) {
 				resourceLog := ld.ResourceLogs().At(i)
 				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
 					scopeLog := resourceLog.ScopeLogs().At(j)
+					scopeAttributes = scopeLog.Scope().Attributes()
 					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
 						LogRecord := scopeLog.LogRecords().At(k)
 						attributes = LogRecord.Attributes()
@@ -142,7 +179,38 @@ func TestPublish(t *testing.T) {
 		dynamicAttributeKey := "elasticsearch.ingest_pipeline"
 		gotValue, ok := attributes.Get(dynamicAttributeKey)
 		require.True(t, ok, "dynamic pipeline attribute was not set")
-		assert.EqualValues(t, "error_pipeline", gotValue.AsString())
+		assert.Equal(t, "error_pipeline", gotValue.AsString())
+
+		dynamicAttributeKey = "elastic.mapping.mode"
+		gotValue, ok = scopeAttributes.Get(dynamicAttributeKey)
+		require.True(t, ok, "elastic mapping mode was not set")
+		assert.Equal(t, "bodymap", gotValue.AsString())
+	})
+
+	t.Run("preserves time.Duration fields as nanoseconds", func(t *testing.T) {
+		eventWithDuration := beat.Event{
+			Fields: mapstr.M{
+				"event": mapstr.M{
+					"duration": 1500 * time.Millisecond,
+				},
+			},
+		}
+
+		batch := outest.NewBatch(eventWithDuration)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			body := record.Body().Map().AsRaw()
+			eventBody, ok := body["event"].(map[string]any)
+			require.True(t, ok, "event body should be encoded as a map")
+			assert.EqualValues(t, 1500*time.Millisecond, eventBody["duration"])
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
@@ -183,6 +251,103 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("retries are delayed by exponential backoff", func(t *testing.T) {
+		const (
+			initBackoff = 50 * time.Millisecond
+			maxBackoff  = 500 * time.Millisecond
+		)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("retryable error")
+		})
+		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+
+		// Measure the duration of each Publish call. Each call blocks during
+		// backoff Wait(), so elapsed time reflects the actual backoff delay.
+		var durations []time.Duration
+		for range 3 {
+			batch := outest.NewBatch(event1)
+			start := time.Now()
+			err := otelConsumer.Publish(ctx, batch)
+			durations = append(durations, time.Since(start))
+			require.NoError(t, err, "Publish should not return an error")
+			assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag, "batch should be retried")
+		}
+
+		assert.GreaterOrEqual(t, durations[0], initBackoff, "first retry delay should be at least ~init")
+		assert.GreaterOrEqual(t, durations[1], 2*initBackoff, "second retry delay should be at least ~2*init (exponential growth)")
+		assert.GreaterOrEqual(t, durations[2], 4*initBackoff, "third retry delay should be at least ~4*init (exponential growth)")
+	})
+
+	t.Run("backoff resets on success", func(t *testing.T) {
+		const (
+			initBackoff = 50 * time.Millisecond
+			maxBackoff  = 500 * time.Millisecond
+		)
+
+		callCount := 0
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			callCount++
+			if callCount == 3 {
+				return nil
+			}
+			return errors.New("retryable error")
+		})
+		otelConsumer.retry = retryConfig{init: initBackoff, max: maxBackoff}
+
+		// Two failures grow the backoff past init level.
+		batch1 := outest.NewBatch(event1)
+		err := otelConsumer.Publish(ctx, batch1)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch1.Signals[0].Tag, "first batch should be retried")
+
+		batch2 := outest.NewBatch(event1)
+		err = otelConsumer.Publish(ctx, batch2)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch2.Signals[0].Tag, "second batch should be retried")
+
+		// Third call succeeds, triggering backoff Reset().
+		batch3 := outest.NewBatch(event1)
+		err = otelConsumer.Publish(ctx, batch3)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchACK, batch3.Signals[0].Tag, "third batch should be acked")
+
+		// Next failure should use init-level backoff ([init, 2*init) = [50ms, 100ms)),
+		// not the grown level which would be [4*init, 8*init) = [200ms, 400ms).
+		batch4 := outest.NewBatch(event1)
+		start := time.Now()
+		err = otelConsumer.Publish(ctx, batch4)
+		duration := time.Since(start)
+		require.NoError(t, err)
+		assert.Equal(t, outest.BatchRetry, batch4.Signals[0].Tag, "fourth batch should be retried")
+		// In equal jitter backoff strategy, initial backoff is between initBackoff and 2*initBackoff.
+		const margin = 10 * time.Millisecond
+		assert.Less(t, duration, 2*initBackoff+margin, "after success, backoff should reset to init level, not continue growing (got %v)", duration)
+	})
+
+	t.Run("cancels batch when context is cancelled during backoff", func(t *testing.T) {
+		batch := outest.NewBatch(event1)
+
+		cancelCtx, cancelFn := context.WithCancel(context.Background())
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("retryable error")
+		})
+		otelConsumer.retry = retryConfig{init: 10 * time.Second, max: 10 * time.Second}
+
+		publishDone := make(chan struct{})
+		go func() {
+			_ = otelConsumer.Publish(cancelCtx, batch)
+			close(publishDone)
+		}()
+
+		time.Sleep(50 * time.Millisecond)
+		cancelFn()
+		<-publishDone
+
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchCancelled, batch.Signals[0].Tag)
 	})
 
 	t.Run("sets the elasticsearchexporter doc id attribute from metadata", func(t *testing.T) {
@@ -303,4 +468,9 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
+}
+
+func checkEventsActive(reg *monitoring.Registry) int64 {
+	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
+	return outputSnapshot.Ints["events.active"]
 }

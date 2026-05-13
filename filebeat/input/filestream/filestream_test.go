@@ -166,7 +166,7 @@ func TestLogFileTruncated(t *testing.T) {
 
 			buf := make([]byte, 32)
 			_, err = reader.Read(buf)
-			assert.Nil(t, err)
+			assert.NoError(t, err)
 
 			err = tc.truncateFn(t, f)
 			require.NoError(t, err, "error while truncating file")

@@ -16,16 +16,17 @@ import (
 	"github.com/cloudfoundry-community/go-cfclient"
 
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetApps(t *testing.T) {
-	var conf Config
-	err := conf.MustNewConfigFrom(cftest.GetConfigFromEnv(t)).Unpack(&conf)
+	var cfg Config
+	err := config.MustNewConfigFrom(cftest.GetConfigFromEnv(t)).Unpack(&cfg)
 	require.NoError(t, err)
 
 	log := logp.NewLogger("cloudfoundry")
-	hub := NewHub(&conf, "filebeat", log)
+	hub := NewHub(&cfg, "filebeat", log)
 
 	client, err := hub.Client()
 	require.NoError(t, err)
@@ -38,7 +39,7 @@ func TestGetApps(t *testing.T) {
 		if len(apps) == 0 {
 			t.Skip("no apps in account?")
 		}
-		client, err := hub.ClientWithCache()
+		client, err := hub.ClientWithCache(t.TempDir())
 		require.NoError(t, err)
 		defer client.Close()
 
@@ -49,7 +50,7 @@ func TestGetApps(t *testing.T) {
 	})
 
 	t.Run("handle error when application is not available", func(t *testing.T) {
-		client, err := hub.ClientWithCache()
+		client, err := hub.ClientWithCache(t.TempDir())
 		require.NoError(t, err)
 		defer client.Close()
 

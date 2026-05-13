@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -52,7 +53,7 @@ func TestMakeReporter(t *testing.T) {
 
 	logger := logptest.NewTestingLogger(t, "")
 
-	r, err := makeReporter(beat.Info{Logger: logger}, beat.NewMonitoring(), report.Settings{}, c)
+	r, err := makeReporter(beat.Info{Logger: logger}, beatmonitoring.NewMonitoring(), report.Settings{}, c)
 	require.NoError(t, err)
 	r.Stop()
 }

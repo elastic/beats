@@ -172,7 +172,7 @@ func (i *staticHostInfo) HostForPort(int) string {
 }
 
 func findComposePath() (string, error) {
-	// find docker-compose
+	// find docker-compose.yml
 	path, err := os.Getwd()
 	if err != nil {
 		return "", err

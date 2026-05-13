@@ -145,7 +145,7 @@ func TestMemoryServiceBadData(t *testing.T) {
 	memoryService := &MemoryService{}
 	memoryRawStats := []docker.Stat{{Stats: badMemStats}}
 	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
-	assert.Len(t, rawStats, 0)
+	assert.Empty(t, rawStats)
 
 }
 

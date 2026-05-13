@@ -25,6 +25,9 @@ import (
 	"regexp"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
@@ -61,7 +64,7 @@ func moduleDocs() error {
 		}
 		name := matches[1]
 		names = append(names, name)
-		modulesListTmpl += fmt.Sprintf("* [%s](/reference/winlogbeat/winlogbeat-module-%s.md)\n", strings.Title(name), name)
+		modulesListTmpl += fmt.Sprintf("* [%s](/reference/winlogbeat/winlogbeat-module-%s.md)\n", cases.Title(language.English).String(name), name)
 
 		// Copy to the docs dirs.
 		dest := filepath.Join(docsDir, "reference", "winlogbeat", fmt.Sprintf("winlogbeat-module-%s.md", name))

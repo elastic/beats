@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/directory-layout.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Directory layout [directory-layout]

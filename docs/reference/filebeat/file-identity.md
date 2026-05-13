@@ -1,6 +1,7 @@
 ---
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # How to choose file identity for filestream [file-identity]
@@ -158,7 +159,7 @@ Users specify a path by setting `file_identity.inode_marker.path`. This path lea
 
 The most stable file identity implementation at the moment. This file identity is default since Filebeat version 9.0.
 
-This file identity is using file fingerprints produced by the scanner component of the filestream input. Therefore, in order to activate this file identity, it's required to first activate fingerprint in the scanner by setting `prospector.scanner.fingerprint.enabled: true`.
+This file identity uses file fingerprints produced by the scanner component of the filestream input. Scanner fingerprinting is enabled by default in 9.x. If you explicitly disable it with `prospector.scanner.fingerprint.enabled: false`, this file identity cannot be used.
 
 In the context of the filestream input, fingerprint is a hash string computed from a part of the file content.
 

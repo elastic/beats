@@ -54,7 +54,7 @@ func TestExitWithError(t *testing.T) {
 
 	stderr, err := runCli("TestExitWithError")
 	if assert.Error(t, err) {
-		assert.Equal(t, err.Error(), "exit status 1")
+		assert.Equal(t, "exit status 1", err.Error())
 	}
 	assert.Equal(t, "Something bad\n", stderr.String())
 }
@@ -73,7 +73,7 @@ func TestExitWithoutError(t *testing.T) {
 
 	stderr, err := runCli("TestExitWithoutError")
 	assert.NoError(t, err)
-	assert.Equal(t, "", stderr.String())
+	assert.Empty(t, stderr.String())
 }
 
 func TestExitWithPanic(t *testing.T) {
@@ -90,7 +90,7 @@ func TestExitWithPanic(t *testing.T) {
 
 	stderr, err := runCli("TestExitWithPanic")
 	if assert.Error(t, err) {
-		assert.Equal(t, err.Error(), "exit status 1")
+		assert.Equal(t, "exit status 1", err.Error())
 	}
 	assert.Contains(t, stderr.String(), "something really bad happened")
 }

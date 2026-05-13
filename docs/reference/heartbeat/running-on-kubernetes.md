@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/running-on-kubernetes.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Running Heartbeat on Kubernetes [running-on-kubernetes]

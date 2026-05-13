@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-limitations.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Known problems and limitations [log-driver-limitations]

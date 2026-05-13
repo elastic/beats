@@ -111,6 +111,13 @@
           format: bytes
           description: >
             The shared memory the process uses.
+        - name: swap
+          type: long
+          format: bytes
+          version:
+              ga: 8.19.11
+          description: >
+            The swap memory used by the process (supported only on Linux kernel version 2.6.34+).
     - name: io
       type: group
       description: Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
@@ -257,6 +264,14 @@
                 An integer value that specifies a relative share of CPU time
                 available to the tasks in a cgroup. The value specified in the
                 cpu.shares file must be 2 or higher.
+
+            - name: cfs.weight
+              type: long
+              description: >
+                CPU weight for the cgroup (cgroupv2). Used by the CFS
+                scheduler to determine the share of CPU time available
+                to the cgroup. Valid values range from 1 to 10000. The
+                default value is 100.
 
             - name: rt.period.us
               type: long
@@ -439,15 +454,15 @@
             - name: mem.low.bytes
               type: long
               format: bytes
-              description: memory low threshhold
+              description: memory low threshold
             - name: mem.high.bytes
               type: long
               format: bytes
-              description: memory high threshhold
+              description: memory high threshold
             - name: mem.max.bytes
               type: long
               format: bytes
-              description: memory max threshhold
+              description: memory max threshold
 
             - name: mem.events
               type: group
@@ -497,15 +512,15 @@
             - name: memsw.low.bytes
               type: long
               format: bytes
-              description: memory low threshhold
+              description: memory low threshold
             - name: memsw.high.bytes
               type: long
               format: bytes
-              description: memory high threshhold
+              description: memory high threshold
             - name: memsw.max.bytes
               type: long
               format: bytes
-              description: memory max threshhold
+              description: memory max threshold
 
             - name: memsw.failures
               type: long

@@ -33,16 +33,6 @@ create_workspace() {
   fi
 }
 
-with_docker_compose() {
-  local version=$1
-  echo "Setting up the Docker-compose environment..."
-  create_workspace
-  retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${PLATFORM_TYPE_LOWERCASE}-${arch_type}"
-  chmod +x ${BIN}/docker-compose
-  export PATH="${BIN}:${PATH}"
-  docker-compose version
-}
-
 add_bin_path() {
   echo "Adding PATH to the environment variables..."
   create_workspace

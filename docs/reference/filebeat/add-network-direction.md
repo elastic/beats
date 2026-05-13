@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-network-direction.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Add network direction [add-network-direction]

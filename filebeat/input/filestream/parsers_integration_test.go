@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParsersAgentLogs(t *testing.T) {
@@ -337,18 +338,29 @@ connection <0.23893.109>, channel 3 - soft error:
 {amqp_error,not_found,
             "no queue 'bucket-1' in vhost '/'",
             'queue.declare'}
+
+
 =ERROR REPORT==== 3-Feb-2016::03:10:32 ===
 connection <0.23893.109>, channel 3 - soft error:
 {amqp_error,not_found,
             "no queue 'bucket-1' in vhost '/'",
             'queue.declare'}
+
+
+=ERROR REPORT==== 3-Feb-2016::03:10:32 ===
+connection <0.23893.109>, channel 3 - soft error:
+{amqp_error,not_found,
+            "no queue 'bucket-1' in vhost '/'",
+            'queue.declare'}
+
+
 `)
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, id, inp)
 
-	env.waitUntilEventCount(2)
+	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
 	cancelInput()
@@ -638,4 +650,27 @@ SetAdCodeMiddleware.default_ad_code route
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+// test_invalid_config from test_multiline.py
+func TestParsersMultilineInvalidConfig(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	_, err := env.createInput(map[string]any{
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
+		"parsers": []map[string]interface{}{
+			{
+				"multiline": map[string]interface{}{
+					"type":  "pattern",
+					"match": "after",
+				},
+			},
+		},
+	})
+	require.ErrorContains(t, err, "multiline.pattern cannot be empty")
 }

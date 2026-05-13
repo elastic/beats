@@ -288,7 +288,7 @@ func TestKafkaPublish(t *testing.T) {
 			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, output.index, "testbeat")
+			assert.Equal(t, "testbeat", output.index)
 			defer output.Close()
 
 			// publish test events
@@ -317,7 +317,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			// validate messages
 			if len(expected) != len(stored) {
-				assert.Equal(t, len(stored), len(expected))
+				assert.Len(t, stored, len(expected))
 				return
 			}
 
@@ -346,7 +346,7 @@ func TestKafkaPublish(t *testing.T) {
 				msg := validate(t, s.Value, expected)
 				seenMsgs[msg] = struct{}{}
 			}
-			assert.Equal(t, len(expected), len(seenMsgs))
+			assert.Len(t, seenMsgs, len(expected))
 		})
 	}
 }
@@ -406,7 +406,7 @@ func TestKafkaErrors(t *testing.T) {
 		if err := output.Connect(context.Background()); err != nil {
 			t.Fatal(err)
 		}
-		assert.Equal(t, output.index, "testbeat")
+		assert.Equal(t, "testbeat", output.index)
 		defer output.Close()
 
 		// publish test events

@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-template.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Load the Elasticsearch index template [winlogbeat-template]
@@ -85,19 +86,6 @@ From the PowerShell prompt, change to the directory where you installed Winlogbe
 ```sh
 PS > .\winlogbeat.exe setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
-
-
-### Force Kibana to look at newest documents [force-kibana-new]
-
-If you’ve already used Winlogbeat to index data into {{es}}, the index may contain old documents. After you load the index template, you can delete the old documents from `winlogbeat-*` to force Kibana to look at the newest documents.
-
-Use this command:
-
-```sh
-PS > Invoke-RestMethod -Method Delete "http://localhost:9200/winlogbeat-*"
-```
-
-This command deletes all indices that match the pattern `winlogbeat`. Before running this command, make sure you want to delete all indices that match the pattern.
 
 
 ## Load the index template manually (alternate method) [load-template-manually-alternate]

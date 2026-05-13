@@ -1,9 +1,0 @@
-kind: enhancement
-summary: Add file-based auth provider for CEL and HTTP JSON inputs.
-description: |
-  The CEL and HTTP JSON inputs now support reading authentication tokens from
-  files, enabling integration with various secret providers like Vault,
-  Kubernetes secret projections, etc. Tokens are automatically refreshed based on
-  a configurable interval without requiring restarts.
-component: filebeat
-issue: https://github.com/elastic/beats/issues/47506

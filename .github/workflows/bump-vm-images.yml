@@ -1,0 +1,65 @@
+---
+name: bump-vm-images
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Since the CI Agent images are produced weekly on Saturday at 0am UTC
+    # and we can only bump the version after the images are available
+    # let's try on Saturday at 12:00 UTC.
+    - cron: "0 12 * * 6"
+
+permissions:
+  contents: read
+
+env:
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+jobs:
+  filter:
+    runs-on: ubuntu-slim
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    permissions:
+      contents: read
+    steps:
+    - id: generator
+      uses: elastic/oblt-actions/elastic/active-branches@v1
+      with:
+        filter-branches: true
+
+  bump:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    needs:
+      - filter
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # NOTE: as long as the updatecli bump differs between branches, we need to
+          # checkout the branch that we are going to bump that we are going to bump
+          # this is needed to ensure that the updatecli bump is done against the correct updatecli
+          # pipeline. For instance, https://github.com/elastic/elastic-agent/pull/8035 was not
+          # backported to the short lived branches.
+          ref: ${{ matrix.branch }}
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: apply --config .github/workflows/updatecli.d/updatecli-bump-vm-images.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+          version-file: .updatecli-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ matrix.branch }}
+
+      - if: ${{ failure()  }}
+        uses: elastic/oblt-actions/slack/send@v1
+        with:
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          channel-id: "#ingest-notifications"
+          message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`[${{ matrix.branch }}], @robots-ci please look what's going on <${{ env.JOB_URL }}|here>"

@@ -10,7 +10,6 @@ in features and helper functions.
 ### Beat Creation
 + `NewBeat`: Creates a new Beat process from the system tests binary with specific settings.
 + `NewStandardBeat`: Creates a Beat process from a standard binary without the system test flag.
-+ `NewAgentBeat`: Creates a new agentbeat process that runs the beatName as a subcommand.
 
 #### Process Control
 + `Start`: Starts the Beat process with optional additional arguments.

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/processor-registered-domain.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Registered Domain [processor-registered-domain]

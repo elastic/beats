@@ -82,8 +82,8 @@ func TestDecode(t *testing.T) {
 		cid, err := NewCloudID(test.cloudID, "")
 		assert.NoError(t, err, test.cloudID)
 
-		assert.Equal(t, cid.ElasticsearchURL(), test.expectedEsURL, test.cloudID)
-		assert.Equal(t, cid.KibanaURL(), test.expectedKibanaURL, test.cloudID)
+		assert.Equal(t, test.expectedEsURL, cid.ElasticsearchURL(), test.cloudID)
+		assert.Equal(t, test.expectedKibanaURL, cid.KibanaURL(), test.cloudID)
 	}
 }
 
@@ -196,7 +196,7 @@ func TestOverwriteSettings(t *testing.T) {
 		err = expectedCfg.Unpack(&expected)
 		assert.NoError(t, err)
 
-		assert.Equal(t, res, expected)
+		assert.Equal(t, expected, res)
 	}
 }
 

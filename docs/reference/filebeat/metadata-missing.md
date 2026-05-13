@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/metadata-missing.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # @metadata is missing in Logstash [metadata-missing]

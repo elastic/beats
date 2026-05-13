@@ -19,7 +19,6 @@ package eventlog
 
 import (
 	"errors"
-	"io"
 
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
@@ -36,10 +35,15 @@ func IsRecoverable(err error, isFile bool) bool {
 		err == win.ERROR_EVT_QUERY_RESULT_STALE ||
 		err == win.ERROR_INVALID_PARAMETER ||
 		err == win.ERROR_EVT_PUBLISHER_DISABLED ||
-		(!isFile && errors.Is(err, io.EOF)) ||
+		errors.Is(err, errRecordIDGap) ||
+		errors.Is(err, errRenderNoEvent) ||
 		(!isFile && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND))
 }
 
 func mustIgnoreError(err error, api EventLog) bool {
 	return api.IgnoreMissingChannel() && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
+}
+
+func isChannelNotFound(err error) bool {
+	return errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
 }

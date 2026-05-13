@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -78,7 +79,7 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	s.Path = b.TempDir()
 
 	s.UseCompression = compress
-	q, err := NewQueue(logp.NewNopLogger(), nil, s, nil)
+	q, err := NewQueue(logp.NewNopLogger(), nil, s, nil, &paths.Path{})
 	if err != nil {
 		panic(err)
 	}

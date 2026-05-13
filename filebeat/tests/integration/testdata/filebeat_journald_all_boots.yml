@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: journald
+    id: journald-all-boots
+
+path.home: %s
+
+queue.mem:
+  flush.timeout: 0
+
+output:
+  file:
+    path: ${path.home}
+    filename: "output"
+    rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - "input.journald"
+    - "input.journald.reader"
+    - "input.journald.reader.journalctl-runner"

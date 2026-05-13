@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/add-id.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Generate an ID for an event [add-id]

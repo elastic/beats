@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
@@ -156,7 +157,7 @@ type certReloadConfig struct {
 
 func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
-		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
+		return errors.New("'restart_on_cert_change.period' must be equal or greater than 1s")
 	}
 
 	if c.Reload.Enabled && runtime.GOOS == "windows" {
@@ -251,10 +252,10 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			StartTime:        time.Now(),
 			EphemeralID:      metricreport.EphemeralID(), //nolint:staticcheck //keep behavior for now
 			FIPSDistribution: version.FIPSDistribution,
+			Paths:            paths.New(),
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
-		Paths:    paths.New(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -389,7 +390,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -429,7 +429,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !management.UnderAgent() {
-		bl := locks.New(b.Info, b.Paths)
+		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -451,11 +451,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP,
-			b.Monitoring.InfoRegistry(),
-			b.Monitoring.StateRegistry(),
-			b.Monitoring.StatsRegistry(),
-			b.Monitoring.InputsRegistry())
+		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP, b.Monitoring)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -494,7 +490,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
-		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
+		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging, b.Monitoring)
 		if err != nil {
 			return err
 		}
@@ -693,7 +689,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				loadILM = idxmgmt.LoadModeEnabled
 			}
 
-			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 			if err != nil {
 				return fmt.Errorf("error creating index management handler: %w", err)
 			}
@@ -764,16 +760,16 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
-	b.Monitoring = beat.NewGlobalMonitoring()
+	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
-	b.Paths = paths.Paths
+	b.Info.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := LoadKeystore(cfg, b.Info.Beat, b.Paths)
+	store, err := LoadKeystore(cfg, b.Info.Beat, b.Info.Paths)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -833,9 +829,9 @@ func (b *Beat) configure(settings Settings) error {
 	b.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", b.Paths.String())
+	logger.Infof("%s", b.Info.Paths.String())
 
-	metaPath := b.Paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Info.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return err
@@ -1005,7 +1001,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("beat meta file failed to encode vaules: %w", encodeErr)
+		return fmt.Errorf("beat meta file failed to encode values: %w", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -1071,7 +1067,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
-		err = dashboards.ImportDashboards(ctx, b.Info, b.Paths.Resolve(paths.Home, ""),
+		err = dashboards.ImportDashboards(ctx, b.Info, b.Info.Paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return fmt.Errorf("error importing Kibana dashboards: %w", err)
@@ -1137,7 +1133,7 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Paths, b.Config.LifecycleConfig)
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
 		}
@@ -1384,10 +1380,10 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"type": b.Info.Beat,
 		"uuid": b.Info.ID,
 		"path": mapstr.M{
-			"config": b.Paths.Resolve(paths.Config, ""),
-			"data":   b.Paths.Resolve(paths.Data, ""),
-			"home":   b.Paths.Resolve(paths.Home, ""),
-			"logs":   b.Paths.Resolve(paths.Logs, ""),
+			"config": b.Info.Paths.Resolve(paths.Config, ""),
+			"data":   b.Info.Paths.Resolve(paths.Data, ""),
+			"home":   b.Info.Paths.Resolve(paths.Home, ""),
+			"logs":   b.Info.Paths.Resolve(paths.Logs, ""),
 		},
 	}
 	log.Infow("Beat info", "beat", beat)

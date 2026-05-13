@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -34,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -499,19 +499,25 @@ type mockManager struct {
 	enabled bool
 }
 
-func (m mockManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
-func (m mockManager) CheckRawConfig(cfg *config.C) error  { return nil }
-func (m mockManager) Enabled() bool                       { return m.enabled }
-func (m mockManager) RegisterAction(action client.Action) {}
-func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
+func (m mockManager) AgentInfo() management.AgentInfo         { return management.AgentInfo{} }
+func (m mockManager) CheckRawConfig(cfg *config.C) error      { return nil }
+func (m mockManager) Enabled() bool                           { return m.enabled }
+func (m mockManager) RegisterAction(action management.Action) {}
+func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook management.DiagnosticHook) {
 }
 func (m mockManager) SetPayload(payload map[string]any)             {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) PreInit() error                                { return nil }
+func (m mockManager) PostInit()                                     {}
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
 func (m mockManager) Stop()                                         {}
-func (m mockManager) UnregisterAction(action client.Action)         {}
+func (m mockManager) UnregisterAction(action management.Action)     {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
+func (m mockManager) WaitForStop(_ time.Duration) bool {
+	m.Stop()
+	return true
+}
 
 func TestManager(t *testing.T) {
 	// set the mockManger factory.

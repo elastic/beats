@@ -27,6 +27,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -47,6 +48,7 @@ const (
 
 var (
 	errFileTooSmall = errors.New("file size is too small for ingestion")
+	errFileEmpty    = errors.New("file is empty")
 )
 
 // fileWatcherConfig is the prospector.scanner configuration
@@ -301,12 +303,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 	// remaining files in newFiles are newly created files
 	for path, fd := range newFilesByName {
-		// no need to react on empty new files
-		if fd.Info.Size() == 0 {
-			w.log.Debugf("file %q has no content yet, skipping", fd.Filename)
-			delete(paths, path)
-			continue
-		}
 		select {
 		case <-ctx.Done():
 			return
@@ -396,12 +392,13 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths       []string
-	cfg         fileScannerConfig
-	log         *logp.Logger
-	hasher      hash.Hash
-	readBuffer  []byte
-	compression string
+	smallFilesWarned atomic.Bool
+	paths            []string
+	cfg              fileScannerConfig
+	log              *logp.Logger
+	hasher           hash.Hash
+	readBuffer       []byte
+	compression      string
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -480,7 +477,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
 
-	tooSmallFiles := 0
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -497,13 +493,22 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				if !errors.Is(err, errFileEmpty) {
+					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+				}
 				continue
 			}
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
-				tooSmallFiles++
+				if s.smallFilesWarned.CompareAndSwap(false, true) {
+					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
+						"least %d in size for ingestion to start. To change this "+
+						"behaviour set 'prospector.scanner.fingerprint.length' and "+
+						"'prospector.scanner.fingerprint.offset'. "+
+						"Enable debug logging to see all file names of delayed files.",
+						s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
+				}
 				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
 				continue
 			}
@@ -520,22 +525,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
-	}
-
-	if tooSmallFiles > 0 {
-		prefix := "%d files are "
-		if tooSmallFiles == 1 {
-			prefix = "%d file is "
-		}
-		s.log.Warnf(
-			prefix+"too small to be ingested, files need to be at "+
-				"least %d in size for ingestion to start. To change this "+
-				"behaviour set 'prospector.scanner.fingerprint.length' and "+
-				"'prospector.scanner.fingerprint.offset'. "+
-				"Enable debug logging to see all file names.",
-			tooSmallFiles,
-			s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length,
-		)
 	}
 
 	return fdByName
@@ -564,13 +553,19 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	if err != nil {
 		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
 	}
-	it.info = commonfile.ExtendFileInfo(info)
-
-	if it.info.IsDir() {
+	if info.IsDir() {
 		return it, fmt.Errorf("file %q is a directory", it.filename)
 	}
 
-	it.symlink = it.info.Mode()&os.ModeSymlink > 0
+	symlink := info.Mode()&os.ModeSymlink > 0
+
+	// we don't need to process empty files
+	if !symlink && info.Size() == 0 {
+		return it, errFileEmpty
+	}
+
+	it.info = commonfile.ExtendFileInfo(info)
+	it.symlink = symlink
 
 	if it.symlink {
 		if !s.cfg.Symlinks {
@@ -582,8 +577,12 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		if err != nil {
 			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
-		it.info = commonfile.ExtendFileInfo(info)
+		// we don't need to process empty files
+		if info.Size() == 0 {
+			return it, errFileEmpty
+		}
 
+		it.info = commonfile.ExtendFileInfo(info)
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {
 			s.log.Debugf("finding path to original file has failed %s: %+v", it.filename, err)

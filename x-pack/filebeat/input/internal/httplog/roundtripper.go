@@ -12,8 +12,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -21,6 +25,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
@@ -30,6 +35,81 @@ var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
 const TraceIDKey = contextKey("trace.id")
 
 type contextKey string
+
+// IsPathInLogsFor returns whether path is a valid path for logs written by the
+// specified input after resolving symbolic links in path.
+func IsPathInLogsFor(input, path string) (ok bool, err error) {
+	root := paths.Resolve(paths.Logs, input)
+	if !filepath.IsAbs(path) && !isRooted(path) {
+		path = filepath.Join(root, path)
+	}
+	return IsPathIn(root, path)
+}
+
+// ResolvePathInLogsFor resolves path relative to the logs directory for the
+// specified input and reports whether the result is within that directory.
+func ResolvePathInLogsFor(input, path string) (resolved string, ok bool, err error) {
+	root := paths.Resolve(paths.Logs, input)
+	if !filepath.IsAbs(path) && !isRooted(path) {
+		path = filepath.Join(root, path)
+	}
+	ok, err = IsPathIn(root, path)
+	return path, ok, err
+}
+
+// isRooted reports whether path begins with a path separator, i.e. it is
+// rooted at the filesystem root even if it is not absolute (no drive letter
+// on Windows). Such paths must not be joined to a base directory.
+func isRooted(path string) bool {
+	return len(path) > 0 && os.IsPathSeparator(path[0])
+}
+
+// IsPathIn returns whether path is a valid path within root after resolving
+// symbolic links in root and path.
+func IsPathIn(root, path string) (ok bool, err error) {
+	// Get all paths in absolute.
+	absRoot, err := filepath.Abs(root)
+	if err != nil {
+		return false, err
+	}
+	absRoot, err = resolveSymlinks(absRoot)
+	if err != nil {
+		return false, err
+	}
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return false, err
+	}
+	absPath, err = resolveSymlinks(absPath)
+	if err != nil {
+		return false, err
+	}
+	// Find the traverse from the root to the path.
+	traversal, err := filepath.Rel(absRoot, absPath)
+	if err != nil {
+		return false, err
+	}
+	return traversal != ".." && !strings.HasPrefix(traversal, ".."+string(filepath.Separator)), nil
+}
+
+func resolveSymlinks(path string) (string, error) {
+	targ, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		// If the path doesn't exist or has invalid syntax for opening
+		// (e.g. Windows rejects paths containing * or ? with
+		// ERROR_INVALID_NAME), resolve the directory and join the base
+		// so we still follow symlinks in the directory part.
+		if errors.Is(err, fs.ErrNotExist) || isInvalidWindowsName(err) {
+			targ, err := resolveSymlinks(filepath.Dir(path))
+			if err != nil {
+				return "", err
+			}
+			return filepath.Join(targ, filepath.Base(path)), nil
+		}
+		return "", err
+	}
+	return targ, nil
+}
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger. Transaction creation is logged to log.

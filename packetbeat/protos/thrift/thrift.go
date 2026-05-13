@@ -234,7 +234,9 @@ func (thrift *thriftPlugin) init(
 func (thrift *thriftPlugin) getTransaction(k common.HashableTCPTuple) *thriftTransaction {
 	v := thrift.transactions.Get(k)
 	if v != nil {
-		return v.(*thriftTransaction)
+		if trans, ok := v.(*thriftTransaction); ok {
+			return trans
+		}
 	}
 	return nil
 }
@@ -272,14 +274,14 @@ func (thrift *thriftPlugin) readConfig(config *thriftConfig) error {
 	case "framed":
 		thrift.TransportType = thriftTFramed
 	default:
-		return fmt.Errorf("Transport type `%s` not known", config.TransportType)
+		return fmt.Errorf("transport type `%s` not known", config.TransportType)
 	}
 
 	switch config.ProtocolType {
 	case "binary":
 		thrift.ProtocolType = thriftTBinary
 	default:
-		return fmt.Errorf("Protocol type `%s` not known", config.ProtocolType)
+		return fmt.Errorf("protocol type `%s` not known", config.ProtocolType)
 	}
 
 	if len(config.IdlFiles) > 0 {
@@ -312,7 +314,7 @@ func (thrift *thriftPlugin) readMessageBegin(s *thriftStream) (bool, bool) {
 	}
 
 	sz := common.BytesNtohl(s.data[s.parseOffset : s.parseOffset+4])
-	if int32(sz) < 0 {
+	if int32(sz) < 0 { //nolint: gosec // cast value is not used outside of this
 		m.version = sz & thriftVersionMask
 		if m.version != thriftVersion1 {
 			logp.Debug("thrift", "Unexpected version: %d", m.version)
@@ -392,7 +394,7 @@ func (thrift *thriftPlugin) readString(data []byte) (value string, ok bool, comp
 		return "", true, false, 0 // ok, not complete
 	}
 	sz := int(common.BytesNtohl(data[:4]))
-	if int32(sz) < 0 {
+	if int32(sz) < 0 { //nolint: gosec // value is not used
 		return "", false, false, 0 // not ok
 	}
 	if len(data[4:]) < sz {
@@ -486,7 +488,7 @@ func (thrift *thriftPlugin) readI64(data []byte) (value string, ok bool, complet
 		return "", true, false, 0
 	}
 	i64 := common.BytesNtohll(data[:8])
-	value = strconv.FormatInt(int64(i64), 10)
+	value = strconv.FormatInt(int64(i64), 10) //nolint: gosec // we're explicitly handling the bytes as a i64
 
 	return value, true, true, 8
 }
@@ -622,11 +624,11 @@ func (thrift *thriftPlugin) readStruct(data []byte) (value string, ok bool, comp
 			return "", false, false, 0
 		}
 
-		if len(data) < 1 {
+		if len(data) <= offset {
 			return "", true, false, 0
 		}
 
-		field.Type = byte(data[offset])
+		field.Type = data[offset]
 		offset++
 		if field.Type == ThriftTypeStop {
 			return thrift.formatStruct(fields, false, []*string{}), true, true, offset
@@ -714,7 +716,7 @@ func (thrift *thriftPlugin) readField(s *thriftStream) (ok bool, complete bool, 
 	if len(s.data) == 0 {
 		return true, false, nil // ok, not complete
 	}
-	field.Type = byte(s.data[s.parseOffset])
+	field.Type = s.data[s.parseOffset]
 	offset := s.parseOffset + 1
 	if field.Type == ThriftTypeStop {
 		s.parseOffset = offset
@@ -903,7 +905,13 @@ func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8
 	stream.message.direction = dir
 	stream.message.cmdlineTuple = thrift.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	if stream.message.frameSize == 0 {
-		stream.message.frameSize = uint32(stream.parseOffset - stream.message.start)
+		frameSize := stream.parseOffset - stream.message.start
+		if frameSize < 0 || frameSize > math.MaxUint32 {
+			stream.message.frameSize = 0
+		} else {
+			stream.message.frameSize = uint32(frameSize)
+		}
+
 	}
 	thrift.handleThrift(stream.message)
 
@@ -1088,8 +1096,16 @@ func (thrift *thriftPlugin) publishTransactions() {
 		evt, pbf := pb.NewBeatEvent(t.ts)
 		pbf.SetSource(&t.src)
 		pbf.SetDestination(&t.dst)
-		pbf.Source.Bytes = int64(t.bytesIn)
-		pbf.Destination.Bytes = int64(t.bytesOut)
+		if t.bytesIn > math.MaxInt64 {
+			pbf.Source.Bytes = math.MaxInt64
+		} else {
+			pbf.Source.Bytes = int64(t.bytesIn)
+		}
+		if t.bytesOut > math.MaxInt64 {
+			pbf.Destination.Bytes = math.MaxInt64
+		} else {
+			pbf.Destination.Bytes = int64(t.bytesOut)
+		}
 		pbf.Event.Dataset = "thrift"
 		pbf.Network.Transport = "tcp"
 		pbf.Network.Protocol = pbf.Event.Dataset
