@@ -16,7 +16,8 @@ kind: bug-fix
 summary: |
   When Filestream is migrating the registry key from inputs that did
   not have an ID, match files by path and file identity instead of
-  only path.
+  only path. Matching only by path could lead to rotated/moved files
+  having the wrong offset.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
