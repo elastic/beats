@@ -26,7 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"strings"
@@ -583,7 +583,11 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 		return nil, err
 	}
 
-	return version.New(v.(string))
+	vs, ok := v.(string)
+	if !ok {
+		return nil, fmt.Errorf("version.number is not a string: %T", v)
+	}
+	return version.New(vs)
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
@@ -634,15 +638,10 @@ func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAtte
 	return false, nil
 }
 
-func randString(len int) string {
-	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	b := make([]byte, len)
-	aIdx := int('a')
+func randString(n int) string {
+	b := make([]byte, n)
 	for i := range b {
-		charIdx := aIdx + rand.Intn(26)
-		b[i] = byte(charIdx)
+		b[i] = byte('a' + rand.IntN(26))
 	}
-
 	return string(b)
 }
