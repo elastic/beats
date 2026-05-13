@@ -10,7 +10,7 @@ applies_to:
 # Add Docker metadata [add-docker-metadata]
 
 
-The `add_docker_metadata` processor annotates each event with relevant metadata from Docker containers. At startup it detects a docker environment and caches the metadata. The events are annotated with Docker metadata, only if a valid configuration is detected and the processor is able to reach Docker API. If Docker is unavailable at startup, the processor retries the connection at the configured `connection_retry_interval` until it succeeds.
+The `add_docker_metadata` processor annotates each event with relevant metadata from Docker containers. At startup it detects a docker environment and caches the metadata. The events are annotated with Docker metadata, only if a valid configuration is detected and the processor is able to reach Docker API. If Docker is unavailable at startup, the processor retries the connection until `wait_for_metadata_timeout` expires. Set `wait_for_metadata` to `true` to block startup until Docker metadata is available.
 
 Each event is annotated with:
 

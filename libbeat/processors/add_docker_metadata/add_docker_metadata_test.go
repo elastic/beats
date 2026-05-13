@@ -110,6 +110,9 @@ func TestInitializationNoDocker(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, docker.NewWatcher)
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
 
 	input := mapstr.M{}
 	result, err := p.Run(&beat.Event{Fields: input})
@@ -453,6 +456,9 @@ func TestWatcherError(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logger, testConfig, MockWatcherFactory(nil, errors.New("mock error")))
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
 	assert.Len(t, observedLogs.FilterMessageSnippet("unable to start the docker watcher").TakeAll(), 1)
 
 	input := mapstr.M{
@@ -463,7 +469,76 @@ func TestWatcherError(t *testing.T) {
 	assert.Equal(t, mapstr.M{"field": "value"}, result.Fields)
 }
 
+func TestConfigValidate(t *testing.T) {
+	tests := []struct {
+		name      string
+		cfg       map[string]any
+		expectErr bool
+	}{
+		{
+			name: "default",
+			cfg:  map[string]any{},
+		},
+		{
+			name: "valid wait timeout",
+			cfg: map[string]any{
+				"wait_for_metadata":         true,
+				"wait_for_metadata_timeout": "20s",
+			},
+		},
+		{
+			name: "zero wait timeout",
+			cfg: map[string]any{
+				"wait_for_metadata":         true,
+				"wait_for_metadata_timeout": "0s",
+			},
+		},
+		{
+			name: "invalid wait timeout",
+			cfg: map[string]any{
+				"wait_for_metadata":         true,
+				"wait_for_metadata_timeout": "invalid_duration",
+			},
+			expectErr: true,
+		},
+		{
+			name: "negative wait timeout",
+			cfg: map[string]any{
+				"wait_for_metadata":         true,
+				"wait_for_metadata_timeout": "-1s",
+			},
+			expectErr: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(test.cfg)
+			c := defaultConfig()
+
+			err := cfg.Unpack(&c)
+			if test.expectErr {
+				require.Error(t, err, "config unpack should fail")
+			} else {
+				require.NoError(t, err, "config unpack should succeed")
+			}
+		})
+	}
+}
+
+func withDockerMetadataRetryInterval(t *testing.T, interval time.Duration) {
+	t.Helper()
+
+	previous := dockerMetadataRetryInterval
+	dockerMetadataRetryInterval = interval
+	t.Cleanup(func() {
+		dockerMetadataRetryInterval = previous
+	})
+}
+
 func TestInitializationRetriesConnectionToDocker(t *testing.T) {
+	withDockerMetadataRetryInterval(t, time.Millisecond)
+
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempt := attempts.Add(1)
@@ -484,7 +559,7 @@ func TestInitializationRetriesConnectionToDocker(t *testing.T) {
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
 		"match_fields":              []string{"foo"},
-		"connection_retry_interval": "1ms",
+		"wait_for_metadata_timeout": "1s",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
@@ -505,7 +580,9 @@ func TestInitializationRetriesConnectionToDocker(t *testing.T) {
 	assert.GreaterOrEqual(t, attempts.Load(), int32(2), "watcher constructor should be called more than once")
 }
 
-func TestInitializationDoesNotRetryWhenDisabled(t *testing.T) {
+func TestInitializationRetriesUntilTimeout(t *testing.T) {
+	withDockerMetadataRetryInterval(t, time.Millisecond)
+
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempts.Add(1)
@@ -514,7 +591,7 @@ func TestInitializationDoesNotRetryWhenDisabled(t *testing.T) {
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
 		"match_fields":              []string{"foo"},
-		"connection_retry_interval": 0,
+		"wait_for_metadata_timeout": "10ms",
 	})
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
@@ -523,12 +600,106 @@ func TestInitializationDoesNotRetryWhenDisabled(t *testing.T) {
 		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
 	})
 
-	time.Sleep(20 * time.Millisecond)
-	assert.EqualValues(t, 1, attempts.Load(), "watcher constructor should not be retried when interval is disabled")
+	assert.Eventually(t, func() bool {
+		return attempts.Load() > 1
+	}, time.Second, time.Millisecond, "watcher constructor should be retried until timeout")
+
+	assert.Eventually(t, func() bool {
+		previous := attempts.Load()
+		time.Sleep(20 * time.Millisecond)
+		return previous == attempts.Load()
+	}, time.Second, 25*time.Millisecond, "watcher constructor should stop being called after timeout")
 
 	result, runErr := p.Run(&beat.Event{Fields: mapstr.M{"foo": "container_id"}})
 	require.NoError(t, runErr, "processing an event")
 	assert.Equal(t, mapstr.M{"foo": "container_id"}, result.Fields, "event must remain unchanged without docker connection")
+}
+
+func TestInitializationRetriesIndefinitelyWithZeroTimeout(t *testing.T) {
+	withDockerMetadataRetryInterval(t, time.Millisecond)
+
+	var attempts atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		attempts.Add(1)
+		return nil, errors.New("docker unavailable")
+	}
+
+	testConfig := config.MustNewConfigFrom(map[string]any{
+		"wait_for_metadata_timeout": "0s",
+	})
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+
+	assert.Eventually(t, func() bool {
+		return attempts.Load() > 2
+	}, time.Second, time.Millisecond, "watcher constructor should keep being retried when timeout is zero")
+
+	require.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	previous := attempts.Load()
+	time.Sleep(20 * time.Millisecond)
+	assert.Equal(t, previous, attempts.Load(), "watcher constructor should stop being retried after close")
+}
+
+func TestInitializationWaitsForMetadata(t *testing.T) {
+	withDockerMetadataRetryInterval(t, time.Millisecond)
+
+	var attempts atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		attempt := attempts.Add(1)
+		if attempt == 1 {
+			return nil, errors.New("docker unavailable")
+		}
+
+		return &mockWatcher{
+			containers: map[string]*docker.Container{
+				"container_id": {
+					ID:    "container_id",
+					Image: "image",
+					Name:  "name",
+				},
+			},
+		}, nil
+	}
+
+	testConfig := config.MustNewConfigFrom(map[string]any{
+		"match_fields":              []string{"foo"},
+		"wait_for_metadata":         true,
+		"wait_for_metadata_timeout": "1s",
+	})
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+	t.Cleanup(func() {
+		assert.NoError(t, processors.Close(p), "closing add_docker_metadata processor")
+	})
+
+	result, runErr := p.Run(&beat.Event{Fields: mapstr.M{"foo": "container_id"}})
+	require.NoError(t, runErr, "processing an event")
+	containerID, getErr := result.Fields.GetValue("container.id")
+	require.NoError(t, getErr, "container metadata should be available immediately after startup")
+	assert.Equal(t, "container_id", containerID, "processor should enrich events after synchronous retry connects to docker")
+	assert.GreaterOrEqual(t, attempts.Load(), int32(2), "watcher constructor should be called more than once")
+}
+
+func TestInitializationWaitForMetadataReturnsErrorOnTimeout(t *testing.T) {
+	withDockerMetadataRetryInterval(t, time.Millisecond)
+
+	var attempts atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		attempts.Add(1)
+		return nil, errors.New("docker unavailable")
+	}
+
+	testConfig := config.MustNewConfigFrom(map[string]any{
+		"wait_for_metadata":         true,
+		"wait_for_metadata_timeout": "10ms",
+	})
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
+	require.Error(t, err, "initializing add_docker_metadata processor should fail after timeout")
+	assert.Nil(t, p, "processor should not be returned after wait_for_metadata timeout")
+	assert.Greater(t, attempts.Load(), int32(1), "watcher constructor should be retried before timeout")
 }
 
 // Mock container watcher
