@@ -223,7 +223,7 @@ func TestFilebeatTakeOverFallbackWithInputReload(t *testing.T) {
 	assertContinuesFromLast(t, events[prevExpectedEvents:], logFiles, lastSeen["filestream"], "filestream")
 
 	// ========================= output "status" =========================
-	// At this point, there was "one fallback", for the each input, and only
+	// At this point, there was "one fallback" for each input, and only
 	// the Filestream input ingested the last batch of events.
 	// For each file (in the order they appear in the output):
 	//   - events 00 ~ 24: Log input
