@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
@@ -72,6 +73,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("docker")
 
@@ -98,7 +100,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -388,7 +390,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints)
+		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints) //nolint:errcheck // preserve existing behaviour
 		// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
 		for _, value := range incorrecthints {
 			d.logger.Debugf("provided hint: %s/%s is not in the supported list", d.config.Prefix, value)
