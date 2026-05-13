@@ -18,6 +18,7 @@
 package stress
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -99,7 +100,7 @@ func RunTests(
 	}
 	defer func() {
 		log.Info("Stop pipeline")
-		pipeline.Close()
+		pipeline.Disconnect(context.Background())
 		log.Info("pipeline closed")
 	}()
 

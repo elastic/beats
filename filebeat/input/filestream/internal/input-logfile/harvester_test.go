@@ -814,6 +814,10 @@ func (mp *MockPipeline) Connect() (beat.Client, error) {
 	return mp.ConnectWith(beat.ClientConfig{})
 }
 
+func (mp *MockPipeline) Disconnect(ctx context.Context) error {
+	return mp.c.Close()
+}
+
 type mockStatusReporter struct{}
 
 // UpdateStatus is a no-op

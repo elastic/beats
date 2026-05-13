@@ -39,7 +39,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
 
-	defer pipeline.Close()
+	defer pipeline.Disconnect(t.Context())
 
 	n := 66000
 	clients := []beat.Client{}
@@ -99,7 +99,7 @@ func TestPipelineWaitCloseThenForce(t *testing.T) {
 		WaitClose:     time.Millisecond,
 	}
 	pipeline := makePipeline(t, settings, mockQueue)
-	require.NoError(t, pipeline.Close())
+	require.NoError(t, pipeline.Disconnect(t.Context()))
 	<-closed
 	<-forceClosed
 }
