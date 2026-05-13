@@ -25,6 +25,7 @@ import (
 	"slices"
 	"time"
 
+	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -217,7 +218,7 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath, "state-id", src.Name())
+	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
 	state := initState(log, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
