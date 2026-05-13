@@ -48,6 +48,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/security_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
@@ -63,6 +64,7 @@ var metricSets = []string{
 	"ml_job",
 	"node",
 	"node_stats",
+	"security_stats",
 	"shard",
 }
 
@@ -547,6 +549,8 @@ func checkSkip(t *testing.T, metricset string, ver *version.V) {
 		checkSkipFeature("CCR", elasticsearch.CCRStatsAPIAvailableVersion)
 	case "enrich":
 		checkSkipFeature("Enrich", elasticsearch.EnrichStatsAPIAvailableVersion)
+	case "security_stats":
+		checkSkipFeature("Security Stats", elasticsearch.SecurityStatsAPIAvailableVersion)
 	}
 }
 

@@ -24,7 +24,15 @@ services:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "transport.host=127.0.0.1"
       - "http.host=0.0.0.0"
-      - "xpack.security.enabled=false"
+      # Security is enabled so the /_security/stats endpoint exists, but
+      # anonymous access is granted superuser to avoid threading
+      # credentials through every metricset's integration test setup.
+      - "xpack.security.enabled=true"
+      - "xpack.security.transport.ssl.enabled=false"
+      - "xpack.security.http.ssl.enabled=false"
+      - "xpack.security.authc.anonymous.username=anonymous"
+      - "xpack.security.authc.anonymous.roles=superuser"
+      - "xpack.security.authc.anonymous.authz_exception=false"
     ports:
       - 9200:9200
 
