@@ -133,7 +133,7 @@ It is unset by default.
  The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
  - `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
  - `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
-`wait_for_metadata` :: (false) If `true` startup will be blocked until processor is initialized. Startup will fail if processor is unable to connect to Kubernetes API within `wait_for_metadata_timeout`.
+`wait_for_metadata` :: (false) When `true` startup will be blocked until processor is initialized. Startup will fail if processor is unable to connect to Kubernetes API within `wait_for_metadata_timeout` and the process will exit.
 If `false`, processor initialization will occur asynchronously. 
 `wait_for_metadata_timeout` :: (30s) The maximum time the processor should spend trying to fetch metadata before giving up. Applies regardless of the value of `wait_for_metadata`.
 
