@@ -522,6 +522,7 @@ steps:
 
   - group: "Packaging"
     key: "x-pack-metricbeat-packaging"
+    if: build.pull_request.id != null
 
     steps:
       - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
