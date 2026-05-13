@@ -467,3 +467,43 @@ func (s *statusReporterRunner) SetStatusReporter(reporter status.StatusReporter)
 type recordingStatusReporter struct{}
 
 func (*recordingStatusReporter) UpdateStatus(status.Status, string) {}
+
+// TestRunnerWithSharedProcessorsForwardsSetOnce verifies the wrapper
+// forwards SetOnce to an inner runner that implements OnceSetter (e.g. the
+// legacy *input.Runner used by Filebeat modules).
+// filebeat/beater/crawler.go does `runner.(channel.OnceSetter).SetOnce(...)`
+// to enable `--once` mode; without this forwarder, modules running under
+// `filebeat --once` never receive the Once flag and don't exit after the
+// first ingest.
+func TestRunnerWithSharedProcessorsForwardsSetOnce(t *testing.T) {
+	inner := &onceSetterRunner{}
+	r := &runnerWithSharedProcessors{
+		Runner: inner,
+		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
+	}
+
+	o, ok := any(r).(OnceSetter)
+	require.Truef(t, ok, "runnerWithSharedProcessors must implement OnceSetter so crawler.startInput can enable --once mode through the wrapper")
+	o.SetOnce(true)
+	require.True(t, inner.once, "SetOnce must reach the inner runner")
+}
+
+// TestRunnerWithSharedProcessorsSetOnceOnInnerWithoutSupport verifies the
+// wrapper degrades gracefully (no panic) when the inner runner doesn't
+// implement OnceSetter.
+func TestRunnerWithSharedProcessorsSetOnceOnInnerWithoutSupport(t *testing.T) {
+	r := &runnerWithSharedProcessors{
+		Runner: &stopOrderRunner{onStop: func() {}},
+		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
+	}
+	r.SetOnce(true) // must not panic
+}
+
+type onceSetterRunner struct {
+	once bool
+}
+
+func (*onceSetterRunner) Start()              {}
+func (*onceSetterRunner) Stop()               {}
+func (*onceSetterRunner) String() string      { return "onceSetterRunner" }
+func (o *onceSetterRunner) SetOnce(once bool) { o.once = once }

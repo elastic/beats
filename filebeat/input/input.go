@@ -186,3 +186,11 @@ func (p *Runner) SetStatusReporter(statusReporter status.StatusReporter) {
 func (p *Runner) GetStatusReporter() status.StatusReporter {
 	return p.statusReporter
 }
+
+// SetOnce configures the runner to run a single scan and exit (used by
+// `filebeat --once`). Exposed as a setter so callers (e.g. crawler.startInput,
+// runner wrappers that hide the concrete type) can opt in without depending
+// on the concrete *Runner type.
+func (p *Runner) SetOnce(once bool) {
+	p.Once = once
+}

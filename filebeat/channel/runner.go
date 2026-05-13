@@ -117,14 +117,26 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 //
 // Embedding cfgfile.Runner (an interface) only promotes Start/Stop/String —
 // methods of the inner concrete type that aren't on the cfgfile.Runner
-// interface (e.g. SetStatusReporter) would be hidden from callers doing
-// runtime type assertions on the wrapper. SetStatusReporter is forwarded
-// explicitly so libbeat/cfgfile/list.go can still wire status reporting to
-// the underlying input runner.
+// interface (e.g. SetStatusReporter, SetOnce) would be hidden from callers
+// doing runtime type assertions on the wrapper. We forward them explicitly
+// so callers (libbeat/cfgfile/list.go for status reporting,
+// filebeat/beater/crawler.go for `--once` mode) keep working through the
+// wrapper.
 type runnerWithSharedProcessors struct {
 	cfgfile.Runner
 	procs    *processors.Processors
 	stopOnce sync.Once
+}
+
+// OnceSetter is implemented by runners that support a "run once" mode, where
+// the runner performs a single scan/iteration and exits. Used by
+// `filebeat --once` for legacy log inputs. Declared here (and not at the
+// caller site in filebeat/beater) because filebeat/beater already imports
+// filebeat/channel, so the interface needs to live at or below the channel
+// package for both consumers (crawler.startInput, this wrapper) to share
+// the same declaration.
+type OnceSetter interface {
+	SetOnce(once bool)
 }
 
 func (r *runnerWithSharedProcessors) Stop() {
@@ -138,6 +150,14 @@ func (r *runnerWithSharedProcessors) Stop() {
 func (r *runnerWithSharedProcessors) SetStatusReporter(reporter status.StatusReporter) {
 	if sr, ok := r.Runner.(status.WithStatusReporter); ok {
 		sr.SetStatusReporter(reporter)
+	}
+}
+
+// SetOnce forwards `--once` mode to the inner runner if it supports it
+// (e.g. the legacy *input.Runner used by Filebeat modules).
+func (r *runnerWithSharedProcessors) SetOnce(once bool) {
+	if o, ok := r.Runner.(OnceSetter); ok {
+		o.SetOnce(once)
 	}
 }
 
