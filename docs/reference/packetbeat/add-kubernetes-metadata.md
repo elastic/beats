@@ -159,6 +159,9 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `annotations.dedot`
 :   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
 
+`wait_for_metadata`: When `true`, startup is blocked until the processor is initialized. If the processor can't connect to the Kubernetes API within the duration set in `wait_for_metadata_timeout`, startup fails and the process exits. When `false`, the processor is initialized asynchronously. Defaults to `false`.
+
+`wait_for_metadata_timeout`: The maximum time allowed for the processor to connect to the Kubernetes API and fetch metadata. Applies regardless of `wait_for_metadata`. To retry the connection indefinitely, set to `0`. Defaults to `30s`.
 
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 
