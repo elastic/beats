@@ -6,6 +6,6 @@ This will be helpful if the azure users will be adding/removing resources that c
 To reduce on the number of API calls we are executing to retrieve the resources each time, users can configure this setting and make sure the list or resources will not be refreshed as often.
 This is also beneficial for performance and rate/ cost reasons (https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits).
 
-`lookback_window`:: Optional duration (default `10m`). On restart, the module backfills metrics from the last successful collection end time up to this window. Set to `0` to disable and preserve the previous behavior of always querying from `now - period`. Overlapping documents are deduplicated by Elasticsearch document ID.
+`lookback_window`:: Optional duration (default `10m`). On restart, the module backfills metrics from the last completed collection end time up to this window. Set to `0` to disable and preserve the previous behavior of always querying from `now - period`. Overlapping documents are deduplicated by Elasticsearch document ID.
 
 `resources` :: This will contain all options for identifying resources and configuring the desired metrics

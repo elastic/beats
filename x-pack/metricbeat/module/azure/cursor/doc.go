@@ -5,6 +5,6 @@
 //go:build !requirefips
 
 // Package cursor provides persistent cursor state for the azure metricbeat module.
-// It stores the last successful collection end time per metricset so that the
+// It stores the last completed collection end time per metricset so that the
 // module can backfill gaps after agent restarts.
 package cursor
