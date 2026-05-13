@@ -18,19 +18,17 @@ import (
 // the next (e.g. "ab"+"c" ≠ "a"+"bc"), and no secrets appear in the stored key.
 //
 // Key reset triggers — changing any of the following resets the cursor:
-//   - metricsetName   — different metricset, different data stream
-//   - subscriptionID  — different Azure environment
-//   - period          — different collection cadence means a different window
-//   - latency         — shifts endTime, so two configs targeting the same
-//     resources but with different latency produce different cursors
-//   - resourcesKey    — fingerprint of the resource filters; two configs that
-//     cover different resources must not share a cursor
+//   - metricsetName  — different metricset, different data stream
+//   - subscriptionID — different Azure environment
+//   - resourcesKey   — fingerprint of metric namespaces and resource-listing
+//     filters (resource_id, resource_group, resource_type, resource_query);
+//     two configs that collect different namespaces or target different
+//     resources are different series
 //
-// Changing lookback_window alone does NOT reset the cursor — it is a
-// query-time bound enforced in computeLookbackStart, not part of key identity.
-func GenerateStateKey(metricsetName, subscriptionID, period, latency, resourcesKey string) string {
+// Changing lookback_window, period, or latency alone does NOT reset the cursor.
+func GenerateStateKey(metricsetName, subscriptionID, resourcesKey string) string {
 	var b strings.Builder
-	for _, p := range []string{metricsetName, subscriptionID, period, latency, resourcesKey} {
+	for _, p := range []string{metricsetName, subscriptionID, resourcesKey} {
 		fmt.Fprintf(&b, "%d:%s|", len(p), p)
 	}
 	hash := xxhash.Sum64String(b.String())
