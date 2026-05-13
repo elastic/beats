@@ -18,61 +18,34 @@
 package filestream
 
 import (
+	"go.uber.org/zap"
+
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// lazyLog wraps a *logp.Logger and defers attaching FS-event fields until a message is actually emitted.
-// This avoids cloning the underlying zap logger for events that never log, which happens when Debug logging is disabled.
-// Not safe for concurrent use: callers must construct one lazyLog per FS event.
-type lazyLog struct {
-	log      *logp.Logger
-	event    loginp.FSEvent
-	enriched bool
-}
-
-func (l *lazyLog) Debugf(format string, args ...interface{}) {
-	if l.log.IsDebug() {
-		l.enrich().Debugf(format, args...)
+// loggerWithEvent returns a logger enriched with FS-event fields. Enrichment
+// is deferred via [logp.Logger.WithLazy], so the underlying core only pays
+// for the fields if a message is actually emitted.
+func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) *logp.Logger {
+	fields := make([]zap.Field, 0, 6)
+	fields = append(fields,
+		zap.String("operation", event.Op.String()),
+		zap.String("source_file", event.SrcID),
+	)
+	if event.Descriptor.Fingerprint != "" {
+		fields = append(fields, zap.String("fingerprint", event.Descriptor.Fingerprint))
 	}
-}
-
-func (l *lazyLog) Warnf(format string, args ...interface{}) {
-	l.enrich().Warnf(format, args...)
-}
-
-func (l *lazyLog) Errorf(format string, args ...any) {
-	l.enrich().Errorf(format, args...)
-}
-
-func (l *lazyLog) enrich() *logp.Logger {
-	if !l.enriched {
-		l.enriched = true
-		fields := make([]any, 0, 12)
-		fields = append(fields, "operation", l.event.Op.String(), "source_file", l.event.SrcID)
-
-		if l.event.Descriptor.Fingerprint != "" {
-			fields = append(fields, "fingerprint", l.event.Descriptor.Fingerprint)
+	if info := event.Descriptor.Info; info != nil {
+		if osID := info.GetOSState().Identifier(); osID != "" {
+			fields = append(fields, zap.String("os_id", osID))
 		}
-		if l.event.Descriptor.Info != nil {
-			if osID := l.event.Descriptor.Info.GetOSState().Identifier(); osID != "" {
-				fields = append(fields, "os_id", osID)
-			}
-		}
-		if l.event.NewPath != "" {
-			fields = append(fields, "new_path", l.event.NewPath)
-		}
-		if l.event.OldPath != "" {
-			fields = append(fields, "old_path", l.event.OldPath)
-		}
-		l.log = l.log.With(fields...)
 	}
-	return l.log
-}
-
-func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) lazyLog {
-	return lazyLog{
-		log:   logger,
-		event: event,
+	if event.NewPath != "" {
+		fields = append(fields, zap.String("new_path", event.NewPath))
 	}
+	if event.OldPath != "" {
+		fields = append(fields, zap.String("old_path", event.OldPath))
+	}
+	return logger.WithLazy(fields...)
 }

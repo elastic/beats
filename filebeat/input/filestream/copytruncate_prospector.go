@@ -28,6 +28,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -231,7 +232,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 	}
 }
 
-func (p *copyTruncateFileProspector) onFSEvent(log lazyLog, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
+func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
@@ -300,7 +301,7 @@ func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
 	return p.rotatedSuffix.MatchString(event.NewPath)
 }
 
-func (p *copyTruncateFileProspector) onRotatedFile(log lazyLog, ctx input.Context, fe loginp.FSEvent, src loginp.Source, hg loginp.HarvesterGroup) {
+func (p *copyTruncateFileProspector) onRotatedFile(log *logp.Logger, ctx input.Context, fe loginp.FSEvent, src loginp.Source, hg loginp.HarvesterGroup) {
 	// Continue reading the rotated file from where we have left off with the original.
 	// The original will be picked up again when updated and read from the beginning.
 	originalPath := p.rotatedSuffix.ReplaceAllLiteralString(fe.NewPath, "")

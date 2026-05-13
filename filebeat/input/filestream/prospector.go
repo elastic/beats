@@ -369,7 +369,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 // onFSEvent uses 'log' instead of the [fileProspector] logger
 // because 'log' has been enriched with event information
-func (p *fileProspector) onFSEvent(log lazyLog, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
+func (p *fileProspector) onFSEvent(log *logp.Logger, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
@@ -422,7 +422,7 @@ func (p *fileProspector) onFSEvent(log lazyLog, ctx input.Context, event loginp.
 	}
 }
 
-func (p *fileProspector) isFileIgnored(log lazyLog, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
+func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
 	if p.ignoreOlder > 0 {
 		now := time.Now()
 		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
@@ -437,7 +437,7 @@ func (p *fileProspector) isFileIgnored(log lazyLog, fe loginp.FSEvent, ignoreIna
 	return false
 }
 
-func (p *fileProspector) onRemove(log lazyLog, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *fileProspector) onRemove(log *logp.Logger, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	if p.stateChangeCloser.Removed {
 		log.Debugf("Stopping harvester as file %s has been removed and close.on_state_change.removed is enabled.", src.Name())
 		hg.Stop(src)
@@ -453,7 +453,7 @@ func (p *fileProspector) onRemove(log lazyLog, fe loginp.FSEvent, src loginp.Sou
 	}
 }
 
-func (p *fileProspector) onRename(log lazyLog, ctx input.Context, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	// if file_identity is based on path, the current reader has to be cancelled
 	// and a new one has to start.
 	if !p.identifier.Supports(trackRename) {
