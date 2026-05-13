@@ -19,6 +19,7 @@ runs:
       with:
         cache: "pip"
         python-version-file: .python-version
+      continue-on-error: true
 
     - name: Install mage
       run: make mage
