@@ -2102,12 +2102,6 @@ ml
 
 node
 
-**`elasticsearch.node.version`**
-:   Node version.
-
-    type: keyword
-
-
 ## jvm [_jvm]
 
 JVM Info.
