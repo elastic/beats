@@ -206,7 +206,6 @@ func (p *fileProspector) Init(
 		}
 
 		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
-		fm.IdentifierName = p.identifier.Name()
 		return newKey, fm
 	})
 
