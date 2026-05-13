@@ -232,6 +232,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -279,6 +285,12 @@ spec:
     spec:
       #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -326,6 +338,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -373,6 +391,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -420,6 +444,12 @@ spec:
     spec:
       branch_configuration: "7.17"
       pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
@@ -466,6 +496,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -513,6 +549,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -560,6 +602,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.packetbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -607,6 +655,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.libbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -654,6 +708,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.otel.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -701,6 +761,12 @@ spec:
     spec:
       branch_configuration: "main 8.19 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -747,6 +813,12 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.package.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       provider_settings:
         trigger_mode: none # this pipeline is only triggered remotely
       cancel_intermediate_builds: false
@@ -781,6 +853,12 @@ spec:
       description: Buildkite pipeline for packaging Elastic Agent core binary and publish it to DRA
     spec:
       pipeline_file: ".buildkite/x-pack/elastic-agent/.buildkite/pipeline.xpack.elastic-agent-binary-dra.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       provider_settings:
         build_branches: true
         build_pull_requests: true
@@ -818,6 +896,12 @@ spec:
     spec:
       # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.auditbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -865,6 +949,12 @@ spec:
     spec:
       # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -912,6 +1002,12 @@ spec:
     spec:
       # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.filebeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -959,6 +1055,12 @@ spec:
     spec:
       # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.heartbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -1006,6 +1108,12 @@ spec:
     spec:
       # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.osquerybeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -1054,6 +1162,12 @@ spec:
     spec:
       # branch_configuration: "main 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.agentbeat.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -1101,6 +1215,12 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/packaging.pipeline.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       branch_configuration: "main 8.19 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
@@ -1150,6 +1270,12 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/ironbank-validation.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       branch_configuration: "main 8.19 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
@@ -1186,6 +1312,12 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/aws-tests-pipeline.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       cancel_intermediate_builds: false
       provider_settings:
         trigger_mode: none
@@ -1220,6 +1352,12 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/pipeline-scheduler.yml"
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       maximum_timeout_in_minutes: 240
       schedules:
         Daily run of Iron Bank validation:
@@ -1272,6 +1410,12 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: '.buildkite/version-bump-pipeline.yml'
+      initial_step_plugins:
+        - sparse-checkout#v1.6.0:
+            paths:
+              - .buildkite
+              - .go-version
+            cleanup_sparse_state: true
       branch_configuration: 'main'
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
