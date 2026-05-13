@@ -83,29 +83,23 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 	waitMetadataTimeout time.Duration,
 	logger *logp.Logger,
 ) bool {
-	var timer *time.Timer
 	var err error
 	var kubernetesAvailable bool
 
-	timer = time.NewTimer(waitMetadataTimeout)
-	defer timer.Stop()
-
-	ticker := time.NewTicker(timeout) // existing 5s backoff
-	defer ticker.Stop()
-
+	deadline := time.Time{}
+	if waitMetadataTimeout > 0 {
+		deadline = time.Now().Add(waitMetadataTimeout)
+	}
 	for {
 		kubernetesAvailable, err = isKubernetesAvailable(client, logger)
 		if kubernetesAvailable {
 			return true
 		}
-		select {
-		case <-timer.C:
+		if !deadline.IsZero() && time.Now().After(deadline) {
 			logger.Errorf("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
 			return false
-		case <-ticker.C:
 		}
 	}
-
 }
 
 // kubernetesMetadataExist checks whether an event is already enriched with kubernetes metadata

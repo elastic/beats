@@ -73,8 +73,8 @@ func (k *kubeAnnotatorConfig) Validate() error {
 		k.Node = ""
 	}
 
-	if k.WaitMetadataTimeout <= 0 {
-		return fmt.Errorf("wait_for_metadata_timeout must be a greater than zero duration")
+	if k.WaitMetadataTimeout < 0 {
+		return fmt.Errorf("wait_for_metadata_timeout must be zero or greater (zero means wait indefinitely)")
 	}
 	// Checks below were added to warn the users early on and avoid initialising the processor in case the `logs_path`
 	// matcher config is not valid: supported paths defined as a `logs_path` configuration setting are strictly defined

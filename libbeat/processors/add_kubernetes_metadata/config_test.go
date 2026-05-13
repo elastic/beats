@@ -65,6 +65,13 @@ func TestConfigValidate(t *testing.T) {
 				"wait_for_metadata_timeout": "0s",
 				"wait_for_metadata":         true,
 			},
+			error: false,
+		},
+		{
+			cfg: map[string]interface{}{
+				"wait_for_metadata_timeout": "-1s",
+				"wait_for_metadata":         true,
+			},
 			error: true,
 		},
 	}
