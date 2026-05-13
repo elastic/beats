@@ -138,7 +138,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	if config.LookbackWindow > 0 {
-		if azMod, ok := base.Module().(Module); ok {
+		if azMod, ok := base.Module().(Module); !ok {
+			base.Logger().Warn("azure module does not implement Module interface, lookback disabled")
+		} else {
 			registry, regErr := azMod.GetCursorRegistry()
 			if regErr != nil {
 				base.Logger().Warnw("azure cursor registry unavailable, lookback disabled", "error", regErr)
