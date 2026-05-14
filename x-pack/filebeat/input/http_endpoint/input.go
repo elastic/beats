@@ -479,7 +479,7 @@ func (m *mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if clean != r.URL.Path {
 		url := *r.URL
 		url.Path = clean
-		http.Redirect(w, r, url.String(), http.StatusMovedPermanently)
+		http.Redirect(w, r, url.String(), cleanRedirectCode)
 		return
 	}
 	m.mu.RLock()
