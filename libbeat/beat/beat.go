@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -30,33 +32,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
-import (
-	"sync/atomic"
-
-	"github.com/elastic/beats/v7/libbeat/api"
-	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
-	// ... other imports
-)
+// ... other imports
 
 var userAgent atomic.Value // stores string
 
 func init() {
 	userAgent.Store(useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))
-}
-
-// In GenerateUserAgent() function:
-func (beat *Beat) GenerateUserAgent(uaOpts ...useragent.Option) {
-	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
-		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
-	userAgent.Store(beat.Info.UserAgent)
-}
-
-// In UserAgent() function:
-func UserAgent() string {
-	if ua, ok := userAgent.Load().(string); ok {
-		return ua
-	}
-	return ""
 }
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -165,7 +146,7 @@ func (beat *Beat) GenerateUserAgent() {
 	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
 		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
-	userAgent = beat.Info.UserAgent
+	userAgent.Store(beat.Info.UserAgent)
 }
 
 // BeatConfig struct contains the basic configuration of every beat
@@ -178,6 +159,10 @@ type BeatConfig struct {
 // for the enabled modules.
 type OverwritePipelinesCallback func(*config.C) error
 
+// In UserAgent() function:
 func UserAgent() string {
-	return userAgent
+	if ua, ok := userAgent.Load().(string); ok {
+		return ua
+	}
+	return ""
 }
