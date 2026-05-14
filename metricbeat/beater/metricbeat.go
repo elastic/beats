@@ -241,14 +241,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	if bt.config.Autodiscover != nil {
 		var err error
-		bt.autodiscover, err = autodiscover.NewAutodiscover(
-			"metricbeat",
-			b.Publisher,
-			factory, autodiscover.QueryConfig(),
-			bt.config.Autodiscover,
-			b.Keystore,
-			b.Info.Logger,
-		)
+		bt.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, factory, autodiscover.QueryConfig(), bt.config.Autodiscover, b.Keystore, b.Info.Logger, nil)
 		if err != nil {
 			return err
 		}

@@ -47,6 +47,7 @@ func TestNewReceiver(t *testing.T) {
 	monitorHost := hostFromSocket(monitorSocket)
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -168,6 +169,7 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 func multiReceiverConfig(helper multiReceiverHelper) *Config {
 	return &Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -375,6 +377,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"filebeat": map[string]any{
 						"inputs": []map[string]any{
 							{
