@@ -362,7 +362,10 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 	}
 
 	if in.APIEndpoint != "" {
+		in.log.Infof("Configuring GCP Pub/Sub client with custom API endpoint: %s", in.APIEndpoint)
 		opts = append(opts, option.WithEndpoint(in.APIEndpoint))
+	} else {
+		in.log.Info("Configuring GCP Pub/Sub client with default Google Cloud API endpoint")
 	}
 
 	if in.CredentialsFile != "" {
