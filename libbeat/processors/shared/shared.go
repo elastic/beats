@@ -10,10 +10,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type SharedProcessor struct {
-	beat.Processor
-}
-
 type SharedProcessorWithClose struct {
 	beat.Processor
 	hash     uint64
@@ -61,7 +57,7 @@ func New(constructor processors.Constructor) processors.Constructor {
 			return proc, nil
 		}
 
-		sharedProcessors[hash] = &SharedProcessorWithClose{Processor: proc, hash: hash, sharedProcessors: sharedProcessors, sharedProcessorMu: sharedProcessorMu}
+		sharedProcessors[hash] = &SharedProcessorWithClose{Processor: proc, hash: hash, sharedProcessors: sharedProcessors, sharedProcessorMu: sharedProcessorMu, refCount: 1}
 		return sharedProcessors[hash], nil
 	}
 }
@@ -82,7 +78,6 @@ func (p *SharedProcessorWithClose) Close() error {
 	return nil
 }
 
-// NOTE: To be called while holding the sharedProcessorMu lock to ensure.
 func (p *SharedProcessorWithClose) deleteFromSharedMap() {
 	if _, ok := p.sharedProcessors[p.hash]; !ok {
 		return
