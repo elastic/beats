@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
+var userAgent string = useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()) // User agent to use cross-component
+
 // Creator initializes and configures a new Beater instance used to execute
 // the beat's run-loop.
 type Creator func(*Beat, *config.C) (Beater, error)
@@ -136,6 +138,7 @@ func (beat *Beat) GenerateUserAgent() {
 	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
 		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
+	userAgent = beat.Info.UserAgent
 }
 
 // BeatConfig struct contains the basic configuration of every beat
@@ -147,3 +150,7 @@ type BeatConfig struct {
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.
 type OverwritePipelinesCallback func(*config.C) error
+
+func UserAgent() string {
+	return userAgent
+}

@@ -22,9 +22,8 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
 
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/mito/lib"
 )
 
@@ -56,9 +55,6 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 	return patterns, nil
 }
 
-// The Filebeat user-agent is provided to the program as useragent.
-var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
-
 func newProgram(ctx context.Context, src, root string, patterns map[string]*regexp.Regexp, log *logp.Logger) (cel.Program, *cel.Ast, error) {
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
@@ -73,7 +69,7 @@ func newProgram(ctx context.Context, src, root string, patterns map[string]*rege
 		lib.Debug(debug(log)),
 		lib.MIME(mimetypes),
 		lib.Globals(map[string]interface{}{
-			"useragent": userAgent,
+			"useragent": beat.UserAgent(),
 		}),
 	}
 	if len(patterns) != 0 {

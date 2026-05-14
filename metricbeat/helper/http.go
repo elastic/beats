@@ -28,16 +28,13 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 
 	"k8s.io/client-go/transport"
 
-	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
-
-var userAgent = useragent.UserAgent("Metricbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
@@ -89,7 +86,7 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger)
 		httpcommon.WithLogger(logger),
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": (beat.UserAgent())}),
 	)
 	if err != nil {
 		return nil, err

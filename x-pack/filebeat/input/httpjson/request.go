@@ -20,6 +20,7 @@ import (
 	"github.com/PaesslerAG/jsonpath"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -480,7 +481,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 
 	header := http.Header{}
 	header.Set("Accept", "application/json")
-	header.Set("User-Agent", userAgent)
+	header.Set("User-Agent", beat.UserAgent())
 	req.setHeader(header)
 
 	var err error
