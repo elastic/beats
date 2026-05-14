@@ -3,7 +3,7 @@
 steps:
 
   - label: "Trigger Auditbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -30,7 +30,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Heartbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -57,7 +57,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Filebeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -84,7 +84,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/filebeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -116,7 +116,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/dockerlogbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -145,7 +145,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Metricbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -172,7 +172,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/metricbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -204,7 +204,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/osquerybeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -233,7 +233,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/winlogbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -263,7 +263,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Deploy/K8S"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -287,7 +287,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Libbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -313,7 +313,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/libbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -340,7 +340,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/otel"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -365,7 +365,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/auditbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -395,7 +395,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/heartbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -425,7 +425,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/packetbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -455,7 +455,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Winlogbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
@@ -482,7 +482,7 @@ steps:
         GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Packetbeat"
-    if: build.pull_request.id != null  # Only run for PRs
+    if: build.pull_request.id != null
     if_changed:
       include:
         # Beat-specific paths
