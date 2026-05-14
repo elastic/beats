@@ -82,5 +82,5 @@ It has the following settings:
 :   (Optional) Specifies the mount point of the host’s filesystem, which can be used to monitor a host from within a container.
 
 `labels.dedot`
-:   (Optional) Default to true. If set to true, replace dots in labels with `_`.
+:   (Optional) If set to `true`, replaces dots in labels with `_`. Defaults to `true`.
 
