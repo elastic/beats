@@ -194,6 +194,84 @@ func TestClient(t *testing.T) {
 	})
 }
 
+// TestCloseWaitsForInFlightPublish verifies that Close waits for an event
+// that is mid-Publish (past the isOpen check but before AddEvent) to be
+// tracked by the clientCloseWaiter before deciding whether to wait.
+// This is a regression test for https://github.com/elastic/beats/issues/49390.
+func TestCloseWaitsForInFlightPublish(t *testing.T) {
+	// inProcessor is closed once the processor is running, letting the
+	// test know Publish is in the race window.
+	inProcessor := make(chan struct{})
+	// releaseProcessor is closed by the test to let the processor finish,
+	// allowing Publish to proceed to AddEvent.
+	releaseProcessor := make(chan struct{})
+
+	waiter := newClientCloseWaiter(time.Minute)
+	c := &client{
+		logger: logp.NewNopLogger(),
+		processors: &testProcessor{
+			processorFn: func(in *beat.Event) (*beat.Event, error) {
+				close(inProcessor) // signal: we are inside the processor
+				<-releaseProcessor // block until test says go
+				return in, nil
+			},
+		},
+		producer: &testProducer{
+			publish: func(_ bool, event publisher.Event) (queue.EntryID, bool) {
+				return 1, true
+			},
+		},
+		waiter:         waiter,
+		observer:       nilObserver,
+		eventListener:  waiter,
+		clientListener: &mockClientListener{},
+	}
+	c.isOpen.Store(true)
+
+	// Start Publish in a goroutine — it will block inside the processor.
+	publishDone := make(chan struct{})
+	go func() {
+		defer close(publishDone)
+		c.Publish(beat.Event{Fields: mapstr.M{"hello": "world"}})
+	}()
+
+	// Wait until Publish is inside the processor (past the isOpen check).
+	<-inProcessor
+
+	// Now call Close from the main goroutine. With the fix, Close acquires
+	// the mutex and blocks until Publish finishes, so signalClose will see
+	// the event in the counter. Without the fix, Close would see zero events
+	// and finish immediately.
+	closeDone := make(chan struct{})
+	go func() {
+		defer close(closeDone)
+		c.Close()
+	}()
+
+	// Release the processor so Publish completes and increments the counter.
+	close(releaseProcessor)
+	<-publishDone
+
+	// Close should now be waiting for the event to be ACKed (WaitClose = 1 min).
+	// Verify it has NOT returned yet — it must be blocked waiting for the ACK.
+	select {
+	case <-closeDone:
+		t.Fatal("Close returned without waiting for the in-flight event to be ACKed")
+	case <-time.After(100 * time.Millisecond):
+		// Good — Close is properly waiting.
+	}
+
+	// ACK the event to unblock Close.
+	waiter.ACKEvents(1)
+
+	select {
+	case <-closeDone:
+		// Good — Close returned after ACK.
+	case <-time.After(10 * time.Second):
+		t.Fatal("Close did not return after event was ACKed")
+	}
+}
+
 func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
