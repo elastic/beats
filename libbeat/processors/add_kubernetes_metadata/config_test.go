@@ -47,27 +47,34 @@ func TestConfigValidate(t *testing.T) {
 			error: false,
 		},
 		{
+			// happy path
 			cfg: map[string]interface{}{
-				"wait_for_metadata_timeout": "invalid_duration",
-				"wait_for_metadata":         true,
+				"wait_for_metadata_timeout":      "20s",
+				"wait_for_metadata":              true,
+				"wait_for_metadata_retry_period": "5s",
+			},
+			error: false,
+		},
+		{
+			// when wait_for_metadata_timeout is 0, it should not error out even if retry period is greater.
+			cfg: map[string]interface{}{
+				"wait_for_metadata_timeout":      "0s",
+				"wait_for_metadata":              true,
+				"wait_for_metadata_retry_period": "4s",
+			},
+			error: false,
+		},
+		{
+			// when the retry period is greater than timeout, it should error out
+			cfg: map[string]interface{}{
+				"wait_for_metadata_timeout":      "2s",
+				"wait_for_metadata":              true,
+				"wait_for_metadata_retry_period": "4s",
 			},
 			error: true,
 		},
 		{
-			cfg: map[string]interface{}{
-				"wait_for_metadata_timeout": "20s",
-				"wait_for_metadata":         true,
-			},
-			error: false,
-		},
-		{
-			cfg: map[string]interface{}{
-				"wait_for_metadata_timeout": "0s",
-				"wait_for_metadata":         true,
-			},
-			error: false,
-		},
-		{
+			// negative metadata timeout is not allowed
 			cfg: map[string]interface{}{
 				"wait_for_metadata_timeout": "-1s",
 				"wait_for_metadata":         true,

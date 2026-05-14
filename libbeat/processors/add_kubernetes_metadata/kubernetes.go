@@ -81,6 +81,7 @@ func isKubernetesAvailable(client k8sclient.Interface, logger *logp.Logger) (boo
 
 func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 	waitMetadataTimeout time.Duration,
+	waitMetadataRetryPeriod time.Duration,
 	logger *logp.Logger,
 ) bool {
 	var err error
@@ -95,10 +96,14 @@ func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
 		if kubernetesAvailable {
 			return true
 		}
+
 		if !deadline.IsZero() && time.Now().After(deadline) {
 			logger.Errorf("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
 			return false
 		}
+
+		time.Sleep(waitMetadataRetryPeriod)
+
 	}
 }
 
@@ -185,7 +190,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		if !isKubernetesAvailableWithTimeout(client, config.WaitMetadataTimeout, k.log) {
+		if !isKubernetesAvailableWithTimeout(client, config.WaitMetadataTimeout, config.WaitMetadataRetryPeriod, k.log) {
 			return
 		}
 

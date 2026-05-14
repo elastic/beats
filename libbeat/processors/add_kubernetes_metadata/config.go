@@ -42,9 +42,10 @@ type kubeAnnotatorConfig struct {
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
-	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
-	WaitMetadata        bool                                `config:"wait_for_metadata"`
-	WaitMetadataTimeout time.Duration                       `config:"wait_for_metadata_timeout"`
+	AddResourceMetadata     *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	WaitMetadata            bool                                `config:"wait_for_metadata"`
+	WaitMetadataTimeout     time.Duration                       `config:"wait_for_metadata_timeout"`
+	WaitMetadataRetryPeriod time.Duration                       `config:"wait_for_metadata_retry_period"`
 }
 
 type Enabled struct {
@@ -62,6 +63,7 @@ func (k *kubeAnnotatorConfig) InitDefaults() {
 	k.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
 	k.WaitMetadata = false
 	k.WaitMetadataTimeout = 30 * time.Second
+	k.WaitMetadataRetryPeriod = 3 * time.Second
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
@@ -76,6 +78,15 @@ func (k *kubeAnnotatorConfig) Validate() error {
 	if k.WaitMetadataTimeout < 0 {
 		return fmt.Errorf("wait_for_metadata_timeout must be zero or greater (zero means wait indefinitely)")
 	}
+
+	if k.WaitMetadataRetryPeriod < 0 {
+		return fmt.Errorf("wait_for_metadata_retry_period must be zero or greater")
+	}
+
+	if k.WaitMetadataTimeout != 0 && k.WaitMetadataRetryPeriod > k.WaitMetadataTimeout {
+		return fmt.Errorf("wait_for_metadata_retry_period must be less than wait_for_metadata_timeout")
+	}
+
 	// Checks below were added to warn the users early on and avoid initialising the processor in case the `logs_path`
 	// matcher config is not valid: supported paths defined as a `logs_path` configuration setting are strictly defined
 	// if `resource_type` is set
