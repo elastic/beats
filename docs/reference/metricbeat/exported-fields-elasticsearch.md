@@ -2884,11 +2884,11 @@ Per-node security statistics collected from the Elasticsearch Security Stats API
 
 ## dls [_dls]
 
-Document Level Security counters.
+Document Level Security (DLS) counters.
 
 ## cache [_cache]
 
-Per-node cache used to materialize the bitsets that enforce DLS queries. Sourced from the `roles.dls.bit_set_cache` block of `GET /_security/stats`.
+Per-node cache used to materialize the bitsets that enforce DLS queries. Sourced from the `roles.dls.bit_set_cache` block in the `GET /_security/stats` response.
 
 **`elasticsearch.security.stats.dls.cache.entries.count`**
 :   Current number of cached entries on this node.
@@ -2917,7 +2917,7 @@ Per-node cache used to materialize the bitsets that enforce DLS queries. Sourced
 
 
 **`elasticsearch.security.stats.dls.cache.evictions.count`**
-:   Number of entries evicted (size or expiration) since node startup.
+:   Number of entries evicted (due to size limit or expiration) since node startup.
 
     type: long
 
