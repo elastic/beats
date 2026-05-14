@@ -43,12 +43,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-<<<<<<< HEAD
-func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
-=======
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
 	t.Helper()
->>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 	logger := logptest.NewTestingLogger(t, "")
 	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
@@ -198,29 +194,8 @@ func TestClient(t *testing.T) {
 
 func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-<<<<<<< HEAD
-	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
-		p, err := New(beat.Info{Logger: logger},
-			Monitors{},
-			conf.Namespace{},
-			outputs.Group{},
-			settings,
-		)
-		if err != nil {
-			panic(err)
-		}
-		// Inject a test queue so the outputController doesn't create one
-		p.outputController.queue = qu
-
-		return p
-	}
-
-	q := memqueue.NewQueue(logger, nil, memqueue.Settings{Events: 1}, 0, nil)
-	pipeline := makePipeline(Settings{}, q)
-=======
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(t, Settings{}, q)
->>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 	defer pipeline.Close()
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
