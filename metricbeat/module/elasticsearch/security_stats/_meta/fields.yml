@@ -16,8 +16,8 @@
           type: group
           description: >
             Per-node cache used to materialize the bitsets that enforce DLS
-            queries. Sourced from the `roles.dls.bit_set_cache` block of
-            `GET /_security/stats`.
+            queries. Sourced from the `roles.dls.bit_set_cache` block in
+            the `GET /_security/stats` response.
           fields:
             - name: entries.count
               type: long
