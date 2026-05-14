@@ -3004,6 +3004,9 @@ filebeat.inputs:
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
 
+  # Optional API endpoint to override the default Google Cloud Pub/Sub endpoint.
+  #api_endpoint: custom-pubsub-endpoint.googleapis.com:443
+
 #------------------------------ AWS S3 input --------------------------------
 # Beta: Config options for AWS S3 input
 #- type: aws-s3
