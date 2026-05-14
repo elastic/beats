@@ -361,6 +361,10 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 		opts = append(opts, option.WithGRPCConn(conn), option.WithTelemetryDisabled())
 	}
 
+	if in.APIEndpoint != "" {
+		opts = append(opts, option.WithEndpoint(in.APIEndpoint))
+	}
+
 	if in.CredentialsFile != "" {
 		opts = append(opts, option.WithCredentialsFile(in.CredentialsFile))
 	} else if len(in.CredentialsJSON) > 0 {
