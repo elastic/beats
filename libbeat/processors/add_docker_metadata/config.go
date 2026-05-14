@@ -54,7 +54,7 @@ func defaultConfig() Config {
 		MatchPIDs:           []string{"process.pid", "process.parent.pid"},
 		DeDot:               true,
 		WaitMetadata:        false,
-		WaitMetadataTimeout: 30 * time.Second,
+		WaitMetadataTimeout: 0, // Retry indefinitely
 		WaitMetadataRetry:   10 * time.Second,
 	}
 }
