@@ -331,6 +331,19 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	return c, nil
 }
 
+func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.clients {
+		if err := c.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
 		return config.EventListener
