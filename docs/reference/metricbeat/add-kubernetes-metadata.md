@@ -163,7 +163,7 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 :   The maximum time allowed for the processor to connect to the Kubernetes API and fetch metadata. Applies regardless of `wait_for_metadata`. To retry the connection indefinitely, set to `0`. Defaults to `30s`.
 
 `wait_for_metadata_retry_period` {applies_to}`stack: ga 9.5`
-:   Time to wait before retrying the metadata request. Retry period must not be greater than `wait_for_metadata_timeout` unless retrying indefinitely. Defaults to `3s`.
+:   Time to wait before retrying the metadata request. The retry period must not be greater than `wait_for_metadata_timeout` unless retrying indefinitely. Defaults to `3s`.
 
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 
