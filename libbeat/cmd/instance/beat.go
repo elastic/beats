@@ -466,6 +466,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
 		}
+		if err := b.API.AttachStateInspector(); err != nil {
+			return fmt.Errorf("failed to attach state inspector: %w", err)
+		}
 	}
 
 	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
