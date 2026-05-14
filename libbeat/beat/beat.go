@@ -30,7 +30,34 @@ import (
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
-var userAgent string = useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()) // User agent to use cross-component
+import (
+	"sync/atomic"
+
+	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
+	// ... other imports
+)
+
+var userAgent atomic.Value // stores string
+
+func init() {
+	userAgent.Store(useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))
+}
+
+// In GenerateUserAgent() function:
+func (beat *Beat) GenerateUserAgent(uaOpts ...useragent.Option) {
+	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
+		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
+	userAgent.Store(beat.Info.UserAgent)
+}
+
+// In UserAgent() function:
+func UserAgent() string {
+	if ua, ok := userAgent.Load().(string); ok {
+		return ua
+	}
+	return ""
+}
 
 // Creator initializes and configures a new Beater instance used to execute
 // the beat's run-loop.
