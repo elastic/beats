@@ -31,16 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-<<<<<<< HEAD
 // outputController manages the pipelines output capabilities, like:
-=======
-type outputController interface {
-	waitClose(ctx context.Context, force bool) error
-	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
-}
-
-// processOutputController manages the pipelines output capabilities, like:
->>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
 // - start
 // - stop
 // - reload
@@ -223,11 +214,7 @@ func (c *outputController) closeQueue(timeout time.Duration, force bool) {
 
 // queueProducer creates a queue producer with the given config, blocking
 // until the queue is created if it does not yet exist.
-<<<<<<< HEAD
-func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
-=======
-func (c *processOutputController) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
->>>>>>> df60c845e ([libbeat] Make queue interfaces a generic with an explicit entry type (#49954))
+func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
 	if publishDisabled {
 		// If publishDisabled is set ("-N" command line flag), then no output
 		// will ever be set, and no queue will ever be created. In this case,
