@@ -47,8 +47,8 @@
               type: long
               metric_type: counter
               description: >
-                Number of entries evicted (size or expiration) since node
-                startup.
+                Number of entries evicted (due to size limit or
+                expiration) since node startup.
             - name: hits.time.ms
               type: long
               metric_type: counter
