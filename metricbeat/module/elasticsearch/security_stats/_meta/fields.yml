@@ -10,7 +10,7 @@
     - name: dls
       type: group
       description: >
-        Document Level Security counters.
+        Document Level Security (DLS) counters.
       fields:
         - name: cache
           type: group
