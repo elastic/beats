@@ -23,7 +23,10 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -155,10 +158,22 @@ logging:
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
-<<<<<<< HEAD
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath)
 	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached")
-=======
+
+	requirePublishedEvents(t, filebeat, numEvents, outputFile)
+
+	// Read the registry log file and check the TTL
+	registryLogFile := filepath.Join(tempDir, "data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
+	require.GreaterOrEqual(t, len(entries), 1, "No registry entries found")
+	firstEntry := entries[0]
+
+	expectedTTL := time.Duration(-1)
+	assert.Equal(t, expectedTTL, firstEntry.TTL,
+		"Registry entry TTL should be -1 by default, but got %v", firstEntry.TTL)
+}
+
 // migrated from test_fixup_registry_entries_with_global_id in test_input.py
 func TestFixupRegistryEntriesWithGlobalID(t *testing.T) {
 	filebeat := integration.NewBeat(
@@ -224,29 +239,6 @@ func TestFixupRegistryEntriesWithGlobalID(t *testing.T) {
 	}
 }
 
-func TestFilestreamCanMigrateIdentity(t *testing.T) {
-	cfgTemplate := `
-filebeat.inputs:
-  - type: filestream
-    id: "test-migrate-ID"
-    paths:
-      - %s
-%s
->>>>>>> be7800883 ([Filestream] Fix global ID state migration (#50599))
-
-	requirePublishedEvents(t, filebeat, numEvents, outputFile)
-
-	// Read the registry log file and check the TTL
-	registryLogFile := filepath.Join(tempDir, "data", "registry", "filebeat", "log.json")
-	entries := readFilestreamRegistryLog(t, registryLogFile)
-	require.GreaterOrEqual(t, len(entries), 1, "No registry entries found")
-	firstEntry := entries[0]
-
-	expectedTTL := time.Duration(-1)
-	assert.Equal(t, expectedTTL, firstEntry.TTL,
-		"Registry entry TTL should be -1 by default, but got %v", firstEntry.TTL)
-}
-
 func requirePublishedEvents(
 	t *testing.T,
 	filebeat *integration.BeatProc,
@@ -258,4 +250,41 @@ func requirePublishedEvents(
 	if publishedEvents != expected {
 		t.Fatalf("expecting %d published events after file migration, got %d instead", expected, publishedEvents)
 	}
+}
+
+// getConfig renders the template in testdata/<folder>/<tmplPath> using vars.
+func getConfig(t *testing.T, vars map[string]any, folder, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", folder, tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	return str.String()
+}
+
+func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
+	t.Helper()
+
+	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
+	for _, entry := range entries {
+		if strings.Contains(entry.Key, "filestream::"+identity+"::") && entry.Removed {
+			return
+		}
+	}
+
+	t.Fatalf("expected registry entry for identity %q to be removed", identity)
+}
+
+func parseRegistry(entries []registryEntry) map[string]registryEntry {
+	registry := map[string]registryEntry{}
+	for _, entry := range entries {
+		registry[entry.Key] = entry
+	}
+	return registry
 }

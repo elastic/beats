@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"

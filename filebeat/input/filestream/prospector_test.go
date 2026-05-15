@@ -215,7 +215,7 @@ func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
 			})
 
 			oldKey := globalIdentifier.ID(oldSource)
-			globalStore := newMockStoreUpdater(map[string]loginp.Value{
+			globalStore := newMockProspectorCleaner(map[string]loginp.Value{
 				oldKey: &mockUnpackValue{
 					key: oldKey,
 					fileMeta: fileMeta{
@@ -234,7 +234,7 @@ func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
 					}),
 			}
 
-			err = p.Init(newMockStoreUpdater(nil), globalStore, inputIdentifier.ID)
+			err = p.Init(newMockProspectorCleaner(nil), globalStore, inputIdentifier.ID)
 			require.NoError(t, err, "prospector Init must succeed")
 			assert.Empty(
 				t,
@@ -915,6 +915,17 @@ func mustPathIdentifier(renamed bool) fileIdentifier {
 		return &renamedPathIdentifier{pathIdentifier}
 	}
 	return pathIdentifier
+}
+
+func mustIdentifier(t *testing.T, name string) fileIdentifier {
+	t.Helper()
+
+	factory, ok := identifierFactories[name]
+	require.Truef(t, ok, "identifier factory %q must exist", name)
+
+	identifier, err := factory(nil, logp.NewNopLogger())
+	require.NoErrorf(t, err, "creating %q identifier", name)
+	return identifier
 }
 
 func TestOnRenameFileIdentity(t *testing.T) {
