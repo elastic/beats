@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-12-19T08:03:42.7234679Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "added-distribution-group-account",

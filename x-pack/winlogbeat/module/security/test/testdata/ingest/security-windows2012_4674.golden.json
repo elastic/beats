@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-04-06T06:38:31.1087891Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "privileged-operation",

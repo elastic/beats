@@ -2,18 +2,22 @@
   {
     "@timestamp": "2020-05-14T15:31:22.4269238Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "403",
-      "ingested": "2025-01-15T10:02:22.075700098Z",
+      "ingested": "2025-10-29T18:18:28.942849919Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 33,
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -61,18 +65,22 @@
   {
     "@timestamp": "2020-05-15T08:11:47.932007Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "403",
-      "ingested": "2025-01-15T10:02:22.075721610Z",
+      "ingested": "2025-10-29T18:18:28.942869960Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 37,
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -121,18 +129,22 @@
   {
     "@timestamp": "2020-05-15T08:28:53.6266982Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "403",
-      "ingested": "2025-01-15T10:02:22.075728323Z",
+      "ingested": "2025-10-29T18:18:28.942874294Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 37,
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant",
@@ -188,18 +200,22 @@
   {
     "@timestamp": "2020-06-04T07:20:28.6861939Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "Engine Lifecycle",
-      "category": "process",
+      "category": [
+        "process"
+      ],
       "code": "403",
-      "ingested": "2025-01-15T10:02:22.075733622Z",
+      "ingested": "2025-10-29T18:18:28.942877752Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
       "sequence": 10,
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant",

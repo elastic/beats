@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:39:43.0856521Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "locked-out-user-account",

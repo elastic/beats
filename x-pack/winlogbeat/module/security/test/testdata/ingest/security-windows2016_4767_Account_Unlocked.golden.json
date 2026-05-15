@@ -2,7 +2,7 @@
   {
     "@timestamp": "2019-09-06T13:40:52.3149485Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "unlocked-user-account",

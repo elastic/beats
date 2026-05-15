@@ -2,7 +2,7 @@
   {
     "@timestamp": "2023-01-17T22:37:25.192Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "session-disconnected",
@@ -72,7 +72,7 @@
   {
     "@timestamp": "2023-01-17T22:09:56.356Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "session-disconnected",
@@ -142,7 +142,7 @@
   {
     "@timestamp": "2023-01-17T21:55:25.393Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "session-disconnected",
@@ -212,7 +212,7 @@
   {
     "@timestamp": "2023-01-17T21:54:30.313Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "session-disconnected",
@@ -282,7 +282,7 @@
   {
     "@timestamp": "2023-01-17T21:53:19.623Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "session-disconnected",
