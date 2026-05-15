@@ -189,7 +189,7 @@ func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bo
 
 func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool) (connected bool, stopped bool) {
 	d.log.Warnf(
-		"could not connect to docker, retrying asynchronously using "+
+		"could not connect to docker, retrying connection attempts using "+
 			"wait_for_metadata_timeout=%s (0 means indefinitely)",
 		d.retryTimeout,
 	)
