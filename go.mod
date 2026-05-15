@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.25.9
 
 require (
-	cloud.google.com/go/bigquery v1.73.1
+	cloud.google.com/go/bigquery v1.74.0
 	cloud.google.com/go/monitoring v1.24.3
 	cloud.google.com/go/pubsub v1.50.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
@@ -129,17 +129,10 @@ require (
 	golang.org/x/sys v0.43.0
 	golang.org/x/text v0.36.0
 	golang.org/x/time v0.15.0
-<<<<<<< HEAD
-	golang.org/x/tools v0.43.0
-	google.golang.org/api v0.272.0
-	google.golang.org/genproto v0.0.0-20260217215200-42d3e9bedb6d // indirect
-	google.golang.org/grpc v1.80.0
-=======
 	golang.org/x/tools v0.44.0
 	google.golang.org/api v0.275.0
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	google.golang.org/grpc v1.81.0
->>>>>>> 529933289 ( chore: update OTel Collector dependencies to `v0.152.0`/`v1.58.0` (#50658))
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -196,7 +189,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.3.2
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/cel-go v0.28.0
-	github.com/googleapis/gax-go/v2 v2.18.0
+	github.com/googleapis/gax-go/v2 v2.21.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/golang-lru/v2 v2.0.7
@@ -284,19 +277,13 @@ require (
 	www.velocidex.com/golang/regparser v0.0.0-20250203141505-31e704a67ef7
 )
 
-<<<<<<< HEAD
-=======
-require (
-	github.com/hashicorp/go-hclog v1.6.3 // indirect
-	go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
-)
+require go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
 
->>>>>>> 529933289 ( chore: update OTel Collector dependencies to `v0.152.0`/`v1.58.0` (#50658))
 require (
 	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
 	cel.dev/expr v0.25.1 // indirect
-	cloud.google.com/go/auth v0.18.2 // indirect
+	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.5.3 // indirect
@@ -535,12 +522,7 @@ require (
 	go.opentelemetry.io/collector/receiver/xreceiver v0.152.0 // indirect
 	go.opentelemetry.io/collector/service/hostcapabilities v0.152.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.18.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/contrib/detectors/gcp v1.39.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0 // indirect
-=======
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.67.0 // indirect
->>>>>>> 529933289 ( chore: update OTel Collector dependencies to `v0.152.0`/`v1.58.0` (#50658))
 	go.opentelemetry.io/contrib/otelconf v0.23.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.43.0 // indirect
 	go.opentelemetry.io/ebpf-profiler v0.0.202618 // indirect
@@ -574,7 +556,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.59.0
+	cloud.google.com/go/storage v1.59.2
 	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/moby/term v0.5.2 // indirect
