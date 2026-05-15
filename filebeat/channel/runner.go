@@ -161,6 +161,12 @@ func (r *runnerWithSharedProcessors) SetOnce(once bool) {
 	}
 }
 
+var (
+	_ cfgfile.Runner            = (*runnerWithSharedProcessors)(nil)
+	_ status.WithStatusReporter = (*runnerWithSharedProcessors)(nil)
+	_ OnceSetter                = (*runnerWithSharedProcessors)(nil)
+)
+
 // noCloseProcessor wraps a beat.Processor whose lifecycle is owned by the
 // input (not by an individual pipeline client). The wrapper:
 //
@@ -192,6 +198,11 @@ func (n *noCloseProcessor) SetPaths(p *paths.Path) error {
 	}
 	return nil
 }
+
+var (
+	_ beat.Processor        = (*noCloseProcessor)(nil)
+	_ processors.PathSetter = (*noCloseProcessor)(nil)
+)
 
 // newCommonConfigEditor builds the per-client editor closure plus the shared
 // per-input processors that the editor's clients reference. The shared
