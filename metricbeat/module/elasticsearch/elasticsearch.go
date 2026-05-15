@@ -251,7 +251,15 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filte
 		queryParams = append(queryParams, filterPathQueryParam)
 	}
 
-	queryString := strings.Join(queryParams, "&")
+	queryString := ""
+	clusterStateURI := "_cluster/state"
+	if len(metrics) > 0 {
+		clusterStateURI += "/" + strings.Join(metrics, ",")
+	}
+
+	if len(filterPaths) > 0 {
+		queryString = "filter_path=" + strings.Join(filterPaths, ",")
+	}
 
 	content, err := fetchPath(http, resetURI, clusterStateURI, queryString)
 	if err != nil {
