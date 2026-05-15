@@ -20,6 +20,7 @@ package pipeline
 import (
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -31,7 +32,7 @@ type queueReader struct {
 }
 
 type queueReaderRequest struct {
-	queue      queue.Queue
+	queue      queue.Queue[publisher.Event]
 	retryer    retryer
 	batchSize  int
 	timeToLive int
