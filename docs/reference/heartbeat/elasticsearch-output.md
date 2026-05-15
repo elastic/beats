@@ -457,8 +457,18 @@ output.elasticsearch:
 
 #### `dead_letter_index` [_dead_letter_index]
 
+```{applies_to}
+stack: deprecated 9.5.0+, beta 9.0-9.4
+```
+
 ::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
+:applies_to: {"stack": "deprecated 9.5.0+, beta 9.0-9.4" }
+
+Starting in version 9.5.0, this functionality is deprecated.
+
+In versions 9.0-9.4, it is in beta. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
+
+To handle documents that fail to index, use the data stream [failure store](docs-content://manage-data/data-store/data-streams/failure-store.md#use-failure-store).
 ::::
 
 

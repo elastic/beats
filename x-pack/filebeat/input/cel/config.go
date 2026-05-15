@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
@@ -57,7 +58,7 @@ type config struct {
 	// placed at state.secret before CEL program execution.
 	// The state.secret key is unconditionally redacted in
 	// debug logs.
-	SecretState map[string]interface{} `config:"secret_state"`
+	SecretState secretState `config:"secret_state"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
@@ -98,6 +99,30 @@ func (c config) GetPackageData(key string) string {
 		return "unknown"
 	}
 	return value
+}
+
+// secretState holds secret key-value pairs. It implements
+// the ucfg Unpacker interface to accept either a map (from
+// direct config) or a string (from Fleet secret resolution,
+// which delivers the stored YAML text as a scalar).
+//
+// The string case is needed because Fleet resolves secrets
+// to their stored string values. See
+// https://github.com/elastic/kibana/issues/267859
+type secretState struct {
+	m map[string]interface{}
+}
+
+func (s *secretState) Unpack(v interface{}) error {
+	switch v := v.(type) {
+	case map[string]interface{}:
+		s.m = v
+		return nil
+	case string:
+		return yaml.Unmarshal([]byte(v), &s.m)
+	default:
+		return fmt.Errorf("secret_state: expected string or map, got %T", v)
+	}
 }
 
 type redact struct {

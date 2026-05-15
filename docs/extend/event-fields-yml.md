@@ -162,7 +162,7 @@ For example, you can define a new text analyzer that does not break hyphenated n
 ```
 
 1. Use a newly defined text analyzer
-2. Define the custome analyzer type
+2. Define the custom analyzer type
 3. Specify the analyzer behaviour
 4. Use the same analyzer for the search
 
