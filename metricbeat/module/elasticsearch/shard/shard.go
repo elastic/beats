@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	content, err := m.HTTP.FetchContent()
+	content, err := m.FetchContent()
 	if err != nil {
 		return err
 	}
