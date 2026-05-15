@@ -1133,6 +1133,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	c.Transport = userAgentDecorator{
+		// The Filebeat user-agent is provided to the program as useragent. If a request
+		// is not given a user-agent string, this user agent is added to the request.s
 		UserAgent: beat.UserAgent(),
 		Transport: c.Transport,
 	}
