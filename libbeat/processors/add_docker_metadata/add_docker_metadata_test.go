@@ -509,6 +509,33 @@ func TestConfigValidate(t *testing.T) {
 			},
 			expectErr: true,
 		},
+		{
+			name: "explicit valid retry period",
+			cfg: map[string]any{
+				"wait_for_metadata_retry_period": "30s",
+			},
+		},
+		{
+			name: "zero retry period",
+			cfg: map[string]any{
+				"wait_for_metadata_retry_period": "0s",
+			},
+			expectErr: true,
+		},
+		{
+			name: "negative retry period",
+			cfg: map[string]any{
+				"wait_for_metadata_retry_period": "-1s",
+			},
+			expectErr: true,
+		},
+		{
+			name: "invalid retry period duration",
+			cfg: map[string]any{
+				"wait_for_metadata_retry_period": "not-a-duration",
+			},
+			expectErr: true,
+		},
 	}
 
 	for _, test := range tests {

@@ -64,5 +64,9 @@ func (c Config) Validate() error {
 		return fmt.Errorf("wait_for_metadata_timeout must be zero or greater (zero means wait indefinitely)")
 	}
 
+	if c.WaitMetadataRetry <= 0 {
+		return fmt.Errorf("wait_for_metadata_retry_period must be greater than zero")
+	}
+
 	return nil
 }
