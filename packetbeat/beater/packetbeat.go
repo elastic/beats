@@ -91,6 +91,7 @@ type packetbeat struct {
 	stopOnce           sync.Once
 
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+	pipeline                 beat.Pipeline
 }
 
 // New returns a new Packetbeat beat.Beater.
@@ -131,6 +132,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		factory:            factory,
 		overwritePipelines: overwritePipelines,
 		done:               make(chan struct{}),
+		pipeline:           b.Publisher,
 	}, nil
 }
 
@@ -197,7 +199,11 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 		return err
 	}
 	runner.Start()
-	defer runner.Stop()
+	defer func() {
+		runner.Stop()
+		// TODO: Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
+		pb.pipeline.Disconnect(context.Background())
+	}()
 
 	logp.Debug("main", "Waiting for the runner to finish")
 
@@ -225,6 +231,8 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 
 	defer func() {
 		runner.Stop()
+		// TODO: Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
+		pb.pipeline.Disconnect(context.Background())
 	}()
 
 	for {

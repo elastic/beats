@@ -522,8 +522,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		func() {
 			stopOnce.Do(func() {
 				b.Instrumentation.Tracer().Close()
-				// disconnect the pipeline first
-				b.Publisher.Disconnect(context.Background())
 				beater.Stop()
 			})
 		})

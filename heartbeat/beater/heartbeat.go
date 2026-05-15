@@ -60,6 +60,8 @@ type Heartbeat struct {
 	trace              tracer.Tracer
 
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+	logger                   *logp.Logger
+	pipeline                 beat.Pipeline
 }
 
 // New creates a new heartbeat.
@@ -137,13 +139,15 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
-		trace: trace,
+		trace:    trace,
+		logger:   b.Info.Logger,
+		pipeline: b.Publisher,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
 		runFromID = parsedConfig.RunFrom.ID
 	}
-	logp.L().Infof("heartbeat starting, running from: %v", runFromID)
+	bt.logger.Infof("heartbeat starting, running from: %v", runFromID)
 	return bt, nil
 }
 
@@ -154,17 +158,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	// Adapt local pipeline to synchronized mode if run_once is enabled
 	pipeline := b.Publisher
-	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
-	if bt.config.RunOnce {
-		sync := &monitors.SyncPipelineWrapper{}
 
-		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
-		pipelineWrapper = sync
-	}
-
-	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
+	bt.logger.Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
-	logp.L().Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
 	waitMonitors := monitors.NewSignalWait()
 
@@ -216,20 +213,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	waitMonitors.AddChan(bt.done)
 	waitMonitors.Wait()
 
-	logp.L().Info("Shutting down, waiting for output to complete")
+	bt.logger.Info("Shutting down, waiting for output to complete")
 
-	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
-	// located _after_ b.Manager.Stop() or else it will exit early
-	waitPublished := monitors.NewSignalWait()
-	defer waitPublished.Wait()
-
-	// Three possible events: global beat, run_once pipeline done and publish timeout
-	waitPublished.AddChan(bt.done)
-	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
-	if bt.config.PublishTimeout > 0 {
-		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
-		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
-			"shutdown: timed out waiting for pipeline to publish events."))
+	ctx, ctxCanacel := context.WithTimeout(context.Background(), bt.config.PublishTimeout)
+	defer ctxCanacel()
+	err = bt.pipeline.Disconnect(ctx)
+	if err != nil {
+		bt.logger.Warnf("error disconnecting pipeline: %v", err)
 	}
 
 	return nil
@@ -278,7 +268,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		// Backoff panics with 0 duration, set to smallest unit
 		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
-			logp.L().Warnf("skipping monitor state management during managed reload: %v", err)
+			bt.logger.Warnf("skipping monitor state management during managed reload: %v", err)
 		} else {
 			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}

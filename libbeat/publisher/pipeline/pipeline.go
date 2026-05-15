@@ -195,11 +195,10 @@ func NewForReceiver(
 	intakeQueueID string,
 ) (*Pipeline, error) {
 	p := &Pipeline{
-		beatInfo:         beatInfo,
-		monitors:         monitors,
-		observer:         newMetricsObserver(monitors.Metrics),
-		waitCloseTimeout: settings.WaitClose,
-		processors:       settings.Processors,
+		beatInfo:   beatInfo,
+		monitors:   monitors,
+		observer:   newMetricsObserver(monitors.Metrics),
+		processors: settings.Processors,
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
@@ -223,22 +222,15 @@ func NewForReceiver(
 }
 
 // Disconnect stops the pipeline, outputs and queue.
-// If WaitClose with WaitOnPipelineClose mode is configured, Disconnect will block
-// for a duration of WaitClose, if there are still active events in the pipeline.
 // Note: clients will no longer accept new Publish calls once Disconnect is started,
 // and will no longer receive event acknowledgments once Disconnect returns.
 func (p *Pipeline) Disconnect(ctx context.Context) error {
-	// Here context does not do anything for now but it will be the responsibility of the beater to determine how long to wait before full disconnection
-	// See issue: https://github.com/elastic/beats/issues/49794
 	p.closeOnce.Do(func() {
 		log := p.monitors.Logger
-
 		log.Debug("close pipeline")
 
 		// Note: active clients are not closed / disconnected.
-		timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
-		defer cancel()
-		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
+		p.outputController.waitClose(ctx, p.forceCloseQueue)
 
 		p.observer.cleanup()
 	})

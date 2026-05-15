@@ -84,7 +84,8 @@ func DefaultConfig() *Config {
 	}
 
 	return &Config{
-		Jobs: limits,
+		Jobs:           limits,
+		PublishTimeout: 1 * time.Second,
 	}
 }
 

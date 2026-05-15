@@ -190,13 +190,6 @@ func (br *BeatReceiver) Shutdown() error {
 	if br.releaseSystemBridge != nil {
 		br.releaseSystemBridge()
 	}
-	// Notify the publisher pipeline to shut down (if configured this will
-	// wait for a specified timeout for outstanding events to be
-	// acknowledged).
-	// TODO: use the caller's context once the pipeline supports context cancellation.
-	if err := br.beat.Publisher.Disconnect(context.Background()); err != nil {
-		br.Logger.Errorf("error closing beat receiver publisher: %v", err)
-	}
 
 	// At this point the publisher pipeline is stopped and no more events can
 	// be sent or acknowledged. Notify the beater to shutdown as well.

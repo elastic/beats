@@ -18,8 +18,10 @@
 package beater
 
 import (
+	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -58,6 +60,7 @@ type Metricbeat struct {
 	// Options
 	moduleOptions []module.Option
 	logger        *logp.Logger
+	pipeline      beat.Pipeline
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -160,6 +163,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		paths:             b.Info.Paths,
 		logger:            b.Info.Logger,
 		dynamicCfgEnabled: dynamicCfgEnabled,
+		pipeline:          b.Publisher,
 	}
 
 	for _, applyOption := range options {
@@ -308,6 +312,14 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	wg.Wait()
+
+	// disconnect pipeline to ensure all pending events are flushed.
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := bt.pipeline.Disconnect(ctx)
+	if err != nil {
+		bt.logger.Warnf("error disconnecting pipeline: %v", err)
+	}
 
 	return nil
 }
