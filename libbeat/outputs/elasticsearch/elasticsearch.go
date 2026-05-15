@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -39,7 +38,6 @@ func makeES(
 	beatInfo beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
-	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	log := beatInfo.Logger.Named(logSelector)
 	esConfig := defaultConfig
@@ -132,7 +130,7 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, beatInfo.Logger, beatPaths, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, beatInfo.Logger, beatInfo.Paths, clients)
 }
 
 func buildSelectors(
