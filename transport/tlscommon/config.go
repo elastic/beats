@@ -62,8 +62,24 @@ func LoadTLSConfig(config *Config, logger *logp.Logger) (*TLSConfig, error) {
 		curves[idx] = tls.CurveID(id)
 	}
 
-	cas, errs := LoadCertificateAuthorities(config.CAs)
-	logFail(errs...)
+	var rootCAs certPoolProvider
+
+	if len(config.CAs) > 0 && config.CertificateReload.IsEnabled() {
+		reloader, err := NewCAReloader(config.CAs, config.CertificateReload.ReloadInterval)
+		logFail(err)
+		if reloader != nil {
+			rootCAs = reloader
+		}
+	} else if len(config.CAs) > 0 {
+		pool, errs := LoadCertificateAuthorities(config.CAs)
+		logFail(errs...)
+		rootCAs = newStaticCertPool(pool)
+	}
+	if rootCAs == nil && config.CATrustedFingerprint != "" {
+		// Pre-allocate an empty pool so trustRootCA can add fingerprint-matched
+		// certs without a nil dereference on concurrent handshakes.
+		rootCAs = newStaticCertPool(nil)
+	}
 
 	var certs []tls.Certificate
 	var reloader *CertReloader
@@ -96,7 +112,7 @@ func LoadTLSConfig(config *Config, logger *logp.Logger) (*TLSConfig, error) {
 		Versions:             config.Versions,
 		Verification:         config.VerificationMode,
 		Certificates:         certs,
-		RootCAs:              cas,
+		rootCAs:              rootCAs,
 		CipherSuites:         config.CipherSuites,
 		CurvePreferences:     curves,
 		Renegotiation:        tls.RenegotiationSupport(config.Renegotiation),

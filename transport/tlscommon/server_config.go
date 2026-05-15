@@ -90,8 +90,19 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 		curves[idx] = tls.CurveID(id)
 	}
 
-	cas, errs := LoadCertificateAuthorities(config.CAs)
-	logFail(errs...)
+	var clientCAs certPoolProvider
+
+	if len(config.CAs) > 0 && config.CertificateReload.IsEnabled() {
+		reloader, err := NewCAReloader(config.CAs, config.CertificateReload.ReloadInterval)
+		logFail(err)
+		if reloader != nil {
+			clientCAs = reloader
+		}
+	} else if len(config.CAs) > 0 {
+		pool, errs := LoadCertificateAuthorities(config.CAs)
+		logFail(errs...)
+		clientCAs = newStaticCertPool(pool)
+	}
 
 	var certs []tls.Certificate
 	var reloader *CertReloader
@@ -129,7 +140,7 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 		Versions:         config.Versions,
 		Verification:     config.VerificationMode,
 		Certificates:     certs,
-		ClientCAs:        cas,
+		clientCAs:        clientCAs,
 		CipherSuites:     config.CipherSuites,
 		CurvePreferences: curves,
 		ClientAuth:       tls.ClientAuthType(clientAuth),

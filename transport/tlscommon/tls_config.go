@@ -26,10 +26,48 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// certPoolProvider abstracts over static and dynamically-reloaded CA pools.
+// CAReloader implements this interface for the dynamic case; staticCertPool
+// implements it for the static case.
+type certPoolProvider interface {
+	GetCertPool() *x509.CertPool
+	AddTrustedCert(cert *x509.Certificate)
+	IsDynamic() bool
+}
+
+// staticCertPool is a certPoolProvider backed by a fixed *x509.CertPool.
+// It is safe for concurrent use.
+type staticCertPool struct {
+	mu   sync.Mutex
+	pool *x509.CertPool
+}
+
+func newStaticCertPool(pool *x509.CertPool) *staticCertPool {
+	return &staticCertPool{pool: pool}
+}
+
+func (s *staticCertPool) GetCertPool() *x509.CertPool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.pool
+}
+
+func (s *staticCertPool) AddTrustedCert(cert *x509.Certificate) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.pool == nil {
+		s.pool = x509.NewCertPool()
+	}
+	s.pool.AddCert(cert)
+}
+
+func (s *staticCertPool) IsDynamic() bool { return false }
 
 // TLSConfig is the interface used to configure a tcp client or server from a `Config`
 type TLSConfig struct {
@@ -46,15 +84,13 @@ type TLSConfig struct {
 	// connection.
 	Certificates []tls.Certificate
 
-	// Set of root certificate authorities use to verify server certificates.
-	// If RootCAs is nil, TLS might use the system its root CA set (not supported
-	// on MS Windows).
-	RootCAs *x509.CertPool
+	// rootCAs provides the CA pool for verifying server certificates.
+	// nil means use the system pool. Use currentRootCAs() to access.
+	rootCAs certPoolProvider
 
-	// Set of root certificate authorities use to verify client certificates.
-	// If ClientCAs is nil, TLS might use the system its root CA set (not supported
-	// on MS Windows).
-	ClientCAs *x509.CertPool
+	// clientCAs provides the CA pool for verifying client certificates.
+	// nil means use the system pool. Use currentClientCAs() to access.
+	clientCAs certPoolProvider
 
 	// List of supported cipher suites. If nil, a default list provided by the
 	// implementation will be used.
@@ -99,6 +135,20 @@ var (
 	ErrMissingPeerCertificate = errors.New("missing peer certificates")
 )
 
+func (c *TLSConfig) currentRootCAs() *x509.CertPool {
+	if c.rootCAs == nil {
+		return nil
+	}
+	return c.rootCAs.GetCertPool()
+}
+
+func (c *TLSConfig) currentClientCAs() *x509.CertPool {
+	if c.clientCAs == nil {
+		return nil
+	}
+	return c.clientCAs.GetCertPool()
+}
+
 type tlsOptFunc func(t *TLSSettings)
 
 func (t tlsOptFunc) apply(c *TLSSettings) {
@@ -124,12 +174,13 @@ func WithLogger(logger *logp.Logger) TLSOption {
 // By default VerifyConnection is set to client mode.
 func (c *TLSConfig) ToConfig() *tls.Config {
 	if c == nil {
-		return &tls.Config{} //nolint:gosec // empty TLS config
+		return &tls.Config{}
 	}
 
 	minVersion, maxVersion := extractMinMaxVersion(c.Versions)
 
-	insecure := c.Verification != VerifyStrict
+	dynamic := (c.rootCAs != nil && c.rootCAs.IsDynamic()) || (c.clientCAs != nil && c.clientCAs.IsDynamic())
+	insecure := c.Verification != VerifyStrict || dynamic
 	if c.Verification == VerifyNone {
 		c.Logger.Named("tls").Warn("SSL/TLS verifications disabled.")
 	}
@@ -138,8 +189,8 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		MinVersion:         minVersion,
 		MaxVersion:         maxVersion,
 		Certificates:       c.Certificates,
-		RootCAs:            c.RootCAs,
-		ClientCAs:          c.ClientCAs,
+		RootCAs:            c.currentRootCAs(),
+		ClientCAs:          c.currentClientCAs(),
 		InsecureSkipVerify: insecure, //nolint:gosec // we are using our own verification for now
 		CipherSuites:       convCipherSuites(c.CipherSuites),
 		CurvePreferences:   c.CurvePreferences,
@@ -248,11 +299,7 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate, logger *logp.Log
 		}
 
 		logger.Debug("CA certificate matching 'ca_trusted_fingerprint' found, adding it to 'certificate_authorities'")
-		if cfg.RootCAs == nil {
-			cfg.RootCAs = x509.NewCertPool()
-		}
-
-		cfg.RootCAs.AddCert(cert)
+		cfg.rootCAs.AddTrustedCert(cert)
 		return nil
 	}
 
@@ -286,7 +333,7 @@ func makeVerifyConnection(cfg *TLSConfig, logger *logp.Logger) func(tls.Connecti
 			}
 
 			opts := x509.VerifyOptions{
-				Roots:         cfg.RootCAs,
+				Roots:         cfg.currentRootCAs(),
 				Intermediates: x509.NewCertPool(),
 			}
 			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
@@ -312,7 +359,7 @@ func makeVerifyConnection(cfg *TLSConfig, logger *logp.Logger) func(tls.Connecti
 			}
 
 			opts := x509.VerifyOptions{
-				Roots:         cfg.RootCAs,
+				Roots:         cfg.currentRootCAs(),
 				Intermediates: x509.NewCertPool(),
 			}
 			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
@@ -321,9 +368,29 @@ func makeVerifyConnection(cfg *TLSConfig, logger *logp.Logger) func(tls.Connecti
 		// Cert is trusted by CA
 		// Hostname or IP matches the certificate
 		// Returns error if SNA is empty
-		// The whole validation is done by Go's standard library default
-		// SSL/TLS verification (tls.Config.InsecureSkipVerify is set to false)
-		// so we only need to check the pin
+		if cfg.rootCAs != nil && cfg.rootCAs.IsDynamic() {
+			// When rootCAs is dynamic, InsecureSkipVerify is true so Go's
+			// stdlib won't validate the chain. Do full strict verification
+			// manually using the dynamically reloaded CA pool.
+			return func(cs tls.ConnectionState) error {
+				if cfg.CATrustedFingerprint != "" {
+					if err := trustRootCA(cfg, cs.PeerCertificates, logger); err != nil {
+						return err
+					}
+				}
+				if len(cs.PeerCertificates) == 0 {
+					return ErrMissingPeerCertificate
+				}
+				opts := x509.VerifyOptions{
+					Roots:         cfg.currentRootCAs(),
+					DNSName:       serverName,
+					Intermediates: x509.NewCertPool(),
+				}
+				return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			}
+		}
+		// Static CAs: Go's stdlib handles chain + hostname verification
+		// (InsecureSkipVerify is false). We only need a callback for CA pin checking.
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
 				if cfg.CATrustedFingerprint != "" {
@@ -358,13 +425,29 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 			}
 
 			opts := x509.VerifyOptions{
-				Roots:         cfg.ClientCAs,
+				Roots:         cfg.currentClientCAs(),
 				Intermediates: x509.NewCertPool(),
 				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 			}
 			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		}
 	case VerifyStrict:
+		if cfg.clientCAs != nil && cfg.clientCAs.IsDynamic() {
+			return func(cs tls.ConnectionState) error {
+				if len(cs.PeerCertificates) == 0 {
+					if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
+						return ErrMissingPeerCertificate
+					}
+					return nil
+				}
+				opts := x509.VerifyOptions{
+					Roots:         cfg.currentClientCAs(),
+					Intermediates: x509.NewCertPool(),
+					KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
+				}
+				return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
+			}
+		}
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
 				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
