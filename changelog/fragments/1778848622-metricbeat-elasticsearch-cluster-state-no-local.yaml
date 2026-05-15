@@ -1,0 +1,5 @@
+kind: bug-fix
+summary: Elasticsearch module cluster state requests no longer append local=true.
+component: metricbeat
+pr: https://github.com/elastic/beats/pull/50723
+issue: https://github.com/elastic/beats/issues/50722
