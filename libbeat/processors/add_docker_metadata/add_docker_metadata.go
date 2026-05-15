@@ -77,6 +77,7 @@ type addDockerMetadata struct {
 	cgreader        processors.CGReader
 	retryPeriod     time.Duration // Period to wait when reconnecting to Docker
 	retryTimeout    time.Duration // Maximum time to wait when connecting to Docker, 0 means wait forever.
+	retryIsBlocking bool          // If true block while trying to connect to Docker
 }
 
 const selector = "add_docker_metadata"
@@ -125,6 +126,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		closeRetry:      make(chan struct{}),
 		retryPeriod:     config.WaitMetadataRetry,
 		retryTimeout:    config.WaitMetadataTimeout,
+		retryIsBlocking: config.WaitMetadata,
 	}
 
 	constructAndStartWatcher := func() docker.Watcher {
@@ -157,7 +159,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	}
 
 	if !connectToDocker() {
-		if config.WaitMetadata {
+		if dm.retryIsBlocking {
 			connected, _ := dm.retryConnectToDocker(connectToDocker)
 			if !connected {
 				if err := processors.Close(dm.sourceProcessor); err != nil {
@@ -188,9 +190,16 @@ func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bo
 }
 
 func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool) (connected bool, stopped bool) {
+	blockingStr := "non-blocking"
+	if d.retryIsBlocking {
+		blockingStr = "blocking"
+	}
+
 	d.log.Warnf(
-		"could not connect to docker, retrying connection attempts using "+
-			"wait_for_metadata_timeout=%s (0 means indefinitely)",
+		"could not connect to docker, retrying (%s) connection attempts every %s "+
+			"with a maximum wait of %s (0 means indefinitely)",
+		blockingStr,
+		d.retryPeriod,
 		d.retryTimeout,
 	)
 
