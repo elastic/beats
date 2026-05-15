@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // builder is used to create the event processing pipeline in Beats.  The
@@ -287,7 +286,7 @@ func (b *builder) Processors() []string {
 //  9. (P) timeseries mangling
 //  10. (P) (if publish/debug enabled) log event
 //  11. (P) (if output disabled) dropEvent
-func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
+func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	var (
 		// pipeline processors
 		processors = newGroup("processPipeline", b.log)
@@ -383,7 +382,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 	// setup 8: pipeline processors list
 	if b.processors != nil {
 		// function processor hides implementation of processors.PathSetter
-		err := b.processors.SetPaths(paths)
+		err := b.processors.SetPaths(b.info.Paths)
 		if err != nil {
 			return nil, fmt.Errorf("failed setting paths for global processors: %w", err)
 		}
@@ -407,7 +406,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path
 		processors.add(dropDisabledProcessor)
 	}
 
-	err := processors.SetPaths(paths)
+	err := processors.SetPaths(b.info.Paths)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set paths for processing pipeline: %w", err)
 	}
