@@ -906,9 +906,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]any{
-					"message": `failed eval: ERROR: <input>:3:21: response body too big
- |   "events": [string(body)]
- | ....................^`,
+					"message": `failed eval: ERROR: <input>:2:5: response body too big
+ |  get(state.url).Body.as(body, {
+ | ....^`,
 				},
 			},
 		},
@@ -2163,13 +2163,11 @@ var inputTests = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
-			// Loss of location information here is a result of changes in the runtime.
-			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					"message": `failed eval: ERROR: <input>:5:14: no such overload
- |    "events": events,
- | .............^`,
+					"message": `failed eval: ERROR: <input>:3:20: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | ...................^`,
 				},
 			},
 		},

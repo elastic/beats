@@ -20,8 +20,7 @@ package image
 import (
 	"context"
 
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -41,7 +40,7 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *client.Client
+	dockerClient *dockerclient.Client
 	dedot        bool
 }
 
@@ -70,12 +69,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	images, err := m.dockerClient.ImageList(context.TODO(), image.ListOptions{})
+	result, err := m.dockerClient.ImageList(context.TODO(), dockerclient.ImageListOptions{})
 	if err != nil {
 		return err
 	}
 
-	events := eventsMapping(images, m.dedot)
+	events := eventsMapping(result.Items, m.dedot)
 	for _, event := range events {
 		reporter.Event(mb.Event{MetricSetFields: event})
 	}

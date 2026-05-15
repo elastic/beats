@@ -351,22 +351,28 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	metaClone := metadata.Clone()
-	_ = metaClone.Delete("kubernetes.container.name")
-	containerImage, err := metadata.GetValue("kubernetes.container.image")
-	if err == nil {
-		_ = metaClone.Delete("kubernetes.container.image")
-		_, _ = metaClone.Put("kubernetes.container.image.name", containerImage)
-	}
-	cmeta, err := metaClone.Clone().GetValue("kubernetes.container")
-	if err == nil {
-		event.Fields.DeepUpdate(mapstr.M{
-			"container": cmeta,
-		})
+	// One full clone for the kubernetes field; one cheap sub-map clone for the OCI
+	// container field. This replaces the original three full clones.
+	kubeMeta := metadata.Clone()
+
+	// Build the OCI container field by cloning only the container sub-map —
+	// much cheaper than cloning the full metadata. Transform it in place:
+	// drop container.name and rewrite container.image -> container.image.name.
+	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
+		if cm, ok := containerVal.(mapstr.M); ok {
+			ociContainer := cm.Clone()
+			_ = ociContainer.Delete("name")
+			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
+				_ = ociContainer.Delete("image")
+				ociContainer["image"] = mapstr.M{"name": img}
+			}
+			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+		}
 	}
 
-	kubeMeta := metadata.Clone()
-	// remove container meta from kubernetes.container.*
+	// Remove container fields that belong only in the OCI section before writing
+	// kubernetes metadata to the event. container.name is intentionally kept here
+	// to match original behaviour.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")

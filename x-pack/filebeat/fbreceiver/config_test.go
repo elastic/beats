@@ -75,6 +75,16 @@ func TestUnmarshal(t *testing.T) {
 	})
 }
 
+func TestUnmarshalIncludeMetadata(t *testing.T) {
+	cfg := &Config{}
+	userConf := confmap.NewFromStringMap(map[string]any{
+		"include_metadata": true,
+		"filebeat":         map[string]any{"inputs": []any{}},
+	})
+	require.NoError(t, cfg.Unmarshal(userConf))
+	assert.Equal(t, true, cfg.Beatconfig["include_metadata"])
+}
+
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
 		c           *Config
