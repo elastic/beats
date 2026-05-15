@@ -22,24 +22,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type forgetfulProducer struct {
-	broker    *broker
-	openState openState
+type forgetfulProducer[T any] struct {
+	broker    *broker[T]
+	openState openState[T]
 }
 
-type ackProducer struct {
-	broker        *broker
+type ackProducer[T any] struct {
+	broker        *broker[T]
 	producedCount uint64
 	state         produceState
-	openState     openState
+	openState     openState[T]
 }
 
-type openState struct {
+type openState[T any] struct {
 	log          *logp.Logger
 	done         chan struct{}
 	queueClosing <-chan struct{}
-	events       chan pushRequest
-	encoder      queue.Encoder
+	events       chan pushRequest[T]
+	encoder      queue.Encoder[T]
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -55,8 +55,8 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer {
-	openState := openState{
+func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) queue.Producer[T] {
+	openState := openState[T]{
 		log:          b.logger,
 		done:         make(chan struct{}),
 		queueClosing: b.closingChan,
@@ -65,35 +65,35 @@ func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer
 	}
 
 	if cb != nil {
-		p := &ackProducer{broker: b, openState: openState}
+		p := &ackProducer[T]{broker: b, openState: openState}
 		p.state.cb = cb
 		return p
 	}
-	return &forgetfulProducer{broker: b, openState: openState}
+	return &forgetfulProducer[T]{broker: b, openState: openState}
 }
 
-func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
+func (p *forgetfulProducer[T]) makePushRequest(event T) pushRequest[T] {
 	resp := make(chan queue.EntryID, 1)
-	return pushRequest{
+	return pushRequest[T]{
 		event: event,
 		resp:  resp}
 }
 
-func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+func (p *forgetfulProducer[T]) Publish(event T) (queue.EntryID, bool) {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+func (p *forgetfulProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) Close() {
+func (p *forgetfulProducer[T]) Close() {
 	p.openState.Close()
 }
 
-func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
+func (p *ackProducer[T]) makePushRequest(event T) pushRequest[T] {
 	resp := make(chan queue.EntryID, 1)
-	return pushRequest{
+	return pushRequest[T]{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
@@ -102,7 +102,7 @@ func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
 		resp:       resp}
 }
 
-func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
 	id, published := p.openState.publish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
@@ -110,7 +110,7 @@ func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
 	return id, published
 }
 
-func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+func (p *ackProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
 	id, published := p.openState.tryPublish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
@@ -118,15 +118,15 @@ func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	return id, published
 }
 
-func (p *ackProducer) Close() {
+func (p *ackProducer[T]) Close() {
 	p.openState.Close()
 }
 
-func (st *openState) Close() {
+func (st *openState[T]) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState[T]) publish(req pushRequest[T]) (queue.EntryID, bool) {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -144,7 +144,7 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState[T]) tryPublish(req pushRequest[T]) (queue.EntryID, bool) {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -162,7 +162,7 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	}
 }
 
-func (st *openState) handlePendingResponse(respChan chan queue.EntryID) (queue.EntryID, bool) {
+func (st *openState[T]) handlePendingResponse(respChan chan queue.EntryID) (queue.EntryID, bool) {
 	// The events channel is buffered, which means we may successfully
 	// write to it even if the queue is shutting down. To avoid blocking
 	// forever during shutdown, we also have to wait on the queue's
