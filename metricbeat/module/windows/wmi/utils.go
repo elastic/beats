@@ -22,6 +22,7 @@ package wmi
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -103,10 +104,30 @@ func internalConvertDateTime(v string) (time.Time, error) {
 // Type conversion that applies to both arrays and scalars
 type WmiConversionFunction func(interface{}) (interface{}, error)
 
+// utility function to verify if an interface is actually a nil value
+func isNil(value interface{}) bool {
+	// In my tests I only encountered this case (untyped nil interface{})
+	if value == nil {
+		return true
+	}
+
+	// To be sure we perform additional checks
+	// Handles typed nil pointers stored in interfaces.
+	// Example: `var p *int = nil; var i interface{} = p;`
+	// Here, `i == nil` is false, but `reflect.ValueOf(i).IsNil()` is true.
+	t := reflect.TypeOf(value)
+
+	if t.Kind() == reflect.Ptr {
+		return reflect.ValueOf(value).IsNil()
+	}
+
+	return false
+}
+
 // General-purpose function that invokes the internal WMI conversion on
 // both strings and arrays to avoid code duplication.
 func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConversionFunction[T]) (interface{}, error) {
-	if v == nil {
+	if isNil(v) {
 		return nil, nil
 	}
 	switch value := v.(type) {
