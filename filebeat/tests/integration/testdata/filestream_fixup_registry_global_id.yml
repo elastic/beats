@@ -1,0 +1,28 @@
+filebeat.inputs:
+  - type: filestream
+{{ if .inputID }}
+    id: {{ .inputID }}
+{{ end }}
+    paths:
+      - {{ .logFilePath }}
+    prospector:
+      scanner:
+        check_interval: 100ms
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: {{ .homePath }}
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - input.filestream
+    - input.filestream.prospector
+  metrics:
+    enabled: false
