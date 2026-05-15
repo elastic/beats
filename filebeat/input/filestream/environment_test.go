@@ -700,10 +700,8 @@ func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
 	defer pc.mtx.Unlock()
 
 	var err error
-	for i, c := range pc.clients {
-		if c == client {
-			err = errors.Join(err, c.Close())
-		}
+	for _, c := range pc.clients {
+		err = errors.Join(err, c.Close())
 	}
 
 	return err
