@@ -76,6 +76,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return fmt.Errorf("failed reading counters: %w", err)
 	}
 
+	m.Logger().Infof("post_events: %+v", events)
+
 	for _, event := range events {
 		isOpen := report.Event(event)
 		if !isOpen {
