@@ -22,8 +22,10 @@ description: |
   The `add_docker_metadata` processor now retries connecting to Docker
   until `wait_for_metadata_timeout` expires. Set `wait_for_metadata`
   to true to block startup until Docker metadata is available. A
-  `wait_for_metadata_timeout` value of zero retries indefinitely. Configure
-  retry cadence with `wait_for_metadata_retry_period`.
+  `wait_for_metadata_timeout` value of zero retries indefinitely,
+  setting it to 1s restores the previous behaviour of not
+  retrying. Configure retry cadence with
+  `wait_for_metadata_retry_period`.
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
