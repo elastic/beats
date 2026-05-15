@@ -1,0 +1,17 @@
+- type: filestream
+  enabled: true
+  id: "group-01"
+  take_over.enabled: true
+  prospector:
+      check_interval: 1s
+  paths:
+    - {{ .logDir }}/group-01-*.log
+
+- type: filestream
+  enabled: true
+  id: "group-02"
+  take_over.enabled: true
+  prospector:
+      check_interval: 1s
+  paths:
+    - {{ .logDir }}/group-02-*.log
