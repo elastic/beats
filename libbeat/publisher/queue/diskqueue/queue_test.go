@@ -139,9 +139,8 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 		count := replayedBatch.Count()
 		var msg any
 		if count > 0 {
-			if ev, ok := replayedBatch.Entry(0).(publisher.Event); ok {
-				msg, _ = ev.Content.Fields.GetValue("message")
-			}
+			ev := replayedBatch.Entry(0)
+			msg, _ = ev.Content.Fields.GetValue("message")
 		}
 		replayedBatch.Done()
 		t.Fatalf("unexpected replayed event after restart"+
@@ -156,7 +155,7 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 func publishAndACKSingleEvent(
 	t *testing.T,
 	queueInstance *diskQueue,
-	producer queue.Producer,
+	producer queue.Producer[publisher.Event],
 	msg string,
 ) {
 	_, ok := producer.Publish(makeDiskQueueTestEvent(msg))
@@ -169,9 +168,9 @@ func publishAndACKSingleEvent(
 	batch.Done()
 }
 
-func readBatch(t *testing.T, queueInstance *diskQueue, timeout time.Duration) queue.Batch {
+func readBatch(t *testing.T, queueInstance *diskQueue, timeout time.Duration) queue.Batch[publisher.Event] {
 	type getResult struct {
-		batch queue.Batch
+		batch queue.Batch[publisher.Event]
 		err   error
 	}
 
@@ -201,10 +200,8 @@ func closeQueueAndWait(t *testing.T, queueInstance *diskQueue) {
 	}
 }
 
-func assertEventMessage(t *testing.T, event queue.Entry, expectedMsg string) {
-	ev, ok := event.(publisher.Event)
-	require.True(t, ok, "queue entry should be a publisher.Event")
-	msg, _ := ev.Content.Fields.GetValue("message")
+func assertEventMessage(t *testing.T, event publisher.Event, expectedMsg string) {
+	msg, _ := event.Content.Fields.GetValue("message")
 	assert.Equal(t, expectedMsg, msg, "unexpected message in consumed event")
 }
 
