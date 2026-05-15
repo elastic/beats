@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 from filebeat import BaseTest
-import json
 import os
-import shutil
 import sys
 import time
 import unittest
@@ -16,6 +14,7 @@ Tests for the input functionality.
 
 
 class Test(BaseTest):
+<<<<<<< HEAD
     def test_fixup_registry_entries_with_global_id(self):
         """
         Should update the registry correctly when an filestream input that
@@ -82,6 +81,8 @@ class Test(BaseTest):
         assert global_entry['ttl'] == 0, "ttl must be 0 because that's the effect of 'removing' the entry from the registry"
         assert fixed_entry['ttl'] != 0, "ttl must not be 0 because the entry has been added recently"
 
+=======
+>>>>>>> be7800883 ([Filestream] Fix global ID state migration (#50599))
     def test_ignore_older_files(self):
         """
         Should ignore files there were not modified for longer then
