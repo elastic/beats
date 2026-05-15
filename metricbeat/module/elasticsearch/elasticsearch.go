@@ -265,7 +265,7 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filte
 
 func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string, filterPaths []string) (mapstr.M, error) {
 
-	queryParams := []string{"expand_wildcards=hidden,all"}
+	queryParams := []string{"local=true", "expand_wildcards=hidden,all"}
 	indicesSettingsURI := indexPattern + "/_settings"
 
 	if len(filterPaths) > 0 {
