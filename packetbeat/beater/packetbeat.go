@@ -92,6 +92,7 @@ type packetbeat struct {
 
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 	pipeline                 beat.Pipeline
+	logger                   *logp.Logger
 }
 
 // New returns a new Packetbeat beat.Beater.
@@ -133,6 +134,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		overwritePipelines: overwritePipelines,
 		done:               make(chan struct{}),
 		pipeline:           b.Publisher,
+		logger:             b.Info.Logger,
 	}, nil
 }
 
@@ -143,9 +145,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 func (pb *packetbeat) Run(b *beat.Beat) error {
 	defer func() {
 		if service.ProfileEnabled() {
-			logp.Debug("main", "Waiting for streams and transactions to expire...")
+			pb.logger.Debug("main", "Waiting for streams and transactions to expire...")
 			time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
-			logp.Debug("main", "Streams and transactions should all be expired now.")
+			pb.logger.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
 
@@ -161,7 +163,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			"input_metrics.json", "application/json", func() []byte {
 				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
-					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					pb.logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
 				}
 				return data
@@ -178,7 +180,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 				return err
 			}
 		} else {
-			logp.L().Warn(pipelinesWarning)
+			pb.logger.Warn(pipelinesWarning)
 		}
 
 		return pb.runStatic(b, pb.factory)
@@ -205,7 +207,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 		pb.pipeline.Disconnect(context.Background())
 	}()
 
-	logp.Debug("main", "Waiting for the runner to finish")
+	pb.logger.Debug("main", "Waiting for the runner to finish")
 
 	select {
 	case <-pb.done:
@@ -221,7 +223,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(runner)
-	logp.Debug("main", "Waiting for the runner to finish")
+	pb.logger.Debug("main", "Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when
 	// the function return.
@@ -253,7 +255,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 
 // Called by the Beat stop function
 func (pb *packetbeat) Stop() {
-	logp.Info("Packetbeat send stop signal")
+	pb.logger.Info("Packetbeat send stop signal")
 	pb.stopOnce.Do(func() { close(pb.done) })
 }
 
