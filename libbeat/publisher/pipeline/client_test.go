@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"context"
 	"errors"
 	"io"
 	"strings"
@@ -70,7 +71,10 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer pipeline.Disconnect(t.Context())
+		// disconnect pipeline in few seconds to not block forever
+		ctx, ctxCancel := context.WithTimeout(t.Context(), 2*time.Second)
+		defer ctxCancel()
+		defer pipeline.Disconnect(ctx)
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
