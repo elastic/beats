@@ -1017,3 +1017,13 @@ func createTestFileDescriptorWithInfo(fi fs.FileInfo) loginp.FileDescriptor {
 		Filename:    "filename",
 	}
 }
+
+// mustIdentifier creates a fileIdentifier or fails the test
+func mustIdentifier(t *testing.T, name string) fileIdentifier {
+	t.Helper()
+	factory, ok := identifierFactories[name]
+	require.True(t, ok, "identifier factory not found: %s", name)
+	identifier, err := factory(nil, logp.NewNopLogger())
+	require.NoError(t, err, "failed to create identifier: %s", name)
+	return identifier
+}
