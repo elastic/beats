@@ -695,7 +695,7 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	return c, nil
 }
 
-func (pc *mockPipelineConnector) Disonnect(ctx context.Context) error {
+func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
