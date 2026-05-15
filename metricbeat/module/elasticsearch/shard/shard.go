@@ -31,7 +31,7 @@ func init() {
 }
 
 const (
-	statePath = "/_cluster/state/version,nodes,master_node,routing_table?local=true"
+	statePath = "/_cluster/state/version,nodes,master_node,routing_table"
 )
 
 // MetricSet type defines all fields of the MetricSet
