@@ -14,7 +14,6 @@ type SharedProcessorWithClose struct {
 	beat.Processor
 	hash     uint64
 	refCount int
-	refLock  sync.RWMutex
 
 	sharedProcessors  map[uint64]*SharedProcessorWithClose
 	sharedProcessorMu *sync.Mutex
@@ -41,9 +40,7 @@ func New(constructor processors.Constructor) processors.Constructor {
 		}
 
 		if p, ok := sharedProcessors[hash]; ok {
-			p.refLock.Lock()
 			p.refCount++
-			p.refLock.Unlock()
 			return p, nil
 		}
 
@@ -65,22 +62,13 @@ func New(constructor processors.Constructor) processors.Constructor {
 func (p *SharedProcessorWithClose) Close() error {
 	p.sharedProcessorMu.Lock()
 	defer p.sharedProcessorMu.Unlock()
-	p.refLock.Lock()
-	defer p.refLock.Unlock()
 	if p.refCount < 0 {
 		return nil
 	}
 	p.refCount--
 	if p.refCount == 0 {
-		p.deleteFromSharedMap()
+		delete(p.sharedProcessors, p.hash)
 		return processors.Close(p.Processor)
 	}
 	return nil
-}
-
-func (p *SharedProcessorWithClose) deleteFromSharedMap() {
-	if _, ok := p.sharedProcessors[p.hash]; !ok {
-		return
-	}
-	delete(p.sharedProcessors, p.hash)
 }
