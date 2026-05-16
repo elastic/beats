@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/gohugoio/hashstructure"
@@ -115,8 +116,29 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	}
 
 	// Why is this empty by default? What should be here? Who knows!
+	defaultLogPath := filepath.Join(pm.logDirectory, info.ContainerID, fmt.Sprintf("%s-json.log", info.ContainerID))
 	if info.LogPath == "" {
-		info.LogPath = filepath.Join(pm.logDirectory, info.ContainerID, fmt.Sprintf("%s-json.log", info.ContainerID))
+		// If Docker did not provide a log path, use the default under pm.logDirectory.
+		info.LogPath = defaultLogPath
+	} else {
+		// Validate that the provided LogPath stays within the configured logDirectory.
+		absLogDir, errAbsDir := filepath.Abs(pm.logDirectory)
+		if errAbsDir != nil {
+			return nil, fmt.Errorf("error resolving log directory: %w", errAbsDir)
+		}
+		absLogPath, errAbsPath := filepath.Abs(info.LogPath)
+		if errAbsPath != nil {
+			// On error resolving the provided path, fall back to the default.
+			pm.Logger.Warnf("invalid log path %q provided for container %s, falling back to default: %v", info.LogPath, info.ContainerID, errAbsPath)
+			info.LogPath = defaultLogPath
+		} else {
+			// Ensure absLogPath is under absLogDir.
+			rel, errRel := filepath.Rel(absLogDir, absLogPath)
+			if errRel != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+				pm.Logger.Warnf("log path %q for container %s is outside of log directory %q, falling back to default", info.LogPath, info.ContainerID, absLogDir)
+				info.LogPath = defaultLogPath
+			}
+		}
 	}
 	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
 	if err != nil {
