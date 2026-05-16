@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || darwin || windows
-
 package shared_test
 
 import (
@@ -72,7 +70,7 @@ func TestNew_SameConfigReturnsSameInstance(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, int32(1), created.Load())
-	assert.True(t, p1 == p2)
+	assert.Equal(t, p1, p2)
 }
 
 func TestNew_DifferentConfigsReturnDifferentInstances(t *testing.T) {
@@ -88,7 +86,7 @@ func TestNew_DifferentConfigsReturnDifferentInstances(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, int32(2), created.Load())
-	assert.False(t, pA == pB)
+	assert.NotEqual(t, pA, pB)
 }
 
 func TestNew_NilConfigReturnsSameInstance(t *testing.T) {
@@ -104,7 +102,7 @@ func TestNew_NilConfigReturnsSameInstance(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, int32(1), created.Load())
-	assert.True(t, p1 == p2)
+	assert.Equal(t, p1, p2)
 }
 
 func TestNew_NonCloserIsNotWrapped(t *testing.T) {
@@ -114,7 +112,7 @@ func TestNew_NonCloserIsNotWrapped(t *testing.T) {
 
 	p, err := constructor(nil, nil)
 	require.NoError(t, err)
-	assert.True(t, p == inner)
+	assert.Equal(t, p, inner)
 }
 
 func TestSharedProcessor_CloseUnderlyingWhenLastUserGone(t *testing.T) {
@@ -195,7 +193,7 @@ func TestNew_ConcurrentSameConfig_NoRace(t *testing.T) {
 
 	assert.Equal(t, int32(1), created.Load())
 	for i, p := range results {
-		assert.True(t, p == results[0], "goroutine %d got different instance", i)
+		assert.Equalf(t, results[0], p, "goroutine %d got different instance", i)
 	}
 }
 

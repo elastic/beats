@@ -171,13 +171,13 @@ func TestAnnotatorRun_EachEventAnnotatedIndependently(t *testing.T) {
 
 		containerRaw, err := r.event.Fields.GetValue("container")
 		require.NoError(t, err, "goroutine %d: event must have container field", i)
-		container := containerRaw.(mapstr.M)
+		container := containerRaw.(mapstr.M) //nolint:errcheck // it's a test
 		assert.Equal(t, cid, container["id"], "goroutine %d: container.id must match its own cache key", i)
 
 		k8sRaw, err := r.event.Fields.GetValue("kubernetes")
 		require.NoError(t, err)
-		k8s := k8sRaw.(mapstr.M)
-		pod := k8s["pod"].(mapstr.M)
+		k8s := k8sRaw.(mapstr.M)     //nolint:errcheck // it's a test
+		pod := k8s["pod"].(mapstr.M) //nolint:errcheck // it's a test
 		assert.Equal(t, "uid-"+cid, pod["uid"], "goroutine %d: kubernetes.pod.uid must match its own cache key", i)
 	}
 }
@@ -209,7 +209,7 @@ func TestAnnotatorRun_MutatingOneResultDoesNotAffectOthers(t *testing.T) {
 	if events[0] != nil {
 		containerRaw, err := events[0].Fields.GetValue("container")
 		require.NoError(t, err)
-		container := containerRaw.(mapstr.M)
+		container := containerRaw.(mapstr.M) //nolint:errcheck // it's a test
 		container["_injected_by_goroutine_0"] = true
 	}
 
@@ -220,7 +220,7 @@ func TestAnnotatorRun_MutatingOneResultDoesNotAffectOthers(t *testing.T) {
 		}
 		containerRaw, err := events[i].Fields.GetValue("container")
 		require.NoError(t, err, "goroutine %d event must still have container field", i)
-		container := containerRaw.(mapstr.M)
+		container := containerRaw.(mapstr.M) //nolint:errcheck // it's a test
 		assert.NotContains(t, container, "_injected_by_goroutine_0",
 			"goroutine %d's container must be independent from goroutine 0's result", i)
 	}
@@ -255,7 +255,7 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 			defer wg.Done()
 			// Write a completely different metadata map to the same key.
 			newMeta := metaMap(containerID)
-			newMeta["kubernetes"].(mapstr.M)["pod"].(mapstr.M)["name"] = "replaced-pod"
+			newMeta["kubernetes"].(mapstr.M)["pod"].(mapstr.M)["name"] = "replaced-pod" //nolint:errcheck // it's a test
 			processor.cache.set(containerID, newMeta)
 		}()
 	}
@@ -273,8 +273,8 @@ func TestAnnotatorRun_CacheMutationDoesNotAffectInFlightEvents(t *testing.T) {
 			// event may have been processed before the first cache.set.
 			continue
 		}
-		k8s := k8sRaw.(mapstr.M)
-		pod := k8s["pod"].(mapstr.M)
+		k8s := k8sRaw.(mapstr.M)     //nolint:errcheck // it's a test
+		pod := k8s["pod"].(mapstr.M) //nolint:errcheck // it's a test
 		name, ok := pod["name"].(string)
 		assert.True(t, ok, "event %d: pod.name must be a string", i)
 		assert.Contains(t, []string{"mypod", "replaced-pod"}, name,
@@ -337,15 +337,15 @@ func TestAnnotatorRun_SharedWrapper_EventIndependenceUnderConcurrency(t *testing
 		// container.id must match this goroutine's own cache key.
 		containerRaw, getErr := r.event.Fields.GetValue("container")
 		require.NoError(t, getErr, "goroutine %d: event must have container field", i)
-		container := containerRaw.(mapstr.M)
+		container := containerRaw.(mapstr.M) //nolint:errcheck // it's a test
 		assert.Equal(t, r.cid, container["id"],
 			"goroutine %d: container.id must equal its own cache key, not another goroutine's", i)
 
 		// kubernetes.pod.uid must also be specific to this goroutine's entry.
 		k8sRaw, getErr := r.event.Fields.GetValue("kubernetes")
 		require.NoError(t, getErr, "goroutine %d: event must have kubernetes field", i)
-		k8s := k8sRaw.(mapstr.M)
-		pod := k8s["pod"].(mapstr.M)
+		k8s := k8sRaw.(mapstr.M)     //nolint:errcheck // it's a test
+		pod := k8s["pod"].(mapstr.M) //nolint:errcheck // it's a test
 		assert.Equal(t, "uid-"+r.cid, pod["uid"],
 			"goroutine %d: kubernetes.pod.uid must belong to its own cache entry", i)
 	}
