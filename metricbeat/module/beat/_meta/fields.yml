@@ -717,6 +717,9 @@
                         - name: failed
                           type: alias
                           path: beat.stats.libbeat.output.events.failed
+                        - name: failure_store
+                          type: alias
+                          path: beat.stats.libbeat.output.events.failure_store
                         - name: toomany
                           type: alias
                           path: beat.stats.libbeat.output.events.toomany
