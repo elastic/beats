@@ -2,6 +2,7 @@
   title: "Elasticsearch"
   description: >
     Elasticsearch module
+  # Keep this metadata near the module-level field aliases.
   release: ga
   settings: ["ssl", "http"]
   short_config: false
