@@ -48,7 +48,6 @@ func TestWaitUntilEOF(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                     id,
 		"paths":                  []string{path},
-		"read_until_eof.enabled": true,
 		"read_until_eof.timeout": waitEOFTimeout,
 		"close.reader.on_eof":    true,
 	})
@@ -77,14 +76,13 @@ func TestWaitUntilEOF(t *testing.T) {
 }
 
 // TestWaitUntilEOF_reachesEOFWithCloseOnEOF proves that
-// `close.reader.on_eof: true` and `read_until_eof.enabled: true` coexist
+// `close.reader.on_eof: true` and `read_until_eof` (on by default) coexist
 // when no cancellation happens: the reader reads the file, reaches EOF,
-// and closes via the close.reader.on_eof path. The readUntilEOF drain is
-// not entered — its flag is harmless in this case, a guarantee the read until
-// EOF loop only activates on input cancel.
+// and closes via the close.reader.on_eof path. The read_until_eof
+// continuation is not entered — it is gated on input cancel.
 // All events must be published, and the "input closing, read_until_eof
-// enabled..." log must NOT appear, proving the readUntilEOF block is
-// skipped when the reader reaches EOF on its own.
+// enabled..." log must NOT appear, proving the continuation is skipped
+// when the reader reaches EOF on its own.
 func TestWaitUntilEOF_reachesEOFWithCloseOnEOF(t *testing.T) {
 	prefix := strings.Repeat("a", 1024)
 	events := 10
@@ -99,7 +97,6 @@ func TestWaitUntilEOF_reachesEOFWithCloseOnEOF(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                     id,
 		"paths":                  []string{path},
-		"read_until_eof.enabled": true,
 		"read_until_eof.timeout": waitEOFTimeout,
 		"close.reader.on_eof":    true,
 	})
@@ -149,7 +146,6 @@ func TestWaitUntilEOF_gzipFile(t *testing.T) {
 		"id":                     id,
 		"paths":                  []string{path},
 		"compression":            "auto",
-		"read_until_eof.enabled": true,
 		"read_until_eof.timeout": waitEOFTimeout,
 	})
 
@@ -273,7 +269,6 @@ func TestWaitUntilEOF_timeout(t *testing.T) {
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                     id,
 		"paths":                  []string{path},
-		"read_until_eof.enabled": true,
 		"read_until_eof.timeout": waitEOFTimeout,
 		"close.reader.on_eof":    true,
 	})
@@ -317,4 +312,58 @@ func TestWaitUntilEOF_timeout(t *testing.T) {
 
 	assert.Len(t, env.pipeline.GetAllEvents(), wantEvents,
 		"unexpected number of events published")
+}
+
+// TestWaitUntilEOF_disabled exercises the opt-out: with
+// `read_until_eof.enabled: false`, the input must exit immediately on
+// cancellation without draining the rest of the file.
+func TestWaitUntilEOF_disabled(t *testing.T) {
+	prefix := strings.Repeat("a", 1024)
+	events := 10
+	want := 2
+	logGen := testingintegration.NewJSONGenerator(prefix)
+	_, files := testingintegration.GenerateLogFiles(t,
+		1, events, logGen)
+	path := files[0]
+
+	env := newInputTestingEnvironment(t)
+	id := "TestWaitUntilEOF_disabled"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                     id,
+		"paths":                  []string{path},
+		"read_until_eof.enabled": false,
+		"close.reader.on_eof":    true,
+	})
+
+	env.pipeline.SetAllowedEvents(1)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+	env.startInput(ctx, id, inp)
+
+	env.WaitLogsContains(fmt.Sprintf("A new file %s has been found", files[0]),
+		time.Minute, 100*time.Millisecond)
+	env.WaitLogsContains("Starting harvester for file",
+		time.Minute, 100*time.Millisecond)
+
+	cancelInput()
+	env.pipeline.UnblockClients()
+
+	// With the feature off, the blocked Publish returns context.Canceled
+	// once backpressure releases; the harvester surfaces that and exits
+	// without entering the read_until_eof continuation.
+	env.waitUntilHarvesterIsDone()
+
+	// The continuation log must NOT appear.
+	found, err := env.testLogger.FindInLogs(
+		"input closing, read_until_eof enabled, waiting EOF or")
+	require.NoError(t, err, "could not scan log file")
+	assert.Falsef(t, found,
+		"read_until_eof continuation must not run when "+
+			"read_until_eof.enabled is false")
+
+	// 2 events published: the 1 allowed and the one blocked on the pipeline.
+	got := len(env.pipeline.GetAllEvents())
+	assert.Equalf(t, got, want,
+		"want %d event with read_until_eof disabled, got %d", want, got)
 }

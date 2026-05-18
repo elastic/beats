@@ -554,8 +554,8 @@ This option is set to 0 by default which means it is disabled.
 stack: beta 9.5.0
 ```
 
-When `read_until_eof.enabled` is set to `true`, the input keeps reading the
-current file until EOF after a shutdown signal is received, instead of stopping
+When `read_until_eof.enabled` is `true`, the input keeps reading the current
+file until EOF after a shutdown signal is received, instead of stopping
 immediately. The shutdown signal can come from {{filebeat}} reloading its
 configuration (for example, an autodiscover provider removing the input when a
 Kubernetes pod terminates) or from any other path that cancels the input.
@@ -564,6 +564,23 @@ Without this option, an input that is stopped while still reading a file leaves
 unread bytes behind. With this option, the harvester reads to EOF (or until
 `read_until_eof.timeout` elapses) and only then exits.
 
+`read_until_eof.enabled` defaults to `true` and `read_until_eof.timeout`
+defaults to `1m`. The timeout must be greater than zero.
+
+To preserve the previous behaviour and have the input exit immediately on
+cancellation, set:
+
+```yaml
+- type: filestream
+  id: my-filestream-id
+  paths:
+    - /var/log/some-app/*.log
+  read_until_eof:
+    enabled: false
+```
+
+To customise the timeout, set `read_until_eof.timeout`:
+
 ```yaml
 - type: filestream
   id: my-filestream-id
@@ -571,11 +588,8 @@ unread bytes behind. With this option, the harvester reads to EOF (or until
     - /var/log/some-app/*.log
   read_until_eof:
     enabled: true
-    timeout: 1m
+    timeout: 30s
 ```
-
-`read_until_eof.enabled` defaults to `false`. `read_until_eof.timeout` defaults
-to `1m` and must be greater than zero.
 
 This option works alongside the `close.*` options. While the input is draining
 to EOF, the close-on-state-change checks (`close.on_state_change.removed`,
@@ -583,7 +597,7 @@ to EOF, the close-on-state-change checks (`close.on_state_change.removed`,
 suspended for that file so they cannot cut the drain short. Once the file is
 fully read (or the timeout fires), the input shuts down normally.
 
-This option does not change {{filebeat}}'s event delivery guarantees. The 
+This option does not change {{filebeat}}'s event delivery guarantees. The
 guarantee is at the input level: the input does not exit while there are still
 bytes to read on the open file.
 

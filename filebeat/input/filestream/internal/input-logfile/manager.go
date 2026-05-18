@@ -294,7 +294,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
 	return ReadUntilEOFConfig{
-		Enabled: false,
+		Enabled: true,
 		Timeout: time.Minute,
 	}
 }

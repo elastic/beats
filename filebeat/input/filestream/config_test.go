@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -260,6 +261,37 @@ read_until_eof.enabled: true
 			got := defaultConfig()
 			err = c.Unpack(&got)
 			assert.NoError(t, err, "read_until_eof should not require close.reader.on_eof")
+		})
+
+		t.Run("default is enabled", func(t *testing.T) {
+			c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+`)
+			require.NoError(t, err, "could not create config from string")
+
+			got := defaultConfig()
+			err = c.Unpack(&got)
+			require.NoError(t, err)
+			assert.True(t, got.ReadUntilEOF.Enabled,
+				"read_until_eof.enabled must default to true")
+			assert.Equal(t, time.Minute, got.ReadUntilEOF.Timeout,
+				"read_until_eof.timeout must default to 1m")
+		})
+
+		t.Run("can be disabled", func(t *testing.T) {
+			c, err := conf.NewConfigFrom(`
+id: 'some id'
+paths: [/foo/bar*]
+read_until_eof.enabled: false
+`)
+			require.NoError(t, err, "could not create config from string")
+
+			got := defaultConfig()
+			err = c.Unpack(&got)
+			require.NoError(t, err)
+			assert.False(t, got.ReadUntilEOF.Enabled,
+				"read_until_eof.enabled should be false")
 		})
 	})
 }

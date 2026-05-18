@@ -84,14 +84,12 @@ logging.level: debug
 	filebeat.WriteConfigFile(mainCfg)
 
 	inputID := "TestFilestreamReadUntilEOFOnInputStop"
+	// read_until_eof is on by default; no need to set it explicitly.
 	inputCfg := fmt.Sprintf(`
 - type: filestream
   id: %s
   enabled: true
   paths: [%s]
-  read_until_eof:
-    enabled: true
-    timeout: 1m
   close.reader.on_eof: true
 `, inputID, logPath)
 	inputFile := filepath.Join(inputsDir, "filestream.yml")
@@ -180,14 +178,12 @@ logging.level: debug
 	// Note: close.reader.on_eof intentionally omitted — defaults to false.
 	// In that mode the harvester tails the file (blocks in backoff.Wait on
 	// current EOF) which is exactly the scenario the drain logic must handle.
+	// read_until_eof is on by default; no need to set it explicitly.
 	inputCfg := fmt.Sprintf(`
 - type: filestream
   id: %s
   enabled: true
   paths: [%s]
-  read_until_eof:
-    enabled: true
-    timeout: 1m
 `, inputID, logPath)
 	inputFile := filepath.Join(inputsDir, "filestream.yml")
 	require.NoError(t, os.WriteFile(inputFile, []byte(inputCfg), 0644))
