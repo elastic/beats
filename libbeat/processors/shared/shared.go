@@ -27,35 +27,36 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type SharedProcessorWithClose struct {
+type sharedProcessorWithClose struct {
 	beat.Processor
 	hash     uint64
 	refCount int
 
-	sharedProcessors  map[uint64]*SharedProcessorWithClose
+	sharedProcessors  map[uint64]*sharedProcessorWithClose
 	sharedProcessorMu *sync.Mutex
 }
 
 // New wraps a processor constructor to return a shared processor.
 // The shared processor will be shared across all processors with the same configuration.
 // The shared processor will be closed when the last processor using it is closed.
+// Warning: the processor is built only once and then reused. Subsequent calls ignore the provided logger.
+// Warning: To be used in conjunction with SafeProcessor. Ref: https://github.com/elastic/beats/blob/5586a1dcc31a748de8805e68c07094d08291fd7c/libbeat/processors/safe_processor.go#L133
 func New(constructor processors.Constructor) processors.Constructor {
-	sharedProcessors := make(map[uint64]*SharedProcessorWithClose)
+	sharedProcessors := make(map[uint64]*sharedProcessorWithClose)
 	sharedProcessorMu := &sync.Mutex{}
 
 	return func(cfg *config.C, logger *logp.Logger) (beat.Processor, error) {
+		hash := uint64(0)
+		if cfg != nil {
+			var err error
+			hash, err = cfgfile.HashConfig(cfg)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		sharedProcessorMu.Lock()
 		defer sharedProcessorMu.Unlock()
-
-		hash, err := cfgfile.HashConfig(cfg)
-		if cfg == nil {
-			err = nil
-			hash = 0
-		}
-		if err != nil {
-			return nil, err
-		}
-
 		if p, ok := sharedProcessors[hash]; ok {
 			p.refCount++
 			return p, nil
@@ -71,12 +72,12 @@ func New(constructor processors.Constructor) processors.Constructor {
 			return proc, nil
 		}
 
-		sharedProcessors[hash] = &SharedProcessorWithClose{Processor: proc, hash: hash, sharedProcessors: sharedProcessors, sharedProcessorMu: sharedProcessorMu, refCount: 1}
+		sharedProcessors[hash] = &sharedProcessorWithClose{Processor: proc, hash: hash, sharedProcessors: sharedProcessors, sharedProcessorMu: sharedProcessorMu, refCount: 1}
 		return sharedProcessors[hash], nil
 	}
 }
 
-func (p *SharedProcessorWithClose) Close() error {
+func (p *sharedProcessorWithClose) Close() error {
 	p.sharedProcessorMu.Lock()
 	defer p.sharedProcessorMu.Unlock()
 	p.refCount--

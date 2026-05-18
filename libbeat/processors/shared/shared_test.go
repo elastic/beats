@@ -141,28 +141,12 @@ func TestSharedProcessor_CloseUnderlyingWhenLastUserGone(t *testing.T) {
 			}
 
 			if tc.expectClosed {
-				assert.Equal(t, int64(1), fp.closeCalls.Load())
+				assert.Equal(t, int64(1), fp.closeCalls.Load(), "expected processor to be closed once")
 			} else {
-				assert.Equal(t, int64(0), fp.closeCalls.Load())
+				assert.Equal(t, int64(0), fp.closeCalls.Load(), "didn't expect processor to be closed")
 			}
 		})
 	}
-}
-
-func TestSharedProcessor_DoubleCloseIsHarmless(t *testing.T) {
-	fp := &fakeProcessor{}
-	constructor := shared.New(newFakeConstructor(fp))
-	cfg := config.MustNewConfigFrom(map[string]interface{}{"k": "v"})
-
-	p1, err := constructor(cfg, nil)
-	require.NoError(t, err)
-	p2, err := constructor(cfg, nil)
-	require.NoError(t, err)
-
-	require.NoError(t, processors.Close(p1))
-	require.NoError(t, processors.Close(p2))
-	require.NoError(t, processors.Close(p2))
-	assert.Equal(t, int64(1), fp.closeCalls.Load())
 }
 
 func TestNew_ConcurrentSameConfig_NoRace(t *testing.T) {
