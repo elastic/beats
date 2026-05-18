@@ -274,7 +274,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	if cursor != nil {
 		state["cursor"] = cursor
 	}
-	safeCursor := cursor
+	goodCursor := cursor
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metricsRecorder.SetResourceURL(goodURL)
@@ -336,7 +336,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 
 		state:      state,
 		cursor:     cursor,
-		safeCursor: safeCursor,
+		goodCursor: goodCursor,
 		goodURL:    goodURL,
 	}
 
@@ -374,7 +374,7 @@ type runSession struct {
 
 	state      map[string]any
 	cursor     map[string]any
-	safeCursor map[string]any
+	goodCursor map[string]any
 	goodURL    string
 }
 
@@ -710,8 +710,8 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		s.health.UpdateStatus(status.Running, "")
 	}
 
-	// Replace the last cursor known to be safe to persist.
-	s.state["cursor"] = s.safeCursor
+	// Replace the last known good cursor.
+	s.state["cursor"] = s.goodCursor
 	s.metrics.AddProgramRunDuration(pubResult.pubCtx, time.Since(start))
 	if more, _ := s.state["want_more"].(bool); !more {
 		execSpan.SetAttributes(attribute.Bool("cel.program.want_more", false))
@@ -764,7 +764,7 @@ loop:
 				// Only set the cursor for publication at the last event
 				// when a single cursor object has been provided.
 				if i == len(events)-1 {
-					s.safeCursor = s.cursor
+					s.goodCursor = s.cursor
 					s.cursor, ok = cursors[0].(map[string]any)
 					if !ok {
 						err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
@@ -775,7 +775,7 @@ loop:
 					pubCursor = s.cursor
 				}
 			} else {
-				s.safeCursor = s.cursor
+				s.goodCursor = s.cursor
 				s.cursor, ok = cursors[i].(map[string]any)
 				if !ok {
 					err := fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
@@ -840,7 +840,7 @@ loop:
 	// Advance the cursor to the final state if there was no error during
 	// publications. This is needed to transition to the next set of events.
 	if !hadPublicationError && !result.degraded {
-		s.safeCursor = s.cursor
+		s.goodCursor = s.cursor
 		s.metrics.AddProgramSuccessExecution(pubCtx)
 		okSpans(pubSpan)
 	}
