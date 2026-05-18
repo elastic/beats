@@ -131,11 +131,13 @@
         - name: limit.bytes
           type: long
           format: bytes
+          overwrite: true
           description: >
             Memory limit bytes for the container. Not emitted if the container has no memory limit defined.
         - name: request.bytes
           type: long
           format: bytes
+          overwrite: true
           description: >
             Requested memory bytes for the container. Not emitted if the container has no memory request defined.
         - name: rss
