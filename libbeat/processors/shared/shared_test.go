@@ -313,3 +313,25 @@ func TestSharedProcessor_RunEventIsolation(t *testing.T) {
 	assert.NotContains(t, e2.Fields, "injected")
 	assert.Equal(t, 2, e2.Fields["id"])
 }
+
+func TestSafeProcessorWithSafe(t *testing.T) {
+	fp := &fakeProcessor{}
+	safeProcConstructor := processors.SafeWrap(shared.New(newFakeConstructor(fp)))
+	proc1, err := safeProcConstructor(nil, nil)
+	require.NoError(t, err)
+	proc2, err := safeProcConstructor(nil, nil)
+	require.NoError(t, err)
+
+	require.NoError(t, processors.Close(proc1))
+	// processors should not be closed
+	require.Zero(t, fp.closeCalls.Load())
+
+	// double-close on first instance
+	require.NoError(t, processors.Close(proc1))
+	// processors should not be closed, yet
+	require.Zero(t, fp.closeCalls.Load())
+
+	require.NoError(t, processors.Close(proc2))
+	// processors should be closed now.
+	require.Equal(t, int64(1), fp.closeCalls.Load())
+}

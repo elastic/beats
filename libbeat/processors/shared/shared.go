@@ -79,9 +79,6 @@ func New(constructor processors.Constructor) processors.Constructor {
 func (p *SharedProcessorWithClose) Close() error {
 	p.sharedProcessorMu.Lock()
 	defer p.sharedProcessorMu.Unlock()
-	if p.refCount < 0 {
-		return nil
-	}
 	p.refCount--
 	if p.refCount == 0 {
 		delete(p.sharedProcessors, p.hash)
