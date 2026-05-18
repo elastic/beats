@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: "Clamp autoops_es *_latency_in_millis metrics to the sampling interval so a single-sample latency can never exceed the wall-clock time between samples (fixes #2471)"
+
+component: metricbeat
