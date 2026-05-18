@@ -44,10 +44,12 @@
                 CPU usage as a percentage of the defined request for the container. Not emitted if the container has no CPU request defined.
         - name: limit.cores
           type: float
+          overwrite: true
           description: >
-            CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
+            Container CPU cores limit
         - name: request.cores
           type: float
+          overwrite: true
           description: >
             Requested CPU cores for the container. Not emitted if the container has no CPU request defined.
     - name: logs

@@ -307,7 +307,7 @@ CPU usage metrics
 
 
 **`kubernetes.container.cpu.limit.cores`**
-:   CPU cores limit for the container. Not emitted if the container has no CPU limit defined.
+:   Container CPU cores limit
 
     type: float
 
