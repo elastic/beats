@@ -191,6 +191,9 @@ func (br *BeatReceiver) Shutdown() error {
 		br.releaseSystemBridge()
 	}
 
+	// Notify the beater to shutdown
+	br.beater.Stop()
+
 	// Trigger the stop callback to close the beater. Some beaters
 	// (e.g. metricbeat) call Manager.Stop() in their Run() method, but others
 	// (e.g. packetbeat in static mode) do not. The OtelManager.stopOnce
