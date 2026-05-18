@@ -33,7 +33,7 @@ import (
 type client struct {
 	logger     *logp.Logger
 	processors beat.Processor
-	producer   queue.Producer
+	producer   queue.Producer[publisher.Event]
 	mutex      sync.Mutex
 	waiter     *clientCloseWaiter
 
