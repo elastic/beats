@@ -320,6 +320,8 @@ func TestWaitUntilEOF_timeout(t *testing.T) {
 func TestWaitUntilEOF_disabled(t *testing.T) {
 	prefix := strings.Repeat("a", 1024)
 	events := 10
+	// 1 event published, then block, then when unblocked, then it finishes the
+	// blocked call to Publish, which publishes one more event
 	want := 2
 	logGen := testingintegration.NewJSONGenerator(prefix)
 	_, files := testingintegration.GenerateLogFiles(t,
@@ -346,7 +348,11 @@ func TestWaitUntilEOF_disabled(t *testing.T) {
 	env.WaitLogsContains("Starting harvester for file",
 		time.Minute, 100*time.Millisecond)
 
+	env.waitUntilEventCount(1)
 	cancelInput()
+
+	// Wait for the input's cancellation to propagate down to the harvester
+	time.Sleep(500 * time.Millisecond)
 	env.pipeline.UnblockClients()
 
 	// With the feature off, the blocked Publish returns context.Canceled
@@ -364,6 +370,6 @@ func TestWaitUntilEOF_disabled(t *testing.T) {
 
 	// 2 events published: the 1 allowed and the one blocked on the pipeline.
 	got := len(env.pipeline.GetAllEvents())
-	assert.Equalf(t, got, want,
+	assert.Equalf(t, want, got,
 		"want %d event with read_until_eof disabled, got %d", want, got)
 }
