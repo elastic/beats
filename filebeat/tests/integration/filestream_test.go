@@ -23,7 +23,10 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -162,13 +165,78 @@ logging:
 
 	// Read the registry log file and check the TTL
 	registryLogFile := filepath.Join(tempDir, "data", "registry", "filebeat", "log.json")
-	entries := readFilestreamRegistryLog(t, registryLogFile)
+	entries, _ := readFilestreamRegistryLog(t, registryLogFile)
 	require.GreaterOrEqual(t, len(entries), 1, "No registry entries found")
 	firstEntry := entries[0]
 
 	expectedTTL := time.Duration(-1)
 	assert.Equal(t, expectedTTL, firstEntry.TTL,
 		"Registry entry TTL should be -1 by default, but got %v", firstEntry.TTL)
+}
+
+// migrated from test_fixup_registry_entries_with_global_id in test_input.py
+func TestFixupRegistryEntriesWithGlobalID(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+	logFilepath := filepath.Join(workDir, "log.log")
+	msgLogFilepath := logFilepath
+	if runtime.GOOS == "windows" {
+		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+	}
+
+	integration.WriteLogFile(t, logFilepath, 50, false)
+
+	// First run: no explicit ID, Filestream stores state under `.global`.
+	cfgYAML := getConfig(t, map[string]any{
+		"homePath":    workDir,
+		"logFilePath": logFilepath,
+		"inputID":     "",
+	}, "", "filestream_fixup_registry_global_id.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached on first run")
+	requirePublishedEvents(t, filebeat, 50, outputFile)
+	filebeat.Stop()
+
+	// Second run: add explicit ID and verify previous state is migrated.
+	cfgYAML = getConfig(t, map[string]any{
+		"homePath":    workDir,
+		"logFilePath": logFilepath,
+		"inputID":     "test-fix-global-id",
+	}, "", "filestream_fixup_registry_global_id.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.RemoveLogFiles()
+	filebeat.Start()
+
+	// Ensure no duplicate ingestion after state migration.
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached on second run")
+	requirePublishedEvents(t, filebeat, 50, outputFile)
+
+	// Add new data and assert only new lines are ingested.
+	integration.WriteLogFile(t, logFilepath, 2, true)
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached after appending lines")
+	filebeat.Stop()
+	requirePublishedEvents(t, filebeat, 52, outputFile)
+
+	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
+	registry := parseRegistry(entries)
+
+	requireRegistryEntryRemoved(t, workDir, ".global")
+
+	// Assert old registry entry was removed
+	for key, entry := range registry {
+		if strings.Contains(key, "filestream::.global::") && !entry.Removed {
+			t.Error("entry from input without ID was not removed from registry")
+		}
+	}
 }
 
 func requirePublishedEvents(
@@ -182,4 +250,41 @@ func requirePublishedEvents(
 	if publishedEvents != expected {
 		t.Fatalf("expecting %d published events after file migration, got %d instead", expected, publishedEvents)
 	}
+}
+
+// getConfig renders the template in testdata/<folder>/<tmplPath> using vars.
+func getConfig(t *testing.T, vars map[string]any, folder, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", folder, tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	return str.String()
+}
+
+func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
+	t.Helper()
+
+	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
+	for _, entry := range entries {
+		if strings.Contains(entry.Key, "filestream::"+identity+"::") && entry.Removed {
+			return
+		}
+	}
+
+	t.Fatalf("expected registry entry for identity %q to be removed", identity)
+}
+
+func parseRegistry(entries []registryEntry) map[string]registryEntry {
+	registry := map[string]registryEntry{}
+	for _, entry := range entries {
+		registry[entry.Key] = entry
+	}
+	return registry
 }
