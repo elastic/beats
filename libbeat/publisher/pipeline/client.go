@@ -130,30 +130,34 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	if c.isOpen.Swap(false) {
-		// Only do shutdown handling the first time Close is called
-		c.onClosing()
+	// Hold the mutex so any in-progress Publish finishes before
+	// signalClose checks the pending event count.
+	c.mutex.Lock()
+	if !c.isOpen.Swap(false) {
+		c.mutex.Unlock()
+		return nil
+	}
+	c.onClosing()
+	c.waiter.signalClose()
+	c.mutex.Unlock()
 
-		c.logger.Debug("client: closing acker")
-		c.waiter.signalClose()
-		c.waiter.wait()
+	c.waiter.wait()
 
-		c.eventListener.ClientClosed()
-		c.logger.Debug("client: done closing acker")
+	c.eventListener.ClientClosed()
+	c.logger.Debug("client: done closing acker")
 
-		c.logger.Debug("client: close queue producer")
-		c.producer.Close()
-		c.onClosed()
-		c.logger.Debug("client: done producer close")
+	c.logger.Debug("client: close queue producer")
+	c.producer.Close()
+	c.onClosed()
+	c.logger.Debug("client: done producer close")
 
-		if c.processors != nil {
-			c.logger.Debug("client: closing processors")
-			err := processors.Close(c.processors)
-			if err != nil {
-				c.logger.Errorf("client: error closing processors: %v", err)
-			}
-			c.logger.Debug("client: done closing processors")
+	if c.processors != nil {
+		c.logger.Debug("client: closing processors")
+		err := processors.Close(c.processors)
+		if err != nil {
+			c.logger.Errorf("client: error closing processors: %v", err)
 		}
+		c.logger.Debug("client: done closing processors")
 	}
 	return nil
 }
@@ -202,7 +206,7 @@ func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
 }
 
 func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Add(^uint32(n - 1))
+	value := w.events.Add(^uint32(n - 1)) //nolint:gosec // G115 n is always a small positive count
 	if value != 0 {
 		return
 	}
