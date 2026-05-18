@@ -103,10 +103,17 @@ func (s *server) Run(ctx input.Context, evtChan chan<- netinput.DataMetadata, me
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		now := time.Now()
 		metrics.EventReceived(len(data), now)
+		// On Windows the conn returns a nil RemoteAddr for truncated
+		// datagrams (WSAEMSGSIZE); calling .String() on it would
+		// panic and kill the input. See #50718.
+		remoteAddr := ""
+		if metadata.RemoteAddr != nil {
+			remoteAddr = metadata.RemoteAddr.String()
+		}
 		logger.Debugw(
 			"Data received",
 			"bytes", len(data),
-			"remote_address", metadata.RemoteAddr.String(),
+			"remote_address", remoteAddr,
 			"truncated", metadata.Truncated)
 
 		evtChan <- netinput.DataMetadata{

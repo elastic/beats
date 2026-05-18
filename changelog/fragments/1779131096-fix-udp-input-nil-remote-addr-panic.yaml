@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Stop the UDP input panicking on Windows when the conn returns a truncated datagram with a nil RemoteAddr.
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/50718
