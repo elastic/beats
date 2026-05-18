@@ -52,6 +52,8 @@ import (
 // exited with the result of the first error
 var maxSniffers = 100
 
+var pipelinePublishTimeout = 1 * time.Second
+
 type flags struct {
 	file       *string
 	loop       *int
@@ -203,8 +205,10 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	runner.Start()
 	defer func() {
 		runner.Stop()
-		// TODO: Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
-		pb.pipeline.Disconnect(context.Background())
+		// Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
+		ctx, cancel := context.WithTimeout(context.Background(), pipelinePublishTimeout)
+		defer cancel()
+		pb.pipeline.Disconnect(ctx)
 	}()
 
 	pb.logger.Debug("main", "Waiting for the runner to finish")
@@ -233,8 +237,10 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 
 	defer func() {
 		runner.Stop()
-		// TODO: Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
-		pb.pipeline.Disconnect(context.Background())
+		// Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
+		ctx, cancel := context.WithTimeout(context.Background(), pipelinePublishTimeout)
+		defer cancel()
+		pb.pipeline.Disconnect(ctx)
 	}()
 
 	for {

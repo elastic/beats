@@ -75,9 +75,7 @@ func RunTests(
 	}
 
 	pipelineSettings := pipeline.Settings{
-		WaitClose:     0,
-		WaitCloseMode: pipeline.NoWaitOnClose,
-		Processors:    processing,
+		Processors: processing,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(info,

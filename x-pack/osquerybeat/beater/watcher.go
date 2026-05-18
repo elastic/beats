@@ -64,6 +64,7 @@ func (w *Watcher) Run() {
 			f()
 		case <-ctx.Done():
 			w.log.Info("exit watcher on context done")
+			return
 		}
 	}
 }

@@ -18,13 +18,12 @@
 package pipeline
 
 import (
+	"context"
 	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -39,7 +38,11 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
 
-	defer pipeline.Disconnect(t.Context())
+	defer func() {
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		pipeline.Disconnect(ctx)
+		cancel()
+	}()
 
 	n := 66000
 	clients := []beat.Client{}
@@ -76,32 +79,6 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 	for _, c := range clients {
 		c.Close()
 	}
-}
-
-func TestPipelineWaitCloseThenForce(t *testing.T) {
-	closed := make(chan struct{})
-	forceClosed := make(chan struct{})
-	queueDone := make(chan struct{})
-	mockQueue := &testQueue{
-		close: func(force bool) error {
-			if force {
-				close(forceClosed)
-				close(queueDone)
-			} else {
-				close(closed)
-			}
-			return nil
-		},
-		done: queueDone,
-	}
-	settings := Settings{
-		WaitCloseMode: WaitOnPipelineCloseThenForce,
-		WaitClose:     time.Millisecond,
-	}
-	pipeline := makePipeline(t, settings, mockQueue)
-	require.NoError(t, pipeline.Disconnect(t.Context()))
-	<-closed
-	<-forceClosed
 }
 
 // makeDiscardQueue returns a queue that always discards all events

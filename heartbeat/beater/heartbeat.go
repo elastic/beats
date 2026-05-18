@@ -158,9 +158,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	bt.trace.Start()
 	defer bt.trace.Close()
 
-	// Adapt local pipeline to synchronized mode if run_once is enabled
-	pipeline := b.Publisher
-
 	bt.logger.Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
@@ -170,7 +167,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
 	// dynamic types.
-	stopStaticMonitors, err := bt.RunStaticMonitors(b, pipeline)
+	stopStaticMonitors, err := bt.RunStaticMonitors(b, b.Publisher)
 	if err != nil {
 		return err
 	}

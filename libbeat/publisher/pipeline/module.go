@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -52,26 +51,6 @@ type outputFactory func(outputs.Observer) (string, outputs.Group, error)
 
 func init() {
 	flag.BoolVar(&publishDisabled, "N", false, "Disable actual publishing for testing")
-}
-
-// Load uses a Config object to create a new complete Pipeline instance with
-// configured queue and outputs. This is a non-blocking operation, and outputs should connect lazily.
-// Deprecated: Use LoadWithSettings
-func Load(
-	beatInfo beat.Info,
-	monitors Monitors,
-	config Config,
-	processors processing.Supporter,
-	makeOutput func(outputs.Observer) (string, outputs.Group, error),
-) (*Pipeline, error) {
-
-	settings := Settings{
-		WaitClose:     0,
-		WaitCloseMode: NoWaitOnClose,
-		Processors:    processors,
-	}
-
-	return LoadWithSettings(beatInfo, monitors, config, makeOutput, settings)
 }
 
 // LoadWithSettings is the same as Load, but it exposes a Settings object that includes processors and WaitClose behavior

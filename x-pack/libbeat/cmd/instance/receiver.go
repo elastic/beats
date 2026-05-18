@@ -191,11 +191,7 @@ func (br *BeatReceiver) Shutdown() error {
 		br.releaseSystemBridge()
 	}
 
-	// At this point the publisher pipeline is stopped and no more events can
-	// be sent or acknowledged. Notify the beater to shutdown as well.
-	br.beater.Stop()
-
-	// Trigger the stop callback to close the publisher pipeline. Some beaters
+	// Trigger the stop callback to close the beater. Some beaters
 	// (e.g. metricbeat) call Manager.Stop() in their Run() method, but others
 	// (e.g. packetbeat in static mode) do not. The OtelManager.stopOnce
 	// ensures the callback runs exactly once regardless.
