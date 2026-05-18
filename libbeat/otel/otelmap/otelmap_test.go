@@ -419,3 +419,15 @@ func TestUnknownType(t *testing.T) {
 	}))
 	assert.Equal(t, map[string]any{"unknown_map": "unknown type: map[string]int"}, dst.AsRaw())
 }
+
+func TestFromMapstrComplex(t *testing.T) {
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{
+		"c64":  complex64(1 + 2i),
+		"c128": complex128(1.5 + 2.5i),
+	}))
+	assert.Equal(t, map[string]any{
+		"c64":  "(1+2i)",
+		"c128": "(1.5+2.5i)",
+	}, dst.AsRaw())
+}

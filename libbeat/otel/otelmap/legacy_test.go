@@ -131,6 +131,8 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 				m[key] = int64(ref.Uint() & uint64(math.MaxInt64)) //nolint:gosec // G115: mask clears bit 63, safe conversion
 			case reflect.Float32, reflect.Float64:
 				m[key] = ref.Float()
+			case reflect.Complex64, reflect.Complex128:
+				m[key] = fmt.Sprintf("%v", ref.Complex())
 			case reflect.Struct:
 				var im map[string]any
 				marshaled, err := json.Marshal(x)

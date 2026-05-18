@@ -138,6 +138,8 @@ func benchmarkCases() []benchCase {
 				"named_uint":     benchPort(8080),
 				"json_number":    json.Number("9223372036854775808"),
 				"marshaler":      benchTextMarshaler{value: "ok"},
+				"complex64":      complex64(1 + 2i),
+				"complex128":     complex128(1.5 + 2.5i),
 			},
 		},
 		{

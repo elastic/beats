@@ -206,6 +206,9 @@ func fromReflective(dst pcommon.Value, value any) error {
 	case reflect.Float32, reflect.Float64:
 		dst.SetDouble(ref.Float())
 		return nil
+	case reflect.Complex64, reflect.Complex128:
+		dst.SetStr(fmt.Sprintf("%v", ref.Complex()))
+		return nil
 	case reflect.Struct:
 		m, err := structToMap(value)
 		if err != nil {
