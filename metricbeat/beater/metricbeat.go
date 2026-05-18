@@ -46,6 +46,8 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
 )
 
+const pipelineShutdownTimeout = 1 * time.Second
+
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
 	done                     chan struct{} // Channel used to initiate shutdown.
@@ -314,7 +316,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	wg.Wait()
 
 	// disconnect pipeline to ensure all pending events are flushed.
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), pipelineShutdownTimeout)
 	defer cancel()
 	err := bt.pipeline.Disconnect(ctx)
 	if err != nil {
