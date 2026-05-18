@@ -167,7 +167,8 @@ logging:
   level: debug
   metrics:
     enabled: false
-
+queue.mem:
+  flush.timeout: 0
 output:
   file:
     path: ${path.home}
