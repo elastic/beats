@@ -217,7 +217,7 @@ func TestCloseWaitsForInFlightPublish(t *testing.T) {
 			},
 		},
 		producer: &testProducer{
-			publish: func(_ bool, event queue.Entry) (queue.EntryID, bool) {
+			publish: func(_ bool, event publisher.Event) (queue.EntryID, bool) {
 				return 1, true
 			},
 		},
