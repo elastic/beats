@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Reserve unique monitoring ports for filebeat OTel multi-receiver integration tests
-component: filebeat
