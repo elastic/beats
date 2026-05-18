@@ -69,7 +69,7 @@ func (r EncoderReader) Next() (reader.Message, error) {
 		Ts:      time.Now(),
 		Content: bytes.TrimPrefix(c, []byte("\uFEFF")),
 		Bytes:   sz,
-		Fields:  mapstr.M{},
+		Fields:  make(mapstr.M, 1),
 	}, err
 }
 
