@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -100,6 +101,24 @@ func (p *fileProspector) Init(
 
 		fd, ok := files[fm.Source]
 		if !ok {
+			return "", fm
+		}
+
+		registryKey := v.Key()
+		split := strings.Split(registryKey, identitySep)
+		// Wrong key format
+		if len(split) != 4 {
+			return "", fm
+		}
+
+		registryFileIdentity := split[2] + identitySep + split[3]
+		fileIdentity := p.identifier.GetSource(loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}).Name()
+
+		// Same paths, different file, do not migrate ID
+		if registryFileIdentity != fileIdentity {
 			return "", fm
 		}
 
