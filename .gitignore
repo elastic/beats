@@ -53,3 +53,6 @@ GEMINI.md
 
 # Files generated with the bump version automations
 *.bck
+
+# Local-only Salesforce live-test credentials (copy from sf-creds.env.example)
+x-pack/filebeat/input/salesforce/sf-creds*.env
