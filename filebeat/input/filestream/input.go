@@ -757,7 +757,7 @@ func (inp *filestream) readFromSource(
 		if isGZIP {
 			metrics.MessagesGZIPRead.Inc()
 		}
-		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(message.Content)) {
+		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
 			continue
 		}
 
@@ -798,14 +798,20 @@ func (inp *filestream) readFromSource(
 
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
-func (inp *filestream) isDroppedLine(line []byte) bool {
+func (inp *filestream) isDroppedLine(log *logp.Logger, line []byte) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
+			if log.IsDebug() {
+				log.Debugf("Drop line as it does not match any of the include patterns %s", line)
+			}
 			return true
 		}
 	}
 	if len(inp.readerConfig.ExcludeLines) > 0 {
 		if matchAny(inp.readerConfig.ExcludeLines, line) {
+			if log.IsDebug() {
+				log.Debugf("Drop line as it does match one of the exclude patterns %s", line)
+			}
 			return true
 		}
 	}
