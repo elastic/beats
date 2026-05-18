@@ -161,7 +161,7 @@ func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, er
 
 	beatEvent.Meta = mapstr.M{}
 
-	beatEvent.Fields = logRecord.Body().Map().AsRaw()
+	beatEvent.Fields = otelmap.ToMapstr(logRecord.Body().Map())
 
 	return beatEvent, nil
 }
