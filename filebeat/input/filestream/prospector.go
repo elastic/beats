@@ -369,7 +369,15 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 // onFSEvent uses 'log' instead of the [fileProspector] logger
 // because 'log' has been enriched with event information
-func (p *fileProspector) onFSEvent(log *logp.Logger, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
+func (p *fileProspector) onFSEvent(
+	log *logp.Logger,
+	ctx input.Context,
+	event loginp.FSEvent,
+	src loginp.Source,
+	updater loginp.StateMetadataUpdater,
+	group loginp.HarvesterGroup,
+	ignoreSince time.Time,
+) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
