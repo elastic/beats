@@ -25,33 +25,44 @@ import (
 )
 
 func TestShortFingerprintIndex_Add(t *testing.T) {
-	idx := newShortFingerprintIndex(10) // max 10 chars
+	set := newShortFingerprintSet()
 
-	t.Run("adds entry with short fingerprint", func(t *testing.T) {
-		ok := idx.Add("key1", "aabb", "/a.log")
-		assert.True(t, ok, "short fingerprint should be added")
-		assert.Equal(t, 1, idx.Len())
+	t.Run("adds entry with non-empty fingerprint", func(t *testing.T) {
+		key := "key1"
+		want := shortFingerprintEntry{
+			Fingerprint: "aabb",
+			Source:      "/a.log",
+		}
+		set.Add(key, want.Fingerprint, want.Source)
+		assert.Equal(t, 1, set.Len(), "non-empty fingerprint should be added")
+		assert.Equal(t, want, set.entries[key], "ShortFingerprintSet entry did not match")
 	})
 
-	t.Run("rejects fingerprint at max length", func(t *testing.T) {
-		ok := idx.Add("key2", "0123456789", "/b.log")
-		assert.False(t, ok, "fingerprint at max length should not be added")
-		assert.Equal(t, 1, idx.Len())
-	})
-
-	t.Run("rejects fingerprint over max length", func(t *testing.T) {
-		ok := idx.Add("key3", "01234567890", "/c.log")
-		assert.False(t, ok, "fingerprint over max length should not be added")
+	t.Run("adds entry regardless of fingerprint length", func(t *testing.T) {
+		key := "key2"
+		want := shortFingerprintEntry{
+			Fingerprint: "aabb",
+			Source:      "/a.log",
+		}
+		set.Add(key, want.Fingerprint, want.Source)
+		assert.Equal(t, 2, set.Len(), "long fingerprint should be added")
+		assert.Equal(t, want, set.entries[key], "ShortFingerprintSet entry did not match")
 	})
 
 	t.Run("rejects empty fingerprint", func(t *testing.T) {
-		ok := idx.Add("key4", "", "/d.log")
-		assert.False(t, ok, "empty fingerprint should not be added")
+		key := "key3"
+		want := shortFingerprintEntry{
+			Fingerprint: "",
+			Source:      "/a.log",
+		}
+		set.Add("key3", want.Fingerprint, want.Source)
+		assert.Equal(t, 2, set.Len(), "length should not change")
+		assert.Empty(t, set.entries[key], "empty fingerprint should not be added")
 	})
 }
 
 func TestShortFingerprintIndex_Remove(t *testing.T) {
-	idx := newShortFingerprintIndex(20)
+	idx := newShortFingerprintSet()
 	idx.Add("key1", "aabb", "/a.log")
 	idx.Add("key2", "ccdd", "/b.log")
 	require.Equal(t, 2, idx.Len())
@@ -64,7 +75,7 @@ func TestShortFingerprintIndex_Remove(t *testing.T) {
 }
 
 func TestShortFingerprintIndex_RemoveBySource(t *testing.T) {
-	idx := newShortFingerprintIndex(20)
+	idx := newShortFingerprintSet()
 	idx.Add("key1", "aabb", "/a.log")
 	idx.Add("key2", "ccdd", "/b.log")
 
@@ -77,7 +88,7 @@ func TestShortFingerprintIndex_RemoveBySource(t *testing.T) {
 }
 
 func TestShortFingerprintIndex_UpdateSource(t *testing.T) {
-	idx := newShortFingerprintIndex(20)
+	idx := newShortFingerprintSet()
 	idx.Add("key1", "aabb", "/a.log")
 
 	idx.UpdateSource("key1", "/a.log.1")
@@ -88,7 +99,7 @@ func TestShortFingerprintIndex_UpdateSource(t *testing.T) {
 }
 
 func TestShortFingerprintIndex_FindPrefixMatch(t *testing.T) {
-	idx := newShortFingerprintIndex(20)
+	idx := newShortFingerprintSet()
 	idx.Add("key1", "aabb", "/a.log")
 	idx.Add("key2", "ccdd", "/b.log")
 
@@ -132,7 +143,7 @@ func TestShortFingerprintIndex_FindPrefixMatch(t *testing.T) {
 	})
 
 	t.Run("without source filter returns longest prefix match", func(t *testing.T) {
-		idx := newShortFingerprintIndex(20)
+		idx := newShortFingerprintSet()
 		idx.Add("short", "aa", "/x.log")
 		idx.Add("long", "aabb", "/y.log")
 

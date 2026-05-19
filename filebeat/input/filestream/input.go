@@ -56,6 +56,13 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+	// FingerprintGrowing is true while the fingerprint is the raw-hex encoded
+	// content of the file. It's cleared when the file reaches the necessary
+	// size (offset+length) for the SHA-256 fingerprint.
+	// Legacy entries from registries written before this field existed read as
+	// the zero value (false) and are treated as final, with no special-case
+	// handling required.
+	FingerprintGrowing bool `json:"fingerprintgrowing,omitzero" struct:"fingerprintgrowing,omitempty"`
 }
 
 // filestream is the input for reading from files which
@@ -536,9 +543,11 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// TODO: with 50115 adding the possibility to have the fingerprint, it's an
-	// issue to the growing fingerprint as it cannot be updated as the file grows.
-	// It's only updated on file open, not on OpWrite
+	// TODO(AndersonQ): the possibility to have a fingerprint that changes
+	// becomes an issue here: the fingerprint cannot be updated as the file grows.
+	// It's only updated on file open, not on OpWrite. It's already an issue for
+	// the path: if a file is renamed, the events are published with the old path.
+	// think if we want to address it here on this PR or not.
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
