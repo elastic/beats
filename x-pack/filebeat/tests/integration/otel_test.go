@@ -2103,11 +2103,12 @@ func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
 		tmpDir := b.TempDir()
 
 		var totalReceived atomic.Int64
+		var totalBytes atomic.Int64
 		var firstNano atomic.Int64
 		var lastNano atomic.Int64
 		var firstOnce sync.Once
 
-		mockHandler := func(action api.Action, _ []byte) int {
+		mockHandler := func(action api.Action, event []byte) int {
 			if action.Action != "create" {
 				return http.StatusOK
 			}
@@ -2115,6 +2116,7 @@ func BenchmarkFilebeatOTelThroughputMockES(b *testing.B) {
 			firstOnce.Do(func() { firstNano.Store(now) })
 			lastNano.Store(now)
 			totalReceived.Add(1)
+			totalBytes.Add(int64(len(event)))
 			return http.StatusOK
 		}
 
@@ -2203,6 +2205,10 @@ service:
 		if first > 0 && last > first {
 			duration := time.Duration(last - first)
 			b.ReportMetric(float64(eventCount)/duration.Seconds(), "events/sec")
+		}
+		received := totalReceived.Load()
+		if received > 0 {
+			b.ReportMetric(float64(totalBytes.Load())/float64(received), "bytes/event")
 		}
 
 		col.Shutdown()
