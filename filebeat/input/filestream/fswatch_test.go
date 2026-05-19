@@ -22,6 +22,8 @@ package filestream
 import (
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -1496,6 +1498,161 @@ func TestToFileDescriptor_TooSmallFile_NoFileOpen(t *testing.T) {
 	_, err = s.toFileDescriptor(&it)
 	require.ErrorIs(t, err, errFileTooSmall,
 		"expected errFileTooSmall, it probably tried to open the file")
+}
+
+// TestToFileDescriptor_GrowingLifecycle tests the Enhanced Fingerprint
+// lifecycle through the scanner:
+//
+//  1. small file (below offset+length) under growing mode → raw-hex
+//     Fingerprint, Growing=true, no GrowingFingerprint, path absent from
+//     hashedPaths.
+//  2. file grows past threshold → SHA-256 Fingerprint matching the static
+//     fingerprint output for the same bytes, Growing=false,
+//     GrowingFingerprint emitted (raw-hex of bytes[offset:offset+length]),
+//     path now in hashedPaths.
+//  3. second scan with file still at threshold → SHA-256 Fingerprint,
+//     no GrowingFingerprint (suppressed by hashedPaths).
+//  4. file truncated back below threshold → raw-hex, Growing=true, path
+//     removed from hashedPaths.
+func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "growing.log")
+
+	const length int64 = 1024
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  length,
+			Growing: true,
+		},
+	}
+	s, err := newFileScanner(
+		logp.NewNopLogger(), []string{filename}, cfg, CompressionNone)
+	require.NoError(t, err, "could not create file scanner")
+
+	writeFile := func(t *testing.T, n int) {
+		t.Helper()
+		// Use a non-trivial repeating pattern so prefix relationships are
+		// preserved as the file grows.
+		require.NoError(t, os.WriteFile(
+			filename, []byte(strings.Repeat("abcd", n/4+1)[:n]), 0o644))
+	}
+
+	// --- Step 1: small file (200 bytes < 1024) ---
+	writeFile(t, 200)
+	it, err := s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd1, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.True(t, fd1.FingerprintGrowing, "step 1: descriptor.Growing should be true for sub-threshold file")
+	assert.Equal(t,
+		hex.EncodeToString([]byte(strings.Repeat("abcd", 51)[:200])),
+		fd1.Fingerprint,
+		"step 1: Fingerprint should be raw hex of bytes[0:200]")
+	assert.Empty(t, fd1.GrowingFingerprint, "step 1: no GrowingFingerprint while below threshold")
+	assert.NotContains(t, s.hashedPaths, filename,
+		"step 1: path must not be in hashedPaths while growing")
+
+	// --- Step 2: file grows past threshold (1500 bytes >= 1024) ---
+	writeFile(t, 1500)
+	it, err = s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd2, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.False(t, fd2.FingerprintGrowing,
+		"step 2: descriptor.Growing must be false at/above threshold")
+
+	expectedRawHex := hex.EncodeToString([]byte(strings.Repeat("abcd", 256)[:length]))
+	expectedSHA := sha256.Sum256([]byte(strings.Repeat("abcd", 256)[:length]))
+	assert.Equal(t, hex.EncodeToString(expectedSHA[:]), fd2.Fingerprint,
+		"step 2: Fingerprint must be SHA-256 of bytes[0:length]")
+	assert.Equal(t, expectedRawHex, fd2.GrowingFingerprint,
+		"step 2: GrowingFingerprint must be raw hex of the same bytes (first scan at threshold)")
+	assert.Contains(t, s.hashedPaths, filename,
+		"step 2: path must be in hashedPaths after first SHA-256 emission")
+
+	// Verify the threshold-transition prefix relationship: previous raw-hex
+	// fingerprint (200 bytes) is a prefix of current GrowingFingerprint (1024 bytes).
+	assert.True(t, strings.HasPrefix(fd2.GrowingFingerprint, fd1.Fingerprint),
+		"step 2: prev raw-hex must be a prefix of current GrowingFingerprint")
+
+	// --- Step 3: same file, second scan still at threshold ---
+	it, err = s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd3, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.Equal(t, fd2.Fingerprint, fd3.Fingerprint,
+		"step 3: Fingerprint stable across scans at threshold")
+	assert.Empty(t, fd3.GrowingFingerprint,
+		"step 3: GrowingFingerprint suppressed once path is in hashedPaths")
+	assert.False(t, fd3.FingerprintGrowing, "step 3: still not growing")
+	assert.Contains(t, s.hashedPaths, filename,
+		"step 3: path should be still in hashedPaths")
+
+	// --- Step 4: file truncated back below threshold ---
+	writeFile(t, 100)
+	it, err = s.getIngestTarget(filename)
+	require.NoError(t, err, "getIngestTarget failed")
+
+	fd4, err := s.toFileDescriptor(&it)
+	require.NoError(t, err, "toFileDescriptor failed")
+
+	assert.True(t, fd4.FingerprintGrowing,
+		"step 4: Growing=true after truncation back below threshold")
+	assert.Empty(t, fd4.GrowingFingerprint,
+		"step 4: no GrowingFingerprint while below threshold")
+	assert.NotContains(t, s.hashedPaths, filename,
+		"step 4: path removed from hashedPaths after re-entering growing phase")
+}
+
+// TestToFileDescriptor_HashedPathsPruning verifies that the scanner prunes
+// hashedPaths at the end of a scan for paths that no longer appear, so a
+// reappearing file would get GrowingFingerprint emitted again.
+func TestToFileDescriptor_HashedPathsPruning(t *testing.T) {
+	dir := t.TempDir()
+	keepPath := filepath.Join(dir, "keep.log")
+	dropPath := filepath.Join(dir, "drop.log")
+	require.NoError(t,
+		os.WriteFile(keepPath,
+			[]byte(strings.Repeat("a", 1024)), 0o644),
+		"could not write log file")
+	require.NoError(t,
+		os.WriteFile(dropPath,
+			[]byte(strings.Repeat("b", 1024)), 0o644),
+		"could not write log file")
+
+	cfg := fileScannerConfig{
+		Fingerprint: fingerprintConfig{
+			Enabled: true,
+			Offset:  0,
+			Length:  1024,
+			Growing: true,
+		},
+	}
+	s, err := newFileScanner(logp.NewNopLogger(),
+		[]string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
+	require.NoError(t, err, "could not create new fileScanner")
+
+	// First scan: both files reach threshold, both end up in hashedPaths.
+	first := s.GetFiles()
+	require.Len(t, first, 2)
+	assert.Contains(t, s.hashedPaths, keepPath)
+	assert.Contains(t, s.hashedPaths, dropPath)
+
+	// Remove dropPath; second scan should prune its hashedPaths entry.
+	require.NoError(t, os.Remove(dropPath), "failed removing log file")
+	second := s.GetFiles()
+	require.Len(t, second, 1)
+	assert.Contains(t, s.hashedPaths, keepPath, "remaining file stays in hashedPaths")
+	assert.NotContains(t, s.hashedPaths, dropPath, "vanished file pruned from hashedPaths")
 }
 
 func BenchmarkToFileDescriptor(b *testing.B) {

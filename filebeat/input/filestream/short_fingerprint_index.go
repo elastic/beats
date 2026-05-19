@@ -19,11 +19,11 @@ package filestream
 
 import "strings"
 
-// shortFingerprintIndex manages a set of fingerprint entries shorter than maxLen
-// and provides O(K) prefix matching. Used by both the filewatcher
-// (for rename+grow detection) and the prospector (for key migration).
+// shortFingerprintIndex manages a set of entries whose fingerprint is still
+// in the growing phase (raw-hex, below the configured threshold). Used by both
+// the filewatcher (for rename+grow detection) and the prospector (for key
+// migration on growth and threshold transition).
 type shortFingerprintIndex struct {
-	maxLen  int                              // max encoded fingerprint length
 	entries map[string]shortFingerprintEntry // key → entry
 }
 
@@ -33,22 +33,23 @@ type shortFingerprintEntry struct {
 	Source      string // file path
 }
 
-func newShortFingerprintIndex(maxLen int) *shortFingerprintIndex {
+func newShortFingerprintSet() *shortFingerprintIndex {
 	return &shortFingerprintIndex{
-		maxLen:  maxLen,
 		entries: make(map[string]shortFingerprintEntry),
 	}
 }
 
-// Add adds an entry if its fingerprint is shorter than maxLen.
-// Returns true if the entry was added (fingerprint short enough).
+// Add adds an entry. Callers must only add entries that are currently in
+// the growing phase; the index does not enforce
+// this. Returns true if the entry was added (fingerprint non-empty).
 // Safe to call on a nil receiver.
-func (idx *shortFingerprintIndex) Add(key, fingerprint, source string) bool {
-	if idx == nil || fingerprint == "" || len(fingerprint) >= idx.maxLen {
-		return false
+// TODO(AndersonQ): check if the return value is necessary
+func (idx *shortFingerprintIndex) Add(key, fingerprint, source string) {
+	if idx == nil || fingerprint == "" {
+		return
 	}
+
 	idx.entries[key] = shortFingerprintEntry{Fingerprint: fingerprint, Source: source}
-	return true
 }
 
 // Remove removes an entry by key. Safe to call on a nil receiver.
@@ -92,6 +93,7 @@ func (idx *shortFingerprintIndex) UpdateSource(key, newSource string) {
 // If matchSource is empty, returns the longest prefix match to avoid ambiguity when
 // multiple entries have prefix-related fingerprints.
 // Returns the key and entry on match. Safe to call on a nil receiver.
+// TODO(AndersonQ): no caller is using the return 'entry', is it needed at all?
 func (idx *shortFingerprintIndex) FindPrefixMatch(targetFingerprint, matchSource string) (key string, entry shortFingerprintEntry, found bool) {
 	if idx == nil || targetFingerprint == "" {
 		return "", shortFingerprintEntry{}, false
