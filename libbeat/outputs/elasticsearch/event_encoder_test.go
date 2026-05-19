@@ -63,11 +63,9 @@ func TestEncodeEntry(t *testing.T) {
 		},
 	}
 
-	encoded, encodedSize := encoder.EncodeEntry(pubEvent)
-	encPubEvent, ok := encoded.(publisher.Event)
+	encPubEvent, encodedSize := encoder.EncodeEntry(pubEvent)
 
 	// Check the resulting publisher.Event
-	require.True(t, ok, "EncodeEntry must return a publisher.Event")
 	require.NotNil(t, encPubEvent.EncodedEvent, "EncodeEntry must set EncodedEvent")
 	assert.Nil(t, encPubEvent.Content.Fields, "EncodeEntry should clear event.Content")
 
@@ -129,8 +127,7 @@ func encodeEvents(client *Client, events []publisher.Event) []publisher.Event {
 	for i := range events {
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
-			encoded, _ := encoder.EncodeEntry(events[i])
-			event, _ := encoded.(publisher.Event)
+			event, _ := encoder.EncodeEntry(events[i])
 			events[i] = event
 		}
 	}
@@ -145,5 +142,5 @@ func encodeEvent(client *Client, event publisher.Event) publisher.Event {
 		client.pipelineSelector,
 	)
 	encoded, _ := encoder.EncodeEntry(event)
-	return encoded.(publisher.Event)
+	return encoded
 }

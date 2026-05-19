@@ -70,8 +70,8 @@ func newEventEncoderFactory(
 	escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
-) queue.EncoderFactory {
-	return func() queue.Encoder {
+) queue.EncoderFactory[publisher.Event] {
+	return func() queue.Encoder[publisher.Event] {
 		return newEventEncoder(escapeHTML, indexSelector, pipelineSelector)
 	}
 }
@@ -79,7 +79,7 @@ func newEventEncoderFactory(
 func newEventEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
-) queue.Encoder {
+) queue.Encoder[publisher.Event] {
 	buf := bytes.NewBuffer(nil)
 	enc := eslegclient.NewJSONEncoder(buf, escapeHTML)
 	return &eventEncoder{
@@ -90,13 +90,7 @@ func newEventEncoder(escapeHTML bool,
 	}
 }
 
-func (pe *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
-	e, ok := entry.(publisher.Event)
-	if !ok {
-		// Currently all queue entries are publisher.Events but let's be cautious.
-		return entry, 0
-	}
-
+func (pe *eventEncoder) EncodeEntry(e publisher.Event) (publisher.Event, int) {
 	encodedEvent := pe.encodeRawEvent(&e.Content)
 	e.EncodedEvent = encodedEvent
 	e.Content = beat.Event{}
