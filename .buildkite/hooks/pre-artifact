@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [[ ("$BUILDKITE_PIPELINE_SLUG" == "beats-packaging-pipeline") ]]; then
+
+fi
+
+# Required: Upload destination
+export BUILDKITE_ARTIFACT_UPLOAD_DESTINATION="gs://buildkite-beats/$BUILDKITE_PIPELINE_ID/$BUILDKITE_BUILD_ID/$BUILDKITE_JOB_ID"
+
+# Disable ACL setting for GCS buckets with uniform bucket-level access
+export BUILDKITE_GS_ACL=""
+
+# Optional: Authenticated access in UI
+export BUILDKITE_GCS_ACCESS_HOST="storage.cloud.google.com"
+
+# Optional: for debugging purposes
+#export BUILDKITE_AGENT_LOG_LEVEL="debug"
