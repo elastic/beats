@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -130,10 +131,20 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
 	logRecords.EnsureCapacity(len(events))
+
+	// cacheTokens tracks tokens stored in the native-events path so they can
+	// be evicted if ConsumeLogs fails.
+	var cacheTokens []int64
+
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-		if err := fillLogRecordFromEvent(logRecord, event, out.beatInfo, out.log, out.isReceiverTest); err != nil {
-			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
+		if out.beatInfo.NativeEvents {
+			token := storeEventInCache(logRecord, event, out.beatInfo, out.log, out.isReceiverTest)
+			cacheTokens = append(cacheTokens, token)
+		} else {
+			if err := fillLogRecordFromEvent(logRecord, event, out.beatInfo, out.log, out.isReceiverTest); err != nil {
+				out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
+			}
 		}
 	}
 
@@ -143,6 +154,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
+		// Evict any cache entries that will never be consumed because the
+		// pipeline rejected the batch. On retry the events will be re-cached
+		// with fresh tokens.
+		for _, token := range cacheTokens {
+			eventcache.Take(token)
+		}
+
 		// Queue full errors are expected backpressure signals, not true errors.
 		// Skip logging to avoid log spam since we already track this via metrics.
 		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
@@ -181,7 +199,19 @@ func (out *otelConsumer) String() string {
 
 func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) error {
 	beatEvent := prepareLogRecordFromEvent(logRecord, event, log, isReceiverTest)
-	return encodeLogRecordBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo)
+	return otelmap.EncodeEventBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo.Beat, beatInfo.Version, beatInfo.IncludeMetadata)
+}
+
+// storeEventInCache is the native-events fast path. It sets up standard
+// logRecord metadata (timestamps, attributes) via prepareLogRecordFromEvent,
+// then stores the full event in the eventcache and writes the resulting token
+// as an attribute on the logRecord. The body is left empty; beatprocessor
+// fills it after running beat processors.
+func storeEventInCache(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) int64 {
+	prepareLogRecordFromEvent(logRecord, event, log, isReceiverTest)
+	token := eventcache.Put(eventcache.Entry{Event: event, BeatInfo: beatInfo})
+	logRecord.Attributes().PutInt(eventcache.TokenAttribute, token)
+	return token
 }
 
 func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, log *logp.Logger, isReceiverTest bool) mapstr.M {
@@ -248,27 +278,3 @@ func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, 
 	return beatEvent
 }
 
-func encodeLogRecordBody(logRecord plog.LogRecord, beatEvent mapstr.M, timestamp time.Time, meta mapstr.M, beatInfo beat.Info) error {
-	bodyMap := logRecord.Body().SetEmptyMap()
-	capacity := len(beatEvent) + 1
-	if beatInfo.IncludeMetadata {
-		capacity++
-	}
-	bodyMap.EnsureCapacity(capacity)
-	if err := otelmap.FromMapstr(bodyMap, beatEvent); err != nil {
-		return err
-	}
-
-	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(timestamp))
-	if beatInfo.IncludeMetadata {
-		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
-		pmeta.EnsureCapacity(len(meta) + 3)
-		if err := otelmap.FromMapstr(pmeta, meta); err != nil {
-			return err
-		}
-		pmeta.PutStr("beat", beatInfo.Beat)
-		pmeta.PutStr("version", beatInfo.Version)
-		pmeta.PutStr("type", "_doc")
-	}
-	return nil
-}

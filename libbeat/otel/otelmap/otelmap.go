@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 )
 
 // otelTimestampLayout is the timestamp format the elasticsearchexporter
@@ -184,6 +185,33 @@ func FromValue(dst pcommon.Value, value any) error {
 // bodymap encoding expects for @timestamp.
 func FormatTimestamp(t time.Time) string {
 	return t.UTC().Format(otelTimestampLayout)
+}
+
+// EncodeEventBody fills the body of logRecord with the beat event fields,
+// @timestamp, and optionally @metadata. It is the shared encoding step used
+// by both otelconsumer (standard path) and beatprocessor (native-events path).
+func EncodeEventBody(logRecord plog.LogRecord, fields mapstr.M, timestamp time.Time, meta mapstr.M, beatName, beatVersion string, includeMetadata bool) error {
+	bodyMap := logRecord.Body().SetEmptyMap()
+	capacity := len(fields) + 1
+	if includeMetadata {
+		capacity++
+	}
+	bodyMap.EnsureCapacity(capacity)
+	if err := FromMapstr(bodyMap, fields); err != nil {
+		return err
+	}
+	bodyMap.PutStr("@timestamp", FormatTimestamp(timestamp))
+	if includeMetadata {
+		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
+		pmeta.EnsureCapacity(len(meta) + 3)
+		if err := FromMapstr(pmeta, meta); err != nil {
+			return err
+		}
+		pmeta.PutStr("beat", beatName)
+		pmeta.PutStr("version", beatVersion)
+		pmeta.PutStr("type", "_doc")
+	}
+	return nil
 }
 
 // fromReflective handles reflect values that don't match the typed switch in

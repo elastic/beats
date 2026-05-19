@@ -12,6 +12,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
@@ -122,31 +123,15 @@ func (p *beatProcessor) Shutdown(_ context.Context) error {
 }
 
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
-	if len(p.processors) == 0 {
-		return logs, nil
-	}
-
 	for _, resourceLogs := range logs.ResourceLogs().All() {
 		for _, scopeLogs := range resourceLogs.ScopeLogs().All() {
 			for _, logRecord := range scopeLogs.LogRecords().All() {
-				beatEvent, err := unpackBeatEventFromOTelLogRecord(logRecord)
-				if err != nil {
-					p.logger.Error("error converting OTel log to Beat event", zap.Error(err))
-					continue
-				}
-
-				for _, processor := range p.processors {
-					processedEvent, err := processor.Run(beatEvent)
-					if err != nil {
-						p.logger.Error("error processing Beat event", zap.Error(err))
-						continue
-					}
-					beatEvent = processedEvent
-				}
-
-				packingError := packBeatEventIntoOTelLogRecord(beatEvent, logRecord)
-				if packingError != nil {
-					p.logger.Error("error converting processed Beat event to OTel log record", zap.Error(packingError))
+				if tokenVal, hasToken := logRecord.Attributes().Get(eventcache.TokenAttribute); hasToken {
+					// Native-events path: always encode to pcommon regardless of
+					// whether beat processors are configured.
+					p.processNativeEvent(logRecord, tokenVal.Int())
+				} else if len(p.processors) > 0 {
+					p.processOTelEvent(logRecord)
 				}
 			}
 		}
@@ -155,14 +140,69 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 	return logs, nil
 }
 
+// processNativeEvent handles the native-events fast path: the full beat.Event
+// lives in the eventcache. After running beat processors the body is encoded
+// from the (possibly modified) event and the cache token attribute is removed.
+func (p *beatProcessor) processNativeEvent(logRecord plog.LogRecord, token int64) {
+	entry, ok := eventcache.Take(token)
+	if !ok {
+		p.logger.Error("native event cache miss", zap.Int64("token", token))
+		return
+	}
+
+	// Clone Fields and Meta so that beat processors (e.g. add_host_metadata)
+	// can write to the map without racing against any goroutine still holding
+	// a reference to the original event (e.g. the publisher debug processor).
+	beatEvent := &beat.Event{
+		Timestamp: entry.Event.Content.Timestamp,
+		Fields:    entry.Event.Content.Fields.Clone(),
+		Meta:      entry.Event.Content.Meta.Clone(),
+	}
+
+	for _, processor := range p.processors {
+		processed, err := processor.Run(beatEvent)
+		if err != nil {
+			p.logger.Error("error processing Beat event", zap.Error(err))
+			continue
+		}
+		beatEvent = processed
+	}
+
+	info := entry.BeatInfo
+	if err := otelmap.EncodeEventBody(logRecord, beatEvent.Fields, beatEvent.Timestamp, beatEvent.Meta, info.Beat, info.Version, info.IncludeMetadata); err != nil {
+		p.logger.Error("error encoding native Beat event into OTel log record", zap.Error(err))
+	}
+	logRecord.Attributes().Remove(eventcache.TokenAttribute)
+}
+
+// processOTelEvent is the standard path: the logRecord body already contains
+// the full pcommon map and beat processors mutate it in place.
+func (p *beatProcessor) processOTelEvent(logRecord plog.LogRecord) {
+	beatEvent, err := unpackBeatEventFromOTelLogRecord(logRecord)
+	if err != nil {
+		p.logger.Error("error converting OTel log to Beat event", zap.Error(err))
+		return
+	}
+
+	for _, processor := range p.processors {
+		processed, err := processor.Run(beatEvent)
+		if err != nil {
+			p.logger.Error("error processing Beat event", zap.Error(err))
+			continue
+		}
+		beatEvent = processed
+	}
+
+	if err := packBeatEventIntoOTelLogRecord(beatEvent, logRecord); err != nil {
+		p.logger.Error("error converting processed Beat event to OTel log record", zap.Error(err))
+	}
+}
+
 func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, error) {
 	beatEvent := &beat.Event{}
 	beatEvent.Timestamp = logRecord.Timestamp().AsTime()
-
 	beatEvent.Meta = mapstr.M{}
-
 	beatEvent.Fields = otelmap.ToMapstr(logRecord.Body().Map())
-
 	return beatEvent, nil
 }
 

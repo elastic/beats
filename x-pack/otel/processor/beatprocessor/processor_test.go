@@ -8,8 +8,11 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -224,6 +227,174 @@ func TestCreateProcessor(t *testing.T) {
 			},
 		}, testLogger())
 		require.Error(t, err)
+	})
+}
+
+func TestConsumeLogsNativeEvents(t *testing.T) {
+	beatInfo := beat.Info{Beat: "testbeat", Version: "1.0.0"}
+
+	makeLogRecordWithToken := func(token int64) plog.LogRecord {
+		lr := plog.NewLogRecord()
+		lr.Attributes().PutInt(eventcache.TokenAttribute, token)
+		return lr
+	}
+
+	putEvent := func(event beat.Event) int64 {
+		return eventcache.Put(eventcache.Entry{
+			Event:    publisher.Event{Content: event},
+			BeatInfo: beatInfo,
+		})
+	}
+
+	t.Run("event is fetched from cache, encoded to pcommon body, token removed", func(t *testing.T) {
+		ts := time.Date(2025, 6, 1, 12, 0, 0, 0, time.UTC)
+		event := beat.Event{
+			Timestamp: ts,
+			Fields:    mapstr.M{"message": "hello native"},
+			Meta:      mapstr.M{},
+		}
+		token := putEvent(event)
+
+		bp := &beatProcessor{logger: zap.NewNop()}
+
+		logs := plog.NewLogs()
+		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+		makeLogRecordWithToken(token).CopyTo(lr)
+
+		out, err := bp.ConsumeLogs(context.Background(), logs)
+		require.NoError(t, err)
+
+		result := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+
+		// Body must be a map (full pcommon encoding).
+		body := result.Body().Map().AsRaw()
+		assert.Equal(t, "hello native", body["message"])
+		assert.Contains(t, body, "@timestamp")
+
+		// Token attribute must be removed.
+		_, hasToken := result.Attributes().Get(eventcache.TokenAttribute)
+		assert.False(t, hasToken, "cache token attribute must be removed after processing")
+
+		// Cache entry must be gone.
+		_, found := eventcache.Take(token)
+		assert.False(t, found, "cache entry must be consumed by the processor")
+	})
+
+	t.Run("beat processors run on the cached event", func(t *testing.T) {
+		event := beat.Event{
+			Fields: mapstr.M{"message": "enrich me"},
+			Meta:   mapstr.M{},
+		}
+		token := putEvent(event)
+
+		bp := &beatProcessor{
+			logger: zap.NewNop(),
+			processors: []beat.Processor{
+				mockProcessor{runFunc: func(e *beat.Event) (*beat.Event, error) {
+					e.Fields["enriched"] = true
+					return e, nil
+				}},
+			},
+		}
+
+		logs := plog.NewLogs()
+		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+		makeLogRecordWithToken(token).CopyTo(lr)
+
+		out, err := bp.ConsumeLogs(context.Background(), logs)
+		require.NoError(t, err)
+
+		body := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Body().Map().AsRaw()
+		assert.Equal(t, true, body["enriched"], "processor must have run on the cached event")
+		assert.Equal(t, "enrich me", body["message"])
+	})
+
+	t.Run("metadata is included when IncludeMetadata is set", func(t *testing.T) {
+		event := beat.Event{
+			Fields: mapstr.M{"message": "with meta"},
+			Meta:   mapstr.M{"raw_index": "logs-test"},
+		}
+		token := eventcache.Put(eventcache.Entry{
+			Event: publisher.Event{Content: event},
+			BeatInfo: beat.Info{
+				Beat:            "testbeat",
+				Version:         "1.0.0",
+				IncludeMetadata: true,
+			},
+		})
+
+		bp := &beatProcessor{logger: zap.NewNop()}
+
+		logs := plog.NewLogs()
+		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+		makeLogRecordWithToken(token).CopyTo(lr)
+
+		out, err := bp.ConsumeLogs(context.Background(), logs)
+		require.NoError(t, err)
+
+		body := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Body().Map().AsRaw()
+		meta, ok := body["@metadata"].(map[string]any)
+		require.True(t, ok, "@metadata must be present in body")
+		assert.Equal(t, "testbeat", meta["beat"])
+		assert.Equal(t, "logs-test", meta["raw_index"])
+	})
+
+	t.Run("cache miss skips encoding and leaves body empty", func(t *testing.T) {
+		bp := &beatProcessor{logger: zap.NewNop()}
+
+		logs := plog.NewLogs()
+		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+		makeLogRecordWithToken(99999999).CopyTo(lr) // token that was never Put
+
+		out, err := bp.ConsumeLogs(context.Background(), logs)
+		require.NoError(t, err)
+
+		result := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+		// Body stays empty since there is nothing to encode.
+		assert.Equal(t, plog.NewLogRecord().Body().Type(), result.Body().Type())
+	})
+
+	t.Run("native and standard log records coexist in the same batch", func(t *testing.T) {
+		event := beat.Event{
+			Fields: mapstr.M{"source": "native"},
+			Meta:   mapstr.M{},
+		}
+		token := putEvent(event)
+
+		bp := &beatProcessor{
+			logger: zap.NewNop(),
+			processors: []beat.Processor{
+				mockProcessor{runFunc: func(e *beat.Event) (*beat.Event, error) {
+					e.Fields["processed"] = true
+					return e, nil
+				}},
+			},
+		}
+
+		logs := plog.NewLogs()
+		sls := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
+
+		// First record: native (token).
+		nativeLR := sls.LogRecords().AppendEmpty()
+		makeLogRecordWithToken(token).CopyTo(nativeLR)
+
+		// Second record: standard pcommon map body.
+		stdLR := sls.LogRecords().AppendEmpty()
+		stdLR.Body().SetEmptyMap().PutStr("source", "standard")
+
+		out, err := bp.ConsumeLogs(context.Background(), logs)
+		require.NoError(t, err)
+
+		records := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
+		require.Equal(t, 2, records.Len())
+
+		nativeBody := records.At(0).Body().Map().AsRaw()
+		assert.Equal(t, "native", nativeBody["source"])
+		assert.Equal(t, true, nativeBody["processed"])
+
+		stdBody := records.At(1).Body().Map().AsRaw()
+		assert.Equal(t, "standard", stdBody["source"])
+		assert.Equal(t, true, stdBody["processed"])
 	})
 }
 

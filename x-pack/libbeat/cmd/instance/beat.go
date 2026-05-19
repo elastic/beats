@@ -72,6 +72,13 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		delete(receiverConfig, "include_metadata")
 	}
 
+	if v, ok := receiverConfig["native_events_enabled"]; ok {
+		if enabled, ok := v.(bool); ok {
+			b.Info.NativeEvents = enabled
+		}
+		delete(receiverConfig, "native_events_enabled")
+	}
+
 	// begin code similar to configure
 	if err = plugin.Initialize(); err != nil {
 		return nil, fmt.Errorf("error initializing plugins: %w", err)

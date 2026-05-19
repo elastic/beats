@@ -46,6 +46,7 @@ type Info struct {
 	LogConsumer     consumer.Logs // otel log consumer
 	ComponentID     string        // otel component id from the collector config e.g. "filebeatreceiver/logs"
 	IncludeMetadata bool          // when true, otelconsumer includes @metadata in the log record body
+	NativeEvents    bool          // when true, otelconsumer skips pcommon conversion and caches the raw beat.Event
 	Logger          *logp.Logger
 	Paths           *paths.Path // per beat paths definition
 }

@@ -35,6 +35,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -547,6 +548,150 @@ func TestPublish(t *testing.T) {
 func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
+}
+
+func TestNativeEvents(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	beatInfo := beat.Info{Name: "testbeat", Version: "0.0.0"}
+
+	makeNativeConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
+		t.Helper()
+		logger := logptest.NewTestingLogger(t, "")
+		logConsumer, err := consumer.NewLogs(consumeFn)
+		require.NoError(t, err)
+		return &otelConsumer{
+			observer:     outputs.NewNilObserver(),
+			logsConsumer: logConsumer,
+			beatInfo:     beat.Info{Name: beatInfo.Name, Version: beatInfo.Version, NativeEvents: true},
+			log:          logger.Named("otelconsumer"),
+			retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+		}
+	}
+
+	t.Run("token attribute is set on each logRecord", func(t *testing.T) {
+		events := []beat.Event{
+			{Fields: mapstr.M{"msg": "a"}},
+			{Fields: mapstr.M{"msg": "b"}},
+		}
+		batch := outest.NewBatch(events...)
+
+		var tokens []int64
+		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
+			for _, lr := range ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().All() {
+				v, ok := lr.Attributes().Get(eventcache.TokenAttribute)
+				require.True(t, ok, "cache token attribute must be present")
+				tokens = append(tokens, v.Int())
+			}
+			return nil
+		})
+
+		require.NoError(t, oc.Publish(ctx, batch))
+		assert.Len(t, tokens, len(events))
+		// Tokens must be unique.
+		seen := make(map[int64]bool)
+		for _, tok := range tokens {
+			assert.False(t, seen[tok], "duplicate token %d", tok)
+			seen[tok] = true
+		}
+	})
+
+	t.Run("logRecord body is empty in native events mode", func(t *testing.T) {
+		batch := outest.NewBatch(beat.Event{Fields: mapstr.M{"field": "value"}})
+
+		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
+			lr := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			assert.Equal(t, pcommon.ValueTypeEmpty, lr.Body().Type(),
+				"native events path must leave logRecord body empty")
+			return nil
+		})
+
+		require.NoError(t, oc.Publish(ctx, batch))
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
+	t.Run("timestamps and metadata attributes are set in native events mode", func(t *testing.T) {
+		ts := time.Date(2025, 6, 1, 12, 0, 0, 0, time.UTC)
+		event := beat.Event{
+			Timestamp: ts,
+			Meta:      mapstr.M{"_id": "doc-native-1", "pipeline": "my-pipe"},
+			Fields: mapstr.M{
+				"data_stream": mapstr.M{
+					"type":      "logs",
+					"dataset":   "test",
+					"namespace": "default",
+				},
+			},
+		}
+		batch := outest.NewBatch(event)
+
+		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
+			lr := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+
+			assert.Equal(t, ts, lr.Timestamp().AsTime(), "timestamp must be set")
+
+			docID, ok := lr.Attributes().Get(esDocumentIDAttribute)
+			require.True(t, ok, "document ID attribute must be set")
+			assert.Equal(t, "doc-native-1", docID.AsString())
+
+			pipe, ok := lr.Attributes().Get("elasticsearch.ingest_pipeline")
+			require.True(t, ok, "ingest pipeline attribute must be set")
+			assert.Equal(t, "my-pipe", pipe.AsString())
+
+			ds, ok := lr.Attributes().Get("data_stream.dataset")
+			require.True(t, ok, "data_stream.dataset attribute must be set")
+			assert.Equal(t, "test", ds.AsString())
+			return nil
+		})
+
+		require.NoError(t, oc.Publish(ctx, batch))
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+	})
+
+	t.Run("cache entries are evicted on retryable consumer error", func(t *testing.T) {
+		batch := outest.NewBatch(
+			beat.Event{Fields: mapstr.M{"msg": "x"}},
+			beat.Event{Fields: mapstr.M{"msg": "y"}},
+		)
+
+		var capturedTokens []int64
+		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
+			for _, lr := range ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().All() {
+				if v, ok := lr.Attributes().Get(eventcache.TokenAttribute); ok {
+					capturedTokens = append(capturedTokens, v.Int())
+				}
+			}
+			return errors.New("retryable error")
+		})
+
+		require.NoError(t, oc.Publish(ctx, batch))
+		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+
+		for _, tok := range capturedTokens {
+			_, found := eventcache.Take(tok)
+			assert.False(t, found, "cache entry for token %d must be evicted after retryable error", tok)
+		}
+	})
+
+	t.Run("cache entries are evicted on permanent consumer error", func(t *testing.T) {
+		batch := outest.NewBatch(beat.Event{Fields: mapstr.M{"msg": "z"}})
+
+		var capturedToken int64
+		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
+			lr := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			if v, ok := lr.Attributes().Get(eventcache.TokenAttribute); ok {
+				capturedToken = v.Int()
+			}
+			return consumererror.NewPermanent(errors.New("permanent error"))
+		})
+
+		require.NoError(t, oc.Publish(ctx, batch))
+		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
+
+		_, found := eventcache.Take(capturedToken)
+		assert.False(t, found, "cache entry must be evicted after permanent error")
+	})
 }
 
 func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
