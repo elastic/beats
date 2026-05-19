@@ -77,9 +77,7 @@ type commonInputConfig struct {
 //
 // The user-configured `processors:` list and the index processor are
 // instantiated once per input and shared across all pipeline clients (each
-// filestream harvester opens its own client). Without this, expensive
-// constructors (e.g. add_kubernetes_metadata's informers and goroutines) get
-// multiplied by the number of files an input matches. See elastic/beats#50376.
+// filestream harvester opens its own client).
 func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return &commonSettingsFactory{info: info, inner: f}
 }
@@ -112,29 +110,23 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 }
 
 // runnerWithSharedProcessors wraps a Runner so its Stop() also closes the
-// per-input shared processors built once by newCommonConfigEditor. Stop is
-// safe to call more than once.
+// per-input shared processors built once by newCommonConfigEditor.
 //
-// Embedding cfgfile.Runner (an interface) only promotes Start/Stop/String —
-// methods of the inner concrete type that aren't on the cfgfile.Runner
-// interface (e.g. SetStatusReporter, SetOnce) would be hidden from callers
-// doing runtime type assertions on the wrapper. We forward them explicitly
-// so callers (libbeat/cfgfile/list.go for status reporting,
-// filebeat/beater/crawler.go for `--once` mode) keep working through the
-// wrapper.
+// Embedding the cfgfile.Runner interface only promotes Start/Stop/String;
+// optional methods on the inner concrete type (SetStatusReporter, SetOnce)
+// must be forwarded explicitly so runtime type-assertion callers keep
+// seeing them through the wrapper. Stop is idempotent because
+// *input.Runner.Stop is not.
 type runnerWithSharedProcessors struct {
 	cfgfile.Runner
 	procs    *processors.Processors
 	stopOnce sync.Once
 }
 
-// OnceSetter is implemented by runners that support a "run once" mode, where
-// the runner performs a single scan/iteration and exits. Used by
-// `filebeat --once` for legacy log inputs. Declared here (and not at the
-// caller site in filebeat/beater) because filebeat/beater already imports
-// filebeat/channel, so the interface needs to live at or below the channel
-// package for both consumers (crawler.startInput, this wrapper) to share
-// the same declaration.
+// OnceSetter is implemented by runners that support `filebeat --once`
+// (single scan then exit). Declared in this package so both
+// crawler.startInput and runnerWithSharedProcessors share one contract
+// without filebeat/beater importing filebeat/input for a type assert.
 type OnceSetter interface {
 	SetOnce(once bool)
 }
@@ -143,7 +135,6 @@ func (r *runnerWithSharedProcessors) Stop() {
 	r.stopOnce.Do(func() {
 		r.Runner.Stop()
 		_ = r.procs.Close()
-		r.procs = nil
 	})
 }
 
@@ -153,8 +144,6 @@ func (r *runnerWithSharedProcessors) SetStatusReporter(reporter status.StatusRep
 	}
 }
 
-// SetOnce forwards `--once` mode to the inner runner if it supports it
-// (e.g. the legacy *input.Runner used by Filebeat modules).
 func (r *runnerWithSharedProcessors) SetOnce(once bool) {
 	if o, ok := r.Runner.(OnceSetter); ok {
 		o.SetOnce(once)
@@ -168,18 +157,13 @@ var (
 )
 
 // noCloseProcessor wraps a beat.Processor whose lifecycle is owned by the
-// input (not by an individual pipeline client). The wrapper:
-//
-//   - swallows Close(): closing the per-client processor list (e.g. when a
-//     filestream harvester stops) must not tear down state still in use by
-//     sibling harvesters of the same input.
-//   - forwards SetPaths(): some processors (cache, javascript script,
-//     conditional processors with path-aware children) rely on lazy path
-//     initialisation. Without forwarding, the publisher pipeline's group
-//     SetPaths would type-assert against the wrapper and miss the inner
-//     processor. SafeProcessor (applied to every registered processor by
-//     SafeWrap) makes this call idempotent across the multiple harvesters
-//     that connect.
+// input (not by an individual pipeline client). It deliberately does not
+// implement processors.Closer, so closing a per-client processor list (e.g.
+// when a filestream harvester stops) leaves the shared inner alive for
+// sibling harvesters. SetPaths is forwarded so path-aware processors
+// (cache, script, conditionals with path-aware children) still see the
+// publisher pipeline's group.SetPaths call; SafeProcessor (applied at
+// registration via SafeWrap) makes repeated calls idempotent.
 type noCloseProcessor struct {
 	inner beat.Processor
 }
@@ -222,16 +206,14 @@ func newCommonConfigEditor(
 		serviceType = config.Module
 	}
 
-	// Build user-configured processors once per input. Some processors
-	// (e.g. add_kubernetes_metadata) spin up watchers, caches, and
-	// goroutines on construction; doing this per ConnectWith call would
-	// multiply the cost by the harvester count. See elastic/beats#50376.
+	// Build user-configured processors once per input — some (e.g.
+	// add_kubernetes_metadata) spin up watchers/caches on construction.
+	// See elastic/beats#50376.
 	userProcs, err := processors.New(config.Processors, beatInfo.Logger)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Build the index processor once too: its config is per-input static.
 	var indexProc beat.Processor
 	if !config.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
@@ -243,9 +225,7 @@ func newCommonConfigEditor(
 		indexProc = add_formatted_index.New(timestampFormat)
 	}
 
-	// shared bundles every processor whose lifecycle is owned by the
-	// input (closed at runner.Stop, not at client.Close). Order is not
-	// meaningful here; it's just the set we must release.
+	// shared bundles the input-owned processors so runner.Stop can release them.
 	shared := processors.NewList(beatInfo.Logger)
 	if indexProc != nil {
 		shared.AddProcessor(indexProc)
@@ -274,9 +254,6 @@ func newCommonConfigEditor(
 		// 1. add support for index configuration via processor
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
-		//
-		// Per-input shared processors are wrapped in noCloseProcessor so
-		// client.Close() does not tear down state used by sibling clients.
 		procs := processors.NewList(beatInfo.Logger)
 		if indexProc != nil {
 			procs.AddProcessor(&noCloseProcessor{inner: indexProc})

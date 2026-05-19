@@ -132,11 +132,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
-		t.Cleanup(func() {
-			if sharedProcs != nil {
-				_ = sharedProcs.Close()
-			}
-		})
+		t.Cleanup(func() { _ = sharedProcs.Close() })
 
 		clientCfg, err := editor(test.clientCfg)
 		require.NoError(t, err)
@@ -192,11 +188,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() {
-		if sharedProcs != nil {
-			_ = sharedProcs.Close()
-		}
-	})
+	t.Cleanup(func() { _ = sharedProcs.Close() })
 
 	clientCfg, err := editor(beat.ClientConfig{})
 	require.NoError(t, err)
@@ -308,19 +300,26 @@ index: "static-index"
 		collected = append(collected, clientCfg.Processing.Processor.All())
 	}
 
-	// All client lists should have the same length and reference the same
-	// underlying instances via noCloseProcessor wrappers — wrappers differ
-	// per call (cheap), but the inner pointer must be identical.
-	require.NotEmpty(t, collected[0])
-	for i := 1; i < numClients; i++ {
-		require.Len(t, collected[i], len(collected[0]))
-		for j := range collected[i] {
-			w0, ok := collected[0][j].(*noCloseProcessor)
-			require.Truef(t, ok, "client 0 processor[%d] must be *noCloseProcessor, got %T", j, collected[0][j])
-			wi, ok := collected[i][j].(*noCloseProcessor)
-			require.Truef(t, ok, "client %d processor[%d] must be *noCloseProcessor, got %T", i, j, collected[i][j])
-			require.NotSamef(t, w0, wi, "wrapper objects must be distinct (cheap per-client allocation)")
-			require.Samef(t, w0.inner, wi.inner, "underlying shared processor instance must be identical across clients (processor[%d])", j)
+	assertNoCloseProcessorsShared(t, collected)
+}
+
+// assertNoCloseProcessorsShared verifies that for every pair of per-client
+// processor lists, each entry is a *noCloseProcessor whose wrapper is
+// distinct per client (so per-client Close is isolated) but whose inner
+// instance is identical (the shared per-input processor — #50376).
+func assertNoCloseProcessorsShared(t *testing.T, perClient [][]beat.Processor) {
+	t.Helper()
+	require.NotEmpty(t, perClient, "need at least one client list")
+	require.NotEmpty(t, perClient[0], "client 0 list cannot be empty")
+	for i := 1; i < len(perClient); i++ {
+		require.Lenf(t, perClient[i], len(perClient[0]), "client %d list length differs from client 0", i)
+		for j := range perClient[i] {
+			w0, ok := perClient[0][j].(*noCloseProcessor)
+			require.Truef(t, ok, "client 0 processor[%d] expected *noCloseProcessor, got %T", j, perClient[0][j])
+			wi, ok := perClient[i][j].(*noCloseProcessor)
+			require.Truef(t, ok, "client %d processor[%d] expected *noCloseProcessor, got %T", i, j, perClient[i][j])
+			require.NotSamef(t, w0, wi, "client %d processor[%d]: wrappers must be distinct allocations", i, j)
+			require.Samef(t, w0.inner, wi.inner, "client %d processor[%d]: inner shared instance must be identical to client 0's (#50376)", i, j)
 		}
 	}
 }
@@ -422,11 +421,9 @@ func (s *stopOrderRunner) Stop()          { s.onStop() }
 func (s *stopOrderRunner) String() string { return "stopOrderRunner" }
 
 // TestRunnerWithSharedProcessorsForwardsStatusReporter verifies the wrapper
-// exposes SetStatusReporter to runtime type-assertion callers (e.g.
-// libbeat/cfgfile/list.go does `runner.(status.WithStatusReporter)` to wire
-// elastic-agent-client status reporting). Embedding cfgfile.Runner — an
-// interface — only promotes Start/Stop/String, so SetStatusReporter must be
-// declared on the wrapper explicitly.
+// exposes SetStatusReporter to runtime type-assertion callers (used by
+// libbeat/cfgfile/list.go to wire elastic-agent-client status reporting)
+// and is a no-op when the inner runner does not implement it.
 func TestRunnerWithSharedProcessorsForwardsStatusReporter(t *testing.T) {
 	inner := &statusReporterRunner{}
 	r := &runnerWithSharedProcessors{
@@ -435,22 +432,18 @@ func TestRunnerWithSharedProcessorsForwardsStatusReporter(t *testing.T) {
 	}
 
 	sr, ok := any(r).(status.WithStatusReporter)
-	require.Truef(t, ok, "runnerWithSharedProcessors must implement status.WithStatusReporter so the cfgfile runner list can wire status reporting through it")
+	require.Truef(t, ok, "runnerWithSharedProcessors must implement status.WithStatusReporter")
 
 	reporter := &recordingStatusReporter{}
 	sr.SetStatusReporter(reporter)
 	require.Same(t, reporter, inner.lastReporter, "SetStatusReporter must reach the inner runner")
-}
 
-// TestRunnerWithSharedProcessorsSetStatusReporterOnInnerWithoutSupport
-// verifies the wrapper degrades gracefully when the inner runner doesn't
-// implement status.WithStatusReporter — no panic, no allocation, no error.
-func TestRunnerWithSharedProcessorsSetStatusReporterOnInnerWithoutSupport(t *testing.T) {
-	r := &runnerWithSharedProcessors{
+	// Inner without WithStatusReporter must not panic.
+	r2 := &runnerWithSharedProcessors{
 		Runner: &stopOrderRunner{onStop: func() {}},
 		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
 	}
-	r.SetStatusReporter(&recordingStatusReporter{}) // must not panic
+	r2.SetStatusReporter(&recordingStatusReporter{})
 }
 
 type statusReporterRunner struct {
@@ -469,12 +462,8 @@ type recordingStatusReporter struct{}
 func (*recordingStatusReporter) UpdateStatus(status.Status, string) {}
 
 // TestRunnerWithSharedProcessorsForwardsSetOnce verifies the wrapper
-// forwards SetOnce to an inner runner that implements OnceSetter (e.g. the
-// legacy *input.Runner used by Filebeat modules).
-// filebeat/beater/crawler.go does `runner.(channel.OnceSetter).SetOnce(...)`
-// to enable `--once` mode; without this forwarder, modules running under
-// `filebeat --once` never receive the Once flag and don't exit after the
-// first ingest.
+// forwards SetOnce to an inner runner that implements OnceSetter (used by
+// crawler.startInput for `filebeat --once`) and is a no-op otherwise.
 func TestRunnerWithSharedProcessorsForwardsSetOnce(t *testing.T) {
 	inner := &onceSetterRunner{}
 	r := &runnerWithSharedProcessors{
@@ -483,20 +472,16 @@ func TestRunnerWithSharedProcessorsForwardsSetOnce(t *testing.T) {
 	}
 
 	o, ok := any(r).(OnceSetter)
-	require.Truef(t, ok, "runnerWithSharedProcessors must implement OnceSetter so crawler.startInput can enable --once mode through the wrapper")
+	require.Truef(t, ok, "runnerWithSharedProcessors must implement OnceSetter")
 	o.SetOnce(true)
 	require.True(t, inner.once, "SetOnce must reach the inner runner")
-}
 
-// TestRunnerWithSharedProcessorsSetOnceOnInnerWithoutSupport verifies the
-// wrapper degrades gracefully (no panic) when the inner runner doesn't
-// implement OnceSetter.
-func TestRunnerWithSharedProcessorsSetOnceOnInnerWithoutSupport(t *testing.T) {
-	r := &runnerWithSharedProcessors{
+	// Inner without OnceSetter must not panic.
+	r2 := &runnerWithSharedProcessors{
 		Runner: &stopOrderRunner{onStop: func() {}},
 		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
 	}
-	r.SetOnce(true) // must not panic
+	r2.SetOnce(true)
 }
 
 type onceSetterRunner struct {

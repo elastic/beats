@@ -21,12 +21,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-
-	"github.com/stretchr/testify/require"
 )
 
 type runnerFactoryMock struct {
@@ -62,18 +62,11 @@ func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 	return nil
 }
 
-// Assert runs various checks for the clients created by the wrapped pipeline connector.
-//
-// `Processing.Meta` and `Processing.Fields` must still be a per-client copy —
-// these are mutated downstream and sharing them would let one client see
-// another's metadata.
-//
-// User-configured processors and the index processor, however, are now built
-// once per input and shared across clients via noCloseProcessor wrappers. We
-// verify both: the wrappers must be distinct per client (so closing one
-// client's list does not affect siblings) AND the underlying inner instances
-// must be the same object (the whole point of the fix — see
-// elastic/beats#50376).
+// Assert runs various checks for the clients created by the wrapped
+// pipeline connector. Processing.Meta and Processing.Fields must still be
+// a per-client copy (they are mutated downstream); user-configured and
+// index processors are shared across clients via noCloseProcessor wrappers
+// (#50376) — see assertNoCloseProcessorsShared.
 func (r runnerFactoryMock) Assert(t *testing.T) {
 	t.Helper()
 
@@ -98,27 +91,12 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 	})
 
 	t.Run("processor wrappers are per-client, but inner instances are shared", func(t *testing.T) {
-		var firstList []beat.Processor
-		for idx, c := range r.cfgs {
-			list := c.Processing.Processor.All()
-			require.NotEmptyf(t, list, "client %d processor list cannot be empty", idx)
+		perClient := make([][]beat.Processor, 0, len(r.cfgs))
+		for _, c := range r.cfgs {
+			perClient = append(perClient, c.Processing.Processor.All())
 			defer c.Processing.Processor.Close()
-
-			if idx == 0 {
-				firstList = list
-				continue
-			}
-
-			require.Lenf(t, list, len(firstList), "client %d processor list length differs from client 0", idx)
-			for j := range list {
-				w0, ok0 := firstList[j].(*noCloseProcessor)
-				wi, oki := list[j].(*noCloseProcessor)
-				require.Truef(t, ok0, "client 0 processor[%d] expected *noCloseProcessor, got %T", j, firstList[j])
-				require.Truef(t, oki, "client %d processor[%d] expected *noCloseProcessor, got %T", idx, j, list[j])
-				require.NotSamef(t, w0, wi, "client %d processor[%d]: wrappers must be distinct allocations so per-client Close is isolated", idx, j)
-				require.Samef(t, w0.inner, wi.inner, "client %d processor[%d]: inner shared instance must be identical to client 0's (elastic/beats#50376)", idx, j)
-			}
 		}
+		assertNoCloseProcessorsShared(t, perClient)
 	})
 }
 
