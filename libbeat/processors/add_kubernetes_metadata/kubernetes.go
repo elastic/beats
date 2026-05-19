@@ -37,6 +37,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/shared"
 )
 
 const (
@@ -60,7 +61,7 @@ type kubernetesAnnotator struct {
 }
 
 func init() {
-	processors.RegisterPlugin("add_kubernetes_metadata", New)
+	processors.RegisterPlugin("add_kubernetes_metadata", shared.New(New))
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
