@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension"
 	"github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage"
 	"github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor"
 	"github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver"
 
@@ -121,6 +122,7 @@ func getComponent() (otelcol.Factories, error) {
 	extensions, err := otelcol.MakeFactoryMap(
 		beatsauthextension.NewFactory(),
 		elasticsearchstorage.NewFactory(),
+		filestorage.NewFactory(),
 	)
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
