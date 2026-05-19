@@ -60,3 +60,7 @@ func RegisterPlugin(name string, constructor Constructor) {
 		panic(err)
 	}
 }
+
+func GetConstructor(name string) (Constructor, error) {
+	return registry.GetConstructor(name)
+}
