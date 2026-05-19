@@ -86,15 +86,11 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("node.id", nodeID)
 		if enriched, ok := nodes[nodeID]; ok {
-			if enriched.Name != "" {
-				event.ModuleFields.Put("node.name", enriched.Name)
-			}
+			event.ModuleFields.Put("node.name", enriched.Name)
 			if len(enriched.Roles) > 0 {
 				event.ModuleFields.Put("node.roles", enriched.Roles)
 			}
-			if enriched.Version != "" {
-				event.ModuleFields.Put("node.version", enriched.Version)
-			}
+			event.ModuleFields.Put("node.version", enriched.Version)
 		}
 
 		// Field names follow the existing thread_pool convention from the

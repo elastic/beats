@@ -77,8 +77,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return fmt.Errorf("error determining if %s is available: %w", m.FullyQualifiedName(), err)
 	}
 	if unavailableMessage != "" {
-		// Throttle the warning so we don't spam logs every collection interval.
-		if time.Since(m.lastUnavailableMessageTimestamp) > 10*time.Minute {
+		// Throttle the message so we don't spam logs: when security is off it
+		// stays off for the lifetime of the process. Hourly still gives an
+		// operational heartbeat without flooding the log.
+		if time.Since(m.lastUnavailableMessageTimestamp) > time.Hour {
 			m.lastUnavailableMessageTimestamp = time.Now()
 			m.Logger().Debug(unavailableMessage)
 		}
@@ -100,7 +102,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if err != nil {
 		fetchErrs = append(fetchErrs,
 			fmt.Errorf("could not fetch node enrichment for %s: %w", m.FullyQualifiedName(), err))
-		enrichment = nil
 	}
 
 	if err := eventsMapping(r, info, content, m.XPackEnabled, enrichment); err != nil {

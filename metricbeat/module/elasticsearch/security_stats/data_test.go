@@ -20,6 +20,7 @@
 package security_stats
 
 import (
+	"encoding/json"
 	"os"
 	"testing"
 
@@ -92,4 +93,101 @@ func TestEnrichmentMissingForNode(t *testing.T) {
 	require.Equal(t, "unknown-node", id)
 	_, err := events[0].ModuleFields.GetValue("node.name")
 	require.Error(t, err, "missing-from-enrichment node must not have node.name set")
+
+	// Every counter the API returns must be present in the emitted event;
+	// distinct values 1-7 in the input let us catch any field that gets
+	// dropped, renamed, or silently swapped with another.
+	for path, want := range map[string]int64{
+		"dls.cache.entries.count":   1,
+		"dls.cache.memory.bytes":    2,
+		"dls.cache.hits.count":      3,
+		"dls.cache.misses.count":    4,
+		"dls.cache.evictions.count": 5,
+		"dls.cache.hits.time.ms":    6,
+		"dls.cache.misses.time.ms":  7,
+	} {
+		got, err := events[0].MetricSetFields.GetValue(path)
+		require.NoError(t, err, "metric field %s must be present", path)
+		require.EqualValues(t, want, got, "metric field %s mismatch", path)
+	}
+}
+
+func TestMetricSetFieldsJSONShape(t *testing.T) {
+	// GetValue passes regardless of whether MetricSetFields uses dotted literal
+	// keys ({"entries.count":1}) or proper nesting ({"entries":{"count":1}}),
+	// because mapFind tries the full remaining key as a literal before splitting.
+	// This test serialises MetricSetFields to JSON — the document actually sent
+	// to Elasticsearch — and asserts the properly nested shape. It will fail if
+	// dotted literal keys are used in the mapstr.M literal.
+	const nodeID = "shape-node"
+	input := []byte(`{"nodes":{"` + nodeID + `":{"roles":{"dls":{"bit_set_cache":{"count":1,"memory_in_bytes":2,"hits":3,"misses":4,"evictions":5,"hits_time_in_millis":6,"misses_time_in_millis":7}}}}}}`)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	require.NoError(t, eventsMapping(reporter, info, input, false, nil))
+	events := reporter.GetEvents()
+	require.Equal(t, 1, len(events))
+
+	raw, err := json.Marshal(events[0].MetricSetFields)
+	require.NoError(t, err)
+
+	var doc map[string]interface{}
+	require.NoError(t, json.Unmarshal(raw, &doc))
+
+	want := map[string]interface{}{
+		"dls": map[string]interface{}{
+			"cache": map[string]interface{}{
+				"entries":   map[string]interface{}{"count": float64(1)},
+				"memory":    map[string]interface{}{"bytes": float64(2)},
+				"hits":      map[string]interface{}{"count": float64(3), "time": map[string]interface{}{"ms": float64(6)}},
+				"misses":    map[string]interface{}{"count": float64(4), "time": map[string]interface{}{"ms": float64(7)}},
+				"evictions": map[string]interface{}{"count": float64(5)},
+			},
+		},
+	}
+	require.Equal(t, want, doc, "MetricSetFields must serialise to properly nested objects, not dotted literal keys")
+}
+
+func TestEventShapeWithEnrichment(t *testing.T) {
+	// Asserts the full event shape on the path where /_nodes enrichment
+	// resolves the node: every identifying module field and every DLS cache
+	// counter must land at its expected path. Without this, dropping
+	// MetricSetFields entirely (or any individual counter) goes unnoticed.
+	const nodeID = "1sFM8cmSROZYhPxVsiWew"
+	input := []byte(`{"nodes":{"` + nodeID + `":{"roles":{"dls":{"bit_set_cache":{"count":12,"memory_in_bytes":4096,"hits":8421,"misses":137,"evictions":4,"hits_time_in_millis":51,"misses_time_in_millis":219}}}}}}`)
+
+	reporter := &mbtest.CapturingReporterV2{}
+	require.NoError(t, eventsMapping(reporter, info, input, false, fixtureEnrichment))
+	events := reporter.GetEvents()
+	require.Equal(t, 1, len(events))
+	event := events[0]
+
+	for path, want := range map[string]interface{}{
+		"cluster.id":   info.ClusterID,
+		"cluster.name": info.ClusterName,
+		"node.id":      nodeID,
+		"node.name":    "instance-0000000019",
+		"node.version": "9.2.0",
+	} {
+		got, err := event.ModuleFields.GetValue(path)
+		require.NoError(t, err, "module field %s must be present", path)
+		require.Equal(t, want, got, "module field %s mismatch", path)
+	}
+
+	roles, err := event.ModuleFields.GetValue("node.roles")
+	require.NoError(t, err, "node.roles must be present")
+	require.Equal(t, []string{"data_hot", "ingest"}, roles)
+
+	for path, want := range map[string]int64{
+		"dls.cache.entries.count":   12,
+		"dls.cache.memory.bytes":    4096,
+		"dls.cache.hits.count":      8421,
+		"dls.cache.misses.count":    137,
+		"dls.cache.evictions.count": 4,
+		"dls.cache.hits.time.ms":    51,
+		"dls.cache.misses.time.ms":  219,
+	} {
+		got, err := event.MetricSetFields.GetValue(path)
+		require.NoError(t, err, "metric field %s must be present", path)
+		require.EqualValues(t, want, got, "metric field %s mismatch", path)
+	}
 }
