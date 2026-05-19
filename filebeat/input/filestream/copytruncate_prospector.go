@@ -235,13 +235,14 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Context, event loginp.FSEvent, src loginp.Source, updater loginp.StateMetadataUpdater, group loginp.HarvesterGroup, ignoreSince time.Time) {
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
-		if event.Op == loginp.OpCreate {
+		switch event.Op {
+		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
-		} else if event.Op == loginp.OpWrite {
+		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
 
-		if p.fileProspector.isFileIgnored(log, event, ignoreSince) {
+		if p.isFileIgnored(log, event, ignoreSince) {
 			return
 		}
 
@@ -278,7 +279,7 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 	case loginp.OpDelete:
 		log.Debugf("File %s has been removed", event.OldPath)
 
-		p.fileProspector.onRemove(log, event, src, updater, group)
+		p.onRemove(log, event, src, updater, group)
 
 	case loginp.OpRename:
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
@@ -290,7 +291,7 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 			p.onRotatedFile(log, ctx, event, src, group)
 		}
 
-		p.fileProspector.onRename(log, ctx, event, src, updater, group)
+		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
 		log.Errorf("Unknown return value %v", event.Op)

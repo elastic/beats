@@ -30,8 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-const unlimited = 0
-
 // LineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
 // from raw input stream for every decoded line.
