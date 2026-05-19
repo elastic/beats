@@ -32,8 +32,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
-// ... other imports
-
 var userAgent atomic.Value // stores string
 
 func init() {
@@ -159,7 +157,7 @@ type BeatConfig struct {
 // for the enabled modules.
 type OverwritePipelinesCallback func(*config.C) error
 
-// In UserAgent() function:
+// UserAgent returns the user agent string for the beat
 func UserAgent() string {
 	if ua, ok := userAgent.Load().(string); ok {
 		return ua
