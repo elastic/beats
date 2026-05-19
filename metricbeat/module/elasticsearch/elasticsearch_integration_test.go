@@ -26,7 +26,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"strings"
@@ -48,6 +48,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/security_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
@@ -63,6 +64,7 @@ var metricSets = []string{
 	"ml_job",
 	"node",
 	"node_stats",
+	"security_stats",
 	"shard",
 }
 
@@ -547,6 +549,14 @@ func checkSkip(t *testing.T, metricset string, ver *version.V) {
 		checkSkipFeature("CCR", elasticsearch.CCRStatsAPIAvailableVersion)
 	case "enrich":
 		checkSkipFeature("Enrich", elasticsearch.EnrichStatsAPIAvailableVersion)
+	case "security_stats":
+		checkSkipFeature("Security Stats", elasticsearch.SecurityStatsAPIAvailableVersion)
+		// /_security/stats is only served when xpack.security.enabled=true,
+		// and the shared metricbeat compose stack runs with security
+		// disabled. Skip unconditionally until a follow-up PR introduces
+		// an x-pack-security-enabled compose stack to exercise this
+		// metricset's live response shape end-to-end.
+		t.Skip("/_security/stats requires xpack.security.enabled=true on the test cluster (deferred to a follow-up compose change)")
 	}
 }
 
@@ -579,7 +589,11 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 		return nil, err
 	}
 
-	return version.New(v.(string))
+	vs, ok := v.(string)
+	if !ok {
+		return nil, fmt.Errorf("version.number is not a string: %T", v)
+	}
+	return version.New(vs)
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
@@ -630,15 +644,10 @@ func waitForSuccess(f checkSuccessFunction, retryInterval time.Duration, numAtte
 	return false, nil
 }
 
-func randString(len int) string {
-	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	b := make([]byte, len)
-	aIdx := int('a')
+func randString(n int) string {
+	b := make([]byte, n)
 	for i := range b {
-		charIdx := aIdx + rand.Intn(26)
-		b[i] = byte(charIdx)
+		b[i] = byte('a' + rand.IntN(26))
 	}
-
 	return string(b)
 }

@@ -64,6 +64,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/pending_tasks"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/security_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
 	_ "github.com/elastic/beats/v7/metricbeat/module/envoyproxy"
 	_ "github.com/elastic/beats/v7/metricbeat/module/envoyproxy/server"

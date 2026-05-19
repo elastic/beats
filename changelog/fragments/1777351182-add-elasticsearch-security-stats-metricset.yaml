@@ -1,0 +1,12 @@
+kind: feature
+summary: Add `elasticsearch/security_stats` metricset for the Elasticsearch module
+description: |
+  Adds a new `security_stats` metricset to the Elasticsearch module that
+  scrapes the per-node `GET /_security/stats` endpoint (available since
+  Elasticsearch 9.2). The first metric exposed is the Document Level Security
+  cache (entries, memory, hits, misses, evictions, hit/miss latency), enabling
+  fleet-wide observability of DLS cache health from Stack Monitoring. Each
+  event is enriched with node name, roles, and version via a single
+  filter-path-scoped /_nodes call per scrape so consumers can slice by node,
+  role, or stack version without joining across data streams.
+component: metricbeat
