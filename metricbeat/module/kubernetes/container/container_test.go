@@ -104,8 +104,8 @@ func (s *ContainerTestSuite) TestEventMapping() {
 		// calculated pct fields:
 		"cpu.usage.node.pct":            0.005631997,
 		"cpu.usage.limit.pct":           0.022527988,
-		"cpu.limit.cores":               0.5,
-		"cpu.request.cores":             0.1,
+		"cpu.limit.cpu":                 0.5,
+		"cpu.request.cpu":               0.1,
 		"cpu.usage.request.pct":         0.11263994,
 		"memory.usage.node.pct":         0.01,
 		"memory.usage.limit.pct":        0.1,

@@ -102,8 +102,8 @@ func (s *PodTestSuite) TestEventMapping() {
 		"cpu.usage.nanocores":   11263994,
 		"cpu.usage.node.pct":    0.005631997,
 		"cpu.usage.limit.pct":   0.022527988,
-		"cpu.limit.cores":       0.5,
-		"cpu.request.cores":     0.25,
+		"cpu.limit.cpu":         0.5,
+		"cpu.request.cpu":       0.25,
 		"cpu.usage.request.pct": 0.04505597600000000,
 
 		"memory.usage.bytes":             1462272,
@@ -227,10 +227,10 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 
 	// "cpu.limit.cores" is not reported since AnotherContainer has no CoresLimit
-	s.assertFieldAbsent(events[0], "cpu.limit.cores")
+	s.assertFieldAbsent(events[0], "cpu.limit.cpu")
 
 	// Verify request fields are absent when not all containers have requests
-	s.assertFieldAbsent(events[0], "cpu.request.cores")
+	s.assertFieldAbsent(events[0], "cpu.request.cpu")
 	s.assertFieldAbsent(events[0], "cpu.usage.request.pct")
 	s.assertFieldAbsent(events[0], "memory.request.bytes")
 	s.assertFieldAbsent(events[0], "memory.usage.request.pct")
@@ -264,9 +264,9 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllLimitsAndReques
 		"cpu.usage.nanocores":   22527988,    // 2x usage since 2 containers
 		"cpu.usage.node.pct":    0.011263994, // 2x usage since 2 containers
 		"cpu.usage.limit.pct":   0.022527988, // 2x usage / 2x limit = same as single-container value
-		"cpu.limit.cores":       1.0,         // 0.5 + 0.5
+		"cpu.limit.cpu":         1.0,         // 0.5 + 0.5
 		"cpu.usage.request.pct": 0.045055976, // 2x usage / 2x request = same as single-container value
-		"cpu.request.cores":     0.5,         // 0.25 + 0.25
+		"cpu.request.cpu":       0.5,         // 0.25 + 0.25
 
 		"memory.usage.bytes":             2924544,             // 2x since 2 containers
 		"memory.usage.node.pct":          0.02,                // 2x usage since 2 containers

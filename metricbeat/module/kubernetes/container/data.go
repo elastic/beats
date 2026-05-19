@@ -169,7 +169,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			}
 
 			if containerMetrics.CoresLimit != nil {
-				kubernetes2.ShouldPut(containerEvent, "cpu.limit.cores", containerMetrics.CoresLimit.Value, logger)
+				kubernetes2.ShouldPut(containerEvent, "cpu.limit.cpu", containerMetrics.CoresLimit.Value, logger)
 			}
 
 			if containerMetrics.MemoryLimit != nil {
@@ -178,7 +178,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 
 			if containerMetrics.CoresRequest != nil {
 				containerCoresRequest := containerMetrics.CoresRequest.Value
-				kubernetes2.ShouldPut(containerEvent, "cpu.request.cores", containerCoresRequest, logger)
+				kubernetes2.ShouldPut(containerEvent, "cpu.request.cpu", containerCoresRequest, logger)
 				if containerCoresRequest > 0 {
 					kubernetes2.ShouldPut(containerEvent, "cpu.usage.request.pct", float64(container.CPU.UsageNanoCores)/1e9/containerCoresRequest, logger)
 				}
