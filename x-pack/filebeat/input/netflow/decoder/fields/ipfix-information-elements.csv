@@ -3617,7 +3617,7 @@ of this field is limited to 10 characters, UTF-8 encoded.",,,,[Felix_Erlacher],0
     [RFC7231]. Encoded in UTF-8.",,,[RFC7231],[Andrew_Feren],0,2017-04-19
 469,httpContentType,string,default,current,"The HTTP Content-Type header field as defined in section 3.1.1.5 of 
     [RFC7231]. Encoded in UTF-8.",,,[RFC7231],[Andrew_Feren],0,2017-04-19
-470,httpReasonPhrase,string,default,current,"The HTTP reason phrase as defined in section 6.1 of of 
+470,httpReasonPhrase,string,default,current,"The HTTP reason phrase as defined in section 6.1 of
     [RFC7231].",,,[RFC7231],[Felix_Erlacher],0,2017-06-19
 471,maxSessionEntries,unsigned32,identifier,current,"This element represents the maximum session entries that
     can be created by the NAT device.",,,"See [RFC3022] for the definition of NAT.  
