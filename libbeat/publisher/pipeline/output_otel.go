@@ -20,6 +20,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelconsumer"
@@ -34,7 +35,9 @@ type otelOutputController struct {
 	beatInfo beat.Info
 	logger   *logp.Logger
 	monitors Monitors
-	queue    queue.Queue[publisher.Event]
+
+	intakeQueueID string
+	queue         queue.Queue[publisher.Event]
 
 	// consumer is a helper goroutine that reads event batches from the queue
 	// and sends them to workerChan for an output worker to process.
@@ -44,6 +47,22 @@ type otelOutputController struct {
 	// send them to the output.
 	workers    []outputWorker
 	workerChan chan publisher.Batch
+
+	// The number of pipelines connected to this output controller
+	pipelineCount int
+}
+
+type otelOutputControllerHandle struct {
+	*otelOutputController
+
+	beatInfo beat.Info
+}
+
+var allOutputControllers = struct {
+	sync.Mutex
+	lookup map[string]*otelOutputController
+}{
+	lookup: make(map[string]*otelOutputController),
 }
 
 func newOTelOutputController(
@@ -52,11 +71,22 @@ func newOTelOutputController(
 	retryObserver retryObserver,
 	queueFactory queue.QueueFactory[publisher.Event],
 	intakeQueueID string,
-) (*otelOutputController, error) {
+) (*otelOutputControllerHandle, error) {
+	allOutputControllers.Lock()
+	defer allOutputControllers.Unlock()
+
 	if intakeQueueID != "" {
-		monitors.Logger.Debugf("newOTelOutputController: intake queue ID %v (inactive)", intakeQueueID)
+		controller, ok := allOutputControllers.lookup[intakeQueueID]
+		if ok {
+			controller.pipelineCount++
+			monitors.Logger.Debugf("newOTelOutputController: connecting to existing output controller for intake queue ID %v (%v pipelines connected)", intakeQueueID, controller.pipelineCount)
+			return &otelOutputControllerHandle{
+				otelOutputController: controller,
+				beatInfo:             beatInfo,
+			}, nil
+		}
 	} else {
-		monitors.Logger.Debugf("newOtelOutputController: no intake queue ID specified")
+		monitors.Logger.Debugf("newOTelOutputController: no intake queue ID specified")
 	}
 
 	// Queue metrics are reported under the pipeline namespace
@@ -100,18 +130,41 @@ func newOTelOutputController(
 			timeToLive: out.Retry + 1,
 		})
 
-	return &otelOutputController{
-		beatInfo:   beatInfo,
-		logger:     beatInfo.Logger.Named("otelOutputController"),
-		monitors:   monitors,
-		queue:      queue,
-		consumer:   consumer,
-		workers:    workers,
-		workerChan: workerChan,
+	controller := &otelOutputController{
+		beatInfo:      beatInfo,
+		logger:        beatInfo.Logger.Named("otelOutputController"),
+		monitors:      monitors,
+		intakeQueueID: intakeQueueID,
+		queue:         queue,
+		consumer:      consumer,
+		workers:       workers,
+		workerChan:    workerChan,
+		pipelineCount: 1,
+	}
+
+	if intakeQueueID != "" {
+		allOutputControllers.lookup[intakeQueueID] = controller
+		monitors.Logger.Debugf("newOTelOutputController: created new output controller for intake queue ID %v", intakeQueueID)
+	}
+
+	return &otelOutputControllerHandle{
+		otelOutputController: controller,
+		beatInfo:             beatInfo,
 	}, nil
 }
 
 func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
+	allOutputControllers.Lock()
+	defer allOutputControllers.Unlock()
+	if c.intakeQueueID != "" {
+		c.pipelineCount--
+		if c.pipelineCount > 0 {
+			c.logger.Debugf("Intake queue %v: waitClose not yet supported when multiple pipelines are connected, skipping", c.intakeQueueID)
+			return nil
+		}
+		delete(allOutputControllers.lookup, c.intakeQueueID)
+	}
+
 	// First: signal the queue that we're shutting down, and allow it to drain
 	// and process ACKs until the given context terminates.
 	c.logger.Infof("Output shutdown started. Waiting for enqueued events to be published.")
