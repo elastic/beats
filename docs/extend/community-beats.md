@@ -98,7 +98,7 @@ Elastic provides no warranty or support for community-sourced {{beats}}.
 :   Periodically gather internet download speed from  [fast.com](https://fast.com).
 
 [fileoccurencebeat](https://github.com/cloudronics/fileoccurancebeat)
-:   Checks for file existence recurssively under a given directory, handy while handling queues/pipeline buffers.
+:   Checks for file existence recursively under a given directory, handy while handling queues/pipeline buffers.
 
 [flowbeat](https://github.com/FStelzer/flowbeat)
 :   Collects, parses, and indexes [sflow](http://www.sflow.org/index.php) samples.
@@ -293,7 +293,7 @@ Elastic provides no warranty or support for community-sourced {{beats}}.
 :   Runs an external command and forwards the [stdout](https://www.computerhope.com/jargon/s/stdout.htm) for the same to Elasticsearch/Logstash.
 
 [timebeat](https://timebeat.app/download.php)
-:   NTP and PTP clock synchonisation beat that reports accuracy metrics to elastic. Includes Kibana dashboards.
+:   NTP and PTP clock synchronisation beat that reports accuracy metrics to elastic. Includes Kibana dashboards.
 
 [tracebeat](https://github.com/berfinsari/tracebeat)
 :   Reads traceroute output and indexes them into Elasticsearch.
