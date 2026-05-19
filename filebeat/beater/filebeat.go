@@ -513,6 +513,15 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
+	ctx, ctxCancel := context.WithTimeout(context.Background(), fb.config.ShutdownTimeout)
+	defer ctxCancel()
+
+	// then disconnect the pipeline to ensure all pending events are flushed and acknowledged before
+	err = fb.pipeline.Disconnect(ctx)
+	if err != nil {
+		fb.logger.Error("Error disconnecting pipeline:", err)
+	}
+
 	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
 	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
 	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
@@ -522,15 +531,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	adiscover.Stop()
 	crawler.Stop()
 	cancelPipelineFactoryCtx()
-
-	ctx, ctxCancel := context.WithTimeout(context.Background(), fb.config.ShutdownTimeout)
-	defer ctxCancel()
-
-	// then disconnect the pipeline to ensure all pending events are flushed and acknowledged before shutting down the beat.
-	err = fb.pipeline.Disconnect(ctx)
-	if err != nil {
-		fb.logger.Error("Error disconnecting pipeline:", err)
-	}
 
 	return nil
 }
