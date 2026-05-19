@@ -39,7 +39,7 @@ func NewRetryer(maxRetries int, initialInterval, maxInterval time.Duration) *Ret
 // Retry attempts to execute the provided function `fn` with a retry mechanism.
 // It uses an exponential backoff strategy and retries up to a maximum number of attempts.
 func (r *Retryer) Retry(ctx context.Context, fn func() error) (err error) {
-	backoff := NewExpBackoff(ctx.Done(), r.initialInterval, r.maxInterval)
+	backoff := NewExpBackoff(r.initialInterval, r.maxInterval)
 
 	for numTries := 0; ; numTries++ {
 		err = fn()
@@ -53,7 +53,7 @@ func (r *Retryer) Retry(ctx context.Context, fn func() error) (err error) {
 			break
 		}
 
-		if !backoff.Wait() {
+		if !backoff.Wait(ctx) {
 			// context cancelled
 			break
 		}

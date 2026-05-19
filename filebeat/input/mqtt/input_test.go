@@ -269,8 +269,8 @@ func TestOnCreateHandler_SubscribeMultiple_Succeeded(t *testing.T) {
 	inputContext := new(finput.Context)
 	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
 	var clientSubscriptions map[string]byte
-	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
-		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
+	newBackoff := func(init, max time.Duration) backoff.Backoff {
+		return backoff.NewEqualJitterBackoff(time.Nanosecond, 2*time.Nanosecond)
 	}
 	logger := logptest.NewTestingLogger(t, "")
 	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
@@ -289,8 +289,8 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSucceeded(t *testing.T) {
 	inputContext := new(finput.Context)
 	onMessageHandler := func(client libmqtt.Client, message libmqtt.Message) {}
 	var clientSubscriptions map[string]byte
-	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
-		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
+	newBackoff := func(init, max time.Duration) backoff.Backoff {
+		return backoff.NewEqualJitterBackoff(time.Nanosecond, 2*time.Nanosecond)
 	}
 	logger := logptest.NewTestingLogger(t, "")
 	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
@@ -314,7 +314,7 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSignalDone(t *testing.T) {
 	mockedBackoff := &mockedBackoff{
 		waits: []bool{true, false},
 	}
-	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
+	newBackoff := func(init, max time.Duration) backoff.Backoff {
 		return mockedBackoff
 	}
 	logger := logptest.NewTestingLogger(t, "")

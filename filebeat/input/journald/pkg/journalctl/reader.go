@@ -285,7 +285,7 @@ func New(
 		canceler:        canceler,
 		jctlFactory:     newJctl,
 		supportsBootAll: supportsBootAll,
-		backoff:         backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+		backoff:         backoff.NewExpBackoff(100*time.Millisecond, 2*time.Second),
 	}
 
 	if err := r.newJctl(extraArgs...); err != nil {
@@ -349,9 +349,9 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	// will return true next time it's called making us to
 	// wait in case jouranlctl crashes in less than 5s.
 	if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
-		r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
+		r.backoff = backoff.NewExpBackoff(100*time.Millisecond, 2*time.Second)
 	} else {
-		r.backoff.Wait()
+		r.backoff.Wait(input.GoContextFromCanceler(cancel))
 	}
 
 	var extraArgs []string

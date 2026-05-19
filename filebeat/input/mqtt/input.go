@@ -18,6 +18,7 @@
 package mqtt
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"sync"
@@ -74,7 +75,7 @@ func newInput(
 	connector channel.Connector,
 	inputContext input.Context,
 	newMqttClient func(options *libmqtt.ClientOptions) libmqtt.Client,
-	newBackoff func(done <-chan struct{}, init, max time.Duration) backoff.Backoff,
+	newBackoff func(init, max time.Duration) backoff.Backoff,
 	logger *logp.Logger,
 ) (input.Input, error) {
 	config := defaultConfig()
@@ -138,11 +139,13 @@ func createOnConnectHandler(logger *logp.Logger,
 	inputContext *input.Context,
 	onMessageHandler func(client libmqtt.Client, message libmqtt.Message),
 	clientSubscriptions map[string]byte,
-	newBackoff func(done <-chan struct{}, init, max time.Duration) backoff.Backoff) func(client libmqtt.Client) {
+	newBackoff func(init, max time.Duration) backoff.Backoff) func(client libmqtt.Client) {
+
+	ctx := doneChannelContext(inputContext)
+
 	// The function subscribes the client to the specific topics (with retry backoff in case of failure).
 	return func(client libmqtt.Client) {
 		backoff := newBackoff(
-			inputContext.Done,
 			subscribeRetryInterval,
 			8*subscribeRetryInterval)
 
@@ -161,7 +164,7 @@ func createOnConnectHandler(logger *logp.Logger,
 					logger.Warnf("Subscribing to topics failed due to error: %v", token.Error())
 				}
 
-				if !backoff.Wait() {
+				if !backoff.Wait(ctx) {
 					backoff.Reset()
 					success = true
 				}
@@ -172,6 +175,35 @@ func createOnConnectHandler(logger *logp.Logger,
 		}
 	}
 }
+
+// channelCtx implements context.Context by wrapping the v1 input.Context's
+// Done channel, similar to the kafka input's channelCtx.
+type channelCtx struct {
+	ctx *input.Context
+}
+
+func doneChannelContext(ctx *input.Context) context.Context {
+	return channelCtx{ctx}
+}
+
+func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
+	return
+}
+
+func (c channelCtx) Done() <-chan struct{} {
+	return c.ctx.Done
+}
+
+func (c channelCtx) Err() error {
+	select {
+	case <-c.ctx.Done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+
+func (c channelCtx) Value(_ interface{}) interface{} { return nil }
 
 // Run method starts the mqtt input and processing.
 // The mqtt client starts in auto-connect mode (with connection retries and resuming topic subscriptions).
