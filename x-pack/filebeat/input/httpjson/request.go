@@ -829,7 +829,7 @@ func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 			return
 		}
 	}
-	if len(*p.trCtx.firstEventClone()) == 0 {
+	if len(*p.trCtx.firstEvent) == 0 {
 		p.trCtx.updateFirstEvent(msg)
 	}
 	p.trCtx.updateLastEvent(msg)

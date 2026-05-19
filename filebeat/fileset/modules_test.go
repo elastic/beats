@@ -87,7 +87,7 @@ func TestNewModuleRegistry(t *testing.T) {
 	beatPaths.Home = t.TempDir()
 	err = beatPaths.InitPaths(beatPaths)
 	require.NoError(t, err)
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger, Paths: beatPaths}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -159,7 +159,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 	beatPaths.Home = t.TempDir()
 	err = beatPaths.InitPaths(beatPaths)
 	require.NoError(t, err)
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger, Paths: beatPaths}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -190,7 +190,7 @@ func TestMovedModule(t *testing.T) {
 	beatPaths.Home = t.TempDir()
 	err = beatPaths.InitPaths(beatPaths)
 	require.NoError(t, err)
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger}, FilesetOverrides{}, beatPaths)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0", Logger: logger, Paths: beatPaths}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -461,7 +461,7 @@ func TestMissingModuleFolder(t *testing.T) {
 	}
 
 	logger := logptest.NewTestingLogger(t, "")
-	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0", Logger: logger}, true, FilesetOverrides{}, p)
+	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0", Logger: logger, Paths: p}, true, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 

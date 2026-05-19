@@ -18,7 +18,7 @@
 package info
 
 import (
-	"github.com/docker/docker/api/types/system"
+	"github.com/moby/moby/api/types/system"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

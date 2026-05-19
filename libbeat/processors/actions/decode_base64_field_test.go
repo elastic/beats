@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -254,4 +255,46 @@ func TestDecodeBase64Run(t *testing.T) {
 		assert.Equal(t, expectedFields, newEvent.Fields)
 		assert.Equal(t, expectedMeta, newEvent.Meta)
 	})
+}
+
+// TestDecodeBase64FailOnErrorSafety verifies that when FailOnError=true and
+// decoding fails, the event fields are unchanged (proving clone skip is safe).
+func TestDecodeBase64FailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name  string
+		input mapstr.M
+	}{
+		{
+			name:  "invalid base64 data",
+			input: mapstr.M{"field1": "not valid base64!!!"},
+		},
+		{
+			name:  "missing source field",
+			input: mapstr.M{"other": "value"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &decodeBase64Field{
+				log: logptest.NewTestingLogger(t, processorName),
+				config: base64Config{
+					Field:       fromTo{From: "field1", To: "field2"},
+					FailOnError: true,
+				},
+			}
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := f.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
 }

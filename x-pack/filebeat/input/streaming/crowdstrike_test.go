@@ -8,6 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"sync/atomic"
@@ -19,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 var (
@@ -222,6 +226,69 @@ func TestRefreshSessionWait(t *testing.T) {
 				t.Fatalf("unexpected wait duration: got %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestCrowdstrikeOAuthHTTPClientRespectsConfiguredTimeout(t *testing.T) {
+	t.Parallel()
+
+	const requestTimeout = 50 * time.Millisecond
+	const tokenDelay = 200 * time.Millisecond
+	tokenSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(tokenDelay)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"access_token":"token","token_type":"bearer","expires_in":3600}`)
+	}))
+	defer tokenSrv.Close()
+
+	discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Error("discover endpoint should not be reached when token fetch times out")
+		http.Error(w, "unexpected", http.StatusInternalServerError)
+	}))
+	defer discoverSrv.Close()
+
+	u, err := url.Parse(discoverSrv.URL)
+	if err != nil {
+		t.Fatalf("failed to parse discover URL: %v", err)
+	}
+	cfg := config{
+		Type: "crowdstrike",
+		URL:  &urlConfig{u},
+		Auth: authConfig{
+			OAuth2: oAuth2Config{
+				ClientID:     "id",
+				ClientSecret: "secret",
+				TokenURL:     tokenSrv.URL,
+			},
+		},
+		CrowdstrikeAppID: "test",
+		Retry:            &retry{MaxAttempts: 1, WaitMin: time.Millisecond, WaitMax: time.Millisecond},
+		Transport:        httpcommon.HTTPTransportSettings{Timeout: requestTimeout},
+		Program: `
+			state.response.decode_json().as(body,{
+				"events": [body],
+			})`,
+	}
+
+	log := logp.NewNopLogger()
+	env := v2.Context{
+		ID:              "crowdstrike_timeout_test",
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+	s, err := NewFalconHoseFollower(context.Background(), env, cfg, nil, &testPublisher{log}, nil, log, time.Now)
+	if err != nil {
+		t.Fatalf("failed to construct follower: %v", err)
+	}
+
+	start := time.Now()
+	err = s.FollowStream(context.Background())
+	elapsed := time.Since(start)
+
+	if err == nil {
+		t.Fatal("expected FollowStream to fail due to token request timeout, but it succeeded")
+	}
+	if elapsed > tokenDelay {
+		t.Fatalf("expected FollowStream to fail before server delay %v, but it took %v: %v", tokenDelay, elapsed, err)
 	}
 }
 

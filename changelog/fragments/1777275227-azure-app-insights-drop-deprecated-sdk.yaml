@@ -1,0 +1,5 @@
+kind: enhancement
+
+summary: Migrate azure/app_insights metricset off the deprecated track-1 Azure SDK and go-autorest, using azcore directly.
+
+component: metricbeat
