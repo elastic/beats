@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package aws
+package identityfederation
 
 import (
 	"context"
@@ -24,10 +24,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFormatExternalID(t *testing.T) {
-	assert.Equal(t, "resource1-ext-id", FormatExternalID("resource1", "ext-id"))
-	assert.Equal(t, "abc123-external-id-456", FormatExternalID("abc123", "external-id-456"))
-	assert.Equal(t, "single-", FormatExternalID("single", ""))
+func TestAWSFormatExternalID(t *testing.T) {
+	assert.Equal(t, "resource1-ext-id", AWSFormatExternalID("resource1", "ext-id"))
+	assert.Equal(t, "abc123-external-id-456", AWSFormatExternalID("abc123", "external-id-456"))
+	assert.Equal(t, "single-", AWSFormatExternalID("single", ""))
 }
 
 // TestAWSConfigRoleChaining verifies that a multi-step chain runs each step in
@@ -81,7 +81,7 @@ func TestAWSConfigRoleChaining(t *testing.T) {
 					case 2:
 						assert.Equal(t, "AssumeRole", q.Get("Action"))
 						assert.Equal(t, remoteRoleARN, q.Get("RoleArn"))
-						assert.Equal(t, FormatExternalID(resourceID, externalIDPart), q.Get("ExternalId"))
+						assert.Equal(t, AWSFormatExternalID(resourceID, externalIDPart), q.Get("ExternalId"))
 						return middleware.FinalizeOutput{
 							Result: &sts.AssumeRoleOutput{
 								Credentials: &types.Credentials{
@@ -103,17 +103,17 @@ func TestAWSConfigRoleChaining(t *testing.T) {
 	})
 
 	chain := []AWSRoleChainingStep{
-		&WebIdentityRoleStep{
+		&AWSWebIdentityRoleStep{
 			RoleARN:              globalRoleARN,
 			WebIdentityTokenFile: tokenPath,
 			Options: func(o *stscreds.WebIdentityRoleOptions) {
 				o.Duration = defaultIntermediateDuration
 			},
 		},
-		&AssumeRoleStep{
+		&AWSAssumeRoleStep{
 			RoleARN: remoteRoleARN,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
-				aro.ExternalID = awssdk.String(FormatExternalID(resourceID, externalIDPart))
+				aro.ExternalID = awssdk.String(AWSFormatExternalID(resourceID, externalIDPart))
 			},
 		},
 	}
@@ -127,8 +127,8 @@ func TestAWSConfigRoleChaining(t *testing.T) {
 	require.Equal(t, 2, receivedCalls)
 }
 
-func TestNewIRSAChainRejectsLongDuration(t *testing.T) {
-	_, err := NewIRSAChain(t.Context(), IRSAChainConfig{
+func TestAWSNewIRSAChainRejectsLongDuration(t *testing.T) {
+	_, err := AWSNewIRSAChain(t.Context(), AWSIRSAChainConfig{
 		GlobalRoleARN:      "arn:aws:iam::999999999999:role/elastic-global-role",
 		RemoteRoleARN:      "arn:aws:iam::123456789012:role/customer-role",
 		AssumeRoleDuration: 2 * time.Hour,
@@ -136,8 +136,8 @@ func TestNewIRSAChainRejectsLongDuration(t *testing.T) {
 	require.ErrorContains(t, err, "assume role duration cannot exceed 1h")
 }
 
-func TestNewOIDCChainRejectsLongDuration(t *testing.T) {
-	_, err := NewOIDCChain(t.Context(), OIDCChainConfig{
+func TestAWSNewOIDCChainRejectsLongDuration(t *testing.T) {
+	_, err := AWSNewOIDCChain(t.Context(), AWSOIDCChainConfig{
 		JWTFilePath:        "/path/to/token",
 		GlobalRoleARN:      "arn:aws:iam::999999999999:role/elastic-global-role",
 		RemoteRoleARN:      "arn:aws:iam::123456789012:role/customer-role",

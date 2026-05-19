@@ -2,10 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// Package gcp provides GCP Workload Identity Federation authentication for the
-// Identity Federation flow. It bridges AWS OIDC credentials to GCP service account
-// impersonation via the GCP external account token exchange.
-package gcp
+package identityfederation
 
 import (
 	"context"
@@ -18,8 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google/externalaccount"
-
-	libbeatidaws "github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation/aws"
 )
 
 const (
@@ -30,14 +25,14 @@ const (
 	defaultAWSRegion      = "us-east-1"
 )
 
-// Params configures the AWS-mediated GCP Workload Identity Federation flow.
+// GCPParams configures the AWS-mediated GCP Workload Identity Federation flow.
 //
 // Authentication chain:
 //  1. Read JWT from JWTFilePath
 //  2. AssumeRoleWithWebIdentity → GlobalRoleARN (using JWT)
 //  3. Supply AWS credentials to GCP STS for WIF token exchange
 //  4. Impersonate ServiceAccountEmail in the customer's GCP project (when set)
-type Params struct {
+type GCPParams struct {
 	// Audience is the Workload Identity Federation audience URL.
 	Audience string
 	// GlobalRoleARN is the Elastic-owned AWS role ARN assumed via WebIdentity.
@@ -57,7 +52,7 @@ type Params struct {
 	HTTPClient *http.Client
 }
 
-func (p Params) validate() error {
+func (p GCPParams) validate() error {
 	var errs []error
 	if p.Audience == "" {
 		errs = append(errs, errors.New("audience is required"))
@@ -74,12 +69,12 @@ func (p Params) validate() error {
 	return nil
 }
 
-// NewTokenSource creates an OAuth2 token source for GCP using AWS-mediated Workload
+// GCPNewTokenSource creates an OAuth2 token source for GCP using AWS-mediated Workload
 // Identity Federation. The returned token source automatically refreshes credentials.
 //
 // If params.HTTPClient is set it is injected into both the AWS STS call and the
 // GCP token exchange context, enabling FIPS-compliant TLS throughout the chain.
-func NewTokenSource(ctx context.Context, params Params) (oauth2.TokenSource, error) {
+func GCPNewTokenSource(ctx context.Context, params GCPParams) (oauth2.TokenSource, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
@@ -96,7 +91,7 @@ func NewTokenSource(ctx context.Context, params Params) (oauth2.TokenSource, err
 	stsClient := sts.New(stsOpts)
 
 	sessionName := params.SessionName
-	credsCache := libbeatidaws.NewWebIdentityCredentialsCache(
+	credsCache := AWSNewWebIdentityCredentialsCache(
 		stsClient,
 		params.GlobalRoleARN,
 		params.JWTFilePath,

@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	identityfederationaws "github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
@@ -198,9 +198,9 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 	logger = logger.Named("applyIdentityFederationChain")
 	logger.Debug("Switching credentials provider to Identity Federation")
 
-	globalRoleARN := os.Getenv(identityfederationaws.GlobalRoleARNEnvVar)
-	idTokenPath := os.Getenv(identityfederationaws.IDTokenFileEnvVar)
-	cloudResourceID := os.Getenv(identityfederationaws.CloudResourceIDEnvVar)
+	globalRoleARN := os.Getenv(identityfederation.AWSGlobalRoleARNEnvVar)
+	idTokenPath := os.Getenv(identityfederation.AWSIDTokenFileEnvVar)
+	cloudResourceID := os.Getenv(identityfederation.AWSCloudResourceIDEnvVar)
 
 	var errs []error
 	if globalRoleARN == "" {
@@ -221,10 +221,10 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		return fmt.Errorf("identity federation config is invalid: %w", errors.Join(errs...))
 	}
 
-	chain := []identityfederationaws.AWSRoleChainingStep{
+	chain := []identityfederation.AWSRoleChainingStep{
 		// Step 1: Assume the Elastic Global Role with web identity using the ID token
 		// provided by the agentless OIDC issuer.
-		&identityfederationaws.WebIdentityRoleStep{
+		&identityfederation.AWSWebIdentityRoleStep{
 			RoleARN:              globalRoleARN,
 			WebIdentityTokenFile: idTokenPath,
 			Options: func(opt *stscreds.WebIdentityRoleOptions) {
@@ -233,12 +233,12 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		},
 		// Step 2: Assume the remote role (the user's configured role), using the
 		// previously assumed Elastic Global Role credentials.
-		&identityfederationaws.AssumeRoleStep{
+		&identityfederation.AWSAssumeRoleStep{
 			RoleARN: config.RoleArn,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
 				aro.Duration = config.AssumeRoleDuration
 				if config.ExternalID != "" {
-					aro.ExternalID = awssdk.String(identityfederationaws.FormatExternalID(cloudResourceID, config.ExternalID))
+					aro.ExternalID = awssdk.String(identityfederation.AWSFormatExternalID(cloudResourceID, config.ExternalID))
 				}
 			},
 			CacheOptions: func(options *awssdk.CredentialsCacheOptions) {
@@ -249,7 +249,7 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		},
 	}
 
-	result := identityfederationaws.AWSConfigRoleChaining(*awsConfig, chain)
+	result := identityfederation.AWSConfigRoleChaining(*awsConfig, chain)
 	awsConfig.Credentials = result.Credentials
 	return nil
 }

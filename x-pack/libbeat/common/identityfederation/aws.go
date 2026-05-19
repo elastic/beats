@@ -2,17 +2,14 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// Package aws provides AWS Identity Federation credential helpers shared across
-// elastic/beats, elastic/elastic-agent, and elastic/cloudbeat.
+// Package identityfederation provides AWS, GCP, and Azure Identity Federation
+// credential helpers shared across elastic/beats, elastic/elastic-agent, and
+// elastic/cloudbeat.
 //
-// It implements the role assumption chains used in the Cloud Connectors
-// Identity Federation flow:
-//   - IRSA chain:  IRSA → GlobalRoleARN → RemoteRoleARN
-//   - OIDC chain:  JWT  → GlobalRoleARN → RemoteRoleARN
-//
-// Environment variable names intentionally retain the CLOUD_CONNECTORS_ prefix
-// because the agentless-controller populates them under those names.
-package aws
+// AWS symbols are prefixed with AWS, GCP symbols with GCP, and Azure symbols
+// with Azure, so callers use identityfederation.AWSxxx, identityfederation.GCPxxx,
+// identityfederation.Azurexxx.
+package identityfederation
 
 import (
 	"context"
@@ -27,17 +24,17 @@ import (
 
 // Environment variables set by the agentless-controller for Identity Federation.
 const (
-	GlobalRoleARNEnvVar   = "CLOUD_CONNECTORS_GLOBAL_ROLE"
-	IDTokenFileEnvVar     = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
-	CloudResourceIDEnvVar = "CLOUD_RESOURCE_ID"
+	AWSGlobalRoleARNEnvVar   = "CLOUD_CONNECTORS_GLOBAL_ROLE"
+	AWSIDTokenFileEnvVar     = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
+	AWSCloudResourceIDEnvVar = "CLOUD_RESOURCE_ID"
 )
 
 const defaultIntermediateDuration = 20 * time.Minute
 
-// FormatExternalID formats the ExternalID for AssumeRole calls in the Identity
+// AWSFormatExternalID formats the ExternalID for AssumeRole calls in the Identity
 // Federation flow. The format "resourceID-externalIDPart" is required by the
 // Elastic trust policy to prevent confused-deputy attacks.
-func FormatExternalID(resourceID, externalIDPart string) string {
+func AWSFormatExternalID(resourceID, externalIDPart string) string {
 	return fmt.Sprintf("%s-%s", resourceID, externalIDPart)
 }
 
@@ -62,8 +59,8 @@ type AWSRoleChainingStep interface {
 	BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache
 }
 
-// AssumeRoleStep assumes a role using standard sts:AssumeRole.
-type AssumeRoleStep struct {
+// AWSAssumeRoleStep assumes a role using standard sts:AssumeRole.
+type AWSAssumeRoleStep struct {
 	RoleARN string
 	Options func(*stscreds.AssumeRoleOptions)
 	// CacheOptions, when non-nil, is applied to the CredentialsCache for this
@@ -72,7 +69,7 @@ type AssumeRoleStep struct {
 }
 
 // BuildCredentialsCache implements AWSRoleChainingStep.
-func (s *AssumeRoleStep) BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache {
+func (s *AWSAssumeRoleStep) BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache {
 	provider := stscreds.NewAssumeRoleProvider(client, s.RoleARN, s.Options)
 	if s.CacheOptions != nil {
 		return awssdk.NewCredentialsCache(provider, s.CacheOptions)
@@ -80,21 +77,21 @@ func (s *AssumeRoleStep) BuildCredentialsCache(client *sts.Client) *awssdk.Crede
 	return awssdk.NewCredentialsCache(provider)
 }
 
-// WebIdentityRoleStep assumes a role using sts:AssumeRoleWithWebIdentity (OIDC/JWT).
-type WebIdentityRoleStep struct {
+// AWSWebIdentityRoleStep assumes a role using sts:AssumeRoleWithWebIdentity (OIDC/JWT).
+type AWSWebIdentityRoleStep struct {
 	RoleARN              string
 	WebIdentityTokenFile string
 	Options              func(*stscreds.WebIdentityRoleOptions)
 }
 
 // BuildCredentialsCache implements AWSRoleChainingStep.
-func (s *WebIdentityRoleStep) BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache {
-	return NewWebIdentityCredentialsCache(client, s.RoleARN, s.WebIdentityTokenFile, s.Options)
+func (s *AWSWebIdentityRoleStep) BuildCredentialsCache(client *sts.Client) *awssdk.CredentialsCache {
+	return AWSNewWebIdentityCredentialsCache(client, s.RoleARN, s.WebIdentityTokenFile, s.Options)
 }
 
-// NewWebIdentityCredentialsCache creates a credentials cache for JWT/OIDC-based
+// AWSNewWebIdentityCredentialsCache creates a credentials cache for JWT/OIDC-based
 // authentication. The token file is re-read on each credential refresh.
-func NewWebIdentityCredentialsCache(
+func AWSNewWebIdentityCredentialsCache(
 	client *sts.Client,
 	roleARN string,
 	tokenFilePath string,
@@ -110,18 +107,18 @@ func NewWebIdentityCredentialsCache(
 
 // Compile-time interface checks.
 var (
-	_ AWSRoleChainingStep = (*AssumeRoleStep)(nil)
-	_ AWSRoleChainingStep = (*WebIdentityRoleStep)(nil)
+	_ AWSRoleChainingStep = (*AWSAssumeRoleStep)(nil)
+	_ AWSRoleChainingStep = (*AWSWebIdentityRoleStep)(nil)
 )
 
 // ──────────────────────────────────────────────
 // High-level chain constructors
 // ──────────────────────────────────────────────
 
-// IRSAChainConfig configures the 3-step IRSA role assumption chain.
+// AWSIRSAChainConfig configures the 3-step IRSA role assumption chain.
 //
 // Chain: IRSA (implicit via LoadDefaultConfig) → GlobalRoleARN → RemoteRoleARN
-type IRSAChainConfig struct {
+type AWSIRSAChainConfig struct {
 	// GlobalRoleARN is the Elastic-owned intermediary role ARN.
 	GlobalRoleARN string
 	// RemoteRoleARN is the customer's target role ARN.
@@ -129,7 +126,7 @@ type IRSAChainConfig struct {
 	// ResourceID is the cloud resource identifier (CLOUD_RESOURCE_ID env var).
 	ResourceID string
 	// ExternalID is combined with ResourceID to form the full ExternalID
-	// on the remote role assumption: FormatExternalID(ResourceID, ExternalID).
+	// on the remote role assumption: AWSFormatExternalID(ResourceID, ExternalID).
 	ExternalID string
 	// Region sets the AWS region. Defaults to "us-east-1".
 	Region string
@@ -137,13 +134,13 @@ type IRSAChainConfig struct {
 	AssumeRoleDuration time.Duration
 }
 
-// NewIRSAChain creates an AWS config using IRSA with role chaining.
+// AWSNewIRSAChain creates an AWS config using IRSA with role chaining.
 //
 // Chain:
 //  1. LoadDefaultConfig – picks up IRSA credentials via AWS_WEB_IDENTITY_TOKEN_FILE
 //  2. Assume GlobalRoleARN (20-minute intermediate session)
-//  3. Assume RemoteRoleARN with ExternalID = FormatExternalID(ResourceID, ExternalID)
-func NewIRSAChain(ctx context.Context, cfg IRSAChainConfig) (*awssdk.Config, error) {
+//  3. Assume RemoteRoleARN with ExternalID = AWSFormatExternalID(ResourceID, ExternalID)
+func AWSNewIRSAChain(ctx context.Context, cfg AWSIRSAChainConfig) (*awssdk.Config, error) {
 	region := cfg.Region
 	if region == "" {
 		region = "us-east-1"
@@ -164,20 +161,20 @@ func NewIRSAChain(ctx context.Context, cfg IRSAChainConfig) (*awssdk.Config, err
 	}
 
 	chain := []AWSRoleChainingStep{
-		&AssumeRoleStep{
+		&AWSAssumeRoleStep{
 			RoleARN: cfg.GlobalRoleARN,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
 				aro.Duration = defaultIntermediateDuration
 			},
 		},
-		&AssumeRoleStep{
+		&AWSAssumeRoleStep{
 			RoleARN: cfg.RemoteRoleARN,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
 				if cfg.AssumeRoleDuration > 0 {
 					aro.Duration = cfg.AssumeRoleDuration
 				}
 				if cfg.ResourceID != "" && cfg.ExternalID != "" {
-					aro.ExternalID = awssdk.String(FormatExternalID(cfg.ResourceID, cfg.ExternalID))
+					aro.ExternalID = awssdk.String(AWSFormatExternalID(cfg.ResourceID, cfg.ExternalID))
 				}
 			},
 		},
@@ -186,10 +183,10 @@ func NewIRSAChain(ctx context.Context, cfg IRSAChainConfig) (*awssdk.Config, err
 	return AWSConfigRoleChaining(baseCfg, chain), nil
 }
 
-// OIDCChainConfig configures the 2-step OIDC/WebIdentity role assumption chain.
+// AWSOIDCChainConfig configures the 2-step OIDC/WebIdentity role assumption chain.
 //
 // Chain: JWT → GlobalRoleARN → RemoteRoleARN
-type OIDCChainConfig struct {
+type AWSOIDCChainConfig struct {
 	// JWTFilePath is the path to the OIDC identity token file.
 	JWTFilePath string
 	// GlobalRoleARN is the Elastic-owned intermediary role ARN.
@@ -206,13 +203,13 @@ type OIDCChainConfig struct {
 	AssumeRoleDuration time.Duration
 }
 
-// NewOIDCChain creates an AWS config using OIDC/WebIdentity token-based
+// AWSNewOIDCChain creates an AWS config using OIDC/WebIdentity token-based
 // authentication with role chaining.
 //
 // Chain:
 //  1. AssumeRoleWithWebIdentity using JWTFilePath → GlobalRoleARN (20-minute intermediate session)
-//  2. Assume RemoteRoleARN with ExternalID = FormatExternalID(ResourceID, ExternalID)
-func NewOIDCChain(ctx context.Context, cfg OIDCChainConfig) (*awssdk.Config, error) {
+//  2. Assume RemoteRoleARN with ExternalID = AWSFormatExternalID(ResourceID, ExternalID)
+func AWSNewOIDCChain(ctx context.Context, cfg AWSOIDCChainConfig) (*awssdk.Config, error) {
 	region := cfg.Region
 	if region == "" {
 		region = "us-east-1"
@@ -233,21 +230,21 @@ func NewOIDCChain(ctx context.Context, cfg OIDCChainConfig) (*awssdk.Config, err
 	}
 
 	chain := []AWSRoleChainingStep{
-		&WebIdentityRoleStep{
+		&AWSWebIdentityRoleStep{
 			RoleARN:              cfg.GlobalRoleARN,
 			WebIdentityTokenFile: cfg.JWTFilePath,
 			Options: func(o *stscreds.WebIdentityRoleOptions) {
 				o.Duration = defaultIntermediateDuration
 			},
 		},
-		&AssumeRoleStep{
+		&AWSAssumeRoleStep{
 			RoleARN: cfg.RemoteRoleARN,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
 				if cfg.AssumeRoleDuration > 0 {
 					aro.Duration = cfg.AssumeRoleDuration
 				}
 				if cfg.ResourceID != "" && cfg.ExternalID != "" {
-					aro.ExternalID = awssdk.String(FormatExternalID(cfg.ResourceID, cfg.ExternalID))
+					aro.ExternalID = awssdk.String(AWSFormatExternalID(cfg.ResourceID, cfg.ExternalID))
 				}
 			},
 		},

@@ -2,9 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// Package azure provides Azure Workload Identity Federation authentication for
-// the Identity Federation flow using JWT client assertions.
-package azure
+package identityfederation
 
 import (
 	"context"
@@ -16,12 +14,12 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
-// Params configures the Azure client assertion credential flow.
+// AzureParams configures the Azure client assertion credential flow.
 //
 // Authentication chain:
 //  1. Read JWT from JWTFilePath on each token refresh
 //  2. ClientAssertionCredential(TenantID, ClientID, JWT) → Azure access token
-type Params struct {
+type AzureParams struct {
 	// TenantID is the Azure Active Directory tenant ID.
 	TenantID string
 	// ClientID is the Azure application (client) ID.
@@ -34,7 +32,7 @@ type Params struct {
 	Options *azidentity.ClientAssertionCredentialOptions
 }
 
-func (p Params) validate() error {
+func (p AzureParams) validate() error {
 	var errs []error
 	if p.TenantID == "" {
 		errs = append(errs, errors.New("TenantID is required"))
@@ -51,25 +49,25 @@ func (p Params) validate() error {
 	return nil
 }
 
-// NewClientAssertionCredential creates an Azure credential that uses a JWT from
+// AzureNewClientAssertionCredential creates an Azure credential that uses a JWT from
 // JWTFilePath as the client assertion. The JWT file is re-read on each token
 // refresh so rotated tokens are picked up automatically.
-func NewClientAssertionCredential(params Params) (*azidentity.ClientAssertionCredential, error) {
+func AzureNewClientAssertionCredential(params AzureParams) (*azidentity.ClientAssertionCredential, error) {
 	if err := params.validate(); err != nil {
 		return nil, err
 	}
 
 	jwtFilePath := params.JWTFilePath
 	getAssertion := func(_ context.Context) (string, error) {
-		return ReadJWT(jwtFilePath)
+		return AzureReadJWT(jwtFilePath)
 	}
 
 	return azidentity.NewClientAssertionCredential(params.TenantID, params.ClientID, getAssertion, params.Options)
 }
 
-// ReadJWT reads and validates a JWT token from the given file path.
+// AzureReadJWT reads and validates a JWT token from the given file path.
 // It trims whitespace and performs a basic structural check (three dot-separated parts).
-func ReadJWT(filePath string) (string, error) {
+func AzureReadJWT(filePath string) (string, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", fmt.Errorf("reading JWT file %s: %w", filePath, err)

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package azure
+package identityfederation
 
 import (
 	"os"
@@ -16,35 +16,35 @@ import (
 // fakeJWT is a syntactically valid (3 dot-separated parts) JWT for tests.
 const fakeJWT = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature"
 
-func TestParamsValidate(t *testing.T) {
+func TestAzureParamsValidate(t *testing.T) {
 	cases := []struct {
 		name    string
-		params  Params
+		params  AzureParams
 		wantErr string
 	}{
 		{
 			name:    "missing all",
-			params:  Params{},
+			params:  AzureParams{},
 			wantErr: "TenantID is required",
 		},
 		{
 			name:    "missing tenant id",
-			params:  Params{ClientID: "client", JWTFilePath: "/p"},
+			params:  AzureParams{ClientID: "client", JWTFilePath: "/p"},
 			wantErr: "TenantID is required",
 		},
 		{
 			name:    "missing client id",
-			params:  Params{TenantID: "tenant", JWTFilePath: "/p"},
+			params:  AzureParams{TenantID: "tenant", JWTFilePath: "/p"},
 			wantErr: "ClientID is required",
 		},
 		{
 			name:    "missing jwt path",
-			params:  Params{TenantID: "tenant", ClientID: "client"},
+			params:  AzureParams{TenantID: "tenant", ClientID: "client"},
 			wantErr: "JWTFilePath is required",
 		},
 		{
 			name:   "all set",
-			params: Params{TenantID: "tenant", ClientID: "client", JWTFilePath: "/p"},
+			params: AzureParams{TenantID: "tenant", ClientID: "client", JWTFilePath: "/p"},
 		},
 	}
 	for _, tc := range cases {
@@ -59,44 +59,44 @@ func TestParamsValidate(t *testing.T) {
 	}
 }
 
-func TestReadJWT(t *testing.T) {
+func TestAzureReadJWT(t *testing.T) {
 	dir := t.TempDir()
 
 	t.Run("happy path", func(t *testing.T) {
 		p := filepath.Join(dir, "good")
 		require.NoError(t, os.WriteFile(p, []byte("  "+fakeJWT+"\n"), 0o600))
-		got, err := ReadJWT(p)
+		got, err := AzureReadJWT(p)
 		require.NoError(t, err)
 		assert.Equal(t, fakeJWT, got)
 	})
 
 	t.Run("missing file", func(t *testing.T) {
-		_, err := ReadJWT(filepath.Join(dir, "does-not-exist"))
+		_, err := AzureReadJWT(filepath.Join(dir, "does-not-exist"))
 		require.ErrorContains(t, err, "reading JWT file")
 	})
 
 	t.Run("empty file", func(t *testing.T) {
 		p := filepath.Join(dir, "empty")
 		require.NoError(t, os.WriteFile(p, []byte("   \n"), 0o600))
-		_, err := ReadJWT(p)
+		_, err := AzureReadJWT(p)
 		require.ErrorContains(t, err, "is empty")
 	})
 
 	t.Run("malformed jwt", func(t *testing.T) {
 		p := filepath.Join(dir, "malformed")
 		require.NoError(t, os.WriteFile(p, []byte("not.a-valid-jwt"), 0o600))
-		_, err := ReadJWT(p)
+		_, err := AzureReadJWT(p)
 		require.ErrorContains(t, err, "invalid JWT")
 	})
 }
 
-func TestNewClientAssertionCredential(t *testing.T) {
+func TestAzureNewClientAssertionCredential(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		dir := t.TempDir()
 		p := filepath.Join(dir, "jwt")
 		require.NoError(t, os.WriteFile(p, []byte(fakeJWT), 0o600))
 
-		cred, err := NewClientAssertionCredential(Params{
+		cred, err := AzureNewClientAssertionCredential(AzureParams{
 			TenantID:    "00000000-0000-0000-0000-000000000000",
 			ClientID:    "00000000-0000-0000-0000-000000000001",
 			JWTFilePath: p,
@@ -106,7 +106,7 @@ func TestNewClientAssertionCredential(t *testing.T) {
 	})
 
 	t.Run("invalid params", func(t *testing.T) {
-		_, err := NewClientAssertionCredential(Params{})
+		_, err := AzureNewClientAssertionCredential(AzureParams{})
 		require.ErrorContains(t, err, "invalid Azure identity federation params")
 	})
 }

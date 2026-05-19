@@ -26,13 +26,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	identityfederationaws "github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation/aws"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 func TestInitializeAWSConfigIdentityFederation(t *testing.T) {
-	t.Setenv(identityfederationaws.GlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
-	t.Setenv(identityfederationaws.IDTokenFileEnvVar, "/path/token")
-	t.Setenv(identityfederationaws.CloudResourceIDEnvVar, "abc123")
+	t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+	t.Setenv(identityfederation.AWSIDTokenFileEnvVar, "/path/token")
+	t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
 
 	inputConfig := ConfigAWS{
 		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
@@ -69,9 +69,9 @@ func TestApplyIdentityFederationChain(t *testing.T) {
 	pth := path.Join(tmpDir, "id_token")
 	_ = os.WriteFile(pth, []byte(tokenFileContent), 0o644)
 
-	t.Setenv(identityfederationaws.GlobalRoleARNEnvVar, globalRoleARN)
-	t.Setenv(identityfederationaws.IDTokenFileEnvVar, pth)
-	t.Setenv(identityfederationaws.CloudResourceIDEnvVar, cloudResourceID)
+	t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, globalRoleARN)
+	t.Setenv(identityfederation.AWSIDTokenFileEnvVar, pth)
+	t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, cloudResourceID)
 
 	// Create a base AWS config with a mock STS interceptor injected via APIOptions.
 	// The interceptor must be set on the base config before calling applyIdentityFederationChain,
@@ -159,8 +159,8 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 
 	t.Run("missing cloud resource id", func(t *testing.T) {
-		t.Setenv(identityfederationaws.GlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
-		t.Setenv(identityfederationaws.IDTokenFileEnvVar, "/path/token")
+		t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(identityfederation.AWSIDTokenFileEnvVar, "/path/token")
 		// CloudResourceIDEnvVar intentionally not set
 
 		err := applyIdentityFederationChain(ConfigAWS{}, &aws.Config{}, logger)
@@ -175,9 +175,9 @@ func TestApplyIdentityFederationChainValidation(t *testing.T) {
 	})
 
 	t.Run("assume role duration exceeds 1h", func(t *testing.T) {
-		t.Setenv(identityfederationaws.GlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
-		t.Setenv(identityfederationaws.IDTokenFileEnvVar, "/path/token")
-		t.Setenv(identityfederationaws.CloudResourceIDEnvVar, "abc123")
+		t.Setenv(identityfederation.AWSGlobalRoleARNEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+		t.Setenv(identityfederation.AWSIDTokenFileEnvVar, "/path/token")
+		t.Setenv(identityfederation.AWSCloudResourceIDEnvVar, "abc123")
 
 		err := applyIdentityFederationChain(ConfigAWS{AssumeRoleDuration: 2 * time.Hour}, &aws.Config{}, logger)
 		require.ErrorContains(t, err, "assume role duration cannot exceed 1h")
