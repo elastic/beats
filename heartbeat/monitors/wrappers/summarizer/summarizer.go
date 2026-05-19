@@ -93,7 +93,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 func (s *Summarizer) setupPlugins() {
 	// ssp must appear before Err plugin since
 	// it intercepts errors
-	if s.sf.Type == "browser" {
+	if s.sf.IsSyntheticsType() {
 		s.plugins = []SummarizerPlugin{
 			DropBrowserExtraEvents{},
 			&BrowserDurationPlugin{},

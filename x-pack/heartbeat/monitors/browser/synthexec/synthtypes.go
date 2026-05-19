@@ -213,18 +213,29 @@ type Journey struct {
 	Name string   `json:"name"`
 	ID   string   `json:"id"`
 	Tags []string `json:"tags"`
+	// Type surfaces the journey kind ("browser" or "api"). The
+	// synthetics agent emits this on journey/start and journey/end
+	// events from v1.x onward; older agents simply leave it empty and
+	// downstream consumers should treat absence as "browser" for back-compat.
+	Type string `json:"type"`
+}
+
+// IsAPI returns true when this journey came from an `apiJourney(...)`
+// declaration in the synthetics agent.
+func (j *Journey) IsAPI() bool {
+	return j != nil && j.Type == "api"
 }
 
 func (j Journey) ToMap() mapstr.M {
-	if len(j.Tags) > 0 {
-		return mapstr.M{
-			"name": j.Name,
-			"id":   j.ID,
-			"tags": j.Tags,
-		}
-	}
-	return mapstr.M{
+	m := mapstr.M{
 		"name": j.Name,
 		"id":   j.ID,
 	}
+	if len(j.Tags) > 0 {
+		m["tags"] = j.Tags
+	}
+	if j.Type != "" {
+		m["type"] = j.Type
+	}
+	return m
 }

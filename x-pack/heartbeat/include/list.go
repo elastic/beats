@@ -10,5 +10,6 @@ package include
 
 import (
 	// Import packages that perform 'func init()'.
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/api"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 )

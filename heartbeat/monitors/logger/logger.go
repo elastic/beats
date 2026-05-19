@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -136,8 +137,9 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 }
 
 func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
-	// Only relevant for lightweight monitors
-	if monitorType == "browser" {
+	// Only relevant for lightweight monitors. Synthetics-driven monitors
+	// (browser, api) emit their own network_info events via synthexec.
+	if stdfields.IsSyntheticsType(monitorType) {
 		return nil
 	}
 
