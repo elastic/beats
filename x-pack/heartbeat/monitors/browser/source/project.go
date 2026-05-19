@@ -126,6 +126,11 @@ func findNPMPath() (string, error) {
 // baked in to the Heartbeat image to maintain compatibility and
 // allows us to control the synthetics agent version
 func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) error {
+	if Offline() {
+		// In offline mode (testing) write a minimal package.json and skip all npm operations.
+		return writePackageJSON(workdir, "file:offline")
+	}
+
 	npmPath, err := findNPMPath()
 	if err != nil {
 		return err
@@ -141,7 +146,24 @@ func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) erro
 		return fmt.Errorf("global synthetics package not found at %s: %w", globalPath, err)
 	}
 
-	symlinkPath := fmt.Sprintf("file:%s", globalPath)
+	if err := writePackageJSON(workdir, fmt.Sprintf("file:%s", globalPath)); err != nil {
+		return err
+	}
+
+	// link the project to the globally installed synthetics library
+	return runSimpleCommand(log,
+		exec.CommandContext(
+			ctx,
+			npmPath, "install",
+			"--no-audit",           // Prevent audit checks that require internet
+			"--no-update-notifier", // Prevent update checks that require internet
+			"--no-fund",            // No need for package funding messages here
+			"--package-lock=false", // no need to write package lock here
+			"--progress=false",     // no need to display progress
+		), workdir)
+}
+
+func writePackageJSON(workdir, symlinkPath string) error {
 	pkgJson := PackageJSON{
 		Name:    "project-journey",
 		Private: true,
@@ -154,29 +176,13 @@ func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) erro
 		return err
 	}
 	pkgFile := filepath.Join(workdir, "package.json")
-	err = os.WriteFile(pkgFile, pkgJsonContent, defaultMod)
-	if err != nil {
+	if err := os.WriteFile(pkgFile, pkgJsonContent, defaultMod); err != nil {
 		return err
 	}
-	err = os.Chmod(pkgFile, defaultMod) // Double tap because of umask
-	if err != nil {
+	if err := os.Chmod(pkgFile, defaultMod); err != nil { // Double tap because of umask
 		return fmt.Errorf("failed assigning default mode %s to package.json: %w", defaultMod, err)
 	}
-
-	if Offline() {
-		return nil
-	}
-	// link the project to the globally installed synthetics library
-	return runSimpleCommand(log,
-		exec.CommandContext(
-			ctx,
-			npmPath, "install",
-			"--no-audit",           // Prevent audit checks that require internet
-			"--no-update-notifier", // Prevent update checks that require internet
-			"--no-fund",            // No need for package funding messages here
-			"--package-lock=false", // no need to write package lock here
-			"--progress=false",     // no need to display progress
-		), workdir)
+	return nil
 }
 
 func (p *ProjectSource) Workdir() string {
@@ -201,11 +207,11 @@ func runSimpleCommand(log *logp.Logger, cmd *exec.Cmd, dir string) error {
 	}
 	output, err := cmd.CombinedOutput()
 	if log != nil {
-		exitCode := -1
 		if cmd.ProcessState != nil {
-			exitCode = cmd.ProcessState.ExitCode()
+			log.Infof("Ran %s (%d) got '%s': (%v) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+		} else {
+			log.Infof("Command %s did not start: (%v) as (%d/%d)", cmd, err, syscall.Getuid(), syscall.Geteuid())
 		}
-		log.Infof("Ran %s (%d) got '%s': (%v) as (%d/%d)", cmd, exitCode, string(output), err, syscall.Getuid(), syscall.Geteuid())
 	}
 	return err
 }
