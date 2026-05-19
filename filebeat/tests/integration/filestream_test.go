@@ -290,6 +290,71 @@ logging:
 		"Filebeat did not log a validation error")
 }
 
+// migrated from test_fixup_registry_entries_with_global_id in test_input.py
+func TestFixupRegistryEntriesWithGlobalID(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+	logFilepath := filepath.Join(workDir, "log.log")
+	msgLogFilepath := logFilepath
+	if runtime.GOOS == "windows" {
+		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+	}
+
+	integration.WriteLogFile(t, logFilepath, 50, false)
+
+	// First run: no explicit ID, Filestream stores state under `.global`.
+	cfgYAML := getConfig(t, map[string]any{
+		"homePath":    workDir,
+		"logFilePath": logFilepath,
+		"inputID":     "",
+	}, "", "filestream_fixup_registry_global_id.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached on first run")
+	requirePublishedEvents(t, filebeat, 50, outputFile)
+	filebeat.Stop()
+
+	// Second run: add explicit ID and verify previous state is migrated.
+	cfgYAML = getConfig(t, map[string]any{
+		"homePath":    workDir,
+		"logFilePath": logFilepath,
+		"inputID":     "test-fix-global-id",
+	}, "", "filestream_fixup_registry_global_id.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.RemoveLogFiles()
+	filebeat.Start()
+
+	// Ensure no duplicate ingestion after state migration.
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached on second run")
+	requirePublishedEvents(t, filebeat, 50, outputFile)
+
+	// Add new data and assert only new lines are ingested.
+	integration.WriteLogFile(t, logFilepath, 2, true)
+	filebeat.WaitLogsContains(eofMsg, 10*time.Second, "EOF was not reached after appending lines")
+	filebeat.Stop()
+	requirePublishedEvents(t, filebeat, 52, outputFile)
+
+	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
+	registry := parseRegistry(entries)
+
+	requireRegistryEntryRemoved(t, workDir, ".global")
+
+	// Assert old registry entry was removed
+	for key, entry := range registry {
+		if strings.Contains(key, "filestream::.global::") && !entry.Removed {
+			t.Error("entry from input without ID was not removed from registry")
+		}
+	}
+}
+
 func TestFilestreamCanMigrateIdentity(t *testing.T) {
 	cfgTemplate := `
 filebeat.inputs:

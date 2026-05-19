@@ -31,7 +31,7 @@ func init() {
 }
 
 const (
-	statePath = "/_cluster/state/version,nodes,master_node,routing_table?local=true"
+	statePath = "/_cluster/state/version,nodes,master_node,routing_table"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -59,7 +59,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	content, err := m.HTTP.FetchContent()
+	content, err := m.FetchContent()
 	if err != nil {
 		return err
 	}

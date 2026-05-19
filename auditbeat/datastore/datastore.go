@@ -19,127 +19,34 @@ package datastore
 
 import (
 	"io"
-	"os"
-	"sync"
+	"sync/atomic"
 
 	bolt "go.etcd.io/bbolt"
 
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var (
-	initDatastoreOnce sync.Once
-	ds                *boltDatastore
+const (
+	dbFileName = "beat.db"
+	dbFileMode = 0o600
 )
 
-// OpenBucket returns a new Bucket that stores data in {path.data}/beat.db.
-// The returned Bucket must be closed when finished to ensure all resources
-// are released.
+// OpenBucket returns a Bucket that stores data in {path.data}/beat.db.
+// The returned Bucket must be closed when no longer needed; the underlying
+// database is closed when the last bucket for a given path is closed.
 func OpenBucket(name string, p *paths.Path) (Bucket, error) {
-	initDatastoreOnce.Do(func() {
-		ds = &boltDatastore{
-			path: p.Resolve(paths.Data, "beat.db"),
-			mode: 0o600,
-		}
-	})
-
-	return ds.OpenBucket(name)
+	return defaultRegistry.openBucket(name, p, nil)
 }
 
-// Update executes a function within the context of a read-write managed transaction.
-// If no error is returned from the function then the transaction is committed. If an
-// error is returned then the entire transaction is rolled back.
-func Update(fn func(tx *bolt.Tx) error, p *paths.Path) error {
-	initDatastoreOnce.Do(func() {
-		ds = &boltDatastore{
-			path: p.Resolve(paths.Data, "beat.db"),
-			mode: 0o600,
-		}
-	})
-
-	return ds.Update(fn)
+// OpenBucketWithMigration is like OpenBucket but runs migrate in a
+// read-write transaction before the named bucket is ensured to exist.
+// migrate must be idempotent: it will run on every call, including after
+// process restarts.
+func OpenBucketWithMigration(name string, p *paths.Path, migrate func(tx *bolt.Tx) error) (Bucket, error) {
+	return defaultRegistry.openBucket(name, p, migrate)
 }
 
-// Datastore
-
-type Datastore interface {
-	OpenBucket(name string) (Bucket, error)
-	Update(fn func(tx *bolt.Tx) error) error
-}
-
-type boltDatastore struct {
-	mutex    sync.Mutex
-	useCount uint32
-	path     string
-	mode     os.FileMode
-	db       *bolt.DB
-}
-
-func New(path string, mode os.FileMode) Datastore {
-	return &boltDatastore{path: path, mode: mode}
-}
-
-func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
-	ds.mutex.Lock()
-	defer ds.mutex.Unlock()
-	if err := ds.init(); err != nil {
-		return nil, err
-	}
-
-	// Ensure the name exists.
-	err := ds.db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(bucket))
-		return err
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &boltBucket{ds, bucket}, nil
-}
-
-// Update executes a function within the context of a read-write managed transaction.
-// If no error is returned from the function then the transaction is committed. If an
-// error is returned then the entire transaction is rolled back.
-func (ds *boltDatastore) Update(fn func(tx *bolt.Tx) error) error {
-	ds.mutex.Lock()
-	defer ds.mutex.Unlock()
-	if err := ds.init(); err != nil {
-		return err
-	}
-
-	return ds.db.Update(fn)
-}
-
-// init initializes the backing data store if it is not already open.
-// Callers should hold the datastore mutex.
-func (ds *boltDatastore) init() error {
-	if ds.db == nil {
-		var err error
-		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (ds *boltDatastore) done() {
-	ds.mutex.Lock()
-	defer ds.mutex.Unlock()
-
-	if ds.useCount > 0 {
-		ds.useCount--
-
-		if ds.useCount == 0 {
-			ds.db.Close()
-			ds.db = nil
-		}
-	}
-}
-
-// Bucket
-
+// Bucket is a key-value bucket within the datastore.
 type Bucket interface {
 	io.Closer
 	Load(key string, f func(blob []byte) error) error
@@ -155,72 +62,75 @@ type BoltBucket interface {
 	Update(func(tx *bolt.Bucket) error) error
 }
 
+// boltBucket implements Bucket and BoltBucket. It holds exactly one
+// reference on db that Close releases.
 type boltBucket struct {
-	ds   *boltDatastore
-	name string
+	db     *boltDB
+	name   []byte
+	closed atomic.Bool
 }
 
 func (b *boltBucket) Load(key string, f func(blob []byte) error) error {
-	return b.ds.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(b.name))
-
-		data := b.Get([]byte(key))
+	return b.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.name)
+		data := bucket.Get([]byte(key))
 		if data == nil {
 			return nil
 		}
-
 		return f(data)
 	})
 }
 
 func (b *boltBucket) Store(key string, blob []byte) error {
-	return b.ds.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(b.name))
-		return b.Put([]byte(key), blob)
+	return b.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.name)
+		return bucket.Put([]byte(key), blob)
 	})
 }
 
 func (b *boltBucket) ForEach(f func(key string, blob []byte) error) error {
-	return b.ds.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(b.name))
-
-		return b.ForEach(func(k, v []byte) error {
+	return b.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.name)
+		return bucket.ForEach(func(k, v []byte) error {
 			return f(string(k), v)
 		})
 	})
 }
 
 func (b *boltBucket) Delete(key string) error {
-	return b.ds.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(b.name))
-		return b.Delete([]byte(key))
+	return b.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.name)
+		return bucket.Delete([]byte(key))
 	})
 }
 
 func (b *boltBucket) DeleteBucket() error {
-	err := b.ds.db.Update(func(tx *bolt.Tx) error {
-		return tx.DeleteBucket([]byte(b.name))
+	err := b.db.Update(func(tx *bolt.Tx) error {
+		return tx.DeleteBucket(b.name)
 	})
-	b.Close()
+	// Always release the reference, even if the delete failed, so we
+	// don't leak the database open forever.
+	if closeErr := b.Close(); err == nil {
+		err = closeErr
+	}
 	return err
 }
 
 func (b *boltBucket) View(f func(*bolt.Bucket) error) error {
-	return b.ds.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(b.name))
-		return f(b)
+	return b.db.View(func(tx *bolt.Tx) error {
+		return f(tx.Bucket(b.name))
 	})
 }
 
 func (b *boltBucket) Update(f func(*bolt.Bucket) error) error {
-	return b.ds.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(b.name))
-		return f(b)
+	return b.db.Update(func(tx *bolt.Tx) error {
+		return f(tx.Bucket(b.name))
 	})
 }
 
 func (b *boltBucket) Close() error {
-	b.ds.done()
-	b.ds = nil
-	return nil
+	if !b.closed.CompareAndSwap(false, true) {
+		return nil
+	}
+	return defaultRegistry.releaseBucket(b.db)
 }

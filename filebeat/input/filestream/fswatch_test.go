@@ -39,6 +39,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
 func TestFileWatcher(t *testing.T) {
@@ -453,6 +454,206 @@ scanner:
 		require.NotContainsf(t, buff.String(), "WARN",
 			"must be no warning messages")
 	})
+}
+
+func TestFileWatcherCopyTruncateWithFingerprint(t *testing.T) {
+	t.Run("copy truncate happens at once", func(t *testing.T) {
+		w, activePath, rotatedPath := newFileWatcherForCopyTruncateTests(t)
+		ctx := context.Background()
+
+		// 1. A single file exists
+		initialContent := strings.Repeat("a", 96)
+		require.NoError(t, os.WriteFile(activePath, []byte(initialContent), 0o600), "failed to write initial active file")
+		w.watch(ctx)
+
+		initialEvents := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, initialEvents, []loginp.FSEvent{
+			{Op: loginp.OpCreate, NewPath: activePath},
+		})
+		initialCreateEvt := findEvent(initialEvents, loginp.FSEvent{Op: loginp.OpCreate, NewPath: activePath})
+		initialFingerprint := initialCreateEvt.Descriptor.Fingerprint
+		require.NotEmpty(t, initialFingerprint, "initial active file fingerprint must be present")
+
+		// 2. Copy+truncate:
+		//   - copy foo.log -> foo.log.1
+		//   - truncate foo.log and add data (less than previously)
+		copyFile(t, activePath, rotatedPath)
+		require.NoError(t, os.WriteFile(activePath, []byte(strings.Repeat("b", 64)), 0o600), "failed to rewrite active file after rotation")
+		w.watch(ctx)
+
+		events := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, events, []loginp.FSEvent{
+			{Op: loginp.OpRename, OldPath: activePath, NewPath: rotatedPath},
+			{Op: loginp.OpCreate, NewPath: activePath},
+		})
+
+		renamedEvt := findEvent(events, loginp.FSEvent{Op: loginp.OpRename, OldPath: activePath, NewPath: rotatedPath})
+		createdActiveEvt := findEvent(events, loginp.FSEvent{Op: loginp.OpCreate, NewPath: activePath})
+		require.Equal(t, initialFingerprint, renamedEvt.Descriptor.Fingerprint, "rotated file should keep initial fingerprint")
+		require.NotEqual(t, initialFingerprint, createdActiveEvt.Descriptor.Fingerprint, "rewritten active file should get a new fingerprint")
+	})
+
+	t.Run("copy truncate happens in two steps", func(t *testing.T) {
+		w, activePath, rotatedPath := newFileWatcherForCopyTruncateTests(t)
+		ctx := context.Background()
+
+		// 1. A single file exists
+		initialContent := strings.Repeat("c", 96)
+		require.NoError(t, os.WriteFile(activePath, []byte(initialContent), 0o600), "failed to write initial active file")
+		w.watch(ctx)
+
+		initialEvents := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, initialEvents, []loginp.FSEvent{
+			{Op: loginp.OpCreate, NewPath: activePath},
+		})
+		initialCreateEvt := findEvent(initialEvents, loginp.FSEvent{Op: loginp.OpCreate, NewPath: activePath})
+		initialFingerprint := initialCreateEvt.Descriptor.Fingerprint
+		require.NotEmpty(t, initialFingerprint, "initial active file fingerprint must be present")
+
+		// 2. The file is copied: foo.log -> foo.log.1
+		copyFile(t, activePath, rotatedPath)
+		w.watch(ctx)
+
+		// Expectation: no file events, because both files are considered the same
+		copyStepEvents := drainPendingFSEvents(w.events)
+		require.Empty(t, copyStepEvents, "no file events when a file is copied (same fingerprint)")
+		requireEventSignatures(t, copyStepEvents, []loginp.FSEvent{})
+
+		// 3. foo.log is truncated & written to (less data than before).
+		require.NoError(t, os.WriteFile(activePath, []byte(strings.Repeat("d", 64)), 0o600), "failed to truncate and rewrite active file")
+		w.watch(ctx)
+
+		// Expectation: 'foo.log' is considered new and 'foo.log.1' is considered a rename
+		truncateStepEvents := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, truncateStepEvents, []loginp.FSEvent{
+			{Op: loginp.OpCreate, NewPath: activePath},
+			{Op: loginp.OpRename, OldPath: activePath, NewPath: rotatedPath},
+		})
+	})
+
+	t.Run("copy truncate happens in three steps", func(t *testing.T) {
+		w, activePath, rotatedPath := newFileWatcherForCopyTruncateTests(t)
+		ctx := context.Background()
+
+		// 1. A single file exists
+		initialContent := strings.Repeat("e", 96)
+		require.NoError(t, os.WriteFile(activePath, []byte(initialContent), 0o600), "failed to write initial active file")
+		w.watch(ctx)
+
+		initialEvents := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, initialEvents, []loginp.FSEvent{
+			{Op: loginp.OpCreate, NewPath: activePath},
+		})
+		initialCreateEvt := findEvent(initialEvents, loginp.FSEvent{Op: loginp.OpCreate, NewPath: activePath})
+		initialFingerprint := initialCreateEvt.Descriptor.Fingerprint
+		require.NotEmpty(t, initialFingerprint, "initial active file fingerprint must be present")
+
+		// 2. The file is copied: foo.log -> foo.log.1
+		copyFile(t, activePath, rotatedPath)
+		w.watch(ctx)
+
+		// Expectation: no file events, because both files are considered the same
+		copyStepEvents := drainPendingFSEvents(w.events)
+		require.Empty(t, copyStepEvents, "no file events when a file is copied (same fingerprint)")
+		requireEventSignatures(t, copyStepEvents, []loginp.FSEvent{})
+
+		// 3. foo.log is truncated (0 bytes)
+		require.NoError(t, os.WriteFile(activePath, nil, 0o600), "failed to truncate active file to empty")
+		w.watch(ctx)
+
+		// Expectation: foo.log is considered renamed: foo.log -> foo.log.1
+		// the empty file foo.log is ignored because it is empty
+		emptyStepEvents := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, emptyStepEvents, []loginp.FSEvent{
+			{Op: loginp.OpRename, OldPath: activePath, NewPath: rotatedPath},
+		})
+
+		// 4. data is added to foo.log
+		require.NoError(t, os.WriteFile(activePath, []byte(strings.Repeat("f", 64)), 0o600), "failed to add new data to active file")
+		w.watch(ctx)
+
+		// Expectation: foo.log is discovered as a new file
+		newDataStepEvents := drainPendingFSEvents(w.events)
+		requireEventSignatures(t, newDataStepEvents, []loginp.FSEvent{
+			{Op: loginp.OpCreate, NewPath: activePath},
+		})
+		newActiveEvt := findEvent(newDataStepEvents, loginp.FSEvent{Op: loginp.OpCreate, NewPath: activePath})
+		require.NotEqual(t, initialFingerprint, newActiveEvt.Descriptor.Fingerprint, "newly recreated active file should have a different fingerprint")
+	})
+}
+
+// newFileWatcherForCopyTruncateTests returns a file watcher configured to
+// harvest rotated files and two file paths used for rotation.
+func newFileWatcherForCopyTruncateTests(t *testing.T) (watcher *fileWatcher, activePath string, rotatedPath string) {
+	dir := fs.TempDir(t, "..", "..", "build")
+	activePath = filepath.Join(dir, "foo.log")
+	rotatedPath = filepath.Join(dir, "foo.log.1")
+	paths := []string{filepath.Join(dir, "foo.log*")}
+	cfgStr := `
+scanner:
+  check_interval: 10ms
+  fingerprint:
+    length: 64
+`
+
+	logger := logptest.NewFileLogger(t, dir)
+	w := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
+	w.events = make(chan loginp.FSEvent, 16)
+	return w, activePath, rotatedPath
+}
+
+func copyFile(t *testing.T, from, to string) {
+	t.Helper()
+
+	content, err := os.ReadFile(from)
+	require.NoError(t, err, "failed to read source file %q", from)
+	require.NoError(t, os.WriteFile(to, content, 0o600), "failed to write destination file %q", to)
+}
+
+// fsEventToString returns a stable string representation that includes
+// only the fields: Op, OldPath and NewPath. The returned string is
+// human-friendly.
+func fsEventToString(e loginp.FSEvent) string {
+	return fmt.Sprintf("Op: '%s'|OldPath: '%s'|NewPath: '%s'", e.Op, e.OldPath, e.NewPath)
+}
+
+func requireEventSignatures(t *testing.T, events, expected []loginp.FSEvent) {
+	t.Helper()
+
+	actualKeys := make([]string, 0, len(events))
+	for _, e := range events {
+		actualKeys = append(actualKeys, fsEventToString(e))
+	}
+
+	expectedKeys := make([]string, 0, len(expected))
+	for _, e := range expected {
+		expectedKeys = append(expectedKeys, fsEventToString(e))
+	}
+
+	require.ElementsMatch(t, expectedKeys, actualKeys, "unexpected file watcher events (order ignored)")
+}
+
+// findEvent finds expected in events by comparing Op, OldPath and NewPath.
+func findEvent(events []loginp.FSEvent, expected loginp.FSEvent) loginp.FSEvent {
+	for _, e := range events {
+		if e.Op == expected.Op && e.OldPath == expected.OldPath && e.NewPath == expected.NewPath {
+			return e
+		}
+	}
+	return loginp.FSEvent{}
+}
+
+func drainPendingFSEvents(events <-chan loginp.FSEvent) []loginp.FSEvent {
+	drained := make([]loginp.FSEvent, 0)
+
+	for {
+		select {
+		case e := <-events:
+			drained = append(drained, e)
+		default:
+			return drained
+		}
+	}
 }
 
 func TestFileScanner(t *testing.T) {
