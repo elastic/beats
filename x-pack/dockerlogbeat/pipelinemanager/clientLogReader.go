@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types/plugins/logdriver"
-	"github.com/docker/docker/daemon/logger"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
+	"github.com/moby/moby/v2/daemon/logger"
 
-	"github.com/docker/docker/api/types/backend"
+	"github.com/moby/moby/v2/daemon/server/backend"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"

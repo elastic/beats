@@ -10,11 +10,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/docker/docker/daemon/logger"
+	"github.com/moby/moby/v2/daemon/logger"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 
-	"github.com/docker/docker/pkg/ioutils"
+	"github.com/moby/moby/v2/pkg/ioutils"
 )
 
 // StartLoggingRequest represents the request object we get on a call to //LogDriver.StartLogging

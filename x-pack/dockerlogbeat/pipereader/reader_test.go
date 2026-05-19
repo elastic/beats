@@ -7,7 +7,7 @@ package pipereader
 import (
 	"testing"
 
-	"github.com/docker/docker/api/types/plugins/logdriver"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"

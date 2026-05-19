@@ -18,9 +18,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
 	"github.com/elastic/elastic-agent-libs/config"
 
-	"github.com/docker/docker/api/types/plugins/logdriver"
-	"github.com/docker/docker/daemon/logger"
-	"github.com/docker/docker/daemon/logger/jsonfilelog"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
+	"github.com/moby/moby/v2/daemon/logger"
+	"github.com/moby/moby/v2/daemon/logger/jsonfilelog"
 
 	protoio "github.com/gogo/protobuf/io"
 
