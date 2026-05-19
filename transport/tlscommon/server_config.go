@@ -104,7 +104,7 @@ func LoadTLSServerConfig(config *ServerConfig, logger *logp.Logger) (*TLSConfig,
 		clientCAs = newStaticCertPool(pool)
 	}
 
-	var certs []tls.Certificate
+	certs := make([]tls.Certificate, 0)
 	var reloader *CertReloader
 
 	// Skip cert reloading when inline PEMs are used; reloading only makes sense with file paths.
