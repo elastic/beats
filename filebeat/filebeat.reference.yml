@@ -1383,6 +1383,18 @@ filebeat.inputs:
 # persistent on-disk storage with support for compaction and TTL-based cleanup.
 #filebeat.registry.backend: memlog
 
+# ----------------------- Memlog backend settings ------------------------------
+# These settings apply only when filebeat.registry.backend is set to "memlog"
+# (the default).
+
+# The registry file size threshold (in bytes) that triggers a checkpoint.
+# When the registry file reaches this size, Filebeat writes a full snapshot
+# of the registry state and resets the file. Larger values mean fewer
+# checkpoints, but a larger registry file. Increasing this value can improve
+# performance when tracking tens of thousands of files or more.
+# Default: 10485760 (10 MB). Minimum: 10485760 (10 MB).
+#filebeat.registry.memlog.checkpoint_size: 10485760
+
 # ----------------------- Bbolt backend settings -------------------------------
 # WARNING: The bbolt backend is EXPERIMENTAL and may change or be removed in
 # future releases. Do not use in production without understanding the risks.

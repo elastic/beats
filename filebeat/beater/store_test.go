@@ -18,6 +18,10 @@
 package beater
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -27,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -153,4 +158,191 @@ func TestOpenStateStore_ConcurrentOpenClose(t *testing.T) {
 	_, exists := globalStores[resolvedKey]
 	globalMu.Unlock()
 	assert.False(t, exists, "entry should be cleaned up after all stores are closed")
+}
+
+// TestOpenStateStore_CheckpointSize verifies that the memlog checkpoint is
+// triggered at the correct WAL size threshold, both for the default (10MB)
+// and for a custom configured value.
+//
+// Important: memlog deletes old checkpoint data files after each new
+// checkpoint, so at most 1 data file exists on disk at any time. We detect
+// checkpoint events by checking whether a data file exists and the WAL log
+// file has been reset (small size).
+func TestOpenStateStore_CheckpointSize(t *testing.T) {
+	const valueSize = 1024
+	value := strings.Repeat("x", valueSize)
+
+	// Test-only values well below the production minimum (10 MB) to keep
+	// tests fast. Config validation prevents these in production; here we
+	// construct memlog.Config directly, bypassing Validate().
+	testCases := []struct {
+		name           string
+		checkpointSize uint64
+	}{
+		{name: "custom 256KB", checkpointSize: 256 * 1024},
+		{name: "custom 64KB", checkpointSize: 64 * 1024},
+		{name: "custom 32KB", checkpointSize: 32 * 1024},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+
+			s := testOpenStoreWithConfig(t, dir, config.Registry{
+				Path:          "",
+				Permissions:   0600,
+				CleanInterval: 5 * time.Second,
+				Memlog:        memlog.Config{CheckpointSize: tc.checkpointSize},
+			})
+			defer s.Close()
+
+			store, err := s.shared.registry.Get("test")
+			require.NoError(t, err)
+			defer store.Close()
+
+			registryDir := filepath.Join(dir, "test")
+
+			written := 0
+
+			// Phase 1: write entries until the WAL reaches ~80% of the
+			// threshold. This should NOT trigger a checkpoint.
+			target80 := tc.checkpointSize * 80 / 100
+			for walFileSize(t, registryDir) < target80 {
+				require.NoError(t, store.Set(fmt.Sprintf("key-%05d", written), map[string]any{"value": value}))
+				written++
+			}
+			assert.False(t, hasCheckpointFile(t, registryDir),
+				"no checkpoint should be triggered below the checkpointSize")
+			t.Logf("phase 1: wrote %d entries, WAL size %d, checkpointSize %d",
+				written, walFileSize(t, registryDir), tc.checkpointSize)
+
+			// Phase 2: write past the checkpointSize — a checkpoint should occur.
+			// After the checkpoint, the WAL is truncated and the data file
+			// appears. We write 2x the checkpointSize to be sure.
+			target2x := tc.checkpointSize * 2
+			for walFileSize(t, registryDir) < target2x {
+				require.NoError(t, store.Set(fmt.Sprintf("key-%05d", written), map[string]any{"value": value}))
+				written++
+
+				// Once a checkpoint fires, the WAL resets to near-zero.
+				// Detect this to avoid writing forever.
+				if hasCheckpointFile(t, registryDir) {
+					break
+				}
+			}
+			assert.True(t, hasCheckpointFile(t, registryDir),
+				"a checkpoint should have been triggered after crossing the checkpointSize")
+			t.Logf("phase 2: wrote %d total entries, checkpoint triggered", written)
+
+			// Phase 3: after checkpoint the WAL was reset. Write past the
+			// checkpointSize again and verify a second checkpoint occurs (the data
+			// file changes).
+			firstDataFile := currentCheckpointFile(t, registryDir)
+			require.NotEmpty(t, firstDataFile, "sanity: data file should exist")
+
+			for walFileSize(t, registryDir) < target2x {
+				require.NoError(t, store.Set(fmt.Sprintf("key-%05d", written), map[string]any{"value": value}))
+				written++
+
+				if cf := currentCheckpointFile(t, registryDir); cf != "" && cf != firstDataFile {
+					break
+				}
+			}
+
+			secondDataFile := currentCheckpointFile(t, registryDir)
+			assert.NotEqual(t, firstDataFile, secondDataFile,
+				"a second checkpoint should produce a new data file (old one is deleted)")
+
+			// The old data file should have been removed.
+			assert.NoFileExists(t, filepath.Join(registryDir, firstDataFile),
+				"the previous checkpoint file should be deleted")
+		})
+	}
+}
+
+// TestOpenStateStore_DefaultCheckpointSize verifies that the default memlog
+// checkpoint (10MB) triggers. This test writes enough data to cross the
+// threshold and checks that a checkpoint file appears.
+func TestOpenStateStore_DefaultCheckpointSize(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: writes ~10 MB to verify default checkpoint threshold")
+	}
+
+	dir := t.TempDir()
+
+	s := testOpenStoreWithConfig(t, dir, config.Registry{
+		Path:          "",
+		Permissions:   0600,
+		CleanInterval: 5 * time.Second,
+	})
+	defer s.Close()
+
+	store, err := s.shared.registry.Get("test")
+	require.NoError(t, err)
+	defer store.Close()
+
+	registryDir := filepath.Join(dir, "test")
+
+	const defaultThreshold = 10 * 1 << 20 // 10MB
+	value := strings.Repeat("x", 4096)
+
+	for i := 0; !hasCheckpointFile(t, registryDir); i++ {
+		require.NoError(t, store.Set(fmt.Sprintf("key-%06d", i), map[string]any{"value": value}))
+
+		if walFileSize(t, registryDir) > defaultThreshold*2 {
+			t.Fatal("WAL exceeded 2x the default threshold without a checkpoint")
+		}
+	}
+
+	assert.True(t, hasCheckpointFile(t, registryDir),
+		"checkpoint should have been triggered at the default 10MB threshold")
+}
+
+func testOpenStoreWithConfig(t *testing.T, dir string, cfg config.Registry) *filebeatStore {
+	t.Helper()
+	beatPaths := paths.New()
+	beatPaths.Data = dir
+
+	store, err := openStateStore(t.Context(), beat.Info{Beat: "test"}, logp.NewNopLogger(), cfg, beatPaths)
+	require.NoError(t, err)
+	return store
+}
+
+// hasCheckpointFile returns true if a checkpoint data file (numbered .json
+// like "42.json") exists in the registry directory. Memlog deletes old
+// checkpoint files after each new one, so at most 1 exists at a time.
+func hasCheckpointFile(t *testing.T, registryDir string) bool {
+	t.Helper()
+	return currentCheckpointFile(t, registryDir) != ""
+}
+
+// currentCheckpointFile returns the name of the checkpoint data file in the
+// registry directory, or "" if none exists.
+func currentCheckpointFile(t *testing.T, registryDir string) string {
+	t.Helper()
+	entries, err := os.ReadDir(registryDir)
+	require.NoError(t, err)
+
+	for _, e := range entries {
+		name := e.Name()
+		if name == "log.json" || name == "meta.json" || name == "active.dat" ||
+			strings.HasSuffix(name, ".new") {
+			continue
+		}
+		if filepath.Ext(name) == ".json" {
+			return name
+		}
+	}
+	return ""
+}
+
+// walFileSize returns the size of the WAL log file in the registry directory.
+func walFileSize(t *testing.T, registryDir string) uint64 {
+	t.Helper()
+	info, err := os.Stat(filepath.Join(registryDir, "log.json"))
+	if os.IsNotExist(err) {
+		return 0
+	}
+	require.NoError(t, err)
+	return uint64(info.Size())
 }
