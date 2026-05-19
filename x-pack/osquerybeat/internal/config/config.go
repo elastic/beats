@@ -44,7 +44,10 @@ type StreamConfig struct {
 	Platform   string                 `config:"platform"`    // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
 	Version    string                 `config:"version"`     // only run on osquery versions greater than or equal-to this version string
 	ECSMapping map[string]interface{} `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
-	// Profile enables per-query profiling for this stream (scheduled query metrics). Requires an input stream with dataset osquery_manager.query_profile to publish events.
+	// Profile enables per-query profiling for this stream. Published profiles for live-style
+	// paths reflect the osqueryd process while extension queries run (serialized on the beat
+	// client; native osqueryd schedules may still contribute load). Requires an input stream
+	// with dataset osquery_manager.query_profile to publish events.
 	Profile bool `config:"profile" json:"profile,omitempty"`
 }
 

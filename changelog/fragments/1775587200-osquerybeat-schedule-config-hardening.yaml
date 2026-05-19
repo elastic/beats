@@ -1,0 +1,8 @@
+# REQUIRED
+kind: enhancement
+
+# REQUIRED for all kinds
+summary: harden osquerybeat RRULE scheduler reload, RRULE osqueryd rendering, splay limits, and pack schedule metadata
+
+# REQUIRED for all kinds
+component: osquerybeat

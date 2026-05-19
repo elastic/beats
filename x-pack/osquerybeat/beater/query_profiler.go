@@ -140,6 +140,13 @@ func diagnosticsErrorJSON(message string) []byte {
 	return data
 }
 
+// Runtime profiling (collectRuntimeSnapshot + buildRuntimeQueryProfile) measures the
+// osqueryd process via processes joined to osquery_info. Live actions and RRULE runs
+// use the same osqdcli.Client, which serializes Query calls with a mutex and a limit
+// of one in flight, so snapshots for those paths do not overlap with each other on
+// that client. Native queries scheduled inside osqueryd still run in the same process;
+// their CPU/memory can therefore appear blended into deltas bracketing an extension query.
+
 func collectRuntimeSnapshot(ctx context.Context, qe queryExecutor) (runtimeSnapshot, error) {
 	var snap runtimeSnapshot
 	rows, err := qe.Query(ctx, `
@@ -166,6 +173,13 @@ LIMIT 1`, 5*time.Second)
 }
 
 func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration time.Duration, queryErr error) map[string]interface{} {
+	return buildRuntimeQueryProfile("live", query, before, after, duration, queryErr)
+}
+
+// buildRuntimeQueryProfile builds a profile from osquery process metrics before and after a query.
+// source distinguishes collection contexts (for example "live" vs "rrule") for downstream consumers.
+// See the comment above collectRuntimeSnapshot for how concurrent osquery work affects these metrics.
+func buildRuntimeQueryProfile(source, query string, before, after runtimeSnapshot, duration time.Duration, queryErr error) map[string]interface{} {
 	userDelta := after.userTimeMS - before.userTimeMS
 	if userDelta < 0 {
 		userDelta = 0
@@ -186,7 +200,7 @@ func buildLiveQueryProfile(query string, before, after runtimeSnapshot, duration
 	}
 
 	return map[string]interface{}{
-		"source":      "live",
+		"source":      source,
 		"query":       query,
 		"utilization": utilizationFromMillis(cpuMS, wallMS),
 		"duration":    wallMS,
