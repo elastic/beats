@@ -7,7 +7,6 @@ package source
 
 import (
 	"bytes"
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -29,7 +28,6 @@ type ProjectSource struct {
 	TargetDirectory string
 	fetched         bool
 	mtx             sync.Mutex
-	log             *logp.Logger
 }
 
 var ErrNoContent = fmt.Errorf("no 'content' value specified for project monitor source")
@@ -47,9 +45,7 @@ func (p *ProjectSource) Fetch() error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 	if p.fetched {
-		if p.log != nil {
-			p.log.Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
-		}
+		logp.L().Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
 		return nil
 	}
 
@@ -75,9 +71,7 @@ func (p *ProjectSource) Fetch() error {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
 
-	if p.log != nil {
-		p.log.Debugf("browser project: unpack source: %s", p.Workdir())
-	}
+	logp.L().Debugf("browser project: unpack source: %s", p.Workdir())
 
 	err = os.Chmod(p.TargetDirectory, defaultMod)
 	if err != nil {
@@ -90,11 +84,14 @@ func (p *ProjectSource) Fetch() error {
 		return err
 	}
 
-	// set up npm project and ensure synthetics is installed;
-	// npm install is skipped in offline mode (testing) but package.json is always created
-	err = setupProjectDir(context.Background(), p.log, p.Workdir())
-	if err != nil {
-		return fmt.Errorf("setting up project dir failed: %w", err)
+	// Offline is not required for project resources as we are only linking
+	// to the globally installed agent, but useful for testing purposes
+	if !Offline() {
+		// set up npm project and ensure synthetics is installed
+		err = setupProjectDir(p.Workdir())
+		if err != nil {
+			return fmt.Errorf("setting up project dir failed: %w", err)
+		}
 	}
 
 	// We've succeeded, mark the fetch as a success
@@ -108,62 +105,21 @@ type PackageJSON struct {
 	Dependencies mapstr.M `json:"dependencies"`
 }
 
-// findNPMPath locates npm, checking common macOS paths because launchd services omit /usr/local/bin and /opt/homebrew/bin from PATH.
-func findNPMPath() (string, error) {
-	if path, err := exec.LookPath("npm"); err == nil {
-		return path, nil
-	}
-	for _, candidate := range []string{"/usr/local/bin/npm", "/opt/homebrew/bin/npm"} {
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate, nil
-		}
-	}
-	return "", fmt.Errorf("npm not found in PATH or common locations (/usr/local/bin, /opt/homebrew/bin)")
-}
-
 // setupProjectDir sets ups the required package.json file and
 // links the synthetics dependency to the globally installed one that is
 // baked in to the Heartbeat image to maintain compatibility and
 // allows us to control the synthetics agent version
-func setupProjectDir(ctx context.Context, log *logp.Logger, workdir string) error {
-	if Offline() {
-		// In offline mode (testing) write a minimal package.json and skip all npm operations.
-		return writePackageJSON(workdir, "file:offline")
+func setupProjectDir(workdir string) error {
+	fname, err := exec.LookPath("elastic-synthetics")
+	if err == nil {
+		fname, err = filepath.Abs(fname)
 	}
-
-	npmPath, err := findNPMPath()
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot resolve global synthetics library: %w", err)
 	}
 
-	out, err := exec.CommandContext(ctx, npmPath, "root", "-g").CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("cannot resolve global npm root: %w: %s", err, strings.TrimSpace(string(out)))
-	}
-
-	globalPath := filepath.Join(strings.TrimSpace(string(out)), "@elastic", "synthetics")
-	if _, err := os.Stat(globalPath); err != nil {
-		return fmt.Errorf("global synthetics package not found at %s: %w", globalPath, err)
-	}
-
-	if err := writePackageJSON(workdir, fmt.Sprintf("file:%s", globalPath)); err != nil {
-		return err
-	}
-
-	// link the project to the globally installed synthetics library
-	return runSimpleCommand(log,
-		exec.CommandContext(
-			ctx,
-			npmPath, "install",
-			"--no-audit",           // Prevent audit checks that require internet
-			"--no-update-notifier", // Prevent update checks that require internet
-			"--no-fund",            // No need for package funding messages here
-			"--package-lock=false", // no need to write package lock here
-			"--progress=false",     // no need to display progress
-		), workdir)
-}
-
-func writePackageJSON(workdir, symlinkPath string) error {
+	globalPath := strings.Replace(fname, "bin/elastic-synthetics", "lib/node_modules/@elastic/synthetics", 1)
+	symlinkPath := fmt.Sprintf("file:%s", globalPath)
 	pkgJson := PackageJSON{
 		Name:    "project-journey",
 		Private: true,
@@ -175,14 +131,25 @@ func writePackageJSON(workdir, symlinkPath string) error {
 	if err != nil {
 		return err
 	}
-	pkgFile := filepath.Join(workdir, "package.json")
-	if err := os.WriteFile(pkgFile, pkgJsonContent, defaultMod); err != nil {
+	err = os.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, defaultMod)
+	if err != nil {
 		return err
 	}
-	if err := os.Chmod(pkgFile, defaultMod); err != nil { // Double tap because of umask
+	err = os.Chmod(filepath.Join(workdir, "package.json"), defaultMod) // Double tap because of umask
+	if err != nil {
 		return fmt.Errorf("failed assigning default mode %s to package.json: %w", defaultMod, err)
 	}
-	return nil
+
+	// setup the project linking to the global synthetics library
+	return runSimpleCommand(
+		exec.Command(
+			"npm", "install",
+			"--no-audit",           // Prevent audit checks that require internet
+			"--no-update-notifier", // Prevent update checks that require internet
+			"--no-fund",            // No need for package funding messages here
+			"--package-lock=false", // no need to write package lock here
+			"--progress=false",     // no need to display progress
+		), workdir)
 }
 
 func (p *ProjectSource) Workdir() string {
@@ -190,9 +157,7 @@ func (p *ProjectSource) Workdir() string {
 }
 
 func (p *ProjectSource) Close() error {
-	if p.log != nil {
-		p.log.Debugf("browser project: close project source: %s", p.Workdir())
-	}
+	logp.L().Debugf("browser project: close project source: %s", p.Workdir())
 
 	if p.TargetDirectory != "" {
 		return os.RemoveAll(p.TargetDirectory)
@@ -200,19 +165,11 @@ func (p *ProjectSource) Close() error {
 	return nil
 }
 
-func runSimpleCommand(log *logp.Logger, cmd *exec.Cmd, dir string) error {
+func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	cmd.Dir = dir
-	if log != nil {
-		log.Infof("Running %s in %s", cmd, dir)
-	}
+	logp.L().Infof("Running %s in %s", cmd, dir)
 	output, err := cmd.CombinedOutput()
-	if log != nil {
-		if cmd.ProcessState != nil {
-			log.Infof("Ran %s (%d) got '%s': (%v) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
-		} else {
-			log.Infof("Command %s did not start: (%v) as (%d/%d)", cmd, err, syscall.Getuid(), syscall.Geteuid())
-		}
-	}
+	logp.L().Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
 	return err
 }
 

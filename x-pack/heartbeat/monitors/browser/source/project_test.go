@@ -15,7 +15,6 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -82,7 +81,6 @@ func validateFileContents(t *testing.T, dir string) {
 	expected := []string{
 		"examples/todos/helpers.ts",
 		"examples/todos/advanced.journey.ts",
-		"package.json",
 	}
 	for _, file := range expected {
 		stat, err := os.Stat(path.Join(dir, file))
@@ -119,7 +117,7 @@ func fetchAndValidate(t *testing.T, psrc *ProjectSource) {
 }
 
 func dummyPSource(conf map[string]interface{}) (*ProjectSource, error) {
-	psrc := &ProjectSource{log: logp.NewNopLogger()}
+	psrc := &ProjectSource{}
 	y, _ := yaml.Marshal(conf)
 	c, err := config.NewConfigWithYAML(y, string(y))
 	if err != nil {
