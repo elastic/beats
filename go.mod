@@ -236,7 +236,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
-	github.com/elastic/entcollect v0.0.0-20260514013106-6d4034497b3d
+	github.com/elastic/entcollect v0.0.0-20260525234839-d7d7a2bf1510
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/jimlambrt/gldap v0.1.14
 	github.com/mattn/go-sqlite3 v1.14.32
