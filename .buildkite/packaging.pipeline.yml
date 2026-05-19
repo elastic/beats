@@ -401,6 +401,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         plugins:
+          - *google_oidc_plugin
           - *docker_elastic_login_plugin
 
       - label: DRA Staging
