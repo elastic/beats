@@ -390,7 +390,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -466,6 +465,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			if err := pprof.HttpAttach(b.Config.HTTPPprof, b.API); err != nil {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
+		}
+		if err := b.API.AttachStateInspector(); err != nil {
+			return fmt.Errorf("failed to attach state inspector: %w", err)
 		}
 	}
 

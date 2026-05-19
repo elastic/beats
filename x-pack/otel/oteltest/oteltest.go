@@ -197,7 +197,7 @@ func CheckReceivers(params CheckReceiversParams) {
 			if params.AssertFunc != nil {
 				params.AssertFunc(ct, logs, zapLogs)
 			}
-		}, 2*time.Minute, 1*time.Second,
+		}, 2*time.Minute, 100*time.Millisecond,
 			"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 		for i, r := range receivers {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)

@@ -56,6 +56,7 @@ func createLatency(latencyKey string, key string, timestampKey string) utils.Enr
 		GetValue:       func(obj *mapstr.M) int64 { return getValue(obj, key) },
 		IsUsable:       func(obj *mapstr.M) bool { return hasKey(obj, key) && hasKey(obj, timestampKey) },
 		WriteValue:     func(obj *mapstr.M, value float64) { setValue(obj, latencyKey, value) },
+		MaxValueMillis: utils.SamplingIntervalMillis[mapstr.M],
 	}
 }
 

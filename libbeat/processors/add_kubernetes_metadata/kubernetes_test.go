@@ -234,7 +234,7 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 
 // newAnnotatorForTest builds a kubernetesAnnotator with a pre-populated cache
 // (no network calls). The matcher looks up events by "container.id".
-func newAnnotatorForTest(t *testing.T, cacheKey string, meta mapstr.M) *kubernetesAnnotator {
+func newAnnotatorForTest(t testing.TB, cacheKey string, meta mapstr.M) *kubernetesAnnotator {
 	t.Helper()
 
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
