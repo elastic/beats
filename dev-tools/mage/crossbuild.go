@@ -351,16 +351,6 @@ func (b GolangCrossBuilder) Build() error {
 		args = append(args, "-v", hostDir+":/go/pkg/mod:ro")
 	}
 
-	// Buildkite reference clones keep some objects in host-side alternates.
-	// Go's VCS stamping runs inside Docker, so those object dirs must be visible.
-	gitMounts, err := gitDockerVolumeMounts(repoInfo.RootDir, mountPoint)
-	if err != nil {
-		return err
-	}
-	for _, mount := range gitMounts {
-		args = append(args, "-v", mount.dockerArg())
-	}
-
 	if b.Platform == "darwin/amd64" {
 		fmt.Printf(">> %v: Forcing DEV=0 for %s: https://github.com/elastic/golang-crossbuild/issues/217\n", b.Target, b.Platform)
 		args = append(args, "--env", "DEV=0")
@@ -378,6 +368,16 @@ func (b GolangCrossBuilder) Build() error {
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 	)
+
+	// Buildkite reference clones keep some objects in host-side alternates.
+	// Go's VCS stamping runs inside Docker, so those object dirs must be visible.
+	gitMounts, err := gitDockerVolumeMounts(repoInfo.RootDir, mountPoint)
+	if err != nil {
+		return err
+	}
+	for _, mount := range gitMounts {
+		args = append(args, "-v", mount.dockerArg())
+	}
 
 	args = append(args,
 		image,
