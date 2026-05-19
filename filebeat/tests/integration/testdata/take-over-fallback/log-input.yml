@@ -1,0 +1,13 @@
+- type: log
+  enabled: true
+  allow_deprecated_use: true
+  scan_frequency: 1s
+  paths:
+    - {{ .logDir }}/group-01-*.log
+
+- type: log
+  enabled: true
+  allow_deprecated_use: true
+  scan_frequency: 1s
+  paths:
+    - {{ .logDir }}/group-02-*.log
