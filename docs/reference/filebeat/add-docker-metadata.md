@@ -46,7 +46,7 @@ processors:
       #match_source_index: 4
       #match_short_id: true
       #cleanup_timeout: 60
-      #labels.dedot: false
+      #labels.dedot: true
       #wait_for_metadata: false
       #wait_for_metadata_timeout: 30s
       #wait_for_metadata_retry_period: 10s
