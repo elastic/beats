@@ -1,6 +1,6 @@
 kind: bug-fix
 
-summary: Stop the UDP input panicking on Windows when the conn returns a truncated datagram with a nil RemoteAddr.
+summary: Fixes UDP input crashes on Windows when oversized datagrams are received.
 
 component: filebeat
 
