@@ -643,13 +643,16 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	c.published = append(c.published, events...)
 }
 
-func (c *mockClient) waitUntilPublishingCount(t *testing.T, count int) {
+func (c *mockClient) waitUntilPublishingCount(t *testing.T, count int, timeout time.Duration) {
 	t.Helper()
-	require.Eventuallyf(t, func() bool {
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
 		c.mtx.Lock()
 		defer c.mtx.Unlock()
-		return len(c.publishing) == count
-	}, 2*time.Minute, 10*time.Millisecond, "unexpected number of publishing events")
+		if got, want := len(c.publishing), count; got != want {
+			collect.Errorf("expecting %d published events, got %d", want, got)
+		}
+
+	}, timeout, time.Millisecond)
 }
 
 func (c *mockClient) waitUntilPublishingHasStarted() {
