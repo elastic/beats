@@ -1202,7 +1202,7 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
-  name: beats-aws-tests
+  name: beats-tests
   description: 'Runs of Beats tests'
   links:
     - title: Pipeline
