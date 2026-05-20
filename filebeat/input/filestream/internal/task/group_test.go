@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand/v2"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -333,7 +334,6 @@ func TestGroup_Stop(t *testing.T) {
 		done := make(chan struct{})
 		wg := sync.WaitGroup{}
 		wg.Add(1)
-		defer func() { close(done) }()
 		err := g.Go(func(_ context.Context) error {
 			wg.Done() // signal that the goroutine is running
 			<-done
@@ -342,9 +342,57 @@ func TestGroup_Stop(t *testing.T) {
 		require.NoError(t, err, "could not launch goroutine")
 		wg.Wait() // wait for the goroutine to start
 
+		goroutinesBefore := runtime.NumGoroutine()
 		err = g.Stop()
 		require.Error(t, err, "Stop should return a timeout error")
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
+
+		// Unblock the task and give the waiter goroutine time to exit.
+		close(done)
+		assert.Eventually(t,
+			func() bool { return runtime.NumGoroutine() <= goroutinesBefore },
+			time.Second, 10*time.Millisecond,
+			"waiter goroutine leaked after Stop timeout")
+	})
+
+	t.Run("no goroutine leak on repeated stop timeout", func(t *testing.T) {
+		// Each iteration: start a group with a blocking task, force Stop()
+		// to time out, then unblock the task. The waiter goroutine spawned
+		// inside Stop() must exit after the task finishes — not block forever
+		// trying to send on an unread channel.
+		const iterations = 20
+
+		// Establish a baseline before the loop.
+		baseline := runtime.NumGoroutine()
+
+		for i := 0; i < iterations; i++ {
+			g := NewGroup(1, time.Millisecond, noopLogger{}, "")
+
+			taskRunning := make(chan struct{})
+			taskBlock := make(chan struct{})
+
+			err := g.Go(func(_ context.Context) error {
+				close(taskRunning)
+				<-taskBlock
+				return nil
+			})
+			require.NoError(t, err)
+			<-taskRunning // ensure the task is running before Stop
+
+			err = g.Stop()
+			require.ErrorIs(t, err, context.DeadlineExceeded,
+				"iteration %d: Stop should time out", i)
+
+			// Unblock the task so the waiter goroutine can exit.
+			close(taskBlock)
+		}
+
+		// Allow all waiter goroutines to finish.
+		assert.Eventually(t,
+			func() bool { return runtime.NumGoroutine() <= baseline+2 },
+			2*time.Second, 10*time.Millisecond,
+			"goroutine count grew after %d stop-timeout iterations (baseline %d, now %d)",
+			iterations, baseline, runtime.NumGoroutine())
 	})
 
 	t.Run("all goroutine finish before timeout", func(t *testing.T) {
