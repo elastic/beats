@@ -1354,9 +1354,9 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 	}{
 		// Custom manager
 		"aws-cloudwatch": {expectedState: proto.State_FAILED, expectedUnit: awscloudwatchInput},
-		"aws-s3":         {expectedState: proto.State_DEGRADED, expectedUnit: awsS3Input},
+		"aws-s3":         {expectedState: proto.State_FAILED, expectedUnit: awsS3Input},
 		"cel":            {expectedState: proto.State_FAILED, expectedUnit: celInput},
-		"filestream":     {expectedState: proto.State_DEGRADED, expectedUnit: filestreamInput},
+		"filestream":     {expectedState: proto.State_FAILED, expectedUnit: filestreamInput},
 		"net inputs":     {expectedState: proto.State_FAILED, expectedUnit: tcpinput},
 		"netflow":        {expectedState: proto.State_FAILED, expectedUnit: netflowinput},
 		"streaming":      {expectedState: proto.State_FAILED, expectedUnit: streaminginput},

@@ -1,0 +1,24 @@
+kind: breaking-change
+summary: Broken processor config on a Filebeat input is now surfaced at input creation instead of at first harvester connect
+description: |
+  As a side effect of building input-level processors once per input rather
+  than once per harvester, processor construction errors (e.g. an unknown
+  option in an `add_fields` processor) are now caught at input creation
+  time. Standalone Filebeat with a broken `processors:` entry under a
+  static `filebeat.inputs:` block exits at startup with a clear error
+  instead of starting silently. Under Elastic Agent the `filestream` and
+  `aws-s3` inputs now report unit status FAILED instead of DEGRADED for
+  this class of error, matching the seven other input types.
+impact: |
+  Standalone Filebeat with a static `filebeat.inputs:` block containing a
+  malformed `processors:` entry will refuse to start; previously the input
+  was silently broken while Filebeat kept running. Elastic Agent users
+  monitoring or alerting specifically on the DEGRADED state for filestream
+  or aws-s3 inputs will see FAILED instead. The error message text is
+  unchanged.
+action: |
+  Fix the offending `processors:` configuration. The error message names
+  the input index and the offending field. Update any
+  monitoring/alerting that distinguishes DEGRADED from FAILED for
+  filestream or aws-s3 inputs.
+component: filebeat

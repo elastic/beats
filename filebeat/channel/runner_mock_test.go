@@ -47,23 +47,33 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 
 		// storing the config that the client was created with
 		// it's needed for the `Assert` later
-		r.cfgs = append(r.cfgs, client.(*clientMock).cfg)
+		r.cfgs = append(r.cfgs, client.(*clientMock).cfg) //nolint:errcheck //Safe to ignore in tests
 	}
-	return &struct {
-		cfgfile.Runner
-	}{}, nil
+	return &noopRunner{}, nil
 }
+
+type noopRunner struct{}
+
+func (*noopRunner) Start()         {}
+func (*noopRunner) Stop()          {}
+func (*noopRunner) String() string { return "noopRunner" }
 
 func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 	return nil
 }
 
-// Assert runs various checks for the clients created by the wrapped pipeline connector
-// We check that the processing configuration does not reference the same addresses as before,
-// re-using some parts of the processing configuration will result in various issues, such as:
-// * closing processors multiple times
-// * using closed processors
-// * modifiying an object shared by multiple pipeline clients
+// Assert runs various checks for the clients created by the wrapped pipeline connector.
+//
+// `Processing.Meta` and `Processing.Fields` must still be a per-client copy —
+// these are mutated downstream and sharing them would let one client see
+// another's metadata.
+//
+// User-configured processors and the index processor, however, are now built
+// once per input and shared across clients via noCloseProcessor wrappers. We
+// verify both: the wrappers must be distinct per client (so closing one
+// client's list does not affect siblings) AND the underlying inner instances
+// must be the same object (the whole point of the fix — see
+// elastic/beats#50376).
 func (r runnerFactoryMock) Assert(t *testing.T) {
 	t.Helper()
 
@@ -87,22 +97,26 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		}
 	})
 
-	t.Run("new processors each time", func(t *testing.T) {
-		var processors []beat.Processor
-		for _, c := range r.cfgs {
-			processors = append(processors, c.Processing.Processor.All()...)
+	t.Run("processor wrappers are per-client, but inner instances are shared", func(t *testing.T) {
+		var firstList []beat.Processor
+		for idx, c := range r.cfgs {
+			list := c.Processing.Processor.All()
+			require.NotEmptyf(t, list, "client %d processor list cannot be empty", idx)
 			defer c.Processing.Processor.Close()
-		}
 
-		require.NotEmptyf(t, processors, "for this test the list of processors cannot be empty")
+			if idx == 0 {
+				firstList = list
+				continue
+			}
 
-		for i, p1 := range processors {
-			for j, p2 := range processors {
-				if i == j {
-					continue
-				}
-
-				require.NotSamef(t, p1, p2, "processors must not be re-used")
+			require.Lenf(t, list, len(firstList), "client %d processor list length differs from client 0", idx)
+			for j := range list {
+				w0, ok0 := firstList[j].(*noCloseProcessor)
+				wi, oki := list[j].(*noCloseProcessor)
+				require.Truef(t, ok0, "client 0 processor[%d] expected *noCloseProcessor, got %T", j, firstList[j])
+				require.Truef(t, oki, "client %d processor[%d] expected *noCloseProcessor, got %T", idx, j, list[j])
+				require.NotSamef(t, w0, wi, "client %d processor[%d]: wrappers must be distinct allocations so per-client Close is isolated", idx, j)
+				require.Samef(t, w0.inner, wi.inner, "client %d processor[%d]: inner shared instance must be identical to client 0's (elastic/beats#50376)", idx, j)
 			}
 		}
 	})

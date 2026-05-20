@@ -1,0 +1,4 @@
+kind: bug-fix
+summary: Build user-configured input processors once per filestream input instead of once per harvester
+component: filebeat
+issue: https://github.com/elastic/beats/issues/50376
