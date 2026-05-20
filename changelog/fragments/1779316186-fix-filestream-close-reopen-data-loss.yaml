@@ -1,0 +1,6 @@
+kind: bug-fix
+summary: |
+  Fix Filestream skipping log lines after inactive close/reopen
+  when outputs are slow to acknowledge events.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/50738
