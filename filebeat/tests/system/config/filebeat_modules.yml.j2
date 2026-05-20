@@ -22,6 +22,7 @@ output.elasticsearch.password: {{ elasticsearch.pass }}
 setup.template.name: {{ index_name }}
 setup.template.pattern: {{ index_name }}*
 
+queue.mem.flush.timeout: 0s
 setup.kibana.host: {{ kibana_url }}
 
 {% if kibana_path %}
