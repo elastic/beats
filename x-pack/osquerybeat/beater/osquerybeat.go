@@ -173,6 +173,11 @@ func (bt *osquerybeat) init() (context.Context, error) {
 }
 
 func (bt *osquerybeat) close() {
+	// close the pipeline first
+	ctx, cancel := context.WithTimeout(context.Background(), pipelineShutdownTimeout)
+	defer cancel()
+	bt.pipeline.Disconnect(ctx)
+
 	bt.mx.Lock()
 	if bt.cancel != nil {
 		bt.cancel()
@@ -189,10 +194,6 @@ func (bt *osquerybeat) close() {
 		bt.watcher = nil
 	}
 	bt.mx.Unlock()
-
-	ctx, cancel := context.WithTimeout(context.Background(), pipelineShutdownTimeout)
-	defer cancel()
-	bt.pipeline.Disconnect(ctx)
 }
 
 // Run starts osquerybeat.
