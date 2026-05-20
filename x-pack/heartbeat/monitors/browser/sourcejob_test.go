@@ -448,3 +448,67 @@ func TestUpdateParams(t *testing.T) {
 	e = s.Close()
 	require.NoError(t, e)
 }
+
+// extraArgs must elide browser-only CLI flags when the monitor type is
+// `api`. Forwarding them to a chromium-less journey would either be
+// ignored (best case) or rejected by stricter agent versions, so we
+// pin the contract here.
+func TestExtraArgsForAPIMonitor(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type":     "api",
+		"name":     "My API monitor",
+		"id":       "myApiId",
+		"schedule": "@every 1m",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "// api journey",
+			},
+		},
+		// Browser-only — should NOT make it into the CLI invocation.
+		"sandbox":     true,
+		"screenshots": "on",
+		"throttling":  false,
+		// Honored for both types.
+		"ignore_https_errors": true,
+		"playwright_options":  mapstr.M{"ignoreHTTPSErrors": true},
+	})
+
+	sj, err := NewSourceJob(cfg)
+	require.NoError(t, err)
+	args := sj.extraArgs(false)
+
+	require.NotContains(t, args, "--sandbox", "api journeys must not receive --sandbox")
+	require.NotContains(t, args, "--screenshots", "api journeys must not receive --screenshots")
+	require.NotContains(t, args, "--no-throttling", "api journeys must not receive --no-throttling")
+	require.NotContains(t, args, "--throttling", "api journeys must not receive --throttling")
+
+	require.Contains(t, args, "--ignore-https-errors", "api journeys must still honor --ignore-https-errors")
+	require.Contains(t, args, "--playwright-options", "api journeys must still receive --playwright-options")
+}
+
+// Browser monitors must keep receiving all the existing flags — guards
+// against accidental over-eager filtering in extraArgs.
+func TestExtraArgsForBrowserMonitorUnchanged(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"type":        "browser",
+		"name":        "My Browser monitor",
+		"id":          "myBrowserId",
+		"schedule":    "@every 1m",
+		"sandbox":     true,
+		"screenshots": "on",
+		"throttling":  false,
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "// browser journey",
+			},
+		},
+	})
+
+	sj, err := NewSourceJob(cfg)
+	require.NoError(t, err)
+	args := sj.extraArgs(false)
+
+	require.Contains(t, args, "--sandbox")
+	require.Contains(t, args, "--screenshots")
+	require.Contains(t, args, "--no-throttling")
+}

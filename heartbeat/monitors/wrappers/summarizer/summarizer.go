@@ -33,7 +33,7 @@ import (
 // this summary.
 type Summarizer struct {
 	rootJob        jobs.Job
-	contsRemaining uint16
+	contsRemaining int
 	mtx            *sync.Mutex
 	sf             stdfields.StdMonitorFields
 	mst            *monitorstate.Tracker
@@ -93,7 +93,7 @@ func NewSummarizer(rootJob jobs.Job, sf stdfields.StdMonitorFields, mst *monitor
 func (s *Summarizer) setupPlugins() {
 	// ssp must appear before Err plugin since
 	// it intercepts errors
-	if s.sf.Type == "browser" {
+	if s.sf.IsSyntheticsType() {
 		s.plugins = []SummarizerPlugin{
 			DropBrowserExtraEvents{},
 			&BrowserDurationPlugin{},
@@ -126,7 +126,7 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 
 		s.contsRemaining-- // we just ran one cont, discount it
 		// these many still need to be processed
-		s.contsRemaining += uint16(len(conts))
+		s.contsRemaining += len(conts)
 
 		for _, plugin := range s.plugins {
 			actions := plugin.EachEvent(event, eventErr)

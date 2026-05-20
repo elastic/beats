@@ -30,6 +30,10 @@ type Config struct {
 	Params    map[string]interface{} `config:"params"`
 	RawConfig *config.C
 	Source    *source.Source `config:"source"`
+	// Type carries the monitor type ("browser" or "api") so the sourcejob
+	// can shape the CLI invocation accordingly. Populated from the monitor
+	// config's top-level `type` field.
+	Type string `config:"type"`
 	// Name is optional for lightweight checks but required for browsers
 	Name string `config:"name"`
 	// Id is optional for lightweight checks but required for browsers
@@ -42,6 +46,14 @@ type Config struct {
 	FilterJourneys    synthexec.FilterJourneyConfig `config:"filter_journeys"`
 	IgnoreHTTPSErrors bool                          `config:"ignore_https_errors"`
 	Timeout           time.Duration                 `config:"timeout"`
+}
+
+// IsAPI reports whether this config is for the `api` monitor type. API
+// journeys reuse the same project/inline source pipeline as browser
+// journeys but never launch Chromium, so a handful of browser-only CLI
+// flags are filtered out before invoking the synthetics agent.
+func (c *Config) IsAPI() bool {
+	return c.Type == "api"
 }
 
 var ErrNameRequired = fmt.Errorf("config 'name' must be specified for this monitor")

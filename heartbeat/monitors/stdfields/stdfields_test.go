@@ -65,3 +65,23 @@ func TestLegacyServiceNameConfig(t *testing.T) {
 	}
 
 }
+
+func TestIsSyntheticsType(t *testing.T) {
+	cases := []struct {
+		monitorType string
+		want        bool
+	}{
+		{"browser", true},
+		{"api", true},
+		{"http", false},
+		{"tcp", false},
+		{"icmp", false},
+		{"", false},
+	}
+	for _, c := range cases {
+		t.Run(c.monitorType, func(t *testing.T) {
+			require.Equal(t, c.want, IsSyntheticsType(c.monitorType))
+			require.Equal(t, c.want, StdMonitorFields{Type: c.monitorType}.IsSyntheticsType())
+		})
+	}
+}

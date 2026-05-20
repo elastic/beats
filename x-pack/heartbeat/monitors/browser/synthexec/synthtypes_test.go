@@ -195,3 +195,27 @@ func TestSynthErrConversion(t *testing.T) {
 		require.Equal(t, stack, se.Stack)
 	})
 }
+
+func TestJourneyTypePropagation(t *testing.T) {
+	t.Run("API journey carries type through ToMap", func(t *testing.T) {
+		j := Journey{ID: "j1", Name: "API", Type: "api"}
+		m := j.ToMap()
+		require.Equal(t, "api", m["type"])
+		require.True(t, j.IsAPI())
+	})
+
+	t.Run("legacy journey omits type from ToMap", func(t *testing.T) {
+		j := Journey{ID: "j1", Name: "legacy"}
+		m := j.ToMap()
+		_, hasType := m["type"]
+		require.False(t, hasType, "Type must be omitted when empty so older docs aren't reshaped")
+		require.False(t, j.IsAPI())
+	})
+
+	t.Run("Journey unmarshals type from agent JSON", func(t *testing.T) {
+		raw := []byte(`{"name":"x","id":"x","type":"api"}`)
+		var j Journey
+		require.NoError(t, json.Unmarshal(raw, &j))
+		require.Equal(t, "api", j.Type)
+	})
+}

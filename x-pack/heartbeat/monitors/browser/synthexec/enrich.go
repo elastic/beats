@@ -108,7 +108,16 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case StepScreenshot, StepScreenshotRef, ScreenshotBlock:
 		add_data_stream.SetEventDataset(event, "browser.screenshot")
 	case JourneyNetworkInfo:
-		add_data_stream.SetEventDataset(event, "browser.network")
+		// Route API journey network events to their own dataset so
+		// ingest pipelines / Kibana dashboards can branch cleanly
+		// without inspecting journey.type on every doc. Fallback to
+		// browser.network when the journey context is unknown so we
+		// don't silently drop dataset routing for older agents.
+		if je.journey.IsAPI() {
+			add_data_stream.SetEventDataset(event, "synthetics.api.network")
+		} else {
+			add_data_stream.SetEventDataset(event, "browser.network")
+		}
 	}
 
 	if se.Id != "" {

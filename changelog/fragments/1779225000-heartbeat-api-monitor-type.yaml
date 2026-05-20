@@ -1,0 +1,18 @@
+kind: feature
+
+summary: Add new `api` monitor type for synthetics multi-step API journeys.
+
+description: |
+  Heartbeat now recognizes `monitor.type: api`, a new synthetics-driven
+  monitor type that runs multi-step API checks via Playwright's
+  `APIRequestContext` without launching Chromium. API monitors share the
+  synthexec runtime with browser monitors but skip browser-only CLI
+  flags (`--sandbox`, `--screenshots`, `--throttling`) and emit network
+  events to a dedicated `synthetics.api.network` dataset. Requires
+  `@elastic/synthetics >= <TBD>`, which introduces the `apiJourney(...)`
+  DSL.
+
+component: heartbeat
+
+# pr: https://github.com/elastic/beats/pull/<TBD>
+# issue: https://github.com/elastic/synthetics/pull/997
