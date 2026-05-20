@@ -239,24 +239,39 @@ func (c *Cache) Size() int {
 // CleanUp() method.
 func (c *Cache) StartJanitor(interval time.Duration) {
 	ticker := time.NewTicker(interval)
-	c.janitorQuit = make(chan struct{})
-	go func() {
+	quit := make(chan struct{})
+
+	c.Lock()
+	oldQuit := c.janitorQuit
+	c.janitorQuit = quit
+	c.Unlock()
+
+	if oldQuit != nil {
+		close(oldQuit)
+	}
+
+	go func(quit <-chan struct{}) {
 		for {
 			select {
 			case <-ticker.C:
 				c.CleanUp()
-			case <-c.janitorQuit:
+			case <-quit:
 				ticker.Stop()
 				return
 			}
 		}
-	}()
+	}(quit)
 }
 
 // StopJanitor stops the goroutine created by StartJanitor.
 func (c *Cache) StopJanitor() {
-	if c.janitorQuit != nil {
-		close(c.janitorQuit)
+	c.Lock()
+	quit := c.janitorQuit
+	c.janitorQuit = nil
+	c.Unlock()
+
+	if quit != nil {
+		close(quit)
 	}
 }
 

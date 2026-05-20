@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"runtime"
 	"strings"
@@ -44,6 +45,7 @@ import (
 // to a Worker.
 type Sniffer struct {
 	sniffers []sniffer
+	closers  []func()
 	cancel   func()
 	log      *logp.Logger
 }
@@ -90,10 +92,15 @@ const (
 // only, but no device is opened yet. Accessing and configuring the actual device
 // is done by the Run method. The id parameter is used to specify the metric
 // collection ID for AF_PACKET sniffers on Linux.
-func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig, logger *logp.Logger, closers ...func()) (*Sniffer, error) {
+	if logger == nil {
+		logger = logp.NewNopLogger()
+	}
+
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
-		log:      logp.NewLogger("sniffer"),
+		closers:  closers,
+		log:      logger.Named("sniffer"),
 	}
 
 	for i, iface := range interfaces {
@@ -157,7 +164,7 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			}
 		}
 
-		err := validateConfig(iface.BpfFilter, &iface) //nolint:gosec // Bad linter! validateConfig completes before the next iteration.
+		err := validateConfig(iface.BpfFilter, &iface)
 		if err != nil {
 			cfg, _ := json.Marshal(iface)
 			return nil, fmt.Errorf("validate: %w: %s", err, cfg)
@@ -225,7 +232,11 @@ func (s *Sniffer) Run() error {
 			return c.sniffDynamic(ctx, defaultRoute, refresh)
 		})
 	}
-	return g.Wait()
+	err := g.Wait()
+	for _, closer := range s.closers {
+		closer()
+	}
+	return err
 }
 
 // pollDefaultRoute repeatedly polls the default route's device at intervals
@@ -310,12 +321,19 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 // the same link type.
 func (s *sniffer) sniffDynamic(ctx context.Context, defaultRoute <-chan string, refresh chan<- struct{}) error {
 	var (
-		last layers.LinkType
-		dec  *decoder.Decoder
+		last    layers.LinkType
+		dec     *decoder.Decoder
+		cleanup func()
 	)
+	defer func() {
+		if cleanup != nil {
+			cleanup()
+		}
+	}()
+
 	for device := range defaultRoute {
 		var err error
-		last, dec, err = s.sniffOneDynamic(ctx, device, last, dec, refresh)
+		last, dec, cleanup, err = s.sniffOneDynamic(ctx, device, last, dec, cleanup, refresh)
 		if err != nil {
 			return err
 		}
@@ -327,28 +345,35 @@ func (s *sniffer) sniffDynamic(ctx context.Context, defaultRoute <-chan string, 
 // If the link type associated with the device differs from the last link
 // type or dec is nil, a new decoder is returned. The link type associated
 // with the device is returned.
-func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layers.LinkType, dec *decoder.Decoder, refresh chan<- struct{}) (layers.LinkType, *decoder.Decoder, error) {
+func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layers.LinkType, dec *decoder.Decoder, cleanup func(), refresh chan<- struct{}) (layers.LinkType, *decoder.Decoder, func(), error) {
 	handle, err := s.open(device)
 	if err != nil {
-		return last, dec, fmt.Errorf("failed to start sniffer: %w", err)
+		return last, dec, cleanup, fmt.Errorf("failed to start sniffer: %w", err)
 	}
 	defer handle.Close()
 
-	linkType := handle.LinkType()
-	if dec == nil || linkType != last {
-		s.log.Infof("changing link type: %d -> %d", last, linkType)
-		var cleanup func()
-		dec, cleanup, err = s.decoders(linkType, device, s.idx)
-		if err != nil {
-			return linkType, dec, err
-		}
-		if cleanup != nil {
-			defer cleanup()
-		}
+	linkType, dec, cleanup, err := s.ensureDecoder(handle.LinkType(), device, last, dec, cleanup)
+	if err != nil {
+		return linkType, dec, cleanup, err
 	}
 
 	err = s.sniffHandle(ctx, handle, dec, refresh)
-	return linkType, dec, err
+	return linkType, dec, cleanup, err
+}
+
+func (s *sniffer) ensureDecoder(linkType layers.LinkType, device string, last layers.LinkType, dec *decoder.Decoder, cleanup func()) (layers.LinkType, *decoder.Decoder, func(), error) {
+	if dec == nil || linkType != last {
+		s.log.Infof("changing link type: %d -> %d", last, linkType)
+		newDec, newCleanup, err := s.decoders(linkType, device, s.idx)
+		if err != nil {
+			return linkType, dec, cleanup, err
+		}
+		if cleanup != nil {
+			cleanup()
+		}
+		return linkType, newDec, newCleanup, nil
+	}
+	return linkType, dec, cleanup, nil
 }
 
 // sniff performs the sniffing work and writing dump files if requested.
@@ -397,7 +422,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 		if s.config.OneAtATime {
 			fmt.Fprintln(os.Stdout, "Press enter to read packet")
-			fmt.Scanln()
+			_, _ = fmt.Scanln()
 		}
 
 		data, ci, err := handle.ReadPacketData()
@@ -493,6 +518,9 @@ func (s *Sniffer) Stop() {
 }
 
 func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+	if cfg.Snaplen < 0 || cfg.Snaplen > math.MaxInt32 {
+		return nil, fmt.Errorf("snaplen %d out of range [0, %d]", cfg.Snaplen, math.MaxInt32)
+	}
 	snaplen := int32(cfg.Snaplen)
 	timeout := 500 * time.Millisecond
 	h, err := pcap.OpenLive(device, snaplen, true, timeout)

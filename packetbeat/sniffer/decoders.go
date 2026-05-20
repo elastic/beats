@@ -20,6 +20,8 @@ package sniffer
 import (
 	"github.com/google/gopacket/layers"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/decoder"
 	"github.com/elastic/beats/v7/packetbeat/flows"
@@ -40,10 +42,16 @@ type Decoders func(_ layers.LinkType, device string, idx int) (decoders *decoder
 
 // DecodersFor returns a source of Decoders using the provided configuration
 // components. The id string is expected to be the ID of the beat.
-func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
+func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config, loggers ...*logp.Logger) Decoders {
+	var logger *logp.Logger
+	if len(loggers) > 0 {
+		logger = loggers[0]
+	}
+
 	return func(dl layers.LinkType, device string, idx int) (*decoder.Decoder, func(), error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
+		var icmpCloser protos.PluginCloser
 		icmpCfg, err := cfg.ICMP()
 		if err != nil {
 			return nil, nil, err
@@ -54,16 +62,17 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 				return nil, nil, err
 			}
 
-			icmp, err := icmp.New(false, reporter, watcher, icmpCfg)
+			p, err := icmp.New(false, reporter, watcher, icmpCfg)
 			if err != nil {
 				return nil, nil, err
 			}
 
-			icmp4 = icmp
-			icmp6 = icmp
+			icmpCloser = p
+			icmp4 = p
+			icmp6 = p
 		}
 
-		tcp, err := tcp.NewTCP(protocols, id, device, idx)
+		tcp, err := tcp.NewTCP(protocols, id, device, idx, logger)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -83,7 +92,9 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 		}
 
 		cleanup := func() {
-			// Close metric collection.
+			if icmpCloser != nil {
+				icmpCloser.Close()
+			}
 			tcp.Close()
 			udp.Close()
 		}

@@ -19,6 +19,7 @@ package pgsql
 
 import (
 	"errors"
+	"math"
 	"strings"
 	"time"
 
@@ -143,6 +144,7 @@ func New(
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
+	p.SetLogger(logp.NewNopLogger())
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -156,13 +158,16 @@ func New(
 	return p, nil
 }
 
+func (pgsql *pgsqlPlugin) SetLogger(logger *logp.Logger) {
+	pgsql.log = logger
+	pgsql.debug = logger.WithOptions(zap.AddCallerSkip(1))
+	pgsql.detail = logger.Named("detailed").WithOptions(zap.AddCallerSkip(1))
+	pgsql.isDebug = logp.IsDebug("pgsql")
+	pgsql.isDetail = logp.IsDebug("pgsqldetailed")
+}
+
 func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
-
-	pgsql.log = logp.NewLogger("pgsql")
-	pgsql.debug = logp.NewLogger("pgsql", zap.AddCallerSkip(1))
-	pgsql.detail = logp.NewLogger("pgsqldetailed", zap.AddCallerSkip(1))
-	pgsql.isDebug, pgsql.isDetail = logp.IsDebug("pgsql"), logp.IsDebug("pgsqldetailed")
 
 	pgsql.transactions = common.NewCache(
 		pgsql.transactionTimeout,
@@ -184,10 +189,16 @@ func (pgsql *pgsqlPlugin) setFromConfig(config *pgsqlConfig) {
 	pgsql.transactionTimeout = config.TransactionTimeout
 }
 
+func (pgsql *pgsqlPlugin) Close() {
+	pgsql.transactions.StopJanitor()
+}
+
 func (pgsql *pgsqlPlugin) getTransaction(k common.HashableTCPTuple) []*pgsqlTransaction {
 	v := pgsql.transactions.Get(k)
 	if v != nil {
-		return v.([]*pgsqlTransaction)
+		if trans, ok := v.([]*pgsqlTransaction); ok {
+			return trans
+		}
 	}
 	return nil
 }
@@ -474,8 +485,16 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 	evt, pbf := pb.NewBeatEvent(t.ts)
 	pbf.SetSource(&t.src)
 	pbf.SetDestination(&t.dst)
-	pbf.Source.Bytes = int64(t.bytesIn)
-	pbf.Destination.Bytes = int64(t.bytesOut)
+	if t.bytesIn > math.MaxInt64 {
+		pbf.Source.Bytes = math.MaxInt64
+	} else {
+		pbf.Source.Bytes = int64(t.bytesIn)
+	}
+	if t.bytesOut > math.MaxInt64 {
+		pbf.Destination.Bytes = math.MaxInt64
+	} else {
+		pbf.Destination.Bytes = int64(t.bytesOut)
+	}
 	pbf.Event.Start = t.ts
 	pbf.Event.End = t.endTime
 	pbf.Event.Dataset = "pgsql"
