@@ -134,6 +134,7 @@ func (p *TransactionPublisher) CreateReporter(
 }
 
 func (p *TransactionPublisher) worker(ch chan beat.Event, client beat.Client) {
+	defer client.Close()
 	for {
 		select {
 		case <-p.done:
