@@ -617,6 +617,7 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	monitoringPorts := libbeattesting.MustAvailableTCP4Ports(t, 2)
 	otelConfig := struct {
 		Index     string
 		Receivers []multiReceiverConfig
@@ -624,12 +625,12 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		Index: "logs-integration-" + namespace,
 		Receivers: []multiReceiverConfig{
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				MonitoringPort: int(monitoringPorts[0]),
 				InputFile:      logFilePath,
 				PathHome:       filepath.Join(tmpdir, "r1"),
 			},
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				MonitoringPort: int(monitoringPorts[1]),
 				InputFile:      logFilePath,
 				PathHome:       filepath.Join(tmpdir, "r2"),
 			},
