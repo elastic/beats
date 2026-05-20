@@ -150,13 +150,13 @@ func (p *beatProcessor) processNativeEvent(logRecord plog.LogRecord, token int64
 		return
 	}
 
-	// Clone Fields and Meta so that beat processors (e.g. add_host_metadata)
-	// can write to the map without racing against any goroutine still holding
-	// a reference to the original event (e.g. the publisher debug processor).
+	// No clone needed: the publisher pipeline guarantees private map ownership
+	// per event when NativeEvents is enabled (addFields clones the shared builtin
+	// fields at injection time). All beat processors produce fresh maps per call.
 	beatEvent := &beat.Event{
 		Timestamp: entry.Event.Content.Timestamp,
-		Fields:    entry.Event.Content.Fields.Clone(),
-		Meta:      entry.Event.Content.Meta.Clone(),
+		Fields:    entry.Event.Content.Fields,
+		Meta:      entry.Event.Content.Meta,
 	}
 
 	for _, processor := range p.processors {

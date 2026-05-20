@@ -376,7 +376,15 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
-		processors.add(addfields.NewAddFields(meta, needsCopy, false))
+		// When native events are enabled, events are mutated after the publisher
+		// pipeline by beatprocessor (e.g. add_host_metadata writes into nested
+		// host.* maps). Without a clone here, all events share the same nested
+		// sub-map pointers from the builtin fields, causing write-write races
+		// between concurrent beatprocessor goroutines. The builtin map is small
+		// (host.name, agent.*), so cloning it per-event is cheaper than the
+		// full event clone that would otherwise be required in beatprocessor.
+		sharedBuiltin := needsCopy || b.info.NativeEvents
+		processors.add(addfields.NewAddFields(meta, sharedBuiltin, false))
 	}
 
 	// setup 8: pipeline processors list
