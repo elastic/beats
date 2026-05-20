@@ -136,13 +136,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// be evicted if ConsumeLogs fails.
 	var cacheTokens []int64
 
-	for _, event := range events {
+	for i := range events {
 		logRecord := logRecords.AppendEmpty()
 		if out.beatInfo.NativeEvents {
-			token := storeEventInCache(logRecord, event, out.beatInfo, out.log, out.isReceiverTest)
+			token := storeEventInCache(logRecord, &events[i], &out.beatInfo, out.log, out.isReceiverTest)
 			cacheTokens = append(cacheTokens, token)
 		} else {
-			if err := fillLogRecordFromEvent(logRecord, event, out.beatInfo, out.log, out.isReceiverTest); err != nil {
+			if err := fillLogRecordFromEvent(logRecord, events[i], out.beatInfo, out.log, out.isReceiverTest); err != nil {
 				out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
 			}
 		}
@@ -207,9 +207,9 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 // then stores the full event in the eventcache and writes the resulting token
 // as an attribute on the logRecord. The body is left empty; beatprocessor
 // fills it after running beat processors.
-func storeEventInCache(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) int64 {
-	prepareLogRecordFromEvent(logRecord, event, log, isReceiverTest)
-	token := eventcache.Put(eventcache.Entry{Event: event, BeatInfo: beatInfo})
+func storeEventInCache(logRecord plog.LogRecord, event *publisher.Event, beatInfo *beat.Info, log *logp.Logger, isReceiverTest bool) int64 {
+	prepareLogRecordFromEvent(logRecord, *event, log, isReceiverTest)
+	token := eventcache.Put(&eventcache.Entry{Event: event, BeatInfo: beatInfo})
 	logRecord.Attributes().PutInt(eventcache.TokenAttribute, token)
 	return token
 }

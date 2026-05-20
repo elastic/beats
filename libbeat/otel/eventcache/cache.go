@@ -34,30 +34,39 @@ import (
 const TokenAttribute = "elastic.beat.cache_token"
 
 // Entry is what the cache stores for each in-flight event.
+// Both fields are pointers: Event points into the batch's event slice (valid
+// until batch ACK/Drop/Retry) and BeatInfo points to the receiver-lifetime
+// struct. No copies are made.
 type Entry struct {
-	Event    publisher.Event
-	BeatInfo beat.Info
+	Event    *publisher.Event
+	BeatInfo *beat.Info
 }
 
 var (
 	counter atomic.Int64
-	store   sync.Map
+	mu      sync.Mutex
+	store   = make(map[int64]*Entry)
 )
 
 // Put stores entry in the cache and returns a unique token that can be used
-// to retrieve it later via Take.
-func Put(entry Entry) int64 {
+// to retrieve it later via Take. Each token is written exactly once and read
+// exactly once, so a plain mutex-protected map outperforms sync.Map here.
+func Put(entry *Entry) int64 {
 	token := counter.Add(1)
-	store.Store(token, entry)
+	mu.Lock()
+	store[token] = entry
+	mu.Unlock()
 	return token
 }
 
 // Take retrieves and removes the entry associated with token. The second return
 // value is false when no entry exists for the given token.
-func Take(token int64) (Entry, bool) {
-	v, loaded := store.LoadAndDelete(token)
-	if !loaded {
-		return Entry{}, false
+func Take(token int64) (*Entry, bool) {
+	mu.Lock()
+	entry, ok := store[token]
+	if ok {
+		delete(store, token)
 	}
-	return v.(Entry), true
+	mu.Unlock()
+	return entry, ok
 }

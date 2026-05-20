@@ -168,7 +168,7 @@ func (p *beatProcessor) processNativeEvent(logRecord plog.LogRecord, token int64
 		beatEvent = processed
 	}
 
-	info := entry.BeatInfo
+	info := *entry.BeatInfo
 	if err := otelmap.EncodeEventBody(logRecord, beatEvent.Fields, beatEvent.Timestamp, beatEvent.Meta, info.Beat, info.Version, info.IncludeMetadata); err != nil {
 		p.logger.Error("error encoding native Beat event into OTel log record", zap.Error(err))
 	}

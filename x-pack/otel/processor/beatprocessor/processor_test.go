@@ -240,9 +240,10 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 	}
 
 	putEvent := func(event beat.Event) int64 {
-		return eventcache.Put(eventcache.Entry{
-			Event:    publisher.Event{Content: event},
-			BeatInfo: beatInfo,
+		pubEvent := publisher.Event{Content: event}
+		return eventcache.Put(&eventcache.Entry{
+			Event:    &pubEvent,
+			BeatInfo: &beatInfo,
 		})
 	}
 
@@ -314,13 +315,11 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 			Fields: mapstr.M{"message": "with meta"},
 			Meta:   mapstr.M{"raw_index": "logs-test"},
 		}
-		token := eventcache.Put(eventcache.Entry{
-			Event: publisher.Event{Content: event},
-			BeatInfo: beat.Info{
-				Beat:            "testbeat",
-				Version:         "1.0.0",
-				IncludeMetadata: true,
-			},
+		pubEvent := publisher.Event{Content: event}
+		bi := beat.Info{Beat: "testbeat", Version: "1.0.0", IncludeMetadata: true}
+		token := eventcache.Put(&eventcache.Entry{
+			Event:    &pubEvent,
+			BeatInfo: &bi,
 		})
 
 		bp := &beatProcessor{logger: zap.NewNop()}
