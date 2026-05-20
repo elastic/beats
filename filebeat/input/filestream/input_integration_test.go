@@ -511,7 +511,7 @@ func TestFilestreamInactiveCloseReopenWithDelayedACKDefaultIdentity(t *testing.T
 
 	env.pipeline.setDelayACK(false)
 	env.mustAppendToFile(testlogName, []byte(strings.Join(secondBatch, "\n")+"\n"))
-	env.waitUntilEventCount(len(secondBatch))
+	env.waitUntilEventCount(len(firstBatch) + len(secondBatch))
 	env.waitUntilHarvesterIsDone()
 
 	messages := env.getOutputMessages()
