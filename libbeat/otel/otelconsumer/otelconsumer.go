@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -132,15 +131,16 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
 	logRecords.EnsureCapacity(len(events))
 
-	// cacheTokens tracks tokens stored in the native-events path so they can
-	// be evicted if ConsumeLogs fails.
-	var cacheTokens []int64
+	consumerCtx := otelctx.NewConsumerContext(ctx, out.beatInfo)
+	if out.beatInfo.NativeEvents {
+		consumerCtx = otelctx.WithNativeEvents(consumerCtx, events, &out.beatInfo)
+	}
 
 	for i := range events {
 		logRecord := logRecords.AppendEmpty()
 		if out.beatInfo.NativeEvents {
-			token := storeEventInCache(logRecord, &events[i], &out.beatInfo, out.log, out.isReceiverTest)
-			cacheTokens = append(cacheTokens, token)
+			prepareLogRecordFromEvent(logRecord, events[i], out.log, out.isReceiverTest)
+			logRecord.Attributes().PutInt(otelctx.EventIndexAttribute, int64(i))
 		} else {
 			if err := fillLogRecordFromEvent(logRecord, events[i], out.beatInfo, out.log, out.isReceiverTest); err != nil {
 				out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
@@ -152,15 +152,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
 	})
 
-	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
+	err := out.logsConsumer.ConsumeLogs(consumerCtx, pLogs)
 	if err != nil {
-		// Evict any cache entries that will never be consumed because the
-		// pipeline rejected the batch. On retry the events will be re-cached
-		// with fresh tokens.
-		for _, token := range cacheTokens {
-			eventcache.Take(token)
-		}
-
 		// Queue full errors are expected backpressure signals, not true errors.
 		// Skip logging to avoid log spam since we already track this via metrics.
 		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
@@ -202,17 +195,6 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 	return otelmap.EncodeEventBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo.Beat, beatInfo.Version, beatInfo.IncludeMetadata)
 }
 
-// storeEventInCache is the native-events fast path. It sets up standard
-// logRecord metadata (timestamps, attributes) via prepareLogRecordFromEvent,
-// then stores the full event in the eventcache and writes the resulting token
-// as an attribute on the logRecord. The body is left empty; beatprocessor
-// fills it after running beat processors.
-func storeEventInCache(logRecord plog.LogRecord, event *publisher.Event, beatInfo *beat.Info, log *logp.Logger, isReceiverTest bool) int64 {
-	prepareLogRecordFromEvent(logRecord, *event, log, isReceiverTest)
-	token := eventcache.Put(&eventcache.Entry{Event: event, BeatInfo: beatInfo})
-	logRecord.Attributes().PutInt(eventcache.TokenAttribute, token)
-	return token
-}
 
 func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, log *logp.Logger, isReceiverTest bool) mapstr.M {
 	if id, ok := event.Content.Meta["_id"]; ok {

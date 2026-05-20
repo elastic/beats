@@ -35,7 +35,6 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
@@ -570,30 +569,28 @@ func TestNativeEvents(t *testing.T) {
 		}
 	}
 
-	t.Run("token attribute is set on each logRecord", func(t *testing.T) {
+	t.Run("event index attribute is set on each logRecord", func(t *testing.T) {
 		events := []beat.Event{
 			{Fields: mapstr.M{"msg": "a"}},
 			{Fields: mapstr.M{"msg": "b"}},
 		}
 		batch := outest.NewBatch(events...)
 
-		var tokens []int64
+		var indices []int64
 		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
 			for _, lr := range ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().All() {
-				v, ok := lr.Attributes().Get(eventcache.TokenAttribute)
-				require.True(t, ok, "cache token attribute must be present")
-				tokens = append(tokens, v.Int())
+				v, ok := lr.Attributes().Get(otelctx.EventIndexAttribute)
+				require.True(t, ok, "event index attribute must be present")
+				indices = append(indices, v.Int())
 			}
 			return nil
 		})
 
 		require.NoError(t, oc.Publish(ctx, batch))
-		assert.Len(t, tokens, len(events))
-		// Tokens must be unique.
-		seen := make(map[int64]bool)
-		for _, tok := range tokens {
-			assert.False(t, seen[tok], "duplicate token %d", tok)
-			seen[tok] = true
+		assert.Len(t, indices, len(events))
+		// Indices must match their position.
+		for i, idx := range indices {
+			assert.Equal(t, int64(i), idx, "index must match event position")
 		}
 	})
 
@@ -649,48 +646,29 @@ func TestNativeEvents(t *testing.T) {
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
 
-	t.Run("cache entries are evicted on retryable consumer error", func(t *testing.T) {
+	t.Run("batch is retried on retryable consumer error", func(t *testing.T) {
 		batch := outest.NewBatch(
 			beat.Event{Fields: mapstr.M{"msg": "x"}},
 			beat.Event{Fields: mapstr.M{"msg": "y"}},
 		)
 
-		var capturedTokens []int64
-		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
-			for _, lr := range ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().All() {
-				if v, ok := lr.Attributes().Get(eventcache.TokenAttribute); ok {
-					capturedTokens = append(capturedTokens, v.Int())
-				}
-			}
+		oc := makeNativeConsumer(t, func(_ context.Context, _ plog.Logs) error {
 			return errors.New("retryable error")
 		})
 
 		require.NoError(t, oc.Publish(ctx, batch))
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
-
-		for _, tok := range capturedTokens {
-			_, found := eventcache.Take(tok)
-			assert.False(t, found, "cache entry for token %d must be evicted after retryable error", tok)
-		}
 	})
 
-	t.Run("cache entries are evicted on permanent consumer error", func(t *testing.T) {
+	t.Run("batch is dropped on permanent consumer error", func(t *testing.T) {
 		batch := outest.NewBatch(beat.Event{Fields: mapstr.M{"msg": "z"}})
 
-		var capturedToken int64
-		oc := makeNativeConsumer(t, func(_ context.Context, ld plog.Logs) error {
-			lr := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
-			if v, ok := lr.Attributes().Get(eventcache.TokenAttribute); ok {
-				capturedToken = v.Int()
-			}
+		oc := makeNativeConsumer(t, func(_ context.Context, _ plog.Logs) error {
 			return consumererror.NewPermanent(errors.New("permanent error"))
 		})
 
 		require.NoError(t, oc.Publish(ctx, batch))
 		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
-
-		_, found := eventcache.Take(capturedToken)
-		assert.False(t, found, "cache entry must be evicted after permanent error")
 	})
 }
 

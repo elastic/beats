@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/collector/component"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
@@ -122,14 +122,16 @@ func (p *beatProcessor) Shutdown(_ context.Context) error {
 	return nil
 }
 
-func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
+func (p *beatProcessor) ConsumeLogs(ctx context.Context, logs plog.Logs) (plog.Logs, error) {
+	nativeBatch, hasNative := otelctx.NativeEventsFromContext(ctx)
+
 	for _, resourceLogs := range logs.ResourceLogs().All() {
 		for _, scopeLogs := range resourceLogs.ScopeLogs().All() {
 			for _, logRecord := range scopeLogs.LogRecords().All() {
-				if tokenVal, hasToken := logRecord.Attributes().Get(eventcache.TokenAttribute); hasToken {
-					// Native-events path: always encode to pcommon regardless of
-					// whether beat processors are configured.
-					p.processNativeEvent(logRecord, tokenVal.Int())
+				if hasNative {
+					if idxVal, hasIdx := logRecord.Attributes().Get(otelctx.EventIndexAttribute); hasIdx {
+						p.processNativeEvent(logRecord, nativeBatch, idxVal.Int())
+					}
 				} else if len(p.processors) > 0 {
 					p.processOTelEvent(logRecord)
 				}
@@ -141,22 +143,23 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 }
 
 // processNativeEvent handles the native-events fast path: the full beat.Event
-// lives in the eventcache. After running beat processors the body is encoded
-// from the (possibly modified) event and the cache token attribute is removed.
-func (p *beatProcessor) processNativeEvent(logRecord plog.LogRecord, token int64) {
-	entry, ok := eventcache.Take(token)
-	if !ok {
-		p.logger.Error("native event cache miss", zap.Int64("token", token))
+// is referenced directly from the in-flight batch slice via its index. After
+// running beat processors the body is encoded from the (possibly modified)
+// event and the index attribute is removed.
+func (p *beatProcessor) processNativeEvent(logRecord plog.LogRecord, batch *otelctx.NativeEventsBatch, idx int64) {
+	if idx < 0 || int(idx) >= len(batch.Events) {
+		p.logger.Error("native event index out of range", zap.Int64("index", idx), zap.Int("batch_size", len(batch.Events)))
 		return
 	}
+	pubEvent := &batch.Events[idx]
 
 	// No clone needed: the publisher pipeline guarantees private map ownership
 	// per event when NativeEvents is enabled (addFields clones the shared builtin
 	// fields at injection time). All beat processors produce fresh maps per call.
 	beatEvent := &beat.Event{
-		Timestamp: entry.Event.Content.Timestamp,
-		Fields:    entry.Event.Content.Fields,
-		Meta:      entry.Event.Content.Meta,
+		Timestamp: pubEvent.Content.Timestamp,
+		Fields:    pubEvent.Content.Fields,
+		Meta:      pubEvent.Content.Meta,
 	}
 
 	for _, processor := range p.processors {
@@ -168,11 +171,11 @@ func (p *beatProcessor) processNativeEvent(logRecord plog.LogRecord, token int64
 		beatEvent = processed
 	}
 
-	info := *entry.BeatInfo
+	info := batch.BeatInfo
 	if err := otelmap.EncodeEventBody(logRecord, beatEvent.Fields, beatEvent.Timestamp, beatEvent.Meta, info.Beat, info.Version, info.IncludeMetadata); err != nil {
 		p.logger.Error("error encoding native Beat event into OTel log record", zap.Error(err))
 	}
-	logRecord.Attributes().Remove(eventcache.TokenAttribute)
+	logRecord.Attributes().Remove(otelctx.EventIndexAttribute)
 }
 
 // processOTelEvent is the standard path: the logRecord body already contains

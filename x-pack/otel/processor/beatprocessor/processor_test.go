@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otel/eventcache"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -233,36 +233,35 @@ func TestCreateProcessor(t *testing.T) {
 func TestConsumeLogsNativeEvents(t *testing.T) {
 	beatInfo := beat.Info{Beat: "testbeat", Version: "1.0.0"}
 
-	makeLogRecordWithToken := func(token int64) plog.LogRecord {
+	// makeNativeCtx builds a context carrying a single-event native batch at index 0.
+	makeNativeCtx := func(event beat.Event, info beat.Info) (context.Context, []publisher.Event) {
+		events := []publisher.Event{{Content: event}}
+		ctx := otelctx.WithNativeEvents(context.Background(), events, &info)
+		return ctx, events
+	}
+
+	makeLogRecordWithIndex := func(idx int64) plog.LogRecord {
 		lr := plog.NewLogRecord()
-		lr.Attributes().PutInt(eventcache.TokenAttribute, token)
+		lr.Attributes().PutInt(otelctx.EventIndexAttribute, idx)
 		return lr
 	}
 
-	putEvent := func(event beat.Event) int64 {
-		pubEvent := publisher.Event{Content: event}
-		return eventcache.Put(&eventcache.Entry{
-			Event:    &pubEvent,
-			BeatInfo: &beatInfo,
-		})
-	}
-
-	t.Run("event is fetched from cache, encoded to pcommon body, token removed", func(t *testing.T) {
+	t.Run("event is fetched by index, encoded to pcommon body, index attribute removed", func(t *testing.T) {
 		ts := time.Date(2025, 6, 1, 12, 0, 0, 0, time.UTC)
 		event := beat.Event{
 			Timestamp: ts,
 			Fields:    mapstr.M{"message": "hello native"},
 			Meta:      mapstr.M{},
 		}
-		token := putEvent(event)
+		ctx, _ := makeNativeCtx(event, beatInfo)
 
 		bp := &beatProcessor{logger: zap.NewNop()}
 
 		logs := plog.NewLogs()
 		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
-		makeLogRecordWithToken(token).CopyTo(lr)
+		makeLogRecordWithIndex(0).CopyTo(lr)
 
-		out, err := bp.ConsumeLogs(context.Background(), logs)
+		out, err := bp.ConsumeLogs(ctx, logs)
 		require.NoError(t, err)
 
 		result := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
@@ -272,21 +271,17 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 		assert.Equal(t, "hello native", body["message"])
 		assert.Contains(t, body, "@timestamp")
 
-		// Token attribute must be removed.
-		_, hasToken := result.Attributes().Get(eventcache.TokenAttribute)
-		assert.False(t, hasToken, "cache token attribute must be removed after processing")
-
-		// Cache entry must be gone.
-		_, found := eventcache.Take(token)
-		assert.False(t, found, "cache entry must be consumed by the processor")
+		// Index attribute must be removed.
+		_, hasIdx := result.Attributes().Get(otelctx.EventIndexAttribute)
+		assert.False(t, hasIdx, "event index attribute must be removed after processing")
 	})
 
-	t.Run("beat processors run on the cached event", func(t *testing.T) {
+	t.Run("beat processors run on the event", func(t *testing.T) {
 		event := beat.Event{
 			Fields: mapstr.M{"message": "enrich me"},
 			Meta:   mapstr.M{},
 		}
-		token := putEvent(event)
+		ctx, _ := makeNativeCtx(event, beatInfo)
 
 		bp := &beatProcessor{
 			logger: zap.NewNop(),
@@ -300,13 +295,13 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 
 		logs := plog.NewLogs()
 		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
-		makeLogRecordWithToken(token).CopyTo(lr)
+		makeLogRecordWithIndex(0).CopyTo(lr)
 
-		out, err := bp.ConsumeLogs(context.Background(), logs)
+		out, err := bp.ConsumeLogs(ctx, logs)
 		require.NoError(t, err)
 
 		body := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Body().Map().AsRaw()
-		assert.Equal(t, true, body["enriched"], "processor must have run on the cached event")
+		assert.Equal(t, true, body["enriched"], "processor must have run on the native event")
 		assert.Equal(t, "enrich me", body["message"])
 	})
 
@@ -315,20 +310,16 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 			Fields: mapstr.M{"message": "with meta"},
 			Meta:   mapstr.M{"raw_index": "logs-test"},
 		}
-		pubEvent := publisher.Event{Content: event}
 		bi := beat.Info{Beat: "testbeat", Version: "1.0.0", IncludeMetadata: true}
-		token := eventcache.Put(&eventcache.Entry{
-			Event:    &pubEvent,
-			BeatInfo: &bi,
-		})
+		ctx, _ := makeNativeCtx(event, bi)
 
 		bp := &beatProcessor{logger: zap.NewNop()}
 
 		logs := plog.NewLogs()
 		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
-		makeLogRecordWithToken(token).CopyTo(lr)
+		makeLogRecordWithIndex(0).CopyTo(lr)
 
-		out, err := bp.ConsumeLogs(context.Background(), logs)
+		out, err := bp.ConsumeLogs(ctx, logs)
 		require.NoError(t, err)
 
 		body := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Body().Map().AsRaw()
@@ -338,27 +329,30 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 		assert.Equal(t, "logs-test", meta["raw_index"])
 	})
 
-	t.Run("cache miss skips encoding and leaves body empty", func(t *testing.T) {
+	t.Run("out-of-range index leaves body empty", func(t *testing.T) {
+		event := beat.Event{Fields: mapstr.M{"message": "x"}, Meta: mapstr.M{}}
+		ctx, _ := makeNativeCtx(event, beatInfo)
+
 		bp := &beatProcessor{logger: zap.NewNop()}
 
 		logs := plog.NewLogs()
 		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
-		makeLogRecordWithToken(99999999).CopyTo(lr) // token that was never Put
+		makeLogRecordWithIndex(99).CopyTo(lr) // index beyond batch size
 
-		out, err := bp.ConsumeLogs(context.Background(), logs)
+		out, err := bp.ConsumeLogs(ctx, logs)
 		require.NoError(t, err)
 
 		result := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
-		// Body stays empty since there is nothing to encode.
+		// Body stays empty since the index was invalid.
 		assert.Equal(t, plog.NewLogRecord().Body().Type(), result.Body().Type())
 	})
 
-	t.Run("native and standard log records coexist in the same batch", func(t *testing.T) {
-		event := beat.Event{
-			Fields: mapstr.M{"source": "native"},
-			Meta:   mapstr.M{},
+	t.Run("multiple native events in a batch are each processed independently", func(t *testing.T) {
+		events := []publisher.Event{
+			{Content: beat.Event{Fields: mapstr.M{"source": "first"}, Meta: mapstr.M{}}},
+			{Content: beat.Event{Fields: mapstr.M{"source": "second"}, Meta: mapstr.M{}}},
 		}
-		token := putEvent(event)
+		ctx := otelctx.WithNativeEvents(context.Background(), events, &beatInfo)
 
 		bp := &beatProcessor{
 			logger: zap.NewNop(),
@@ -372,28 +366,19 @@ func TestConsumeLogsNativeEvents(t *testing.T) {
 
 		logs := plog.NewLogs()
 		sls := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
+		makeLogRecordWithIndex(0).CopyTo(sls.LogRecords().AppendEmpty())
+		makeLogRecordWithIndex(1).CopyTo(sls.LogRecords().AppendEmpty())
 
-		// First record: native (token).
-		nativeLR := sls.LogRecords().AppendEmpty()
-		makeLogRecordWithToken(token).CopyTo(nativeLR)
-
-		// Second record: standard pcommon map body.
-		stdLR := sls.LogRecords().AppendEmpty()
-		stdLR.Body().SetEmptyMap().PutStr("source", "standard")
-
-		out, err := bp.ConsumeLogs(context.Background(), logs)
+		out, err := bp.ConsumeLogs(ctx, logs)
 		require.NoError(t, err)
 
 		records := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
 		require.Equal(t, 2, records.Len())
 
-		nativeBody := records.At(0).Body().Map().AsRaw()
-		assert.Equal(t, "native", nativeBody["source"])
-		assert.Equal(t, true, nativeBody["processed"])
-
-		stdBody := records.At(1).Body().Map().AsRaw()
-		assert.Equal(t, "standard", stdBody["source"])
-		assert.Equal(t, true, stdBody["processed"])
+		assert.Equal(t, "first", records.At(0).Body().Map().AsRaw()["source"])
+		assert.Equal(t, true, records.At(0).Body().Map().AsRaw()["processed"])
+		assert.Equal(t, "second", records.At(1).Body().Map().AsRaw()["source"])
+		assert.Equal(t, true, records.At(1).Body().Map().AsRaw()["processed"])
 	})
 }
 
