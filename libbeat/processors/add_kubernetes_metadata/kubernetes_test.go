@@ -231,8 +231,6 @@ func TestNewProcessorConfigDefaultIndexers(t *testing.T) {
 		})
 	}
 }
-<<<<<<< HEAD
-=======
 
 // newAnnotatorForTest builds a kubernetesAnnotator with a pre-populated cache
 // (no network calls). The matcher looks up events by "container.id".
@@ -613,4 +611,3 @@ func BenchmarkKubernetesAnnotatorRun(b *testing.B) {
 		}
 	}
 }
->>>>>>> 54f760048 ([libbeat/processing] add a new shared processor wrapper (#50713))
