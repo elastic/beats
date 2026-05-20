@@ -23,41 +23,7 @@ import (
 	"go.opentelemetry.io/collector/client"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 )
-
-// EventIndexAttribute is the pdata log-record attribute key used to carry the
-// index into the native events slice through the OTel pipeline.
-const EventIndexAttribute = "elastic.beat.event_index"
-
-type nativeEventsKeyType struct{}
-
-var nativeEventsKey nativeEventsKeyType
-
-// NativeEventsBatch carries the in-flight events slice and the beat info
-// pointer through the OTel pipeline context so beatprocessor can access
-// them by index without a global side-channel map.
-type NativeEventsBatch struct {
-	Events   []publisher.Event
-	BeatInfo *beat.Info
-}
-
-// WithNativeEvents attaches the events slice and beat info to ctx.
-// The slice must remain valid for the lifetime of the ConsumeLogs call.
-func WithNativeEvents(ctx context.Context, events []publisher.Event, beatInfo *beat.Info) context.Context {
-	return context.WithValue(ctx, nativeEventsKey, &NativeEventsBatch{
-		Events:   events,
-		BeatInfo: beatInfo,
-	})
-}
-
-// NativeEventsFromContext retrieves the NativeEventsBatch stored by
-// WithNativeEvents. The second return value is false when the context
-// carries no native events batch.
-func NativeEventsFromContext(ctx context.Context) (*NativeEventsBatch, bool) {
-	v, ok := ctx.Value(nativeEventsKey).(*NativeEventsBatch)
-	return v, ok
-}
 
 const (
 	BeatNameCtxKey        = "beat_name"
