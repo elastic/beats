@@ -38,7 +38,7 @@ func TestLogFileRenamed(t *testing.T) {
 
 	renamedFile := f.Name() + ".renamed"
 
-	reader, err := newFileReader(
+	reader, _, err := newFileReader(
 		logptest.NewTestingLogger(t, ""),
 		context.TODO(),
 		f,
@@ -49,6 +49,7 @@ func TestLogFileRenamed(t *testing.T) {
 				Renamed:       true,
 			},
 		},
+		false,
 	)
 	if err != nil {
 		t.Fatalf("error while creating logReader: %+v", err)
@@ -73,7 +74,7 @@ func TestLogFileRemoved(t *testing.T) {
 	f := createTestLogFile()
 	defer f.Close()
 
-	reader, err := newFileReader(
+	reader, _, err := newFileReader(
 		logptest.NewTestingLogger(t, ""),
 		context.TODO(),
 		f,
@@ -84,6 +85,7 @@ func TestLogFileRemoved(t *testing.T) {
 				Removed:       true,
 			},
 		},
+		false,
 	)
 	if err != nil {
 		t.Fatalf("error while creating logReader: %+v", err)

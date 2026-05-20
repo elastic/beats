@@ -146,6 +146,7 @@ type defaultHarvesterGroup struct {
 	metrics      *Metrics
 	notifyChan   chan HarvesterStatus
 	inputID      string
+	readUntilEOF ReadUntilEOFConfig
 }
 
 // HarvesterStatus is used to notify an observer that the harvester for the ID
@@ -305,7 +306,25 @@ func startHarvester(
 
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
 		cursor := makeCursor(resource)
-		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
+
+		// When read_until_eof is enabled the canceler must be nil. If the harvester
+		// is blocked in client.Publish at the moment of input cancel, Publish
+		// eventually returns once backpressure releases. With a non-nil canceler,
+		// forward would then return ctx.Cancelation.Err() (context.Canceled),
+		// readLineFromSource would surface it as a generic error, and
+		// handleReadError would end the normal-read loop without entering the
+		// readUntilEOF drain. Returning nil here lets the outer loop re-check
+		// ctx.Cancelation and fall through to the readUntilEOF loop and finish
+		// reading the file and publishing events until EOF or the timeout is
+		// reached.
+		var publisherCanceler = ctx.Cancelation
+		if hg.readUntilEOF.Enabled {
+			publisherCanceler = nil
+		}
+		publisher := &cursorPublisher{
+			canceler: publisherCanceler,
+			client:   client,
+			cursor:   &cursor}
 
 		defer func() {
 			// The cursor struct used by Filestream, it is defined on:

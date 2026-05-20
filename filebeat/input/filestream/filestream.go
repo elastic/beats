@@ -68,19 +68,33 @@ type logFile struct {
 
 	backoff backoff.Backoff
 	tg      *unison.TaskGroup
+
+	readUntilEOFOnce sync.Once
 }
 
-// newFileReader creates a new log instance to read log sources
+// newFileReader creates a new log instance to read log sources.
+//
+// readUntilEOF controls the second return value:
+//   - true: returns a closure that switches the reader into readUntilEOF
+//     mode when invoked. It stops the file-monitoring goroutines started
+//     by startFileMonitoringIfNeeded (periodicStateCheck and
+//     closeIfTimeout), replaces readerCtx with the context passed to the
+//     closure, and sets closeOnEOF to true. From that point Read returns
+//     either when the file reaches EOF or when the supplied context is
+//     cancelled.
+//   - false: returns a no-op closure. The reader's lifecycle is governed
+//     entirely by closerConfig.
 func newFileReader(
 	log *logp.Logger,
 	canceler input.Canceler,
 	f File,
 	config readerConfig,
 	closerConfig closerConfig,
-) (*logFile, error) {
+	readUntilEOF bool,
+) (*logFile, func(ctxtool.CancelContext), error) {
 	offset, err := f.Seek(0, io.SeekCurrent)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	readerCtx := ctxtool.WithCancelContext(ctxtool.FromCanceller(canceler))
@@ -102,9 +116,14 @@ func newFileReader(
 		tg:                 tg,
 	}
 
+	startReadUntilEOF := func(ctxtool.CancelContext) {}
+	if readUntilEOF {
+		startReadUntilEOF = l.startReadUntilEOF
+	}
+
 	l.startFileMonitoringIfNeeded()
 
-	return l, nil
+	return l, startReadUntilEOF, nil
 }
 
 // Read reads from the reader and updates the offset
@@ -247,6 +266,25 @@ func (f *logFile) shouldBeClosed() bool {
 	return false
 }
 
+// startReadUntilEOF switches the reader into readUntilEOF mode: the only
+// conditions that terminate Read from now on are reaching EOF on the
+// underlying file or the caller-supplied ctx being cancelled. It:
+//   - stops the file-monitoring goroutines spawned by startFileMonitoringIfNeeded
+//     (inactive / removed / renamed / after_interval checks).
+//   - swaps readerCtx with the caller-supplied ctx so Read's loop is driven by
+//     the new context (which owns the readUntilEOF timeout).
+//   - sets closeOnEOF=true so the next EOF terminates Read instead of parking
+//     in the backoff wait.
+//
+// startReadUntilEOF is idempotent: only the first call has any effect.
+func (f *logFile) startReadUntilEOF(ctx ctxtool.CancelContext) {
+	f.readUntilEOFOnce.Do(func() {
+		_ = f.tg.Stop()
+		f.readerCtx = ctx
+		f.closeOnEOF = true
+	})
+}
+
 func isSameFile(path string, info os.FileInfo) bool {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
@@ -297,7 +335,8 @@ func (f *logFile) handleEOF() error {
 	return nil
 }
 
-// Close
+// Close stops reader activity, closes the underlying file handle, and waits
+// for background monitoring goroutines to exit before returning.
 func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
 	err := f.file.Close()
