@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -285,13 +286,13 @@ func TestGetCPU(t *testing.T) {
 				},
 				Stats: CPUStats{
 					Usage: cgcommon.CPUUsage{
-						NS: 26772130245,
+						NS: 26772130245 * uint64(time.Microsecond),
 					},
 					User: cgcommon.CPUUsage{
-						NS: 20979069928,
+						NS: 20979069928 * uint64(time.Microsecond),
 					},
 					System: cgcommon.CPUUsage{
-						NS: 5793060316,
+						NS: 5793060316 * uint64(time.Microsecond),
 					},
 					Periods: opt.UintWith(1),
 					Throttled: ThrottledField{
@@ -336,13 +337,13 @@ func TestGetCPU(t *testing.T) {
 				Pressure: map[string]cgcommon.Pressure{},
 				Stats: CPUStats{
 					Usage: cgcommon.CPUUsage{
-						NS: 26772130245,
+						NS: 26772130245 * uint64(time.Microsecond),
 					},
 					User: cgcommon.CPUUsage{
-						NS: 20979069928,
+						NS: 20979069928 * uint64(time.Microsecond),
 					},
 					System: cgcommon.CPUUsage{
-						NS: 5793060316,
+						NS: 5793060316 * uint64(time.Microsecond),
 					},
 					Periods: opt.UintWith(1),
 					Throttled: ThrottledField{
@@ -384,6 +385,36 @@ func TestGetCPU(t *testing.T) {
 			assert.EqualValues(t, test.expected, cpu)
 		})
 	}
+}
+
+// TestGetStatsUsecToNanos pins the µs -> ns conversion contract for the
+// *_usec fields in cgroups v2 cpu.stat. throttled_usec is intentionally
+// left in microseconds (its destination field is .Us).
+func TestGetStatsUsecToNanos(t *testing.T) {
+	dir := t.TempDir()
+	const content = `usage_usec 123
+user_usec 100
+system_usec 23
+nr_periods 7
+nr_throttled 2
+throttled_usec 50
+`
+	writeFile(t, filepath.Join(dir, "cpu.stat"), content)
+
+	stats, err := getStats(dir)
+	require.NoError(t, err)
+
+	expected := CPUStats{
+		Usage:   cgcommon.CPUUsage{NS: 123 * uint64(time.Microsecond)},
+		User:    cgcommon.CPUUsage{NS: 100 * uint64(time.Microsecond)},
+		System:  cgcommon.CPUUsage{NS: 23 * uint64(time.Microsecond)},
+		Periods: opt.UintWith(7),
+		Throttled: ThrottledField{
+			Periods: opt.UintWith(2),
+			Us:      opt.UintWith(50),
+		},
+	}
+	assert.Equal(t, expected, stats)
 }
 
 func TestParseCPUMax(t *testing.T) {

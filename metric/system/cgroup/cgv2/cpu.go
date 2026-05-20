@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
@@ -131,12 +132,14 @@ func getStats(path string) (CPUStats, error) {
 			return data, fmt.Errorf("error parsing cpu.stat file: %w", err)
 		}
 		switch key {
+		// cpu.stat reports CPU time in microseconds; the destination *.NS
+		// fields are nanoseconds (matching cgroups v1), so scale at parse.
 		case "usage_usec":
-			data.Usage.NS = val
+			data.Usage.NS = val * uint64(time.Microsecond)
 		case "user_usec":
-			data.User.NS = val
+			data.User.NS = val * uint64(time.Microsecond)
 		case "system_usec":
-			data.System.NS = val
+			data.System.NS = val * uint64(time.Microsecond)
 		case "nr_periods":
 			data.Periods = opt.UintWith(val)
 		case "nr_throttled":
