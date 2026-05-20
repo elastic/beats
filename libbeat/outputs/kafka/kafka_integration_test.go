@@ -311,7 +311,7 @@ func TestKafkaPublish(t *testing.T) {
 			// Wait until the output has finished handling every batch (not necessarily ACKed).
 			wg.Wait()
 			// Failed publishes signal BatchRetryEvents; only proceed to read the topic after ACK.
-			assertBatchesACKed(t, batches)
+			requiretBatchesACKed(t, batches)
 
 			expected := flatten(test.events)
 
@@ -646,8 +646,8 @@ readLoop:
 	return messages
 }
 
-// assertBatchesACKed fails if the kafka client finished the batch with retry/drop instead of ACK.
-func assertBatchesACKed(t *testing.T, batches []*outest.Batch) {
+// requiretBatchesACKed fails if the kafka client finished the batch with retry/drop instead of ACK.
+func requiretBatchesACKed(t *testing.T, batches []*outest.Batch) {
 	t.Helper()
 	for _, batch := range batches {
 		require.NotEmpty(t, batch.Signals, "expected publish batch to receive a signal")
