@@ -242,11 +242,8 @@ func TestResolveSymlinks(t *testing.T) {
 }
 
 func TestResolvePathInLogsFor(t *testing.T) {
-	origLogs := paths.Paths.Logs
-	t.Cleanup(func() { paths.Paths.Logs = origLogs })
-
 	logsDir := filepath.Join(t.TempDir(), "logs")
-	paths.Paths.Logs = logsDir
+	p := &paths.Path{Logs: logsDir}
 
 	const input = "cel"
 	root := filepath.Join(logsDir, input)
@@ -351,7 +348,7 @@ func TestResolvePathInLogsFor(t *testing.T) {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			resolved, ok, err := ResolvePathInLogsFor(input, tt.path)
+			resolved, ok, err := ResolvePathInLogsFor(p, input, tt.path)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
