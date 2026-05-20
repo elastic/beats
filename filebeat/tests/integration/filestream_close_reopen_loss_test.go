@@ -35,11 +35,11 @@ import (
 
 func TestFilebeatFilestreamInactiveCloseReopenWithSlowOutputLosesData(t *testing.T) {
 	const (
-		firstBatchSize  = 5000
+		firstBatchSize  = 10
 		secondBatchSize = 8
 	)
 
-	server, esAddr, es, _ := integration.StartMockES(t, "", 0, 100, 0, 0, 20000)
+	server, esAddr, es, _ := integration.StartMockES(t, "", 0, 0, 100, 0, 20000)
 	defer server.Close()
 
 	filebeat := integration.NewBeat(
