@@ -87,6 +87,7 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 	// Should be impossible since outer monitor.go should run this same code elsewhere
 	// TODO: Just pass stdfields in to remove second deserialize
 	if err != nil {
+		//nolint:forbidigo // StdFields() has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
 		logp.L().Warnf("Could not deserialize monitor fields for browser, this should never happen: %s", err)
 	}
 	return sFields
@@ -153,6 +154,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
+			//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
 			logp.L().Warnf("could not serialize playwright options '%v': %v", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
@@ -184,6 +186,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 			case map[string]interface{}:
 				j, err := json.Marshal(t)
 				if err != nil {
+					//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
 					logp.L().Warnf("could not serialize throttling config to JSON: %s", err)
 				} else {
 					extraArgs = append(extraArgs, "--throttling", string(j))

@@ -94,13 +94,16 @@ type FactoryParams struct {
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
 func NewFactory(fp FactoryParams) *RunnerFactory {
+	// RunnerFactory predates per-beat loggers being threaded through FactoryParams.
+	// Fall back to the global logger here; matches the pre-existing pattern in this package.
+	logger := logp.L() //nolint:forbidigo // see comment above
 	return &RunnerFactory{
 		info:                  fp.BeatInfo,
 		addTask:               fp.AddTask,
 		byId:                  map[string]*Monitor{},
 		mtx:                   &sync.Mutex{},
 		pluginsReg:            fp.PluginsReg,
-		logger:                logp.L(),
+		logger:                logger,
 		pipelineClientFactory: fp.PipelineClientFactory,
 		beatLocation:          fp.BeatRunFrom,
 		stateLoader:           fp.StateLoader,
@@ -318,6 +321,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 		geoM, err := util.GeoConfigToMap(location.Geo)
 		if err != nil {
 			geoErrOnce.Do(func() {
+				//nolint:forbidigo // preProcessors is called from configuration reload paths without a contextual logger; matches the pre-existing pattern.
 				logp.L().Warnf("could not add heartbeat geo info: %v", err)
 			})
 		}
@@ -354,6 +358,7 @@ func preProcessors(info beat.Info, location *config.LocationWithID, settings pub
 	}
 
 	if !settings.Index.IsEmpty() {
+		//nolint:forbidigo // preProcessors is called from configuration reload paths without a contextual logger; matches the pre-existing pattern.
 		logp.L().Warn("Deprecated use of 'index' setting in heartbeat monitor, use 'data_stream' instead!")
 		proc, err := indexProcessor(&settings.Index, info)
 		if err != nil {

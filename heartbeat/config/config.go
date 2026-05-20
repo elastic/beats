@@ -76,6 +76,7 @@ func DefaultConfig() *Config {
 		if limitStr := os.Getenv(envKey); limitStr != "" {
 			tLimitVal, err := strconv.ParseInt(limitStr, 10, 64)
 			if err != nil {
+				//nolint:forbidigo // DefaultConfig is called before a beat-scoped logger is available; matches the pre-existing pattern used elsewhere in this package.
 				logp.L().Warnf("Could not parse job limit env var %s with value '%s' as integer", envKey, limitStr)
 				continue
 			}

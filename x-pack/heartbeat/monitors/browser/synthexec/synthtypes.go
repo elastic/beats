@@ -96,6 +96,7 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 		u, e := url.Parse(se.URL)
 		if e != nil {
 			_, _ = m.Put("url", mapstr.M{"full": se.URL})
+			//nolint:forbidigo // ToMap has no logger handle; matches the pre-existing pattern in this package.
 			logp.L().Warnf("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
 			_, _ = m.Put("url", wraputil.URLFields(u))
