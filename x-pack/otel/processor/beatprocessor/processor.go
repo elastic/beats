@@ -83,9 +83,8 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to get constructor for '%s': %w", processorName, err)
 		}
 
-		// Wrap the constructor with NewConditional so that `when` conditions
-		// configured on the processor are honored.
-		processorInstance, createProcessorError := processors.NewConditional(constructor)(processorConfig, logpLogger)
+		// no need to wrap NewConditional because it is being wrapped when processors are registered
+		processorInstance, createProcessorError := constructor(processorConfig, logpLogger)
 		if createProcessorError != nil {
 			return nil, fmt.Errorf("failed to create processor '%s': %w", processorName, createProcessorError)
 		}

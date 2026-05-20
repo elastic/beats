@@ -113,6 +113,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -160,6 +162,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -207,6 +211,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -254,6 +260,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -301,6 +309,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -348,6 +358,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -395,6 +407,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -441,6 +455,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -488,6 +504,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -535,6 +553,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -582,6 +602,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -629,6 +651,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -676,6 +700,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -723,6 +749,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -758,6 +786,8 @@ spec:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
@@ -793,6 +823,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -840,6 +872,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -887,6 +921,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -934,6 +970,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -981,6 +1019,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1028,6 +1068,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 # TODO: Remove the following pipeline once agentbeat is no longer required by any supported version.
 ---
@@ -1076,7 +1118,8 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
-
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1126,6 +1169,8 @@ spec:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1162,6 +1207,8 @@ spec:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1248,6 +1295,8 @@ spec:
           access_level: BUILD_AND_READ
         everyone:
           access_level: BUILD_AND_READ
+        observablt-ci:
+          access_level: MANAGE_BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
