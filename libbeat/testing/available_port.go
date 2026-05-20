@@ -34,11 +34,6 @@ func AvailableTCP4Port() (uint16, error) {
 	return ports[0], nil
 }
 
-<<<<<<< HEAD
-	tcpAddr := uint16(listener.Addr().(*net.TCPAddr).Port)
-
-	return tcpAddr, nil
-=======
 // AvailableTCP4Ports returns n unique unused TCP ports for 127.0.0.1.
 func AvailableTCP4Ports(n int) ([]uint16, error) {
 	if n <= 0 {
@@ -74,7 +69,6 @@ func AvailableTCP4Ports(n int) ([]uint16, error) {
 	}
 
 	return ports, nil
->>>>>>> 9ea3607f6 (Fix flaky OTel multi-receiver port allocation in Filebeat integration test (#50767))
 }
 
 func MustAvailableTCP4Port(t *testing.T) uint16 {
