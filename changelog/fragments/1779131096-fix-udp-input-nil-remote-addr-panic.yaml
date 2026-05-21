@@ -1,0 +1,7 @@
+kind: bug-fix
+
+summary: Fixes UDP input crashes on Windows when oversized datagrams are received.
+
+component: filebeat
+
+issue: https://github.com/elastic/beats/issues/50718
