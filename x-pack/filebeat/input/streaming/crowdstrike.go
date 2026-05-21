@@ -238,7 +238,10 @@ func (s *falconHoseStream) FollowStream(ctx context.Context) error {
 // they are received. It always returns a valid state value unless the error
 // returned is a hardError.
 func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, state map[string]any) (map[string]any, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.discoverURL, nil)
+	sessionCtx, sessionCancel := context.WithCancel(ctx)
+	defer sessionCancel()
+
+	req, err := http.NewRequestWithContext(sessionCtx, http.MethodGet, s.discoverURL, nil)
 	if err != nil {
 		return state, fmt.Errorf("failed to prepare discover stream request: %w", err)
 	}
@@ -309,9 +312,9 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}
 		refreshAfter := time.Duration(r.RefreshAfter) * time.Second
 		go func() {
-			runRefreshLoopWithAfter(ctx, refreshSessionWait(refreshAfter), time.After, func() error {
+			runRefreshLoopWithAfter(sessionCtx, refreshSessionWait(refreshAfter), time.After, func() error {
 				s.log.Debugw("session refresh", "url", r.RefreshURL)
-				req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
+				req, err := http.NewRequestWithContext(sessionCtx, http.MethodPost, r.RefreshURL, nil)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
 					s.status.UpdateStatus(status.Failed, "failed to prepare refresh stream request: "+err.Error())
@@ -351,7 +354,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}
 
 		s.log.Debugw("stream request", "url", r.FeedURL)
-		req, err := http.NewRequestWithContext(ctx, "GET", r.FeedURL, nil)
+		req, err := http.NewRequestWithContext(sessionCtx, "GET", r.FeedURL, nil)
 		if err != nil {
 			return state, fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)
 		}
