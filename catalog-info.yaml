@@ -1154,11 +1154,19 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
+<<<<<<< HEAD
   name: beats-macos-tests
   description: 'Runs of Beats macOS tests'
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats-macos-tests
+=======
+  name: beats-tests
+  description: 'Runs of Beats tests'
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-tests
+>>>>>>> 79b726c30 (bk: run all beats tests on daily for active branches (#50687))
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
@@ -1167,6 +1175,7 @@ spec:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
     metadata:
+<<<<<<< HEAD
       name: beats-macos-tests
       description: 'Runs of Beats macOS tests'
     spec:
@@ -1189,6 +1198,19 @@ spec:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
+=======
+      name: beats-tests
+      description: 'Runs of Beats tests'
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/beats-tests-pipeline.yml"
+      cancel_intermediate_builds: false
+      provider_settings:
+        trigger_mode: none
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+>>>>>>> 79b726c30 (bk: run all beats tests on daily for active branches (#50687))
         everyone:
           access_level: BUILD_AND_READ
 
@@ -1229,6 +1251,12 @@ spec:
           message: Daily trigger of Beats AWS tests
           env:
             PIPELINES_TO_TRIGGER: 'beats-aws-tests'
+        Daily run of Beats tests:
+          branch: main
+          cronline: 0 04 * * *
+          message: Daily trigger of Beats tests
+          env:
+            PIPELINES_TO_TRIGGER: 'beats-tests'
       skip_intermediate_builds: true
       provider_settings:
         trigger_mode: none
