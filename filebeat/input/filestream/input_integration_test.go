@@ -479,7 +479,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 
 func TestFilestreamDoesNotSkipEventsOnInactiveCloseReopen(t *testing.T) {
 	env := newInputTestingEnvironment(t)
-	env.pipeline = &mockPipelineConnector{delayACK: true}
+	env.pipeline = &mockPipelineConnector{skipACK: true}
 	env.workingDir = fs.TempDir(t, "..", "..", "build", "integration-tests")
 
 	testlogName := "test.log"
@@ -517,7 +517,7 @@ func TestFilestreamDoesNotSkipEventsOnInactiveCloseReopen(t *testing.T) {
 	env.pipeline.clients[0].waitUntilPublishingCount(t, lenFirstBatch, 500*time.Millisecond)
 	env.waitUntilHarvesterIsDone()
 
-	env.pipeline.setDelayACK(false)
+	env.pipeline.setSkipACK(false)
 	env.mustAppendToFile(testlogName, []byte(secondBatch))
 	env.waitUntilEventCount(lenFirstBatch + lenSecondBatch)
 	env.waitUntilHarvesterIsDone()

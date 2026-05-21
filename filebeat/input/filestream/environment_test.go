@@ -677,7 +677,7 @@ func (c *mockClient) Close() error {
 // mockPipelineConnector mocks the PipelineConnector interface
 type mockPipelineConnector struct {
 	blocking bool
-	delayACK bool
+	skipACK  bool
 	clients  []*mockClient
 	mtx      sync.Mutex
 }
@@ -705,7 +705,7 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := newMockClient(pc.blocking, pc.delayACK, config)
+	c := newMockClient(pc.blocking, pc.skipACK, config)
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
@@ -772,9 +772,9 @@ func (pc *mockPipelineConnector) invertBlocking() {
 	pc.blocking = !pc.blocking
 }
 
-func (pc *mockPipelineConnector) setDelayACK(delay bool) {
+func (pc *mockPipelineConnector) setSkipACK(skip bool) {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	pc.delayACK = delay
+	pc.skipACK = skip
 }
