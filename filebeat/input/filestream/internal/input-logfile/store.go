@@ -719,10 +719,18 @@ func (r *resource) UpdatesReleaseN(n uint) {
 func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 
 // UnpackCursor deserializes the in memory state.
-func (r *resource) UnpackCursor(to interface{}) error {
+// If there are un-ACKed operations, the cursor/offset will include them.
+func (r *resource) UnpackCursor(to any) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
 	return typeconv.Convert(to, r.activeCursor())
+}
+
+// UnpackACKedCursor deserializes the last ACKed cursor state.
+func (r *resource) UnpackACKedCursor(to any) error {
+	r.stateMutex.Lock()
+	defer r.stateMutex.Unlock()
+	return typeconv.Convert(to, r.cursor)
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
