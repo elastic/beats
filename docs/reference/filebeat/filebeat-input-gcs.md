@@ -23,7 +23,7 @@ Use the `google cloud storage input` to read content from files stored in bucket
 ::::{note}
 :name: supported-types-gcs
 
-Currently only `JSON` and `NDJSON` are supported object/file formats. Objects/files may be also be gzip compressed. "JSON credential keys" and "credential files" are supported authentication types. If an array is present as the root object for an object/file, it is automatically split into individual objects and processed. If a download for a file/object fails or gets interrupted, the download is retried for 2 times. This is currently not user configurable.
+Currently only `JSON` and `NDJSON` are supported object/file formats. Objects/files may also be compressed as gzip ([RFC 1952](https://rfc-editor.org/rfc/rfc1952.html)) or Snappy framed streams ([framing format](https://github.com/google/snappy/blob/main/framing_format.txt)). Raw Snappy blocks are not supported. "JSON credential keys" and "credential files" are supported authentication types. If an array is present as the root object for an object/file, it is automatically split into individual objects and processed. If a download for a file/object fails or gets interrupted, the download is retried for 2 times. This is currently not user configurable.
 ::::
 
 

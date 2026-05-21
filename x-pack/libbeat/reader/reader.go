@@ -8,8 +8,15 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"io"
+
+	"github.com/klauspost/compress/snappy"
 )
+
+// snappyStreamID is the 10-byte stream identifier chunk that begins every
+// Snappy framed stream. See https://github.com/google/snappy/blob/main/framing_format.txt.
+var snappyStreamID = []byte("\xff\x06\x00\x00sNaPpY")
 
 // IsStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
 // represents gzipped content or not. A buffered reader is used so the function can peek into the byte
@@ -25,20 +32,41 @@ func IsStreamGzipped(r *bufio.Reader) (bool, error) {
 	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }
 
-// AddGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not and adds gzipped decoder if needed. A buffered reader is used
-// so the function can peek into the byte  stream without consuming it. This makes it convenient for
-// code executed after this function call to consume the stream if it wants.
-func AddGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
+// IsStreamSnappy determines whether the given stream of bytes (encapsulated in a buffered reader)
+// represents Snappy framed content or not. A buffered reader is used so the function can peek into
+// the byte stream without consuming it.
+func IsStreamSnappy(r *bufio.Reader) (bool, error) {
+	buf, err := r.Peek(len(snappyStreamID))
+	if err != nil && !errors.Is(err, io.EOF) {
+		return false, err
+	}
+
+	return bytes.HasPrefix(buf, snappyStreamID), nil
+}
+
+// AddDecoderIfNeeded determines whether the given stream of bytes represents
+// gzipped or Snappy framed content and adds the appropriate decoder if needed.
+// A buffered reader is used so the function can peek into the byte stream
+// without consuming it. This makes it convenient for code executed after this
+// function call to consume the stream if it wants.
+func AddDecoderIfNeeded(body io.Reader) (io.Reader, error) {
 	bufReader := bufio.NewReader(body)
 
 	gzipped, err := IsStreamGzipped(bufReader)
 	if err != nil {
 		return nil, err
 	}
-	if !gzipped {
-		return bufReader, nil
+	if gzipped {
+		return gzip.NewReader(bufReader)
 	}
 
-	return gzip.NewReader(bufReader)
+	snapped, err := IsStreamSnappy(bufReader)
+	if err != nil {
+		return nil, err
+	}
+	if snapped {
+		return snappy.NewReader(bufReader), nil
+	}
+
+	return bufReader, nil
 }

@@ -101,6 +101,10 @@ func TestS3ObjectProcessor(t *testing.T) {
 		testProcessS3Object(t, "testdata/multiline.json.gz", "application/json", 2)
 	})
 
+	t.Run("uncompress snappy content", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/test.json.sz", "application/json", 1)
+	})
+
 	t.Run("unparsable json", func(t *testing.T) {
 		testProcessS3ObjectError(t, "testdata/invalid.json", "application/json", 0)
 	})
