@@ -53,7 +53,7 @@ type Registry struct {
 	MigrateFile        string           `config:"migrate_file"`
 	Backend            string           `config:"backend"`
 	Bbolt              bboltst.Config   `config:"bbolt"`
-	ESStorageExtension backend.Registry `config:"-"`
+	StorageExtension backend.Registry `config:"-"`
 }
 
 var DefaultConfig = Config{

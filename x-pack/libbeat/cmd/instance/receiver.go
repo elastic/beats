@@ -145,17 +145,17 @@ func (br *BeatReceiver) Start(host component.Host) error {
 		}
 	}
 
-	if w, ok := br.beater.(backend.WithESStateStoreExtension); ok {
+	if w, ok := br.beater.(backend.WithStorageExtension); ok {
 		if present, err := br.beat.RawConfig.Has("storage", -1); present && err == nil {
 			storageID, err := br.beat.RawConfig.String("storage", -1)
 			if err != nil {
 				return fmt.Errorf("error reading storage extension from config: %w", err)
 			}
-			esStorageExtension, err := br.getESStateStoreExtension(host, storageID)
+			storageExtension, err := br.getStorageExtension(host, storageID)
 			if err != nil {
-				return fmt.Errorf("error getting ES state store extension: %w", err)
+				return fmt.Errorf("error getting storage extension: %w", err)
 			}
-			w.WithESStateStoreExtension(esStorageExtension)
+			w.WithStorageExtension(storageExtension)
 		}
 	}
 
@@ -235,11 +235,11 @@ func (br *BeatReceiver) stopMonitoring() error {
 	return nil
 }
 
-func (br *BeatReceiver) getESStateStoreExtension(host component.Host, storageExtension string) (backend.Registry, error) {
+func (br *BeatReceiver) getStorageExtension(host component.Host, storageExtensionID string) (backend.Registry, error) {
 	componentID := component.ID{}
-	err := componentID.UnmarshalText([]byte(storageExtension))
+	err := componentID.UnmarshalText([]byte(storageExtensionID))
 	if err != nil {
-		return nil, fmt.Errorf("invalid component id for ES state store extension (%v): %w", []byte(storageExtension), err)
+		return nil, fmt.Errorf("invalid component id for storage extension (%v): %w", []byte(storageExtensionID), err)
 	}
 	extension, ok := host.GetExtensions()[componentID]
 	if !ok {

@@ -6,6 +6,7 @@ package elasticsearchstorage
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -15,10 +16,14 @@ import (
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
+	"go.opentelemetry.io/collector/extension/xextension/storage"
 )
 
 var _ extension.Extension = (*elasticStorage)(nil)
 var _ backend.Registry = (*elasticStorage)(nil)
+var _ storage.Extension = (*elasticStorage)(nil)
+
+const esDocType = "_doc"
 
 type elasticStorage struct {
 	cfg    *Config
@@ -53,6 +58,21 @@ func (e *elasticStorage) Access(name string) (backend.Store, error) {
 }
 
 func (e *elasticStorage) Close() error {
-	// no-op. Client will be close in Shutdown
+	// no-op. Client will be closed in Shutdown
 	return nil
+}
+
+func (e *elasticStorage) GetClient(ctx context.Context, kind component.Kind, id component.ID, storageName string) (storage.Client, error) {
+	if e.client == nil {
+		return nil, fmt.Errorf("elasticsearch storage extension not started")
+	}
+	name := storageName
+	if name == "" {
+		name = id.String()
+	}
+	return &esStorageClient{
+		logger: e.logger,
+		client: e.client,
+		index:  es.RenderIndexName(name),
+	}, nil
 }

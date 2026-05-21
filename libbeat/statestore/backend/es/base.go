@@ -42,7 +42,7 @@ type baseStore struct {
 
 const docType = "_doc"
 
-func renderIndexName(name string) string {
+func RenderIndexName(name string) string {
 	return "agentless-state-" + name
 }
 
@@ -50,7 +50,7 @@ func NewStore(ctx context.Context, log *logp.Logger, cli *eslegclient.Connection
 	return &baseStore{
 		cli:   cli,
 		name:  name,
-		index: renderIndexName(name),
+		index: RenderIndexName(name),
 		log:   log,
 		ctx:   ctx,
 	}
@@ -189,7 +189,7 @@ func (b *baseStore) SetID(id string) {
 	if id == "" {
 		return
 	}
-	b.index = renderIndexName(id)
+	b.index = RenderIndexName(id)
 }
 
 type queryResult struct {
