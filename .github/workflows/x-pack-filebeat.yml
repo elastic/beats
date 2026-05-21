@@ -1,0 +1,155 @@
+# GitHub Actions workflow for x-pack/filebeat
+# Converted from Buildkite pipeline: .buildkite/x-pack/pipeline.xpack.filebeat.yml
+#
+# GitHub-hosted Runners Used:
+# - ubuntu-22.04: 4 cores, 16GB RAM, 14GB SSD (x64)
+# - ubuntu-22.04-arm: 4 cores, 16GB RAM, 14GB SSD (ARM64)
+# - windows-2022: 4 cores, 16GB RAM, 14GB SSD (x64)
+# - windows-11-arm: 4 cores, 16GB RAM, 14GB SSD (ARM64)
+#
+# Note: GitHub-hosted runners have limitations compared to the original Buildkite setup:
+# - Maximum 4 CPU cores (Buildkite used up to 16 cores for packaging)
+# - Windows Server 2016, 2019, and Windows 10 are not available (using 2022 instead)
+# - No support for custom GCP machine types or Azure VM configurations
+# - Container jobs use the same Docker images as Buildkite where possible
+
+name: x-pack-filebeat
+
+on:
+  pull_request:
+    paths:
+      - 'x-pack/filebeat/**'
+      - '.github/workflows/x-pack-filebeat.yml'
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+## Concurrency only allowed in the main branch.
+## So old builds running for old commits within the same Pull Request are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  check-update:
+    name: "Check/Update"
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: .go-version
+
+      - name: Run check/update
+        run: |
+          make -C x-pack/filebeat check update
+          make check-no-changes
+
+  unit-tests:
+    name: "${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    #needs: [check-update]
+    env:
+      RACE_DETECTOR: "true"
+      TEST_COVERAGE: "true"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64 variants
+          - name: "Ubuntu x86_64 Unit Tests"
+            os: ubuntu-22.04
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "Ubuntu x86_64 Unit Tests with requirefips build tag"
+            os: ubuntu-22.04
+            mage-target: "unitTest"
+            fips: "true"
+
+          - name: "Ubuntu x86_64 fips140=only Unit Tests"
+            os: ubuntu-22.04
+            mage-target: "goFIPSOnlyUnitTest"
+            fips: "true"
+
+          - name: "Ubuntu ARM64 Unit Tests"
+            os: ubuntu-22.04-arm
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "Windows Server 2022 Unit Tests"
+            os: windows-2022
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "Windows 11 ARM Unit Tests"
+            os: windows-11-arm
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "macos-15-intel Unit Tests"
+            os: macos-15-intel
+            mage-target: "build unitTest"
+            fips: ""
+
+          - name: "macos-15 Unit Tests"
+            os: macos-15
+            mage-target: "build unitTest"
+            fips: ""
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/unit-test
+        with:
+          beat: x-pack/filebeat
+          command: "mage ${{ matrix.mage-target }}"
+        env:
+          FIPS: ${{ matrix.fips }}
+
+  integration-tests:
+    name: "${{ matrix.name }}"
+    runs-on: ${{ matrix.os }}
+    #needs: [check-update]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux Go integration tests
+          - name: "Go Integration Tests"
+            os: ubuntu-22.04
+            mage-target: "goIntegTest"
+            fips: ""
+
+          - name: "Go fips140=only Integration Tests"
+            os: ubuntu-22.04
+            mage-target: "goFIPSOnlyIntegTest"
+            fips: "true"
+
+          # Linux Python integration tests
+          - name: "Python Integration Tests"
+            os: ubuntu-22.04
+            mage-target: "pythonIntegTest"
+            fips: ""
+
+          # Windows integration tests
+          - name: "Go Windows Integration Tests"
+            os: windows-2022
+            mage-target: "build goWindowsIntegTest"
+            fips: ""
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # TODO: rename actions
+      - uses: ./.github/actions/unit-test
+        with:
+          beat: x-pack/filebeat
+          command: "mage ${{ matrix.mage-target }}"
+        env:
+          FIPS: ${{ matrix.fips }}

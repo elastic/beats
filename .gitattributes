@@ -5,6 +5,9 @@ CHANGELOG-developer.next.asciidoc  merge=union
 *.go text eol=lf
 *.sh text eol=lf
 
+# Fix for TestProcessObjectMetricCollection which expects exact byte size
+/x-pack/filebeat/input/awss3/testdata/log.txt text eol=lf
+
 # Keep these file types as CRLF (Windows).
 *.bat    text eol=crlf
 *.cmd    text eol=crlf
