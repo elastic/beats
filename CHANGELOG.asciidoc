@@ -10347,7 +10347,7 @@ https://github.com/elastic/beats/compare/v6.2.3\...v6.3.0[View commits]
 - Add `has_fields` conditional to filter events based on the existence of all the given fields. {issue}6285[6285] {pull}6653[6653]
 - Add support for spooling to disk to the beats event publishing pipeline. {pull}6581[6581]
 - Added logging of system info at Beat startup. {issue}5946[5946]
-- Do not log errors if X-Pack Monitoring is enabled but Elastisearch X-Pack is not. {pull}6627[6627]
+- Do not log errors if X-Pack Monitoring is enabled but Elasticsearch X-Pack is not. {pull}6627[6627]
 - Add rename processor. {pull}6292[6292]
 - Allow override of dynamic template `match_mapping_type` for fields with object_type. {pull}6691[6691]
 
