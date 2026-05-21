@@ -2,5 +2,13 @@ kind: bug-fix
 summary: |
   Fix Filestream skipping log lines after inactive close/reopen
   when outputs are slow to acknowledge events.
+description: |
+  Filestream now takes a more conservative approach when reopening
+  files that were closed: it uses the last acked (and synced to disk)
+  offset instead of the in-memory one. This offset does not take into
+  account any queued event or in-flight request to the
+  output. Therefore, there might be a small amount of duplicated
+  events when the file is re-opened.
+
 component: filebeat
 issue: https://github.com/elastic/beats/issues/50738
