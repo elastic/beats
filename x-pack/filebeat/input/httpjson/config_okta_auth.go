@@ -32,11 +32,12 @@ import (
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // for more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource
 type oktaTokenSource struct {
-	mu      sync.Mutex
-	ctx     context.Context
-	conf    *oauth2.Config
-	token   *oauth2.Token
-	oktaJWK []byte
+	mu         sync.Mutex
+	ctx        context.Context
+	conf       *oauth2.Config
+	token      *oauth2.Token
+	oktaJWK    []byte
+	oktaJWKPEM string
 }
 
 // fetchOktaOauthClient fetches an OAuth2 client using the Okta JWK credentials.
@@ -101,10 +102,11 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, 
 	}
 
 	tokenSource := &oktaTokenSource{
-		conf:    conf,
-		ctx:     ctx,
-		oktaJWK: o.OktaJWKJSON,
-		token:   token,
+		conf:       conf,
+		ctx:        ctx,
+		oktaJWK:    o.OktaJWKJSON,
+		oktaJWKPEM: o.OktaJWKPEM,
+		token:      token,
 	}
 	// reuse the tokenSource to refresh the token (automatically calls the custom Token() method when token is no longer valid).
 	client := oauth2.NewClient(ctx, oauth2.ReuseTokenSource(token, tokenSource))
@@ -120,7 +122,13 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
-	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
+	var oktaJWT string
+	var err error
+	if ts.oktaJWKPEM != "" {
+		oktaJWT, err = generateOktaJWTPEM(ts.oktaJWKPEM, ts.conf)
+	} else {
+		oktaJWT, err = generateOktaJWT(ts.oktaJWK, ts.conf)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)
 	}
