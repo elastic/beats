@@ -21,6 +21,7 @@ package filestream
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -691,6 +692,18 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
+}
+
+func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	var err error
+	for _, c := range pc.clients {
+		err = errors.Join(err, c.Close())
+	}
+
+	return err
 }
 
 func newMockClient(blocking bool, config beat.ClientConfig) *mockClient {

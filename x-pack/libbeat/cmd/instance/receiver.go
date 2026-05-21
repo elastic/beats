@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -194,12 +193,9 @@ func (br *BeatReceiver) Shutdown() error {
 	// Notify the publisher pipeline to shut down (if configured this will
 	// wait for a specified timeout for outstanding events to be
 	// acknowledged).
-	// On a live system the cast to io.Closer will always succeed because
-	// Publisher is implemented by pipeline.Pipeline.
-	if c, ok := br.beat.Publisher.(io.Closer); ok {
-		if err := c.Close(); err != nil {
-			br.Logger.Errorf("error closing beat receiver publisher: %v", err)
-		}
+	// TODO: use the caller's context once the pipeline supports context cancellation.
+	if err := br.beat.Publisher.Disconnect(context.Background()); err != nil {
+		br.Logger.Errorf("error closing beat receiver publisher: %v", err)
 	}
 
 	// At this point the publisher pipeline is stopped and no more events can

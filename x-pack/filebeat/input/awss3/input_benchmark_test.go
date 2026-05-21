@@ -178,7 +178,11 @@ func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error
 }
 
 func (c *fakePipeline) Connect() (beat.Client, error) {
-	panic("Connect() is not implemented.")
+	return c.ConnectWith(beat.ClientConfig{})
+}
+
+func (c *fakePipeline) Disconnect(ctx context.Context) error {
+	return nil
 }
 
 var _ beat.Client = (*ackClient)(nil)

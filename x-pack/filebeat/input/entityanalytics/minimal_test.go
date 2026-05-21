@@ -87,6 +87,9 @@ func (f *fakeConnector) Connect() (beat.Client, error) {
 	return f.client, nil
 }
 
+func (f *fakeConnector) Disconnect(ctx context.Context) error {
+	return f.client.Close()
+}
 func TestMinimalInput_RunSync_FullCycle(t *testing.T) {
 	t.Parallel()
 

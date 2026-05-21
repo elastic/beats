@@ -222,12 +222,14 @@ func NewForReceiver(
 	return p, nil
 }
 
-// Close stops the pipeline, outputs and queue.
-// If WaitClose with WaitOnPipelineClose mode is configured, Close will block
+// Disconnect stops the pipeline, outputs and queue.
+// If WaitClose with WaitOnPipelineClose mode is configured, Disconnect will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients will no longer accept new Publish calls once Close is started,
-// and will no longer receive event acknowledgments once Close returns.
-func (p *Pipeline) Close() error {
+// Note: clients will no longer accept new Publish calls once Disconnect is started,
+// and will no longer receive event acknowledgments once Disconnect returns.
+func (p *Pipeline) Disconnect(ctx context.Context) error {
+	// Here context does not do anything for now but it will be the responsibility of the beater to determine how long to wait before full disconnection
+	// See issue: https://github.com/elastic/beats/issues/49794
 	p.closeOnce.Do(func() {
 		log := p.monitors.Logger
 

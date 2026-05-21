@@ -32,6 +32,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+var _ outputController = (*processOutputController)(nil)
+
+// processOutputController implements outputController
 // processOutputController manages the pipelines output capabilities, like:
 // - start
 // - stop

@@ -183,7 +183,7 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 
 	pipeConn, err := pipeline.Connect()
 	if err != nil {
-		pipeline.Close()
+		pipeline.Disconnect(context.Background())
 		return nil, err
 	}
 
@@ -206,7 +206,7 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
-	r.pipeline.Close()
+	r.pipeline.Disconnect(context.Background())
 	r.wg.Wait()
 }
 
