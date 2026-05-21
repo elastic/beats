@@ -127,10 +127,11 @@ func TestCertificateReload(t *testing.T) {
 	_, clientPairB, err := certutil.GenerateChildCert("client-b", nil, caPrivKey, caCert)
 	require.NoError(t, err)
 
-	// mTLS mock-ES: record the CN of each connecting client cert and delegate
-	// the actual request handling to the ES mock.
+	// mTLS mock-ES: record the first DNS SAN of each connecting client cert
+	// and delegate the actual request handling to the ES mock.
+	// certutil.GenerateChildCert places `name` in DNSNames, not CommonName.
 	var mu sync.Mutex
-	var lastClientCN string
+	var lastClientName string
 
 	uid := uuid.Must(uuid.NewV4())
 	rdr := sdkmetric.NewManualReader()
@@ -141,9 +142,11 @@ func TestCertificateReload(t *testing.T) {
 	)
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.TLS != nil && len(r.TLS.PeerCertificates) > 0 {
-			mu.Lock()
-			lastClientCN = r.TLS.PeerCertificates[0].Subject.CommonName
-			mu.Unlock()
+			if sans := r.TLS.PeerCertificates[0].DNSNames; len(sans) > 0 {
+				mu.Lock()
+				lastClientName = sans[0]
+				mu.Unlock()
+			}
 		}
 		esHandler.ServeHTTP(w, r)
 	})
@@ -206,7 +209,7 @@ output.elasticsearch:
 	require.Eventually(t, func() bool {
 		mu.Lock()
 		defer mu.Unlock()
-		return lastClientCN == "client-a"
+		return lastClientName == "client-a"
 	}, 10*time.Second, 100*time.Millisecond,
 		"beat should present client-a cert initially")
 
@@ -220,7 +223,7 @@ output.elasticsearch:
 	require.Eventually(t, func() bool {
 		mu.Lock()
 		defer mu.Unlock()
-		return lastClientCN == "client-b"
+		return lastClientName == "client-b"
 	}, 15*time.Second, 200*time.Millisecond,
 		"beat should present client-b cert after rotation without restarting")
 }
