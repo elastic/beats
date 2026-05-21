@@ -84,6 +84,11 @@ func (p *Parser) Next() (reader.Message, error) {
 	for k, v := range data {
 		logFields[k] = v
 	}
+	// auparse normalises res/success → result, but the ingest pipeline
+	// renames auditd.log.res to event.outcome, so restore the alias.
+	if result, ok := logFields["result"]; ok {
+		logFields["res"] = result
+	}
 	if dataErr != nil {
 		if p.cfg.LogErrors {
 			p.logger.Errorf("error extracting auditd data fields: %v", dataErr)

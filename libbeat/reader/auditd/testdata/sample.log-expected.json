@@ -1,0 +1,89 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "a0": "1def880",
+        "a1": "1df0fd0",
+        "a2": "1d3e5f0",
+        "a3": "7fff70ed9310",
+        "arch": "x86_64",
+        "auid": "1000",
+        "comm": "auditctl",
+        "egid": "0",
+        "euid": "0",
+        "exe": "/sbin/auditctl",
+        "exit": "0",
+        "fsgid": "0",
+        "fsuid": "0",
+        "gid": "0",
+        "items": "2",
+        "pid": "1360",
+        "ppid": "1299",
+        "record_type": "SYSCALL",
+        "res": "success",
+        "result": "success",
+        "sequence": "479",
+        "ses": "1",
+        "sgid": "0",
+        "suid": "0",
+        "syscall": "execve",
+        "tty": "pts0",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "auditctl",
+        "a1": "-a",
+        "a2": "exit,always",
+        "a3": "-F",
+        "a4": "arch=b32",
+        "a5": "-S",
+        "a6": "execve",
+        "argc": "7",
+        "record_type": "EXECVE",
+        "sequence": "479"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "acct": "root",
+        "addr": "1.2.3.4",
+        "auid": "700",
+        "exe": "/usr/sbin/sshd",
+        "hostname": "1.2.3.4",
+        "op": "login",
+        "pid": "28281",
+        "record_type": "USER_LOGIN",
+        "res": "success",
+        "result": "success",
+        "sequence": "19623791",
+        "ses": "6793",
+        "terminal": "sshd",
+        "uid": "0"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "comm": "httpd",
+        "dev": "dm-0",
+        "ino": "284133",
+        "path": "/var/www/html/file1",
+        "pid": "2465",
+        "record_type": "AVC",
+        "scontext": "unconfined_u:system_r:httpd_t:s0",
+        "seperms": "getattr",
+        "sequence": "96",
+        "seresult": "denied",
+        "tclass": "file",
+        "tcontext": "unconfined_u:object_r:samba_share_t:s0"
+      }
+    }
+  }
+]

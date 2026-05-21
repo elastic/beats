@@ -20,7 +20,12 @@
 package auditd
 
 import (
+	"bufio"
+	"encoding/json"
+	"errors"
+	"flag"
 	"io"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,6 +35,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+var update = flag.Bool("update", false, "update expected parser output json file")
 
 var _ reader.Reader = &testReader{}
 
@@ -85,8 +92,8 @@ func TestParser(t *testing.T) {
 			wantLogFields: map[string]string{
 				"record_type": "SYSCALL",
 				"sequence":    "18877199",
-				"arch":        "x86_64",  // auparse resolves c000003e → x86_64
-				"syscall":     "execve",  // auparse resolves syscall 59 → execve
+				"arch":        "x86_64", // auparse resolves c000003e → x86_64
+				"syscall":     "execve", // auparse resolves syscall 59 → execve
 				"ppid":        "1234",
 				"pid":         "5678",
 				"auid":        "1000",
@@ -105,20 +112,57 @@ func TestParser(t *testing.T) {
 				"pid":         "28281",
 				"uid":         "0",
 				"auid":        "700",
+				// auparse normalises res → result; parser restores res so the
+				// ingest pipeline rename auditd.log.res → event.outcome fires.
+				"res":    "success",
+				"result": "success",
 			},
 			wantEpoch: 1489636960,
 		},
+		"execve with decoded args": {
+			cfg:  DefaultConfig(),
+			line: []byte(`type=EXECVE msg=audit(1485893834.891:18877200): argc=3 a0="ls" a1="-la" a2="/tmp"`),
+			wantLogFields: map[string]string{
+				"record_type": "EXECVE",
+				"sequence":    "18877200",
+				"argc":        "3",
+				"a0":          "ls",
+				"a1":          "-la",
+				"a2":          "/tmp",
+			},
+		},
+		"avc selinux denial": {
+			cfg:  DefaultConfig(),
+			line: []byte(`type=AVC msg=audit(1226874073.147:96): avc:  denied  { getattr } for  pid=2465 comm="httpd" path="/var/www/html/file1" dev=dm-0 ino=284133 scontext=unconfined_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:samba_share_t:s0 tclass=file`),
+			wantLogFields: map[string]string{
+				"record_type": "AVC",
+				"sequence":    "96",
+				"seresult":    "denied",
+				"seperms":     "getattr",
+				"comm":        "httpd",
+				"tclass":      "file",
+			},
+			wantEpoch: 1226874073,
+		},
+		"data error still sets record_type and sequence": {
+			// EXECVE with argc=3 but a1 missing causes Data() to error;
+			// record_type and sequence from the parsed header must survive.
+			cfg:           DefaultConfig(),
+			line:          []byte(`type=EXECVE msg=audit(1485893834.891:18877201): argc=3 a0="ls" a2="/tmp"`),
+			wantLogFields: map[string]string{"record_type": "EXECVE", "sequence": "18877201"},
+			wantErrorKey:  true,
+		},
 		"invalid line adds error key": {
-			cfg:          DefaultConfig(),
-			line:         []byte(`not a valid audit line`),
+			cfg:           DefaultConfig(),
+			line:          []byte(`not a valid audit line`),
 			wantLogFields: map[string]string{},
-			wantErrorKey: true,
+			wantErrorKey:  true,
 		},
 		"invalid line no error key when disabled": {
-			cfg:          Config{LogErrors: false, AddErrorKey: false},
-			line:         []byte(`not a valid audit line`),
+			cfg:           Config{LogErrors: false, AddErrorKey: false},
+			line:          []byte(`not a valid audit line`),
 			wantLogFields: map[string]string{},
-			wantErrorKey: false,
+			wantErrorKey:  false,
 		},
 	}
 
@@ -147,4 +191,76 @@ func TestParser(t *testing.T) {
 			assert.ErrorIs(t, err, io.EOF)
 		})
 	}
+}
+
+// TestParserMultiRecord verifies that related records sharing the same
+// sequence number are not consolidated into a single message. This is
+// to preserve the prior behaviour of the integrations.
+func TestParserMultiRecord(t *testing.T) {
+	lines := [][]byte{
+		[]byte(`type=SYSCALL msg=audit(1485893834.891:42): arch=c000003e syscall=59 success=yes exit=0 a0=7f095d0a4b88 items=1 ppid=1234 pid=5678 auid=1000 uid=0 gid=0 comm="ls" exe="/bin/ls" key=(null)`),
+		[]byte(`type=EXECVE msg=audit(1485893834.891:42): argc=1 a0="ls"`),
+	}
+	r := &testReader{messages: lines}
+	p := NewParser(r, DefaultConfig(), logptest.NewTestingLogger(t, ""))
+
+	msg1, err := p.Next()
+	require.NoError(t, err)
+	seq1, ok := auditdLogField(msg1.Fields, "sequence")
+	assert.True(t, ok, "sequence missing from first record")
+	assert.Equal(t, "42", seq1)
+
+	msg2, err := p.Next()
+	require.NoError(t, err)
+	seq2, ok := auditdLogField(msg2.Fields, "sequence")
+	assert.True(t, ok, "sequence missing from second record")
+	assert.Equal(t, "42", seq2)
+
+	_, err = p.Next()
+	assert.ErrorIs(t, err, io.EOF)
+}
+
+func TestLogFiles(t *testing.T) {
+	const (
+		inputPath  = "testdata/sample.log"
+		goldenPath = "testdata/sample.log-expected.json"
+	)
+
+	f, err := os.Open(inputPath)
+	require.NoError(t, err)
+	defer f.Close()
+
+	var lines [][]byte
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		lines = append(lines, []byte(scanner.Text()))
+	}
+	require.NoError(t, scanner.Err())
+
+	p := NewParser(&testReader{messages: lines}, DefaultConfig(), logptest.NewTestingLogger(t, ""))
+	var got []mapstr.M
+	for {
+		msg, err := p.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		require.NoError(t, err)
+		var norm mapstr.M
+		b, _ := json.Marshal(msg.Fields)
+		_ = json.Unmarshal(b, &norm)
+		got = append(got, norm)
+	}
+
+	if *update {
+		b, err := json.MarshalIndent(got, "", "  ")
+		require.NoError(t, err)
+		require.NoError(t, os.WriteFile(goldenPath, b, 0o644))
+		return
+	}
+
+	b, err := os.ReadFile(goldenPath)
+	require.NoError(t, err)
+	var want []mapstr.M
+	require.NoError(t, json.Unmarshal(b, &want))
+	assert.Equal(t, want, got)
 }
