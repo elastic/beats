@@ -45,7 +45,7 @@ func (c Cursor) Unpack(to interface{}) error {
 	return c.resource.UnpackCursor(to)
 }
 
-// UnpackACKed deserialises the last ACKed cursor state into to.
+// UnpackACKed deserializes the last ACKed cursor state into the argument 'to'.
 func (c Cursor) UnpackACKed(to any) error {
 	if c.IsNew() {
 		return nil

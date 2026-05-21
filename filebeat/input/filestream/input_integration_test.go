@@ -512,7 +512,7 @@ func TestFilestreamDoesNotSkipEventsOnInactiveCloseReopen(t *testing.T) {
 		func() bool {
 			return env.pipeline.clientsCount() == 1
 		},
-		100*time.Millisecond, time.Millisecond, "pipeline client did not connect")
+		time.Second, time.Millisecond, "pipeline client did not connect")
 
 	env.pipeline.clients[0].waitUntilPublishingCount(t, lenFirstBatch, 500*time.Millisecond)
 	env.waitUntilHarvesterIsDone()

@@ -643,6 +643,9 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	c.published = append(c.published, events...)
 }
 
+// waitUntilPublishingCount waits until the publishing slice reaches the
+// desired count. The publishing slice contains all received events, even the
+// ones that were not ACKed.
 func (c *mockClient) waitUntilPublishingCount(t *testing.T, count int, timeout time.Duration) {
 	t.Helper()
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -723,12 +726,12 @@ func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
 	return err
 }
 
-func newMockClient(blocking, delayACK bool, config beat.ClientConfig) *mockClient {
+func newMockClient(blocking, skipACK bool, config beat.ClientConfig) *mockClient {
 	done := make(chan struct{})
 	return &mockClient{
 		done:       done,
 		ackHandler: newMockACKHandler(done, blocking, config),
-		skipACK:    delayACK,
+		skipACK:    skipACK,
 	}
 }
 
