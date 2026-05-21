@@ -7,6 +7,7 @@ package streaming
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -25,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -822,7 +822,6 @@ var urlEvalTests = []struct {
 }
 
 func TestURLEval(t *testing.T) {
-	logp.TestingSetup()
 	for _, test := range urlEvalTests {
 		t.Run(test.name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -853,7 +852,7 @@ func TestURLEval(t *testing.T) {
 			if now == nil {
 				now = time.Now
 			}
-			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, logp.NewLogger("websocket_url_eval_test"), now)
+			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, logptest.NewTestingLogger(t, "websocket_url_eval_test"), now)
 			if err != nil && !errors.Is(err, context.Canceled) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
 			}
@@ -867,20 +866,21 @@ func TestInput(t *testing.T) {
 	testutils.SkipIfFIPSOnly(t, "websocket setup requires SHA-1.")
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
-	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
+			testConfig := cloneConfig(t, test.config)
+
 			if test.oauth2Server != nil {
-				test.oauth2Server(t, test.oauth2Handler, test.config)
+				test.oauth2Server(t, test.oauth2Handler, testConfig)
 			}
 			if test.server != nil {
-				test.server(t, test.handler, test.config, test.response)
+				test.server(t, test.handler, testConfig, test.response)
 			}
 			if test.proxyServer != nil {
-				test.proxyServer(t, test.handler, test.config, test.response)
+				test.proxyServer(t, test.handler, testConfig, test.response)
 			}
 
-			cfg := conf.MustNewConfigFrom(test.config)
+			cfg := conf.MustNewConfigFrom(testConfig)
 
 			conf := config{}
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
@@ -907,7 +907,7 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			v2Ctx := v2.Context{
-				Logger:          logp.NewLogger("websocket_test"),
+				Logger:          logptest.NewTestingLogger(t, "websocket_test"),
 				ID:              "test_id:" + test.name,
 				Cancelation:     ctx,
 				MetricsRegistry: monitoring.NewRegistry(),
@@ -927,18 +927,35 @@ func TestInput(t *testing.T) {
 				return
 			}
 
-			if len(client.published) < len(test.want) {
-				t.Errorf("unexpected number of published events: got:%d want at least:%d", len(client.published), len(test.want))
-				test.want = test.want[:len(client.published)]
+			want := test.want
+			if len(client.published) < len(want) {
+				t.Errorf("unexpected number of published events: got:%d want at least:%d", len(client.published), len(want))
+				want = want[:len(client.published)]
 			}
-			client.published = client.published[:len(test.want)]
+			client.published = client.published[:len(want)]
 			for i, got := range client.published {
-				if !reflect.DeepEqual(got.Fields, mapstr.M(test.want[i])) {
-					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(test.want[i])))
+				if !reflect.DeepEqual(got.Fields, mapstr.M(want[i])) {
+					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(want[i])))
 				}
 			}
 		})
 	}
+}
+
+// cloneConfig returns a deep copy of m via a JSON round-trip. This prevents
+// server factories from mutating the package-level inputTests table, which
+// would otherwise cause stale URLs and state when tests are run with -count >1.
+func cloneConfig(t *testing.T, m map[string]interface{}) map[string]interface{} {
+	t.Helper()
+	b, err := json.Marshal(m)
+	if err != nil {
+		t.Fatalf("failed to marshal config for deep copy: %v", err)
+	}
+	var clone map[string]interface{}
+	if err := json.Unmarshal(b, &clone); err != nil {
+		t.Fatalf("failed to unmarshal config for deep copy: %v", err)
+	}
+	return clone
 }
 
 // TestURLProgramReconnect verifies that url_program is re-evaluated before
@@ -1272,8 +1289,8 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 
 // webSocketServerWithRetry returns a function that creates a WebSocket server that rejects the first two connection attempts and accepts the third.
 func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
-	var attempt int
 	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		var attempt int
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			attempt++
 			if attempt <= 2 {
@@ -1418,9 +1435,12 @@ func webSocketProxyHandler(targetURL string) http.HandlerFunc {
 // newWebSocketProxyTestServer creates a proxy server forwarding WebSocket traffic.
 func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) *httptest.Server {
 	backendServer := webSocketTestServer(t, handler, response)
+	t.Cleanup(backendServer.Close)
 	config["url"] = "ws" + backendServer.URL[4:]
 	config["proxy_url"] = "ws" + backendServer.URL[4:]
-	return httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
+	proxy := httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
+	t.Cleanup(proxy.Close)
+	return proxy
 }
 
 //nolint:errcheck // no point checking errors in test server.
