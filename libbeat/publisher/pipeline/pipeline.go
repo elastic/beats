@@ -221,16 +221,17 @@ func NewForReceiver(
 // Note: clients will no longer accept new Publish calls once Disconnect is started,
 // and will no longer receive event acknowledgments once Disconnect returns.
 func (p *Pipeline) Disconnect(ctx context.Context) error {
+	var disconnectErr error
 	p.closeOnce.Do(func() {
 		log := p.monitors.Logger
 		log.Debug("close pipeline")
 
 		// Note: active clients are not closed / disconnected.
-		p.outputController.waitClose(ctx, p.forceCloseQueue)
+		disconnectErr = p.outputController.waitClose(ctx, p.forceCloseQueue)
 
 		p.observer.cleanup()
 	})
-	return nil
+	return disconnectErr
 }
 
 // Connect creates a new client with default settings.
