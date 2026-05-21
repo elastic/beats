@@ -35,8 +35,10 @@ type Float64Metric struct {
 
 // ContainerMetrics contains all the metrics for a Container.
 type ContainerMetrics struct {
-	CoresLimit  *Float64Metric
-	MemoryLimit *Float64Metric
+	CoresLimit    *Float64Metric
+	MemoryLimit   *Float64Metric
+	CoresRequest  *Float64Metric
+	MemoryRequest *Float64Metric
 }
 
 // NodeMetrics contains all the metrics for a Node.
@@ -91,8 +93,10 @@ func NewFloat64Metric(value float64) *Float64Metric {
 // NewContainerMetrics creates an empty ContainerMetrics object.
 func NewContainerMetrics() *ContainerMetrics {
 	return &ContainerMetrics{
-		CoresLimit:  nil,
-		MemoryLimit: nil,
+		CoresLimit:    nil,
+		MemoryLimit:   nil,
+		CoresRequest:  nil,
+		MemoryRequest: nil,
 	}
 }
 
@@ -155,6 +159,12 @@ func (cm *ContainerMetrics) Clone() *ContainerMetrics {
 	}
 	if cm.MemoryLimit != nil {
 		ans.MemoryLimit = cm.MemoryLimit.Clone()
+	}
+	if cm.CoresRequest != nil {
+		ans.CoresRequest = cm.CoresRequest.Clone()
+	}
+	if cm.MemoryRequest != nil {
+		ans.MemoryRequest = cm.MemoryRequest.Clone()
 	}
 	return ans
 }

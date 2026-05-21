@@ -255,6 +255,8 @@ func TestWatcherContainerMetrics(t *testing.T) {
 	containerName := "test"
 	cpuLimit := resource.MustParse("100m")
 	memoryLimit := resource.MustParse("100Mi")
+	cpuRequest := resource.MustParse("50m")
+	memoryRequest := resource.MustParse("50Mi")
 	pod := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			UID:  types.UID("mockuid"),
@@ -273,6 +275,10 @@ func TestWatcherContainerMetrics(t *testing.T) {
 						Limits: v1.ResourceList{
 							v1.ResourceCPU:    cpuLimit,
 							v1.ResourceMemory: memoryLimit,
+						},
+						Requests: v1.ResourceList{
+							v1.ResourceCPU:    cpuRequest,
+							v1.ResourceMemory: memoryRequest,
 						},
 					},
 				},
@@ -302,6 +308,8 @@ func TestWatcherContainerMetrics(t *testing.T) {
 	require.NotNil(t, metrics)
 	assert.Equal(t, 0.1, metrics.CoresLimit.Value)
 	assert.Equal(t, 100*1024*1024.0, metrics.MemoryLimit.Value)
+	assert.Equal(t, 0.05, metrics.CoresRequest.Value)
+	assert.Equal(t, 50*1024*1024.0, metrics.MemoryRequest.Value)
 
 	// modify the limit and verify the new value is present
 	pod.Spec.Containers[0].Resources.Limits[v1.ResourceCPU] = resource.MustParse("200m")
@@ -317,6 +325,8 @@ func TestWatcherContainerMetrics(t *testing.T) {
 	require.NotNil(t, metrics)
 	assert.Nil(t, metrics.CoresLimit)
 	assert.Nil(t, metrics.MemoryLimit)
+	assert.Nil(t, metrics.CoresRequest)
+	assert.Nil(t, metrics.MemoryRequest)
 }
 
 func TestWatcherNodeMetrics(t *testing.T) {
