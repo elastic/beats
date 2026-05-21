@@ -21,18 +21,26 @@ package integration
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"fmt"
+	"net"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 
 	"github.com/elastic/elastic-agent-libs/testing/certutil"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 var esCfg = `
@@ -102,35 +110,119 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s.Close()
 }
 
-func TestRestartOnCertChangeDeprecation(t *testing.T) {
+func TestCertificateReload(t *testing.T) {
+	// Generate a CA and sign both the server cert and two distinct client certs.
+	caPrivKey, caCert, caPair, err := certutil.NewRootCA()
+	require.NoError(t, err)
+
+	serverTLSCert, _, err := certutil.GenerateChildCert(
+		"mock-es", []net.IP{net.IPv4(127, 0, 0, 1)}, caPrivKey, caCert,
+	)
+	require.NoError(t, err)
+
+	// client-a and client-b are both signed by the same CA so the server accepts
+	// both. Their distinct CNs let us assert which cert the beat is presenting.
+	_, clientPairA, err := certutil.GenerateChildCert("client-a", nil, caPrivKey, caCert)
+	require.NoError(t, err)
+	_, clientPairB, err := certutil.GenerateChildCert("client-b", nil, caPrivKey, caCert)
+	require.NoError(t, err)
+
+	// mTLS mock-ES: record the CN of each connecting client cert and delegate
+	// the actual request handling to the ES mock.
+	var mu sync.Mutex
+	var lastClientCN string
+
+	uid := uuid.Must(uuid.NewV4())
+	rdr := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(rdr))
+	esHandler := api.NewAPIHandler(
+		uid, t.Name(), provider, time.Now().Add(24*time.Hour),
+		0, 0, 0, 0, 0, 0,
+	)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.TLS != nil && len(r.TLS.PeerCertificates) > 0 {
+			mu.Lock()
+			lastClientCN = r.TLS.PeerCertificates[0].Subject.CommonName
+			mu.Unlock()
+		}
+		esHandler.ServeHTTP(w, r)
+	})
+
+	caPool := x509.NewCertPool()
+	caPool.AddCert(caCert)
+	l, err := tls.Listen("tcp", "127.0.0.1:0", &tls.Config{
+		Certificates: []tls.Certificate{*serverTLSCert},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    caPool,
+	})
+	require.NoError(t, err)
+
+	srv := &http.Server{Handler: handler, ReadHeaderTimeout: time.Second}
+	go func() {
+		if err := srv.Serve(l); !errors.Is(err, http.ErrServerClosed) {
+			t.Errorf("mock ES TLS server: %v", err)
+		}
+	}()
+	t.Cleanup(func() { _ = srv.Close() })
+	esAddr := "https://" + l.Addr().String()
+
+	// Write PKI material to files that the beat will read.
+	tmpDir := t.TempDir()
+	caCertPath := filepath.Join(tmpDir, "ca.pem")
+	clientCertPath := filepath.Join(tmpDir, "client.crt")
+	clientKeyPath := filepath.Join(tmpDir, "client.key")
+	require.NoError(t, os.WriteFile(caCertPath, caPair.Cert, 0600))
+	require.NoError(t, os.WriteFile(clientCertPath, clientPairA.Cert, 0600))
+	require.NoError(t, os.WriteFile(clientKeyPath, clientPairA.Key, 0600))
+
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-
-	s, esAddr, _, _ := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
-	defer s.Close()
-
-	_, _, pair, err := certutil.NewRootCA()
-	require.NoError(t, err, "could not generate root CA")
-	caPath := filepath.Join(os.TempDir(), "ca.pem")
-	err = os.WriteFile(caPath, pair.Cert, 0644)
-	require.NoError(t, err, "could not write CA")
-
 	mockbeat.WriteConfigFile(fmt.Sprintf(`
+mockbeat:
+logging:
+  level: debug
+queue.mem:
+  events: 4096
+  flush.min_events: 8
+  flush.timeout: 0.1s
 output.elasticsearch:
   allow_older_versions: true
   hosts: ["%s"]
+  idle_connection_timeout: 50ms
+  backoff:
+    init: 0.1s
+    max: 0.5s
   ssl:
-    certificate_authorities: "%s"
-    restart_on_cert_change.enabled: true
-    restart_on_cert_change.period: 1s
-logging.level: debug
-`, esAddr, caPath))
+    certificate_authorities: ["%s"]
+    certificate: "%s"
+    key: "%s"
+    certificate_reload:
+      enabled: true
+      period: 1s
+`, esAddr, caCertPath, clientCertPath, clientKeyPath))
 
 	mockbeat.Start()
+	waitForEventToBePublished(t, rdr)
 
-	mockbeat.WaitLogsContains(
-		"'ssl.restart_on_cert_change' is deprecated",
-		10*time.Second,
-		"did not find deprecation warning for 'ssl.restart_on_cert_change'")
+	require.Eventually(t, func() bool {
+		mu.Lock()
+		defer mu.Unlock()
+		return lastClientCN == "client-a"
+	}, 10*time.Second, 100*time.Millisecond,
+		"beat should present client-a cert initially")
+
+	// Rotate: overwrite the on-disk files with client-b material.
+	require.NoError(t, os.WriteFile(clientCertPath, clientPairB.Cert, 0600))
+	require.NoError(t, os.WriteFile(clientKeyPath, clientPairB.Key, 0600))
+
+	// The cert reloader checks every 1s on the TLS-handshake hot-path; the
+	// 50ms idle connection timeout forces frequent reconnects so the check
+	// is triggered quickly after the rotation.
+	require.Eventually(t, func() bool {
+		mu.Lock()
+		defer mu.Unlock()
+		return lastClientCN == "client-b"
+	}, 15*time.Second, 200*time.Millisecond,
+		"beat should present client-b cert after rotation without restarting")
 }
 
 // waitForEventToBePublished waits for at least one event published
