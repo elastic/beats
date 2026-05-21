@@ -81,6 +81,27 @@ func TestRemoved(t *testing.T) {
 	assert.True(t, IsRemoved(file))
 }
 
+func TestNotRemoved(t *testing.T) {
+	file, err := ioutil.TempFile("", "")
+	assert.NoError(t, err)
+	defer os.Remove(file.Name())
+	defer file.Close()
+
+	assert.False(t, IsRemoved(file))
+}
+
+func TestIdentifierBackwardCompatibility(t *testing.T) {
+	state := StateOS{
+		Inode:  12,
+		Device: 34,
+		UID:    56,
+		GID:    78,
+	}
+
+	assert.Equal(t, "12-34", state.Identifier())
+	assert.Equal(t, "12-34-56-78", state.String())
+}
+
 func BenchmarkStateString(b *testing.B) {
 	var samples [50]uint64
 	for i, v := 0, uint64(0); i < len(samples); i, v = i+1, v+math.MaxUint64/uint64(len(samples)) {
