@@ -48,6 +48,7 @@ func (tl *testLogger) Errorf(format string, args ...interface{}) {
 	tl.b.WriteString(fmt.Sprintf(format, args...))
 	tl.b.WriteString("\n")
 }
+
 func (tl *testLogger) String() string {
 	tl.mu.Lock()
 	defer tl.mu.Unlock()
@@ -57,12 +58,12 @@ func (tl *testLogger) String() string {
 func TestNewGroup(t *testing.T) {
 	limit := 10
 	timeout := time.Second
-	g := NewGroup(uint64(limit), timeout, noopLogger{}, "")
+	g := NewGroup(uint64(limit), timeout, noopLogger{}, "") //nolint:gosec //limit is 10 no overflow
 	require.NotNil(t, g, "NewGroup returned a nil group, it cannot be nil")
 
 	require.NotNil(t, g.sem)
 
-	err := g.sem.Acquire(context.Background(), int64(limit-1))
+	err := g.sem.Acquire(context.Background(), int64(limit-1)) //nolint:gosec //limit is 10 no overflow
 	require.NoError(t, err, "semaphore Acquire failed")
 	assert.True(t, g.sem.TryAcquire(1),
 		"semaphore should have 1 place left, there is none")
@@ -262,7 +263,6 @@ func TestGroup_Go(t *testing.T) {
 		assert.Contains(t, logs, wantErr.Error())
 		assert.Contains(t, logs, "[2]")
 		assert.Contains(t, logs, "[1]")
-
 	})
 
 	t.Run("some workloads return an error", func(t *testing.T) {
