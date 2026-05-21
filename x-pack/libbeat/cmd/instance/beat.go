@@ -34,11 +34,6 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
-// This is the timeout for the beat's internal publishing pipeline to close when shutting down the receiver. Closing
-// requires flushing the event queue, and if this doesn't happen within the timeout, data may be lost depending on
-// input type.
-const receiverPublisherCloseTimeout = 5 * time.Second
-
 var fqdnOnce = sync.OnceValues(func() (string, error) {
 	h, err := sysinfo.Host()
 	if err != nil {

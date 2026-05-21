@@ -179,12 +179,13 @@ func (bt *osquerybeat) close() {
 	bt.pipeline.Disconnect(ctx)
 
 	bt.mx.Lock()
+	defer bt.mx.Unlock()
+	if bt.pub != nil {
+		bt.pub.Close()
+	}
 	if bt.cancel != nil {
 		bt.cancel()
 		bt.cancel = nil
-	}
-	if bt.pub != nil {
-		bt.pub.Close()
 	}
 
 	// Start watching the parent process.
@@ -193,7 +194,7 @@ func (bt *osquerybeat) close() {
 		go bt.watcher.Run()
 		bt.watcher = nil
 	}
-	bt.mx.Unlock()
+
 }
 
 // Run starts osquerybeat.

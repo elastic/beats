@@ -71,8 +71,8 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		// disconnect pipeline in few seconds to not block forever
-		ctx, ctxCancel := context.WithTimeout(t.Context(), 2*time.Second)
+		// disconnect pipeline
+		ctx, ctxCancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 		defer ctxCancel()
 		defer pipeline.Disconnect(ctx)
 

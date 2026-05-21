@@ -516,7 +516,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	ctx, ctxCancel := context.WithTimeout(context.Background(), fb.config.ShutdownTimeout)
 	defer ctxCancel()
 
-	// then disconnect the pipeline to ensure all pending events are flushed and acknowledged before
+	// disconnect the pipeline to ensure all pending events are flushed and acknowledged
 	err = fb.pipeline.Disconnect(ctx)
 	if err != nil {
 		fb.logger.Error("Error disconnecting pipeline:", err)
@@ -539,7 +539,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 func (fb *Filebeat) Stop() {
 	fb.logger.Info("Stopping filebeat")
 
-	// Wait for the main run loop to finish, which will stop the crawler and all inputs
 	// Stop Filebeat
 	fb.stopOnce.Do(func() { close(fb.done) })
 }

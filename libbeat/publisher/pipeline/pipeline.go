@@ -65,10 +65,6 @@ type Pipeline struct {
 
 	observer observer
 
-	// If waitCloseTimeout is positive, then the pipeline will wait up to the
-	// specified time when it is closed for pending events to be acknowledged.
-	waitCloseTimeout time.Duration
-
 	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
 	// elapses.
 	forceCloseQueue bool
@@ -81,9 +77,38 @@ type Pipeline struct {
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
 type Settings struct {
-	Processors     processing.Supporter
+	// WaitClose sets the maximum duration to block when clients or pipeline itself is closed.
+	// When and how WaitClose is applied depends on WaitCloseMode.
+	// Deprecated: Pipeline close now waits until the given context expires.
+	WaitClose time.Duration
+
+	// This field has no effect when running as a Beats receiver.
+	WaitCloseMode WaitCloseMode
+
+	Processors processing.Supporter
+
 	InputQueueSize int
 }
+
+// WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
+type WaitCloseMode uint8
+
+const (
+	// NoWaitOnClose disable wait close in the pipeline. Clients can still
+	// selectively enable WaitClose when connecting to the pipeline.
+	NoWaitOnClose WaitCloseMode = iota
+
+	// WaitOnPipelineClose applies WaitClose to the pipeline itself, waiting for outputs
+	// to ACK any outstanding events. This is independent of Clients asking for
+	// ACK and/or WaitClose. Clients can still optionally configure WaitClose themselves.
+	WaitOnPipelineClose
+
+	// WaitOnPipelineCloseThenForce is identical to WaitOnPipelineClose, but it also force closes
+	// the queue after the timeout, dropping in-flight data and unprocessed acknowledgements.
+	// This is useful when we know terminating the process won't free the memory for us, such as
+	// when running in an otel receiver.
+	WaitOnPipelineCloseThenForce
+)
 
 // outputController is the interface between the Pipeline and the output,
 // which may be either the legacy Beats output pipeline (under the process
@@ -129,6 +154,8 @@ func New(
 		observer:   nilObserver,
 		processors: settings.Processors,
 	}
+
+	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
@@ -199,7 +226,7 @@ func (p *Pipeline) Disconnect(ctx context.Context) error {
 		log.Debug("close pipeline")
 
 		// Note: active clients are not closed / disconnected.
-		p.outputController.waitClose(ctx, false)
+		p.outputController.waitClose(ctx, p.forceCloseQueue)
 
 		p.observer.cleanup()
 	})
