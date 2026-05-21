@@ -145,6 +145,7 @@ steps:
 
   - group: "Packaging"
     key: "xpack-dockerlogbeat-packaging"
+    if: build.pull_request.id != null
 
     steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux"
