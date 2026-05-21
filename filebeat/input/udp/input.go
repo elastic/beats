@@ -106,6 +106,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 
 	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
+<<<<<<< HEAD:filebeat/input/udp/input.go
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Meta: mapstr.M{
@@ -121,6 +122,27 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 					"address": metadata.RemoteAddr.String(),
 				},
 			}
+=======
+		now := time.Now()
+		metrics.EventReceived(len(data), now)
+		// On Windows the conn returns a nil RemoteAddr for truncated
+		// datagrams (WSAEMSGSIZE); calling .String() on it would
+		// panic and kill the input. See #50718.
+		remoteAddr := ""
+		if metadata.RemoteAddr != nil {
+			remoteAddr = metadata.RemoteAddr.String()
+		}
+		logger.Debugw(
+			"Data received",
+			"bytes", len(data),
+			"remote_address", remoteAddr,
+			"truncated", metadata.Truncated)
+
+		evtChan <- netinput.DataMetadata{
+			Data:      data,
+			Metadata:  metadata,
+			Timestamp: now,
+>>>>>>> 134e3deef (filebeat: nil-check UDP RemoteAddr before formatting in debug log (#50770)):filebeat/input/net/udp/input.go
 		}
 
 		publisher.Publish(evt)
