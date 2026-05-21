@@ -104,7 +104,9 @@ func TestPipelineWaitCloseThenForce(t *testing.T) {
 		WaitClose:     time.Millisecond,
 	}
 	pipeline := makePipeline(t, settings, mockQueue)
-	require.NoError(t, pipeline.Disconnect(t.Context()))
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+	require.NoError(t, pipeline.Disconnect(ctx))
 	<-closed
 	<-forceClosed
 }
