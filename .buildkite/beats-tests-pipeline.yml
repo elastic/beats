@@ -109,3 +109,10 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Agentbeat"
+    if: build.pull_request.id == null
+    trigger: "beats-xpack-agentbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
