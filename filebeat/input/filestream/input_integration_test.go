@@ -476,6 +476,48 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env.waitUntilInputStops()
 }
 
+func TestFilestreamInactiveCloseReopenWithDelayedACKDefaultIdentity(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+	env.pipeline = &mockPipelineConnector{delayACK: true}
+
+	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                   id,
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "50ms",
+		"close.on_state_change.check_interval": "25ms",
+		"close.on_state_change.inactive":       "100ms",
+		"backoff.init":                         "10ms",
+		"backoff.max":                          "10ms",
+	})
+
+	firstBatch := filestreamNumberedLines("before-close", 32)
+	secondBatch := filestreamNumberedLines("after-reopen", 8)
+	env.mustWriteToFile(testlogName, []byte(strings.Join(firstBatch, "\n")+"\n"))
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+	defer func() {
+		cancelInput()
+		env.waitUntilInputStops()
+	}()
+
+	for env.pipeline.clientsCount() != 1 {
+		time.Sleep(10 * time.Millisecond)
+	}
+	env.pipeline.clients[0].waitUntilPublishingCount(t, len(firstBatch))
+	env.waitUntilHarvesterIsDone()
+
+	env.pipeline.setDelayACK(false)
+	env.mustAppendToFile(testlogName, []byte(strings.Join(secondBatch, "\n")+"\n"))
+	env.waitUntilEventCount(len(secondBatch))
+	env.waitUntilHarvesterIsDone()
+
+	messages := env.getOutputMessages()
+	requireNoMissingFilestreamMessages(t, append(firstBatch, secondBatch...), messages)
+}
+
 // test_close_inactive_file_removal from test_input.py
 func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
@@ -1439,4 +1481,42 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 
 	// Ensure all events have been ingested
 	env.waitUntilEventCount(55)
+}
+
+func filestreamNumberedLines(prefix string, count int) []string {
+	lines := make([]string, count)
+	padding := strings.Repeat("x", 64)
+	for i := range lines {
+		lines[i] = fmt.Sprintf("%s line %03d %s", prefix, i, padding)
+	}
+	return lines
+}
+
+func requireNoMissingFilestreamMessages(t *testing.T, expected, got []string) {
+	t.Helper()
+
+	seen := make(map[string]struct{}, len(got))
+	for _, msg := range got {
+		seen[msg] = struct{}{}
+	}
+
+	var missing []string
+	for _, msg := range expected {
+		if _, exists := seen[msg]; !exists {
+			missing = append(missing, msg)
+		}
+	}
+
+	if len(missing) > 0 {
+		sampleSize := min(len(missing), 5)
+		require.Failf(
+			t,
+			"filestream lost messages after inactive close/reopen",
+			"lost=%d delivered=%d expected=%d first_missing=%v",
+			len(missing),
+			len(got),
+			len(expected),
+			missing[:sampleSize],
+		)
+	}
 }

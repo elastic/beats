@@ -586,6 +586,7 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
+	delayACK   bool
 	closed     atomic.Bool
 	// publishingStarted is set the first time PublishAll is called. It must
 	// be readable without holding mtx because PublishAll keeps mtx while
@@ -634,9 +635,21 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	for _, event := range events {
 		c.ackHandler.AddEvent(event, true)
 	}
+	if c.delayACK {
+		return
+	}
 	c.ackHandler.ACKEvents(len(events))
 
 	c.published = append(c.published, events...)
+}
+
+func (c *mockClient) waitUntilPublishingCount(t *testing.T, count int) {
+	t.Helper()
+	require.Eventuallyf(t, func() bool {
+		c.mtx.Lock()
+		defer c.mtx.Unlock()
+		return len(c.publishing) == count
+	}, 2*time.Minute, 10*time.Millisecond, "unexpected number of publishing events")
 }
 
 func (c *mockClient) waitUntilPublishingHasStarted() {
@@ -661,6 +674,7 @@ func (c *mockClient) Close() error {
 // mockPipelineConnector mocks the PipelineConnector interface
 type mockPipelineConnector struct {
 	blocking bool
+	delayACK bool
 	clients  []*mockClient
 	mtx      sync.Mutex
 }
@@ -688,7 +702,7 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	c := newMockClient(pc.blocking, config)
+	c := newMockClient(pc.blocking, pc.delayACK, config)
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
@@ -706,11 +720,12 @@ func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
 	return err
 }
 
-func newMockClient(blocking bool, config beat.ClientConfig) *mockClient {
+func newMockClient(blocking, delayACK bool, config beat.ClientConfig) *mockClient {
 	done := make(chan struct{})
 	return &mockClient{
 		done:       done,
 		ackHandler: newMockACKHandler(done, blocking, config),
+		delayACK:   delayACK,
 	}
 }
 
@@ -752,4 +767,11 @@ func (pc *mockPipelineConnector) invertBlocking() {
 	defer pc.mtx.Unlock()
 
 	pc.blocking = !pc.blocking
+}
+
+func (pc *mockPipelineConnector) setDelayACK(delay bool) {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.delayACK = delay
 }
