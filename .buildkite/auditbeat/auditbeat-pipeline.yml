@@ -403,7 +403,7 @@ steps:
 
   - group: "Packaging"
     key: "auditbeat-packaging"
-
+    if: build.pull_request.id != null
     steps:
       - label: ":ubuntu: Auditbeat: Packaging Linux"
         key: "auditbeat-package-linux-x86"

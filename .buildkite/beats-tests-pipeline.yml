@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+steps:
+
+  - label: "Triggering Build for Auditbeat"
+    trigger: "auditbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Heartbeat"
+    trigger: "heartbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Filebeat"
+    trigger: "filebeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/filebeat"
+    trigger: "beats-xpack-filebeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/dockerlogbeat"
+    trigger: "beats-xpack-dockerlogbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Metricbeat"
+    trigger: "beats-metricbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/metricbeat"
+    trigger: "beats-xpack-metricbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/osquerybeat"
+    trigger: "beats-xpack-osquerybeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/winlogbeat"
+    trigger: "beats-xpack-winlogbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Deploy/K8S"
+    trigger: "deploy-k8s"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Libbeat"
+    trigger: "beats-libbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/libbeat"
+    trigger: "beats-xpack-libbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/otel"
+    trigger: "beats-xpack-otel"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/auditbeat"
+    trigger: "beats-xpack-auditbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/heartbeat"
+    trigger: "beats-xpack-heartbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for x-pack/packetbeat"
+    trigger: "beats-xpack-packetbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Winlogbeat"
+    trigger: "beats-winlogbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Packetbeat"
+    trigger: "beats-packetbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Agentbeat"
+    if: build.pull_request.id == null
+    trigger: "beats-xpack-agentbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"

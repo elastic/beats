@@ -474,6 +474,7 @@ steps:
 
   - group: "Packaging"
     key: "x-pack-filebeat-packaging"
+    if: build.pull_request.id != null
 
     steps:
       - label: ":linux: x-pack/filebeat: Packaging Linux"

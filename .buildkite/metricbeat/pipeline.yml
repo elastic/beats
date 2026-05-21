@@ -401,6 +401,7 @@ steps:
 
   - group: "Packaging"
     key: "metricbeat-packaging"
+    if: build.pull_request.id != null
     steps:
       - label: ":ubuntu: Metricbeat: Packaging Linux"
         key: "packaging-linux"
