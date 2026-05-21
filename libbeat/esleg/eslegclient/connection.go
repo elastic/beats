@@ -30,17 +30,16 @@ import (
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/version"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/testing"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -144,11 +143,7 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 
 	// fall back to a default if nothing has configured the user-agent field
 	if s.UserAgent == "" {
-		beatname := "Libbeat"
-		if s.Beatname != "" {
-			beatname = s.Beatname
-		}
-		s.UserAgent = useragent.UserAgent(beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
+		s.UserAgent = beat.UserAgent()
 	}
 
 	// Default the product origin header to beats if it wasn't already set.

@@ -51,7 +51,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
@@ -62,7 +61,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/mito/lib"
@@ -78,10 +76,6 @@ const (
 	// exposed to the CEL program.
 	root = "state"
 )
-
-// The Filebeat user-agent is provided to the program as useragent. If a request
-// is not given a user-agent string, this user agent is added to the request.
-var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
@@ -1265,7 +1259,9 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	c.Transport = userAgentDecorator{
-		UserAgent: userAgent,
+		// The Filebeat user-agent is provided to the program as useragent. If a request
+		// is not given a user-agent string, this user agent is added to the request.
+		UserAgent: beat.UserAgent(),
 		Transport: c.Transport,
 	}
 
@@ -1532,7 +1528,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			return m
 		}),
 		lib.Globals(map[string]interface{}{
-			"useragent":            userAgent,
+			"useragent":            beat.UserAgent(),
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
 		}),
