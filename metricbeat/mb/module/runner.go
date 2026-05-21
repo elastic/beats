@@ -92,8 +92,8 @@ func (mr *runner) Start() {
 func (mr *runner) Stop() {
 	mr.stopOnce.Do(func() {
 		close(mr.done)
-		mr.client.Close()
 		mr.wg.Wait()
+		mr.client.Close()
 		moduleList.Remove(mr.mod.Name())
 	})
 }
