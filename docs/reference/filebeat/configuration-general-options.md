@@ -171,7 +171,7 @@ filebeat.registry.bbolt.retention.interval: 0
 
 How long Filebeat waits on shutdown for the publisher to finish sending events before Filebeat shuts down.
 
-By default, this option is disabled, and Filebeat does not wait for the publisher to finish sending events before shutting down. This means that any events sent to the output, but not acknowledged before Filebeat shuts down, are sent again when you restart Filebeat. For more details about how this works, see [How does Filebeat ensure at-least-once delivery?](/reference/filebeat/how-filebeat-works.md#at-least-once-delivery).
+By default, it waits for 1s. Any events sent to the output, but not acknowledged before Filebeat shuts down, are sent again when you restart Filebeat. For more details about how this works, see [How does Filebeat ensure at-least-once delivery?](/reference/filebeat/how-filebeat-works.md#at-least-once-delivery).
 
 You can configure the `shutdown_timeout` option to specify the maximum amount of time that Filebeat waits for the publisher to finish sending events before shutting down. If all events are acknowledged before `shutdown_timeout` is reached, Filebeat will shut down.
 

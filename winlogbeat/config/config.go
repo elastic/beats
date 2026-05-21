@@ -32,8 +32,9 @@ const (
 )
 
 var DefaultSettings = WinlogbeatConfig{
-	RegistryFile:  DefaultRegistryFile,
-	RegistryFlush: 5 * time.Second,
+	RegistryFile:    DefaultRegistryFile,
+	RegistryFlush:   5 * time.Second,
+	ShutdownTimeout: 1 * time.Second,
 }
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.

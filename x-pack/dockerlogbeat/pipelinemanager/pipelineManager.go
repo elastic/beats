@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/gohugoio/hashstructure"
 
@@ -27,6 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var pipelineShutdownTimeout = 10 * time.Second
 
 // containerConfig is the config.C unpacking type
 type containerConfig struct {
@@ -219,14 +222,6 @@ func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConf
 	return pipeline, nil
 }
 
-// getClient gets a pipeline client based on a file handle
-func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) {
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-	cli, exists := pm.clients[file]
-	return cli, exists
-}
-
 func (pm *PipelineManager) getLogger(info logger.Info) (logger.Logger, bool) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
@@ -246,7 +241,11 @@ func (pm *PipelineManager) removePipelineIfNeeded(hash uint64) {
 		//pipelines must be closed after clients
 		//Just do this here, since the caller doesn't know if we need to close the libbeat pipeline
 		pm.Logger.Debugf("Pipeline closing from removePipelineIfNeeded")
-		err := pipeline.Disconnect(context.Background())
+
+		// we wait 10s for pipeline to fully shutdown
+		ctx, cancel := context.WithTimeout(context.Background(), pipelineShutdownTimeout)
+		defer cancel()
+		err := pipeline.Disconnect(ctx)
 		if err != nil {
 			pm.Logger.Errorf("Error closing pipeline: %s", err)
 		}

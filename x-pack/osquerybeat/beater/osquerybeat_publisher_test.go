@@ -50,6 +50,7 @@ func TestOsquerybeatClose_ClosesPublisher(t *testing.T) {
 		cancel: func() {
 			cancelCalled = true
 		},
+		pipeline: makeTestPipeline(t),
 	}
 
 	bt.close()

@@ -61,14 +61,12 @@ winlogbeat.registry_flush: 5s
 
 ### `shutdown_timeout` [_shutdown_timeout]
 
-The amount of time to wait for all events to be published when shutting down. By default there is no shutdown timeout so Winlogbeat will stop without waiting. When you restart it will resume from the last successfully published event in each event log.
-
-In some use cases you do want to wait for the publishing queue to drain before exiting and that’s when you would use this option.
+The amount of time to wait for all events to be published when shutting down. By default, it waits for 1s. When you restart it will resume from the last successfully published event in each event log.
 
 Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
 
 ```yaml
-winlogbeat.shutdown_timeout: 30s
+winlogbeat.shutdown_timeout: 1s
 ```
 
 

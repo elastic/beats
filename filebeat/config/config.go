@@ -66,7 +66,7 @@ var DefaultConfig = Config{
 		Backend:       "memlog",
 		Bbolt:         bboltst.DefaultConfig(),
 	},
-	ShutdownTimeout:    0,
+	ShutdownTimeout:    1 * time.Second,
 	OverwritePipelines: false,
 }
 

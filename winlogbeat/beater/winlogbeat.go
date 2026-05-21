@@ -190,13 +190,9 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 	wg.Wait()
 	defer eb.checkpoint.Shutdown()
 
-	if eb.config.ShutdownTimeout > 0 {
-		eb.log.Infof("Shutdown will wait max %v for the remaining %v events to publish.",
-			eb.config.ShutdownTimeout, acker.Active())
-		ctx, cancel := context.WithTimeout(context.Background(), eb.config.ShutdownTimeout)
-		defer cancel()
-		acker.Wait(ctx)
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), eb.config.ShutdownTimeout)
+	defer cancel()
+	eb.pipeline.Disconnect(ctx)
 
 	return nil
 }
