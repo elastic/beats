@@ -67,7 +67,7 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.5.0
 	github.com/elastic/go-structform v0.0.12
 	github.com/elastic/go-sysinfo v1.15.3
-	github.com/elastic/go-ucfg v0.8.8
+	github.com/elastic/go-ucfg v0.9.1
 	github.com/elastic/gosigar v0.14.4
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fearful-symmetry/gorapl v0.0.4
@@ -98,7 +98,7 @@ require (
 	github.com/josephspurrier/goversioninfo v1.5.0
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/lib/pq v1.10.9
-	github.com/magefile/mage v1.15.0
+	github.com/magefile/mage v1.17.2
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/miekg/dns v1.1.72
 	github.com/osquery/osquery-go v0.0.0-20260226222546-0cc22f415e57
@@ -172,7 +172,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.9.0
 	github.com/elastic/elastic-agent-autodiscover v0.10.3-0.20260423154939-e990715f9426
-	github.com/elastic/elastic-agent-libs v0.40.0
+	github.com/elastic/elastic-agent-libs v0.43.0
 	github.com/elastic/elastic-agent-system-metrics v0.14.3
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/elastic/go-freelru v0.16.0
