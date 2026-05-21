@@ -71,10 +71,11 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		// disconnect pipeline
-		ctx, ctxCancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
-		defer ctxCancel()
-		defer pipeline.Disconnect(ctx)
+		defer func() {
+			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+			defer cancel()
+			pipeline.Disconnect(ctx)
+		}()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
