@@ -33,10 +33,7 @@ import (
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-var (
-	ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
-	ErrHarvesterLimitReached   = errors.New("harvester limit reached")
-)
+var ErrHarvesterAlreadyRunning = errors.New("harvester is already running for file")
 
 type permanentHarvesterError struct {
 	err error
@@ -74,7 +71,7 @@ func newReaderGroup() *readerGroup {
 }
 
 // newContext creates a new context, cancel function and associates it with the given id within
-// the reader group. Using the cancel function does not remvoe the association.
+// the reader group. Using the cancel function does not remove the association.
 // An error is returned if the id is already associated with a context. The cancel
 // function is nil in that case and must not be called.
 //
@@ -179,13 +176,11 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
 	if fn == nil {
 		return
 	}
+
 	if err := hg.tg.Go(fn); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester for %s with task group already closed",
@@ -198,10 +193,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
-	sourceName := hg.identifier.ID(src)
-
-	ctx.Logger = ctx.Logger.With("source_file", sourceName)
-	ctx.Logger.Debug("Restarting harvester for file")
+	ctx.Logger.Debugf("Restarting harvester for %s", src)
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
@@ -230,7 +222,7 @@ func startHarvester(
 		// until a slot is available. Without this early check, repeated file events
 		// would spawn goroutines that wait on the semaphore only to discover (after
 		// acquiring it) that a harvester is already running, causing a goroutine leak.
-		ctx.Logger.Debug("Harvester already running")
+		ctx.Logger.Debugf("Harvester already running for %s", srcID)
 		return nil
 	}
 
@@ -250,6 +242,9 @@ func startHarvester(
 				)
 			}
 		}()
+
+		// We clone the logger here where we need it to avoid redundant copies that increase memory pressure.
+		ctx.Logger = ctx.Logger.With("source_file", srcID)
 
 		if restart {
 			// stop previous harvester

@@ -39,6 +39,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
+const unlimited = 0
+
 // Sample texts are from http://www.columbia.edu/~kermit/utf8.html
 type lineTestCase struct {
 	encoding       string

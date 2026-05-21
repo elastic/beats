@@ -356,7 +356,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			p.onFSEvent(loggerWithEvent(p.logger, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
+			p.onFSEvent(loggerWithEvent(p.logger, fe), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -378,8 +378,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
-	log = log.With("source_file", event.SrcID)
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
