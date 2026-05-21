@@ -27,6 +27,7 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -83,6 +84,8 @@ type fileProspector struct {
 	takeOver              loginp.TakeOverConfig
 	filestreamIdentifiers map[string]fileIdentifier
 	logIdentifiers        map[string]file.StateIdentifier
+	shortFingerprints     *shortFingerprintIndex
+	growingFingerprint    bool
 }
 
 func (p *fileProspector) previousID(name string, fd loginp.FileDescriptor, v loginp.TakeOverState) string {
@@ -233,7 +236,7 @@ func (p *fileProspector) Init(
 	if identifierName != fingerprintName {
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 	} else {
-		p.logger.Debug("trying to migrate file identity to fingerprint")
+		p.logger.Debugf("trying to migrate file identity to %s", identifierName)
 		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
@@ -380,15 +383,37 @@ func (p *fileProspector) onFSEvent(
 ) {
 
 	log = log.With("source_file", event.SrcID)
+
+	// TODO(AndersonQ): improve the split between loginp.OpRename and
+	//  loginp.OpCreate, loginp.OpWrite.
+
+	// For growing fingerprint mode, handle prefix matching and migration.
+	// Skip for OpRename: handleGrowingFingerprintLookup assumes event.SrcID is
+	// the current identity — its KeyExists fast path returns true for the old key
+	// and skips migration. OpRename migration is handled in the OpRename case below.
+	if p.growingFingerprint && event.Op != loginp.OpRename {
+		src = p.handleGrowingFingerprintLookup(log, event, src, updater)
+	}
+
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
 		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
 
-			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
+			err := updater.UpdateMetadata(src, fileMeta{
+				Source:             event.NewPath,
+				IdentifierName:     p.identifier.Name(),
+				FingerprintGrowing: event.Descriptor.FingerprintGrowing,
+			})
 			if err != nil {
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+			}
+
+			// Only growing entries participate in prefix-matching. Final
+			// SHA-256 entries (Growing=false) don't need to be in the index.
+			if event.Descriptor.FingerprintGrowing {
+				p.shortFingerprints.Add(event.SrcID, event.Descriptor.Fingerprint, event.NewPath)
 			}
 
 		case loginp.OpWrite:
@@ -406,6 +431,10 @@ func (p *fileProspector) onFSEvent(
 			return
 		}
 
+		// Note: In growing fingerprint mode, migration updates the key in-place.
+		// The harvester manager tracks by resource pointer, so if a harvester
+		// is already running on this resource (even with old key), it will
+		// be detected as "Harvester already running".
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
@@ -417,15 +446,50 @@ func (p *fileProspector) onFSEvent(
 		}
 		group.Restart(ctx, src)
 
+		// Remove stale short fingerprint entry by source path.
+		// We can't use event.SrcID because truncation changes the fingerprint,
+		// so the SrcID is based on the truncated content, not the old fingerprint.
+		p.shortFingerprints.RemoveBySource(event.NewPath)
+
 	case loginp.OpDelete:
 		log.Debugf("File %s has been removed", event.OldPath)
 
 		p.onRemove(log, event, src, updater, group)
+		p.shortFingerprints.Remove(event.SrcID)
 
 	case loginp.OpRename:
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 
+		// For growing fingerprint mode: if the fingerprint grew during the rename,
+		// migrate the registry key BEFORE onRename. We use event.OldPath for
+		// the prefix lookup because shortFingerprintEntries still has the old
+		// source path at this point.
+		// Migration must happen first so onRename's UpdateMetadata finds the
+		// entry under the new key (which uses the new fingerprint from src).
+		if p.growingFingerprint {
+			oldKey, found := p.findGrowingFingerprintMatch(
+				updater,
+				event.Descriptor.Fingerprint,
+				event.Descriptor.GrowingFingerprint,
+				event.OldPath)
+			if found {
+				newKey, err := p.migrateGrowingFingerprint(updater, oldKey, src, event)
+				if err != nil {
+					log.Errorf("failed to migrate growing fingerprint on rename: %v", err)
+				} else {
+					p.shortFingerprints.Remove(oldKey)
+					if event.Descriptor.FingerprintGrowing {
+						p.shortFingerprints.Add(newKey, event.Descriptor.Fingerprint, event.NewPath)
+					}
+				}
+			}
+		}
+
 		p.onRename(log, ctx, event, src, updater, group)
+
+		// Update source path for non-migrated short fingerprint entries
+		// (e.g., rename without fingerprint growth, or non-growing identities).
+		p.shortFingerprints.UpdateSource(event.SrcID, event.NewPath)
 
 	default:
 		log.Errorf("Unknown operation '%s'", event.Op.String())
@@ -531,4 +595,195 @@ func (t *ignoreInactiveType) Unpack(v string) error {
 	}
 	*t = val
 	return nil
+}
+
+// handleGrowingFingerprintLookup handles the lookup logic for growing-mode
+// fingerprint events. Two transitions are reconciled here: continued growth
+// below threshold (raw-hex extending) and the one-time threshold crossing
+// where the primary Fingerprint flips from raw-hex to SHA-256 (with the
+// descriptor carrying GrowingFingerprint as the bridging value).
+func (p *fileProspector) handleGrowingFingerprintLookup(
+	log *logp.Logger,
+	event loginp.FSEvent,
+	src loginp.Source,
+	updater loginp.StateMetadataUpdater) loginp.Source {
+	// Empty fingerprint - nothing to match
+	if event.Descriptor.Fingerprint == "" {
+		return src
+	}
+
+	// Fast path: if the current fingerprint key already exists, no migration
+	// needed.
+	if updater.KeyExists(event.SrcID) {
+		return src
+	}
+
+	// Try to find a prefix match across both Fingerprint and GrowingFingerprint.
+	oldKey, found := p.findGrowingFingerprintMatch(
+		updater, event.Descriptor.Fingerprint, event.Descriptor.GrowingFingerprint, event.NewPath)
+	if !found {
+		return src
+	}
+
+	// Found a prefix match - migrate to new key
+	if _, err := p.migrateGrowingFingerprint(updater, oldKey, src, event); err != nil {
+		log.Errorf("failed to migrate growing fingerprint: %v", err)
+		// Continue anyway - might create duplicate, but better than losing data
+		return src
+	}
+
+	// Update short fingerprint set after successful migration.
+	p.shortFingerprints.Remove(oldKey)
+	// Only re-add the new entry to the growing index if the migrated value
+	// is itself still in the growing phase. After a threshold-crossing
+	// migration the new key holds a final SHA-256 (Growing=false) and must
+	// not participate in prefix matching.
+	if event.Descriptor.FingerprintGrowing {
+		p.shortFingerprints.Add(event.SrcID, event.Descriptor.Fingerprint, event.NewPath)
+	}
+
+	// Migration succeeded - the old harvester is still running and will continue
+	// reading. We should NOT start a new harvester.
+	return src
+}
+
+// buildShortFingerprintSet scans the store once and populates shortFingerprints
+// with entries whose persisted state has Growing == true (their Fingerprint is
+// a raw-hex value still below the configured threshold).
+// Entries whose state has Growing == false (default, including legacy entries
+// written before this field existed) are skipped: they are final SHA-256 keys
+// and don't participate in prefix matching.
+func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUpdater) {
+	p.shortFingerprints = newShortFingerprintSet()
+
+	updater.IterateOnPrefix(func(key string, meta interface{}) bool {
+		// key format: filestream::INPUT_ID::fingerprint::FINGERPRINT
+		// Find '::' separator positions manually to avoid wrong match
+		// if the input ID contains "fingerprint::".
+		var seps [4]int
+		nSeps := 0
+		for i := 0; i < len(key)-1; i++ {
+			if key[i] == ':' && key[i+1] == ':' {
+				seps[nSeps] = i
+				nSeps++
+				if nSeps == 4 {
+					break
+				}
+				i++
+			}
+		}
+		if nSeps != 3 {
+			return true // malformed key
+		}
+
+		identityName := key[seps[1]+2 : seps[2]]
+		if identityName != fingerprintName {
+			return true // not a fingerprint entry
+		}
+
+		// Convert with typeconv: when entries are freshly written in this
+		// process the cursorMeta is a fileMeta value, but when loaded from
+		// the persistent registry on startup it is a map[string]interface{}
+		// produced by JSON decoding into interface{}. typeconv.Convert
+		// handles both cases.
+		var fm fileMeta
+		if err := typeconv.Convert(&fm, meta); err != nil {
+			p.logger.Debugf("buildShortFingerprintSet: skipping %s: cannot convert meta to fileMeta: %v",
+				key, err)
+			return true
+		}
+		if !fm.FingerprintGrowing {
+			return true // final SHA-256 entry; not eligible for prefix matching
+		}
+
+		fingerprint := key[seps[2]+2:]
+		p.shortFingerprints.Add(key, fingerprint, fm.Source)
+		return true
+	})
+}
+
+// findGrowingFingerprintMatch looks for an existing registry entry whose
+// raw-hex fingerprint is a prefix of the current scan's raw-hex fingerprint.
+// Two prefix candidates are tried, in order:
+//
+//  1. currentFingerprint — handles same-format growth (raw-hex extending
+//     while the file is still below threshold).
+//  2. currentGrowingFingerprint — handles the one-time threshold-crossing
+//     scan, where the primary Fingerprint has flipped to SHA-256 but the
+//     descriptor also carries the raw-hex GrowingFingerprint for matching.
+//
+// Only entries in shortFingerprintIndex (those whose state has Growing == true)
+// are searched, making this O(K) where K is the number of still-growing entries.
+func (p *fileProspector) findGrowingFingerprintMatch(
+	updater loginp.StateMetadataUpdater,
+	currentFingerprint string,
+	currentGrowingFingerprint string,
+	currentPath string,
+) (oldKey string, found bool) {
+	if currentFingerprint == "" && currentGrowingFingerprint == "" {
+		return "", false
+	}
+
+	// Build short fingerprint set on first use
+	if p.shortFingerprints == nil {
+		p.buildShortFingerprintSet(updater)
+	}
+
+	if currentFingerprint != "" {
+		if key, _, ok := p.shortFingerprints.FindPrefixMatch(currentFingerprint, currentPath); ok {
+			return key, true
+		}
+	}
+
+	if currentGrowingFingerprint != "" {
+		if key, _, ok := p.shortFingerprints.FindPrefixMatch(currentGrowingFingerprint, currentPath); ok {
+			return key, true
+		}
+	}
+
+	return "", false
+}
+
+// migrateGrowingFingerprint migrates a registry entry from an old key to a new key.
+// This is called when a file's fingerprint has grown.
+// Returns the new key on success.
+func (p *fileProspector) migrateGrowingFingerprint(
+	updater loginp.StateMetadataUpdater,
+	oldKey string,
+	newSrc loginp.Source,
+	event loginp.FSEvent,
+) (string, error) {
+	// Carry the current descriptor's FingerprintGrowing flag into the migrated
+	// meta.
+	// On fingerprint growth bellow threshold the fingerprint is the raw-hex and
+	// FingerprintGrowing=true.
+	// On a threshold-crossing migration the new value is the final SHA-256
+	// (FingerprintGrowing=false). FingerprintGrowing=false is not serialized,
+	// making the migrated entry indistinguishable from a static fingerprint
+	// entry on disk.
+	newMeta := fileMeta{
+		Source:             event.NewPath,
+		IdentifierName:     fingerprintName,
+		FingerprintGrowing: event.Descriptor.FingerprintGrowing,
+	}
+
+	// Find the boundary between input ID and identity name. We can't
+	// use strings.Split on fingerprintName because the input ID may
+	// also contain "fingerprint" as a substring (e.g. an input id of
+	// "my-fingerprint-input"). The full delimiter "::fingerprint::"
+	// is unambiguous: it can only mark the start of the identity
+	// segment, since "::" cannot legally appear inside an input ID.
+	delim := identitySep + fingerprintName + identitySep
+	idx := strings.LastIndex(oldKey, delim)
+	if idx < 0 {
+		return "", fmt.Errorf("invalid old key format: %s", oldKey)
+	}
+	newKey := oldKey[:idx+len(identitySep)] + newSrc.Name()
+
+	err := updater.UpdateKey(oldKey, newKey, newMeta)
+	if err != nil {
+		return "", fmt.Errorf("failed to migrate growing fingerprint from %s to %s: %w", oldKey, newKey, err)
+	}
+
+	return newKey, nil
 }
