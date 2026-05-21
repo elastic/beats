@@ -1978,6 +1978,9 @@ metricbeat.modules:
 #      match_short_id: false
 #      cleanup_timeout: 60
 #      labels.dedot: true
+#      wait_for_metadata: false
+#      wait_for_metadata_timeout: 30s
+#      wait_for_metadata_retry_period: 10s
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"

@@ -26,6 +26,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -69,8 +71,13 @@ type addDockerMetadata struct {
 	pidFields       []string      // Field names that contain PIDs.
 	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
 	dedot           bool          // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	dockerAvailable atomic.Bool   // If Docker exists in env, then it is set to true
+	closeRetry      chan struct{} // Channel to signal the connection retry goroutine to stop
+	waitRetry       sync.WaitGroup
 	cgreader        processors.CGReader
+	retryPeriod     time.Duration // Period to wait when reconnecting to Docker
+	retryTimeout    time.Duration // Maximum time to wait when connecting to Docker, 0 means wait forever.
+	retryIsBlocking bool          // If true block while trying to connect to Docker
 }
 
 const selector = "add_docker_metadata"
@@ -86,24 +93,9 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
-	var dockerAvailable bool
-
-	watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
-	if err != nil {
-		dockerAvailable = false
-		log.Debugf("%v: docker environment not detected: %+v", processorName, err)
-	} else {
-		dockerAvailable = true
-		log.Debugf("%v: docker environment detected", processorName)
-		if err = watcher.Start(); err != nil {
-			// mark dockerAvailable as false because watcher creation failed
-			dockerAvailable = false
-			log.Infof("unable to start the docker watcher: %v", err)
-		}
-	}
-
 	// Use extract_field processor to get container ID from source file path.
 	var sourceProcessor beat.Processor
+	var err error
 	if config.MatchSource {
 		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",
@@ -124,16 +116,113 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
 	}
 
-	return &addDockerMetadata{
+	dm := addDockerMetadata{
 		log:             log,
-		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
 		dedot:           config.DeDot,
-		dockerAvailable: dockerAvailable,
 		cgreader:        reader,
-	}, nil
+		closeRetry:      make(chan struct{}),
+		retryPeriod:     config.WaitMetadataRetry,
+		retryTimeout:    config.WaitMetadataTimeout,
+		retryIsBlocking: config.WaitMetadata,
+	}
+
+	constructAndStartWatcher := func() docker.Watcher {
+		watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
+		if err != nil {
+			log.Debugf("%v: docker environment not detected: %+v", processorName, err)
+			return nil
+		} else {
+			log.Debugf("%v: docker environment detected", processorName)
+			if err = watcher.Start(); err != nil {
+				// mark dockerAvailable as false because watcher creation failed
+				log.Debugf("unable to start the docker watcher: %v", err)
+				return nil
+			}
+		}
+
+		log.Info("successfully connected to docker")
+		return watcher
+	}
+
+	connectToDocker := func() bool {
+		watcher := constructAndStartWatcher()
+		if watcher == nil {
+			return false
+		}
+
+		dm.watcher = watcher
+		dm.dockerAvailable.Store(true)
+		return true
+	}
+
+	if !connectToDocker() {
+		if dm.retryIsBlocking {
+			connected, _ := dm.retryConnectToDocker(connectToDocker)
+			if !connected {
+				if err := processors.Close(dm.sourceProcessor); err != nil {
+					dm.log.Debugf("error closing source processor after docker connection timeout: %v", err)
+				}
+				return nil, fmt.Errorf("%s: could not connect to docker", processorName)
+			}
+		} else {
+			// If docker is not available, try reconnecting asynchronously until the timeout expires.
+			dm.startDockerConnectionRetry(connectToDocker)
+		}
+	}
+
+	return &dm, nil
+}
+
+func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bool) {
+	d.waitRetry.Go(func() {
+		defer d.log.Debug("retry goroutine done")
+		connected, stopped := d.retryConnectToDocker(connectToDocker)
+		if !connected && !stopped {
+			d.log.Warnf(
+				"stopped retrying docker connection before metadata became available; wait_for_metadata_timeout=%s elapsed",
+				d.retryTimeout,
+			)
+		}
+	})
+}
+
+func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool) (connected bool, stopped bool) {
+	blockingStr := "non-blocking"
+	if d.retryIsBlocking {
+		blockingStr = "blocking"
+	}
+
+	d.log.Warnf(
+		"could not connect to docker, retrying (%s) connection attempts every %s "+
+			"with a maximum wait of %s (0 means indefinitely)",
+		blockingStr,
+		d.retryPeriod,
+		d.retryTimeout,
+	)
+
+	ticker := time.NewTicker(d.retryPeriod)
+	defer ticker.Stop()
+
+	var timeoutC <-chan time.Time
+	if d.retryTimeout > 0 {
+		timeoutC = time.Tick(d.retryTimeout)
+	}
+
+	for {
+		select {
+		case <-ticker.C:
+			if connectToDocker() {
+				return true, false
+			}
+		case <-timeoutC:
+			return false, false
+		case <-d.closeRetry:
+			return false, true
+		}
+	}
 }
 
 func lazyCgroupCacheInit(d *addDockerMetadata) {
@@ -148,7 +237,7 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 }
 
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
-	if !d.dockerAvailable {
+	if !d.dockerAvailable.Load() {
 		return event, nil
 	}
 	var cid string
@@ -233,10 +322,17 @@ func (d *addDockerMetadata) Close() error {
 	if d.cgroups != nil {
 		d.cgroups.StopJanitor()
 	}
-	// Watcher can be nil if processor failed on creation
-	if d.watcher != nil {
+
+	// Stop the retry goroutine, this is safe to call even if
+	// the goroutine is not running
+	close(d.closeRetry)
+	d.waitRetry.Wait()
+
+	// If the watcher is running, stop it.
+	if d.dockerAvailable.Load() {
 		d.watcher.Stop()
 	}
+
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
 		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
