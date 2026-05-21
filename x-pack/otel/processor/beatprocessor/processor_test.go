@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	_ "github.com/elastic/beats/v7/libbeat/cmd/instance" // needed for registering processors
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -93,7 +94,7 @@ func TestCreateProcessor(t *testing.T) {
 			"unknown_processor": map[string]any{},
 		}, testLogger())
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "invalid processor name 'unknown_processor'")
+		assert.Contains(t, err.Error(), "failed to get constructor for 'unknown_processor'")
 	})
 
 	t.Run("valid add_cloud_metadata processor config returns processor", func(t *testing.T) {
