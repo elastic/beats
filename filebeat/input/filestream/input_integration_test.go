@@ -477,7 +477,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env.waitUntilInputStops()
 }
 
-func TestFilestreamInactiveCloseReopenWithDelayedACKDefaultIdentity(t *testing.T) {
+func TestFilestreamDoesNotSkipEventsOnInactiveCloseReopen(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	env.pipeline = &mockPipelineConnector{delayACK: true}
 	env.workingDir = fs.TempDir(t, "..", "..", "build", "integration-tests")
@@ -500,7 +500,7 @@ func TestFilestreamInactiveCloseReopenWithDelayedACKDefaultIdentity(t *testing.T
 	secondBatch := numberedLines("after-reopen", lenSecondBatch)
 	env.mustWriteToFile(testlogName, []byte(firstBatch))
 
-	ctx, cancelInput := context.WithCancel(context.Background())
+	ctx, cancelInput := context.WithCancel(t.Context())
 	env.startInput(ctx, id, inp)
 	defer func() {
 		cancelInput()
@@ -1497,7 +1497,7 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 
 // numberedLines returns a string with count numbered lines,
 // each line is 50 bytes long. The lines are prefixed with prefix,
-// if the prefix plus the counter is larger then no padding is added.
+// if the prefix plus the counter is larger, then no padding is added.
 func numberedLines(prefix string, count int) string {
 	paddingLen := 50 - (len(prefix) + 6)
 	padding := ""

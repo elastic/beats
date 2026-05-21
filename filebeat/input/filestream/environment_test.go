@@ -586,7 +586,7 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
-	delayACK   bool
+	skipACK    bool
 	closed     atomic.Bool
 	// publishingStarted is set the first time PublishAll is called. It must
 	// be readable without holding mtx because PublishAll keeps mtx while
@@ -635,7 +635,7 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	for _, event := range events {
 		c.ackHandler.AddEvent(event, true)
 	}
-	if c.delayACK {
+	if c.skipACK {
 		return
 	}
 	c.ackHandler.ACKEvents(len(events))
@@ -652,7 +652,7 @@ func (c *mockClient) waitUntilPublishingCount(t *testing.T, count int, timeout t
 			collect.Errorf("expecting %d published events, got %d", want, got)
 		}
 
-	}, timeout, time.Millisecond)
+	}, timeout, time.Millisecond, "did not find the expected number of events")
 }
 
 func (c *mockClient) waitUntilPublishingHasStarted() {
@@ -728,7 +728,7 @@ func newMockClient(blocking, delayACK bool, config beat.ClientConfig) *mockClien
 	return &mockClient{
 		done:       done,
 		ackHandler: newMockACKHandler(done, blocking, config),
-		delayACK:   delayACK,
+		skipACK:    delayACK,
 	}
 }
 
