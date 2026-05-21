@@ -1,0 +1,8 @@
+kind: bug-fix
+
+summary: Stop the filestream task group cleanly when the stop timeout elapses, fixing a goroutine leak on busy hosts.
+
+component: filebeat
+
+# pr: https://github.com/owner/repo/1234
+# issue: https://github.com/owner/repo/1234

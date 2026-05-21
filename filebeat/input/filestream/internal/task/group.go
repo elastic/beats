@@ -126,10 +126,16 @@ func (g *Group) Go(fn func(context.Context) error) error {
 func (g *Group) Stop() error {
 	g.cancelCtx()
 
+	// done has buffer 1 (or close) so the wait-goroutine always finishes
+	// even if the timeout branch is selected below. With an unbuffered
+	// channel and no reader, `done <- struct{}{}` blocks forever when
+	// stopTimeout elapses before all tasks finish, leaking the goroutine
+	// (and through it, references to g.wg, g.ctx, and anything the
+	// in-flight tasks close over).
 	done := make(chan struct{})
 	go func() {
 		g.wg.Wait()
-		done <- struct{}{}
+		close(done)
 	}()
 
 	timeout, cancel := context.WithTimeout(context.Background(), g.stopTimeout)

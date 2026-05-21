@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand/v2"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -355,5 +356,66 @@ func TestGroup_Stop(t *testing.T) {
 
 		err = g.Stop()
 		assert.NoError(t, err)
+	})
+
+	// Regression test for elastic/beats#50824. Before the fix, Stop's
+	// internal wait-goroutine sent to an unbuffered `done` channel. When
+	// the stop timeout fired first, the Stop call returned but the
+	// wait-goroutine remained blocked on its send forever, leaking the
+	// goroutine (and a reference to the task group) on every busy-host
+	// shutdown.
+	//
+	// The test triggers the timeout branch, then releases the in-flight
+	// task and confirms that the wait-goroutine count returns to its
+	// pre-Stop value within a short window. With the buggy code that
+	// count stays elevated indefinitely.
+	t.Run("does not leak the wait-goroutine after timeout", func(t *testing.T) {
+		// Quiet down any unrelated transient goroutines before measuring.
+		runtime.GC()
+		time.Sleep(20 * time.Millisecond)
+		runtime.GC()
+
+		baseline := runtime.NumGoroutine()
+
+		g := NewGroup(50, time.Millisecond, noopLogger{}, "")
+
+		// Block the task so Stop must hit the timeout branch.
+		taskRunning := make(chan struct{})
+		taskRelease := make(chan struct{})
+		err := g.Go(func(_ context.Context) error {
+			close(taskRunning)
+			<-taskRelease
+			return nil
+		})
+		require.NoError(t, err)
+		<-taskRunning
+
+		// Take the timeout path.
+		err = g.Stop()
+		require.Error(t, err)
+		assert.ErrorIs(t, err, context.DeadlineExceeded)
+
+		// Release the in-flight task so g.wg.Wait() in the Stop
+		// wait-goroutine can return. With the unbuffered-send bug the
+		// wait-goroutine then tries `done <- struct{}{}` with no reader
+		// and blocks forever. With close(done) it just calls close and
+		// exits.
+		close(taskRelease)
+
+		// Allow the in-flight task goroutine and the Stop wait-goroutine
+		// to unwind. Use a poll loop instead of a fixed sleep so the test
+		// is robust against slow CI.
+		deadline := time.Now().Add(2 * time.Second)
+		var leaked int
+		for time.Now().Before(deadline) {
+			runtime.GC()
+			leaked = runtime.NumGoroutine() - baseline
+			if leaked <= 0 {
+				break
+			}
+			time.Sleep(20 * time.Millisecond)
+		}
+		assert.LessOrEqual(t, leaked, 0,
+			"task group leaked %d goroutine(s) after Stop timeout", leaked)
 	})
 }
