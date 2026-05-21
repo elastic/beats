@@ -161,14 +161,11 @@ func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, er
 
 	beatEvent.Meta = mapstr.M{}
 
-	beatEvent.Fields = logRecord.Body().Map().AsRaw()
+	beatEvent.Fields = otelmap.ToMapstr(logRecord.Body().Map())
 
 	return beatEvent, nil
 }
 
 func packBeatEventIntoOTelLogRecord(beatEvent *beat.Event, logRecord plog.LogRecord) error {
-	beatEvent.Fields = beatEvent.Fields.Clone()
-	otelmap.ConvertNonPrimitive((map[string]any)(beatEvent.Fields))
-	err := logRecord.Body().Map().FromRaw(beatEvent.Fields)
-	return err
+	return otelmap.FromMapstr(logRecord.Body().Map(), beatEvent.Fields)
 }
