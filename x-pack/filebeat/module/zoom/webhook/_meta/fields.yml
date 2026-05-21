@@ -551,15 +551,15 @@
     - name: registrant.purchasing_time_frame
       type: keyword
       description: >
-        Choosen purchase timeframe of the user registering to a meeting or webinar
+        Chosen purchase timeframe of the user registering to a meeting or webinar
     - name: registrant.role_in_purchase_process
       type: keyword
       description: >
-        Choosen role in a purchase process related to the user registering to a meeting or webinar
+        Chosen role in a purchase process related to the user registering to a meeting or webinar
     - name: registrant.no_of_employees
       type: keyword
       description: >
-        Number of employees choosen by the user registering to a meeting or webinar
+        Number of employees chosen by the user registering to a meeting or webinar
     - name: registrant.comments
       type: keyword
       description: >
