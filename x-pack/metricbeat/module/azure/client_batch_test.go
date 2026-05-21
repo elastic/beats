@@ -113,7 +113,7 @@ func TestGetMetricsInBatch(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)
-		results := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr)
+		results := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr, nil)
 		assert.Empty(t, results, "expected no metric values when QueryResources returns an error")
 		m.AssertExpectations(t)
 	})
@@ -183,7 +183,7 @@ func TestGetMetricsInBatch(t *testing.T) {
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 
-		metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr)
+		metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, &mr, nil)
 		require.Len(t, metricValues, 1, "expected exactly one metric value group")
 		require.Len(t, metricValues[0].Values, 1, "expected exactly one value in the metric group")
 
