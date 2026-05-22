@@ -44,6 +44,7 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{
@@ -108,6 +109,7 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{
@@ -132,6 +134,7 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"auditbeat": map[string]any{
 				"modules": []map[string]any{
 					{

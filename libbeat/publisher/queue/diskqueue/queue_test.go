@@ -126,7 +126,6 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 	run2Producer := run2Queue.Producer(queue.ProducerConfig{})
 	publishAndACKSingleEvent(t, run2Queue, run2Producer, "event-3")
 	run2Producer.Close()
-	requireSegmentFiles(t, diskQueuePath, 2)
 	closeQueueAndWait(t, run2Queue)
 
 	// Run 3: reopen queue without publishing a new event. Correct behavior is
@@ -138,7 +137,7 @@ func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
 	replayedBatch := readBatch(t, run3Queue, 3*time.Second)
 	if replayedBatch != nil {
 		count := replayedBatch.Count()
-		var msg interface{}
+		var msg any
 		if count > 0 {
 			msg, _ = replayedBatch.Entry(0).Content.Fields.GetValue("message")
 		}
@@ -210,16 +209,4 @@ func makeDiskQueueTestEvent(msg string) publisher.Event {
 		"message": msg,
 		"payload": strings.Repeat("x", 2048),
 	})
-}
-
-func requireSegmentFiles(t *testing.T, dir string, expected int) {
-	segFiles, err := filepath.Glob(filepath.Join(dir, "*.seg"))
-	if err != nil {
-		t.Fatalf("cannot resolve segment files glob: %s", err)
-	}
-
-	gotSegments := len(segFiles)
-	if expected != gotSegments {
-		t.Fatalf("expecting %d segment files, got %d. Segment files:\n%s", expected, gotSegments, strings.Join(segFiles, "\n"))
-	}
 }

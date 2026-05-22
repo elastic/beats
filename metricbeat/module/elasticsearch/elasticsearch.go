@@ -161,7 +161,7 @@ func getNodeName(http *helper.HTTP, uri string) (string, error) {
 }
 
 func getMasterName(http *helper.HTTP, uri string) (string, error) {
-	content, err := fetchPath(http, uri, "_cluster/state/master_node", "local=true")
+	content, err := fetchPath(http, uri, "_cluster/state/master_node", "")
 	if err != nil {
 		return "", err
 	}
@@ -240,18 +240,16 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 
 // GetClusterState returns cluster state information.
 func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filterPaths []string) (mapstr.M, error) {
-	queryParams := []string{"local=true"}
+	queryString := ""
 	clusterStateURI := "_cluster/state"
+
 	if len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
 	if len(filterPaths) > 0 {
-		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
-		queryParams = append(queryParams, filterPathQueryParam)
+		queryString = "filter_path=" + strings.Join(filterPaths, ",")
 	}
-
-	queryString := strings.Join(queryParams, "&")
 
 	content, err := fetchPath(http, resetURI, clusterStateURI, queryString)
 	if err != nil {
