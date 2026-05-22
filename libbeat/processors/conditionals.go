@@ -22,8 +22,11 @@ import (
 	"fmt"
 	"strings"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -88,6 +91,33 @@ func (r *WhenProcessor) SetPaths(paths *paths.Path) error {
 
 func (r *WhenProcessor) String() string {
 	return fmt.Sprintf("%v, condition=%v", r.p.String(), r.condition.String())
+}
+
+// RunPdata implements the pdata fast path. The condition is evaluated via
+// PdataValuesMap, which reads directly from the pcommon.Map without converting
+// to mapstr.M. If the condition passes and the inner processor also supports
+// RunPdata, the inner processor's RunPdata is called — no round-trip allocation.
+// If the inner processor only supports the legacy Run path, a round-trip
+// conversion is performed only when the condition passes (saving the conversion
+// on the fast-reject path).
+func (r *WhenProcessor) RunPdata(body pcommon.Map) error {
+	if !r.condition.Check(otelmap.PdataValuesMap{M: body}) {
+		return nil
+	}
+	if pp, ok := r.p.(interface{ RunPdata(pcommon.Map) error }); ok {
+		return pp.RunPdata(body)
+	}
+	// Inner processor is legacy-only: round-trip through mapstr.M.
+	event := &beat.Event{Fields: otelmap.ToMapstr(body)}
+	out, err := r.p.Run(event)
+	if err != nil {
+		return err
+	}
+	if out == nil {
+		return nil
+	}
+	body.Clear()
+	return otelmap.FromMapstr(body, out.Fields)
 }
 
 // ClosingWhenProcessor is the same as WhenProcessor but has the Close

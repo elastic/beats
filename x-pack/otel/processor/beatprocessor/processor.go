@@ -23,14 +23,24 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/processor"
 	"go.uber.org/zap"
 )
 
+// PdataProcessor is an optional interface that beat processors can implement to
+// operate directly on a pcommon.Map, avoiding the round-trip conversion to/from
+// mapstr.M. When all processors in a chain implement this interface, the
+// beatprocessor skips the unpack/pack steps entirely.
+type PdataProcessor interface {
+	RunPdata(body pcommon.Map) error
+}
+
 type beatProcessor struct {
-	logger     *zap.Logger
-	processors []beat.Processor
+	logger      *zap.Logger
+	processors  []beat.Processor
+	pdataProcs  []PdataProcessor // non-nil only when all processors implement PdataProcessor
 }
 
 func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, error) {
@@ -55,7 +65,22 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 		}
 	}
 
+	bp.pdataProcs = buildPdataProcs(bp.processors)
 	return bp, nil
+}
+
+// buildPdataProcs returns a typed slice for the fast path if every processor
+// implements PdataProcessor, or nil if any does not.
+func buildPdataProcs(procs []beat.Processor) []PdataProcessor {
+	out := make([]PdataProcessor, 0, len(procs))
+	for _, p := range procs {
+		pp, ok := p.(PdataProcessor)
+		if !ok {
+			return nil
+		}
+		out = append(out, pp)
+	}
+	return out
 }
 
 // createProcessor creates a Beat processor using the provided configuration.
@@ -129,30 +154,45 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 	for _, resourceLogs := range logs.ResourceLogs().All() {
 		for _, scopeLogs := range resourceLogs.ScopeLogs().All() {
 			for _, logRecord := range scopeLogs.LogRecords().All() {
-				beatEvent, err := unpackBeatEventFromOTelLogRecord(logRecord)
-				if err != nil {
-					p.logger.Error("error converting OTel log to Beat event", zap.Error(err))
-					continue
-				}
-
-				for _, processor := range p.processors {
-					processedEvent, err := processor.Run(beatEvent)
-					if err != nil {
-						p.logger.Error("error processing Beat event", zap.Error(err))
-						continue
-					}
-					beatEvent = processedEvent
-				}
-
-				packingError := packBeatEventIntoOTelLogRecord(beatEvent, logRecord)
-				if packingError != nil {
-					p.logger.Error("error converting processed Beat event to OTel log record", zap.Error(packingError))
+				if p.pdataProcs != nil {
+					p.consumeLogRecordPdata(logRecord.Body().Map(), p.pdataProcs)
+				} else {
+					p.consumeLogRecordLegacy(logRecord)
 				}
 			}
 		}
 	}
 
 	return logs, nil
+}
+
+func (p *beatProcessor) consumeLogRecordPdata(body pcommon.Map, procs []PdataProcessor) {
+	for _, proc := range procs {
+		if err := proc.RunPdata(body); err != nil {
+			p.logger.Error("error processing Beat event", zap.Error(err))
+		}
+	}
+}
+
+func (p *beatProcessor) consumeLogRecordLegacy(logRecord plog.LogRecord) {
+	beatEvent, err := unpackBeatEventFromOTelLogRecord(logRecord)
+	if err != nil {
+		p.logger.Error("error converting OTel log to Beat event", zap.Error(err))
+		return
+	}
+
+	for _, proc := range p.processors {
+		processedEvent, err := proc.Run(beatEvent)
+		if err != nil {
+			p.logger.Error("error processing Beat event", zap.Error(err))
+			continue
+		}
+		beatEvent = processedEvent
+	}
+
+	if err := packBeatEventIntoOTelLogRecord(beatEvent, logRecord); err != nil {
+		p.logger.Error("error converting processed Beat event to OTel log record", zap.Error(err))
+	}
 }
 
 func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, error) {

@@ -10,6 +10,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -225,6 +228,177 @@ func TestCreateProcessor(t *testing.T) {
 		}, testLogger())
 		require.Error(t, err)
 	})
+}
+
+// TestConsumeLogsPdataPath verifies that each supported processor either takes
+// the pdata fast path (implements PdataProcessor) or falls back to the legacy
+// path, and that ConsumeLogs produces the expected result in both cases.
+func TestConsumeLogsPdataPath(t *testing.T) {
+	type processorCase struct {
+		name        string
+		config      map[string]any
+		wantPdata   bool
+		checkResult func(t *testing.T, body map[string]any)
+	}
+
+	cases := []processorCase{
+		{
+			name: "add_host_metadata",
+			config: map[string]any{
+				"add_host_metadata": map[string]any{},
+			},
+			wantPdata: true,
+			checkResult: func(t *testing.T, body map[string]any) {
+				host, ok := body["host"]
+				require.True(t, ok, "expected 'host' key in body after add_host_metadata")
+				hostMap, ok := host.(map[string]any)
+				require.True(t, ok, "expected 'host' to be a map")
+				assert.NotEmpty(t, hostMap["name"], "expected host.name to be set")
+			},
+		},
+		{
+			name: "add_cloud_metadata",
+			config: map[string]any{
+				"add_cloud_metadata": map[string]any{},
+			},
+			wantPdata: true,
+			checkResult: func(t *testing.T, body map[string]any) {
+				assert.Equal(t, "test message", body["message"], "original message must be preserved")
+			},
+		},
+		{
+			name: "add_docker_metadata",
+			config: map[string]any{
+				"add_docker_metadata": map[string]any{},
+			},
+			wantPdata: true,
+			checkResult: func(t *testing.T, body map[string]any) {
+				assert.Equal(t, "test message", body["message"], "original message must be preserved")
+			},
+		},
+		{
+			name: "add_kubernetes_metadata",
+			config: map[string]any{
+				"add_kubernetes_metadata": map[string]any{},
+			},
+			wantPdata: true,
+			checkResult: func(t *testing.T, body map[string]any) {
+				assert.Equal(t, "test message", body["message"], "original message must be preserved")
+			},
+		},
+		{
+			name: "add_fields",
+			config: map[string]any{
+				"add_fields": map[string]any{
+					"target": "",
+					"fields": map[string]any{"env": "test"},
+				},
+			},
+			wantPdata: true,
+			checkResult: func(t *testing.T, body map[string]any) {
+				assert.Equal(t, "test", body["env"], "add_fields should add the 'env' field")
+			},
+		},
+		{
+			name: "add_host_metadata with when condition (pdata inner)",
+			config: map[string]any{
+				"add_host_metadata": map[string]any{
+					"when": map[string]any{
+						"equals": map[string]any{"tagged": "yes"},
+					},
+				},
+			},
+			wantPdata: true,
+			checkResult: func(t *testing.T, body map[string]any) {
+				// condition not met — host should not be enriched
+				_, hasHost := body["host"]
+				assert.False(t, hasHost, "host should not be added when condition is not met")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			proc, err := createProcessor(tc.config, testLogger())
+			require.NoError(t, err)
+			require.NotNil(t, proc)
+
+			_, isPdata := proc.(PdataProcessor)
+			assert.Equal(t, tc.wantPdata, isPdata, "PdataProcessor implementation mismatch")
+
+			logs := plog.NewLogs()
+			lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+			lr.Body().SetEmptyMap()
+			lr.Body().Map().PutStr("message", "test message")
+
+			bp := &beatProcessor{logger: zap.NewNop(), processors: []beat.Processor{proc}}
+			out, err := bp.ConsumeLogs(context.Background(), logs)
+			require.NoError(t, err)
+
+			body := out.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0).Body().Map().AsRaw()
+			tc.checkResult(t, body)
+		})
+	}
+}
+
+// TestWhenProcessorRunPdataLegacyFallback verifies the round-trip path in
+// WhenProcessor.RunPdata when the inner processor does not implement
+// PdataProcessor. Fields added by the inner processor must appear and fields it
+// removes must be absent after the call.
+func TestWhenProcessorRunPdataLegacyFallback(t *testing.T) {
+	addField := mockProcessor{
+		runFunc: func(event *beat.Event) (*beat.Event, error) {
+			event.Fields["injected"] = "yes"
+			delete(event.Fields, "remove_me")
+			return event, nil
+		},
+	}
+
+	// Wrap with a when condition that passes when present=="yes".
+	cfg, err := config.NewConfigFrom(map[string]any{
+		"when": map[string]any{"equals": map[string]any{"present": "yes"}},
+	})
+	require.NoError(t, err)
+	proc, err := processors.NewConditional(func(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
+		return addField, nil
+	})(cfg, testLogger())
+	require.NoError(t, err)
+
+	pp, ok := proc.(PdataProcessor)
+	require.True(t, ok, "WhenProcessor must implement PdataProcessor")
+
+	body := plog.NewLogs().ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().
+		LogRecords().AppendEmpty().Body().SetEmptyMap()
+	body.PutStr("present", "yes")
+	body.PutStr("remove_me", "gone")
+
+	require.NoError(t, pp.RunPdata(body))
+
+	raw := body.AsRaw()
+	assert.Equal(t, "yes", raw["injected"], "injected field must be present")
+	_, hasRemoved := raw["remove_me"]
+	assert.False(t, hasRemoved, "field deleted by inner processor must be absent")
+}
+
+// TestAddFieldsRunPdataNoOverwrite verifies that RunPdata with overwrite=false
+// does not clobber existing values.
+func TestAddFieldsRunPdataNoOverwrite(t *testing.T) {
+	proc := addfields.NewAddFields(mapstr.M{"env": "prod", "new": "val"}, false, false)
+
+	pp, ok := proc.(PdataProcessor)
+	require.True(t, ok, "addFields must implement PdataProcessor")
+
+	body := plog.NewLogs().ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().
+		LogRecords().AppendEmpty().Body().SetEmptyMap()
+	body.PutStr("env", "staging") // pre-existing, must not be overwritten
+	body.PutStr("message", "hello")
+
+	require.NoError(t, pp.RunPdata(body))
+
+	raw := body.AsRaw()
+	assert.Equal(t, "staging", raw["env"], "existing value must not be overwritten")
+	assert.Equal(t, "val", raw["new"], "new field must be added")
+	assert.Equal(t, "hello", raw["message"], "unrelated field must be preserved")
 }
 
 func testLogger() *logp.Logger {
