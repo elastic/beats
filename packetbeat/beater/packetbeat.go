@@ -236,12 +236,12 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 	}
 
 	defer func() {
-		runner.Stop()
-
 		// Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
 		ctx, cancel := context.WithTimeout(context.Background(), pipelinePublishTimeout)
 		defer cancel()
 		pb.pipeline.Disconnect(ctx)
+
+		runner.Stop()
 	}()
 
 	for {
