@@ -240,6 +240,8 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/mitchellh/gox v1.0.1
+	github.com/moby/moby/api v1.54.1
+	github.com/moby/moby/client v0.4.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.14.1
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
