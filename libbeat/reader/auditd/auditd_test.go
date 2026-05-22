@@ -144,6 +144,24 @@ func TestParser(t *testing.T) {
 			},
 			wantEpoch: 1226874073,
 		},
+		"syscall record with node prefix": {
+			// When name_format=hostname is set in /etc/audit/auditd.conf, userspace
+			// auditd prepends "node=<hostname> " to every log line. auparse does not
+			// handle this prefix (it reads from the kernel directly), so the parser
+			// must strip it and expose the value as auditd.log.node.
+			cfg:  DefaultConfig(),
+			line: []byte(`node=myhost.example.com type=SYSCALL msg=audit(1485893834.891:18877199): arch=c000003e syscall=59 success=yes exit=0 a0=7f095d0a4b88 items=2 ppid=1234 pid=5678 auid=1000 uid=0 gid=0 comm="ls" exe="/bin/ls" key=(null)`),
+			wantLogFields: map[string]string{
+				"record_type": "SYSCALL",
+				"sequence":    "18877199",
+				"node":        "myhost.example.com",
+				"arch":        "x86_64",
+				"syscall":     "execve",
+				"pid":         "5678",
+				"comm":        "ls",
+			},
+			wantEpoch: 1485893834,
+		},
 		"data error still sets record_type and sequence": {
 			// EXECVE with argc=3 but a1 missing causes Data() to error;
 			// record_type and sequence from the parsed header must survive.

@@ -21,6 +21,7 @@ package auditd
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -60,7 +61,8 @@ func (p *Parser) Next() (reader.Message, error) {
 		return msg, err
 	}
 
-	auditMsg, err := auparse.ParseLogLine(string(msg.Content))
+	line, nodeVal := stripNodePrefix(string(msg.Content))
+	auditMsg, err := auparse.ParseLogLine(line)
 	if err != nil {
 		if p.cfg.LogErrors {
 			p.logger.Errorf("error parsing auditd log line: %v", err)
@@ -84,6 +86,9 @@ func (p *Parser) Next() (reader.Message, error) {
 	for k, v := range data {
 		logFields[k] = v
 	}
+	if nodeVal != "" {
+		logFields["node"] = nodeVal
+	}
 	// auparse normalises res/success → result, but the ingest pipeline
 	// renames auditd.log.res to event.outcome, so restore the alias.
 	if result, ok := logFields["result"]; ok {
@@ -103,4 +108,20 @@ func (p *Parser) Next() (reader.Message, error) {
 	msg.AddFields(mapstr.M{"auditd": mapstr.M{"log": logFields}})
 
 	return msg, nil
+}
+
+// stripNodePrefix removes the "node=<value> " prefix that userspace auditd
+// prepends when name_format=hostname is set in auditd.conf. auparse.ParseLogLine
+// only handles lines that start with "type=", so the prefix must be stripped
+// before parsing. The extracted node value (empty string if absent) is returned.
+func stripNodePrefix(line string) (string, string) {
+	const prefix = "node="
+	if !strings.HasPrefix(line, prefix) {
+		return line, ""
+	}
+	i := strings.IndexByte(line, ' ')
+	if i < 0 {
+		return line, ""
+	}
+	return line[i+1:], line[len(prefix):i]
 }
