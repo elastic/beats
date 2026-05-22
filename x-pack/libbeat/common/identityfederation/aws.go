@@ -27,6 +27,10 @@ const (
 	AWSGlobalRoleARNEnvVar   = "CLOUD_CONNECTORS_GLOBAL_ROLE"
 	AWSIDTokenFileEnvVar     = "CLOUD_CONNECTORS_ID_TOKEN_FILE"
 	AWSCloudResourceIDEnvVar = "CLOUD_RESOURCE_ID"
+	// AWSIRSATokenFileEnvVar is the standard AWS SDK env var for IRSA (IAM Roles
+	// for Service Accounts) on EKS. When set, the pod authenticates via its
+	// Kubernetes service-account token rather than an OIDC JWT from the agentless controller.
+	AWSIRSATokenFileEnvVar = "AWS_WEB_IDENTITY_TOKEN_FILE"
 )
 
 const defaultIntermediateDuration = 20 * time.Minute

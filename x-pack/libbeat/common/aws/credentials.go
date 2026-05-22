@@ -189,28 +189,37 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 const defaultIntermediateDuration = 20 * time.Minute
 
 // applyIdentityFederationChain configures awsConfig with Identity Federation role-chaining
-// credentials. It reads the three required env vars set by the agentless controller and
-// builds a two-step STS chain:
+// credentials. It reads the required env vars set by the agentless controller and builds a
+// two-step STS chain. Two paths are supported:
 //
-//  1. AssumeRoleWithWebIdentity → Elastic Global Role (using the OIDC JWT from IDTokenFileEnvVar)
+// IRSA path (AWS_WEB_IDENTITY_TOKEN_FILE is set — EKS pod with IRSA):
+//  1. AssumeRole → Elastic Global Role (using IRSA pod credentials from LoadDefaultConfig)
+//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
+//
+// OIDC path (default — agentless controller with JWT token file):
+//  1. AssumeRoleWithWebIdentity → Elastic Global Role (using OIDC JWT from IDTokenFileEnvVar)
 //  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
 func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) error {
 	logger = logger.Named("applyIdentityFederationChain")
-	logger.Debug("Switching credentials provider to Identity Federation")
 
 	globalRoleARN := os.Getenv(identityfederation.AWSGlobalRoleARNEnvVar)
 	idTokenPath := os.Getenv(identityfederation.AWSIDTokenFileEnvVar)
 	cloudResourceID := os.Getenv(identityfederation.AWSCloudResourceIDEnvVar)
+	irsaTokenFile := os.Getenv(identityfederation.AWSIRSATokenFileEnvVar)
 
 	var errs []error
 	if globalRoleARN == "" {
 		errs = append(errs, errors.New("elastic global role arn is not configured"))
 	}
-	if idTokenPath == "" {
+	// idTokenPath is only required for the OIDC path; IRSA uses pod credentials instead.
+	if idTokenPath == "" && irsaTokenFile == "" {
 		errs = append(errs, errors.New("id token path is not configured"))
 	}
 	if cloudResourceID == "" {
 		errs = append(errs, errors.New("cloud resource id is not configured"))
+	}
+	if config.RoleArn == "" {
+		errs = append(errs, errors.New("role_arn is not configured"))
 	}
 	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
 	// called using credentials from another assumed role (role chaining).
@@ -221,22 +230,40 @@ func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, lo
 		return fmt.Errorf("identity federation config is invalid: %w", errors.Join(errs...))
 	}
 
-	chain := []identityfederation.AWSRoleChainingStep{
-		// Step 1: Assume the Elastic Global Role with web identity using the ID token
+	var step1 identityfederation.AWSRoleChainingStep
+	if irsaTokenFile != "" {
+		// IRSA flow: LoadDefaultConfig already loaded IRSA pod credentials via
+		// AWS_WEB_IDENTITY_TOKEN_FILE/AWS_ROLE_ARN. Use AssumeRole directly.
+		logger.Debug("Switching credentials provider to Identity Federation (IRSA)")
+		step1 = &identityfederation.AWSAssumeRoleStep{
+			RoleARN: globalRoleARN,
+			Options: func(aro *stscreds.AssumeRoleOptions) {
+				aro.Duration = defaultIntermediateDuration
+			},
+		}
+	} else {
+		// OIDC flow: assume the Elastic Global Role with web identity using the ID token
 		// provided by the agentless OIDC issuer.
-		&identityfederation.AWSWebIdentityRoleStep{
+		logger.Debug("Switching credentials provider to Identity Federation (OIDC)")
+		step1 = &identityfederation.AWSWebIdentityRoleStep{
 			RoleARN:              globalRoleARN,
 			WebIdentityTokenFile: idTokenPath,
 			Options: func(opt *stscreds.WebIdentityRoleOptions) {
 				opt.Duration = defaultIntermediateDuration
 			},
-		},
+		}
+	}
+
+	chain := []identityfederation.AWSRoleChainingStep{
+		step1,
 		// Step 2: Assume the remote role (the user's configured role), using the
 		// previously assumed Elastic Global Role credentials.
 		&identityfederation.AWSAssumeRoleStep{
 			RoleARN: config.RoleArn,
 			Options: func(aro *stscreds.AssumeRoleOptions) {
-				aro.Duration = config.AssumeRoleDuration
+				if config.AssumeRoleDuration > 0 {
+					aro.Duration = config.AssumeRoleDuration
+				}
 				if config.ExternalID != "" {
 					aro.ExternalID = awssdk.String(identityfederation.AWSFormatExternalID(cloudResourceID, config.ExternalID))
 				}
