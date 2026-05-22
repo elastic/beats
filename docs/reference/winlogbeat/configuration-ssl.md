@@ -503,11 +503,13 @@ This feature requres the `execve` system call to be enabled. If you have a custo
 
 ### `restart_on_cert_change.period` [restart_on_cert_change_period]
 
-::::{admonition} Deprecated in 9.5.0.
-:class: warning
+```{applies_to}
+stack: deprecated 9.5+
+```
 
-Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
-::::
+:::{note} 
+This setting is deprecated in 9.5.0. Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
+:::
 
 Specifies how often the files are checked for changes. Do not set the period to less than 1s because the modification time of files is often stored in seconds. Setting the period to less than 1s will result in validation error and Winlogbeat will not start. The default value is 1m.
 
