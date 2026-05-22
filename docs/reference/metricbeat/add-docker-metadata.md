@@ -44,7 +44,7 @@ processors:
       #match_source_index: 4
       #match_short_id: true
       #cleanup_timeout: 60
-      #labels.dedot: false
+      #labels.dedot: true
       # To connect to Docker over TLS you must specify a client and CA certificate.
       #ssl:
       #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -82,5 +82,5 @@ It has the following settings:
 :   (Optional) Specifies the mount point of the host’s filesystem, which can be used to monitor a host from within a container.
 
 `labels.dedot`
-:   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+:   (Optional) If set to `true`, replaces dots in labels with `_`. Defaults to `true`.
 

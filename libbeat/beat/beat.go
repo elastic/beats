@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -129,8 +130,12 @@ func (beat *Beat) GenerateUserAgent() {
 	mode := beat.userAgentMode()
 	unprivileged := beat.userAgentUnprivilegedMode()
 
+	var uaOpts []string
+	if features.IsElasticsearchStateStoreEnabled() {
+		uaOpts = append(uaOpts, "agentless")
+	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
-		mode, unprivileged, beat.Info.FIPSDistribution)
+		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
 }
 
 // BeatConfig struct contains the basic configuration of every beat
