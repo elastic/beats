@@ -19,6 +19,8 @@ package beater
 
 import (
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type signalWait struct {
@@ -78,4 +80,11 @@ func waitTimer(t *time.Timer) signaler {
 
 func waitDuration(d time.Duration) signaler {
 	return waitTimer(time.NewTimer(d))
+}
+
+func withLog(s signaler, msg string, logger *logp.Logger) signaler {
+	return func() {
+		s()
+		logger.Infof("%v", msg)
+	}
 }

@@ -30,7 +30,8 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultType = "log"
+	DefaultType            = "log"
+	DefaultShutdownTimeout = 1 * time.Second
 )
 
 type Config struct {
@@ -66,7 +67,7 @@ var DefaultConfig = Config{
 		Backend:       "memlog",
 		Bbolt:         bboltst.DefaultConfig(),
 	},
-	ShutdownTimeout:    1 * time.Second,
+	ShutdownTimeout:    DefaultShutdownTimeout,
 	OverwritePipelines: false,
 }
 
