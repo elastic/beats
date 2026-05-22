@@ -465,6 +465,10 @@ func (p *testPipeline) Connect() (beat.Client, error) {
 	return &testClient{p}, nil
 }
 
+func (p *testPipeline) Disconnect(ctx context.Context) error {
+	return nil
+}
+
 type testClient struct {
 	testPipeline *testPipeline
 }
