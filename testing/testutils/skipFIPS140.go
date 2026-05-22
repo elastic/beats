@@ -18,6 +18,7 @@
 package testutils
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -32,4 +33,5 @@ func SkipIfFIPSOnly(t *testing.T, msg string) {
 	if strings.Contains(s, "fips140=only") {
 		t.Skip("GODEBUG=fips140=only detected, skipping test:", msg)
 	}
+	fmt.Printf("GODEBUG=%s, not skipping test: %s\n", s, msg)
 }
