@@ -1460,6 +1460,163 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 	assertFingerprintMigratedToSHA256(t, tempDir, appLogRenamed)
 }
 
+// TestFilestreamEnhancedFingerprint_Gzip covers Enhanced Fingerprint on
+// GZIP-compressed files. The fingerprint is computed on DECOMPRESSED content,
+// so the threshold check is against the decompressed size, not the on-disk
+// gzip-file size.
+//
+// Two files exist from the start:
+//   - smallGz: decompressed ~250 bytes → below threshold → growing tracking
+//     (raw-hex registry key, FingerprintGrowing=true).
+//   - largeGz: decompressed ~1500 bytes → above threshold → SHA-256 tracking.
+//
+// Both must be ingested completely under growing mode.
+func TestFilestreamEnhancedFingerprint_Gzip(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	smallGzFile := filepath.Join(logDir, "small.log.gz")
+	largeGzFile := filepath.Join(logDir, "large.log.gz")
+
+	smallContent := generateLines("small gzip", 5)  // ~250 bytes decompressed
+	largeContent := generateLines("large gzip", 30) // ~1500 bytes decompressed
+
+	smallGzBytes := gziptest.Compress(t, []byte(smallContent), gziptest.CorruptNone)
+	largeGzBytes := gziptest.Compress(t, []byte(largeContent), gziptest.CorruptNone)
+
+	require.NoError(t, os.WriteFile(smallGzFile, smallGzBytes, 0o644),
+		"failed to write small gzip file")
+	require.NoError(t, os.WriteFile(largeGzFile, largeGzBytes, 0o644),
+		"failed to write large gzip file")
+
+	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.Start()
+
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// Expect 35 events: 5 (small, raw-hex growing) + 30 (large, SHA-256).
+	filebeat.WaitPublishedEvents(15*time.Second, 35)
+	// GZIP files are finite, so the harvester closes on EOF rather than
+	// backing off.
+	filebeat.WaitLogsContainsAnyOrder(
+		[]string{
+			fmt.Sprintf("EOF has been reached. Closing. Path='%s'", smallGzFile),
+			fmt.Sprintf("EOF has been reached. Closing. Path='%s'", largeGzFile)},
+		10*time.Second, "small gzip file was not fully read")
+
+	events := readOutputEvents(t, tempDir)
+	assert.Len(t, events, 35, "expected exactly 35 events (5 small + 30 large)")
+	assert.Len(t, messagesForFile(events, smallGzFile), 5,
+		"small gzip file should have 5 events")
+	assert.Len(t, messagesForFile(events, largeGzFile), 30,
+		"large gzip file should have 30 events")
+
+	filebeat.Stop()
+
+	// Registry: small gzip below threshold → raw-hex (growing) entry;
+	// large gzip above threshold → SHA-256 entry.
+	assertGrowingRegistryEntry(t, tempDir, smallGzFile)
+	assertSingleSHA256RegistryEntry(t, tempDir, largeGzFile)
+}
+
+// TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold covers
+// the edge case where a file already at threshold (SHA-256 key) is truncated
+// to below threshold with different content. The new content has a different
+// fingerprint identity (raw-hex of the new bytes), so the file is treated as
+// a brand-new file — the new content is ingested from offset 0.
+//
+// The existing TestFilestreamGrowingFingerprintTruncation covers the
+// below→below case (raw-hex → different raw-hex). This test covers the
+// above→below case (SHA-256 → raw-hex), specific to Enhanced Fingerprint.
+func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	logFile := filepath.Join(logDir, "app.log")
+
+	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.Start()
+
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// Phase 1: write large file (~1500 bytes), above threshold → SHA-256 key.
+	writeTruncatingFile(t, logFile, generateLines("large content", 30))
+	filebeat.WaitPublishedEvents(15*time.Second, 30)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFile),
+		10*time.Second, "phase 1 did not reach EOF")
+
+	// Phase 2: truncate with smaller, DIFFERENT content (~400 bytes), below
+	// threshold. The new fingerprint identity is raw-hex(new bytes), distinct
+	// from the SHA-256 key from phase 1. SameFile sees no prefix relationship
+	// → the fileWatcher treats this as a removal + creation (not OpTruncate,
+	// which only fires when SameFile matched) → the new content is ingested
+	// from offset 0 under a fresh registry entry.
+	writeTruncatingFile(t, logFile, generateLines("completely different", 8))
+
+	// Expect 30 + 8 = 38 events.
+	filebeat.WaitPublishedEvents(15*time.Second, 38)
+
+	events := readOutputEvents(t, tempDir)
+	assert.Len(t, events, 38,
+		"expected 38 events (30 large + 8 truncated); fewer means truncated content not ingested, more means re-ingestion")
+
+	// All events under the same path (single harvester rotated through
+	// truncation).
+	msgs := messagesForFile(events, logFile)
+	assert.Len(t, msgs, 38, "all events should be attributed to logFile")
+
+	// First 30 are the large content; next 8 are the post-truncation content.
+	// Spot-check that the new content's first message is present (proves the
+	// new content was ingested from offset 0).
+	var sawTruncatedFirst bool
+	for _, m := range msgs {
+		if strings.HasPrefix(m, "completely different 1") {
+			sawTruncatedFirst = true
+			break
+		}
+	}
+	assert.True(t, sawTruncatedFirst,
+		"expected the first line of the post-truncation content to appear in events")
+
+	filebeat.Stop()
+
+	// Registry shape after above→below truncation:
+	// - An active raw-hex entry exists for the file under its new (post-
+	//   truncation) identity.
+	// - The pre-truncation SHA-256 entry may still be present too
+	state := readFingerprintRegistry(t, tempDir)
+	var (
+		activeRawHex []string
+		activeSHA256 []string
+	)
+	for _, e := range state {
+		if e.source != logFile || e.removed {
+			continue
+		}
+		if len(e.fingerprint) == 64 {
+			activeSHA256 = append(activeSHA256, e.key)
+		} else {
+			activeRawHex = append(activeRawHex, e.key)
+		}
+	}
+	assert.NotEmpty(t, activeRawHex,
+		"expected at least one active raw-hex registry entry for %q (the post-truncation identity); got SHA-256=%v raw-hex=%v",
+		logFile, activeSHA256, activeRawHex)
+	assert.LessOrEqual(t, len(activeSHA256), 1,
+		"expected at most one stale SHA-256 entry (pre-truncation orphan), got %d", len(activeSHA256))
+}
+
 // fingerprintRegistryEntry holds the parts of a fingerprint registry entry
 // the Enhanced Fingerprint tests care about.
 type fingerprintRegistryEntry struct {
