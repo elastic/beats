@@ -189,17 +189,17 @@ func normalizeConfig(cfg *conf.C, c *config) error {
 
 	name := c.FileIdentity.Name()
 	if name == fingerprintName {
-		var fingerprintCfg fingerprintIdentityConfig
+		// Start from the file-identity defaults (growing=true on 9.5+) and
+		// let any explicit user setting (true/false) override.
+		fingerprintCfg := defaultFingerprintIdentityConfig()
 		if sub := c.FileIdentity.Config(); sub != nil {
 			if err := sub.Unpack(&fingerprintCfg); err != nil {
 				return fmt.Errorf("cannot read 'file_identity.fingerprint' config: %w", err)
 			}
 		}
-		// file_identity.fingerprint is the ONLY user-facing config. Set the
-		// scanner config accordingly.
-		if fingerprintCfg.Growing {
-			c.FileWatcher.Scanner.Fingerprint.Growing = true
-		}
+		// file_identity.fingerprint is the ONLY user-facing config for
+		// growing mode. Propagate to the scanner config.
+		c.FileWatcher.Scanner.Fingerprint.Growing = fingerprintCfg.Growing
 		return nil
 	}
 

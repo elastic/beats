@@ -38,42 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-// Test configuration for fingerprint file identity with small files.
-// This test documents the current behavior where files smaller than the
-// fingerprint size (default 1024 bytes) are not ingested until they grow
-// large enough.
-//
-// When growing_fingerprint is implemented and this test is updated to use it,
-// the assertions should change to verify that small files ARE ingested
-// immediately.
-var fingerprintSmallFilesCfg = `
-filebeat.inputs:
-  - type: filestream
-    id: test-fingerprint-small-files
-    enabled: true
-    paths:
-      - %s/*.log
-    prospector.scanner:
-      check_interval: 1s
-      fingerprint.enabled: true
-    file_identity.fingerprint: ~
-
-queue.mem:
-  flush.timeout: 0s
-
-path.home: %s
-
-output.file:
-  path: ${path.home}
-  filename: "output"
-  rotate_on_startup: false
-
-logging:
-  level: debug
-  metrics:
-    enabled: false
-`
-
 // enhancedFingerprintCfg is the Enhanced-Fingerprint test configuration:
 // growing enabled, default fingerprint length (1024 bytes) — so files cross
 // the threshold once they exceed 1024 bytes of decompressed content.
@@ -88,8 +52,7 @@ filebeat.inputs:
       - %s/*.log*
     prospector.scanner:
       check_interval: %s
-    file_identity.fingerprint:
-      growing: true
+    file_identity.fingerprint: ~
 
 queue.mem:
   flush.timeout: 0s
@@ -108,9 +71,10 @@ logging:
 `
 
 // staticFingerprintCfg is the same as enhancedFingerprintCfg but with growing
-// disabled. Used by the upgrade test to simulate an existing static-fingerprint
+// disabled. Used by the upgrade tests to simulate an existing static-fingerprint
 // deployment. The input id and paths match enhancedFingerprintCfg so the
 // registry built under static is reused when the user opts in to growing.
+//
 // Format args: logDir, checkInterval, tempDir.
 var staticFingerprintCfg = `
 filebeat.inputs:
@@ -121,7 +85,8 @@ filebeat.inputs:
       - %s/*.log
     prospector.scanner:
       check_interval: %s
-    file_identity.fingerprint: ~
+    file_identity.fingerprint:
+      growing: false
 
 queue.mem:
   flush.timeout: 0s
@@ -160,7 +125,7 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	file2 := filepath.Join(logDir, "file2.log")
 	file3 := filepath.Join(logDir, "file3.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(fingerprintSmallFilesCfg, logDir, tempDir))
+	filebeat.WriteConfigFile(fmt.Sprintf(staticFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting", 10*time.Second, "filestream did not start")

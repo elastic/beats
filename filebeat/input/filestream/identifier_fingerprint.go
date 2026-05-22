@@ -29,10 +29,27 @@ import (
 // fingerprint file identity. The fields are propagated to the scanner's
 // fingerprint config via normalizeConfig before the prospector is created.
 type fingerprintIdentityConfig struct {
-	// Growing opts into the growing-fingerprint mode: files smaller than the
-	// configured fingerprint size are tracked using the raw bytes available
-	// instead of being skipped as too small.
+	// Growing opts into the Enhanced Fingerprint behavior: files smaller
+	// than the configured fingerprint size (prospector.scanner.fingerprint.
+	// offset + prospector.scanner.fingerprint.length) are tracked using the
+	// raw bytes available so far, instead of being skipped as too small.
+	// Once such a file grows past the threshold it is automatically rekeyed
+	// to the same SHA-256 hex the static fingerprint produces, so existing
+	// static-fingerprint state is reused with no data duplication.
+	//
+	// Default: true (9.5+). Set to `false` to fall back to the legacy
+	// static-fingerprint behavior where small files are dropped until
+	// they reach offset+length.
 	Growing bool `config:"growing"`
+}
+
+// defaultFingerprintIdentityConfig returns the default configuration for the
+// fingerprint file identity. Growing defaults to `true` on 9.5+; and on
+// 8.19.x it defaults to `false`.
+func defaultFingerprintIdentityConfig() fingerprintIdentityConfig {
+	return fingerprintIdentityConfig{
+		Growing: true,
+	}
 }
 
 type fingerprintIdentifier struct {
@@ -44,7 +61,7 @@ func newFingerprintIdentifier(cfg *conf.C, _ *logp.Logger) (fileIdentifier, erro
 	// later in normalizeConfig and propagated to the scanner config; the
 	// identifier itself does not currently need them at runtime, but
 	// unpacking here surfaces config errors at the right point.
-	var fpCfg fingerprintIdentityConfig
+	fpCfg := defaultFingerprintIdentityConfig()
 	if cfg != nil {
 		if err := cfg.Unpack(&fpCfg); err != nil {
 			return nil, fmt.Errorf("invalid file_identity.fingerprint config: %w", err)

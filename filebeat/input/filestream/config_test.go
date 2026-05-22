@@ -229,13 +229,19 @@ func TestNormalizeConfig(t *testing.T) {
 				},
 			},
 			wantEnabled: false,
+			// growing-default applies even when fingerprint is disabled —
+			// the contradictory `enabled: false` + `file_identity:
+			// fingerprint` config is caught by checkConfigCompatibility at
+			// prospector creation time.
+			wantGrowing: true,
 		},
 		{
-			name: "fingerprint identity keeps default scanner fingerprint",
+			name: "fingerprint identity defaults to growing enabled on 9.5+",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"fingerprint": nil},
 			},
 			wantEnabled: true,
+			wantGrowing: true,
 		},
 		{
 			name: "non-fingerprint inode_marker disables scanner fingerprint by default",
@@ -272,15 +278,15 @@ func TestNormalizeConfig(t *testing.T) {
 			wantGrowing: false,
 		},
 		{
-			name: "file_identity.fingerprint with no growing field defaults to false",
+			name: "file_identity.fingerprint with no growing field defaults to true (9.5+)",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"fingerprint": nil},
 			},
 			wantEnabled: true,
-			wantGrowing: false,
+			wantGrowing: true,
 		},
 		{
-			name: "scanner-level growing in YAML is silently ignored",
+			name: "scanner-level growing in YAML is silently ignored; default still applies",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"fingerprint": nil},
 				"prospector": map[string]interface{}{
@@ -290,7 +296,9 @@ func TestNormalizeConfig(t *testing.T) {
 				},
 			},
 			wantEnabled: true,
-			wantGrowing: false,
+			// 9.5+ default for file_identity.fingerprint.growing is true; the
+			// scanner-level YAML key remains silently ignored either way.
+			wantGrowing: true,
 		},
 	}
 
