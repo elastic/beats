@@ -24,11 +24,46 @@ import (
 )
 
 func TestRound(t *testing.T) {
-	assert.EqualValues(t, 0.5, Round(0.5, DefaultDecimalPlacesCount))
-	assert.EqualValues(t, 0.5, Round(0.50004, DefaultDecimalPlacesCount))
-	assert.EqualValues(t, 0.5001, Round(0.50005, DefaultDecimalPlacesCount))
+	testCases := []struct {
+		name     string
+		input    float64
+		expected float64
+	}{
+		{
+			name:     "keep exact half",
+			input:    0.5,
+			expected: 0.5,
+		},
+		{
+			name:     "truncate below midpoint",
+			input:    0.50004,
+			expected: 0.5,
+		},
+		{
+			name:     "round up at midpoint",
+			input:    0.50005,
+			expected: 0.5001,
+		},
+		{
+			name:     "keep exact integer plus half",
+			input:    1234.5,
+			expected: 1234.5,
+		},
+		{
+			name:     "truncate larger number below midpoint",
+			input:    1234.50004,
+			expected: 1234.5,
+		},
+		{
+			name:     "round up larger number at midpoint",
+			input:    1234.50005,
+			expected: 1234.5001,
+		},
+	}
 
-	assert.EqualValues(t, 1234.5, Round(1234.5, DefaultDecimalPlacesCount))
-	assert.EqualValues(t, 1234.5, Round(1234.50004, DefaultDecimalPlacesCount))
-	assert.EqualValues(t, 1234.5001, Round(1234.50005, DefaultDecimalPlacesCount))
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.InDelta(t, tc.expected, Round(tc.input, DefaultDecimalPlacesCount), 1e-10, "rounding %v should be %v", tc.input, tc.expected)
+		})
+	}
 }
