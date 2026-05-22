@@ -9,11 +9,11 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: security
+kind: enhancement
 
 # REQUIRED for all kinds
 # Change summary; a 80ish characters long description of the change.
-summary: Update github.com/Azure/go-ntlmssp to v0.1.1
+summary:  Introduce `wait_for_metadata` and `wait_for_metadata_timeout` and `wait_for_metadata_retry_period` settings to `add_kubernetes_metadata` processor to allow waiting for Kubernetes API availability before processing events. 
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
@@ -28,7 +28,7 @@ summary: Update github.com/Azure/go-ntlmssp to v0.1.1
 
 # REQUIRED for all kinds
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: "all"
+component: all
 
 # AUTOMATED
 # OPTIONAL to manually add other PR URLs

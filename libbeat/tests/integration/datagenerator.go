@@ -37,6 +37,19 @@ import (
 // Prefix is added instead of current time if it exists.
 // If no prefix is passed, each line is 50 bytes long
 func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...string) {
+	_ = writeLogFileWithStartCounter(t, path, 0, count, append, prefix...)
+}
+
+// WriteLogFileFrom writes count lines to path, starting from startAt.
+// It returns the next counter to use in subsequent calls.
+// Each line contains the current time (RFC3339) and a counter.
+// Prefix is added instead of current time if it exists.
+// If no prefix is passed, each line is 50 bytes long.
+func WriteLogFileFrom(t *testing.T, path string, startAt, count int, append bool, prefix ...string) int {
+	return writeLogFileWithStartCounter(t, path, startAt, count, append, prefix...)
+}
+
+func writeLogFileWithStartCounter(t *testing.T, path string, startAt, count int, append bool, prefix ...string) int {
 	var file *os.File
 	var err error
 	if !append {
@@ -78,10 +91,13 @@ func WriteLogFile(t *testing.T, path string, count int, append bool, prefix ...s
 	}
 
 	for i := range count {
-		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
+		counter := startAt + i
+		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, counter); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
 		}
 	}
+
+	return startAt + count
 }
 
 // WriteDockerJSONLog writes Docker JSON log lines to path.
