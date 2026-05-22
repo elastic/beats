@@ -34,7 +34,6 @@ const (
 
 func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
 	osstate := fi.GetOSState()
-<<<<<<< HEAD
 	_, err := fields.Put(deviceIDKey, strconv.FormatUint(osstate.Device, 10))
 	if err != nil {
 		return fmt.Errorf("failed to set %q: %w", deviceIDKey, err)
@@ -44,25 +43,5 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M) error {
 		return fmt.Errorf("failed to set %q: %w", inodeKey, err)
 	}
 
-=======
-	fileMap[deviceIDKey] = strconv.FormatUint(osstate.Device, 10)
-	fileMap[inodeKey] = osstate.InodeString()
-
-	if includeOwner {
-		o, err := user.LookupId(strconv.FormatUint(osstate.UID, 10))
-		if err != nil {
-			return fmt.Errorf("failed to lookup uid %d: %w", osstate.UID, err)
-		}
-		fileMap[ownerKey] = o.Username
-	}
-
-	if includeGroup {
-		g, err := user.LookupGroupId(strconv.FormatUint(osstate.GID, 10))
-		if err != nil {
-			return fmt.Errorf("failed to lookup gid %d: %w", osstate.GID, err)
-		}
-		fileMap[groupKey] = g.Name
-	}
->>>>>>> 51e732166 (Update go to 1.26.3 (#50644))
 	return nil
 }
