@@ -10,6 +10,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.uber.org/zap"
@@ -111,4 +115,163 @@ func benchmarkBeatProcessor(b *testing.B, logCount int, tc testCase) {
 type testCase struct {
 	name      string
 	logRecord func() plog.LogRecord
+}
+
+// legacyOnlyProcessor wraps a beat.Processor and intentionally does NOT implement
+// PdataProcessor, forcing the legacy mapstr.M conversion path in benchmarks.
+type legacyOnlyProcessor struct {
+	beat.Processor
+}
+
+// BenchmarkWhenCondition measures the overhead of the conditional (when:) wrapper
+// for three scenarios:
+//   - condition false: event is skipped entirely (no processor runs)
+//   - condition true, pdata inner: condition passes and inner RunPdata is called
+//   - condition true, legacy inner: condition passes but inner only supports Run (round-trip)
+func BenchmarkWhenCondition(b *testing.B) {
+	logger := logp.NewNopLogger()
+
+	hostProc, err := add_host_metadata.New(config.NewConfig(), logger)
+	if err != nil {
+		b.Fatalf("failed to create add_host_metadata: %v", err)
+	}
+
+	// Wrap add_host_metadata with a when.contains.tags condition.
+	wrappedPdata, err := processors.NewConditional(func(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
+		return hostProc, nil
+	})(mustConfig(b, map[string]any{
+		"when": map[string]any{"contains": map[string]any{"tags": "forwarded"}},
+	}), logger)
+	if err != nil {
+		b.Fatalf("failed to wrap processor: %v", err)
+	}
+
+	// Same condition but inner is legacy-only.
+	wrappedLegacy, err := processors.NewConditional(func(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
+		return legacyOnlyProcessor{hostProc}, nil
+	})(mustConfig(b, map[string]any{
+		"when": map[string]any{"contains": map[string]any{"tags": "forwarded"}},
+	}), logger)
+	if err != nil {
+		b.Fatalf("failed to wrap legacy processor: %v", err)
+	}
+
+	makeLogs := func(withTag bool) plog.Logs {
+		logs := plog.NewLogs()
+		lr := logs.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().LogRecords().AppendEmpty()
+		lr.Body().SetEmptyMap()
+		lr.Body().Map().PutStr("message", "test log message")
+		if withTag {
+			s := lr.Body().Map().PutEmptySlice("tags")
+			s.AppendEmpty().SetStr("forwarded")
+		}
+		return logs
+	}
+
+	logsMatch := makeLogs(true)
+	logsNoMatch := makeLogs(false)
+
+	b.Run("condition_false", func(b *testing.B) {
+		bp := &beatProcessor{logger: zap.NewNop(), processors: []beat.Processor{wrappedPdata}}
+		for b.Loop() {
+			_, _ = bp.ConsumeLogs(context.Background(), logsNoMatch)
+		}
+	})
+
+	b.Run("condition_true/pdata_inner", func(b *testing.B) {
+		bp := &beatProcessor{logger: zap.NewNop(), processors: []beat.Processor{wrappedPdata}}
+		for b.Loop() {
+			_, _ = bp.ConsumeLogs(context.Background(), logsMatch)
+		}
+	})
+
+	b.Run("condition_true/legacy_inner", func(b *testing.B) {
+		bp := &beatProcessor{logger: zap.NewNop(), processors: []beat.Processor{wrappedLegacy}}
+		for b.Loop() {
+			_, _ = bp.ConsumeLogs(context.Background(), logsMatch)
+		}
+	})
+}
+
+func mustConfig(b *testing.B, m map[string]any) *config.C {
+	b.Helper()
+	cfg, err := config.NewConfigFrom(m)
+	if err != nil {
+		b.Fatalf("mustConfig: %v", err)
+	}
+	return cfg
+}
+
+// BenchmarkAddHostMetadata compares the legacy mapstr path against the pdata path
+// for the add_host_metadata processor to quantify the conversion overhead savings.
+func BenchmarkAddHostMetadata(b *testing.B) {
+	logger := logp.NewNopLogger()
+
+	proc, err := add_host_metadata.New(config.NewConfig(), logger)
+	if err != nil {
+		b.Fatalf("failed to create add_host_metadata processor: %v", err)
+	}
+
+	testCases := []testCase{
+		{
+			name: "empty log record",
+			logRecord: func() plog.LogRecord {
+				lr := plog.NewLogRecord()
+				lr.Body().SetEmptyMap()
+				return lr
+			},
+		},
+		{
+			name: "Nginx access log",
+			logRecord: func() plog.LogRecord {
+				lr := plog.NewLogRecord()
+				lr.Body().SetEmptyMap()
+				lr.Body().Map().PutStr("timestamp", "2025-10-05T13:33:14+00:00")
+				lr.Body().Map().PutStr("client_ip", "172.19.0.1")
+				lr.Body().Map().PutStr("http_method", "GET")
+				lr.Body().Map().PutStr("http_path", "/")
+				lr.Body().Map().PutInt("status_code", 200)
+				return lr
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		for _, logCount := range []int{1, 1000} {
+			name := fmt.Sprintf("%s/%d_logs", tc.name, logCount)
+
+			logs := plog.NewLogs()
+			rl := logs.ResourceLogs().AppendEmpty()
+			sl := rl.ScopeLogs().AppendEmpty()
+			for range logCount {
+				lr := sl.LogRecords().AppendEmpty()
+				tc.logRecord().CopyTo(lr)
+			}
+
+				// Legacy path: wrap proc in legacyOnlyProcessor to hide PdataProcessor.
+			b.Run("legacy/"+name, func(b *testing.B) {
+				bp := &beatProcessor{
+					logger:     zap.NewNop(),
+					processors: []beat.Processor{legacyOnlyProcessor{proc}},
+				}
+				for b.Loop() {
+					_, _ = bp.ConsumeLogs(context.Background(), logs)
+				}
+			})
+
+			// Pdata path: processor implements PdataProcessor, fast path is taken.
+			b.Run("pdata/"+name, func(b *testing.B) {
+				if _, ok := proc.(PdataProcessor); !ok {
+					b.Skip("processor does not implement PdataProcessor")
+				}
+				bp := &beatProcessor{
+					logger:     zap.NewNop(),
+					processors: []beat.Processor{proc},
+				}
+				for b.Loop() {
+					_, _ = bp.ConsumeLogs(context.Background(), logs)
+				}
+			})
+		}
+	}
 }

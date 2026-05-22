@@ -23,12 +23,15 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
@@ -238,6 +241,40 @@ func (p *addHostMetadata) fetchData(useFQDN bool) (mapstr.M, error) {
 	}
 
 	return data, nil
+}
+
+// RunPdata enriches the given pcommon.Map directly with host metadata, avoiding
+// the round-trip conversion to/from mapstr.M used by the standard Run path.
+func (p *addHostMetadata) RunPdata(body pcommon.Map) error {
+	if !p.config.ReplaceFields && skipAddingHostMetadataPdata(body) {
+		return nil
+	}
+
+	data, err := p.loadData(features.FQDN())
+	if err != nil {
+		return fmt.Errorf("error loading data during event update: %w", err)
+	}
+
+	if err := otelmap.MergeMapstrIntoPdata(data, body); err != nil {
+		return fmt.Errorf("error merging host metadata: %w", err)
+	}
+
+	if len(p.geoData) > 0 {
+		if err := otelmap.MergeMapstrIntoPdata(p.geoData, body); err != nil {
+			return fmt.Errorf("error merging geo data: %w", err)
+		}
+	}
+	return nil
+}
+
+func skipAddingHostMetadataPdata(body pcommon.Map) bool {
+	hostVal, ok := body.Get("host")
+	if !ok || hostVal.Type() != pcommon.ValueTypeMap {
+		return false
+	}
+	hostMap := hostVal.Map()
+	_, hasName := hostMap.Get("name")
+	return hostMap.Len() > 0 && !(hasName && hostMap.Len() == 1)
 }
 
 func (p *addHostMetadata) String() string {
