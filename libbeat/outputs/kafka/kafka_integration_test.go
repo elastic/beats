@@ -291,10 +291,12 @@ func TestKafkaPublish(t *testing.T) {
 			assert.Equal(t, "testbeat", output.index)
 			defer output.Close()
 
-			// publish test events
+			// Publish asynchronously; OnSignal runs for any terminal outcome (ACK, retry, drop, ...).
 			var wg sync.WaitGroup
+			batches := make([]*outest.Batch, 0, len(test.events))
 			for i := range test.events {
 				batch := outest.NewBatch(test.events[i].events...)
+				batches = append(batches, batch)
 				batch.OnSignal = func(_ outest.BatchSignal) {
 					wg.Done()
 				}
@@ -306,8 +308,10 @@ func TestKafkaPublish(t *testing.T) {
 				}
 			}
 
-			// wait for all published batches to be ACKed
+			// Wait until the output has finished handling every batch (not necessarily ACKed).
 			wg.Wait()
+			// Failed publishes signal BatchRetryEvents; only proceed to read the topic after ACK.
+			requiretBatchesACKed(t, batches)
 
 			expected := flatten(test.events)
 
@@ -424,7 +428,7 @@ func TestKafkaErrors(t *testing.T) {
 			}
 		}
 
-		// wait for all published batches to be ACKed
+		// Wait until handling completes; this test expects a drop/retry, not necessarily ACK.
 		wg.Wait()
 
 		t.Cleanup(func() {
@@ -581,6 +585,8 @@ func (m *topicOffsetMap) SetOffset(topic string, partition int32, offset int64) 
 
 var testTopicOffsets = topicOffsetMap{}
 
+// testReadFromKafkaTopic consumes up to nMessages from topic across all partitions.
+// Returns after timeout even when fewer than nMessages were read (caller must assert count).
 func testReadFromKafkaTopic(
 	t *testing.T, topic string, nMessages int,
 	timeout time.Duration,
@@ -626,17 +632,28 @@ func testReadFromKafkaTopic(
 	var messages []*sarama.ConsumerMessage
 	timer := time.After(timeout)
 
+readLoop:
 	for len(messages) < nMessages {
 		select {
 		case msg := <-msgs:
 			messages = append(messages, msg)
 		case <-timer:
-			break
+			break readLoop
 		}
 	}
 
 	close(done)
 	return messages
+}
+
+// requiretBatchesACKed fails if the kafka client finished the batch with retry/drop instead of ACK.
+func requiretBatchesACKed(t *testing.T, batches []*outest.Batch) {
+	t.Helper()
+	for _, batch := range batches {
+		require.NotEmpty(t, batch.Signals, "expected publish batch to receive a signal")
+		last := batch.Signals[len(batch.Signals)-1]
+		require.Equal(t, outest.BatchACK, last.Tag, "expected batch to be ACKed, got %v", last.Tag)
+	}
 }
 
 func flatten(infos []eventInfo) []beat.Event {
