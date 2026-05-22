@@ -147,12 +147,12 @@ func (d *eventDecoder) Buffer(n int) []byte {
 	return d.buf
 }
 
-func (d *eventDecoder) Decode() (interface{}, error) {
+func (d *eventDecoder) Decode() (publisher.Event, error) {
 	switch d.serializationFormat {
 	case SerializationJSON, SerializationCBOR:
 		return d.decodeJSONAndCBOR()
 	default:
-		return nil, fmt.Errorf("unknown serialization format: %d", d.serializationFormat)
+		return publisher.Event{}, fmt.Errorf("unknown serialization format: %d", d.serializationFormat)
 	}
 }
 

@@ -184,7 +184,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors, b.Paths)
+		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors, b.Info.Paths)
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()
@@ -304,15 +304,7 @@ func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 
 // makeAutodiscover creates an autodiscover object ready to be started.
 func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
-	ad, err := autodiscover.NewAutodiscover(
-		"heartbeat",
-		b.Publisher,
-		bt.monitorFactory,
-		autodiscover.QueryConfig(),
-		bt.config.Autodiscover,
-		b.Keystore,
-		b.Info.Logger,
-	)
+	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, bt.monitorFactory, autodiscover.QueryConfig(), bt.config.Autodiscover, b.Keystore, b.Info.Logger, nil)
 	if err != nil {
 		return nil, err
 	}
