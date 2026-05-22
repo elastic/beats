@@ -1021,11 +1021,17 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	logDir := filepath.Join(tempDir, "logs")
 	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
 
-	logFile := filepath.Join(logDir, "app.log")
+	largeFile := filepath.Join(logDir, "large.log")
+	smallFile := filepath.Join(logDir, "small.log")
 
-	// Phase 1: static fingerprint config, large enough file to be tracked.
+	// Phase 1: static fingerprint config. Two files exist from the start:
+	//   - largeFile: 30 lines (~1500 bytes), above threshold → ingested
+	//     under static; ends up keyed by its SHA-256 in the registry.
+	//   - smallFile: 5 lines  (~250 bytes), below threshold → dropped by
+	//     static (errFileTooSmall); no registry entry created.
 	filebeat.WriteConfigFile(fmt.Sprintf(staticFingerprintCfg, logDir, "1s", tempDir))
-	appendToFile(t, logFile, generateLines("static", 30)) // ~1500 bytes, above threshold
+	appendToFile(t, largeFile, generateLines("large", 30))
+	appendToFile(t, smallFile, generateLines("small", 5))
 
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -1033,37 +1039,180 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 
 	filebeat.WaitPublishedEvents(15*time.Second, 30)
 	filebeat.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", logFile),
-		10*time.Second, "static phase did not reach EOF")
+		fmt.Sprintf("End of file reached: %s; Backoff now.", largeFile),
+		10*time.Second, "static phase did not reach EOF for the large file")
 
 	filebeat.Stop()
 
 	staticEvents := readOutputEvents(t, tempDir)
-	require.Len(t, staticEvents, 30, "static phase should have ingested all 30 lines")
+	assert.Len(t, staticEvents, 30, "static phase should have ingested only the large file's 30 lines")
+	assert.Empty(t, messagesForFile(staticEvents, smallFile),
+		"static phase must not produce any events for the below-threshold small file")
 
-	// Phase 2: switch to growing — registry from static run must be reused.
+	// Phase 2: switch to growing. The promise has two halves:
+	//   1. largeFile's existing SHA-256 entry is reused → no re-ingestion.
+	//   2. smallFile is now eligible (growing tracks below-threshold files)
+	//      → its 5 lines are ingested for the first time.
+	// Expected post-upgrade total: 30 (large, unchanged) + 5 (small, new) = 35.
 	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not restart under growing config")
 
-	// Wait long enough for the scanner to run at least twice; no new events
-	// should be produced for an already-ingested file. If the registry were
-	// not reused, the file would be re-ingested from offset 0 → 30 more events.
-	filebeat.WaitLogsContains(fmt.Sprintf("End of file reached: %s; Backoff now.", logFile),
-		10*time.Second, "filestream did not restart under growing config")
-	filebeat.WaitLogsContains(fmt.Sprintf("End of file reached: %s; Backoff now.", logFile),
-		10*time.Second, "filestream did not restart under growing config")
+	filebeat.WaitPublishedEvents(15*time.Second, 35)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", smallFile),
+		10*time.Second, "growing phase did not reach EOF for the small file")
 
 	postUpgrade := readOutputEvents(t, tempDir)
-	require.Len(t, postUpgrade, 30,
-		"opting in to growing must not re-ingest a file that was already at threshold under static")
+	assert.Len(t, postUpgrade, 35,
+		"expected 35 events after upgrade (30 large + 5 small); more means re-ingestion, fewer means small file not tracked")
+	assert.Len(t, messagesForFile(postUpgrade, largeFile), 30,
+		"opting in to growing must not re-ingest the large file")
+	assert.Len(t, messagesForFile(postUpgrade, smallFile), 5,
+		"it should have ingested the previously-dropped small file")
 
 	filebeat.Stop()
 
-	// Registry state: the file is keyed by the same SHA-256 produced under
-	// static, with no extra growing entry created on the upgrade.
-	assertSingleSHA256RegistryEntry(t, tempDir, logFile)
+	// Registry state: largeFile keyed by the same SHA-256 from the static
+	// phase (no extra entries on upgrade); smallFile keyed by raw-hex with
+	// FingerprintGrowing=true (it's still below threshold).
+	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
+	assertGrowingRegistryEntry(t, tempDir, smallFile)
+}
+
+// TestFilestreamEnhancedFingerprint_NoDuplicationConfigReload is
+// the same no-data-duplication guarantee as
+// TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade but exercises
+// Filebeat's live config-reload path (filebeat.config.inputs with
+// reload.enabled). The input is restarted, when the inputs.d/*.yml
+// file is edited. On both configs, the inputs have the same id, so the registry
+// state is preserved across the reload — the new growing-enabled prospector
+// must reuse the existing SHA-256 entry and produce no new events for a file
+// that was already at threshold.
+func TestFilestreamEnhancedFingerprint_NoDuplicationConfigReload(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+	inputsDir := filepath.Join(tempDir, "inputs.d")
+	require.NoError(t, os.MkdirAll(inputsDir, 0o755), "failed to create inputs.d directory")
+
+	inputConfigFile := filepath.Join(inputsDir, "filestream.yml")
+	largeFile := filepath.Join(logDir, "large.log")
+	smallFile := filepath.Join(logDir, "small.log")
+
+	// Filebeat config
+	configTemplate := `
+filebeat.config.inputs:
+  path: %s/*.yml
+  reload.enabled: true
+  reload.period: 1s
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
+
+	// Initial input config: static fingerprint.
+	staticInputCfg := `
+- type: filestream
+  id: test-enhanced-fingerprint
+  enabled: true
+  paths:
+    - %s/*.log
+  prospector.scanner:
+    check_interval: 1s
+  file_identity.fingerprint:
+    growing: false
+`
+
+	// Post-reload input config: growing enabled.
+	growingInputCfg := `
+- type: filestream
+  id: test-enhanced-fingerprint
+  enabled: true
+  paths:
+    - %s/*.log
+  prospector.scanner:
+    check_interval: 1s
+  file_identity.fingerprint:
+    growing: true
+`
+
+	filebeat.WriteConfigFile(fmt.Sprintf(configTemplate, inputsDir, tempDir))
+
+	// Phase 1: write the initial (static) input config and the log files.
+	// Two files exist from the start:
+	//   - largeFile: 30 lines (~1500 bytes), above threshold → ingested
+	//     under static; SHA-256 entry in the registry.
+	//   - smallFile: 5 lines  (~250 bytes), below threshold → dropped by
+	//     static (errFileTooSmall); no registry entry.
+	require.NoError(t,
+		os.WriteFile(inputConfigFile, []byte(fmt.Sprintf(staticInputCfg, logDir)), 0o644),
+		"failed to write initial static input config")
+	appendToFile(t, largeFile, generateLines("large", 30))
+	appendToFile(t, smallFile, generateLines("small", 5))
+
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		15*time.Second, "filestream did not start under the static input config")
+
+	filebeat.WaitPublishedEvents(15*time.Second, 30)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", largeFile),
+		10*time.Second, "static phase did not reach EOF for the large file")
+
+	staticEvents := readOutputEvents(t, tempDir)
+	require.Len(t, staticEvents, 30, "static phase should have ingested only the large file's 30 lines")
+	require.Empty(t, messagesForFile(staticEvents, smallFile),
+		"static phase must not produce any events for the below-threshold small file")
+
+	// Phase 2: replace the input config to enable growing fingerprint.
+	// Expected post-reload total: 30 (large, unchanged) + 5 (small, new) = 35.
+	require.NoError(t,
+		os.WriteFile(inputConfigFile, []byte(fmt.Sprintf(growingInputCfg, logDir)), 0o644),
+		"failed to replace input config with growing-enabled version")
+
+	// Wait for the input to be stopped
+	filebeat.WaitLogsContains("Runner: 'filestream' has stopped",
+		30*time.Second, "input runner was not stopped by the reloader")
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		15*time.Second, "filestream did not restart under the growing input config")
+
+	filebeat.WaitPublishedEvents(15*time.Second, 35)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", smallFile),
+		10*time.Second, "growing phase did not reach EOF for the small file")
+
+	postReload := readOutputEvents(t, tempDir)
+	assert.Len(t, postReload, 35,
+		"expected 35 events after reload (30 large + 5 small); more means re-ingestion, fewer means small file not tracked")
+	assert.Len(t, messagesForFile(postReload, largeFile), 30,
+		"enabling growing via config reload must not re-ingest the large file")
+	assert.Len(t, messagesForFile(postReload, smallFile), 5,
+		"config reload to growing must now ingest the previously-dropped small file")
+
+	filebeat.Stop()
+
+	// Registry state: largeFile keyed by the same SHA-256 produced under
+	// static (no extra entries from the reload); smallFile keyed by raw-hex
+	// (still below threshold under growing).
+	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
+	assertGrowingRegistryEntry(t, tempDir, smallFile)
 }
 
 // TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart covers
@@ -1420,5 +1569,31 @@ func assertSingleSHA256RegistryEntry(t *testing.T, tempDir, filePath string) {
 		filePath, len(activeKeysForFile))
 	assert.Len(t, activeKeysForFile[0].fingerprint, 64,
 		"expected the active entry to be keyed by a SHA-256 (64-char) fingerprint; got len=%d",
+		len(activeKeysForFile[0].fingerprint))
+}
+
+// assertGrowingRegistryEntry asserts that the file has exactly one active
+// fingerprint entry whose key is NOT the 64-char SHA-256 form — i.e. the
+// file is being tracked in the growing phase (raw-hex of bytes available so
+// far). Used to verify that a small file below the configured threshold is
+// indeed being tracked under growing mode (and would migrate to SHA-256 if
+// the file ever grew past offset+length).
+func assertGrowingRegistryEntry(t *testing.T, tempDir, filePath string) {
+	t.Helper()
+	state := readFingerprintRegistry(t, tempDir)
+
+	var activeKeysForFile []fingerprintRegistryEntry
+	for _, e := range state {
+		if e.source != filePath || e.removed {
+			continue
+		}
+		activeKeysForFile = append(activeKeysForFile, e)
+	}
+
+	require.Len(t, activeKeysForFile, 1,
+		"expected exactly one active fingerprint registry entry for %q; got %d",
+		filePath, len(activeKeysForFile))
+	assert.NotEqual(t, 64, len(activeKeysForFile[0].fingerprint),
+		"expected the active entry to be keyed by raw-hex (NOT a 64-char SHA-256); got len=%d — file is treated as final, not growing",
 		len(activeKeysForFile[0].fingerprint))
 }
