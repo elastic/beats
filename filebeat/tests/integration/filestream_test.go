@@ -128,7 +128,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	filebeat.WaitFileContains(registryFile, `"op":"remove"`, time.Second)
 }
 
-func TestFilestreamIDValidationPreventsFilebeatStart(t *testing.T) {
+func TestFilestreamValidationPreventsFilebeatStart(t *testing.T) {
 	duplicatedIDs := `
 filebeat.inputs:
   - type: filestream
