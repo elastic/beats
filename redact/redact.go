@@ -99,12 +99,33 @@ func redactMap[K comparable](obj map[K]any, ro *redactOptions) {
 		}
 		if val != nil {
 			switch cast := val.(type) {
+			case map[string][]string:
+				newMap := make(map[string]any, len(cast))
+				for k, v := range cast {
+					if redactKey(k, ro) {
+						newMap[k] = REDACTED
+						continue
+					}
+					newSlice := make([]interface{}, len(v))
+					for i, s := range v {
+						newSlice[i] = s
+					}
+					newMap[k] = newSlice
+				}
+				redactMap(newMap, ro)
+				val = newMap
 			case map[string]any:
 				redactMap(cast, ro)
 			case map[any]any:
 				redactMap(cast, ro)
 			case map[int]any:
 				redactMap(cast, ro)
+			case []map[string]interface{}:
+				updatedRootValue := make([]map[string]interface{}, len(cast))
+				for _, item := range cast {
+					redactMap(item, ro)
+				}
+				val = updatedRootValue
 			case []any:
 				// Recursively process each element in the slice so that we also walk
 				// through lists (e.g. inputs[4].streams[0]). This is required to
