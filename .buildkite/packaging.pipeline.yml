@@ -4,9 +4,9 @@
 env:
   ASDF_MAGE_VERSION: 1.15.0
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1777608114"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1778817704"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1777608114"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1778817704"
 
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64 darwin/arm64 windows/arm64"
@@ -22,6 +22,13 @@ common:
   - docker_elastic_login_plugin: &docker_elastic_login_plugin
       elastic/vault-docker-login#v0.6.4:
         secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
+  - google_oidc_plugin: &google_oidc_plugin
+      # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/elastic-agent/01-gcp-oidc.tf
+      # This plugin authenticates to Google Cloud using the OIDC token.
+      elastic/oblt-google-auth#v1.3.1:
+        lifetime: 10800 # seconds
+        project-id: "elastic-observability-ci"
+        project-number: "911195782929"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -70,6 +77,8 @@ steps:
           DEV: true
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *google_oidc_plugin
 
       - label: Staging dashboards
         # TODO remove OR clause below (see earlier comment)
@@ -94,6 +103,8 @@ steps:
           DEV: false
         artifact_paths:
           - build/distributions/**/*
+        plugins:
+          - *google_oidc_plugin
 
   - group: Packaging snapshot
     if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
@@ -118,6 +129,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -154,6 +166,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -191,6 +204,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -217,6 +231,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -249,6 +264,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -286,6 +302,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -325,6 +342,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -353,6 +371,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         matrix:
@@ -382,6 +401,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         plugins:
+          - *google_oidc_plugin
           - *docker_elastic_login_plugin
 
       - label: DRA Staging
@@ -404,6 +424,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         plugins:
+          - *google_oidc_plugin
           - *docker_elastic_login_plugin
 
   - wait
