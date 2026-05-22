@@ -44,6 +44,7 @@ const (
 	ERROR_INVALID_PARAMETER      syscall.Errno = 87
 	ERROR_INSUFFICIENT_BUFFER    syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS          syscall.Errno = 259
+	RPC_S_UNKNOWN_IF             syscall.Errno = 1717
 	RPC_S_SERVER_UNAVAILABLE     syscall.Errno = 1722
 	RPC_S_INVALID_BOUND          syscall.Errno = 1734
 	RPC_S_CALL_CANCELLED         syscall.Errno = 1818
