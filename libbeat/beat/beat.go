@@ -34,10 +34,6 @@ import (
 
 var userAgent atomic.Value // stores string
 
-func init() {
-	userAgent.Store(useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String()))
-}
-
 // Creator initializes and configures a new Beater instance used to execute
 // the beat's run-loop.
 type Creator func(*Beat, *config.C) (Beater, error)
