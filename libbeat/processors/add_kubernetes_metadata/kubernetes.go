@@ -373,13 +373,35 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// One full clone for the kubernetes field; one cheap sub-map clone for the OCI
-	// container field. This replaces the original three full clones.
-	kubeMeta := metadata.Clone()
+	// Fast path for the common metadata shape:
+	// mapstr.M{"kubernetes": mapstr.M{...}}.
+	if k8sVal, ok := metadata["kubernetes"]; ok {
+		if k8sMeta, ok := k8sVal.(mapstr.M); ok {
+			k8sMeta = k8sMeta.Clone()
 
-	// Build the OCI container field by cloning only the container sub-map —
-	// much cheaper than cloning the full metadata. Transform it in place:
-	// drop container.name and rewrite container.image -> container.image.name.
+			if containerVal, ok := k8sMeta["container"]; ok {
+				if containerMeta, ok := containerVal.(mapstr.M); ok {
+					ociContainer := containerMeta.Clone()
+					delete(ociContainer, "name")
+					if img, ok := ociContainer["image"]; ok {
+						delete(ociContainer, "image")
+						ociContainer["image"] = mapstr.M{"name": img}
+					}
+					event.Fields["container"] = ociContainer
+
+					delete(containerMeta, "id")
+					delete(containerMeta, "runtime")
+					delete(containerMeta, "image")
+				}
+			}
+
+			event.Fields["kubernetes"] = k8sMeta
+			return event, nil
+		}
+	}
+
+	// Fallback for non-standard metadata shapes kept for compatibility.
+	kubeMeta := metadata.Clone()
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
 		if cm, ok := containerVal.(mapstr.M); ok {
 			ociContainer := cm.Clone()
@@ -391,10 +413,6 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
 		}
 	}
-
-	// Remove container fields that belong only in the OCI section before writing
-	// kubernetes metadata to the event. container.name is intentionally kept here
-	// to match original behaviour.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")

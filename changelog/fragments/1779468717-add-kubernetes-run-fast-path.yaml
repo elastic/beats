@@ -1,0 +1,4 @@
+kind: enhancement
+summary: Optimize add_kubernetes_metadata Run with a direct kubernetes fast path.
+component: libbeat
+issue: https://github.com/elastic/beats/issues/50763
