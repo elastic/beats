@@ -105,6 +105,7 @@ func (idx *shortFingerprintIndex) FindPrefixMatch(targetFingerprint, matchSource
 		if !strings.HasPrefix(targetFingerprint, e.Fingerprint) {
 			continue
 		}
+		// TODO: can it create a edge-case?
 		if matchSource != "" {
 			if e.Source == matchSource {
 				return k, e, true // exact path — at most one match, return immediately

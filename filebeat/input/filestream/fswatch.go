@@ -140,19 +140,6 @@ func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 func (w *fileWatcher) Run(ctx unison.Canceler) {
 	defer close(w.events)
 
-	// Clear the scanner's hashedPaths set before the first event-producing
-	// scan. The prospector calls GetFiles() during Init (for identity
-	// migration) and at the start of Run (for take-over enumeration) —
-	// those scans go through the same toFileDescriptor path and would
-	// populate hashedPaths even though no FS events are emitted. If we
-	// didn't clear, the watch loop's first scan would observe a path as
-	// already-hashed and skip the GrowingFingerprint emission needed for
-	// the prospector to match an existing growing registry entry and
-	// migrate it (the threshold-crossing-across-restart case).
-	if fs, ok := w.scanner.(*fileScanner); ok {
-		fs.clearHashedPaths()
-	}
-
 	// run initial scan before starting regular
 	w.watch(ctx)
 
@@ -298,16 +285,20 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		w.closedHarvestersMutex.Unlock()
 	}
 
-	// Remaining files in the prev map are missing — either deleted or renamed.
-	// Rename detection uses three phases:
-	//   Phase A: Exact FileID match (works for all identities including static fingerprint).
-	//   Phase B: Prefix match for growing_fingerprint — handles rename+grow
-	//            where the fingerprint changed between scans.
-	//   Phase C: Emit deletes and creates for unmatched entries.
+	// Remaining files in the prev map are missing from this scan — either
+	// deleted or renamed. Three rename-detection passes follow, in order:
+	//
+	//   1. Exact-FileID rename match — works for every identity including
+	//      static fingerprint. Catches a plain rename where the file's
+	//      content (and so its fingerprint) is unchanged.
+	//   2. Prefix-match rename detection (Enhanced Fingerprint / growing
+	//      mode only) — catches rename + content growth in the same scan.
+	//   3. Unmatched-leftover emission — anything still in w.prev becomes
+	//      OpDelete, anything still in newFilesByName becomes OpCreate.
 
-	// Phase A — exact renames: match remaining prev files against new files by FileID.
-	// For growing fingerprint, also build the short fingerprint index from entries
-	// that don't get an exact match — these are the candidates for Phase B.
+	// Exact-FileID rename match: For growing mode, also accumulate the
+	// short-fingerprint index from prev entries that did NOT get an exact
+	// match — they are the candidates for the next (prefix-match) pass.
 	var shortFingerprints *shortFingerprintIndex
 	if w.growingFingerprint {
 		shortFingerprints = newShortFingerprintSet()
@@ -317,6 +308,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
 
 		switch {
+		// Exact-FileID rename match
 		case renamed:
 			srcID := w.getFileIdentity(remainingDesc)
 			select {
@@ -331,17 +323,28 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			delete(newFilesByID, remainingDesc.FileID())
 			delete(w.prev, remainingPath)
 
+		// If it isn't an exact match, make it a candidate for prefix-match
 		case w.growingFingerprint:
 			shortFingerprints.Add(
 				remainingPath, remainingDesc.Fingerprint, remainingPath)
 		}
 	}
 
-	// Phase B — prefix renames (growing fingerprint only): for remaining prev
-	// files with short fingerprints, check if any new file's fingerprint has
-	// the old fingerprint as a prefix. This handles files that were renamed
-	// AND grew between scans. The short fingerprint index was populated during
-	// Phase A from entries that didn't get an exact match.
+	// Prefix-match rename detection (growing fingerprint only). For each
+	// new file that didn't match exactly, look for an unmatched prev entry
+	// whose raw-hex fingerprint is a STRICT PREFIX of the new file's
+	// fingerprint material — that means the same file was renamed AND its
+	// content grew between scans.
+	//
+	// Two prefix candidates are tried per new file:
+	//
+	//   1. newDesc.Fingerprint — handles rename + same-format growth
+	//      (raw-hex extends to longer raw-hex while still below threshold).
+	//   2. newDesc.GrowingFingerprint — handles rename + threshold-crossing
+	//      in the same scan: the new descriptor's primary Fingerprint is a
+	//      SHA-256 (no prefix relationship to the prev raw-hex), but the
+	//      GrowingFingerprint carries the raw-hex of bytes[offset:offset+length]
+	//      and prev's raw-hex IS a prefix of that.
 	if shortFingerprints.Len() > 0 {
 		type prefixMatch struct {
 			oldPath string
@@ -352,6 +355,9 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 
 		for newPath, newDesc := range newFilesByName {
 			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint, "")
+			if !found && newDesc.GrowingFingerprint != "" {
+				oldPath, _, found = shortFingerprints.FindPrefixMatch(newDesc.GrowingFingerprint, "")
+			}
 			if found {
 				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
 				shortFingerprints.Remove(oldPath)
@@ -374,8 +380,8 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		}
 	}
 
-	// Phase C — deletes: remaining prev files that weren't matched by either
-	// exact or prefix rename detection are genuinely deleted.
+	// Unmatched-leftover deletes: prev files that weren't matched by either
+	// the exact-FileID or the prefix-match rename pass are genuinely gone.
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
 		select {
@@ -390,7 +396,8 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		w.closedHarvestersMutex.Unlock()
 	}
 
-	// Phase C — creates: remaining new files are genuinely new.
+	// Unmatched-leftover creates: new files left over after both rename
+	// passes are genuinely new.
 	for path, fd := range newFilesByName {
 		select {
 		case <-ctx.Done():
@@ -446,6 +453,18 @@ func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp
 
 func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
+}
+
+// SetHashedPaths populates the underlying scanner's set of "already-final"
+// paths. See fileScanner.setHashedPaths for details. Called by the
+// prospector at Run() start with the set of paths whose persisted state has
+// FingerprintGrowing=false, so the watch loop's first scan suppresses
+// GrowingFingerprint emission for files that are already keyed by SHA-256
+// and only emits the bridging value for files that still need to migrate.
+func (w *fileWatcher) SetHashedPaths(paths map[string]struct{}) {
+	if fs, ok := w.scanner.(*fileScanner); ok {
+		fs.setHashedPaths(paths)
+	}
 }
 
 func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
@@ -903,14 +922,29 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	return fd, nil
 }
 
-// clearHashedPaths clears the per-process set of paths whose Fingerprint is
-// known to be a final SHA-256. Called by the fileWatcher before its first
-// event-producing scan so that enumeration-only scans (from the prospector's
-// Init and Run take-over paths) do not suppress the one-time
-// GrowingFingerprint emission that the watch loop needs.
-func (s *fileScanner) clearHashedPaths() {
-	if s.hashedPaths != nil {
-		clear(s.hashedPaths)
+// setHashedPaths replaces the per-process set of "already-final" paths with
+// the given seed. Called by the fileProspector at startup with the set of
+// paths whose persisted registry state has FingerprintGrowing=false (i.e. they
+// are already keyed by a SHA-256 hex). The result is that the watch loop's
+// first scan emits GrowingFingerprint only for files that actually need
+// migration — files that were below threshold at the previous shutdown — and
+// emits SHA-256 only for everything else. This both:
+//
+//  1. Replaces the correctness-preserving wipe of any hashedPaths entries
+//     added by enumeration-only scans run during prospector Init/take-over
+//     (those scans pollute the set but emit no events).
+//  2. Avoids a wasteful GrowingFingerprint-emission burst on restart for
+//     every file already at threshold.
+//
+// Safe to call when growing mode is disabled — hashedPaths is nil there and
+// the method is a no-op.
+func (s *fileScanner) setHashedPaths(seed map[string]struct{}) {
+	if s.hashedPaths == nil {
+		return
+	}
+	clear(s.hashedPaths)
+	for p := range seed {
+		s.hashedPaths[p] = struct{}{}
 	}
 }
 

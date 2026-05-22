@@ -148,11 +148,7 @@ logging:
 // ARE ingested immediately.
 func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	t.Skip("the way we log small files changed. needs to update this test")
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	logDir := filepath.Join(tempDir, "logs")
@@ -262,11 +258,7 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 // This is the counterpart to TestFilestreamFingerprintSmallFiles which tests
 // the current fingerprint behavior where small files are not ingested.
 func TestFilestreamGrowingFingerprint(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -366,11 +358,7 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 // This is the counterpart to TestFilestreamFingerprintSmallFiles which tests
 // the current fingerprint behavior where small files are not ingested.
 func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -457,11 +445,7 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 // independently once they grow with different content, even across Filebeat
 // restarts.
 func TestFilestreamGrowingFingerprint_do_not_mix_up_files(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -542,11 +526,7 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files(t *testing.T) {
 // started with the same content) is correctly identified and fully ingested
 // without being confused with file1's registry entry.
 func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_deletion(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -611,11 +591,7 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_dele
 // TestFilestreamGrowingFingerprintTruncation tests that truncation with
 // different content is treated as a new file (no prefix match = new entry).
 func TestFilestreamGrowingFingerprintTruncation(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -872,11 +848,7 @@ func printOutputOnFailure(t *testing.T, tempDir string) {
 // the store metadata but does not affect the in-flight harvester's path.
 // The key assertion is offset continuity: 5 total events (not 6 from re-read).
 func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -973,11 +945,7 @@ func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 //
 // Expected: 30 events total (5 + 25), one migration log, no duplicates.
 func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -1046,11 +1014,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
 //
 // The promise: opting in to growing is contained to small files.
 func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -1116,11 +1080,7 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 // migration mechanism still produces correct results. Step 7 optimises
 // the burst away.
 func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := integration.NewFilebeat(t)
 
 	tempDir := filebeat.TempDir()
 	printOutputOnFailure(t, tempDir)
@@ -1176,6 +1136,181 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testi
 	assertFingerprintMigratedToSHA256(t, tempDir, logFile)
 }
 
+// TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing verifies the
+// rename + threshold-crossing case while filebeat is running: a
+// file is renamed AND grown past the configured threshold within a single
+// scan interval. The fileWatcher's prefix-match phase
+// recognises the renamed-and-grown file as the
+// same identity as the previous registry entry, emits OpRename, and the
+// prospector migrates the raw-hex registry key to the SHA-256 form. No
+// content is re-read.
+//
+//	Phase 1: 5 lines  ≈ 250 bytes  in app.log  (below threshold)
+//	Phase 2: rename app.log → app.log.1 + append 25 lines (~1500 bytes total, above threshold)
+//
+// Expected: 30 events total, no duplicates, monotonic offsets. Registry
+// ends up with one active SHA-256 entry for app.log.1 and the raw-hex
+// entry from before the rename is removed.
+func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	homeDir := filebeat.TempDir()
+	printOutputOnFailure(t, homeDir)
+	logDir := filepath.Join(homeDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	appLog := filepath.Join(logDir, "app.log")
+	appLogRenamed := filepath.Join(logDir, "app.log.1")
+
+	// 1s scan interval ensures the scanner runs again after the rename +
+	// append below, so the in-process prefix-match rename detection actually
+	// observes the file under its new path AND past threshold within the
+	// test window. (With a longer interval the harvester may finish reading
+	// via the still-open fd before the scanner re-scans, leaving the
+	// registry under the original raw-hex key.)
+	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", homeDir))
+	filebeat.Start()
+
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// Phase 1: small file (~250 bytes) — below threshold, raw-hex key.
+	appendToFile(t, appLog, generateLines("app original line", 5))
+	filebeat.WaitPublishedEvents(15*time.Second, 5)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", appLog),
+		15*time.Second, "phase 1 did not reach EOF")
+
+	// Phase 2: in a single inter-scan window, rename AND grow past threshold.
+	require.NoError(t, os.Rename(appLog, appLogRenamed),
+		"failed to rename app.log -> app.log.1")
+	appendToFile(t, appLogRenamed, generateLines("app new line", 25))
+
+	// Wait for the rename + grow to be observed and the additional lines
+	// ingested. 30 events total = 5 original + 25 new.
+	filebeat.WaitPublishedEvents(30*time.Second, 30)
+
+	// Wait for the scanner to observe the file under its new path (the
+	// prefix-match rename pass detects the rename + threshold crossing and
+	// emits OpRename) — without this, the test can end before the migration
+	// has had a chance to run.
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("File %s has been renamed to %s", appLog, appLogRenamed),
+		15*time.Second,
+		"scanner did not observe the rename + threshold crossing within the test window")
+
+	events := readOutputEvents(t, homeDir)
+	assert.Len(t, events, 30,
+		"expected exactly 30 events (5 original + 25 new); more means re-read from offset 0")
+
+	// All events should be attributed to the same harvester. (The harvester
+	// caches the open path at startup, so the message-path of events from
+	// after the rename remains the original path — same behaviour as
+	// TestFilestreamGrowingFingerprint_rename_and_grow.)
+	msgs := messagesForFile(events, appLog)
+	assert.Len(t, msgs, 30, "all events should be attributed to the original path (harvester known behaviour)")
+
+	seen := make(map[string]struct{}, len(msgs))
+	for _, msg := range msgs {
+		_, duplicate := seen[msg]
+		assert.False(t, duplicate, "duplicate event detected: %s", msg)
+		seen[msg] = struct{}{}
+	}
+
+	for i := 1; i < len(events); i++ {
+		assert.Greater(t, events[i].Log.Offset, events[i-1].Log.Offset,
+			"offsets must be monotonically increasing (event %d vs %d)", i-1, i)
+	}
+
+	filebeat.Stop()
+
+	// Registry state: the renamed file ends up under a SHA-256 (64-char)
+	// key with Source pointing to the new path; the original raw-hex key
+	// (from the pre-rename, pre-threshold scan) has been removed by the
+	// migration. This is direct evidence the prefix-match rename pass ran
+	// against GrowingFingerprint and the prospector migrated the key.
+	assertFingerprintMigratedToSHA256(t, homeDir, appLogRenamed)
+}
+
+// TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart is the
+// hardest of the threshold scenarios: BOTH rename and threshold-crossing
+// happen while Filebeat is stopped. After restart the fileWatcher's w.prev
+// is empty, so its in-process rename detection (neither the exact-FileID
+// nor the prefix-match pass) can help; the match has to come from the
+// prospector's lazy short-fingerprint set, which is built from the
+// persistent registry. The prospector finds the prior raw-hex entry by
+// path-agnostic prefix match against the new descriptor's GrowingFingerprint
+// and migrates the registry key.
+func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	appLog := filepath.Join(logDir, "app.log")
+	appLogRenamed := filepath.Join(logDir, "app.log.1")
+
+	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+
+	// Phase 1: small file (~250 bytes) — below threshold, raw-hex registry key.
+	appendToFile(t, appLog, generateLines("before-restart line", 5))
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+	filebeat.WaitPublishedEvents(10*time.Second, 5)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", appLog),
+		10*time.Second, "phase 1 did not reach EOF")
+
+	// Phase 2: stop Filebeat. Rename + append past threshold while stopped.
+	filebeat.Stop()
+	require.NoError(t, os.Rename(appLog, appLogRenamed),
+		"failed to rename app.log -> app.log.1 while filebeat is stopped")
+	appendToFile(t, appLogRenamed, generateLines("after-restart line", 25)) // total ~1500 bytes
+
+	// Phase 3: restart. fileWatcher sees app.log.1 as new (w.prev empty).
+	// Scanner emits SHA-256 + GrowingFingerprint for the new path. The
+	// prospector's findGrowingFingerprintMatch first tries source==NewPath
+	// against the registry, fails (stored Source is the OLD path), then
+	// falls back to path-agnostic prefix matching against GrowingFingerprint
+	// and finds the prior raw-hex entry. Migration completes.
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not restart")
+
+	filebeat.WaitPublishedEvents(15*time.Second, 30)
+
+	events := readOutputEvents(t, tempDir)
+	require.Len(t, events, 30,
+		"expected exactly 30 events (5 before-restart + 25 after-restart); more means content was re-ingested across the restart")
+
+	// Pre-restart events were emitted under the original path (app.log)
+	// during the first filebeat run; post-restart events come out under the
+	// new path (app.log.1) because the second filebeat opens the file fresh
+	// under its current name. The TOTAL is 30 and there are no duplicates —
+	// that is the no-re-ingestion guarantee.
+	preMsgs := messagesForFile(events, appLog)
+	postMsgs := messagesForFile(events, appLogRenamed)
+	require.Len(t, preMsgs, 5, "5 before-restart events should be attributed to the original path")
+	require.Len(t, postMsgs, 25, "25 after-restart events should be attributed to the post-rename path")
+
+	allMsgs := append(append([]string{}, preMsgs...), postMsgs...)
+	seen := make(map[string]struct{}, len(allMsgs))
+	for _, msg := range allMsgs {
+		_, duplicate := seen[msg]
+		require.False(t, duplicate, "duplicate event detected: %s", msg)
+		seen[msg] = struct{}{}
+	}
+
+	filebeat.Stop()
+
+	// Registry state: app.log.1 ends up under a SHA-256 (64-char) key,
+	// raw-hex key for the old app.log path is removed by the migration.
+	assertFingerprintMigratedToSHA256(t, tempDir, appLogRenamed)
+}
+
 // fingerprintRegistryEntry holds the parts of a fingerprint registry entry
 // the Enhanced Fingerprint tests care about.
 type fingerprintRegistryEntry struct {
@@ -1221,10 +1356,13 @@ func readFingerprintRegistry(t *testing.T, tempDir string) map[string]fingerprin
 
 // assertFingerprintMigratedToSHA256 asserts that the given file has exactly
 // one active fingerprint entry whose key uses the 64-char SHA-256 form, and
-// that any other fingerprint key for the same source path has been removed.
-func assertFingerprintMigratedToSHA256(t *testing.T, tempDir, filePath string) {
+// that the migration left at least one removed raw-hex (non-SHA-256) entry
+// in the log. The removed entry's source path may or may not equal filePath
+// — across a rename the old entry was stored under the OLD path, so we
+// do not path-filter the removed-entries check.
+func assertFingerprintMigratedToSHA256(t *testing.T, homeDir, filePath string) {
 	t.Helper()
-	state := readFingerprintRegistry(t, tempDir)
+	state := readFingerprintRegistry(t, homeDir)
 
 	var (
 		activeSHA256Keys []string
@@ -1232,13 +1370,15 @@ func assertFingerprintMigratedToSHA256(t *testing.T, tempDir, filePath string) {
 		removedNonSHA256 []string
 	)
 	for _, e := range state {
-		if e.source != filePath {
+		// "Removed raw-hex" check is source-path-agnostic: the migration
+		// removes the old entry under whatever Source it was stored with,
+		// which for a rename is the OLD path, not filePath.
+		if e.removed && len(e.fingerprint) != 64 {
+			removedNonSHA256 = append(removedNonSHA256, e.key)
 			continue
 		}
-		if e.removed {
-			if len(e.fingerprint) != 64 {
-				removedNonSHA256 = append(removedNonSHA256, e.key)
-			}
+		// "Active entry for this file" check is path-filtered.
+		if e.source != filePath || e.removed {
 			continue
 		}
 		if len(e.fingerprint) == 64 {
@@ -1254,7 +1394,7 @@ func assertFingerprintMigratedToSHA256(t *testing.T, tempDir, filePath string) {
 	assert.Empty(t, activeOtherKeys,
 		"expected no active raw-hex (non-SHA-256) entries for %q after migration", filePath)
 	assert.NotEmpty(t, removedNonSHA256,
-		"expected at least one removed raw-hex entry for %q (proof of migration); none found", filePath)
+		"expected at least one removed raw-hex entry (proof of migration); none found")
 }
 
 // assertSingleSHA256RegistryEntry asserts that the file has exactly one

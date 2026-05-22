@@ -1492,7 +1492,16 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			currentPath:        currentPath,
 			expectedFound:      false,
 		},
-		"skips path mismatch": {
+		// TODO: find a better name or keep original 'skips path mismatch'.
+		// also, `FingerprintGrowing: true`, thus it isn't "ordinary Fingerprint
+		// match"
+		"path-agnostic fallback NOT enabled for ordinary Fingerprint match (same-source-path required)": {
+			// Path-agnostic fallback is restricted to the threshold-crossing
+			// case (matched via GrowingFingerprint, not Fingerprint). For
+			// ordinary same-format growth, the stored entry's Source must
+			// match currentPath; mismatched sources are rejected to avoid
+			// confusing two distinct files with a shared content prefix
+			// for renames of one another.
 			storeEntries: map[string]interface{}{
 				"filestream::my-input::fingerprint::aabb": fileMeta{
 					Source:             "/other/file.log",

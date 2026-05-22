@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -221,8 +222,45 @@ func (p *fileProspector) Init(
 				return true
 			}
 
-			_, ok := files[fm.Source]
-			return !ok
+			if _, ok := files[fm.Source]; ok {
+				return false // source still present, keep
+			}
+
+			// Growing entry whose Source path is absent from the current
+			// scan: could be a true deletion (cleanup removes it) or a
+			// rename while filebeat was stopped (the entry needs to stay
+			// alive so the next scan's migrate path can pick it up).
+			//
+			// We preserve ONLY when there's a current file whose
+			// GrowingFingerprint has this entry's stored fingerprint as a
+			// STRICT prefix. GrowingFingerprint is emitted by the scanner
+			// on the one-time scan a path crosses threshold, so a hit
+			// here means a file has bridged from a (potentially renamed)
+			// raw-hex identity to a final SHA-256 identity — strong
+			// evidence of a rename + threshold crossing.
+			//
+			// Ordinary growing-phase rename across restart is intentionally
+			// NOT covered by this skip: distinguishing it from a
+			// shared-header collision (two distinct files starting with
+			// the same content, one of them deleted) is ambiguous without
+			// the threshold signal, and preserving in that case would
+			// cause incorrect state reuse for the surviving file.
+			if !fm.FingerprintGrowing {
+				return true
+			}
+			key := v.Key()
+			delim := identitySep + fingerprintName + identitySep
+			idx := strings.LastIndex(key, delim)
+			if idx < 0 {
+				return true
+			}
+			storedFP := key[idx+len(delim):]
+			for _, desc := range files {
+				if isStrictPrefix(desc.GrowingFingerprint, storedFP) {
+					return false // possible rename + threshold crossing, preserve
+				}
+			}
+			return true
 		})
 	}
 
@@ -336,6 +374,18 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	// Because the harvester is not really part of the prospector,
 	// we use this logger instead of the prospector logger.
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
+
+	// Bootstrap the scanner's hashedPaths set from the persisted registry.
+	// The seed contains paths whose registry state has FingerprintGrowing=false
+	// (or absent — legacy entries read as zero-value). Those files are already
+	// keyed by a SHA-256 hex; their next scan should emit only SHA-256 and not
+	// the (transient, large) GrowingFingerprint. Files in the growing phase
+	// (FingerprintGrowing=true) are NOT in the seed and so will emit
+	// GrowingFingerprint on the watch loop's first scan, enabling the
+	// prospector's prefix-match-and-migrate path. Also subsumes the wipe of
+	// any pollution caused by the enumeration-only GetFiles calls in
+	// Init/takeover above (they touch the same hashedPaths set).
+	p.initFileWatcherHashedPaths(s)
 
 	var tg unison.MultiErrGroup
 
@@ -566,6 +616,62 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 	}
 }
 
+// isStrictPrefix reports whether prefix is a non-empty string strictly
+// shorter than target, and target begins with prefix.
+func isStrictPrefix(target, prefix string) bool {
+	return prefix != "" && len(prefix) < len(target) && strings.HasPrefix(target, prefix)
+}
+
+// initFileWatcherHashedPaths reads the registry and populates the fileWatcher's
+// scanner-side "already-final" path set so that on the next scan we only emit
+// GrowingFingerprint for files that actually still need to migrate.
+//
+// Selection: a fingerprint entry whose persisted state has
+// FingerprintGrowing=false (the omitzero default, also the value legacy
+// entries from registries written before the field existed read as) is a
+// final SHA-256 entry; its source path goes into the seed. Entries with
+// FingerprintGrowing=true are deliberately excluded — they need
+// GrowingFingerprint emitted on the next scan to bridge to their SHA-256.
+//
+// No-op when growing mode is disabled (the scanner has no hashedPaths set in
+// that case and the type-assertion-based dispatch on the fileWatcher silently
+// does nothing).
+func (p *fileProspector) initFileWatcherHashedPaths(updater loginp.StateMetadataUpdater) {
+	if !p.growingFingerprint {
+		return
+	}
+
+	fw, ok := p.filewatcher.(*fileWatcher)
+	if !ok {
+		// TODO(AndersonQ): return an error: if the conversion failed, the code
+		// changed and we need to account for that
+		return
+	}
+
+	fullyGrownPaths := make(map[string]struct{})
+	const fingerprintKeyPrefix = identitySep + fingerprintName + identitySep
+	updater.IterateOnPrefix(func(key string, meta interface{}) bool {
+		if !strings.Contains(key, fingerprintKeyPrefix) {
+			return true
+		}
+		var fm fileMeta
+		if err := typeconv.Convert(&fm, meta); err != nil {
+			return true
+		}
+		if fm.FingerprintGrowing {
+			return true // still growing; needs GrowingFingerprint on next scan
+		}
+		if fm.Source == "" {
+			return true
+		}
+		fullyGrownPaths[fm.Source] = struct{}{}
+		return true
+	})
+
+	fw.SetHashedPaths(fullyGrownPaths)
+	p.logger.Debugf("seeded fileWatcher hashedPaths with %d already-final paths", len(fullyGrownPaths))
+}
+
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
 	err := hg.StopHarvesters()
 	if err != nil {
@@ -712,8 +818,17 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 //     scan, where the primary Fingerprint has flipped to SHA-256 but the
 //     descriptor also carries the raw-hex GrowingFingerprint for matching.
 //
-// Only entries in shortFingerprintIndex (those whose state has Growing == true)
-// are searched, making this O(K) where K is the number of still-growing entries.
+// For each candidate the lookup is tried first with same-source-path
+// matching (high-confidence: stored entry's Source path == currentPath) and
+// then with path-agnostic matching (handles restart + rename, where the
+// stored entry's Source is the OLD path but the descriptor only has the
+// NEW path). The path-agnostic fallback returns the longest prefix match
+// across all growing entries, which makes accidental collisions extremely
+// unlikely for SHA-256-length raw-hex fingerprints (~2048 chars).
+//
+// Only entries in shortFingerprintIndex (those whose state has
+// FingerprintGrowing == true) are searched, making this O(K) where K is
+// the number of still-growing entries.
 func (p *fileProspector) findGrowingFingerprintMatch(
 	updater loginp.StateMetadataUpdater,
 	currentFingerprint string,
@@ -729,16 +844,45 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 		p.buildShortFingerprintSet(updater)
 	}
 
-	if currentFingerprint != "" {
-		if key, _, ok := p.shortFingerprints.FindPrefixMatch(currentFingerprint, currentPath); ok {
+	tryMatch := func(target string, allowPathAgnostic bool) (string, bool) {
+		if target == "" {
+			return "", false
+		}
+		// High-confidence: same source path.
+		if key, _, ok := p.shortFingerprints.FindPrefixMatch(target, currentPath); ok {
 			return key, true
 		}
+		if !allowPathAgnostic {
+			return "", false
+		}
+		// Path-agnostic fallback: only enabled for the threshold-crossing
+		// case (caller passes the descriptor's GrowingFingerprint here).
+		// Restricted to this case because GrowingFingerprint is set only
+		// on the one-time scan a file's primary Fingerprint flips from
+		// raw-hex to SHA-256 — i.e. it carries strong evidence of an
+		// identity transition. Ordinary same-format growth (raw-hex
+		// extending below threshold) does NOT get the fallback, so two
+		// distinct files with a shared header content prefix are not
+		// confused for renames of one another.
+		//
+		// Additional guard: refuse if the stored entry's Source path still
+		// exists on disk — a likely collision (the old file is still
+		// there), not a rename.
+		if key, entry, ok := p.shortFingerprints.FindPrefixMatch(target, ""); ok {
+			if _, err := os.Stat(entry.Source); err != nil {
+				return key, true
+			}
+		}
+		return "", false
 	}
 
-	if currentGrowingFingerprint != "" {
-		if key, _, ok := p.shortFingerprints.FindPrefixMatch(currentGrowingFingerprint, currentPath); ok {
-			return key, true
-		}
+	// Ordinary same-format growth: no path-agnostic fallback.
+	if key, ok := tryMatch(currentFingerprint, false); ok {
+		return key, true
+	}
+	// Threshold-crossing: path-agnostic fallback enabled.
+	if key, ok := tryMatch(currentGrowingFingerprint, true); ok {
+		return key, true
 	}
 
 	return "", false
