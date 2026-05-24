@@ -297,9 +297,9 @@ func TestEnrichAPIJourneyDatasetRouting(t *testing.T) {
 	require.NoError(t, se.enrich(netEvt, &SynthEvent{Type: JourneyNetworkInfo}))
 
 	require.Equal(t,
-		"synthetics.api.network",
+		"api.network",
 		netEvt.Meta[add_data_stream.FieldMetaCustomDataset],
-		"API journey/network_info must land in synthetics.api.network, not browser.network",
+		"API journey/network_info must land in api.network (matching the Fleet integration's `data_stream/api_network` package), not browser.network",
 	)
 }
 

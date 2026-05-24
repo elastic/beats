@@ -110,11 +110,17 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case JourneyNetworkInfo:
 		// Route API journey network events to their own dataset so
 		// ingest pipelines / Kibana dashboards can branch cleanly
-		// without inspecting journey.type on every doc. Fallback to
-		// browser.network when the journey context is unknown so we
-		// don't silently drop dataset routing for older agents.
+		// without inspecting journey.type on every doc. The dataset
+		// name must match the Fleet integration package's
+		// `data_stream/api_network/manifest.yml` (`dataset: api.network`),
+		// otherwise the agent API key — which Fleet scopes to
+		// `synthetics-api.network-default` — will reject writes with
+		// a 403 and the data stream will silently stay empty.
+		// Fallback to browser.network when the journey context is
+		// unknown so we don't silently drop dataset routing for older
+		// agents.
 		if je.journey.IsAPI() {
-			add_data_stream.SetEventDataset(event, "synthetics.api.network")
+			add_data_stream.SetEventDataset(event, "api.network")
 		} else {
 			add_data_stream.SetEventDataset(event, "browser.network")
 		}
