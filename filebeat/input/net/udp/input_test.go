@@ -25,6 +25,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -106,4 +107,61 @@ func TestInput(t *testing.T) {
 	default:
 		// No more events on the channel, test passed
 	}
+}
+
+// TestInputOversizedDatagram sends a datagram larger than max_message_size and
+// checks the input keeps running. On Windows an oversized read returns a nil
+// RemoteAddr, which used to panic the input while formatting the debug log
+// (#50718). A panic here would crash the test binary, so simply reaching the
+// end of the test is the assertion.
+func TestInputOversizedDatagram(t *testing.T) {
+	serverAddr := "127.0.0.1:9043"
+	wg := sync.WaitGroup{}
+	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
+		"host":             serverAddr,
+		"max_message_size": 64,
+	}))
+	if err != nil {
+		t.Fatalf("cannot create input: %s", err)
+	}
+
+	ctx, cancel := context.WithCancel(t.Context())
+	v2Ctx := v2.Context{
+		ID:              t.Name(),
+		Cancelation:     ctx,
+		Logger:          logp.NewNopLogger(),
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
+
+	metrics := inp.InitMetrics("udp", v2Ctx.MetricsRegistry, v2Ctx.Logger)
+	c := make(chan netinput.DataMetadata, 10)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := inp.Run(v2Ctx, c, metrics); err != nil {
+			if !errors.Is(err, context.Canceled) {
+				t.Errorf("input exited with error: %s", err)
+			}
+		}
+	}()
+
+	// Allow the UDP server to start
+	runtime.Gosched()
+
+	// A datagram several times larger than max_message_size. It is sent a few
+	// times so a dropped packet on a slow runner doesn't leave the truncation
+	// path unexercised.
+	oversized := strings.Repeat("x", 256)
+	nettest.RunUDPClient(t, serverAddr, []string{oversized, oversized, oversized})
+
+	select {
+	case <-c:
+		// The oversized datagram was processed without panicking.
+	case <-time.After(30 * time.Second):
+		t.Fatal("timed out waiting for the oversized datagram to be processed")
+	}
+
+	cancel()
+	wg.Wait()
 }

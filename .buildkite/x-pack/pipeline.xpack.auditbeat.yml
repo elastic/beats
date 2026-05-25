@@ -400,7 +400,7 @@ steps:
 
   - group: "Packaging"
     key: "x-pack-auditbeat-packaging"
-
+    if: build.pull_request.id != null
     steps:
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux"
         key: "packaging-linux"
