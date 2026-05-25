@@ -344,9 +344,9 @@ heartbeat.monitors:
 
 ## Publish timeout (Experimental) [publish-timeout]
 
-You can configure Heartbeat to exit after an elapsed timeout if unable to publish pending events. This is an experimental feature and is subject to change.
+The amount of time to wait for all events to be published when shutting down. By default, it waits for 1s. This is an experimental feature and is subject to change. 
 
-Note, the `heartbeat.run_once` flag is required for `publish_timeout` to take effect.
+Note, the `heartbeat.run_once` flag is required for `publish_timeout` to take effect. 
 
 ```yaml
 # heartbeat.yml

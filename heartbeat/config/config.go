@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+const DefaultPipelineShutdownTimeout = 1 * time.Second
+
 type LocationWithID struct {
 	ID  string         `config:"id"`
 	Geo util.GeoConfig `config:"geo"`
@@ -85,7 +87,7 @@ func DefaultConfig(logger *logp.Logger) *Config {
 
 	return &Config{
 		Jobs:           limits,
-		PublishTimeout: 1 * time.Second,
+		PublishTimeout: DefaultPipelineShutdownTimeout,
 	}
 }
 
