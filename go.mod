@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.25.9
+go 1.26.3
 
 require (
 	cloud.google.com/go/bigquery v1.77.0
@@ -212,7 +212,7 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.2
 	go.elastic.co/apm/module/apmhttp/v2 v2.7.2
 	go.elastic.co/apm/v2 v2.7.2
-	go.mongodb.org/mongo-driver v1.17.6
+	go.mongodb.org/mongo-driver v1.17.9
 	go.opentelemetry.io/collector/component v1.58.0
 	go.opentelemetry.io/collector/component/componentstatus v0.152.0
 	go.opentelemetry.io/collector/config/configtls v1.58.0
