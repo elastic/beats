@@ -258,6 +258,7 @@ steps:
 
   - group: "Packaging"
     key: "x-pack-querybeat-packaging"
+    if: build.pull_request.id != null
     steps:
       - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
