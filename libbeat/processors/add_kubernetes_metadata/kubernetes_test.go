@@ -632,7 +632,8 @@ func unavailableK8sClient() k8sclient.Interface {
 // TestCloseUnblocksAsyncInit verifies that Close cancels an async init stuck in the
 // indefinite kubernetes availability wait (timeout=0) and does not leak goroutines.
 func TestCloseUnblocksAsyncInit(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	// Ignore cache.cleanup goroutines from other tests in this package that never call cache.stop().
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 
 	logger := logptest.NewTestingLogger(t, selector)
 	ctx, cancel := context.WithCancel(context.Background())
