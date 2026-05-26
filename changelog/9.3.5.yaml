@@ -5,9 +5,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
+        - https://github.com/elastic/beats/pull/49481
       issue:
         - https://github.com/elastic/beats/issues/49451
       impact: ""
@@ -48,12 +46,8 @@ entries:
       description: ""
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/49869
+      issue: []
       impact: ""
       action: ""
       timestamp: 1775088009
@@ -65,12 +59,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/49980
+      issue: []
       impact: ""
       action: ""
       timestamp: 1775602464
@@ -82,12 +72,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50049
+      issue: []
       impact: ""
       action: ""
       timestamp: 1776193328
@@ -112,12 +98,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50302
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777045487
@@ -129,12 +111,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50382
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777046500
@@ -146,12 +124,8 @@ entries:
       description: ""
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50392
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777275227
@@ -163,12 +137,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50343
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777305272
@@ -188,12 +158,8 @@ entries:
         role, or stack version without joining across data streams.
       component: metricbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50674
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777351182
@@ -211,12 +177,8 @@ entries:
         the evolved cursor so that callers can propagate it into the shared state.
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50383
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777418848
@@ -228,12 +190,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50384
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777430032
@@ -259,12 +217,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50406
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777491987
@@ -276,9 +230,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
+        - https://github.com/elastic/beats/pull/50433
       issue:
         - https://github.com/elastic/beats/issues/50426
       impact: ""
@@ -292,12 +244,8 @@ entries:
       description: ""
       component: winlogbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50443
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777582712
@@ -309,9 +257,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
+        - https://github.com/elastic/beats/pull/50472
       issue:
         - https://github.com/elastic/beats/issues/50471
       impact: ""
@@ -325,12 +271,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50486
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777914810
@@ -342,12 +284,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50492
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777958918
@@ -372,12 +310,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50497
+      issue: []
       impact: ""
       action: ""
       timestamp: 1777989951
@@ -389,12 +323,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50508
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778038687
@@ -406,12 +336,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50534
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778107949
@@ -423,12 +349,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50552
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778172750
@@ -440,12 +362,8 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50555
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778182489
@@ -461,12 +379,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50599
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778513575
@@ -478,12 +392,8 @@ entries:
       description: ""
       component: heartbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50598
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778525715
@@ -495,12 +405,8 @@ entries:
       description: ""
       component: libbeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50609
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778571333
@@ -512,9 +418,7 @@ entries:
       description: ""
       component: all
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
+        - https://github.com/elastic/beats/pull/50625
       issue:
         - https://github.com/elastic/beats/issues/49390
       impact: ""
@@ -528,12 +432,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50686
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778709908
@@ -546,11 +446,7 @@ entries:
       component: all
       pr:
         - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+      issue: []
       impact: ""
       action: ""
       timestamp: 1778788830
@@ -576,9 +472,7 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
+        - https://github.com/elastic/beats/pull/50770
       issue:
         - https://github.com/elastic/beats/issues/50718
       impact: ""
@@ -592,12 +486,8 @@ entries:
       description: ""
       component: filebeat
       pr:
-        - https://github.com/elastic/beats/pull/50644
-        - https://github.com/elastic/beats/pull/50839
-        - https://github.com/elastic/beats/pull/50939
-      issue:
-        - https://github.com/elastic/beats/issues/50640
-        - https://github.com/elastic/beats/issues/50824
+        - https://github.com/elastic/beats/pull/50803
+      issue: []
       impact: ""
       action: ""
       timestamp: 1779249109
