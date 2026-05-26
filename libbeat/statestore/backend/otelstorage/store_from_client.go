@@ -111,7 +111,9 @@ func (s *storeFromClient) Each(fn func(string, backend.ValueDecoder) (bool, erro
 	})
 }
 
-func (s *storeFromClient) SetID(string) {}
+func (s *storeFromClient) SetID(_ string) {
+	// NOOP
+}
 
 type jsonValueDecoder struct {
 	raw json.RawMessage
