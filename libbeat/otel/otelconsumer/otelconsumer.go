@@ -244,25 +244,21 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		}
 	}
 
-	return encodeLogRecordBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo)
-}
-
-func encodeLogRecordBody(logRecord plog.LogRecord, beatEvent mapstr.M, timestamp time.Time, meta mapstr.M, beatInfo beat.Info) error {
 	bodyMap := logRecord.Body().SetEmptyMap()
-	capacity := len(beatEvent) + 1 // +1 for timestamp
+	capacity := len(beatEvent) + 1 // +1 for @timestamp added below
 	if beatInfo.IncludeMetadata {
-		capacity++ // for @metadata
+		capacity++ // +1 for @metadata map added below
 	}
 	bodyMap.EnsureCapacity(capacity)
 	if err := otelmap.FromMapstr(bodyMap, beatEvent); err != nil {
 		return err
 	}
 
-	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(timestamp))
+	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(event.Content.Timestamp))
 	if beatInfo.IncludeMetadata {
 		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
-		pmeta.EnsureCapacity(len(meta) + 3)
-		if err := otelmap.FromMapstr(pmeta, meta); err != nil {
+		pmeta.EnsureCapacity(len(event.Content.Meta) + 3)
+		if err := otelmap.FromMapstr(pmeta, event.Content.Meta); err != nil {
 			return err
 		}
 		pmeta.PutStr("beat", beatInfo.Beat)
