@@ -32,8 +32,19 @@ import (
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
 	beatNameCtxKey        = "beat_name"
 	beatVersionCtxtKey    = "beat_version"
+=======
+
+	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
+	// It is duplicated here to avoid importing the receivertest package
+	// (and pulling its testify/testing deps) into production binaries.
+	receivertestUniqueIDAttrName = "test_id"
+
+	retryBackoffInit = 1 * time.Second
+	retryBackoffMax  = 60 * time.Second
+>>>>>>> 426dc4327 (libbeat/otel: avoid importing receivertest from production code (#50924)):libbeat/otel/otelconsumer/otelconsumer.go
 )
 
 func init() {
@@ -116,6 +127,16 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			switch id := id.(type) {
 			case string:
 				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer.go
+=======
+
+				// The receivertest package needs a unique attribute to track generated ids.
+				// When receivertest allows this to be customized we can remove this condition.
+				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+				if out.isReceiverTest {
+					logRecord.Attributes().PutStr(receivertestUniqueIDAttrName, id)
+				}
+>>>>>>> 426dc4327 (libbeat/otel: avoid importing receivertest from production code (#50924)):libbeat/otel/otelconsumer/otelconsumer.go
 			}
 		}
 
