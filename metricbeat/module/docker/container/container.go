@@ -23,8 +23,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -40,7 +39,7 @@ func init() {
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *client.Client
+	dockerClient *dockerclient.Client
 	dedot        bool
 }
 
@@ -67,11 +66,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ContainerList(ctx, container.ListOptions{})
+	result, err := m.dockerClient.ContainerList(ctx, dockerclient.ContainerListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get docker containers list: %w", err)
 	}
-	eventsMapping(r, containers, m.dedot, m.Logger())
+	eventsMapping(r, result.Items, m.dedot, m.Logger())
 
 	return nil
 }

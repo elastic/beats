@@ -390,7 +390,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
 	if err != nil {
@@ -467,6 +466,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
 		}
+		if err := b.API.AttachStateInspector(); err != nil {
+			return fmt.Errorf("failed to attach state inspector: %w", err)
+		}
 	}
 
 	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
@@ -520,10 +522,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		func() {
 			stopOnce.Do(func() {
 				b.Instrumentation.Tracer().Close()
-				// If the publisher has a Close() method, call it before stopping the beater.
-				if c, ok := b.Publisher.(io.Closer); ok {
-					c.Close()
-				}
+				// disconnect the pipeline first
+				b.Publisher.Disconnect(context.Background())
 				beater.Stop()
 			})
 		})
@@ -1278,7 +1278,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
-	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), b.Info.Paths)
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
 }
 
 func (b *Beat) registerClusterUUIDFetching() {

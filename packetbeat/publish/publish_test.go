@@ -20,6 +20,7 @@
 package publish
 
 import (
+	"context"
 	"net"
 	"sync/atomic"
 	"testing"
@@ -56,6 +57,10 @@ func (p *mockPipeline) ConnectWith(_ beat.ClientConfig) (beat.Client, error) {
 }
 func (p *mockPipeline) Connect() (beat.Client, error) {
 	return p.client, nil
+}
+
+func (p *mockPipeline) Disconnect(ctx context.Context) error {
+	return p.client.Close()
 }
 
 func TestStopWaitsForWorkers(t *testing.T) {
