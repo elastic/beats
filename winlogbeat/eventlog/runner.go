@@ -34,6 +34,13 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
+var (
+	isRecoverable         = IsRecoverable
+	openRetryInitialDelay = 5 * time.Second
+	readRetryInitialDelay = 5 * time.Second
+	retryMaxDelay         = time.Minute
+)
+
 type Publisher interface {
 	Publish(records []Record) error
 }
@@ -73,7 +80,7 @@ func Run(
 		openChannelNotFoundErrDetected = true
 	}
 
-	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+	openErrHandler := newExponentialLimitedBackoff(log, openRetryInitialDelay, retryMaxDelay, func(err error) bool {
 		if mustIgnoreError(err, api) {
 			if isChannelNotFound(err) {
 				logChannelNotFoundOpenRetry(err)
@@ -82,7 +89,7 @@ func Run(
 			}
 			return true
 		}
-		if !IsRecoverable(err, api.IsFile()) {
+		if !isRecoverable(err, api.IsFile()) {
 			return false
 		}
 		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
@@ -94,7 +101,7 @@ func Run(
 		return true
 	})
 
-	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+	readErrHandler := newExponentialLimitedBackoff(log, readRetryInitialDelay, retryMaxDelay, func(err error) bool {
 		if mustIgnoreError(err, api) {
 			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
 			if resetErr := api.Reset(); resetErr != nil {
@@ -102,7 +109,7 @@ func Run(
 			}
 			return true
 		}
-		if !IsRecoverable(err, api.IsFile()) {
+		if !isRecoverable(err, api.IsFile()) {
 			return false
 		}
 		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
@@ -113,9 +120,10 @@ func Run(
 		return true
 	})
 
+	currentCheckpoint := evtCheckpoint
 runLoop:
 	for cancelCtx.Err() == nil {
-		openErr := api.Open(evtCheckpoint, metricsRegistry)
+		openErr := api.Open(currentCheckpoint, metricsRegistry)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
@@ -141,6 +149,7 @@ runLoop:
 					return err
 				}
 			}
+			currentCheckpoint = api.Checkpoint()
 
 			if readErr != nil {
 				// io.EOF signals a clean end of stream (e.g. no_more_events: stop).

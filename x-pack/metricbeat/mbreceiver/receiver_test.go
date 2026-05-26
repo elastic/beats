@@ -47,7 +47,9 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -126,7 +128,9 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -151,7 +155,9 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -355,7 +361,9 @@ func BenchmarkFactory(b *testing.B) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		rcvr, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
 }
@@ -398,6 +406,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"metricbeat": map[string]any{
 						"max_start_delay": "0s",
 						"modules": []map[string]any{

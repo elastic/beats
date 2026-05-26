@@ -58,6 +58,8 @@ type Heartbeat struct {
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
+
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 // New creates a new heartbeat.
@@ -313,6 +315,10 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
+}
+
+func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
+	bt.otelStatusFactoryWrapper = wrapper
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state

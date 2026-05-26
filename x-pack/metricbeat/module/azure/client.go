@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // MetricCollectionInfo contains information about the last time
@@ -45,18 +46,20 @@ type Client struct {
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
 type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
-// NewClient instantiates the Azure monitoring client
-func NewClient(config Config, logger *logp.Logger) (*Client, error) {
+// NewClient instantiates the Azure monitoring client. Pass nil for metrics
+// to disable API instrumentation (e.g. in tests).
+func NewClient(config Config, logger *logp.Logger, metrics *monitoring.Registry) (*Client, error) {
 	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
+	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, metrics, logger)
 
 	logger = logger.Named("azure monitor client")
 
 	client := &Client{
 		BaseClient: &BaseClient{
-			AzureMonitorService: azureMonitorService,
+			AzureMonitorService: observedAzureMonitorService,
 			Config:              config,
 			Log:                 logger,
 			MetricRegistry:      NewMetricRegistry(logger),

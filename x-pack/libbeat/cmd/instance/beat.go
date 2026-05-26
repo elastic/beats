@@ -65,6 +65,13 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	b.Info.ComponentID = componentID
 	b.Info.LogConsumer = consumer
 
+	if v, ok := receiverConfig["include_metadata"]; ok {
+		if include, ok := v.(bool); ok {
+			b.Info.IncludeMetadata = include
+		}
+		delete(receiverConfig, "include_metadata")
+	}
+
 	// begin code similar to configure
 	if err = plugin.Initialize(); err != nil {
 		return nil, fmt.Errorf("error initializing plugins: %w", err)
@@ -277,7 +284,6 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		InputQueueSize: b.InputQueueSize,
 		WaitCloseMode:  pipeline.WaitOnPipelineCloseThenForce,
 		WaitClose:      receiverPublisherCloseTimeout,
-		Paths:          b.Info.Paths,
 	}
 	publisher, err := pipeline.NewForReceiver(b.Info, monitors, b.Config.Pipeline.Queue, pipelineSettings, intakeQueueID)
 	if err != nil {

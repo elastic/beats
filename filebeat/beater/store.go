@@ -28,8 +28,8 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/filebeat/features"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
@@ -72,8 +72,8 @@ func storeKey(resolvedPath, backendName string) string {
 	return backendName + "://" + resolvedPath
 }
 
-func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry, beatPaths *paths.Path) (*filebeatStore, error) {
-	resolvedPath := beatPaths.Resolve(paths.Data, cfg.Path)
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
+	resolvedPath := info.Paths.Resolve(paths.Data, cfg.Path)
 	key := storeKey(resolvedPath, cfg.Backend)
 
 	globalMu.Lock()
