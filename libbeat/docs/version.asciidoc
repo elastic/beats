@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 :stack-version: 9.4.1
 :doc-branch: 9.4
-:go-version: 1.25.9
-=======
-:stack-version: 9.3.0
-:doc-branch: current
 :go-version: 1.26.3
->>>>>>> 51e732166 (Update go to 1.26.3 (#50644))
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
