@@ -70,7 +70,7 @@ func (s *storeFromClient) Get(key string, to any) error {
 	if b == nil {
 		return errKeyUnknown
 	}
-	var dec map[string]any
+	var dec mapstr.M
 	if err := json.Unmarshal(b, &dec); err != nil {
 		return fmt.Errorf("failed to unmarshal stored value for key %q: %w", key, err)
 	}
@@ -118,7 +118,7 @@ type jsonValueDecoder struct {
 }
 
 func (d *jsonValueDecoder) Decode(to any) error {
-	var dec map[string]any
+	var dec mapstr.M
 	if err := json.Unmarshal(d.raw, &dec); err != nil {
 		return err
 	}
