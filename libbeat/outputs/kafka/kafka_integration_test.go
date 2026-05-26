@@ -22,6 +22,7 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand/v2"
 	"os"
@@ -64,6 +65,11 @@ func TestKafkaPublish(t *testing.T) {
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
 	logType := fmt.Sprintf("log-type-%s", id)
+
+	// Topic auto-creation is asynchronous; wait for leaders before publishing to avoid
+	// "no leader for this partition" failures during leadership election.
+	ensureKafkaTopicReadyForWrites(t, testTopic)
+	ensureKafkaTopicReadyForWrites(t, logType)
 
 	tests := []struct {
 		title  string
@@ -358,6 +364,7 @@ func TestKafkaPublish(t *testing.T) {
 func TestKafkaErrors(t *testing.T) {
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
+	ensureKafkaTopicReadyForWrites(t, testTopic)
 
 	tests := []struct {
 		title        string
@@ -522,6 +529,51 @@ func getTestSASLKafkaHost() string {
 		getenv("KAFKA_HOST", kafkaDefaultHost),
 		getenv("KAFKA_SASL_PORT", kafkaDefaultSASLPort),
 	)
+}
+
+func ensureKafkaTopicReadyForWrites(t *testing.T, topic string) {
+	t.Helper()
+
+	saramaCfg := sarama.NewConfig()
+	saramaCfg.Version = sarama.V2_1_0_0
+	hosts := []string{getTestKafkaHost()}
+
+	admin, err := sarama.NewClusterAdmin(hosts, saramaCfg)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, admin.Close())
+	})
+
+	topicDetail := &sarama.TopicDetail{
+		NumPartitions:     3,
+		ReplicationFactor: 1,
+	}
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		err = admin.CreateTopic(topic, topicDetail, false)
+		if err != nil && !errors.Is(err, sarama.ErrTopicAlreadyExists) {
+			require.NoError(ct, err)
+		}
+	}, 30*time.Second, 200*time.Millisecond, "failed to create topic %s", topic)
+
+	client, err := sarama.NewClient(hosts, saramaCfg)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, client.Close())
+	})
+
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		require.NoError(ct, client.RefreshMetadata(topic))
+
+		partitions, err := client.Partitions(topic)
+		require.NoError(ct, err)
+		require.NotEmpty(ct, partitions)
+
+		for _, partition := range partitions {
+			leader, err := client.Leader(topic, partition)
+			require.NoError(ct, err)
+			require.NotNil(ct, leader)
+		}
+	}, 30*time.Second, 200*time.Millisecond, "topic %s is not ready for writes", topic)
 }
 
 func makeConfig(t *testing.T, in map[string]interface{}) *config.C {
