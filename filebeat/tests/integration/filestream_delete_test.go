@@ -41,16 +41,16 @@ import (
 )
 
 var logFileLines = []string{
-	"You can't connect the panel without connecting the wireless AGP panel!",
-	"We need to back up the haptic FTP hard drive!",
-	"Indexing the array won't do anything, we need to parse the neural SMTP system!",
-	"I'll generate the haptic TCP pixel, that should transmitter the JBOD application!",
-	"I'll quantify the wireless XSS driver, that should port the HTTP driver!",
-	"If we connect the program, we can get to the ADP alarm through the back-end EXE pixel!",
-	"I'll generate the primary SSL port, that should firewall the IB firewall!",
-	"I'll program the digital RSS bus, that should sensor the JSON system!",
-	"Hacking the feed won't do anything, we need to input the optical PNG microchip!",
-	"We need to synthesize the solid state GB port!",
+	"[01] ============================================",
+	"[02] ============================================",
+	"[03] ============================================",
+	"[04] ============================================",
+	"[05] ============================================",
+	"[06] ============================================",
+	"[07] ============================================",
+	"[08] ============================================",
+	"[09] ============================================",
+	"[10] ============================================",
 }
 
 func TestFilestreamDelete(t *testing.T) {
