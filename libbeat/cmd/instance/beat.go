@@ -522,10 +522,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		func() {
 			stopOnce.Do(func() {
 				b.Instrumentation.Tracer().Close()
-				// If the publisher has a Close() method, call it before stopping the beater.
-				if c, ok := b.Publisher.(io.Closer); ok {
-					c.Close()
-				}
+				// disconnect the pipeline first
+				b.Publisher.Disconnect(context.Background())
 				beater.Stop()
 			})
 		})
