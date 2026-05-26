@@ -212,20 +212,6 @@ require (
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.7.2
 	go.elastic.co/apm/module/apmhttp/v2 v2.7.2
 	go.elastic.co/apm/v2 v2.7.2
-<<<<<<< HEAD
-	go.mongodb.org/mongo-driver v1.17.6
-	go.opentelemetry.io/collector/component v1.58.0
-	go.opentelemetry.io/collector/component/componentstatus v0.152.0
-	go.opentelemetry.io/collector/config/configtls v1.58.0
-	go.opentelemetry.io/collector/confmap v1.58.0
-	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.58.0
-	go.opentelemetry.io/collector/consumer v1.58.0
-	go.opentelemetry.io/collector/consumer/consumererror v0.152.0
-	go.opentelemetry.io/collector/exporter/debugexporter v0.152.0
-	go.opentelemetry.io/collector/otelcol v0.152.0
-	go.opentelemetry.io/collector/pdata v1.58.0
-	go.opentelemetry.io/collector/receiver v1.58.0
-=======
 	go.mongodb.org/mongo-driver v1.17.9
 	go.opentelemetry.io/collector/component v1.59.0
 	go.opentelemetry.io/collector/component/componentstatus v0.153.0
@@ -238,7 +224,6 @@ require (
 	go.opentelemetry.io/collector/otelcol v0.153.0
 	go.opentelemetry.io/collector/pdata v1.59.0
 	go.opentelemetry.io/collector/receiver v1.59.0
->>>>>>> 59ee6851c (chore: update OTel Collector dependencies to v0.153.0/v1.59.0 (#50913))
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.43.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260406210006-6f92a3bedf2d
@@ -320,17 +305,8 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.6.0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.31.0 // indirect
-<<<<<<< HEAD
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.54.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.54.0 // indirect
-	github.com/IBM/sarama v1.48.0 // indirect
-=======
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.55.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.55.0 // indirect
-	github.com/Velocidex/json v0.0.0-20220224052537-92f3c0326e5a // indirect
-	github.com/Velocidex/ordereddict v0.0.0-20230909174157-2aa49cc5d11d // indirect
-	github.com/Velocidex/yaml/v2 v2.2.8 // indirect
->>>>>>> 59ee6851c (chore: update OTel Collector dependencies to v0.153.0/v1.59.0 (#50913))
 	github.com/VictoriaMetrics/easyproto v0.1.4 // indirect
 	github.com/alecthomas/repr v0.1.1 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 // indirect
