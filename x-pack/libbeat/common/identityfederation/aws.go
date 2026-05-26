@@ -30,7 +30,7 @@ const (
 	// AWSIRSATokenFileEnvVar is the standard AWS SDK env var for IRSA (IAM Roles
 	// for Service Accounts) on EKS. When set, the pod authenticates via its
 	// Kubernetes service-account token rather than an OIDC JWT from the agentless controller.
-	AWSIRSATokenFileEnvVar = "AWS_WEB_IDENTITY_TOKEN_FILE"
+	AWSIRSATokenFileEnvVar = "AWS_WEB_IDENTITY_TOKEN_FILE" //nolint:gosec // G101 false positive: this is an env var name, not a credential
 )
 
 const defaultIntermediateDuration = 20 * time.Minute
