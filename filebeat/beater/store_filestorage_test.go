@@ -35,12 +35,12 @@ func TestOpenStateStore_OtelFileStorageSetGet(t *testing.T) {
 	beatPaths := paths.New()
 	beatPaths.Data = dir
 
-	fb, err := openStateStore(t.Context(), beat.Info{Beat: "testbeat"}, logp.NewNopLogger(), config.Registry{
+	fb, err := openStateStore(t.Context(), beat.Info{Beat: "testbeat", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
 		Path:          "",
 		Permissions:   0o600,
 		CleanInterval: 5 * time.Second,
 		Backend:       "otel_file_storage",
-	}, beatPaths)
+	})
 	require.NoError(t, err)
 	defer fb.Close()
 
@@ -59,11 +59,11 @@ func TestOpenStateStore_UnknownBackend(t *testing.T) {
 	beatPaths := paths.New()
 	beatPaths.Data = dir
 
-	_, err := openStateStore(t.Context(), beat.Info{Beat: "test"}, logp.NewNopLogger(), config.Registry{
+	_, err := openStateStore(t.Context(), beat.Info{Beat: "test", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
 		Path:          "",
 		Backend:       "not_a_real_backend",
 		CleanInterval: 5 * time.Second,
-	}, beatPaths)
+	})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "unknown registry backend")
 }
@@ -73,11 +73,11 @@ func TestOpenStateStore_OtelFileStorageInvalidBeatName(t *testing.T) {
 	beatPaths := paths.New()
 	beatPaths.Data = dir
 
-	_, err := openStateStore(t.Context(), beat.Info{Beat: "!!!invalid component id!!!"}, logp.NewNopLogger(), config.Registry{
+	_, err := openStateStore(t.Context(), beat.Info{Beat: "!!!invalid component id!!!", Paths: beatPaths}, logp.NewNopLogger(), config.Registry{
 		Path:          "",
 		Backend:       "otel_file_storage",
 		CleanInterval: 5 * time.Second,
-	}, beatPaths)
+	})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid beat name for otel_file_storage registry")
 }
@@ -94,11 +94,11 @@ func TestOpenStateStore_OtelFileStorageSharesRegistryByPath(t *testing.T) {
 		Backend:       "otel_file_storage",
 	}
 
-	s1, err := openStateStore(t.Context(), beat.Info{Beat: "a"}, logp.NewNopLogger(), cfg, beatPaths)
+	s1, err := openStateStore(t.Context(), beat.Info{Beat: "a", Paths: beatPaths}, logp.NewNopLogger(), cfg)
 	require.NoError(t, err)
 	defer s1.Close()
 
-	s2, err := openStateStore(t.Context(), beat.Info{Beat: "b"}, logp.NewNopLogger(), cfg, beatPaths)
+	s2, err := openStateStore(t.Context(), beat.Info{Beat: "b", Paths: beatPaths}, logp.NewNopLogger(), cfg)
 	require.NoError(t, err)
 	defer s2.Close()
 
