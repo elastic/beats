@@ -53,6 +53,10 @@ func (m noopProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {
 	return nil
 }
 
+func (m noopProspector) TakeOver(_ StoreUpdater, _ func(Source) string) error {
+	return nil
+}
+
 func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {}
 
 func (m noopProspector) Test() error {

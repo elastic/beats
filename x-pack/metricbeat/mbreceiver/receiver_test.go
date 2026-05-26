@@ -47,7 +47,9 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -78,7 +80,7 @@ func TestNewReceiver(t *testing.T) {
 				Name:    "r1",
 				Beat:    "metricbeat",
 				Config:  &config,
-				Factory: NewFactory(Settings{Home: t.TempDir()}),
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
@@ -126,7 +128,9 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -151,7 +155,9 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -174,7 +180,7 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
-	factory := NewFactory(Settings{Home: t.TempDir()})
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
 		T: t,
 		Receivers: []oteltest.ReceiverConfig{
@@ -347,7 +353,7 @@ func BenchmarkFactory(b *testing.B) {
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		zapcore.InfoLevel)
 
-	factory := NewFactory(Settings{Home: tmpDir})
+	factory := NewFactoryWithSettings(Settings{Home: tmpDir})
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
@@ -355,7 +361,9 @@ func BenchmarkFactory(b *testing.B) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		rcvr, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
 }
@@ -398,6 +406,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"metricbeat": map[string]any{
 						"max_start_delay": "0s",
 						"modules": []map[string]any{
@@ -421,7 +430,7 @@ func TestReceiverStatus(t *testing.T) {
 						Name:    "r1",
 						Beat:    "metricbeat",
 						Config:  &config,
-						Factory: NewFactory(Settings{Home: t.TempDir()}),
+						Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
 					},
 				},
 				Status: test.status,
@@ -457,5 +466,5 @@ func TestReceiverHook(t *testing.T) {
 
 	// For metricbeatreceiver, we expect 2 hooks to be registered:
 	// 	one for beat metrics and one for input metrics.
-	oteltest.TestReceiverHook(t, &cfg, NewFactory(Settings{Home: t.TempDir()}), receiverSettings, 2)
+	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
 }

@@ -1,0 +1,14 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*_querylog.json
+    os.darwin:
+      - /usr/local/var/lib/elasticsearch/*_querylog.json
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_querylog.json
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/querylog.yml

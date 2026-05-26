@@ -15,6 +15,24 @@ import (
 
 const LimitOperator table.Operator = 73
 
+// isNumericKind reports whether k is any integer, unsigned integer, or floating-point kind.
+// float64 can represent all int32/uint32 values exactly; precision is lost only for
+// int64/uint64 values beyond 2^53, which are not realistic in osquery filter expressions.
+func isNumericKind(k reflect.Kind) bool {
+	switch k {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Float32, reflect.Float64:
+		return true
+	}
+	return false
+}
+
+// toFloat64Value converts any numeric reflect.Value to float64.
+func toFloat64Value(v reflect.Value) float64 {
+	return v.Convert(reflect.TypeFor[float64]()).Float()
+}
+
 // Filter represents an osquery constraint
 type Filter struct {
 	// ColumnName is the name of the column to filter on
@@ -40,28 +58,15 @@ func (f Filter) equals(entry any) bool {
 			return false
 		}
 		return expressionBool == value.Bool()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		expressionInt, ok := ToInt64(f.Expression)
-		if !ok {
+	default:
+		if !isNumericKind(value.Kind()) {
 			return false
 		}
-		fieldInt, ok := ToInt64(value.Interface())
-		if !ok {
-			return false
-		}
-		return expressionInt == fieldInt
-	case reflect.Float64, reflect.Float32:
 		expressionFloat, ok := ToFloat64(f.Expression)
 		if !ok {
 			return false
 		}
-		fieldFloat, ok := ToFloat64(value.Interface())
-		if !ok {
-			return false
-		}
-		return expressionFloat == fieldFloat
-	default:
-		return false
+		return toFloat64Value(value) == expressionFloat
 	}
 }
 
@@ -73,28 +78,6 @@ func (f Filter) lessThan(entry any) bool {
 	}
 
 	switch value.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		expressionInt, ok := ToInt64(f.Expression)
-		if !ok {
-			return false
-		}
-		// Even though the field is an int, it may not cast to an int64, so we need to convert it
-		// to be safe
-		fieldInt, ok := ToInt64(value.Interface())
-		if !ok {
-			return false
-		}
-		return fieldInt < expressionInt
-	case reflect.Float64, reflect.Float32:
-		expressionFloat, ok := ToFloat64(f.Expression)
-		if !ok {
-			return false
-		}
-		fieldFloat, ok := ToFloat64(value.Interface())
-		if !ok {
-			return false
-		}
-		return fieldFloat < expressionFloat
 	case reflect.Bool:
 		expressionBool, ok := ToBool(f.Expression)
 		if !ok {
@@ -102,7 +85,14 @@ func (f Filter) lessThan(entry any) bool {
 		}
 		return !value.Bool() && expressionBool
 	default:
-		return false
+		if !isNumericKind(value.Kind()) {
+			return false
+		}
+		expressionFloat, ok := ToFloat64(f.Expression)
+		if !ok {
+			return false
+		}
+		return toFloat64Value(value) < expressionFloat
 	}
 }
 
@@ -113,28 +103,6 @@ func (f Filter) greaterThan(entry any) bool {
 		return false
 	}
 	switch value.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		expressionInt, ok := ToInt64(f.Expression)
-		if !ok {
-			return false
-		}
-		// Even though the field is an int, it may not cast to an int64, so we need to convert it
-		// to be safe
-		fieldInt, ok := ToInt64(value.Interface())
-		if !ok {
-			return false
-		}
-		return fieldInt > expressionInt
-	case reflect.Float64, reflect.Float32:
-		expressionFloat, ok := ToFloat64(f.Expression)
-		if !ok {
-			return false
-		}
-		fieldFloat, ok := ToFloat64(value.Interface())
-		if !ok {
-			return false
-		}
-		return fieldFloat > expressionFloat
 	case reflect.Bool:
 		expressionBool, ok := ToBool(f.Expression)
 		if !ok {
@@ -142,7 +110,14 @@ func (f Filter) greaterThan(entry any) bool {
 		}
 		return value.Bool() && !expressionBool
 	default:
-		return false
+		if !isNumericKind(value.Kind()) {
+			return false
+		}
+		expressionFloat, ok := ToFloat64(f.Expression)
+		if !ok {
+			return false
+		}
+		return toFloat64Value(value) > expressionFloat
 	}
 }
 

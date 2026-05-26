@@ -21,10 +21,12 @@ import (
 	"reflect"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
@@ -96,7 +98,7 @@ func TestRenameRun(t *testing.T) {
 				"a": 2,
 				"b": "q",
 				"error": mapstr.M{
-					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
+					"message": "failed to rename fields in processor: target field b already exists, drop or rename this field first",
 				},
 			},
 			error:         true,
@@ -195,7 +197,7 @@ func TestRenameRun(t *testing.T) {
 				"a": 9,
 				"c": 10,
 				"error": mapstr.M{
-					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
+					"message": "failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
 				},
 			},
 			error:         true,
@@ -251,6 +253,63 @@ func TestRenameRun(t *testing.T) {
 			}
 
 			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
+		})
+	}
+}
+
+// TestRenameSingleFieldNoClone verifies that a single rename with non-overlapping
+// top-level paths uses renameFieldSafe and returns the same event pointer (no clone).
+func TestRenameSingleFieldNoClone(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "rename_test")
+	tests := []struct {
+		name       string
+		input      mapstr.M
+		from, to   string
+		wantErr    bool
+		wantFields mapstr.M
+	}{
+		{
+			name:       "success: single non-overlapping rename",
+			input:      mapstr.M{"message": "hello"},
+			from:       "message",
+			to:         "event.original",
+			wantFields: mapstr.M{"event": mapstr.M{"original": "hello"}},
+		},
+		{
+			name:    "error: target already exists",
+			input:   mapstr.M{"a": 1, "b": 2},
+			from:    "a",
+			to:      "b",
+			wantErr: true,
+			wantFields: mapstr.M{
+				"a": 1,
+				"b": 2,
+				"error": mapstr.M{
+					"message": "failed to rename fields in processor: target field b already exists, drop or rename this field first",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &renameFields{
+				config: renameFieldsConfig{
+					Fields:      []fromTo{{From: tc.from, To: tc.to}},
+					FailOnError: true,
+				},
+				logger: log,
+			}
+			event := &beat.Event{Fields: tc.input.Clone()}
+
+			result, err := f.Run(event)
+			if tc.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Same(t, event, result, "single non-overlapping rename must not clone the event")
+			assert.Equal(t, tc.wantFields, result.Fields)
 		})
 	}
 }
@@ -394,4 +453,40 @@ func TestRenameField(t *testing.T) {
 		assert.Equal(t, expMeta, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
+}
+
+// BenchmarkRenameSingleField benchmarks a single-field rename with different
+// top-level keys (e.g. message → event.original), the common agent pattern.
+func BenchmarkRenameSingleField(b *testing.B) {
+	c, err := conf.NewConfigFrom(map[string]interface{}{
+		"fields": []map[string]interface{}{
+			{"from": "message", "to": "event.original"},
+		},
+		"fail_on_error": true,
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	p, err := NewRenameFields(c, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{
+			Fields: mapstr.M{
+				"message": "test log line with some content",
+				"agent":   mapstr.M{"name": "test", "version": "8.17.0"},
+				"host":    mapstr.M{"name": "myhost", "os": mapstr.M{"type": "linux"}},
+				"cloud":   mapstr.M{"provider": "gcp", "region": "us-central1"},
+			},
+		}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
 }

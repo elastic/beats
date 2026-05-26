@@ -17,7 +17,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 This is a module for different types of MySQL logs. Currently focusing on data from the MySQL Enterprise Audit Plugin in JSON format.
 
-To configure the the Enterprise Audit Plugin to output in JSON format please follow the directions in the [MySQL Documentation.](https://dev.mysql.com/doc/refman/8.0/en/audit-log-file-formats.md)
+To configure the Enterprise Audit Plugin to output in JSON format please follow the directions in the [MySQL Documentation.](https://dev.mysql.com/doc/refman/8.0/en/audit-log-file-formats.md)
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.

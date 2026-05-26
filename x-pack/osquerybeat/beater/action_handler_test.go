@@ -39,6 +39,7 @@ type mockPublisher struct {
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
 	reqData    interface{}
+	profile    map[string]interface{}
 }
 
 func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
@@ -50,6 +51,10 @@ func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID,
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData
+}
+
+func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+	p.profile = profile
 }
 
 func TestActionHandlerExecute(t *testing.T) {
@@ -70,7 +75,7 @@ func TestActionHandlerExecute(t *testing.T) {
 	tests := []struct {
 		Name          string
 		QueryExecutor queryExecutor
-		Publisher     queryResultPublisher
+		Publisher     actionQueryPublisher
 
 		Request map[string]interface{}
 		Err     error

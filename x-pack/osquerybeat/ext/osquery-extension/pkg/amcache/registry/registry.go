@@ -10,38 +10,21 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 
-	"github.com/forensicanalysis/fslib"
-	"github.com/forensicanalysis/fslib/systemfs"
 	"www.velocidex.com/golang/regparser"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 
-// getFileContents reads the contents of a file and returns it as a byte slice.
-// If the file is not readable, it will attempt to read it using a low level read
-// using fslib.
 func getFileContents(filePath string, log *logger.Logger) ([]byte, error) {
 	content, err := os.ReadFile(filePath)
 	if err == nil {
 		return content, nil
 	}
 	log.Infof("failed to read %s, falling back to low level read", filePath)
-
-	// fallback to a low level read using fslib
-	sourceFS, err := systemfs.New()
-	if err != nil {
-		log.Errorf("failed to open file %s: %s", filePath, err.Error())
-		return nil, err
-	}
-	fsPath, err := fslib.ToFSPath(filePath)
-	if err != nil {
-		return nil, err
-	}
-	return fs.ReadFile(sourceFS, fsPath)
+	return readFileViaNTFS(filePath)
 }
 
 // loadExistingRegistry loads the registry from the given file path.  Without any transaction logs.

@@ -26,13 +26,16 @@ import (
 //   query: select * from usb_devices
 
 const (
-	DefaultNamespace              = "default"
-	DefaultDataset                = "osquery_manager.result"
-	DefaultType                   = "logs"
-	DefaultActionResponsesDataset = "osquery_manager.action.responses"
+	DefaultNamespace               = "default"
+	DefaultDataset                 = "osquery_manager.result"
+	DefaultType                    = "logs"
+	DefaultActionResponsesDataset  = "osquery_manager.action.responses"
+	DefaultQueryProfileDataset     = "osquery_manager.query_profile"
+	DefaultQueryProfileMaxProfiles = 64
 )
 
 var datastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultDataset)
+var queryProfileDatastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultQueryProfileDataset)
 
 type StreamConfig struct {
 	ID         string                 `config:"id"`
@@ -41,6 +44,8 @@ type StreamConfig struct {
 	Platform   string                 `config:"platform"`    // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
 	Version    string                 `config:"version"`     // only run on osquery versions greater than or equal-to this version string
 	ECSMapping map[string]interface{} `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
+	// Profile enables per-query profiling for this stream (scheduled query metrics). Requires an input stream with dataset osquery_manager.query_profile to publish events.
+	Profile bool `config:"profile" json:"profile,omitempty"`
 }
 
 type DatastreamConfig struct {
@@ -132,6 +137,36 @@ func hasArtifactConfig(cfg *InstallArtifactConfig) bool {
 	return cfg != nil && strings.TrimSpace(cfg.ArtifactURL) != ""
 }
 
+func cloneInstallArtifactConfig(cfg *InstallArtifactConfig) *InstallArtifactConfig {
+	if cfg == nil {
+		return nil
+	}
+	clone := *cfg
+	if cfg.AllowInsecureURL != nil {
+		val := *cfg.AllowInsecureURL
+		clone.AllowInsecureURL = &val
+	}
+	return &clone
+}
+
+func cloneInstallPlatformConfig(cfg *InstallPlatformConfig) *InstallPlatformConfig {
+	if cfg == nil {
+		return nil
+	}
+	clone := *cfg
+	clone.AMD64 = cloneInstallArtifactConfig(cfg.AMD64)
+	clone.ARM64 = cloneInstallArtifactConfig(cfg.ARM64)
+	return &clone
+}
+
+func cloneInstallConfig(cfg InstallConfig) InstallConfig {
+	clone := cfg
+	clone.Linux = cloneInstallPlatformConfig(cfg.Linux)
+	clone.Darwin = cloneInstallPlatformConfig(cfg.Darwin)
+	clone.Windows = cloneInstallPlatformConfig(cfg.Windows)
+	return clone
+}
+
 func (c InstallConfig) AllowInsecureURLForPlatform(goos, goarch string) bool {
 	platformCfg := c.PlatformConfig(goos)
 	if platformCfg != nil {
@@ -169,14 +204,15 @@ func (c *InstallPlatformConfig) ArchConfig(goarch string) *InstallArtifactConfig
 	}
 }
 
-func (c *InstallConfig) NormalizeAndValidate() error {
+func (c InstallConfig) NormalizeAndValidate() (InstallConfig, error) {
+	normalized := cloneInstallConfig(c)
 	platforms := []struct {
 		name string
 		cfg  *InstallPlatformConfig
 	}{
-		{name: "linux", cfg: c.Linux},
-		{name: "darwin", cfg: c.Darwin},
-		{name: "windows", cfg: c.Windows},
+		{name: "linux", cfg: normalized.Linux},
+		{name: "darwin", cfg: normalized.Darwin},
+		{name: "windows", cfg: normalized.Windows},
 	}
 
 	for _, platform := range platforms {
@@ -197,14 +233,14 @@ func (c *InstallConfig) NormalizeAndValidate() error {
 			if err := normalizeAndValidateArtifactConfig(
 				arch.cfg,
 				fmt.Sprintf("osquery.elastic_options.install.%s.%s", platform.name, arch.name),
-				c.AllowInsecureURLForPlatform(platform.name, arch.name),
+				normalized.AllowInsecureURLForPlatform(platform.name, arch.name),
 			); err != nil {
-				return err
+				return InstallConfig{}, err
 			}
 		}
 	}
 
-	return nil
+	return normalized, nil
 }
 
 func normalizeAndValidateArtifactConfig(cfg *InstallArtifactConfig, configPath string, allowInsecure bool) error {
@@ -248,6 +284,13 @@ func Datastream(namespace string) string {
 	return datastreamPrefix + namespace
 }
 
+func QueryProfileDatastream(namespace string) string {
+	if namespace == "" {
+		namespace = DefaultNamespace
+	}
+	return queryProfileDatastreamPrefix + namespace
+}
+
 // GetOsqueryOptions Returns options from the first input if available
 func GetOsqueryOptions(inputs []InputConfig) map[string]interface{} {
 	if len(inputs) == 0 {
@@ -268,4 +311,15 @@ func GetOsqueryInstallConfig(inputs []InputConfig) InstallConfig {
 		return InstallConfig{}
 	}
 	return *inputs[0].Osquery.ElasticOptions.Install
+}
+
+// GetQueryProfileStorageConfig returns live query profile storage settings from the first input if available.
+func GetQueryProfileStorageConfig(inputs []InputConfig) QueryProfileStorageConfig {
+	if len(inputs) == 0 {
+		return QueryProfileStorageConfig{}
+	}
+	if inputs[0].Osquery == nil || inputs[0].Osquery.ElasticOptions == nil || inputs[0].Osquery.ElasticOptions.QueryProfileStorage == nil {
+		return QueryProfileStorageConfig{}
+	}
+	return *inputs[0].Osquery.ElasticOptions.QueryProfileStorage
 }

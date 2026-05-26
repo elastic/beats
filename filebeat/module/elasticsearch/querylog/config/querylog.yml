@@ -1,0 +1,20 @@
+type: filestream
+id: elasticsearch-querylog
+index: logs-elasticsearch.querylog-default
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+prospector.scanner.exclude_files: ['\.gz$']
+
+parsers:
+  - ndjson:
+      target: ""
+      expand_keys: true
+      add_error_key: true
+
+processors:
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.12.0

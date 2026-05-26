@@ -1,3 +1,0 @@
-kind: feature
-summary: Add gentables code generator for creating typed Go packages from YAML specs
-component: osquerybeat

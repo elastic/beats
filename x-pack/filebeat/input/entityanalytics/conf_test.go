@@ -28,6 +28,25 @@ func TestConf_Validate(t *testing.T) {
 			},
 			WantErr: ErrProviderUnknown.Error(),
 		},
+		"use-minimal-state-defaults-false": {
+			In: conf{
+				Provider: azuread.Name,
+			},
+		},
+		"err-minimal-state-unknown-provider": {
+			In: conf{
+				Provider:        "unknown",
+				UseMinimalState: true,
+			},
+			WantErr: ErrProviderUnknown.Error(),
+		},
+		"err-minimal-state-legacy-only-provider": {
+			In: conf{
+				Provider:        azuread.Name,
+				UseMinimalState: true,
+			},
+			WantErr: ErrProviderUnknown.Error(),
+		},
 	}
 
 	for name, tc := range tests {

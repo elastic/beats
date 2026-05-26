@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Demote missing user/device state lookup to debug log in Azure entity analytics provider.
-component: filebeat

@@ -185,18 +185,19 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
-			require.NotNil(ct, host.getEvent(), "expected not nil, got nil")
+			evt := host.getEvent()
+			require.NotNil(ct, evt, "expected not nil, got nil")
 
 			if params.Status != nil {
-				assert.Equal(t, params.Status.Status(), host.Evt.Status())
-				assert.Equal(t, params.Status.Err(), host.Evt.Err())
-				assert.Equal(t, params.Status.Attributes().AsRaw(), host.Evt.Attributes().AsRaw())
+				assert.Equal(ct, params.Status.Status(), evt.Status())
+				assert.Equal(ct, params.Status.Err(), evt.Err())
+				assert.Equal(ct, params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw())
 			}
 
 			if params.AssertFunc != nil {
 				params.AssertFunc(ct, logs, zapLogs)
 			}
-		}, 2*time.Minute, 1*time.Second,
+		}, 2*time.Minute, 100*time.Millisecond,
 			"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 		for i, r := range receivers {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
