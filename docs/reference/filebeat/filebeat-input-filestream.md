@@ -739,6 +739,23 @@ When set to `true`, enables GZIP file reading with auto-detection.
 
 The maximum number of bytes that a single log message can have. All bytes after `message_max_bytes` are discarded and not sent. The default is 10MB (10485760).
 
+### `line_terminator` [filebeat-input-filestream-line-terminator]
+
+The characters that separate lines in the input file. The default is `auto`.
+
+Valid values:
+
+* `auto`: Detects both LF and CR+LF line endings (U+000A and U+000D U+000A).
+* `line_feed`: Line feed (LF, `\n`, U+000A).
+* `vertical_tab`: Vertical tab (VT, `\v`, U+000B).
+* `form_feed`: Form feed (FF, `\f`, U+000C).
+* `carriage_return`: Carriage return (CR, `\r`, U+000D).
+* `carriage_return_line_feed`: Carriage return followed by line feed (CR+LF, `\r\n`, U+000D U+000A).
+* `next_line`: Next line (NEL, U+0085).
+* `line_separator`: Line separator (LS, U+2028).
+* `paragraph_separator`: Paragraph separator (PS, U+2029).
+* `null_terminator`: Null character (`\u0000`, U+0000).
+
 ### `parsers` [_parsers]
 
 This option expects a list of parsers that the log line has to go through.
