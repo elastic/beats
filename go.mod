@@ -568,6 +568,4 @@ replace (
 	github.com/fsnotify/fsnotify => github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250616163611-a325b49669a4
-	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage => github.com/rdner/opentelemetry-collector-contrib/extension/storage/filestorage v0.0.0-20260424144402-7c46b12bea43
-	go.opentelemetry.io/collector/extension/xextension => github.com/rdner/opentelemetry-collector/extension/xextension v0.0.0-20260424145937-ec99e0d930e4
 )
