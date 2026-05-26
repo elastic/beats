@@ -696,10 +696,11 @@ func TestInitializationWaitsForMetadata(t *testing.T) {
 }
 
 func TestInitializationWaitForMetadataReturnsErrorOnTimeout(t *testing.T) {
+	dockerUnavailable := errors.New("docker unavailable")
 	var attempts atomic.Int32
 	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
 		attempts.Add(1)
-		return nil, errors.New("docker unavailable")
+		return nil, dockerUnavailable
 	}
 
 	testConfig := config.MustNewConfigFrom(map[string]any{
@@ -710,6 +711,7 @@ func TestInitializationWaitForMetadataReturnsErrorOnTimeout(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
 	require.Error(t, err, "initializing add_docker_metadata processor should fail after timeout")
+	assert.ErrorIs(t, err, dockerUnavailable, "error should wrap the last docker connection failure")
 	assert.Nil(t, p, "processor should not be returned after wait_for_metadata timeout")
 	assert.Greater(t, attempts.Load(), int32(1), "watcher constructor should be retried before timeout")
 }

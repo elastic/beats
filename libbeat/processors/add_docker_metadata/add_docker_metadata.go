@@ -129,43 +129,45 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		retryIsBlocking: config.WaitMetadata,
 	}
 
-	constructAndStartWatcher := func() docker.Watcher {
+	constructAndStartWatcher := func() (docker.Watcher, error) {
 		watcher, err := watcherConstructor(log, config.Host, config.TLS, config.MatchShortID)
 		if err != nil {
 			log.Debugf("%v: docker environment not detected: %+v", processorName, err)
-			return nil
-		} else {
-			log.Debugf("%v: docker environment detected", processorName)
-			if err = watcher.Start(); err != nil {
-				// mark dockerAvailable as false because watcher creation failed
-				log.Debugf("unable to start the docker watcher: %v", err)
-				return nil
-			}
+			return nil, err
+		}
+
+		log.Debugf("%v: docker environment detected", processorName)
+		if err = watcher.Start(); err != nil {
+			log.Debugf("unable to start the docker watcher: %v", err)
+			return nil, err
 		}
 
 		log.Info("successfully connected to docker")
-		return watcher
+		return watcher, nil
 	}
 
-	connectToDocker := func() bool {
-		watcher := constructAndStartWatcher()
-		if watcher == nil {
-			return false
+	connectToDocker := func() error {
+		watcher, err := constructAndStartWatcher()
+		if err != nil {
+			return err
 		}
 
 		dm.watcher = watcher
 		dm.dockerAvailable.Store(true)
-		return true
+		return nil
 	}
 
-	if !connectToDocker() {
+	if err := connectToDocker(); err != nil {
 		if dm.retryIsBlocking {
-			connected, _ := dm.retryConnectToDocker(connectToDocker)
+			connected, _, lastErr := dm.retryConnectToDocker(connectToDocker)
 			if !connected {
 				if err := processors.Close(dm.sourceProcessor); err != nil {
 					dm.log.Debugf("error closing source processor after docker connection timeout: %v", err)
 				}
-				return nil, fmt.Errorf("%s: could not connect to docker", processorName)
+				if lastErr == nil {
+					lastErr = err
+				}
+				return nil, fmt.Errorf("%s: could not connect to docker: %w", processorName, lastErr)
 			}
 		} else {
 			// If docker is not available, try reconnecting asynchronously until the timeout expires.
@@ -176,10 +178,10 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 	return &dm, nil
 }
 
-func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bool) {
+func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() error) {
 	d.waitRetry.Go(func() {
 		defer d.log.Debug("retry goroutine done")
-		connected, stopped := d.retryConnectToDocker(connectToDocker)
+		connected, stopped, _ := d.retryConnectToDocker(connectToDocker)
 		if !connected && !stopped {
 			d.log.Warnf(
 				"stopped retrying docker connection before metadata became available; wait_for_metadata_timeout=%s elapsed",
@@ -189,7 +191,7 @@ func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() bo
 	})
 }
 
-func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool) (connected bool, stopped bool) {
+func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() error) (connected bool, stopped bool, lastErr error) {
 	blockingStr := "non-blocking"
 	if d.retryIsBlocking {
 		blockingStr = "blocking"
@@ -214,13 +216,15 @@ func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() bool) (c
 	for {
 		select {
 		case <-ticker.C:
-			if connectToDocker() {
-				return true, false
+			if err := connectToDocker(); err != nil {
+				lastErr = err
+			} else {
+				return true, false, nil
 			}
 		case <-timeoutC:
-			return false, false
+			return false, false, lastErr
 		case <-d.closeRetry:
-			return false, true
+			return false, true, lastErr
 		}
 	}
 }
