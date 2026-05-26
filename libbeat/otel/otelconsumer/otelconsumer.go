@@ -184,11 +184,6 @@ func (out *otelConsumer) String() string {
 }
 
 func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) error {
-	beatEvent := prepareLogRecordFromEvent(logRecord, event, log, isReceiverTest)
-	return encodeLogRecordBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo)
-}
-
-func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, log *logp.Logger, isReceiverTest bool) mapstr.M {
 	if id, ok := event.Content.Meta["_id"]; ok {
 		// Specify the id as an attribute used by the elasticsearchexporter
 		// to set the final document ID in Elasticsearch.
@@ -249,14 +244,14 @@ func prepareLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, 
 		}
 	}
 
-	return beatEvent
+	return encodeLogRecordBody(logRecord, beatEvent, event.Content.Timestamp, event.Content.Meta, beatInfo)
 }
 
 func encodeLogRecordBody(logRecord plog.LogRecord, beatEvent mapstr.M, timestamp time.Time, meta mapstr.M, beatInfo beat.Info) error {
 	bodyMap := logRecord.Body().SetEmptyMap()
-	capacity := len(beatEvent) + 1
+	capacity := len(beatEvent) + 1 // +1 for timestamp
 	if beatInfo.IncludeMetadata {
-		capacity++
+		capacity++ // for @metadata
 	}
 	bodyMap.EnsureCapacity(capacity)
 	if err := otelmap.FromMapstr(bodyMap, beatEvent); err != nil {
