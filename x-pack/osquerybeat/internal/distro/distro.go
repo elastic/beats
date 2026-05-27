@@ -22,7 +22,7 @@ var (
 	DataCacheDir   = filepath.Join(DataDir, "cache")
 )
 
-// Windows ARM URL: https://github.com/osquery/osquery/releases/download/5.22.1/osquery-5.22.1.windows_arm64.zip
+// Windows ARM URL: https://github.com/osquery/osquery/releases/download/{{osqueryVersion}}/osquery-{{osqueryVersion}}.windows_arm64.zip
 const (
 	osqueryDownloadBaseURL       = "https://pkg.osquery.io"
 	osqueryDownloadGithubBaseURL = "https://github.com/osquery/osquery/releases/download"
@@ -44,16 +44,16 @@ const (
 
 	osqueryLensesDir = "lenses"
 
-	osqueryVersion = "5.22.1"
+	osqueryVersion = "5.23.0"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 	osqueryZipExt  = ".zip"
 
-	osqueryDistroDarwinSHA256     = "63118ae94aa4292c7b302a69a121e197d120eafcfcb186fd3ebeccb1b0c06129"
-	osqueryDistroLinuxSHA256      = "ce03611ab75da07d069d56aa88b71028a411dbf5147ff5249cf941cb8553de86"
-	osqueryDistroLinuxARMSHA256   = "5eb41f11329aa19a8a1cb81ad21ecd9155b97b22e7b491b388908a6c28402717"
-	osqueryDistroWindowsSHA256    = "91238c6f7543979e59d88886d61e8e7a222f6595f89b24bfac385d31433f7a02"
-	osqueryDistroWindowsZipSHA256 = "5909552058b3d2986782c3dd618e7d6138c5ed11cfaac8e7f4d4280312b049e5"
+	osqueryDistroDarwinSHA256     = "2621179c334a6482fa822732f121409bbccc36784db18f576e2965dfc4f1845d"
+	osqueryDistroLinuxSHA256      = "0045739a68475760f7bc26ca493afda71cc02a8e4d29984717742d3e4c099296"
+	osqueryDistroLinuxARMSHA256   = "d9d4e5f6eeabda4949ae0ba6a8db424c789ec60ffef99269f479ff4b73f46e33"
+	osqueryDistroWindowsSHA256    = "5060c7cc21bc00258b5d7822a769cb619ff432c02ba89f6c1b6cbfa127d59b40"
+	osqueryDistroWindowsZipSHA256 = "92a820a39c12f7516040b62dc8e8546469c821f505eed0b7ff1eb7e43cc4b018"
 )
 
 type OSArch struct {
