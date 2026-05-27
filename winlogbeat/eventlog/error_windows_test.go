@@ -22,8 +22,9 @@ package eventlog
 import (
 	"testing"
 
-	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	"github.com/stretchr/testify/assert"
+
+	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
 func TestIsRecoverable(t *testing.T) {

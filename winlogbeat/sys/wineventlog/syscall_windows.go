@@ -19,6 +19,7 @@ package wineventlog
 
 import (
 	"fmt"
+	"math"
 	"syscall"
 	"time"
 	"unsafe"
@@ -430,14 +431,30 @@ var sizeofEvtVariant = unsafe.Sizeof(EvtVariant{})
 type hexInt32 int32
 
 func (n hexInt32) String() string {
-	return fmt.Sprintf("%#x", uint32(n))
+	return fmt.Sprintf("%#x", bitPatternUint32(int32(n)))
 }
 
 type hexInt64 int64
 
 func (n hexInt64) String() string {
-	return fmt.Sprintf("%#x", uint64(n))
+	return fmt.Sprintf("%#x", bitPatternUint64(int64(n)))
 }
+
+// bitPatternUint32 returns the unsigned two's-complement bit pattern of v.
+// The conversion is intentional: we want the raw bit representation for display.
+func bitPatternUint32(v int32) uint32 { return uint32(v) } //nolint:gosec
+
+// bitPatternUint64 returns the unsigned two's-complement bit pattern of v.
+func bitPatternUint64(v int64) uint64 { return uint64(v) } //nolint:gosec
+
+// evtVariantInt8/16/32/64 convert Windows EVT_VARIANT unsigned storage to the
+// equivalent signed Go type.  The Windows API stores all integer variants as
+// unsigned; reinterpreting the bit pattern as signed is intentional and correct
+// by definition of the Windows type system.
+func evtVariantInt8(v uint8) int8   { return int8(v) }   //nolint:gosec
+func evtVariantInt16(v uint16) int16 { return int16(v) } //nolint:gosec
+func evtVariantInt32(v uint32) int32 { return int32(v) } //nolint:gosec
+func evtVariantInt64(v uint64) int64 { return int64(v) } //nolint:gosec
 
 func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	typ := v.Type.Mask()
@@ -455,19 +472,19 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 		s, err := sys.ANSIBytesToString(buf[offset:])
 		return s, err
 	case EvtVarTypeSByte:
-		return int8(v.ValueAsUint8()), nil
+		return evtVariantInt8(v.ValueAsUint8()), nil
 	case EvtVarTypeByte:
 		return v.ValueAsUint8(), nil
 	case EvtVarTypeInt16:
-		return int16(v.ValueAsUint16()), nil
+		return evtVariantInt16(v.ValueAsUint16()), nil
 	case EvtVarTypeInt32:
-		return int32(v.ValueAsUint32()), nil
+		return evtVariantInt32(v.ValueAsUint32()), nil
 	case EvtVarTypeHexInt32:
-		return hexInt32(v.ValueAsUint32()), nil
+		return hexInt32(evtVariantInt32(v.ValueAsUint32())), nil
 	case EvtVarTypeInt64:
-		return int64(v.ValueAsUint64()), nil
+		return evtVariantInt64(v.ValueAsUint64()), nil
 	case EvtVarTypeHexInt64:
-		return hexInt64(v.ValueAsUint64()), nil
+		return hexInt64(evtVariantInt64(v.ValueAsUint64())), nil
 	case EvtVarTypeUInt16:
 		return v.ValueAsUint16(), nil
 	case EvtVarTypeUInt32:
@@ -569,12 +586,12 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 	var bufferUsed uint32
 	err := _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
-		return "", fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
+		return "", fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w", err)
 	}
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
-	err = _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
+	err = _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, bufferUsed, pEvtVariant, &bufferUsed)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtGetPublisherMetadataProperty: %w", err)
 	}
@@ -586,7 +603,10 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 
 	switch t := v.(type) {
 	case EvtHandle:
-		return EvtObjectArrayPropertyHandle(t), nil
+		if t > math.MaxUint32 {
+			return nil, fmt.Errorf("EvtObjectArrayPropertyHandle value %d overflows uint32", t)
+		}
+		return EvtObjectArrayPropertyHandle(t), nil //nolint:gosec // bounds-checked above
 	default:
 		return v, nil
 	}
@@ -601,7 +621,7 @@ func EvtGetObjectArrayProperty(arrayHandle EvtObjectArrayPropertyHandle, propert
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
-	err = _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
+	err = _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, bufferUsed, pEvtVariant, &bufferUsed)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtGetObjectArrayProperty: %w", err)
 	}
@@ -631,12 +651,12 @@ func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetad
 	var bufferUsed uint32
 	err := _EvtGetEventMetadataProperty(metadataHandle, 8, 0, 0, nil, &bufferUsed)
 	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
-		return nil, fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
+		return nil, fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w", err)
 	}
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
-	err = _EvtGetEventMetadataProperty(metadataHandle, propertyID, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
+	err = _EvtGetEventMetadataProperty(metadataHandle, propertyID, 0, bufferUsed, pEvtVariant, &bufferUsed)
 	if err != nil {
 		return nil, fmt.Errorf("_EvtGetEventMetadataProperty: %w", err)
 	}
