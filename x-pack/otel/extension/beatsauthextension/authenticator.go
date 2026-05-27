@@ -153,7 +153,7 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 
 // applyRestartOnCertChangeAlias maps the legacy ssl.restart_on_cert_change.*
 // keys onto ssl.certificate_reload.*. Reloading the certificates now happens
-// in-process via tlscommon instead of whole-process restarts,so the alias
+// in-process via tlscommon instead of whole-process restarts, so the alias
 // just enables the same hot-reload behavior.
 func applyRestartOnCertChangeAlias(cfg *config.C, beatAuthConfig *BeatsAuthConfig, logger *logp.Logger) {
 	sslConfig, err := cfg.Child("ssl", -1)
