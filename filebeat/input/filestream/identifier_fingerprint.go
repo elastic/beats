@@ -18,8 +18,6 @@
 package filestream
 
 import (
-	"fmt"
-
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -55,18 +53,11 @@ func defaultFingerprintIdentityConfig() fingerprintIdentityConfig {
 type fingerprintIdentifier struct {
 }
 
-func newFingerprintIdentifier(cfg *conf.C, _ *logp.Logger) (fileIdentifier, error) {
-	// Parse the sub-config to validate the fields users may set on the
-	// fingerprint identity (e.g. growing). The values themselves are read
-	// later in normalizeConfig and propagated to the scanner config; the
-	// identifier itself does not currently need them at runtime, but
-	// unpacking here surfaces config errors at the right point.
-	fpCfg := defaultFingerprintIdentityConfig()
-	if cfg != nil {
-		if err := cfg.Unpack(&fpCfg); err != nil {
-			return nil, fmt.Errorf("invalid file_identity.fingerprint config: %w", err)
-		}
-	}
+// newFingerprintIdentifier constructs the fingerprint file identifier. The
+// `file_identity.fingerprint` sub-config (e.g. `growing`) is consumed and
+// validated later by normalizeConfig; the identifier itself does not
+// currently need those values at runtime.
+func newFingerprintIdentifier(_ *conf.C, _ *logp.Logger) (fileIdentifier, error) {
 	return &fingerprintIdentifier{}, nil
 }
 

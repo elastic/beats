@@ -271,7 +271,19 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 	// Update the table: remove old entry, add new entry with same resource
 	s.store.ephemeralStore.table[newKey] = res
 	delete(s.store.ephemeralStore.table, oldKey)
-	_ = s.store.persistentStore.Remove(oldKeyValue)
+
+	// Best-effort: the in-memory swap above is what makes the registry
+	// observe the new key; the persistent delete just trims the on-disk
+	// log. If it fails (transient I/O, full disk) we keep going — the new
+	// key has been written and will be persisted on the next checkpoint;
+	// the stale persistent entry for the old key will be ignored on the
+	// next read because no in-memory entry references it. Surface the
+	// error anyway.
+	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
+		s.store.log.Errorf(
+			"UpdateKey: failed to remove old key %q from persistent store: %v",
+			oldKeyValue, err)
+	}
 
 	return nil
 }

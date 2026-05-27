@@ -62,7 +62,7 @@ type fileMeta struct {
 	// Legacy entries from registries written before this field existed read as
 	// the zero value (false) and are treated as final, with no special-case
 	// handling required.
-	FingerprintGrowing bool `json:"fingerprintgrowing,omitzero" struct:"fingerprintgrowing,omitempty"`
+	FingerprintGrowing bool `json:"fingerprint_growing,omitzero" struct:"fingerprint_growing,omitempty"`
 }
 
 // filestream is the input for reading from files which

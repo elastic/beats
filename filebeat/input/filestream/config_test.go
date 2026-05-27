@@ -189,6 +189,7 @@ func TestNormalizeConfig(t *testing.T) {
 	tcs := []struct {
 		name        string
 		cfg         map[string]interface{}
+		wantErr     string
 		wantEnabled bool
 		wantGrowing bool
 	}{
@@ -300,6 +301,36 @@ func TestNormalizeConfig(t *testing.T) {
 			// scanner-level YAML key remains silently ignored either way.
 			wantGrowing: true,
 		},
+		{
+			name: "file_identity.fingerprint.growing false wins over scanner-level true",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": false},
+				},
+				"prospector": map[string]interface{}{
+					"scanner": map[string]interface{}{
+						"fingerprint": map[string]interface{}{"growing": true},
+					},
+				},
+			},
+			wantEnabled: true,
+			// scanner-level YAML is silently ignored; the user-facing
+			// `growing: false` must win regardless of what is set at the
+			// scanner level.
+			wantGrowing: false,
+		},
+		{
+			// Invalid file_identity.fingerprint sub-config is rejected by
+			// normalizeConfig itself — the identifier factory does not
+			// unpack the sub-config, so this is the only line of defence.
+			name: "growing as non-bool string is rejected",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": "not-a-bool"},
+				},
+			},
+			wantErr: "cannot read 'file_identity.fingerprint' config",
+		},
 	}
 
 	for _, tc := range tcs {
@@ -312,9 +343,15 @@ func TestNormalizeConfig(t *testing.T) {
 				cfg[key] = value
 			}
 			raw := conf.MustNewConfigFrom(cfg)
-			require.NoError(t, raw.Unpack(&c))
+			require.NoError(t, raw.Unpack(&c),
+				"unpack should succeed; rejection happens in normalizeConfig")
 
 			err := normalizeConfig(raw, &c)
+			if tc.wantErr != "" {
+				require.Error(t, err, "expected normalizeConfig to reject invalid sub-config")
+				assert.ErrorContains(t, err, tc.wantErr)
+				return
+			}
 			require.NoError(t, err)
 
 			assert.Equal(t,

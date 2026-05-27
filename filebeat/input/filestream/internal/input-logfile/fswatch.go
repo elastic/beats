@@ -83,9 +83,6 @@ type FileDescriptor struct {
 	// FingerprintGrowing is true when Fingerprint is a raw-hex value that has
 	// not yet reached the configured threshold (offset+length). False otherwise,
 	// including for SHA-256 fingerprints and for non-growing-mode files.
-	// TODO(AndersonQ): do we need this flag if we have GrowingFingerprint and
-	// Fingerprint. Can we use them to infer "Growing". If so, is it worth doing
-	// so?
 	FingerprintGrowing bool
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool

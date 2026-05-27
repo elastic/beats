@@ -2208,3 +2208,125 @@ func mustInodeMarker(t *testing.T) fileIdentifier {
 	}
 	return identifier
 }
+
+// newGrowingFileWatcherForTest builds a real *fileWatcher whose scanner has
+// hashedPaths initialised (Growing=true), suitable for asserting against
+// initFileWatcherHashedPaths' seed behaviour.
+func newGrowingFileWatcherForTest(t *testing.T) *fileWatcher {
+	t.Helper()
+	fw := &fileWatcher{
+		log: logp.L(),
+		scanner: &fileScanner{
+			log: logp.L(),
+			cfg: fileScannerConfig{
+				Fingerprint: fingerprintConfig{
+					Enabled: true,
+					Offset:  0,
+					Length:  1024,
+					Growing: true,
+				},
+			},
+			hashedPaths: map[string]struct{}{},
+		},
+		growingFingerprint: true,
+	}
+	return fw
+}
+
+// TestInitFileWatcherHashedPaths covers the three branches of the seed:
+// disabled (no-op), filewatcher not a *fileWatcher, and the happy path where
+// only final SHA-256 entries (FingerprintGrowing=false) are seeded.
+func TestInitFileWatcherHashedPaths(t *testing.T) {
+	const inputID = "test-input"
+
+	t.Run("growing disabled is a no-op", func(t *testing.T) {
+		// Even though filewatcher is the mock (wrong type), the disabled
+		// branch must return before the type assertion runs.
+		p := &fileProspector{
+			logger:             logp.L(),
+			filewatcher:        newMockFileWatcher(nil, 0),
+			growingFingerprint: false,
+		}
+		store := newMockMetadataUpdater()
+		store.table["filestream::"+inputID+"::fingerprint::aabb"] = fileMeta{
+			Source:             "/a.log",
+			IdentifierName:     fingerprintName,
+			FingerprintGrowing: true,
+		}
+
+		err := p.initFileWatcherHashedPaths(store)
+		require.NoError(t, err, "disabled growing must not return an error")
+		assert.Equal(t, 0, store.IterateOnPrefixCalled,
+			"registry must not be iterated when growing is disabled")
+	})
+
+	t.Run("filewatcher without SetHashedPaths returns error", func(t *testing.T) {
+		// mockFileWatcher does not have a SetHashedPaths method, so the
+		// inline-interface assertion must fail and the function must return
+		// a descriptive error rather than silently no-op.
+		p := &fileProspector{
+			logger:             logp.L(),
+			filewatcher:        newMockFileWatcher(nil, 0),
+			growingFingerprint: true,
+		}
+		store := newMockMetadataUpdater()
+
+		err := p.initFileWatcherHashedPaths(store)
+		require.Error(t, err, "expected error when filewatcher does not implement SetHashedPaths")
+		assert.ErrorContains(t, err, "SetHashedPaths",
+			"error must name the missing method")
+	})
+
+	t.Run("happy path: only final SHA-256 entries are seeded", func(t *testing.T) {
+		fw := newGrowingFileWatcherForTest(t)
+		p := &fileProspector{
+			logger:             logp.L(),
+			filewatcher:        fw,
+			growingFingerprint: true,
+		}
+		store := newMockMetadataUpdater()
+
+		// Final SHA-256 entry (FingerprintGrowing=false) — seeded.
+		store.table["filestream::"+inputID+"::fingerprint::"+strings.Repeat("a", 64)] = fileMeta{
+			Source:             "/final.log",
+			IdentifierName:     fingerprintName,
+			FingerprintGrowing: false,
+		}
+		// Growing entry (FingerprintGrowing=true) — NOT seeded; needs
+		// GrowingFingerprint emission on the next scan to migrate.
+		store.table["filestream::"+inputID+"::fingerprint::aabb"] = fileMeta{
+			Source:             "/growing.log",
+			IdentifierName:     fingerprintName,
+			FingerprintGrowing: true,
+		}
+		// Legacy entry (no FingerprintGrowing field on disk → zero value) — seeded.
+		store.table["filestream::"+inputID+"::fingerprint::"+strings.Repeat("b", 64)] = fileMeta{
+			Source:         "/legacy.log",
+			IdentifierName: fingerprintName,
+		}
+		// Final entry with empty Source — skipped (defensive guard).
+		store.table["filestream::"+inputID+"::fingerprint::"+strings.Repeat("c", 64)] = fileMeta{
+			Source:             "",
+			IdentifierName:     fingerprintName,
+			FingerprintGrowing: false,
+		}
+		// Non-fingerprint entry — skipped by the key-prefix filter.
+		store.table["filestream::"+inputID+"::native::xyz"] = fileMeta{
+			Source:         "/native.log",
+			IdentifierName: nativeName,
+		}
+
+		// Pre-pollute scanner.hashedPaths to verify the seed clears it
+		// before writing (the "subsumes Init/takeover pollution wipe"
+		// behaviour.
+		fw.scanner.(*fileScanner).hashedPaths["/stale.log"] = struct{}{}
+
+		err := p.initFileWatcherHashedPaths(store)
+		require.NoError(t, err, "seed must succeed on happy path")
+		assert.Equal(t, map[string]struct{}{
+			"/final.log":  {},
+			"/legacy.log": {},
+		}, fw.scanner.(*fileScanner).hashedPaths,
+			"only FingerprintGrowing=false entries with a non-empty Source must be in hashedPaths; pre-existing entries must be wiped")
+	})
+}

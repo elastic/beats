@@ -385,7 +385,16 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	// prospector's prefix-match-and-migrate path. Also subsumes the wipe of
 	// any pollution caused by the enumeration-only GetFiles calls in
 	// Init/takeover above (they touch the same hashedPaths set).
-	p.initFileWatcherHashedPaths(s)
+	//
+	// Best-effort: a seed failure (filewatcher doesn't implement
+	// hashedPathsSetter) is logged and the input continues. Not initializing
+	// HashedPaths will cause the file watcher to emmit a growing fingerprint
+	// for files that are already using the SHA-256 version of the fingerprint.
+	// The error causes a performanhce hit at startup, later the HashedPaths is
+	// populated as the input runs.
+	if err := p.initFileWatcherHashedPaths(s); err != nil {
+		p.logger.Errorf("failed to seed fileWatcher hashedPaths: %v", err)
+	}
 
 	var tg unison.MultiErrGroup
 
@@ -633,19 +642,22 @@ func isStrictPrefix(target, prefix string) bool {
 // FingerprintGrowing=true are deliberately excluded — they need
 // GrowingFingerprint emitted on the next scan to bridge to their SHA-256.
 //
-// No-op when growing mode is disabled (the scanner has no hashedPaths set in
-// that case and the type-assertion-based dispatch on the fileWatcher silently
-// does nothing).
-func (p *fileProspector) initFileWatcherHashedPaths(updater loginp.StateMetadataUpdater) {
+// Returns nil and is a no-op when growing mode is disabled. Returns an error
+// when growing mode is enabled but p.filewatcher does not expose
+// SetHashedPaths — the only capability needed here.
+func (p *fileProspector) initFileWatcherHashedPaths(updater loginp.StateMetadataUpdater) error {
 	if !p.growingFingerprint {
-		return
+		return nil
 	}
 
-	fw, ok := p.filewatcher.(*fileWatcher)
+	fw, ok := p.filewatcher.(interface {
+		SetHashedPaths(paths map[string]struct{})
+	})
 	if !ok {
-		// TODO(AndersonQ): return an error: if the conversion failed, the code
-		// changed and we need to account for that
-		return
+		return fmt.Errorf(
+			"filewatcher of type %T does not implement SetHashedPaths(map[string]struct{}); "+
+				"hashedPaths cannot be seeded",
+			p.filewatcher)
 	}
 
 	fullyGrownPaths := make(map[string]struct{})
@@ -670,6 +682,7 @@ func (p *fileProspector) initFileWatcherHashedPaths(updater loginp.StateMetadata
 
 	fw.SetHashedPaths(fullyGrownPaths)
 	p.logger.Debugf("seeded fileWatcher hashedPaths with %d already-final paths", len(fullyGrownPaths))
+	return nil
 }
 
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
