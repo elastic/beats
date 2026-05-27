@@ -37,12 +37,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/shared"
 )
 
 const (
-	timeout                = time.Second * 5
-	selector               = "kubernetes"
-	checkNodeReadyAttempts = 10
+	timeout  = time.Second * 5
+	selector = "kubernetes"
 )
 
 type kubernetesAnnotator struct {
@@ -60,7 +60,7 @@ type kubernetesAnnotator struct {
 }
 
 func init() {
-	processors.RegisterPlugin("add_kubernetes_metadata", New)
+	processors.RegisterPlugin("add_kubernetes_metadata", shared.New(New))
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -71,28 +71,40 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
-func isKubernetesAvailable(client k8sclient.Interface) (bool, error) {
+func isKubernetesAvailable(client k8sclient.Interface, logger *logp.Logger) (bool, error) {
 	server, err := client.Discovery().ServerVersion()
 	if err != nil {
 		return false, err
 	}
-	logp.Info("%v: kubernetes env detected, with version: %v", "add_kubernetes_metadata", server)
+	logger.Infof("add_kubernetes_metadata: kubernetes env detected, with version: %v", server)
 	return true, nil
 }
 
-func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
-	connectionAttempts := 1
+func isKubernetesAvailableWithTimeout(client k8sclient.Interface,
+	waitMetadataTimeout time.Duration,
+	waitMetadataRetryPeriod time.Duration,
+	logger *logp.Logger,
+) bool {
+	var err error
+	var kubernetesAvailable bool
+
+	deadline := time.Time{}
+	if waitMetadataTimeout > 0 {
+		deadline = time.Now().Add(waitMetadataTimeout)
+	}
 	for {
-		kubernetesAvailable, err := isKubernetesAvailable(client)
+		kubernetesAvailable, err = isKubernetesAvailable(client, logger)
 		if kubernetesAvailable {
 			return true
 		}
-		if connectionAttempts > checkNodeReadyAttempts {
-			logp.Info("%v: could not detect kubernetes env: %v", "add_kubernetes_metadata", err)
+
+		if !deadline.IsZero() && time.Now().After(deadline) {
+			logger.Errorf("add_kubernetes_metadata: could not detect kubernetes env: %v", err)
 			return false
 		}
-		time.Sleep(3 * time.Second)
-		connectionAttempts += 1
+
+		time.Sleep(waitMetadataRetryPeriod)
+
 	}
 }
 
@@ -112,15 +124,24 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	}
 
 	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
+
 	processor := &kubernetesAnnotator{
-		log:                 log,
-		cache:               newCache(config.CleanupTimeout),
-		kubernetesAvailable: false,
+		log:   log,
+		cache: newCache(config.CleanupTimeout),
 	}
 
-	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
-	// the k8s node is not yet ready.
-	go processor.init(config, cfg)
+	if config.WaitMetadata {
+		processor.init(config, cfg)
+		if !processor.kubernetesAvailable {
+			return nil, fmt.Errorf("add_kubernetes_metadata: could not detect kubernetes env")
+		}
+	} else {
+		// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
+		// the k8s node is not yet ready.
+		go func() {
+			processor.init(config, cfg)
+		}()
+	}
 
 	return processor, nil
 }
@@ -170,7 +191,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			return
 		}
 
-		if !isKubernetesAvailableWithRetry(client) {
+		if !isKubernetesAvailableWithTimeout(client, config.WaitMetadataTimeout, config.WaitMetadataRetryPeriod, k.log) {
 			return
 		}
 
@@ -333,10 +354,11 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 // contains a map with various Kubernetes metadata.
 // This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
-	if !k.kubernetesAvailable {
+	if kubernetesMetadataExist(event) {
 		return event, nil
 	}
-	if kubernetesMetadataExist(event) {
+
+	if !k.kubernetesAvailable {
 		return event, nil
 	}
 
@@ -351,22 +373,28 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	metaClone := metadata.Clone()
-	_ = metaClone.Delete("kubernetes.container.name")
-	containerImage, err := metadata.GetValue("kubernetes.container.image")
-	if err == nil {
-		_ = metaClone.Delete("kubernetes.container.image")
-		_, _ = metaClone.Put("kubernetes.container.image.name", containerImage)
-	}
-	cmeta, err := metaClone.Clone().GetValue("kubernetes.container")
-	if err == nil {
-		event.Fields.DeepUpdate(mapstr.M{
-			"container": cmeta,
-		})
+	// One full clone for the kubernetes field; one cheap sub-map clone for the OCI
+	// container field. This replaces the original three full clones.
+	kubeMeta := metadata.Clone()
+
+	// Build the OCI container field by cloning only the container sub-map —
+	// much cheaper than cloning the full metadata. Transform it in place:
+	// drop container.name and rewrite container.image -> container.image.name.
+	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
+		if cm, ok := containerVal.(mapstr.M); ok {
+			ociContainer := cm.Clone()
+			_ = ociContainer.Delete("name")
+			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
+				_ = ociContainer.Delete("image")
+				ociContainer["image"] = mapstr.M{"name": img}
+			}
+			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+		}
 	}
 
-	kubeMeta := metadata.Clone()
-	// remove container meta from kubernetes.container.*
+	// Remove container fields that belong only in the OCI section before writing
+	// kubernetes metadata to the event. container.name is intentionally kept here
+	// to match original behaviour.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")

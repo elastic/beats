@@ -179,31 +179,31 @@ Process metrics.
 
 
 **`system.core.model_number`**
-:   CPU model number. Only availabe on Linux
+:   CPU model number. Only available on Linux
 
     type: keyword
 
 
 **`system.core.model_name`**
-:   CPU model name. Only availabe on Linux
+:   CPU model name. Only available on Linux
 
     type: keyword
 
 
 **`system.core.mhz`**
-:   CPU core current clock. Only availabe on Linux
+:   CPU core current clock. Only available on Linux
 
     type: float
 
 
 **`system.core.core_id`**
-:   CPU physical core ID. One core might might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only availabe on Linux
+:   CPU physical core ID. One core might execute multiple threads, hence more than one `system.core.id` can share the same `system.core.core_id`. Only available on Linux
 
     type: keyword
 
 
 **`system.core.physical_id`**
-:   CPU core physical ID. Only availabe on Linux
+:   CPU core physical ID. Only available on Linux
 
     type: keyword
 
@@ -469,7 +469,7 @@ Process metrics.
 
 
 **`system.diskio.io.time`**
-:   The total number of of milliseconds spent doing I/Os.
+:   The total number of milliseconds spent doing I/Os.
 
     type: long
 
@@ -1569,7 +1569,7 @@ Memory limits and metrics.
 
 
 **`system.process.cgroup.memory.mem.low.bytes`**
-:   memory low threshhold
+:   memory low threshold
 
     type: long
 
@@ -1577,7 +1577,7 @@ Memory limits and metrics.
 
 
 **`system.process.cgroup.memory.mem.high.bytes`**
-:   memory high threshhold
+:   memory high threshold
 
     type: long
 
@@ -1585,7 +1585,7 @@ Memory limits and metrics.
 
 
 **`system.process.cgroup.memory.mem.max.bytes`**
-:   memory max threshhold
+:   memory max threshold
 
     type: long
 
@@ -1657,7 +1657,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.memsw.low.bytes`**
-:   memory low threshhold
+:   memory low threshold
 
     type: long
 
@@ -1665,7 +1665,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.memsw.high.bytes`**
-:   memory high threshhold
+:   memory high threshold
 
     type: long
 
@@ -1673,7 +1673,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.memsw.max.bytes`**
-:   memory max threshhold
+:   memory max threshold
 
     type: long
 

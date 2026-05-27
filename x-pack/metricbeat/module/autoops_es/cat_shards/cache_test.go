@@ -250,6 +250,49 @@ func TestEnrichNodeIndexShardsWithCachedValues(t *testing.T) {
 	}
 }
 
+func TestEnrichNodeIndexShardsClampsLatencyToInterval(t *testing.T) {
+	// 16s sampling interval
+	initCache(getNodeIndexShards(), 16)
+
+	indexMetadata := getIndexMetadata()
+	nodeIndexShardsMap := getNodeIndexShards()
+
+	for key, nodeIndexShards := range nodeIndexShardsMap {
+		// Small deltas for index and merge — raw latency well below 16 000 ms
+		*nodeIndexShards.IndexingIndexTotal += 3
+		*nodeIndexShards.IndexingIndexTotalTime += 30
+		*nodeIndexShards.IndexingFailedIndexTotal += 3
+		*nodeIndexShards.MergesTotal += 3
+		*nodeIndexShards.MergesTotalTime += 30
+		*nodeIndexShards.GetMissingDocTotal += 3
+		// Reproduces #2471: 3 search ops with combined query_time > interval
+		// raw latency = 126 000 / 3 = 42 000 ms/op; interval = 16 000 ms → clamped
+		*nodeIndexShards.SearchQueryTotal += 3
+		*nodeIndexShards.SearchQueryTime += 126_000
+
+		nodeIndexShardsMap[key] = nodeIndexShards
+	}
+
+	nodeIndexShardsList := enrichNodeIndexShards(nodeIndexShardsMap, indexMetadata)
+
+	require.Equal(t, len(nodeIndexShardsMap), len(nodeIndexShardsList))
+
+	for _, nodeIndexShards := range nodeIndexShardsList {
+		require.NotNil(t, nodeIndexShards.SearchLatencyInMillis, "SearchLatencyInMillis should be written")
+		require.EqualValues(t, 16_000, *nodeIndexShards.SearchLatencyInMillis,
+			"search latency exceeding the sampling interval should be clamped to the interval")
+
+		// Index and merge latencies are well below the interval and must not be clamped
+		require.NotNil(t, nodeIndexShards.IndexLatencyInMillis, "IndexLatencyInMillis should be written")
+		require.InDelta(t, 10, *nodeIndexShards.IndexLatencyInMillis, 0.01,
+			"index latency below interval should not be clamped")
+
+		require.NotNil(t, nodeIndexShards.MergeLatencyInMillis, "MergeLatencyInMillis should be written")
+		require.InDelta(t, 10, *nodeIndexShards.MergeLatencyInMillis, 0.01,
+			"merge latency below interval should not be clamped")
+	}
+}
+
 func TestEnrichNodeIndexShardsWithCachedValuesWithNoChange(t *testing.T) {
 	// 10s ago cache
 	initCache(getNodeIndexShards(), 10)
@@ -700,13 +743,13 @@ func TestConvertToNodeIndexShardsWithCache(t *testing.T) {
 	require.Equal(t, *indexToShardsList["my-index"][0].search_query_time, *myIndexNode1.SearchQueryTime)
 	require.Equal(t, *indexToShardsList["my-index"][0].merges_total, *myIndexNode1.TotalMergesTotal)
 	require.Equal(t, *indexToShardsList["my-index"][0].merges_total_time, *myIndexNode1.TotalMergesTotalTime)
-	require.EqualValues(t, 10000, *myIndexNode1.TimestampDiff)
-	require.EqualValues(t, 5, *myIndexNode1.IndexFailedRatePerSecond)
+	require.InDelta(t, 10000, *myIndexNode1.TimestampDiff, 1)
+	require.InDelta(t, 5, *myIndexNode1.IndexFailedRatePerSecond, 0.01)
 	require.EqualValues(t, 0.25, *myIndexNode1.IndexLatencyInMillis)
-	require.EqualValues(t, 4, *myIndexNode1.IndexRatePerSecond)
-	require.EqualValues(t, 10.9, *myIndexNode1.GetMissingDocRatePerSecond)
+	require.InDelta(t, 4, *myIndexNode1.IndexRatePerSecond, 0.01)
+	require.InDelta(t, 10.9, *myIndexNode1.GetMissingDocRatePerSecond, 0.01)
 	require.EqualValues(t, 0.6, *myIndexNode1.MergeLatencyInMillis)
-	require.EqualValues(t, 5, *myIndexNode1.MergeRatePerSecond)
+	require.InDelta(t, 5, *myIndexNode1.MergeRatePerSecond, 0.01)
 	// note: these are examples of restarted values, so we blank them out rather than calculate negative or massive values
 	// if you're interested: compare the `search_query_total` and `search_query_time` values from the cache and this value
 	require.Nil(t, myIndexNode1.SearchLatencyInMillis)

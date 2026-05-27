@@ -421,6 +421,7 @@ toc:
           - file: filebeat/exported-fields-docker-processor.md
           - file: filebeat/exported-fields-ecs.md
           - file: filebeat/exported-fields-elasticsearch.md
+          - file: filebeat/exported-fields-elasticsearch-querylog.md
           - file: filebeat/exported-fields-envoyproxy.md
           - file: filebeat/exported-fields-fortinet.md
           - file: filebeat/exported-fields-gcp.md
@@ -934,6 +935,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-elasticsearch-node.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-node_stats.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-pending_tasks.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-security_stats.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-shard.md
           - file: metricbeat/metricbeat-module-envoyproxy.md
             children:

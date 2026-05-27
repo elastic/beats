@@ -187,6 +187,24 @@ func (p *fileProspector) Init(
 			return "", fm
 		}
 
+		registryKey := v.Key()
+		split := strings.Split(registryKey, identitySep)
+		// Wrong key format
+		if len(split) != 4 {
+			return "", fm
+		}
+
+		registryFileIdentity := split[2] + identitySep + split[3]
+		fileIdentity := p.identifier.GetSource(loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}).Name()
+
+		// Same paths, different file, do not migrate ID
+		if registryFileIdentity != fileIdentity {
+			return "", fm
+		}
+
 		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 		return newKey, fm
 	})
@@ -283,10 +301,18 @@ func (p *fileProspector) Init(
 		})
 	}
 
-	// Last, but not least, take over states if needed/enabled.
+	return nil
+}
+
+// TakeOver migrates states from other inputs (Log input or other Filestream
+// inputs with different IDs) to this input. It must be called after Init and
+// before Run so that it is not triggered during CheckConfig validation.
+func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID func(loginp.Source) string) error {
 	if !p.takeOver.Enabled {
 		return nil
 	}
+
+	files := p.filewatcher.GetFiles()
 
 	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.TakeOverState) (string, any) {

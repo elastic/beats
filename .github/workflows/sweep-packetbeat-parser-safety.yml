@@ -1,0 +1,94 @@
+name: "Sweeper: Packetbeat Parser Bounds Safety"
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[packetbeat-parser-safety]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **bounds-safety sweeper** for Packetbeat's protocol parsers. Your goal is to
+        find every place where malformed or truncated network packets can cause a panic, infinite
+        loop, or integer overflow — and write a failing Go test for each one you confirm.
+
+        ## The component
+
+        All parsers live under `packetbeat/protos/`. Each subdirectory is a separate protocol
+        (amqp, mongodb, mysql, http, memcache, thrift, pgsql, sip, dns, redis, cassandra, nfs,
+        and others). Each parser receives raw bytes from the network and must be hardened against
+        adversarial input.
+
+        ## The bug class
+
+        The recurring pattern across this codebase is: a **length, count, or size field is read
+        from untrusted packet bytes and then used directly as a slice index or loop bound**
+        without first validating that it is non-negative and within the buffer's actual length.
+        This produces index-out-of-range panics or infinite loops (when a loop advances by a
+        value read from the packet and that value can be zero).
+
+        A secondary pattern is **integer overflow**: arithmetic on two packet-derived values
+        (e.g. `offset + length`) overflows before the result is used as an index.
+
+        ## How to investigate
+
+        Start by reading the main parsing function for each protocol — it is usually named
+        something like `fooMessageParser()` or `parse()`. Trace how raw bytes flow from the
+        input buffer into slice operations. Ask yourself: if an attacker controls the value of
+        every length field in this packet, what is the worst thing that can happen?
+
+        Look specifically for:
+        - Direct indexing (`buf[n]`, `buf[a:b]`) where `n`, `a`, or `b` come from parsed data
+          without a preceding `len(buf)` check covering all of them
+        - Arithmetic before indexing (`offset + size`, `start + length`) that could overflow
+          a signed or unsigned integer, producing a huge or negative value
+        - Loops that advance a cursor by a value from the packet — what happens when that value
+          is zero? Can the loop run forever?
+        - Conversions from a larger integer type to a smaller one (e.g. `uint32` to `int`) where
+          the truncation creates a negative value used as a length
+
+        The `libbeat/common/streambuf` package provides a `Buffer` type with safe, bounds-checked
+        methods (`Collect`, `CollectUntil`, `PeekByteFrom`). Where a parser uses these methods it
+        is generally safe. Where it accesses the underlying byte slice directly, inspect carefully.
+
+        ## For each unsafe location you find
+
+        1. Write a Go test in the relevant `*_test.go` file. The test should construct a crafted
+           byte slice designed to trigger the panic (e.g. a length field set to `0xFFFFFF` in a
+           20-byte buffer) and call the parser's entry-point function. Assert it returns an error
+           or `(false, false)` — it should NOT panic. Run it with `go test ./packetbeat/protos/<parser>/...`
+           to confirm the panic is real today.
+        2. Note the file, the unsafe expression, and which packet field controls it.
+        3. Note the one-line fix (add a bounds check, use a safe helper, guard against zero advance).
+
+        Be thorough. Check every parser, not just the ones that seem obvious. The same mistake
+        appears independently in multiple protocols because each parser was written separately.
+
+        ## The bar for filing
+
+        Only report findings that a real user could actually encounter. For this sweeper that
+        means: the malformed packet could plausibly arrive from a network peer (a misbehaving
+        client, a fuzzer, a buggy server, or an attacker). If the only way to trigger the bug
+        is to modify the test binary or inject data that could never appear on the wire, skip it.
+        If you cannot write a test that panics using a byte slice that looks like a real (if
+        malformed) protocol message, the finding is not worth filing.
+
+        ## Output
+
+        File a single issue containing:
+        - Confirmed panics first (tests that reproduce an actual crash), with the test code so
+          an engineer can paste it in and verify the fix
+        - A checklist of every unsafe location found, grouped by parser, with the unsafe
+          expression and the one-line fix
+        - Any parsers you inspected and found clean (so reviewers know the coverage)
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

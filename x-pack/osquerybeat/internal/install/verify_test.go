@@ -8,8 +8,10 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -30,7 +32,19 @@ func setupFiles(testdataBaseDir string, files []string) (string, error) {
 			return "", err
 		}
 
-		err = os.WriteFile(fp, nil, 0600)
+		mode := os.FileMode(0600)
+		content := []byte{}
+		base := filepath.Base(fp)
+		if base == "osqueryd" || base == "osqueryd.exe" {
+			mode = 0755
+			if strings.HasSuffix(base, ".exe") {
+				content = []byte("fake windows binary")
+			} else {
+				content = []byte("#!/bin/sh\necho \"osqueryd version " + distro.OsquerydVersion() + "\"\n")
+			}
+		}
+
+		err = os.WriteFile(fp, content, mode)
 		if err != nil {
 			return "", err
 		}

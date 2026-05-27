@@ -40,6 +40,9 @@ var (
 
 	// ErrModuleDisabled indicates a disabled module has been tried to instantiate.
 	ErrModuleDisabled = errors.New("disabled module")
+
+	// ErrPathsRequired indicates that paths were nil when creating a module.
+	ErrPathsRequired = errors.New("paths must not be nil when creating a module")
 )
 
 // NewModule builds a new Module and its associated MetricSets based on the
@@ -50,6 +53,9 @@ var (
 func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
+	}
+	if p == nil {
+		return nil, nil, ErrPathsRequired
 	}
 
 	bm, err := newBaseModuleFromConfig(config, logger)
@@ -203,7 +209,7 @@ func newBaseMetricSets(r *Register, m Module, p *paths.Path, logger *logp.Logger
 			if m.Config().ID != "" {
 				logger = logger.With("id", m.Config().ID)
 			}
-			metricsets = append(metricsets, BaseMetricSet{
+			metricsets = append(metricsets, BaseMetricSet{ //nolint:exhaustruct // hostData and registration are set after construction
 				id:      msID,
 				name:    name,
 				module:  m,

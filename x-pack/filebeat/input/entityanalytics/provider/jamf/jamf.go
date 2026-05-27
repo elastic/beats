@@ -113,7 +113,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
-	if p.cfg.Tracer != nil {
+	if p.cfg.Tracer.enabled() {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
 		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(Name, path)

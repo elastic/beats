@@ -12,17 +12,44 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
 )
+
+const maxArtifactSize = 1 << 30
+const defaultHTTPClientTimeout = 30 * time.Minute
+
+type countingWriter struct {
+	w io.Writer
+	n int64
+}
+
+func (cw *countingWriter) Write(p []byte) (int, error) {
+	written, err := cw.w.Write(p)
+	cw.n += int64(written)
+	return written, err
+}
 
 // Download downloads the osquery distro package
 // writes the content into a given filepath
 // returns the sha256 hash
 func Download(ctx context.Context, url, fp string) (hashout string, err error) {
-	log.Printf("Download %s to %s", url, fp)
+	cli := http.Client{
+		Timeout: defaultHTTPClientTimeout,
+	}
+	return DownloadWithClient(ctx, &cli, url, fp)
+}
 
-	cli := http.Client{}
+// DownloadWithClient downloads the osquery distro package using the provided client.
+// Writes the content into a given filepath and returns the sha256 hash.
+func DownloadWithClient(ctx context.Context, cli *http.Client, url, fp string) (hashout string, err error) {
+	log.Printf("Download %s to %s", url, fp)
+	if cli == nil {
+		cli = &http.Client{
+			Timeout: defaultHTTPClientTimeout,
+		}
+	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -53,6 +80,16 @@ func Download(ctx context.Context, url, fp string) (hashout string, err error) {
 	}
 	defer out.Close()
 
+	countingOut := &countingWriter{w: out}
+	limitedBody := io.LimitReader(res.Body, maxArtifactSize+1)
+
 	// Calculate hash and write file
-	return hash.Calculate(res.Body, out)
+	hashout, err = hash.Calculate(limitedBody, countingOut)
+	if err != nil {
+		return "", err
+	}
+	if countingOut.n > maxArtifactSize {
+		return "", fmt.Errorf("artifact exceeds maximum size of %d bytes", maxArtifactSize)
+	}
+	return hashout, nil
 }

@@ -19,6 +19,7 @@ package redis
 
 import (
 	"bytes"
+	"errors"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -350,7 +351,7 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 
 	content, err := buf.CollectWithSuffix(int(length), []byte("\r\n"))
 	if err != nil {
-		if err != streambuf.ErrNoMoreBytes {
+		if !errors.Is(err, streambuf.ErrNoMoreBytes) {
 			return common.NetString{}, false, false
 		}
 		return common.NetString{}, true, false
@@ -425,8 +426,12 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 
 	// handle top-level request command
 	var oneWordCommand, twoWordsCommand bool
+	var twoWordMethod []byte
 	oneWordCommand = isRedisCommand(content[0])
-	twoWordsCommand = count > 1 && isRedisCommand(bytes.Join(content[0:2], []byte(" ")))
+	if !oneWordCommand && count > 1 {
+		twoWordMethod = bytes.Join(content[0:2], []byte(" "))
+		twoWordsCommand = isRedisCommand(twoWordMethod)
+	}
 
 	if depth == 0 && (oneWordCommand || twoWordsCommand) {
 		p.message.isRequest = true
@@ -436,7 +441,7 @@ func (p *parser) parseArray(depth int, buf *streambuf.Buffer) (common.NetString,
 				p.message.path = content[1]
 			}
 		} else if twoWordsCommand {
-			p.message.method = bytes.Join(content[0:2], []byte(" "))
+			p.message.method = twoWordMethod
 			if len(content) > 2 {
 				p.message.path = content[2]
 			}

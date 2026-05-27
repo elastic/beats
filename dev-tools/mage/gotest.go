@@ -36,6 +36,7 @@ import (
 	"golang.org/x/sys/execabs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 )
 
 // GoTestArgs are the arguments used for the "go*Test" targets and they define
@@ -519,29 +520,11 @@ func BuildSystemTestBinary() error {
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
 func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
-	args := []string{
-		"test", "-c",
-		"-o", binArgs.Name + ".test",
-	}
-
-	if DevBuild {
-		// Disable optimizations (-N) and inlining (-l) for debugging.
-		args = append(args, `-gcflags=all=-N -l`)
-	}
-
-	if TestCoverage {
-		args = append(args, "-coverpkg", "./...")
-	}
-	args = append(args, binArgs.ExtraFlags...)
-	if len(binArgs.InputFiles) > 0 {
-		args = append(args, binArgs.InputFiles...)
-	}
-
-	start := time.Now()
-	defer func() {
-		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
-	}()
-	return sh.RunV("go", args...)
+	_, err := testbin.Build(binArgs.Name, ".",
+		testbin.WithExtraFlags(binArgs.ExtraFlags...),
+		testbin.WithInputFiles(binArgs.InputFiles...),
+	)
+	return err
 }
 
 func DefaultECHTestArgs() GoTestArgs {

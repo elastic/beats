@@ -56,8 +56,6 @@ type Monitor struct {
 	configuredJobs []*configuredJob
 	enabled        bool
 	state          int
-	// endpoints is a count of endpoints this monitor measures.
-	endpoints int
 	// internalsMtx is used to synchronize access to critical
 	// internal datastructures
 	internalsMtx sync.Mutex
@@ -73,6 +71,7 @@ type Monitor struct {
 
 	monitorStateTracker *monitorstate.Tracker
 	statusReporter      status.StatusReporter
+	plugin              plugin.Plugin
 }
 
 func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
@@ -196,7 +195,7 @@ func newMonitorUnsafe(
 		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
 	}
 
-	m.endpoints = p.Endpoints
+	m.plugin = p
 
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
@@ -244,7 +243,7 @@ func (m *Monitor) Start() {
 		t.Start(m.pubClient)
 	}
 
-	m.stats.StartMonitor(int64(m.endpoints))
+	m.stats.StartMonitor(int64(m.plugin.Endpoints))
 	m.state = MON_STARTED
 	m.updateStatus(status.Running, "")
 }
@@ -270,9 +269,25 @@ func (m *Monitor) Stop() {
 		}
 	}
 
-	m.stats.StopMonitor(int64(m.endpoints))
+	m.stats.StopMonitor(int64(m.plugin.Endpoints))
 	m.state = MON_STOPPED
 	m.updateStatus(status.Stopped, "")
+}
+
+// Update invokes the plugin's optional Update method wrapping it with
+// the corresponding status reporting
+func (m *Monitor) Update(config *conf.C) error {
+	m.internalsMtx.Lock()
+	defer m.internalsMtx.Unlock()
+
+	m.updateStatus(status.Configuring, "updating runner config")
+	if err := m.plugin.Update(config); err != nil {
+		m.updateStatus(status.Degraded, "failed to update runner config")
+		return err
+	}
+	m.updateStatus(status.Running, "runner updated")
+
+	return nil
 }
 
 func (m *Monitor) updateStatus(status status.Status, msg string) {

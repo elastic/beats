@@ -219,7 +219,7 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 	}{
 		"load template with ilm without loading ilm": {
 			ilmEnabled: true, tmplEnabled: true, loadILM: LoadModeDisabled,
-			warn:      "whithout loading ILM policy",
+			warn:      "without loading ILM policy",
 			lifecycle: lifecycle.LifecycleConfig{ILM: lifecycle.Config{Enabled: true, PolicyName: *fmtstr.MustCompileEvent("test")}},
 		},
 		"load ilm without template": {

@@ -72,7 +72,7 @@ func TestValidInline(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
-	require.Equal(t, "", s.Workdir())
+	require.Empty(t, s.Workdir())
 	require.Equal(t, testParams, s.Params())
 
 	e = s.Close()
@@ -376,7 +376,7 @@ func TestSourceDecoding(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, script, s.browserCfg.Source.Inline.Script)
-	require.Equal(t, "", s.Workdir())
+	require.Empty(t, s.Workdir())
 
 	e = s.Close()
 	require.NoError(t, e)
@@ -400,7 +400,50 @@ func TestDisabledSourceDecoding(t *testing.T) {
 	require.NoError(t, e)
 	require.NotNil(t, s)
 	require.Equal(t, encoded, s.browserCfg.Source.Inline.Script)
-	require.Equal(t, "", s.Workdir())
+	require.Empty(t, s.Workdir())
+
+	e = s.Close()
+	require.NoError(t, e)
+}
+
+func TestUpdateParams(t *testing.T) {
+	timeout := 30
+	script := "a script"
+	testParams := map[string]interface{}{
+		"key1": "value1",
+		"key2": "value2",
+	}
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"name":   "My Name",
+		"id":     "myId",
+		"params": testParams,
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": script,
+			},
+		},
+		"timeout": timeout,
+	})
+	s, e := NewSourceJob(cfg)
+	require.NoError(t, e)
+	require.NotNil(t, s)
+	require.Equal(t, testParams, s.Params())
+
+	// Check params are updated when reevaluated
+	testParams["key3"] = "value3"
+	e = s.Update(conf.MustNewConfigFrom(mapstr.M{
+		"name":   "My Name",
+		"id":     "myId",
+		"params": testParams,
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": script,
+			},
+		},
+		"timeout": timeout,
+	}))
+	require.NoError(t, e)
+	require.Equal(t, testParams, s.Params())
 
 	e = s.Close()
 	require.NoError(t, e)

@@ -18,7 +18,7 @@
 package dev_tools
 
 // This file contains tests that can be run on the generated packages.
-// To run these tests use `go test package_test.go`.
+// To run these tests from this directory use `go test ./dev-tools/packaging`.
 
 import (
 	"archive/tar"
@@ -29,7 +29,6 @@ import (
 	"context"
 	"debug/buildinfo"
 	"debug/elf"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -37,16 +36,15 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/api/types/strslice"
+	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
@@ -287,11 +285,38 @@ func checkNpcapNotices(pkg, file string, contents io.Reader) error {
 }
 
 func checkDocker(t *testing.T, file string) {
-	p, info, err := readDocker(file)
+	imageType, err := detectDockerImageType(file)
 	if err != nil {
-		t.Errorf("error reading file %v: %v", file, err)
+		t.Errorf("error detecting docker image format for %v: %v", file, err)
 		return
 	}
+	t.Logf("docker image format: %s", imageType)
+
+	var p *packageFile
+	var info *dockerInfo
+	var daemonImageRef string
+	switch imageType {
+	case dockerImageTypeLegacy:
+		p, info, err = readDocker(file)
+		if err != nil {
+			t.Errorf("error reading file %v: %v", file, err)
+			return
+		}
+	case dockerImageTypeOCI:
+		p, info, err = readDockerOCI(file)
+		if err != nil && errors.Is(err, errDockerArchiveEntryNotFound) {
+			t.Logf("OCI archive is missing blob data; falling back to an already-loaded daemon image discovered via manifest.json/RepoTags: %v", err)
+			p, info, daemonImageRef, err = readDockerOCIFromDaemon(t, file)
+		}
+		if err != nil {
+			t.Errorf("error reading file %v: %v", file, err)
+			return
+		}
+	default:
+		t.Errorf("unsupported docker image format %q for %s", imageType, file)
+		return
+	}
+
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
@@ -300,7 +325,7 @@ func checkDocker(t *testing.T, file string) {
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkLicensesPresent(t, "licenses/", p)
-	checkDockerImageRun(t, p, file)
+	checkDockerImageRun(t, p, file, daemonImageRef)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -426,7 +451,7 @@ func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
 				return
 			}
 		}
-		t.Errorf("no systemd unit file found matching %v", configFilePattern)
+		t.Errorf("no systemd unit file found matching %v", systemdUnitFilePattern)
 	})
 }
 
@@ -509,8 +534,7 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 		}
 
 		entrypoint := info.Config.Entrypoint[0]
-		if strings.HasPrefix(entrypoint, "/") {
-			entrypoint := strings.TrimPrefix(entrypoint, "/")
+		if entrypoint, ok := strings.CutPrefix(entrypoint, "/"); ok {
 			entry, found := p.Contents[entrypoint]
 			if !found {
 				t.Fatalf("%s entrypoint not found in docker", entrypoint)
@@ -569,76 +593,59 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	})
 }
 
-func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
+func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef string) {
 	t.Run(fmt.Sprintf("%s check docker images runs", p.Name), func(t *testing.T) {
-		var ctx context.Context
-		dl, ok := t.Deadline()
-		if !ok {
-			ctx = context.Background()
-		} else {
-			c, cancel := context.WithDeadline(context.Background(), dl)
-			ctx = c
-			defer cancel()
-		}
-		f, err := os.Open(imagePath)
-		if err != nil {
-			t.Fatalf("failed to open docker image %q: %s", imagePath, err)
-		}
-		defer f.Close()
+		ctx, cancel := dockerTestContext(t)
+		defer cancel()
 
-		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		dockerClient, err := client.New(client.FromEnv)
 		if err != nil {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
-		if err != nil {
-			t.Fatalf("error loading docker image: %s", err)
+		imageID := imageRef
+		if imageID == "" {
+			imageID, err = loadDockerImageFromArchive(ctx, dockerClient, imagePath)
+			if err != nil {
+				t.Fatalf("error loading docker image: %s", err)
+			}
+		} else {
+			_, err = dockerClient.ImageInspect(ctx, imageID)
+			if err != nil {
+				t.Fatalf("error inspecting docker image %q from daemon: %s", imageID, err)
+			}
 		}
-
-		loadRespBody, err := io.ReadAll(loadResp.Body)
-		if err != nil {
-			t.Fatalf("failed to read image load response: %s", err)
-		}
-		loadResp.Body.Close()
-
-		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
-		if !found {
-			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
-		}
-		imageId := strings.TrimRight(after, "\\n\"}\r\n")
 
 		var caps strslice.StrSlice
-		if strings.Contains(imageId, "packetbeat") {
+		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
 
-		createResp, err := c.ContainerCreate(ctx,
-			&container.Config{
-				Image: imageId,
-			},
-			&container.HostConfig{
-				CapAdd: caps,
-			},
-			nil,
-			nil,
-			"")
+		createResp, err := dockerClient.ContainerCreate(ctx,
+			client.ContainerCreateOptions{
+				Config: &container.Config{
+					Image: imageID,
+				},
+				HostConfig: &container.HostConfig{
+					CapAdd: caps,
+				},
+			})
 		if err != nil {
 			t.Fatalf("error creating container from image: %s", err)
 		}
 		defer func() {
-			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})
 			if err != nil {
 				t.Errorf("error removing container: %s", err)
 			}
 		}()
 
-		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})
 		if err != nil {
 			t.Fatalf("failed to start container: %s", err)
 		}
 		defer func() {
-			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})
 			if err != nil {
 				t.Errorf("error stopping container: %s", err)
 			}
@@ -657,7 +664,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
 				return
 			case <-ticker.C:
-				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}
@@ -672,6 +679,66 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			}
 		}
 	})
+}
+
+func dockerTestContext(t *testing.T) (context.Context, context.CancelFunc) {
+	t.Helper()
+
+	deadline, ok := t.Deadline()
+	if !ok {
+		return context.Background(), func() {}
+	}
+
+	return context.WithDeadline(context.Background(), deadline)
+}
+
+func loadDockerImageFromArchive(ctx context.Context, dockerClient *client.Client, imagePath string) (string, error) {
+	f, err := os.Open(imagePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to open docker image %q: %w", imagePath, err)
+	}
+	defer f.Close()
+
+	loadResp, err := dockerClient.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
+	if err != nil {
+		return "", err
+	}
+	defer loadResp.Close()
+
+	loadRespBody, err := io.ReadAll(loadResp)
+	if err != nil {
+		return "", fmt.Errorf("failed to read image load response: %w", err)
+	}
+
+	imageID, err := parseLoadedImageRef(string(loadRespBody))
+	if err != nil {
+		return "", err
+	}
+	return imageID, nil
+}
+
+func parseLoadedImageRef(loadResponse string) (string, error) {
+	for _, prefix := range []string{"Loaded image: ", "Loaded image ID: "} {
+		_, after, ok := strings.Cut(loadResponse, prefix)
+		if !ok {
+			continue
+		}
+
+		end := len(after)
+		for i, r := range after {
+			if r == '\n' || r == '\r' || r == '"' || r == '\\' {
+				end = i
+				break
+			}
+		}
+
+		imageID := strings.TrimSpace(after[:end])
+		if imageID != "" {
+			return imageID, nil
+		}
+	}
+
+	return "", fmt.Errorf("image load response was unexpected: %s", loadResponse)
 }
 
 // ensureNoBuildIDLinks checks for regressions related to
@@ -908,170 +975,4 @@ func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFil
 	}
 
 	return p, nil
-}
-
-func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
-	var manifest *dockerManifest
-	var info *dockerInfo
-	layers := make(map[string]*packageFile)
-
-	manifest, err := readManifest(dockerFile)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	file, err := os.Open(dockerFile)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer file.Close()
-
-	gzipReader, err := gzip.NewReader(file)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer gzipReader.Close()
-
-	tarReader := tar.NewReader(gzipReader)
-	for {
-		header, err := tarReader.Next()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, nil, err
-		}
-
-		switch {
-		case header.Name == manifest.Config:
-			info, err = readDockerInfo(tarReader)
-			if err != nil {
-				return nil, nil, err
-			}
-		case slices.Contains(manifest.Layers, header.Name):
-			layer, err := readTarContents(header.Name, tarReader)
-			if err != nil {
-				return nil, nil, err
-			}
-			layers[header.Name] = layer
-		}
-	}
-
-	if len(info.Config.Entrypoint) == 0 {
-		return nil, nil, fmt.Errorf("no entrypoint")
-	}
-
-	workingDir := info.Config.WorkingDir
-	entrypoint := info.Config.Entrypoint[0]
-
-	// Read layers in order and for each file keep only the entry seen in the later layer
-	p := &packageFile{Name: filepath.Base(dockerFile), Contents: map[string]packageEntry{}}
-	for _, layerFile := range layers {
-		for name, entry := range layerFile.Contents {
-			// Check only files in working dir and entrypoint
-			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
-				p.Contents[name] = entry
-			}
-			if excludedPathsPattern.MatchString(name) {
-				continue
-			}
-			// Add also licenses
-			for _, licenseFile := range licenseFiles {
-				if strings.Contains(name, licenseFile) {
-					p.Contents[name] = entry
-				}
-			}
-		}
-	}
-
-	if len(p.Contents) == 0 {
-		return nil, nil, fmt.Errorf("no files found in docker working directory (%s)", info.Config.WorkingDir)
-	}
-
-	return p, info, nil
-}
-
-func readManifest(dockerFile string) (*dockerManifest, error) {
-	var manifest *dockerManifest
-
-	file, err := os.Open(dockerFile)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	gzipReader, err := gzip.NewReader(file)
-	if err != nil {
-		return nil, err
-	}
-	defer gzipReader.Close()
-
-	tarReader := tar.NewReader(gzipReader)
-	for {
-		header, err := tarReader.Next()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, err
-		}
-
-		if header.Name == "manifest.json" {
-			manifest, err = readDockerManifest(tarReader)
-			if err != nil {
-				return nil, err
-			}
-			break
-		}
-	}
-	return manifest, err
-}
-
-type dockerManifest struct {
-	Config   string
-	RepoTags []string
-	Layers   []string
-}
-
-func readDockerManifest(r io.Reader) (*dockerManifest, error) {
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	var manifests []*dockerManifest
-	err = json.Unmarshal(data, &manifests)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(manifests) != 1 {
-		return nil, fmt.Errorf("one and only one manifest expected, %d found", len(manifests))
-	}
-
-	return manifests[0], nil
-}
-
-type dockerInfo struct {
-	Config struct {
-		Entrypoint []string
-		Labels     map[string]string
-		User       string
-		WorkingDir string
-	} `json:"config"`
-}
-
-func readDockerInfo(r io.Reader) (*dockerInfo, error) {
-	data, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	var info dockerInfo
-	err = json.Unmarshal(data, &info)
-	if err != nil {
-		return nil, err
-	}
-
-	return &info, nil
 }
