@@ -21,7 +21,7 @@ Returns information about files on NTFS volumes, parsed from the $MFT file on Wi
 | Column | Type | Description |
 |--------|------|-------------|
 | `drive` | `TEXT` | Volume drive letter (e.g. C) |
-| `device` | `TEXT` | Volume device path (e.g. \\.\C:) |
+| `device` | `TEXT` | Physical device path (e.g. \\\\.\PhysicalDrive0) |
 | `partition` | `INTEGER` | Partition number of the volume (e.g. 1) |
 | `inode` | `BIGINT` | MFT record number (inode) |
 | `sequence_number` | `INTEGER` | MFT entry sequence number |
@@ -49,14 +49,27 @@ Returns information about files on NTFS volumes, parsed from the $MFT file on Wi
 | `fn_atime` | `BIGINT` | File last-accessed time (Unix epoch) from $FILE_NAME |
 
 ## Examples
-### List all NTFS files
+### Path lookup
 
 ```sql
-SELECT * FROM elastic_ntfs_file;
+SELECT * FROM elastic_ntfs_file WHERE path = 'C:\Windows\System32\ntoskrnl.exe';
+```
+### Inode lookup (drive constraint required)
+
+```sql
+SELECT * FROM elastic_ntfs_file WHERE inode = 1972769 AND drive = 'C';
+```
+### Directory + filename glob
+
+```sql
+SELECT * FROM elastic_ntfs_file
+WHERE directory = 'C:\Windows\System32' AND filename GLOB '*.exe';
 ```
 
 ## Notes
 - Windows only
+- Glob patterns are not recursive. A query like `WHERE directory = 'C:\Windows' AND filename GLOB '*.exe'` will not find `C:\Windows\System32\notepad.exe`
+- Integer columns with value 0 are returned as empty string by the osquery wire protocol, not "0". Use numeric comparison (e.g. WHERE ads = 0, not ads = '0').
 
 ## Related Tables
 - `elastic_ntfs_partitions`

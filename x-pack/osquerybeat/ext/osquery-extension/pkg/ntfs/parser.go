@@ -48,7 +48,7 @@ func (v *Volume) explodePath(p string) ([]string, error) {
 
 // childrenMatching lists all direct children of parent whose names satisfy predicate.
 // It owns the Dir → GetMFT → NewFileInfo pipeline and applies the correct MftReference mask.
-func (v *Volume) childrenMatching(parent *fileNode, predicate func(string) bool) ([]*fileNode, error) {
+func (v *Volume) childrenMatching(parent *fileNode, predicate func(string) (bool, error)) ([]*fileNode, error) {
 	log := getLogger()
 	ntfsCtx, err := v.ntfsContext()
 	if err != nil {
@@ -68,14 +68,20 @@ func (v *Volume) childrenMatching(parent *fileNode, predicate func(string) bool)
 		}
 
 		// Apply the predicate to filter out unwanted children before the more expensive GetMFT call.
-		if !predicate(name) {
+		match, err := predicate(name)
+		if err != nil {
+			log.Errorf("predicate failed for %q: %v", name, err)
+			continue
+		}
+		if !match {
 			continue
 		}
 
-		// The MftReference needs to be masked to get the actual record number
+		// The & 0xFFFFFFFFFFFF mask strips the 16-bit sequence number from an NTFS MFT reference (48-bit record number + 16-bit sequence)
 		mftEntry, err := ntfsCtx.GetMFT(int64(idx.MftReference() & 0xFFFFFFFFFFFF))
 		if err != nil {
-			return nil, fmt.Errorf("GetMFT for %q: %w", name, err)
+			log.Errorf("GetMFT failed for %q: %v", name, err)
+			continue
 		}
 
 		// Create a fileNode for this child and add it to the results if successful
@@ -117,7 +123,7 @@ func (v *Volume) Root() (*parser.MFT_ENTRY, error) {
 }
 
 func (v *Volume) findAndResolveInode(inode int64, depth int) (*fileNode, error) {
-	if depth > 64 {
+	if depth > 128 {
 		return nil, fmt.Errorf("exceeded max depth resolving parent chain at inode %d", inode)
 	}
 
@@ -194,9 +200,12 @@ func (v *Volume) FindByDirectory(directory string, pattern string) ([]*fileNode,
 		return nil, fmt.Errorf("failed to find directory %s: %w", directory, err)
 	}
 
-	children, err := v.childrenMatching(dirNode, func(name string) bool {
-		matched, _ := path.Match(pattern, name)
-		return matched
+	children, err := v.childrenMatching(dirNode, func(name string) (bool, error) {
+		matched, err := path.Match(pattern, name)
+		if err != nil {
+			return false, fmt.Errorf("invalid filename glob %q: %w", pattern, err)
+		}
+		return matched, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list children of directory %s: %w", directory, err)
@@ -323,13 +332,13 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 	// Handle inode constraint
 	if len(inodeConstraints) > 0 {
 		inodeStr := inodeConstraints[0].Expression
-		inode, err := strconv.Atoi(inodeStr)
+		inode, err := strconv.ParseInt(inodeStr, 10, 64)
 		if err != nil {
 			log.Warningf("invalid inode constraint %s: %v", inodeStr, err)
 			return results, nil
 		}
 
-		result, err := vol.FindByInode(int64(inode))
+		result, err := vol.FindByInode(inode)
 		if err != nil {
 			log.Warningf("Failed to find by inode %d: %v", inode, err)
 			return results, nil

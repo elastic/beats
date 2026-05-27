@@ -55,12 +55,14 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 		Inode:     int64(f.mftEntry.Record_number()),
 	}
 
-	result.SequenceNumber = int32(f.mftEntry.Sequence_value()) //nolint:gosec // G115: sequence numbers are 16-bit values that fit comfortably in int32
+	result.SequenceNumber = int32(f.mftEntry.Sequence_value())
 
 	result.Path = f.BuildFullPath()
 	result.Directory = filepath.Dir(result.Path)
 	if f.parent != nil {
 		result.ParentInode = int64(f.parent.mftEntry.Record_number())
+	} else {
+		result.ParentInode = 5 // Root directory has a parent inode of 5 in NTFS
 	}
 
 	if f.mftEntry.IsDir(ntfsCtx) {
@@ -123,32 +125,48 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 	return result, nil
 }
 
-// preferredFileName returns the Win32 or Win32+DOS namespace $FILE_NAME attribute from
-// the list, falling back to the first entry if neither is present.
-// preferredFileName selects the best $FILE_NAME attribute for timestamps,
-// filename, and allocated size. Priority:
-//  1. Win32 (namespace 1) with non-zero allocated size
-//  2. Win32+DOS (namespace 3) with non-zero allocated size
-//  3. Last POSIX entry (namespace 0) — no Win32 family entry has valid size data;
-//     take the last one in MFT order, which tends to be the most recently written
+// preferredFileName selects the $FILE_NAME attribute with the highest-priority
+// namespace for timestamps, filename, and allocated size. Priority:
 //
-// TODO: Should we consider adding a FILE_NAME table that returns all FILE_NAME attributes for a given MFT entry, would have an inode or path constraint
+//	1 (Win32)       — present when a separate DOS 8.3 short-name attribute exists
+//	3 (Win32+DOS)   — most common; single attribute covering both namespaces
+//	0 (POSIX)       — rare; used on case-sensitive volumes
+//	2 (DOS)         — timestamps frozen at creation; always stale
+//
+// Namespace selection is based purely on the NameType value, not Allocated_size.
+// Allocated_size is 0 for directories regardless of namespace, so gating on it
+// caused directory entries to fall through to the DOS (stale) namespace.
 func preferredFileName(fileNames []*parser.FILE_NAME) *parser.FILE_NAME {
 	if len(fileNames) == 0 {
 		return nil
 	}
+
+	var win32, win32AndDOS, posix, dos *parser.FILE_NAME
 	for _, fn := range fileNames {
-		if fn.NameType().Value == 1 && fn.Allocated_size() > 0 { // Win32
-			return fn
+		switch fn.NameType().Value {
+		case 0:
+			posix = fn
+		case 1:
+			win32 = fn
+		case 2:
+			dos = fn
+		case 3:
+			win32AndDOS = fn
 		}
 	}
-	for _, fn := range fileNames {
-		if fn.NameType().Value == 3 && fn.Allocated_size() > 0 { // Win32+DOS
-			return fn
-		}
+
+	switch {
+	case win32 != nil:
+		return win32
+	case win32AndDOS != nil:
+		return win32AndDOS
+	case posix != nil:
+		return posix
+	case dos != nil:
+		return dos
+	default:
+		return fileNames[0]
 	}
-	// Fall back to last entry — matches TSK/ToB iteration order
-	return fileNames[len(fileNames)-1]
 }
 
 func parentInode(volumeInfo *Volume, mftEntry *parser.MFT_ENTRY) (int64, error) {

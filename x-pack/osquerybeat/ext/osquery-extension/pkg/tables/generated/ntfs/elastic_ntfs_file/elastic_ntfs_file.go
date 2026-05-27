@@ -62,7 +62,7 @@ func GetGenerateFunc(log *logger.Logger, client *client.ResilientClient) (table.
 // Result represents a row from the elastic_ntfs_file table.
 type Result struct {
 	Drive          string `osquery:"drive"`           // Volume drive letter (e.g. C)
-	Device         string `osquery:"device"`          // Volume device path (e.g. \\.\C:)
+	Device         string `osquery:"device"`          // Physical device path (e.g. \\\\.\PhysicalDrive0)
 	Partition      int32  `osquery:"partition"`       // Partition number of the volume (e.g. 1)
 	Inode          int64  `osquery:"inode"`           // MFT record number (inode)
 	SequenceNumber int32  `osquery:"sequence_number"` // MFT entry sequence number

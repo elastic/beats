@@ -13,7 +13,7 @@ columns:
     description: Volume drive letter (e.g. C)
   - name: device
     type: TEXT
-    description: Volume device path (e.g. \\.\C:)
+    description: Physical device path (e.g. \\\\.\PhysicalDrive0)
   - name: partition
     type: INTEGER
     description: Partition number of the volume (e.g. 1)
@@ -96,11 +96,20 @@ documentation:
      The $MFT file contains metadata about all files and directories on an NTFS volume, including their names, sizes, timestamps, and attributes. This table parses the $MFT file to extract this information and present it in a structured format.
      Note that this table is Windows-only, as the $MFT file is specific to the NTFS file system used by Windows.
   examples:
-    - title: List all NTFS files
+    - title: Path lookup
       query: |
-        SELECT * FROM elastic_ntfs_file;
+        SELECT * FROM elastic_ntfs_file WHERE path = 'C:\Windows\System32\ntoskrnl.exe';
+    - title: Inode lookup (drive constraint required)
+      query: |
+        SELECT * FROM elastic_ntfs_file WHERE inode = 1972769 AND drive = 'C';
+    - title: Directory + filename glob
+      query: |
+        SELECT * FROM elastic_ntfs_file
+        WHERE directory = 'C:\Windows\System32' AND filename GLOB '*.exe';
   notes:
     - "Windows only"
+    - "Glob patterns are not recursive. A query like `WHERE directory = 'C:\\Windows' AND filename GLOB '*.exe'` will not find `C:\\Windows\\System32\\notepad.exe`"
+    - "Integer columns with value 0 are returned as empty string by the osquery wire protocol, not \"0\". Use numeric comparison (e.g. WHERE ads = 0, not ads = '0')."
   related_tables:
     - elastic_ntfs_partitions
     - elastic_ntfs_volumes
