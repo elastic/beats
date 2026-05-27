@@ -16,15 +16,13 @@
 // under the License.
 
 /*
-Package auditd provides a filestream parser that pre-parses Linux audit log
-lines on the agent using go-libaudit's auparse package before events are
-shipped to Elasticsearch.
+Package auditd provides a filestream parser for Linux audit log lines.
 
-Each line is processed by auparse.ParseLogLine, which populates
-auditd.log.* fields (record type, sequence number, and all key=value pairs)
-and sets the message timestamp from the audit header. Architecture codes
-(e.g. c000003e → x86_64), syscall numbers (e.g. 59 → execve), and
-res=success normalisation are resolved by auparse at parse time.
+Each input line is parsed as an independent audit record. The parser
+populates auditd.log.* fields (record type, sequence number, and all
+key=value pairs) and sets the message timestamp from the audit header.
+Architecture codes (e.g. c000003e → x86_64), syscall numbers (e.g.
+59 → execve), and res=success normalisation are resolved at parse time.
 
 Lines written by userspace auditd with name_format=hostname in
 /etc/audit/auditd.conf carry a "node=<hostname> " prefix that the kernel
@@ -38,10 +36,8 @@ libbeat/reader/parser/parser.go and is configurable through Config:
   - add_error_key – add an error.message field to the event on parse
     failure (default: true)
 
-Compatibility: this parser replaces the grok/Painless ingest pipeline used
-by the auditd integration (elastic/integrations). The integration provides
-a use_filebeat_parser toggle (default false) so users can opt in and
-validate before the pipeline path is retired.
+The parser processes each audit log record independently and does not
+coalesce related records that share the same audit sequence number.
 
 Note: the implementation is Linux-only because go-libaudit's auparse
 package depends on linux/unix signal name lookups. A build stub is provided

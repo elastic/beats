@@ -916,7 +916,7 @@ This example shows you how to include messages that start with the string ERR or
 stack: ga 9.5.0
 ```
 
-Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). Each line is parsed using [go-libaudit](https://github.com/elastic/go-libaudit) and the extracted fields are placed under `auditd.log.*`, matching the schema expected by the Elastic auditd integration's ingest pipeline.
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
 
 The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
 

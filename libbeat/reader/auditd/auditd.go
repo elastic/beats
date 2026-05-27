@@ -35,35 +35,24 @@ import (
 // set of key-value pairs inside the outer message.
 var innerMsgRe = regexp.MustCompile(`\bmsg='([^']*)'`)
 
-// avcRe extracts the AVC action and first requested permission from a log
-// line. Mirrors the integrations-pipeline grok pattern:
-//
-//	avc:%{SPACE}%{WORD:auditd.log.avc.action}%{SPACE}{%{SPACE}%{WORD:auditd.log.avc.request}%{SPACE}}%{SPACE}for%{SPACE}
-//
-// This grok is skipped on the pre-parsed path (guarded by
-// ctx.auditd?.log?.record_type == null), so we must extract the fields
-// ourselves.
+// avcRe extracts the AVC action and first requested permission from an audit
+// log line such as: "avc: denied { getattr } for".
 var avcRe = regexp.MustCompile(`\bavc:\s+(\w+)\s+\{\s+(\w+)\s+\}\s+for\s+`)
 
 // auidSesRe extracts the raw numeric value of auid= and ses= fields from a
 // log line. auparse normalises auid=4294967295 and ses=4294967295 (the
-// kernel's sentinel for "not set") to the string "unset", but the ingest
-// pipeline simply renames auditd.log.auid → user.audit.id without any
-// semantic check, so "unset" would land verbatim in user.audit.id.
-// Restoring the raw numeric value matches the grok/KV path behaviour.
+// kernel's sentinel for "not set") to the string "unset". Restoring the raw
+// numeric value preserves the original audit record value in auditd.log.*.
 var auidSesRe = regexp.MustCompile(`\b(auid|ses)=(\d+)\b`)
 
 // innerMsgKVRe extracts individual key=value pairs from inner msg content.
 // Unquoted values may span multiple words (e.g. op=adding group to /etc/group)
-// because auparse's KV regex stops at the first whitespace. The boundary
-// condition "next token is key=" mirrors the Elasticsearch ingest pipeline's
-//
-//	field_split: "\\s+(?=[^\\s]+=)"
+// because auparse's KV regex stops at the first whitespace. The boundary is
+// the next key=value token.
 var innerMsgKVRe = regexp.MustCompile(`([a-z][a-z0-9_-]*)=(.*?)(?:\s+[a-z][a-z0-9_-]+=|\s*$)`)
 
 // Parser parses each line of an audit.log file using go-libaudit's auparse
-// package and populates auditd.log.* fields on the message, replacing the
-// grok/KV stages in the ingest pipeline.
+// package and populates auditd.log.* fields on the message.
 type Parser struct {
 	cfg    Config
 	reader reader.Reader
@@ -115,15 +104,24 @@ func (p *Parser) Next() (reader.Message, error) {
 	}
 
 	data, dataErr := auditMsg.Data()
+	if dataErr != nil {
+		if p.cfg.LogErrors {
+			p.logger.Errorf("error extracting auditd data fields: %v", dataErr)
+		}
+		if p.cfg.AddErrorKey {
+			msg.AddFields(mapstr.M{
+				"error": mapstr.M{"message": "error extracting auditd data fields: " + dataErr.Error()},
+			})
+		}
+	}
 	for k, v := range data {
 		logFields[k] = v
 	}
 	if nodeVal != "" {
 		logFields["node"] = nodeVal
 	}
-	// auparse normalises auid=4294967295 and ses=4294967295 to "unset". Restore
-	// the raw numeric value so the pipeline's rename produces the expected
-	// user.audit.id value instead of the literal string "unset".
+	// auparse normalises auid=4294967295 and ses=4294967295 to "unset".
+	// Restore the raw numeric value from the original audit record.
 	for _, m := range auidSesRe.FindAllStringSubmatch(auditMsg.RawData, -1) {
 		field, rawVal := m[1], m[2]
 		if v, ok := logFields[field]; ok && v == "unset" {
@@ -132,7 +130,7 @@ func (p *Parser) Next() (reader.Message, error) {
 	}
 
 	// auparse moves the audit rule key(s) from the data map to AuditMessage.Tags.
-	// Restore them as auditd.log.key to match the ingest pipeline field.
+	// Restore them as auditd.log.key so the parsed event keeps the rule key.
 	if tags, _ := auditMsg.Tags(); len(tags) > 0 {
 		if len(tags) == 1 {
 			logFields["key"] = tags[0]
@@ -156,25 +154,11 @@ func (p *Parser) Next() (reader.Message, error) {
 			}
 		}
 	}
-	// The ingest pipeline's AVC grok processor is guarded by
-	// ctx.auditd?.log?.record_type == null and therefore skipped on the
-	// pre-parsed path. Extract avc.action and avc.request directly from the
-	// raw log line so downstream ECS mapping still works.
+	// Extract avc.action and avc.request from SELinux AVC records.
 	if m := avcRe.FindStringSubmatch(auditMsg.RawData); len(m) > 2 {
 		logFields["avc"] = mapstr.M{
 			"action":  m[1],
 			"request": m[2],
-		}
-	}
-
-	if dataErr != nil {
-		if p.cfg.LogErrors {
-			p.logger.Errorf("error extracting auditd data fields: %v", dataErr)
-		}
-		if p.cfg.AddErrorKey {
-			msg.AddFields(mapstr.M{
-				"error": mapstr.M{"message": "error extracting auditd data fields: " + dataErr.Error()},
-			})
 		}
 	}
 

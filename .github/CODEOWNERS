@@ -74,6 +74,7 @@ changelog/fragments/
 /libbeat/processors/syslog/ @elastic/integration-experience
 /libbeat/processors/translate_ldap_attribute/ @elastic/sec-windows-platform
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
+/libbeat/reader/auditd/ @elastic/sec-linux-platform
 /libbeat/reader/etw/ @elastic/sec-windows-platform
 /libbeat/reader/syslog/ @elastic/integration-experience
 /licenses/ @elastic/elastic-agent-data-plane
