@@ -320,7 +320,7 @@ func fromUnsignedSlice[T unsigned](dst pcommon.Slice, src []T) error {
 // only carries a signed 64-bit integer, so values above math.MaxInt64 cannot
 // be represented losslessly.
 func maskUnsignedInt(value uint64) int64 {
-	return int64(value & uint64(math.MaxInt64)) //nolint:gosec // G115: mask clears bit 63, safe conversion
+	return int64(value & uint64(math.MaxInt64))
 }
 
 // structToMap round-trips a struct value through JSON to obtain a
