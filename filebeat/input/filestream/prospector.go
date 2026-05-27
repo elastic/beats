@@ -325,7 +325,12 @@ func (p *fileProspector) TakeOver(prospectorStore loginp.StoreUpdater, newID fun
 // Run starts the fileProspector which accepts FS events from a file watcher.
 //
 //nolint:dupl // Different prospectors have a similar run method
-func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *fileProspector) Run(
+	ctx input.Context,
+	s loginp.StateMetadataUpdater,
+	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
+) {
 	p.logger.Debug("Starting prospector")
 	defer p.logger.Debug("Prospector has stopped")
 
@@ -333,6 +338,16 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	// Because the harvester is not really part of the prospector,
 	// we use this logger instead of the prospector logger.
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
+
+	// TODO: Try to put this back into the goroutine
+	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+	if scanMetrics, ok := p.filewatcher.(interface {
+		SetScanMetrics(*loginp.Metrics, time.Duration, time.Time)
+		ResetScanMetrics()
+	}); ok {
+		scanMetrics.SetScanMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
+		defer scanMetrics.ResetScanMetrics()
+	}
 
 	var tg unison.MultiErrGroup
 
@@ -346,8 +361,6 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	})
 
 	tg.Go(func() error {
-		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 

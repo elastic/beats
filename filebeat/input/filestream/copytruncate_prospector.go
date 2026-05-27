@@ -196,12 +196,27 @@ type copyTruncateFileProspector struct {
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
-func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
+func (p *copyTruncateFileProspector) Run(
+	ctx input.Context,
+	s loginp.StateMetadataUpdater,
+	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
+) {
 	log := ctx.Logger.With("prospector", copyTruncateProspectorDebugKey)
 	log.Debug("Starting prospector")
 	defer log.Debug("Prospector has stopped")
 
 	defer p.stopHarvesterGroup(log, hg)
+
+	// TODO: Review/test this. Also review if this can go back into the goroutine
+	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+	if scanMetrics, ok := p.filewatcher.(interface {
+		SetScanMetrics(*loginp.Metrics, time.Duration, time.Time)
+		ResetScanMetrics()
+	}); ok {
+		scanMetrics.SetScanMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
+		defer scanMetrics.ResetScanMetrics()
+	}
 
 	var tg unison.MultiErrGroup
 
@@ -211,8 +226,6 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 	})
 
 	tg.Go(func() error {
-		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 

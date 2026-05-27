@@ -82,6 +82,14 @@ type fileWatcher struct {
 	closedHarvesters map[string]int64
 	// closedHarvestersMutex controls access to closedHarvesters
 	closedHarvestersMutex sync.Mutex
+
+	// scanMetrics receives each scan's aggregate file counts. The watcher owns
+	// these updates because it has the complete post-scan file set.
+	scanMetrics loginp.Metrics
+	// scanIgnoreOlder and scanIgnoreInactiveSince mirror the prospector ignore
+	// settings so scan metrics can include files that are discovered but ignored.
+	scanIgnoreOlder         time.Duration
+	scanIgnoreInactiveSince time.Time
 }
 
 // Ensure fileWatcher implements loginp.FSWatcher
@@ -173,6 +181,15 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
 	paths := w.scanner.GetFiles()
+	// Fall back to len(paths) for scanner implementations that do not expose
+	// richer scan metrics; the real fileScanner overwrites this below with the
+	// full snapshot collected while scanning.
+	scanMetrics := loginp.FileScanMetrics{FilesUnique: int64(len(paths))}
+	if metricsProvider, ok := w.scanner.(interface{ LastScanMetrics() loginp.FileScanMetrics }); ok {
+		scanMetrics = metricsProvider.LastScanMetrics()
+	}
+	scanMetrics.FilesIgnored = countIgnoredFiles(paths, w.scanIgnoreOlder, w.scanIgnoreInactiveSince)
+	w.scanMetrics.UpdateFileScanMetrics(scanMetrics)
 
 	// for debugging purposes
 	writtenCount := 0
@@ -323,6 +340,41 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.prev = paths
 }
 
+// TODO: try to move that to watch and re-use the existing logic instead of
+// re-implementing it.
+func countIgnoredFiles(
+	paths map[string]loginp.FileDescriptor,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) int64 {
+	if ignoreOlder <= 0 && ignoreInactiveSince.IsZero() {
+		return 0
+	}
+
+	now := time.Now()
+	var ignored int64
+	for _, fd := range paths {
+		if fileIsIgnored(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) {
+			ignored++
+		}
+	}
+
+	return ignored
+}
+
+func fileIsIgnored(
+	modTime time.Time,
+	now time.Time,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) bool {
+	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
+		return true
+	}
+
+	return !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0
+}
+
 // getFileIdentity mimics the same algorithm used by the harvester to generate
 // the file identity to any given file.
 // See 'startHarvester' on internal/input-logfile/harvester.go.
@@ -399,6 +451,7 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
+	lastScanMetrics  loginp.FileScanMetrics
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -476,6 +529,13 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	uniqueIDs := map[string]string{}
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
+	scanMetrics := loginp.FileScanMetrics{}
+
+	// Set the metrics before returning
+	defer func() {
+		scanMetrics.FilesUnique = int64(len(fdByName))
+		s.lastScanMetrics = scanMetrics
+	}()
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -483,16 +543,19 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			s.log.Errorf("glob(%s) failed: %v", path, err)
 			continue
 		}
+		scanMetrics.FilesMatched += int64(len(matches))
 
 		for _, filename := range matches {
 			// in case multiple globs match on the same file we filter out duplicates
 			if _, knownFile := uniqueFiles[filename]; knownFile {
+				scanMetrics.FilesNoIngestTarget++
 				continue
 			}
 			uniqueFiles[filename] = struct{}{}
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
+				scanMetrics.FilesNoIngestTarget++
 				if !errors.Is(err, errFileEmpty) {
 					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
 				}
@@ -501,6 +564,7 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
+				scanMetrics.FilesNoIngestTarget++
 				if s.smallFilesWarned.CompareAndSwap(false, true) {
 					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
 						"least %d in size for ingestion to start. To change this "+
@@ -513,12 +577,14 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 				continue
 			}
 			if err != nil {
+				scanMetrics.FilesNoIngestTarget++
 				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
 			}
 
 			fileID := fd.FileID()
 			if knownFilename, exists := uniqueIDs[fileID]; exists {
+				scanMetrics.FilesNoIngestTarget++
 				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
 				continue
 			}
@@ -528,6 +594,11 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	}
 
 	return fdByName
+}
+
+// TODO: Do we need this? can't we just access the field?
+func (s *fileScanner) LastScanMetrics() loginp.FileScanMetrics {
+	return s.lastScanMetrics
 }
 
 type ingestTarget struct {

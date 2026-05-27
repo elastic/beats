@@ -61,6 +61,21 @@ type Metrics struct {
 	HarvesterGZIPClosed    *monitoring.Int
 	HarvesterGZIPRunning   *monitoring.Int
 	HarvesterOpenGZIPFiles *monitoring.Int
+
+	FilesMatched        *monitoring.Int // Number of files matched by the configured paths (gauge).
+	FilesUnique         *monitoring.Int // Number of unique ingestible files found by the scanner (gauge).
+	FilesNoIngestTarget *monitoring.Int // Number of matched files without an ingest target (gauge).
+	FilesIgnored        *monitoring.Int // Number of ingestible files ignored by filestream settings (gauge).
+
+	lastFileScanMetrics FileScanMetrics
+}
+
+// FileScanMetrics contains one filestream scanner snapshot for an input.
+type FileScanMetrics struct {
+	FilesMatched        int64
+	FilesUnique         int64
+	FilesNoIngestTarget int64
+	FilesIgnored        int64
 }
 
 func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
@@ -69,6 +84,7 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 	// However, at least on testing scenarios this does not hold true, so
 	// if needed, we create the registry ourselves.
 	harvesterMetrics := monitoring.Default.GetOrCreateRegistry("filebeat.harvester")
+	filestreamMetrics := monitoring.Default.GetOrCreateRegistry("filebeat.filestream")
 
 	m := Metrics{
 		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),
@@ -100,6 +116,11 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 		HarvesterGZIPClosed:    monitoring.NewInt(harvesterMetrics, "gzip_closed"),
 		HarvesterGZIPRunning:   monitoring.NewInt(harvesterMetrics, "gzip_running"),
 		HarvesterOpenGZIPFiles: monitoring.NewInt(harvesterMetrics, "gzip_open_files"),
+
+		FilesMatched:        monitoring.NewInt(filestreamMetrics, "files_matched"),
+		FilesUnique:         monitoring.NewInt(filestreamMetrics, "files_unique"),
+		FilesNoIngestTarget: monitoring.NewInt(filestreamMetrics, "files_no_ingest_target"),
+		FilesIgnored:        monitoring.NewInt(filestreamMetrics, "files_ignored"),
 	}
 	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
@@ -107,4 +128,30 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 		Register("histogram", metrics.NewHistogram(m.ProcessingGZIPTime))
 
 	return &m
+}
+
+// UpdateFileScanMetrics updates the aggregate filestream scan gauges with this
+// input's delta since the previous scan.
+func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
+	if m == nil {
+		return
+	}
+
+	m.FilesMatched.Add(current.FilesMatched - m.lastFileScanMetrics.FilesMatched)
+	m.FilesUnique.Add(current.FilesUnique - m.lastFileScanMetrics.FilesUnique)
+	m.FilesNoIngestTarget.Add(current.FilesNoIngestTarget - m.lastFileScanMetrics.FilesNoIngestTarget)
+	m.FilesIgnored.Add(current.FilesIgnored - m.lastFileScanMetrics.FilesIgnored)
+
+	m.lastFileScanMetrics = current
+}
+
+// ResetFileScanMetrics removes this input's contribution from the aggregate
+// filestream scan gauges.
+// TODO: Fix this. Reset will erase metrics for all inputs
+func (m *Metrics) ResetFileScanMetrics() {
+	if m == nil {
+		return
+	}
+
+	m.UpdateFileScanMetrics(FileScanMetrics{})
 }
