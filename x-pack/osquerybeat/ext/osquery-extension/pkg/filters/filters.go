@@ -230,7 +230,7 @@ func GetValueByOsqueryTag(s any, tagValue string) (reflect.Value, error) {
 	v := reflect.ValueOf(s)
 
 	// If s is a pointer, we need to get the element it points to
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
@@ -259,7 +259,7 @@ func GetValueByOsqueryTag(s any, tagValue string) (reflect.Value, error) {
 		// and the tag will be empty.  We need to recurse into the embedded struct and look for the tag there.
 		if fieldType.Anonymous && tag == "" {
 			// Handle pointer to struct if necessary
-			if fieldValue.Kind() == reflect.Ptr {
+			if fieldValue.Kind() == reflect.Pointer {
 				if fieldValue.IsNil() {
 					continue
 				}
