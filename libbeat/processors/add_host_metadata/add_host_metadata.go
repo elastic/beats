@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -65,8 +66,8 @@ type hostInfo interface {
 type hostInfoFactory func() (hostInfo, error)
 
 type hostMetadataCache struct {
-	sync.Mutex
-	lastUpdate time.Time
+	mu         sync.Mutex
+	lastUpdate atomic.Int64 // unix nano timestamp for lock-free read
 	data       mapstr.Pointer
 }
 
@@ -127,10 +128,11 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, fmt.Errorf("error loading data during event update: %w", err)
 	}
 
-	// Superficially this clone seems unnecessary, but it seems to have been
-	// applied as a fix a long time ago -- possibly there can be later processors
-	// or changes to an event that would affect the cached data?
-	event.Fields.DeepUpdate(data.Clone())
+	// The cached data must not be aliased into the event because downstream
+	// processors or outputs could mutate the event's fields. deepCopyUpdate
+	// merges the data while creating fresh nested maps in one pass, avoiding
+	// a separate Clone + DeepUpdate.
+	event.Fields.DeepCloneUpdate(data)
 
 	if len(p.geoData) > 0 {
 		event.Fields.DeepUpdate(p.geoData.Clone())
@@ -154,32 +156,45 @@ func (p *addHostMetadata) cacheForFQDN(useFQDN bool) *hostMetadataCache {
 	return &p.caches[0]
 }
 
-func timestampExpired(timestamp time.Time, ttl time.Duration) bool {
-	if ttl <= 0 {
+// atomicTimestampExpired checks if the given unix nano timestamp plus ttl is before now.
+func atomicTimestampExpired(unixNano int64, ttl time.Duration) bool {
+	if ttl <= 0 || unixNano == 0 {
 		return true
 	}
-	return timestamp.Add(ttl).Before(time.Now())
+	return time.Unix(0, unixNano).Add(ttl).Before(time.Now())
 }
 
-// loadData update's the processor's associated host metadata
+// loadData returns the cached host metadata, refreshing it if the cache has expired.
+// It uses a lock-free fast path for the common case where cached data is still valid.
 func (p *addHostMetadata) loadData(useFQDN bool) (mapstr.M, error) {
 	cache := p.cacheForFQDN(useFQDN)
-	cache.Lock()
-	defer cache.Unlock()
 
+	// Fast path: read cached data without locking. The mapstr.Pointer is
+	// atomically updated, and lastUpdate is an atomic int64.
 	data := cache.data.Get()
-	var err error
-	if data == nil || timestampExpired(cache.lastUpdate, p.config.CacheTTL) {
-		// Data is absent or expired, refresh it.
-		data, err = p.fetchData(useFQDN)
-		if err == nil {
-			cache.data.Set(data)
-		}
-		// Backwards compatibility (for now): cache timestamp is updated even if
-		// the update fails (falls back on the last successful update, and avoids
-		// blocking the pipeline when there are issues with the hostname).
-		cache.lastUpdate = time.Now()
+	if data != nil && !atomicTimestampExpired(cache.lastUpdate.Load(), p.config.CacheTTL) {
+		return data, nil
 	}
+
+	// Slow path: cache is empty or expired, acquire the lock to refresh.
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	// Double-check after acquiring lock: another goroutine may have refreshed.
+	data = cache.data.Get()
+	if data != nil && !atomicTimestampExpired(cache.lastUpdate.Load(), p.config.CacheTTL) {
+		return data, nil
+	}
+
+	var err error
+	data, err = p.fetchData(useFQDN)
+	if err == nil {
+		cache.data.Set(data)
+	}
+	// Backwards compatibility (for now): cache timestamp is updated even if
+	// the update fails (falls back on the last successful update, and avoids
+	// blocking the pipeline when there are issues with the hostname).
+	cache.lastUpdate.Store(time.Now().UnixNano())
 	return data, err
 }
 

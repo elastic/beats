@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Reduce per-event memory allocations and CPU cost when the add_fields, add_cloud_metadata, add_host_metadata, or add_observer_metadata processors are configured and on the events pipeline.
+component: libbeat

@@ -91,7 +91,7 @@ func (p *observerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		if p.config.Overwrite {
 			_ = event.Fields.Delete("observer")
 		}
-		event.Fields.DeepUpdate(p.data.Get().Clone())
+		event.Fields.DeepCloneUpdate(p.data.Get())
 
 		if len(p.geoData) > 0 {
 			event.Fields.DeepUpdate(p.geoData)
