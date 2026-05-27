@@ -148,7 +148,7 @@ require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/compute v1.62.0
 	cloud.google.com/go/redis v1.23.0
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/v2 v2.0.2
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
@@ -196,7 +196,7 @@ require (
 	github.com/icholy/digest v0.1.22
 	github.com/klauspost/compress v1.18.6
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/microsoft/go-mssqldb v1.9.5
+	github.com/microsoft/go-mssqldb v1.10.0
 	github.com/microsoft/wmi v0.38.3
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.153.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.153.0
@@ -236,7 +236,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.4.1
 	github.com/cilium/ebpf v0.21.0
 	github.com/coder/websocket v1.8.14
-	github.com/elastic/entcollect v0.0.0-20260514013106-6d4034497b3d
+	github.com/elastic/entcollect v0.0.0-20260525234839-d7d7a2bf1510
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/jimlambrt/gldap v0.1.14
 	github.com/mattn/go-sqlite3 v1.14.32
@@ -300,7 +300,7 @@ require (
 	filippo.io/edwards25519 v1.1.1 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.11.2 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.12.0 // indirect
 	github.com/Azure/go-amqp v1.5.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.24 // indirect
