@@ -241,11 +241,11 @@ The maximum number of bytes that a single log message can have. All bytes after 
 
 #### `line_terminator` [filebeat-input-log-line-terminator]
 
-The characters that separate lines in the input file. The default is `auto`.
+Specifies the characters used to separate lines in the input file. The default is `auto`.
 
 Valid values:
 
-* `auto`: Detects both LF and CR+LF line endings (U+000A and U+000D U+000A).
+* `auto`: Automatic detection of LF and CR+LF line endings (U+000A and U+000D U+000A).
 * `line_feed`: Line feed (LF, `\n`, U+000A).
 * `vertical_tab`: Vertical tab (VT, `\v`, U+000B).
 * `form_feed`: Form feed (FF, `\f`, U+000C).
