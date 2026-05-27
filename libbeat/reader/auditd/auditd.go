@@ -20,6 +20,7 @@
 package auditd
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -28,6 +29,37 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/auparse"
 )
+
+// innerMsgRe matches the content of an inner msg='...' block, which many
+// record types (ADD_GROUP, ADD_USER, USER_LOGIN, …) use to embed a second
+// set of key-value pairs inside the outer message.
+var innerMsgRe = regexp.MustCompile(`\bmsg='([^']*)'`)
+
+// avcRe extracts the AVC action and first requested permission from a log
+// line. Mirrors the integrations-pipeline grok pattern:
+//
+//	avc:%{SPACE}%{WORD:auditd.log.avc.action}%{SPACE}{%{SPACE}%{WORD:auditd.log.avc.request}%{SPACE}}%{SPACE}for%{SPACE}
+//
+// This grok is skipped on the pre-parsed path (guarded by
+// ctx.auditd?.log?.record_type == null), so we must extract the fields
+// ourselves.
+var avcRe = regexp.MustCompile(`\bavc:\s+(\w+)\s+\{\s+(\w+)\s+\}\s+for\s+`)
+
+// auidSesRe extracts the raw numeric value of auid= and ses= fields from a
+// log line. auparse normalises auid=4294967295 and ses=4294967295 (the
+// kernel's sentinel for "not set") to the string "unset", but the ingest
+// pipeline simply renames auditd.log.auid → user.audit.id without any
+// semantic check, so "unset" would land verbatim in user.audit.id.
+// Restoring the raw numeric value matches the grok/KV path behaviour.
+var auidSesRe = regexp.MustCompile(`\b(auid|ses)=(\d+)\b`)
+
+// innerMsgKVRe extracts individual key=value pairs from inner msg content.
+// Unquoted values may span multiple words (e.g. op=adding group to /etc/group)
+// because auparse's KV regex stops at the first whitespace. The boundary
+// condition "next token is key=" mirrors the Elasticsearch ingest pipeline's
+//
+//	field_split: "\\s+(?=[^\\s]+=)"
+var innerMsgKVRe = regexp.MustCompile(`([a-z][a-z0-9_-]*)=(.*?)(?:\s+[a-z][a-z0-9_-]+=|\s*$)`)
 
 // Parser parses each line of an audit.log file using go-libaudit's auparse
 // package and populates auditd.log.* fields on the message, replacing the
@@ -89,11 +121,52 @@ func (p *Parser) Next() (reader.Message, error) {
 	if nodeVal != "" {
 		logFields["node"] = nodeVal
 	}
-	// auparse normalises res/success → result, but the ingest pipeline
-	// renames auditd.log.res to event.outcome, so restore the alias.
-	if result, ok := logFields["result"]; ok {
-		logFields["res"] = result
+	// auparse normalises auid=4294967295 and ses=4294967295 to "unset". Restore
+	// the raw numeric value so the pipeline's rename produces the expected
+	// user.audit.id value instead of the literal string "unset".
+	for _, m := range auidSesRe.FindAllStringSubmatch(auditMsg.RawData, -1) {
+		field, rawVal := m[1], m[2]
+		if v, ok := logFields[field]; ok && v == "unset" {
+			logFields[field] = rawVal
+		}
 	}
+
+	// auparse moves the audit rule key(s) from the data map to AuditMessage.Tags.
+	// Restore them as auditd.log.key to match the ingest pipeline field.
+	if tags, _ := auditMsg.Tags(); len(tags) > 0 {
+		if len(tags) == 1 {
+			logFields["key"] = tags[0]
+		} else {
+			logFields["key"] = tags
+		}
+	}
+
+	// Re-parse the inner msg='...' block to recover multi-word unquoted values
+	// that auparse truncates at the first whitespace. We only overwrite a field
+	// when the raw value is strictly longer and the current value is a prefix
+	// of it, which identifies truncation while preserving auparse enrichments
+	// (e.g. syscall number resolved to a name).
+	if m := innerMsgRe.FindStringSubmatch(auditMsg.RawData); len(m) > 1 {
+		for _, kv := range innerMsgKVRe.FindAllStringSubmatch(m[1], -1) {
+			k, rawV := kv[1], strings.Trim(kv[2], `'"`)
+			if existing, ok := logFields[k]; ok {
+				if s, ok := existing.(string); ok && len(rawV) > len(s) && strings.HasPrefix(rawV, s) {
+					logFields[k] = rawV
+				}
+			}
+		}
+	}
+	// The ingest pipeline's AVC grok processor is guarded by
+	// ctx.auditd?.log?.record_type == null and therefore skipped on the
+	// pre-parsed path. Extract avc.action and avc.request directly from the
+	// raw log line so downstream ECS mapping still works.
+	if m := avcRe.FindStringSubmatch(auditMsg.RawData); len(m) > 2 {
+		logFields["avc"] = mapstr.M{
+			"action":  m[1],
+			"request": m[2],
+		}
+	}
+
 	if dataErr != nil {
 		if p.cfg.LogErrors {
 			p.logger.Errorf("error extracting auditd data fields: %v", dataErr)

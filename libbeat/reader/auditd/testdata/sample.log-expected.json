@@ -20,7 +20,6 @@
         "pid": "1360",
         "ppid": "1299",
         "record_type": "SYSCALL",
-        "res": "success",
         "result": "success",
         "sequence": "479",
         "ses": "1",
@@ -59,7 +58,6 @@
         "op": "login",
         "pid": "28281",
         "record_type": "USER_LOGIN",
-        "res": "success",
         "result": "success",
         "sequence": "19623791",
         "ses": "6793",
@@ -71,6 +69,10 @@
   {
     "auditd": {
       "log": {
+        "avc": {
+          "action": "denied",
+          "request": "getattr"
+        },
         "comm": "httpd",
         "dev": "dm-0",
         "ino": "284133",

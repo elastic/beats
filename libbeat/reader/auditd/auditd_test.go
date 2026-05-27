@@ -26,6 +26,7 @@ import (
 	"flag"
 	"io"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -112,10 +113,7 @@ func TestParser(t *testing.T) {
 				"pid":         "28281",
 				"uid":         "0",
 				"auid":        "700",
-				// auparse normalises res → result; parser restores res so the
-				// ingest pipeline rename auditd.log.res → event.outcome fires.
-				"res":    "success",
-				"result": "success",
+				"result":      "success",
 			},
 			wantEpoch: 1489636960,
 		},
@@ -182,6 +180,47 @@ func TestParser(t *testing.T) {
 			wantLogFields: map[string]string{},
 			wantErrorKey:  false,
 		},
+		// auparse moves key= to AuditMessage.Tags; the parser must restore it
+		// as auditd.log.key. The double-prefix form key="key=net" is normalised
+		// to "net" by auparse before storing in tags.
+		"syscall with audit rule key (double-prefix form)": {
+			cfg:  DefaultConfig(),
+			line: []byte(`type=SYSCALL msg=audit(1492752520.441:8832): arch=c000003e syscall=43 success=yes exit=5 a0=3 a1=7ffd0dc80040 a2=7ffd0dc7ffd0 a3=0 items=0 ppid=1 pid=1663 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=4294967295 comm="sshd" exe="/usr/sbin/sshd" key="key=net"`),
+			wantLogFields: map[string]string{
+				"record_type": "SYSCALL",
+				"sequence":    "8832",
+				"key":         "net",
+			},
+		},
+		"syscall with audit rule key (simple form)": {
+			cfg:  DefaultConfig(),
+			line: []byte(`type=SYSCALL msg=audit(1492752520.441:8833): arch=c000003e syscall=59 success=yes exit=0 a0=1 a1=2 a2=3 a3=4 items=0 ppid=1 pid=100 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=(none) ses=1 comm="sh" exe="/bin/sh" key="exec"`),
+			wantLogFields: map[string]string{
+				"record_type": "SYSCALL",
+				"key":         "exec",
+			},
+		},
+		// auparse's KV regex stops at the first space for unquoted values inside
+		// inner msg='...' blocks. The parser re-parses the inner msg content using a
+		// generic approach (equivalent to the pipeline's field_split lookahead) to
+		// recover full multi-word values such as "adding group to /etc/group".
+		"add_group with multi-word op": {
+			cfg:  DefaultConfig(),
+			line: []byte(`type=ADD_GROUP msg=audit(1610903553.686:584): pid=2940 uid=0 auid=1000 ses=14 msg='op=adding group to /etc/group id=1004 exe="/usr/sbin/groupadd" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'`),
+			wantLogFields: map[string]string{
+				"record_type": "ADD_GROUP",
+				"sequence":    "584",
+				"op":          "adding group to /etc/group",
+			},
+		},
+		"add_user with two-word op": {
+			cfg:  DefaultConfig(),
+			line: []byte(`type=ADD_USER msg=audit(1610903553.730:591): pid=2945 uid=0 auid=1000 ses=14 msg='op=adding user id=1004 exe="/usr/sbin/useradd" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'`),
+			wantLogFields: map[string]string{
+				"record_type": "ADD_USER",
+				"op":          "adding user",
+			},
+		},
 	}
 
 	for name, tc := range tests {
@@ -239,46 +278,59 @@ func TestParserMultiRecord(t *testing.T) {
 }
 
 func TestLogFiles(t *testing.T) {
-	const (
-		inputPath  = "testdata/sample.log"
-		goldenPath = "testdata/sample.log-expected.json"
-	)
-
-	f, err := os.Open(inputPath)
-	require.NoError(t, err)
-	defer f.Close()
-
-	var lines [][]byte
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		lines = append(lines, []byte(scanner.Text()))
-	}
-	require.NoError(t, scanner.Err())
-
-	p := NewParser(&testReader{messages: lines}, DefaultConfig(), logptest.NewTestingLogger(t, ""))
-	var got []mapstr.M
-	for {
-		msg, err := p.Next()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		require.NoError(t, err)
-		var norm mapstr.M
-		b, _ := json.Marshal(msg.Fields)
-		_ = json.Unmarshal(b, &norm)
-		got = append(got, norm)
+	logFiles := []string{
+		"testdata/sample.log",
+		"testdata/avc.log",
+		"testdata/audit-cent7-node.log",
+		"testdata/audit-rhel6.log",
+		"testdata/audit-ubuntu1604.log",
+		"testdata/useradd.log",
+		"testdata/test.log",
+		"testdata/execve.log",
+		"testdata/rare.log",
 	}
 
-	if *update {
-		b, err := json.MarshalIndent(got, "", "  ")
-		require.NoError(t, err)
-		require.NoError(t, os.WriteFile(goldenPath, b, 0o644))
-		return
-	}
+	for _, inputPath := range logFiles {
+		t.Run(filepath.Base(inputPath), func(t *testing.T) {
+			goldenPath := inputPath + "-expected.json"
 
-	b, err := os.ReadFile(goldenPath)
-	require.NoError(t, err)
-	var want []mapstr.M
-	require.NoError(t, json.Unmarshal(b, &want))
-	assert.Equal(t, want, got)
+			f, err := os.Open(inputPath)
+			require.NoError(t, err, "open input log")
+			defer f.Close()
+
+			var lines [][]byte
+			scanner := bufio.NewScanner(f)
+			for scanner.Scan() {
+				lines = append(lines, []byte(scanner.Text()))
+			}
+			require.NoError(t, scanner.Err())
+
+			p := NewParser(&testReader{messages: lines}, DefaultConfig(), logptest.NewTestingLogger(t, ""))
+			var got []mapstr.M
+			for {
+				msg, err := p.Next()
+				if errors.Is(err, io.EOF) {
+					break
+				}
+				require.NoError(t, err)
+				var norm mapstr.M
+				b, _ := json.Marshal(msg.Fields)
+				_ = json.Unmarshal(b, &norm)
+				got = append(got, norm)
+			}
+
+			if *update {
+				b, err := json.MarshalIndent(got, "", "  ")
+				require.NoError(t, err)
+				require.NoError(t, os.WriteFile(goldenPath, b, 0o644))
+				return
+			}
+
+			b, err := os.ReadFile(goldenPath)
+			require.NoError(t, err, "golden file missing — run with -update to create it")
+			var want []mapstr.M
+			require.NoError(t, json.Unmarshal(b, &want))
+			assert.Equal(t, want, got)
+		})
+	}
 }
