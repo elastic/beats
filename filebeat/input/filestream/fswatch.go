@@ -101,6 +101,7 @@ func newFileWatcher(
 	config fileWatcherConfig,
 	compression string,
 	sendNotChanged bool,
+	ignoreOlder time.Duration,
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
@@ -123,6 +124,7 @@ func newFileWatcher(
 		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
 		fileIdentifier:   fi,
 		sourceIdentifier: srci,
+		scanIgnoreOlder:  ignoreOlder,
 	}, nil
 }
 

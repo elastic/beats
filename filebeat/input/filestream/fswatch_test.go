@@ -62,7 +62,7 @@ scanner:
 	defer cancel()
 
 	logger := logptest.NewFileLogger(t, filepath.Join("..", "..", "build", "integration-tests"))
-	fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
+	fw := createWatcherWithConfig(t, logger.Logger, paths, 0, cfgStr)
 
 	go fw.Run(ctx)
 
@@ -212,7 +212,7 @@ scanner:
 		defer cancel()
 
 		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
-		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
+		fw := createWatcherWithConfig(t, logger.Logger, paths, 0, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -247,7 +247,7 @@ scanner:
 		defer cancel()
 
 		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
-		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
+		fw := createWatcherWithConfig(t, logger.Logger, paths, 0, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -287,7 +287,7 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logptest.NewTestingLogger(t, ""), paths, cfgStr)
+		fw := createWatcherWithConfig(t, logptest.NewTestingLogger(t, ""), paths, 0, cfgStr)
 		// Wait for the watcher goroutine to exit before the subtest returns.
 		// logptest.NewTestingLogger writes via t.Log, which is unsafe to call
 		// after the subtest finishes and triggers a data race in
@@ -336,7 +336,7 @@ scanner:
 		defer cancel()
 
 		logger := logptest.NewFileLogger(t, filepath.Join("../", "../", "build", "integration-tests"))
-		fw := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
+		fw := createWatcherWithConfig(t, logger.Logger, paths, 0, cfgStr)
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -394,7 +394,7 @@ scanner:
 		defer cancel()
 
 		inMemoryLog, buff := logp.NewInMemoryLocal("", logp.JSONEncoderConfig())
-		fw := createWatcherWithConfig(t, inMemoryLog, paths, cfgStr)
+		fw := createWatcherWithConfig(t, inMemoryLog, paths, 0, cfgStr)
 
 		// Wrap Run so we can wait for the watcher goroutine to exit before
 		// inspecting the in-memory log buffer. The buffer returned by
@@ -598,7 +598,7 @@ scanner:
 `
 
 	logger := logptest.NewFileLogger(t, dir)
-	w := createWatcherWithConfig(t, logger.Logger, paths, cfgStr)
+	w := createWatcherWithConfig(t, logger.Logger, paths, 0, cfgStr)
 	w.events = make(chan loginp.FSEvent, 16)
 	return w, activePath, rotatedPath
 }
@@ -1220,6 +1220,7 @@ scanner:
 			cfg,
 			CompressionNone,
 			false,
+			0,
 			mustPathIdentifier(false),
 			mustSourceIdentifier("foo-id"),
 		)
@@ -1338,7 +1339,7 @@ func TestFileWatcherScanMetricsCountsIgnoredFiles(t *testing.T) {
 	oldModTime := time.Now().Add(-2 * time.Hour)
 	require.NoError(t, os.Chtimes(oldLog, oldModTime, oldModTime), "failed to age old log")
 
-	fw := createWatcherWithConfig(t, logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, `
+	fw := createWatcherWithConfig(t, logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, time.Hour, `
 scanner:
   fingerprint.enabled: false
 `)
@@ -1429,7 +1430,14 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
+func createWatcherWithConfig(
+	t *testing.T,
+	logger *logp.Logger,
+	paths []string,
+	ignoreOlder time.Duration,
+	cfgStr string,
+) *fileWatcher {
+
 	tmpCfg := struct {
 		Scaner fileWatcherConfig `config:"scanner"`
 	}{
@@ -1447,6 +1455,7 @@ func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, 
 		tmpCfg.Scaner,
 		CompressionNone,
 		false,
+		ignoreOlder,
 		mustPathIdentifier(false),
 		mustSourceIdentifier("foo-id"),
 	)

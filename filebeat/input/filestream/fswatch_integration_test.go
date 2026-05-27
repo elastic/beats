@@ -189,6 +189,7 @@ func TestFileWatcherNotifications(t *testing.T) {
 				cfg,
 				CompressionNone,
 				false,
+				0,
 				mustFingerprintIdentifier(),
 				mustSourceIdentifier("foo-id"),
 			)
