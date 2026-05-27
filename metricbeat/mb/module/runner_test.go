@@ -153,10 +153,7 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 
 	client := &blockingClient{
 		onPublish: func(e beat.Event) {
-			select {
-			case ready <- struct{}{}:
-			default:
-			}
+			ready <- struct{}{}
 			<-unblock
 			// This is the call that fails in production when the processor
 			// chain is closed before the publish goroutine finishes.
@@ -196,7 +193,7 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 	// while the goroutine is still blocked in Publish(). Give it a moment.
 	select {
 	case <-closed:
-	case <-time.After(100 * time.Millisecond):
+	case <-time.After(500 * time.Millisecond):
 	}
 
 	close(unblock)
