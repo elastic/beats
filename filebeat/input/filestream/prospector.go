@@ -31,7 +31,10 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-type ignoreInactiveType uint8
+type (
+	ignoreInactiveType uint8
+	ignoreReason       uint8
+)
 
 const (
 	InvalidIgnoreInactive = iota
@@ -40,6 +43,10 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
+
+	notIgnored ignoreReason = iota
+	ignoredByIgnoreOlder
+	ignoredByIgnoreInactive
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
@@ -66,6 +73,24 @@ func init() {
 		}
 		identifiersMap[name] = identifier
 	}
+}
+
+// fileIgnoreReason returns why a file should be ignored based on its modification time.
+func fileIgnoreReason(
+	modTime time.Time,
+	now time.Time,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) ignoreReason {
+	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
+		return ignoredByIgnoreOlder
+	}
+
+	if !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0 {
+		return ignoredByIgnoreInactive
+	}
+
+	return notIgnored
 }
 
 // fileProspector implements the Prospector interface.
@@ -446,14 +471,15 @@ func (p *fileProspector) onFSEvent(
 }
 
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
-	if p.ignoreOlder > 0 {
-		now := time.Now()
-		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
-			log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
-			return true
-		}
+	if p.ignoreOlder <= 0 && ignoreInactiveSince.IsZero() {
+		return false
 	}
-	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+
+	switch fileIgnoreReason(fe.Descriptor.Info.ModTime(), time.Now(), p.ignoreOlder, ignoreInactiveSince) {
+	case ignoredByIgnoreOlder:
+		log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
+		return true
+	case ignoredByIgnoreInactive:
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
 	}

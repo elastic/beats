@@ -340,8 +340,12 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.prev = paths
 }
 
-// TODO: try to move that to watch and re-use the existing logic instead of
-// re-implementing it.
+// countIgnoredFiles returns the number of ignored files based on
+// activity and modification time.
+// The logic for ignoring files in the prospector and runs for each fsEvent,
+// so we apply it here. Because the metrics are a snapshot of the file system
+// at a specific point in time, it is ok if our calculations are off by a small
+// delta.
 func countIgnoredFiles(
 	paths map[string]loginp.FileDescriptor,
 	ignoreOlder time.Duration,
@@ -354,25 +358,12 @@ func countIgnoredFiles(
 	now := time.Now()
 	var ignored int64
 	for _, fd := range paths {
-		if fileIsIgnored(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) {
+		if fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored {
 			ignored++
 		}
 	}
 
 	return ignored
-}
-
-func fileIsIgnored(
-	modTime time.Time,
-	now time.Time,
-	ignoreOlder time.Duration,
-	ignoreInactiveSince time.Time,
-) bool {
-	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
-		return true
-	}
-
-	return !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0
 }
 
 // getFileIdentity mimics the same algorithm used by the harvester to generate
