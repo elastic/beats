@@ -48,7 +48,7 @@ type beatStateMonitoring struct {
 func freePort(t *testing.T) int {
 	t.Helper()
 	lc := &net.ListenConfig{}
-	l, err := lc.Listen(context.Background(), "tcp", "localhost:0")
+	l, err := lc.Listen(t.Context(), "tcp", "localhost:0")
 	require.NoError(t, err, "could not find a free port")
 	tcpAddr, ok := l.Addr().(*net.TCPAddr)
 	require.True(t, ok, "listener address is not a *net.TCPAddr")
@@ -95,7 +95,7 @@ func getMonitoringESURL(t *testing.T) url.URL {
 func ensureMonitoringESIsRunning(t *testing.T) {
 	t.Helper()
 	monURL := getMonitoringESURL(t)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, monURL.String(), nil)
 	require.NoError(t, err)
@@ -112,7 +112,7 @@ func cleanMonitoringCluster(t *testing.T) {
 	t.Helper()
 	monURL := getMonitoringESURL(t)
 	monURL.Path = "/.monitoring-beats-*"
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, monURL.String(), nil)
 	require.NoError(t, err)
@@ -130,7 +130,7 @@ func cleanOutputCluster(t *testing.T) {
 	esURL.Path = "/_cluster/settings"
 
 	payload := `{"transient":{"xpack.monitoring.exporters.*":null,"xpack.monitoring.collection.enabled":null}}`
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, esURL.String(), bytes.NewBufferString(payload))
 	require.NoError(t, err)
@@ -154,7 +154,7 @@ func monitoringDocExists(t *testing.T, monitoringType string) bool {
 		"size": []string{"1"},
 	}.Encode()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, monURL.String(), nil)
 	if err != nil {
@@ -187,7 +187,7 @@ func getMonitoringDoc(t *testing.T, monitoringType string) map[string]interface{
 		"size": []string{"1"},
 	}.Encode()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, monURL.String(), nil)
 	require.NoError(t, err)
