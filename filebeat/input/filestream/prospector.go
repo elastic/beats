@@ -440,12 +440,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
-	log = log.With("source_file", event.SrcID)
-
-	// TODO(AndersonQ): improve the split between loginp.OpRename and
-	//  loginp.OpCreate, loginp.OpWrite.
-
 	// For growing fingerprint mode, handle prefix matching and migration.
 	// Skip for OpRename: handleGrowingFingerprintLookup assumes event.SrcID is
 	// the current identity — its KeyExists fast path returns true for the old key
