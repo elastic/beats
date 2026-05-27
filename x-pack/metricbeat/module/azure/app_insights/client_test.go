@@ -10,7 +10,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -36,7 +35,7 @@ func TestClient(t *testing.T) {
 		client := NewMockClient(logger)
 		client.Config = config
 		m := &MockService{}
-		m.On("GetMetricValues", mock.Anything, mock.Anything).Return(insights.ListMetricsResultsItem{}, errors.New("invalid query"))
+		m.On("GetMetricValues", mock.Anything, mock.Anything).Return(ListMetricsResultsItem{}, errors.New("invalid query"))
 		client.Service = m
 		results, err := client.GetMetricValues()
 		assert.Error(t, err)
@@ -47,8 +46,8 @@ func TestClient(t *testing.T) {
 		client := NewMockClient(logger)
 		client.Config = config
 		m := &MockService{}
-		metrics := []insights.MetricsResultsItem{{}, {}}
-		m.On("GetMetricValues", mock.Anything, mock.Anything).Return(insights.ListMetricsResultsItem{Value: &metrics}, nil)
+		metrics := []MetricsResultsItem{{}, {}}
+		m.On("GetMetricValues", mock.Anything, mock.Anything).Return(ListMetricsResultsItem{Value: &metrics}, nil)
 		client.Service = m
 		results, err := client.GetMetricValues()
 		assert.NoError(t, err)
