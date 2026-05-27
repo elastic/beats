@@ -486,10 +486,13 @@ This configures what types of TLS renegotiation are supported. The valid options
 ### `certificate_reload.enabled` [certificate_reload_enabled]
 
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.3+
 ```
 
-If set to `true`, Metricbeat will automatically reload TLS certificates, keys, and CA certificates from disk whenever they change, without requiring a restart. The default value is `true`.
+If set to `true`, Metricbeat will automatically reload TLS certificates, keys, and CA certificates from disk whenever they change, without requiring a restart. The default value is:
+
+* {applies_to}`stack: ga 9.3-9.4` `false`
+* {applies_to}`stack: ga 9.5+` `true`
 
 Certificate reload is checked on each TLS handshake. The files are re-read at most once per `certificate_reload.reload_interval`.
 
@@ -497,7 +500,7 @@ Certificate reload is checked on each TLS handshake. The files are re-read at mo
 ### `certificate_reload.reload_interval` [certificate_reload_reload_interval]
 
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.3+
 ```
 
 How often Metricbeat checks whether the certificate, key, or CA files have changed on disk. The default value is `5s`.
