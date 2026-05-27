@@ -493,11 +493,13 @@ How often Filebeat checks whether the certificate, key, or CA files have changed
 
 ### `restart_on_cert_change.enabled` [exit_on_cert_change_enabled]
 
-::::{admonition} Deprecated in 9.5.0.
-:class: warning
+```{applies_to}
+stack: deprecated 9.5+
+```
 
-Use [`certificate_reload`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
-::::
+:::{note}
+This setting is deprecated in 9.5.0. Use [`certificate_reload`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
+:::
 
 If set to `true` Filebeat will restart if any file listed by `key`, `certificate`, or `certificate_authorities` is modified.
 
@@ -514,11 +516,13 @@ This feature requres the `execve` system call to be enabled. If you have a custo
 
 ### `restart_on_cert_change.period` [restart_on_cert_change_period]
 
-::::{admonition} Deprecated in 9.5.0.
-:class: warning
+```{applies_to}
+stack: deprecated 9.5+
+```
 
-Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
-::::
+:::{note}
+This setting is deprecated in 9.5.0. Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
+:::
 
 Specifies how often the files are checked for changes. Do not set the period to less than 1s because the modification time of files is often stored in seconds. Setting the period to less than 1s will result in validation error and Filebeat will not start. The default value is 1m.
 

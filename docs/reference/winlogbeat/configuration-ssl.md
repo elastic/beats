@@ -493,11 +493,13 @@ How often Winlogbeat checks whether the certificate, key, or CA files have chang
 
 ### `restart_on_cert_change.enabled` [exit_on_cert_change_enabled]
 
-::::{admonition} Deprecated in 9.5.0.
-:class: warning
+```{applies_to}
+stack: deprecated 9.5+
+```
 
-Use [`certificate_reload`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
-::::
+:::{note}
+This setting is deprecated in 9.5.0. Use [`certificate_reload`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
+:::
 
 If set to `true` Winlogbeat will restart if any file listed by `key`, `certificate`, or `certificate_authorities` is modified.
 
