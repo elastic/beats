@@ -128,7 +128,7 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 				m[key] = ref.Int()
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-				m[key] = int64(ref.Uint() & uint64(math.MaxInt64)) //nolint:gosec // G115: mask clears bit 63, safe conversion
+				m[key] = int64(ref.Uint() & uint64(math.MaxInt64))
 			case reflect.Float32, reflect.Float64:
 				m[key] = ref.Float()
 			case reflect.Complex64, reflect.Complex128:
