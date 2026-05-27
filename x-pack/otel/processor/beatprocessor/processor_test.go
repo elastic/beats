@@ -94,7 +94,7 @@ func TestCreateProcessor(t *testing.T) {
 			"unknown_processor": map[string]any{},
 		}, testLogger())
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to get constructor for 'unknown_processor'")
+		assert.Contains(t, err.Error(), "invalid processor name 'unknown_processor'")
 	})
 
 	t.Run("valid add_cloud_metadata processor config returns processor", func(t *testing.T) {
@@ -223,6 +223,13 @@ func TestCreateProcessor(t *testing.T) {
 					"not_a_real_condition": map[string]any{},
 				},
 			},
+		}, testLogger())
+		require.Error(t, err)
+	})
+
+	t.Run("invalid processor", func(t *testing.T) {
+		_, err := createProcessor(map[string]any{
+			"unsupported_processor": map[string]any{},
 		}, testLogger())
 		require.Error(t, err)
 	})

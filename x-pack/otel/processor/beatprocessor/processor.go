@@ -78,6 +78,12 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
 		}
 
+		switch processorName {
+		case "add_host_metadata", "add_cloud_metadata", "add_docker_metadata", "add_kubernetes_metadata", "add_fields":
+		default:
+			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
+		}
+
 		constructor, err := processors.GetConstructor(processorName)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get constructor for '%s': %w", processorName, err)
