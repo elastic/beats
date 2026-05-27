@@ -1,4 +1,3 @@
-
 ######################## Filebeat Configuration ############################
 
 # This file is a full configuration example documenting all non-deprecated
@@ -867,13 +866,6 @@ filebeat.inputs:
   # a fingerprint is generated using the first 1024 bytes of the file,
   # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
-
-  # Enable Enhanced Fingerprint behavior. Files smaller than the configured
-  # fingerprint size (offset + length) are tracked using the raw bytes
-  # available so far, instead of being skipped as too small.
-  # Default: true.
-  #file_identity.fingerprint:
-  #  growing: true
 
   # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
   #include_file_owner_name: false
