@@ -462,7 +462,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
-			p.Run(ctx, newMockMetadataUpdater(), hg)
+			p.Run(ctx, newMockMetadataUpdater(), hg, nil)
 
 			assert.ElementsMatch(t, test.expectedEvents, hg.events, "expected different harvester events")
 		})
@@ -503,7 +503,7 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		p.Run(ctx, testStore, hg)
+		p.Run(ctx, testStore, hg, nil)
 
 		wg.Done()
 	}()
@@ -567,7 +567,7 @@ func TestProspectorDeletedFile(t *testing.T) {
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
 
-			p.Run(ctx, testStore, newTestHarvesterGroup())
+			p.Run(ctx, testStore, newTestHarvesterGroup(), nil)
 
 			has := testStore.has("path::/path/to/file")
 
@@ -648,7 +648,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 			testStore.set("path::/old/path/to/file")
 
 			hg := newTestHarvesterGroup()
-			p.Run(ctx, testStore, hg)
+			p.Run(ctx, testStore, hg, nil)
 
 			has := testStore.has("path::/old/path/to/file")
 			if test.trackRename {
@@ -982,7 +982,7 @@ func TestOnRenameFileIdentity(t *testing.T) {
 			}
 
 			hg := newTestHarvesterGroup()
-			p.Run(ctx, testStore, hg)
+			p.Run(ctx, testStore, hg, nil)
 
 			got := testStore.get(id)
 			meta := fileMeta{}

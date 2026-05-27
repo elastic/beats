@@ -144,14 +144,3 @@ func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
 
 	m.lastFileScanMetrics = current
 }
-
-// ResetFileScanMetrics removes this input's contribution from the aggregate
-// filestream scan gauges.
-// TODO: Fix this. Reset will erase metrics for all inputs
-func (m *Metrics) ResetFileScanMetrics() {
-	if m == nil {
-		return
-	}
-
-	m.UpdateFileScanMetrics(FileScanMetrics{})
-}

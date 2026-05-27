@@ -85,7 +85,7 @@ type fileWatcher struct {
 
 	// scanMetrics receives each scan's aggregate file counts. The watcher owns
 	// these updates because it has the complete post-scan file set.
-	scanMetrics loginp.Metrics
+	scanMetrics *loginp.Metrics
 	// scanIgnoreOlder and scanIgnoreInactiveSince mirror the prospector ignore
 	// settings so scan metrics can include files that are discovered but ignored.
 	scanIgnoreOlder         time.Duration
@@ -185,7 +185,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// richer scan metrics; the real fileScanner overwrites this below with the
 	// full snapshot collected while scanning.
 	scanMetrics := loginp.FileScanMetrics{FilesUnique: int64(len(paths))}
-	if metricsProvider, ok := w.scanner.(interface{ LastScanMetrics() loginp.FileScanMetrics }); ok {
+	if metricsProvider, ok := w.scanner.(loginp.ScanMetricsProvider); ok {
 		scanMetrics = metricsProvider.LastScanMetrics()
 	}
 	scanMetrics.FilesIgnored = countIgnoredFiles(paths, w.scanIgnoreOlder, w.scanIgnoreInactiveSince)

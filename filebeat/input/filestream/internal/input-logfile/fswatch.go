@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"time"
+
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -127,6 +129,19 @@ type FSScanner interface {
 	// The keys of the map are the paths to the files and
 	// the values are the file descriptors that contain all necessary information about the file.
 	GetFiles() map[string]FileDescriptor
+}
+
+// ScanMetricsProvider returns metrics collected during the last file scan.
+// TODO: Do we need it?
+type ScanMetricsProvider interface {
+	LastScanMetrics() FileScanMetrics
+}
+
+// ScanMetricsController configures scan metric collection for a file watcher.
+// TODO: Do we need it?
+type ScanMetricsController interface {
+	SetScanMetrics(*Metrics, time.Duration, time.Time)
+	ResetScanMetrics()
 }
 
 // FSWatcher returns file events of the monitored files.

@@ -39,6 +39,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
@@ -1281,6 +1282,86 @@ scanner:
 		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
 	})
+}
+
+func TestFileScannerScanMetrics(t *testing.T) {
+	dir := t.TempDir()
+	keepLog := filepath.Join(dir, "keep.log")
+	excludedLog := filepath.Join(dir, "excluded.log")
+	emptyLog := filepath.Join(dir, "empty.log")
+	smallLog := filepath.Join(dir, "small.log")
+	dirLog := filepath.Join(dir, "directory.log")
+	linkLog := filepath.Join(dir, "link.log")
+
+	require.NoError(t, os.WriteFile(keepLog, []byte(strings.Repeat("k", 128)), 0644), "failed to write keep log")
+	require.NoError(t, os.WriteFile(excludedLog, []byte(strings.Repeat("e", 128)), 0644), "failed to write excluded log")
+	require.NoError(t, os.WriteFile(emptyLog, nil, 0644), "failed to write empty log")
+	require.NoError(t, os.WriteFile(smallLog, []byte("small"), 0644), "failed to write small log")
+	require.NoError(t, os.Mkdir(dirLog, 0755), "failed to create directory")
+	require.NoError(t, os.Symlink(keepLog, linkLog), "failed to create symlink")
+
+	paths := []string{
+		filepath.Join(dir, "*.log"),
+	}
+	cfgStr := `
+scanner:
+  exclude_files: ['.*excluded.*']
+  symlinks: false
+  recursive_glob: false
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 64
+`
+
+	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
+	files := scanner.GetFiles()
+	require.Contains(t, files, keepLog, "keep log must be ingestible")
+	require.Len(t, files, 1, "only keep log should be ingestible")
+
+	metricsProvider, ok := scanner.(interface{ LastScanMetrics() loginp.FileScanMetrics })
+	require.True(t, ok, "scanner must expose scan metrics")
+	assert.Equal(t, loginp.FileScanMetrics{
+		FilesMatched:        6,
+		FilesUnique:         1,
+		FilesNoIngestTarget: 5,
+	}, metricsProvider.LastScanMetrics(), "unexpected scan metrics")
+}
+
+func TestFileWatcherScanMetricsCountsIgnoredFiles(t *testing.T) {
+	dir := t.TempDir()
+	oldLog := filepath.Join(dir, "old.log")
+	newLog := filepath.Join(dir, "new.log")
+
+	require.NoError(t, os.WriteFile(oldLog, []byte("old\n"), 0644), "failed to write old log")
+	require.NoError(t, os.WriteFile(newLog, []byte("new\n"), 0644), "failed to write new log")
+	oldModTime := time.Now().Add(-2 * time.Hour)
+	require.NoError(t, os.Chtimes(oldLog, oldModTime, oldModTime), "failed to age old log")
+
+	fw := createWatcherWithConfig(t, logp.NewNopLogger(), []string{filepath.Join(dir, "*.log")}, `
+scanner:
+  fingerprint.enabled: false
+`)
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	baseline := loginp.FileScanMetrics{
+		FilesMatched:        metrics.FilesMatched.Get(),
+		FilesUnique:         metrics.FilesUnique.Get(),
+		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
+		FilesIgnored:        metrics.FilesIgnored.Get(),
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	fw.scanMetrics = metrics
+	fw.scanIgnoreOlder = time.Hour
+	fw.scanIgnoreInactiveSince = time.Time{}
+	fw.watch(ctx)
+
+	assert.Equal(t, baseline.FilesMatched+2, metrics.FilesMatched.Get(), "files_matched")
+	assert.Equal(t, baseline.FilesUnique+2, metrics.FilesUnique.Get(), "files_unique")
+	assert.Equal(t, baseline.FilesNoIngestTarget, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target")
+	assert.Equal(t, baseline.FilesIgnored+1, metrics.FilesIgnored.Get(), "files_ignored")
 }
 
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {

@@ -69,14 +69,18 @@ func TestFilestreamMetrics(t *testing.T) {
 	env.waitUntilHarvesterIsDone()
 
 	checkMetrics(t, env.monitoring, id, expectedMetrics{
-		FilesOpened:       1,
-		FilesClosed:       1,
-		FilesActive:       0,
-		MessagesRead:      3,
-		MessagesTruncated: 2,
-		BytesProcessed:    130,
-		EventsProcessed:   3,
-		ProcessingErrors:  0,
+		FilesOpened:         1,
+		FilesClosed:         1,
+		FilesActive:         0,
+		MessagesRead:        3,
+		MessagesTruncated:   2,
+		BytesProcessed:      130,
+		EventsProcessed:     3,
+		ProcessingErrors:    0,
+		FilesMatched:        1,
+		FilesUnique:         1,
+		FilesNoIngestTarget: 0,
+		FilesIgnored:        0,
 	})
 
 	cancelInput()
@@ -110,14 +114,18 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 	env.waitUntilHarvesterIsDone()
 
 	checkMetrics(t, env.monitoring, id, expectedMetrics{
-		FilesOpened:       1,
-		FilesClosed:       1,
-		FilesActive:       0,
-		MessagesRead:      4,
-		MessagesTruncated: 1,
-		BytesProcessed:    82,
-		EventsProcessed:   4,
-		ProcessingErrors:  0,
+		FilesOpened:         1,
+		FilesClosed:         1,
+		FilesActive:         0,
+		MessagesRead:        4,
+		MessagesTruncated:   1,
+		BytesProcessed:      82,
+		EventsProcessed:     4,
+		ProcessingErrors:    0,
+		FilesMatched:        1,
+		FilesUnique:         1,
+		FilesNoIngestTarget: 0,
+		FilesIgnored:        0,
 	})
 
 	cancelInput()
@@ -162,14 +170,18 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 	env.waitUntilHarvesterIsDone()
 
 	checkMetrics(t, env.monitoring, id, expectedMetrics{
-		FilesOpened:       1,
-		FilesClosed:       1,
-		FilesActive:       0,
-		MessagesRead:      3,
-		MessagesTruncated: 1,
-		BytesProcessed:    66,
-		EventsProcessed:   3,
-		ProcessingErrors:  0,
+		FilesOpened:         1,
+		FilesClosed:         1,
+		FilesActive:         0,
+		MessagesRead:        3,
+		MessagesTruncated:   1,
+		BytesProcessed:      66,
+		EventsProcessed:     3,
+		ProcessingErrors:    0,
+		FilesMatched:        1,
+		FilesUnique:         1,
+		FilesNoIngestTarget: 0,
+		FilesIgnored:        0,
 	})
 
 	cancelInput()
@@ -185,6 +197,11 @@ type expectedMetrics struct {
 	BytesProcessed    uint64
 	EventsProcessed   uint64
 	ProcessingErrors  uint64
+
+	FilesMatched        int64
+	FilesUnique         int64
+	FilesNoIngestTarget int64
+	FilesIgnored        int64
 }
 
 func checkMetrics(t *testing.T, mon beatmonitoring.Monitoring, id string, expected expectedMetrics) {
@@ -200,4 +217,10 @@ func checkMetrics(t *testing.T, mon beatmonitoring.Monitoring, id string, expect
 	require.Equal(t, expected.BytesProcessed, reg.Get("bytes_processed_total").(*monitoring.Uint).Get(), "bytes_processed_total")          //nolint:errcheck // ignore
 	require.Equal(t, expected.EventsProcessed, reg.Get("events_processed_total").(*monitoring.Uint).Get(), "events_processed_total")       //nolint:errcheck // ignore
 	require.Equal(t, expected.ProcessingErrors, reg.Get("processing_errors_total").(*monitoring.Uint).Get(), "processing_errors_total")    //nolint:errcheck // ignore
+
+	filestreamReg := monitoring.Default.GetOrCreateRegistry("filebeat.filestream")
+	require.Equal(t, expected.FilesMatched, filestreamReg.Get("files_matched").(*monitoring.Int).Get(), "filebeat.filestream.files_matched")                          //nolint:errcheck // ignore
+	require.Equal(t, expected.FilesUnique, filestreamReg.Get("files_unique").(*monitoring.Int).Get(), "filebeat.filestream.files_unique")                             //nolint:errcheck // ignore
+	require.Equal(t, expected.FilesNoIngestTarget, filestreamReg.Get("files_no_ingest_target").(*monitoring.Int).Get(), "filebeat.filestream.files_no_ingest_target") //nolint:errcheck // ignore
+	require.Equal(t, expected.FilesIgnored, filestreamReg.Get("files_ignored").(*monitoring.Int).Get(), "filebeat.filestream.files_ignored")                          //nolint:errcheck // ignore
 }
