@@ -26,6 +26,7 @@ changelog/fragments/
 /.github/actions @elastic/observablt-ci
 /.github/workflows @elastic/observablt-ci
 /.github/workflows/release-notes.yml @elastic/ingest-docs @elastic/elastic-agent-data-plane
+/.github/workflows/golangci-lint.yml @elastic/elastic-agent-data-plane
 /.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
@@ -204,6 +205,7 @@ changelog/fragments/
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/integration-experience
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
+/x-pack/libbeat/common/identityfederation/ @elastic/cloud-services
 /x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
