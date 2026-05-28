@@ -1708,8 +1708,11 @@ func TestInput(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(test.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
+			ctx, cancel, err := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			var g errgroup.Group
 			g.Go(func() error {
@@ -1787,8 +1790,11 @@ func BenchmarkInput(b *testing.B) {
 				chanClient := beattest.NewChanClient(len(test.expected))
 				b.Cleanup(func() { _ = chanClient.Close() })
 
-				ctx, cancel := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
+				ctx, cancel, err := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
 				b.Cleanup(cancel)
+				if err != nil {
+					b.Fatal(err)
+				}
 
 				var g errgroup.Group
 				g.Go(func() error {
@@ -1904,9 +1910,12 @@ func newChainPaginationTestServer(
 	}
 }
 
-func newV2Context(id string) (v2.Context, func()) {
+func newV2Context(id string) (v2.Context, func(), error) {
 	ctx, cancel := context.WithCancel(context.Background())
-	cwd, _ := os.Getwd()
+	cwd, err := os.Getwd()
+	if err != nil {
+		return v2.Context{}, cancel, fmt.Errorf("failed to get working directory: %w", err)
+	}
 	return v2.Context{
 		Logger:          logp.NewLogger("httpjson_test"),
 		ID:              id,
@@ -1914,7 +1923,7 @@ func newV2Context(id string) (v2.Context, func()) {
 		Cancelation:     ctx,
 		Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 		MetricsRegistry: monitoring.NewRegistry(),
-	}, cancel
+	}, cancel, nil
 }
 
 //nolint:errcheck // We can safely ignore errors here
