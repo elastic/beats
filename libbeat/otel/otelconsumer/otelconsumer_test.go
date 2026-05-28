@@ -605,7 +605,8 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 	otelSrv := httptest.NewServer(otelMockES)
 
 	f := elasticsearchexporter.NewFactory()
-	cfg := f.CreateDefaultConfig().(*elasticsearchexporter.Config)
+	cfg, ok := f.CreateDefaultConfig().(*elasticsearchexporter.Config)
+	require.Truef(t, ok, "elasticsearchexporter config must be of type *elasticsearchexporter.Config")
 	cfg.Endpoints = []string{otelSrv.URL}
 	// Reduce the batch flush timeout so the test does not wait the default 10s.
 	qb := cfg.QueueBatchConfig.Get()
@@ -644,7 +645,7 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 	// Compare raw JSON tokens directly so that integer-vs-float differences are visible.
 	beats := rawJSONFields(t, beatsDoc)
 	otel := rawJSONFields(t, otelDoc)
-	assert.Equalf(t, len(beats), len(otel), "top-level field count differs: beats=%d otel=%d", len(beats), len(otel))
+	assert.Lenf(t, beats, len(otel), "top-level field count differs: beats=%d otel=%d", len(beats), len(otel))
 	for field := range otel {
 		assert.Containsf(t, beats, field, "unexpected field %q in OTel document", field)
 	}
@@ -667,7 +668,7 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			otelNested := rawJSONFields(t, otel[field])
 			for nestedField, beatsNestedRaw := range beatsNested {
 				otelNestedRaw, ok := otelNested[nestedField]
-				assert.Equalf(t, len(beatsNested), len(otelNested), "mapstr_nested field count differs")
+				assert.Lenf(t, beatsNested, len(otelNested), "mapstr_nested field count differs")
 				assert.True(t, ok, "mapstr_nested.%s missing from OTel document", nestedField)
 				assert.Equal(t, string(beatsNestedRaw), string(otelNestedRaw), "mapstr_nested.%s should be serialized identically", nestedField)
 			}
