@@ -221,7 +221,7 @@ func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConf
 }
 
 // getClient gets a pipeline client based on a file handle
-func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) {
+func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) { //nolint:unused // retained for future use
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 	cli, exists := pm.clients[file]
