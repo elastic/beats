@@ -222,15 +222,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	bt.logger.Info("Shutting down, waiting for output to complete")
 
-	if !bt.config.RunOnce {
-		ctx, ctxCanacel := context.WithTimeout(context.Background(), bt.config.PublishTimeout)
-		defer ctxCanacel()
-		err = bt.pipeline.Disconnect(ctx)
-		if err != nil {
-			bt.logger.Warnf("error disconnecting pipeline: %v", err)
-		}
-	}
-
 	if bt.config.RunOnce {
 		waitPublished := monitors.NewSignalWait()
 		defer waitPublished.Wait()
@@ -243,6 +234,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 			waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
 				"shutdown: timed out waiting for pipeline to publish events."))
 		}
+	}
+
+	ctx, ctxCanacel := context.WithTimeout(context.Background(), bt.config.PublishTimeout)
+	defer ctxCanacel()
+	err = bt.pipeline.Disconnect(ctx)
+	if err != nil {
+		bt.logger.Warnf("error disconnecting pipeline: %v", err)
 	}
 
 	return nil
