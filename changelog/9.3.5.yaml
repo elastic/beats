@@ -1,6 +1,6 @@
 version: 9.3.5
 entries:
-    - kind: unknown
+    - kind: bug-fix
       summary: Filestream only reports degraded status for permanent harvester errors.
       description: ""
       component: filebeat
