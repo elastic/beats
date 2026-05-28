@@ -426,20 +426,20 @@ func TestUnknownType(t *testing.T) {
 // Elasticsearch exporter renders them as "42" rather than "42.0".
 func TestFromMapstrWholeNumberFloat(t *testing.T) {
 	input := mapstr.M{
-		"int_val":     float64(42),
+		"int_val":      float64(42),
 		"int_as_float": float64(2),
-		"zero_float":  float64(0),
-		"neg_float":   float64(-1.5),
-		"large_whole": float64(1e12),
-		"frac_float":  float64(3.14),
+		"zero_float":   float64(0),
+		"neg_float":    float64(-1.5),
+		"large_whole":  float64(1e12),
+		"frac_float":   float64(3.14),
 	}
 	want := map[string]any{
-		"int_val":     int64(42),
+		"int_val":      int64(42),
 		"int_as_float": int64(2),
-		"zero_float":  int64(0),
-		"neg_float":   float64(-1.5),
-		"large_whole": int64(1e12),
-		"frac_float":  float64(3.14),
+		"zero_float":   int64(0),
+		"neg_float":    float64(-1.5),
+		"large_whole":  int64(1e12),
+		"frac_float":   float64(3.14),
 	}
 	dst := pcommon.NewMap()
 	require.NoError(t, FromMapstr(dst, input))
