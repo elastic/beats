@@ -201,6 +201,7 @@ steps:
           automatic:
             - limit: 1
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
         artifact_paths:
@@ -385,6 +386,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
         plugins:
+          - *google_oidc_plugin
           - *dockerhub_login_plugin
           - *docker_elastic_login_plugin
 
