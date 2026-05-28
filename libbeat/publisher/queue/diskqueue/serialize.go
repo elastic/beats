@@ -139,7 +139,7 @@ func (d *eventDecoder) reset() {
 
 // Buffer prepares the read buffer to hold the next event of n bytes.
 func (d *eventDecoder) Buffer(n int) []byte {
-	if cap(d.buf) > n {
+	if cap(d.buf) >= n {
 		d.buf = d.buf[:n]
 	} else {
 		d.buf = make([]byte, n)
@@ -181,7 +181,7 @@ func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
 	}
 
 	return publisher.Event{
-		Flags: publisher.EventFlags(to.Flags),
+		Flags: publisher.EventFlags(to.Flags), //nolint:gosec // Flags field is uint32 on wire but valid values fit uint8
 		Content: beat.Event{
 			Timestamp: time.Unix(0, to.Timestamp),
 			Fields:    to.Fields,
