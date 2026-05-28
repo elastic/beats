@@ -313,7 +313,7 @@ func TestBatchFreeEntries(t *testing.T) {
 	}
 	batch1.FreeEntries()
 	for i := 0; i < queueSize; i++ {
-		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
+		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches", i)
 	}
 }
 

@@ -39,7 +39,8 @@ func TestPublishReusesResponseChannel(t *testing.T) {
 	t.Run("forgetful", func(t *testing.T) {
 		p := q.Producer(queue.ProducerConfig{})
 		defer p.Close()
-		fp := p.(*forgetfulProducer[int])
+		fp, ok := p.(*forgetfulProducer[int])
+		require.True(t, ok, "producer should be of type forgetfulProducer")
 		r1 := fp.makePushRequest(1)
 		r2 := fp.makePushRequest(2)
 		require.Equal(t, r1.resp, r2.resp,
@@ -49,7 +50,8 @@ func TestPublishReusesResponseChannel(t *testing.T) {
 	t.Run("ack", func(t *testing.T) {
 		p := q.Producer(queue.ProducerConfig{ACK: func(int) {}})
 		defer p.Close()
-		ap := p.(*ackProducer[int])
+		ap, ok := p.(*ackProducer[int])
+		require.True(t, ok, "producer should be of type ackProducer")
 		r1 := ap.makePushRequest(1)
 		r2 := ap.makePushRequest(2)
 		require.Equal(t, r1.resp, r2.resp,
