@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"time"
+
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -147,4 +149,8 @@ type FSWatcher interface {
 	// NotifyChan returns the channel used to listen for
 	// harvester closing notifications
 	NotifyChan() chan HarvesterStatus
+
+	// ConfigureInactive is used to configure inactive parameters to be used
+	// when collecting file scan metrics
+	ConfigureInactive(ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 }

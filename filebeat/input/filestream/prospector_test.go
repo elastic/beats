@@ -775,6 +775,8 @@ func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return m.c
 }
 
+func (m *mockFileWatcher) ConfigureInactive(_ time.Duration, _ time.Time) {}
+
 // mockMetadataUpdater is a test implementation of loginp.MetadataUpdater whose
 // methods may be invoked from the prospector's goroutines while the test
 // goroutine inspects the stored state (e.g. via assert.Eventually). Read paths

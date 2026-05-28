@@ -1221,7 +1221,6 @@ scanner:
 			cfg,
 			CompressionNone,
 			false,
-			0,
 			mustPathIdentifier(false),
 			mustSourceIdentifier("foo-id"),
 		)
@@ -1456,11 +1455,12 @@ func createWatcherWithConfig(
 		tmpCfg.Scaner,
 		CompressionNone,
 		false,
-		ignoreOlder,
 		mustPathIdentifier(false),
 		mustSourceIdentifier("foo-id"),
 	)
 	require.NoError(t, err)
+
+	fw.ConfigureInactive(ignoreOlder, time.Time{})
 
 	return fw
 }

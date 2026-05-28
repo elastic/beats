@@ -83,6 +83,7 @@ type fileWatcher struct {
 	// closedHarvestersMutex controls access to closedHarvesters
 	closedHarvestersMutex sync.Mutex
 
+	// TODO: improve those comments
 	// scanMetrics receives each scan's aggregate file counts. The watcher owns
 	// these updates because it has the complete post-scan file set.
 	scanMetrics *loginp.Metrics
@@ -101,7 +102,6 @@ func newFileWatcher(
 	config fileWatcherConfig,
 	compression string,
 	sendNotChanged bool,
-	ignoreOlder time.Duration,
 	fi fileIdentifier,
 	srci *loginp.SourceIdentifier,
 ) (*fileWatcher, error) {
@@ -124,7 +124,6 @@ func newFileWatcher(
 		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
 		fileIdentifier:   fi,
 		sourceIdentifier: srci,
-		scanIgnoreOlder:  ignoreOlder,
 	}, nil
 }
 
@@ -139,6 +138,11 @@ func defaultFileWatcherConfig() fileWatcherConfig {
 
 func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return w.notifyChan
+}
+
+func (w *fileWatcher) ConfigureInactive(ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
+	w.scanIgnoreOlder = ignoreOlder
+	w.scanIgnoreInactiveSince = ignoreInactiveSince
 }
 
 func (w *fileWatcher) Run(ctx unison.Canceler) {

@@ -210,14 +210,15 @@ func (p *copyTruncateFileProspector) Run(
 
 	var tg unison.MultiErrGroup
 
+	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+	p.filewatcher.ConfigureInactive(p.ignoreOlder, ignoreInactiveSince)
+
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
 		return nil
 	})
 
 	tg.Go(func() error {
-		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
