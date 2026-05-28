@@ -584,7 +584,10 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 	require.Len(t, beatsBatch.Events(), 1)
 	beatsBatch.Events()[0], _ = beatsEnc.EncodeEntry(beatsBatch.Events()[0])
 	require.Len(t, beatsGroup.Clients, 1)
-	require.NoError(t, beatsGroup.Clients[0].Publish(ctx, beatsBatch))
+	beatsClient, ok := beatsGroup.Clients[0].(outputs.NetworkClient)
+	require.True(t, ok, "ES output client must implement outputs.NetworkClient")
+	require.NoError(t, beatsClient.Connect(ctx))
+	require.NoError(t, beatsClient.Publish(ctx, beatsBatch))
 
 	var beatsDoc []byte
 	select {
