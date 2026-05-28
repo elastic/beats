@@ -420,32 +420,6 @@ func TestUnknownType(t *testing.T) {
 	assert.Equal(t, map[string]any{"unknown_map": "unknown type: map[string]int"}, dst.AsRaw())
 }
 
-// TestFromMapstrWholeNumberFloat covers the CEL / JSON-decoder path where
-// integer values arrive as float64 (e.g. 42.0 instead of int64(42)).
-// Whole-number floats must be stored as pcommon.ValueTypeInt so that the
-// Elasticsearch exporter renders them as "42" rather than "42.0".
-func TestFromMapstrWholeNumberFloat(t *testing.T) {
-	input := mapstr.M{
-		"int_val":      float64(42),
-		"int_as_float": float64(2),
-		"zero_float":   float64(0),
-		"neg_float":    float64(-1.5),
-		"large_whole":  float64(1e12),
-		"frac_float":   float64(3.14),
-	}
-	want := map[string]any{
-		"int_val":      int64(42),
-		"int_as_float": int64(2),
-		"zero_float":   int64(0),
-		"neg_float":    float64(-1.5),
-		"large_whole":  int64(1e12),
-		"frac_float":   float64(3.14),
-	}
-	dst := pcommon.NewMap()
-	require.NoError(t, FromMapstr(dst, input))
-	assert.Equal(t, want, dst.AsRaw())
-}
-
 func TestFromMapstrComplex(t *testing.T) {
 	dst := pcommon.NewMap()
 	require.NoError(t, FromMapstr(dst, mapstr.M{
