@@ -137,14 +137,10 @@ type FSWatcher interface {
 
 	// Run is the event loop which watchers for changes
 	// in the file system and returns events based on the data.
-	Run(unison.Canceler)
+	Run(unison.Canceler, *Metrics, time.Duration, time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for
 	// harvester closing notifications
 	NotifyChan() chan HarvesterStatus
-
-	// ConfigureMetrics is used to configure the metric registry and inactive
-	// parameters to be used when collecting file scan metrics.
-	ConfigureMetrics(metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 }

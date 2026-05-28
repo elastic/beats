@@ -373,10 +373,8 @@ func (p *fileProspector) Run(
 	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	p.filewatcher.ConfigureMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
-
 	tg.Go(func() error {
-		p.filewatcher.Run(ctx.Cancelation)
+		p.filewatcher.Run(ctx.Cancelation, metrics, p.ignoreOlder, ignoreInactiveSince)
 		return nil
 	})
 

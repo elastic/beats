@@ -765,7 +765,7 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 	return evt
 }
 
-func (m *mockFileWatcher) Run(_ unison.Canceler) {}
+func (m *mockFileWatcher) Run(_ unison.Canceler, _ *loginp.Metrics, _ time.Duration, _ time.Time) {}
 
 func (m *mockFileWatcher) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
 	return m.filesOnDisk, loginp.FileScanMetrics{}
@@ -774,8 +774,6 @@ func (m *mockFileWatcher) GetFiles() (map[string]loginp.FileDescriptor, loginp.F
 func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return m.c
 }
-
-func (m *mockFileWatcher) ConfigureMetrics(_ time.Duration, _ time.Time) {}
 
 // mockMetadataUpdater is a test implementation of loginp.MetadataUpdater whose
 // methods may be invoked from the prospector's goroutines while the test

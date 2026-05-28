@@ -82,15 +82,6 @@ type fileWatcher struct {
 	closedHarvesters map[string]int64
 	// closedHarvestersMutex controls access to closedHarvesters
 	closedHarvestersMutex sync.Mutex
-
-	// TODO: improve those comments
-	// scanMetrics receives each scan's aggregate file counts. The watcher owns
-	// these updates because it has the complete post-scan file set.
-	scanMetrics *loginp.Metrics
-	// scanIgnoreOlder and scanIgnoreInactiveSince mirror the prospector ignore
-	// settings so scan metrics can include files that are discovered but ignored.
-	scanIgnoreOlder         time.Duration
-	scanIgnoreInactiveSince time.Time
 }
 
 // Ensure fileWatcher implements loginp.FSWatcher
@@ -140,17 +131,16 @@ func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return w.notifyChan
 }
 
-func (w *fileWatcher) ConfigureMetrics(metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
-	w.scanMetrics = metrics
-	w.scanIgnoreOlder = ignoreOlder
-	w.scanIgnoreInactiveSince = ignoreInactiveSince
-}
-
-func (w *fileWatcher) Run(ctx unison.Canceler) {
+func (w *fileWatcher) Run(
+	ctx unison.Canceler,
+	metrics *loginp.Metrics,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) {
 	defer close(w.events)
 
 	// run initial scan before starting regular
-	w.watch(ctx)
+	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
 
 	// Read from notifyChan in a separate goroutine becase
 	// there are cases when w.watch can take minutes or even
@@ -170,7 +160,7 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 	for {
 		select {
 		case <-tick:
-			w.watch(ctx)
+			w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
 		case <-ctx.Done():
 			return
 		}
@@ -184,7 +174,12 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 	w.closedHarvestersMutex.Unlock()
 }
 
-func (w *fileWatcher) watch(ctx unison.Canceler) {
+func (w *fileWatcher) watch(
+	ctx unison.Canceler,
+	metrics *loginp.Metrics,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) {
 	w.log.Debug("Start next scan")
 
 	paths, scanMetrics := w.scanner.GetFiles()
@@ -193,8 +188,8 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// so we "duplicate" it here for the sake of metrics.
 	// countIgnoredFiles calls the same function as the prospector
 	// so the logic is not duplicated
-	scanMetrics.FilesIgnored = countIgnoredFiles(paths, w.scanIgnoreOlder, w.scanIgnoreInactiveSince)
-	w.scanMetrics.UpdateFileScanMetrics(scanMetrics)
+	scanMetrics.FilesIgnored = countIgnoredFiles(paths, ignoreOlder, ignoreInactiveSince)
+	metrics.UpdateFileScanMetrics(scanMetrics)
 
 	// for debugging purposes
 	writtenCount := 0
