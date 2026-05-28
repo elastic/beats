@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -55,7 +56,9 @@ func TestNewClient(t *testing.T) {
 
 	event := testReturn(t, client)
 	assert.Equal(t, event.Fields["message"], logString)
-	assert.Equal(t, "testContainer", event.Fields["container"].(mapstr.M)["name"])
+	containerFields, ok := event.Fields["container"].(mapstr.M)
+	require.True(t, ok)
+	assert.Equal(t, "testContainer", containerFields["name"])
 }
 
 // setupTestReader sets up the "read side" of the pipeline, spawing a goroutine to read and event and send it back to the test.
@@ -93,7 +96,7 @@ func createNewClient(t *testing.T, logString string, mockConnector *pipelinemock
 	localLog, err := jsonfilelog.New(info)
 	assert.NoError(t, err)
 
-	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject, localLog, "test")
+	client, err := newClientFromPipeline(mockConnector, reader, 123, cfgObject, localLog, "test", logp.NewLogger("test")) //nolint:forbidigo // test helper creates its own logger
 	require.NoError(t, err)
 
 	return client

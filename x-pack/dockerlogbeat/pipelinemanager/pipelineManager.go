@@ -60,9 +60,9 @@ type PipelineManager struct {
 }
 
 // NewPipelineManager creates a new Pipeline map
-func NewPipelineManager(logDestroy bool, hostname string) *PipelineManager {
+func NewPipelineManager(logDestroy bool, hostname string, log *logp.Logger) *PipelineManager {
 	return &PipelineManager{
-		Logger:            logp.NewLogger("PipelineManager"),
+		Logger:            log,
 		pipelines:         make(map[uint64]*Pipeline),
 		clients:           make(map[string]*ClientLogger),
 		clientLogger:      make(map[string]logger.Logger),
@@ -77,7 +77,7 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 
 	cl, err := pm.removeClient(file)
 	if err != nil {
-		return fmt.Errorf("Error removing client: %w", err)
+		return fmt.Errorf("error removing client: %w", err)
 	}
 
 	hash := cl.pipelineHash
@@ -138,7 +138,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	}
 
 	//actually get to crafting the new client.
-	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog, pm.hostname)
+	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog, pm.hostname, pm.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %w", err)
 	}
@@ -152,7 +152,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 func (pm *PipelineManager) CreateReaderForContainer(info logger.Info, config logger.ReadConfig) (io.ReadCloser, error) {
 	logObject, exists := pm.getLogger(info)
 	if !exists {
-		return nil, fmt.Errorf("Could not find logger for %s", info.ContainerID)
+		return nil, fmt.Errorf("could not find logger for %s", info.ContainerID)
 	}
 	pipeReader, pipeWriter := io.Pipe()
 	logReader, ok := logObject.(logger.LogReader)
@@ -280,7 +280,9 @@ func (pm *PipelineManager) removeLogger(info logger.Info) {
 	logger.Close()
 	delete(pm.clientLogger, info.ContainerID)
 	if pm.destroyLogsOnStop {
-		pm.removeLogFile(info.ContainerID)
+		if err := pm.removeLogFile(info.ContainerID); err != nil {
+			pm.Logger.Warnf("failed to remove log file for container %s: %v", info.ContainerID, err)
+		}
 	}
 }
 
@@ -298,7 +300,7 @@ func (pm *PipelineManager) removeClient(file string) (*ClientLogger, error) {
 
 	cl, ok := pm.clients[file]
 	if !ok {
-		return nil, fmt.Errorf("No client for file %s", file)
+		return nil, fmt.Errorf("no client for file %s", file)
 	}
 
 	// deincrement the ref count

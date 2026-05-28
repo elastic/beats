@@ -42,9 +42,11 @@ type logsRequest struct {
 
 func reportCaps() func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(&capabilitiesResponse{
+		if err := json.NewEncoder(w).Encode(&capabilitiesResponse{
 			Cap: logger.Capability{ReadLogs: true},
-		})
+		}); err != nil {
+			http.Error(w, fmt.Sprintf("error encoding capabilities: %v", err), http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -122,7 +124,9 @@ func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWri
 		w.Header().Set("Content-Type", "application/x-json-stream")
 		wf := ioutils.NewWriteFlusher(w)
 		defer wf.Close()
-		io.Copy(wf, stream)
+		if _, err = io.Copy(wf, stream); err != nil {
+			pm.Logger.Errorf("error copying log stream: %v", err)
+		}
 
 	} //end func
 }
@@ -135,5 +139,7 @@ func respondOK(w http.ResponseWriter) {
 		"",
 	}
 
-	json.NewEncoder(w).Encode(&res)
+	if err := json.NewEncoder(w).Encode(&res); err != nil {
+		http.Error(w, fmt.Sprintf("error encoding response: %v", err), http.StatusInternalServerError)
+	}
 }
