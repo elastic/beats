@@ -364,16 +364,6 @@ func (p *fileProspector) Run(
 	// we use this logger instead of the prospector logger.
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
-	// TODO: Try to put this back into the goroutine
-	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	if scanMetrics, ok := p.filewatcher.(interface {
-		SetScanMetrics(*loginp.Metrics, time.Duration, time.Time)
-		ResetScanMetrics()
-	}); ok {
-		scanMetrics.SetScanMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
-		defer scanMetrics.ResetScanMetrics()
-	}
-
 	var tg unison.MultiErrGroup
 
 	// The harvester needs to notify the FileWatcher
@@ -386,6 +376,8 @@ func (p *fileProspector) Run(
 	})
 
 	tg.Go(func() error {
+		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 

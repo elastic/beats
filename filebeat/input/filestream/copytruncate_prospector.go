@@ -208,16 +208,6 @@ func (p *copyTruncateFileProspector) Run(
 
 	defer p.stopHarvesterGroup(log, hg)
 
-	// TODO: Review/test this. Also review if this can go back into the goroutine
-	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	if scanMetrics, ok := p.filewatcher.(interface {
-		SetScanMetrics(*loginp.Metrics, time.Duration, time.Time)
-		ResetScanMetrics()
-	}); ok {
-		scanMetrics.SetScanMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
-		defer scanMetrics.ResetScanMetrics()
-	}
-
 	var tg unison.MultiErrGroup
 
 	tg.Go(func() error {
@@ -226,6 +216,8 @@ func (p *copyTruncateFileProspector) Run(
 	})
 
 	tg.Go(func() error {
+		ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
+
 		for ctx.Cancelation.Err() == nil {
 			fe := p.filewatcher.Event()
 
