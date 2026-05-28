@@ -129,6 +129,18 @@ func benchmarkCases() []benchCase {
 			},
 		},
 		{
+			// json_floats reproduces the CEL/JSON-decoder case where integer
+			// values arrive as float64 (e.g. json.Unmarshal without UseNumber).
+			name: "json_floats",
+			src: mapstr.M{
+				"int_val":      float64(42),
+				"int_as_float": float64(2),
+				"zero_float":   float64(0),
+				"neg_float":    float64(-1.5),
+				"frac_float":   float64(3.14),
+			},
+		},
+		{
 			name: "reflective_types",
 			src: mapstr.M{
 				"struct":         benchStruct{Name: "svc", Count: 7},

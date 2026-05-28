@@ -108,10 +108,10 @@ func FromValue(dst pcommon.Value, value any) error {
 		dst.SetInt(maskUnsignedInt(v))
 		return nil
 	case float32:
-		dst.SetDouble(float64(v))
+		setFloat(dst, float64(v))
 		return nil
 	case float64:
-		dst.SetDouble(v)
+		setFloat(dst, v)
 		return nil
 	case bool:
 		dst.SetBool(v)
@@ -204,7 +204,7 @@ func fromReflective(dst pcommon.Value, value any) error {
 		dst.SetInt(maskUnsignedInt(ref.Uint()))
 		return nil
 	case reflect.Float32, reflect.Float64:
-		dst.SetDouble(ref.Float())
+		setFloat(dst, ref.Float())
 		return nil
 	case reflect.Complex64, reflect.Complex128:
 		dst.SetStr(fmt.Sprintf("%v", ref.Complex()))
@@ -314,6 +314,25 @@ func fromUnsignedSlice[T unsigned](dst pcommon.Slice, src []T) error {
 		dst.AppendEmpty().SetInt(maskUnsignedInt(uint64(item)))
 	}
 	return nil
+}
+
+// isWholeFloat64 reports whether v is a finite, whole-number float64 that
+// can be represented exactly as int64. JSON decoders (and CEL) produce float64
+// for all numeric values, so 42 arrives as float64(42). Storing that as an
+// integer preserves the "42" string form in Elasticsearch instead of "42.0".
+// The 2^53 bound ensures the float64 mantissa represents the integer exactly.
+func setFloat(dst pcommon.Value, v float64) {
+	if isWholeFloat64(v) {
+		dst.SetInt(int64(v))
+	} else {
+		dst.SetDouble(v)
+	}
+}
+
+func isWholeFloat64(v float64) bool {
+	const maxSafeInt = float64(1 << 53) // 9007199254740992
+	return !math.IsNaN(v) && !math.IsInf(v, 0) && v == math.Trunc(v) &&
+		v >= -maxSafeInt && v <= maxSafeInt
 }
 
 // maskUnsignedInt converts a uint64 to int64 by clearing bit 63. pcommon.Value

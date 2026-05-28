@@ -112,7 +112,17 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 				s[i] = ref.Index(i).Interface()
 			}
 			m[key] = s
-		case nil, string, int, int8, int16, int32, int64, uint8, uint16, uint32, float32, float64, bool:
+		case float64:
+			if isWholeFloat64(x) {
+				m[key] = int64(x)
+			}
+			// else leave as float64; FromRaw stores it as Double.
+		case float32:
+			if f := float64(x); isWholeFloat64(f) {
+				m[key] = int64(f)
+			}
+			// else leave as float32; FromRaw stores it as Double.
+		case nil, string, int, int8, int16, int32, int64, uint8, uint16, uint32, bool:
 			// FromRaw handles these primitives directly.
 		case uint:
 			m[key] = int64(uint64(x) & uint64(math.MaxInt64))
