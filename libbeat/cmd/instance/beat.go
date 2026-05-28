@@ -1208,7 +1208,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	}
 
 	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
-		"TLS certificates and CAs are now automatically reloaded via 'ssl.certificate_reload'. " +
+		"TLS certificates and CAs are now automatically reloaded using 'ssl.certificate_reload'. " +
 		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
