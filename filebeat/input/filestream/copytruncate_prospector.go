@@ -200,6 +200,7 @@ func (p *copyTruncateFileProspector) Run(
 	ctx input.Context,
 	s loginp.StateMetadataUpdater,
 	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
 ) {
 	log := ctx.Logger.With("prospector", copyTruncateProspectorDebugKey)
 	log.Debug("Starting prospector")
@@ -210,7 +211,7 @@ func (p *copyTruncateFileProspector) Run(
 	var tg unison.MultiErrGroup
 
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	p.filewatcher.ConfigureInactive(p.ignoreOlder, ignoreInactiveSince)
+	p.filewatcher.ConfigureMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)

@@ -102,7 +102,7 @@ func (inp *managedInput) Run(
 	// Any errors encountered by harvester will change state to Degraded
 	ctx.UpdateStatus(status.Running, "")
 
-	inp.prospector.Run(ctx, sourceStore, hg)
+	inp.prospector.Run(ctx, sourceStore, hg, metrics)
 
 	return nil
 }

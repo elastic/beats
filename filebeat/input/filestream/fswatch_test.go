@@ -1458,7 +1458,7 @@ func createWatcherWithConfig(
 	)
 	require.NoError(t, err)
 
-	fw.ConfigureInactive(ignoreOlder, time.Time{})
+	fw.ConfigureMetrics(ignoreOlder, time.Time{})
 
 	return fw
 }

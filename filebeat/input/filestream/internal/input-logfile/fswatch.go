@@ -144,7 +144,7 @@ type FSWatcher interface {
 	// harvester closing notifications
 	NotifyChan() chan HarvesterStatus
 
-	// ConfigureInactive is used to configure inactive parameters to be used
-	// when collecting file scan metrics
-	ConfigureInactive(ignoreOlder time.Duration, ignoreInactiveSince time.Time)
+	// ConfigureMetrics is used to configure the metric registry and inactive
+	// parameters to be used when collecting file scan metrics.
+	ConfigureMetrics(metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 }

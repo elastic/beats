@@ -140,7 +140,8 @@ func (w *fileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return w.notifyChan
 }
 
-func (w *fileWatcher) ConfigureInactive(ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
+func (w *fileWatcher) ConfigureMetrics(metrics *loginp.Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time) {
+	w.scanMetrics = metrics
 	w.scanIgnoreOlder = ignoreOlder
 	w.scanIgnoreInactiveSince = ignoreInactiveSince
 }

@@ -356,6 +356,7 @@ func (p *fileProspector) Run(
 	ctx input.Context,
 	s loginp.StateMetadataUpdater,
 	hg loginp.HarvesterGroup,
+	metrics *loginp.Metrics,
 ) {
 	p.logger.Debug("Starting prospector")
 	defer p.logger.Debug("Prospector has stopped")
@@ -372,7 +373,7 @@ func (p *fileProspector) Run(
 	hg.SetObserver(p.filewatcher.NotifyChan())
 
 	ignoreInactiveSince := getIgnoreSince(p.ignoreInactiveSince, ctx.Agent)
-	p.filewatcher.ConfigureInactive(p.ignoreOlder, ignoreInactiveSince)
+	p.filewatcher.ConfigureMetrics(metrics, p.ignoreOlder, ignoreInactiveSince)
 
 	tg.Go(func() error {
 		p.filewatcher.Run(ctx.Cancelation)
