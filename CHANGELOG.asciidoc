@@ -3,6 +3,84 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+// begin 8.19.16 relnotes
+
+[[release-notes-8.19.16]]
+=== Beats version 8.19.16
+
+https://github.com/elastic/beats/compare/v8.19.15\...v8.19.16[View commits]
+
+[discrete]
+[[security-updates-8.19.16]]
+==== Security updates
+
+**All**
+
+* Update Go to v1.25.9. https://github.com/elastic/beats/pull/50201[#50201] 
+* Bump `aws-sdk-go-v2/service/cloudwatchlogs` to v1.65.0 to fix GHSA-xmrv-pmrh-hhx2. https://github.com/elastic/beats/pull/50307[#50307] 
+* Update `github.com/Azure/go-ntlmssp` to v0.1.1. https://github.com/elastic/beats/pull/50504[#50504] 
+
+**Heartbeat**
+
+* Upgrade npm to v11 in non-wolfi Heartbeat Docker images. https://github.com/elastic/beats/pull/50633[#50633] 
+
+[discrete]
+[[enhancements-8.19.16]]
+==== Enhancements
+
+**Filebeat**
+
+* Match `http.ServeMux` redirect status code for path cleaning in `http_endpoint` mux. https://github.com/elastic/beats/pull/50691[#50691] 
+
+**Libbeat**
+
+* Cache `add_locale` processor and refresh only when `zone` or `offset` changes. https://github.com/elastic/beats/pull/50489[#50489]
+* Update `ebpfevents` to v0.9.0. https://github.com/elastic/beats/pull/50639[#50639] 
+
+[discrete]
+[[upgrades-8.19.16]]
+==== Upgrades
+
+**All**
+
+* Update `github.com/prometheus/prometheus` to v0.311.3. https://github.com/elastic/beats/pull/50520[#50520] 
+
+[discrete]
+[[bug-fixes-8.19.16]]
+==== Bug fixes
+
+**All**
+
+* Initialize disk queue frame IDs from persisted state. https://github.com/elastic/beats/pull/50603[#50603]
+* Fix OTel Beat processor to honor `when` conditions. https://github.com/elastic/beats/pull/50559[#50559]
+* Fix race in pipeline client between `Publish` and `Close` that could skip waiting for events to be acknowledged. https://github.com/elastic/beats/pull/50679[#50679] https://github.com/elastic/beats/issues/49390[#49390]
+
+**Auditbeat**
+
+* Release the bolt file lock when the last datastore bucket is closed. https://github.com/elastic/beats/pull/50606[#50606] https://github.com/elastic/beats/issues/50381[#50381]
+
+**Filebeat**
+
+* Fix internal processing time metric for `azureeventhub` input. https://github.com/elastic/beats/pull/50043[#50043]
+* Fix a race condition during multiline parser shutdown. https://github.com/elastic/beats/pull/50524[#50524]
+* Re-evaluate `url_program` on each websocket reconnect using evolved cursor state. https://github.com/elastic/beats/pull/50410[#50410]
+* Reduce allocation pressure in `httpjson` cursor update and split paths. https://github.com/elastic/beats/pull/50407[#50407]
+* Fix Active Directory entity analytics to emit device attributes under `activedirectory.device`. https://github.com/elastic/beats/pull/50556[#50556] https://github.com/elastic/beats/issues/50471[#50471]
+* Fix handling of OAuth2.0 timeouts in CrowdStrike streaming input. https://github.com/elastic/beats/pull/50531[#50531]
+* Accept string values for `secret_state` to support Fleet secret resolution. https://github.com/elastic/beats/pull/50582[#50582]
+* When Filestream is migrating the registry key from inputs that did not have an ID, match files by path and file identity instead of only path. https://github.com/elastic/beats/pull/50731[#50731]
+
+**Libbeat**
+
+* Fix conversion of time duration fields such as `event.duration` when using Beat receivers. https://github.com/elastic/beats/pull/50354[#50354]
+* Fix OTel map conversion for `[]time.Duration` fields to avoid dropping duration slices. https://github.com/elastic/beats/pull/50517[#50517]
+
+**Metricbeat**
+
+* Fix panic in Azure module when all configured resources match no Azure resources. https://github.com/elastic/beats/pull/50587[#50587]
+
+// end 8.19.16 relnotes
+
 // begin 8.19.15 relnotes
 
 [[release-notes-8.19.15]]
