@@ -1,0 +1,1182 @@
+[
+  {
+    "auditd": {
+      "log": {
+        "a0": "auditctl",
+        "a1": "-a",
+        "a2": "exit,always",
+        "a3": "-F",
+        "a4": "arch=b32",
+        "a5": "-S",
+        "a6": "execve",
+        "argc": "7",
+        "record_type": "EXECVE",
+        "sequence": "479"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "auditctl",
+        "a1": "-e",
+        "a2": "1",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "481"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "485"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/sbin/sshd",
+        "a1": "-D",
+        "a2": "-R",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "486"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/sbin/unix_chkpwd",
+        "a1": "some_user",
+        "a2": "chkexpiry",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "493"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "-bash",
+        "argc": "1",
+        "record_type": "EXECVE",
+        "sequence": "507"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "id",
+        "a1": "-un",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "508"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/hostname",
+        "argc": "1",
+        "record_type": "EXECVE",
+        "sequence": "509"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "id",
+        "a1": "-gn",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "510"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "id",
+        "a1": "-un",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "511"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/bin/sh",
+        "a1": "/usr/libexec/grepconf.sh",
+        "a2": "-c",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "512"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "grep",
+        "a1": "-qsi",
+        "a2": "^COLOR.*none",
+        "a3": "/etc/GREP_COLORS",
+        "argc": "4",
+        "record_type": "EXECVE",
+        "sequence": "513"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/tty",
+        "a1": "-s",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "514"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/tput",
+        "a1": "colors",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "515"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/dircolors",
+        "a1": "--sh",
+        "a2": "/etc/DIR_COLORS.256color",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "516"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/grep",
+        "a1": "-qi",
+        "a2": "^COLOR.*none",
+        "a3": "/etc/DIR_COLORS.256color",
+        "argc": "4",
+        "record_type": "EXECVE",
+        "sequence": "517"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/id",
+        "a1": "-u",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "518"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "519"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "520"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "521"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "522"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "vim",
+        "a1": "audit.yaml",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "525"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "528"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "sudo",
+        "a1": "./go-audit",
+        "a2": "-config",
+        "a3": "audit.yaml",
+        "argc": "4",
+        "record_type": "EXECVE",
+        "sequence": "529"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "./go-audit",
+        "a1": "-config",
+        "a2": "audit.yaml",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "533"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "auditctl",
+        "a1": "-D",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "534"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "auditctl",
+        "a1": "-a",
+        "a2": "exit,always",
+        "a3": "-F",
+        "a4": "arch=b32",
+        "a5": "-S",
+        "a6": "execve",
+        "argc": "7",
+        "record_type": "EXECVE",
+        "sequence": "538"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "auditctl",
+        "a1": "-e",
+        "a2": "1",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "540"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "./go-audit",
+        "a1": "-h",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "542"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "sudo",
+        "a1": "su",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "543"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "su",
+        "argc": "1",
+        "record_type": "EXECVE",
+        "sequence": "547"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "bash",
+        "argc": "1",
+        "record_type": "EXECVE",
+        "sequence": "552"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/bin/sh",
+        "a1": "/usr/libexec/grepconf.sh",
+        "a2": "-c",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "553"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "grep",
+        "a1": "-qsi",
+        "a2": "^COLOR.*none",
+        "a3": "/etc/GREP_COLORS",
+        "argc": "4",
+        "record_type": "EXECVE",
+        "sequence": "554"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/tty",
+        "a1": "-s",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "555"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/tput",
+        "a1": "colors",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "556"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/dircolors",
+        "a1": "--sh",
+        "a2": "/etc/DIR_COLORS.256color",
+        "argc": "3",
+        "record_type": "EXECVE",
+        "sequence": "557"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/grep",
+        "a1": "-qi",
+        "a2": "^COLOR.*none",
+        "a3": "/etc/DIR_COLORS.256color",
+        "argc": "4",
+        "record_type": "EXECVE",
+        "sequence": "558"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/id",
+        "a1": "-u",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "559"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "./go-audit",
+        "a1": "-h",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "560"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "563"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "564"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "565"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "566"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "567"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "570"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "571"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "572"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "573"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "574"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "577"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "580"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "581"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "582"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "583"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "584"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "587"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "588"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "589"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "590"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "591"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "594"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "vim",
+        "a1": "audit.yaml",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "597"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "600"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "601"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "602"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "603"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "604"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "607"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "608"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "609"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "610"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "611"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "614"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/usr/bin/systemd-tmpfiles",
+        "a1": "--clean",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "615"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "618"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "619"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "620"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "621"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "624"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "627"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "628"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "629"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "630"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "631"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "ip",
+        "a1": "route",
+        "a10": "eth0",
+        "a11": "proto",
+        "a12": "66",
+        "a2": "ls",
+        "a3": "table",
+        "a4": "local",
+        "a5": "type",
+        "a6": "local",
+        "a7": "scope",
+        "a8": "host",
+        "a9": "dev",
+        "argc": "13",
+        "record_type": "EXECVE",
+        "sequence": "634"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "635"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "636"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/home/some_user/.ssh/authorized_keys",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "637"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "a0": "/sbin/restorecon",
+        "a1": "/var/lib/google/google_users",
+        "argc": "2",
+        "record_type": "EXECVE",
+        "sequence": "638"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "log": {
+        "record_type": "EXECVE",
+        "sequence": "639"
+      }
+    },
+    "error": {
+      "message": "error extracting auditd data fields: failed to find arg a100"
+    }
+  }
+]
