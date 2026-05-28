@@ -693,3 +693,8 @@
               type: boolean
               description: >
                 Is mlockall enabled on the node?
+            - name: version
+              type: keyword
+              description: >
+                Elasticsearch version reported by the node (for example,
+                `9.2.0`).
