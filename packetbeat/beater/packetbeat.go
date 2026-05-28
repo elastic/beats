@@ -208,7 +208,10 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 		// Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
 		ctx, cancel := context.WithTimeout(context.Background(), pipelinePublishTimeout)
 		defer cancel()
-		pb.pipeline.Disconnect(ctx)
+		err := pb.pipeline.Disconnect(ctx)
+		if err != nil {
+			pb.logger.Warnf("error disconnecting pipeline: %s", err)
+		}
 	}()
 
 	pb.logger.Debug("main", "Waiting for the runner to finish")
@@ -239,7 +242,10 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 		// Use default 1sec to wait for pipleline disconnect, to allow pending events to be acknowleged
 		ctx, cancel := context.WithTimeout(context.Background(), pipelinePublishTimeout)
 		defer cancel()
-		pb.pipeline.Disconnect(ctx)
+		err := pb.pipeline.Disconnect(ctx)
+		if err != nil {
+			pb.logger.Warnf("error disconnecting pipeline: %s", err)
+		}
 
 		runner.Stop()
 	}()

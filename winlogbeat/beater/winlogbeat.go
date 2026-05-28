@@ -63,7 +63,7 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 		return nil, fmt.Errorf("error reading configuration file: %w", err)
 	}
 
-	log := logp.NewLogger("winlogbeat")
+	log := b.Info.Logger.Named("winlogbeat")
 
 	// resolve registry file path
 	config.RegistryFile = b.Info.Paths.Resolve(paths.Data, config.RegistryFile)
@@ -171,7 +171,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 			"input_metrics.json", "application/json", func() []byte {
 				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
-					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					eb.log.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
 				}
 				return data
@@ -192,7 +192,10 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), eb.config.ShutdownTimeout)
 	defer cancel()
-	eb.pipeline.Disconnect(ctx)
+	err := eb.pipeline.Disconnect(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to disconnect pipeline: %w", err)
+	}
 
 	return nil
 }

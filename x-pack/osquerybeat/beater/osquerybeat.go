@@ -176,7 +176,7 @@ func (bt *osquerybeat) close() {
 	// close the pipeline first
 	ctx, cancel := context.WithTimeout(context.Background(), pipelineShutdownTimeout)
 	defer cancel()
-	bt.pipeline.Disconnect(ctx)
+	bt.pipeline.Disconnect(ctx) // nolint: errcheck // we can ignore the error here
 
 	bt.mx.Lock()
 	defer bt.mx.Unlock()

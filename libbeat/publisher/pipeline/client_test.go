@@ -74,7 +74,7 @@ func TestClient(t *testing.T) {
 		defer func() {
 			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 			defer cancel()
-			pipeline.Disconnect(ctx)
+			pipeline.Disconnect(ctx) // nolint: errcheck // we can ignore the error here
 		}()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
@@ -279,7 +279,7 @@ func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(t, Settings{}, q)
-	defer pipeline.Disconnect(t.Context())
+	defer pipeline.Disconnect(t.Context()) // nolint: errcheck // we can ignore the error here
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
 		routinesChecker := resources.NewGoroutinesChecker()
@@ -404,7 +404,7 @@ func TestMonitoring(t *testing.T) {
 		)
 
 		require.NoError(t, err)
-		defer pipeline.Disconnect(t.Context())
+		defer pipeline.Disconnect(t.Context()) // nolint: errcheck // we can ignore the error here
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
