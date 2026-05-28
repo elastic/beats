@@ -49,7 +49,8 @@ import (
 )
 
 func BenchmarkFilestream(b *testing.B) {
-	logger := logp.NewNopLogger()
+	// Info level keeps per-line Debugf calls out of the hot path.
+	logger := logptest.NewTestingLogger(b, "", zap.IncreaseLevel(zap.InfoLevel))
 
 	cases := []struct {
 		name        string
@@ -461,6 +462,10 @@ func (p *testPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
 }
 func (p *testPipeline) Connect() (beat.Client, error) {
 	return &testClient{p}, nil
+}
+
+func (p *testPipeline) Disconnect(ctx context.Context) error {
+	return nil
 }
 
 type testClient struct {

@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix Winlogbeat record ID gap retries reopening from stale checkpoints.
+component: winlogbeat
