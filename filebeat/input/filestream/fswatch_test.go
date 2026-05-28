@@ -1316,17 +1316,15 @@ scanner:
 `
 
 	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
-	files, _ := scanner.GetFiles()
+	files, scanMetrics := scanner.GetFiles()
 	require.Contains(t, files, keepLog, "keep log must be ingestible")
 	require.Len(t, files, 1, "only keep log should be ingestible")
 
-	metricsProvider, ok := scanner.(interface{ LastScanMetrics() loginp.FileScanMetrics })
-	require.True(t, ok, "scanner must expose scan metrics")
 	assert.Equal(t, loginp.FileScanMetrics{
 		FilesMatched:        6,
 		FilesUnique:         1,
 		FilesNoIngestTarget: 5,
-	}, metricsProvider.LastScanMetrics(), "unexpected scan metrics")
+	}, scanMetrics, "unexpected scan metrics")
 }
 
 func TestFileWatcherScanMetricsCountsIgnoredFiles(t *testing.T) {

@@ -187,6 +187,11 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
 	paths, scanMetrics := w.scanner.GetFiles()
+
+	// The ignored/inactive logic is handled by the prospector,
+	// so we "duplicate" it here for the sake of metrics.
+	// countIgnoredFiles calls the same function as the prospector
+	// so the logic is not duplicated
 	scanMetrics.FilesIgnored = countIgnoredFiles(paths, w.scanIgnoreOlder, w.scanIgnoreInactiveSince)
 	w.scanMetrics.UpdateFileScanMetrics(scanMetrics)
 
@@ -441,7 +446,6 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
-	lastScanMetrics  loginp.FileScanMetrics
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -578,13 +582,7 @@ func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileS
 	}
 
 	scanMetrics.FilesUnique = int64(len(fdByName))
-	s.lastScanMetrics = scanMetrics
 	return fdByName, scanMetrics
-}
-
-// TODO: Do we need this? can't we just access the field?
-func (s *fileScanner) LastScanMetrics() loginp.FileScanMetrics {
-	return s.lastScanMetrics
 }
 
 type ingestTarget struct {
