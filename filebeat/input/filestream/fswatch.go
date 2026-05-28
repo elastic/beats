@@ -47,8 +47,10 @@ const (
 )
 
 var (
-	errFileTooSmall = errors.New("file size is too small for ingestion")
-	errFileEmpty    = errors.New("file is empty")
+	errFileTooSmall    = errors.New("file size is too small for ingestion")
+	errFileEmpty       = errors.New("file is empty")
+	errFileExcluded    = errors.New("excluded from ingestion")
+	errFileNotIncluded = errors.New("not included in ingestion")
 )
 
 // fileWatcherConfig is the prospector.scanner configuration
@@ -188,7 +190,7 @@ func (w *fileWatcher) watch(
 	// so we "duplicate" it here for the sake of metrics.
 	// countIgnoredFiles calls the same function as the prospector
 	// so the logic is not duplicated
-	scanMetrics.FilesIgnored = countIgnoredFiles(paths, ignoreOlder, ignoreInactiveSince)
+	scanMetrics.FilesIgnored += countIgnoredFiles(paths, ignoreOlder, ignoreInactiveSince)
 	metrics.UpdateFileScanMetrics(scanMetrics)
 
 	// for debugging purposes
@@ -539,10 +541,16 @@ func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileS
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				scanMetrics.FilesNoIngestTarget++
 				if !errors.Is(err, errFileEmpty) {
 					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
 				}
+
+				if errors.Is(err, errFileNotIncluded) || errors.Is(err, errFileExcluded) {
+					scanMetrics.FilesIgnored++
+					continue
+				}
+
+				scanMetrics.FilesNoIngestTarget++
 				continue
 			}
 
@@ -590,11 +598,11 @@ type ingestTarget struct {
 
 func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
 	if s.isFileExcluded(filename) {
-		return it, fmt.Errorf("file %q is excluded from ingestion", filename)
+		return it, fmt.Errorf("file %q is %w", filename, errFileExcluded)
 	}
 
 	if !s.isFileIncluded(filename) {
-		return it, fmt.Errorf("file %q is not included in ingestion", filename)
+		return it, fmt.Errorf("file %q is %w", filename, errFileNotIncluded)
 	}
 
 	it.filename = filename
