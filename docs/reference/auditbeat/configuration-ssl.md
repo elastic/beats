@@ -479,7 +479,7 @@ If set to `true`, Auditbeat will automatically reload TLS certificates, keys, an
 * {applies_to}`stack: ga 9.3-9.4` `false`
 * {applies_to}`stack: ga 9.5+` `true`
 
-Certificate reload is checked on each TLS handshake. The files are re-read at most once per `certificate_reload.reload_interval`.
+Certificate reload is checked on each TLS handshake. The files are re-read at most once per [`certificate_reload.reload_interval`](#certificate_reload_reload_interval).
 
 
 ### `certificate_reload.reload_interval` [certificate_reload_reload_interval]
