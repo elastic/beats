@@ -158,7 +158,7 @@ USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi9-minimal")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
 USER root
 
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
@@ -169,7 +169,7 @@ RUN for iter in {1..10}; do \
     microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
     at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
     libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
-    dbus-glib libicu mesa-libGL unzip \
+    libicu mesa-libGL unzip \
     findutils shadow-utils ca-certificates gawk libcap xz tar -y && \
     mkdir -p /usr/share/fonts/google-noto && \
     curl -L -o NotoSansCJKjp.zip https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/06_NotoSansCJKjp.zip && \
