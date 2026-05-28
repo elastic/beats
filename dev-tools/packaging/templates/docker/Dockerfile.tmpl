@@ -223,6 +223,12 @@ RUN cd /usr/share/heartbeat/.node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
 
+# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 11.14.0
+# Bootstrap npm 11.14.1 from a downloaded copy to avoid npm 10.x self-replacement failures
+RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-11.14.1.tgz | tar xz -C /tmp \
+    && node /tmp/package/bin/npm-cli.js install -g npm@11.14.1 \
+    && rm -rf /tmp/package
+
 # Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}

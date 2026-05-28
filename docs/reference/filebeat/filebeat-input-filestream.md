@@ -739,6 +739,23 @@ When set to `true`, enables GZIP file reading with auto-detection.
 
 The maximum number of bytes that a single log message can have. All bytes after `message_max_bytes` are discarded and not sent. The default is 10MB (10485760).
 
+### `line_terminator` [filebeat-input-filestream-line-terminator]
+
+Specifies the characters used to separate lines in the input file. The default is `auto`.
+
+Valid values:
+
+* `auto`: Automatic detection of LF and CR+LF line endings (U+000A and U+000D U+000A).
+* `line_feed`: Line feed (LF, `\n`, U+000A).
+* `vertical_tab`: Vertical tab (VT, `\v`, U+000B).
+* `form_feed`: Form feed (FF, `\f`, U+000C).
+* `carriage_return`: Carriage return (CR, `\r`, U+000D).
+* `carriage_return_line_feed`: Carriage return followed by line feed (CR+LF, `\r\n`, U+000D U+000A).
+* `next_line`: Next line (NEL, U+0085).
+* `line_separator`: Line separator (LS, U+2028).
+* `paragraph_separator`: Paragraph separator (PS, U+2029).
+* `null_terminator`: Null character (`\u0000`, U+0000).
+
 ### `parsers` [_parsers]
 
 This option expects a list of parsers that the log line has to go through.
@@ -750,6 +767,7 @@ Available parsers:
 * `container`
 * `syslog`
 * `include_message`
+* `auditd`
 
 In this example, Filebeat is reading multiline messages that consist of 3 lines and are encapsulated in single-line JSON objects. The multiline message is stored under the key `msg`.
 
@@ -907,6 +925,42 @@ This example shows you how to include messages that start with the string ERR or
     - "/var/log/containers/*.log"
   parsers:
     - include_message.patterns: ["^ERR", "^WARN"]
+```
+
+#### `auditd` [filebeat-input-filestream-parsers-auditd]
+
+```{applies_to}
+stack: ga 9.5.0
+```
+
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
+
+The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
+
+:::{note}
+This parser is only supported on Linux. On other platforms, configuring it returns an error.
+:::
+
+The supported configuration options are:
+
+**`log_errors`**
+:   (Optional) If `true`, parse errors are logged via the Filebeat logger. Defaults to `false`.
+
+**`add_error_key`**
+:   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
+
+Example configuration:
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: auditd-logs
+    paths:
+      - /var/log/audit/audit.log
+    parsers:
+      - auditd:
+          log_errors: true
+          add_error_key: true
 ```
 
 ### `encoding` [_encoding_2]
