@@ -1,4 +1,0 @@
-kind: upgrade
-summary: Upgrade Azure Event Hubs SDK (azeventhubs) from v1.3.1 to v2.0.2.
-pr: https://github.com/elastic/beats/pull/49867
-component: filebeat

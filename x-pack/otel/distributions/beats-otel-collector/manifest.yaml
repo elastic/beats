@@ -7,64 +7,75 @@ dist:
   cgo_enabled: true
 
 extensions:
-  - gomod: go.opentelemetry.io/collector/extension/memorylimiterextension v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.149.0
+  - gomod: go.opentelemetry.io/collector/extension/memorylimiterextension v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.150.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/extension/beatsauthextension
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/extension/elasticsearchstorage
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/otel/extension/kafkapartitionerextension
 
 connectors:
 
 converters:
 
 receivers:
-  - gomod: go.opentelemetry.io/collector/receiver/nopreceiver v0.149.0
-  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/jaegerreceiver v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheckreceiver v0.149.0
+  - gomod: go.opentelemetry.io/collector/receiver/nopreceiver v0.150.0
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/jaegerreceiver v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheckreceiver v0.150.0
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/heartbeat/hbreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/metricbeat/mbreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/osquerybeat/osqreceiver
+  - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
+    import: github.com/elastic/beats/v7/x-pack/packetbeat/pbreceiver
 
 processors:
-  - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.149.0
-  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.149.0
+  - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.150.0
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.150.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/processor/beatprocessor
 
 exporters:
-  - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.149.0
-  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.149.0
-  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.149.0
-  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.149.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.149.0
+  - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.150.0
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.150.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.150.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.150.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.150.0
   - gomod: github.com/elastic/beats/v7 v7.0.0-alpha
     import: github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter
 
 providers:
-  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.55.0
-  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.55.0
-  - gomod: go.opentelemetry.io/collector/confmap/provider/httpprovider v1.55.0
-  - gomod: go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.55.0
-  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.55.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.56.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.56.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpprovider v1.56.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.56.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.56.0
 
 replaces:
   # Replaces from root go.mod

@@ -44,7 +44,7 @@ type IndexTemplates struct {
 	Templates []IndexTemplate `json:"index_templates"`
 }
 
-func getNamedTemplates(transactionId string, info *utils.ClusterInfo, templates *IndexTemplates, reporter t.ReportNamedTemplate) (errs []error) {
+func getNamedTemplates(info *utils.ClusterInfo, templates *IndexTemplates, reporter t.ReportNamedTemplate) (errs []error) {
 	for _, templateData := range templates.Templates {
 		template, err := templateSchema.Apply(templateData.IndexTemplate)
 
@@ -55,7 +55,7 @@ func getNamedTemplates(transactionId string, info *utils.ClusterInfo, templates 
 
 		template["template_name"] = templateData.Name
 
-		reporter(transactionId, info, template)
+		reporter(info, template)
 	}
 
 	return errs
@@ -78,7 +78,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 
 	if err != nil {
 		err = fmt.Errorf("failed applying index template schema: %w", err)
-		events.LogAndSendErrorEventWithRandomTransactionId(err, info, r, IndexTemplateMetricSet, IndexTemplatePath)
+		events.LogAndSendErrorEventWithoutTransactionId(err, info, r, IndexTemplateMetricSet, IndexTemplatePath)
 	}
 
 	return nil

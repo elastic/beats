@@ -77,9 +77,6 @@ type Pipeline struct {
 	closeOnce sync.Once
 
 	processors processing.Supporter
-
-	// paths contains the paths configuration for processor initialization.
-	paths *paths.Path
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -88,14 +85,12 @@ type Settings struct {
 	// When and how WaitClose is applied depends on WaitCloseMode.
 	WaitClose time.Duration
 
+	// This field has no effect when running as a Beats receiver.
 	WaitCloseMode WaitCloseMode
 
 	Processors processing.Supporter
 
 	InputQueueSize int
-
-	// Paths contains the paths configuration used for processor initialization.
-	Paths *paths.Path
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -117,6 +112,21 @@ const (
 	// when running in an otel receiver.
 	WaitOnPipelineCloseThenForce
 )
+
+// outputController is the interface between the Pipeline and the output,
+// which may be either the legacy Beats output pipeline (under the process
+// runtime) or a bridge to the OTel Collector (when running as a Beats
+// receiver under the otel runtime).
+type outputController interface {
+	// queueProducer creates a queue producer with the given config, blocking
+	// until the queue is created if it does not yet exist.
+	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
+
+	// Close the queue and output, waiting for pending events until all are
+	// acknowledged or the provided context expires.
+	// The force parameter has no effect when running as a Beats receiver.
+	waitClose(ctx context.Context, force bool) error
+}
 
 // OutputReloader interface, that can be queried from an active publisher pipeline.
 // The output reloader can be used to change the active output.
@@ -147,14 +157,6 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
-		paths:            settings.Paths,
-	}
-	switch settings.WaitCloseMode {
-	case WaitOnPipelineClose, WaitOnPipelineCloseThenForce:
-		if settings.WaitClose > 0 {
-			p.waitCloseTimeout = settings.WaitClose
-		}
-	default:
 	}
 
 	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
@@ -170,7 +172,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -185,12 +187,49 @@ func New(
 	return p, nil
 }
 
-// Close stops the pipeline, outputs and queue.
-// If WaitClose with WaitOnPipelineClose mode is configured, Close will block
+func NewForReceiver(
+	beatInfo beat.Info,
+	monitors Monitors,
+	userQueueConfig conf.Namespace,
+	settings Settings,
+	intakeQueueID string,
+) (*Pipeline, error) {
+	p := &Pipeline{
+		beatInfo:         beatInfo,
+		monitors:         monitors,
+		observer:         newMetricsObserver(monitors.Metrics),
+		waitCloseTimeout: settings.WaitClose,
+		processors:       settings.Processors,
+	}
+
+	// Convert the raw queue config to a parsed Settings object that will
+	// be used during queue creation. This lets us fail immediately on startup
+	// if there's a configuration problem.
+	queueType := defaultQueueType
+	if b := userQueueConfig.Name(); b != "" {
+		queueType = b
+	}
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	if err != nil {
+		return nil, err
+	}
+
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}
+
+// Disconnect stops the pipeline, outputs and queue.
+// If WaitClose with WaitOnPipelineClose mode is configured, Disconnect will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients will no longer accept new Publish calls once Close is started,
-// and will no longer receive event acknowledgments once Close returns.
-func (p *Pipeline) Close() error {
+// Note: clients will no longer accept new Publish calls once Disconnect is started,
+// and will no longer receive event acknowledgments once Disconnect returns.
+func (p *Pipeline) Disconnect(ctx context.Context) error {
+	// Here context does not do anything for now but it will be the responsibility of the beater to determine how long to wait before full disconnection
+	// See issue: https://github.com/elastic/beats/issues/49794
 	p.closeOnce.Do(func() {
 		log := p.monitors.Logger
 
@@ -300,7 +339,7 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish, p.paths)
+	return p.processors.Create(cfg, noPublish)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
