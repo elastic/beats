@@ -19,13 +19,20 @@ package otelconsumer
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"go.opentelemetry.io/collector/client"
+	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/exporter/exportertest"
 
+	"github.com/gofrs/uuid/v5"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
@@ -35,12 +42,16 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	mockesapi "github.com/elastic/mock-es/pkg/api"
 )
 
 func TestPublish(t *testing.T) {
@@ -486,4 +497,221 @@ func TestPublish(t *testing.T) {
 func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
+}
+
+// TestElasticsearchOutputVsExporterSerialization verifies that Beat events are serialized
+// identically whether they flow through the Beats Elasticsearch output or
+// through the OTel path (otelconsumer + ES exporter using bodymap mode).
+func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	fixedTime := time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC)
+	beatEvent := beat.Event{
+		Timestamp: time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC),
+		Fields: mapstr.M{
+			"int_val":     int(42),
+			"int64_val":   int64(1000),
+			"uint64_val":  uint64(1234),
+			"float_val":   float64(1.5),
+			"neg_float":   float64(-1.5),
+			"float32_val": float32(1.5),
+			"bool_val":    true,
+			"str_val":     "hello world",
+
+			"int_slice":    []int{1, 2, 3},
+			"str_slice":    []string{"a", "b", "c"},
+			"bool_slice":   []bool{true, false},
+			"uint64_slice": []uint64{100, 200},
+			"time_slice":   []time.Time{fixedTime},
+			"any_slice":    []any{1, "two", true},
+
+			"ts_field":          fixedTime,
+			"duration_field":    1500 * time.Millisecond,
+			"common_time_field": common.Time(fixedTime),
+
+			"mapstr_nested": mapstr.M{
+				"str_field": "nested value",
+				"int_field": int(7),
+			},
+			"mapstr_slice": []mapstr.M{
+				{"id": int(1), "tag": "alpha"},
+				{"id": int(2), "tag": "beta"},
+			},
+
+			// TODO(https://github.com/elastic/elastic-agent/issues/14610):
+			// The Beats encoder (go-structform, ExplicitRadixPoint=false) emits "2",
+			// while the OTel ES exporter (ExplicitRadixPoint=true) emits "2.0".
+			// This affects top-level scalars, nested map fields, and slice elements.
+			// "zero_float":  float64(0.0),
+			// "float64_int": float64(1.0),
+			// "float32_int": float32(2.0),
+			// "float_slice": []float64{1.5, 2.0, 0.0},
+
+			// TODO: common.NetString diverges because go-structform encodes the
+			// underlying []byte as a JSON number array ([104,101,108,108,111])
+			// while the OTel path calls MarshalText() and stores the string "hello".
+			// "net_string_field": common.NetString("hello"),
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+
+	// ── Beats Elasticsearch output path ──────────────────────────────────────
+	// Use outputs.Load to build the Beats ES output, which internally calls
+	// elasticsearch.NewEventEncoderFactory.  The factory is exposed via
+	// group.EncoderFactory so we can pre-encode the event exactly as the real
+	// pipeline does, then publish through the ES client to capture the raw JSON.
+	beatsDocCh := make(chan []byte, 1)
+	beatsMockES := newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		beatsDocCh <- event
+		return http.StatusOK
+	})
+	beatsSrv := httptest.NewServer(beatsMockES)
+	t.Cleanup(beatsSrv.Close)
+
+	beatsGroup, err := outputs.Load(
+		testIndexManager{},
+		beat.Info{Name: "testbeat", Version: "0.0.0", Logger: logger},
+		nil,
+		"elasticsearch",
+		agentconfig.MustNewConfigFrom(mapstr.M{"hosts": []string{beatsSrv.URL}}),
+	)
+	require.NoError(t, err)
+
+	// Pre-encode the event using the factory (identical to what the pipeline does).
+	beatsBatch := outest.NewBatch(beatEvent)
+	beatsEnc := beatsGroup.EncoderFactory()
+	require.Len(t, beatsBatch.Events(), 1)
+	beatsBatch.Events()[0], _ = beatsEnc.EncodeEntry(beatsBatch.Events()[0])
+	require.Len(t, beatsGroup.Clients, 1)
+	require.NoError(t, beatsGroup.Clients[0].Publish(ctx, beatsBatch))
+
+	var beatsDoc []byte
+	select {
+	case beatsDoc = <-beatsDocCh:
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for Beats ES output to deliver document to mock server")
+	}
+
+	// ── OTel path: otelconsumer → OTel ES exporter (bodymap) ─────────────────
+	otelDocCh := make(chan []byte, 1)
+	otelMockES := newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		otelDocCh <- event
+		return http.StatusOK
+	})
+	otelSrv := httptest.NewServer(otelMockES)
+
+	f := elasticsearchexporter.NewFactory()
+	cfg := f.CreateDefaultConfig().(*elasticsearchexporter.Config)
+	cfg.Endpoints = []string{otelSrv.URL}
+	// Reduce the batch flush timeout so the test does not wait the default 10s.
+	qb := cfg.QueueBatchConfig.Get()
+	qb.NumConsumers = 1
+	qb.Batch.Get().FlushTimeout = 50 * time.Millisecond
+
+	esExp, err := f.CreateLogs(ctx, exportertest.NewNopSettings(f.Type()), cfg)
+	require.NoError(t, err)
+	require.NoError(t, esExp.Start(ctx, componenttest.NewNopHost()))
+
+	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
+		return esExp.ConsumeLogs(ctx, ld)
+	})
+	require.NoError(t, err)
+
+	oc := &otelConsumer{
+		observer:     outputs.NewNilObserver(),
+		logsConsumer: logConsumer,
+		beatInfo:     beat.Info{Name: "testbeat", Version: "0.0.0"},
+		log:          logger.Named("otelconsumer"),
+		retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+	}
+
+	otelBatch := outest.NewBatch(beatEvent)
+	require.NoError(t, oc.Publish(ctx, otelBatch))
+
+	var otelDoc []byte
+	select {
+	case otelDoc = <-otelDocCh:
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for OTel exporter to deliver document to mock server")
+	}
+
+	// ── Comparison ────────────────────────────────────────────────────────────
+	// assert.JSONEq normalises numbers (so "2" == "2.0"), hiding float comparison bugs.
+	// Compare raw JSON tokens directly so that integer-vs-float differences are visible.
+	beats := rawJSONFields(t, beatsDoc)
+	otel := rawJSONFields(t, otelDoc)
+
+	// Compare all scalar and slice fields as raw JSON tokens.
+	for field, beatsRaw := range beats {
+		if field == "mapstr_slice" {
+			// mapstr_slice — same key-ordering concern but elements contain only integers and strings
+			// so number normalisation in JSONEq does not hide any float divergence.
+			assert.JSONEqf(t, string(beats[field]), string(otel[field]), "mapstr_slice should be serialized identically")
+			continue
+		}
+
+		if field == "mapstr_nested" {
+			// mapstr_nested — Go map iteration order is non-deterministic so the two
+			// serialisers may produce different key orderings in the JSON object.
+			// Compare each nested field individually rather than comparing the raw token.
+			require.Contains(t, otel, field, "missing field in otel output")
+			beatsNested := rawJSONFields(t, beats[field])
+			otelNested := rawJSONFields(t, otel[field])
+			for nestedField, beatsNestedRaw := range beatsNested {
+				otelNestedRaw, ok := otelNested[nestedField]
+				assert.True(t, ok, "mapstr_nested.%s missing from OTel document", nestedField)
+				assert.Equal(t, string(beatsNestedRaw), string(otelNestedRaw), "mapstr_nested.%s should be serialized identically", nestedField)
+			}
+			continue
+		}
+
+		otelRaw, ok := otel[field]
+		if !assert.True(t, ok, "field %q missing from OTel document", field) {
+			continue
+		}
+		assert.Equal(t, string(beatsRaw), string(otelRaw), "field %q: Beats=%s OTel=%s", field, beatsRaw, otelRaw)
+	}
+}
+
+// rawJSONFields parses a JSON object and returns a map of field name to raw
+// JSON token, preserving the exact byte form of each value so that "2" and
+// "2.0" remain distinguishable (unlike a full json.Unmarshal which converts
+// both to float64(2)).
+func rawJSONFields(t *testing.T, data []byte) map[string]json.RawMessage {
+	t.Helper()
+	var m map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(data, &m), "failed to parse JSON document: %s", data)
+	return m
+}
+
+// newMockES creates a mock-es APIHandler that calls handler for each document
+// in every bulk request.  The handler receives the parsed action and the raw
+// document JSON bytes, and returns the HTTP status to report for that action.
+func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockesapi.APIHandler {
+	t.Helper()
+	return mockesapi.NewDeterministicAPIHandler(
+		uuid.Must(uuid.NewV4()),
+		"",  // clusterUUID — empty is fine for tests
+		nil, // meterProvider — nil uses the global no-op provider
+		time.Now().Add(time.Hour),
+		0,  // no artificial delay
+		10, // history cap
+		handler,
+	)
+}
+
+// testIndexManager is a minimal outputs.IndexManager that always selects a
+// fixed index name.  It is used when constructing the Beats ES output via
+// outputs.Load in tests that do not need real index management.
+type testIndexManager struct{}
+
+func (testIndexManager) BuildSelector(_ *agentconfig.C) (outputs.IndexSelector, error) {
+	return testIndexSelector{}, nil
+}
+
+type testIndexSelector struct{}
+
+func (testIndexSelector) Select(_ *beat.Event) (string, error) {
+	return "test-index", nil
 }
