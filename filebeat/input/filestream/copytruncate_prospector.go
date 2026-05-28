@@ -200,7 +200,6 @@ func (p *copyTruncateFileProspector) Run(
 	ctx input.Context,
 	s loginp.StateMetadataUpdater,
 	hg loginp.HarvesterGroup,
-	metrics *loginp.Metrics,
 ) {
 	log := ctx.Logger.With("prospector", copyTruncateProspectorDebugKey)
 	log.Debug("Starting prospector")

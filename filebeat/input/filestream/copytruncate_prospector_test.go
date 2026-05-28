@@ -134,7 +134,7 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
-			p.Run(ctx, newMockMetadataUpdater(), hg, nil)
+			p.Run(ctx, newMockMetadataUpdater(), hg)
 
 			require.Len(t, hg.events, len(test.expectedEvents))
 			for i := 0; i < len(test.expectedEvents); i++ {

@@ -64,7 +64,7 @@ type Metrics struct {
 
 	FilesMatched        *monitoring.Int // Number of files matched by the configured paths (gauge).
 	FilesUnique         *monitoring.Int // Number of unique ingestible files found by the scanner (gauge).
-	FilesNoIngestTarget *monitoring.Int // Number of matched files without an ingest target (gauge).
+	FilesNoIngestTarget *monitoring.Int // Number of matched files without an ingest target, too small, or other internal errors (gauge).
 	FilesIgnored        *monitoring.Int // Number of ingestible files ignored by filestream settings (gauge).
 
 	lastFileScanMetrics FileScanMetrics

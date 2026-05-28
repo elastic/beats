@@ -33,7 +33,9 @@ import (
 
 type (
 	ignoreInactiveType uint8
-	ignoreReason       uint8
+	// ignoreReason is the reason a file is ignored.
+	// This is needed to correctly generate metrics and debug logs
+	ignoreReason uint8
 )
 
 const (
@@ -354,7 +356,6 @@ func (p *fileProspector) Run(
 	ctx input.Context,
 	s loginp.StateMetadataUpdater,
 	hg loginp.HarvesterGroup,
-	metrics *loginp.Metrics,
 ) {
 	p.logger.Debug("Starting prospector")
 	defer p.logger.Debug("Prospector has stopped")

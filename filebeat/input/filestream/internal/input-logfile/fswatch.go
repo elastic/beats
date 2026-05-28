@@ -131,12 +131,6 @@ type FSScanner interface {
 	GetFiles() (map[string]FileDescriptor, FileScanMetrics)
 }
 
-// ScanMetricsProvider returns metrics collected during the last file scan.
-// TODO: Do we need it?
-type ScanMetricsProvider interface {
-	LastScanMetrics() FileScanMetrics
-}
-
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
