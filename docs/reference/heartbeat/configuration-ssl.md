@@ -511,7 +511,7 @@ stack: deprecated 9.5+
 ```
 
 :::{note}
-This setting is deprecated in 9.5.0. Use [`certificate_reload`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
+This setting is deprecated in 9.5.0. Use [`certificate_reload.enabled`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
 :::
 
 If set to `true` Heartbeat will restart if any file listed by `key`, `certificate`, or `certificate_authorities` is modified.
