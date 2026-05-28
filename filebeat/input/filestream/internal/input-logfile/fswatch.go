@@ -126,7 +126,7 @@ type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
 	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles() map[string]FileDescriptor
+	GetFiles() (map[string]FileDescriptor, FileScanMetrics)
 }
 
 // ScanMetricsProvider returns metrics collected during the last file scan.

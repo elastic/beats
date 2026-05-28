@@ -182,14 +182,7 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
-	paths := w.scanner.GetFiles()
-	// Fall back to len(paths) for scanner implementations that do not expose
-	// richer scan metrics; the real fileScanner overwrites this below with the
-	// full snapshot collected while scanning.
-	scanMetrics := loginp.FileScanMetrics{FilesUnique: int64(len(paths))}
-	if metricsProvider, ok := w.scanner.(loginp.ScanMetricsProvider); ok {
-		scanMetrics = metricsProvider.LastScanMetrics()
-	}
+	paths, scanMetrics := w.scanner.GetFiles()
 	scanMetrics.FilesIgnored = countIgnoredFiles(paths, w.scanIgnoreOlder, w.scanIgnoreInactiveSince)
 	w.scanMetrics.UpdateFileScanMetrics(scanMetrics)
 
@@ -404,7 +397,7 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
-func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
+func (w *fileWatcher) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
 	return w.scanner.GetFiles()
 }
 
@@ -516,19 +509,13 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 
 // GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
-func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
+func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
 	uniqueIDs := map[string]string{}
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
 	scanMetrics := loginp.FileScanMetrics{}
-
-	// Set the metrics before returning
-	defer func() {
-		scanMetrics.FilesUnique = int64(len(fdByName))
-		s.lastScanMetrics = scanMetrics
-	}()
 
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
@@ -586,7 +573,9 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 	}
 
-	return fdByName
+	scanMetrics.FilesUnique = int64(len(fdByName))
+	s.lastScanMetrics = scanMetrics
+	return fdByName, scanMetrics
 }
 
 // TODO: Do we need this? can't we just access the field?

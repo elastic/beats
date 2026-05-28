@@ -1150,7 +1150,8 @@ scanner:
 		t.Run(tc.name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			s := createScannerWithConfig(t, logger, paths, tc.cfgStr, tc.compression)
-			requireEqualFiles(t, tc.expDesc, s.GetFiles())
+			files, _ := s.GetFiles()
+			requireEqualFiles(t, tc.expDesc, files)
 		})
 	}
 
@@ -1167,11 +1168,11 @@ scanner:
 		// the glob for the very small files
 		paths := []string{filepath.Join(dir, undersizedGlob)}
 		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
-		files := s.GetFiles()
+		files, _ := s.GetFiles()
 		require.Empty(t, files)
-		files = s.GetFiles()
+		files, _ = s.GetFiles()
 		require.Empty(t, files)
-		files = s.GetFiles()
+		files, _ = s.GetFiles()
 		require.Empty(t, files)
 
 		logs := parseLogs(buffer.String())
@@ -1246,7 +1247,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files := s.GetFiles()
+		files, _ := s.GetFiles()
 		assert.Len(t, files, 1, "empty.log must be excluded")
 		assert.Contains(t, files, nonEmpty, "nonempty.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1278,7 +1279,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files := s.GetFiles()
+		files, _ := s.GetFiles()
 		assert.Len(t, files, 1, "empty_link.log must be excluded")
 		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1316,7 +1317,7 @@ scanner:
 `
 
 	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
-	files := scanner.GetFiles()
+	files, _ := scanner.GetFiles()
 	require.Contains(t, files, keepLog, "keep log must be ingestible")
 	require.Len(t, files, 1, "only keep log should be ingestible")
 
@@ -1397,7 +1398,7 @@ func BenchmarkGetFiles(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files := s.GetFiles()
+		files, _ := s.GetFiles()
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
@@ -1425,7 +1426,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files := s.GetFiles()
+		files, _ := s.GetFiles()
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
