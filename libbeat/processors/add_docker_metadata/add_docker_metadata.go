@@ -74,10 +74,12 @@ type addDockerMetadata struct {
 	dockerAvailable atomic.Bool   // If Docker exists in env, then it is set to true
 	closeRetry      chan struct{} // Channel to signal the connection retry goroutine to stop
 	waitRetry       sync.WaitGroup
+	closeOnce       sync.Once
+	closeErr        error
 	cgreader        processors.CGReader
 	retryPeriod     time.Duration // Period to wait when reconnecting to Docker
 	retryTimeout    time.Duration // Maximum time to wait when connecting to Docker, 0 means wait forever.
-	retryIsBlocking bool          // If true block while trying to connect to Docker
+	retryIsBlocking bool          // If true, startup waits for the retry loop before returning.
 }
 
 const selector = "add_docker_metadata"
@@ -157,9 +159,10 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		return nil
 	}
 
+	retryStart := time.Now()
 	if err := connectToDocker(); err != nil {
 		if dm.retryIsBlocking {
-			connected, _, lastErr := dm.retryConnectToDocker(connectToDocker)
+			connected, _, lastErr := dm.retryConnectToDocker(connectToDocker, retryStart)
 			if !connected {
 				if err := processors.Close(dm.sourceProcessor); err != nil {
 					dm.log.Debugf("error closing source processor after docker connection timeout: %v", err)
@@ -171,17 +174,17 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 			}
 		} else {
 			// If docker is not available, try reconnecting asynchronously until the timeout expires.
-			dm.startDockerConnectionRetry(connectToDocker)
+			dm.startDockerConnectionRetry(connectToDocker, retryStart)
 		}
 	}
 
 	return &dm, nil
 }
 
-func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() error) {
+func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() error, retryStart time.Time) {
 	d.waitRetry.Go(func() {
 		defer d.log.Debug("retry goroutine done")
-		connected, stopped, _ := d.retryConnectToDocker(connectToDocker)
+		connected, stopped, _ := d.retryConnectToDocker(connectToDocker, retryStart)
 		if !connected && !stopped {
 			d.log.Warnf(
 				"stopped retrying docker connection before metadata became available; wait_for_metadata_timeout=%s elapsed",
@@ -191,7 +194,7 @@ func (d *addDockerMetadata) startDockerConnectionRetry(connectToDocker func() er
 	})
 }
 
-func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() error) (connected bool, stopped bool, lastErr error) {
+func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() error, retryStart time.Time) (connected bool, stopped bool, lastErr error) {
 	blockingStr := "non-blocking"
 	if d.retryIsBlocking {
 		blockingStr = "blocking"
@@ -209,8 +212,15 @@ func (d *addDockerMetadata) retryConnectToDocker(connectToDocker func() error) (
 	defer ticker.Stop()
 
 	var timeoutC <-chan time.Time
+	var timeoutTimer *time.Timer
 	if d.retryTimeout > 0 {
-		timeoutC = time.Tick(d.retryTimeout)
+		remaining := time.Until(retryStart.Add(d.retryTimeout))
+		if remaining <= 0 {
+			return false, false, nil
+		}
+		timeoutTimer = time.NewTimer(remaining)
+		timeoutC = timeoutTimer.C
+		defer timeoutTimer.Stop()
 	}
 
 	for {
@@ -323,25 +333,26 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (d *addDockerMetadata) Close() error {
-	if d.cgroups != nil {
-		d.cgroups.StopJanitor()
-	}
+	d.closeOnce.Do(func() {
+		if d.cgroups != nil {
+			d.cgroups.StopJanitor()
+		}
 
-	// Stop the retry goroutine, this is safe to call even if
-	// the goroutine is not running
-	close(d.closeRetry)
-	d.waitRetry.Wait()
+		// Stop the retry goroutine, this is safe to call even if the goroutine is not running.
+		close(d.closeRetry)
+		d.waitRetry.Wait()
 
-	// If the watcher is running, stop it.
-	if d.dockerAvailable.Load() {
-		d.watcher.Stop()
-	}
+		// If the watcher is running, stop it.
+		if d.dockerAvailable.Load() && d.watcher != nil {
+			d.watcher.Stop()
+		}
 
-	err := processors.Close(d.sourceProcessor)
-	if err != nil {
-		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
-	}
-	return nil
+		err := processors.Close(d.sourceProcessor)
+		if err != nil {
+			d.closeErr = fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
+		}
+	})
+	return d.closeErr
 }
 
 func (d *addDockerMetadata) String() string {

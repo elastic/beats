@@ -716,6 +716,42 @@ func TestInitializationWaitForMetadataReturnsErrorOnTimeout(t *testing.T) {
 	assert.Greater(t, attempts.Load(), int32(1), "watcher constructor should be retried before timeout")
 }
 
+func TestInitializationWaitForMetadataTimeoutIncludesInitialAttempt(t *testing.T) {
+	dockerUnavailable := errors.New("docker unavailable")
+	var attempts atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		attempts.Add(1)
+		time.Sleep(20 * time.Millisecond)
+		return nil, dockerUnavailable
+	}
+
+	testConfig := config.MustNewConfigFrom(map[string]any{
+		"wait_for_metadata":              true,
+		"wait_for_metadata_retry_period": "1ms",
+		"wait_for_metadata_timeout":      "10ms",
+	})
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), testConfig, watcherConstructor)
+	require.Error(t, err, "initializing add_docker_metadata processor should fail after timeout")
+	assert.ErrorIs(t, err, dockerUnavailable, "error should wrap the initial docker connection failure")
+	assert.Nil(t, p, "processor should not be returned after wait_for_metadata timeout")
+	assert.Equal(t, int32(1), attempts.Load(), "timeout should include time spent in the initial attempt")
+}
+
+func TestCloseCanBeCalledMultipleTimes(t *testing.T) {
+	var stops atomic.Int32
+	watcherConstructor := func(_ *logp.Logger, host string, tls *docker.TLSConfig, shortID bool) (docker.Watcher, error) {
+		return &mockWatcher{stopCount: &stops}, nil
+	}
+
+	p, err := buildDockerMetadataProcessor(logp.NewNopLogger(), config.NewConfig(), watcherConstructor)
+	require.NoError(t, err, "initializing add_docker_metadata processor")
+
+	require.NoError(t, processors.Close(p), "first close should succeed")
+	require.NoError(t, processors.Close(p), "second close should succeed")
+	assert.Equal(t, int32(1), stops.Load(), "watcher should be stopped only once")
+}
+
 // Mock container watcher
 
 func MockWatcherFactory(containers map[string]*docker.Container, startErr error) docker.WatcherConstructor {
@@ -730,6 +766,7 @@ func MockWatcherFactory(containers map[string]*docker.Container, startErr error)
 type mockWatcher struct {
 	containers map[string]*docker.Container
 	startErr   error
+	stopCount  *atomic.Int32
 }
 
 func (m *mockWatcher) Start() error {
@@ -739,7 +776,11 @@ func (m *mockWatcher) Start() error {
 	return nil
 }
 
-func (m *mockWatcher) Stop() {}
+func (m *mockWatcher) Stop() {
+	if m.stopCount != nil {
+		m.stopCount.Add(1)
+	}
+}
 
 func (m *mockWatcher) Container(ID string) *docker.Container {
 	return m.containers[ID]

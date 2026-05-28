@@ -37,8 +37,8 @@ type Config struct {
 	MatchPIDs           []string          `config:"match_pids"`                     // A list of fields containing process IDs (PIDs).
 	HostFS              string            `config:"hostfs"`                         // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
 	DeDot               bool              `config:"labels.dedot"`                   // If set to true, replace dots in labels with `_`.
-	WaitMetadata        bool              `config:"wait_for_metadata"`              // Block initialization until Docker metadata is available.
-	WaitMetadataTimeout time.Duration     `config:"wait_for_metadata_timeout"`      // Maximum time to wait for Docker metadata.
+	WaitMetadata        bool              `config:"wait_for_metadata"`              // Block initialization when Docker is unavailable until metadata is available.
+	WaitMetadataTimeout time.Duration     `config:"wait_for_metadata_timeout"`      // Maximum time to wait for Docker metadata, 0 means wait indefinitely.
 	WaitMetadataRetry   time.Duration     `config:"wait_for_metadata_retry_period"` // How long to wait between retries.
 
 	// Annotations are kept after container is killed, until they haven't been
@@ -54,7 +54,7 @@ func defaultConfig() Config {
 		MatchPIDs:           []string{"process.pid", "process.parent.pid"},
 		DeDot:               true,
 		WaitMetadata:        false,
-		WaitMetadataTimeout: 0, // Retry indefinitely
+		WaitMetadataTimeout: 30 * time.Second,
 		WaitMetadataRetry:   10 * time.Second,
 	}
 }
