@@ -59,7 +59,7 @@ steps:
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "hearbeat: check/update"
+              context: "heartbeat: check/update"
 
       - label: "Heartbeat: Run pre-commit"
         command: "pre-commit run --all-files"
