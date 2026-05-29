@@ -115,7 +115,7 @@ func TestFromMapstrSliceAny(t *testing.T) {
 func TestFromMapstrSliceDouble(t *testing.T) {
 	dst := pcommon.NewMap()
 	require.NoError(t, FromMapstr(dst, mapstr.M{"slice": []float32{4.2, 4.3, 4.4}}))
-	want := []any{float64(float32(4.2)), float64(float32(4.3)), float64(float32(4.4))}
+	want := []any{float32ToFloat64(4.2), float32ToFloat64(4.3), float32ToFloat64(4.4)}
 	assert.Equal(t, map[string]any{"slice": want}, dst.AsRaw())
 }
 

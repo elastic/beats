@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -108,10 +109,10 @@ func FromValue(dst pcommon.Value, value any) error {
 		dst.SetInt(maskUnsignedInt(v))
 		return nil
 	case float32:
-		dst.SetDouble(float64(v))
+		setFloatValue(dst, float32ToFloat64(v))
 		return nil
 	case float64:
-		dst.SetDouble(v)
+		setFloatValue(dst, v)
 		return nil
 	case bool:
 		dst.SetBool(v)
@@ -135,6 +136,11 @@ func FromValue(dst pcommon.Value, value any) error {
 	case time.Duration:
 		dst.SetInt(int64(v))
 		return nil
+	case common.NetString:
+		// go-structform (Beats ES output path) encodes NetString as raw []byte,
+		// producing a JSON integer array. Match that behavior for document shape
+		// parity across both output paths.
+		return fromUnsignedSlice(dst.SetEmptySlice(), []byte(v))
 	case encoding.TextMarshaler:
 		text, err := v.MarshalText()
 		if err != nil {
@@ -203,8 +209,11 @@ func fromReflective(dst pcommon.Value, value any) error {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		dst.SetInt(maskUnsignedInt(ref.Uint()))
 		return nil
-	case reflect.Float32, reflect.Float64:
-		dst.SetDouble(ref.Float())
+	case reflect.Float32:
+		setFloatValue(dst, float32ToFloat64(float32(ref.Float())))
+		return nil
+	case reflect.Float64:
+		setFloatValue(dst, ref.Float())
 		return nil
 	case reflect.Complex64, reflect.Complex128:
 		dst.SetStr(fmt.Sprintf("%v", ref.Complex()))
@@ -295,9 +304,43 @@ func fromBoolSlice(dst pcommon.Slice, src []bool) error {
 func fromFloatSlice[T floating](dst pcommon.Slice, src []T) error {
 	dst.EnsureCapacity(len(src))
 	for _, item := range src {
-		dst.AppendEmpty().SetDouble(float64(item))
+		f64 := float64(item)
+		// Use float32 decimal precision when the source is float32.
+		if _, ok := any(item).(float32); ok {
+			f64 = float32ToFloat64(float32(item))
+		}
+		setFloatValue(dst.AppendEmpty(), f64)
 	}
 	return nil
+}
+
+// float32ToFloat64 converts a float32 to float64 using the float32's shortest
+// decimal representation, matching the Beats go-structform encoder which
+// serializes float32 with float32 precision (e.g. float32(3.14) → "3.14",
+// not "3.140000104904175").
+func float32ToFloat64(v float32) float64 {
+	f64, _ := strconv.ParseFloat(strconv.FormatFloat(float64(v), 'g', -1, 32), 64)
+	return f64
+}
+
+// floatToAny converts v to int64 when it has no fractional part, matching the
+// Beats go-structform encoder (ExplicitRadixPoint=false) which emits "2"
+// rather than "2.0" for integer-valued floats. Used by both [setFloatValue]
+// and [legacyConvertNonPrimitive].
+func floatToAny(v float64) any {
+	if i := int64(v); float64(i) == v {
+		return i
+	}
+	return v
+}
+
+func setFloatValue(dst pcommon.Value, v float64) {
+	switch val := floatToAny(v).(type) {
+	case int64:
+		dst.SetInt(val)
+	case float64:
+		dst.SetDouble(val)
+	}
 }
 
 func fromSignedSlice[T signed](dst pcommon.Slice, src []T) error {

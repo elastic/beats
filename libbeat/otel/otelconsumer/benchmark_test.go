@@ -238,12 +238,12 @@ func makeBenchmarkBatch(event beat.Event, size int) []beat.Event {
 func BenchmarkFillLogRecordFromEvent(b *testing.B) {
 	for _, includeMetadata := range []bool{false, true} {
 		beatInfo := beat.Info{IncludeMetadata: includeMetadata}
-		suffix := ""
-		if includeMetadata {
-			suffix = "/with_metadata"
-		}
 		for _, tc := range benchmarkEventCases() {
-			b.Run(tc.name+suffix, func(b *testing.B) {
+			name := tc.name
+			if includeMetadata {
+				name += "/with_metadata"
+			}
+			b.Run(name, func(b *testing.B) {
 				b.ReportAllocs()
 				pubEvent := publisher.Event{Content: tc.event}
 				logger := logp.NewNopLogger()

@@ -18,31 +18,43 @@
 package otelconsumer
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
-	"go.opentelemetry.io/collector/client"
-
+	"github.com/gofrs/uuid/v5"
+	"github.com/google/go-cmp/cmp"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/client"
+	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
+	"go.opentelemetry.io/collector/exporter/exportertest"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	mockesapi "github.com/elastic/mock-es/pkg/api"
 )
 
 func TestPublish(t *testing.T) {
@@ -562,4 +574,235 @@ func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestElasticsearchOutputVsExporterSerialization verifies that Beat events are
+// serialized identically across three paths for every fixture in
+// otelmap.BenchmarkCases:
+//   - Beats Elasticsearch output (go-structform encoder)
+//   - OTel path: otelmap.FromMapstr (direct) -> ES exporter (bodymap)
+//   - Legacy OTel path: otelmap.FromMapstrLegacy (clone+FromRaw) -> ES exporter (bodymap)
+func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	timestamp := time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)
+
+	// Build the Beats ES output once and reuse it across all sub-tests.
+	beatsDocCh := make(chan []byte, 1)
+	beatsSrv := httptest.NewServer(newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		beatsDocCh <- event
+		return http.StatusOK
+	}))
+	t.Cleanup(beatsSrv.Close)
+
+	beatsGroup, err := outputs.Load(
+		testIndexManager{},
+		beat.Info{Name: "testbeat", Version: "0.0.0", Logger: logger},
+		nil,
+		"elasticsearch",
+		agentconfig.MustNewConfigFrom(mapstr.M{"hosts": []string{beatsSrv.URL}}),
+	)
+	require.NoError(t, err)
+	require.Len(t, beatsGroup.Clients, 1)
+	beatsClient, ok := beatsGroup.Clients[0].(outputs.NetworkClient)
+	require.True(t, ok, "ES output client must implement outputs.NetworkClient")
+	beatsEnc := beatsGroup.EncoderFactory()
+
+	setupCtx, setupCancel := context.WithTimeout(t.Context(), 10*time.Second)
+	defer setupCancel()
+	require.NoError(t, beatsClient.Connect(setupCtx))
+
+	for _, tc := range otelmap.BenchmarkCases() {
+		t.Run(tc.Name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
+			defer cancel()
+
+			// Strip @timestamp from the fields so both Beats and OTel use
+			// beatEvent.Timestamp as the canonical source, avoiding a conflict
+			// when the bench case has its own @timestamp field.
+			fields := tc.Src.Clone()
+			delete(fields, "@timestamp")
+			beatEvent := beat.Event{Timestamp: timestamp, Fields: fields}
+
+			// ── Beats ES output path ──────────────────────────────────────────
+			beatsBatch := outest.NewBatch(beatEvent)
+			beatsBatch.Events()[0], _ = beatsEnc.EncodeEntry(beatsBatch.Events()[0])
+			require.NoError(t, beatsClient.Publish(ctx, beatsBatch))
+
+			// ── OTel path: via otelConsumer.Publish (production code path) ────
+			otelDoc := collectOtelDocViaPublish(t, ctx, logger, beatEvent)
+
+			// ── Legacy OTel path: FromMapstrLegacy → ES exporter ─────────────
+			legacyDoc := collectOtelDoc(t, ctx, beatEvent, otelmap.FromMapstrLegacy[mapstr.M])
+
+			// ── Comparisons ───────────────────────────────────────────────────
+			// OTel vs legacy always runs.
+			t.Run("otel_vs_legacy", func(t *testing.T) {
+				compareJSONValues(t, "otel", "legacy", otelDoc, legacyDoc)
+			})
+
+			// Beats comparison: the Beats encoder (go-structform) may not
+			// support all types (e.g. complex64/128), so we use a short
+			// deadline and skip rather than hard-fail on timeout.
+			beatsCtx, beatsCancel := context.WithTimeout(ctx, 3*time.Second)
+			defer beatsCancel()
+			select {
+			case beatsDoc := <-beatsDocCh:
+				t.Run("beats_vs_otel", func(t *testing.T) {
+					compareJSONValues(t, "beats", "otel", beatsDoc, otelDoc)
+				})
+				t.Run("beats_vs_legacy", func(t *testing.T) {
+					compareJSONValues(t, "beats", "legacy", beatsDoc, legacyDoc)
+				})
+			case <-beatsCtx.Done():
+				t.Log("skipping beats comparisons: Beats did not produce a document (field types may be unsupported by go-structform)")
+			}
+		})
+	}
+}
+
+// newTestESConsumer creates a fresh mock ES server backed by an ES exporter and
+// returns a consumer.Logs that forwards to it plus a channel that receives each
+// raw JSON document the mock server captures. Both are registered for cleanup on t.
+func newTestESConsumer(t *testing.T, ctx context.Context) (consumer.Logs, <-chan []byte) {
+	t.Helper()
+
+	docCh := make(chan []byte, 1)
+	srv := httptest.NewServer(newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		docCh <- event
+		return http.StatusOK
+	}))
+	t.Cleanup(srv.Close)
+
+	f := elasticsearchexporter.NewFactory()
+	cfg, ok := f.CreateDefaultConfig().(*elasticsearchexporter.Config)
+	require.Truef(t, ok, "elasticsearchexporter config must be *elasticsearchexporter.Config")
+	cfg.Endpoints = []string{srv.URL}
+	qb := cfg.QueueBatchConfig.Get()
+	qb.NumConsumers = 1
+	qb.Batch.Get().FlushTimeout = 50 * time.Millisecond
+
+	esExp, err := f.CreateLogs(ctx, exportertest.NewNopSettings(f.Type()), cfg)
+	require.NoError(t, err)
+	require.NoError(t, esExp.Start(ctx, componenttest.NewNopHost()))
+	t.Cleanup(func() { _ = esExp.Shutdown(context.Background()) })
+
+	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
+		return esExp.ConsumeLogs(ctx, ld)
+	})
+	require.NoError(t, err)
+	return logConsumer, docCh
+}
+
+// collectOtelDoc sends beatEvent through the OTel ES exporter using bodyFiller
+// to populate the log record body, and returns the raw JSON document captured
+// by the mock ES server.
+func collectOtelDoc(
+	t *testing.T,
+	ctx context.Context,
+	beatEvent beat.Event,
+	bodyFiller func(pcommon.Map, mapstr.M) error,
+) []byte {
+	t.Helper()
+
+	logConsumer, docCh := newTestESConsumer(t, ctx)
+
+	// Build plog.Logs mirroring otelConsumer.logsPublish so the ES exporter
+	// uses bodymap encoding.
+	ld := plog.NewLogs()
+	scopeLogs := ld.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
+	scopeLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
+	logRecord := scopeLogs.LogRecords().AppendEmpty()
+	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(beatEvent.Timestamp))
+	logRecord.SetObservedTimestamp(pcommon.NewTimestampFromTime(beatEvent.Timestamp))
+	bodyMap := logRecord.Body().SetEmptyMap()
+	bodyMap.EnsureCapacity(len(beatEvent.Fields) + 1)
+	require.NoError(t, bodyFiller(bodyMap, beatEvent.Fields))
+	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(beatEvent.Timestamp))
+
+	require.NoError(t, logConsumer.ConsumeLogs(ctx, ld))
+
+	select {
+	case doc := <-docCh:
+		return doc
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for OTel exporter to deliver document to mock server")
+		return nil
+	}
+}
+
+// collectOtelDocViaPublish sends beatEvent through the production
+// otelConsumer.Publish path and returns the raw JSON document captured by the
+// mock ES server.
+func collectOtelDocViaPublish(t *testing.T, ctx context.Context, logger *logp.Logger, beatEvent beat.Event) []byte {
+	t.Helper()
+	logConsumer, docCh := newTestESConsumer(t, ctx)
+	oc := &otelConsumer{
+		observer:     outputs.NewNilObserver(),
+		logsConsumer: logConsumer,
+		beatInfo:     beat.Info{Name: "testbeat", Version: "0.0.0"},
+		log:          logger.Named("otelconsumer"),
+		retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+	}
+	require.NoError(t, oc.Publish(ctx, outest.NewBatch(beatEvent)))
+	select {
+	case doc := <-docCh:
+		return doc
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for OTel exporter to deliver document to mock server")
+		return nil
+	}
+}
+
+// compareJSONValues compares two JSON documents for exact equality, preserving
+// number token representation so "2" and "2.0" are distinguishable, while
+// tolerating non-deterministic JSON object key ordering.
+//
+// Decoding with UseNumber stores numbers as json.Number (a string type), so
+// the cmp.Comparer below compares them by their raw text, keeping "2" ≠ "2.0".
+func compareJSONValues(t *testing.T, nameA, nameB string, docA, docB []byte) {
+	t.Helper()
+	a := parseJSONDoc(t, nameA, docA)
+	b := parseJSONDoc(t, nameB, docB)
+	if diff := cmp.Diff(a, b, cmp.Comparer(func(x, y json.Number) bool {
+		return x.String() == y.String()
+	})); diff != "" {
+		t.Errorf("%s vs %s differ (-want +got):\n%s", nameA, nameB, diff)
+	}
+}
+
+func parseJSONDoc(t *testing.T, name string, data []byte) any {
+	t.Helper()
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	var v any
+	require.NoErrorf(t, dec.Decode(&v), "parse %s JSON: %s", name, data)
+	return v
+}
+
+// newMockES creates a mock-es APIHandler that calls handler for each document
+// in every bulk request.
+func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockesapi.APIHandler {
+	t.Helper()
+	return mockesapi.NewDeterministicAPIHandler(
+		uuid.Must(uuid.NewV4()),
+		"",
+		nil,
+		time.Now().Add(time.Hour),
+		0,
+		10,
+		handler,
+	)
+}
+
+// testIndexManager is a minimal outputs.IndexManager that always selects a fixed index name.
+type testIndexManager struct{}
+
+func (testIndexManager) BuildSelector(_ *agentconfig.C) (outputs.IndexSelector, error) {
+	return testIndexSelector{}, nil
+}
+
+type testIndexSelector struct{}
+
+func (testIndexSelector) Select(_ *beat.Event) (string, error) {
+	return "test-index", nil
 }
