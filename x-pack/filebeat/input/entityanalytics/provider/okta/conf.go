@@ -12,8 +12,12 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/paths"
+=======
+	"github.com/elastic/beats/v7/libbeat/common"
+>>>>>>> ec6e82f86 (x-pack/filebeat/input/{cel,httpjson,http_endpoint,entityanalytics},internal/httplog: fix request tracer path validation under OTel receiver runtime (#50581))
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -210,13 +214,6 @@ func (c *conf) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(Name, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, Name))
 	}
 	return nil
 }
