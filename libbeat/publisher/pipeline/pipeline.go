@@ -172,7 +172,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, _, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, _, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func NewForReceiver(
 	// queue. queueConfig holds the parsed queue settings so the controller can
 	// reject a later pipeline that would otherwise silently inherit the first
 	// pipeline's queue settings.
-	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
