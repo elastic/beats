@@ -224,19 +224,20 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	if bt.config.RunOnce {
 		waitPublished := monitors.NewSignalWait()
-		defer waitPublished.Wait()
 
 		// Three possible events: global beat, run_once pipeline done and publish timeout
 		waitPublished.AddChan(bt.done)
 		waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
-		if bt.config.PublishTimeout > config.DefaultPipelineShutdownTimeout {
+		if bt.config.PublishTimeout > 0 {
 			bt.logger.Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
 			waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
 				"shutdown: timed out waiting for pipeline to publish events."))
 		}
+
+		waitPublished.Wait()
 	}
 
-	ctx, ctxCanacel := context.WithTimeout(context.Background(), bt.config.PublishTimeout)
+	ctx, ctxCanacel := context.WithTimeout(context.Background(), 1*time.Second) // We have chosen 1s timeout to allow graceful shutdown of pending events
 	defer ctxCanacel()
 	err = bt.pipeline.Disconnect(ctx)
 	if err != nil {

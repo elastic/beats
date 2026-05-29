@@ -86,8 +86,7 @@ func DefaultConfig(logger *logp.Logger) *Config {
 	}
 
 	return &Config{
-		Jobs:           limits,
-		PublishTimeout: DefaultPipelineShutdownTimeout,
+		Jobs: limits,
 	}
 }
 
