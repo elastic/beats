@@ -30,6 +30,7 @@ import (
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
 
+<<<<<<< HEAD
 // TraceIDKey is key used to add a trace.id value to the context of HTTP
 // requests. The value will be logged by LoggingRoundTripper.
 const TraceIDKey = contextKey("trace.id")
@@ -46,10 +47,13 @@ func IsPathInLogsFor(input, path string) (ok bool, err error) {
 	return IsPathIn(root, path)
 }
 
+=======
+>>>>>>> ec6e82f86 (x-pack/filebeat/input/{cel,httpjson,http_endpoint,entityanalytics},internal/httplog: fix request tracer path validation under OTel receiver runtime (#50581))
 // ResolvePathInLogsFor resolves path relative to the logs directory for the
 // specified input and reports whether the result is within that directory.
-func ResolvePathInLogsFor(input, path string) (resolved string, ok bool, err error) {
-	root := paths.Resolve(paths.Logs, input)
+// p must not be nil.
+func ResolvePathInLogsFor(p *paths.Path, input, path string) (resolved string, ok bool, err error) {
+	root := p.Resolve(paths.Logs, input)
 	if !filepath.IsAbs(path) && !isRooted(path) {
 		path = filepath.Join(root, path)
 	}
