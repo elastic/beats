@@ -48,7 +48,8 @@ func TestOTelQueueMetrics(t *testing.T) {
 		},
 		nilObserver,
 		memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1000}),
-		"")
+		"",
+		nil)
 	require.NoError(t, err, "creating OTel output controller should succeed")
 	defer controller.waitClose(context.Background(), true)
 	entry := reg.Get("pipeline.queue.max_events")
@@ -87,6 +88,7 @@ func TestSharedQueue(t *testing.T) {
 		nilObserver,
 		queueFactory,
 		"queueID",
+		queueSettings,
 	)
 	require.NoError(t, err, "output controller creation should succeed")
 	defer c1.waitClose(cancelledContext(), false)
@@ -100,6 +102,7 @@ func TestSharedQueue(t *testing.T) {
 		nilObserver,
 		queueFactory,
 		"queueID",
+		queueSettings,
 	)
 	require.NoError(t, err, "output controller creation should succeed")
 	defer c2.waitClose(cancelledContext(), false)
@@ -112,46 +115,37 @@ func TestSharedQueue(t *testing.T) {
 	}
 	batchChan := c1.workerChan
 
-	ackChan1 := make(chan int, 1)
-	prod1 := c1.queueProducer(queue.ProducerConfig{
-		ACK: func(count int) {
-			ackChan1 <- count
-		},
-	})
-	ackChan2 := make(chan int, 1)
-	prod2 := c2.queueProducer(queue.ProducerConfig{
-		ACK: func(count int) {
-			ackChan2 <- count
-		},
-	})
+	prod1 := c1.queueProducer(queue.ProducerConfig{})
+	prod2 := c2.queueProducer(queue.ProducerConfig{})
 
 	var events []publisher.Event
 	for i := range 6 {
 		events = append(events, testEvent(i))
 	}
 
-	// Publish one event through each handle, verify that they can be read as a single batch
+	// Publish one event through each handle. They are read together (the queue's
+	// MaxGetRequest is 2) and the pipeline splits them into one single-source
+	// batch per destination.
 	prod1.Publish(events[0])
 	prod2.Publish(events[1])
 
-	// Two events published with a two-event batch size should make a batch
-	// ~immediately available on the worker channel.
-	var ackFirstBatch func()
-	select {
-	case batch := <-batchChan:
-		batchEvents := batch.Events()
-		require.Len(t, batchEvents, 2, "batch should contain 2 events")
-		assert.Equal(t, events[0], batchEvents[0])
-		assert.Equal(t, events[1], batchEvents[1])
-
-		// Save the ack callback to trigger after the queue is blocked
-		ackFirstBatch = batch.ACK
-	case <-time.After(flushTimeout / 2):
-		require.Fail(t, "expected 2-event batch on worker channel, no batch received")
+	// Collect the two split batches and their ACK callbacks, keyed by source.
+	acks := map[*beat.Info]func(){}
+	for range 2 {
+		select {
+		case batch := <-batchChan:
+			batchEvents := batch.Events()
+			require.Len(t, batchEvents, 1, "each split batch should target a single source")
+			acks[batchEvents[0].Source] = batch.ACK
+		case <-time.After(flushTimeout / 2):
+			require.Fail(t, "expected a split batch on worker channel, no batch received")
+		}
 	}
+	require.Contains(t, acks, &c1.beatInfo, "prod1's event should be routed to c1's destination")
+	require.Contains(t, acks, &c2.beatInfo, "prod2's event should be routed to c2's destination")
 
-	// Publish 3 more events through controller 1. After this,
-	// the queue should be full.
+	// Fill the rest of the shared queue (cap 5) through controller 1: the two
+	// events above still occupy their slots until acknowledged.
 	prod1.Publish(events[2])
 	prod1.Publish(events[3])
 	prod1.Publish(events[4])
@@ -165,18 +159,63 @@ func TestSharedQueue(t *testing.T) {
 
 	select {
 	case <-time.After(time.Second):
-		// All is well, the event was blocked by the other pipeline's events as expected
+		// All is well, the event was blocked by the full shared queue as expected.
 	case <-publishedChan:
 		require.Fail(t, "Publish call to full shared queue should block")
 	}
 
-	// Acknowledging the first batch should unblock the queue
-	ackFirstBatch()
+	// The first queue read holds its slots until *both* destinations' split
+	// batches are acknowledged, so the shared queue never exceeds its event cap
+	// regardless of the number of destinations. Acking only one must not unblock.
+	acks[&c1.beatInfo]()
+	select {
+	case <-time.After(250 * time.Millisecond):
+		// Still blocked: one destination's ack is not enough to free the read.
+	case <-publishedChan:
+		require.Fail(t, "Publish should stay blocked until all split batches are acknowledged")
+	}
+
+	// Acking the second destination completes the read and frees its slots.
+	acks[&c2.beatInfo]()
 	select {
 	case <-time.After(time.Second):
-		require.Fail(t, "Acknowledging the first batch should unblock the pending Publish call to shared queue")
+		require.Fail(t, "Acknowledging both split batches should unblock the pending Publish")
 	case <-publishedChan:
 	}
+}
+
+func TestSharedQueueConfigMismatch(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	queueFactory := func(
+		logger *logp.Logger,
+		observer queue.Observer,
+		inputQueueSize int,
+		encoderFactory queue.EncoderFactory[publisher.Event],
+	) (queue.Queue[publisher.Event], error) {
+		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
+	}
+	monitors := Monitors{Logger: logger, Metrics: monitoring.NewRegistry()}
+
+	c1, err := newOTelOutputController(
+		beat.Info{Logger: logger},
+		monitors,
+		nilObserver,
+		queueFactory,
+		"mismatchID",
+		memqueue.Settings{Events: 5},
+	)
+	require.NoError(t, err, "first output controller creation should succeed")
+	defer c1.waitClose(cancelledContext(), false)
+
+	_, err = newOTelOutputController(
+		beat.Info{Logger: logger},
+		monitors,
+		nilObserver,
+		queueFactory,
+		"mismatchID",
+		memqueue.Settings{Events: 10},
+	)
+	require.Error(t, err, "connecting to a shared intake queue with a different queue config should fail")
 }
 
 func testEvent(i int) publisher.Event {
@@ -189,4 +228,63 @@ func cancelledContext() context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	return ctx
+}
+
+// recordingProducer is a queue.Producer that records the last published event.
+type recordingProducer struct {
+	published    publisher.Event
+	tryPublished publisher.Event
+}
+
+func (p *recordingProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
+	p.published = event
+	return 0, true
+}
+
+func (p *recordingProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
+	p.tryPublished = event
+	return 0, true
+}
+
+func (p *recordingProducer) Close() {}
+
+func TestSourceTaggingProducer(t *testing.T) {
+	source := &beat.Info{Name: "src"}
+	rec := &recordingProducer{}
+	prod := &sourceTaggingProducer{Producer: rec, source: source}
+
+	prod.Publish(testEvent(1))
+	assert.Same(t, source, rec.published.Source, "Publish should tag the event with the source")
+
+	prod.TryPublish(testEvent(2))
+	assert.Same(t, source, rec.tryPublished.Source, "TryPublish should tag the event with the source")
+}
+
+func TestHandleQueueProducerTagging(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	queueFactory := func(
+		logger *logp.Logger,
+		observer queue.Observer,
+		inputQueueSize int,
+		encoderFactory queue.EncoderFactory[publisher.Event],
+	) (queue.Queue[publisher.Event], error) {
+		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
+	}
+	monitors := Monitors{Logger: logger, Metrics: monitoring.NewRegistry()}
+
+	// A non-shared controller has a single destination, so it must not wrap the
+	// producer with source tagging.
+	plain, err := newOTelOutputController(beat.Info{Logger: logger}, monitors, nilObserver, queueFactory, "", nil)
+	require.NoError(t, err)
+	defer plain.waitClose(cancelledContext(), false)
+	_, tagging := plain.queueProducer(queue.ProducerConfig{}).(*sourceTaggingProducer)
+	assert.False(t, tagging, "non-shared handle should not tag events")
+
+	// A shared controller must wrap the producer so events can be routed back
+	// to the pipeline that produced them.
+	shared, err := newOTelOutputController(beat.Info{Logger: logger}, monitors, nilObserver, queueFactory, "tagging-id", memqueue.Settings{Events: 5})
+	require.NoError(t, err)
+	defer shared.waitClose(cancelledContext(), false)
+	_, tagging = shared.queueProducer(queue.ProducerConfig{}).(*sourceTaggingProducer)
+	assert.True(t, tagging, "shared handle should tag events")
 }

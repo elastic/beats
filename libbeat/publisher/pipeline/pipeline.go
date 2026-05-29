@@ -179,7 +179,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	queueFactory, _, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -217,12 +217,16 @@ func NewForReceiver(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
+	// Pipelines sharing an intake queue id share a single output controller and
+	// queue. queueConfig holds the parsed queue settings so the controller can
+	// reject a later pipeline that would otherwise silently inherit the first
+	// pipeline's queue settings.
+	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), settings.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID, queueConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -360,22 +364,25 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], error) {
+// It also returns the parsed queue settings (with defaults applied) so callers
+// can detect mismatched configs between pipelines that connect with the same
+// shared intake queue id.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], any, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return memqueue.FactoryForSettings[publisher.Event](settings), nil
+		return memqueue.FactoryForSettings[publisher.Event](settings), settings, nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return diskqueue.FactoryForSettings(settings, paths), nil
+		return diskqueue.FactoryForSettings(settings, paths), settings, nil
 	default:
-		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
+		return nil, nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
 }
 

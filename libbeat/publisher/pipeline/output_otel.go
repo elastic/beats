@@ -20,6 +20,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -37,6 +38,7 @@ type otelOutputController struct {
 	monitors Monitors
 
 	intakeQueueID string
+	queueConfig   any
 	queue         queue.Queue[publisher.Event]
 
 	// consumer is a helper goroutine that reads event batches from the queue
@@ -71,6 +73,7 @@ func newOTelOutputController(
 	retryObserver retryObserver,
 	queueFactory queue.QueueFactory[publisher.Event],
 	intakeQueueID string,
+	queueConfig any,
 ) (*otelOutputControllerHandle, error) {
 	allOutputControllers.Lock()
 	defer allOutputControllers.Unlock()
@@ -78,6 +81,9 @@ func newOTelOutputController(
 	if intakeQueueID != "" {
 		controller, ok := allOutputControllers.lookup[intakeQueueID]
 		if ok {
+			if !reflect.DeepEqual(controller.queueConfig, queueConfig) {
+				return nil, fmt.Errorf("shared intake queue %q is already initialized with a different queue configuration", intakeQueueID)
+			}
 			controller.pipelineCount++
 			monitors.Logger.Debugf("newOTelOutputController: connecting to existing output controller for intake queue ID %v (%v pipelines connected)", intakeQueueID, controller.pipelineCount)
 			return &otelOutputControllerHandle{
@@ -128,6 +134,9 @@ func newOTelOutputController(
 			ch:         workerChan,
 			batchSize:  out.BatchSize,
 			timeToLive: out.Retry + 1,
+			// When the controller is shared across pipelines, split each queue
+			// read by source so each pipeline's events go to its own consumer.
+			splitByDestination: intakeQueueID != "",
 		})
 
 	controller := &otelOutputController{
@@ -135,6 +144,7 @@ func newOTelOutputController(
 		logger:        beatInfo.Logger.Named("otelOutputController"),
 		monitors:      monitors,
 		intakeQueueID: intakeQueueID,
+		queueConfig:   queueConfig,
 		queue:         queue,
 		consumer:      consumer,
 		workers:       workers,
@@ -154,16 +164,20 @@ func newOTelOutputController(
 }
 
 func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
+	// Update the shared lookup table under the lock, but release it before the
+	// blocking shutdown below so that closing one controller doesn't stall
+	// newOTelOutputController for every other pipeline.
 	allOutputControllers.Lock()
-	defer allOutputControllers.Unlock()
 	if c.intakeQueueID != "" {
 		c.pipelineCount--
 		if c.pipelineCount > 0 {
 			c.logger.Debugf("Intake queue %v: waitClose not yet supported when multiple pipelines are connected, skipping", c.intakeQueueID)
+			allOutputControllers.Unlock()
 			return nil
 		}
 		delete(allOutputControllers.lookup, c.intakeQueueID)
 	}
+	allOutputControllers.Unlock()
 
 	// First: signal the queue that we're shutting down, and allow it to drain
 	// and process ACKs until the given context terminates.
@@ -194,4 +208,34 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 
 func (c *otelOutputController) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
 	return c.queue.Producer(config)
+}
+
+// queueProducer overrides the embedded controller's method so that, when this
+// handle's controller is shared across pipelines, every event produced through
+// this handle is tagged with the handle's beat.Info. This lets the output route
+// each event back to the consumer of the pipeline that produced it. When the
+// controller isn't shared there is only one destination, so tagging is skipped.
+func (h *otelOutputControllerHandle) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
+	producer := h.otelOutputController.queueProducer(config)
+	if h.intakeQueueID == "" {
+		return producer
+	}
+	return &sourceTaggingProducer{Producer: producer, source: &h.beatInfo}
+}
+
+// sourceTaggingProducer stamps each published event with the source beat.Info
+// of the pipeline that owns it before delegating to the underlying producer.
+type sourceTaggingProducer struct {
+	queue.Producer[publisher.Event]
+	source *beat.Info
+}
+
+func (p *sourceTaggingProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
+	event.Source = p.source
+	return p.Producer.Publish(event)
+}
+
+func (p *sourceTaggingProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
+	event.Source = p.source
+	return p.Producer.TryPublish(event)
 }

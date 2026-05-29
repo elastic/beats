@@ -94,6 +94,69 @@ func TestNestedBatchSplit(t *testing.T) {
 	assert.True(t, doneWasCalled, "Original callback should be invoked when all children are")
 }
 
+func TestBatchSplitByDestination(t *testing.T) {
+	source1 := &beat.Info{Name: "s1"}
+	source2 := &beat.Info{Name: "s2"}
+
+	privateIDs := func(events []publisher.Event) []int {
+		ids := make([]int, len(events))
+		for i, e := range events {
+			ids[i] = e.Content.Private.(int)
+		}
+		return ids
+	}
+
+	t.Run("splits by source and shares completion accounting", func(t *testing.T) {
+		retryer := &mockRetryer{}
+		// events 0 and 2 belong to source1, event 1 to source2 (interleaved).
+		events := []publisher.Event{
+			{Content: beat.Event{Private: 0}, Source: source1},
+			{Content: beat.Event{Private: 1}, Source: source2},
+			{Content: beat.Event{Private: 2}, Source: source1},
+		}
+		doneWasCalled := false
+		root := &ttlBatch{
+			events:  events,
+			retryer: retryer,
+			ttl:     3,
+			done:    func() { doneWasCalled = true },
+		}
+
+		batches := root.splitByDestination()
+		require.Len(t, batches, 2, "should create one batch per distinct source")
+
+		// Groups preserve first-seen source order, with each group's events.
+		assert.Equal(t, []int{0, 2}, privateIDs(batches[0].events))
+		assert.Equal(t, []int{1}, privateIDs(batches[1].events))
+		assert.Same(t, source1, batches[0].events[0].Source)
+		assert.Same(t, source2, batches[1].events[0].Source)
+
+		// Children carry over the retryer and ttl and share split metadata.
+		assert.Equal(t, 3, batches[0].ttl)
+		assert.Equal(t, 3, batches[1].ttl)
+		assert.NotNil(t, batches[0].split)
+		assert.Same(t, batches[0].split, batches[1].split, "children must share completion accounting")
+
+		// The underlying queue read is acknowledged only after every child
+		// completes, so the queue's event cap is held until all destinations are
+		// done regardless of how many there are.
+		batches[0].done()
+		assert.False(t, doneWasCalled, "original done must wait for all children")
+		batches[1].done()
+		assert.True(t, doneWasCalled, "original done fires once all children complete")
+	})
+
+	t.Run("single source is not split", func(t *testing.T) {
+		root := &ttlBatch{events: []publisher.Event{{Source: source1}, {Source: source1}}}
+		assert.Nil(t, root.splitByDestination(), "a single-source batch should not be split")
+	})
+
+	t.Run("untagged events are a single destination", func(t *testing.T) {
+		root := &ttlBatch{events: []publisher.Event{{}, {}}}
+		assert.Nil(t, root.splitByDestination(), "an all-nil-source batch should not be split")
+	})
+}
+
 func TestBatchCallsDoneAndFreesEvents(t *testing.T) {
 	doneCalled := false
 	batch := &ttlBatch{

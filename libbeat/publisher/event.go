@@ -65,6 +65,14 @@ type Event struct {
 	// to free the unencoded data. The updated event will be provided to
 	// output workers when calling Publish.
 	EncodedEvent interface{}
+
+	// Source identifies the Beats receiver (pipeline) that produced this
+	// event. It is only set when multiple pipelines share a single output
+	// controller via a shared intake queue, so the output can route each
+	// event back to the consumer belonging to the pipeline that produced it.
+	// It is nil in the normal single-pipeline case. Because it is not
+	// serialized, shared intake queues require an in-memory queue.
+	Source *beat.Info
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.

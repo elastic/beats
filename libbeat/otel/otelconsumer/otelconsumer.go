@@ -52,6 +52,16 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
+// dataStreamAttributeKeys are the data_stream sub-fields promoted to log record
+// attributes to support dynamic indexing. They double as both the mapstr lookup
+// path and the attribute key, and are kept at package scope so they aren't
+// rebuilt for every event.
+var dataStreamAttributeKeys = [...]string{
+	"data_stream.dataset",
+	"data_stream.namespace",
+	"data_stream.type",
+}
+
 type retryConfig struct {
 	init time.Duration
 	max  time.Duration
@@ -113,6 +123,60 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	events := batch.Events()
 	st.NewBatch(len(events))
 
+	// The pipeline splits batches so that every event in a batch shares the same
+	// Source, so the first event identifies the destination for the whole batch.
+	// A nil Source is the normal, non-shared case and uses this consumer's own
+	// destination.
+	logsConsumer := out.logsConsumer
+	beatInfo := &out.beatInfo
+	if len(events) > 0 && events[0].Source != nil {
+		logsConsumer = events[0].Source.LogConsumer
+		beatInfo = events[0].Source
+	}
+
+	pLogs := out.eventsToLogs(events, beatInfo)
+
+	out.backoffInit.Do(func() {
+		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
+	})
+
+	err := logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, *beatInfo), pLogs)
+	if err != nil {
+		// Queue full errors are expected backpressure signals, not true errors.
+		// Skip logging to avoid log spam since we already track this via metrics.
+		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
+		}
+
+		// Permanent errors shouldn't be retried. This typically means
+		// the data cannot be serialized by the exporter that is attached
+		// to the pipeline or when the destination refuses the data because
+		// it cannot decode it. Retrying in this case is useless.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
+		if consumererror.IsPermanent(err) {
+			st.PermanentErrors(len(events))
+			batch.Drop()
+		} else {
+			st.RetryableErrors(len(events))
+			if !out.retryBackoff.Wait() {
+				batch.Cancelled()
+				return nil
+			}
+			batch.Retry()
+		}
+		return nil
+	}
+
+	batch.ACK()
+	st.AckedEvents(len(events))
+	out.retryBackoff.Reset()
+	return nil
+}
+
+// eventsToLogs converts a group of Beat events to a single plog.Logs, using the
+// given beat.Info for metadata.
+func (out *otelConsumer) eventsToLogs(events []publisher.Event, beatInfo *beat.Info) plog.Logs {
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
@@ -121,6 +185,9 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
 
 	logRecords := sourceLogs.LogRecords()
+	// Pre-size the record slice so it isn't repeatedly grown as we append one
+	// record per event below.
+	logRecords.EnsureCapacity(len(events))
 
 	// Convert the batch of events to Otel plog.Logs. The encoding we
 	// choose here is to set all fields in a Map in the Body of the log
@@ -164,10 +231,10 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			beatEvent = mapstr.M{}
 		}
 
-		if out.beatInfo.IncludeMetadata {
+		if beatInfo.IncludeMetadata {
 			meta := event.Content.Meta.Clone()
-			meta["beat"] = out.beatInfo.Beat
-			meta["version"] = out.beatInfo.Version
+			meta["beat"] = beatInfo.Beat
+			meta["version"] = beatInfo.Version
 			meta["type"] = "_doc"
 			beatEvent["@metadata"] = meta
 		}
@@ -193,60 +260,20 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
 		if val, _ := beatEvent.GetValue("data_stream"); val != nil {
-			// If the below sub fields do not exist, it will return empty string.
-			subFields := []string{"dataset", "namespace", "type"}
-
-			for _, subField := range subFields {
-				// value, ok := data.Map().Get(subField)
-				value, err := beatEvent.GetValue("data_stream." + subField)
+			for _, key := range dataStreamAttributeKeys {
+				value, err := beatEvent.GetValue(key)
 				if vStr, ok := value.(string); ok && err == nil {
 					// set log record attribute only if value is non empty
-					logRecord.Attributes().PutStr("data_stream."+subField, vStr)
+					logRecord.Attributes().PutStr(key, vStr)
 				}
 			}
-
 		}
 		if err := logRecord.Body().SetEmptyMap().FromRaw(map[string]any(beatEvent)); err != nil {
 			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
 		}
 	}
 
-	out.backoffInit.Do(func() {
-		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
-	})
-
-	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
-	if err != nil {
-		// Queue full errors are expected backpressure signals, not true errors.
-		// Skip logging to avoid log spam since we already track this via metrics.
-		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
-			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
-		}
-
-		// Permanent errors shouldn't be retried. This typically means
-		// the data cannot be serialized by the exporter that is attached
-		// to the pipeline or when the destination refuses the data because
-		// it cannot decode it. Retrying in this case is useless.
-		//
-		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
-		if consumererror.IsPermanent(err) {
-			st.PermanentErrors(len(events))
-			batch.Drop()
-		} else {
-			st.RetryableErrors(len(events))
-			if !out.retryBackoff.Wait() {
-				batch.Cancelled()
-				return nil
-			}
-			batch.Retry()
-		}
-		return nil
-	}
-
-	batch.ACK()
-	st.AckedEvents(len(events))
-	out.retryBackoff.Reset()
-	return nil
+	return pLogs
 }
 
 func (out *otelConsumer) String() string {
