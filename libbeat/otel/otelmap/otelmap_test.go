@@ -18,6 +18,7 @@
 package otelmap
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -163,6 +164,39 @@ func TestFromMapstrSliceDouble(t *testing.T) {
 
 	ConvertNonPrimitive(inputMap)
 	assert.Equal(t, want, inputMap)
+}
+
+// TestConvertNonPrimitiveWholeFloat verifies that whole-number floats are
+// converted to int64 so that the OTel ES exporter (ExplicitRadixPoint=true)
+// serialises them without a trailing ".0", matching Beats output.
+func TestConvertNonPrimitiveWholeFloat(t *testing.T) {
+	input := mapstr.M{
+		"zero_f64":  float64(0.0),
+		"one_f64":   float64(1.0),
+		"neg_f64":   float64(-2.0),
+		"zero_f32":  float32(0.0),
+		"two_f32":   float32(2.0),
+		"frac_f64":  float64(1.5),
+		"frac_f32":  float32(1.5),
+		"neg_frac":  float64(-1.5),
+		"f64_slice": []float64{1.5, 2.0, 0.0},
+		"f32_slice": []float32{1.5, 2.0, 0.0},
+	}
+	want := mapstr.M{
+		"zero_f64":  int64(0),
+		"one_f64":   int64(1),
+		"neg_f64":   int64(-2),
+		"zero_f32":  int64(0),
+		"two_f32":   int64(2),
+		"frac_f64":  float64(1.5),
+		"frac_f32":  float32(1.5),
+		"neg_frac":  float64(-1.5),
+		"f64_slice": []any{float64(1.5), int64(2), int64(0)},
+		"f32_slice": []any{float32(1.5), int64(2), int64(0)},
+	}
+
+	ConvertNonPrimitive(input)
+	assert.Equal(t, want, input)
 }
 
 func TestFromMapstrBool(t *testing.T) {
@@ -426,4 +460,32 @@ func TestUnknownType(t *testing.T) {
 
 	ConvertNonPrimitive(inputMap)
 	assert.Equal(t, expected, inputMap)
+}
+
+func TestIsFloatWholeNumber(t *testing.T) {
+	tests := []struct {
+		name string
+		f    float64
+		want bool
+	}{
+		{name: "zero", f: 0.0, want: true},
+		{name: "positive whole", f: 1.0, want: true},
+		{name: "negative whole", f: -2.0, want: true},
+		{name: "large whole", f: 1e15, want: true},
+		{name: "min int64", f: float64(math.MinInt64), want: true},
+		{name: "fractional", f: 1.5, want: false},
+		{name: "negative fractional", f: -1.5, want: false},
+		{name: "small nonzero", f: math.SmallestNonzeroFloat64, want: false},
+		{name: "max float64", f: math.MaxFloat64, want: false},
+		// float64(math.MaxInt64) rounds up to 2^63, which overflows int64.
+		{name: "max int64 as float64 overflows", f: float64(math.MaxInt64), want: false},
+		{name: "NaN", f: math.NaN(), want: false},
+		{name: "positive infinity", f: math.Inf(1), want: false},
+		{name: "negative infinity", f: math.Inf(-1), want: false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, isFloatWholeNumber(tc.f))
+		})
+	}
 }
