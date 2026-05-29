@@ -19,13 +19,21 @@ package otelconsumer
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"go.opentelemetry.io/collector/client"
+	"go.opentelemetry.io/collector/component/componenttest"
+	"go.opentelemetry.io/collector/exporter/exportertest"
 
+	"github.com/gofrs/uuid/v5"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
@@ -35,12 +43,16 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	mockesapi "github.com/elastic/mock-es/pkg/api"
 )
 
 func TestPublish(t *testing.T) {
@@ -561,4 +573,371 @@ func TestPublishRoutesToBatchSource(t *testing.T) {
 func checkEventsActive(reg *monitoring.Registry) int64 {
 	outputSnapshot := monitoring.CollectFlatSnapshot(reg, monitoring.Full, true)
 	return outputSnapshot.Ints["events.active"]
+}
+
+// TestElasticsearchOutputVsExporterSerialization verifies that Beat events are serialized
+// identically whether they flow through the Beats Elasticsearch output or
+// through the OTel path (otelconsumer + ES exporter using bodymap mode).
+func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	fixedTime := time.Date(2024, 6, 15, 10, 30, 0, 0, time.UTC)
+	beatEvent := beat.Event{
+		Timestamp: time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC),
+		Fields: mapstr.M{
+			// ── Primitive types: signed integers (max and zero) ───────────────────
+			"int_val":    int(42),
+			"int8_val":   int8(math.MaxInt8),
+			"int16_val":  int16(math.MaxInt16),
+			"int32_val":  int32(math.MaxInt32),
+			"int64_val":  int64(1000),
+			"int_zero":   int(0),
+			"int8_zero":  int8(0),
+			"int16_zero": int16(0),
+			"int32_zero": int32(0),
+			"int64_zero": int64(0),
+
+			// ── Primitive types: unsigned integers (max and zero) ─────────────────
+			"uint_val":    uint(42),
+			"uint8_val":   uint8(math.MaxUint8),
+			"uint16_val":  uint16(math.MaxUint16),
+			"uint32_val":  uint32(math.MaxUint32),
+			"uint64_val":  uint64(1234),
+			"uint_zero":   uint(0),
+			"uint8_zero":  uint8(0),
+			"uint16_zero": uint16(0),
+			"uint32_zero": uint32(0),
+			"uint64_zero": uint64(0),
+
+			// byte = uint8 and rune = int32 — test via their named aliases
+			"byte_val": byte('A'),
+			"rune_val": rune('€'),
+
+			// ── Primitive types: floats ───────────────────────────────────────────
+			"float_val":     float64(1.5),
+			"neg_float":     float64(-1.5),
+			"float32_val":   float32(1.5),
+			"float64_max":   math.MaxFloat64,
+			"float64_large": math.MaxFloat64 / 3,
+
+			// ── Primitive types: other scalars ────────────────────────────────────
+			"bool_val":   true,
+			"bool_false": false,
+			"str_val":    "hello world",
+			"str_empty":  "",
+			"nil_val":    nil,
+
+			// ── Collection types: signed integer slices (max, min, zero) ──────────
+			"int_slice":   []int{1, 2, 3},
+			"int8_slice":  []int8{math.MaxInt8, math.MinInt8, 0},
+			"int16_slice": []int16{math.MaxInt16, math.MinInt16, 0},
+			"int32_slice": []int32{math.MaxInt32, math.MinInt32, 0},
+			"int64_slice": []int64{math.MaxInt64, math.MinInt64, 0},
+
+			// ── Collection types: unsigned integer / bool / string slices ─────────
+			"uint_slice":   []uint{0, 1, 2},
+			"uint8_slice":  []uint8{0, 1, math.MaxUint8},
+			"uint16_slice": []uint16{0, 1, math.MaxUint16},
+			"uint32_slice": []uint32{0, 1, math.MaxUint32},
+			"uint64_slice": []uint64{100, 200},
+			"bool_slice":   []bool{true, false},
+			"str_slice":    []string{"a", "b", "c"},
+			"any_slice":    []any{1, "two", true},
+
+			// ── Collection types: float slices ────────────────────────────────────
+
+			"float64_slice": []float64{1.5, -2.5, 0.25},
+			"float32_slice": []float32{1.5, -2.5, 0.25},
+
+			// ── Time types ────────────────────────────────────────────────────────
+			"time_slice":        []time.Time{fixedTime},
+			"ts_field":          fixedTime,
+			"duration_field":    1500 * time.Millisecond,
+			"common_time_field": common.Time(fixedTime),
+			"common_time_slice": []common.Time{common.Time(fixedTime)},
+
+			// ── mapstr types ──────────────────────────────────────────────────────
+			"mapstr_nested": mapstr.M{
+				"str_field": "nested value",
+				"int_field": int(7),
+			},
+			"mapstr_slice": []mapstr.M{
+				{"id": int(1), "tag": "alpha"},
+				{"id": int(2), "tag": "beta"},
+			},
+
+			// ── map[string]any (handled same as mapstr.M in ConvertNonPrimitive) ──
+			"map_any": map[string]any{
+				"str_field": "from map_any",
+				"int_field": int(99),
+			},
+
+			// ── JSON types ────────────────────────────────────────────────────────
+			// json.RawMessage is a named []byte type. Neither path passes through
+			// the raw JSON: go-structform converts to []uint8 via liftFold and emits
+			// each byte as an integer; ConvertNonPrimitive's generic slice branch
+			// stores each byte as uint8, serialised by pcommon as an integer.
+			// Both paths produce the same integer array (not a JSON pass-through).
+			"json_raw": json.RawMessage(`{"key":"value"}`),
+
+			// ── Known divergences (commented out) ─────────────────────────────────
+
+			// TODO: NaN and Inf — go-structform's ES encoder has ignoreInvalidFloat=false
+			// (unlike the codec JSON encoder). Encountering NaN or Inf returns
+			// "unsupported float value: NaN" and aborts the Beats encoding entirely,
+			// so no document is delivered to Elasticsearch and the test times out.
+			// On the OTel side, ConvertNonPrimitive passes float64 through unchanged;
+			// pcommon stores Double(NaN)/Double(Inf) and the ES exporter behaviour is
+			// undefined (likely null or omitted field).
+			// "float_nan":     math.NaN(),
+			// "float_inf_pos": math.Inf(1),
+			// "float_inf_neg": math.Inf(-1),
+
+			// TODO: complex64 / complex128 — go-structform's getReflectFoldPrimitiveKind
+			// returns errUnsupported for reflect.Complex64 and reflect.Complex128 (they
+			// are absent from its generated kind switch), aborting the Beats encoding
+			// with the same timeout failure as NaN/Inf above. On the OTel side,
+			// ConvertNonPrimitive's default branch produces the string
+			// "unknown type: complex64" / "unknown type: complex128".
+			// "complex64_val":  complex64(1 + 2i),
+			// "complex128_val": complex128(3 + 4i),
+
+			// TODO(https://github.com/elastic/elastic-agent/issues/14610):
+			// ExplicitRadixPoint=false (Beats) vs =true (OTel ES exporter) causes:
+			//   • Decimal form: float64(2.0) → "2" (Beats) vs "2.0" (OTel).
+			//   • Scientific-notation whole-number mantissa: math.SmallestNonzeroFloat64
+			//     (5e-324) → "5e-324" (Beats) vs "5.0e-324" (OTel).
+			// Affects scalars, nested map values, and slice elements.
+			// "zero_float":   float64(0.0),
+			// "float64_int":  float64(1.0),
+			// "float32_int":  float32(2.0),
+			// "float_slice":  []float64{1.5, 2.0, 0.0},
+			// "float64_tiny": math.SmallestNonzeroFloat64,
+
+			// TODO: common.NetString — go-structform encodes the underlying []byte
+			// as a JSON integer array; the OTel path calls MarshalText() and stores
+			// the string.
+			// "net_string_field": common.NetString("hello"),
+
+			// TODO: json.Number — ConvertNonPrimitive has no case for this named
+			// string type; falls to "unknown type: json.Number". Beats go-structform
+			// folds it as its underlying string value (e.g. json.Number("42") → "42").
+			// "json_number": json.Number("42"),
+
+			// TODO: [][]byte — go-structform serialises each inner []byte as a JSON
+			// integer array; pcommon.Value.FromRaw([]byte) stores it as Bytes, which
+			// the OTel ES exporter base64-encodes.
+			// "bytes_slice": [][]byte{[]byte("hello"), []byte("world")},
+
+			// TODO: []*conf.C — complex structured type; ConvertNonPrimitive falls
+			// to the generic slice path which stores each element as interface{};
+			// pcommon cannot handle the resulting *agentconfig.C values.
+			// "conf_slice": []*agentconfig.C{agentconfig.MustNewConfigFrom(mapstr.M{"k": "v"})},
+
+			// TODO: concretely-typed maps — ConvertNonPrimitive only handles
+			// map[string]any and mapstr.M; all other map types fall to
+			// "unknown type: <T>". Beats go-structform handles each via its own fold.
+			// "map_str":    map[string]string{"key": "value"},
+			// "map_mapstr": map[string]mapstr.M{"nested": {"k": "v"}},
+			// "map_f64":    map[string]float64{"pi": 3.14},
+			// "map_bool":   map[string]bool{"flag": true},
+			// "map_u64":    map[string]uint64{"n": 1},
+			// "map_int":    map[string]int{"a": 1},
+			// "map_struct": map[string]struct{}{},
+			// "map_byte":   map[string]byte{"b": 'A'},
+
+			// TODO: pointer types — ConvertNonPrimitive has no pointer-unwrapping;
+			// *time.Time and *mapstr.M produce "unknown type: *<T>". Beats
+			// go-structform dereferences pointers and serialises normally.
+			// "time_ptr":   &fixedTime,
+			// "mapstr_ptr": &mapstr.M{"key": "val"},
+
+			// TODO: domain-specific struct-pointer slices — ConvertNonPrimitive's
+			// generic slice path stores each pointer element as interface{} in a
+			// []any; pcommon.Value.FromRaw cannot handle arbitrary struct pointers
+			// and logs "<Invalid value type *T>" for each element, storing null.
+			// Beats go-structform serialises each struct via JSON marshal/unmarshal
+			// to a full JSON object.
+			// Verified failures:
+			//   field "x509_certs"     — Beats: [{...full cert fields...}], OTel: [null]
+			//   field "beat_info_slice" — Beats: [{...full Info fields...}], OTel: [null]
+			// "x509_certs":      []*x509.Certificate{{}},
+			// "beat_info_slice": []*beat.Info{{Name: "example"}},
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+
+	// ── Beats Elasticsearch output path ──────────────────────────────────────
+	// Use outputs.Load to build the Beats ES output, which internally calls
+	// elasticsearch.NewEventEncoderFactory.  The factory is exposed via
+	// group.EncoderFactory so we can pre-encode the event exactly as the real
+	// pipeline does, then publish through the ES client to capture the raw JSON.
+	beatsDocCh := make(chan []byte, 1)
+	beatsMockES := newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		beatsDocCh <- event
+		return http.StatusOK
+	})
+	beatsSrv := httptest.NewServer(beatsMockES)
+	t.Cleanup(beatsSrv.Close)
+
+	beatsGroup, err := outputs.Load(
+		testIndexManager{},
+		beat.Info{Name: "testbeat", Version: "0.0.0", Logger: logger},
+		nil,
+		"elasticsearch",
+		agentconfig.MustNewConfigFrom(mapstr.M{"hosts": []string{beatsSrv.URL}}),
+	)
+	require.NoError(t, err)
+
+	// Pre-encode the event using the factory (identical to what the pipeline does).
+	beatsBatch := outest.NewBatch(beatEvent)
+	beatsEnc := beatsGroup.EncoderFactory()
+	require.Len(t, beatsBatch.Events(), 1)
+	beatsBatch.Events()[0], _ = beatsEnc.EncodeEntry(beatsBatch.Events()[0])
+	require.Len(t, beatsGroup.Clients, 1)
+	beatsClient, ok := beatsGroup.Clients[0].(outputs.NetworkClient)
+	require.True(t, ok, "ES output client must implement outputs.NetworkClient")
+	require.NoError(t, beatsClient.Connect(ctx))
+	require.NoError(t, beatsClient.Publish(ctx, beatsBatch))
+
+	var beatsDoc []byte
+	select {
+	case beatsDoc = <-beatsDocCh:
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for Beats ES output to deliver document to mock server")
+	}
+
+	// ── OTel path: otelconsumer → OTel ES exporter (bodymap) ─────────────────
+	otelDocCh := make(chan []byte, 1)
+	otelMockES := newMockES(t, func(_ mockesapi.Action, event []byte) int {
+		otelDocCh <- event
+		return http.StatusOK
+	})
+	otelSrv := httptest.NewServer(otelMockES)
+
+	f := elasticsearchexporter.NewFactory()
+	cfg, ok := f.CreateDefaultConfig().(*elasticsearchexporter.Config)
+	require.Truef(t, ok, "elasticsearchexporter config must be of type *elasticsearchexporter.Config")
+	cfg.Endpoints = []string{otelSrv.URL}
+	// Reduce the batch flush timeout so the test does not wait the default 10s.
+	qb := cfg.QueueBatchConfig.Get()
+	qb.NumConsumers = 1
+	qb.Batch.Get().FlushTimeout = 50 * time.Millisecond
+
+	esExp, err := f.CreateLogs(ctx, exportertest.NewNopSettings(f.Type()), cfg)
+	require.NoError(t, err)
+	require.NoError(t, esExp.Start(ctx, componenttest.NewNopHost()))
+
+	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
+		return esExp.ConsumeLogs(ctx, ld)
+	})
+	require.NoError(t, err)
+
+	oc := &otelConsumer{
+		observer:     outputs.NewNilObserver(),
+		logsConsumer: logConsumer,
+		beatInfo:     beat.Info{Name: "testbeat", Version: "0.0.0"},
+		log:          logger.Named("otelconsumer"),
+		retry:        retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond},
+	}
+
+	otelBatch := outest.NewBatch(beatEvent)
+	require.NoError(t, oc.Publish(ctx, otelBatch))
+
+	var otelDoc []byte
+	select {
+	case otelDoc = <-otelDocCh:
+	case <-ctx.Done():
+		t.Fatal("timed out waiting for OTel exporter to deliver document to mock server")
+	}
+
+	// ── Comparison ────────────────────────────────────────────────────────────
+	// assert.JSONEq normalises numbers (so "2" == "2.0"), hiding float comparison bugs.
+	// Compare raw JSON tokens directly so that integer-vs-float differences are visible.
+	beats := rawJSONFields(t, beatsDoc)
+	otel := rawJSONFields(t, otelDoc)
+	assert.Lenf(t, beats, len(otel), "top-level field count differs: beats=%d otel=%d", len(beats), len(otel))
+	for field := range otel {
+		assert.Containsf(t, beats, field, "unexpected field %q in OTel document", field)
+	}
+
+	// Fields whose values are JSON objects: Go map iteration order is non-deterministic
+	// so the two serialisers may produce different key orderings. Compare each nested
+	// field individually rather than comparing the raw token.
+	nestedObjectFields := map[string]bool{
+		"mapstr_nested": true,
+		"map_any":       true,
+	}
+
+	// Compare all scalar and slice fields as raw JSON tokens.
+	for field, beatsRaw := range beats {
+		if field == "mapstr_slice" {
+			// Elements contain only integers and strings so JSONEq does not hide
+			// any float divergence while tolerating key-ordering differences.
+			assert.JSONEqf(t, string(beats[field]), string(otel[field]), "mapstr_slice should be serialized identically")
+			continue
+		}
+
+		if nestedObjectFields[field] {
+			require.Contains(t, otel, field, "missing field %q in otel output", field)
+			beatsNested := rawJSONFields(t, beats[field])
+			otelNested := rawJSONFields(t, otel[field])
+			assert.Lenf(t, beatsNested, len(otelNested), "%s field count differs", field)
+			for nestedField, beatsNestedRaw := range beatsNested {
+				otelNestedRaw, ok := otelNested[nestedField]
+				assert.True(t, ok, "%s.%s missing from OTel document", field, nestedField)
+				assert.Equal(t, string(beatsNestedRaw), string(otelNestedRaw), "%s.%s should be serialized identically", field, nestedField)
+			}
+			continue
+		}
+
+		otelRaw, ok := otel[field]
+		if !assert.True(t, ok, "field %q missing from OTel document", field) {
+			continue
+		}
+		assert.Equal(t, string(beatsRaw), string(otelRaw), "field %q: Beats=%s OTel=%s", field, beatsRaw, otelRaw)
+	}
+}
+
+// rawJSONFields parses a JSON object and returns a map of field name to raw
+// JSON token, preserving the exact byte form of each value so that "2" and
+// "2.0" remain distinguishable (unlike a full json.Unmarshal which converts
+// both to float64(2)).
+func rawJSONFields(t *testing.T, data []byte) map[string]json.RawMessage {
+	t.Helper()
+	var m map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(data, &m), "failed to parse JSON document: %s", data)
+	return m
+}
+
+// newMockES creates a mock-es APIHandler that calls handler for each document
+// in every bulk request.  The handler receives the parsed action and the raw
+// document JSON bytes, and returns the HTTP status to report for that action.
+func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockesapi.APIHandler {
+	t.Helper()
+	return mockesapi.NewDeterministicAPIHandler(
+		uuid.Must(uuid.NewV4()),
+		"",  // clusterUUID — empty is fine for tests
+		nil, // meterProvider — nil uses the global no-op provider
+		time.Now().Add(time.Hour),
+		0,  // no artificial delay
+		10, // history cap
+		handler,
+	)
+}
+
+// testIndexManager is a minimal outputs.IndexManager that always selects a
+// fixed index name.  It is used when constructing the Beats ES output via
+// outputs.Load in tests that do not need real index management.
+type testIndexManager struct{}
+
+func (testIndexManager) BuildSelector(_ *agentconfig.C) (outputs.IndexSelector, error) {
+	return testIndexSelector{}, nil
+}
+
+type testIndexSelector struct{}
+
+func (testIndexSelector) Select(_ *beat.Event) (string, error) {
+	return "test-index", nil
 }
