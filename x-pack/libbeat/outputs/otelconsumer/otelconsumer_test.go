@@ -525,6 +525,9 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			"rune_val": rune('€'),
 
 			// ── Primitive types: floats ───────────────────────────────────────────
+			"zero_float":    float64(0.0),
+			"float64_int":   float64(1.0),
+			"float32_int":   float32(2.0),
 			"float_val":     float64(1.5),
 			"neg_float":     float64(-1.5),
 			"float32_val":   float32(1.5),
@@ -556,9 +559,8 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			"any_slice":    []any{1, "two", true},
 
 			// ── Collection types: float slices ────────────────────────────────────
-
-			"float64_slice": []float64{1.5, -2.5, 0.25},
-			"float32_slice": []float32{1.5, -2.5, 0.25},
+			"float64_slice": []float64{1.5, 2.0, 0.0, -2.5, 0.25},
+			"float32_slice": []float32{1.5, 2.0, 0.0, -2.5, 0.25},
 
 			// ── Time types ────────────────────────────────────────────────────────
 			"time_slice":        []time.Time{fixedTime},
@@ -613,16 +615,12 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			// "complex64_val":  complex64(1 + 2i),
 			// "complex128_val": complex128(3 + 4i),
 
-			// TODO(https://github.com/elastic/elastic-agent/issues/14610):
-			// ExplicitRadixPoint=false (Beats) vs =true (OTel ES exporter) causes:
-			//   • Decimal form: float64(2.0) → "2" (Beats) vs "2.0" (OTel).
-			//   • Scientific-notation whole-number mantissa: math.SmallestNonzeroFloat64
-			//     (5e-324) → "5e-324" (Beats) vs "5.0e-324" (OTel).
-			// Affects scalars, nested map values, and slice elements.
-			// "zero_float":   float64(0.0),
-			// "float64_int":  float64(1.0),
-			// "float32_int":  float32(2.0),
-			// "float_slice":  []float64{1.5, 2.0, 0.0},
+			// TODO: ExplicitRadixPoint=true in the OTel ES exporter adds a ".0" suffix to
+			// whole-number mantissas in scientific-notation form:
+			// math.SmallestNonzeroFloat64 (5e-324) → "5e-324" (Beats) vs "5.0e-324" (OTel).
+			// otelmap.ConvertNonPrimitive converts whole-number decimal floats to int64
+			// (fixing "2" vs "2.0") but cannot help here because 5e-324 is not a whole
+			// number (math.Trunc(5e-324) == 0) and must remain as float64.
 			// "float64_tiny": math.SmallestNonzeroFloat64,
 
 			// TODO: common.NetString — go-structform encodes the underlying []byte
