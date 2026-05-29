@@ -560,7 +560,8 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			"int16_slice": []int16{math.MaxInt16, math.MinInt16, 0},
 			"int32_slice": []int32{math.MaxInt32, math.MinInt32, 0},
 			"int64_slice": []int64{math.MaxInt64, math.MinInt64, 0},
-			"float_slice": []float64{1.5, 2.0, 0.0},
+			"float64_slice": []float64{1.5, 2.0, 0.0},
+			"float32_slice": []float32{1.5, 2.0, 0.0},
 
 			// ── Collection types: unsigned integer / bool / string slices ─────────
 			"uint_slice":   []uint{0, 1, 2},
