@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -508,26 +509,78 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 	beatEvent := beat.Event{
 		Timestamp: time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC),
 		Fields: mapstr.M{
-			"int_val":     int(42),
-			"int64_val":   int64(1000),
-			"uint64_val":  uint64(1234),
-			"float_val":   float64(1.5),
-			"neg_float":   float64(-1.5),
-			"float32_val": float32(1.5),
-			"bool_val":    true,
-			"str_val":     "hello world",
+			// ── Primitive types: signed integers (max and zero) ───────────────────
+			"int_val":    int(42),
+			"int8_val":   int8(math.MaxInt8),
+			"int16_val":  int16(math.MaxInt16),
+			"int32_val":  int32(math.MaxInt32),
+			"int64_val":  int64(1000),
+			"int_zero":   int(0),
+			"int8_zero":  int8(0),
+			"int16_zero": int16(0),
+			"int32_zero": int32(0),
+			"int64_zero": int64(0),
 
-			"int_slice":    []int{1, 2, 3},
-			"str_slice":    []string{"a", "b", "c"},
-			"bool_slice":   []bool{true, false},
+			// ── Primitive types: unsigned integers (max and zero) ─────────────────
+			"uint_val":    uint(42),
+			"uint8_val":   uint8(math.MaxUint8),
+			"uint16_val":  uint16(math.MaxUint16),
+			"uint32_val":  uint32(math.MaxUint32),
+			"uint64_val":  uint64(1234),
+			"uint_zero":   uint(0),
+			"uint8_zero":  uint8(0),
+			"uint16_zero": uint16(0),
+			"uint32_zero": uint32(0),
+			"uint64_zero": uint64(0),
+
+			// byte = uint8 and rune = int32 — test via their named aliases
+			"byte_val": byte('A'),
+			"rune_val": rune('€'),
+
+			// ── Primitive types: floats ───────────────────────────────────────────
+			"float_val":     float64(1.5),
+			"neg_float":     float64(-1.5),
+			"float32_val":   float32(1.5),
+			"float64_max":   math.MaxFloat64,
+			"float64_large": math.MaxFloat64 / 3,
+
+			// ── Primitive types: other scalars ────────────────────────────────────
+			"bool_val":   true,
+			"bool_false": false,
+			"str_val":    "hello world",
+			"str_empty":  "",
+			"nil_val":    nil,
+
+			// ── Collection types: signed integer slices (max, min, zero) ──────────
+			"int_slice":   []int{1, 2, 3},
+			"int8_slice":  []int8{math.MaxInt8, math.MinInt8, 0},
+			"int16_slice": []int16{math.MaxInt16, math.MinInt16, 0},
+			"int32_slice": []int32{math.MaxInt32, math.MinInt32, 0},
+			"int64_slice": []int64{math.MaxInt64, math.MinInt64, 0},
+
+			// ── Collection types: unsigned integer / bool / string slices ─────────
+			"uint_slice":   []uint{0, 1, 2},
+			"uint8_slice":  []uint8{0, 1, math.MaxUint8},
+			"uint16_slice": []uint16{0, 1, math.MaxUint16},
+			"uint32_slice": []uint32{0, 1, math.MaxUint32},
 			"uint64_slice": []uint64{100, 200},
-			"time_slice":   []time.Time{fixedTime},
+			"bool_slice":   []bool{true, false},
+			"str_slice":    []string{"a", "b", "c"},
 			"any_slice":    []any{1, "two", true},
 
+			// ── Collection types: float slices ────────────────────────────────────
+
+			"float64_slice": []float64{1.5, -2.5, 0.25},
+			"float32_slice": []float32{1.5, -2.5, 0.25},
+
+			// ── Time types ────────────────────────────────────────────────────────
+			"time_slice":        []time.Time{fixedTime},
 			"ts_field":          fixedTime,
 			"duration_field":    1500 * time.Millisecond,
 			"common_time_field": common.Time(fixedTime),
+			"common_time_slice": []common.Time{common.Time(fixedTime)},
 
+			// ── mapstr types ──────────────────────────────────────────────────────
 			"mapstr_nested": mapstr.M{
 				"str_field": "nested value",
 				"int_field": int(7),
@@ -537,19 +590,83 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 				{"id": int(2), "tag": "beta"},
 			},
 
-			// TODO(https://github.com/elastic/elastic-agent/issues/14610):
-			// The Beats encoder (go-structform, ExplicitRadixPoint=false) emits "2",
-			// while the OTel ES exporter (ExplicitRadixPoint=true) emits "2.0".
-			// This affects top-level scalars, nested map fields, and slice elements.
-			// "zero_float":  float64(0.0),
-			// "float64_int": float64(1.0),
-			// "float32_int": float32(2.0),
-			// "float_slice": []float64{1.5, 2.0, 0.0},
+			// ── map[string]any (handled same as mapstr.M in ConvertNonPrimitive) ──
+			"map_any": map[string]any{
+				"str_field": "from map_any",
+				"int_field": int(99),
+			},
 
-			// TODO: common.NetString diverges because go-structform encodes the
-			// underlying []byte as a JSON number array ([104,101,108,108,111])
-			// while the OTel path calls MarshalText() and stores the string "hello".
+			// ── JSON types ────────────────────────────────────────────────────────
+			// json.RawMessage is a named []byte type. Neither path passes through
+			// the raw JSON: go-structform converts to []uint8 via liftFold and emits
+			// each byte as an integer; ConvertNonPrimitive's generic slice branch
+			// stores each byte as uint8, serialised by pcommon as an integer.
+			// Both paths produce the same integer array (not a JSON pass-through).
+			"json_raw": json.RawMessage(`{"key":"value"}`),
+
+			// ── Known divergences (commented out) ─────────────────────────────────
+
+			// TODO(https://github.com/elastic/elastic-agent/issues/14610):
+			// ExplicitRadixPoint=false (Beats) vs =true (OTel ES exporter) causes:
+			//   • Decimal form: float64(2.0) → "2" (Beats) vs "2.0" (OTel).
+			//   • Scientific-notation whole-number mantissa: math.SmallestNonzeroFloat64
+			//     (5e-324) → "5e-324" (Beats) vs "5.0e-324" (OTel).
+			// Affects scalars, nested map values, and slice elements.
+			// "zero_float":   float64(0.0),
+			// "float64_int":  float64(1.0),
+			// "float32_int":  float32(2.0),
+			// "float_slice":  []float64{1.5, 2.0, 0.0},
+			// "float64_tiny": math.SmallestNonzeroFloat64,
+
+			// TODO: common.NetString — go-structform encodes the underlying []byte
+			// as a JSON integer array; the OTel path calls MarshalText() and stores
+			// the string.
 			// "net_string_field": common.NetString("hello"),
+
+			// TODO: json.Number — ConvertNonPrimitive has no case for this named
+			// string type; falls to "unknown type: json.Number". Beats go-structform
+			// folds it as its underlying string value (e.g. json.Number("42") → "42").
+			// "json_number": json.Number("42"),
+
+			// TODO: [][]byte — go-structform serialises each inner []byte as a JSON
+			// integer array; pcommon.Value.FromRaw([]byte) stores it as Bytes, which
+			// the OTel ES exporter base64-encodes.
+			// "bytes_slice": [][]byte{[]byte("hello"), []byte("world")},
+
+			// TODO: []*conf.C — complex structured type; ConvertNonPrimitive falls
+			// to the generic slice path which stores each element as interface{};
+			// pcommon cannot handle the resulting *agentconfig.C values.
+			// "conf_slice": []*agentconfig.C{agentconfig.MustNewConfigFrom(mapstr.M{"k": "v"})},
+
+			// TODO: concretely-typed maps — ConvertNonPrimitive only handles
+			// map[string]any and mapstr.M; all other map types fall to
+			// "unknown type: <T>". Beats go-structform handles each via its own fold.
+			// "map_str":    map[string]string{"key": "value"},
+			// "map_mapstr": map[string]mapstr.M{"nested": {"k": "v"}},
+			// "map_f64":    map[string]float64{"pi": 3.14},
+			// "map_bool":   map[string]bool{"flag": true},
+			// "map_u64":    map[string]uint64{"n": 1},
+			// "map_int":    map[string]int{"a": 1},
+			// "map_struct": map[string]struct{}{},
+			// "map_byte":   map[string]byte{"b": 'A'},
+
+			// TODO: pointer types — ConvertNonPrimitive has no pointer-unwrapping;
+			// *time.Time and *mapstr.M produce "unknown type: *<T>". Beats
+			// go-structform dereferences pointers and serialises normally.
+			// "time_ptr":   &fixedTime,
+			// "mapstr_ptr": &mapstr.M{"key": "val"},
+
+			// TODO: domain-specific struct-pointer slices — ConvertNonPrimitive's
+			// generic slice path stores each pointer element as interface{} in a
+			// []any; pcommon.Value.FromRaw cannot handle arbitrary struct pointers
+			// and logs "<Invalid value type *T>" for each element, storing null.
+			// Beats go-structform serialises each struct via JSON marshal/unmarshal
+			// to a full JSON object.
+			// Verified failures:
+			//   field "x509_certs"     — Beats: [{...full cert fields...}], OTel: [null]
+			//   field "beat_info_slice" — Beats: [{...full Info fields...}], OTel: [null]
+			// "x509_certs":      []*x509.Certificate{{}},
+			// "beat_info_slice": []*beat.Info{{Name: "example"}},
 		},
 	}
 
@@ -650,27 +767,32 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 		assert.Containsf(t, beats, field, "unexpected field %q in OTel document", field)
 	}
 
+	// Fields whose values are JSON objects: Go map iteration order is non-deterministic
+	// so the two serialisers may produce different key orderings. Compare each nested
+	// field individually rather than comparing the raw token.
+	nestedObjectFields := map[string]bool{
+		"mapstr_nested": true,
+		"map_any":       true,
+	}
+
 	// Compare all scalar and slice fields as raw JSON tokens.
 	for field, beatsRaw := range beats {
 		if field == "mapstr_slice" {
-			// mapstr_slice — same key-ordering concern but elements contain only integers and strings
-			// so number normalisation in JSONEq does not hide any float divergence.
+			// Elements contain only integers and strings so JSONEq does not hide
+			// any float divergence while tolerating key-ordering differences.
 			assert.JSONEqf(t, string(beats[field]), string(otel[field]), "mapstr_slice should be serialized identically")
 			continue
 		}
 
-		if field == "mapstr_nested" {
-			// mapstr_nested — Go map iteration order is non-deterministic so the two
-			// serialisers may produce different key orderings in the JSON object.
-			// Compare each nested field individually rather than comparing the raw token.
-			require.Contains(t, otel, field, "missing field in otel output")
+		if nestedObjectFields[field] {
+			require.Contains(t, otel, field, "missing field %q in otel output", field)
 			beatsNested := rawJSONFields(t, beats[field])
 			otelNested := rawJSONFields(t, otel[field])
+			assert.Lenf(t, beatsNested, len(otelNested), "%s field count differs", field)
 			for nestedField, beatsNestedRaw := range beatsNested {
 				otelNestedRaw, ok := otelNested[nestedField]
-				assert.Lenf(t, beatsNested, len(otelNested), "mapstr_nested field count differs")
-				assert.True(t, ok, "mapstr_nested.%s missing from OTel document", nestedField)
-				assert.Equal(t, string(beatsNestedRaw), string(otelNestedRaw), "mapstr_nested.%s should be serialized identically", nestedField)
+				assert.True(t, ok, "%s.%s missing from OTel document", field, nestedField)
+				assert.Equal(t, string(beatsNestedRaw), string(otelNestedRaw), "%s.%s should be serialized identically", field, nestedField)
 			}
 			continue
 		}
