@@ -431,3 +431,28 @@ func TestFromMapstrComplex(t *testing.T) {
 		"c128": "(1.5+2.5i)",
 	}, dst.AsRaw())
 }
+
+func TestFormatTimestamp(t *testing.T) {
+	tests := []struct {
+		name string
+		in   time.Time
+		out  string
+	}{
+		{
+			name: "utc",
+			in:   time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+			out:  "1970-01-01T00:00:00.000Z",
+		},
+		{
+			name: "non-utc converted to utc",
+			in:   time.Date(2006, 1, 2, 15, 4, 5, 0, time.FixedZone("UTC+7", 7*60*60)),
+			out:  "2006-01-02T08:04:05.000Z",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.out, FormatTimestamp(tc.in))
+		})
+	}
+}
