@@ -442,19 +442,19 @@ func (n hexInt64) String() string {
 
 // bitPatternUint32 returns the unsigned two's-complement bit pattern of v.
 // The conversion is intentional: we want the raw bit representation for display.
-func bitPatternUint32(v int32) uint32 { return uint32(v) } //nolint:gosec
+func bitPatternUint32(v int32) uint32 { return uint32(v) } //nolint:gosec // preserve signed bit pattern
 
 // bitPatternUint64 returns the unsigned two's-complement bit pattern of v.
-func bitPatternUint64(v int64) uint64 { return uint64(v) } //nolint:gosec
+func bitPatternUint64(v int64) uint64 { return uint64(v) } //nolint:gosec // preserve signed bit pattern
 
 // evtVariantInt8/16/32/64 convert Windows EVT_VARIANT unsigned storage to the
 // equivalent signed Go type.  The Windows API stores all integer variants as
 // unsigned; reinterpreting the bit pattern as signed is intentional and correct
 // by definition of the Windows type system.
-func evtVariantInt8(v uint8) int8   { return int8(v) }   //nolint:gosec
-func evtVariantInt16(v uint16) int16 { return int16(v) } //nolint:gosec
-func evtVariantInt32(v uint32) int32 { return int32(v) } //nolint:gosec
-func evtVariantInt64(v uint64) int64 { return int64(v) } //nolint:gosec
+func evtVariantInt8(v uint8) int8    { return int8(v) }  //nolint:gosec // preserve Windows EVT_VARIANT bit pattern
+func evtVariantInt16(v uint16) int16 { return int16(v) } //nolint:gosec // preserve Windows EVT_VARIANT bit pattern
+func evtVariantInt32(v uint32) int32 { return int32(v) } //nolint:gosec // preserve Windows EVT_VARIANT bit pattern
+func evtVariantInt64(v uint64) int64 { return int64(v) } //nolint:gosec // preserve Windows EVT_VARIANT bit pattern
 
 func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	typ := v.Type.Mask()
@@ -606,7 +606,7 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 		if t > math.MaxUint32 {
 			return nil, fmt.Errorf("EvtObjectArrayPropertyHandle value %d overflows uint32", t)
 		}
-		return EvtObjectArrayPropertyHandle(t), nil //nolint:gosec // bounds-checked above
+		return EvtObjectArrayPropertyHandle(t), nil
 	default:
 		return v, nil
 	}
