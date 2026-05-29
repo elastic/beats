@@ -16,11 +16,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v3"
 
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-=======
-	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
->>>>>>> ec6e82f86 (x-pack/filebeat/input/{cel,httpjson,http_endpoint,entityanalytics},internal/httplog: fix request tracer path validation under OTel receiver runtime (#50581))
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/mito/lib"

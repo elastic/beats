@@ -6,18 +6,11 @@ package okta
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/paths"
-=======
-	"github.com/elastic/beats/v7/libbeat/common"
->>>>>>> ec6e82f86 (x-pack/filebeat/input/{cel,httpjson,http_endpoint,entityanalytics},internal/httplog: fix request tracer path validation under OTel receiver runtime (#50581))
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
