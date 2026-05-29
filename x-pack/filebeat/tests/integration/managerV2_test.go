@@ -1354,12 +1354,16 @@ func TestPipelineConnectionErrorFailsInput(t *testing.T) {
 	}{
 		// Custom manager
 		"aws-cloudwatch": {expectedState: proto.State_FAILED, expectedUnit: awscloudwatchInput},
-		"aws-s3":         {expectedState: proto.State_FAILED, expectedUnit: awsS3Input},
-		"cel":            {expectedState: proto.State_FAILED, expectedUnit: celInput},
-		"filestream":     {expectedState: proto.State_FAILED, expectedUnit: filestreamInput},
-		"net inputs":     {expectedState: proto.State_FAILED, expectedUnit: tcpinput},
-		"netflow":        {expectedState: proto.State_FAILED, expectedUnit: netflowinput},
-		"streaming":      {expectedState: proto.State_FAILED, expectedUnit: streaminginput},
+		// filestream and aws-s3 now build their input-level processors
+		// eagerly at input creation (shared once per input, see #50376), so a
+		// broken processor config fails the input instead of degrading it
+		// after it starts — matching every other input type.
+		"aws-s3":     {expectedState: proto.State_FAILED, expectedUnit: awsS3Input},
+		"cel":        {expectedState: proto.State_FAILED, expectedUnit: celInput},
+		"filestream": {expectedState: proto.State_FAILED, expectedUnit: filestreamInput},
+		"net inputs": {expectedState: proto.State_FAILED, expectedUnit: tcpinput},
+		"netflow":    {expectedState: proto.State_FAILED, expectedUnit: netflowinput},
+		"streaming":  {expectedState: proto.State_FAILED, expectedUnit: streaminginput},
 
 		// input-statless.InputManager
 		"httpjson": {expectedState: proto.State_FAILED, expectedUnit: httpjsonInput},

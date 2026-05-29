@@ -31,7 +31,6 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // commonInputConfig defines common input settings
@@ -77,7 +76,7 @@ type commonInputConfig struct {
 //
 // The user-configured `processors:` list and the index processor are
 // instantiated once per input and shared across all pipeline clients (each
-// filestream harvester opens its own client).
+// filestream harvester opens its own client). See elastic/beats#50376.
 func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return &commonSettingsFactory{info: info, inner: f}
 }
@@ -103,6 +102,8 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 		return nil, err
 	}
 
+	// Without shared processors there is nothing extra to release on Stop,
+	// so avoid the wrapper entirely.
 	if len(sharedProcs.List) == 0 {
 		return r, nil
 	}
@@ -114,8 +115,8 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 //
 // Embedding the cfgfile.Runner interface only promotes Start/Stop/String;
 // optional methods on the inner concrete type (SetStatusReporter, SetOnce)
-// must be forwarded explicitly so runtime type-assertion callers keep
-// seeing them through the wrapper. Stop is idempotent because
+// must be forwarded explicitly so runtime type-assertion callers keep seeing
+// them through the wrapper. Stop is made idempotent with sync.Once because
 // *input.Runner.Stop is not.
 type runnerWithSharedProcessors struct {
 	cfgfile.Runner
@@ -123,16 +124,18 @@ type runnerWithSharedProcessors struct {
 	stopOnce sync.Once
 }
 
-// OnceSetter is implemented by runners that support `filebeat --once`
-// (single scan then exit). Declared in this package so both
-// crawler.startInput and runnerWithSharedProcessors share one contract
-// without filebeat/beater importing filebeat/input for a type assert.
+// OnceSetter is implemented by runners that support `filebeat --once` (single
+// scan then exit). Declared in this package so both crawler.startInput and
+// runnerWithSharedProcessors share one contract without filebeat/beater
+// importing filebeat/input just for a type assertion.
 type OnceSetter interface {
 	SetOnce(once bool)
 }
 
 func (r *runnerWithSharedProcessors) Stop() {
 	r.stopOnce.Do(func() {
+		// Stop the input first so all of its pipeline clients drain before
+		// the shared processors they reference are released.
 		r.Runner.Stop()
 		_ = r.procs.Close()
 	})
@@ -156,37 +159,24 @@ var (
 	_ OnceSetter                = (*runnerWithSharedProcessors)(nil)
 )
 
-// noCloseProcessor wraps a beat.Processor whose lifecycle is owned by the
-// input (not by an individual pipeline client). It deliberately does not
-// implement processors.Closer, so closing a per-client processor list (e.g.
-// when a filestream harvester stops) leaves the shared inner alive for
-// sibling harvesters. SetPaths is forwarded so path-aware processors
-// (cache, script, conditionals with path-aware children) still see the
-// publisher pipeline's group.SetPaths call; SafeProcessor (applied at
-// registration via SafeWrap) makes repeated calls idempotent.
-type noCloseProcessor struct {
-	inner beat.Processor
+// sharedProcessor is a run-only view of an input-owned processor. The
+// per-input processors are built once and shared across every pipeline client
+// the input opens (one per filestream harvester). Embedding the beat.Processor
+// interface promotes only Run/String, hiding Closer and PathSetter, so a
+// pipeline client closing its own processor list (when a harvester stops)
+// cannot tear down — or re-initialise — state still used by sibling
+// harvesters. The shared instances are path-initialised and closed exactly
+// once by the owning input (see newCommonConfigEditor and
+// runnerWithSharedProcessors.Stop).
+//
+// This mirrors how pipeline-global processors are wrapped as a function
+// processor in libbeat/publisher/processing/default.go so that clients cannot
+// close them.
+type sharedProcessor struct {
+	beat.Processor
 }
 
-func (n *noCloseProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	return n.inner.Run(event)
-}
-
-func (n *noCloseProcessor) String() string {
-	return n.inner.String()
-}
-
-func (n *noCloseProcessor) SetPaths(p *paths.Path) error {
-	if ps, ok := n.inner.(processors.PathSetter); ok {
-		return ps.SetPaths(p)
-	}
-	return nil
-}
-
-var (
-	_ beat.Processor        = (*noCloseProcessor)(nil)
-	_ processors.PathSetter = (*noCloseProcessor)(nil)
-)
+var _ beat.Processor = sharedProcessor{}
 
 // newCommonConfigEditor builds the per-client editor closure plus the shared
 // per-input processors that the editor's clients reference. The shared
@@ -201,17 +191,31 @@ func newCommonConfigEditor(
 		return nil, nil, err
 	}
 
-	serviceType := config.ServiceType
-	if serviceType == "" {
-		serviceType = config.Module
-	}
-
-	// Build user-configured processors once per input — some (e.g.
-	// add_kubernetes_metadata) spin up watchers/caches on construction.
-	// See elastic/beats#50376.
+	// Build the user-configured processors once per input — some (e.g.
+	// add_kubernetes_metadata) start watchers/caches/goroutines on
+	// construction, so building them per harvester blows up memory and
+	// goroutine usage. See elastic/beats#50376.
 	userProcs, err := processors.New(config.Processors, beatInfo.Logger)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	return newConfigEditor(beatInfo, config, userProcs)
+}
+
+// newConfigEditor wires the resolved input config and the input-owned user
+// processors into the per-client editor closure and the shared per-input
+// processor list. It is split out from newCommonConfigEditor so the
+// registry-driven processors.New build stays separate from the wiring, which
+// lets tests inject processors directly instead of registering a global plugin.
+func newConfigEditor(
+	beatInfo beat.Info,
+	config commonInputConfig,
+	userProcs *processors.Processors,
+) (pipetool.ConfigEditor, *processors.Processors, error) {
+	serviceType := config.ServiceType
+	if serviceType == "" {
+		serviceType = config.Module
 	}
 
 	var indexProc beat.Processor
@@ -220,17 +224,28 @@ func newCommonConfigEditor(
 		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
 			_ = userProcs.Close()
-			return nil, nil, fmt.Errorf("failed to build index processor: %w", err)
+			return nil, nil, fmt.Errorf("failed to build the index processor: %w", err)
 		}
 		indexProc = add_formatted_index.New(timestampFormat)
 	}
 
-	// shared bundles the input-owned processors so runner.Stop can release them.
 	shared := processors.NewList(beatInfo.Logger)
 	if indexProc != nil {
 		shared.AddProcessor(indexProc)
 	}
 	shared.AddProcessors(*userProcs)
+
+	// Path-aware processors (cache, script, conditionals with path-aware
+	// children, ...) must have their paths set before Run, otherwise
+	// SafeProcessor.Run returns ErrPathsNotSet and drops every event. The
+	// per-client publisher group can no longer do this for us because the
+	// sharedProcessor wrapper hides PathSetter, so we initialise the shared
+	// instances once here. The beat paths are already configured at startup,
+	// before any input is created.
+	if err := shared.SetPaths(beatInfo.Paths); err != nil {
+		_ = shared.Close()
+		return nil, nil, fmt.Errorf("failed to set paths for input processors: %w", err)
+	}
 
 	editor := func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
 		meta := clientCfg.Processing.Meta.Clone()
@@ -254,15 +269,19 @@ func newCommonConfigEditor(
 		// 1. add support for index configuration via processor
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
+		//
+		// Shared processors are wrapped per client (sharedProcessor) and kept
+		// as flat siblings to preserve the client group's continue-on-error
+		// semantics — see TestProcessorsForConfigIsFlat.
 		procs := processors.NewList(beatInfo.Logger)
 		if indexProc != nil {
-			procs.AddProcessor(&noCloseProcessor{inner: indexProc})
+			procs.AddProcessor(sharedProcessor{indexProc})
 		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
 		}
 		for _, p := range userProcs.List {
-			procs.AddProcessor(&noCloseProcessor{inner: p})
+			procs.AddProcessor(sharedProcessor{p})
 		}
 
 		clientCfg.Processing.EventMetadata = config.EventMetadata

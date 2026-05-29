@@ -22,12 +22,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+
+	"github.com/stretchr/testify/require"
 )
 
 type runnerFactoryMock struct {
@@ -48,7 +48,7 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 
 		// storing the config that the client was created with
 		// it's needed for the `Assert` later
-		r.cfgs = append(r.cfgs, client.(*clientMock).cfg) //nolint:errcheck //Safe to ignore in tests
+		r.cfgs = append(r.cfgs, client.(*clientMock).cfg) //nolint:errcheck // Safe to ignore in tests
 	}
 	return &noopRunner{}, nil
 }
@@ -63,11 +63,12 @@ func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 	return nil
 }
 
-// Assert runs various checks for the clients created by the wrapped
-// pipeline connector. Processing.Meta and Processing.Fields must still be
-// a per-client copy (they are mutated downstream); user-configured and
-// index processors are shared across clients via noCloseProcessor wrappers
-// (#50376) — see assertNoCloseProcessorsShared.
+// Assert runs various checks for the clients created by the wrapped pipeline
+// connector. Processing.Meta and Processing.Fields must still be a per-client
+// copy (they are mutated downstream); the user-configured and index processors
+// are now shared across clients via sharedProcessor wrappers (#50376) — each
+// client gets a distinct wrapper, but the wrapped instance is the same — see
+// assertSharedProcessors.
 func (r runnerFactoryMock) Assert(t *testing.T) {
 	t.Helper()
 
@@ -91,13 +92,13 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		}
 	})
 
-	t.Run("processor wrappers are per-client, but inner instances are shared", func(t *testing.T) {
+	t.Run("processor wrappers are per-client, inner instances are shared", func(t *testing.T) {
 		perClient := make([][]beat.Processor, 0, len(r.cfgs))
 		for _, c := range r.cfgs {
 			perClient = append(perClient, c.Processing.Processor.All())
 			defer c.Processing.Processor.Close()
 		}
-		assertNoCloseProcessorsShared(t, perClient)
+		assertSharedProcessors(t, perClient)
 	})
 }
 

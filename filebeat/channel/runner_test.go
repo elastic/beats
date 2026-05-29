@@ -267,11 +267,11 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 	rf.Assert(t)
 }
 
-// TestSharedProcessorsAcrossClients verifies that, after the hoisting fix,
-// the user-configured processors and the index processor are constructed
-// once per input and shared across all clients connected to the wrapped
-// pipeline — instead of being instantiated per client/harvester (the
-// blow-up reported in elastic/beats#50376).
+// TestSharedProcessorsAcrossClients verifies that the user-configured
+// processors and the index processor are constructed once per input and shared
+// across all clients connected to the wrapped pipeline — instead of being
+// instantiated per client/harvester (the blow-up reported in
+// elastic/beats#50376).
 func TestSharedProcessorsAcrossClients(t *testing.T) {
 	configYAML := `
 processors:
@@ -300,54 +300,98 @@ index: "static-index"
 		collected = append(collected, clientCfg.Processing.Processor.All())
 	}
 
-	assertNoCloseProcessorsShared(t, collected)
+	assertSharedProcessors(t, collected)
 }
 
-// assertNoCloseProcessorsShared verifies that for every pair of per-client
-// processor lists, each entry is a *noCloseProcessor whose wrapper is
-// distinct per client (so per-client Close is isolated) but whose inner
-// instance is identical (the shared per-input processor — #50376).
-func assertNoCloseProcessorsShared(t *testing.T, perClient [][]beat.Processor) {
+// assertSharedProcessors verifies that, across all per-client processor lists,
+// each entry is a sharedProcessor whose embedded processor is the same shared
+// per-input instance (#50376). Per-client Close isolation comes from
+// sharedProcessor hiding Closer (see TestSharedProcessorHidesLifecycleMethods),
+// not from how the wrapper itself is allocated.
+func assertSharedProcessors(t *testing.T, perClient [][]beat.Processor) {
 	t.Helper()
 	require.NotEmpty(t, perClient, "need at least one client list")
 	require.NotEmpty(t, perClient[0], "client 0 list cannot be empty")
 	for i := 1; i < len(perClient); i++ {
 		require.Lenf(t, perClient[i], len(perClient[0]), "client %d list length differs from client 0", i)
 		for j := range perClient[i] {
-			w0, ok := perClient[0][j].(*noCloseProcessor)
-			require.Truef(t, ok, "client 0 processor[%d] expected *noCloseProcessor, got %T", j, perClient[0][j])
-			wi, ok := perClient[i][j].(*noCloseProcessor)
-			require.Truef(t, ok, "client %d processor[%d] expected *noCloseProcessor, got %T", i, j, perClient[i][j])
-			require.NotSamef(t, w0, wi, "client %d processor[%d]: wrappers must be distinct allocations", i, j)
-			require.Samef(t, w0.inner, wi.inner, "client %d processor[%d]: inner shared instance must be identical to client 0's (#50376)", i, j)
+			w0, ok := perClient[0][j].(sharedProcessor)
+			require.Truef(t, ok, "client 0 processor[%d] expected sharedProcessor, got %T", j, perClient[0][j])
+			wi, ok := perClient[i][j].(sharedProcessor)
+			require.Truef(t, ok, "client %d processor[%d] expected sharedProcessor, got %T", i, j, perClient[i][j])
+			require.Samef(t, w0.Processor, wi.Processor, "client %d processor[%d]: embedded instance must be the shared one (#50376)", i, j)
 		}
 	}
 }
 
-// TestNoCloseProcessor verifies that the per-client wrapper:
-//   - does NOT propagate Close to the shared inner processor
-//   - DOES forward SetPaths so lazy-init processors (cache, script,
-//     conditional processors with path-aware children) work correctly.
-func TestNoCloseProcessor(t *testing.T) {
+// TestSharedProcessorHidesLifecycleMethods verifies that the per-client wrapper
+// exposes only Run/String: it must NOT implement processors.Closer (so a
+// harvester's client closing its list cannot close the shared inner) nor
+// processors.PathSetter (paths are set once on the shared list, not per client).
+func TestSharedProcessorHidesLifecycleMethods(t *testing.T) {
 	inner := &recordingProcessor{}
-	w := &noCloseProcessor{inner: inner}
+	w := sharedProcessor{inner}
 
-	// Close path: a per-client list closing the wrapper must not close inner.
+	_, isCloser := any(w).(processors.Closer)
+	require.Falsef(t, isCloser, "sharedProcessor must not implement Closer, otherwise per-client Close would tear down the shared instance")
+	_, isPathSetter := any(w).(processors.PathSetter)
+	require.Falsef(t, isPathSetter, "sharedProcessor must not implement PathSetter; paths are initialised once on the shared list")
+
+	// processors.Close is therefore a no-op on the wrapper.
 	require.NoError(t, processors.Close(w))
 	require.Falsef(t, inner.closed, "inner processor must not be closed via the wrapper")
 
-	// SetPaths forwarding: the wrapper must implement PathSetter and delegate.
-	ps, ok := any(w).(processors.PathSetter)
-	require.Truef(t, ok, "noCloseProcessor must implement PathSetter so the publisher pipeline's group.SetPaths reaches the inner processor")
-	require.NoError(t, ps.SetPaths(nil))
-	require.Equal(t, 1, inner.setPathsCalls)
-
-	// Run forwarding: events flow through to inner.
+	// Run/String forward to the inner processor.
 	ev := &beat.Event{Fields: mapstr.M{}}
 	out, err := w.Run(ev)
 	require.NoError(t, err)
 	require.Same(t, ev, out)
 	require.Equal(t, 1, inner.runCalls)
+	require.Equal(t, inner.String(), w.String())
+}
+
+// TestInputProcessorPathsSetOnce verifies that newConfigEditor calls SetPaths
+// exactly once, at build time (before any client connects), on the shared
+// path-aware processors; that a per-client Close does not reach them; and that
+// they are closed once at input shutdown via shared.Close().
+func TestInputProcessorPathsSetOnce(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	rec := &recordingProcessor{}
+
+	// processors.New wraps every constructed processor with SafeWrap (the same
+	// wrapper RegisterPlugin applies). Mirror that here so the shared list has
+	// the production SetPaths-once / Close-once semantics, without registering a
+	// global test plugin.
+	ctor := processors.SafeWrap(func(*conf.C, *logp.Logger) (beat.Processor, error) {
+		return rec, nil
+	})
+	wrapped, err := ctor(nil, logger)
+	require.NoError(t, err)
+
+	userProcs := processors.NewList(logger)
+	userProcs.AddProcessor(wrapped)
+
+	b := beat.Info{Logger: logger, Paths: paths.New()}
+
+	editor, sharedProcs, err := newConfigEditor(b, commonInputConfig{}, userProcs)
+	require.NoError(t, err)
+	// This test drives shutdown explicitly below to assert close-once; no
+	// t.Cleanup close here on purpose.
+
+	// SetPaths was applied once at build time, before any client connected.
+	require.Equalf(t, 1, rec.setPathsCalls, "SetPaths must be applied once when the shared list is built")
+
+	// A per-client list closing must not close the shared instance, nor set
+	// paths again.
+	clientCfg, err := editor(beat.ClientConfig{})
+	require.NoError(t, err)
+	require.NoError(t, clientCfg.Processing.Processor.Close())
+	require.Falsef(t, rec.closed, "per-client Close must not close the shared processor")
+	require.Equalf(t, 1, rec.setPathsCalls, "SetPaths must not be called again per client")
+
+	// Closing the shared list (input shutdown) closes it exactly once.
+	require.NoError(t, sharedProcs.Close())
+	require.Truef(t, rec.closed, "shared processor must be closed at input shutdown")
 }
 
 // recordingProcessor implements beat.Processor, processors.Closer, and
@@ -370,16 +414,15 @@ func (r *recordingProcessor) Close() error {
 	return nil
 }
 
-// SetPaths is intentionally permissive (any *paths.Path, including nil).
+// SetPaths is intentionally permissive (accepts any *paths.Path, including nil).
 func (r *recordingProcessor) SetPaths(_ *paths.Path) error {
 	r.setPathsCalls++
 	return nil
 }
 
-// TestRunnerWithSharedProcessorsClosesProcessorsAtStop verifies the new
-// runner.Stop() ordering: the wrapped Runner stops first (draining all
-// pipeline clients), THEN the shared processors are closed. Stop is also
-// safe to call more than once.
+// TestRunnerWithSharedProcessorsClosesProcessorsAtStop verifies runner.Stop()
+// ordering: the wrapped Runner stops first (draining its pipeline clients),
+// THEN the shared processors are closed. Stop is idempotent.
 func TestRunnerWithSharedProcessorsClosesProcessorsAtStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	inner1 := &recordingProcessor{}
@@ -393,8 +436,8 @@ func TestRunnerWithSharedProcessorsClosesProcessorsAtStop(t *testing.T) {
 	r := &runnerWithSharedProcessors{
 		Runner: &stopOrderRunner{onStop: func() {
 			stopped++
-			// Inner must still be live when the underlying Runner is
-			// stopping — clients may still be flushing on Stop().
+			// Inner must still be live while the underlying Runner stops;
+			// clients may still be flushing on Stop().
 			require.Falsef(t, inner1.closed, "shared processor closed before Runner.Stop returned")
 			require.Falsef(t, inner2.closed, "shared processor closed before Runner.Stop returned")
 		}},
@@ -406,8 +449,7 @@ func TestRunnerWithSharedProcessorsClosesProcessorsAtStop(t *testing.T) {
 	require.True(t, inner1.closed, "shared processor must be closed after Runner.Stop returns")
 	require.True(t, inner2.closed, "shared processor must be closed after Runner.Stop returns")
 
-	// Idempotent: a second Stop must not call the underlying Stop again
-	// and must not error.
+	// Idempotent: a second Stop must not call the underlying Stop again.
 	r.Stop()
 	require.Equal(t, 1, stopped, "Stop must be idempotent")
 }
@@ -422,8 +464,8 @@ func (s *stopOrderRunner) String() string { return "stopOrderRunner" }
 
 // TestRunnerWithSharedProcessorsForwardsStatusReporter verifies the wrapper
 // exposes SetStatusReporter to runtime type-assertion callers (used by
-// libbeat/cfgfile/list.go to wire elastic-agent-client status reporting)
-// and is a no-op when the inner runner does not implement it.
+// libbeat/cfgfile/list.go to wire elastic-agent-client status reporting) and is
+// a no-op when the inner runner does not implement it.
 func TestRunnerWithSharedProcessorsForwardsStatusReporter(t *testing.T) {
 	inner := &statusReporterRunner{}
 	r := &runnerWithSharedProcessors{
@@ -461,8 +503,8 @@ type recordingStatusReporter struct{}
 
 func (*recordingStatusReporter) UpdateStatus(status.Status, string) {}
 
-// TestRunnerWithSharedProcessorsForwardsSetOnce verifies the wrapper
-// forwards SetOnce to an inner runner that implements OnceSetter (used by
+// TestRunnerWithSharedProcessorsForwardsSetOnce verifies the wrapper forwards
+// SetOnce to an inner runner that implements OnceSetter (used by
 // crawler.startInput for `filebeat --once`) and is a no-op otherwise.
 func TestRunnerWithSharedProcessorsForwardsSetOnce(t *testing.T) {
 	inner := &onceSetterRunner{}

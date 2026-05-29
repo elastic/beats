@@ -187,9 +187,9 @@ func (p *Runner) GetStatusReporter() status.StatusReporter {
 	return p.statusReporter
 }
 
-// SetOnce enables `filebeat --once` mode (single scan then exit). Exposed
-// as a setter so callers can opt in via channel.OnceSetter without
-// depending on the concrete *Runner type.
+// SetOnce enables `filebeat --once` mode (single scan then exit). Exposed as a
+// setter so callers can opt in via the channel.OnceSetter contract without
+// depending on the concrete *Runner type (the runner may be wrapped).
 func (p *Runner) SetOnce(once bool) {
 	p.Once = once
 }
