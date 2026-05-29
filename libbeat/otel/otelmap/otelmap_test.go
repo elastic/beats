@@ -482,6 +482,8 @@ func TestIsFloatWholeNumber(t *testing.T) {
 		{name: "NaN", f: math.NaN(), want: false},
 		{name: "positive infinity", f: math.Inf(1), want: false},
 		{name: "negative infinity", f: math.Inf(-1), want: false},
+		{name: "negative fraction no rounding", f: -0.99999999999999994, want: false},
+		{name: "negative fraction that causes rounding", f: -0.99999999999999995, want: true}, // should round to -1
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
