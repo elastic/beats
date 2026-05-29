@@ -139,8 +139,6 @@ func (c *crawler) startInput(
 	if err != nil {
 		return fmt.Errorf("error while initializing input: %w", err)
 	}
-	// The runner may be wrapped (e.g. by channel.RunnerFactoryWithCommonInputSettings),
-	// so assert the OnceSetter contract instead of the concrete *input.Runner.
 	if o, ok := runner.(channel.OnceSetter); ok {
 		o.SetOnce(c.once)
 	}

@@ -61,7 +61,6 @@ type commonInputConfig struct {
 // RunnerFactoryWithCommonInputSettings wraps a runner factory so all runners
 // it creates share the same processing capabilities and configuration-file
 // settings:
-//
 //   - *fields*: common fields to be added to the pipeline
 //   - *fields_under_root*: select at which level to store the fields
 //   - *tags*: add additional tags to the events
@@ -75,8 +74,7 @@ type commonInputConfig struct {
 //   - *service.type*: implicit event type
 //
 // The user-configured `processors:` list and the index processor are
-// instantiated once per input and shared across all pipeline clients (each
-// filestream harvester opens its own client). See elastic/beats#50376.
+// instantiated once per input and shared across all pipeline clients.
 func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
 	return &commonSettingsFactory{info: info, inner: f}
 }
@@ -102,11 +100,6 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 		return nil, err
 	}
 
-	// Without shared processors there is nothing extra to release on Stop,
-	// so avoid the wrapper entirely.
-	if len(sharedProcs.List) == 0 {
-		return r, nil
-	}
 	return &runnerWithSharedProcessors{Runner: r, procs: sharedProcs}, nil
 }
 
@@ -124,10 +117,7 @@ type runnerWithSharedProcessors struct {
 	stopOnce sync.Once
 }
 
-// OnceSetter is implemented by runners that support `filebeat --once` (single
-// scan then exit). Declared in this package so both crawler.startInput and
-// runnerWithSharedProcessors share one contract without filebeat/beater
-// importing filebeat/input just for a type assertion.
+// OnceSetter is implemented by runners that support `filebeat --once` (single scan then exit).
 type OnceSetter interface {
 	SetOnce(once bool)
 }
@@ -176,8 +166,6 @@ type sharedProcessor struct {
 	beat.Processor
 }
 
-var _ beat.Processor = sharedProcessor{}
-
 // newCommonConfigEditor builds the per-client editor closure plus the shared
 // per-input processors that the editor's clients reference. The shared
 // processors are returned separately so the caller closes them at input
@@ -191,16 +179,13 @@ func newCommonConfigEditor(
 		return nil, nil, err
 	}
 
-	// Build the user-configured processors once per input — some (e.g.
-	// add_kubernetes_metadata) start watchers/caches/goroutines on
-	// construction, so building them per harvester blows up memory and
-	// goroutine usage. See elastic/beats#50376.
-	userProcs, err := processors.New(config.Processors, beatInfo.Logger)
+	// Build the user-configured processors once per input
+	userProcessors, err := processors.New(config.Processors, beatInfo.Logger)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return newConfigEditor(beatInfo, config, userProcs)
+	return newConfigEditor(beatInfo, config, userProcessors)
 }
 
 // newConfigEditor wires the resolved input config and the input-owned user
