@@ -67,7 +67,6 @@ func ReadHostList(cfg *config.C) ([]string, error) {
 	if len(lst) == 0 || config.NumWorkers() <= 1 {
 		return lst, nil
 	}
-
 	// duplicate entries config.NumWorkers() times
 	hosts := make([]string, 0, len(lst)*config.NumWorkers())
 	for _, entry := range lst {
@@ -77,4 +76,20 @@ func ReadHostList(cfg *config.C) ([]string, error) {
 	}
 
 	return hosts, nil
+}
+
+func NumofWorker(cfg *config.C) int {
+	var config HostWorkerCfg
+	err := cfg.Unpack(&config)
+	// If there was error unpacking, just return 1 worker as fallback
+	if err != nil {
+		return 1
+	}
+
+	// Default to one worker
+	if config.NumWorkers() < 1 {
+		config.Worker = 1
+	}
+
+	return config.NumWorkers()
 }
