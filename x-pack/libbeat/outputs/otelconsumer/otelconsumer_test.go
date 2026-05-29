@@ -30,19 +30,12 @@ import (
 	"go.opentelemetry.io/collector/receiver/receivertest"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer_test.go
-=======
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
->>>>>>> d5d715c9b (Add test comparing JSON serialized events from ES output to those from the ES exporter. (#50993)):libbeat/otel/otelconsumer/otelconsumer_test.go
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch" // register "elasticsearch" output type
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-<<<<<<< HEAD:x-pack/libbeat/outputs/otelconsumer/otelconsumer_test.go
 	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
-=======
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
->>>>>>> d5d715c9b (Add test comparing JSON serialized events from ES output to those from the ES exporter. (#50993)):libbeat/otel/otelconsumer/otelconsumer_test.go
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
