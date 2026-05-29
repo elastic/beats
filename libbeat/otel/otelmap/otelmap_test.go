@@ -456,3 +456,60 @@ func TestFormatTimestamp(t *testing.T) {
 		})
 	}
 }
+
+func TestIsFloatWholeNumber(t *testing.T) {
+	tests := []struct {
+		name string
+		f    float64
+		want bool
+	}{
+		{name: "zero", f: 0.0, want: true},
+		{name: "positive whole", f: 1.0, want: true},
+		{name: "negative whole", f: -2.0, want: true},
+		{name: "large whole", f: 1e15, want: true},
+		{name: "min int64", f: float64(math.MinInt64), want: true},
+		{name: "fractional", f: 1.5, want: false},
+		{name: "negative fractional", f: -1.5, want: false},
+		{name: "small nonzero", f: math.SmallestNonzeroFloat64, want: false},
+		{name: "max float64", f: math.MaxFloat64, want: false},
+		// float64(math.MaxInt64) rounds up to 2^63, which overflows int64.
+		{name: "max int64 as float64 overflows", f: float64(math.MaxInt64), want: false},
+		{name: "NaN", f: math.NaN(), want: false},
+		{name: "positive infinity", f: math.Inf(1), want: false},
+		{name: "negative infinity", f: math.Inf(-1), want: false},
+		{name: "negative fraction no rounding", f: -0.99999999999999994, want: false},
+		{name: "negative fraction that causes rounding", f: -0.99999999999999995, want: true}, // rounds to -1
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, isFloatWholeNumber(tc.f))
+		})
+	}
+}
+
+func TestFromMapstrWholeFloat(t *testing.T) {
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, mapstr.M{
+		"zero_f64":  float64(0.0),
+		"one_f64":   float64(1.0),
+		"neg_f64":   float64(-2.0),
+		"zero_f32":  float32(0.0),
+		"two_f32":   float32(2.0),
+		"frac_f64":  float64(1.5),
+		"frac_f32":  float32(1.5),
+		"neg_frac":  float64(-1.5),
+		"f64_slice": []float64{1.5, 2.0, 0.0},
+		"f32_slice": []float32{1.5, 2.0, 0.0},
+	}))
+	raw := dst.AsRaw()
+	assert.Equal(t, int64(0), raw["zero_f64"])
+	assert.Equal(t, int64(1), raw["one_f64"])
+	assert.Equal(t, int64(-2), raw["neg_f64"])
+	assert.Equal(t, int64(0), raw["zero_f32"])
+	assert.Equal(t, int64(2), raw["two_f32"])
+	assert.Equal(t, float64(1.5), raw["frac_f64"])
+	assert.Equal(t, float64(1.5), raw["frac_f32"]) // float32 promoted to float64 precision
+	assert.Equal(t, float64(-1.5), raw["neg_frac"])
+	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f64_slice"])
+	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f32_slice"])
+}

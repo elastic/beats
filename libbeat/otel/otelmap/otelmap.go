@@ -323,24 +323,22 @@ func float32ToFloat64(v float32) float64 {
 	return f64
 }
 
-// floatToAny converts v to int64 when it has no fractional part, matching the
-// Beats go-structform encoder (ExplicitRadixPoint=false) which emits "2"
-// rather than "2.0" for integer-valued floats. Used by both [setFloatValue]
-// and [legacyConvertNonPrimitive].
-func floatToAny(v float64) any {
-	if i := int64(v); float64(i) == v {
-		return i
-	}
-	return v
+// isFloatWholeNumber reports whether f is a finite, whole number that fits in
+// int64. Used to convert whole-number floats to int64 so the OTel ES exporter
+// (ExplicitRadixPoint=true) serialises them without a trailing ".0", matching
+// the Beats Elasticsearch output behaviour.
+func isFloatWholeNumber(f float64) bool {
+	return !math.IsNaN(f) && !math.IsInf(f, 0) &&
+		f == math.Trunc(f) &&
+		f >= float64(math.MinInt64) && f < float64(math.MaxInt64)
 }
 
 func setFloatValue(dst pcommon.Value, v float64) {
-	switch val := floatToAny(v).(type) {
-	case int64:
-		dst.SetInt(val)
-	case float64:
-		dst.SetDouble(val)
+	if isFloatWholeNumber(v) {
+		dst.SetInt(int64(v))
+		return
 	}
+	dst.SetDouble(v)
 }
 
 func fromSignedSlice[T signed](dst pcommon.Slice, src []T) error {
