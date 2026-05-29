@@ -1,0 +1,253 @@
+version: 9.4.2
+entries:
+    - kind: feature
+      summary: Add failure_store metric to the stats metricset in the beat module.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49452
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773425590
+      file:
+        name: 1773425590-add-failure_store-metric-to-beats-stats-metricset.yaml
+        checksum: 214235699e533960ebac07bbbc062d950a3f3a14
+    - kind: enhancement
+      summary: Migrate azure/app_insights metricset off the deprecated track-1 Azure SDK and go-autorest, using azcore directly.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50392
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777275227
+      file:
+        name: 1777275227-azure-app-insights-drop-deprecated-sdk.yaml
+        checksum: 7808b52b2b30e779ed56c76a2b6a901591b567fa
+    - kind: feature
+      summary: Add `elasticsearch/security_stats` metricset for the Elasticsearch module
+      description: |
+        Adds a new `security_stats` metricset to the Elasticsearch module that
+        scrapes the per-node `GET /_security/stats` endpoint (available since
+        Elasticsearch 9.2). The first metric exposed is the Document Level Security
+        cache (entries, memory, hits, misses, evictions, hit/miss latency), enabling
+        fleet-wide observability of DLS cache health from Stack Monitoring. Each
+        event is enriched with node name, roles, and version via a single
+        filter-path-scoped /_nodes call per scrape so consumers can slice by node,
+        role, or stack version without joining across data streams.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50674
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777351182
+      file:
+        name: 1777351182-add-elasticsearch-security-stats-metricset.yaml
+        checksum: 4e231d0e9d67537442171cbec9109ea7778b438b
+    - kind: bug-fix
+      summary: Release the bolt file lock when the last datastore bucket is closed.
+      description: ""
+      component: auditbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50386
+      issue:
+        - https://github.com/elastic/beats/issues/50381
+      impact: ""
+      action: ""
+      timestamp: 1777458291
+      file:
+        name: 1777458291-auditbeat-datastore-per-path.yaml
+        checksum: a22829419a7f6fbdc65d43d17ff21bf44c5d05fa
+    - kind: bug-fix
+      summary: Fix token refresh for jwk_pem/jwk_file in cel, httpjson, okta inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50433
+      issue:
+        - https://github.com/elastic/beats/issues/50426
+      impact: ""
+      action: ""
+      timestamp: 1777549938
+      file:
+        name: 1777549938-fix-okta-oauth2-pem-file-auth-token-refresh.yaml
+        checksum: d5321ff6edce965120b517aad585667c84c44a45
+    - kind: bug-fix
+      summary: Fix panic in azure module when all configured resources match no Azure resources
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50498
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777989631
+      file:
+        name: 1777989631-fix-azure-batch-client-panic-on-empty-resources.yaml
+        checksum: 3422d836d5dd2f3cabdbcc9d012a7a5e3af70222
+    - kind: bug-fix
+      summary: Accept string values for secret_state to support Fleet secret resolution.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50508
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778038687
+      file:
+        name: 1778038687-cel-secret-state-unpack.yaml
+        checksum: 27d24d2dda4d24ca098fca6a83b3ee0eacff46af
+    - kind: bug-fix
+      summary: Initialize disk queue frame IDs from persisted state
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50534
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778107949
+      file:
+        name: 1778107949-fix-disk-queue-initialisation.yaml
+        checksum: 121598d28e18623f7d964d7a4bc3851a787fe892
+    - kind: bug-fix
+      summary: Respect max_bytes/message_max_bytes when reading the first chunk of CRI partial lines
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50552
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778172750
+      file:
+        name: 1778172750-fix-cri-max-bytes-first-chunk.yaml
+        checksum: e92b3915f385dc62592a814d6995c86feb74320b
+    - kind: bug-fix
+      summary: |
+        When Filestream is migrating the registry key from inputs that did
+        not have an ID, match files by path and file identity instead of
+        only path. Matching only by path could lead to rotated/moved files
+        having the wrong offset.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50599
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778513575
+      file:
+        name: 1778513575-prevent-stale-filestream-global-registry-state-migration.yaml
+        checksum: 75c2c3e4d8943ecb850f5c9f49774c665e7b6913
+    - kind: security
+      summary: Upgrade npm to v11 in non-wolfi heartbeat Docker images
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50598
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778525715
+      file:
+        name: 1778525715-upgrade-npm-heartbeat-docker.yaml
+        checksum: 6959a3fcf5e454261dcdb7f6ab813ee646d8500a
+    - kind: enhancement
+      summary: Update ebpfevents to 0.9.0
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50609
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778571333
+      file:
+        name: 1778571333-update-ebpfevents-090.yaml
+        checksum: b6758d123c541770d866588f1dfbbaf7576e0442
+    - kind: bug-fix
+      summary: Fix race in pipeline client between Publish and Close that could skip waiting for event acks
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50625
+      issue:
+        - https://github.com/elastic/beats/issues/49390
+      impact: ""
+      action: ""
+      timestamp: 1778595030
+      file:
+        name: 1778595030-fix-pipeline-client-close-race.yaml
+        checksum: 2fb2cdbd67b7082cfdfec0832fe866104b8aad24
+    - kind: upgrade
+      summary: upgrade osquery version to 5.23.0
+      description: osquery 5.23.0 adds new tables and includes dependency/security fixes, including an expat update for CVE-2026-25210.
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/50629
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778601544
+      file:
+        name: 1778601544-upgrade-osquery-5.23.0.yaml
+        checksum: e8e98acb4c4cae1b54cb384308bd316a80a6cd75
+    - kind: enhancement
+      summary: Match http.ServeMux redirect status code for path cleaning in http_endpoint mux.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50686
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778709908
+      file:
+        name: 1778709908-match-servemux-redirect-status.yaml
+        checksum: ea86ae35c0182c55bce294e0e8fef204dbfc90ef
+    - kind: bug-fix
+      summary: Elasticsearch module cluster state requests no longer append local=true.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/50723
+      issue:
+        - https://github.com/elastic/beats/issues/50722
+      impact: ""
+      action: ""
+      timestamp: 1778848622
+      file:
+        name: 1778848622-metricbeat-elasticsearch-cluster-state-no-local.yaml
+        checksum: c8ef56d25c7069857ab6d0b15e4710d3d96fd6df
+    - kind: bug-fix
+      summary: Fixes UDP input crashes on Windows when oversized datagrams are received.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50770
+      issue:
+        - https://github.com/elastic/beats/issues/50718
+      impact: ""
+      action: ""
+      timestamp: 1779131096
+      file:
+        name: 1779131096-fix-udp-input-nil-remote-addr-panic.yaml
+        checksum: f22f6be948526c5e37565d2e6809844263c77bfe
+    - kind: bug-fix
+      summary: Make CrowdStrike streaming input cancel refresh goroutines on session reconnect.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50803
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779249109
+      file:
+        name: 1779249109-fix-crowdstrike-refresh-goroutine-leak.yaml
+        checksum: 5f2e5ed8be0cff3b3a103e3b1823d0b6929a355d
