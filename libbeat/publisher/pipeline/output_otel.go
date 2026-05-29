@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -82,6 +83,13 @@ func newOTelOutputController(
 	defer allOutputControllers.Unlock()
 
 	if intakeQueueID != "" {
+		// Shared intake queues route per-pipeline events via publisher.Event.Source,
+		// which lives only in memory; the disk queue's serializer drops it,
+		// silently misattributing events between pipelines. Reject anything but
+		// an in-memory queue here so the misconfiguration surfaces at startup.
+		if _, ok := queueConfig.(memqueue.Settings); !ok {
+			return nil, fmt.Errorf("shared intake queue %q requires an in-memory queue, got %T", intakeQueueID, queueConfig)
+		}
 		controller, ok := allOutputControllers.lookup[intakeQueueID]
 		if ok {
 			if !reflect.DeepEqual(controller.queueConfig, queueConfig) {

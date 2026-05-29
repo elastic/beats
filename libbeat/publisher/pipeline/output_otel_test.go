@@ -218,6 +218,39 @@ func TestSharedQueueConfigMismatch(t *testing.T) {
 	require.Error(t, err, "connecting to a shared intake queue with a different queue config should fail")
 }
 
+func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
+	// publisher.Event.Source is not serialized by the disk queue, so a shared
+	// intake queue backed by anything but the memory queue would silently
+	// misroute events between pipelines. The controller must reject such a
+	// misconfiguration at startup.
+	logger := logptest.NewTestingLogger(t, "")
+	queueFactory := func(
+		logger *logp.Logger,
+		observer queue.Observer,
+		inputQueueSize int,
+		encoderFactory queue.EncoderFactory[publisher.Event],
+	) (queue.Queue[publisher.Event], error) {
+		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
+	}
+	monitors := Monitors{Logger: logger, Metrics: monitoring.NewRegistry()}
+
+	// queueConfig is anything other than memqueue.Settings; the parsed
+	// diskqueue settings are the realistic case, modeled here as a struct
+	// literal so the test doesn't take a new package dependency.
+	type fakeNonMemqueueSettings struct{ Path string }
+
+	_, err := newOTelOutputController(
+		beat.Info{Logger: logger},
+		monitors,
+		nilObserver,
+		queueFactory,
+		"non-mem-id",
+		fakeNonMemqueueSettings{},
+	)
+	require.Error(t, err, "shared intake queue must reject non-memory queue configs")
+	assert.Contains(t, err.Error(), "in-memory queue", "error should explain the requirement")
+}
+
 func testEvent(i int) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{Private: i},
