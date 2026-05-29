@@ -606,6 +606,26 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 
 			// ── Known divergences (commented out) ─────────────────────────────────
 
+			// TODO: NaN and Inf — go-structform's ES encoder has ignoreInvalidFloat=false
+			// (unlike the codec JSON encoder). Encountering NaN or Inf returns
+			// "unsupported float value: NaN" and aborts the Beats encoding entirely,
+			// so no document is delivered to Elasticsearch and the test times out.
+			// On the OTel side, ConvertNonPrimitive passes float64 through unchanged;
+			// pcommon stores Double(NaN)/Double(Inf) and the ES exporter behaviour is
+			// undefined (likely null or omitted field).
+			// "float_nan":     math.NaN(),
+			// "float_inf_pos": math.Inf(1),
+			// "float_inf_neg": math.Inf(-1),
+
+			// TODO: complex64 / complex128 — go-structform's getReflectFoldPrimitiveKind
+			// returns errUnsupported for reflect.Complex64 and reflect.Complex128 (they
+			// are absent from its generated kind switch), aborting the Beats encoding
+			// with the same timeout failure as NaN/Inf above. On the OTel side,
+			// ConvertNonPrimitive's default branch produces the string
+			// "unknown type: complex64" / "unknown type: complex128".
+			// "complex64_val":  complex64(1 + 2i),
+			// "complex128_val": complex128(3 + 4i),
+
 			// TODO(https://github.com/elastic/elastic-agent/issues/14610):
 			// ExplicitRadixPoint=false (Beats) vs =true (OTel ES exporter) causes:
 			//   • Decimal form: float64(2.0) → "2" (Beats) vs "2.0" (OTel).
