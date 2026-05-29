@@ -177,6 +177,8 @@ You can configure the `shutdown_timeout` option to specify the maximum amount of
 
 There is no recommended setting for this option because determining the correct value for `shutdown_timeout` depends heavily on the environment in which Filebeat is running and the current state of the output.
 
+For `--once` mode, Filebeat will wait for all events to be acknowledged before shutting down unless `shutdown_timeout` is greater than the default value. 
+
 Example configuration:
 
 ```yaml
