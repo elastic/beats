@@ -86,7 +86,6 @@ type EventCache struct {
 
 // Put lets outputs put key-value pairs into the event cache
 func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
-	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
 		ec.m = mapstr.M{}
@@ -97,7 +96,6 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 
 // GetValue lets outputs retrieve values from the event cache by key
 func (ec *EventCache) GetValue(key string) (interface{}, error) {
-	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
 		return nil, mapstr.ErrKeyNotFound

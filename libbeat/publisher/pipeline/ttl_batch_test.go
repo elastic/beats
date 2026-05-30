@@ -101,7 +101,9 @@ func TestBatchSplitByDestination(t *testing.T) {
 	privateIDs := func(events []publisher.Event) []int {
 		ids := make([]int, len(events))
 		for i, e := range events {
-			ids[i] = e.Content.Private.(int)
+			id, ok := e.Content.Private.(int)
+			require.True(t, ok, "test event Private should be an int")
+			ids[i] = id
 		}
 		return ids
 	}
