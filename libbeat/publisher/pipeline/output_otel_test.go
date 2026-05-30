@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -39,11 +38,10 @@ func TestOTelQueueMetrics(t *testing.T) {
 	// here we just want to make sure that they appear under the right
 	// monitoring namespace.
 	reg := monitoring.NewRegistry()
-	logger := logptest.NewTestingLogger(t, "")
 	controller, err := newOTelOutputController(
-		beat.Info{Logger: logger},
+		beat.Info{Logger: logp.NewNopLogger()},
 		Monitors{
-			Logger:  logger,
+			Logger:  logp.NewNopLogger(),
 			Metrics: reg,
 		},
 		nilObserver,
@@ -60,7 +58,6 @@ func TestOTelQueueMetrics(t *testing.T) {
 }
 
 func TestSharedQueue(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
 
 	// The shared queue holds at most 5 events, and when read will wait up to
 	// 1sec to return a "full" batch with 2 events.
@@ -80,9 +77,9 @@ func TestSharedQueue(t *testing.T) {
 	}
 
 	c1, err := newOTelOutputController(
-		beat.Info{Logger: logger},
+		beat.Info{Logger: logp.NewNopLogger()},
 		Monitors{
-			Logger:  logger,
+			Logger:  logp.NewNopLogger(),
 			Metrics: monitoring.NewRegistry(),
 		},
 		nilObserver,
@@ -94,9 +91,9 @@ func TestSharedQueue(t *testing.T) {
 	defer c1.waitClose(cancelledContext(), false)
 
 	c2, err := newOTelOutputController(
-		beat.Info{Logger: logger},
+		beat.Info{Logger: logp.NewNopLogger()},
 		Monitors{
-			Logger:  logger,
+			Logger:  logp.NewNopLogger(),
 			Metrics: monitoring.NewRegistry(),
 		},
 		nilObserver,
@@ -185,7 +182,6 @@ func TestSharedQueue(t *testing.T) {
 }
 
 func TestSharedQueueConfigMismatch(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
 	queueFactory := func(
 		logger *logp.Logger,
 		observer queue.Observer,
@@ -194,10 +190,10 @@ func TestSharedQueueConfigMismatch(t *testing.T) {
 	) (queue.Queue[publisher.Event], error) {
 		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
 	}
-	monitors := Monitors{Logger: logger, Metrics: monitoring.NewRegistry()}
+	monitors := Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
 
 	c1, err := newOTelOutputController(
-		beat.Info{Logger: logger},
+		beat.Info{Logger: logp.NewNopLogger()},
 		monitors,
 		nilObserver,
 		queueFactory,
@@ -208,7 +204,7 @@ func TestSharedQueueConfigMismatch(t *testing.T) {
 	defer c1.waitClose(cancelledContext(), false)
 
 	_, err = newOTelOutputController(
-		beat.Info{Logger: logger},
+		beat.Info{Logger: logp.NewNopLogger()},
 		monitors,
 		nilObserver,
 		queueFactory,
@@ -223,7 +219,6 @@ func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
 	// intake queue backed by anything but the memory queue would silently
 	// misroute events between pipelines. The controller must reject such a
 	// misconfiguration at startup.
-	logger := logptest.NewTestingLogger(t, "")
 	queueFactory := func(
 		logger *logp.Logger,
 		observer queue.Observer,
@@ -232,7 +227,7 @@ func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
 	) (queue.Queue[publisher.Event], error) {
 		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
 	}
-	monitors := Monitors{Logger: logger, Metrics: monitoring.NewRegistry()}
+	monitors := Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
 
 	// queueConfig is anything other than memqueue.Settings; the parsed
 	// diskqueue settings are the realistic case, modeled here as a struct
@@ -240,7 +235,7 @@ func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
 	type fakeNonMemqueueSettings struct{ Path string }
 
 	_, err := newOTelOutputController(
-		beat.Info{Logger: logger},
+		beat.Info{Logger: logp.NewNopLogger()},
 		monitors,
 		nilObserver,
 		queueFactory,
@@ -294,7 +289,6 @@ func TestSourceTaggingProducer(t *testing.T) {
 }
 
 func TestHandleQueueProducerTagging(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
 	queueFactory := func(
 		logger *logp.Logger,
 		observer queue.Observer,
@@ -303,11 +297,11 @@ func TestHandleQueueProducerTagging(t *testing.T) {
 	) (queue.Queue[publisher.Event], error) {
 		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
 	}
-	monitors := Monitors{Logger: logger, Metrics: monitoring.NewRegistry()}
+	monitors := Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
 
 	// A non-shared controller has a single destination, so it must not wrap the
 	// producer with source tagging.
-	plain, err := newOTelOutputController(beat.Info{Logger: logger}, monitors, nilObserver, queueFactory, "", nil)
+	plain, err := newOTelOutputController(beat.Info{Logger: logp.NewNopLogger()}, monitors, nilObserver, queueFactory, "", nil)
 	require.NoError(t, err)
 	defer plain.waitClose(cancelledContext(), false)
 	_, tagging := plain.queueProducer(queue.ProducerConfig{}).(*sourceTaggingProducer)
@@ -315,7 +309,7 @@ func TestHandleQueueProducerTagging(t *testing.T) {
 
 	// A shared controller must wrap the producer so events can be routed back
 	// to the pipeline that produced them.
-	shared, err := newOTelOutputController(beat.Info{Logger: logger}, monitors, nilObserver, queueFactory, "tagging-id", memqueue.Settings{Events: 5})
+	shared, err := newOTelOutputController(beat.Info{Logger: logp.NewNopLogger()}, monitors, nilObserver, queueFactory, "tagging-id", memqueue.Settings{Events: 5})
 	require.NoError(t, err)
 	defer shared.waitClose(cancelledContext(), false)
 	_, tagging = shared.queueProducer(queue.ProducerConfig{}).(*sourceTaggingProducer)

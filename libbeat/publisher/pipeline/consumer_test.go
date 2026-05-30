@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -73,9 +74,8 @@ func receiveBatch(t *testing.T, ch <-chan publisher.Batch) publisher.Batch {
 // read is delivered as one single-source batch per destination, and the
 // underlying queue read is acknowledged only after every split batch completes.
 func TestEventConsumerSplitsByDestination(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](
-		logger, queue.NewQueueObserver(nil),
+		logp.NewNopLogger(), queue.NewQueueObserver(nil),
 		memqueue.Settings{Events: 10, MaxGetRequest: 4, FlushTimeout: 10 * time.Millisecond},
 		0, nil)
 
@@ -93,7 +93,7 @@ func TestEventConsumerSplitsByDestination(t *testing.T) {
 	publish(1, source2)
 	publish(2, source1)
 
-	c := newEventConsumer(logger, nilObserver)
+	c := newEventConsumer(logp.NewNopLogger(), nilObserver)
 	ch := make(chan publisher.Batch)
 	defer func() {
 		// Close the queue first so the queue reader unblocks, then the consumer
@@ -111,7 +111,9 @@ func TestEventConsumerSplitsByDestination(t *testing.T) {
 		src := b.Events()[0].Source
 		for _, e := range b.Events() {
 			require.Same(t, src, e.Source, "a split batch must contain a single source")
-			idsForSource[src] = append(idsForSource[src], e.Content.Private.(int))
+			id, ok := e.Content.Private.(int)
+			require.True(t, ok, "test event Private should be an int")
+			idsForSource[src] = append(idsForSource[src], id)
 		}
 		batchForSource[src] = b
 	}
@@ -141,9 +143,8 @@ func TestEventConsumerSplitsByDestination(t *testing.T) {
 // a retried batch is re-delivered until its TTL is exhausted, then dropped (and
 // the underlying events acknowledged to the queue so it can make progress).
 func TestEventConsumerRetriesUntilTTLExhausted(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](
-		logger, queue.NewQueueObserver(nil),
+		logp.NewNopLogger(), queue.NewQueueObserver(nil),
 		memqueue.Settings{Events: 10, MaxGetRequest: 1, FlushTimeout: 10 * time.Millisecond},
 		0, nil)
 
@@ -152,7 +153,7 @@ func TestEventConsumerRetriesUntilTTLExhausted(t *testing.T) {
 	_, ok := producer.Publish(publisher.Event{Content: beat.Event{Private: 0}})
 	require.True(t, ok, "publish should succeed")
 
-	c := newEventConsumer(logger, nilObserver)
+	c := newEventConsumer(logp.NewNopLogger(), nilObserver)
 	ch := make(chan publisher.Batch)
 	defer func() {
 		q.Close(false)
@@ -191,8 +192,7 @@ func TestEventConsumerRetriesUntilTTLExhausted(t *testing.T) {
 // setTarget() return cleanly once the consumer is shut down, dropping any batch
 // handed to retry rather than blocking.
 func TestEventConsumerRetryAfterCloseDropsBatch(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
-	c := newEventConsumer(logger, nilObserver)
+	c := newEventConsumer(logp.NewNopLogger(), nilObserver)
 	c.close()
 
 	dropped := false
