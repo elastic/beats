@@ -577,49 +577,33 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 		}
 		defer f.Close()
 
-<<<<<<< HEAD
-		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-=======
 		dockerClient, err := client.New(client.FromEnv)
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
 		if err != nil {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
+		loadResp, err := dockerClient.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
 		if err != nil {
 			t.Fatalf("error loading docker image: %s", err)
 		}
 
-		loadRespBody, err := io.ReadAll(loadResp.Body)
+		loadRespBody, err := io.ReadAll(loadResp)
 		if err != nil {
 			t.Fatalf("failed to read image load response: %s", err)
 		}
-		loadResp.Body.Close()
+		loadResp.Close()
 
 		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
 		if !found {
 			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
 		}
-		imageId := strings.TrimRight(after, "\\n\"}\r\n")
+		imageID := strings.TrimRight(after, "\\n\"}\r\n")
 
 		var caps strslice.StrSlice
-		if strings.Contains(imageId, "packetbeat") {
+		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
 
-<<<<<<< HEAD
-		createResp, err := c.ContainerCreate(ctx,
-			&container.Config{
-				Image: imageId,
-			},
-			&container.HostConfig{
-				CapAdd: caps,
-			},
-			nil,
-			nil,
-			"")
-=======
 		createResp, err := dockerClient.ContainerCreate(ctx,
 			client.ContainerCreateOptions{
 				Config: &container.Config{
@@ -628,37 +612,20 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				HostConfig: &container.HostConfig{
 					CapAdd: caps,
 				},
-			})
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
-		if err != nil {
+			})		if err != nil {
 			t.Fatalf("error creating container from image: %s", err)
 		}
 		defer func() {
-<<<<<<< HEAD
-			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
-=======
-			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
-			if err != nil {
+			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})			if err != nil {
 				t.Errorf("error removing container: %s", err)
 			}
 		}()
 
-<<<<<<< HEAD
-		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
-=======
-		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
-		if err != nil {
+		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})		if err != nil {
 			t.Fatalf("failed to start container: %s", err)
 		}
 		defer func() {
-<<<<<<< HEAD
-			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
-=======
-			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
-			if err != nil {
+			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})			if err != nil {
 				t.Errorf("error stopping container: %s", err)
 			}
 		}()
@@ -676,12 +643,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
 				return
 			case <-ticker.C:
-<<<<<<< HEAD
-				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
-=======
-				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
-				if err != nil {
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}
 				logs, err = io.ReadAll(out)
@@ -697,8 +659,6 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 	})
 }
 
-<<<<<<< HEAD
-=======
 func dockerTestContext(t *testing.T) (context.Context, context.CancelFunc) {
 	t.Helper()
 
@@ -758,8 +718,6 @@ func parseLoadedImageRef(loadResponse string) (string, error) {
 
 	return "", fmt.Errorf("image load response was unexpected: %s", loadResponse)
 }
-
->>>>>>> ee575e8f3 (Migrate from deprecated docker/docker to moby/moby split modules (#50300))
 // ensureNoBuildIDLinks checks for regressions related to
 // https://github.com/elastic/beats/issues/12956.
 func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
