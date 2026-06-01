@@ -61,17 +61,10 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 
 	idxMgr := newIndexSupporter(info)
 
-	// dockerlogbeat runs as a Docker plugin inside a minimal container with
-	// no configurable data directory — all paths are hardcoded (/tmp for
-	// metadata, /var/log/docker/containers for logs). There is no
-	// paths.InitPaths() call and no CLI flags to set path.home/data/etc.
-	beatPaths := paths.New()
-
 	settings := pipeline.Settings{
 		WaitClose:     time.Second * 10,
 		WaitCloseMode: pipeline.WaitOnPipelineClose,
 		Processors:    processing,
-		Paths:         beatPaths,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
@@ -84,7 +77,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		pipelineCfg,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config(), beatPaths)
+			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
 		settings,
@@ -113,6 +106,10 @@ func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string, logger *logp
 
 	beatName := "elastic-log-driver"
 
+	// dockerlogbeat runs as a Docker plugin inside a minimal container with
+	// no configurable data directory — all paths are hardcoded (/tmp for
+	// metadata, /var/log/docker/containers for logs). There is no
+	// paths.InitPaths() call and no CLI flags to set path.home/data/etc.
 	info := beat.Info{
 		Beat:        beatName,
 		Name:        pluginOpts.BeatName,
@@ -122,6 +119,7 @@ func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string, logger *logp
 		EphemeralID: eid,
 		ID:          id,
 		Logger:      logger,
+		Paths:       paths.New(),
 	}
 
 	return info, nil

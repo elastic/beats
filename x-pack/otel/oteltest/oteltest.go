@@ -197,7 +197,7 @@ func CheckReceivers(params CheckReceiversParams) {
 			if params.AssertFunc != nil {
 				params.AssertFunc(ct, logs, zapLogs)
 			}
-		}, 2*time.Minute, 1*time.Second,
+		}, 2*time.Minute, 100*time.Millisecond,
 			"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 		for i, r := range receivers {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
@@ -218,6 +218,11 @@ func VerifyNoLeaks(t *testing.T) {
 		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
 		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
+		// On Windows, some HTTP/2 client goroutines are leaked.
+		// https://github.com/elastic/beats/pull/50219#issuecomment-4286973591
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).readLoop"),
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).writeLoop"),
+		goleak.IgnoreAnyFunction("golang.org/x/net/http2.(*clientConnReadLoop).run"),
 	}
 
 	goleak.VerifyNone(t, skipped...)

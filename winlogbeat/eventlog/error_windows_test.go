@@ -15,22 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testing
+//go:build windows
+
+package eventlog
 
 import (
-	"os"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/stretchr/testify/assert"
+
+	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
-// SetupDataDir sets up a temporary data directory to use for testing.
-func SetupDataDir(t testing.TB) func() {
-	// path.data should be set so that the DB is written to a predictable location.
-	var err error
-	paths.Paths.Data, err = os.MkdirTemp("", "beat-data-dir")
-	if err != nil {
-		t.Fatal()
+func TestIsRecoverable(t *testing.T) {
+	tests := []struct {
+		name   string
+		err    error
+		isFile bool
+		want   bool
+	}{
+		{"RPC_S_UNKNOWN_IF is recoverable", win.RPC_S_UNKNOWN_IF, false, true},
+		{"RPC_S_SERVER_UNAVAILABLE recoverable", win.RPC_S_SERVER_UNAVAILABLE, false, true},
+		{"RPC_S_CALL_CANCELLED recoverable", win.RPC_S_CALL_CANCELLED, false, true},
+		{"ERROR_INVALID_HANDLE recoverable", win.ERROR_INVALID_HANDLE, false, true},
+		{"nil is not recoverable", nil, false, false},
 	}
-	return func() { os.RemoveAll(paths.Paths.Data) }
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, IsRecoverable(tc.err, tc.isFile))
+		})
+	}
 }
