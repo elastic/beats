@@ -233,14 +233,10 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 
 	// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
 	if ds, ok := beatEvent["data_stream"].(mapstr.M); ok {
-		if vStr, ok := ds["dataset"].(string); ok {
-			logRecord.Attributes().PutStr("data_stream.dataset", vStr)
-		}
-		if vStr, ok := ds["namespace"].(string); ok {
-			logRecord.Attributes().PutStr("data_stream.namespace", vStr)
-		}
-		if vStr, ok := ds["type"].(string); ok {
-			logRecord.Attributes().PutStr("data_stream.type", vStr)
+		for _, sub := range [...]string{"dataset", "namespace", "type"} {
+			if vStr, ok := ds[sub].(string); ok {
+				logRecord.Attributes().PutStr("data_stream."+sub, vStr)
+			}
 		}
 	}
 
