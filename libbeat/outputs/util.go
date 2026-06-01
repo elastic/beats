@@ -111,6 +111,8 @@ func SuccessNet(cfg config.Namespace,
 		if len(netclients)%worker != 0 {
 			return Group{}, fmt.Errorf("output worker count (%d) does not match host list (%d network clients)", worker, len(netclients))
 		}
+
+		// This logic is tied to how ReadHostList() duplicates entry
 		numHosts := len(netclients) / worker
 		groupNetClients := make([]NetworkClient, worker)
 		for i := 0; i < worker; i++ {

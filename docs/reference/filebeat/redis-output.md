@@ -146,7 +146,7 @@ The default value is `1`.
 When `loadbalance: true` is set, Filebeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts.
 Use the `worker` or `workers` setting to specify the number of connections per host.
 
-When `loadbalance: false` is set, Filebeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts.
+When `loadbalance: false` is set, Filebeat sends data to a single host at a time. Filebeat connects to the first configured host and sends all data to that host until the connection fails, then fails over to the next configured host in order. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts.
 
 The default value is `true`.
 
