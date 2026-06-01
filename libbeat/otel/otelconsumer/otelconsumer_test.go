@@ -579,7 +579,6 @@ func TestFillLogRecordFromEventDoesNotError(t *testing.T) {
 // otelmap.BenchmarkCases:
 //   - Beats Elasticsearch output (go-structform encoder)
 //   - OTel path: otelmap.FromMapstr (direct) -> ES exporter (bodymap)
-//   - Legacy OTel path: otelmap.FromMapstrLegacy (clone+FromRaw) -> ES exporter (bodymap)
 func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	timestamp := time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC)
@@ -624,15 +623,6 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			// ── OTel path: via otelConsumer.Publish (production code path) ────
 			otelDoc := collectOtelDocViaPublish(t, ctx, logger, beatEvent)
 
-			// ── Legacy OTel path: FromMapstrLegacy → ES exporter ─────────────
-			legacyDoc := collectOtelDoc(t, ctx, beatEvent, otelmap.FromMapstrLegacy[mapstr.M])
-
-			// ── Comparisons ───────────────────────────────────────────────────
-			// OTel vs legacy always runs.
-			t.Run("otel_vs_legacy", func(t *testing.T) {
-				compareJSONValues(t, "otel", "legacy", otelDoc, legacyDoc)
-			})
-
 			// ── Beats ES output path ──────────────────────────────────────────
 			beatsBatch := outest.NewBatch(beatEvent)
 			encodedEvent, encodedSize := beatsEnc.EncodeEntry(beatsBatch.Events()[0])
@@ -651,9 +641,6 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			}
 			t.Run("beats_vs_otel", func(t *testing.T) {
 				compareJSONValues(t, "beats", "otel", beatsDoc, otelDoc)
-			})
-			t.Run("beats_vs_legacy", func(t *testing.T) {
-				compareJSONValues(t, "beats", "legacy", beatsDoc, legacyDoc)
 			})
 		})
 	}
