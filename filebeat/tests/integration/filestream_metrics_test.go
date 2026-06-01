@@ -40,10 +40,11 @@ func TestFilestreamScannerMetricsLoggedWithFileOutput(t *testing.T) {
 	emptyLog := filepath.Join(tempDir, "empty.log")
 	oldLog := filepath.Join(tempDir, "old.log")
 
-	require.NoError(t, os.WriteFile(keepLog, []byte("first line\nsecond line\n"), 0o644), "failed to write keep log")
-	require.NoError(t, os.WriteFile(excludedLog, []byte("excluded line\n"), 0o644), "failed to write excluded log")
+	integration.WriteLogFileFrom(t, keepLog, 0, 25, false)
+	integration.WriteLogFileFrom(t, excludedLog, 25, 25, false)
+	integration.WriteLogFileFrom(t, oldLog, 50, 25, false)
 	require.NoError(t, os.WriteFile(emptyLog, nil, 0o644), "failed to write empty log")
-	require.NoError(t, os.WriteFile(oldLog, []byte("old line\n"), 0o644), "failed to write old log")
+
 	oldTime := time.Now().Add(-2 * time.Hour)
 	require.NoError(t, os.Chtimes(oldLog, oldTime, oldTime), "failed to age old log")
 
@@ -56,17 +57,18 @@ filebeat.inputs:
     prospector.scanner.exclude_files: ['excluded\.log$']
     ignore_older: 1h
     prospector.scanner.check_interval: 200ms
-    prospector.scanner.fingerprint.enabled: false
-    file_identity.native: ~
 
 path.home: %s
+
+queue.mem:
+  flush.timeout: 0s
 
 output.file:
   path: ${path.home}
   filename: "output-file"
 
 logging:
-  level: info
+  level: debug
   metrics:
     enabled: true
     period: 1s
@@ -75,35 +77,16 @@ logging:
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	outputFile := waitForOutputFile(t, tempDir, "output-file-*.ndjson")
-	integration.WaitLineCountInFile(t, outputFile, 2)
+	filebeat.WaitPublishedEvents(30*time.Second, 25)
 
 	filebeat.WaitLogsContainsAnyOrder(
 		[]string{
-			`"files_matched":4`,
-			`"files_unique":2`,
-			`"files_no_ingest_target":1`,
-			`"files_ignored":2`,
+			`"files_matched":4`,          // All files the input is monitoring
+			`"files_unique":2`,           // Unique, non-ignored files
+			`"files_no_ingest_target":1`, // Empty file has no ingest target
+			`"files_ignored":2`,          // Old and inactive files are ignored
 		},
 		15*time.Second,
 		"filestream scanner metrics were not logged",
 	)
-}
-
-func waitForOutputFile(t *testing.T, dir, pattern string) string {
-	t.Helper()
-
-	var outputFile string
-	var globErr error
-	require.Eventually(t, func() bool {
-		matches, err := filepath.Glob(filepath.Join(dir, pattern))
-		globErr = err
-		if err != nil || len(matches) == 0 {
-			return false
-		}
-		outputFile = matches[0]
-		return true
-	}, 30*time.Second, time.Second, "output file %q was not created: %v", pattern, globErr)
-
-	return outputFile
 }
