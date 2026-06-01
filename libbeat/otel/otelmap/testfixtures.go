@@ -32,7 +32,6 @@ type BenchCase struct {
 	Src  mapstr.M
 }
 
-
 type fixtureStruct struct {
 	Name  string `json:"name"`
 	Count int    `json:"count"`
