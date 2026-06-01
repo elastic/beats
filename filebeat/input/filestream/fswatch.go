@@ -331,14 +331,14 @@ func (w *fileWatcher) watch(
 		}
 	}
 
-	w.log.With(
+	w.log.Debugw("File scan complete",
 		"total", len(paths),
 		"written", writtenCount,
 		"truncated", truncatedCount,
 		"renamed", renamedCount,
 		"removed", removedCount,
 		"created", createdCount,
-	).Debugf("File scan complete")
+	)
 
 	w.prev = paths
 }
