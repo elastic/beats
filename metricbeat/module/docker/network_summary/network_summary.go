@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -47,7 +47,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	dockerClient *client.Client
+	dockerClient *dockerclient.Client
 	cfg          Config
 }
 
@@ -94,12 +94,12 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		ctx, cancel := context.WithTimeout(ctx, m.Module().Config().Timeout)
 		defer cancel()
 
-		inspect, err := m.dockerClient.ContainerInspect(ctx, myStats.Container.ID)
+		inspectResult, err := m.dockerClient.ContainerInspect(ctx, myStats.Container.ID, dockerclient.ContainerInspectOptions{})
 		if err != nil {
 			return fmt.Errorf("error fetching stats for container %s: %w", myStats.Container.ID, err)
 		}
 
-		rootPID := inspect.ContainerJSONBase.State.Pid
+		rootPID := inspectResult.Container.State.Pid
 
 		netNS, err := fetchNamespace(rootPID)
 		if err != nil {
