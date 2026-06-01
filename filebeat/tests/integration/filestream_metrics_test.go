@@ -81,15 +81,34 @@ logging:
 
 	filebeat.WaitPublishedEvents(30*time.Second, 25)
 
-	filebeat.WaitLogsContainsAnyOrder(
-		[]string{
-			`"files_matched":5`,          // All files the input is monitoring
-			`"files_unique":2`,           // Unique, non-ignored files
-			`"files_no_ingest_target":1`, // Empty files are counted separately
-			`"files_ignored":2`,          // Old and inactive files are ignored
-			`"files_empty":1`,            // Empty files matched by the scanner
+	type fileScanMetrics struct {
+		FilesMatched        int64 `config:"files_matched"`
+		FilesUnique         int64 `config:"files_unique"`
+		FilesNoIngestTarget int64 `config:"files_no_ingest_target"`
+		FilesIgnored        int64 `config:"files_ignored"`
+		FilesEmpty          int64 `config:"files_empty"`
+	}
+
+	expect := fileScanMetrics{
+		FilesMatched:        5, // All files the input is monitoring
+		FilesUnique:         2, // Unique, non-ignored files
+		FilesNoIngestTarget: 1, // Empty files are counted separately
+		FilesIgnored:        2, // Old and inactive files are ignored
+		FilesEmpty:          1, // Empty files matched by the scanner
+	}
+
+	require.Eventually(
+		t,
+		func() bool {
+			got := integration.GetMetricsFromLogs[fileScanMetrics](
+				filebeat,
+				"monitoring.metrics.filebeat.filestream",
+			)
+			return got == expect
 		},
-		15*time.Second,
-		"filestream scanner metrics were not logged",
+		30*time.Second,
+		100*time.Millisecond,
+		"did not find the expected metrics %#v",
+		expect,
 	)
 }
