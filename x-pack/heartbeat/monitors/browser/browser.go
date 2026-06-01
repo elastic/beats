@@ -14,8 +14,8 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 func init() {

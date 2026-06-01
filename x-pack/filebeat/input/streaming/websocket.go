@@ -129,7 +129,7 @@ func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, curso
 		cfg:       cfg,
 		cursor:    cursor,
 		userAgent: env.Agent.UserAgent,
-		status: stat,
+		status:    stat,
 		processor: processor{
 			ns:      "websocket",
 			pub:     pub,

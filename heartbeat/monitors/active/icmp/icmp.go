@@ -23,8 +23,8 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
