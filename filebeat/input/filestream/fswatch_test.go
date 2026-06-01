@@ -1323,7 +1323,7 @@ scanner:
 	assert.Equal(t, loginp.FileScanMetrics{
 		FilesIgnored:        1,
 		FilesMatched:        6,
-		FilesNoIngestTarget: 4,
+		FilesNoIngestTarget: 3,
 		FilesEmpty:          1,
 		FilesUnique:         1,
 	}, scanMetrics, "unexpected scan metrics")

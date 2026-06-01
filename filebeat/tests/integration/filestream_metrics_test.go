@@ -38,11 +38,13 @@ func TestFilestreamScannerMetricsLoggedWithFileOutput(t *testing.T) {
 	keepLog := filepath.Join(tempDir, "keep.log")
 	excludedLog := filepath.Join(tempDir, "excluded.log")
 	emptyLog := filepath.Join(tempDir, "empty.log")
+	tooSmallLog := filepath.Join(tempDir, "too-smal.log")
 	oldLog := filepath.Join(tempDir, "old.log")
 
 	integration.WriteLogFileFrom(t, keepLog, 0, 25, false)
 	integration.WriteLogFileFrom(t, excludedLog, 25, 25, false)
 	integration.WriteLogFileFrom(t, oldLog, 50, 25, false)
+	integration.WriteLogFileFrom(t, tooSmallLog, 75, 5, false)
 	require.NoError(t, os.WriteFile(emptyLog, nil, 0o644), "failed to write empty log")
 
 	oldTime := time.Now().Add(-2 * time.Hour)
@@ -81,9 +83,9 @@ logging:
 
 	filebeat.WaitLogsContainsAnyOrder(
 		[]string{
-			`"files_matched":4`,          // All files the input is monitoring
+			`"files_matched":5`,          // All files the input is monitoring
 			`"files_unique":2`,           // Unique, non-ignored files
-			`"files_no_ingest_target":1`, // Empty file has no ingest target
+			`"files_no_ingest_target":1`, // Empty files are counted separately
 			`"files_ignored":2`,          // Old and inactive files are ignored
 			`"files_empty":1`,            // Empty files matched by the scanner
 		},
