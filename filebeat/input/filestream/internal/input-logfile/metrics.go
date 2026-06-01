@@ -66,6 +66,7 @@ type Metrics struct {
 	FilesUnique         *monitoring.Int // Number of unique ingestible files found by the scanner (gauge).
 	FilesNoIngestTarget *monitoring.Int // Number of matched files without an ingest target, too small, or other internal errors (gauge).
 	FilesIgnored        *monitoring.Int // Number of ingestible files ignored by filestream settings (gauge).
+	FilesEmpty          *monitoring.Int // Number of empty files found by the scanner (gauge).
 
 	lastFileScanMetrics FileScanMetrics
 }
@@ -76,6 +77,7 @@ type FileScanMetrics struct {
 	FilesUnique         int64
 	FilesNoIngestTarget int64
 	FilesIgnored        int64
+	FilesEmpty          int64
 }
 
 func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
@@ -121,6 +123,7 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 		FilesUnique:         monitoring.NewInt(filestreamMetrics, "files_unique"),
 		FilesNoIngestTarget: monitoring.NewInt(filestreamMetrics, "files_no_ingest_target"),
 		FilesIgnored:        monitoring.NewInt(filestreamMetrics, "files_ignored"),
+		FilesEmpty:          monitoring.NewInt(filestreamMetrics, "files_empty"),
 	}
 	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
@@ -141,6 +144,7 @@ func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
 	m.FilesUnique.Add(current.FilesUnique - m.lastFileScanMetrics.FilesUnique)
 	m.FilesNoIngestTarget.Add(current.FilesNoIngestTarget - m.lastFileScanMetrics.FilesNoIngestTarget)
 	m.FilesIgnored.Add(current.FilesIgnored - m.lastFileScanMetrics.FilesIgnored)
+	m.FilesEmpty.Add(current.FilesEmpty - m.lastFileScanMetrics.FilesEmpty)
 
 	m.lastFileScanMetrics = current
 }

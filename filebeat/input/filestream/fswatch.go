@@ -542,7 +542,9 @@ func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileS
 
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
-				if !errors.Is(err, errFileEmpty) {
+				if errors.Is(err, errFileEmpty) {
+					scanMetrics.FilesEmpty++
+				} else {
 					s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
 				}
 

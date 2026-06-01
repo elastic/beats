@@ -85,6 +85,7 @@ logging:
 			`"files_unique":2`,           // Unique, non-ignored files
 			`"files_no_ingest_target":1`, // Empty file has no ingest target
 			`"files_ignored":2`,          // Old and inactive files are ignored
+			`"files_empty":1`,            // Empty files matched by the scanner
 		},
 		15*time.Second,
 		"filestream scanner metrics were not logged",

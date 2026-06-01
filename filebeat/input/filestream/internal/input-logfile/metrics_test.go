@@ -35,6 +35,7 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 		FilesUnique:         metrics.FilesUnique.Get(),
 		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
 		FilesIgnored:        metrics.FilesIgnored.Get(),
+		FilesEmpty:          metrics.FilesEmpty.Get(),
 	}
 
 	metrics.UpdateFileScanMetrics(FileScanMetrics{
@@ -42,20 +43,24 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 		FilesUnique:         6,
 		FilesNoIngestTarget: 3,
 		FilesIgnored:        1,
+		FilesEmpty:          2,
 	})
 	assert.Equal(t, baseline.FilesMatched+10, metrics.FilesMatched.Get(), "files_matched")
 	assert.Equal(t, baseline.FilesUnique+6, metrics.FilesUnique.Get(), "files_unique")
 	assert.Equal(t, baseline.FilesNoIngestTarget+3, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target")
 	assert.Equal(t, baseline.FilesIgnored+1, metrics.FilesIgnored.Get(), "files_ignored")
+	assert.Equal(t, baseline.FilesEmpty+2, metrics.FilesEmpty.Get(), "files_empty")
 
 	metrics.UpdateFileScanMetrics(FileScanMetrics{
 		FilesMatched:        12,
 		FilesUnique:         5,
 		FilesNoIngestTarget: 4,
 		FilesIgnored:        0,
+		FilesEmpty:          1,
 	})
 	assert.Equal(t, baseline.FilesMatched+12, metrics.FilesMatched.Get(), "files_matched after second update")
 	assert.Equal(t, baseline.FilesUnique+5, metrics.FilesUnique.Get(), "files_unique after second update")
 	assert.Equal(t, baseline.FilesNoIngestTarget+4, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target after second update")
 	assert.Equal(t, baseline.FilesIgnored, metrics.FilesIgnored.Get(), "files_ignored after second update")
+	assert.Equal(t, baseline.FilesEmpty+1, metrics.FilesEmpty.Get(), "files_empty after second update")
 }

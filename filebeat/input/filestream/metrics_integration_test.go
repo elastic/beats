@@ -81,6 +81,7 @@ func TestFilestreamMetrics(t *testing.T) {
 		FilesUnique:         1,
 		FilesNoIngestTarget: 0,
 		FilesIgnored:        0,
+		FilesEmpty:          0,
 	})
 
 	cancelInput()
@@ -126,6 +127,7 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 		FilesUnique:         1,
 		FilesNoIngestTarget: 0,
 		FilesIgnored:        0,
+		FilesEmpty:          0,
 	})
 
 	cancelInput()
@@ -182,6 +184,7 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 		FilesUnique:         1,
 		FilesNoIngestTarget: 0,
 		FilesIgnored:        0,
+		FilesEmpty:          0,
 	})
 
 	cancelInput()
@@ -202,6 +205,7 @@ type expectedMetrics struct {
 	FilesUnique         int64
 	FilesNoIngestTarget int64
 	FilesIgnored        int64
+	FilesEmpty          int64
 }
 
 func checkMetrics(t *testing.T, mon beatmonitoring.Monitoring, id string, expected expectedMetrics) {
@@ -223,4 +227,5 @@ func checkMetrics(t *testing.T, mon beatmonitoring.Monitoring, id string, expect
 	require.Equal(t, expected.FilesUnique, filestreamReg.Get("files_unique").(*monitoring.Int).Get(), "filebeat.filestream.files_unique")                             //nolint:errcheck // ignore
 	require.Equal(t, expected.FilesNoIngestTarget, filestreamReg.Get("files_no_ingest_target").(*monitoring.Int).Get(), "filebeat.filestream.files_no_ingest_target") //nolint:errcheck // ignore
 	require.Equal(t, expected.FilesIgnored, filestreamReg.Get("files_ignored").(*monitoring.Int).Get(), "filebeat.filestream.files_ignored")                          //nolint:errcheck // ignore
+	require.Equal(t, expected.FilesEmpty, filestreamReg.Get("files_empty").(*monitoring.Int).Get(), "filebeat.filestream.files_empty")                                //nolint:errcheck // ignore
 }

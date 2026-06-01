@@ -1324,6 +1324,7 @@ scanner:
 		FilesIgnored:        1,
 		FilesMatched:        6,
 		FilesNoIngestTarget: 4,
+		FilesEmpty:          1,
 		FilesUnique:         1,
 	}, scanMetrics, "unexpected scan metrics")
 }
@@ -1348,6 +1349,7 @@ scanner:
 		FilesUnique:         metrics.FilesUnique.Get(),
 		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
 		FilesIgnored:        metrics.FilesIgnored.Get(),
+		FilesEmpty:          metrics.FilesEmpty.Get(),
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -1359,6 +1361,7 @@ scanner:
 	assert.Equal(t, baseline.FilesUnique+2, metrics.FilesUnique.Get(), "files_unique")
 	assert.Equal(t, baseline.FilesNoIngestTarget, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target")
 	assert.Equal(t, baseline.FilesIgnored+1, metrics.FilesIgnored.Get(), "files_ignored")
+	assert.Equal(t, baseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty")
 }
 
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {

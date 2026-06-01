@@ -37,6 +37,7 @@ var (
 			"gone":                              1,
 			"active_gauge":                      6,
 			"filebeat.filestream.files_matched": 10,
+			"filebeat.filestream.files_empty":   4,
 		},
 		Floats: map[string]float64{
 			"system.load.1":     2.0,
@@ -50,6 +51,7 @@ var (
 			"new":                               1,
 			"active_gauge":                      5,
 			"filebeat.filestream.files_matched": 3,
+			"filebeat.filestream.files_empty":   2,
 		},
 		Floats: map[string]float64{
 			"system.load.1":     1.2,
@@ -77,6 +79,7 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	assert.InDelta(t, 2, delta.Floats["float_counter"], 0.001)
 	assert.EqualValues(t, 5, delta.Ints["active_gauge"])
 	assert.EqualValues(t, 3, delta.Ints["filebeat.filestream.files_matched"])
+	assert.EqualValues(t, 2, delta.Ints["filebeat.filestream.files_empty"])
 	assert.InDelta(t, 4.1, delta.Floats["foo.histogram.p99"], 0.001)
 	assert.NotContains(t, delta.Ints, "gone")
 }
