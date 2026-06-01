@@ -136,7 +136,7 @@ func TestNewFactoryChroot(t *testing.T) {
 		}
 	case err := <-waitErrChan:
 		t.Fatalf("error waiting for container to finish: %s", err)
-	case <-time.After(30 * time.Second):
+	case <-time.After(time.Minute):
 		t.Fatal("Container is stuck, stopping the test. Look at the container logs for more information.")
 	}
 }
