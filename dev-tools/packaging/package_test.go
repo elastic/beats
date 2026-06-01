@@ -723,6 +723,7 @@ func parseLoadedImageRef(loadResponse string) (string, error) {
 
 	return "", fmt.Errorf("image load response was unexpected: %s", loadResponse)
 }
+
 // ensureNoBuildIDLinks checks for regressions related to
 // https://github.com/elastic/beats/issues/12956.
 func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
