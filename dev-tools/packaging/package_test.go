@@ -612,20 +612,24 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				HostConfig: &container.HostConfig{
 					CapAdd: caps,
 				},
-			})		if err != nil {
+			})
+		if err != nil {
 			t.Fatalf("error creating container from image: %s", err)
 		}
 		defer func() {
-			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})			if err != nil {
+			_, err := dockerClient.ContainerRemove(ctx, createResp.ID, client.ContainerRemoveOptions{Force: true})
+			if err != nil {
 				t.Errorf("error removing container: %s", err)
 			}
 		}()
 
-		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})		if err != nil {
+		_, err = dockerClient.ContainerStart(ctx, createResp.ID, client.ContainerStartOptions{})
+		if err != nil {
 			t.Fatalf("failed to start container: %s", err)
 		}
 		defer func() {
-			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})			if err != nil {
+			_, err := dockerClient.ContainerStop(ctx, createResp.ID, client.ContainerStopOptions{})
+			if err != nil {
 				t.Errorf("error stopping container: %s", err)
 			}
 		}()
@@ -643,7 +647,8 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
 				return
 			case <-ticker.C:
-				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})				if err != nil {
+				out, err := dockerClient.ContainerLogs(ctx, createResp.ID, client.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}
 				logs, err = io.ReadAll(out)
