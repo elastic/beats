@@ -1342,9 +1342,12 @@ func GetEventsFromFileOutput[E any](b *BeatProc, n int, waitForFile bool) []E {
 
 // GetMetricsFromLogs finds the next 'Non-zero metrics in the last' log entry
 // and parses [metricName] as E, [metricName] must use the dotted path
-// notation. GetMetricsFromLogs uses our elastic-agent-libs/config to
+// notation. Ex: 'monitoring.metrics.filebeat.filestream'.
+// GetMetricsFromLogs uses our elastic-agent-libs/config to
 // easily parse the metrics JSON using the dotted notation.
-// On any error, t.Fatal is called.
+// On error, t.Fatal is called, however error accessing the metric
+// is ignored because some monitoring metrics entries might not contain
+// all metrics.
 func GetMetricsFromLogs[E any](b *BeatProc, metricName string) E {
 	logFile := b.openLogFile()
 	defer logFile.Close()

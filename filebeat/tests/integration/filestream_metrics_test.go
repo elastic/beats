@@ -38,7 +38,7 @@ func TestFilestreamScannerMetrics(t *testing.T) {
 	keepLog := filepath.Join(tempDir, "keep.log")
 	excludedLog := filepath.Join(tempDir, "excluded.log")
 	emptyLog := filepath.Join(tempDir, "empty.log")
-	tooSmallLog := filepath.Join(tempDir, "too-smal.log")
+	tooSmallLog := filepath.Join(tempDir, "too-small.log")
 	oldLog := filepath.Join(tempDir, "old.log")
 
 	integration.WriteLogFileFrom(t, keepLog, 0, 25, false)
