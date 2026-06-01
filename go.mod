@@ -257,9 +257,16 @@ require (
 	go.opentelemetry.io/collector/service v0.153.0
 	go.opentelemetry.io/otel/sdk/metric v1.43.0
 	go.uber.org/goleak v1.3.0
+	sigs.k8s.io/kind v0.31.0
 )
 
-require go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
+require (
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
+	github.com/pelletier/go-toml v1.9.5 // indirect
+	go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
+)
 
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
