@@ -664,66 +664,6 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 	})
 }
 
-func dockerTestContext(t *testing.T) (context.Context, context.CancelFunc) {
-	t.Helper()
-
-	deadline, ok := t.Deadline()
-	if !ok {
-		return context.Background(), func() {}
-	}
-
-	return context.WithDeadline(context.Background(), deadline)
-}
-
-func loadDockerImageFromArchive(ctx context.Context, dockerClient *client.Client, imagePath string) (string, error) {
-	f, err := os.Open(imagePath)
-	if err != nil {
-		return "", fmt.Errorf("failed to open docker image %q: %w", imagePath, err)
-	}
-	defer f.Close()
-
-	loadResp, err := dockerClient.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
-	if err != nil {
-		return "", err
-	}
-	defer loadResp.Close()
-
-	loadRespBody, err := io.ReadAll(loadResp)
-	if err != nil {
-		return "", fmt.Errorf("failed to read image load response: %w", err)
-	}
-
-	imageID, err := parseLoadedImageRef(string(loadRespBody))
-	if err != nil {
-		return "", err
-	}
-	return imageID, nil
-}
-
-func parseLoadedImageRef(loadResponse string) (string, error) {
-	for _, prefix := range []string{"Loaded image: ", "Loaded image ID: "} {
-		_, after, ok := strings.Cut(loadResponse, prefix)
-		if !ok {
-			continue
-		}
-
-		end := len(after)
-		for i, r := range after {
-			if r == '\n' || r == '\r' || r == '"' || r == '\\' {
-				end = i
-				break
-			}
-		}
-
-		imageID := strings.TrimSpace(after[:end])
-		if imageID != "" {
-			return imageID, nil
-		}
-	}
-
-	return "", fmt.Errorf("image load response was unexpected: %s", loadResponse)
-}
-
 // ensureNoBuildIDLinks checks for regressions related to
 // https://github.com/elastic/beats/issues/12956.
 func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
