@@ -1377,7 +1377,9 @@ This behaviour of targeted fixed pattern replacement in the url helps solve vari
     the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be
     extrated becomes `"" (an empty string)`, which has no definition within any context variable.
 
-NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+    3. All but the last response in a chain may be an array of strings or numbers, where each element is an identifier used to construct subsequent requests. The replace expression to access the identifiers is `replace: $[:]`.
+
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object can only store flat JSON structures (no support for NDJSON or Gzipped JSON), except for chained configurations where an array of strings or numbers is allowed. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
 ==== `chain[].while`

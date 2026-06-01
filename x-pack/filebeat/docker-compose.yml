@@ -9,6 +9,7 @@ services:
       elasticsearch_kerberos.elastic: { condition: service_healthy }
       kibana:        { condition: service_healthy }
       cometd: { condition: service_healthy }
+      kafka: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -88,3 +89,12 @@ services:
       - http-server
       - --addr=:8090
       - --config=/files/config.yaml
+  kafka:
+    build: ${ES_BEATS}/testing/environments/docker/kafka
+    ports:
+      - 9092:9092
+      - 9093:9093
+      - 9094:9094
+      - 2181:2181
+    environment:
+      - ADVERTISED_HOST=kafka

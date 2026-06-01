@@ -20,12 +20,21 @@ package diskqueue
 import (
 	"flag"
 	"math/rand/v2"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
 var seed int64
@@ -73,12 +82,12 @@ func TestProduceConsumer(t *testing.T) {
 }
 
 func makeTestQueue() queuetest.QueueFactory {
-	return func(t *testing.T) queue.Queue {
+	return func(t *testing.T) queue.Queue[publisher.Event] {
 		dir := t.TempDir()
 		settings := DefaultSettings()
 		settings.Path = dir
 		logger := logptest.NewTestingLogger(t, "")
-		queue, _ := NewQueue(logger, nil, settings, nil)
+		queue, _ := NewQueue(logger, nil, settings, nil, &paths.Path{})
 		return testQueue{
 			diskQueue: queue,
 		}
@@ -88,4 +97,117 @@ func makeTestQueue() queuetest.QueueFactory {
 func (t testQueue) Close(force bool) error {
 	err := t.diskQueue.Close(force)
 	return err
+}
+
+func TestQueueDoesNotReplayLastEventAfterRestart(t *testing.T) {
+	workDir := fs.TempDir(t, "..", "..", "..", "build", "integration-tests")
+	diskQueuePath := filepath.Join(workDir, "queue")
+	settings := DefaultSettings()
+	settings.Path = diskQueuePath
+	// Keep segment size small enough to produce multiple segments quickly.
+	settings.MaxSegmentSize = 4 * 1024
+
+	fileLogger := logptest.NewFileLogger(t, workDir)
+
+	// Run 1: publish and ACK two events.
+	run1Queue, err := NewQueue(fileLogger.Logger, nil, settings, nil, &paths.Path{})
+	require.NoError(t, err, "run1 queue should be created successfully")
+
+	run1Producer := run1Queue.Producer(queue.ProducerConfig{})
+	publishAndACKSingleEvent(t, run1Queue, run1Producer, "event-1")
+	publishAndACKSingleEvent(t, run1Queue, run1Producer, "event-2")
+	run1Producer.Close()
+	closeQueueAndWait(t, run1Queue)
+
+	// Run 2: reopen queue, publish one event and ACK it.
+	run2Queue, err := NewQueue(fileLogger.Logger, nil, settings, nil, &paths.Path{})
+	require.NoError(t, err, "run2 queue should be created successfully")
+
+	run2Producer := run2Queue.Producer(queue.ProducerConfig{})
+	publishAndACKSingleEvent(t, run2Queue, run2Producer, "event-3")
+	run2Producer.Close()
+	closeQueueAndWait(t, run2Queue)
+
+	// Run 3: reopen queue without publishing a new event. Correct behavior is
+	// that no event is replayed. This used to fail with the last event being
+	// replayed.
+	run3Queue, err := NewQueue(fileLogger.Logger, nil, settings, nil, &paths.Path{})
+	require.NoError(t, err, "run3 queue should be created successfully")
+
+	replayedBatch := readBatch(t, run3Queue, 3*time.Second)
+	if replayedBatch != nil {
+		count := replayedBatch.Count()
+		var msg any
+		if count > 0 {
+			pe := replayedBatch.Entry(0)
+			msg, _ = pe.Content.Fields.GetValue("message")
+		}
+		replayedBatch.Done()
+		t.Fatalf("unexpected replayed event after restart: "+
+			"found replayed batch with count=%d and first message=%v",
+			count,
+			msg,
+		)
+	}
+	closeQueueAndWait(t, run3Queue)
+}
+
+func publishAndACKSingleEvent(
+	t *testing.T,
+	queueInstance *diskQueue,
+	producer queue.Producer[publisher.Event],
+	msg string,
+) {
+	_, ok := producer.Publish(makeDiskQueueTestEvent(msg))
+	require.True(t, ok, "publishing test event %q should succeed", msg)
+
+	batch := readBatch(t, queueInstance, 3*time.Second)
+	require.NotNil(t, batch, "queue should return a batch for message %q", msg)
+	require.Equal(t, 1, batch.Count(), "queue should return a single event batch for message %q", msg)
+	assertEventMessage(t, batch.Entry(0), msg)
+	batch.Done()
+}
+
+func readBatch(t *testing.T, queueInstance *diskQueue, timeout time.Duration) queue.Batch[publisher.Event] {
+	type getResult struct {
+		batch queue.Batch[publisher.Event]
+		err   error
+	}
+
+	results := make(chan getResult, 1)
+	go func() {
+		batch, err := queueInstance.Get(1)
+		results <- getResult{batch: batch, err: err}
+	}()
+
+	select {
+	case result := <-results:
+		require.NoError(t, result.err, "reading from queue should not return an error")
+		return result.batch
+	case <-time.After(timeout):
+		return nil
+	}
+}
+
+func closeQueueAndWait(t *testing.T, queueInstance *diskQueue) {
+	err := queueInstance.Close(false)
+	require.NoError(t, err, "closing queue should not return an error")
+
+	select {
+	case <-queueInstance.Done():
+	case <-time.After(5 * time.Second):
+		require.Fail(t, "queue did not close in time", "queue.Done() should close within timeout")
+	}
+}
+
+func assertEventMessage(t *testing.T, event publisher.Event, expectedMsg string) {
+	msg, _ := event.Content.Fields.GetValue("message")
+	assert.Equal(t, expectedMsg, msg, "unexpected message in consumed event")
+}
+
+func makeDiskQueueTestEvent(msg string) publisher.Event {
+	return queuetest.MakeEvent(mapstr.M{
+		"message": msg,
+		"payload": strings.Repeat("x", 2048),
+	})
 }

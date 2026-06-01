@@ -20,6 +20,7 @@ package add_locale
 import (
 	"fmt"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -31,6 +32,17 @@ import (
 
 type addLocale struct {
 	TimezoneFormat TimezoneFormat
+	// cache holds the last formatted timezone, updated on zone/offset changes (e.g., DST).
+	// Benign data race: deterministic formatting makes concurrent recomputation harmless.
+	cache atomic.Pointer[tzEntry]
+}
+
+type tzEntry struct {
+	zone   string
+	offset int
+	// boxedFormat holds the formatted string pre-wrapped in an interface{}.
+	// Optimization: avoids boxing and heap allocation per event.PutValue call.
+	boxedFormat any
 }
 
 // TimezoneFormat type
@@ -78,17 +90,21 @@ func New(c *config.C, log *logp.Logger) (beat.Processor, error) {
 		loc.TimezoneFormat = Offset
 	default:
 		return nil, fmt.Errorf("'%s' is not a valid format option for the "+
-			"add_locale processor. Valid options are 'abbreviation' and 'offset'.",
+			"add_locale processor. Valid options are 'abbreviation' and 'offset'",
 			config.Format)
 
 	}
-	return loc, nil
+	return &loc, nil
 }
 
-func (l addLocale) Run(event *beat.Event) (*beat.Event, error) {
+func (l *addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
-	format := l.Format(zone, offset)
-	_, _ = event.PutValue("event.timezone", format)
+	e := l.cache.Load()
+	if e == nil || e.zone != zone || e.offset != offset {
+		e = &tzEntry{zone: zone, offset: offset, boxedFormat: l.Format(zone, offset)}
+		l.cache.Store(e)
+	}
+	_, _ = event.PutValue("event.timezone", e.boxedFormat)
 	return event, nil
 }
 
@@ -98,7 +114,7 @@ const (
 	hour = 60 * min
 )
 
-func (l addLocale) Format(zone string, offset int) string {
+func (l *addLocale) Format(zone string, offset int) string {
 	var ft string
 	switch l.TimezoneFormat {
 	case Abbreviation:
@@ -117,6 +133,6 @@ func (l addLocale) Format(zone string, offset int) string {
 	return ft
 }
 
-func (l addLocale) String() string {
+func (l *addLocale) String() string {
 	return "add_locale=[format=" + l.TimezoneFormat.String() + "]"
 }

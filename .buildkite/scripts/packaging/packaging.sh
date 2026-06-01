@@ -13,6 +13,8 @@ source .buildkite/scripts/qemu.sh
 # shellcheck source=/dev/null
 source .buildkite/scripts/docker.sh
 
+echo "~~~ Packaging : $BEAT_DIR"
+
 # Make Docker builds less verbose
 BUILDKIT_PROGRESS=plain
 export BUILDKIT_PROGRESS

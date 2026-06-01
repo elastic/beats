@@ -70,6 +70,20 @@ func TestDecoding(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:          "csv_quoted_values",
+			file:          "txn_quoted.csv",
+			content:       "text/csv",
+			numEvents:     2,
+			assertAgainst: "txn_quoted.json",
+			config: decoderConfig{
+				Codec: &codecConfig{
+					CSV: &csvCodecConfig{
+						Enabled: true,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

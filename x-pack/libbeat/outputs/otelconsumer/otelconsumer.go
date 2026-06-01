@@ -6,6 +6,7 @@ package otelconsumer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime"
 	"time"
@@ -23,6 +24,7 @@ import (
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
+	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 )
@@ -62,7 +64,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		})
 	}
 
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, clients...)
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, beat.Logger, beat.Paths, clients...)
 }
 
 // Close is a noop for otelconsumer
@@ -183,7 +185,12 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Retry()
 		}
 
-		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
+		// Queue full errors are expected backpressure signals, not true errors.
+		// Skip logging to avoid log spam since we already track this via metrics.
+		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			return fmt.Errorf("failed to send batch events to otel collector: %w", err)
+		}
+		return nil
 	}
 
 	batch.ACK()

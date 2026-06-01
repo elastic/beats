@@ -167,9 +167,12 @@ func buildMemberOfFilter(groupDNs []string) string {
 }
 
 // Entry is an Active Directory user entry with associated group membership.
+// For device (computer) entries, Device holds the entity attributes. Groups
+// holds resolved group memberships for user and device entries.
 type Entry struct {
 	ID          string         `json:"id"`
-	User        map[string]any `json:"user"`
+	User        map[string]any `json:"user,omitempty"`
+	Device      map[string]any `json:"device,omitempty"`
 	Groups      []any          `json:"groups,omitempty"`
 	WhenChanged time.Time      `json:"whenChanged"`
 }
@@ -194,7 +197,15 @@ type Entry struct {
 // memberOf filters to find users who are members of those groups. This is
 // necessary because groups are leaf objects in LDAP and don't contain users
 // as children in the directory tree hierarchy.
-func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, userAttrs, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
+//
+// entTyp controls which Entry field receives the entity attributes:
+// "user" populates Entry.User, "device" populates Entry.Device.
+func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, userAttrs, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config, entTyp string) ([]Entry, error) {
+	switch entTyp {
+	case "user", "device":
+	default:
+		return nil, fmt.Errorf("invalid entity type: %q", entTyp)
+	}
 	if base == nil || len(base.RDNs) == 0 {
 		return nil, fmt.Errorf("%w: no path", ErrInvalidDistinguishedName)
 	}
@@ -255,7 +266,7 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 		errs = []error{fmt.Errorf("%w: %w", ErrGroups, err)}
 		groups.Entries = entries{}
 	} else {
-		groups = collate(grps, nil)
+		groups = collate(grps, nil, "")
 	}
 
 	// Get users in the directory...
@@ -274,16 +285,16 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 		return nil, errors.Join(errs...)
 	}
 	// ...and apply group membership.
-	users := collate(usrs, groups.Entries)
+	users := collate(usrs, groups.Entries, entTyp)
 
 	// Also collect users that are members of groups that have changed.
 	if sinceFmtd != "" {
-		grps, err := search(conn, baseDN, "(&(objectClass=groups)(whenChanged>="+sinceFmtd+"))", grpAttrs, pagingSize)
+		grps, err := search(conn, baseDN, "(&(objectClass=group)(whenChanged>="+sinceFmtd+"))", grpAttrs, pagingSize)
 		if err != nil {
 			// Allow continuation if groups query fails, but warn.
 			errs = append(errs, fmt.Errorf("failed to collect changed groups: %w: %w", ErrGroups, err))
 		} else {
-			groups := collate(grps, nil)
+			groups := collate(grps, nil, "")
 
 			// Get users of the changed groups
 			var modGrps []string
@@ -312,7 +323,7 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 				} else {
 					// ...and apply group membership, inserting into users
 					// if not present.
-					for dn, u := range collate(usrs, groups.Entries).Entries {
+					for dn, u := range collate(usrs, groups.Entries, entTyp).Entries {
 						_, ok := users.Entries[dn]
 						if ok {
 							continue
@@ -327,7 +338,7 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 	// Assemble into a set of documents.
 	docs := make([]Entry, 0, len(users.Entries))
 	for id, u := range users.Entries {
-		user := u["user"].(map[string]any)
+		attrs := u[entTyp].(map[string]any)
 		var groups []any
 		switch g := u["groups"].(type) {
 		case nil:
@@ -335,7 +346,16 @@ func GetDetails(query, url, user, pass string, base *ldap.DN, since time.Time, u
 			// Do not bother concretising these.
 			groups = g
 		}
-		docs = append(docs, Entry{ID: id, User: user, Groups: groups, WhenChanged: whenChanged(user, groups)})
+		e := Entry{ID: id, Groups: groups, WhenChanged: whenChanged(attrs, groups)}
+		switch entTyp {
+		case "user":
+			e.User = attrs
+		case "device":
+			e.Device = attrs
+		default:
+			panic("unreachable")
+		}
+		docs = append(docs, e)
 	}
 	return docs, errors.Join(errs...)
 }
@@ -393,7 +413,9 @@ type directory struct {
 // group information if it is available. Fields with known types will be converted
 // from strings to the known type.
 // Also included in the returned map is the sets of referrals and controls.
-func collate(resp *ldap.SearchResult, groups entries) directory {
+// entTyp labels the entity attributes when group membership is being
+// resolved (e.g. "user" or "device"); it is ignored when groups is nil.
+func collate(resp *ldap.SearchResult, groups entries, entTyp string) directory {
 	dir := directory{
 		Entries: make(entries),
 	}
@@ -401,7 +423,7 @@ func collate(resp *ldap.SearchResult, groups entries) directory {
 		u := make(map[string]any)
 		m := u
 		if groups != nil {
-			m = map[string]any{"user": u}
+			m = map[string]any{entTyp: u}
 		}
 		for _, attr := range e.Attributes {
 			val := entype(attr)

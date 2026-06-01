@@ -43,6 +43,10 @@ type DockerJSONReader struct {
 	// parse CRI flags
 	criflags bool
 
+	// maximum number of bytes to use when reassembling partial CRI/docker log lines.
+	// A value of 0 means no limit is applied during reassembly.
+	maxBytes int
+
 	parseLine func(message *reader.Message, msg *logLine) error
 
 	stripNewLine func(msg *reader.Message)
@@ -60,12 +64,13 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, logger *logp.Logger) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, maxBytes int, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
+		maxBytes: maxBytes,
 		logger:   logger.Named("reader_docker_json"),
 	}
 
@@ -87,12 +92,13 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 	return &reader
 }
 
-func NewContainerParser(r reader.Reader, config *ContainerJSONConfig, logger *logp.Logger) *DockerJSONReader {
+func NewContainerParser(r reader.Reader, config *ContainerJSONConfig, maxBytes int, logger *logp.Logger) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   config.Stream.String(),
 		partial:  true,
 		reader:   r,
 		criflags: true,
+		maxBytes: maxBytes,
 		logger:   logger.Named("parser_container"),
 	}
 
@@ -233,6 +239,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 		}
 
 		// Handle multiline messages, join partial lines
+		truncated := false
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
 
@@ -248,7 +255,34 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 				p.logger.Errorf("Parse line error: %v", err)
 				continue
 			}
-			message.Content = append(message.Content, next.Content...)
+
+			// Enforce max_bytes during partial line reassembly to prevent unbounded
+			// memory growth. Once the limit is reached, drain remaining partial
+			// chunks (updating the byte counter only) so the reader stays aligned
+			// to logical line boundaries for the next Next() call.
+			if truncated {
+				continue
+			}
+			if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
+				remaining := p.maxBytes - len(message.Content)
+				if remaining < 0 {
+					// Just cutting the slice won't shrink the underlying array,
+					// so we create a slice the size we want and copy the data.
+					msg := make([]byte, p.maxBytes)
+					copy(msg, message.Content[:p.maxBytes])
+					message.Content = msg
+				} else if remaining > 0 {
+					message.Content = append(message.Content, next.Content[:remaining]...)
+					// Make sure the underlaying array is the same size as the content
+					msg := make([]byte, p.maxBytes)
+					copy(msg, message.Content)
+					message.Content = msg
+				}
+				_ = message.AddFlagsWithKey("log.flags", "truncated")
+				truncated = true
+			} else {
+				message.Content = append(message.Content, next.Content...)
+			}
 		}
 
 		if p.stream != "all" && p.stream != logLine.Stream {

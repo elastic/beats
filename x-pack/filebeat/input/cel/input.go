@@ -51,6 +51,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -174,15 +175,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
-	if cfg.Resource.Tracer != nil {
+	if cfg.Resource.Tracer.enabled() {
 		id := sanitizeFileName(env.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(env.Agent.Paths, inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, env.Agent.Paths.Resolve(paths.Logs, inputName))
 		}
 		cfg.Resource.Tracer.Filename = resolved
 	}
@@ -213,6 +214,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Value: cfg.Auth.Token.Value,
 		}
 	}
+
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	doCov := cfg.RecordCoverage && log.IsDebug()
 	httpOptions := lib.HTTPOptions{
@@ -232,6 +234,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		state = make(map[string]interface{})
 	} else {
 		state = cfg.State
+	}
+	if len(cfg.SecretState.m) > 0 {
+		state["secret"] = cfg.SecretState.m
+	}
+	if cfg.Redact == nil {
+		cfg.Redact = &redact{}
+	}
+	if !slices.Contains(cfg.Redact.Fields, "secret") {
+		cfg.Redact.Fields = append(cfg.Redact.Fields, "secret")
 	}
 	if cursor != nil {
 		state["cursor"] = cursor
@@ -855,6 +866,15 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 			Password:  cfg.Auth.Digest.Password,
 			NoReuse:   noReuse,
 		}
+	} else if cfg.Auth.AWS.IsEnabled() {
+		// this transport runs after the other ones (the other ones wrap this one); just to be on the safe side.
+		// If any of the other transports add any header, it must happen before the signing.
+		tr, err := aws.InitializeSignerTransport(*cfg.Auth.AWS, log, c.Transport)
+		if err != nil {
+			log.Errorw("failed to initialize aws config failed for signer", "error", err)
+			return nil, nil, err
+		}
+		c.Transport = tr
 	}
 
 	var trace *httplog.LoggingRoundTripper

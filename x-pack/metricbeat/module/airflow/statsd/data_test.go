@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"runtime"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -43,7 +44,7 @@ func getConfig() map[string]interface{} {
 }
 
 func createEvent(data string, t *testing.T) {
-	udpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", STATSD_HOST, STATSD_PORT))
+	udpAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(STATSD_HOST, strconv.Itoa(int(STATSD_PORT))))
 	require.NoError(t, err)
 
 	conn, err := net.DialUDP("udp", nil, udpAddr)

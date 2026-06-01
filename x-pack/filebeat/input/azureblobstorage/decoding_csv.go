@@ -7,6 +7,7 @@ package azureblobstorage
 import (
 	"bytes"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"slices"
@@ -106,7 +107,7 @@ func (d *csvDecoder) decodeValue() ([]byte, map[string]any, error) {
 		m[n] = d.current[i]
 	}
 	d.current = d.current[:0]
-	b, err := d.decode()
+	b, err := json.Marshal(m)
 	if err != nil {
 		return nil, nil, err
 	}

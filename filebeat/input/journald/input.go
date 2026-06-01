@@ -140,7 +140,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		"",
 		inp.Since,
 		src.Name(),
-		journalctl.Factory,
+		journalctl.NewFactory("", "journalctl"),
 	)
 	if err != nil {
 		return err
@@ -175,7 +175,7 @@ func (inp *journald) Run(
 		pos,
 		inp.Since,
 		src.Name(),
-		journalctl.Factory,
+		journalctl.NewFactory("", "journalctl"),
 	)
 	if err != nil {
 		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)
@@ -343,6 +343,7 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	}
 
 	m := reader.Message{
+		//nolint:gosec // it's a timestamp, it should not overflow
 		Ts:      time.UnixMicro(int64(data.RealtimeTimestamp)),
 		Content: content,
 		Bytes:   len(content),

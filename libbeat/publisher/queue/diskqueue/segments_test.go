@@ -50,7 +50,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		qs := &queueSegment{
 			id: tc.id,
 		}
-		sw, err := qs.getWriter(settings)
+		sw, err := qs.getWriter(settings, nil)
 		assert.NoError(t, err, name)
 
 		n, err := sw.Write(tc.plaintext)
@@ -60,7 +60,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		err = sw.Close()
 		assert.NoError(t, err, name)
 
-		sr, err := qs.getReader(settings)
+		sr, err := qs.getReader(settings, nil)
 		assert.NoError(t, err, name)
 
 		n, err = sr.Read(dst)
@@ -106,7 +106,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 		qs := &queueSegment{
 			id: tc.id,
 		}
-		sw, err := qs.getWriter(settings)
+		sw, err := qs.getWriter(settings, nil)
 		assert.NoError(t, err, name)
 		for _, plaintext := range tc.plaintexts {
 			n, err := sw.Write(plaintext)
@@ -116,7 +116,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 			assert.NoError(t, err, name)
 		}
 		sw.Close()
-		sr, err := qs.getReader(settings)
+		sr, err := qs.getReader(settings, nil)
 		assert.NoError(t, err, name)
 		// seek to second data piece
 		n, err := sr.Seek(segmentHeaderSize+int64(len(tc.plaintexts[0])), io.SeekStart)
@@ -160,7 +160,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 		qs := &queueSegment{
 			id: tc.id,
 		}
-		sw, err := qs.getWriter(settings)
+		sw, err := qs.getWriter(settings, nil)
 		assert.NoError(t, err, name)
 		for _, plaintext := range tc.plaintexts {
 			n, err := sw.Write(plaintext)
@@ -168,7 +168,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 			assert.Equal(t, len(plaintext), n, name)
 		}
 		sw.Close()
-		sr, err := qs.getReader(settings)
+		sr, err := qs.getReader(settings, nil)
 		assert.NoError(t, err, name)
 		// seek to location
 		_, err = sr.Seek(tc.location, io.SeekStart)

@@ -367,6 +367,26 @@ service:
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
+type multiReceiverConfig struct {
+	Index          int
+	PathHome       string
+	InputFile      string
+	MonitoringPort int
+}
+
+func renderOtelConfig(tb testing.TB, cfgTemplate string, data any) string {
+	tb.Helper()
+	var buf bytes.Buffer
+	require.NoError(tb, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&buf, data))
+	cfg := buf.String()
+	tb.Cleanup(func() {
+		if tb.Failed() {
+			tb.Logf("OTel config:\n%s", cfg)
+		}
+	})
+	return cfg
+}
+
 func writeEventsToFile(t *testing.T, file *os.File, startLine, numEvents int) {
 	t.Helper()
 	for i := startLine; i < startLine+numEvents; i++ {
@@ -596,33 +616,28 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	type receiverConfig struct {
-		MonitoringPort int
-		InputFile      string
-		PathHome       string
-	}
-
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	monitoringPorts := libbeattesting.MustAvailableTCP4Ports(t, 2)
 	otelConfig := struct {
 		Index     string
-		Receivers []receiverConfig
+		Receivers []multiReceiverConfig
 	}{
 		Index: "logs-integration-" + namespace,
-		Receivers: []receiverConfig{
+		Receivers: []multiReceiverConfig{
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				MonitoringPort: int(monitoringPorts[0]),
 				InputFile:      logFilePath,
 				PathHome:       filepath.Join(tmpdir, "r1"),
 			},
 			{
-				MonitoringPort: int(libbeattesting.MustAvailableTCP4Port(t)),
+				MonitoringPort: int(monitoringPorts[1]),
 				InputFile:      logFilePath,
 				PathHome:       filepath.Join(tmpdir, "r2"),
 			},
 		},
 	}
 
-	cfg := `receivers:
+	cfg := renderOtelConfig(t, `receivers:
 {{range $i, $receiver := .Receivers}}
   filebeatreceiver/{{$i}}:
     filebeat:
@@ -676,21 +691,11 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
-	var configBuffer bytes.Buffer
-	require.NoError(t,
-		template.Must(template.New("config").Parse(cfg)).Execute(&configBuffer, otelConfig))
-	configContents := configBuffer.Bytes()
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Config contents:\n%s", configContents)
-		}
-	})
+`, otelConfig)
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
 
-	oteltestcol.New(t, configBuffer.String())
+	oteltestcol.New(t, cfg)
 
 	es := integration.GetESClient(t, "http")
 
@@ -1102,19 +1107,19 @@ service:
 
 				m = m.Flatten()
 
-				assert.Equal(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], "expected total events published to pipeline to match")
+				assert.InDelta(ct, float64(numTestEvents), m["libbeat.pipeline.events.published"], 0, "expected total events published to pipeline to match")
 
 				// For non-retryable errors like 400, events are dropped by the exporter
 				if tt.requestLevelFailure && tt.requestStatusCode == "400" {
-					assert.Equal(ct, float64(0), m["libbeat.output.events.acked"], "expected no events to be acked (400 errors drop events)")
+					assert.InDelta(ct, float64(0), m["libbeat.output.events.acked"], 0, "expected no events to be acked (400 errors drop events)")
 				} else {
 					// For retryable errors or successful cases, events are eventually acked
 					// Currently, otelconsumer either ACKs or fails the entire batch and has no visibility into individual event failures within the exporter.
 					// From otelconsumer's perspective, the whole batch is considered successful as long as ConsumeLogs returns no error.
 					// events.total can be larger than the acknowledged event count because it includes retrys.
 					assert.GreaterOrEqual(ct, m["libbeat.output.events.total"], float64(numTestEvents), "expected total events sent to output include all events")
-					assert.Equal(ct, float64(numTestEvents), m["libbeat.output.events.acked"], "expected total events acked to match")
-					assert.Equal(ct, float64(0), m["libbeat.output.events.dropped"], "expected total events dropped to match")
+					assert.InDelta(ct, float64(numTestEvents), m["libbeat.output.events.acked"], 0, "expected total events acked to match")
+					assert.InDelta(ct, float64(0), m["libbeat.output.events.dropped"], 0, "expected total events dropped to match")
 				}
 			}, 10*time.Second, 100*time.Millisecond, "expected output stats to be available in monitoring endpoint")
 		})
@@ -1533,7 +1538,8 @@ service:
 	// wait for 8888 port to be free (an indication that previous collector has exited)
 	require.Eventually(t,
 		func() bool {
-			ln, err := net.Listen("tcp", "localhost:8888")
+			var lc net.ListenConfig
+			ln, err := lc.Listen(context.Background(), "tcp", "localhost:8888")
 			if err != nil {
 				return false
 			}
@@ -1718,7 +1724,8 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 			),
 		)
 
-		l, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", serverPort))
+		var lc net.ListenConfig
+		l, err := lc.Listen(context.Background(), "tcp", fmt.Sprintf("localhost:%d", serverPort))
 		require.NoError(t, err)
 		mockServer.Listener = l
 		mockServer.Start()
@@ -1894,6 +1901,71 @@ service:
 	})
 }
 
+func TestDiskQueuePerReceiverPaths(t *testing.T) {
+	tmpdir := t.TempDir()
+	logFilePath := filepath.Join(tmpdir, "input.log")
+	writeEventsToLogFile(t, logFilePath, 5)
+
+	receivers := []multiReceiverConfig{
+		{Index: 0, PathHome: filepath.Join(tmpdir, "receiver-a")},
+		{Index: 1, PathHome: filepath.Join(tmpdir, "receiver-b")},
+	}
+
+	cfg := renderOtelConfig(t, `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-diskqueue-{{.Index}}
+          enabled: true
+          paths:
+            - {{$.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    path.home: {{.PathHome}}
+    queue.disk:
+      max_size: 100MB
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`, struct {
+		Receivers []multiReceiverConfig
+		InputFile string
+	}{Receivers: receivers, InputFile: logFilePath})
+
+	oteltestcol.New(t, cfg)
+
+	for _, r := range receivers {
+		diskqueueDir := filepath.Join(r.PathHome, "data", "diskqueue")
+		require.EventuallyWithT(t, func(ct *assert.CollectT) {
+			assert.FileExists(ct, filepath.Join(diskqueueDir, "state.dat"),
+				"receiver %d: expected diskqueue state.dat under %s", r.Index, diskqueueDir)
+		}, 30*time.Second, 500*time.Millisecond)
+	}
+
+	// Verify the two receivers have distinct diskqueue directories.
+	assert.NotEqual(t,
+		filepath.Join(receivers[0].PathHome, "data", "diskqueue"),
+		filepath.Join(receivers[1].PathHome, "data", "diskqueue"),
+		"receivers must have different diskqueue paths")
+}
+
 func BenchmarkFilebeatOTelCollector(b *testing.B) {
 	numReceivers := 4
 
@@ -1901,25 +1973,15 @@ func BenchmarkFilebeatOTelCollector(b *testing.B) {
 		b.StopTimer()
 		tmpDir := b.TempDir()
 
-		type receiverConfig struct {
-			Index    int
-			PathHome string
-		}
-
-		configData := struct {
-			Receivers []receiverConfig
-		}{
-			Receivers: make([]receiverConfig, numReceivers),
-		}
-
+		receivers := make([]multiReceiverConfig, numReceivers)
 		for i := range numReceivers {
-			configData.Receivers[i] = receiverConfig{
+			receivers[i] = multiReceiverConfig{
 				Index:    i + 1,
 				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
 			}
 		}
 
-		cfgTemplate := `receivers:
+		cfg := renderOtelConfig(b, `receivers:
 {{range .Receivers}}
   filebeatreceiver/{{.Index}}:
     filebeat:
@@ -1947,14 +2009,11 @@ service:
       level: DEBUG
     metrics:
       level: none
-`
-
-		var configBuffer bytes.Buffer
-		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+`, struct{ Receivers []multiReceiverConfig }{Receivers: receivers})
 
 		b.StartTimer()
 
-		col := oteltestcol.New(b, configBuffer.String())
+		col := oteltestcol.New(b, cfg)
 		require.NotNil(b, col)
 		require.Eventually(b, func() bool {
 			return col.ObservedLogs().
@@ -1962,4 +2021,148 @@ service:
 		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
 		col.Shutdown()
 	}
+}
+
+// TestBeatProcessorSharedAcrossPipelines verifies that when the same beat
+// processor component ID is referenced by multiple OTel pipelines, only a
+// single underlying beatProcessor instance is created. This avoids duplicate
+// initialisation of expensive Beat sub-processors (add_cloud_metadata,
+// add_kubernetes_metadata, etc.).
+//
+// The test configures a full OTel Collector with two log pipelines that both
+// reference the same "beat" processor, then asserts that the "Configured Beat
+// processor" log message appears exactly once — proving a single shared instance.
+func TestBeatProcessorSharedAcrossPipelines(t *testing.T) {
+	cfg := `service:
+  pipelines:
+    logs/1:
+      receivers:
+        - filebeatreceiver/1
+      processors:
+        - beat
+      exporters:
+        - debug
+    logs/2:
+      receivers:
+        - filebeatreceiver/2
+      processors:
+        - beat
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: debug
+    metrics:
+      level: none
+receivers:
+  filebeatreceiver/1:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "first test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+  filebeatreceiver/2:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "second test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_fields:
+          fields:
+            env: "test"
+exporters:
+  debug:
+    verbosity: detailed
+`
+	col := oteltestcol.New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		// Verify the first test message was enriched by finding the output from Debug exporter.
+		return col.ObservedLogs().
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"first test message"`).
+			FilterMessageSnippet(`"fields":{"env":"test"}`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected exactly one log with first test message")
+	require.Eventually(t, func() bool {
+		// Verify the second test message was enriched by finding the output from Debug exporter.
+		return col.ObservedLogs().
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"second test message"`).
+			FilterMessageSnippet(`"fields":{"env":"test"}`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "Expected exactly one log with second test message")
+
+	processorInstanceCount := col.ObservedLogs().FilterMessageSnippet("Configured Beat processor").Len()
+	assert.Equal(t, 1, processorInstanceCount, "expected beat processor to be configured once (shared instance), but got %d", processorInstanceCount)
+}
+
+// TestBeatProcessorWhenCondition verifies that `when` conditions are
+// honored for beat processors.
+func TestBeatProcessorWhenCondition(t *testing.T) {
+	cfg := `service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      processors:
+        - beat
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: debug
+    metrics:
+      level: none
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          message: "marker test message"
+          count: 1
+    queue.mem.flush.timeout: 0s
+processors:
+  beat:
+    processors:
+      - add_fields:
+          target: ""
+          fields:
+            should_be_added: "yes"
+          when.contains.message: "marker"
+      - add_fields:
+          target: ""
+          fields:
+            should_not_be_added: "yes"
+          when.not.contains.message: "marker"
+exporters:
+  debug:
+    verbosity: detailed
+`
+	col := oteltestcol.New(t, cfg)
+	require.NotNil(t, col)
+
+	require.Eventually(t, func() bool {
+		return col.ObservedLogs().
+			FilterMessageSnippet("Body: Map({").
+			FilterMessageSnippet(`"message":"marker test message"`).
+			FilterMessageSnippet(`"should_be_added":"yes"`).
+			Len() == 1
+	}, 30*time.Second, 100*time.Millisecond, "expected event to be enriched")
+
+	// The processor whose condition does not match must not enrich the event.
+	matchingNotAdded := col.ObservedLogs().
+		FilterMessageSnippet("Body: Map({").
+		FilterMessageSnippet(`"should_not_be_added"`).
+		Len()
+	assert.Equal(t, 0, matchingNotAdded, "expected `should_not_be_added` field to be absent")
 }
