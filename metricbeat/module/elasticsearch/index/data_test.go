@@ -63,7 +63,7 @@ func TestMapper(t *testing.T) {
 			URI:          server.URL,
 			SanitizedURI: server.URL,
 			Host:         server.URL,
-		}, logptest.NewTestingLogger(t, ""))
+		}, logptest.NewTestingLogger(t, ""), "")
 		if err != nil {
 			t.Fatal(err)
 		}
