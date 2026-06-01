@@ -73,7 +73,7 @@ func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix str
 
 	var sem *semaphore.Weighted
 	if limit > 0 {
-		sem = semaphore.NewWeighted(int64(min(limit, math.MaxInt64)))
+		sem = semaphore.NewWeighted(int64(min(limit, math.MaxInt64))) //nolint:gosec // min ensures no overflow
 	}
 
 	return &Group{
