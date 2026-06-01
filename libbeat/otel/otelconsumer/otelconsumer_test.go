@@ -505,13 +505,10 @@ func TestPublishRoutesToBatchSource(t *testing.T) {
 	// every log record it receives into the given slice.
 	collectFields := func(received *[]int64) consumer.Logs {
 		c, err := consumer.NewLogs(func(_ context.Context, ld plog.Logs) error {
-			rl := ld.ResourceLogs()
-			for i := 0; i < rl.Len(); i++ {
-				sl := rl.At(i).ScopeLogs()
-				for j := 0; j < sl.Len(); j++ {
-					lr := sl.At(j).LogRecords()
-					for k := 0; k < lr.Len(); k++ {
-						if v, ok := lr.At(k).Body().Map().Get("field"); ok {
+			for _, rl := range ld.ResourceLogs().All() {
+				for _, sl := range rl.ScopeLogs().All() {
+					for _, lr := range sl.LogRecords().All() {
+						if v, ok := lr.Body().Map().Get("field"); ok {
 							*received = append(*received, v.Int())
 						}
 					}
