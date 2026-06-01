@@ -144,3 +144,10 @@ func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
 
 	m.lastFileScanMetrics = current
 }
+
+// CleanupFileScanMetrics removes this input's last file scan contribution from
+// the shared aggregate scan gauges. Call this during input/prospector shutdown
+// so stale scan counts are not left behind after an input stops or restarts.
+func (m *Metrics) CleanupFileScanMetrics() {
+	m.UpdateFileScanMetrics(FileScanMetrics{})
+}

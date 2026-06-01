@@ -1321,9 +1321,10 @@ scanner:
 	require.Len(t, files, 1, "only keep log should be ingestible")
 
 	assert.Equal(t, loginp.FileScanMetrics{
+		FilesIgnored:        1,
 		FilesMatched:        6,
+		FilesNoIngestTarget: 4,
 		FilesUnique:         1,
-		FilesNoIngestTarget: 5,
 	}, scanMetrics, "unexpected scan metrics")
 }
 

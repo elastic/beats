@@ -140,6 +140,7 @@ func (w *fileWatcher) Run(
 	ignoreInactiveSince time.Time,
 ) {
 	defer close(w.events)
+	defer metrics.CleanupFileScanMetrics()
 
 	// run initial scan before starting regular
 	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
@@ -649,11 +650,11 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		}
 
 		if s.isFileExcluded(it.originalFilename) {
-			return it, fmt.Errorf("file %q->%q is excluded from ingestion", it.filename, it.originalFilename)
+			return it, fmt.Errorf("file %q->%q is %w", it.filename, it.originalFilename, errFileExcluded)
 		}
 
 		if !s.isFileIncluded(it.originalFilename) {
-			return it, fmt.Errorf("file %q->%q is not included in ingestion", it.filename, it.originalFilename)
+			return it, fmt.Errorf("file %q->%q is %w", it.filename, it.originalFilename, errFileNotIncluded)
 		}
 	}
 
