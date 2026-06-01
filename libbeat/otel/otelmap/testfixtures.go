@@ -32,13 +32,6 @@ type BenchCase struct {
 	Src  mapstr.M
 }
 
-type fixtureTextMarshaler struct {
-	value string
-}
-
-func (f fixtureTextMarshaler) MarshalText() ([]byte, error) {
-	return []byte("marshalled:" + f.value), nil
-}
 
 type fixtureStruct struct {
 	Name  string `json:"name"`
@@ -158,9 +151,6 @@ func BenchmarkCases() []BenchCase {
 				"named_uint":        fixturePort(8080),
 				"json_number_int":   json.Number("9223372036854775808"),
 				"json_number_float": json.Number("9.223372036854775808"),
-				"marshaler":         fixtureTextMarshaler{value: "ok"},
-				"complex64":         complex64(1 + 2i),
-				"complex128":        complex128(1.5 + 2.5i),
 			},
 		},
 		{

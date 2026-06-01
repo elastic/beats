@@ -623,11 +623,6 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 			delete(fields, "@timestamp")
 			beatEvent := beat.Event{Timestamp: timestamp, Fields: fields}
 
-			// ── Beats ES output path ──────────────────────────────────────────
-			beatsBatch := outest.NewBatch(beatEvent)
-			beatsBatch.Events()[0], _ = beatsEnc.EncodeEntry(beatsBatch.Events()[0])
-			require.NoError(t, beatsClient.Publish(ctx, beatsBatch))
-
 			// ── OTel path: via otelConsumer.Publish (production code path) ────
 			otelDoc := collectOtelDocViaPublish(t, ctx, logger, beatEvent)
 
@@ -640,22 +635,28 @@ func TestElasticsearchOutputVsExporterSerialization(t *testing.T) {
 				compareJSONValues(t, "otel", "legacy", otelDoc, legacyDoc)
 			})
 
-			// Beats comparison: the Beats encoder (go-structform) may not
-			// support all types (e.g. complex64/128), so we use a short
-			// deadline and skip rather than hard-fail on timeout.
-			beatsCtx, beatsCancel := context.WithTimeout(ctx, 3*time.Second)
-			defer beatsCancel()
-			select {
-			case beatsDoc := <-beatsDocCh:
-				t.Run("beats_vs_otel", func(t *testing.T) {
-					compareJSONValues(t, "beats", "otel", beatsDoc, otelDoc)
-				})
-				t.Run("beats_vs_legacy", func(t *testing.T) {
-					compareJSONValues(t, "beats", "legacy", beatsDoc, legacyDoc)
-				})
-			case <-beatsCtx.Done():
-				t.Log("skipping beats comparisons: Beats did not produce a document (field types may be unsupported by go-structform)")
+			// ── Beats ES output path ──────────────────────────────────────────
+			beatsBatch := outest.NewBatch(beatEvent)
+			encodedEvent, encodedSize := beatsEnc.EncodeEntry(beatsBatch.Events()[0])
+			if encodedSize == 0 {
+				t.Logf("skipping Beats comparison for case %q: EncodeEntry produced no output — Src contains a type unsupported by go-structform", tc.Name)
+				return
 			}
+			beatsBatch.Events()[0] = encodedEvent
+			require.NoError(t, beatsClient.Publish(ctx, beatsBatch))
+
+			var beatsDoc []byte
+			select {
+			case beatsDoc = <-beatsDocCh:
+			case <-ctx.Done():
+				t.Fatal("timed out waiting for Beats ES output to deliver document")
+			}
+			t.Run("beats_vs_otel", func(t *testing.T) {
+				compareJSONValues(t, "beats", "otel", beatsDoc, otelDoc)
+			})
+			t.Run("beats_vs_legacy", func(t *testing.T) {
+				compareJSONValues(t, "beats", "legacy", beatsDoc, legacyDoc)
+			})
 		})
 	}
 }
