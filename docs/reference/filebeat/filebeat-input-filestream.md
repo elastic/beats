@@ -1302,7 +1302,7 @@ each scanner pass and reset when inputs stop.
 | Metric | Description |
 | --- | --- |
 | `files_empty` | Number of matched files that are empty. |
-| `files_ignored` | Number of matched files ignored by `filestream` settings or state, such as `prospector.scanner.exclude_files`, `prospector.scanner.include_files`, `ignore_older`, or `ignore_inactive`. |
+| `files_ignored` | Number of matched files ignored by `filestream` settings or state, such as `prospector.scanner.exclude_files`, `ignore_older`, or `ignore_inactive`. |
 | `files_matched` | Number of filesystem path matches returned by the configured `paths` globs before duplicate, ignore, and ingestibility filtering. |
-| `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint, symlinks to already known files, or files that cannot be converted to file descriptors. |
+| `files_no_ingest_target` | Number of matched non-empty files that did not produce an ingest target, such as duplicate matches, files that are too small to fingerprint or symlinks to already known files. |
 | `files_unique` | Number of unique files that produced ingest targets after scanner filtering and de-duplication. |

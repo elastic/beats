@@ -1429,13 +1429,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	}
 }
 
-func createWatcherWithConfig(
-	t *testing.T,
-	logger *logp.Logger,
-	paths []string,
-	cfgStr string,
-) *fileWatcher {
-
+func createWatcherWithConfig(t *testing.T, logger *logp.Logger, paths []string, cfgStr string) *fileWatcher {
 	tmpCfg := struct {
 		Scaner fileWatcherConfig `config:"scanner"`
 	}{

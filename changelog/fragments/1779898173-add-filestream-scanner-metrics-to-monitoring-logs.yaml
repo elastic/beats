@@ -18,7 +18,15 @@ summary: Add Filestream scanner metrics to monitoring logs
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-# description:
+description: |
+  This commit add the following Filestream metrics to the logs and the `/stats` HTTP endpoint:
+   - files_empty
+   - files_ignored
+   - files_matched
+   - files_no_ingest_target
+   - files_unique
+  
+  The metrics are gauges aggregated from all running Filestream inputs
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:

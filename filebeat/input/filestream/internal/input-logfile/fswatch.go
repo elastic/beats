@@ -135,9 +135,11 @@ type FSScanner interface {
 type FSWatcher interface {
 	FSScanner
 
-	// Run is the event loop which watchers for changes
+	// Run is the event loop which watches for changes
 	// in the file system and returns events based on the data.
-	Run(unison.Canceler, *Metrics, time.Duration, time.Time)
+	// Aside from the metrics struct it also has ignore older
+	// and ignore inactive as arguments.
+	Run(ctx unison.Canceler, metrics *Metrics, ingoreOlder time.Duration, ignoreInativeSince time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for
