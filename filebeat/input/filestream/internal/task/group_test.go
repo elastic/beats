@@ -45,7 +45,7 @@ type testLogger struct {
 func (tl *testLogger) Errorf(format string, args ...interface{}) {
 	tl.mu.Lock()
 	defer tl.mu.Unlock()
-	tl.b.WriteString(fmt.Sprintf(format, args...))
+	fmt.Fprintf(&tl.b, format, args...)
 	tl.b.WriteString("\n")
 }
 
@@ -58,12 +58,12 @@ func (tl *testLogger) String() string {
 func TestNewGroup(t *testing.T) {
 	limit := 10
 	timeout := time.Second
-	g := NewGroup(uint64(limit), timeout, noopLogger{}, "") //nolint:gosec //limit is 10 no overflow
+	g := NewGroup(uint64(limit), timeout, noopLogger{}, "")
 	require.NotNil(t, g, "NewGroup returned a nil group, it cannot be nil")
 
 	require.NotNil(t, g.sem)
 
-	err := g.sem.Acquire(context.Background(), int64(limit-1)) //nolint:gosec //limit is 10 no overflow
+	err := g.sem.Acquire(context.Background(), int64(limit-1))
 	require.NoError(t, err, "semaphore Acquire failed")
 	assert.True(t, g.sem.TryAcquire(1),
 		"semaphore should have 1 place left, there is none")
@@ -206,7 +206,7 @@ func TestGroup_Go(t *testing.T) {
 		// 100 <= limit <= 10000
 		limit := rand.IntN(10000-100) + 100
 		t.Logf("running %d goroutines", limit)
-		g := NewGroup(uint64(limit), time.Second, noopLogger{}, "")
+		g := NewGroup(uint64(limit), time.Second, noopLogger{}, "") //nolint:gosec // limit won't overflow
 
 		done := make(chan struct{})
 		var runningCounter atomic.Int64
