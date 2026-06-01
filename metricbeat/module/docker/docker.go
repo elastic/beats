@@ -26,9 +26,9 @@ import (
 	"sync"
 	"time"
 
-	dcontainer "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
+	"github.com/moby/moby/api/types/container"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -60,7 +60,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 }
 
 // NewDockerClient initializes and returns a new Docker client
-func NewDockerClient(endpoint string, config Config, logger *logp.Logger) (*client.Client, error) {
+func NewDockerClient(endpoint string, config Config, logger *logp.Logger) (*dockerclient.Client, error) {
 	var httpClient *http.Client
 
 	if config.TLS.IsEnabled() {
@@ -91,25 +91,25 @@ func NewDockerClient(endpoint string, config Config, logger *logp.Logger) (*clie
 }
 
 // FetchStats returns a list of running containers with all related stats inside
-func FetchStats(client *client.Client, timeout time.Duration, stream bool, logger *logp.Logger) ([]Stat, error) {
+func FetchStats(cli *dockerclient.Client, timeout time.Duration, stream bool, logger *logp.Logger) ([]Stat, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	containers, err := client.ContainerList(ctx, dcontainer.ListOptions{})
+	listResult, err := cli.ContainerList(ctx, dockerclient.ContainerListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
 	var wg sync.WaitGroup
 
-	containersList := make([]Stat, 0, len(containers))
+	containersList := make([]Stat, 0, len(listResult.Items))
 	statsQueue := make(chan Stat, 1)
-	wg.Add(len(containers))
+	wg.Add(len(listResult.Items))
 
-	for _, container := range containers {
-		go func(container dcontainer.Summary) {
+	for _, c := range listResult.Items {
+		go func(c container.Summary) {
 			defer wg.Done()
-			statsQueue <- exportContainerStats(ctx, client, &container, stream, logger)
-		}(container)
+			statsQueue <- exportContainerStats(ctx, cli, &c, stream, logger)
+		}(c)
 	}
 
 	go func() {
@@ -136,10 +136,10 @@ func FetchStats(client *client.Client, timeout time.Duration, stream bool, logge
 // In case stream is true, we use get a stream of results for container stats. From the stream we keep the second result.
 // This is needed for podman use case where in case stream is false, no precpu stats are returned. The precpu stats
 // are required for the cpu percentage calculation. We keep the second  result as in the first result, the stats are not correct.
-func exportContainerStats(ctx context.Context, client *client.Client, container *dcontainer.Summary, stream bool, logger *logp.Logger) Stat {
+func exportContainerStats(ctx context.Context, cli *dockerclient.Client, cont *container.Summary, stream bool, logger *logp.Logger) Stat {
 	var event Stat
-	event.Container = container
-	containerStats, err := client.ContainerStats(ctx, container.ID, stream)
+	event.Container = cont
+	containerStats, err := cli.ContainerStats(ctx, cont.ID, dockerclient.ContainerStatsOptions{Stream: stream, IncludePreviousSample: !stream})
 	if err != nil {
 		logger.Debugf("Failed fetching container stats: %v", err)
 		return event
