@@ -6,7 +6,6 @@ package http_endpoint
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -60,14 +59,13 @@ func Test_validateConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid log destination",
+			name: "invalid_log_destination_accepted_at_config_time",
 			config: config{
 				URL:          "/",
 				ResponseBody: `{"message": "success"}`,
 				Method:       http.MethodPost,
 				Tracer:       &tracerConfig{Enabled: ptrTo(true), Logger: lumberjack.Logger{Filename: "/var/log"}},
 			},
-			wantError: fmt.Errorf(`request tracer path must be within %q path accessing config`, inputName),
 		},
 	}
 
