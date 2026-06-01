@@ -507,9 +507,9 @@ func TestFromMapstrWholeFloat(t *testing.T) {
 	assert.Equal(t, int64(-2), raw["neg_f64"])
 	assert.Equal(t, int64(0), raw["zero_f32"])
 	assert.Equal(t, int64(2), raw["two_f32"])
-	assert.Equal(t, float64(1.5), raw["frac_f64"])
-	assert.Equal(t, float64(1.5), raw["frac_f32"]) // float32 promoted to float64 precision
-	assert.Equal(t, float64(-1.5), raw["neg_frac"])
+	assert.InDelta(t, float64(1.5), raw["frac_f64"], 0)
+	assert.InDelta(t, float64(1.5), raw["frac_f32"], 0) // float32 promoted to float64 precision
+	assert.InDelta(t, float64(-1.5), raw["neg_frac"], 0)
 	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f64_slice"])
 	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f32_slice"])
 }
