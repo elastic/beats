@@ -26,7 +26,7 @@ var RootCmd *cmd.BeatsRootCmd
 // heartbeatCfg is a callback registered via SetTransform that returns a Elastic Agent client.Unit
 // configuration generated from a raw Elastic Agent config
 func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	inputs, err := management.CreateInputsFromStreams(rawIn, "synthetics", agentInfo)
+	inputs, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
@@ -34,7 +34,7 @@ func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 	base := []map[string]interface{}{}
 	// Filter streams without a explicit type, as UnnestStream did
 	for _, input := range inputs {
-		if input["type"] != "" {
+		if _, ok := input["type"]; !ok {
 			base = append(base, input)
 			break
 		}
@@ -46,37 +46,6 @@ func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 	}
 
 	return configList, nil
-	// // configList, err := management.CreateReloadConfigFromInputs(TransformRawIn(rawIn))
-	// // if err != nil {
-	// // 	return nil, fmt.Errorf("error creating reloader config: %w", err)
-	// // }
-
-	// unnestedList := []*reload.ConfigWithMeta{}
-	// for _, cfg := range configList {
-	// 	unnested, err := stdfields.UnnestStream(cfg.Config)
-	// 	if err != nil {
-	// 		unnestedList = append(unnestedList, cfg)
-	// 	} else {
-	// 		unnestedList = append(unnestedList, &reload.ConfigWithMeta{Config: unnested})
-	// 	}
-	// }
-
-	// return unnestedList, nil
-}
-
-// TransformRawIn removes unwanted fields to keep consistent hashing on reload()
-func TransformRawIn(rawIn *proto.UnitExpectedConfig) []map[string]interface{} {
-	rawInput := []map[string]interface{}{rawIn.GetSource().AsMap()}
-
-	for _, p := range rawInput {
-		delete(p, "policy")
-		// revision gets incremented even if no actual change to the monitor policy
-		// happened, changing the config hash. This is particularly impactful if using
-		// global parameters
-		delete(p, "revision")
-	}
-
-	return rawInput
 }
 
 func init() {
