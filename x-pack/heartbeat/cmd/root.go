@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 
 	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -26,23 +25,43 @@ var RootCmd *cmd.BeatsRootCmd
 
 // heartbeatCfg is a callback registered via SetTransform that returns a Elastic Agent client.Unit
 // configuration generated from a raw Elastic Agent config
-func heartbeatCfg(rawIn *proto.UnitExpectedConfig, _ *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	configList, err := management.CreateReloadConfigFromInputs(TransformRawIn(rawIn))
+func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
+	inputs, err := management.CreateInputsFromStreams(rawIn, "synthetics", agentInfo)
+	if err != nil {
+		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
+	}
+
+	base := []map[string]interface{}{}
+	// Filter streams without a explicit type, as UnnestStream did
+	for _, input := range inputs {
+		if input["type"] != "" {
+			base = append(base, input)
+			break
+		}
+	}
+
+	configList, err := management.CreateReloadConfigFromInputs(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating reloader config: %w", err)
 	}
 
-	unnestedList := []*reload.ConfigWithMeta{}
-	for _, cfg := range configList {
-		unnested, err := stdfields.UnnestStream(cfg.Config)
-		if err != nil {
-			unnestedList = append(unnestedList, cfg)
-		} else {
-			unnestedList = append(unnestedList, &reload.ConfigWithMeta{Config: unnested})
-		}
-	}
+	return configList, nil
+	// // configList, err := management.CreateReloadConfigFromInputs(TransformRawIn(rawIn))
+	// // if err != nil {
+	// // 	return nil, fmt.Errorf("error creating reloader config: %w", err)
+	// // }
 
-	return unnestedList, nil
+	// unnestedList := []*reload.ConfigWithMeta{}
+	// for _, cfg := range configList {
+	// 	unnested, err := stdfields.UnnestStream(cfg.Config)
+	// 	if err != nil {
+	// 		unnestedList = append(unnestedList, cfg)
+	// 	} else {
+	// 		unnestedList = append(unnestedList, &reload.ConfigWithMeta{Config: unnested})
+	// 	}
+	// }
+
+	// return unnestedList, nil
 }
 
 // TransformRawIn removes unwanted fields to keep consistent hashing on reload()
