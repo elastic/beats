@@ -1,7 +1,0 @@
-kind: upgrade
-
-summary: upgrade osquery version to 5.23.0
-
-description: osquery 5.23.0 adds new tables and includes dependency/security fixes, including an expat update for CVE-2026-25210.
-
-component: osquerybeat
