@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func TestFilestreamScannerMetricsLoggedWithFileOutput(t *testing.T) {
+func TestFilestreamScannerMetrics(t *testing.T) {
 	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
 	tempDir := filebeat.TempDir()
 
