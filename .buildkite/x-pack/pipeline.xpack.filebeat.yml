@@ -37,9 +37,11 @@ env:
 common:
   - dockerhub_login_plugin: &dockerhub_login_plugin
       elastic/vault-docker-login#v0.8.0:
+        disable_logout: true
         secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
   - docker_elastic_login_plugin: &docker_elastic_login_plugin
       elastic/vault-docker-login#v0.8.0:
+        disable_logout: true
         secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
 
 steps:
