@@ -256,14 +256,19 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 
 	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(event.Content.Timestamp))
 	if beatInfo.IncludeMetadata {
+		extra := [...]struct{ k, v string }{
+			{"beat", beatInfo.Beat},
+			{"version", beatInfo.Version},
+			{"type", "_doc"},
+		}
 		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
-		pmeta.EnsureCapacity(len(event.Content.Meta) + 3)
+		pmeta.EnsureCapacity(len(event.Content.Meta) + len(extra))
 		if err := otelmap.FromMapstr(pmeta, event.Content.Meta); err != nil {
 			return err
 		}
-		pmeta.PutStr("beat", beatInfo.Beat)
-		pmeta.PutStr("version", beatInfo.Version)
-		pmeta.PutStr("type", "_doc")
+		for _, kv := range extra {
+			pmeta.PutStr(kv.k, kv.v)
+		}
 	}
 	return nil
 }
