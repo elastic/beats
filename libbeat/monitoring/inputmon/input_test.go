@@ -183,7 +183,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	}
 	found := map[string]bool{}
 
-	assert.Equal(t, len(want), len(got), "got a different number of metrics than wanted")
+	assert.Len(t, got, len(want), "got a different number of metrics than wanted")
 	for _, m := range got {
 		if found[m.ID] {
 			t.Error("found duplicate id")

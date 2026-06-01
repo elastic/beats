@@ -38,6 +38,11 @@ When Packetbeat is running on a Linux system with systemd, it uses by default th
 You can specify the following options in the `logging` section of the `packetbeat.yml` config file:
 
 
+::::{warning}
+The `logging.to_*` options are mutually exclusive. If multiple are set to `true`, only the first one takes effect, following the precedence order of the options listed below.
+::::
+
+
 ### `logging.to_stderr` [_logging_to_stderr]
 
 When true, writes all logging output to standard error output. This is equivalent to using the `-e` command line option.

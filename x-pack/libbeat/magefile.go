@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/magefile/mage/mg"
 
@@ -35,7 +36,11 @@ func Build() error {
 }
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: For Go integration tests only. The test binary is now built automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests only. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target remains required for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 

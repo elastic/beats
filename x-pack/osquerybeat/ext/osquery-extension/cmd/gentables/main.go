@@ -109,12 +109,13 @@ const (
 )
 
 var (
-	specDir  = flag.String("spec-dir", "../../specs", "Comma-separated directories containing YAML specifications (tables and views)")
-	outDir   = flag.String("out-dir", "../../pkg/tables/generated", "Output directory for generated table Go files")
-	viewsOut = flag.String("views-out-dir", "../../pkg/views/generated", "Output directory for generated view Go files")
-	docsDir  = flag.String("docs-dir", "../../docs/tables", "Output directory for generated table documentation")
-	viewsDoc = flag.String("views-docs-dir", "../../docs/views", "Output directory for generated view documentation")
-	verbose  = flag.Bool("verbose", false, "Verbose output")
+	specDir   = flag.String("spec-dir", "../../specs", "Comma-separated directories containing YAML specifications (tables and views)")
+	outDir    = flag.String("out-dir", "../../pkg/tables/generated", "Output directory for generated table Go files")
+	viewsOut  = flag.String("views-out-dir", "../../pkg/views/generated", "Output directory for generated view Go files")
+	docsDir   = flag.String("docs-dir", "../../docs/tables", "Output directory for generated table documentation")
+	viewsDoc  = flag.String("views-docs-dir", "../../docs/views", "Output directory for generated view documentation")
+	readmeOut = flag.String("readme-out", "../../README.md", "Output path for generated extension README")
+	verbose   = flag.Bool("verbose", false, "Verbose output")
 )
 
 func main() {
@@ -235,6 +236,10 @@ func run() error {
 
 	if err := generateStaticViewsRegistry(viewSpecs, *viewsOut); err != nil {
 		return fmt.Errorf("failed to generate static views registry: %w", err)
+	}
+
+	if err := generateReadme(specs, *readmeOut); err != nil {
+		return fmt.Errorf("failed to generate README: %w", err)
 	}
 
 	if *verbose {
@@ -510,6 +515,22 @@ type docTemplateData struct {
 	Examples        []exampleQuery
 	Notes           []string
 	RelatedTables   []string
+}
+
+type readmeEntry struct {
+	Name        string
+	Type        string
+	Description string
+	Linux       string
+	Darwin      string
+	Windows     string
+	DocPath      string
+}
+
+type readmeTemplateData struct {
+	Entries []readmeEntry
+	Tables  []readmeEntry
+	Views   []readmeEntry
 }
 
 type importEntry struct {
@@ -799,6 +820,66 @@ func generateDocumentation(s spec, docsDir string) error {
 
 	filename := filepath.Join(docsDir, s.Name+".md")
 	return writeFile(filename, content)
+}
+
+func generateReadme(specs []spec, readmePath string) error {
+	entries := make([]readmeEntry, 0, len(specs))
+	tables := make([]readmeEntry, 0)
+	views := make([]readmeEntry, 0)
+
+	for _, s := range specs {
+		platformMap := map[string]bool{
+			"linux":   false,
+			"darwin":  false,
+			"windows": false,
+		}
+		for _, p := range s.Platforms {
+			platformMap[p] = true
+		}
+
+		docDir := "tables"
+		if s.Type == "view" {
+			docDir = "views"
+		}
+
+		entry := readmeEntry{
+			Name:        s.Name,
+			Type:        s.Type,
+			Description: s.Description,
+			Linux:       checkmark(platformMap["linux"]),
+			Darwin:      checkmark(platformMap["darwin"]),
+			Windows:     checkmark(platformMap["windows"]),
+			DocPath:     fmt.Sprintf("docs/%s/%s.md", docDir, s.Name),
+		}
+
+		entries = append(entries, entry)
+		if s.Type == "table" {
+			tables = append(tables, entry)
+		} else if s.Type == "view" {
+			views = append(views, entry)
+		}
+	}
+
+	sort.Slice(entries, func(i, j int) bool { return entries[i].Name < entries[j].Name })
+	sort.Slice(tables, func(i, j int) bool { return tables[i].Name < tables[j].Name })
+	sort.Slice(views, func(i, j int) bool { return views[i].Name < views[j].Name })
+
+	data := readmeTemplateData{
+		Entries: entries,
+		Tables:  tables,
+		Views:   views,
+	}
+
+	content, err := renderTemplate("readme", "templates/readme.tmpl", data)
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(readmePath), 0755); err != nil {
+		return fmt.Errorf("failed to create README directory: %w", err)
+	}
+
+	return writeFile(readmePath, content)
 }
 
 // osqueryTypeToGoType maps osquery column types to Go types for result structs

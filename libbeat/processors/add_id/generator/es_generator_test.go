@@ -60,7 +60,7 @@ func TestIDConsecutiveOrdering(t *testing.T) {
 		// wrap around of first byte).
 		if decodedCurrID[0] == 0x00 { // first byte wrapped around
 			// Check that previous ID's first byte was max possible byte value (0xff)
-			assert.EqualValues(t, decodedPrevID[0], 0xff)
+			assert.EqualValues(t, 0xff, decodedPrevID[0])
 
 			// Check that rest of current ID (after first byte) is greater than rest of
 			// previous ID (after first byte)
@@ -113,7 +113,7 @@ func TestMonotonicTimestamp(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			assert.True(t, timestamp(test.clockTimestamp, test.lastTimestamp, test.sequenceNumber) >= test.lastTimestamp)
+			assert.GreaterOrEqual(t, timestamp(test.clockTimestamp, test.lastTimestamp, test.sequenceNumber), test.lastTimestamp)
 		})
 	}
 }

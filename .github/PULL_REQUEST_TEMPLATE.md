@@ -52,13 +52,6 @@ could make on their end to nullify or minimize this disruption. Consider impacts
 when using Beats.
 -->
 
-## Author's Checklist
-
-<!-- Recommended
-Add a checklist of things that are required to be reviewed in order to have the PR approved
--->
-- [ ]
-
 ## How to test this PR locally
 
 <!-- Recommended

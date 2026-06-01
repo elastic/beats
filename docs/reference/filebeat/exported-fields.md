@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Exported fields [exported-fields]
 
@@ -31,6 +31,7 @@ This document describes the fields that are exported by Filebeat. They are group
 * [*Docker fields*](/reference/filebeat/exported-fields-docker-processor.md)
 * [*ECS fields*](/reference/filebeat/exported-fields-ecs.md)
 * [*Elasticsearch fields*](/reference/filebeat/exported-fields-elasticsearch.md)
+* [*Elasticsearch query log fields*](/reference/filebeat/exported-fields-elasticsearch-querylog.md)
 * [*Envoyproxy fields*](/reference/filebeat/exported-fields-envoyproxy.md)
 * [*Fortinet fields*](/reference/filebeat/exported-fields-fortinet.md)
 * [*Google Cloud Platform (GCP) fields*](/reference/filebeat/exported-fields-gcp.md)

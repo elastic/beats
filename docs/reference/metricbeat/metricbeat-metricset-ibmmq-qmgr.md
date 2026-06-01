@@ -6,7 +6,7 @@ applies_to:
   serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # IBM MQ qmgr metricset [metricbeat-metricset-ibmmq-qmgr]
 

@@ -14,13 +14,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 func init() {
-	elasticbrowserhistory.RegisterGenerateFunc(getResults)
+	elasticbrowserhistory.RegisterGenerateFunc(func(ctx context.Context, queryContext table.QueryContext, log *logger.Logger, _ *client.ResilientClient) ([]elasticbrowserhistory.Result, error) {
+		return getResults(ctx, queryContext, log)
+	})
 }
 
 func getResults(ctx context.Context, queryContext table.QueryContext, log *logger.Logger) ([]elasticbrowserhistory.Result, error) {

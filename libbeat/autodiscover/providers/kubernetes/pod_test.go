@@ -2057,7 +2057,7 @@ func TestNamespacePodUpdater(t *testing.T) {
 
 			updater.OnUpdate(namespace1)
 
-			assert.EqualValues(t, c.expected, handler.objects)
+			assert.Equal(t, c.expected, handler.objects)
 		})
 	}
 }
@@ -2123,7 +2123,7 @@ func TestNodePodUpdater(t *testing.T) {
 			//This is when the update happens.
 			updater.OnUpdate(node1)
 
-			assert.EqualValues(t, c.expected, handler.objects)
+			assert.Equal(t, c.expected, handler.objects)
 		})
 	}
 }
@@ -2226,11 +2226,11 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 			nodeWatcher := eventer.(*pod).nodeWatcher
 
 			if test.expectedNil {
-				assert.Equalf(t, nil, namespaceWatcher, "Namespace "+test.msg)
-				assert.Equalf(t, nil, nodeWatcher, "Node "+test.msg)
+				assert.Nilf(t, namespaceWatcher, "Namespace "+test.msg)
+				assert.Nilf(t, nodeWatcher, "Node "+test.msg)
 			} else {
-				assert.NotEqualf(t, nil, namespaceWatcher, "Namespace "+test.msg)
-				assert.NotEqualf(t, nil, nodeWatcher, "Node "+test.msg)
+				assert.NotNilf(t, namespaceWatcher, "Namespace "+test.msg)
+				assert.NotNilf(t, nodeWatcher, "Node "+test.msg)
 			}
 		})
 	}

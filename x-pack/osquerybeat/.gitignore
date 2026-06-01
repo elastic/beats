@@ -9,6 +9,8 @@
 # Ignore Osquery artifacts that could be created during development
 /osqueryd
 /osquery/
+/releases/
+/.custom-artifact-install.lock
 
 /ext/osquery-extension/build/
 /osquery-extension.ext

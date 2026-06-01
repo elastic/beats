@@ -24,8 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestBatchSplitRetry(t *testing.T) {
@@ -46,9 +47,9 @@ func TestBatchSplitRetry(t *testing.T) {
 
 	rootBatch.SplitRetry()
 
-	require.Equal(t, 2, len(retryer.batches), "SplitRetry should retry 2 batches")
-	require.Equal(t, 1, len(retryer.batches[0].events), "Retried batches should have one event each")
-	require.Equal(t, 1, len(retryer.batches[1].events), "Retried batches should have one event each")
+	require.Len(t, retryer.batches, 2, "SplitRetry should retry 2 batches")
+	require.Len(t, retryer.batches[0].events, 1, "Retried batches should have one event each")
+	require.Len(t, retryer.batches[1].events, 1, "Retried batches should have one event each")
 	assert.Same(t, &events[0], &retryer.batches[0].events[0], "Retried batch events should match original")
 	assert.Same(t, &events[1], &retryer.batches[1].events[0], "Retried batch events should match original")
 
@@ -73,18 +74,18 @@ func TestNestedBatchSplit(t *testing.T) {
 	}
 
 	rootBatch.SplitRetry()
-	require.Equal(t, 2, len(retryer.batches), "SplitRetry should retry 2 batches")
+	require.Len(t, retryer.batches, 2, "SplitRetry should retry 2 batches")
 	// Clear out the first-level batches from the retry buffer and retry both of them
 	batches := retryer.batches
 	retryer.batches = []*ttlBatch{}
 	batches[0].SplitRetry()
 	batches[1].SplitRetry()
 
-	require.Equal(t, 4, len(retryer.batches), "two SplitRetry calls should generate four retrys")
+	require.Len(t, retryer.batches, 4, "two SplitRetry calls should generate four retrys")
 
 	for i := 0; i < 4; i++ {
 		assert.False(t, doneWasCalled, "Original callback shouldn't be invoked until all children are")
-		require.Equal(t, 1, len(retryer.batches[i].events), "Retried batches should have one event each")
+		require.Len(t, retryer.batches[i].events, 1, "Retried batches should have one event each")
 
 		// We expect the indices in the retried batches to match because we retried them in order
 		assert.Same(t, &events[i], &retryer.batches[i].events[0], "Retried batch events should match original")
@@ -129,8 +130,14 @@ func (b *mockQueueBatch) Count() int {
 func (b *mockQueueBatch) Done() {
 }
 
-func (b *mockQueueBatch) Entry(i int) queue.Entry {
-	return fmt.Sprintf("event %v", i)
+func (b *mockQueueBatch) Entry(i int) publisher.Event {
+	return publisher.Event{
+		Content: beat.Event{
+			Fields: mapstr.M{
+				"message": fmt.Sprintf("event %v", i),
+			},
+		},
+	}
 }
 
 func (b *mockQueueBatch) FreeEntries() {

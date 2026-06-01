@@ -18,6 +18,7 @@ import (
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 	elastichostgroups "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_host_groups"
@@ -27,10 +28,10 @@ import (
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This function is called from main.go after all init() functions have run.
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, client *client.ResilientClient) {
 	{
 		// Browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema
-		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log)
+		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_browser_history: %v", err)
 		} else {
@@ -40,7 +41,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Host system group information from /etc/group (e.g. when running in a container with hostfs mounted)
-		genFunc, err := elastichostgroups.GetGenerateFunc(log)
+		genFunc, err := elastichostgroups.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_host_groups: %v", err)
 		} else {
@@ -50,7 +51,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Host system running processes from /proc (e.g. when running in a container with hostfs mounted)
-		genFunc, err := elastichostprocesses.GetGenerateFunc(log)
+		genFunc, err := elastichostprocesses.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_host_processes: %v", err)
 		} else {
@@ -60,7 +61,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Host system user account information from /etc/passwd (e.g. when running in a container with hostfs mounted)
-		genFunc, err := elastichostusers.GetGenerateFunc(log)
+		genFunc, err := elastichostusers.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_host_users: %v", err)
 		} else {

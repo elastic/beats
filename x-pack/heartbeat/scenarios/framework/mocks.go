@@ -5,6 +5,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -84,6 +85,21 @@ func (pc *mockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	pc.Clients = append(pc.Clients, c)
 
 	return c, nil
+}
+
+// Disconnect disconnects all clients created by this mockPipeline.
+func (pc *mockPipeline) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.Clients {
+		err := c.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (pc *mockPipeline) PublishedEvents() []*beat.Event {

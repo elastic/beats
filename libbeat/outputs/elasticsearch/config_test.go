@@ -39,7 +39,7 @@ non_indexable_policy.drop: ~
 	if err != nil {
 		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
-	assert.Equal(t, "", index, "dead letter index should be empty string")
+	assert.Empty(t, index, "dead letter index should be empty string")
 }
 
 func TestDeadLetterIndexPolicyConfig(t *testing.T) {

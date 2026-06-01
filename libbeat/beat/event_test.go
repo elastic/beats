@@ -129,7 +129,7 @@ func TestEvent(t *testing.T) {
 			event := &Event{}
 			require.NotPanics(t, func() {
 				s := event.String()
-				require.Equal(t, `{"@metadata":{},"@timestamp":"0001-01-01T00:00:00Z"}`, s)
+				require.JSONEq(t, `{"@metadata":{},"@timestamp":"0001-01-01T00:00:00Z"}`, s)
 			})
 		})
 	})

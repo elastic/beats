@@ -44,7 +44,11 @@ func Build() error {
 }
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+// Deprecated: For Go integration tests only. The test binary is now built automatically via TestMain.
 func BuildSystemTestBinary() error {
+	fmt.Println("WARNING: BuildSystemTestBinary is deprecated for Go integration tests only. " +
+		"The test binary is now built automatically via TestMain. " +
+		"This target remains required for Python system tests.")
 	return devtools.BuildSystemTestBinary()
 }
 
@@ -168,7 +172,6 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	devtools.BuildSystemTestBinary()
 	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search
@@ -179,7 +182,6 @@ func GoIntegTest(ctx context.Context) error {
 
 // GoFIPSOnlyIntegTest starts the docker containers and executes the Go integration tests with GODEBUG=fips140=only set.
 func GoFIPSOnlyIntegTest(ctx context.Context) error {
-	devtools.BuildSystemTestBinary()
 	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search

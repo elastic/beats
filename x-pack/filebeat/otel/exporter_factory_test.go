@@ -13,6 +13,7 @@ import (
 
 func TestExporterFactoryRace(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_METRICS_EXPORTER", "otlp")
 	factory := NewMetricsExporterFactory(GetDefaultMetricExporterOptions())
 	g, ctx := errgroup.WithContext(t.Context())
 
@@ -42,6 +43,7 @@ func TestGetGlobalExporterFactory(t *testing.T) {
 
 func TestExporterFactory(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_METRICS_EXPORTER", "otlp")
 	options := GetDefaultMetricExporterOptions()
 	factory := NewMetricsExporterFactory(options)
 	if factory == nil {
@@ -90,6 +92,7 @@ func TestExporterFactory(t *testing.T) {
 
 func TestExporterFactoryNoMetricsEnvironment(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_METRICS_EXPORTER", "otlp")
 	options := GetDefaultMetricExporterOptions()
 	factory := NewMetricsExporterFactory(options)
 	if factory == nil {
@@ -117,16 +120,14 @@ func TestGetGlobalExporterNoneType(t *testing.T) {
 	if err != nil {
 		t.Errorf("GetExporter returned an error: %v", err)
 	}
-	if exporter == nil {
-		t.Errorf("Exporter should not be nil")
-	}
-	if exporter != factory.globalMetricsExporter {
-		t.Errorf("exporter = %v, want %v", exporter, factory.globalMetricsExporter)
+	if exporter != nil {
+		t.Errorf("Exporter should be nil when not set")
 	}
 }
 
 func TestGetGlobalExporterGRPCType(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "set")
+	t.Setenv("OTEL_METRICS_EXPORTER", "otlp")
 	factory := GetGlobalMetricsExporterFactory()
 	exporter, _, err := factory.GetExporter(context.Background(), true)
 	if err != nil {
@@ -149,6 +150,7 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 		metricsExporter string
 		protocol        string
 		endpoint        string
+		metricsEndpoint string
 		eType           string
 		isNil           bool
 	}{
@@ -163,10 +165,12 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 		{name: "none empty exporter", metricsExporter: "", eType: "none", protocol: "", endpoint: "", isNil: true},
 		{name: "none otlp but no other environment set", metricsExporter: "otlp", eType: "none", protocol: "", endpoint: "", isNil: true},
 		{name: "otlp with endpoint set", metricsExporter: "otlp", eType: "grpc", protocol: "", endpoint: "set"},
-		{name: "metrics exporter falls through to grpc", metricsExporter: "anything", eType: "grpc", protocol: "", endpoint: "set"},
-		{name: "grpc default", metricsExporter: "", eType: "grpc", protocol: "", endpoint: "set"},
-		{name: "grpc explicit", metricsExporter: "", eType: "grpc", protocol: "OTLP/gRPC", endpoint: "set"},
-		{name: "http/protobuf explicit", metricsExporter: "", eType: "http", protocol: "http/protobuf", endpoint: "set"},
+		{name: "otlp with metrics endpoint set", metricsExporter: "otlp", eType: "grpc", protocol: "", endpoint: "", metricsEndpoint: "set"},
+		{name: "otlp with metrics endpoint takes precedence", metricsExporter: "otlp", eType: "http", protocol: "http/protobuf", endpoint: "set", metricsEndpoint: "set"},
+		{name: "metrics exporter falls through to grpc", metricsExporter: "anything", eType: "none", protocol: "", endpoint: "set", isNil: true},
+		{name: "grpc default", metricsExporter: "otlp", eType: "grpc", protocol: "", endpoint: "set"},
+		{name: "grpc explicit", metricsExporter: "otlp", eType: "grpc", protocol: "grpc", endpoint: "set"},
+		{name: "http/protobuf explicit", metricsExporter: "otlp", eType: "http", protocol: "http/protobuf", endpoint: "set"},
 		{name: "http/json not allowed", metricsExporter: "", eType: "none", protocol: "http/json", endpoint: "set", isNil: true},
 		{name: "invalid protocol", metricsExporter: "", eType: "none", protocol: "invalid", endpoint: "set", isNil: true},
 	}
@@ -178,6 +182,9 @@ func TestGetExporterFromEnvironment(t *testing.T) {
 			}
 			if tc.endpoint != "" {
 				t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", tc.endpoint)
+			}
+			if tc.metricsEndpoint != "" {
+				t.Setenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", tc.metricsEndpoint)
 			}
 			if tc.protocol != "" {
 				t.Setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", tc.protocol)

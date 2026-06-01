@@ -184,15 +184,15 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	log := ctx.Logger.With("input_url", cfg.Request.URL)
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	if cfg.Request.Tracer != nil {
+	if cfg.Request.Tracer.enabled() {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(ctx.Agent.Paths, inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, ctx.Agent.Paths.Resolve(paths.Logs, inputName))
 		}
 		cfg.Request.Tracer.Filename = resolved
 

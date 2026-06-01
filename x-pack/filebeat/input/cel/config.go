@@ -14,10 +14,10 @@ import (
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v3"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/mito/lib"
 )
@@ -51,6 +51,12 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
+	// SecretState holds secret key-value pairs that are
+	// stored encrypted by Fleet (via secret: true) and
+	// placed at state.secret before CEL program execution.
+	// The state.secret key is unconditionally redacted in
+	// debug logs.
+	SecretState secretState `config:"secret_state"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
@@ -76,6 +82,10 @@ type config struct {
 	// Package contains information about the integration package.
 	// name and version are expected.
 	Package map[string]string `config:"package"`
+
+	// OTel configuration for which headers and request parameters should be
+	// redacted or unredacted in span attributes.
+	OTelTraceConfig *otel.TraceConfig `config:"otel.trace"`
 }
 
 func (c config) GetPackageData(key string) string {
@@ -87,6 +97,30 @@ func (c config) GetPackageData(key string) string {
 		return "unknown"
 	}
 	return value
+}
+
+// secretState holds secret key-value pairs. It implements
+// the ucfg Unpacker interface to accept either a map (from
+// direct config) or a string (from Fleet secret resolution,
+// which delivers the stored YAML text as a scalar).
+//
+// The string case is needed because Fleet resolves secrets
+// to their stored string values. See
+// https://github.com/elastic/kibana/issues/267859
+type secretState struct {
+	m map[string]interface{}
+}
+
+func (s *secretState) Unpack(v interface{}) error {
+	switch v := v.(type) {
+	case map[string]interface{}:
+		s.m = v
+		return nil
+	case string:
+		return yaml.Unmarshal([]byte(v), &s.m)
+	default:
+		return fmt.Errorf("secret_state: expected string or map, got %T", v)
+	}
 }
 
 type redact struct {
@@ -117,6 +151,9 @@ func (c config) Validate() error {
 	}
 	if c.MaxExecutions != nil && *c.MaxExecutions <= 0 {
 		return fmt.Errorf("invalid maximum number of executions: %d <= 0", *c.MaxExecutions)
+	}
+	if _, exists := c.State["secret"]; exists {
+		return errors.New(`state must not contain a "secret" key: values intended to be secret cannot be guaranteed to be encrypted in the stored configuration; use secret_state instead`)
 	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
@@ -304,13 +341,6 @@ func (c *ResourceConfig) Validate() error {
 		// is excessive for a debugging logger, so default to 1MB
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
-	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
 	}
 	return nil
 }

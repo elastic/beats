@@ -1,0 +1,4 @@
+kind: enhancement
+summary: Add minimal-state Active Directory entity analytics provider.
+component: filebeat
+issue: https://github.com/elastic/beats/issues/49162

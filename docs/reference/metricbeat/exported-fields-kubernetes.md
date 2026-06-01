@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Kubernetes fields [exported-fields-kubernetes]
 
@@ -1502,6 +1502,12 @@ kubernetes container metrics
 
 **`kubernetes.container.id`**
 :   Container id
+
+    type: keyword
+
+
+**`kubernetes.container.type`**
+:   Container type (container or init)
 
     type: keyword
 

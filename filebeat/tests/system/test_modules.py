@@ -24,6 +24,7 @@ remove_timestamp = {
     "cisco.nexus",
     "citrix.netscaler",
     "cylance.protect",
+    "elasticsearch.querylog",
     "f5.bigipafm",
     "fortinet.clientendpoint",
     "haproxy.log",
@@ -120,6 +121,11 @@ def load_fileset_test_cases():
     return test_cases
 
 
+def module_uses_filestream_input(module, fileset):
+    """Filesets that only define filestream inputs need the same flags as RUN_AS_FILESTREAM."""
+    return module == "elasticsearch" and fileset == "querylog"
+
+
 class Test(BaseTest):
 
     def init(self):
@@ -191,7 +197,7 @@ class Test(BaseTest):
         # if the test file contains '.journal', later it will try to remove
         # the '--once' flag and the journald input will be used,
         # so there is nothing to do here.
-        if log_as_filestream() and ".journal" not in test_file:
+        if (log_as_filestream() or module_uses_filestream_input(module, fileset)) and ".journal" not in test_file:
             cmd.append("-E")
             cmd.append("features.log_input_run_as_filestream.enabled=true")
             cmd.append("-M")
@@ -219,6 +225,18 @@ class Test(BaseTest):
             cmd.append("-M")
             cmd.append("{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file))
+
+        # elasticsearch/querylog sets a data stream index on the input; override
+        # so events land in the test index (same as output.elasticsearch.index).
+        if module == "elasticsearch" and fileset == "querylog":
+            cmd.extend(
+                [
+                    "-M",
+                    "{module}.{fileset}.input.index={index_name}".format(
+                        module=module, fileset=fileset, index_name=self.index_name
+                    ),
+                ]
+            )
 
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
@@ -287,7 +305,7 @@ class Test(BaseTest):
                 pass
             else:
                 # Remove some fields if running the Filestream input
-                if log_as_filestream():
+                if log_as_filestream() or module_uses_filestream_input(module, fileset):
                     remove_filestream_fields(objects)
                 self.assert_fields_are_documented(obj)
 
@@ -329,8 +347,10 @@ class Test(BaseTest):
             ev = expected[idx]
             obj = objects[idx]
 
-            # Flatten objects for easier comparing
+            # Flatten objects for easier comparing (clean_keys expects dot notation;
+            # goldens may be nested JSON or pre-flattened like apache/access).
             obj = self.flatten_object(obj, {}, "")
+            ev = self.flatten_object(ev, {}, "")
             clean_keys(obj)
             clean_keys(ev)
 
@@ -366,8 +386,9 @@ def clean_keys(obj):
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
 
-    if log_as_filestream() and "tags" in obj:
-        obj["tags"].remove("take_over")
+    if (log_as_filestream() or obj.get("event.dataset") == "elasticsearch.querylog") and "tags" in obj:
+        if "take_over" in obj["tags"]:
+            obj["tags"].remove("take_over")
         if len(obj["tags"]) == 0:
             delete_key(obj, "tags")
 

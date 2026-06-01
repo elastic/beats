@@ -59,7 +59,7 @@ func TestFetch(t *testing.T) {
 		//Check heapObjects
 		heapObjects, ok := runtime["heap_objects"].(float64)
 		assert.True(t, ok)
-		assert.True(t, heapObjects > float64(0))
+		assert.Greater(t, heapObjects, float64(0))
 
 	}
 }

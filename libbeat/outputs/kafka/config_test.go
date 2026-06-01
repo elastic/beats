@@ -23,6 +23,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -53,7 +55,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
-			cfg, err := readConfig(c)
+			cfg, err := ReadConfig(c)
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
@@ -85,7 +87,7 @@ func TestConfigInvalid(t *testing.T) {
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
-			_, err := readConfig(c)
+			_, err := ReadConfig(c)
 			if err == nil {
 				t.Fatalf("Can create test configuration from invalid input")
 			}
@@ -143,7 +145,7 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
 
-			_, err := readConfig(c)
+			_, err := ReadConfig(c)
 
 			if test.expectError && err == nil {
 				t.Fatalf("invalid configuration must not be created")
@@ -154,6 +156,48 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConfig_defaults(t *testing.T) {
+	t.Run("SingleFlightOn_is_set", func(t *testing.T) {
+		c := config.MustNewConfigFrom(`
+hosts: localhost
+topic: foo`)
+		logger := logptest.NewTestingLogger(t, "")
+
+		cfg, err := ReadConfig(c)
+		if err != nil {
+			t.Fatalf("Can not create test configuration: %v", err)
+		}
+
+		sc, err := newSaramaConfig(logger, cfg)
+		if err != nil {
+			t.Fatalf("Failure creating sarama config: %v", err)
+		}
+
+		assert.True(t, sc.Metadata.SingleFlight,
+			"Metadata.SingleFlight should be set to true")
+	})
+
+	t.Run("ApiVersionsRequest_is_disabled", func(t *testing.T) {
+		c := config.MustNewConfigFrom(`
+hosts: localhost
+topic: foo`)
+		logger := logptest.NewTestingLogger(t, "")
+
+		cfg, err := ReadConfig(c)
+		if err != nil {
+			t.Fatalf("Can not create test configuration: %v", err)
+		}
+
+		sc, err := newSaramaConfig(logger, cfg)
+		if err != nil {
+			t.Fatalf("Failure creating sarama config: %v", err)
+		}
+
+		assert.False(t, sc.ApiVersionsRequest,
+			"ApiVersionsRequest should be false")
+	})
 }
 
 func TestBackoffFunc(t *testing.T) {

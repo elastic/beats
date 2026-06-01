@@ -39,6 +39,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	testingfs "github.com/elastic/elastic-agent-libs/testing/fs"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -91,7 +93,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
-				logger:       logp.L(),
+				logger:       logp.NewNopLogger(),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
@@ -162,13 +164,86 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
-				logger:      logp.L(),
+				logger:      logp.NewNopLogger(),
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
 			err := p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
-			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
+			assert.Equal(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
+		})
+	}
+}
+
+func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
+	workDir := testingfs.TempDir(t, "")
+	sourcePath := filepath.Join(workDir, "app.log")
+	oldSourcePath := filepath.Join(workDir, "app.log.1")
+
+	oldFile, err := os.Create(oldSourcePath)
+	require.NoError(t, err, "creating old log file")
+	defer oldFile.Close()
+
+	oldInfo, err := oldFile.Stat()
+	require.NoError(t, err, "stating old log file")
+	oldDescriptor := loginp.FileDescriptor{
+		Filename:    sourcePath,
+		Info:        file.ExtendFileInfo(oldInfo),
+		Fingerprint: "old-fingerprint",
+	}
+
+	currentFile, err := os.Create(sourcePath)
+	require.NoError(t, err, "creating current log file")
+	defer currentFile.Close()
+
+	currentInfo, err := currentFile.Stat()
+	require.NoError(t, err, "stating current log file")
+	currentDescriptor := loginp.FileDescriptor{
+		Filename:    sourcePath,
+		Info:        file.ExtendFileInfo(currentInfo),
+		Fingerprint: "current-fingerprint",
+	}
+
+	globalIdentifier, err := loginp.NewSourceIdentifier(pluginName, "")
+	require.NoError(t, err, "creating global source identifier")
+	inputIdentifier, err := loginp.NewSourceIdentifier(pluginName, "input-id")
+	require.NoError(t, err, "creating input source identifier")
+
+	for _, identityName := range []string{nativeName, fingerprintName} {
+		t.Run(identityName, func(t *testing.T) {
+			identifier := mustIdentifier(t, identityName)
+			oldSource := identifier.GetSource(loginp.FSEvent{
+				NewPath:    sourcePath,
+				Descriptor: oldDescriptor,
+			})
+
+			oldKey := globalIdentifier.ID(oldSource)
+			globalStore := newMockStoreUpdater(map[string]loginp.Value{
+				oldKey: &mockUnpackValue{
+					key: oldKey,
+					fileMeta: fileMeta{
+						Source:         sourcePath,
+						IdentifierName: identityName,
+					},
+				},
+			})
+
+			p := fileProspector{
+				logger:     logptest.NewFileLogger(t, workDir).Logger,
+				identifier: identifier,
+				filewatcher: newMockFileWatcherWithFiles(
+					map[string]loginp.FileDescriptor{
+						sourcePath: currentDescriptor,
+					}),
+			}
+
+			err = p.Init(newMockStoreUpdater(nil), globalStore, inputIdentifier.ID)
+			require.NoError(t, err, "prospector Init must succeed")
+			assert.Empty(
+				t,
+				globalStore.updatedKeys,
+				"stale global registry entry must not be migrated to the current file",
+			)
 		})
 	}
 }
@@ -262,7 +337,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 			}
 
 			p := fileProspector{
-				logger:      logp.L(),
+				logger:      logp.NewNopLogger(),
 				identifier:  tc.newIdentifier,
 				filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
 			}
@@ -379,12 +454,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:      logp.L(),
+				logger:      logp.NewNopLogger(),
 				filewatcher: newMockFileWatcher(test.events, len(test.events)),
 				identifier:  mustPathIdentifier(false),
 				ignoreOlder: test.ignoreOlder,
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 			hg := newTestHarvesterGroup()
 
 			p.Run(ctx, newMockMetadataUpdater(), hg)
@@ -417,12 +492,12 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 
 	filewatcher := newMockFileWatcher([]loginp.FSEvent{eventCreate}, 2)
 	p := fileProspector{
-		logger:      logp.L(),
+		logger:      logp.NewNopLogger(),
 		filewatcher: filewatcher,
 		identifier:  mustPathIdentifier(false),
 		ignoreOlder: 10 * time.Second,
 	}
-	ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+	ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 	hg := newTestHarvesterGroup()
 	testStore := newMockMetadataUpdater()
 	var wg sync.WaitGroup
@@ -482,12 +557,12 @@ func TestProspectorDeletedFile(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:       logp.L(),
+				logger:       logp.NewNopLogger(),
 				filewatcher:  newMockFileWatcher(test.events, len(test.events)),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: test.cleanRemoved,
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/path/to/file")
@@ -560,16 +635,14 @@ func TestProspectorRenamedFile(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := fileProspector{
-				logger:            logp.L(),
+				logger:            logp.NewNopLogger(),
 				filewatcher:       newMockFileWatcher(test.events, len(test.events)),
 				identifier:        mustPathIdentifier(test.trackRename),
 				stateChangeCloser: stateChangeCloserConfig{Renamed: test.closeRenamed},
 			}
-			ctx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+			ctx := input.Context{Logger: logp.NewNopLogger(), Cancelation: context.Background()}
 
 			testStore := newMockMetadataUpdater()
 			testStore.set("path::/old/path/to/file")
@@ -700,8 +773,14 @@ func (m *mockFileWatcher) NotifyChan() chan loginp.HarvesterStatus {
 	return m.c
 }
 
+// mockMetadataUpdater is a test implementation of loginp.MetadataUpdater whose
+// methods may be invoked from the prospector's goroutines while the test
+// goroutine inspects the stored state (e.g. via assert.Eventually). Read paths
+// dominate (assert.Eventually polls), so an RWMutex is used to allow
+// concurrent reads.
 type mockMetadataUpdater struct {
-	table map[string]interface{}
+	mu    sync.RWMutex
+	table map[string]any
 }
 
 func newMockMetadataUpdater() *mockMetadataUpdater {
@@ -710,14 +789,38 @@ func newMockMetadataUpdater() *mockMetadataUpdater {
 	}
 }
 
-func (mu *mockMetadataUpdater) set(id string) { mu.table[id] = struct{}{} }
+func (mu *mockMetadataUpdater) set(id string) {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
+	mu.table[id] = struct{}{}
+}
+
+// setRaw stores an arbitrary value under id. Used by tests that pre-populate
+// the store before running the prospector.
+func (mu *mockMetadataUpdater) setRaw(id string, v any) {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
+	mu.table[id] = v
+}
+
+// get returns the raw value stored under id. Used by tests that need to
+// inspect the stored value after the prospector has run.
+func (mu *mockMetadataUpdater) get(id string) any {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
+	return mu.table[id]
+}
 
 func (mu *mockMetadataUpdater) has(id string) bool {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	_, ok := mu.table[id]
 	return ok
 }
 
 func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	c, ok := mu.table[id]
 	if !ok {
 		return false
@@ -729,7 +832,9 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 	return cursor.Offset == offset
 }
 
-func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
+func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v any) error {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	meta, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id [%q]", s.Name())
@@ -737,17 +842,23 @@ func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) er
 	return typeconv.Convert(v, meta)
 }
 
-func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur interface{}) error {
+func (mu *mockMetadataUpdater) ResetCursor(s loginp.Source, cur any) error {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	mu.table[s.Name()] = cur
 	return nil
 }
 
-func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v interface{}) error {
+func (mu *mockMetadataUpdater) UpdateMetadata(s loginp.Source, v any) error {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	mu.table[s.Name()] = v
 	return nil
 }
 
 func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	delete(mu.table, s.Name())
 	return nil
 }
@@ -867,13 +978,13 @@ func TestOnRenameFileIdentity(t *testing.T) {
 
 			testStore := newMockMetadataUpdater()
 			if tc.populateStore {
-				testStore.table[id] = fileMeta{Source: path, IdentifierName: expectedIdentifier}
+				testStore.setRaw(id, fileMeta{Source: path, IdentifierName: expectedIdentifier})
 			}
 
 			hg := newTestHarvesterGroup()
 			p.Run(ctx, testStore, hg)
 
-			got := testStore.table[id]
+			got := testStore.get(id)
 			meta := fileMeta{}
 			typeconv.Convert(&meta, got)
 
