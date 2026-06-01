@@ -217,7 +217,7 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 
 	// Set the timestamp for when the event was first seen by the pipeline.
 	observedTimestamp := logRecord.Timestamp()
-	if eventMap, ok := beatEvent["event"].(mapstr.M); ok {
+	if eventMap, ok := tryToMapStr(beatEvent["event"]); ok {
 		switch created := eventMap["created"].(type) {
 		case time.Time:
 			observedTimestamp = pcommon.NewTimestampFromTime(created)
@@ -232,7 +232,7 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 	logRecord.SetObservedTimestamp(observedTimestamp)
 
 	// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
-	if ds, ok := beatEvent["data_stream"].(mapstr.M); ok {
+	if ds, ok := tryToMapStr(beatEvent["data_stream"]); ok {
 		for _, sub := range [...]string{"dataset", "namespace", "type"} {
 			if vStr, ok := ds[sub].(string); ok {
 				logRecord.Attributes().PutStr("data_stream."+sub, vStr)
@@ -267,4 +267,15 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		}
 	}
 	return nil
+}
+
+func tryToMapStr(v interface{}) (mapstr.M, bool) {
+	switch m := v.(type) {
+	case mapstr.M:
+		return m, true
+	case map[string]interface{}:
+		return mapstr.M(m), true
+	default:
+		return nil, false
+	}
 }

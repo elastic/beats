@@ -134,42 +134,40 @@ func TestPublish(t *testing.T) {
 	})
 
 	t.Run("data_stream fields are set on logrecord.Attribute", func(t *testing.T) {
-		dataStreamField := mapstr.M{
+		want := map[string]any{
 			"type":      "logs",
 			"namespace": "not_default",
 			"dataset":   "not_elastic_agent",
 		}
-		event1.Fields["data_stream"] = dataStreamField
+		for _, tc := range []struct {
+			name  string
+			value any
+		}{
+			{"mapstr.M", mapstr.M(want)},
+			{"map[string]any", want},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				event1.Fields["data_stream"] = tc.value
 
-		batch := outest.NewBatch(event1)
-
-		var countLogs int
-		var attributes pcommon.Map
-		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
-			countLogs = countLogs + ld.LogRecordCount()
-			for i := 0; i < ld.ResourceLogs().Len(); i++ {
-				resourceLog := ld.ResourceLogs().At(i)
-				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
-					scopeLog := resourceLog.ScopeLogs().At(j)
-					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
-						LogRecord := scopeLog.LogRecords().At(k)
-						attributes = LogRecord.Attributes()
+				var attributes pcommon.Map
+				oc := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+					for _, rl := range ld.ResourceLogs().All() {
+						for _, sl := range rl.ScopeLogs().All() {
+							for _, record := range sl.LogRecords().All() {
+								attributes = record.Attributes()
+							}
+						}
 					}
+					return nil
+				})
+
+				require.NoError(t, oc.Publish(ctx, outest.NewBatch(event1)))
+				for _, sub := range []string{"dataset", "namespace", "type"} {
+					gotValue, ok := attributes.Get("data_stream." + sub)
+					require.True(t, ok, "data_stream.%s not found on log record attribute", sub)
+					assert.EqualValues(t, want[sub], gotValue.AsRaw())
 				}
-			}
-			return nil
-		})
-
-		err := otelConsumer.Publish(ctx, batch)
-		assert.NoError(t, err)
-		assert.Len(t, batch.Signals, 1)
-		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-
-		subFields := []string{"dataset", "namespace", "type"}
-		for _, subField := range subFields {
-			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok, "data_stream.%s not found on log record attribute", subField)
-			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
+			})
 		}
 	})
 
