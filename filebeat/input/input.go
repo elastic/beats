@@ -69,6 +69,7 @@ func New(
 	conf *conf.C,
 	connector channel.Connector,
 	beatDone chan struct{},
+	userAgent string,
 	states []file.State,
 	logger *logp.Logger,
 ) (*Runner, error) {
@@ -100,6 +101,7 @@ func New(
 		Done:              input.done,
 		BeatDone:          input.beatDone,
 		Meta:              nil,
+		UserAgent:         userAgent,
 		GetStatusReporter: input.GetStatusReporter,
 	}
 	var ipt Input

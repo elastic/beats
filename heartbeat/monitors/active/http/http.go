@@ -41,6 +41,7 @@ func init() {
 func create(
 	name string,
 	cfg *conf.C,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -79,13 +80,13 @@ func create(
 	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
 	// separate DNS rtt data.
 	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
-		transport, err := newRoundTripper(&config)
+		transport, err := newRoundTripper(&config, info.UserAgent)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
+			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator, info.UserAgent)
 		}
 	} else {
 		// preload TLS configuration
@@ -97,7 +98,7 @@ func create(
 		config.Transport.TLS = nil
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, info.UserAgent)
 		}
 	}
 
@@ -121,13 +122,13 @@ func create(
 	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts)}, nil
 }
 
-func newRoundTripper(config *Config) (http.RoundTripper, error) {
+func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error) {
 	return config.Transport.RoundTripper(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithoutProxyEnvironmentVariables(),
 		httpcommon.WithKeepaliveSettings{
 			Disable: true,
 		},
-		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": beat.UserAgent()}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
 }

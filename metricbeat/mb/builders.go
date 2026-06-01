@@ -50,7 +50,7 @@ var (
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a Module and its configured MetricSets or an error.
-func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) (Module, []MetricSet, error) {
+func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger, userAgent string) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
 	}
@@ -62,6 +62,7 @@ func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger) 
 	if err != nil {
 		return nil, nil, err
 	}
+	bm.userAgent = userAgent
 
 	module, err := createModule(r, bm)
 	if err != nil {

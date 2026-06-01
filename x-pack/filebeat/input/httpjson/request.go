@@ -20,7 +20,6 @@ import (
 	"github.com/PaesslerAG/jsonpath"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -305,9 +304,10 @@ type requestFactory struct {
 	chainResponseProcessor *responseProcessor
 	saveFirstResponse      bool
 	log                    *logp.Logger
+	userAgent              string
 }
 
-func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry, userAgent string) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, stat, log)
@@ -318,6 +318,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		body:              config.Request.Body,
 		transforms:        ts,
 		log:               log,
+		userAgent:         userAgent,
 		encoder:           registeredEncoders[config.Request.EncodeAs],
 		saveFirstResponse: config.Response.SaveFirstResponse,
 	}
@@ -354,6 +355,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 				body:                   ch.Step.Request.Body,
 				transforms:             ts,
 				log:                    log,
+				userAgent:              userAgent,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.Step.Replace,
 				replaceWith:            ch.Step.ReplaceWith,
@@ -381,6 +383,7 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 				body:                   ch.While.Request.Body,
 				transforms:             ts,
 				log:                    log,
+				userAgent:              userAgent,
 				encoder:                registeredEncoders[config.Request.EncodeAs],
 				replace:                ch.While.Replace,
 				replaceWith:            ch.While.ReplaceWith,
@@ -481,7 +484,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 
 	header := http.Header{}
 	header.Set("Accept", "application/json")
-	header.Set("User-Agent", beat.UserAgent())
+	header.Set("User-Agent", rf.userAgent)
 	req.setHeader(header)
 
 	var err error

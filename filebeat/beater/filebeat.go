@@ -181,14 +181,14 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", fb.logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", fb.logger, b.Info.UserAgent)
 		if err != nil {
 			return err
 		}
 
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
-		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), fb.logger)
+		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config(), fb.logger, b.Info.UserAgent)
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
 		forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
 		filesetOverrides := fileset.FilesetOverrides{
@@ -407,7 +407,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
 		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring.InputsRegistry(), v2InputLoader),
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
+		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, b.Info.UserAgent, fb.logger),
 	))
 
 	if fb.otelStatusFactoryWrapper != nil {
@@ -424,7 +424,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
 	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
+		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger, b.Info.UserAgent)
 	} else {
 		if !b.Manager.Enabled() {
 			fb.logger.Warn(pipelinesWarning)
@@ -557,9 +557,9 @@ func (fb *Filebeat) Stop() {
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *logp.Logger) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C, logger *logp.Logger, userAgent string) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", logger)
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", logger, userAgent)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err) //nolint:staticcheck //Keep old behavior
 		}

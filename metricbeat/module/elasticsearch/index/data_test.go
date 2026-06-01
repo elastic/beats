@@ -74,7 +74,7 @@ func TestMapper(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{}, logptest.NewTestingLogger(t, ""))
+	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{}, logptest.NewTestingLogger(t, ""), "")
 	if err != nil {
 		t.Fatal(err)
 	}

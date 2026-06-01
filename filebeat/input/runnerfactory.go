@@ -35,15 +35,17 @@ type RunnerFactory struct {
 	outlet    channel.Factory
 	registrar *registrar.Registrar
 	beatDone  chan struct{}
+	userAgent string
 	logger    *logp.Logger
 }
 
 // NewRunnerFactory instantiates a new RunnerFactory
-func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}, logger *logp.Logger) *RunnerFactory {
+func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}, userAgent string, logger *logp.Logger) *RunnerFactory {
 	return &RunnerFactory{
 		outlet:    outlet,
 		registrar: registrar,
 		beatDone:  beatDone,
+		userAgent: userAgent,
 		logger:    logger,
 	}
 }
@@ -54,7 +56,7 @@ func (r *RunnerFactory) Create(
 	c *conf.C,
 ) (cfgfile.Runner, error) {
 	connector := r.outlet(pipeline)
-	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), r.logger)
+	p, err := New(c, connector, r.beatDone, r.userAgent, r.registrar.GetStates(), r.logger)
 	if err != nil {
 		// In case of error with loading state, input is still returned
 		return p, err

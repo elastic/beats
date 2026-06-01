@@ -202,7 +202,7 @@ func TestConfigureModule(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.initConfig)
-			m, _, err := mb.NewModule(cfg, mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
+			m, _, err := mb.NewModule(cfg, mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 			require.NoError(t, err)
 
 			bm, ok := m.(*mb.BaseModule)

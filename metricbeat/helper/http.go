@@ -31,7 +31,6 @@ import (
 
 	"k8s.io/client-go/transport"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -57,11 +56,15 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return NewHTTPFromConfig(config, base.HostData(), base.Logger())
+	userAgent := ""
+	if bm, ok := base.Module().(*mb.BaseModule); ok {
+		userAgent = bm.UserAgent()
+	}
+	return NewHTTPFromConfig(config, base.HostData(), base.Logger(), userAgent)
 }
 
 // NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
-func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger, userAgent string) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
@@ -86,7 +89,7 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger)
 		httpcommon.WithLogger(logger),
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": (beat.UserAgent())}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
 	if err != nil {
 		return nil, err

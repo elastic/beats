@@ -157,7 +157,7 @@ func TestNewModuleRejectsNilPaths(t *testing.T) {
 		"metricsets": []string{metricSetName},
 	})
 
-	_, _, err := NewModule(c, r, nil, logptest.NewTestingLogger(t, ""))
+	_, _, err := NewModule(c, r, nil, logptest.NewTestingLogger(t, ""), "")
 	assert.ErrorIs(t, err, ErrPathsRequired)
 }
 
@@ -172,7 +172,7 @@ func TestNewModulesDuplicateHosts(t *testing.T) {
 		"hosts":      []string{"a", "b", "a"},
 	})
 
-	_, _, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, _, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	assert.Error(t, err)
 }
 
@@ -185,7 +185,7 @@ func TestNewModulesWithDefaultMetricSet(t *testing.T) {
 		"module": moduleName,
 	})
 
-	_, metricSets, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(c, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -278,7 +278,7 @@ func newTestRegistry(t testing.TB, metricSetOptions ...MetricSetOption) *Registe
 }
 
 func newTestMetricSet(t testing.TB, r *Register, config map[string]interface{}) MetricSet {
-	_, metricsets, err := NewModule(newConfig(t, config), r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := NewModule(newConfig(t, config), r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -365,7 +365,7 @@ func TestBaseModuleWithConfig(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			}
 
-			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
+			m, _, err := NewModule(conf.MustNewConfigFrom(initConfig), mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 			require.NoError(t, err)
 
 			bm, ok := m.(*BaseModule)

@@ -90,7 +90,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
-		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second)
+		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second, b.Info.UserAgent)
 		if err != nil {
 			if parsedConfig.RunOnce {
 				trace.Abort()
@@ -276,7 +276,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		}
 
 		// Backoff panics with 0 duration, set to smallest unit
-		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
+		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond, b.Info.UserAgent)
 		if err != nil {
 			logp.L().Warnf("skipping monitor state management during managed reload: %v", err)
 		} else {
@@ -322,7 +322,7 @@ func (bt *Heartbeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
-func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
+func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Duration, userAgent string) (*eslegclient.Connection, error) {
 	var (
 		esClient *eslegclient.Connection
 		err      error
@@ -352,7 +352,7 @@ func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Dura
 
 	for i := 0; i < attempts; i++ {
 		// TODO: use local logger here
-		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger(""))
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logp.NewLogger(""), userAgent)
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil

@@ -31,9 +31,9 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -50,6 +50,7 @@ var debugf = logp.MakeDebug("tcp")
 func create(
 	name string,
 	cfg *conf.C,
+	_ beat.Info,
 ) (p plugin.Plugin, err error) {
 	return createWithResolver(cfg, monitors.NewStdResolver())
 }

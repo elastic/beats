@@ -245,7 +245,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
-	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, env.Agent.UserAgent, log, trace, wantDump, doCov)
 	if err != nil {
 		return err
 	}
@@ -1261,7 +1261,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	c.Transport = userAgentDecorator{
 		// The Filebeat user-agent is provided to the program as useragent. If a request
 		// is not given a user-agent string, this user agent is added to the request.
-		UserAgent: beat.UserAgent(),
+		UserAgent: env.Agent.UserAgent,
 		Transport: c.Transport,
 	}
 
@@ -1498,7 +1498,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, userAgent string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1528,7 +1528,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			return m
 		}),
 		lib.Globals(map[string]interface{}{
-			"useragent":            beat.UserAgent(),
+			"useragent":            userAgent,
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
 		}),

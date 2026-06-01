@@ -23,6 +23,7 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -44,6 +44,7 @@ func init() {
 func create(
 	name string,
 	commonConfig *conf.C,
+	_ beat.Info,
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {

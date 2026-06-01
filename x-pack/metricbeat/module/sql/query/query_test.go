@@ -170,7 +170,7 @@ func instantiateMetricSetWithConfig(t *testing.T, cfg map[string]interface{}) er
 
 	c, err := conf.NewConfigFrom(cfg)
 	require.NoError(t, err)
-	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	if err != nil {
 		return err
 	}

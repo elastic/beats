@@ -308,7 +308,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				monitoring := beatmonitoring.NewMonitoring()
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 				require.NoError(t, err)
 
 				// Set the mock status reporter
@@ -538,7 +538,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				monitoring := beatmonitoring.NewMonitoring()
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+				aModule, metricSets, err := mb.NewModule(tc.config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 				require.NoError(t, err)
 
 				// Set the mock status reporter

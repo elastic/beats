@@ -61,7 +61,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	client, err := newHTTPClient(ctx, config.Auth, config.Request, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
 
-	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil)
+	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil, "")
 	assert.NoError(t, err)
 	pagination := newPagination(config, client, noopReporter{}, log)
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
@@ -193,7 +193,7 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 
 			tt.args.cfg.Chain[0].Step = tt.args.step
 			tt.args.cfg.Chain[0].While = tt.args.while
-			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil)
+			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil, "")
 			assert.NoError(t, err)
 			assert.NotNil(t, requestFactories)
 			for _, rf := range requestFactories {

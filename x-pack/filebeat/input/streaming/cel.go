@@ -22,7 +22,6 @@ import (
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/google/cel-go/common/types/traits"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/mito/lib"
 )
@@ -55,7 +54,7 @@ func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
 	return patterns, nil
 }
 
-func newProgram(ctx context.Context, src, root string, patterns map[string]*regexp.Regexp, log *logp.Logger) (cel.Program, *cel.Ast, error) {
+func newProgram(ctx context.Context, src, root string, patterns map[string]*regexp.Regexp, userAgent string, log *logp.Logger) (cel.Program, *cel.Ast, error) {
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
@@ -69,7 +68,7 @@ func newProgram(ctx context.Context, src, root string, patterns map[string]*rege
 		lib.Debug(debug(log)),
 		lib.MIME(mimetypes),
 		lib.Globals(map[string]interface{}{
-			"useragent": beat.UserAgent(),
+			"useragent": userAgent,
 		}),
 	}
 	if len(patterns) != 0 {

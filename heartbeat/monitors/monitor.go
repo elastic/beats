@@ -84,8 +84,8 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
+func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg, info beat.Info) error {
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, info, nil)
 
 	return err
 }
@@ -98,9 +98,10 @@ func newMonitor(
 	pubClient beat.Client,
 	taskAdder scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
+	info beat.Info,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, info, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -115,6 +116,7 @@ func newMonitorUnsafe(
 	pubClient beat.Client,
 	addTask scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
+	info beat.Info,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
@@ -152,7 +154,7 @@ func newMonitorUnsafe(
 		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
 
-	p, err := pluginFactory.Create(config)
+	p, err := pluginFactory.Create(config, info)
 
 	m.close = func() error {
 		if onStop != nil {

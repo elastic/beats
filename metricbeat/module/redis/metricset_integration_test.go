@@ -134,7 +134,7 @@ func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interfa
 	c, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	_, metricsets, err := mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricsets, err := mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 	require.Len(t, metricsets, 1)
 

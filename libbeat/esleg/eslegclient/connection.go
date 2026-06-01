@@ -30,8 +30,8 @@ import (
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	cfg "github.com/elastic/elastic-agent-libs/config"
@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -143,7 +144,11 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 
 	// fall back to a default if nothing has configured the user-agent field
 	if s.UserAgent == "" {
-		s.UserAgent = beat.UserAgent()
+		beatname := "Libbeat"
+		if s.Beatname != "" {
+			beatname = s.Beatname
+		}
+		s.UserAgent = useragent.UserAgent(beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	}
 
 	// Default the product origin header to beats if it wasn't already set.
@@ -198,7 +203,7 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
 // The returned Connection is a non-thread-safe connection.
-func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, error) {
+func NewClients(cfg *cfg.C, beatname string, log *logp.Logger, userAgent string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -225,6 +230,7 @@ func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, er
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
 			Beatname:         beatname,
+			UserAgent:        userAgent,
 			Kerberos:         config.Kerberos,
 			Username:         config.Username,
 			Password:         config.Password,
@@ -246,8 +252,8 @@ func NewClients(cfg *cfg.C, beatname string, log *logp.Logger) ([]Connection, er
 }
 
 // NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
-func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string, log *logp.Logger) (*Connection, error) {
-	clients, err := NewClients(cfg, beatname, log)
+func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string, log *logp.Logger, userAgent string) (*Connection, error) {
+	clients, err := NewClients(cfg, beatname, log, userAgent)
 	if err != nil {
 		return nil, err
 	}

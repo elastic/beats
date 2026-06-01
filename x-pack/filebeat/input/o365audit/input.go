@@ -168,7 +168,7 @@ func (inp *o365input) run(v2ctx v2.Context, stream *stream, cursor cursor.Cursor
 		poll.WithLogger(log),
 		poll.WithContext(ctx),
 		poll.WithRequestDecorator(
-			autorest.WithUserAgent(beat.UserAgent()),
+			autorest.WithUserAgent(v2ctx.Agent.UserAgent),
 			autorest.WithQueryParameters(mapstr.M{
 				"publisherIdentifier": tenantID,
 			}),

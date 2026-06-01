@@ -40,7 +40,7 @@ func TestMakeESClient(t *testing.T) {
 		anyAttempt := 1
 		anyDuration := 1 * time.Second
 
-		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration)
+		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration, "")
 
 		timeout, err := origCfg.Int("timeout", -1)
 		require.NoError(t, err)

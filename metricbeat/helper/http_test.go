@@ -56,7 +56,7 @@ func TestTimeout(t *testing.T) {
 		SanitizedURI: ts.URL,
 	}
 
-	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	checkTimeout(t, h)
@@ -73,7 +73,7 @@ func TestConnectTimeout(t *testing.T) {
 		SanitizedURI: uri,
 	}
 
-	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	checkTimeout(t, h)
@@ -97,7 +97,7 @@ func TestAuthentication(t *testing.T) {
 		URI:          ts.URL,
 		SanitizedURI: ts.URL,
 	}
-	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	response, err := h.FetchResponse()
@@ -112,7 +112,7 @@ func TestAuthentication(t *testing.T) {
 		User:         expectedUser,
 		Password:     expectedPassword,
 	}
-	h, err = NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+	h, err = NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	response, err = h.FetchResponse()
@@ -127,7 +127,7 @@ func TestSetHeader(t *testing.T) {
 		"Override": "default",
 	}
 
-	h, err := NewHTTPFromConfig(cfg, mb.HostData{}, logptest.NewTestingLogger(t, ""))
+	h, err := NewHTTPFromConfig(cfg, mb.HostData{}, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	h.SetHeader("Override", "overridden")
@@ -141,7 +141,7 @@ func TestSetHeaderDefault(t *testing.T) {
 		"Override": "default",
 	}
 
-	h, err := NewHTTPFromConfig(cfg, mb.HostData{}, logptest.NewTestingLogger(t, ""))
+	h, err := NewHTTPFromConfig(cfg, mb.HostData{}, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	h.SetHeaderDefault("Override", "overridden")
@@ -214,7 +214,7 @@ func TestOverUnixSocket(t *testing.T) {
 			hostData, err := c.hostDataBuilder(sockFile)
 			require.NoError(t, err)
 
-			h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+			h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 			require.NoError(t, err)
 
 			r, err := h.FetchResponse()
@@ -251,7 +251,7 @@ func TestRefreshAuthorizationHeader(t *testing.T) {
 		SanitizedURI: ts.URL,
 	}
 
-	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""))
+	h, err := NewHTTPFromConfig(cfg, hostData, logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 
 	res, err := h.FetchResponse()

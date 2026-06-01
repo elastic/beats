@@ -91,7 +91,7 @@ type stats struct {
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
 func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beatmonitoring.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
-	module, metricSets, err := mb.NewModule(config, r, p, logger)
+	module, metricSets, err := mb.NewModule(config, r, p, logger, "")
 	if err != nil {
 		return nil, err
 	}

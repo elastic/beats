@@ -56,7 +56,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	module, metricsets, err := mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	assert.Nil(t, module)
 	assert.Nil(t, metricsets)
 	assert.Error(t, err, "no resource options defined: module azure - monitor metricset")
@@ -64,7 +64,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	module, metricsets, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -249,7 +249,7 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger())
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger(), "")
 	require.NoError(t, err)
 
 	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beatmonitoring.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())

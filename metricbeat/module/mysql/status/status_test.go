@@ -88,7 +88,7 @@ func TestConfigValidation(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, _, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""))
+		_, _, err = mb.NewModule(c, mb.Registry, paths.New(), logptest.NewTestingLogger(t, ""), "")
 		if err != nil && test.err == "" {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue

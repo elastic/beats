@@ -56,7 +56,7 @@ func newMetricSetWithPaths(t *testing.T, config map[string]interface{}, p *paths
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	_, metricsets, err := mb.NewModule(c, mb.Registry, p, logger)
+	_, metricsets, err := mb.NewModule(c, mb.Registry, p, logger, "")
 	require.NoError(t, err)
 	require.Len(t, metricsets, 1)
 

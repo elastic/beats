@@ -54,7 +54,7 @@ func NewFactory(beatInfo beat.Info, monitoring beatmonitoring.Monitoring, regist
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	module, metricSets, err := mb.NewModule(c, r.registry, r.beatInfo.Paths, r.beatInfo.Logger)
+	module, metricSets, err := mb.NewModule(c, r.registry, r.beatInfo.Paths, r.beatInfo.Logger, r.beatInfo.UserAgent)
 	if err != nil {
 		return nil, err
 	}

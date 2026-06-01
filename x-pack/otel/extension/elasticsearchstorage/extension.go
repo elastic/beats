@@ -32,7 +32,7 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 	if err != nil {
 		return err
 	}
-	client, err := eslegclient.NewConnectedClient(ctx, c, "Filebeat", e.logger)
+	client, err := eslegclient.NewConnectedClient(ctx, c, "Filebeat", e.logger, "")
 	if err != nil {
 		return err
 	}

@@ -259,7 +259,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 			config, err := conf.NewConfigFrom(c.config)
 			require.NoError(t, err)
 
-			module, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+			module, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 			if c.err {
 				assert.Error(t, err)
 				return
@@ -316,7 +316,7 @@ func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	_, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 	require.Len(t, metricSets, 1)
 
@@ -339,7 +339,7 @@ func TestLightMetricSet_WithoutHostParser(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	_, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 	require.Len(t, metricSets, 1)
 
@@ -372,7 +372,7 @@ func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
 		})
 	require.NoError(t, err)
 
-	_, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, metricSets, err := NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	require.NoError(t, err)
 	require.Len(t, metricSets, 1)
 
@@ -396,7 +396,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 	config, err := conf.NewConfigFrom(mapstr.M{"module": "service"})
 	require.NoError(t, err)
 
-	_, _, err = NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""))
+	_, _, err = NewModule(config, r, paths.New(), logptest.NewTestingLogger(t, ""), "")
 	assert.NoError(t, err)
 
 	assert.True(t, called, "module factory must be called if registered")

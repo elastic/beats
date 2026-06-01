@@ -84,7 +84,7 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config)
+	p, err := create("tls", config, beat.Info{})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
@@ -324,7 +324,7 @@ func TestLargeResponse(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("largeresp", config)
+	p, err := create("largeresp", config, beat.Info{})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -440,7 +440,7 @@ func TestJsonBody(t *testing.T) {
 			config, err := conf.NewConfigFrom(configSrc)
 			require.NoError(t, err)
 
-			p, err := create("largeresp", config)
+			p, err := create("largeresp", config, beat.Info{})
 			require.NoError(t, err)
 
 			sched, _ := schedule.Parse("@every 1s")
@@ -670,7 +670,7 @@ func TestRedirect(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect", config)
+	p, err := create("redirect", config, beat.Info{})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
@@ -714,7 +714,7 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config)
+	p, err := create("http", config, beat.Info{})
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")

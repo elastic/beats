@@ -210,7 +210,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		return err
 	}
 
-	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, ctx, log, metrics, reg, ctx.Agent.UserAgent)
 	if err != nil {
 		log.Errorf("Error while creating requestFactory: %v", err)
 		ctx.UpdateStatus(status.Failed, "failed to create request factory: "+err.Error())
