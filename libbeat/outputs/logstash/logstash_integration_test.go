@@ -44,7 +44,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -66,7 +65,7 @@ type esConnection struct {
 type testOutputer struct {
 	outputs.NetworkClient
 	*esConnection
-	encoder queue.Encoder
+	encoder queue.Encoder[publisher.Event]
 }
 
 type esSource interface {
@@ -200,7 +199,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		t.Fatal("init index management:", err)
 	}
 
-	grp, err := plugin(im, info, outputs.NewNilObserver(), config, paths.New())
+	grp, err := plugin(im, info, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("init elasticsearch output plugin failed: %v", err)
 	}
@@ -555,13 +554,13 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(event))
+	batch := encodeBatch(t.encoder, outest.NewBatch(event))
 	t.Publish(context.Background(), batch) //nolint:errcheck //This is a test file
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 	ok := false
-	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(events...))
+	batch := encodeBatch(t.encoder, outest.NewBatch(events...))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -579,19 +578,18 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 // Client.Publish and other helpers.
 // This modifies the batch in place, but also returns its input batch
 // to allow for easy chaining while creating test batches.
-func encodeBatch[B publisher.Batch](encoder queue.Encoder, batch B) B {
+func encodeBatch[B publisher.Batch](encoder queue.Encoder[publisher.Event], batch B) B {
 	if encoder != nil {
 		encodeEvents(encoder, batch.Events())
 	}
 	return batch
 }
 
-func encodeEvents(encoder queue.Encoder, events []publisher.Event) []publisher.Event {
+func encodeEvents(encoder queue.Encoder[publisher.Event], events []publisher.Event) []publisher.Event {
 	for i := range events {
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
-			encoded, _ := encoder.EncodeEntry(events[i])
-			event := encoded.(publisher.Event) //nolint:errcheck //This is a test file, can ignore
+			event, _ := encoder.EncodeEntry(events[i])
 			events[i] = event
 		}
 	}

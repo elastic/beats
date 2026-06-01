@@ -1,5 +1,5 @@
 # Module: elasticsearch
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-elasticsearch.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/9.4/metricbeat-module-elasticsearch.html
 
 - module: elasticsearch
   #metricsets:
@@ -14,6 +14,7 @@
   #  - node
   #  - node_stats
   #  - pending_tasks
+  #  - security_stats
   #  - shard
   xpack.enabled: true
   period: 10s

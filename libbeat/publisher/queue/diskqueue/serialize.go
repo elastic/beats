@@ -139,7 +139,7 @@ func (d *eventDecoder) reset() {
 
 // Buffer prepares the read buffer to hold the next event of n bytes.
 func (d *eventDecoder) Buffer(n int) []byte {
-	if cap(d.buf) > n {
+	if cap(d.buf) >= n {
 		d.buf = d.buf[:n]
 	} else {
 		d.buf = make([]byte, n)
@@ -147,12 +147,12 @@ func (d *eventDecoder) Buffer(n int) []byte {
 	return d.buf
 }
 
-func (d *eventDecoder) Decode() (interface{}, error) {
+func (d *eventDecoder) Decode() (publisher.Event, error) {
 	switch d.serializationFormat {
 	case SerializationJSON, SerializationCBOR:
 		return d.decodeJSONAndCBOR()
 	default:
-		return nil, fmt.Errorf("unknown serialization format: %d", d.serializationFormat)
+		return publisher.Event{}, fmt.Errorf("unknown serialization format: %d", d.serializationFormat)
 	}
 }
 
@@ -181,7 +181,7 @@ func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
 	}
 
 	return publisher.Event{
-		Flags: publisher.EventFlags(to.Flags),
+		Flags: publisher.EventFlags(to.Flags), //nolint:gosec // Flags field is uint32 on wire but valid values fit uint8
 		Content: beat.Event{
 			Timestamp: time.Unix(0, to.Timestamp),
 			Fields:    to.Fields,
