@@ -7,7 +7,7 @@
     },
     "istio": {
         "pilot": {
-            "cluster": "outbound_.15031_._.istio-ingressgateway.istio-system.svc.cluster.local",
+            "cluster": "outbound_.15010_._.istio-pilot.istio-system.svc.cluster.local",
             "xds": {
                 "eds": {
                     "instances": 1

@@ -40,7 +40,7 @@ import (
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
 
-var testBeatUserAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion())
+var testBeatUserAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
