@@ -222,26 +222,28 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	bt.logger.Info("Shutting down, waiting for output to complete")
 
-	if bt.config.RunOnce {
-		waitPublished := monitors.NewSignalWait()
-
-		// Three possible events: global beat, run_once pipeline done and publish timeout
-		waitPublished.AddChan(bt.done)
-		waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
-		if bt.config.PublishTimeout > 0 {
-			bt.logger.Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
-			waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
-				"shutdown: timed out waiting for pipeline to publish events."))
+	// disconnect pipeline
+	defer func() {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), 1*time.Second) // We have chosen 1s timeout to allow graceful shutdown of pending events
+		defer ctxCancel()
+		err = bt.pipeline.Disconnect(ctx)
+		if err != nil {
+			bt.logger.Warnf("error disconnecting pipeline: %v", err)
 		}
+	}()
 
-		waitPublished.Wait()
-	}
+	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
+	// located _after_ b.Manager.Stop() or else it will exit early
+	waitPublished := monitors.NewSignalWait()
+	defer waitPublished.Wait()
 
-	ctx, ctxCanacel := context.WithTimeout(context.Background(), 1*time.Second) // We have chosen 1s timeout to allow graceful shutdown of pending events
-	defer ctxCanacel()
-	err = bt.pipeline.Disconnect(ctx)
-	if err != nil {
-		bt.logger.Warnf("error disconnecting pipeline: %v", err)
+	// Three possible events: global beat, run_once pipeline done and publish timeout
+	waitPublished.AddChan(bt.done)
+	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
+	if bt.config.PublishTimeout > 0 {
+		bt.logger.Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
+		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
+			"shutdown: timed out waiting for pipeline to publish events."))
 	}
 
 	return nil
