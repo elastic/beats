@@ -121,11 +121,6 @@ type InputRunnerFactory interface {
 	CheckConfig(cfg *conf.C) error
 }
 
-// OnceSetter is implemented by runners that support `filebeat --once` (single scan then exit).
-type OnceSetter interface {
-	SetOnce(once bool)
-}
-
 // sharedProcessor is a run-only view of an input-owned processor. The
 // per-input processors are built once and shared across every pipeline client
 // the input opens (one per filestream harvester). Embedding the beat.Processor

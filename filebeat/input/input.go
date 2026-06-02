@@ -197,20 +197,10 @@ func (p *Runner) GetStatusReporter() status.StatusReporter {
 	return p.statusReporter
 }
 
-// SetOnce enables `filebeat --once` mode (single scan then exit). Exposed as a
-// setter so callers (crawler.startInput) can opt in via the channel.OnceSetter
-// contract without depending on the concrete *Runner type.
-func (p *Runner) SetOnce(once bool) {
-	p.Once = once
-}
-
 // AddCloser implements channel.InputRunner: the shared processors are closed in
 // Stop, after the input's harvesters have drained.
 func (p *Runner) AddCloser(c processors.Closer) {
 	p.closers = append(p.closers, c)
 }
 
-var (
-	_ channel.InputRunner = (*Runner)(nil)
-	_ channel.OnceSetter  = (*Runner)(nil)
-)
+var _ channel.InputRunner = (*Runner)(nil)

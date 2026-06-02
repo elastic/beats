@@ -23,7 +23,7 @@ import (
 
 	"github.com/gohugoio/hashstructure"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -139,8 +139,8 @@ func (c *crawler) startInput(
 	if err != nil {
 		return fmt.Errorf("error while initializing input: %w", err)
 	}
-	if o, ok := runner.(channel.OnceSetter); ok {
-		o.SetOnce(c.once)
+	if inputRunner, ok := runner.(*input.Runner); ok {
+		inputRunner.Once = c.once
 	}
 
 	c.inputs[id] = runner
