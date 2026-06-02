@@ -139,7 +139,7 @@ type FSWatcher interface {
 	// in the file system and returns events based on the data.
 	// Aside from the metrics struct it also has ignore older
 	// and ignore inactive as arguments.
-	Run(ctx unison.Canceler, metrics *Metrics, ingoreOlder time.Duration, ignoreInativeSince time.Time)
+	Run(ctx unison.Canceler, metrics *Metrics, ignoreOlder time.Duration, ignoreInactiveSince time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for
