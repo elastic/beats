@@ -16,7 +16,7 @@ Registry path: `monitoring.metrics.filebeat.filestream`.
 
 ## Design
 
-Use `input-logfile.Metrics` as the aggregation owner.
+Use `input-logfile.Metrics` as the aggregation owner, but keep the harvester hot path lock-free.
 
 Rationale:
 
@@ -26,57 +26,76 @@ Rationale:
 - Keeping bucket logic in `Metrics` avoids new harvester-to-watcher progress messages.
 - No extra syscall is needed.
 
-`Metrics` should maintain an in-memory per-source progress table:
+`Metrics` should maintain an in-memory per-source active offset table:
 
 ```go
-type fileProgress struct {
-    size   int64
-    offset int64
-    bucket progressBucket
-    knownSize bool
-    knownOffset bool
-}
+map[string]*atomic.Int64
 ```
 
-Only count an entry once both size and offset are known, size is positive, the file is not GZIP, and the file is not ignored.
+The harvester receives a pointer to its active offset when it starts and only stores the latest offset atomically while reading. The file watcher computes bucket counts on scan using:
+
+- current file size from `FileDescriptor.Info.Size()`
+- ignored/GZIP status from the scan/prospector logic
+- latest active harvester offset loaded from the `*atomic.Int64`
+
+Only count a source when it has an active offset entry, size is positive, the file is not GZIP, and the file is not ignored. Files are removed from the active table when the harvester closes.
+
+## Benefits
+
+- No global mutex in the harvester read loop.
+- Hot path cost is one atomic offset store per message, similar in cost profile to existing atomic metrics.
+- Bucket calculation is moved to the file watcher scan cadence, where fresh file size is already available.
+- No extra `stat` syscall is needed.
+- Progress percentages are scan-consistent: size is the latest scanner-observed size, which matches Filestream's existing file-change model.
+- Shared gauge updates happen once per scan by delta, not once per harvested line.
 
 ## Code Changes
 
 1. Extend `input-logfile.Metrics`.
    - Add three gauge fields.
-   - Add a mutex-protected `map[string]fileProgress`.
+   - Add a mutex-protected `map[string]*atomic.Int64` for active plain-file offsets.
+   - Add a `lastFileProgressMetrics` snapshot so shared gauges can be updated by delta, like `UpdateFileScanMetrics`.
    - Add helper methods:
-     - `UpdateFileSize(id string, size int64, gzip bool, ignored bool)`
-     - `UpdateFileOffset(id string, offset int64)`
-     - `RemoveFileProgress(id string)`
+     - `RegisterFileOffset(id string, offset int64) *atomic.Int64`
+     - `UpdateFileIngestedBuckets(current FileIngestedMetrics)`
+     - `RemoveFileOffset(id string)`
      - `CleanupFileProgressMetrics()`
-   - Recompute only the affected source on each update:
-     - decrement old bucket if counted
-     - update source state
-     - increment new bucket if counted
+   - Keep map mutation behind a mutex, but do not acquire that mutex from the harvester read loop.
 
-2. Update file watcher scan path.
-   - In `fileWatcher.watch`, after calculating `srcID`, call `metrics.UpdateFileSize(srcID, fd.Info.Size(), fd.GZIP, ignored)` for current files.
+2. Add active offset API.
+   - `RegisterFileOffset` stores and returns a `*atomic.Int64`.
+   - The harvester keeps the returned offset pointer in a local variable for the lifetime of the run.
+   - The read loop updates it directly with `offset.Store(s.Offset)`.
+   - The watcher scan reads it directly with `offset.Load()`.
+
+3. Update file watcher scan path.
+   - In `fileWatcher.watch`, build a `FileIngestedMetrics` snapshot during the existing scan.
+   - For each current file, after calculating `srcID`, look up the active offset.
+   - If there is no active offset, do not count the file.
+   - If the file is GZIP, ignored, or size <= 0, do not count the file.
+   - Load the latest offset from the `*atomic.Int64` and classify it against `fd.Info.Size()`.
+   - Call `metrics.UpdateFileIngestedBuckets(snapshot)` once per scan.
    - Reuse the existing ignore logic from `fileIgnoreReason`; do not count files ignored by `ignore_older`, `ignore_inactive`, include/exclude filters, fingerprint-too-small handling, empty-file handling, or any other scanner/prospector ignore path.
-   - Do not register GZIP or ignored files.
-   - Call `metrics.RemoveFileProgress(srcID)` when a file is removed.
-   - On rename, preserve progress if the source ID is unchanged; otherwise remove the old ID and let the new descriptor register naturally.
+   - On rename, the active offset remains keyed by source ID. If the source ID changes, the old harvester should close/remove its offset entry and the new harvester should register a new one.
 
-3. Update harvester read path.
-   - In `filestream.readFromSource`, after `s.Offset` advances, call `metrics.UpdateFileOffset(sourceID, s.Offset)`.
+4. Update harvester path.
+   - After `initState`, register progress for non-GZIP files using the current state offset.
    - Pass the source ID into `readFromSource`, probably from `src.Name()` or from the outer `Run` context.
-   - Do not update progress for GZIP. Either pass `isGZIP` into the helper and let it ignore, or avoid the call when `isGZIP`.
-   - When the harvester closes, call `metrics.RemoveFileProgress(sourceID)` so closed files no longer contribute to the progress gauges.
+   - In `filestream.readFromSource`, after `s.Offset` advances, call `activeOffset.Store(s.Offset)` if an active offset exists.
+   - Do not register or update progress for GZIP files.
+   - When the harvester closes, call `metrics.RemoveFileOffset(sourceID)` so closed files no longer contribute to the progress gauges.
 
-4. Handle initial offset state.
+5. Handle initial offset state.
    - After `initState`, before reading starts, register the current offset with metrics for non-GZIP files.
    - This ensures restarted harvesters and already-partially-ingested files are counted before the next message is read.
+   - The file is only counted after the watcher scan observes its size and sees it is not ignored.
 
-5. Handle truncation and ignored files.
+6. Handle truncation and ignored files.
    - Truncation already resets cursor to zero. Ensure progress offset is updated to zero for the affected source.
    - Ignored files must be removed from progress tracking, not counted as complete, even when the cursor is reset to file size.
+   - If a file becomes ignored while a harvester is still active, the watcher scan must exclude it from the bucket snapshot.
 
-6. Cleanup on input shutdown.
+7. Cleanup on input shutdown.
    - In file watcher shutdown, call progress cleanup alongside `CleanupFileScanMetrics`.
    - Ensure cleanup subtracts this input's current bucket contributions from shared aggregate gauges.
 
@@ -113,19 +132,21 @@ Add unit tests for `Metrics`:
 - size zero does not count
 - GZIP is excluded
 - ignored file is excluded
+- inactive/no-harvester file is excluded
 - below 95 bucket
 - exactly 95 bucket
 - 99 bucket
 - exactly complete bucket
 - offset greater than size counts complete
-- source moving between buckets updates aggregate gauges by delta
+- source moving between buckets across scans updates aggregate gauges by delta
 - remove source decrements previous bucket
 - cleanup removes all current contributions
+- harvester offset store does not acquire the metrics map mutex
 
 Add focused watcher/harvester tests where practical:
 
 - watcher reports size without extra filesystem calls beyond scan
-- harvester reports offset updates for plain files
+- harvester stores offset updates in its active offset for plain files
 - GZIP file does not update progress buckets
 - ignored file does not update progress buckets
 - harvester close clears progress state
@@ -148,3 +169,4 @@ If full Filestream tests are too broad or slow, run the specific packages/tests 
 - Boundary math around 95% must be exact and integer-only.
 - GZIP exclusion must be explicit so compressed files do not skew plain-file progress counts.
 - Ignored-file exclusion must be applied consistently across scanner and prospector ignore paths.
+- Progress percentages are based on the latest scanner-observed file size. In append-heavy workloads, the metric can lag behind real file growth until the next scan.
