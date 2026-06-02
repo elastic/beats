@@ -141,17 +141,19 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	if b.Config.Output.Name() == "elasticsearch" {
-		callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
-			_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
-			return err
+	if beat.SetupPipelinesEnabled(b.BeatConfig) {
+		if b.Config.Output.Name() == "elasticsearch" {
+			callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
+				_, err := module.UploadPipelines(b.Info, esClient, eb.config.OverwritePipelines)
+				return err
+			}
+			_, err := elasticsearch.RegisterConnectCallback(callback)
+			if err != nil {
+				return err
+			}
+		} else {
+			eb.log.Warn(pipelinesWarning)
 		}
-		_, err := elasticsearch.RegisterConnectCallback(callback)
-		if err != nil {
-			return err
-		}
-	} else {
-		eb.log.Warn(pipelinesWarning)
 	}
 
 	acker := newEventACKer(eb.checkpoint)
