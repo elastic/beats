@@ -385,7 +385,7 @@ func TestProcessBatchResultHandlesCancelledContext(t *testing.T) {
 
 	exp := newExporterWithDefaults(t)
 	logs := newTestLogs()
-	batch, err := internal.NewLogBatch(cancelledCtx, logs)
+	batch, err := internal.NewLogBatch(logs)
 	require.NoError(t, err)
 
 	ok, err := runWithTimeout(t.Context(), func(context.Context) error {

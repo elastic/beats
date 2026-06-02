@@ -3,13 +3,13 @@ name: "beats-xpack-dockerlogbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1772337686"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1778612446"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1772337686"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1772337686"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1778612446"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1778612446"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -24,10 +24,12 @@ env:
 # See https://buildkite.com/docs/pipelines/integrations/plugins/using#using-yaml-anchors-with-plugins
 common:
   - dockerhub_login_plugin: &dockerhub_login_plugin
-      elastic/vault-docker-login#v0.6.4:
+      elastic/vault-docker-login#v0.8.0:
+        disable_logout: true
         secret_path: 'kv/ci-shared/observability-github-secrets/shared/docker/dockerhub/observabilityrobots'
   - docker_elastic_login_plugin: &docker_elastic_login_plugin
-      elastic/vault-docker-login#v0.6.4:
+      elastic/vault-docker-login#v0.8.0:
+        disable_logout: true
         secret_path: 'kv/ci-shared/platform-ingest/elastic_docker_registry'
 
 steps:
@@ -145,6 +147,7 @@ steps:
 
   - group: "Packaging"
     key: "xpack-dockerlogbeat-packaging"
+    if: build.pull_request.id != null
 
     steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux"

@@ -200,12 +200,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	if cfg.Resource.Tracer.enabled() {
 		id := sanitizeFileName(env.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(env.Agent.Paths, inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, env.Agent.Paths.Resolve(paths.Logs, inputName))
 		}
 		cfg.Resource.Tracer.Filename = resolved
 	}
@@ -262,8 +262,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	} else {
 		state = cfg.State
 	}
-	if len(cfg.SecretState) > 0 {
-		state["secret"] = cfg.SecretState
+	if len(cfg.SecretState.m) > 0 {
+		state["secret"] = cfg.SecretState.m
 	}
 	if cfg.Redact == nil {
 		cfg.Redact = &redact{}

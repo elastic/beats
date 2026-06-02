@@ -80,7 +80,7 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 		appendNodeShards(nodeShards, &shard)
 	}
 
-	transactionID := utils.NewUUIDV4()
+	transactionID := utils.NewUUID()
 
 	sendNodeShardsEvent(r, info, slices.Collect(maps.Values(nodeShards)), transactionID)
 

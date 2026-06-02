@@ -58,12 +58,11 @@ func newModuleRegistry(modulesPath string,
 	overrides *ModuleOverrides,
 	beatInfo beat.Info,
 	filesetOverrides FilesetOverrides,
-	beatPaths *paths.Path,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
 		registry:  []Module{},
 		log:       beatInfo.Logger.Named(logName),
-		beatPaths: beatPaths,
+		beatPaths: beatInfo.Paths,
 	}
 
 	for _, mcfg := range moduleConfigs {
@@ -123,7 +122,7 @@ func newModuleRegistry(modulesPath string,
 				return nil, fmt.Errorf("fileset %s/%s is configured but doesn't exist", mcfg.Module, filesetName)
 			}
 
-			fileset, err := New(modulesPath, filesetName, mcfg.Module, fcfg, beatInfo.Logger, beatPaths)
+			fileset, err := New(modulesPath, filesetName, mcfg.Module, fcfg, beatInfo.Logger, beatInfo.Paths)
 			if err != nil {
 				return nil, err
 			}
@@ -146,8 +145,8 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, filesetOverrides FilesetOverrides, beatPaths *paths.Path) (*ModuleRegistry, error) {
-	modulesPath := beatPaths.Resolve(paths.Home, "module")
+func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, filesetOverrides FilesetOverrides) (*ModuleRegistry, error) {
+	modulesPath := beatInfo.Paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
 	if err != nil || !stat.IsDir() {
@@ -156,7 +155,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 			// When run under bundled in elastic-otel-collector via elastic-agent there is no modules directory and this is expected.
 			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
 		}
-		return &ModuleRegistry{log: log, beatPaths: beatPaths}, nil
+		return &ModuleRegistry{log: log, beatPaths: beatInfo.Paths}, nil
 	}
 
 	var modulesCLIList []string
@@ -169,7 +168,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 	}
 	var mcfgs []*ModuleConfig //nolint:prealloc  //breaks tests
 	for _, cfg := range moduleConfigs {
-		cfg, err = mergePathDefaults(cfg, beatPaths)
+		cfg, err = mergePathDefaults(cfg, beatInfo.Paths)
 		if err != nil {
 			return nil, err
 		}
@@ -187,7 +186,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 	}
 
 	enableFilesetsFromOverrides(mcfgs, modulesOverrides)
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, filesetOverrides, beatPaths)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, filesetOverrides)
 }
 
 // enableFilesetsFromOverrides enables in mcfgs the filesets mentioned in overrides,

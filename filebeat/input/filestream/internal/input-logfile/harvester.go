@@ -158,9 +158,14 @@ type HarvesterStatus struct {
 	Size int64
 }
 
-func (hg *defaultHarvesterGroup) notifyObserver(srcID string, size int64) {
-	if hg.notifyChan != nil {
-		hg.notifyChan <- HarvesterStatus{srcID, size}
+func (hg *defaultHarvesterGroup) notifyObserver(canceler inputv2.Canceler, srcID string, size int64) {
+	if hg.notifyChan == nil {
+		return
+	}
+
+	select {
+	case hg.notifyChan <- HarvesterStatus{srcID, size}:
+	case <-canceler.Done():
 	}
 }
 
@@ -316,7 +321,7 @@ func startHarvester(
 				return
 			}
 
-			hg.notifyObserver(srcID, st.Offset)
+			hg.notifyObserver(canceler, srcID, st.Offset)
 			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
 		}()
 

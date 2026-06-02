@@ -124,7 +124,9 @@ func TestSetupNginx(t *testing.T) {
 	if err := beatPaths.InitPaths(beatPaths); err != nil {
 		t.Fatal(err)
 	}
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"), FilesetOverrides{}, beatPaths)
+	info := makeTestInfo("5.2.0")
+	info.Paths = beatPaths
+	reg, err := newModuleRegistry(modulesPath, configs, nil, info, FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,7 +210,9 @@ func TestLoadMultiplePipelines(t *testing.T) {
 	if err := beatPaths.InitPaths(beatPaths); err != nil {
 		t.Fatal(err)
 	}
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{}, beatPaths)
+	info := makeTestInfo("6.6.0")
+	info.Paths = beatPaths
+	reg, err := newModuleRegistry(modulesPath, configs, nil, info, FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -258,8 +262,9 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 	if err := beatPaths.InitPaths(beatPaths); err != nil {
 		t.Fatal(err)
 	}
-
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{}, beatPaths)
+	info := makeTestInfo("6.6.0")
+	info.Paths = beatPaths
+	reg, err := newModuleRegistry(modulesPath, configs, nil, info, FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
