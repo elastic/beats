@@ -66,7 +66,7 @@ The amount of time to wait for all events to be published when shutting down. By
 Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
 
 ```yaml
-winlogbeat.shutdown_timeout: 1s
+winlogbeat.shutdown_timeout: 15s
 ```
 
 
