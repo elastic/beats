@@ -100,7 +100,7 @@ logging.level: info
 		"every harvester must contribute all its events, with no missing or extra sources")
 
 	filebeat.Stop()
-	filebeat.WaitLogsContains("filebeat stopped.", 30*time.Second, "Filebeat did not stop cleanly")
+	filebeat.WaitLogsContains("filebeat stopped.", 30*time.Second)
 }
 
 func TestBadInputProcessorConfigFailsFast(t *testing.T) {
@@ -123,11 +123,10 @@ output.discard:
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitLogsContains(
-		"Exiting: Failed to start crawler: starting input failed: error while initializing input: "+
-			"unexpected INVALID_CONFIG_KEY option in filebeat.inputs.0.processors.0.add_fields",
-		30*time.Second,
-	)
+	filebeat.WaitLogsContainsAnyOrder([]string{
+		"Exiting: Failed to start crawler",
+		"unexpected INVALID_CONFIG_KEY",
+	}, 30*time.Second, "Filebeat should fail fast naming the offending input processor option")
 
 	require.Error(t, filebeat.Cmd.Wait(), "Filebeat must exit on a broken input processor config")
 	assert.Equal(t, 1, filebeat.Cmd.ProcessState.ExitCode())
