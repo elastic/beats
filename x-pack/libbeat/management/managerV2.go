@@ -90,8 +90,14 @@ type BeatV2Manager struct {
 	// sync channel for shutting down the manager after we get a stop from
 	// either the agent or the beat
 	stopChan chan struct{}
+	stopOnce sync.Once
+	// waits for manager goroutines started in PreInit() to exit
+	stopWait sync.WaitGroup
 
 	isRunning bool
+
+	// Set to true when the Beat is ready to start inputs/output
+	beatIsReady bool
 
 	// set with the last applied output config
 	// allows tracking if the configuration actually changed and if the
@@ -210,7 +216,7 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 		units:              make(map[unitKey]*agentUnit),
 		status:             status.Running,
 		message:            "Healthy",
-		stopChan:           make(chan struct{}, 1),
+		stopChan:           make(chan struct{}),
 		changeDebounce:     time.Second,
 		// forceReloadDebounce is greater than changeDebounce because it is only
 		// used when an input has not reached its finished state, this means some events
@@ -277,8 +283,11 @@ func (cm *BeatV2Manager) SetStopCallback(stopFunc func()) {
 	cm.stopFunc = stopFunc
 }
 
-// Start the config manager.
-func (cm *BeatV2Manager) Start() error {
+// PreInit starts the unitListen loop, so the manager can already
+// check-in with Elastic Agent, but no input/output will be
+// started yet. Call [PostInit] to enable starting/stopping
+// inputs/output.
+func (cm *BeatV2Manager) PreInit() error {
 	if !cm.Enabled() {
 		return fmt.Errorf("V2 Manager is disabled")
 	}
@@ -287,6 +296,7 @@ func (cm *BeatV2Manager) Start() error {
 		cm.errCanceller = nil
 	}
 
+	cm.logger.Debug("Manager starting")
 	ctx := context.Background()
 	err := cm.client.Start(ctx)
 	if err != nil {
@@ -295,7 +305,9 @@ func (cm *BeatV2Manager) Start() error {
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 
-	go cm.watchErrChan(ctx)
+	cm.stopWait.Go(func() {
+		cm.watchErrChan(ctx)
+	})
 	cm.client.RegisterDiagnosticHook(
 		"beat-rendered-config",
 		"the rendered config used by the beat",
@@ -303,14 +315,69 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
-	go cm.unitListen()
+	cm.UpdateStatus(status.Starting, "Starting")
+
+	cm.stopWait.Go(cm.unitListen)
 	cm.isRunning = true
+	return nil
+}
+
+// PostInit allows the manager to start/stop inputs/output.
+func (cm *BeatV2Manager) PostInit() {
+	cm.UpdateStatus(status.Running, "Running")
+
+	cm.mx.Lock()
+	defer cm.mx.Unlock()
+
+	cm.beatIsReady = true
+	cm.logger.Debug("Manager ready to accept units.")
+}
+
+// Start starts the manager.
+//
+// Deprecated: Use [PreInit] and [PostInit] instead
+//
+// For backwards compatibility, [Start] calls [PreInit] then [PostInit].
+func (cm *BeatV2Manager) Start() error {
+	if err := cm.PreInit(); err != nil {
+		return err
+	}
+
+	cm.PostInit()
 	return nil
 }
 
 // Stop stops the current Manager and close the connection to Elastic Agent.
 func (cm *BeatV2Manager) Stop() {
-	cm.stopChan <- struct{}{}
+	cm.stopOnce.Do(func() {
+		close(cm.stopChan)
+	})
+}
+
+// WaitForStop blocks until the manager has fully stopped, or timeout elapses.
+// It returns true if the manager stopped before timeout, false otherwise.
+// A non-positive timeout means wait indefinitely.
+func (cm *BeatV2Manager) WaitForStop(timeout time.Duration) bool {
+	cm.Stop()
+	done := make(chan struct{})
+	go func() {
+		cm.stopWait.Wait()
+		close(done)
+	}()
+
+	if timeout <= 0 {
+		<-done
+		return true
+	}
+
+	t := time.NewTimer(timeout)
+
+	select {
+	case <-done:
+		return true
+	case <-t.C:
+		return false
+	}
 }
 
 // CheckRawConfig is currently not implemented for V1.
@@ -477,8 +544,6 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 			if !errors.Is(err, context.Canceled) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
-		case <-cm.stopChan:
-			return
 		}
 	}
 }
@@ -518,7 +583,7 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.logger.Infof(
 				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
 				change.Unit.ID(),
-				change.Type, int64(change.Triggers), change.Type, change.Triggers)
+				change.Type, int64(change.Triggers), change.Type, change.Triggers) //nolint:gosec // It's just logging
 
 			switch change.Type {
 			// Within the context of how we send config to beats, I'm not sure if there is a difference between
@@ -539,10 +604,20 @@ func (cm *BeatV2Manager) unitListen() {
 				cm.softDeleteUnit(change.Unit)
 			}
 		case <-t.C:
+			cm.mx.Lock()
+
+			// If the Beat is not ready to accept configuration, do nothing
+			// and ensure the timer will fire again.
+			if !cm.beatIsReady {
+				cm.logger.Debug("Debounce timer fired, but Beat is not ready yet.")
+				cm.mx.Unlock()
+				t.Reset(cm.forceReloadDebounce)
+				continue
+			}
+
 			// a copy of the units is used for reload to prevent the holding of the `cm.mx`.
 			// it could be possible that sending the configuration to reload could cause the `UpdateStatus`
 			// to be called on the manager causing it to try and grab the `cm.mx` lock, causing a deadlock.
-			cm.mx.Lock()
 			units := make(map[unitKey]*agentUnit, len(cm.units))
 			for k, u := range cm.units {
 				if u.softDeleted {

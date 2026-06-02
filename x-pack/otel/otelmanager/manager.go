@@ -6,6 +6,7 @@ package otelmanager
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -59,6 +60,8 @@ func (n *OtelManager) Stop() {
 // Returning true might lead to side effects.
 func (n *OtelManager) Enabled() bool                             { return false }
 func (n *OtelManager) AgentInfo() management.AgentInfo           { return management.AgentInfo{} }
+func (n *OtelManager) PreInit() error                            { return nil }
+func (n *OtelManager) PostInit()                                 {}
 func (n *OtelManager) Start() error                              { return nil }
 func (n *OtelManager) CheckRawConfig(cfg *config.C) error        { return nil }
 func (n *OtelManager) RegisterAction(action management.Action)   {}
@@ -72,4 +75,8 @@ func (n *OtelManager) RegisterDiagnosticHook(_ string, description string, filen
 func (n *OtelManager) SetDiagnosticExtension(receiverName string, ext DiagnosticExtension) {
 	n.ext = ext
 	n.receiverName = receiverName
+}
+func (n *OtelManager) WaitForStop(_ time.Duration) bool {
+	n.Stop()
+	return true
 }

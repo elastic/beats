@@ -401,7 +401,7 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 	if p.cfg.UserQuery != "" {
 		query = p.cfg.UserQuery
 	}
-	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig, "user")
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
@@ -433,7 +433,7 @@ func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSyn
 	if p.cfg.DeviceQuery != "" {
 		query = p.cfg.DeviceQuery
 	}
-	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig, "device")
 	p.logger.Debugf("received %d devices from API", len(entries))
 	if err != nil {
 		return nil, err

@@ -47,7 +47,8 @@ func TestManagerV2(t *testing.T) {
 	fqdnEnabled := atomic.Bool{}
 	allStopped := atomic.Bool{}
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
-		if currentIdx == 1 {
+		switch currentIdx {
+		case 1:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -55,7 +56,7 @@ func TestManagerV2(t *testing.T) {
 				configsSet.Store(true)
 				t.Log("output, inputs, and APM configuration set")
 			}
-		} else if currentIdx == 2 {
+		case 2:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -64,7 +65,7 @@ func TestManagerV2(t *testing.T) {
 				configsSet.Store(false)
 				t.Log("output, inputs, and APM configuration cleared (should not happen)")
 			}
-		} else {
+		default:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -258,9 +259,10 @@ func TestManagerV2(t *testing.T) {
 	}, r, client, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
+	//nolint:staticcheck // We want to ensure Start still has the same behaviour
 	err = m.Start()
 	require.NoError(t, err)
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	require.Eventually(t, func() bool {
 		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
@@ -394,12 +396,130 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 
 	err = m.Start()
 	require.NoError(t, err)
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	<-inputConfigUpdated
 	assert.Equal(t, 1, output.reloadCount) // initial load
 	assert.Equal(t, 2, inputs.reloadCount) // initial load + config update
 	assert.Equal(t, 0, apm.reloadCount)    // no apm tracing config applied
+}
+
+func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
+	beatReady := atomic.Bool{}
+
+	r := reload.NewRegistry()
+	output := &reloadable{}
+	r.MustRegisterOutput(output)
+	inputs := &reloadableList{}
+	r.MustRegisterInput(inputs)
+
+	agentInfo := &proto.AgentInfo{
+		Id:      "elastic-agent-id",
+		Version: version.GetDefaultVersion(),
+	}
+	units := []*proto.UnitExpected{
+		{
+			Id:       "output-unit",
+			Type:     proto.UnitType_OUTPUT,
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "elasticsearch",
+				Name: "elasticsearch",
+			},
+		},
+		{
+			Id:       "input-unit-1",
+			Type:     proto.UnitType_INPUT,
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "filestram-unit-id",
+				Type: "filestream",
+				Name: "filesteam",
+				Streams: []*proto.Stream{
+					{
+						Id: "filestream-input-id",
+						Source: integration.RequireNewStruct(t, map[string]any{
+							"id":    "filestream-input-id",
+							"paths": []any{"/foo/bar"},
+						}),
+					},
+				},
+			},
+		},
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if !beatReady.Load() {
+				for _, u := range observed.Units {
+					if u.State != proto.State_STARTING {
+						t.Errorf(
+							"Unit %q is not in %q state, got %q",
+							u.GetId(), proto.State_STARTING,
+							u.GetState().String())
+					}
+				}
+			}
+
+			return &proto.CheckinExpected{
+				AgentInfo:   agentInfo,
+				Units:       units,
+				Features:    nil,
+				FeaturesIdx: 1,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+	require.NoError(t, server.Start())
+	defer server.Stop()
+
+	client := client.NewV2(
+		fmt.Sprintf(":%d", server.Port),
+		"",
+		client.VersionInfo{},
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{
+			Enabled: true,
+		},
+		r,
+		client,
+		logp.NewNopLogger(),
+	)
+	require.NoError(t, err)
+	defer stopManagerAndWait(t, m)
+
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok, "NewV2AgentManagerWithClient must return a BeatV2Manager")
+
+	mm.changeDebounce = 10 * time.Millisecond
+	mm.forceReloadDebounce = 20 * time.Millisecond
+
+	require.NoError(t, m.PreInit())
+
+	// Ensure unit changes are received while the beat is not ready.
+	require.Eventually(t, func() bool {
+		mm.mx.Lock()
+		defer mm.mx.Unlock()
+		return len(mm.units) == len(units)
+	}, 5*time.Second, 10*time.Millisecond, "expected manager to receive units before PostInit")
+
+	// Wait for debounce windows to pass while not ready; nothing should be reloaded.
+	time.Sleep(mm.changeDebounce + 2*mm.forceReloadDebounce)
+	assert.Nil(t, output.Config(), "output should not be reloaded before PostInit")
+	assert.Empty(t, inputs.Configs(), "inputs should not be reloaded before PostInit")
+
+	// Once ready, previously buffered unit state should eventually be applied.
+	m.PostInit()
+	beatReady.Store(true)
+	require.Eventually(t, func() bool {
+		return output.Config() != nil && len(inputs.Configs()) > 0
+	}, 5*time.Second, 10*time.Millisecond,
+		"expected buffered units to be applied after PostInit without requiring new unit changes")
 }
 
 func TestOutputError(t *testing.T) {
@@ -523,7 +643,7 @@ func TestOutputError(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
@@ -683,7 +803,7 @@ func TestErrorPerUnit(t *testing.T) {
 	if err := m.Start(); err != nil {
 		t.Fatalf("could not start ManagerV2: %s", err)
 	}
-	defer m.Stop()
+	defer stopManagerAndWait(t, m)
 
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
@@ -778,4 +898,13 @@ func (m *mockReloadable) Configs() []*reload.ConfigWithMeta {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	return m.ConfigsFn()
+}
+
+type stopAndWait interface {
+	WaitForStop(time.Duration) bool
+}
+
+func stopManagerAndWait(t *testing.T, m stopAndWait) {
+	t.Helper()
+	require.True(t, m.WaitForStop(15*time.Second), "timed out waiting for manager shutdown")
 }

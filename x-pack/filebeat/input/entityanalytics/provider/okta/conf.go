@@ -17,8 +17,7 @@ import (
 
 	"gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
-	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -104,9 +103,9 @@ type oAuth2Config struct {
 	TokenURL     string   `config:"token_url" validate:"required"`
 
 	// JWT-based authentication (private key)
-	OktaJWKFile string `config:"jwk_file"`
-	OktaJWKJSON []byte `config:"jwk_json"`
-	OktaJWKPEM  []byte `config:"jwk_pem"`
+	OktaJWKFile string          `config:"jwk_file"`
+	OktaJWKJSON common.JSONBlob `config:"jwk_json"`
+	OktaJWKPEM  string          `config:"jwk_pem"`
 }
 
 func (o *oAuth2Config) isEnabled() bool {
@@ -127,7 +126,7 @@ func (o *oAuth2Config) Validate() error {
 
 	// Determine authentication method based on provided credentials
 	hasClientSecret := o.ClientSecret != ""
-	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != nil
+	hasJWTKeys := o.OktaJWKFile != "" || o.OktaJWKJSON != nil || o.OktaJWKPEM != ""
 
 	if hasClientSecret && hasJWTKeys {
 		return errors.New("oauth2 validation error: cannot use both client secret and JWT private keys")
@@ -147,7 +146,7 @@ func (o *oAuth2Config) Validate() error {
 		if o.OktaJWKJSON != nil {
 			n++
 		}
-		if o.OktaJWKPEM != nil {
+		if o.OktaJWKPEM != "" {
 			n++
 		}
 		if n > 1 {
@@ -176,8 +175,8 @@ func (o *oAuth2Config) Validate() error {
 				return fmt.Errorf("oauth2 validation error: invalid JWK JSON format: %w", err)
 			}
 		}
-		if o.OktaJWKPEM != nil {
-			if _, err := pemPKCS8PrivateKey(o.OktaJWKPEM); err != nil {
+		if o.OktaJWKPEM != "" {
+			if _, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM)); err != nil {
 				return fmt.Errorf("oauth2 validation error: %w", err)
 			}
 		}
@@ -320,13 +319,6 @@ func (c *conf) Validate() error {
 		// which is the minimum.
 		c.Tracer.MaxSize = 1
 	}
-	ok, err := httplog.IsPathInLogsFor(Name, c.Tracer.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, Name))
-	}
 	return nil
 }
 
@@ -349,7 +341,7 @@ func (c *conf) wantDevices() bool {
 }
 
 // populateJSONFromFile reads a JSON file and populates the destination.
-func populateJSONFromFile(file string, dst *[]byte) error {
+func populateJSONFromFile(file string, dst *common.JSONBlob) error {
 	_, err := os.Stat(file)
 	if errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("the file %q cannot be found", file)

@@ -934,6 +934,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-elasticsearch-node.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-node_stats.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-pending_tasks.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-security_stats.md
               - file: metricbeat/metricbeat-metricset-elasticsearch-shard.md
           - file: metricbeat/metricbeat-module-envoyproxy.md
             children:

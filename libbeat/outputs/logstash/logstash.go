@@ -42,10 +42,9 @@ func makeLogstash(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
-	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	log := beat.Logger.Named("logstash")
-	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix, beatPaths)
+	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix, beat.Paths)
 }
 
 func MakeLogstashClients(

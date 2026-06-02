@@ -1205,12 +1205,13 @@ func TestGenerateHints(t *testing.T) {
 		t.Run(test.msg, func(t *testing.T) {
 			// Configure path for modules access
 			abs, _ := filepath.Abs("../../..")
-			require.NoError(t, paths.InitPaths(&paths.Path{
+			p := paths.New()
+			require.NoError(t, p.InitPaths(&paths.Path{
 				Home: abs,
 			}))
 
 			logger := logptest.NewTestingLogger(t, "")
-			l, err := NewLogHints(test.config, logger)
+			l, err := newLogHints(test.config, logger, p)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1442,11 +1443,12 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		require.NoError(t, paths.InitPaths(&paths.Path{
+		p := paths.New()
+		require.NoError(t, p.InitPaths(&paths.Path{
 			Home: abs,
 		}))
 		logger := logptest.NewTestingLogger(t, "")
-		l, err := NewLogHints(cfg, logger)
+		l, err := newLogHints(cfg, logger, p)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1487,7 +1489,7 @@ func TestCreateConfigResolvesVariablesFromOptions(t *testing.T) {
 		"hints":      mapstr.M{"logs": mapstr.M{"raw": `[{"type":"docker","containers":{"ids":["${data.container.id}"]},"password":"${PASSWORD}"}]`}},
 	}
 
-	l, err := NewLogHints(cfg, logptest.NewTestingLogger(t, ""))
+	l, err := newLogHints(cfg, logptest.NewTestingLogger(t, ""), paths.New())
 	require.NoError(t, err)
 	cfgs := l.CreateConfig(event, opts...)
 	require.Len(t, cfgs, 1)

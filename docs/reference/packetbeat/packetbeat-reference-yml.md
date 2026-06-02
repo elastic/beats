@@ -279,7 +279,7 @@ packetbeat.protocols:
   #send_all_headers: false
 
   # A list of headers to redact if present in the HTTP request. This will keep
-  # the header field present, but will redact it's value to show the headers
+  # the header field present, but will redact its value to show the headers
   # presence.
   #redact_headers: []
 

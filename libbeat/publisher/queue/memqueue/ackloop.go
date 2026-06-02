@@ -22,19 +22,19 @@ package memqueue
 // worker, to reduce the number of signals to return to the producer and the
 // broker event loop.
 // Producer ACKs are run in the ackLoop go-routine.
-type ackLoop struct {
-	broker *broker
+type ackLoop[T any] struct {
+	broker *broker[T]
 
 	// A list of batches given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.
-	pendingBatches batchList
+	pendingBatches batchList[T]
 }
 
-func newACKLoop(broker *broker) *ackLoop {
-	return &ackLoop{broker: broker}
+func newACKLoop[T any](broker *broker[T]) *ackLoop[T] {
+	return &ackLoop[T]{broker: broker}
 }
 
-func (l *ackLoop) run() {
+func (l *ackLoop[T]) run() {
 	b := l.broker
 	for {
 		nextBatchChan := l.pendingBatches.nextBatchChannel()
@@ -58,7 +58,7 @@ func (l *ackLoop) run() {
 
 // handleBatchSig collects and handles a batch ACK/Cancel signal. handleBatchSig
 // is run by the ackLoop.
-func (l *ackLoop) handleBatchSig() int {
+func (l *ackLoop[T]) handleBatchSig() int {
 	ackedBatches := l.collectAcked()
 
 	count := 0
@@ -71,11 +71,6 @@ func (l *ackLoop) handleBatchSig() int {
 		l.processACK(ackedBatches, count)
 	}
 
-	for !ackedBatches.empty() {
-		// Release finished batch structs into the shared memory pool
-		releaseBatch(ackedBatches.pop())
-	}
-
 	// return final ACK to EventLoop, in order to clean up internal buffer
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
 
@@ -83,8 +78,8 @@ func (l *ackLoop) handleBatchSig() int {
 	return count
 }
 
-func (l *ackLoop) collectAcked() batchList {
-	ackedBatches := batchList{}
+func (l *ackLoop[T]) collectAcked() batchList[T] {
+	ackedBatches := batchList[T]{}
 
 	acks := l.pendingBatches.pop()
 	ackedBatches.append(acks)
@@ -107,7 +102,7 @@ func (l *ackLoop) collectAcked() batchList {
 // Called by ackLoop. This function exists to decouple the work of collecting
 // and running producer callbacks from logical deletion of the events, so
 // input callbacks can't block the queue by occupying the runLoop goroutine.
-func (l *ackLoop) processACK(lst batchList, N int) {
+func (l *ackLoop[T]) processACK(lst batchList[T], N int) {
 	ackCallbacks := []func(){}
 	// First we traverse the entries we're about to remove, collecting any callbacks
 	// we need to run.
