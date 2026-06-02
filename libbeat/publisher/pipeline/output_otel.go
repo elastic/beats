@@ -35,14 +35,17 @@ import (
 var _ outputController = (*otelOutputController)(nil)
 
 // otelOutputController is the per-pipeline outputController for a Beat
-// receiver. Each connected pipeline owns its own queue (a façade over a
-// shared otelqueue.Pool), its own event consumer, and its own set of output
-// workers wired to its own LogConsumer.
+// receiver. By default the receiver path uses the otelqueue pool: an
+// explicit intake queue ID joins the pool registered under that name, and
+// no ID joins the global default pool. Either way the pool is shared
+// across every receiver with the same ID, keeping a single in-memory event
+// budget across all of them while keeping each receiver's FIFO independent
+// (so a slow consumer on one receiver doesn't block others).
 //
-// Multiple pipelines that share an intake queue ID share the underlying
-// otelqueue.Pool. The pool is the shared event budget; per-pipeline queues
-// keep events isolated, so a slow consumer on one pipeline cannot block
-// other pipelines' deliveries.
+// The only escape hatch from otelqueue is an explicit disk queue
+// configuration (queue.disk). In that case the receiver builds its own
+// queue from the user-supplied factory — sharing is not supported for disk
+// queues, so an intake queue ID combined with queue.disk is rejected.
 type otelOutputController struct {
 	beatInfo beat.Info
 	logger   *logp.Logger
@@ -50,7 +53,10 @@ type otelOutputController struct {
 
 	intakeQueueID string
 	queue         queue.Queue[publisher.Event]
-	pool          *otelqueue.Pool[publisher.Event]
+	// pool is non-nil whenever the receiver uses the otelqueue pool (i.e.
+	// queue.mem); it is nil when the receiver was configured with queue.disk
+	// and owns its queue outright via queueFactory.
+	pool *otelqueue.Pool[publisher.Event]
 
 	consumer *eventConsumer
 
@@ -78,24 +84,39 @@ func newOTelOutputController(
 	monitors Monitors,
 	retryObserver retryObserver,
 	intakeQueueID string,
+	queueFactory queue.QueueFactory[publisher.Event],
 	queueConfig any,
 ) (*otelOutputController, error) {
-	// publisher.Event.Source-style routing is no longer used by this
-	// implementation, but we still require an in-memory queue configuration
-	// because the receiver path does not support a disk-backed pool.
-	settings, ok := queueConfig.(memqueue.Settings)
-	if !ok {
-		return nil, fmt.Errorf("receiver output requires an in-memory queue configuration, got %T", queueConfig)
-	}
+	var (
+		pipelineQueue queue.Queue[publisher.Event]
+		pool          *otelqueue.Pool[publisher.Event]
+	)
 
-	// Get (or create) the pool for this intake queue ID. An empty ID means
-	// "private pool for this pipeline only" and is never registered.
-	pool, err := acquireOTelPool(intakeQueueID, settings, monitors)
-	if err != nil {
-		return nil, err
+	// The default receiver path uses the otelqueue pool: when queueConfig
+	// is a memqueue.Settings (the default; also any explicit queue.mem),
+	// we go through acquireOTelPool. Anything else (in practice
+	// diskqueue.Settings from an explicit queue.disk) opts out and builds
+	// its queue from the user-supplied queueFactory.
+	if settings, isMem := queueConfig.(memqueue.Settings); isMem {
+		var err error
+		pool, err = acquireOTelPool(intakeQueueID, settings, monitors)
+		if err != nil {
+			return nil, err
+		}
+		pipelineQueue = pool.Connect()
+	} else {
+		// Non-memory queue (e.g. queue.disk): sharing is meaningless because
+		// each receiver writes to its own on-disk path, so an intake queue
+		// ID combined with a non-memory queue is a configuration error.
+		if intakeQueueID != "" {
+			return nil, fmt.Errorf("shared intake queue %q requires queue.mem, got %T", intakeQueueID, queueConfig)
+		}
+		q, err := queueFactory(monitors.Logger, observerForMonitors(monitors), 0, nil)
+		if err != nil {
+			return nil, fmt.Errorf("queue creation failed: %w", err)
+		}
+		pipelineQueue = q
 	}
-
-	pipelineQueue := pool.Connect()
 
 	// Initialize output group.
 	out, err := loadOutput(monitors, func(outStats outputs.Observer) (string, outputs.Group, error) {
@@ -103,7 +124,7 @@ func newOTelOutputController(
 		return "otelconsumer", grp, err
 	})
 	if err != nil {
-		pipelineQueue.Close(true)
+		closePipelineQueue(pipelineQueue)
 		releaseOTelPool(intakeQueueID)
 		return nil, err
 	}
@@ -136,16 +157,22 @@ func newOTelOutputController(
 	}, nil
 }
 
+// closePipelineQueue force-closes the underlying queue. Used to clean up
+// after a failed controller initialization.
+func closePipelineQueue(q queue.Queue[publisher.Event]) {
+	if q == nil {
+		return
+	}
+	_ = q.Close(true)
+}
+
 // acquireOTelPool returns the otelqueue.Pool for the given intake queue ID,
-// creating it if necessary. An empty ID returns a private pool that is not
-// shared and not tracked in the global registry. Settings mismatches against
-// an already-registered ID return an error.
+// creating it if necessary. The empty string is the global default ID:
+// every receiver started without an explicit intake queue ID joins the
+// same global pool. Settings mismatches against an already-registered ID
+// (including the global one) return an error.
 func acquireOTelPool(intakeQueueID string, settings memqueue.Settings, monitors Monitors) (*otelqueue.Pool[publisher.Event], error) {
 	poolSettings := otelqueue.Settings{Events: settings.Events}
-
-	if intakeQueueID == "" {
-		return otelqueue.NewPool[publisher.Event](poolSettings, observerForMonitors(monitors)), nil
-	}
 
 	allOTelPools.Lock()
 	defer allOTelPools.Unlock()
@@ -154,21 +181,19 @@ func acquireOTelPool(intakeQueueID string, settings memqueue.Settings, monitors 
 			return nil, fmt.Errorf("shared intake queue %q already initialized with different queue settings", intakeQueueID)
 		}
 		existing.refs++
-		monitors.Logger.Debugf("newOTelOutputController: joining existing pool for intake queue ID %v (%v pipelines connected)", intakeQueueID, existing.refs)
+		monitors.Logger.Debugf("newOTelOutputController: joining existing pool for intake queue ID %q (%v pipelines connected)", intakeQueueID, existing.refs)
 		return existing.pool, nil
 	}
 	pool := otelqueue.NewPool[publisher.Event](poolSettings, observerForMonitors(monitors))
 	allOTelPools.lookup[intakeQueueID] = &sharedPool{pool: pool, settings: settings, refs: 1}
-	monitors.Logger.Debugf("newOTelOutputController: created new pool for intake queue ID %v", intakeQueueID)
+	monitors.Logger.Debugf("newOTelOutputController: created new pool for intake queue ID %q", intakeQueueID)
 	return pool, nil
 }
 
 // releaseOTelPool decrements the ref count for the given intake queue ID and
-// shuts the pool down once the last connected pipeline leaves.
+// shuts the pool down once the last connected pipeline leaves. The empty ID
+// is the global default pool and is treated the same as a named ID.
 func releaseOTelPool(intakeQueueID string) {
-	if intakeQueueID == "" {
-		return
-	}
 	allOTelPools.Lock()
 	defer allOTelPools.Unlock()
 	entry, ok := allOTelPools.lookup[intakeQueueID]

@@ -60,8 +60,10 @@ func monitorsForTest() Monitors {
 func TestOTelQueueMetrics(t *testing.T) {
 	// More thorough testing of queue metrics is in the queue package; here we
 	// just want to make sure that they appear under the right monitoring
-	// namespace.
+	// namespace. Uses a test-unique intake queue ID so it doesn't share the
+	// global pool with any other test.
 	reg := monitoring.NewRegistry()
+	settings := memqueue.Settings{Events: 1000}
 	controller, err := newOTelOutputController(
 		beatInfoForTest(t),
 		Monitors{
@@ -69,8 +71,9 @@ func TestOTelQueueMetrics(t *testing.T) {
 			Metrics: reg,
 		},
 		nilObserver,
-		"",
-		memqueue.Settings{Events: 1000},
+		"TestOTelQueueMetrics",
+		nil, // queueFactory unused on the otelqueue pool path
+		settings,
 	)
 	require.NoError(t, err, "creating OTel output controller should succeed")
 	defer controller.waitClose(context.Background(), true)
@@ -79,6 +82,38 @@ func TestOTelQueueMetrics(t *testing.T) {
 	value, ok := entry.(*monitoring.Uint)
 	require.True(t, ok, "pipeline.queue.max_events must be a *monitoring.Uint")
 	assert.Equal(t, uint64(1000), value.Get(), "pipeline.queue.max_events should match the events configuration key")
+}
+
+// TestEmptyIntakeQueueIDJoinsGlobalPool verifies that two receivers started
+// without an explicit intake queue ID share the same (global default) pool,
+// matching what an unconfigured production deployment sees.
+func TestEmptyIntakeQueueIDJoinsGlobalPool(t *testing.T) {
+	settings := memqueue.Settings{Events: 8}
+
+	c1, err := newOTelOutputController(
+		beatInfoForTest(t),
+		monitorsForTest(),
+		nilObserver,
+		"",
+		nil, // queueFactory unused on the otelqueue pool path
+		settings,
+	)
+	require.NoError(t, err)
+	defer c1.waitClose(cancelledContext(), false)
+
+	c2, err := newOTelOutputController(
+		beatInfoForTest(t),
+		monitorsForTest(),
+		nilObserver,
+		"",
+		nil, // queueFactory unused on the otelqueue pool path
+		settings,
+	)
+	require.NoError(t, err)
+	defer c2.waitClose(cancelledContext(), false)
+
+	assert.Same(t, c1.poolForTest(), c2.poolForTest(),
+		"empty intake queue ID must share the global default pool across receivers")
 }
 
 // TestSharedPoolBudgetIsolatesPipelines verifies that pipelines connected to
@@ -98,6 +133,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
+		nil, // queueFactory unused on the otelqueue pool path
 		settings,
 	)
 	require.NoError(t, err, "first controller creation should succeed")
@@ -108,6 +144,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
+		nil, // queueFactory unused on the otelqueue pool path
 		settings,
 	)
 	require.NoError(t, err, "second controller creation should succeed")
@@ -121,13 +158,13 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 
 	// Fill the entire pool budget through c1, leaving zero slots for c2.
 	for i := 0; i < settings.Events; i++ {
-		_, ok := prod1.(queue.Producer[publisher.Event]).TryPublish(testEvent(i))
+		_, ok := prod1.TryPublish(testEvent(i))
 		require.True(t, ok, "TryPublish should succeed while the pool has slots")
 	}
 
 	// A further TryPublish on either producer must fail because the pool
 	// budget is fully consumed.
-	_, ok := prod2.(queue.Producer[publisher.Event]).TryPublish(testEvent(100))
+	_, ok := prod2.TryPublish(testEvent(100))
 	assert.False(t, ok, "TryPublish should fail when the shared pool budget is exhausted")
 }
 
@@ -137,6 +174,7 @@ func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"mismatchID",
+		nil, // queueFactory unused on the otelqueue pool path
 		memqueue.Settings{Events: 5},
 	)
 	require.NoError(t, err, "first output controller creation should succeed")
@@ -147,14 +185,43 @@ func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"mismatchID",
+		nil,
 		memqueue.Settings{Events: 10},
 	)
 	require.Error(t, err, "connecting to a shared intake queue with a different queue config should fail")
 }
 
+// TestNonMemQueueOptsOutOfPool verifies that a non-memory queue config
+// (e.g. queue.disk in production) opts the receiver out of the otelqueue
+// pool and uses the user-supplied queueFactory instead. The receiver
+// controller must not be backed by a pool in this mode.
+func TestNonMemQueueOptsOutOfPool(t *testing.T) {
+	type fakeNonMemqueueSettings struct{ Path string }
+
+	// On the non-mem path the controller calls queueFactory; we substitute
+	// an in-memory factory so the test doesn't perform real disk I/O. The
+	// point of the test is that the otelqueue pool is skipped, not what
+	// the factory actually returns.
+	stubFactory := memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 4})
+	c, err := newOTelOutputController(
+		beatInfoForTest(t),
+		monitorsForTest(),
+		nilObserver,
+		"", // non-mem queue cannot be shared, so intake queue ID must be empty
+		stubFactory,
+		fakeNonMemqueueSettings{Path: "/tmp/dq"},
+	)
+	require.NoError(t, err, "non-mem queue config must take the queueFactory path")
+	defer c.waitClose(cancelledContext(), false)
+
+	assert.Nil(t, c.poolForTest(),
+		"non-mem queue receiver must not be backed by an otelqueue pool")
+}
+
 func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
-	// The receiver pool only knows how to size itself from a memqueue.Settings;
-	// other queue configurations must be rejected at startup.
+	// Sharing an intake queue is meaningless for a non-memory queue (each
+	// receiver writes to its own on-disk path), so the combination is
+	// rejected at startup.
 	type fakeNonMemqueueSettings struct{ Path string }
 
 	_, err := newOTelOutputController(
@@ -162,10 +229,11 @@ func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"non-mem-id",
+		nil, // factory unreachable: shared-non-mem combination is rejected
 		fakeNonMemqueueSettings{},
 	)
 	require.Error(t, err, "shared intake queue must reject non-memory queue configs")
-	assert.Contains(t, err.Error(), "in-memory queue", "error should explain the requirement")
+	assert.Contains(t, err.Error(), "queue.mem", "error should explain the requirement")
 }
 
 // TestSharedPoolRefCount verifies that the pool registered for an intake
@@ -173,9 +241,9 @@ func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
 func TestSharedPoolRefCount(t *testing.T) {
 	settings := memqueue.Settings{Events: 4}
 
-	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "refcount-id", settings)
+	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "refcount-id", nil, settings)
 	require.NoError(t, err)
-	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "refcount-id", settings)
+	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "refcount-id", nil, settings)
 	require.NoError(t, err)
 
 	pool := c1.poolForTest()
@@ -202,9 +270,9 @@ func TestSharedPoolRefCount(t *testing.T) {
 func TestPipelineQueuesAreIndependent(t *testing.T) {
 	settings := memqueue.Settings{Events: 10}
 
-	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "isolation-id", settings)
+	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "isolation-id", nil, settings)
 	require.NoError(t, err)
-	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "isolation-id", settings)
+	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "isolation-id", nil, settings)
 	require.NoError(t, err)
 	defer c2.waitClose(cancelledContext(), false)
 
@@ -216,7 +284,7 @@ func TestPipelineQueuesAreIndependent(t *testing.T) {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		_, ok := prod2.(queue.Producer[publisher.Event]).TryPublish(testEvent(1))
+		_, ok := prod2.TryPublish(testEvent(1))
 		assert.True(t, ok, "c2 must still be able to publish after c1 is closed")
 	}()
 
@@ -246,7 +314,7 @@ func TestConcurrentControllerCreate(t *testing.T) {
 		i := i
 		go func() {
 			defer wg.Done()
-			c, err := newOTelOutputController(infos[i], mons[i], nilObserver, "concurrent-id", settings)
+			c, err := newOTelOutputController(infos[i], mons[i], nilObserver, "concurrent-id", nil, settings)
 			require.NoError(t, err)
 			controllers[i] = c
 		}()

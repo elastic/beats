@@ -208,15 +208,18 @@ func NewForReceiver(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	// Receiver pipelines use the otelqueue pool, which is in-memory only.
-	// queueFactory is parsed for its settings (capacity, etc.) but not used to
-	// construct a queue; the pool is created inside newOTelOutputController.
-	_, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	// Receiver pipelines route through the OTel output controller. With an
+	// in-memory queue configuration the controller uses the otelqueue pool
+	// (a global default pool when no intake queue ID is set, or a pool
+	// keyed by the ID when one is). With an explicit queue.disk config the
+	// controller falls back to building its queue via queueFactory, in
+	// which case sharing is not supported.
+	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueConfig)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueFactory, queueConfig)
 	if err != nil {
 		return nil, err
 	}

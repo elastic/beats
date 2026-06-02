@@ -18,6 +18,7 @@
 package otelqueue_test
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"sync"
@@ -149,7 +150,7 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 			defer consumerWG.Done()
 			for {
 				batch, err := q.Get(128)
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					return
 				}
 				if err != nil {
