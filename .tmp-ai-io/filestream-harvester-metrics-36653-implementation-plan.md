@@ -150,6 +150,7 @@ Add focused watcher/harvester tests where practical:
 - GZIP file does not update progress buckets
 - ignored file does not update progress buckets
 - harvester close clears progress state
+- rotation/copytruncate flows remove closed harvester offset entries and count active original/rotated source IDs exactly once
 
 ## Validation
 
@@ -165,7 +166,7 @@ If full Filestream tests are too broad or slow, run the specific packages/tests 
 ## Risks
 
 - Shared global registry gauges require correct cleanup, otherwise stopped inputs can leave stale counts.
-- Rename and copy-truncate flows can double-count if old source IDs are not removed correctly.
+- Rotation/copytruncate flows need coverage to ensure closed harvesters remove their offset entries and active original/rotated source IDs are counted exactly once.
 - Boundary math around 95% must be exact and integer-only.
 - GZIP exclusion must be explicit so compressed files do not skew plain-file progress counts.
 - Ignored-file exclusion must be applied consistently across scanner and prospector ignore paths.
