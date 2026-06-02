@@ -217,6 +217,45 @@ func TestMergeQueryWithPackScheduleDefaults(t *testing.T) {
 		assert.Equal(t, "s1", got.SpaceID)
 		require.NotNil(t, got.RRuleSchedule)
 	})
+
+	t.Run("inherits pack query defaults", func(t *testing.T) {
+		defaultSnapshot := false
+		pack := Pack{
+			DefaultPlatform: "linux,darwin",
+			DefaultVersion:  "5.12.0",
+			DefaultSnapshot: &defaultSnapshot,
+		}
+		q := Query{Query: "select 1", NativeSchedule: NativeSchedule{Interval: 60}}
+		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
+		require.NoError(t, err)
+		assert.Equal(t, "linux,darwin", got.Platform)
+		assert.Equal(t, "5.12.0", got.Version)
+		require.NotNil(t, got.Snapshot)
+		assert.False(t, *got.Snapshot)
+	})
+
+	t.Run("query overrides pack query defaults", func(t *testing.T) {
+		defaultSnapshot := false
+		querySnapshot := true
+		pack := Pack{
+			DefaultPlatform: "linux",
+			DefaultVersion:  "5.12.0",
+			DefaultSnapshot: &defaultSnapshot,
+		}
+		q := Query{
+			Query:          "select 1",
+			NativeSchedule: NativeSchedule{Interval: 60},
+			Platform:       "windows",
+			Version:        "5.13.0",
+			Snapshot:       &querySnapshot,
+		}
+		got, err := MergeQueryWithPackScheduleDefaults(pack, q)
+		require.NoError(t, err)
+		assert.Equal(t, "windows", got.Platform)
+		assert.Equal(t, "5.13.0", got.Version)
+		require.NotNil(t, got.Snapshot)
+		assert.True(t, *got.Snapshot)
+	})
 }
 
 func TestValidatePackQueriesAfterMerge(t *testing.T) {

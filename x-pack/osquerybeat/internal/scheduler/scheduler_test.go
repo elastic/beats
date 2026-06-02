@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
@@ -20,7 +21,7 @@ func TestScheduler_NewAndStartStop(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
 	var called atomic.Int32
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		called.Add(1)
 		return nil
 	}
@@ -40,7 +41,7 @@ func TestScheduler_NewAndStartStop(t *testing.T) {
 func TestScheduler_AddRemoveQuery(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
 	}
 
@@ -59,7 +60,7 @@ func TestScheduler_AddRemoveQuery(t *testing.T) {
 
 	sq := &ScheduledQuery{
 		Name:     "test_query",
-		Query:    "SELECT * FROM processes",
+		Config:   config.Query{Query: "SELECT * FROM processes"},
 		Timeout:  time.Minute,
 		Schedule: schedule,
 	}
@@ -80,7 +81,7 @@ func TestScheduler_AddRemoveQuery(t *testing.T) {
 func TestScheduler_UpdateQueries(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
 	}
 
@@ -107,12 +108,12 @@ func TestScheduler_UpdateQueries(t *testing.T) {
 	queries := []*ScheduledQuery{
 		{
 			Name:     "query1",
-			Query:    "SELECT 1",
+			Config:   config.Query{Query: "SELECT 1"},
 			Schedule: schedule1,
 		},
 		{
 			Name:     "query2",
-			Query:    "SELECT 2",
+			Config:   config.Query{Query: "SELECT 2"},
 			Schedule: schedule2,
 		},
 	}
@@ -173,7 +174,7 @@ func TestScheduler_QueryEndDateExpired(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
 	var executed atomic.Int32
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		executed.Add(1)
 		return nil
 	}
@@ -195,7 +196,7 @@ func TestScheduler_QueryEndDateExpired(t *testing.T) {
 
 	sq := &ScheduledQuery{
 		Name:     "expired_query",
-		Query:    "SELECT 1",
+		Config:   config.Query{Query: "SELECT 1"},
 		Schedule: schedule,
 	}
 
@@ -212,7 +213,7 @@ func TestScheduler_ContextCancellation(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
 	var executed atomic.Int32
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		executed.Add(1)
 		return nil
 	}
@@ -231,7 +232,7 @@ func TestScheduler_ContextCancellation(t *testing.T) {
 
 	sq := &ScheduledQuery{
 		Name:     "test_query",
-		Query:    "SELECT 1",
+		Config:   config.Query{Query: "SELECT 1"},
 		Schedule: schedule,
 	}
 
@@ -259,7 +260,7 @@ func TestScheduler_ContextCancellation(t *testing.T) {
 func TestScheduler_NilSchedule(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
 	}
 
@@ -271,7 +272,7 @@ func TestScheduler_NilSchedule(t *testing.T) {
 	// Query with nil schedule should not be added
 	sq := &ScheduledQuery{
 		Name:     "no_schedule_query",
-		Query:    "SELECT 1",
+		Config:   config.Query{Query: "SELECT 1"},
 		Schedule: nil,
 	}
 
@@ -283,7 +284,7 @@ func TestScheduler_NilSchedule(t *testing.T) {
 func TestScheduler_InactiveSchedule(t *testing.T) {
 	log := logptest.NewTestingLogger(t, "")
 
-	queryFunc := func(ctx context.Context, name, query string, timeout time.Duration, actionID string, executionIndex int, plannedScheduleTime time.Time) error {
+	queryFunc := func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
 		return nil
 	}
 
@@ -299,7 +300,7 @@ func TestScheduler_InactiveSchedule(t *testing.T) {
 
 	sq := &ScheduledQuery{
 		Name:     "inactive_query",
-		Query:    "SELECT 1",
+		Config:   config.Query{Query: "SELECT 1"},
 		Schedule: schedule,
 	}
 

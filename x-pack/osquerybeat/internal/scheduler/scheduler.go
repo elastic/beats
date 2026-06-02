@@ -11,23 +11,59 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // QueryFunc is the function type for executing a query.
-// scheduleID is the policy-defined schedule id (may be empty, caller can use name).
 // executionIndex is the 1-based schedule execution count for this run.
 // plannedScheduleTime is the intended schedule slot (before splay/jitter).
-type QueryFunc func(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int, plannedScheduleTime time.Time) error
+type QueryFunc func(ctx context.Context, query ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error
 
 // ScheduledQuery represents a query with its recurrence schedule
 type ScheduledQuery struct {
 	Name     string
-	Query    string
+	Config   config.Query
 	Timeout  time.Duration
 	Schedule *RecurrenceSchedule
-	// ScheduleID is the policy-defined schedule id for this scheduled query (optional)
-	ScheduleID string
+}
+
+// SQL returns the query text.
+func (q ScheduledQuery) SQL() string {
+	return q.Config.Query
+}
+
+// ScheduleID returns the policy-defined schedule id, falling back to query name.
+func (q ScheduledQuery) ScheduleID() string {
+	if q.Config.ScheduleID != "" {
+		return q.Config.ScheduleID
+	}
+	return q.Name
+}
+
+// Snapshot returns true when this query should publish full snapshots.
+func (q ScheduledQuery) Snapshot() bool {
+	if q.Config.Snapshot == nil {
+		return true
+	}
+	return *q.Config.Snapshot
+}
+
+// Removed returns true when diff removals should be published.
+func (q ScheduledQuery) Removed() bool {
+	if q.Config.Removed == nil {
+		return true
+	}
+	return *q.Config.Removed
+}
+
+func (q ScheduledQuery) sameExecutionConfig(o ScheduledQuery) bool {
+	return q.Config.Query == o.Config.Query &&
+		q.ScheduleID() == o.ScheduleID() &&
+		q.Snapshot() == o.Snapshot() &&
+		q.Removed() == o.Removed() &&
+		q.Config.Platform == o.Config.Platform &&
+		q.Config.Version == o.Config.Version
 }
 
 // Scheduler manages cron-based query scheduling
@@ -184,9 +220,8 @@ func (s *Scheduler) UpdateQueries(queries []*ScheduledQuery) error {
 		// Check if query needs updating
 		if existing, ok := s.queries[sq.Name]; ok {
 			// If nothing material changed, skip
-			if existing.query.Query == sq.Query &&
-				existing.query.Timeout == sq.Timeout &&
-				existing.query.ScheduleID == sq.ScheduleID &&
+			if existing.query.Timeout == sq.Timeout &&
+				existing.query.sameExecutionConfig(*sq) &&
 				existing.query.Schedule.Equal(sq.Schedule) {
 				continue
 			}
@@ -295,11 +330,8 @@ func (s *Scheduler) executeQuery(ctx context.Context, sq *ScheduledQuery, runTim
 		defer cancel()
 	}
 
-	scheduleID := sq.ScheduleID
-	if scheduleID == "" {
-		scheduleID = sq.Name
-	}
-	err := s.queryFunc(execCtx, sq.Name, sq.Query, sq.Timeout, scheduleID, executionIndex, plannedScheduleTime)
+	query := *sq
+	err := s.queryFunc(execCtx, query, executionIndex, plannedScheduleTime)
 	if err != nil {
 		s.log.Errorf("Error executing scheduled query '%s': %v", sq.Name, err)
 	} else {

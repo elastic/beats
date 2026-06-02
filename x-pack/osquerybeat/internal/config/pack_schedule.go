@@ -134,6 +134,16 @@ func MergeQueryWithPackScheduleDefaults(pack Pack, q Query) (Query, error) {
 	if q.SpaceID == "" && pack.DefaultSpaceID != "" {
 		q.SpaceID = pack.DefaultSpaceID
 	}
+	if q.Platform == "" && pack.DefaultPlatform != "" {
+		q.Platform = pack.DefaultPlatform
+	}
+	if q.Version == "" && pack.DefaultVersion != "" {
+		q.Version = pack.DefaultVersion
+	}
+	if q.Snapshot == nil && pack.DefaultSnapshot != nil {
+		snapshot := *pack.DefaultSnapshot
+		q.Snapshot = &snapshot
+	}
 
 	if err := ValidateQueryScheduleMode(q); err != nil {
 		return q, err

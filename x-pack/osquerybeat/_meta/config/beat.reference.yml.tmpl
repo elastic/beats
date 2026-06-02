@@ -110,8 +110,12 @@ osquerybeat:
 #      osquery:
 #        packs:
 #          security_pack:
-#            # Optional pack default: space_id is shared; each query sets its own schedule_id.
+#            # Optional pack defaults. These are merged into queries that omit them;
+#            # query-level values override the default_* values.
 #            #default_space_id: "default"
+#            #default_platform: "linux,darwin"
+#            #default_version: "5.12.0"
+#            #default_snapshot: true
 #            default_rrule_schedule:
 #              rrule: "FREQ=DAILY"  # Daily
 #              start_date: "2024-01-01T00:00:00Z"
@@ -141,6 +145,10 @@ osquerybeat:
 #        fast:
 #          query: "select 1"
 #          interval: 60
+#
+# Pack-level defaults for query fields (default_platform, default_version,
+# default_snapshot, and default_space_id) use default_* names so they do not
+# conflict with osquery's native pack-level platform/version semantics.
 #
 # Splay Best Practices:
 # - Default is 0s (disabled); opt in to splay for most schedules

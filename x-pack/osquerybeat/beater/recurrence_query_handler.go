@@ -6,9 +6,14 @@ package beater
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"runtime"
+	"strings"
+	"sync"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -43,18 +48,24 @@ type recurrenceQueryHandler struct {
 	configPlugin *ConfigPlugin
 	publisher    scheduledQueryPublisher
 	profiles     liveProfileRecorder
+	osqueryVer   string
+
+	mx              sync.Mutex
+	previousResults map[string]map[string]map[string]interface{}
 }
 
 // newRecurrenceQueryHandler creates a new RRULE query handler.
 // profiles may be nil; when set, runtime-style profiles are recorded for every RRULE execution
 // (same backing store as live queries), and policy-driven publish still follows LookupQueryProfile.
-func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlugin *ConfigPlugin, pub scheduledQueryPublisher, profiles liveProfileRecorder) *recurrenceQueryHandler {
+func newRecurrenceQueryHandler(log *logp.Logger, cli *osqdcli.Client, configPlugin *ConfigPlugin, pub scheduledQueryPublisher, profiles liveProfileRecorder, osqueryVersion string) *recurrenceQueryHandler {
 	h := &recurrenceQueryHandler{
-		log:          log.With("component", "rrule-query-handler"),
-		cli:          cli,
-		configPlugin: configPlugin,
-		publisher:    pub,
-		profiles:     profiles,
+		log:             log.With("component", "rrule-query-handler"),
+		cli:             cli,
+		configPlugin:    configPlugin,
+		publisher:       pub,
+		profiles:        profiles,
+		osqueryVer:      osqueryVersion,
+		previousResults: make(map[string]map[string]map[string]interface{}),
 	}
 
 	h.scheduler = scheduler.New(log, h.executeQuery)
@@ -89,6 +100,9 @@ func (h *recurrenceQueryHandler) UpdateFromConfig(osqConfig *config.OsqueryConfi
 		if err != nil {
 			return fmt.Errorf("osquery.schedule[%q]: %w", name, err)
 		}
+		if sq == nil {
+			continue
+		}
 		queries = append(queries, sq)
 	}
 
@@ -106,16 +120,31 @@ func (h *recurrenceQueryHandler) UpdateFromConfig(osqConfig *config.OsqueryConfi
 			if err != nil {
 				return fmt.Errorf("osquery.packs[%q].queries[%q]: %w", packName, queryName, err)
 			}
+			if sq == nil {
+				continue
+			}
 			queries = append(queries, sq)
 		}
 	}
 
-	return h.scheduler.UpdateQueries(queries)
+	if err := h.scheduler.UpdateQueries(queries); err != nil {
+		return err
+	}
+	h.retainDiffState(queries)
+	return nil
 }
 
 // createScheduledQuery creates a ScheduledQuery from config
 func (h *recurrenceQueryHandler) createScheduledQuery(name string, q config.Query) (*scheduler.ScheduledQuery, error) {
 	rruleConfig := q.RRuleSchedule
+	if !platformMatches(q.Platform, runtime.GOOS) {
+		h.log.Debugf("Skipping RRULE-scheduled query '%s': platform %q does not match %q", name, q.Platform, runtime.GOOS)
+		return nil, nil
+	}
+	if !versionMatches(q.Version, h.osqueryVer) {
+		h.log.Debugf("Skipping RRULE-scheduled query '%s': requires osquery >= %q, current %q", name, q.Version, h.osqueryVer)
+		return nil, nil
+	}
 
 	startDate, err := rruleConfig.ParseStartDate()
 	if err != nil {
@@ -150,12 +179,68 @@ func (h *recurrenceQueryHandler) createScheduledQuery(name string, q config.Quer
 	}
 
 	return &scheduler.ScheduledQuery{
-		Name:       name,
-		Query:      q.Query,
-		Timeout:    timeout,
-		Schedule:   recurrenceSchedule,
-		ScheduleID: q.ScheduleID,
+		Name:     name,
+		Config:   q,
+		Timeout:  timeout,
+		Schedule: recurrenceSchedule,
 	}, nil
+}
+
+func platformMatches(selector, goos string) bool {
+	selector = strings.TrimSpace(strings.ToLower(selector))
+	if selector == "" || selector == "all" {
+		return true
+	}
+	for _, platform := range strings.Split(selector, ",") {
+		switch strings.TrimSpace(strings.ToLower(platform)) {
+		case "all":
+			return true
+		case goos:
+			return true
+		case "posix":
+			if goos == "linux" || goos == "darwin" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func versionMatches(minVersion, currentVersion string) bool {
+	minVersion = strings.TrimSpace(minVersion)
+	if minVersion == "" {
+		return true
+	}
+	currentVersion = strings.TrimSpace(currentVersion)
+	if currentVersion == "" {
+		return true
+	}
+	min, err := semver.NewVersion(minVersion)
+	if err != nil {
+		return true
+	}
+	current, err := semver.NewVersion(currentVersion)
+	if err != nil {
+		return true
+	}
+	return !current.LessThan(min)
+}
+
+func (h *recurrenceQueryHandler) retainDiffState(queries []*scheduler.ScheduledQuery) {
+	retain := make(map[string]struct{}, len(queries))
+	for _, q := range queries {
+		if q != nil {
+			retain[q.Name] = struct{}{}
+		}
+	}
+
+	h.mx.Lock()
+	defer h.mx.Unlock()
+	for name := range h.previousResults {
+		if _, ok := retain[name]; !ok {
+			delete(h.previousResults, name)
+		}
+	}
 }
 
 // initRRuleRuntimeProfiling collects a pre-query process snapshot when profiling is enabled
@@ -211,7 +296,9 @@ func (h *recurrenceQueryHandler) completeRRuleRuntimeProfiling(ctx context.Conte
 }
 
 // executeQuery is called by the scheduler to execute a query
-func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query string, timeout time.Duration, scheduleID string, executionIndex int, plannedScheduleTime time.Time) error {
+func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, scheduledQuery scheduler.ScheduledQuery, executionIndex int, plannedScheduleTime time.Time) error {
+	name := scheduledQuery.Name
+	query := scheduledQuery.SQL()
 	h.log.Debugf("Executing RRULE-scheduled query '%s' (execution #%d)", name, executionIndex)
 
 	ns, ok := h.configPlugin.LookupNamespace(name)
@@ -223,7 +310,7 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 	profSt := h.initRRuleRuntimeProfiling(ctx, name, ns, responseID, query)
 
 	startedAt := time.Now()
-	hits, err := h.cli.Query(ctx, query, timeout)
+	hits, err := h.cli.Query(ctx, query, scheduledQuery.Timeout)
 	queryDuration := time.Since(startedAt)
 	completedAt := time.Now()
 	h.completeRRuleRuntimeProfiling(ctx, profSt, queryDuration, err)
@@ -241,14 +328,9 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 		packID = qi.PackID
 	}
 
-	// Use policy schedule_id when provided
-	if scheduleID == "" {
-		scheduleID = name
-	}
+	scheduleID := scheduledQuery.ScheduleID()
 
-	// Publish results with response_id + schedule fields for parity across scheduled outputs.
-	meta := map[string]interface{}{
-		"type":                     "rrule_snapshot",
+	baseMeta := map[string]interface{}{
 		"unix_time":                completedAt.Unix(),
 		"planned_schedule_time":    plannedScheduleTime.Format(time.RFC3339Nano),
 		"rrule_query":              true,
@@ -256,11 +338,86 @@ func (h *recurrenceQueryHandler) executeQuery(ctx context.Context, name, query s
 		"schedule_execution_count": executionIndex,
 	}
 
-	h.publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, spaceID, packID, meta, hits, ecsMapping, nil)
+	totalHits := 0
+	publish := func(typ, action string, rows []map[string]interface{}) {
+		if len(rows) == 0 {
+			return
+		}
+		totalHits += len(rows)
+		meta := cloneRRuleMeta(baseMeta)
+		meta["type"] = typ
+		if action != "" {
+			meta["action"] = action
+		}
+		h.publisher.Publish(config.Datastream(ns), scheduleID, "schedule_id", responseID, spaceID, packID, meta, rows, ecsMapping, nil)
+	}
+
+	if scheduledQuery.Snapshot() {
+		publish("snapshot", "", hits)
+	} else {
+		added, removed := h.diffResults(name, hits, scheduledQuery.Removed())
+		publish("diff", "added", added)
+		publish("diff", "removed", removed)
+	}
 
 	// Synthetic response document (no action) with execution count for correlation
-	h.publisher.PublishScheduledResponse(scheduleID, packID, spaceID, responseID, startedAt, completedAt, plannedScheduleTime, len(hits), int64(executionIndex))
+	h.publisher.PublishScheduledResponse(scheduleID, packID, spaceID, responseID, startedAt, completedAt, plannedScheduleTime, totalHits, int64(executionIndex))
 
 	h.log.Debugf("RRULE-scheduled query '%s' completed with %d results", name, len(hits))
 	return nil
+}
+
+func cloneRRuleMeta(meta map[string]interface{}) map[string]interface{} {
+	out := make(map[string]interface{}, len(meta)+2)
+	for k, v := range meta {
+		out[k] = v
+	}
+	return out
+}
+
+func (h *recurrenceQueryHandler) diffResults(name string, hits []map[string]interface{}, includeRemoved bool) ([]map[string]interface{}, []map[string]interface{}) {
+	current := rowsByKey(hits)
+
+	h.mx.Lock()
+	previous := h.previousResults[name]
+	h.previousResults[name] = current
+	h.mx.Unlock()
+
+	added, removed := diffRows(previous, current, includeRemoved)
+	return added, removed
+}
+
+func diffRows(previous, current map[string]map[string]interface{}, includeRemoved bool) ([]map[string]interface{}, []map[string]interface{}) {
+	var added []map[string]interface{}
+	for key, row := range current {
+		if _, ok := previous[key]; !ok {
+			added = append(added, row)
+		}
+	}
+	if !includeRemoved {
+		return added, nil
+	}
+	var removed []map[string]interface{}
+	for key, row := range previous {
+		if _, ok := current[key]; !ok {
+			removed = append(removed, row)
+		}
+	}
+	return added, removed
+}
+
+func rowsByKey(rows []map[string]interface{}) map[string]map[string]interface{} {
+	out := make(map[string]map[string]interface{}, len(rows))
+	for _, row := range rows {
+		out[rowKey(row)] = row
+	}
+	return out
+}
+
+func rowKey(row map[string]interface{}) string {
+	raw, err := json.Marshal(row)
+	if err != nil {
+		return fmt.Sprintf("%v", row)
+	}
+	return string(raw)
 }

@@ -188,6 +188,14 @@ type Pack struct {
 	DefaultRRuleSchedule *RRuleScheduleConfig `config:"default_rrule_schedule,omitempty" json:"-"`
 	// DefaultSpaceID is applied to queries that omit space_id (native and RRULE).
 	DefaultSpaceID string `config:"default_space_id,omitempty" json:"-"`
+	// DefaultPlatform is applied to queries that omit platform. Use this instead
+	// of the native pack platform when the policy expects per-query override semantics.
+	DefaultPlatform string `config:"default_platform,omitempty" json:"-"`
+	// DefaultVersion is applied to queries that omit version. Use this instead
+	// of the native pack version when the policy expects per-query override semantics.
+	DefaultVersion string `config:"default_version,omitempty" json:"-"`
+	// DefaultSnapshot is applied to queries that omit snapshot.
+	DefaultSnapshot *bool `config:"default_snapshot,omitempty" json:"-"`
 
 	Queries map[string]Query `config:"queries" json:"queries,omitempty"`
 }
