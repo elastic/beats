@@ -505,6 +505,108 @@ func TestCertificateHotReload(t *testing.T) {
 			"alias should enable reload with the legacy period as reload_interval")
 	})
 
+	t.Run("ssl.enabled=false with certificate_reload.enabled=true does not rotate certs", func(t *testing.T) {
+		// tlscommon guards CertificateReload behind its own IsEnabled() check,
+		// so when ssl.enabled=false the hot-reloader is never started regardless
+		// of the certificate_reload block. goleak in TestMain enforces that no
+		// reloader goroutine leaks out of this subtest.
+		tmpDir := t.TempDir()
+		certPath := filepath.Join(tmpDir, "client.crt")
+		keyPath := filepath.Join(tmpDir, "client.key")
+		writeCertKeyFiles(t, certPath, keyPath, clientCertA)
+
+		client, _ := startAuthClient(t, map[string]any{
+			"ssl": map[string]any{
+				"enabled":                 false,
+				"certificate":             certPath,
+				"key":                     keyPath,
+				"certificate_authorities": []string{string(caPEM)},
+				"certificate_reload": map[string]any{
+					"enabled":         true,
+					"reload_interval": "100ms",
+				},
+			},
+		})
+
+		// Rotate the cert on disk — if a reloader were running it would pick
+		// this up and the goroutine would outlive the subtest, failing goleak.
+		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
+		time.Sleep(300 * time.Millisecond) // longer than reload_interval
+
+		// The client must still be usable (no panic, no internal error).
+		require.NotNil(t, client)
+	})
+
+	t.Run("ssl.enabled=false skips restart_on_cert_change alias entirely", func(t *testing.T) {
+		// When ssl.enabled is explicitly false, the TLS config is present but
+		// disabled. The alias must not touch CertificateReload in that case.
+		//
+		// We verify by checking that no deprecation warning is emitted even
+		// though restart_on_cert_change keys are present.
+		beatAuthCfg := map[string]any{
+			"ssl": map[string]any{
+				"enabled": false,
+				"restart_on_cert_change": map[string]any{
+					"enabled": true,
+					"period":  "100ms",
+				},
+			},
+		}
+
+		core, observed := observer.New(zapcore.WarnLevel)
+		settings := componenttest.NewNopTelemetrySettings()
+		settings.Logger = zap.New(core)
+		auth, err := newAuthenticator(&Config{BeatAuthConfig: beatAuthCfg}, settings)
+		require.NoError(t, err)
+
+		host := &mockHost{
+			extensions:       extensionsMap{component.NewID(Type): auth},
+			reportStatusFunc: func(*componentstatus.Event) {},
+		}
+		require.NoError(t, auth.Start(t.Context(), host))
+
+		warnings := observed.FilterMessageSnippet("'ssl.restart_on_cert_change' is deprecated").All()
+		require.Empty(t, warnings, "alias must not fire when ssl.enabled=false")
+	})
+
+	t.Run("certificate_reload.enabled=false takes precedence over restart_on_cert_change.enabled=true", func(t *testing.T) {
+		// When both options are present, certificate_reload wins.
+		// The alias code only applies restart_on_cert_change values when
+		// certificate_reload has not been explicitly set (Enabled == nil).
+		tmpDir := t.TempDir()
+		certPath := filepath.Join(tmpDir, "client.crt")
+		keyPath := filepath.Join(tmpDir, "client.key")
+		writeCertKeyFiles(t, certPath, keyPath, clientCertA)
+
+		serverURL, lastCN := startMTLSServer(t)
+
+		client, observed := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
+			"certificate_reload": map[string]any{
+				"enabled": false,
+			},
+			"restart_on_cert_change": map[string]any{
+				"enabled": true,
+				"period":  "100ms",
+			},
+		}))
+
+		warnings := observed.FilterMessageSnippet("'ssl.restart_on_cert_change' is deprecated").All()
+		require.Len(t, warnings, 1, "expected one deprecation warning")
+
+		doGET(t, client, serverURL)
+		require.Equal(t, clientACN, lastCN(), "server should initially see cert A")
+
+		writeCertKeyFiles(t, certPath, keyPath, clientCertB)
+
+		// certificate_reload.enabled=false wins: no rotation despite restart_on_cert_change saying enabled=true.
+		deadline := time.Now().Add(1 * time.Second)
+		for time.Now().Before(deadline) {
+			doGET(t, client, serverURL)
+			require.Equal(t, clientACN, lastCN(),
+				"certificate_reload=false must prevent rotation even when restart_on_cert_change=true")
+		}
+	})
+
 	t.Run("legacy restart_on_cert_change.enabled=false aliases reload off", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		certPath := filepath.Join(tmpDir, "client.crt")

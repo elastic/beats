@@ -168,13 +168,13 @@ func applyRestartOnCertChangeAlias(cfg *config.C, beatAuthConfig *BeatsAuthConfi
 		return
 	}
 
+	if beatAuthConfig.Transport.TLS == nil || !beatAuthConfig.Transport.TLS.IsEnabled() {
+		return
+	}
+
 	logger.Warn("'ssl.restart_on_cert_change' is deprecated; please switch to " +
 		"'ssl.certificate_reload'. The legacy values are still honored as an " +
 		"alias and TLS certificates are now hot-reloaded without a process restart")
-
-	if beatAuthConfig.Transport.TLS == nil {
-		return
-	}
 
 	type aliasShape struct {
 		Enabled *bool         `config:"enabled"`
