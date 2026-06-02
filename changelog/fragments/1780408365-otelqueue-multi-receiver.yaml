@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Beat receivers can share a single in-memory event budget across multiple receivers via a new otelqueue pool, eliminating head-of-line blocking and improving multi-receiver throughput.
+component: beats
