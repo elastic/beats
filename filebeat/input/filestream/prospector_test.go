@@ -1495,7 +1495,7 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 		// TODO: find a better name or keep original 'skips path mismatch'.
 		// also, `FingerprintGrowing: true`, thus it isn't "ordinary Fingerprint
 		// match"
-		"path-agnostic fallback NOT enabled for ordinary Fingerprint match (same-source-path required)": {
+		"skips path mismatch": {
 			// Path-agnostic fallback is restricted to the threshold-crossing
 			// case (matched via GrowingFingerprint, not Fingerprint). For
 			// ordinary same-format growth, the stored entry's Source must
@@ -1848,7 +1848,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		p := &fileProspector{
 			logger:     logp.L(),
 			identifier: identifier,
-			shortFingerprints: &shortFingerprintIndex{entries: map[string]shortFingerprintEntry{
+			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				srcID: {Fingerprint: "aabb", Source: "/a.log"},
 			}},
 		}
@@ -1869,7 +1869,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		p := &fileProspector{
 			logger:     logp.L(),
 			identifier: identifier,
-			shortFingerprints: &shortFingerprintIndex{entries: map[string]shortFingerprintEntry{
+			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				srcID: {Fingerprint: "aabb", Source: "/a.log"},
 			}},
 		}
@@ -1903,7 +1903,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		p := &fileProspector{
 			logger:     logp.L(),
 			identifier: identifier,
-			shortFingerprints: &shortFingerprintIndex{entries: map[string]shortFingerprintEntry{
+			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				oldSrcID: {Fingerprint: "aabb", Source: "/a.log"},
 			}},
 		}
@@ -1936,7 +1936,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		p := &fileProspector{
 			logger:     logp.L(),
 			identifier: identifier,
-			shortFingerprints: &shortFingerprintIndex{entries: map[string]shortFingerprintEntry{
+			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				oldKey: {Fingerprint: oldFingerprint, Source: path},
 			}},
 		}
@@ -1981,7 +1981,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		p := &fileProspector{
 			logger:     logp.L(),
 			identifier: identifier,
-			shortFingerprints: &shortFingerprintIndex{entries: map[string]shortFingerprintEntry{
+			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				oldKey: {Fingerprint: oldFingerprint, Source: path},
 			}},
 		}
@@ -2023,7 +2023,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		p := &fileProspector{
 			logger:     logp.L(),
 			identifier: identifier,
-			shortFingerprints: &shortFingerprintIndex{
+			shortFingerprints: &shortFingerprintSet{
 				entries: map[string]shortFingerprintEntry{
 					oldKey: {Fingerprint: oldFingerprint, Source: path},
 				}},

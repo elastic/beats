@@ -85,7 +85,7 @@ type fileProspector struct {
 	takeOver              loginp.TakeOverConfig
 	filestreamIdentifiers map[string]fileIdentifier
 	logIdentifiers        map[string]file.StateIdentifier
-	shortFingerprints     *shortFingerprintIndex
+	shortFingerprints     *shortFingerprintSet
 	growingFingerprint    bool
 }
 
@@ -833,7 +833,7 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 // across all growing entries, which makes accidental collisions extremely
 // unlikely for SHA-256-length raw-hex fingerprints (~2048 chars).
 //
-// Only entries in shortFingerprintIndex (those whose state has
+// Only entries in shortFingerprintSet (those whose state has
 // FingerprintGrowing == true) are searched, making this O(K) where K is
 // the number of still-growing entries.
 func (p *fileProspector) findGrowingFingerprintMatch(

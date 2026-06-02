@@ -19,11 +19,11 @@ package filestream
 
 import "strings"
 
-// shortFingerprintIndex manages a set of entries whose fingerprint is still
+// shortFingerprintSet manages a set of entries whose fingerprint is still
 // in the growing phase (raw-hex, below the configured threshold). Used by both
 // the filewatcher (for rename+grow detection) and the prospector (for key
 // migration on growth and threshold transition).
-type shortFingerprintIndex struct {
+type shortFingerprintSet struct {
 	entries map[string]shortFingerprintEntry // key → entry
 }
 
@@ -33,8 +33,8 @@ type shortFingerprintEntry struct {
 	Source      string // file path
 }
 
-func newShortFingerprintSet() *shortFingerprintIndex {
-	return &shortFingerprintIndex{
+func newShortFingerprintSet() *shortFingerprintSet {
+	return &shortFingerprintSet{
 		entries: make(map[string]shortFingerprintEntry),
 	}
 }
@@ -43,8 +43,7 @@ func newShortFingerprintSet() *shortFingerprintIndex {
 // the growing phase; the index does not enforce
 // this. Returns true if the entry was added (fingerprint non-empty).
 // Safe to call on a nil receiver.
-// TODO(AndersonQ): check if the return value is necessary
-func (idx *shortFingerprintIndex) Add(key, fingerprint, source string) {
+func (idx *shortFingerprintSet) Add(key, fingerprint, source string) {
 	if idx == nil || fingerprint == "" {
 		return
 	}
@@ -53,7 +52,7 @@ func (idx *shortFingerprintIndex) Add(key, fingerprint, source string) {
 }
 
 // Remove removes an entry by key. Safe to call on a nil receiver.
-func (idx *shortFingerprintIndex) Remove(key string) {
+func (idx *shortFingerprintSet) Remove(key string) {
 	if idx == nil {
 		return
 	}
@@ -63,7 +62,7 @@ func (idx *shortFingerprintIndex) Remove(key string) {
 // RemoveBySource removes the first entry whose source matches.
 // Used on truncation where the key is unknown (fingerprint changed).
 // Safe to call on a nil receiver.
-func (idx *shortFingerprintIndex) RemoveBySource(source string) {
+func (idx *shortFingerprintSet) RemoveBySource(source string) {
 	if idx == nil {
 		return
 	}
@@ -77,7 +76,7 @@ func (idx *shortFingerprintIndex) RemoveBySource(source string) {
 
 // UpdateSource updates the source path for an entry.
 // Safe to call on a nil receiver.
-func (idx *shortFingerprintIndex) UpdateSource(key, newSource string) {
+func (idx *shortFingerprintSet) UpdateSource(key, newSource string) {
 	if idx == nil {
 		return
 	}
@@ -93,8 +92,7 @@ func (idx *shortFingerprintIndex) UpdateSource(key, newSource string) {
 // If matchSource is empty, returns the longest prefix match to avoid ambiguity when
 // multiple entries have prefix-related fingerprints.
 // Returns the key and entry on match. Safe to call on a nil receiver.
-// TODO(AndersonQ): no caller is using the return 'entry', is it needed at all?
-func (idx *shortFingerprintIndex) FindPrefixMatch(targetFingerprint, matchSource string) (key string, entry shortFingerprintEntry, found bool) {
+func (idx *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource string) (key string, entry shortFingerprintEntry, found bool) {
 	if idx == nil || targetFingerprint == "" {
 		return "", shortFingerprintEntry{}, false
 	}
@@ -105,13 +103,14 @@ func (idx *shortFingerprintIndex) FindPrefixMatch(targetFingerprint, matchSource
 		if !strings.HasPrefix(targetFingerprint, e.Fingerprint) {
 			continue
 		}
-		// TODO: can it create a edge-case?
+
 		if matchSource != "" {
 			if e.Source == matchSource {
 				return k, e, true // exact path — at most one match, return immediately
 			}
 			continue
 		}
+
 		// No source filter: pick the longest prefix to avoid ambiguity.
 		if len(e.Fingerprint) > len(entry.Fingerprint) {
 			key, entry, found = k, e, true
@@ -121,7 +120,7 @@ func (idx *shortFingerprintIndex) FindPrefixMatch(targetFingerprint, matchSource
 }
 
 // Len returns the number of entries. Safe to call on a nil receiver.
-func (idx *shortFingerprintIndex) Len() int {
+func (idx *shortFingerprintSet) Len() int {
 	if idx == nil {
 		return 0
 	}

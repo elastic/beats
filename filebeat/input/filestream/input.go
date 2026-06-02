@@ -543,11 +543,14 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// TODO(AndersonQ): the possibility to have a fingerprint that changes
-	// becomes an issue here: the fingerprint cannot be updated as the file grows.
-	// It's only updated on file open, not on OpWrite. It's already an issue for
-	// the path: if a file is renamed, the events are published with the old path.
-	// think if we want to address it here on this PR or not.
+	// TODO(AndersonQ): The raw-hex encoded fingerprint CANNOT be on the logs as
+	//  it exposes the file content on the logs. Which might leak sensitive
+	//  information.
+	//  the possibility to have a fingerprint that changes
+	//  becomes an issue here: the fingerprint cannot be updated as the file grows.
+	//  It's only updated on file open, not on OpWrite. It's already an issue for
+	//  the path: if a file is renamed, the events are published with the old path.
+	//  think if we want to address it here on this PR or not.
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)

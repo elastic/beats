@@ -299,7 +299,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	// Exact-FileID rename match: For growing mode, also accumulate the
 	// short-fingerprint index from prev entries that did NOT get an exact
 	// match — they are the candidates for the next (prefix-match) pass.
-	var shortFingerprints *shortFingerprintIndex
+	var shortFingerprints *shortFingerprintSet
 	if w.growingFingerprint {
 		shortFingerprints = newShortFingerprintSet()
 	}
