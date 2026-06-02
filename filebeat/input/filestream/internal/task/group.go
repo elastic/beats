@@ -20,6 +20,7 @@ package task
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -56,7 +57,7 @@ type Logger interface {
 func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix string) *Group {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	var logErr = func(error) {}
+	logErr := func(error) {}
 	if log != nil {
 		var format string
 		if errPrefix == "" {
@@ -72,7 +73,7 @@ func NewGroup(limit uint64, stopTimeout time.Duration, log Logger, errPrefix str
 
 	var sem *semaphore.Weighted
 	if limit > 0 {
-		sem = semaphore.NewWeighted(int64(limit))
+		sem = semaphore.NewWeighted(int64(min(limit, math.MaxInt64))) //nolint:gosec //min prevents overflow
 	}
 
 	return &Group{
@@ -129,7 +130,7 @@ func (g *Group) Stop() error {
 	done := make(chan struct{})
 	go func() {
 		g.wg.Wait()
-		done <- struct{}{}
+		close(done)
 	}()
 
 	timeout, cancel := context.WithTimeout(context.Background(), g.stopTimeout)
