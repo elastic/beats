@@ -26,6 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/otelqueue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -94,71 +96,6 @@ func TestNestedBatchSplit(t *testing.T) {
 	assert.True(t, doneWasCalled, "Original callback should be invoked when all children are")
 }
 
-func TestBatchSplitByDestination(t *testing.T) {
-	source1 := &beat.Info{Name: "s1"}
-	source2 := &beat.Info{Name: "s2"}
-
-	privateIDs := func(events []publisher.Event) []int {
-		ids := make([]int, len(events))
-		for i, e := range events {
-			id, ok := e.Content.Private.(int)
-			require.True(t, ok, "test event Private should be an int")
-			ids[i] = id
-		}
-		return ids
-	}
-
-	t.Run("splits by source and shares completion accounting", func(t *testing.T) {
-		retryer := &mockRetryer{}
-		// events 0 and 2 belong to source1, event 1 to source2 (interleaved).
-		events := []publisher.Event{
-			{Content: beat.Event{Private: 0}, Source: source1},
-			{Content: beat.Event{Private: 1}, Source: source2},
-			{Content: beat.Event{Private: 2}, Source: source1},
-		}
-		doneWasCalled := false
-		root := &ttlBatch{
-			events:  events,
-			retryer: retryer,
-			ttl:     3,
-			done:    func() { doneWasCalled = true },
-		}
-
-		batches := root.splitByDestination()
-		require.Len(t, batches, 2, "should create one batch per distinct source")
-
-		// Groups preserve first-seen source order, with each group's events.
-		assert.Equal(t, []int{0, 2}, privateIDs(batches[0].events))
-		assert.Equal(t, []int{1}, privateIDs(batches[1].events))
-		assert.Same(t, source1, batches[0].events[0].Source)
-		assert.Same(t, source2, batches[1].events[0].Source)
-
-		// Children carry over the retryer and ttl and share split metadata.
-		assert.Equal(t, 3, batches[0].ttl)
-		assert.Equal(t, 3, batches[1].ttl)
-		assert.NotNil(t, batches[0].split)
-		assert.Same(t, batches[0].split, batches[1].split, "children must share completion accounting")
-
-		// The underlying queue read is acknowledged only after every child
-		// completes, so the queue's event cap is held until all destinations are
-		// done regardless of how many there are.
-		batches[0].done()
-		assert.False(t, doneWasCalled, "original done must wait for all children")
-		batches[1].done()
-		assert.True(t, doneWasCalled, "original done fires once all children complete")
-	})
-
-	t.Run("single source is not split", func(t *testing.T) {
-		root := &ttlBatch{events: []publisher.Event{{Source: source1}, {Source: source1}}}
-		assert.Nil(t, root.splitByDestination(), "a single-source batch should not be split")
-	})
-
-	t.Run("untagged events are a single destination", func(t *testing.T) {
-		root := &ttlBatch{events: []publisher.Event{{}, {}}}
-		assert.Nil(t, root.splitByDestination(), "an all-nil-source batch should not be split")
-	})
-}
-
 func TestBatchCallsDoneAndFreesEvents(t *testing.T) {
 	doneCalled := false
 	batch := &ttlBatch{
@@ -182,6 +119,66 @@ func TestNewBatchFreesEvents(t *testing.T) {
 	queueBatch := &mockQueueBatch{}
 	_ = newBatch(nil, queueBatch, 0)
 	assert.Equal(t, 1, queueBatch.freeEntriesCalled, "Creating a new ttlBatch should call FreeEntries on the underlying queue.Batch")
+}
+
+// TestTTLBatchRetryDoesNotReleaseSlots verifies that retrying a ttlBatch
+// wrapping an otelqueue Batch keeps the underlying slots reserved for the
+// entire retry chain — slots are only returned to the pool on final
+// ACK/Drop. This is what guarantees the queue's max-events budget can never
+// be violated even when batches bounce through the retry path repeatedly.
+func TestTTLBatchRetryDoesNotReleaseSlots(t *testing.T) {
+	pool := otelqueue.NewPool[publisher.Event](otelqueue.Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := 0; i < 4; i++ {
+		_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: i}})
+		require.True(t, ok)
+	}
+	require.Equal(t, 0, pool.Available(), "pool should be full after 4 publishes")
+
+	queueBatch, err := q.Get(0)
+	require.NoError(t, err)
+	require.Equal(t, 4, queueBatch.Count())
+
+	retryer := &mockRetryer{}
+	batch := newBatch(retryer, queueBatch, 3) // ttl=3
+
+	// Retry several times — TTL decreases via reduceTTL but slots remain
+	// reserved because the queue.Batch's Done has not been invoked.
+	for i := 0; i < 3; i++ {
+		batch.Retry()
+		require.Equal(t, 0, pool.Available(), "slots must stay reserved during retry %d", i+1)
+	}
+	require.Len(t, retryer.batches, 3, "retryer should have received 3 retry attempts")
+
+	// ACK releases the slots in one shot.
+	batch.ACK()
+	assert.Equal(t, 4, pool.Available(), "all slots must be released after ACK")
+}
+
+// TestTTLBatchDropReleasesSlots verifies that Drop also releases slots, so
+// when an output decides to drop a batch (e.g. permanent error or TTL
+// exhausted) the queue is not leaked.
+func TestTTLBatchDropReleasesSlots(t *testing.T) {
+	pool := otelqueue.NewPool[publisher.Event](otelqueue.Settings{Events: 2}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	p.Publish(publisher.Event{Content: beat.Event{Private: 1}})
+	p.Publish(publisher.Event{Content: beat.Event{Private: 2}})
+	require.Equal(t, 0, pool.Available())
+
+	queueBatch, err := q.Get(0)
+	require.NoError(t, err)
+
+	batch := newBatch(&mockRetryer{}, queueBatch, 1)
+	batch.Drop()
+	assert.Equal(t, 2, pool.Available(), "slots must be released after Drop")
 }
 
 type mockQueueBatch struct {

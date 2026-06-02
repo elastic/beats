@@ -19,11 +19,14 @@ package pipeline
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -33,21 +36,42 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// nopLogConsumer is a consumer.Logs that drops every batch it receives.
+func nopLogConsumer(t *testing.T) consumer.Logs {
+	t.Helper()
+	c, err := consumer.NewLogs(func(context.Context, plog.Logs) error { return nil })
+	require.NoError(t, err)
+	return c
+}
+
+// beatInfoForTest returns a beat.Info wired with a nop LogConsumer so the
+// otelconsumer worker does not panic when receiving batches.
+func beatInfoForTest(t *testing.T) beat.Info {
+	return beat.Info{Logger: logp.NewNopLogger(), LogConsumer: nopLogConsumer(t)}
+}
+
+// monitorsForTest returns a fresh Monitors with its own metrics registry. Each
+// controller must get its own registry because loadOutput registers stats
+// under fixed names that would collide if reused.
+func monitorsForTest() Monitors {
+	return Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
+}
+
 func TestOTelQueueMetrics(t *testing.T) {
-	// More thorough testing of queue metrics are in the queue package,
-	// here we just want to make sure that they appear under the right
-	// monitoring namespace.
+	// More thorough testing of queue metrics is in the queue package; here we
+	// just want to make sure that they appear under the right monitoring
+	// namespace.
 	reg := monitoring.NewRegistry()
 	controller, err := newOTelOutputController(
-		beat.Info{Logger: logp.NewNopLogger()},
+		beatInfoForTest(t),
 		Monitors{
 			Logger:  logp.NewNopLogger(),
 			Metrics: reg,
 		},
 		nilObserver,
-		memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 1000}),
 		"",
-		nil)
+		memqueue.Settings{Events: 1000},
+	)
 	require.NoError(t, err, "creating OTel output controller should succeed")
 	defer controller.waitClose(context.Background(), true)
 	entry := reg.Get("pipeline.queue.max_events")
@@ -57,146 +81,61 @@ func TestOTelQueueMetrics(t *testing.T) {
 	assert.Equal(t, uint64(1000), value.Get(), "pipeline.queue.max_events should match the events configuration key")
 }
 
-func TestSharedQueue(t *testing.T) {
-
-	// The shared queue holds at most 5 events, and when read will wait up to
-	// 1sec to return a "full" batch with 2 events.
+// TestSharedPoolBudgetIsolatesPipelines verifies that pipelines connected to
+// the same intake queue ID share a single event budget, but each pipeline has
+// its own independent Queue façade so a slow consumer on one pipeline cannot
+// block deliveries on another.
+func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 	const flushTimeout = time.Second
-	queueSettings := memqueue.Settings{
+	settings := memqueue.Settings{
 		Events:        5,
 		MaxGetRequest: 2,
 		FlushTimeout:  flushTimeout,
 	}
-	queueFactory := func(
-		logger *logp.Logger,
-		observer queue.Observer,
-		inputQueueSize int,
-		encoderFactory queue.EncoderFactory[publisher.Event],
-	) (queue.Queue[publisher.Event], error) {
-		return memqueue.NewQueue(logger, observer, queueSettings, 0, encoderFactory), nil
-	}
 
 	c1, err := newOTelOutputController(
-		beat.Info{Logger: logp.NewNopLogger()},
-		Monitors{
-			Logger:  logp.NewNopLogger(),
-			Metrics: monitoring.NewRegistry(),
-		},
+		beatInfoForTest(t),
+		monitorsForTest(),
 		nilObserver,
-		queueFactory,
-		"queueID",
-		queueSettings,
+		"sharedID",
+		settings,
 	)
-	require.NoError(t, err, "output controller creation should succeed")
+	require.NoError(t, err, "first controller creation should succeed")
 	defer c1.waitClose(cancelledContext(), false)
 
 	c2, err := newOTelOutputController(
-		beat.Info{Logger: logp.NewNopLogger()},
-		Monitors{
-			Logger:  logp.NewNopLogger(),
-			Metrics: monitoring.NewRegistry(),
-		},
+		beatInfoForTest(t),
+		monitorsForTest(),
 		nilObserver,
-		queueFactory,
-		"queueID",
-		queueSettings,
+		"sharedID",
+		settings,
 	)
-	require.NoError(t, err, "output controller creation should succeed")
+	require.NoError(t, err, "second controller creation should succeed")
 	defer c2.waitClose(cancelledContext(), false)
 
-	assert.Same(t, c1.otelOutputController, c2.otelOutputController, "output controller handles with the same intake queue ID should reference the same output controller")
-
-	// Close the otelconsumer workers, we will check the batches manually from the worker input channel
-	for _, worker := range c1.workers {
-		_ = worker.Close()
-	}
-	batchChan := c1.workerChan
+	assert.Same(t, c1.poolForTest(), c2.poolForTest(),
+		"controllers with the same intake queue ID must share the same pool")
 
 	prod1 := c1.queueProducer(queue.ProducerConfig{})
 	prod2 := c2.queueProducer(queue.ProducerConfig{})
 
-	var events []publisher.Event
-	for i := range 6 {
-		events = append(events, testEvent(i))
+	// Fill the entire pool budget through c1, leaving zero slots for c2.
+	for i := 0; i < settings.Events; i++ {
+		_, ok := prod1.(queue.Producer[publisher.Event]).TryPublish(testEvent(i))
+		require.True(t, ok, "TryPublish should succeed while the pool has slots")
 	}
 
-	// Publish one event through each handle. They are read together (the queue's
-	// MaxGetRequest is 2) and the pipeline splits them into one single-source
-	// batch per destination.
-	prod1.Publish(events[0])
-	prod2.Publish(events[1])
-
-	// Collect the two split batches and their ACK callbacks, keyed by source.
-	acks := map[*beat.Info]func(){}
-	for range 2 {
-		select {
-		case batch := <-batchChan:
-			batchEvents := batch.Events()
-			require.Len(t, batchEvents, 1, "each split batch should target a single source")
-			acks[batchEvents[0].Source] = batch.ACK
-		case <-time.After(flushTimeout / 2):
-			require.Fail(t, "expected a split batch on worker channel, no batch received")
-		}
-	}
-	require.Contains(t, acks, &c1.beatInfo, "prod1's event should be routed to c1's destination")
-	require.Contains(t, acks, &c2.beatInfo, "prod2's event should be routed to c2's destination")
-
-	// Fill the rest of the shared queue (cap 5) through controller 1: the two
-	// events above still occupy their slots until acknowledged.
-	prod1.Publish(events[2])
-	prod1.Publish(events[3])
-	prod1.Publish(events[4])
-
-	// publishedChan will be closed when events[5] is published.
-	publishedChan := make(chan struct{})
-	go func() {
-		defer close(publishedChan)
-		prod2.Publish(events[5])
-	}()
-
-	select {
-	case <-time.After(time.Second):
-		// All is well, the event was blocked by the full shared queue as expected.
-	case <-publishedChan:
-		require.Fail(t, "Publish call to full shared queue should block")
-	}
-
-	// The first queue read holds its slots until *both* destinations' split
-	// batches are acknowledged, so the shared queue never exceeds its event cap
-	// regardless of the number of destinations. Acking only one must not unblock.
-	acks[&c1.beatInfo]()
-	select {
-	case <-time.After(250 * time.Millisecond):
-		// Still blocked: one destination's ack is not enough to free the read.
-	case <-publishedChan:
-		require.Fail(t, "Publish should stay blocked until all split batches are acknowledged")
-	}
-
-	// Acking the second destination completes the read and frees its slots.
-	acks[&c2.beatInfo]()
-	select {
-	case <-time.After(time.Second):
-		require.Fail(t, "Acknowledging both split batches should unblock the pending Publish")
-	case <-publishedChan:
-	}
+	// A further TryPublish on either producer must fail because the pool
+	// budget is fully consumed.
+	_, ok := prod2.(queue.Producer[publisher.Event]).TryPublish(testEvent(100))
+	assert.False(t, ok, "TryPublish should fail when the shared pool budget is exhausted")
 }
 
-func TestSharedQueueConfigMismatch(t *testing.T) {
-	queueFactory := func(
-		logger *logp.Logger,
-		observer queue.Observer,
-		inputQueueSize int,
-		encoderFactory queue.EncoderFactory[publisher.Event],
-	) (queue.Queue[publisher.Event], error) {
-		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
-	}
-	monitors := Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
-
+func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 	c1, err := newOTelOutputController(
-		beat.Info{Logger: logp.NewNopLogger()},
-		monitors,
+		beatInfoForTest(t),
+		monitorsForTest(),
 		nilObserver,
-		queueFactory,
 		"mismatchID",
 		memqueue.Settings{Events: 5},
 	)
@@ -204,10 +143,9 @@ func TestSharedQueueConfigMismatch(t *testing.T) {
 	defer c1.waitClose(cancelledContext(), false)
 
 	_, err = newOTelOutputController(
-		beat.Info{Logger: logp.NewNopLogger()},
-		monitors,
+		beatInfoForTest(t),
+		monitorsForTest(),
 		nilObserver,
-		queueFactory,
 		"mismatchID",
 		memqueue.Settings{Events: 10},
 	)
@@ -215,35 +153,120 @@ func TestSharedQueueConfigMismatch(t *testing.T) {
 }
 
 func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {
-	// publisher.Event.Source is not serialized by the disk queue, so a shared
-	// intake queue backed by anything but the memory queue would silently
-	// misroute events between pipelines. The controller must reject such a
-	// misconfiguration at startup.
-	queueFactory := func(
-		logger *logp.Logger,
-		observer queue.Observer,
-		inputQueueSize int,
-		encoderFactory queue.EncoderFactory[publisher.Event],
-	) (queue.Queue[publisher.Event], error) {
-		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
-	}
-	monitors := Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
-
-	// queueConfig is anything other than memqueue.Settings; the parsed
-	// diskqueue settings are the realistic case, modeled here as a struct
-	// literal so the test doesn't take a new package dependency.
+	// The receiver pool only knows how to size itself from a memqueue.Settings;
+	// other queue configurations must be rejected at startup.
 	type fakeNonMemqueueSettings struct{ Path string }
 
 	_, err := newOTelOutputController(
-		beat.Info{Logger: logp.NewNopLogger()},
-		monitors,
+		beatInfoForTest(t),
+		monitorsForTest(),
 		nilObserver,
-		queueFactory,
 		"non-mem-id",
 		fakeNonMemqueueSettings{},
 	)
 	require.Error(t, err, "shared intake queue must reject non-memory queue configs")
 	assert.Contains(t, err.Error(), "in-memory queue", "error should explain the requirement")
+}
+
+// TestSharedPoolRefCount verifies that the pool registered for an intake
+// queue ID is only shut down once the last pipeline disconnects.
+func TestSharedPoolRefCount(t *testing.T) {
+	settings := memqueue.Settings{Events: 4}
+
+	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "refcount-id", settings)
+	require.NoError(t, err)
+	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "refcount-id", settings)
+	require.NoError(t, err)
+
+	pool := c1.poolForTest()
+	require.Same(t, pool, c2.poolForTest(), "both controllers should share the pool")
+
+	// First close: pool must remain registered for the second connection.
+	require.NoError(t, c1.waitClose(cancelledContext(), false))
+	allOTelPools.Lock()
+	_, stillRegistered := allOTelPools.lookup["refcount-id"]
+	allOTelPools.Unlock()
+	assert.True(t, stillRegistered, "pool must remain registered while at least one pipeline uses it")
+
+	// Second close: pool must be deregistered.
+	require.NoError(t, c2.waitClose(cancelledContext(), false))
+	allOTelPools.Lock()
+	_, stillRegistered = allOTelPools.lookup["refcount-id"]
+	allOTelPools.Unlock()
+	assert.False(t, stillRegistered, "pool must be deregistered once the last pipeline disconnects")
+}
+
+// TestPipelineQueuesAreIndependent verifies that closing or stalling one
+// pipeline's Queue does not block the other pipeline. We close c1's queue and
+// confirm c2 can still publish through its own queue.
+func TestPipelineQueuesAreIndependent(t *testing.T) {
+	settings := memqueue.Settings{Events: 10}
+
+	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "isolation-id", settings)
+	require.NoError(t, err)
+	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "isolation-id", settings)
+	require.NoError(t, err)
+	defer c2.waitClose(cancelledContext(), false)
+
+	// Close c1's pipeline-local queue. The shared pool stays alive (c2 still
+	// holds a ref) and c2's queue must remain usable.
+	require.NoError(t, c1.waitClose(cancelledContext(), false))
+
+	prod2 := c2.queueProducer(queue.ProducerConfig{})
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_, ok := prod2.(queue.Producer[publisher.Event]).TryPublish(testEvent(1))
+		assert.True(t, ok, "c2 must still be able to publish after c1 is closed")
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("c2 publish did not return; pipeline queues are not independent")
+	}
+}
+
+// TestConcurrentControllerCreate stresses the acquire/release path under
+// concurrency to exercise the global registry locking.
+func TestConcurrentControllerCreate(t *testing.T) {
+	settings := memqueue.Settings{Events: 4}
+
+	const n = 16
+	controllers := make([]*otelOutputController, n)
+	infos := make([]beat.Info, n)
+	mons := make([]Monitors, n)
+	for i := 0; i < n; i++ {
+		infos[i] = beatInfoForTest(t)
+		mons[i] = monitorsForTest()
+	}
+	var wg sync.WaitGroup
+	wg.Add(n)
+	for i := 0; i < n; i++ {
+		i := i
+		go func() {
+			defer wg.Done()
+			c, err := newOTelOutputController(infos[i], mons[i], nilObserver, "concurrent-id", settings)
+			require.NoError(t, err)
+			controllers[i] = c
+		}()
+	}
+	wg.Wait()
+
+	// All controllers should share the same pool.
+	first := controllers[0].poolForTest()
+	for _, c := range controllers[1:] {
+		assert.Same(t, first, c.poolForTest(), "all controllers must share the same pool")
+	}
+
+	// Release all of them; the pool must end up deregistered.
+	for _, c := range controllers {
+		require.NoError(t, c.waitClose(cancelledContext(), false))
+	}
+	allOTelPools.Lock()
+	_, stillRegistered := allOTelPools.lookup["concurrent-id"]
+	allOTelPools.Unlock()
+	assert.False(t, stillRegistered, "pool must be deregistered once every controller closes")
 }
 
 func testEvent(i int) publisher.Event {
@@ -256,62 +279,4 @@ func cancelledContext() context.Context {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	return ctx
-}
-
-// recordingProducer is a queue.Producer that records the last published event.
-type recordingProducer struct {
-	published    publisher.Event
-	tryPublished publisher.Event
-}
-
-func (p *recordingProducer) Publish(event publisher.Event) (queue.EntryID, bool) {
-	p.published = event
-	return 0, true
-}
-
-func (p *recordingProducer) TryPublish(event publisher.Event) (queue.EntryID, bool) {
-	p.tryPublished = event
-	return 0, true
-}
-
-func (p *recordingProducer) Close() {}
-
-func TestSourceTaggingProducer(t *testing.T) {
-	source := &beat.Info{Name: "src"}
-	rec := &recordingProducer{}
-	prod := &sourceTaggingProducer{Producer: rec, source: source}
-
-	prod.Publish(testEvent(1))
-	assert.Same(t, source, rec.published.Source, "Publish should tag the event with the source")
-
-	prod.TryPublish(testEvent(2))
-	assert.Same(t, source, rec.tryPublished.Source, "TryPublish should tag the event with the source")
-}
-
-func TestHandleQueueProducerTagging(t *testing.T) {
-	queueFactory := func(
-		logger *logp.Logger,
-		observer queue.Observer,
-		inputQueueSize int,
-		encoderFactory queue.EncoderFactory[publisher.Event],
-	) (queue.Queue[publisher.Event], error) {
-		return memqueue.NewQueue(logger, observer, memqueue.Settings{Events: 5}, 0, encoderFactory), nil
-	}
-	monitors := Monitors{Logger: logp.NewNopLogger(), Metrics: monitoring.NewRegistry()}
-
-	// A non-shared controller has a single destination, so it must not wrap the
-	// producer with source tagging.
-	plain, err := newOTelOutputController(beat.Info{Logger: logp.NewNopLogger()}, monitors, nilObserver, queueFactory, "", nil)
-	require.NoError(t, err)
-	defer plain.waitClose(cancelledContext(), false)
-	_, tagging := plain.queueProducer(queue.ProducerConfig{}).(*sourceTaggingProducer)
-	assert.False(t, tagging, "non-shared handle should not tag events")
-
-	// A shared controller must wrap the producer so events can be routed back
-	// to the pipeline that produced them.
-	shared, err := newOTelOutputController(beat.Info{Logger: logp.NewNopLogger()}, monitors, nilObserver, queueFactory, "tagging-id", memqueue.Settings{Events: 5})
-	require.NoError(t, err)
-	defer shared.waitClose(cancelledContext(), false)
-	_, tagging = shared.queueProducer(queue.ProducerConfig{}).(*sourceTaggingProducer)
-	assert.True(t, tagging, "shared handle should tag events")
 }

@@ -208,16 +208,15 @@ func NewForReceiver(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	// Pipelines sharing an intake queue id share a single output controller and
-	// queue. queueConfig holds the parsed queue settings so the controller can
-	// reject a later pipeline that would otherwise silently inherit the first
-	// pipeline's queue settings.
-	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	// Receiver pipelines use the otelqueue pool, which is in-memory only.
+	// queueFactory is parsed for its settings (capacity, etc.) but not used to
+	// construct a queue; the pool is created inside newOTelOutputController.
+	_, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID, queueConfig)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueConfig)
 	if err != nil {
 		return nil, err
 	}

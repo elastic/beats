@@ -62,13 +62,6 @@ type consumerTarget struct {
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
-
-	// When splitByDestination is set, each batch read from the queue is split
-	// into one batch per event Source before being sent to the output, so an
-	// output controller shared by multiple pipelines delivers each pipeline's
-	// events to its own destination. The split batches share completion
-	// accounting, so the queue's event cap is unaffected.
-	splitByDestination bool
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
@@ -123,10 +116,8 @@ func (c *eventConsumer) run() {
 		// The batches waiting to be retried.
 		retryBatches []*ttlBatch
 
-		// The batches read from the queue and waiting to be sent. This is a
-		// single batch unless the target splits reads by destination, in which
-		// case it holds one batch per destination.
-		queueBatches []*ttlBatch
+		// The batch read from the queue and waiting to be sent, if any.
+		queueBatch *ttlBatch
 
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
@@ -138,7 +129,7 @@ outerLoop:
 		// If possible, start reading the next batch in the background.
 		// We require a non-nil target channel so we don't queue up a large
 		// batch before we know the real requested size for our output.
-		if len(queueBatches) == 0 && !pendingRead && target.queue != nil && target.ch != nil {
+		if queueBatch == nil && !pendingRead && target.queue != nil && target.ch != nil {
 			pendingRead = true
 			c.queueReader.req <- queueReaderRequest{
 				queue:      target.queue,
@@ -153,8 +144,8 @@ outerLoop:
 		// one. Otherwise, use a new batch if we have one.
 		if len(retryBatches) > 0 {
 			active = retryBatches[0]
-		} else if len(queueBatches) > 0 {
-			active = queueBatches[0]
+		} else if queueBatch != nil {
+			active = queueBatch
 		}
 
 		// If we have a batch, we'll point the output channel at the target
@@ -174,17 +165,15 @@ outerLoop:
 				// This was a retry, advance the retry batch list
 				retryBatches = retryBatches[1:]
 			} else {
-				// This was directly from the queue, advance the pending list
-				queueBatches = queueBatches[1:]
+				// This was directly from the queue, clear the value so we can
+				// fetch a new one
+				queueBatch = nil
 			}
 
 		case target = <-c.targetChan:
 
-		case batch := <-c.queueReader.resp:
+		case queueBatch = <-c.queueReader.resp:
 			pendingRead = false
-			if batch != nil {
-				queueBatches = c.splitBatch(target, batch)
-			}
 
 		case req := <-c.retryChan:
 			if req.decreaseTTL {
@@ -212,20 +201,6 @@ outerLoop:
 
 	// Close the queueReader request channel so it knows to shutdown.
 	close(c.queueReader.req)
-}
-
-// splitBatch returns the batches to send to the output for a freshly read queue
-// batch. When the target splits by destination, the batch is divided into one
-// batch per event Source (sharing completion accounting with the original);
-// otherwise the batch is returned unchanged. Retried batches bypass this and
-// are sent as-is, so a batch is only ever split once, when first read.
-func (c *eventConsumer) splitBatch(target consumerTarget, batch *ttlBatch) []*ttlBatch {
-	if target.splitByDestination {
-		if batches := batch.splitByDestination(); batches != nil {
-			return batches
-		}
-	}
-	return []*ttlBatch{batch}
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {

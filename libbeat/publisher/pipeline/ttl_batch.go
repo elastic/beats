@@ -20,7 +20,6 @@ package pipeline
 import (
 	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -135,86 +134,6 @@ func (b *ttlBatch) SplitRetry() bool {
 		split:   splitData,
 	}, false)
 	return true
-}
-
-// splitByDestination splits b into one batch per distinct event Source so each
-// destination can be published and acknowledged independently. All resulting
-// batches share completion accounting with the original (via batchSplitData),
-// so the underlying queue read is acknowledged only after every destination's
-// batch has completed. This keeps the queue's event cap unchanged no matter how
-// many destinations a batch fans out to: the events stay accounted against the
-// queue until all of them are done. It returns nil when the batch targets a
-// single destination, in which case the caller should use b unchanged.
-func (b *ttlBatch) splitByDestination() []*ttlBatch {
-	groups := groupEventsBySource(b.events)
-	if len(groups) < 2 {
-		// Single destination (or empty): no split needed.
-		return nil
-	}
-
-	splitData := b.split
-	if splitData == nil {
-		// Splitting a previously unsplit batch, create the metadata.
-		splitData = &batchSplitData{
-			originalDone: b.done,
-		}
-		// Initialize to the number of events in the original batch.
-		splitData.outstandingEvents.Add(int64(len(b.events)))
-	}
-
-	batches := make([]*ttlBatch, len(groups))
-	for i, events := range groups {
-		batches[i] = &ttlBatch{
-			events:  events,
-			done:    splitData.doneCallback(len(events)),
-			retryer: b.retryer,
-			ttl:     b.ttl,
-			split:   splitData,
-		}
-	}
-	return batches
-}
-
-// groupEventsBySource partitions events into one slice per distinct
-// publisher.Event.Source, preserving the order in which sources first appear.
-// Events with a nil Source are grouped together. The number of distinct sources
-// (one per pipeline sharing the queue) is small, so a linear scan is used and
-// each group is allocated to its exact size.
-func groupEventsBySource(events []publisher.Event) [][]publisher.Event {
-	var sources []*beat.Info
-	var counts []int
-	indexOf := func(source *beat.Info) int {
-		for i, s := range sources {
-			if s == source {
-				return i
-			}
-		}
-		return -1
-	}
-
-	// First pass: discover the distinct sources and how many events each holds.
-	for i := range events {
-		source := events[i].Source
-		idx := indexOf(source)
-		if idx < 0 {
-			sources = append(sources, source)
-			counts = append(counts, 0)
-			idx = len(sources) - 1
-		}
-		counts[idx]++
-	}
-
-	groups := make([][]publisher.Event, len(sources))
-	for i := range groups {
-		groups[i] = make([]publisher.Event, 0, counts[i])
-	}
-
-	// Second pass: place each event into its source's group.
-	for i := range events {
-		idx := indexOf(events[i].Source)
-		groups[idx] = append(groups[idx], events[i])
-	}
-	return groups
 }
 
 // returns a callback to acknowledge the given number of events from

@@ -127,24 +127,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	events := batch.Events()
 	st.NewBatch(len(events))
 
-	// The pipeline splits batches so that every event in a batch shares the same
-	// Source, so the first event identifies the destination for the whole batch.
-	// A nil Source is the normal, non-shared case and uses this consumer's own
-	// destination.
-	logsConsumer := out.logsConsumer
-	beatInfo := &out.beatInfo
-	if len(events) > 0 && events[0].Source != nil {
-		logsConsumer = events[0].Source.LogConsumer
-		beatInfo = events[0].Source
-	}
-
-	pLogs := out.eventsToLogs(events, beatInfo)
+	pLogs := out.eventsToLogs(events, &out.beatInfo)
 
 	out.backoffInit.Do(func() {
 		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
 	})
 
-	err := logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, *beatInfo), pLogs)
+	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
 		// Queue full errors are expected backpressure signals, not true errors.
 		// Skip logging to avoid log spam since we already track this via metrics.
