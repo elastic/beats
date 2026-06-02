@@ -306,8 +306,6 @@ github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 h1:sDMmm+q/3+Bu
 github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0/go.mod h1:4Zcjuz89kmFXt9morQgcfYZAYZ5n8WHjt81YYWIwtTM=
 github.com/coder/websocket v1.8.14 h1:9L0p0iKiNOibykf283eHkKUHHrpG7f65OE3BhhO7v9g=
 github.com/coder/websocket v1.8.14/go.mod h1:NX3SzP+inril6yawo5CQXx8+fk145lPDC6pumgx0mVg=
-github.com/containerd/containerd/v2 v2.2.3 h1:mOBRLaHGvmgy0bRo1Sg6OD8ugMKZIvCoWWMeMMygliA=
-github.com/containerd/containerd/v2 v2.2.3/go.mod h1:ns24cwt+p36mRnuKE3hLRxVBpuSP+a/Y25AMki1t/RY=
 github.com/containerd/containerd/v2 v2.2.4 h1:8x2UdXqww7NYqGNabQ7i1nAgB5LegzjC9KQzO/900iA=
 github.com/containerd/containerd/v2 v2.2.4/go.mod h1:YBcTO8D9149QY9zNmUjy04Mhuc4DlrZQ8FIOwKZEM7o=
 github.com/containerd/errdefs v1.0.0 h1:tg5yIfIlQIrxYtu9ajqY42W3lpS19XqdxRQeEwYG8PI=
