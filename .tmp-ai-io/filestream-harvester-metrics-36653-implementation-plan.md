@@ -170,3 +170,18 @@ If full Filestream tests are too broad or slow, run the specific packages/tests 
 - GZIP exclusion must be explicit so compressed files do not skew plain-file progress counts.
 - Ignored-file exclusion must be applied consistently across scanner and prospector ignore paths.
 - Progress percentages are based on the latest scanner-observed file size. In append-heavy workloads, the metric can lag behind real file growth until the next scan.
+
+## Commit Message
+
+```text
+Add Filestream harvester ingestion progress metrics
+
+Track active harvesters by ingestion percentage so users can see which files are fully caught up, nearly caught up, or lagging. Use scanner-observed file sizes and atomic harvester offsets to avoid extra syscalls and keep the harvester read path free of shared mutex contention.
+
+GZIP files and files ignored for any reason are excluded because their progress cannot be represented accurately by plain-file offset/size comparisons.
+
+GenAI-Assisted: Yes
+Human-Reviewed: Yes
+Tool: Cursor, Model: GPT-5.5 Agent Mode
+Assisted-By: Cursor
+```
