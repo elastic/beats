@@ -74,7 +74,6 @@ func NewPipelineManager(logDestroy bool, hostname string, log *logp.Logger) *Pip
 
 // CloseClientWithFile closes the client with the associated file
 func (pm *PipelineManager) CloseClientWithFile(file string) error {
-
 	cl, err := pm.removeClient(file)
 	if err != nil {
 		return fmt.Errorf("error removing client: %w", err)
@@ -100,7 +99,6 @@ func (pm *PipelineManager) CloseClientWithFile(file string) error {
 // CreateClientWithConfig gets the pipeline linked to the given config, and creates a client
 // If no pipeline for that config exists, it creates one.
 func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutputConfig, info logger.Info, file string) (*ClientLogger, error) {
-
 	hashstring, err := hashstructure.Hash(containerConfig, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating config hash: %w", err)
@@ -119,7 +117,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 	if info.LogPath == "" {
 		info.LogPath = filepath.Join(pm.logDirectory, info.ContainerID, fmt.Sprintf("%s-json.log", info.ContainerID))
 	}
-	err = os.MkdirAll(filepath.Dir(info.LogPath), 0755)
+	err = os.MkdirAll(filepath.Dir(info.LogPath), 0o755)
 	if err != nil {
 		return nil, fmt.Errorf("error creating directory for local logs: %w", err)
 	}
@@ -137,7 +135,7 @@ func (pm *PipelineManager) CreateClientWithConfig(containerConfig ContainerOutpu
 		return nil, fmt.Errorf("error creating local log: %w", err)
 	}
 
-	//actually get to crafting the new client.
+	// actually get to crafting the new client.
 	cl, err := newClientFromPipeline(pipeline.pipeline, reader, hashstring, info, localLog, pm.hostname, pm.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %w", err)
@@ -191,7 +189,6 @@ func (pm *PipelineManager) CreateReaderForContainer(info logger.Info, config log
 
 			}
 		}
-
 	}()
 
 	return pipeReader, nil
@@ -220,14 +217,6 @@ func (pm *PipelineManager) getOrCreatePipeline(logOptsConfig ContainerOutputConf
 	return pipeline, nil
 }
 
-// getClient gets a pipeline client based on a file handle
-func (pm *PipelineManager) getClient(file string) (*ClientLogger, bool) { //nolint:unused // retained for future use
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-	cli, exists := pm.clients[file]
-	return cli, exists
-}
-
 func (pm *PipelineManager) getLogger(info logger.Info) (logger.Logger, bool) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
@@ -240,12 +229,12 @@ func (pm *PipelineManager) removePipelineIfNeeded(hash uint64) {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
-	//if the pipeline is no longer in use, clean up
+	// if the pipeline is no longer in use, clean up
 	if pm.pipelines[hash].refCount < 1 {
 		pipeline := pm.pipelines[hash].pipeline
 		delete(pm.pipelines, hash)
-		//pipelines must be closed after clients
-		//Just do this here, since the caller doesn't know if we need to close the libbeat pipeline
+		// pipelines must be closed after clients
+		// Just do this here, since the caller doesn't know if we need to close the libbeat pipeline
 		pm.Logger.Debugf("Pipeline closing from removePipelineIfNeeded")
 		err := pipeline.Disconnect(context.Background())
 		if err != nil {
