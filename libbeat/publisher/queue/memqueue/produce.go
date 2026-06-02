@@ -40,6 +40,12 @@ type openState[T any] struct {
 	queueClosing <-chan struct{}
 	events       chan pushRequest[T]
 	encoder      queue.Encoder[T]
+
+	// resp is used to receive the assigned EntryID after the runLoop
+	// processes a push request. It is allocated once per producer and
+	// reused across publishes. Publish is synchronous, so only one
+	// request is outstanding at a time.
+	resp chan queue.EntryID
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -62,6 +68,7 @@ func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) q
 		queueClosing: b.closingChan,
 		events:       b.pushChan,
 		encoder:      encoder,
+		resp:         make(chan queue.EntryID, 1),
 	}
 
 	if cb != nil {
@@ -73,10 +80,9 @@ func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) q
 }
 
 func (p *forgetfulProducer[T]) makePushRequest(event T) pushRequest[T] {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest[T]{
 		event: event,
-		resp:  resp}
+		resp:  p.openState.resp}
 }
 
 func (p *forgetfulProducer[T]) Publish(event T) (queue.EntryID, bool) {
@@ -92,14 +98,13 @@ func (p *forgetfulProducer[T]) Close() {
 }
 
 func (p *ackProducer[T]) makePushRequest(event T) pushRequest[T] {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest[T]{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+		resp:       p.openState.resp}
 }
 
 func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
