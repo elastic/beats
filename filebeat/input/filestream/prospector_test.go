@@ -1492,9 +1492,6 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			currentPath:        currentPath,
 			expectedFound:      false,
 		},
-		// TODO: find a better name or keep original 'skips path mismatch'.
-		// also, `FingerprintGrowing: true`, thus it isn't "ordinary Fingerprint
-		// match"
 		"skips path mismatch": {
 			// Path-agnostic fallback is restricted to the threshold-crossing
 			// case (matched via GrowingFingerprint, not Fingerprint). For
