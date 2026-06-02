@@ -1466,6 +1466,45 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after reset")
 }
 
+func TestFileWatcherRunCleansHarvesterMetricsOnShutdown(t *testing.T) {
+	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
+	require.NoError(t, err, "failed to create fingerprint identifier")
+
+	now := time.Now()
+	fd := loginp.FileDescriptor{
+		Filename:    "complete",
+		Fingerprint: "complete",
+		Info:        file.ExtendFileInfo(&testFileInfo{name: "complete", size: 100, time: now}),
+	}
+	paths := map[string]loginp.FileDescriptor{
+		"complete": fd,
+	}
+
+	fw := &fileWatcher{
+		cfg:              fileWatcherConfig{Interval: time.Hour},
+		prev:             map[string]loginp.FileDescriptor{"complete": fd},
+		scanner:          &testFileScanner{files: paths},
+		log:              logp.NewNopLogger(),
+		events:           make(chan loginp.FSEvent, 1),
+		notifyChan:       make(chan loginp.HarvesterStatus, 1),
+		closedHarvesters: map[string]int64{},
+		fileIdentifier:   identifier,
+		sourceIdentifier: mustSourceIdentifier("foo-id"),
+	}
+
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	sourceID := fw.getFileIdentity(fd)
+	_, _ = metrics.RegisterHarvesterOffset(sourceID, 100)
+
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	fw.Run(ctx, metrics, time.Hour, time.Time{})
+
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after watcher shutdown")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after watcher shutdown")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after watcher shutdown")
+}
+
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
 	si, err := loginp.NewSourceIdentifier("filestream", inputID)
 	if err != nil {

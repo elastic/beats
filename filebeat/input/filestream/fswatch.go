@@ -141,6 +141,7 @@ func (w *fileWatcher) Run(
 ) {
 	defer close(w.events)
 	defer metrics.CleanupFileScanMetrics()
+	defer metrics.CleanupHarvesterMetrics()
 
 	// run initial scan before starting regular
 	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
