@@ -467,7 +467,7 @@ func TestIsFloatWholeNumber(t *testing.T) {
 		{name: "positive whole", f: 1.0, want: true},
 		{name: "negative whole", f: -2.0, want: true},
 		{name: "large whole", f: 1e15, want: true},
-		{name: "min int64", f: float64(math.MinInt64), want: true},
+		{name: "min int64", f: float64(math.MinInt64), want: false},
 		{name: "fractional", f: 1.5, want: false},
 		{name: "negative fractional", f: -1.5, want: false},
 		{name: "small nonzero", f: math.SmallestNonzeroFloat64, want: false},
@@ -479,6 +479,8 @@ func TestIsFloatWholeNumber(t *testing.T) {
 		{name: "negative infinity", f: math.Inf(-1), want: false},
 		{name: "negative fraction no rounding", f: -0.99999999999999994, want: false},
 		{name: "negative fraction that causes rounding", f: -0.99999999999999995, want: true}, // rounds to -1
+		{name: "just inside upper bound", f: 0x1p53 - 1, want: true},
+		{name: "just outside upper bound", f: 0x1p53, want: false},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

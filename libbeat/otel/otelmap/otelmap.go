@@ -109,7 +109,7 @@ func FromValue(dst pcommon.Value, value any) error {
 		dst.SetInt(maskUnsignedInt(v))
 		return nil
 	case float32:
-		setFloatValue(dst, float32ToFloat64(v))
+		setFloatValue(dst, v)
 		return nil
 	case float64:
 		setFloatValue(dst, v)
@@ -210,7 +210,7 @@ func fromReflective(dst pcommon.Value, value any) error {
 		dst.SetInt(maskUnsignedInt(ref.Uint()))
 		return nil
 	case reflect.Float32:
-		setFloatValue(dst, float32ToFloat64(float32(ref.Float())))
+		setFloatValue(dst, float32(ref.Float()))
 		return nil
 	case reflect.Float64:
 		setFloatValue(dst, ref.Float())
@@ -304,12 +304,7 @@ func fromBoolSlice(dst pcommon.Slice, src []bool) error {
 func fromFloatSlice[T floating](dst pcommon.Slice, src []T) error {
 	dst.EnsureCapacity(len(src))
 	for _, item := range src {
-		f64 := float64(item)
-		// Use float32 decimal precision when the source is float32.
-		if _, ok := any(item).(float32); ok {
-			f64 = float32ToFloat64(float32(item))
-		}
-		setFloatValue(dst.AppendEmpty(), f64)
+		setFloatValue(dst.AppendEmpty(), item)
 	}
 	return nil
 }
@@ -323,22 +318,34 @@ func float32ToFloat64(v float32) float64 {
 	return f64
 }
 
-// isFloatWholeNumber reports whether f is a finite, whole number that fits in
-// int64. Used to convert whole-number floats to int64 so the OTel ES exporter
-// (ExplicitRadixPoint=true) serialises them without a trailing ".0", matching
-// the Beats Elasticsearch output behaviour.
-func isFloatWholeNumber(f float64) bool {
-	return !math.IsNaN(f) && !math.IsInf(f, 0) &&
-		f == math.Trunc(f) &&
-		f >= float64(math.MinInt64) && f < float64(math.MaxInt64)
+// isFloatWholeNumber reports whether f is a whole number that can be
+// precisely represented as an integer for its type. float32 has 24 bits
+// of mantissa so integers outside [-2²⁴+1, 2²⁴-1] cannot be represented
+// exactly; float64 has 53 bits giving a range of [-2⁵³+1, 2⁵³-1].
+// Values outside these ranges may have frac == 0 but skip integers,
+// making int64 conversion lossy.
+func isFloatWholeNumber[T floating](f T) bool {
+	var preciseFloatMax T
+	switch any(f).(type) {
+	case float32:
+		preciseFloatMax = 0x1p24 - 1
+	case float64:
+		preciseFloatMax = 0x1p53 - 1
+	}
+	_, frac := math.Modf(float64(f))
+	return frac == 0 && -preciseFloatMax <= f && f <= preciseFloatMax
 }
 
-func setFloatValue(dst pcommon.Value, v float64) {
+func setFloatValue[T floating](dst pcommon.Value, v T) {
 	if isFloatWholeNumber(v) {
 		dst.SetInt(int64(v))
 		return
 	}
-	dst.SetDouble(v)
+	if f32, ok := any(v).(float32); ok {
+		dst.SetDouble(float32ToFloat64(f32))
+	} else {
+		dst.SetDouble(float64(v))
+	}
 }
 
 func fromSignedSlice[T signed](dst pcommon.Slice, src []T) error {
