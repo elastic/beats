@@ -98,6 +98,24 @@ type HarvesterMetrics struct {
 	FilesIngestedPercentLt95   int64
 }
 
+// HarvesterFile contains the scanner-observed file state needed to calculate
+// harvester progress metrics.
+type HarvesterFile struct {
+	ID   string
+	Size int64
+}
+
+func (m *HarvesterMetrics) addFile(offset, size int64) {
+	switch {
+	case offset >= size:
+		m.FilesIngestedPercent100++
+	case offset >= size-size/20:
+		m.FilesIngestedPercent95To99++
+	default:
+		m.FilesIngestedPercentLt95++
+	}
+}
+
 func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 	// The log input creates the `filebeat.harvester` registry as a package
 	// variable, so it should always exist before this function runs.
@@ -214,8 +232,8 @@ func (m *Metrics) RegisterHarvesterOffset(id string, offset int64) (*atomic.Int6
 	return activeOffset, cleanup
 }
 
-// FindHarvesterOffset returns the active offset for a harvester.
-func (m *Metrics) FindHarvesterOffset(id string) (*atomic.Int64, bool) {
+// TODO: Delete me
+func (m *Metrics) findHarvesterOffset(id string) (*atomic.Int64, bool) {
 	if m == nil {
 		return nil, false
 	}
@@ -227,15 +245,29 @@ func (m *Metrics) FindHarvesterOffset(id string) (*atomic.Int64, bool) {
 	return offset, ok
 }
 
-// UpdateHarvesterBuckets updates the aggregate harvester progress gauges with
-// this input's delta since the previous snapshot.
-func (m *Metrics) UpdateHarvesterBuckets(current HarvesterMetrics) {
+// UpdateHarvesterBuckets updates the aggregate harvester progress gauges from
+// the current scanner-observed file snapshot.
+func (m *Metrics) UpdateHarvesterBuckets(files []HarvesterFile) {
 	if m == nil {
 		return
 	}
 
 	m.harvesterMetricsMu.Lock()
 	defer m.harvesterMetricsMu.Unlock()
+
+	current := HarvesterMetrics{}
+	for _, file := range files {
+		if file.Size <= 0 {
+			continue
+		}
+
+		offset, ok := m.harvesterOffsets[file.ID]
+		if !ok {
+			continue
+		}
+
+		current.addFile(offset.Load(), file.Size)
+	}
 
 	m.updateHarvesterBucketsLocked(current)
 }

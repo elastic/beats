@@ -1364,6 +1364,71 @@ scanner:
 	assert.Equal(t, baseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty")
 }
 
+func TestFileWatcherHarvesterMetrics(t *testing.T) {
+	identifier, err := newFingerprintIdentifier(nil, logp.NewNopLogger())
+	require.NoError(t, err, "failed to create fingerprint identifier")
+	fw := &fileWatcher{
+		fileIdentifier:   identifier,
+		sourceIdentifier: mustSourceIdentifier("foo-id"),
+	}
+
+	now := time.Now()
+	oldModTime := now.Add(-2 * time.Hour)
+	descriptor := func(name string, size int64, modTime time.Time, gzip bool) loginp.FileDescriptor {
+		return loginp.FileDescriptor{
+			Filename:    name,
+			Fingerprint: name,
+			GZIP:        gzip,
+			Info:        file.ExtendFileInfo(&testFileInfo{name: name, size: size, time: modTime}),
+		}
+	}
+	paths := map[string]loginp.FileDescriptor{
+		"complete":  descriptor("complete", 100, now, false),
+		"near":      descriptor("near", 100, now, false),
+		"lagging":   descriptor("lagging", 100, now, false),
+		"no-active": descriptor("no-active", 100, now, false),
+		"gzip":      descriptor("gzip", 100, now, true),
+		"ignored":   descriptor("ignored", 100, oldModTime, false),
+	}
+
+	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+
+	// Register some files/offisets, like a harevester would do
+	completeOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["complete"]), 10)
+	nearOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["near"]), 5)
+	laggingOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["lagging"]), 4)
+	gzipOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["gzip"]), 10)
+	ignoredOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["ignored"]), 10)
+
+	// Make sure the test uses the same atomic update path as harvesters.
+	// Update to the actually expected values, like a harvester would do.
+	completeOffset.Store(100)
+	nearOffset.Store(95)
+	laggingOffset.Store(94)
+	gzipOffset.Store(100)
+	ignoredOffset.Store(100)
+
+	baseline := loginp.HarvesterMetrics{
+		FilesIngestedPercent100:    metrics.FilesIngestedPercent100.Get(),
+		FilesIngestedPercent95To99: metrics.FilesIngestedPercent95To99.Get(),
+		FilesIngestedPercentLt95:   metrics.FilesIngestedPercentLt95.Get(),
+	}
+
+	fw.updateHarvesterMetrics(metrics, paths, time.Hour, time.Time{})
+
+	assert.Equal(t, baseline.FilesIngestedPercent100+1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
+	assert.Equal(t, baseline.FilesIngestedPercent95To99+1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
+	assert.Equal(t, baseline.FilesIngestedPercentLt95+1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
+
+	// An update with no paths slice effectively removes all files from the
+	// last update from the metrics
+	fw.updateHarvesterMetrics(metrics, nil, time.Hour, time.Time{})
+
+	assert.Equal(t, baseline.FilesIngestedPercent100, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after reset")
+	assert.Equal(t, baseline.FilesIngestedPercent95To99, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after reset")
+	assert.Equal(t, baseline.FilesIngestedPercentLt95, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after reset")
+}
+
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
 	si, err := loginp.NewSourceIdentifier("filestream", inputID)
 	if err != nil {

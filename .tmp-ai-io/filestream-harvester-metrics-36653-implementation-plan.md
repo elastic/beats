@@ -32,13 +32,12 @@ Rationale:
 map[string]*atomic.Int64
 ```
 
-The harvester receives a pointer to its active offset when it starts and only stores the latest offset atomically while reading. The file watcher computes bucket counts on scan using:
+The harvester receives a pointer to its active offset when it starts and only stores the latest offset atomically while reading. The file watcher sends eligible scanner-observed file facts to `Metrics` on each scan:
 
+- source ID
 - current file size from `FileDescriptor.Info.Size()`
-- ignored/GZIP status from the scan/prospector logic
-- latest active harvester offset loaded from the `*atomic.Int64`
 
-Only count a source when it has an active offset entry, size is positive, the file is not GZIP, and the file is not ignored. Files are removed from the active table when the harvester closes.
+`Metrics` owns active offset lookup and bucket calculation. Only count a source when it has an active offset entry, size is positive, the file is not GZIP, and the file is not ignored. Files are removed from the active table when the harvester closes.
 
 ## Benefits
 
@@ -55,9 +54,10 @@ Only count a source when it has an active offset entry, size is positive, the fi
    - Add three gauge fields.
    - Add a mutex-protected `map[string]*atomic.Int64` for active plain-file offsets.
    - Add a `lastHarvesterMetrics` snapshot so shared gauges can be updated by delta, like `UpdateFileScanMetrics`.
+   - Add `HarvesterFile { ID string; Size int64 }` for scan-side file facts.
    - Add helper methods:
      - `RegisterHarvesterOffset(id string, offset int64) (*atomic.Int64, func())`
-     - `UpdateHarvesterBuckets(current HarvesterMetrics)`
+     - `UpdateHarvesterBuckets(files []HarvesterFile)`
      - `CleanupHarvesterMetrics()`
    - Keep map mutation behind a mutex, but do not acquire that mutex from the harvester read loop.
 
@@ -69,12 +69,11 @@ Only count a source when it has an active offset entry, size is positive, the fi
    - The cleanup function removes the active offset only if it still matches the offset registered by that harvester. This prevents an older harvester's deferred cleanup from deleting a newer offset after restart for the same source ID.
 
 3. Update file watcher scan path.
-   - In `fileWatcher.watch`, build a `HarvesterMetrics` snapshot during the existing scan.
-   - For each current file, after calculating `srcID`, look up the active offset.
-   - If there is no active offset, do not count the file.
+   - In `fileWatcher.watch`, build a `[]HarvesterFile` snapshot during the existing scan.
    - If the file is GZIP, ignored, or size <= 0, do not count the file.
-   - Load the latest offset from the `*atomic.Int64` and classify it against `fd.Info.Size()`.
-   - Call `metrics.UpdateHarvesterBuckets(snapshot)` once per scan.
+   - For each eligible file, append `{ID: srcID, Size: fd.Info.Size()}`.
+   - Call `metrics.UpdateHarvesterBuckets(files)` once per scan.
+   - `Metrics` resolves active offsets and classifies buckets while holding `harvesterMetricsMu`.
    - Reuse the existing ignore logic from `fileIgnoreReason`; do not count files ignored by `ignore_older`, `ignore_inactive`, include/exclude filters, fingerprint-too-small handling, empty-file handling, or any other scanner/prospector ignore path.
    - On rename, the active offset remains keyed by source ID. If the source ID changes, the old harvester should close/remove its offset entry and the new harvester should register a new one.
 

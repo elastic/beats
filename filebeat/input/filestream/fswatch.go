@@ -193,6 +193,7 @@ func (w *fileWatcher) watch(
 	// so the logic is not duplicated
 	scanMetrics.FilesIgnored += countIgnoredFiles(paths, ignoreOlder, ignoreInactiveSince)
 	metrics.UpdateFileScanMetrics(scanMetrics)
+	w.updateHarvesterMetrics(metrics, paths, ignoreOlder, ignoreInactiveSince)
 
 	// for debugging purposes
 	writtenCount := 0
@@ -361,12 +362,45 @@ func countIgnoredFiles(
 	now := time.Now()
 	var ignored int64
 	for _, fd := range paths {
-		if fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored {
+		if isFileIgnored(fd, now, ignoreOlder, ignoreInactiveSince) {
 			ignored++
 		}
 	}
 
 	return ignored
+}
+
+func (w *fileWatcher) updateHarvesterMetrics(
+	metrics *loginp.Metrics,
+	paths map[string]loginp.FileDescriptor,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) {
+	now := time.Now()
+	files := make([]loginp.HarvesterFile, 0, len(paths))
+
+	for _, fd := range paths {
+		if fd.GZIP || fd.Info.Size() <= 0 || isFileIgnored(fd, now, ignoreOlder, ignoreInactiveSince) {
+			continue
+		}
+
+		files = append(files, loginp.HarvesterFile{
+			ID:   w.getFileIdentity(fd),
+			Size: fd.Info.Size(),
+		})
+	}
+
+	metrics.UpdateHarvesterBuckets(files)
+}
+
+// isFileIgnored returns true when a file is ignored, no matter the reason.
+func isFileIgnored(
+	fd loginp.FileDescriptor,
+	now time.Time,
+	ignoreOlder time.Duration,
+	ignoreInactiveSince time.Time,
+) bool {
+	return fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored
 }
 
 // getFileIdentity mimics the same algorithm used by the harvester to generate
