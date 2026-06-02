@@ -23,10 +23,12 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -39,13 +41,25 @@ import (
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
-	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+
+	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
+	// It is duplicated here to avoid importing the receivertest package
+	// (and pulling its testify/testing deps) into production binaries.
+	receivertestUniqueIDAttrName = "test_id"
+
+	retryBackoffInit = 1 * time.Second
+	retryBackoffMax  = 60 * time.Second
 )
+
+type retryConfig struct {
+	init time.Duration
+	max  time.Duration
+}
 
 type otelConsumer struct {
 	observer       outputs.Observer
@@ -53,10 +67,19 @@ type otelConsumer struct {
 	beatInfo       beat.Info
 	log            *logp.Logger
 	isReceiverTest bool // whether we are running in receivertest context
+
+	retry        retryConfig
+	retryBackoff backoff.Backoff
+	backoffInit  sync.Once
 }
 
 func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group, error) {
 	isReceiverTest := os.Getenv("OTELCONSUMER_RECEIVERTEST") == "1"
+
+	retry := retryConfig{init: retryBackoffInit, max: retryBackoffMax}
+	if isReceiverTest {
+		retry = retryConfig{init: 1 * time.Millisecond, max: 2 * time.Millisecond}
+	}
 
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
@@ -67,6 +90,7 @@ func MakeOtelConsumer(beat beat.Info, observer outputs.Observer) (outputs.Group,
 			beatInfo:       beat,
 			log:            beat.Logger.Named("otelconsumer"),
 			isReceiverTest: isReceiverTest,
+			retry:          retry,
 		})
 	}
 
@@ -127,7 +151,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 				// When receivertest allows this to be customized we can remove this condition.
 				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
 				if out.isReceiverTest {
-					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+					logRecord.Attributes().PutStr(receivertestUniqueIDAttrName, id)
 				}
 			}
 		}
@@ -191,9 +215,19 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 	}
 
+	out.backoffInit.Do(func() {
+		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
+	})
+
 	err := out.logsConsumer.ConsumeLogs(otelctx.NewConsumerContext(ctx, out.beatInfo), pLogs)
 	if err != nil {
-		// Permanent errors shouldn't be retried. This tipically means
+		// Queue full errors are expected backpressure signals, not true errors.
+		// Skip logging to avoid log spam since we already track this via metrics.
+		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
+			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
+		}
+
+		// Permanent errors shouldn't be retried. This typically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
 		// it cannot decode it. Retrying in this case is useless.
@@ -204,19 +238,18 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
+			if !out.retryBackoff.Wait() {
+				batch.Cancelled()
+				return nil
+			}
 			batch.Retry()
-		}
-
-		// Queue full errors are expected backpressure signals, not true errors.
-		// Skip logging to avoid log spam since we already track this via metrics.
-		if !errors.Is(err, exporterhelper.ErrQueueIsFull) {
-			out.log.Errorf("failed to publish batch events to otel collector pipeline: %v", err)
 		}
 		return nil
 	}
 
 	batch.ACK()
 	st.AckedEvents(len(events))
+	out.retryBackoff.Reset()
 	return nil
 }
 

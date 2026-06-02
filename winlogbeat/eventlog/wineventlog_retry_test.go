@@ -102,4 +102,9 @@ func TestShouldDetectGap(t *testing.T) {
 		l := &winEventLog{config: config{Name: "Security", Forwarded: &forwarded}}
 		assert.False(t, l.shouldDetectGap(prevRecordID, currentRecordID))
 	})
+
+	t.Run("custom xml_query skips gap detection", func(t *testing.T) {
+		l := &winEventLog{config: config{Name: "Application", XMLQuery: "<QueryList></QueryList>"}}
+		assert.False(t, l.shouldDetectGap(prevRecordID, currentRecordID), "filtered XML queries may omit record IDs; gaps are expected")
+	})
 }

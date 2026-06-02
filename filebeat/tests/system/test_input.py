@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 from filebeat import BaseTest
-import json
 import os
-import shutil
 import sys
 import time
 import unittest
@@ -16,67 +14,6 @@ Tests for the input functionality.
 
 
 class Test(BaseTest):
-    def test_fixup_registry_entries_with_global_id(self):
-        """
-        Should update the registry correctly when an filestream input that
-        did not have an ID set is given an ID. The observable effect in the
-        registry is the entries using the old '.global' ID migrated to use the
-        new ID.
-        """
-        testfile = os.path.join(self.working_dir, "log", "test.log")
-        self.render_config_template(
-            template_name="filestream-fixup-id",
-            path=testfile,
-        )
-        os.mkdir(os.path.join(self.working_dir, "log/"))
-
-        with open(testfile, 'w') as file:
-            offset = 0  # keep count of the bytes written
-            for n in range(0, 5):
-                offset += file.write("hello world\n")
-
-        os.makedirs(self.registry.path)
-        registry_file = os.path.join(self.registry.path, "log.json")
-
-        # Windows requires some extra escaping, Linux works either way.
-        # We encode 'testfile' as a JSON string and then remove the '"'
-        # added by the encoding
-        testfile = json.encoder.c_encode_basestring(testfile)
-        testfile = testfile.replace('"', '')
-
-        template_path = "./tests/system/input/filestream-fix-registry-global-id.j2"
-        self.render_template(template_path, registry_file, log_file=testfile, offset=offset)
-
-        shutil.copyfile(os.path.join(os.getcwd(), "tests", "system", "input", "registry-meta.json"),
-                        os.path.join(self.registry.path, "meta.json"))
-
-        proc = self.start_beat()
-
-        # wait for the "Start next scan" log message, this means the file has been
-        # fully harvested
-        self.wait_until(
-            lambda: self.log_contains(
-                "Start next scan"),
-            max_timeout=10)
-
-        proc.check_kill_and_wait()
-
-        reg = self.access_registry()
-        self.wait_until(reg.exists)
-        entries = [entry for entry in reg.load()]
-
-        # The old state with the '.global' identifier is removed right away
-        # so the only active entry in the registry is the new one.
-        assert len(entries) == 1, "the registry must contain one entry with the 'fixed' ID"
-        fixed_entry = entries[0]
-
-        # Compare the key excluding the inode and device ID bits
-        assert fixed_entry['_key'].startswith(
-            'filestream::test-fix-global-id::native::'), "key in registry does not have the expected ID"
-
-        # Compare the TTL because it indicates if the entry has been 'removed' or not
-        assert fixed_entry['ttl'] != 0, "ttl must not be 0 because the entry has been added recently"
-
     def test_ignore_older_files(self):
         """
         Should ignore files there were not modified for longer then

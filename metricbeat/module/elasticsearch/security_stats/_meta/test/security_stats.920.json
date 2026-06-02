@@ -1,0 +1,36 @@
+{
+    "nodes": {
+        "1sFM8cmSROZYhPxVsiWew": {
+            "roles": {
+                "dls": {
+                    "bit_set_cache": {
+                        "count": 12,
+                        "memory": "4kb",
+                        "memory_in_bytes": 4096,
+                        "hits": 8421,
+                        "misses": 137,
+                        "evictions": 4,
+                        "hits_time_in_millis": 51,
+                        "misses_time_in_millis": 219
+                    }
+                }
+            }
+        },
+        "2tGN9dnTSPAYiQyWtjXfx": {
+            "roles": {
+                "dls": {
+                    "bit_set_cache": {
+                        "count": 0,
+                        "memory": "0b",
+                        "memory_in_bytes": 0,
+                        "hits": 0,
+                        "misses": 0,
+                        "evictions": 0,
+                        "hits_time_in_millis": 0,
+                        "misses_time_in_millis": 0
+                    }
+                }
+            }
+        }
+    }
+}
