@@ -31,10 +31,10 @@ func (v *Volume) explodePath(p string) ([]string, error) {
 
 	p = strings.ReplaceAll(p, "\\", "/")
 	if strings.HasPrefix(p[1:], ":/") {
-		if !strings.HasPrefix(p, v.DriveLetter) {
+		if !strings.EqualFold(string(p[0]), v.DriveLetter) {
 			return nil, fmt.Errorf("path %s does not start with drive letter %s", p, v.DriveLetter)
 		}
-		p = strings.TrimPrefix(p, v.DriveLetter+":/")
+		p = p[len(v.DriveLetter)+2:] // strip "X:/"
 	}
 	// Remove ADS if present, as NTFS file enumeration does not consider ADS as part of the filename
 	p = strings.Split(p, ":")[0]
@@ -70,8 +70,7 @@ func (v *Volume) childrenMatching(parent *fileNode, predicate func(string) (bool
 		// Apply the predicate to filter out unwanted children before the more expensive GetMFT call.
 		match, err := predicate(name)
 		if err != nil {
-			log.Errorf("predicate failed for %q: %v", name, err)
-			continue
+			return nil, fmt.Errorf("predicate failed for %q: %w", name, err)
 		}
 		if !match {
 			continue
@@ -269,7 +268,7 @@ func fileGenerateFunc(_ context.Context, queryContext table.QueryContext, log *l
 	filenameConstraints := filters.GetColumnConstraints(queryContext, "filename", table.OperatorGlob)
 
 	// Determine the drive letter from the query constraints
-	driveLetter, err := determineDriveLetter(driveConstraints, directoryConstraints, pathConstraints)
+	driveLetter, err := determineDriveLetter(driveConstraints, pathConstraints, directoryConstraints)
 	if err != nil {
 		log.Warningf("%v", err)
 		return results, nil

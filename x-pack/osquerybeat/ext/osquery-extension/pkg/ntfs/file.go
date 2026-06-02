@@ -186,6 +186,9 @@ func NewFileNode(volumeInfo *Volume, mftEntry *parser.MFT_ENTRY, name string, pa
 	if mftEntry == nil {
 		return nil, fmt.Errorf("invalid MFT entry provided")
 	}
+	if volumeInfo == nil {
+		return nil, fmt.Errorf("invalid volumeInfo provided")
+	}
 
 	fi := &fileNode{
 		mftEntry: mftEntry,
