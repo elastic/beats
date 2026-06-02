@@ -56,17 +56,17 @@ Only count a source when it has an active offset entry, size is positive, the fi
    - Add a mutex-protected `map[string]*atomic.Int64` for active plain-file offsets.
    - Add a `lastHarvesterMetrics` snapshot so shared gauges can be updated by delta, like `UpdateFileScanMetrics`.
    - Add helper methods:
-     - `RegisterHarvesterOffset(id string, offset int64) *atomic.Int64`
+     - `RegisterHarvesterOffset(id string, offset int64) (*atomic.Int64, func())`
      - `UpdateHarvesterBuckets(current HarvesterMetrics)`
-     - `RemoveHarvesterOffset(id string)`
      - `CleanupHarvesterMetrics()`
    - Keep map mutation behind a mutex, but do not acquire that mutex from the harvester read loop.
 
 2. Add active offset API.
-   - `RegisterHarvesterOffset` stores and returns a `*atomic.Int64`.
+   - `RegisterHarvesterOffset` stores and returns a `*atomic.Int64` plus a cleanup function.
    - The harvester keeps the returned offset pointer in a local variable for the lifetime of the run.
    - The read loop updates it directly with `offset.Store(s.Offset)`.
    - The watcher scan reads it directly with `offset.Load()`.
+   - The cleanup function removes the active offset only if it still matches the offset registered by that harvester. This prevents an older harvester's deferred cleanup from deleting a newer offset after restart for the same source ID.
 
 3. Update file watcher scan path.
    - In `fileWatcher.watch`, build a `HarvesterMetrics` snapshot during the existing scan.
@@ -83,7 +83,7 @@ Only count a source when it has an active offset entry, size is positive, the fi
    - Pass the source ID into `readFromSource`, probably from `src.Name()` or from the outer `Run` context.
    - In `filestream.readFromSource`, after `s.Offset` advances, call `activeOffset.Store(s.Offset)` if an active offset exists.
    - Do not register or update progress for GZIP files.
-   - When the harvester closes, call `metrics.RemoveHarvesterOffset(sourceID)` so closed files no longer contribute to the progress gauges.
+   - When the harvester closes, call the cleanup function returned by `RegisterHarvesterOffset` so closed files no longer contribute to the progress gauges.
 
 5. Handle initial offset state.
    - After `initState`, before reading starts, register the current offset with metrics for non-GZIP files.

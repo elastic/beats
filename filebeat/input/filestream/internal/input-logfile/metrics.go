@@ -18,6 +18,9 @@
 package input_logfile
 
 import (
+	"sync"
+	"sync/atomic"
+
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -68,7 +71,15 @@ type Metrics struct {
 	FilesIgnored        *monitoring.Int // Number of ingestible files ignored by filestream settings (gauge).
 	FilesEmpty          *monitoring.Int // Number of empty files found by the scanner (gauge).
 
-	lastFileScanMetrics FileScanMetrics
+	FilesIngestedPercent100    *monitoring.Int // Number of active harvesters that have fully ingested their files (gauge).
+	FilesIngestedPercent95To99 *monitoring.Int // Number of active harvesters that have ingested 95-99% of their files (gauge).
+	FilesIngestedPercentLt95   *monitoring.Int // Number of active harvesters that have ingested less than 95% of their files (gauge).
+
+	harvesterMetricsMu sync.Mutex
+	harvesterOffsets   map[string]*atomic.Int64
+
+	lastFileScanMetrics  FileScanMetrics
+	lastHarvesterMetrics HarvesterMetrics
 }
 
 // FileScanMetrics contains one filestream scanner snapshot for an input.
@@ -78,6 +89,13 @@ type FileScanMetrics struct {
 	FilesNoIngestTarget int64
 	FilesIgnored        int64
 	FilesEmpty          int64
+}
+
+// HarvesterMetrics contains the harvester progress snapshot for an input.
+type HarvesterMetrics struct {
+	FilesIngestedPercent100    int64
+	FilesIngestedPercent95To99 int64
+	FilesIngestedPercentLt95   int64
 }
 
 func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
@@ -124,6 +142,12 @@ func NewMetrics(reg *monitoring.Registry, logger *logp.Logger) *Metrics {
 		FilesNoIngestTarget: monitoring.NewInt(filestreamMetrics, "files_no_ingest_target"),
 		FilesIgnored:        monitoring.NewInt(filestreamMetrics, "files_ignored"),
 		FilesEmpty:          monitoring.NewInt(filestreamMetrics, "files_empty"),
+
+		FilesIngestedPercent100:    monitoring.NewInt(filestreamMetrics, "files_ingested_percent_100"),
+		FilesIngestedPercent95To99: monitoring.NewInt(filestreamMetrics, "files_ingested_percent_95_99"),
+		FilesIngestedPercentLt95:   monitoring.NewInt(filestreamMetrics, "files_ingested_percent_lt_95"),
+
+		harvesterOffsets: map[string]*atomic.Int64{},
 	}
 	_ = adapter.NewGoMetrics(reg, "processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
@@ -154,4 +178,89 @@ func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
 // so stale scan counts are not left behind after an input stops or restarts.
 func (m *Metrics) CleanupFileScanMetrics() {
 	m.UpdateFileScanMetrics(FileScanMetrics{})
+}
+
+// RegisterHarvesterOffset registers an active harvester offset and returns the
+// atomic value the harvester must update while reading, plus a cleanup function.
+//
+// The cleanup function only removes the offset if it still points to the same
+// value registered by this call. This protects a restarted harvester for the
+// same source ID from an older harvester's deferred cleanup: if the new
+// harvester has already registered a replacement offset, the old cleanup must
+// not delete it.
+func (m *Metrics) RegisterHarvesterOffset(id string, offset int64) (*atomic.Int64, func()) {
+	if m == nil {
+		return nil, func() {}
+	}
+
+	activeOffset := &atomic.Int64{}
+	activeOffset.Store(offset)
+
+	m.harvesterMetricsMu.Lock()
+	defer m.harvesterMetricsMu.Unlock()
+
+	m.harvesterOffsets[id] = activeOffset
+
+	cleanup := func() {
+		m.harvesterMetricsMu.Lock()
+		defer m.harvesterMetricsMu.Unlock()
+
+		if m.harvesterOffsets[id] != activeOffset {
+			return
+		}
+		delete(m.harvesterOffsets, id)
+	}
+
+	return activeOffset, cleanup
+}
+
+// FindHarvesterOffset returns the active offset for a harvester.
+func (m *Metrics) FindHarvesterOffset(id string) (*atomic.Int64, bool) {
+	if m == nil {
+		return nil, false
+	}
+
+	m.harvesterMetricsMu.Lock()
+	defer m.harvesterMetricsMu.Unlock()
+
+	offset, ok := m.harvesterOffsets[id]
+	return offset, ok
+}
+
+// UpdateHarvesterBuckets updates the aggregate harvester progress gauges with
+// this input's delta since the previous snapshot.
+func (m *Metrics) UpdateHarvesterBuckets(current HarvesterMetrics) {
+	if m == nil {
+		return
+	}
+
+	m.harvesterMetricsMu.Lock()
+	defer m.harvesterMetricsMu.Unlock()
+
+	m.updateHarvesterBucketsLocked(current)
+}
+
+// updateHarvesterBucketsLocked updates the harvester metrics bucket,
+// the caller MUST hold the lock on harvesterMetricsMu when calling this
+// method.
+func (m *Metrics) updateHarvesterBucketsLocked(current HarvesterMetrics) {
+	m.FilesIngestedPercent100.Add(current.FilesIngestedPercent100 - m.lastHarvesterMetrics.FilesIngestedPercent100)
+	m.FilesIngestedPercent95To99.Add(current.FilesIngestedPercent95To99 - m.lastHarvesterMetrics.FilesIngestedPercent95To99)
+	m.FilesIngestedPercentLt95.Add(current.FilesIngestedPercentLt95 - m.lastHarvesterMetrics.FilesIngestedPercentLt95)
+
+	m.lastHarvesterMetrics = current
+}
+
+// CleanupHarvesterMetrics removes this input's harvester metric contribution
+// from the shared aggregate gauges and clears active harvester offsets.
+func (m *Metrics) CleanupHarvesterMetrics() {
+	if m == nil {
+		return
+	}
+
+	m.harvesterMetricsMu.Lock()
+	defer m.harvesterMetricsMu.Unlock()
+
+	m.updateHarvesterBucketsLocked(HarvesterMetrics{})
+	clear(m.harvesterOffsets)
 }
