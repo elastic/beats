@@ -227,5 +227,5 @@ def log_as_filestream():
 def remove_filestream_fields(events):
     for evt in events:
         file_info = evt.get("log", {}).get("file", {})
-        for field in ("inode", "device_id"):
+        for field in ("inode", "device_id", "fingerprint"):
             file_info.pop(field, None)

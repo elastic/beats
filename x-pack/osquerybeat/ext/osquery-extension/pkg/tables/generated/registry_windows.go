@@ -12,10 +12,13 @@ package generated
 import (
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/browserhistory"
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/jumplists"
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/ntfs"
 
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	elasticamcacheapplication "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application"
 	elasticamcacheapplicationfile "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_application_file"
@@ -24,14 +27,17 @@ import (
 	elasticamcachedriverbinary "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_binary"
 	elasticamcachedriverpackage "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/amcache/elastic_amcache_driver_package"
 	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
+	elasticjumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/elastic_jumplists"
+	elasticntfspartitions "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_partitions"
+	elasticntfsvolumes "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/ntfs/elastic_ntfs_volumes"
 )
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This function is called from main.go after all init() functions have run.
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, client *client.ResilientClient) {
 	{
 		// Windows Amcache inventory application entries (Root\InventoryApplication)
-		genFunc, err := elasticamcacheapplication.GetGenerateFunc(log)
+		genFunc, err := elasticamcacheapplication.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_application: %v", err)
 		} else {
@@ -41,7 +47,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory application file entries (Root\InventoryApplicationFile)
-		genFunc, err := elasticamcacheapplicationfile.GetGenerateFunc(log)
+		genFunc, err := elasticamcacheapplicationfile.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_application_file: %v", err)
 		} else {
@@ -51,7 +57,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory application shortcut entries (Root\InventoryApplicationShortcut)
-		genFunc, err := elasticamcacheapplicationshortcut.GetGenerateFunc(log)
+		genFunc, err := elasticamcacheapplicationshortcut.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_application_shortcut: %v", err)
 		} else {
@@ -61,7 +67,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory device PnP entries (Root\InventoryDevicePnp)
-		genFunc, err := elasticamcachedevicepnp.GetGenerateFunc(log)
+		genFunc, err := elasticamcachedevicepnp.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_device_pnp: %v", err)
 		} else {
@@ -71,7 +77,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory driver binary entries (Root\InventoryDriverBinary)
-		genFunc, err := elasticamcachedriverbinary.GetGenerateFunc(log)
+		genFunc, err := elasticamcachedriverbinary.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_driver_binary: %v", err)
 		} else {
@@ -81,7 +87,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Amcache inventory driver package entries (Root\InventoryDriverPackage)
-		genFunc, err := elasticamcachedriverpackage.GetGenerateFunc(log)
+		genFunc, err := elasticamcachedriverpackage.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_amcache_driver_package: %v", err)
 		} else {
@@ -91,12 +97,42 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Browser history from multiple browsers (Chrome, Edge, Firefox, Safari) with unified schema
-		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log)
+		genFunc, err := elasticbrowserhistory.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for elastic_browser_history: %v", err)
 		} else {
 			server.RegisterPlugin(table.NewPlugin("elastic_browser_history", elasticbrowserhistory.Columns(), genFunc))
 			log.Infof("Registered table: elastic_browser_history")
+		}
+	}
+	{
+		// Windows Jump Lists containing recent and pinned items with LNK and destination metadata
+		genFunc, err := elasticjumplists.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_jumplists: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_jumplists", elasticjumplists.Columns(), genFunc))
+			log.Infof("Registered table: elastic_jumplists")
+		}
+	}
+	{
+		// Windows disk partition layout information from IOCTL_DISK_GET_DRIVE_LAYOUT_EX
+		genFunc, err := elasticntfspartitions.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_partitions: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_partitions", elasticntfspartitions.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_partitions")
+		}
+	}
+	{
+		// Windows mounted volume information including device type, drive letter, and filesystem
+		genFunc, err := elasticntfsvolumes.GetGenerateFunc(log, client)
+		if err != nil {
+			log.Errorf("Failed to get generate function for elastic_ntfs_volumes: %v", err)
+		} else {
+			server.RegisterPlugin(table.NewPlugin("elastic_ntfs_volumes", elasticntfsvolumes.Columns(), genFunc))
+			log.Infof("Registered table: elastic_ntfs_volumes")
 		}
 	}
 }

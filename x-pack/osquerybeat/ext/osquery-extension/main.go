@@ -103,13 +103,8 @@ func main() {
 		log.Fatalf("Error creating extension: %s", err)
 	}
 
-	// Register the tables available for the specific platform build
-	// Any module that needs to execute a post hook should register the hook
-	// within this function
-	RegisterTables(server, log, hooks, client)
-
 	// Register tables and views generated from the specs
-	tables.RegisterTables(server, log)
+	tables.RegisterTables(server, log, client)
 	views.RegisterViews(hooks, log)
 
 	// Execute all post hooks to create any views required for the specific platform build

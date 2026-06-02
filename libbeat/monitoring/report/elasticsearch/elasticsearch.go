@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
@@ -43,7 +44,7 @@ import (
 type reporter struct {
 	done       *stopper
 	logger     *logp.Logger
-	monitoring beat.Monitoring
+	monitoring beatmonitoring.Monitoring
 
 	checkRetry time.Duration
 
@@ -99,7 +100,7 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(beat beat.Info, mon beat.Monitoring, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
+func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
 	log := beat.Logger.Named(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
@@ -182,7 +183,7 @@ func makeReporter(beat beat.Info, mon beat.Monitoring, settings report.Settings,
 
 	pipeConn, err := pipeline.Connect()
 	if err != nil {
-		pipeline.Close()
+		pipeline.Disconnect(context.Background())
 		return nil, err
 	}
 
@@ -205,7 +206,7 @@ func makeReporter(beat beat.Info, mon beat.Monitoring, settings report.Settings,
 func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
-	r.pipeline.Close()
+	r.pipeline.Disconnect(context.Background())
 	r.wg.Wait()
 }
 
@@ -347,7 +348,7 @@ func makeMeta(beat beat.Info) mapstr.M {
 	}
 }
 
-func getClusterUUID(mon beat.Monitoring) string {
+func getClusterUUID(mon beatmonitoring.Monitoring) string {
 	stateRegistry := mon.StateRegistry()
 	outputsRegistry := stateRegistry.GetRegistry("outputs")
 	if outputsRegistry == nil {

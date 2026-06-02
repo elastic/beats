@@ -34,7 +34,9 @@
 # ignore_missing_channel.
 # The xml_query key requires an id and must not be used with the name,
 # ignore_older, level, event_id, or provider keys. Please visit the
-# documentation for the complete details of each option.
+# documentation for the complete details of each option. Query filters in
+# custom XML queries are not always reliable across all Windows versions and
+# forwarding scenarios.
 # https://go.es.io/WinlogbeatConfig
 
 winlogbeat.event_logs:
@@ -218,7 +220,7 @@ winlogbeat.event_logs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -876,7 +878,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -1683,6 +1685,30 @@ logging.files:
 # Controls the fraction of mutex contention events that are reported in the
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
+
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 

@@ -16,8 +16,8 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelctx"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
 )
 
 func TestNewLogBatch(t *testing.T) {
@@ -85,10 +85,9 @@ func TestNewLogBatch(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.setupCtx()
 			logs := tt.setupLogs()
 
-			batch, err := NewLogBatch(ctx, logs)
+			batch, err := NewLogBatch(logs)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -109,24 +108,12 @@ func TestNewLogBatch(t *testing.T) {
 
 func TestCreateEvents(t *testing.T) {
 	tests := []struct {
-		name     string
-		setupCtx func() context.Context
-		setup    func() plog.Logs
-		wantErr  bool
+		name    string
+		setup   func() plog.Logs
+		wantErr bool
 	}{
 		{
 			name: "multiple resource logs with multiple scope logs",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						otelctx.BeatNameCtxKey:        {"filebeat"},
-						otelctx.BeatVersionCtxKey:     {"9.0.0"},
-						otelctx.BeatIndexPrefixCtxKey: {"filebeat"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setup: func() plog.Logs {
 				logs := plog.NewLogs()
 
@@ -162,58 +149,13 @@ func TestCreateEvents(t *testing.T) {
 		},
 		{
 			name: "empty logs",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"metricbeat"},
-						"beat_version": {"7.15.2"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setup: func() plog.Logs {
 				return plog.NewLogs()
 			},
 			wantErr: false,
 		},
 		{
-			name: "invalid beats event in logs",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						"beat_version": {"8.0.0"}, // Missing beat_name
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
-			setup: func() plog.Logs {
-				logs := plog.NewLogs()
-				rl := logs.ResourceLogs().AppendEmpty()
-				sl := rl.ScopeLogs().AppendEmpty()
-
-				lr := sl.LogRecords().AppendEmpty()
-				lr.SetObservedTimestamp(pcommon.NewTimestampFromTime(mustParseTime("2023-01-01T12:00:00Z")))
-				bodyMap := lr.Body().SetEmptyMap()
-				bodyMap.PutStr("message", "test message")
-
-				return logs
-			},
-			wantErr: true,
-		},
-		{
 			name: "invalid log record body",
-			setupCtx: func() context.Context {
-				ctx := t.Context()
-				info := client.Info{
-					Metadata: client.NewMetadata(map[string][]string{
-						"beat_name":    {"filebeat"},
-						"beat_version": {"8.0.0"},
-					}),
-				}
-				return client.NewContext(ctx, info)
-			},
 			setup: func() plog.Logs {
 				logs := plog.NewLogs()
 				rl := logs.ResourceLogs().AppendEmpty()
@@ -231,10 +173,9 @@ func TestCreateEvents(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.setupCtx()
 			logs := tt.setup()
 
-			events, err := createEvents(ctx, &logs)
+			events, err := createEvents(&logs)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -243,7 +184,6 @@ func TestCreateEvents(t *testing.T) {
 				require.NoError(t, err)
 				assert.Len(t, events, logs.LogRecordCount())
 
-				ctxData := client.FromContext(ctx)
 				eventIndex := 0
 
 				// Verify each event matches the original plog data and metadata
@@ -251,10 +191,6 @@ func TestCreateEvents(t *testing.T) {
 					for _, sl := range rl.ScopeLogs().All() {
 						for _, lr := range sl.LogRecords().All() {
 							beatEvent := events[eventIndex].Content
-
-							// Verify metadata from context
-							assert.Equal(t, ctxData.Metadata.Get("beat_name")[0], beatEvent.Meta["beat"])
-							assert.Equal(t, ctxData.Metadata.Get("beat_version")[0], beatEvent.Meta["version"])
 
 							// Verify fields match original log record body
 							originalBody := lr.Body().Map().AsRaw()
@@ -276,7 +212,7 @@ func TestCreateEvents(t *testing.T) {
 }
 
 func TestLogBatchEvents(t *testing.T) {
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 
 	batch.pendingEvents = []publisher.Event{
@@ -291,7 +227,7 @@ func TestLogBatchEvents(t *testing.T) {
 }
 
 func TestLogBatchACK(t *testing.T) {
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 
 	batch.ACK()
@@ -308,7 +244,7 @@ func TestLogBatchACK(t *testing.T) {
 }
 
 func TestLogBatchDrop(t *testing.T) {
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 
 	batch.Drop()
@@ -326,7 +262,7 @@ func TestLogBatchDrop(t *testing.T) {
 
 func TestLogBatchRetry(t *testing.T) {
 	var result LogBatchResult
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 
 	// First retry
@@ -360,7 +296,7 @@ func TestLogBatchRetryEvents(t *testing.T) {
 		{Content: beat.Event{Fields: map[string]any{"message": "test2"}}},
 	}
 
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 
 	batch.pendingEvents = events
@@ -381,7 +317,7 @@ func TestLogBatchRetryEvents(t *testing.T) {
 }
 
 func TestLogBatchCancelled(t *testing.T) {
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 
 	batch.Cancelled()
@@ -398,7 +334,7 @@ func TestLogBatchCancelled(t *testing.T) {
 }
 
 func TestSplitRetry(t *testing.T) {
-	batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+	batch, err := NewLogBatch(plog.NewLogs())
 	require.NoError(t, err)
 	assert.False(t, batch.SplitRetry())
 }
@@ -420,7 +356,7 @@ func TestAddRetry(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			batch, err := NewLogBatch(t.Context(), plog.NewLogs())
+			batch, err := NewLogBatch(plog.NewLogs())
 			require.NoError(t, err)
 
 			batch.retries.Store(tt.current)

@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # System module [filebeat-module-system]
 

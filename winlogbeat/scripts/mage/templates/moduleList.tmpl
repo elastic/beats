@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See winlogbeat/scripts/mage/docs.go
 
 # Modules [winlogbeat-modules]
 

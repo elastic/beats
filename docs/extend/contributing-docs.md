@@ -73,16 +73,16 @@ you must run the doc collector scripts to regenerate the docs:
 
     The `make` command calls the following scripts to generate the docs:
 
-    * [**`auditbeat/scripts/docs_collector.py`**](https://github.com/elastic/beats/blob/main/auditbeat/scripts/docs_collector.py) generates:
+    * [**`auditbeat/scripts/mage/docs.go`**](https://github.com/elastic/beats/blob/main/auditbeat/scripts/mage/docs.go) generates:
         * `docs/reference/auditbeat/auditbeat-modules.md`
         * `docs/reference/auditbeat/auditbeat-module-*.md`
-    * [**`filebeat/scripts/docs_collector.py`**](https://github.com/elastic/beats/blob/main/filebeat/scripts/docs_collector.py) generates:
+    * [**`filebeat/scripts/mage/docs.go`**](https://github.com/elastic/beats/blob/main/filebeat/scripts/mage/docs.go) generates:
       * `docs/reference/filebeat/filebeat-modules.md`
       * `docs/reference/filebeat/filebeat-module-*.md`
     * [**`metricbeat/scripts/mage/docs_collector.go`**](https://github.com/elastic/beats/blob/main/metricbeat/scripts/mage/docs_collector.go) generates:
       * `docs/reference/metricbeat/metricbeat-modules.md`
       * `docs/reference/metricbeat/metricbeat-module-*.md`
-    * [**`libbeat/scripts/generate_fields_docs.py`**](https://github.com/elastic/beats/blob/main/libbeat/scripts/generate_fields_docs.py) generates:
+    * [**`dev-tools/mage/generate_fields_docs.go`**](https://github.com/elastic/beats/blob/main/dev-tools/mage/generate_fields_docs.go) generates:
       * `docs/reference/auditbeat/exported-fields.md`
       * `docs/reference/filebeat/exported-fields.md`
       * `docs/reference/heartbeat/exported-fields.md`

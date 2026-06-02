@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Beat fields [exported-fields-beat]
 
@@ -1072,6 +1072,12 @@ Beat module
 :   type: alias
 
     alias to: beat.stats.libbeat.output.events.failed
+
+
+**`beats_stats.metrics.libbeat.output.events.failure_store`**
+:   type: alias
+
+    alias to: beat.stats.libbeat.output.events.failure_store
 
 
 **`beats_stats.metrics.libbeat.output.events.toomany`**
@@ -2518,6 +2524,12 @@ Event counters
 
 **`beat.stats.libbeat.output.events.failed`**
 :   Number of events failed
+
+    type: long
+
+
+**`beat.stats.libbeat.output.events.failure_store`**
+:   Number of events written to the failure store
 
     type: long
 

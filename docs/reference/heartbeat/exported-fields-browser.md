@@ -6,7 +6,7 @@ applies_to:
   serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Synthetics browser metrics fields [exported-fields-browser]
 
@@ -60,7 +60,7 @@ duration of Load end event
 
 ## relative_trace [_relative_trace]
 
-trace event with timing information that are realtive to journey timings in microseconds
+trace event with timing information that are relative to journey timings in microseconds
 
 **`browser.relative_trace.name`**
 :   name of the trace event

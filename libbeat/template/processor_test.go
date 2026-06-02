@@ -573,8 +573,8 @@ func TestPropertiesCombine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, v1, mapstr.M{"type": "text", "norms": false})
-	assert.Equal(t, v2, mapstr.M{"type": "text", "norms": false})
+	assert.Equal(t, mapstr.M{"type": "text", "norms": false}, v1)
+	assert.Equal(t, mapstr.M{"type": "text", "norms": false}, v2)
 }
 
 func TestProcessNoName(t *testing.T) {

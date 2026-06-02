@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -39,7 +40,7 @@ type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(beat.Info, beat.Monitoring, Settings, *conf.C) (Reporter, error)
+type ReporterFactory func(beat.Info, beatmonitoring.Monitoring, Settings, *conf.C) (Reporter, error)
 
 type hostsCfg struct {
 	Hosts []string `config:"hosts"`
@@ -60,7 +61,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 
 func New(
 	beat beat.Info,
-	mon beat.Monitoring,
+	mon beatmonitoring.Monitoring,
 	settings Settings,
 	cfg *conf.C,
 	outputs conf.Namespace,
@@ -121,7 +122,7 @@ func getReporterConfig(
 		}
 	}
 
-	return "", nil, errors.New("No monitoring reporter configured")
+	return "", nil, errors.New("no monitoring reporter configured")
 }
 
 func collectSubObject(cfg *conf.C) *conf.C {

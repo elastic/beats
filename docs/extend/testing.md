@@ -57,7 +57,7 @@ mage docker:composeDown
 
 Go tests support generating sample events to be used as fixtures.
 
-This generation can be perfomed running `go test --data`. This functionality is supported by packetbeat and Metricbeat.
+This generation can be performed by running `go test --data`. This functionality is supported by packetbeat and Metricbeat.
 
 In Metricbeat, run the command from within a module like this: `go test --tags integration,azure --data --run "TestData"`. Make sure to add the relevant tags (`integration` is common then add module and metricset specific tags).
 
@@ -68,6 +68,10 @@ A note about tags: the `--data` flag is a custom flag added by Metricbeat and Pa
 ## Running System (integration) Tests (Python and Go) [_running_system_integration_tests_python_and_go]
 
 The system tests are defined in the `tests/system` (for legacy Python test) and on `tests/integration` (for Go tests) directory. They require a testing binary to be available and the python environment to be set up.
+
+::::{note}
+Winlogbeat does not use Python system tests. Its system tests are plain Go tests located in `winlogbeat/tests/testscript/` and require Windows to run.
+::::
 
 To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To set up the Python testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the [virtualenv documentation](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment).
 

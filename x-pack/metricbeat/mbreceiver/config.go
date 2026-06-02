@@ -4,22 +4,54 @@
 
 package mbreceiver
 
-import "fmt"
+import (
+	"fmt"
+
+	"go.opentelemetry.io/collector/confmap"
+
+	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+)
 
 // Config is config settings for metricbeat receiver.  The structure of
 // which is the same as the metricbeat.yml configuration file.
 type Config struct {
-	Beatconfig map[string]interface{} `mapstructure:",remain"`
+	Beatconfig map[string]any `mapstructure:",remain"`
+}
+
+// Unmarshal implements confmap.Unmarshaler for custom unmarshaling logic.
+func (c *Config) Unmarshal(conf *confmap.Conf) error {
+	if err := xpInstance.DeDotKeys(conf); err != nil {
+		return fmt.Errorf("error converting paths: %w", err)
+	}
+
+	// Deep-merge factory defaults into the user-supplied conf so that
+	// partial overrides (e.g. only path.home) preserve sibling defaults
+	// (e.g. path.data). We merge defaults first, then re-apply the
+	// original user values on top so user settings always win.
+	if len(c.Beatconfig) > 0 {
+		userMap := conf.ToStringMap()
+		if err := conf.Merge(confmap.NewFromStringMap(c.Beatconfig)); err != nil {
+			return fmt.Errorf("error merging defaults: %w", err)
+		}
+		if err := conf.Merge(confmap.NewFromStringMap(userMap)); err != nil {
+			return fmt.Errorf("error re-applying user config: %w", err)
+		}
+	}
+
+	if err := conf.Unmarshal(c); err != nil {
+		return fmt.Errorf("error unmarshalling conf: %w", err)
+	}
+	return nil
 }
 
 // Validate checks if the configuration in valid
-func (cfg *Config) Validate() error {
-	if len(cfg.Beatconfig) == 0 {
-		return fmt.Errorf("Configuration is required")
+func (c *Config) Validate() error {
+	if len(c.Beatconfig) == 0 {
+		return fmt.Errorf("configuration is required")
 	}
-	_, prs := cfg.Beatconfig["metricbeat"]
-	if !prs {
-		return fmt.Errorf("Configuration key 'metricbeat' is required")
+
+	if _, prs := c.Beatconfig["metricbeat"]; !prs {
+		return fmt.Errorf("configuration key 'metricbeat' is required")
 	}
 	return nil
 }

@@ -1,0 +1,25 @@
+[!windows] skip 'requires Windows'
+
+# Read an .evtx file with a small batch size to force multiple Read() calls.
+# sysmon-9.01.evtx has 32 events. With batch_read_size=5, Read() is called 7
+# times (6x5 + 2). The final call returns 2 records alongside io.EOF. Before
+# the runner.go fix (Fixes #47388), those last 2 events were silently dropped.
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 32
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${EVTX_TESTDATA:?missing EVTX_TESTDATA}/sysmon-9.01.evtx
+    no_more_events: stop
+    batch_read_size: 5
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

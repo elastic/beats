@@ -110,17 +110,22 @@ class Test(metricbeat.BaseTest):
         )
         mb_handler = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 2),
             max_timeout=20)
 
         mb_handler.kill_and_wait()
 
-        output = self.read_output(
+        outputs = self.read_output(
             required_fields=["@timestamp"],
-        )[0]
+        )
 
-        print(output)
-        assert float(output["system.process.cpu.total.ticks"]) >= 100
+        # one of the outputs will be an error event because we're running this test as a non-root user.
+        # In this scenario, “permission denied” errors are expected, and the actual metrics will be captured in a separate event.
+        found = False
+        for output in outputs:
+            found |= float(output.get("system.process.cpu.total.ticks", 0)) >= 100
+
+        assert found
 
     def test_dropevent_with_complex_condition(self):
         """

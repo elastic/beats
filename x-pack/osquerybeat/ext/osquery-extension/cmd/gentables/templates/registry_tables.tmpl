@@ -10,6 +10,7 @@ import (
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 {{- range .TableImports}}
 	{{.Alias}} "{{.Path}}"
@@ -19,6 +20,7 @@ import (
 import (
 	"github.com/osquery/osquery-go"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 )
 {{- end}}
@@ -28,14 +30,14 @@ import (
 {{- if not .HasTables}}
 // No tables are defined for this platform.
 {{- end}}
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, client *client.ResilientClient) {
 {{- if not .HasTables}}
 	// No tables to register for this platform
 {{- else}}
 {{- range .Entries}}
 	{
 		// {{.Description}}
-		genFunc, err := {{.PackageAlias}}.GetGenerateFunc(log)
+		genFunc, err := {{.PackageAlias}}.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for {{.Name}}: %v", err)
 		} else {

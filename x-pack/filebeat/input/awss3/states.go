@@ -51,7 +51,13 @@ type stateRegistry interface {
 
 // newStateRegistry creates the appropriate state registry based on configuration.
 func newStateRegistry(log *logp.Logger, stateStore statestore.States, keyPrefix string, lexicographicalOrdering bool, lexicographicalLookbackKeys int) (stateRegistry, error) {
-	store, err := stateStore.StoreFor("")
+	// When lexicographical ordering is enabled, pass the input type to allow
+	// ES state store routing for agentless deployments
+	storeKey := ""
+	if lexicographicalOrdering {
+		storeKey = inputName
+	}
+	store, err := stateStore.StoreFor(storeKey)
 	if err != nil {
 		return nil, fmt.Errorf("can't access persistent store: %w", err)
 	}

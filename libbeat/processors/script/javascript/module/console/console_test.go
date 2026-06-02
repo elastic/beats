@@ -63,18 +63,18 @@ function process(evt) {
 	logs := observedLogs.FilterMessageSnippet("TestConsole").TakeAll()
 	if assert.Len(t, logs, 5) {
 		assert.Contains(t, logs[0].Message, "Debug")
-		assert.Equal(t, logs[0].Level, zap.DebugLevel)
+		assert.Equal(t, zap.DebugLevel, logs[0].Level)
 
 		assert.Contains(t, logs[1].Message, "Log/Info")
-		assert.Equal(t, logs[1].Level, zap.InfoLevel)
+		assert.Equal(t, zap.InfoLevel, logs[1].Level)
 
 		assert.Contains(t, logs[2].Message, "Info")
-		assert.Equal(t, logs[2].Level, zap.InfoLevel)
+		assert.Equal(t, zap.InfoLevel, logs[2].Level)
 
 		assert.Contains(t, logs[3].Message, "Warning")
-		assert.Equal(t, logs[3].Level, zap.WarnLevel)
+		assert.Equal(t, zap.WarnLevel, logs[3].Level)
 
 		assert.Contains(t, logs[4].Message, "Error")
-		assert.Equal(t, logs[4].Level, zap.ErrorLevel)
+		assert.Equal(t, zap.ErrorLevel, logs[4].Level)
 	}
 }

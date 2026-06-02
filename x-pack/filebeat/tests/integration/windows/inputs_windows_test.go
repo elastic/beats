@@ -118,8 +118,7 @@ output.console:
 logging.level: info
 `,
 			expectedOutput: []string{
-				"ignoring open error",
-				"NonExistentChannel1",
+				"encountered channel not found error when opening Windows Event Log, retrying",
 			},
 		},
 		"explicit true ignores missing channels": {
@@ -134,7 +133,7 @@ output.console:
   enabled: true
 logging.level: info
 `,
-			expectedOutput: []string{"ignoring open error", "NonExistentChannel2"},
+			expectedOutput: []string{"encountered channel not found error when opening Windows Event Log, retrying"},
 		},
 		"explicit false fails on missing channels": {
 			configTemplate: `
@@ -148,7 +147,7 @@ output.console:
   enabled: true
 logging.level: debug
 `,
-			expectedOutput: []string{"NonExistentChannel3", "The specified channel could not be found", "encountered recoverable error"},
+			expectedOutput: []string{"The specified channel could not be found", "encountered channel not found error when opening Windows Event Log, retrying"},
 		},
 	}
 	for name, tc := range tcs {
