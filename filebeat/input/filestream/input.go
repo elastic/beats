@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"sync/atomic"
 	"time"
 
 	"go.uber.org/zap"
@@ -209,6 +210,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 func (inp *filestream) Run(
 	ctx input.Context,
 	src loginp.Source,
+	sourceID string,
 	cursor loginp.Cursor,
 	publisher loginp.Publisher,
 	metrics *loginp.Metrics,
@@ -237,6 +239,13 @@ func (inp *filestream) Run(
 		state.Offset = 0
 	}
 
+	var metricsOffset *atomic.Int64
+	if !fs.desc.GZIP {
+		var cleanupActiveOffset func()
+		metricsOffset, cleanupActiveOffset = metrics.RegisterHarvesterOffset(sourceID, state.Offset)
+		defer cleanupActiveOffset()
+	}
+
 	metrics.FilesActive.Inc()
 	metrics.HarvesterRunning.Inc()
 	defer metrics.FilesActive.Dec()
@@ -260,7 +269,7 @@ func (inp *filestream) Run(
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
 	err = inp.readFromSource(
-		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics)
+		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metricsOffset, metrics)
 	if err != nil {
 		// First handle actual errors
 		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
@@ -690,6 +699,7 @@ func (inp *filestream) readFromSource(
 	s state,
 	p loginp.Publisher,
 	isGZIP bool,
+	metricsOffset *atomic.Int64,
 	metrics *loginp.Metrics) error {
 
 	metrics.FilesOpened.Inc()
@@ -737,6 +747,10 @@ func (inp *filestream) readFromSource(
 
 		// sate offset increase
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
+		// Shared offset used for metrics
+		if metricsOffset != nil {
+			metricsOffset.Store(s.Offset)
+		}
 
 		flags, err := message.Fields.GetValue("log.flags")
 		if err == nil {

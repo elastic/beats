@@ -35,6 +35,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/testing/gziptest"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -346,6 +347,32 @@ func TestOpenFile_GZIPNeverTruncated(t *testing.T) {
 	}
 }
 
+func TestReadFromSourceUpdatesActiveOffset(t *testing.T) {
+	inp := filestream{}
+	metricsOffset := &atomic.Int64{}
+	metricsOffset.Store(5)
+
+	err := inp.readFromSource(
+		v2.Context{Cancelation: context.Background(), Logger: logp.NewNopLogger()},
+		logp.NewNopLogger(),
+		&mockReader{
+			resp: []readerResponse{
+				{msg: "abc"},
+				{msg: "de"},
+			},
+		},
+		"test.log",
+		state{Offset: 5},
+		noopPublisher{},
+		false,
+		metricsOffset,
+		loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger()),
+	)
+
+	require.NoError(t, err, "readFromSource should finish without error")
+	assert.EqualValues(t, 10, metricsOffset.Load(), "active harvester offset")
+}
+
 // runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
@@ -470,6 +497,12 @@ func (p *testPipeline) Disconnect(ctx context.Context) error {
 
 type testClient struct {
 	testPipeline *testPipeline
+}
+
+type noopPublisher struct{}
+
+func (noopPublisher) Publish(beat.Event, interface{}) error {
+	return nil
 }
 
 func (c *testClient) Publish(event beat.Event) {
