@@ -46,9 +46,9 @@ go list -m -json all $@ | go run go.elastic.co/go-licence-detector \
 # Fill-in required values for UBI images
 # Check headers in $SRCPATH/notice/dependencies.csv.tmpl:
 # name,url,version,revision,license
-ubiurl='https://catalog.redhat.com/software/containers/ubi9/ubi-minimal/615bd9b4075b022acc111bf5'
-ubisource='https://oss-dependencies.elastic.co/red-hat-universal-base-image-minimal/9/ubi-minimal-9-source.tar.gz'
+ubiurl='https://catalog.redhat.com/software/containers/ubi10/ubi-minimal/615bd9b4075b022acc111bf5'
+ubisource='https://oss-dependencies.elastic.co/red-hat-universal-base-image-minimal/10/ubi-minimal-10-source.tar.gz'
 ubilicense='Custom;https://www.redhat.com/licenses/EULA_Red_Hat_Universal_Base_Image_English_20190422.pdf'
 cat <<EOF >> $outfile
-Red Hat Universal Base Image minimal,$ubiurl,9,,$ubilicense,$ubisource
+Red Hat Universal Base Image minimal,$ubiurl,10,,$ubilicense,$ubisource
 EOF
