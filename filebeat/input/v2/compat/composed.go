@@ -18,9 +18,9 @@
 package compat
 
 import (
+	"github.com/elastic/beats/v7/filebeat/channel"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -28,19 +28,20 @@ import (
 // For each operation the configured factory will be tried first. If the
 // operation failed (for example the input type is unknown) the fallback factory is tried.
 type composeFactory struct {
-	factory  cfgfile.RunnerFactory
-	fallback cfgfile.RunnerFactory
+	factory  channel.InputRunnerFactory
+	fallback channel.InputRunnerFactory
 }
 
-// Combine takes two RunnerFactory instances and creates a new RunnerFactory.
-// The new factory will first try to create an input using factory. If this operation fails fallback will be used.
+// Combine takes two InputRunnerFactory instances and creates a new
+// InputRunnerFactory. The new factory will first try to create an input using
+// factory. If this operation fails fallback will be used.
 //
-// The new RunnerFactory will return the error of fallback only if factory did
-// signal that the input type is unknown via v2.ErrUnknown.
+// The new InputRunnerFactory will return the error of fallback only if factory
+// did signal that the input type is unknown via v2.ErrUnknown.
 //
-// XXX: This RunnerFactory is used for combining the v2.Loader with the
+// XXX: This InputRunnerFactory is used for combining the v2.Loader with the
 // existing RunnerFactory for inputs in Filebeat. The Combine function should be removed once the old RunnerFactory is removed.
-func Combine(factory, fallback cfgfile.RunnerFactory) cfgfile.RunnerFactory {
+func Combine(factory, fallback channel.InputRunnerFactory) channel.InputRunnerFactory {
 	return composeFactory{factory: factory, fallback: fallback}
 }
 
@@ -55,8 +56,8 @@ func (f composeFactory) CheckConfig(cfg *conf.C) error {
 func (f composeFactory) Create(
 	p beat.PipelineConnector,
 	config *conf.C,
-) (cfgfile.Runner, error) {
-	var runner cfgfile.Runner
+) (channel.InputRunner, error) {
+	var runner channel.InputRunner
 	var err1, err2 error
 
 	runner, err1 = f.factory.Create(p, config)

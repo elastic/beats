@@ -19,12 +19,10 @@ package channel
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -75,13 +73,13 @@ type commonInputConfig struct {
 //
 // The user-configured `processors:` list and the index processor are
 // instantiated once per input and shared across all pipeline clients.
-func RunnerFactoryWithCommonInputSettings(info beat.Info, f cfgfile.RunnerFactory) cfgfile.RunnerFactory {
+func RunnerFactoryWithCommonInputSettings(info beat.Info, f InputRunnerFactory) cfgfile.RunnerFactory {
 	return &commonSettingsFactory{info: info, inner: f}
 }
 
 type commonSettingsFactory struct {
 	info  beat.Info
-	inner cfgfile.RunnerFactory
+	inner InputRunnerFactory
 }
 
 func (f *commonSettingsFactory) CheckConfig(cfg *conf.C) error {
@@ -100,21 +98,27 @@ func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *con
 		return nil, err
 	}
 
-	return &runnerWithSharedProcessors{Runner: r, procs: sharedProcs}, nil
+	r.AddCloser(sharedProcs)
+
+	return r, nil
 }
 
-// runnerWithSharedProcessors wraps a Runner so its Stop() also closes the
-// per-input shared processors built once by newCommonConfigEditor.
-//
-// Embedding the cfgfile.Runner interface only promotes Start/Stop/String;
-// optional methods on the inner concrete type (SetStatusReporter, SetOnce)
-// must be forwarded explicitly so runtime type-assertion callers keep seeing
-// them through the wrapper. Stop is made idempotent with sync.Once because
-// *input.Runner.Stop is not.
-type runnerWithSharedProcessors struct {
+// InputRunner is a cfgfile.Runner that also owns the per-input shared
+// processors built by newCommonConfigEditor. It closes them on Stop, after its
+// pipeline clients have drained so in-flight events still see them.
+type InputRunner interface {
 	cfgfile.Runner
-	procs    *processors.Processors
-	stopOnce sync.Once
+
+	// AddCloser hands the runner the shared processors to close on Stop.
+	AddCloser(processors.Closer)
+}
+
+// InputRunnerFactory is the cfgfile.RunnerFactory variant whose runners are
+// InputRunners, so RunnerFactoryWithCommonInputSettings can attach the shared
+// processors without a runtime type assertion.
+type InputRunnerFactory interface {
+	Create(pipeline beat.PipelineConnector, cfg *conf.C) (InputRunner, error)
+	CheckConfig(cfg *conf.C) error
 }
 
 // OnceSetter is implemented by runners that support `filebeat --once` (single scan then exit).
@@ -122,42 +126,14 @@ type OnceSetter interface {
 	SetOnce(once bool)
 }
 
-func (r *runnerWithSharedProcessors) Stop() {
-	r.stopOnce.Do(func() {
-		// Stop the input first so all of its pipeline clients drain before
-		// the shared processors they reference are released.
-		r.Runner.Stop()
-		_ = r.procs.Close()
-	})
-}
-
-func (r *runnerWithSharedProcessors) SetStatusReporter(reporter status.StatusReporter) {
-	if sr, ok := r.Runner.(status.WithStatusReporter); ok {
-		sr.SetStatusReporter(reporter)
-	}
-}
-
-func (r *runnerWithSharedProcessors) SetOnce(once bool) {
-	if o, ok := r.Runner.(OnceSetter); ok {
-		o.SetOnce(once)
-	}
-}
-
-var (
-	_ cfgfile.Runner            = (*runnerWithSharedProcessors)(nil)
-	_ status.WithStatusReporter = (*runnerWithSharedProcessors)(nil)
-	_ OnceSetter                = (*runnerWithSharedProcessors)(nil)
-)
-
 // sharedProcessor is a run-only view of an input-owned processor. The
 // per-input processors are built once and shared across every pipeline client
 // the input opens (one per filestream harvester). Embedding the beat.Processor
 // interface promotes only Run/String, hiding Closer and PathSetter, so a
 // pipeline client closing its own processor list (when a harvester stops)
-// cannot tear down — or re-initialise — state still used by sibling
+// cannot tear down or re-initialise state still used by sibling
 // harvesters. The shared instances are path-initialised and closed exactly
-// once by the owning input (see newCommonConfigEditor and
-// runnerWithSharedProcessors.Stop).
+// once by the owning input (see newCommonConfigEditor and InputRunner).
 //
 // This mirrors how pipeline-global processors are wrapped as a function
 // processor in libbeat/publisher/processing/default.go so that clients cannot
@@ -257,7 +233,7 @@ func newConfigEditor(
 		//
 		// Shared processors are wrapped per client (sharedProcessor) and kept
 		// as flat siblings to preserve the client group's continue-on-error
-		// semantics — see TestProcessorsForConfigIsFlat.
+		// semantics (see TestProcessorsForConfigIsFlat).
 		procs := processors.NewList(beatInfo.Logger)
 		if indexProc != nil {
 			procs.AddProcessor(sharedProcessor{indexProc})

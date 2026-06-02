@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/processors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 
@@ -35,7 +35,7 @@ type runnerFactoryMock struct {
 	cfgs        []beat.ClientConfig
 }
 
-func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
+func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (InputRunner, error) {
 	// When using the connector multiple times to create a client
 	// it's using the same editor function for creating a new client
 	// with a modified configuration that includes predefined processing.
@@ -53,11 +53,22 @@ func (r *runnerFactoryMock) Create(p beat.PipelineConnector, config *conf.C) (cf
 	return &noopRunner{}, nil
 }
 
-type noopRunner struct{}
+// noopRunner is a test double for InputRunner: it records the shared processors
+// handed to it and closes them on Stop.
+type noopRunner struct {
+	closers []processors.Closer
+}
 
-func (*noopRunner) Start()         {}
-func (*noopRunner) Stop()          {}
-func (*noopRunner) String() string { return "noopRunner" }
+func (*noopRunner) Start() {}
+func (r *noopRunner) Stop() {
+	for _, c := range r.closers {
+		_ = c.Close()
+	}
+}
+func (*noopRunner) String() string                 { return "noopRunner" }
+func (r *noopRunner) AddCloser(c processors.Closer) { r.closers = append(r.closers, c) }
+
+var _ InputRunner = (*noopRunner)(nil)
 
 func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 	return nil
@@ -66,9 +77,9 @@ func (runnerFactoryMock) CheckConfig(config *conf.C) error {
 // Assert runs various checks for the clients created by the wrapped pipeline
 // connector. Processing.Meta and Processing.Fields must still be a per-client
 // copy (they are mutated downstream); the user-configured and index processors
-// are now shared across clients via sharedProcessor wrappers (#50376) — each
-// client gets a distinct wrapper, but the wrapped instance is the same — see
-// assertSharedProcessors.
+// are now shared across clients via sharedProcessor wrappers (#50376): each
+// client gets a distinct wrapper, but the wrapped instance is the same (see
+// assertSharedProcessors).
 func (r runnerFactoryMock) Assert(t *testing.T) {
 	t.Helper()
 

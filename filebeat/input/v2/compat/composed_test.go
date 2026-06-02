@@ -21,15 +21,16 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/elastic/beats/v7/filebeat/channel"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type fakeRunnerFactory struct {
 	OnCheck  func(*conf.C) error
-	OnCreate func(beat.PipelineConnector, *conf.C) (cfgfile.Runner, error)
+	OnCreate func(beat.PipelineConnector, *conf.C) (channel.InputRunner, error)
 }
 
 type fakeRunner struct {
@@ -43,7 +44,7 @@ func TestCombine_CheckConfig(t *testing.T) {
 	oops2 := errors.New("oops2")
 
 	cases := map[string]struct {
-		factory, fallback cfgfile.RunnerFactory
+		factory, fallback channel.InputRunnerFactory
 		want              error
 	}{
 		"success": {
@@ -81,18 +82,18 @@ func TestCombine_CheckConfig(t *testing.T) {
 }
 
 func TestCombine_Create(t *testing.T) {
-	type validation func(*testing.T, cfgfile.Runner, error)
+	type validation func(*testing.T, channel.InputRunner, error)
 
 	wantError := func(want error) validation {
-		return func(t *testing.T, _ cfgfile.Runner, got error) {
+		return func(t *testing.T, _ channel.InputRunner, got error) {
 			if want != got {
 				t.Fatalf("Wrong error. Want: %v, Got: %v", want, got)
 			}
 		}
 	}
 
-	wantRunner := func(want cfgfile.Runner) validation {
-		return func(t *testing.T, got cfgfile.Runner, err error) {
+	wantRunner := func(want channel.InputRunner) validation {
+		return func(t *testing.T, got channel.InputRunner, err error) {
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -109,8 +110,8 @@ func TestCombine_Create(t *testing.T) {
 	oops2 := errors.New("oops2")
 
 	cases := map[string]struct {
-		factory  cfgfile.RunnerFactory
-		fallback cfgfile.RunnerFactory
+		factory  channel.InputRunnerFactory
+		fallback channel.InputRunnerFactory
 		Type     string
 		check    validation
 	}{
@@ -152,7 +153,7 @@ func TestCombine_Create(t *testing.T) {
 }
 
 // Create creates a new Runner based on the given configuration.
-func (f *fakeRunnerFactory) Create(p beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
+func (f *fakeRunnerFactory) Create(p beat.PipelineConnector, config *conf.C) (channel.InputRunner, error) {
 	if f.OnCreate == nil {
 		return nil, errors.New("not implemented")
 	}
@@ -182,19 +183,21 @@ func (f *fakeRunner) Stop() {
 	}
 }
 
-func constRunnerFactory(runner cfgfile.Runner) cfgfile.RunnerFactory {
+func (f *fakeRunner) AddCloser(processors.Closer) {}
+
+func constRunnerFactory(runner channel.InputRunner) channel.InputRunnerFactory {
 	return &fakeRunnerFactory{
-		OnCreate: func(_ beat.PipelineConnector, _ *conf.C) (cfgfile.Runner, error) {
+		OnCreate: func(_ beat.PipelineConnector, _ *conf.C) (channel.InputRunner, error) {
 			return runner, nil
 		},
 	}
 }
 
-func failingRunnerFactory(err error) cfgfile.RunnerFactory {
+func failingRunnerFactory(err error) channel.InputRunnerFactory {
 	return &fakeRunnerFactory{
 		OnCheck: func(_ *conf.C) error { return err },
 
-		OnCreate: func(_ beat.PipelineConnector, _ *conf.C) (cfgfile.Runner, error) {
+		OnCreate: func(_ beat.PipelineConnector, _ *conf.C) (channel.InputRunner, error) {
 			return nil, err
 		},
 	}

@@ -18,6 +18,7 @@
 package channel
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -29,7 +30,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
@@ -269,7 +269,7 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 
 // TestSharedProcessorsAcrossClients verifies that the user-configured
 // processors and the index processor are constructed once per input and shared
-// across all clients connected to the wrapped pipeline — instead of being
+// across all clients connected to the wrapped pipeline, instead of being
 // instantiated per client/harvester (the blow-up reported in
 // elastic/beats#50376).
 func TestSharedProcessorsAcrossClients(t *testing.T) {
@@ -420,117 +420,43 @@ func (r *recordingProcessor) SetPaths(_ *paths.Path) error {
 	return nil
 }
 
-// TestRunnerWithSharedProcessorsClosesProcessorsAtStop verifies runner.Stop()
-// ordering: the wrapped Runner stops first (draining its pipeline clients),
-// THEN the shared processors are closed. Stop is idempotent.
-func TestRunnerWithSharedProcessorsClosesProcessorsAtStop(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
-	inner1 := &recordingProcessor{}
-	inner2 := &recordingProcessor{}
+// TestCommonSettingsFactoryAttachesSharedProcessorsToRunner verifies the
+// factory returns the inner runner unwrapped (so its optional interfaces stay
+// visible to libbeat/cfgfile/list.go) and registers the shared processors on it
+// via AddCloser.
+func TestCommonSettingsFactoryAttachesSharedProcessorsToRunner(t *testing.T) {
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, ""), Paths: paths.New()}
+	inner := &noopRunner{}
+	f := RunnerFactoryWithCommonInputSettings(b, &fakeInnerFactory{runner: inner})
 
-	procs := processors.NewList(logger)
-	procs.AddProcessor(inner1)
-	procs.AddProcessor(inner2)
-
-	stopped := 0
-	r := &runnerWithSharedProcessors{
-		Runner: &stopOrderRunner{onStop: func() {
-			stopped++
-			// Inner must still be live while the underlying Runner stops;
-			// clients may still be flushing on Stop().
-			require.Falsef(t, inner1.closed, "shared processor closed before Runner.Stop returned")
-			require.Falsef(t, inner2.closed, "shared processor closed before Runner.Stop returned")
-		}},
-		procs: procs,
-	}
-
-	r.Stop()
-	require.Equal(t, 1, stopped)
-	require.True(t, inner1.closed, "shared processor must be closed after Runner.Stop returns")
-	require.True(t, inner2.closed, "shared processor must be closed after Runner.Stop returns")
-
-	// Idempotent: a second Stop must not call the underlying Stop again.
-	r.Stop()
-	require.Equal(t, 1, stopped, "Stop must be idempotent")
+	r, err := f.Create(nil, conf.NewConfig())
+	require.NoError(t, err)
+	require.Same(t, inner, r, "factory must return the inner runner without wrapping it")
+	require.Lenf(t, inner.closers, 1, "shared processors must be registered with the runner via AddCloser")
 }
 
-type stopOrderRunner struct {
-	onStop func()
+// TestCommonSettingsFactoryClosesSharedProcessorsOnInnerError verifies that the
+// per-input shared processors are released when the inner factory fails to
+// create the runner.
+func TestCommonSettingsFactoryClosesSharedProcessorsOnInnerError(t *testing.T) {
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, ""), Paths: paths.New()}
+	wantErr := errors.New("inner create failed")
+	f := RunnerFactoryWithCommonInputSettings(b, &fakeInnerFactory{err: wantErr})
+
+	r, err := f.Create(nil, conf.NewConfig())
+	require.Nil(t, r)
+	require.ErrorIs(t, err, wantErr)
 }
 
-func (s *stopOrderRunner) Start()         {}
-func (s *stopOrderRunner) Stop()          { s.onStop() }
-func (s *stopOrderRunner) String() string { return "stopOrderRunner" }
-
-// TestRunnerWithSharedProcessorsForwardsStatusReporter verifies the wrapper
-// exposes SetStatusReporter to runtime type-assertion callers (used by
-// libbeat/cfgfile/list.go to wire elastic-agent-client status reporting) and is
-// a no-op when the inner runner does not implement it.
-func TestRunnerWithSharedProcessorsForwardsStatusReporter(t *testing.T) {
-	inner := &statusReporterRunner{}
-	r := &runnerWithSharedProcessors{
-		Runner: inner,
-		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
-	}
-
-	sr, ok := any(r).(status.WithStatusReporter)
-	require.Truef(t, ok, "runnerWithSharedProcessors must implement status.WithStatusReporter")
-
-	reporter := &recordingStatusReporter{}
-	sr.SetStatusReporter(reporter)
-	require.Same(t, reporter, inner.lastReporter, "SetStatusReporter must reach the inner runner")
-
-	// Inner without WithStatusReporter must not panic.
-	r2 := &runnerWithSharedProcessors{
-		Runner: &stopOrderRunner{onStop: func() {}},
-		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
-	}
-	r2.SetStatusReporter(&recordingStatusReporter{})
+// fakeInnerFactory is a channel.InputRunnerFactory stub that returns a preset
+// runner or error, letting the tests exercise commonSettingsFactory.Create in
+// isolation.
+type fakeInnerFactory struct {
+	runner InputRunner
+	err    error
 }
 
-type statusReporterRunner struct {
-	lastReporter status.StatusReporter
+func (f *fakeInnerFactory) CheckConfig(*conf.C) error { return nil }
+func (f *fakeInnerFactory) Create(beat.PipelineConnector, *conf.C) (InputRunner, error) {
+	return f.runner, f.err
 }
-
-func (s *statusReporterRunner) Start()         {}
-func (s *statusReporterRunner) Stop()          {}
-func (s *statusReporterRunner) String() string { return "statusReporterRunner" }
-func (s *statusReporterRunner) SetStatusReporter(reporter status.StatusReporter) {
-	s.lastReporter = reporter
-}
-
-type recordingStatusReporter struct{}
-
-func (*recordingStatusReporter) UpdateStatus(status.Status, string) {}
-
-// TestRunnerWithSharedProcessorsForwardsSetOnce verifies the wrapper forwards
-// SetOnce to an inner runner that implements OnceSetter (used by
-// crawler.startInput for `filebeat --once`) and is a no-op otherwise.
-func TestRunnerWithSharedProcessorsForwardsSetOnce(t *testing.T) {
-	inner := &onceSetterRunner{}
-	r := &runnerWithSharedProcessors{
-		Runner: inner,
-		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
-	}
-
-	o, ok := any(r).(OnceSetter)
-	require.Truef(t, ok, "runnerWithSharedProcessors must implement OnceSetter")
-	o.SetOnce(true)
-	require.True(t, inner.once, "SetOnce must reach the inner runner")
-
-	// Inner without OnceSetter must not panic.
-	r2 := &runnerWithSharedProcessors{
-		Runner: &stopOrderRunner{onStop: func() {}},
-		procs:  processors.NewList(logptest.NewTestingLogger(t, "")),
-	}
-	r2.SetOnce(true)
-}
-
-type onceSetterRunner struct {
-	once bool
-}
-
-func (*onceSetterRunner) Start()              {}
-func (*onceSetterRunner) Stop()               {}
-func (*onceSetterRunner) String() string      { return "onceSetterRunner" }
-func (o *onceSetterRunner) SetOnce(once bool) { o.once = once }
