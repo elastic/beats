@@ -1370,6 +1370,8 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 	fw := &fileWatcher{
 		fileIdentifier:   identifier,
 		sourceIdentifier: mustSourceIdentifier("foo-id"),
+		log:              logp.NewNopLogger(),
+		events:           make(chan loginp.FSEvent, 10),
 	}
 
 	now := time.Now()
@@ -1390,11 +1392,19 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 		"gzip":      descriptor("gzip", 100, now, true),
 		"ignored":   descriptor("ignored", 100, oldModTime, false),
 	}
+	fw.prev = map[string]loginp.FileDescriptor{
+		"complete":  descriptor("complete", 100, now, false),
+		"near":      descriptor("near", 100, now, false),
+		"lagging":   descriptor("lagging", 100, now, false),
+		"no-active": descriptor("no-active", 100, now, false),
+		"gzip":      descriptor("gzip", 100, now, true),
+		"ignored":   descriptor("ignored", 100, oldModTime, false),
+	}
+	fw.scanner = &testFileScanner{files: paths}
 
 	metrics := loginp.NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
-
-	// Register some files/offisets, like a harevester would do
-	completeOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["complete"]), 10)
+	// Register some files/offsets, like a harvester would do.
+	completeOffset, cleanupCompleteOffset := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["complete"]), 10)
 	nearOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["near"]), 5)
 	laggingOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["lagging"]), 4)
 	gzipOffset, _ := metrics.RegisterHarvesterOffset(fw.getFileIdentity(paths["gzip"]), 10)
@@ -1408,25 +1418,52 @@ func TestFileWatcherHarvesterMetrics(t *testing.T) {
 	gzipOffset.Store(100)
 	ignoredOffset.Store(100)
 
-	baseline := loginp.HarvesterMetrics{
-		FilesIngestedPercent100:    metrics.FilesIngestedPercent100.Get(),
-		FilesIngestedPercent95To99: metrics.FilesIngestedPercent95To99.Get(),
-		FilesIngestedPercentLt95:   metrics.FilesIngestedPercentLt95.Get(),
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
+
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
+
+	// Copy paths and 'truncate' one file
+	truncatedPaths := map[string]loginp.FileDescriptor{}
+	for path, fd := range paths {
+		truncatedPaths[path] = fd
 	}
+	truncatedPaths["complete"] = descriptor("complete", 50, now, false)
+	fw.scanner = &testFileScanner{files: truncatedPaths}
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
 
-	fw.updateHarvesterMetrics(metrics, paths, time.Hour, time.Time{})
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after truncation")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after truncation")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after truncation")
 
-	assert.Equal(t, baseline.FilesIngestedPercent100+1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
-	assert.Equal(t, baseline.FilesIngestedPercent95To99+1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
-	assert.Equal(t, baseline.FilesIngestedPercentLt95+1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
+	// Simulate the harvester restart caused by truncation.
+	cleanupCompleteOffset()
+	_, _ = metrics.RegisterHarvesterOffset(fw.getFileIdentity(truncatedPaths["complete"]), 0)
+
+	// Copy truncatedPaths and make one file older
+	ignoredPaths := map[string]loginp.FileDescriptor{}
+	for path, fd := range truncatedPaths {
+		ignoredPaths[path] = fd
+	}
+	ignoredPaths["near"] = descriptor("near", 100, oldModTime, false)
+	fw.scanner = &testFileScanner{files: ignoredPaths}
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
+
+	// The truncated file from the previous step is now a 'normal file at 50%'
+	// The 'near' file (95% ingested) is ignored because of ignore_older
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after ignored")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after ignored")
+	assert.EqualValues(t, 2, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after ignored")
 
 	// An update with no paths slice effectively removes all files from the
 	// last update from the metrics
-	fw.updateHarvesterMetrics(metrics, nil, time.Hour, time.Time{})
+	fw.scanner = &testFileScanner{}
+	fw.watch(t.Context(), metrics, time.Hour, time.Time{})
 
-	assert.Equal(t, baseline.FilesIngestedPercent100, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after reset")
-	assert.Equal(t, baseline.FilesIngestedPercent95To99, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after reset")
-	assert.Equal(t, baseline.FilesIngestedPercentLt95, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after reset")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after reset")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after reset")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after reset")
 }
 
 func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
@@ -1437,6 +1474,15 @@ func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
 	}
 
 	return si
+}
+
+type testFileScanner struct {
+	files map[string]loginp.FileDescriptor
+}
+
+// GetFiles return s.files and empty metrics
+func (s *testFileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	return s.files, loginp.FileScanMetrics{}
 }
 
 const benchmarkFileCount = 1000

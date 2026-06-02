@@ -193,7 +193,6 @@ func (w *fileWatcher) watch(
 	// so the logic is not duplicated
 	scanMetrics.FilesIgnored += countIgnoredFiles(paths, ignoreOlder, ignoreInactiveSince)
 	metrics.UpdateFileScanMetrics(scanMetrics)
-	w.updateHarvesterMetrics(metrics, paths, ignoreOlder, ignoreInactiveSince)
 
 	// for debugging purposes
 	writtenCount := 0
@@ -204,6 +203,8 @@ func (w *fileWatcher) watch(
 
 	newFilesByName := make(map[string]*loginp.FileDescriptor)
 	newFilesByID := make(map[string]*loginp.FileDescriptor)
+	harvesterFiles := make([]loginp.HarvesterFile, 0, len(paths))
+	now := time.Now()
 
 	for path, fd := range paths {
 		// srcID is the file identity, it is the same value used to identify
@@ -287,6 +288,11 @@ func (w *fileWatcher) watch(
 			}
 		}
 
+		// we want progress metrics to all files, but truncated ones
+		if e.Op != loginp.OpTruncate {
+			harvesterFiles = appendHarvesterFile(harvesterFiles, fd, srcID, now, ignoreOlder, ignoreInactiveSince)
+		}
+
 		// delete from previous state to mark that we've seen the existing file again
 		delete(w.prev, path)
 		// Delete used state from closedHarvesters
@@ -324,12 +330,18 @@ func (w *fileWatcher) watch(
 
 	// remaining files in newFiles are newly created files
 	for path, fd := range newFilesByName {
+		srcID := w.getFileIdentity(*fd)
+
 		select {
 		case <-ctx.Done():
 			return
-		case w.events <- createEvent(path, *fd, w.getFileIdentity(*fd)):
+		case w.events <- createEvent(path, *fd, srcID):
 			createdCount++
 		}
+
+		// The previous for loop has an early return for new files,
+		// so we need to collect their metrics here.
+		harvesterFiles = appendHarvesterFile(harvesterFiles, *fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 	}
 
 	w.log.Debugw("File scan complete",
@@ -340,6 +352,8 @@ func (w *fileWatcher) watch(
 		"removed", removedCount,
 		"created", createdCount,
 	)
+
+	metrics.UpdateHarvesterBuckets(harvesterFiles)
 
 	w.prev = paths
 }
@@ -370,27 +384,22 @@ func countIgnoredFiles(
 	return ignored
 }
 
-func (w *fileWatcher) updateHarvesterMetrics(
-	metrics *loginp.Metrics,
-	paths map[string]loginp.FileDescriptor,
+func appendHarvesterFile(
+	files []loginp.HarvesterFile,
+	fd loginp.FileDescriptor,
+	srcID string,
+	now time.Time,
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
-) {
-	now := time.Now()
-	files := make([]loginp.HarvesterFile, 0, len(paths))
-
-	for _, fd := range paths {
-		if fd.GZIP || fd.Info.Size() <= 0 || isFileIgnored(fd, now, ignoreOlder, ignoreInactiveSince) {
-			continue
-		}
-
-		files = append(files, loginp.HarvesterFile{
-			ID:   w.getFileIdentity(fd),
-			Size: fd.Info.Size(),
-		})
+) []loginp.HarvesterFile {
+	if fd.GZIP || fd.Info.Size() <= 0 || isFileIgnored(fd, now, ignoreOlder, ignoreInactiveSince) {
+		return files
 	}
 
-	metrics.UpdateHarvesterBuckets(files)
+	return append(files, loginp.HarvesterFile{
+		ID:   srcID,
+		Size: fd.Info.Size(),
+	})
 }
 
 // isFileIgnored returns true when a file is ignored, no matter the reason.
