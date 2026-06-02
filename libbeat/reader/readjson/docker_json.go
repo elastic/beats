@@ -43,8 +43,7 @@ type DockerJSONReader struct {
 	// parse CRI flags
 	criflags bool
 
-	// maximum number of bytes to use when reassembling partial CRI/docker log lines;
-	// limits growth while joining fragments but does not cap the size of the initial chunk.
+	// maximum number of bytes to use when reassembling partial CRI/docker log lines.
 	// A value of 0 means no limit is applied during reassembly.
 	maxBytes int
 
@@ -266,8 +265,18 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			}
 			if p.maxBytes > 0 && len(message.Content)+len(next.Content) > p.maxBytes {
 				remaining := p.maxBytes - len(message.Content)
-				if remaining > 0 {
+				if remaining < 0 {
+					// Just cutting the slice won't shrink the underlying array,
+					// so we create a slice the size we want and copy the data.
+					msg := make([]byte, p.maxBytes)
+					copy(msg, message.Content[:p.maxBytes])
+					message.Content = msg
+				} else if remaining > 0 {
 					message.Content = append(message.Content, next.Content[:remaining]...)
+					// Make sure the underlaying array is the same size as the content
+					msg := make([]byte, p.maxBytes)
+					copy(msg, message.Content)
+					message.Content = msg
 				}
 				_ = message.AddFlagsWithKey("log.flags", "truncated")
 				truncated = true
