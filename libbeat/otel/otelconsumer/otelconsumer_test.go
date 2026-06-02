@@ -679,43 +679,6 @@ func newTestESConsumer(t *testing.T, ctx context.Context) (consumer.Logs, <-chan
 	return logConsumer, docCh
 }
 
-// collectOtelDoc sends beatEvent through the OTel ES exporter using bodyFiller
-// to populate the log record body, and returns the raw JSON document captured
-// by the mock ES server.
-func collectOtelDoc(
-	t *testing.T,
-	ctx context.Context,
-	beatEvent beat.Event,
-	bodyFiller func(pcommon.Map, mapstr.M) error,
-) []byte {
-	t.Helper()
-
-	logConsumer, docCh := newTestESConsumer(t, ctx)
-
-	// Build plog.Logs mirroring otelConsumer.logsPublish so the ES exporter
-	// uses bodymap encoding.
-	ld := plog.NewLogs()
-	scopeLogs := ld.ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty()
-	scopeLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
-	logRecord := scopeLogs.LogRecords().AppendEmpty()
-	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(beatEvent.Timestamp))
-	logRecord.SetObservedTimestamp(pcommon.NewTimestampFromTime(beatEvent.Timestamp))
-	bodyMap := logRecord.Body().SetEmptyMap()
-	bodyMap.EnsureCapacity(len(beatEvent.Fields) + 1)
-	require.NoError(t, bodyFiller(bodyMap, beatEvent.Fields))
-	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(beatEvent.Timestamp))
-
-	require.NoError(t, logConsumer.ConsumeLogs(ctx, ld))
-
-	select {
-	case doc := <-docCh:
-		return doc
-	case <-ctx.Done():
-		t.Fatal("timed out waiting for OTel exporter to deliver document to mock server")
-		return nil
-	}
-}
-
 // collectOtelDocViaPublish sends beatEvent through the production
 // otelConsumer.Publish path and returns the raw JSON document captured by the
 // mock ES server.
