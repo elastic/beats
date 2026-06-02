@@ -54,27 +54,27 @@ Only count a source when it has an active offset entry, size is positive, the fi
 1. Extend `input-logfile.Metrics`.
    - Add three gauge fields.
    - Add a mutex-protected `map[string]*atomic.Int64` for active plain-file offsets.
-   - Add a `lastFileProgressMetrics` snapshot so shared gauges can be updated by delta, like `UpdateFileScanMetrics`.
+   - Add a `lastHarvesterMetrics` snapshot so shared gauges can be updated by delta, like `UpdateFileScanMetrics`.
    - Add helper methods:
-     - `RegisterFileOffset(id string, offset int64) *atomic.Int64`
-     - `UpdateFileIngestedBuckets(current FileIngestedMetrics)`
-     - `RemoveFileOffset(id string)`
-     - `CleanupFileProgressMetrics()`
+     - `RegisterHarvesterOffset(id string, offset int64) *atomic.Int64`
+     - `UpdateHarvesterBuckets(current HarvesterMetrics)`
+     - `RemoveHarvesterOffset(id string)`
+     - `CleanupHarvesterMetrics()`
    - Keep map mutation behind a mutex, but do not acquire that mutex from the harvester read loop.
 
 2. Add active offset API.
-   - `RegisterFileOffset` stores and returns a `*atomic.Int64`.
+   - `RegisterHarvesterOffset` stores and returns a `*atomic.Int64`.
    - The harvester keeps the returned offset pointer in a local variable for the lifetime of the run.
    - The read loop updates it directly with `offset.Store(s.Offset)`.
    - The watcher scan reads it directly with `offset.Load()`.
 
 3. Update file watcher scan path.
-   - In `fileWatcher.watch`, build a `FileIngestedMetrics` snapshot during the existing scan.
+   - In `fileWatcher.watch`, build a `HarvesterMetrics` snapshot during the existing scan.
    - For each current file, after calculating `srcID`, look up the active offset.
    - If there is no active offset, do not count the file.
    - If the file is GZIP, ignored, or size <= 0, do not count the file.
    - Load the latest offset from the `*atomic.Int64` and classify it against `fd.Info.Size()`.
-   - Call `metrics.UpdateFileIngestedBuckets(snapshot)` once per scan.
+   - Call `metrics.UpdateHarvesterBuckets(snapshot)` once per scan.
    - Reuse the existing ignore logic from `fileIgnoreReason`; do not count files ignored by `ignore_older`, `ignore_inactive`, include/exclude filters, fingerprint-too-small handling, empty-file handling, or any other scanner/prospector ignore path.
    - On rename, the active offset remains keyed by source ID. If the source ID changes, the old harvester should close/remove its offset entry and the new harvester should register a new one.
 
@@ -83,7 +83,7 @@ Only count a source when it has an active offset entry, size is positive, the fi
    - Pass the source ID into `readFromSource`, probably from `src.Name()` or from the outer `Run` context.
    - In `filestream.readFromSource`, after `s.Offset` advances, call `activeOffset.Store(s.Offset)` if an active offset exists.
    - Do not register or update progress for GZIP files.
-   - When the harvester closes, call `metrics.RemoveFileOffset(sourceID)` so closed files no longer contribute to the progress gauges.
+   - When the harvester closes, call `metrics.RemoveHarvesterOffset(sourceID)` so closed files no longer contribute to the progress gauges.
 
 5. Handle initial offset state.
    - After `initState`, before reading starts, register the current offset with metrics for non-GZIP files.
@@ -96,7 +96,7 @@ Only count a source when it has an active offset entry, size is positive, the fi
    - If a file becomes ignored while a harvester is still active, the watcher scan must exclude it from the bucket snapshot.
 
 7. Cleanup on input shutdown.
-   - In file watcher shutdown, call progress cleanup alongside `CleanupFileScanMetrics`.
+   - In file watcher shutdown, call harvester metrics cleanup alongside `CleanupFileScanMetrics`.
    - Ensure cleanup subtracts this input's current bucket contributions from shared aggregate gauges.
 
 ## Bucket Calculation
