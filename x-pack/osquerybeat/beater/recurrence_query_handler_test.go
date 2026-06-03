@@ -22,7 +22,7 @@ func TestRecurrenceQueryHandlerCreateScheduledQueryOptions(t *testing.T) {
 	removed := false
 	sq, err := handler.createScheduledQuery("q", config.Query{
 		Query:    "select 1",
-		Platform: "linux,darwin",
+		Platform: "all",
 		Version:  "5.11.0",
 		Snapshot: &snapshot,
 		Removed:  &removed,
@@ -40,7 +40,7 @@ func TestRecurrenceQueryHandlerCreateScheduledQueryOptions(t *testing.T) {
 	assert.Equal(t, "schedule-1", sq.ScheduleID())
 	assert.False(t, sq.Snapshot())
 	assert.False(t, sq.Removed())
-	assert.Equal(t, "linux,darwin", sq.Config.Platform)
+	assert.Equal(t, "all", sq.Config.Platform)
 	assert.Equal(t, "5.11.0", sq.Config.Version)
 }
 
