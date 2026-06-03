@@ -84,7 +84,7 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 			return Settings{}, fmt.Errorf("couldn't unpack pooledqueue config: %w", err)
 		}
 	}
-	return Settings{Events: parsed.Events}, nil
+	return Settings(parsed), nil
 }
 
 // FactoryForSettings returns a queue.QueueFactory[T] that gives each

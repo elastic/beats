@@ -108,9 +108,23 @@ type Producer[T any] interface {
 type Batch[T any] interface {
 	Count() int
 	Entry(i int) T
+	// Done signals that the consumer has successfully finished with this
+	// batch: producer ACK callbacks fire and any backing storage is
+	// released. This is the normal completion path.
 	Done()
-	// Release internal references to the contained events if supported
-	// (the disk queue does not currently implement this).
+	// Release returns the batch's backing storage to the queue WITHOUT
+	// firing producer ACK callbacks. Used by the pipeline on shutdown to
+	// reclaim queue-side resources for batches the consumer is abandoning.
+	// Implementations differ:
+	//   - memqueue: marks the batch cancelled and advances ackLoop past
+	//     it so subsequent batches' ACKs aren't stalled, but does not
+	//     fire the producer ACK callback.
+	//   - pooledqueue: returns slot indices to the pool's free list and
+	//     removes the batch from the queue's pending list. No ACK.
+	//   - diskqueue: no-op; events stay on disk for next-process recovery.
+	Release()
+	// FreeEntries releases internal references to the contained events if
+	// supported (the disk queue does not currently implement this).
 	// Entry() should not be used after this call.
 	FreeEntries()
 }

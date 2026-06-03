@@ -127,8 +127,17 @@ type batch[T any] struct {
 	start, count int
 
 	// batch.Done() sends to doneChan, where ackLoop reads it and handles
-	// acknowledgment / cleanup.
+	// acknowledgment / cleanup. batch.Release() also sends to doneChan
+	// but with batchDoneMsg.cancelled=true; ackLoop captures that flag
+	// here so processACK can skip the producer ACK callback while still
+	// freeing the underlying buffer slots.
 	doneChan chan batchDoneMsg
+
+	// cancelled is set by ackLoop when this batch was Released (abandoned)
+	// rather than Done'd. Read by processACK to skip the producer ACK
+	// callback while still counting the events for deletion from the ring
+	// buffer.
+	cancelled bool
 }
 
 type batchList[T any] struct {
@@ -404,4 +413,17 @@ func (b *batch[T]) FreeEntries() {
 
 func (b *batch[T]) Done() {
 	b.doneChan <- batchDoneMsg{}
+}
+
+// Release signals that the consumer is abandoning this batch — used by the
+// pipeline on shutdown when a batch has been read from the queue but
+// cannot be delivered. It removes the batch from ackLoop's pending list
+// (so subsequent batches' ACKs are not stalled behind it) and frees the
+// in-buffer slots, but does NOT fire producer ACK callbacks. This matches
+// memqueue's existing behaviour for batches abandoned by the consumer
+// not calling Done at all — except by making it explicit we also unblock
+// the ackLoop, which otherwise would sit forever on this batch's
+// doneChan and stall every batch queued behind it.
+func (b *batch[T]) Release() {
+	b.doneChan <- batchDoneMsg{cancelled: true}
 }

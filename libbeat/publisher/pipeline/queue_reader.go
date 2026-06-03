@@ -65,11 +65,13 @@ func (qr *queueReader) run(logger *logp.Logger) {
 		case <-qr.req:
 			// If the request channel unblocks before we've sent our response,
 			// it means we're shutting down and the pending request can be
-			// discarded. Drop the batch so its underlying queue.Batch.Done
-			// runs; for pooledqueue this returns the slot indices to the
-			// pool's free list, without which they would leak.
+			// discarded. Release the batch so the queue reclaims its
+			// backing storage (pooledqueue slot indices, memqueue ackLoop
+			// position) without firing producer ACK callbacks — Drop()
+			// would falsely signal successful delivery for an
+			// abandoned batch.
 			if batch != nil {
-				batch.Drop()
+				batch.Release()
 			}
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return

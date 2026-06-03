@@ -192,6 +192,9 @@ func (b *mockQueueBatch) Count() int {
 func (b *mockQueueBatch) Done() {
 }
 
+func (b *mockQueueBatch) Release() {
+}
+
 func (b *mockQueueBatch) Entry(i int) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{

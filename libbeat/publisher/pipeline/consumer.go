@@ -195,22 +195,22 @@ outerLoop:
 			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
-			// Drop any batches we're still holding so their underlying
-			// queue.Batch.Done callbacks fire. For pooledqueue this
-			// releases the slot indices back to the pool's free list;
-			// without this drop, those slot indices are leaked for the
-			// process lifetime and the pool's effective capacity
-			// silently shrinks. memqueue doesn't strictly need this
-			// (its accounting is handled by the broker GC) but Drop is
-			// safe there too.
+			// Release any batches we're still holding so the underlying
+			// queue can reclaim its backing storage without firing
+			// producer ACK callbacks. Release is the abandonment
+			// path: pooledqueue returns its slot indices to the pool's
+			// free list; memqueue advances ackLoop past the batch
+			// without invoking input ACK handlers; diskqueue is a
+			// no-op (events stay on disk for next-process recovery).
+			// We must NOT call Drop here — Drop signals successful
+			// delivery and would falsely advance input registries for
+			// events the consumer is abandoning.
 			if queueBatch != nil {
-				queueBatch.Drop()
-				queueBatch = nil
+				queueBatch.Release()
 			}
 			for _, rb := range retryBatches {
-				rb.Drop()
+				rb.Release()
 			}
-			retryBatches = nil
 			break outerLoop
 		}
 	}

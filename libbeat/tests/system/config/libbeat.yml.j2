@@ -53,10 +53,15 @@ processors:
 
 #================================ Queue =====================================
 
+{% if queue_type|default("mem") == "pooled" %}
+queue.pooled:
+  events: 4096
+{% else %}
 queue.mem:
   events: 4096
   flush.min_events: {{ flush_min_events|default(8) }}
   flush.timeout: 0.1s
+{% endif %}
 
 {% if kibana -%}
 setup.kibana.host: "{{ kibana.host }}"

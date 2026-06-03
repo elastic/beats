@@ -33,6 +33,11 @@ type ttlBatch struct {
 	// that this batch has been acknowledged.
 	done func()
 
+	// release is the queue.Batch.Release callback: returns backing
+	// storage to the queue without firing producer ACK callbacks. Set
+	// by newBatch from the wrapped queue.Batch.
+	release func()
+
 	// The internal hook back to the eventConsumer, used to implement the
 	// publisher.Batch retry interface.
 	retryer retryer
@@ -75,11 +80,24 @@ func newBatch(retryer retryer, original queue.Batch[publisher.Event], ttl int) *
 
 	b := &ttlBatch{
 		done:    original.Done,
+		release: original.Release,
 		retryer: retryer,
 		ttl:     ttl,
 		events:  events,
 	}
 	return b
+}
+
+// Release returns the batch's backing storage to the underlying queue
+// without firing producer ACK callbacks. Used by the pipeline on
+// shutdown to reclaim queue-side resources for batches the consumer is
+// abandoning — must not be called in normal completion paths (use ACK
+// or Drop for those).
+func (b *ttlBatch) Release() {
+	b.events = nil
+	if b.release != nil {
+		b.release()
+	}
 }
 
 func (b *ttlBatch) Events() []publisher.Event {

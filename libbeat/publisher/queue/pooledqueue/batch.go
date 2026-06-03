@@ -171,3 +171,66 @@ func (b *batch[T]) Done() {
 		}
 	}
 }
+
+// Release returns this batch's slot indices to the pool's free list
+// without firing producer ACK callbacks. Used by the pipeline on
+// shutdown when the consumer is abandoning a batch it cannot deliver;
+// pool slots must be reclaimed (otherwise the pool's effective capacity
+// shrinks for the process lifetime) but the producer must not be told
+// the events were delivered.
+//
+// Release is safe to call concurrently with Done on different batches;
+// it takes Queue.mu to remove this batch from the pending FIFO if it's
+// still there. Calling Release on a batch whose Done has already run
+// (slots already in pool.free) would double-release, so Release should
+// only be called on batches the consumer is *abandoning* — never after
+// any Done/Drop path.
+func (b *batch[T]) Release() {
+	pool := b.queue.pool
+
+	// Clear slot state and gather indices for release. Mirrors the
+	// slot-cleanup section of Done but skips the ackProducers/ackCounts
+	// collection — we explicitly do not want to fire callbacks.
+	var zero T
+	for _, i := range b.indices {
+		s := &pool.storage[i]
+		if !b.freed {
+			s.event = zero
+		}
+		s.producer = nil
+		s.next = -1
+	}
+
+	// Return slots to the pool. pool.free's buffer is sized to the slot
+	// count so this never blocks.
+	pool.observer.RemoveEvents(len(b.indices), 0)
+	for _, i := range b.indices {
+		pool.free <- i
+	}
+
+	// Remove the batch from the pending FIFO if it's still there.
+	// Done's sweep relies on the per-batch `done` flag and walks from
+	// the head; for a Released batch we just splice it out wherever it
+	// sits so a later Done on an earlier batch doesn't get stuck behind
+	// us (and so the sweep can still drain the prefix that's ready).
+	q := b.queue
+	q.mu.Lock()
+	var prev *batch[T]
+	for cur := q.pendingHead; cur != nil; cur = cur.next {
+		if cur == b {
+			if prev == nil {
+				q.pendingHead = cur.next
+			} else {
+				prev.next = cur.next
+			}
+			if q.pendingTail == cur {
+				q.pendingTail = prev
+			}
+			break
+		}
+		prev = cur
+	}
+	b.next = nil
+	q.maybeMarkDone()
+	q.mu.Unlock()
+}
