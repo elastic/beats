@@ -87,18 +87,18 @@ func (f *commonSettingsFactory) CheckConfig(cfg *conf.C) error {
 }
 
 func (f *commonSettingsFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
-	editor, sharedProcs, err := newCommonConfigEditor(f.info, cfg)
+	editor, sharedProcessors, err := newCommonConfigEditor(f.info, cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	r, err := f.inner.Create(pipetool.WithClientConfigEdit(pipeline, editor), cfg)
 	if err != nil {
-		_ = sharedProcs.Close()
+		_ = sharedProcessors.Close()
 		return nil, err
 	}
 
-	r.AddCloser(sharedProcs)
+	r.AddCloser(sharedProcessors)
 
 	return r, nil
 }
@@ -113,9 +113,7 @@ type InputRunner interface {
 	AddCloser(processors.Closer)
 }
 
-// InputRunnerFactory is the cfgfile.RunnerFactory variant whose runners are
-// InputRunners, so RunnerFactoryWithCommonInputSettings can attach the shared
-// processors without a runtime type assertion.
+// InputRunnerFactory is a variant of cfgfile.RunnerFactory whose runners are InputRunners.
 type InputRunnerFactory interface {
 	Create(pipeline beat.PipelineConnector, cfg *conf.C) (InputRunner, error)
 	CheckConfig(cfg *conf.C) error
@@ -129,10 +127,6 @@ type InputRunnerFactory interface {
 // cannot tear down or re-initialise state still used by sibling
 // harvesters. The shared instances are path-initialised and closed exactly
 // once by the owning input (see newCommonConfigEditor and InputRunner).
-//
-// This mirrors how pipeline-global processors are wrapped as a function
-// processor in libbeat/publisher/processing/default.go so that clients cannot
-// close them.
 type sharedProcessor struct {
 	beat.Processor
 }
@@ -167,29 +161,29 @@ func newCommonConfigEditor(
 func newConfigEditor(
 	beatInfo beat.Info,
 	config commonInputConfig,
-	userProcs *processors.Processors,
+	userProcessors *processors.Processors,
 ) (pipetool.ConfigEditor, *processors.Processors, error) {
 	serviceType := config.ServiceType
 	if serviceType == "" {
 		serviceType = config.Module
 	}
 
-	var indexProc beat.Processor
+	var indexProcessor beat.Processor
 	if !config.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
 		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
-			_ = userProcs.Close()
+			_ = userProcessors.Close()
 			return nil, nil, fmt.Errorf("failed to build the index processor: %w", err)
 		}
-		indexProc = add_formatted_index.New(timestampFormat)
+		indexProcessor = add_formatted_index.New(timestampFormat)
 	}
 
 	shared := processors.NewList(beatInfo.Logger)
-	if indexProc != nil {
-		shared.AddProcessor(indexProc)
+	if indexProcessor != nil {
+		shared.AddProcessor(indexProcessor)
 	}
-	shared.AddProcessors(*userProcs)
+	shared.AddProcessors(*userProcessors)
 
 	// Path-aware processors (cache, script, conditionals with path-aware
 	// children, ...) must have their paths set before Run, otherwise
@@ -230,13 +224,13 @@ func newConfigEditor(
 		// as flat siblings to preserve the client group's continue-on-error
 		// semantics (see TestProcessorsForConfigIsFlat).
 		procs := processors.NewList(beatInfo.Logger)
-		if indexProc != nil {
-			procs.AddProcessor(sharedProcessor{indexProc})
+		if indexProcessor != nil {
+			procs.AddProcessor(sharedProcessor{indexProcessor})
 		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
 		}
-		for _, p := range userProcs.List {
+		for _, p := range userProcessors.List {
 			procs.AddProcessor(sharedProcessor{p})
 		}
 
