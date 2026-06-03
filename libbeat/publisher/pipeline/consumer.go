@@ -195,6 +195,22 @@ outerLoop:
 			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
+			// Drop any batches we're still holding so their underlying
+			// queue.Batch.Done callbacks fire. For pooledqueue this
+			// releases the slot indices back to the pool's free list;
+			// without this drop, those slot indices are leaked for the
+			// process lifetime and the pool's effective capacity
+			// silently shrinks. memqueue doesn't strictly need this
+			// (its accounting is handled by the broker GC) but Drop is
+			// safe there too.
+			if queueBatch != nil {
+				queueBatch.Drop()
+				queueBatch = nil
+			}
+			for _, rb := range retryBatches {
+				rb.Drop()
+			}
+			retryBatches = nil
 			break outerLoop
 		}
 	}

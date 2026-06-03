@@ -66,14 +66,21 @@ func TestPipeline(t *testing.T) {
 		configTest(t, "pipeline", pipelineConfigs, func(t *testing.T, pipeline string) {
 			configTest(t, "out", outConfigs, func(t *testing.T, out string) {
 
+				// Reset and snapshot the global ack counter so each
+				// scenario reports its own throughput.
+				stress.AckedEventCount.Store(0)
+				start := time.Now()
 				if testing.Verbose() {
-					start := time.Now()
 					fmt.Printf("%v Start stress test %v\n", start.Format(time.RFC3339), t.Name())
-					defer func() {
-						end := time.Now()
-						fmt.Printf("%v Finished stress test %v. Duration=%v\n", end.Format(time.RFC3339), t.Name(), end.Sub(start))
-					}()
 				}
+				defer func() {
+					end := time.Now()
+					elapsed := end.Sub(start)
+					acked := stress.AckedEventCount.Load()
+					rate := float64(acked) / elapsed.Seconds()
+					fmt.Printf("STRESS %v: acked=%d duration=%v rate=%.0f events/s\n",
+						t.Name(), acked, elapsed.Round(time.Millisecond), rate)
+				}()
 
 				config, err := common.LoadFiles(gen, pipeline, out)
 				if err != nil {

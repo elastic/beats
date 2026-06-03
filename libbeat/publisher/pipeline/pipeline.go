@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -209,7 +210,7 @@ func NewForReceiver(
 		queueType = b
 	}
 	// Receiver pipelines route through the OTel output controller. With an
-	// in-memory queue configuration the controller uses the otelqueue pool
+	// in-memory queue configuration the controller uses the pooledqueue pool
 	// (a global default pool when no intake queue ID is set, or a pool
 	// keyed by the ID when one is). With an explicit queue.disk config the
 	// controller falls back to building its queue via queueFactory, in
@@ -370,6 +371,12 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *path
 			return nil, nil, err
 		}
 		return memqueue.FactoryForSettings[publisher.Event](settings), settings, nil
+	case pooledqueue.QueueType:
+		settings, err := pooledqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, nil, err
+		}
+		return pooledqueue.FactoryForSettings[publisher.Event](settings), settings, nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {

@@ -15,14 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelqueue
+package pooledqueue
 
 // batch is a queue.Batch[T] over a (possibly non-contiguous) slice of slot
 // indices into the pool's backing array.
+//
+// Concurrency: a batch instance flows along a strict hand-off path —
+// Queue.Get creates it, the eventConsumer hands it to an output worker
+// via a synchronizing channel send, and the worker is the sole caller
+// of FreeEntries (via newBatch in the pipeline package) and Done. Each
+// hand-off is a happens-before edge, so the non-atomic state below
+// (`freed`, and the post-Done sweep state) is safe without atomic ops.
+// The only multi-goroutine interaction is the sweep of pendingBatches
+// at the tail of Done, which is serialized through Queue.mu.
 type batch[T any] struct {
 	queue   *Queue[T]
 	indices []int
-	freed   bool // true after FreeEntries has cleared the events
+	freed   bool // true after FreeEntries has cleared the events; read/written by a single goroutine, ordering provided by the consumer→worker channel hand-off
 
 	// next links this batch into Queue.pendingHead/pendingTail, an intrusive
 	// FIFO of in-flight batches in publish order. Set under Queue.mu in Get
@@ -31,6 +40,7 @@ type batch[T any] struct {
 
 	// Filled in by Done() before marking the batch ready. The owning Queue
 	// invokes these in publish order as the pending list's prefix drains.
+	// Reads happen under Queue.mu in the sweep, after `done` is set true.
 	done         bool
 	ackProducers []*producer[T]
 	ackCounts    []int

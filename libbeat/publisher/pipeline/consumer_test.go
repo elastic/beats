@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -132,4 +133,58 @@ func TestEventConsumerRetryAfterCloseDropsBatch(t *testing.T) {
 
 	// setTarget after close should return without blocking.
 	c.setTarget(consumerTarget{})
+}
+
+// TestEventConsumerCloseReleasesHeldBatches verifies the shutdown-leak fix:
+// when the consumer's run loop is closed while it holds in-flight batches
+// (a fresh queueBatch from the reader or batches awaiting retry), those
+// batches' done callbacks must fire so the underlying queue can release
+// its slots. For pooledqueue this is load-bearing — slot indices are
+// permanently leaked from the pool's semaphore if Done never runs.
+func TestEventConsumerCloseReleasesHeldBatches(t *testing.T) {
+	const capacity = 8
+	pool := pooledqueue.NewPool[publisher.Event](pooledqueue.Settings{Events: capacity}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	defer q.Close(true)
+
+	p := q.Producer(queue.ProducerConfig{})
+	for i := 0; i < capacity; i++ {
+		_, ok := p.Publish(publisher.Event{Content: beat.Event{Private: i}})
+		require.True(t, ok)
+	}
+	require.Equal(t, 0, pool.Available(), "pool should be full after publishing capacity events")
+
+	c := newEventConsumer(logp.NewNopLogger(), nilObserver)
+
+	// Hand the consumer a target whose output channel is a real (but
+	// unread) channel. The run loop's request gate requires ch != nil
+	// to fire a queueReader read, so we need a real channel; nothing
+	// reads from it, so once the consumer has the batch the dispatch
+	// blocks and the batch sits in its queueBatch local.
+	out := make(chan publisher.Batch)
+	c.setTarget(consumerTarget{
+		queue:      q,
+		ch:         out,
+		batchSize:  capacity,
+		timeToLive: 3,
+	})
+
+	// Give the consumer time to pull the batch from the queue into its
+	// queueBatch local and then block on the unread `out`. There's no
+	// externally observable signal that the consumer has reached the
+	// dispatch step, so we sleep with a margin that's large enough for
+	// CI under load.
+	time.Sleep(100 * time.Millisecond)
+
+	// Close the consumer. Without the leak fix the held queueBatch (and
+	// any retry batches) would be silently dropped without releasing the
+	// pool's slot indices.
+	c.close()
+
+	require.Eventually(t, func() bool {
+		return pool.Available() == capacity
+	}, time.Second, 10*time.Millisecond,
+		"all slots must return to the pool after consumer close (got %d/%d)",
+		pool.Available(), capacity)
 }

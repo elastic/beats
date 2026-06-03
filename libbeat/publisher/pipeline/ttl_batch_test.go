@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/otelqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -122,12 +122,12 @@ func TestNewBatchFreesEvents(t *testing.T) {
 }
 
 // TestTTLBatchRetryDoesNotReleaseSlots verifies that retrying a ttlBatch
-// wrapping an otelqueue Batch keeps the underlying slots reserved for the
+// wrapping an pooledqueue Batch keeps the underlying slots reserved for the
 // entire retry chain — slots are only returned to the pool on final
 // ACK/Drop. This is what guarantees the queue's max-events budget can never
 // be violated even when batches bounce through the retry path repeatedly.
 func TestTTLBatchRetryDoesNotReleaseSlots(t *testing.T) {
-	pool := otelqueue.NewPool[publisher.Event](otelqueue.Settings{Events: 4}, nil)
+	pool := pooledqueue.NewPool[publisher.Event](pooledqueue.Settings{Events: 4}, nil)
 	defer pool.Shutdown()
 	q := pool.Connect()
 	defer q.Close(true)
@@ -163,7 +163,7 @@ func TestTTLBatchRetryDoesNotReleaseSlots(t *testing.T) {
 // when an output decides to drop a batch (e.g. permanent error or TTL
 // exhausted) the queue is not leaked.
 func TestTTLBatchDropReleasesSlots(t *testing.T) {
-	pool := otelqueue.NewPool[publisher.Event](otelqueue.Settings{Events: 2}, nil)
+	pool := pooledqueue.NewPool[publisher.Event](pooledqueue.Settings{Events: 2}, nil)
 	defer pool.Shutdown()
 	q := pool.Connect()
 	defer q.Close(true)

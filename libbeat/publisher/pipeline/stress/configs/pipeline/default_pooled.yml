@@ -1,0 +1,2 @@
+pipeline.queue.pooled:
+  events: 4096

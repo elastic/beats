@@ -15,9 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelqueue_test
+package pooledqueue_test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -27,7 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/otelqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -37,7 +38,7 @@ import (
 //     (one per input) all feeding the same FIFO, and one consumer worker
 //     loop. This is what `filebeat` looks like today with M inputs.
 //
-//   - otelqueue (Beat-receiver mode): one otelqueue.Pool of the same total
+//   - pooledqueue (Beat-receiver mode): one pooledqueue.Pool of the same total
 //     capacity, but with M Queue façades — one per receiver — each with its
 //     own producer and its own consumer goroutine. This is what the receiver
 //     path looks like with M receivers.
@@ -53,7 +54,7 @@ import (
 //
 // Run locally with:
 //
-//   go test -run=^$ -bench=. -benchmem -benchtime=2s ./libbeat/publisher/queue/otelqueue/...
+//   go test -run=^$ -bench=. -benchmem -benchtime=2s ./libbeat/publisher/queue/pooledqueue/...
 
 type benchEvent struct {
 	id int
@@ -61,7 +62,7 @@ type benchEvent struct {
 
 // benchPipelines is the set of input/receiver counts we sweep. For memqueue
 // this is the number of producers feeding the single shared queue. For
-// otelqueue it is the number of Queue façades (one per receiver).
+// pooledqueue it is the number of Queue façades (one per receiver).
 var benchPipelines = []int{1, 4, 8, 16}
 
 // benchTotalCapacity is the queue/pool's total event budget — the same value
@@ -103,15 +104,15 @@ func BenchmarkMemqueueShared(b *testing.B) {
 	}
 }
 
-// BenchmarkOTelQueuePool models Beat-receiver mode: one shared pool with the
-// same total capacity, but each receiver gets its own Queue façade and its
-// own consumer goroutine. receivers=N means N façades, N producers, N
-// consumers.
-func BenchmarkOTelQueuePool(b *testing.B) {
+// BenchmarkPooledQueuePool models multi-pipeline mode: one shared pool
+// with the same total capacity, but each pipeline gets its own Queue
+// façade and its own consumer goroutine. receivers=N means N façades,
+// N producers, N consumers.
+func BenchmarkPooledQueuePool(b *testing.B) {
 	for _, m := range benchPipelines {
 		b.Run(fmt.Sprintf("receivers=%d", m), func(b *testing.B) {
-			pool := otelqueue.NewPool[benchEvent](
-				otelqueue.Settings{Events: benchTotalCapacity}, nil,
+			pool := pooledqueue.NewPool[benchEvent](
+				pooledqueue.Settings{Events: benchTotalCapacity}, nil,
 			)
 
 			queues := make([]queue.Queue[benchEvent], m)
@@ -192,4 +193,49 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 	// Close the queues so the consumer goroutines unblock from Get with io.EOF.
 	closeQueues()
 	consumerWG.Wait()
+}
+
+// BenchmarkProducerThroughput mirrors memqueue's BenchmarkProducerThroughput
+// (libbeat/publisher/queue/memqueue/queue_test.go) for direct EPS
+// comparison: 10 producer goroutines feed a single 10,000-slot queue
+// while one consumer drains batches.
+//
+// Because pooledqueue's Get returns immediately with whatever events are
+// available (no FlushTimeout / MaxGetRequest equivalent), per-iteration
+// batch size varies. To make the comparison fair we count events actually
+// processed and report events/s via b.ReportMetric; the memqueue
+// benchmark's events/s can be derived as queueSize / ns-per-op since it
+// always drains a full batch.
+func BenchmarkProducerThroughput(b *testing.B) {
+	const queueSize = 10000
+	const publishWorkers = 10
+
+	pool := pooledqueue.NewPool[int](pooledqueue.Settings{Events: queueSize}, nil)
+	defer pool.Shutdown()
+	testQueue := pool.Connect()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	publishWorker := func() {
+		producer := testQueue.Producer(queue.ProducerConfig{})
+		for ctx.Err() == nil {
+			producer.Publish(0)
+		}
+	}
+	for range publishWorkers {
+		go publishWorker()
+	}
+	var totalEvents int64
+	for b.Loop() {
+		batch, err := testQueue.Get(queueSize)
+		if err != nil {
+			b.Fatal("Fetching queue batch should succeed")
+		}
+		totalEvents += int64(batch.Count())
+		batch.Done()
+	}
+	if elapsed := b.Elapsed().Seconds(); elapsed > 0 {
+		b.ReportMetric(float64(totalEvents)/elapsed, "events/s")
+	}
+	cancel()
+	_ = testQueue.Close(true)
 }

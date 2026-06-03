@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelqueue
+package pooledqueue
 
 import (
 	"io"
@@ -191,7 +191,7 @@ func (q *Queue[T]) Close(force bool) error {
 func (q *Queue[T]) Done() <-chan struct{} { return q.doneCh }
 
 // QueueType identifies the implementation.
-func (q *Queue[T]) QueueType() string { return "otelqueue" }
+func (q *Queue[T]) QueueType() string { return QueueType }
 
 // BufferConfig reports the pool's capacity. Note: this is the *shared* upper
 // bound across all queues connected to the same pool, not a per-queue cap.

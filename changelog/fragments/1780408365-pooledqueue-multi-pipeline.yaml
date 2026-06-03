@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add pooledqueue, a new in-memory publisher queue that shares a single event budget across multiple pipelines while keeping per-pipeline FIFOs isolated. Selectable via queue.pooled (~2.5× throughput vs queue.mem in stress tests); used by default in Beat receivers to support multi-receiver intake queue sharing.
+component: beats

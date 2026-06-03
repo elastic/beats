@@ -28,21 +28,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/otelqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var _ outputController = (*otelOutputController)(nil)
 
 // otelOutputController is the per-pipeline outputController for a Beat
-// receiver. By default the receiver path uses the otelqueue pool: an
+// receiver. By default the receiver path uses the pooledqueue pool: an
 // explicit intake queue ID joins the pool registered under that name, and
 // no ID joins the global default pool. Either way the pool is shared
 // across every receiver with the same ID, keeping a single in-memory event
 // budget across all of them while keeping each receiver's FIFO independent
 // (so a slow consumer on one receiver doesn't block others).
 //
-// The only escape hatch from otelqueue is an explicit disk queue
+// The only escape hatch from pooledqueue is an explicit disk queue
 // configuration (queue.disk). In that case the receiver builds its own
 // queue from the user-supplied factory — sharing is not supported for disk
 // queues, so an intake queue ID combined with queue.disk is rejected.
@@ -53,10 +53,10 @@ type otelOutputController struct {
 
 	intakeQueueID string
 	queue         queue.Queue[publisher.Event]
-	// pool is non-nil whenever the receiver uses the otelqueue pool (i.e.
+	// pool is non-nil whenever the receiver uses the pooledqueue pool (i.e.
 	// queue.mem); it is nil when the receiver was configured with queue.disk
 	// and owns its queue outright via queueFactory.
-	pool *otelqueue.Pool[publisher.Event]
+	pool *pooledqueue.Pool[publisher.Event]
 
 	consumer *eventConsumer
 
@@ -64,14 +64,24 @@ type otelOutputController struct {
 	workerChan chan publisher.Batch
 }
 
-// sharedPool tracks one otelqueue.Pool together with its connected pipeline
-// count, for ref-counted lifecycle of pools indexed by intake queue ID.
+// sharedPool tracks one pooledqueue.Pool together with its connected
+// pipeline count, for ref-counted lifecycle of pools indexed by intake
+// queue ID.
+//
+// All fields are protected by allOTelPools.Mutex — sharedPool itself
+// carries no lock, and instances live only inside allOTelPools.lookup,
+// so a sharedPool value should never be touched outside a section that
+// holds the registry lock.
 type sharedPool struct {
-	pool     *otelqueue.Pool[publisher.Event]
+	pool     *pooledqueue.Pool[publisher.Event]
 	settings memqueue.Settings // remembered so later joiners can be validated
 	refs     int
 }
 
+// allOTelPools is the process-global registry of pooledqueue.Pools keyed
+// by intake queue ID. The embedded mutex protects both `lookup` and every
+// field of every *sharedPool it contains; callers must always acquire it
+// before reading or modifying either.
 var allOTelPools = struct {
 	sync.Mutex
 	lookup map[string]*sharedPool
@@ -89,10 +99,10 @@ func newOTelOutputController(
 ) (*otelOutputController, error) {
 	var (
 		pipelineQueue queue.Queue[publisher.Event]
-		pool          *otelqueue.Pool[publisher.Event]
+		pool          *pooledqueue.Pool[publisher.Event]
 	)
 
-	// The default receiver path uses the otelqueue pool: when queueConfig
+	// The default receiver path uses the pooledqueue pool: when queueConfig
 	// is a memqueue.Settings (the default; also any explicit queue.mem),
 	// we go through acquireOTelPool. Anything else (in practice
 	// diskqueue.Settings from an explicit queue.disk) opts out and builds
@@ -166,13 +176,13 @@ func closePipelineQueue(q queue.Queue[publisher.Event]) {
 	_ = q.Close(true)
 }
 
-// acquireOTelPool returns the otelqueue.Pool for the given intake queue ID,
+// acquireOTelPool returns the pooledqueue.Pool for the given intake queue ID,
 // creating it if necessary. The empty string is the global default ID:
 // every receiver started without an explicit intake queue ID joins the
 // same global pool. Settings mismatches against an already-registered ID
 // (including the global one) return an error.
-func acquireOTelPool(intakeQueueID string, settings memqueue.Settings, monitors Monitors) (*otelqueue.Pool[publisher.Event], error) {
-	poolSettings := otelqueue.Settings{Events: settings.Events}
+func acquireOTelPool(intakeQueueID string, settings memqueue.Settings, monitors Monitors) (*pooledqueue.Pool[publisher.Event], error) {
+	poolSettings := pooledqueue.Settings{Events: settings.Events}
 
 	allOTelPools.Lock()
 	defer allOTelPools.Unlock()
@@ -184,7 +194,7 @@ func acquireOTelPool(intakeQueueID string, settings memqueue.Settings, monitors 
 		monitors.Logger.Debugf("newOTelOutputController: joining existing pool for intake queue ID %q (%v pipelines connected)", intakeQueueID, existing.refs)
 		return existing.pool, nil
 	}
-	pool := otelqueue.NewPool[publisher.Event](poolSettings, observerForMonitors(monitors))
+	pool := pooledqueue.NewPool[publisher.Event](poolSettings, observerForMonitors(monitors))
 	allOTelPools.lookup[intakeQueueID] = &sharedPool{pool: pool, settings: settings, refs: 1}
 	monitors.Logger.Debugf("newOTelOutputController: created new pool for intake queue ID %q", intakeQueueID)
 	return pool, nil
@@ -248,6 +258,6 @@ func (c *otelOutputController) queueProducer(config queue.ProducerConfig) queue.
 
 // poolForTest exposes the underlying pool for tests; it is not part of the
 // outputController interface and must not be used outside tests.
-func (c *otelOutputController) poolForTest() *otelqueue.Pool[publisher.Event] {
+func (c *otelOutputController) poolForTest() *pooledqueue.Pool[publisher.Event] {
 	return c.pool
 }
