@@ -1,0 +1,5 @@
+kind: bug-fix
+
+summary: Propagate osquery live-query space IDs to action response events.
+
+component: osquerybeat
