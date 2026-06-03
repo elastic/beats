@@ -140,7 +140,24 @@ func (b *batch[T]) Done() {
 		q.pendingTail = nil
 	}
 	q.maybeMarkDone()
+	forced := q.forced.Load()
 	q.mu.Unlock()
+
+	// Slots are already back in the pool above; the remaining work is
+	// invoking producer ACK callbacks for any batches whose turn in the
+	// publish-order FIFO has come up.
+	//
+	// Suppress ACK callbacks once the queue has been force-closed.
+	// Force-close means the caller explicitly abandoned in-flight events
+	// (Close(true) released FIFO slots without acking them); reporting
+	// ACKs for the parallel set of in-flight batches that were already
+	// out at workers would be inconsistent and could mislead
+	// order-sensitive consumers (e.g. filestream's registry tracker).
+	// This matches memqueue's behaviour: its ackLoop exits on force-
+	// close and no further producer ACK callbacks fire.
+	if forced {
+		return
+	}
 
 	// Invoke ACK callbacks outside the lock in publish (Get) order. A
 	// callback that re-publishes through this queue will be free to take the

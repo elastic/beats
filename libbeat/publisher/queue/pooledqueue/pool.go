@@ -95,21 +95,27 @@ func (p *Pool[T]) Connect() *Queue[T] {
 	return q
 }
 
-// Shutdown closes the pool, signaling any pending Publish calls to return.
-// Per-pipeline queues should normally be closed first; Shutdown is the
-// pool-level final teardown.
+// Shutdown closes the pool and force-closes every connected Queue. Callers
+// typically Close each queue individually first; Shutdown then completes the
+// pool-level teardown. Calling Shutdown without a prior per-queue Close
+// is still safe — the force-close path here ensures each queue's doneCh
+// fires so anything waiting on q.Done() unblocks. Without this, the pool
+// would close pool.closed (unblocking Get) but leave doneCh unset because
+// q.closing was never assigned, deadlocking any q.Done() observer.
 func (p *Pool[T]) Shutdown() {
 	p.closeOnce.Do(func() {
 		close(p.closed)
-		// Wake any queues blocked in Get.
 		p.mu.Lock()
 		queues := make([]*Queue[T], 0, len(p.queues))
 		for q := range p.queues {
 			queues = append(queues, q)
 		}
 		p.mu.Unlock()
+		// Close is idempotent, so queues the caller already closed are
+		// not affected. Force is used because pool.Shutdown is itself a
+		// "we're done with this pool" signal — no graceful drain.
 		for _, q := range queues {
-			q.signal()
+			_ = q.Close(true)
 		}
 	})
 }

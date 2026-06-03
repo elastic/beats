@@ -408,6 +408,109 @@ func TestCloseForceReleasesSlots(t *testing.T) {
 	}
 }
 
+// TestShutdownUnblocksDoneWithoutPriorClose verifies that calling
+// pool.Shutdown when a Queue was never explicitly Closed still unblocks
+// callers waiting on q.Done(). Previously Shutdown would only close
+// pool.closed (which unblocks Get) but never set q.closing, so
+// q.doneCh would never fire and any goroutine on <-q.Done()
+// deadlocked.
+func TestShutdownUnblocksDoneWithoutPriorClose(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	q := pool.Connect()
+
+	doneFired := make(chan struct{})
+	go func() {
+		<-q.Done()
+		close(doneFired)
+	}()
+
+	// Shut down the pool *without* calling q.Close first. doneFired
+	// must close shortly after.
+	pool.Shutdown()
+
+	select {
+	case <-doneFired:
+		// expected
+	case <-time.After(time.Second):
+		t.Fatal("q.Done() did not fire after pool.Shutdown — deadlock")
+	}
+}
+
+// TestForceCloseClearsPendingHead verifies the state invariant that a
+// force-closed queue holds no references to in-flight batches in its
+// pending list. The batches themselves remain referenced by their
+// owning workers; clearing the queue's view of them just keeps the
+// queue's internal state consistent with "we have given up on these".
+func TestForceCloseClearsPendingHead(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	p := q.Producer(queue.ProducerConfig{})
+	p.Publish(1)
+	p.Publish(2)
+
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	require.NotNil(t, b)
+
+	// Before close: a batch is in the pending list.
+	q.mu.Lock()
+	preClose := q.pendingHead
+	q.mu.Unlock()
+	require.NotNil(t, preClose, "pendingHead should reference the in-flight batch before close")
+
+	q.Close(true)
+
+	q.mu.Lock()
+	postCloseHead := q.pendingHead
+	postCloseTail := q.pendingTail
+	q.mu.Unlock()
+	assert.Nil(t, postCloseHead, "force-close must clear pendingHead")
+	assert.Nil(t, postCloseTail, "force-close must clear pendingTail")
+
+	// Completing the still-held batch must still release slots and not
+	// fire any callback.
+	b.Done()
+	assert.Equal(t, 4, pool.Available(), "slots must still return to the pool after force-close")
+}
+
+// TestForceCloseSuppressesACKCallbacks verifies that force-closing a
+// queue prevents producer ACK callbacks from firing for in-flight
+// batches whose workers complete after the close. Slots are still
+// released to the pool, but the caller has explicitly given up on
+// these events and reporting acks for a subset would mislead
+// order-sensitive consumers.
+func TestForceCloseSuppressesACKCallbacks(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+
+	ackCount := 0
+	p := q.Producer(queue.ProducerConfig{ACK: func(n int) { ackCount += n }})
+	p.Publish(1)
+	p.Publish(2)
+
+	// Get the batch into "in-flight" state — slots reserved, not yet
+	// acked.
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	require.Equal(t, 2, b.Count())
+
+	// Force-close the queue. The worker (us) still holds an in-flight
+	// batch and will eventually call Done on it; that's the case
+	// memqueue suppresses and we now match.
+	q.Close(true)
+
+	// Complete the batch. Slots must return, but the producer ACK
+	// callback must not fire.
+	b.Done()
+
+	assert.Equal(t, 4, pool.Available(),
+		"slots must return to the pool even when ACK callback is suppressed")
+	assert.Equal(t, 0, ackCount,
+		"producer ACK callback must NOT fire after force-close (got %d)", ackCount)
+}
+
 // TestCloseGracefulWaitsForDrain verifies Close(false) waits for in-flight
 // events to be acked before Done() fires.
 func TestCloseGracefulWaitsForDrain(t *testing.T) {

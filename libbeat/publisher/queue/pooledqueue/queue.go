@@ -123,11 +123,22 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 	}
 }
 
-// Close shuts down the queue. With force=false the queue continues to deliver
-// already-queued events; once they all drain (Get returns them and the
-// resulting batches are acked), Done() unblocks. With force=true any remaining
-// in-flight events are released back to the pool and Done() unblocks
-// immediately.
+// Close shuts down the queue.
+//
+// With force=false the queue continues to deliver already-queued events;
+// once they all drain (Get returns them and the resulting batches are
+// acked), Done() unblocks and producer ACK callbacks fire normally for
+// every event that was delivered.
+//
+// With force=true any events still in the FIFO are released back to the
+// pool and Done() unblocks immediately. ACK callbacks are suppressed for
+// every event affected by the force-close: the released FIFO events get
+// no callback (they were abandoned), and in-flight batches still held by
+// workers will release their slots when batch.Done eventually runs but
+// will not invoke producer ACK callbacks. This matches memqueue's
+// force-close semantics — the caller explicitly gave up on these events
+// and consumers that depend on ACK ordering would be misled by partial
+// acks for an abandoned set.
 func (q *Queue[T]) Close(force bool) error {
 	if force {
 		q.forced.Store(true)
@@ -137,17 +148,28 @@ func (q *Queue[T]) Close(force bool) error {
 		q.closing = true
 	}
 	var releaseIndices []int
-	if force && q.count > 0 {
-		// Walk the FIFO and gather the slots so we can release them back to the
-		// pool below (outside the lock, since pool.free is a channel).
-		cur := q.head
-		for cur != -1 {
-			releaseIndices = append(releaseIndices, cur)
-			cur = q.pool.storage[cur].next
+	if force {
+		if q.count > 0 {
+			// Walk the FIFO and gather the slots so we can release them back to
+			// the pool below (outside the lock, since pool.free is a channel).
+			cur := q.head
+			for cur != -1 {
+				releaseIndices = append(releaseIndices, cur)
+				cur = q.pool.storage[cur].next
+			}
+			q.head = -1
+			q.tail = -1
+			q.count = 0
 		}
-		q.head = -1
-		q.tail = -1
-		q.count = 0
+		// Drop the in-flight batch list. The batches themselves are still
+		// held by workers and will run their Done callback in the normal
+		// course; that path observes q.forced and suppresses ACK
+		// callbacks (see batch.Done). Clearing the list here ensures
+		// "force-closed queue holds no pending batches" as a state
+		// invariant — a reader inspecting Queue internals after Close
+		// won't see references that the queue logically abandoned.
+		q.pendingHead = nil
+		q.pendingTail = nil
 	}
 	q.mu.Unlock()
 
