@@ -68,12 +68,6 @@ func TestFileScanMetricsUpdate(t *testing.T) {
 func TestHarvesterMetricsUpdate(t *testing.T) {
 	metrics := NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
-	baseline := HarvesterMetrics{
-		FilesIngestedPercent100:    metrics.FilesIngestedPercent100.Get(),
-		FilesIngestedPercent95To99: metrics.FilesIngestedPercent95To99.Get(),
-		FilesIngestedPercentLt95:   metrics.FilesIngestedPercentLt95.Get(),
-	}
-
 	// Simulate the Harvester registering files and the ingested offset.
 	// The offsets are all at boundary value.
 	completeOffset, _ := metrics.RegisterHarvesterOffset("complete", 100)
@@ -93,14 +87,14 @@ func TestHarvesterMetricsUpdate(t *testing.T) {
 		{ID: "not-active", Size: 100}, // aka: not registered with 'RegisterHarvesterOffset'
 		{ID: "zero-size", Size: 0},
 	})
-	assert.Equal(t, baseline.FilesIngestedPercent100+1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
-	assert.Equal(t, baseline.FilesIngestedPercent95To99+1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
-	assert.Equal(t, baseline.FilesIngestedPercentLt95+1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
 
 	// Simulate harvester updating the offset after publishing an event
-	completeOffset.Store(100)
-	nearOffset.Store(100)
-	laggingOffset.Store(99)
+	completeOffset.Store(100) // continues 100% ingested
+	nearOffset.Store(100)     // moves from 95to99 bucket to 100 bucket
+	laggingOffset.Store(99)   // moves from Lt95 bucket to 95to99 bucket
 
 	// Simulate the scanner calling UpdateHarvesterBuckets with the file sizes.
 	// No change in file sizes, however some files don't exist any more.
@@ -109,9 +103,9 @@ func TestHarvesterMetricsUpdate(t *testing.T) {
 		{ID: "near", Size: 100},
 		{ID: "lagging", Size: 100},
 	})
-	assert.Equal(t, baseline.FilesIngestedPercent100+2, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after second update")
-	assert.Equal(t, baseline.FilesIngestedPercent95To99+1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after second update")
-	assert.Equal(t, baseline.FilesIngestedPercentLt95, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after second update")
+	assert.EqualValues(t, 2, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after second update")
+	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after second update")
+	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after second update")
 }
 
 func TestHarvesterMetricsAddFile(t *testing.T) {
@@ -212,19 +206,6 @@ func TestHarvesterOffsetRegistration(t *testing.T) {
 func TestMetricsCleanup(t *testing.T) {
 	metrics := NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
-	scanBaseline := FileScanMetrics{
-		FilesMatched:        metrics.FilesMatched.Get(),
-		FilesUnique:         metrics.FilesUnique.Get(),
-		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
-		FilesIgnored:        metrics.FilesIgnored.Get(),
-		FilesEmpty:          metrics.FilesEmpty.Get(),
-	}
-	harvesterBaseline := HarvesterMetrics{
-		FilesIngestedPercent100:    metrics.FilesIngestedPercent100.Get(),
-		FilesIngestedPercent95To99: metrics.FilesIngestedPercent95To99.Get(),
-		FilesIngestedPercentLt95:   metrics.FilesIngestedPercentLt95.Get(),
-	}
-
 	metrics.UpdateFileScanMetrics(FileScanMetrics{
 		FilesMatched:        5,
 		FilesUnique:         4,
@@ -239,14 +220,8 @@ func TestMetricsCleanup(t *testing.T) {
 
 	metrics.Cleanup()
 
-	assert.EqualValues(t, scanBaseline.FilesMatched, metrics.FilesMatched.Get(), "files_matched after cleanup")
-	assert.EqualValues(t, scanBaseline.FilesUnique, metrics.FilesUnique.Get(), "files_unique after cleanup")
-	assert.EqualValues(t, scanBaseline.FilesNoIngestTarget, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target after cleanup")
-	assert.EqualValues(t, scanBaseline.FilesIgnored, metrics.FilesIgnored.Get(), "files_ignored after cleanup")
-	assert.EqualValues(t, scanBaseline.FilesEmpty, metrics.FilesEmpty.Get(), "files_empty after cleanup")
-	assert.EqualValues(t, harvesterBaseline.FilesIngestedPercent100, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after cleanup")
-	assert.EqualValues(t, harvesterBaseline.FilesIngestedPercent95To99, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after cleanup")
-	assert.EqualValues(t, harvesterBaseline.FilesIngestedPercentLt95, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after cleanup")
+	assert.Equal(t, FileScanMetrics{}, metrics.lastFileScanMetrics, "file scan metrics snapshot after cleanup")
+	assert.Equal(t, HarvesterMetrics{}, metrics.lastHarvesterMetrics, "harvester metrics snapshot after cleanup")
 	_, ok := metrics.harvesterOffsets["test-id"]
 	assert.False(t, ok, "cleanup should remove active harvester offsets")
 }

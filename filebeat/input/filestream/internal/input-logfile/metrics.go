@@ -106,10 +106,18 @@ type HarvesterFile struct {
 }
 
 func (m *HarvesterMetrics) addFile(offset, size int64) {
+	// 95% is 19/20. Use integer math to avoid float precision issues and to
+	// avoid multiplication like offset*100 >= size*95, which can overflow int64.
+	// This is equivalent to ceil(size*0.95):
+	// - size=100 -> threshold=95
+	// - size=101 -> threshold=96
+	// - size=19  -> threshold=19
+	nearCompleteThreshold := size - size/20
+
 	switch {
 	case offset >= size:
 		m.FilesIngestedPercent100++
-	case offset >= size-size/20:
+	case offset >= nearCompleteThreshold:
 		m.FilesIngestedPercent95To99++
 	default:
 		m.FilesIngestedPercentLt95++
