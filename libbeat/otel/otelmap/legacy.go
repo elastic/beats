@@ -105,7 +105,7 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 			s := make([]any, len(x))
 			for i, v := range x {
 				f64 := float32ToFloat64(v)
-				if isFloatWholeNumber(f64) {
+				if isFloat32WholeNumber(v) {
 					s[i] = int64(f64)
 				} else {
 					s[i] = f64
@@ -115,7 +115,7 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 		case []float64:
 			s := make([]any, len(x))
 			for i, v := range x {
-				if isFloatWholeNumber(v) {
+				if isFloat64WholeNumber(v) {
 					s[i] = int64(v)
 				} else {
 					s[i] = v
@@ -132,13 +132,13 @@ func legacyConvertNonPrimitive[T mapstrOrMap](m T) {
 			m[key] = s
 		case float32:
 			f64 := float32ToFloat64(x)
-			if isFloatWholeNumber(f64) {
+			if isFloat32WholeNumber(x) {
 				m[key] = int64(f64)
 			} else {
 				m[key] = f64
 			}
 		case float64:
-			if isFloatWholeNumber(x) {
+			if isFloat64WholeNumber(x) {
 				m[key] = int64(x)
 			}
 		case nil, string, int, int8, int16, int32, int64, uint8, uint16, uint32, bool:

@@ -484,7 +484,7 @@ func TestIsFloatWholeNumber(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.want, isFloatWholeNumber(tc.f))
+			assert.Equal(t, tc.want, isFloat64WholeNumber(tc.f))
 		})
 	}
 }
