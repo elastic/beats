@@ -80,7 +80,7 @@ func (k *kubeAnnotatorConfig) Validate() error {
 	}
 
 	if k.WaitMetadataRetryPeriod <= 0 {
-		return fmt.Errorf("wait_for_metadata_retry_period must greater than zero")
+		return fmt.Errorf("wait_for_metadata_retry_period must be greater than zero")
 	}
 
 	if k.WaitMetadataTimeout != 0 && k.WaitMetadataRetryPeriod > k.WaitMetadataTimeout {
