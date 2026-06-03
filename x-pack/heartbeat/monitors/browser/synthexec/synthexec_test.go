@@ -24,7 +24,26 @@ import (
 
 	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestCheckGroupFromEvent(t *testing.T) {
+	t.Run("reads monitor.check_group", func(t *testing.T) {
+		event := &beat.Event{Fields: mapstr.M{}}
+		_, err := event.PutValue("monitor.check_group", "abc-1")
+		require.NoError(t, err)
+		require.Equal(t, "abc-1", checkGroupFromEvent(event))
+	})
+
+	t.Run("empty when absent", func(t *testing.T) {
+		require.Equal(t, "", checkGroupFromEvent(&beat.Event{Fields: mapstr.M{}}))
+	})
+
+	t.Run("empty for nil event", func(t *testing.T) {
+		require.Equal(t, "", checkGroupFromEvent(nil))
+	})
+}
 
 func TestSyntheticsCrosslinkEnv(t *testing.T) {
 	tests := []struct {

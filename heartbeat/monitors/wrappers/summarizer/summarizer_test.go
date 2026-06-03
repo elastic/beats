@@ -34,6 +34,29 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestStateStatusPluginBeforeEachEventSetsCheckGroup(t *testing.T) {
+	tracker := monitorstate.NewTracker(monitorstate.NilStateLoader, false)
+	sf := stdfields.StdMonitorFields{ID: "testmon", Name: "testmon", Type: "browser", MaxAttempts: 1}
+
+	t.Run("browser", func(t *testing.T) {
+		p := NewBrowserStateStatusplugin(tracker, sf)
+		event := &beat.Event{Fields: mapstr.M{}}
+		p.BeforeEachEvent(event)
+		cg, err := event.GetValue("monitor.check_group")
+		require.NoError(t, err)
+		require.Equal(t, p.cssp.checkGroup+"-1", cg)
+	})
+
+	t.Run("lightweight", func(t *testing.T) {
+		p := NewLightweightStateStatusPlugin(tracker, sf)
+		event := &beat.Event{Fields: mapstr.M{}}
+		p.BeforeEachEvent(event)
+		cg, err := event.GetValue("monitor.check_group")
+		require.NoError(t, err)
+		require.Equal(t, p.cssp.checkGroup+"-1", cg)
+	})
+}
+
 func TestSummarizer(t *testing.T) {
 	t.Parallel()
 	charToStatus := func(c uint8) monitorstate.StateStatus {

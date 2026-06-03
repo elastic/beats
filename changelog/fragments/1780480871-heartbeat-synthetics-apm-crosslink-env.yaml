@@ -19,7 +19,8 @@ description: >
   Inject the monitor id, type, location and execution trace id as environment
   variables (ELASTIC_SYNTHETICS_*) when spawning the @elastic/synthetics runner,
   so its APM plugin can cross-link synthetics journey executions with the APM
-  data of the traced application.
+  data of the traced application. The trace id is the monitor.check_group of the
+  current attempt, so it matches the value published on the heartbeat documents.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
 component: "heartbeat"

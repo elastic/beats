@@ -93,7 +93,16 @@ func InlineJourneyJob(ctx context.Context, script string, params func() map[stri
 func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys, sFields, senr.checkGroup)
+		// Prefer the published monitor.check_group (set by the summarizer's
+		// BeforeEachEvent before this job runs) so the APM trace id matches the
+		// value stored on the heartbeat documents. Fall back to the stream
+		// enricher's own check group when running outside the summarizer (e.g.
+		// unit tests).
+		traceID := checkGroupFromEvent(event)
+		if traceID == "" {
+			traceID = senr.checkGroup
+		}
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys, sFields, traceID)
 		if err != nil {
 			err := senr.enrich(event, &SynthEvent{
 				Type:  "cmd/could_not_start",
@@ -119,6 +128,22 @@ func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich 
 			return nil, err
 		}
 	}
+}
+
+// checkGroupFromEvent extracts the monitor.check_group value from the event, if
+// present. The summarizer sets this before the synthetics process is spawned so
+// it can be used as the APM trace id, keeping it identical to the check group
+// published on the heartbeat documents.
+func checkGroupFromEvent(event *beat.Event) string {
+	if event == nil {
+		return ""
+	}
+	if v, err := event.GetValue("monitor.check_group"); err == nil {
+		if cg, ok := v.(string); ok {
+			return cg
+		}
+	}
+	return ""
 }
 
 // syntheticsCrosslinkEnv builds the environment variables consumed by the
