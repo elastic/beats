@@ -232,19 +232,6 @@ func (m *Metrics) RegisterHarvesterOffset(id string, offset int64) (*atomic.Int6
 	return activeOffset, cleanup
 }
 
-// TODO: Delete me
-func (m *Metrics) findHarvesterOffset(id string) (*atomic.Int64, bool) {
-	if m == nil {
-		return nil, false
-	}
-
-	m.harvesterMetricsMu.Lock()
-	defer m.harvesterMetricsMu.Unlock()
-
-	offset, ok := m.harvesterOffsets[id]
-	return offset, ok
-}
-
 // UpdateHarvesterBuckets updates the aggregate harvester progress gauges from
 // the current scanner-observed file snapshot.
 func (m *Metrics) UpdateHarvesterBuckets(files []HarvesterFile) {

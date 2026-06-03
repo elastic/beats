@@ -186,13 +186,13 @@ func TestHarvesterOffsetRegistration(t *testing.T) {
 	firstOffset, cleanupFirstOffset := metrics.RegisterHarvesterOffset("test-id", 10)
 	assert.NotNil(t, firstOffset, "registered harvester offset should not be nil")
 
-	offset, ok := metrics.findHarvesterOffset("test-id")
+	offset, ok := metrics.harvesterOffsets["test-id"]
 	assert.True(t, ok, "registered harvester offset should be found")
 	assert.Same(t, firstOffset, offset, "registered harvester offset should match returned offset")
 	assert.EqualValues(t, 10, offset.Load(), "registered harvester offset")
 
 	firstOffset.Store(42)
-	offset, ok = metrics.findHarvesterOffset("test-id")
+	offset, ok = metrics.harvesterOffsets["test-id"]
 	assert.True(t, ok, "updated harvester offset should be found")
 	assert.EqualValues(t, 42, offset.Load(), "updated harvester offset")
 
@@ -200,12 +200,12 @@ func TestHarvesterOffsetRegistration(t *testing.T) {
 	assert.NotSame(t, firstOffset, secondOffset, "re-registering should create a new active harvester offset")
 
 	cleanupFirstOffset()
-	offset, ok = metrics.findHarvesterOffset("test-id")
+	offset, ok = metrics.harvesterOffsets["test-id"]
 	assert.True(t, ok, "removing a stale harvester offset should keep the current one")
 	assert.Same(t, secondOffset, offset, "stale harvester removal should not remove current offset")
 
 	cleanupSecondOffset()
-	_, ok = metrics.findHarvesterOffset("test-id")
+	_, ok = metrics.harvesterOffsets["test-id"]
 	assert.False(t, ok, "removing the active harvester offset should clear it")
 }
 
@@ -228,6 +228,6 @@ func TestHarvesterMetricsCleanup(t *testing.T) {
 	assert.EqualValues(t, baseline.FilesIngestedPercent100, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after cleanup")
 	assert.EqualValues(t, baseline.FilesIngestedPercent95To99, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after cleanup")
 	assert.EqualValues(t, baseline.FilesIngestedPercentLt95, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after cleanup")
-	_, ok := metrics.findHarvesterOffset("test-id")
+	_, ok := metrics.harvesterOffsets["test-id"]
 	assert.False(t, ok, "cleanup should remove active harvester offsets")
 }
