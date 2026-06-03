@@ -74,7 +74,7 @@ func TestClient(t *testing.T) {
 		defer func() {
 			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 			defer cancel()
-			pipeline.Disconnect(ctx) // nolint: errcheck // we can ignore the error here
+			pipeline.Disconnect(ctx) //nolint:errcheck
 		}()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
