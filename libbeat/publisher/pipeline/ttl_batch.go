@@ -57,13 +57,26 @@ type ttlBatch struct {
 }
 
 type batchSplitData struct {
-	// The original done callback, to be invoked when all split batches
-	// descending from it have been completed.
+	// originalDone is the wrapped queue.Batch.Done — invoked when every
+	// descendant of the original batch has been Done()'d (no abandonment).
 	originalDone func()
 
-	// The number of events awaiting acknowledgment from the original
-	// batch. When this reaches zero, originalDone should be invoked.
+	// originalRelease is the wrapped queue.Batch.Release — invoked when
+	// the last descendant of the original batch finishes AND at least one
+	// descendant was Release()'d (abandoned). This keeps the at-least-
+	// once contract: a partially abandoned batch must not signal
+	// successful delivery to the input via originalDone.
+	originalRelease func()
+
+	// outstandingEvents counts events still awaiting completion from
+	// either Done or Release. When it reaches zero, one of
+	// originalDone/originalRelease fires (chosen by anyReleased).
 	outstandingEvents atomic.Int64
+
+	// anyReleased is set true the first time a descendant invokes its
+	// release callback. If set when outstandingEvents hits zero,
+	// originalRelease fires instead of originalDone.
+	anyReleased atomic.Bool
 }
 
 func newBatch(retryer retryer, original queue.Batch[publisher.Event], ttl int) *ttlBatch {
@@ -89,10 +102,15 @@ func newBatch(retryer retryer, original queue.Batch[publisher.Event], ttl int) *
 }
 
 // Release returns the batch's backing storage to the underlying queue
-// without firing producer ACK callbacks. Used by the pipeline on
-// shutdown to reclaim queue-side resources for batches the consumer is
-// abandoning — must not be called in normal completion paths (use ACK
-// or Drop for those).
+// without firing producer ACK callbacks. It is the abandonment path,
+// to be used only on pipeline shutdown — see queue.Batch.Release for
+// the caller contract. ACK / Drop are the normal completion paths.
+//
+// For a batch created by SplitRetry, the release callback decrements
+// the shared outstanding-events counter and, when all descendants
+// finish, invokes the original queue.Batch.Release if any descendant
+// was Released (preserving at-least-once for partially abandoned
+// splits).
 func (b *ttlBatch) Release() {
 	b.events = nil
 	if b.release != nil {
@@ -129,7 +147,8 @@ func (b *ttlBatch) SplitRetry() bool {
 	if splitData == nil {
 		// Splitting a previously unsplit batch, create the metadata
 		splitData = &batchSplitData{
-			originalDone: b.done,
+			originalDone:    b.done,
+			originalRelease: b.release,
 		}
 		// Initialize to the number of events in the original batch
 		splitData.outstandingEvents.Add(int64(len(b.events)))
@@ -140,6 +159,7 @@ func (b *ttlBatch) SplitRetry() bool {
 	b.retryer.retry(&ttlBatch{
 		events:  events1,
 		done:    splitData.doneCallback(len(events1)),
+		release: splitData.releaseCallback(len(events1)),
 		retryer: b.retryer,
 		ttl:     b.ttl,
 		split:   splitData,
@@ -147,6 +167,7 @@ func (b *ttlBatch) SplitRetry() bool {
 	b.retryer.retry(&ttlBatch{
 		events:  events2,
 		done:    splitData.doneCallback(len(events2)),
+		release: splitData.releaseCallback(len(events2)),
 		retryer: b.retryer,
 		ttl:     b.ttl,
 		split:   splitData,
@@ -154,15 +175,46 @@ func (b *ttlBatch) SplitRetry() bool {
 	return true
 }
 
-// returns a callback to acknowledge the given number of events from
-// a batch fragment.
+// doneCallback returns a callback used as a descendant batch's done
+// hook: it decrements outstandingEvents by eventCount and, when the
+// last descendant finishes, invokes the original Done — unless any
+// sibling was Released, in which case originalRelease fires instead.
 func (splitData *batchSplitData) doneCallback(eventCount int) func() {
 	return func() {
 		remaining := splitData.outstandingEvents.Add(-int64(eventCount))
 		if remaining == 0 {
-			splitData.originalDone()
+			splitData.completeOriginal()
 		}
 	}
+}
+
+// releaseCallback returns a callback used as a descendant batch's
+// release hook: it records that abandonment occurred and, on the last
+// descendant, invokes originalRelease (never originalDone — once any
+// descendant is abandoned, the whole batch is treated as abandoned for
+// at-least-once correctness).
+func (splitData *batchSplitData) releaseCallback(eventCount int) func() {
+	return func() {
+		splitData.anyReleased.Store(true)
+		remaining := splitData.outstandingEvents.Add(-int64(eventCount))
+		if remaining == 0 {
+			splitData.completeOriginal()
+		}
+	}
+}
+
+// completeOriginal invokes the appropriate terminal callback on the
+// wrapped queue.Batch — Release if any descendant was abandoned,
+// otherwise Done. Called from doneCallback / releaseCallback exactly
+// once, when outstandingEvents reaches zero.
+func (splitData *batchSplitData) completeOriginal() {
+	if splitData.anyReleased.Load() {
+		if splitData.originalRelease != nil {
+			splitData.originalRelease()
+		}
+		return
+	}
+	splitData.originalDone()
 }
 
 func (b *ttlBatch) Retry() {

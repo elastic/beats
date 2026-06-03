@@ -122,6 +122,17 @@ type Batch[T any] interface {
 	//   - pooledqueue: returns slot indices to the pool's free list and
 	//     removes the batch from the queue's pending list. No ACK.
 	//   - diskqueue: no-op; events stay on disk for next-process recovery.
+	//
+	// Caller contract — IMPORTANT: Release must only be invoked when no
+	// further Done()s are expected from the same producer. In practice
+	// that means it is only safe to call from a pipeline-wide shutdown
+	// path (currently eventConsumer.run's shutdown handler and
+	// queueReader.run's shutdown handler). Calling Release on a batch
+	// while other batches from the same producer are still in flight
+	// would leave a hole in the producer's ACK accounting: subsequent
+	// Done callbacks would compute a count that includes the abandoned
+	// events, causing the input registry to advance over undelivered
+	// data. This invariant is honored by every caller in this repo.
 	Release()
 	// FreeEntries releases internal references to the contained events if
 	// supported (the disk queue does not currently implement this).

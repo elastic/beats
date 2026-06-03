@@ -424,6 +424,15 @@ func (b *batch[T]) Done() {
 // not calling Done at all — except by making it explicit we also unblock
 // the ackLoop, which otherwise would sit forever on this batch's
 // doneChan and stall every batch queued behind it.
+//
+// Caller contract — IMPORTANT: see queue.Batch.Release. Release must
+// only be invoked when no further batches from the same producer will
+// be Done()'d; in this repo that means it is only safe from a
+// pipeline-wide shutdown path. Calling Release mid-flight leaves a
+// hole in the producer's ACK accounting (lastACK is not advanced past
+// the abandoned producer IDs by design, so a subsequent Done from the
+// same producer would over-count and falsely advance the input
+// registry).
 func (b *batch[T]) Release() {
 	b.doneChan <- batchDoneMsg{cancelled: true}
 }

@@ -185,6 +185,11 @@ func (b *batch[T]) Done() {
 // (slots already in pool.free) would double-release, so Release should
 // only be called on batches the consumer is *abandoning* — never after
 // any Done/Drop path.
+//
+// Caller contract — IMPORTANT: see queue.Batch.Release. Release must
+// only be invoked when no further batches from the same producer are
+// in flight. In this repo Release is reached only on pipeline
+// shutdown, where that invariant holds.
 func (b *batch[T]) Release() {
 	pool := b.queue.pool
 

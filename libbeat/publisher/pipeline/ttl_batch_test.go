@@ -96,6 +96,123 @@ func TestNestedBatchSplit(t *testing.T) {
 	assert.True(t, doneWasCalled, "Original callback should be invoked when all children are")
 }
 
+// TestSplitRetryAllChildrenDone verifies the unchanged happy path: when
+// every descendant of a split batch is Done()'d, originalDone fires and
+// originalRelease does not.
+func TestSplitRetryAllChildrenDone(t *testing.T) {
+	retryer := &mockRetryer{}
+	events := make([]publisher.Event, 4)
+	doneCalled := false
+	releaseCalled := false
+
+	root := &ttlBatch{
+		events:  events,
+		retryer: retryer,
+		done:    func() { doneCalled = true },
+		release: func() { releaseCalled = true },
+	}
+	require.True(t, root.SplitRetry(), "SplitRetry should succeed")
+	require.Len(t, retryer.batches, 2)
+
+	// Done every descendant.
+	for _, b := range retryer.batches {
+		b.done()
+	}
+	assert.True(t, doneCalled, "all-Done → originalDone fires")
+	assert.False(t, releaseCalled, "all-Done → originalRelease must NOT fire")
+}
+
+// TestSplitRetryAnyChildReleased verifies the at-least-once contract:
+// if at least one descendant of a split batch is Released (abandoned),
+// originalRelease fires instead of originalDone — even if siblings were
+// Done()'d normally. Without this, a partially abandoned split would
+// report a successful delivery and falsely advance the input registry.
+func TestSplitRetryAnyChildReleased(t *testing.T) {
+	retryer := &mockRetryer{}
+	events := make([]publisher.Event, 4)
+	doneCalled := false
+	releaseCalled := false
+
+	root := &ttlBatch{
+		events:  events,
+		retryer: retryer,
+		done:    func() { doneCalled = true },
+		release: func() { releaseCalled = true },
+	}
+	require.True(t, root.SplitRetry())
+	require.Len(t, retryer.batches, 2)
+
+	// One descendant is Released (e.g. consumer shut down while it was
+	// in retryBatches), the other gets Done.
+	retryer.batches[0].release()
+	assert.False(t, doneCalled, "Original must not fire until all descendants finish")
+	assert.False(t, releaseCalled, "Original must not fire until all descendants finish")
+
+	retryer.batches[1].done()
+	assert.False(t, doneCalled, "originalDone must NOT fire when any descendant was Released")
+	assert.True(t, releaseCalled, "originalRelease must fire when any descendant was Released")
+}
+
+// TestSplitRetryAllChildrenReleased verifies the fully-abandoned path:
+// every descendant Released → originalRelease fires exactly once.
+func TestSplitRetryAllChildrenReleased(t *testing.T) {
+	retryer := &mockRetryer{}
+	events := make([]publisher.Event, 4)
+	doneCalled := false
+	releaseCount := 0
+
+	root := &ttlBatch{
+		events:  events,
+		retryer: retryer,
+		done:    func() { doneCalled = true },
+		release: func() { releaseCount++ },
+	}
+	require.True(t, root.SplitRetry())
+
+	for _, b := range retryer.batches {
+		b.release()
+	}
+	assert.False(t, doneCalled, "originalDone must not fire on full release")
+	assert.Equal(t, 1, releaseCount, "originalRelease must fire exactly once")
+}
+
+// TestSplitRetryReleaseInheritedThroughNestedSplit verifies that the
+// release path survives splitting a child batch again. The leaf
+// batches still share the original's batchSplitData and a Release on
+// any leaf still trips originalRelease at completion.
+func TestSplitRetryReleaseInheritedThroughNestedSplit(t *testing.T) {
+	retryer := &mockRetryer{}
+	events := make([]publisher.Event, 4)
+	doneCalled := false
+	releaseCalled := false
+
+	root := &ttlBatch{
+		events:  events,
+		retryer: retryer,
+		done:    func() { doneCalled = true },
+		release: func() { releaseCalled = true },
+	}
+	require.True(t, root.SplitRetry())
+	firstLevel := retryer.batches
+	retryer.batches = nil
+
+	for _, b := range firstLevel {
+		require.True(t, b.SplitRetry(), "nested SplitRetry should succeed")
+	}
+	require.Len(t, retryer.batches, 4)
+
+	// Three leaves Done, one Released.
+	for i, b := range retryer.batches {
+		if i == 0 {
+			b.release()
+		} else {
+			b.done()
+		}
+	}
+	assert.False(t, doneCalled, "originalDone must NOT fire when any leaf was Released")
+	assert.True(t, releaseCalled, "originalRelease must fire when any leaf was Released, even across nested splits")
+}
+
 func TestBatchCallsDoneAndFreesEvents(t *testing.T) {
 	doneCalled := false
 	batch := &ttlBatch{
