@@ -65,7 +65,7 @@ func (r *noopRunner) Stop() {
 		_ = c.Close()
 	}
 }
-func (*noopRunner) String() string                 { return "noopRunner" }
+func (*noopRunner) String() string                  { return "noopRunner" }
 func (r *noopRunner) AddCloser(c processors.Closer) { r.closers = append(r.closers, c) }
 
 var _ InputRunner = (*noopRunner)(nil)

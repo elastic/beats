@@ -74,7 +74,7 @@ func TestCombine_CheckConfig(t *testing.T) {
 			factory := Combine(test.factory, test.fallback)
 			cfg := conf.MustNewConfigFrom(struct{ Type string }{"test"})
 			err := factory.CheckConfig(cfg)
-			if test.want != err {
+			if !errors.Is(err, test.want) {
 				t.Fatalf("Failed. Want: %v, Got: %v", test.want, err)
 			}
 		})
@@ -86,7 +86,7 @@ func TestCombine_Create(t *testing.T) {
 
 	wantError := func(want error) validation {
 		return func(t *testing.T, _ channel.InputRunner, got error) {
-			if want != got {
+			if !errors.Is(got, want) {
 				t.Fatalf("Wrong error. Want: %v, Got: %v", want, got)
 			}
 		}
