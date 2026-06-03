@@ -191,11 +191,23 @@ func (m *Metrics) UpdateFileScanMetrics(current FileScanMetrics) {
 	m.lastFileScanMetrics = current
 }
 
-// CleanupFileScanMetrics removes this input's last file scan contribution from
-// the shared aggregate scan gauges. Call this during input/prospector shutdown
-// so stale scan counts are not left behind after an input stops or restarts.
-func (m *Metrics) CleanupFileScanMetrics() {
+// Cleanup removes this input's last metric contributions from shared aggregate
+// gauges. Call this during input/prospector shutdown so stale counts are not
+// left behind after an input stops or restarts.
+func (m *Metrics) Cleanup() {
+	if m == nil {
+		return
+	}
+
+	// Clean up the file scan metrics
 	m.UpdateFileScanMetrics(FileScanMetrics{})
+
+	// Cleanup harvester metrics
+	m.harvesterMetricsMu.Lock()
+	defer m.harvesterMetricsMu.Unlock()
+
+	m.updateHarvesterBucketsLocked(HarvesterMetrics{})
+	clear(m.harvesterOffsets)
 }
 
 // RegisterHarvesterOffset registers an active harvester offset and returns the
@@ -268,18 +280,4 @@ func (m *Metrics) updateHarvesterBucketsLocked(current HarvesterMetrics) {
 	m.FilesIngestedPercentLt95.Add(current.FilesIngestedPercentLt95 - m.lastHarvesterMetrics.FilesIngestedPercentLt95)
 
 	m.lastHarvesterMetrics = current
-}
-
-// CleanupHarvesterMetrics removes this input's harvester metric contribution
-// from the shared aggregate gauges and clears active harvester offsets.
-func (m *Metrics) CleanupHarvesterMetrics() {
-	if m == nil {
-		return
-	}
-
-	m.harvesterMetricsMu.Lock()
-	defer m.harvesterMetricsMu.Unlock()
-
-	m.updateHarvesterBucketsLocked(HarvesterMetrics{})
-	clear(m.harvesterOffsets)
 }

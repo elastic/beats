@@ -140,8 +140,7 @@ func (w *fileWatcher) Run(
 	ignoreInactiveSince time.Time,
 ) {
 	defer close(w.events)
-	defer metrics.CleanupFileScanMetrics()
-	defer metrics.CleanupHarvesterMetrics()
+	defer metrics.Cleanup()
 
 	// run initial scan before starting regular
 	w.watch(ctx, metrics, ignoreOlder, ignoreInactiveSince)
@@ -340,7 +339,7 @@ func (w *fileWatcher) watch(
 			createdCount++
 		}
 
-		// The previous for loop has an early return for new files,
+		// The previous for loop has an early continue for new files,
 		// so we need to collect their metrics here.
 		harvesterFiles = appendHarvesterFile(harvesterFiles, *fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 	}
