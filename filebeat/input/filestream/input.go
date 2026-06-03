@@ -547,7 +547,9 @@ func (inp *filestream) open(
 	// TODO(AndersonQ): The raw-hex encoded fingerprint CANNOT be on the logs as
 	//  it exposes the file content on the logs. Which might leak sensitive
 	//  information.
-	//  the possibility to have a fingerprint that changes
+	//  https://github.com/elastic/beats/issues/50725 addresses removing it from logs
+	//
+	//  also, the possibility to have a fingerprint that changes
 	//  becomes an issue here: the fingerprint cannot be updated as the file grows.
 	//  It's only updated on file open, not on OpWrite. It's already an issue for
 	//  the path: if a file is renamed, the events are published with the old path.
