@@ -34,7 +34,7 @@ func heartbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 	base := []map[string]interface{}{}
 	// Filter streams without a explicit type, as UnnestStream did
 	for _, input := range inputs {
-		if _, ok := input["type"]; !ok {
+		if _, ok := input["type"]; ok {
 			base = append(base, input)
 			break
 		}
