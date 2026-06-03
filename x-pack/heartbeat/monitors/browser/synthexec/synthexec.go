@@ -93,7 +93,7 @@ func InlineJourneyJob(ctx context.Context, script string, params func() map[stri
 func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys, sFields, senr.checkGroup)
 		if err != nil {
 			err := senr.enrich(event, &SynthEvent{
 				Type:  "cmd/could_not_start",
@@ -121,6 +121,28 @@ func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich 
 	}
 }
 
+// syntheticsCrosslinkEnv builds the environment variables consumed by the
+// @elastic/synthetics APM plugin to cross-link a synthetics journey execution
+// with the APM data of the application it traces. Only non-empty values are
+// emitted so the synthetics agent can fall back to its own defaults.
+func syntheticsCrosslinkEnv(traceID string, sFields stdfields.StdMonitorFields) []string {
+	var env []string
+	add := func(key, val string) {
+		if val != "" {
+			env = append(env, key+"="+val)
+		}
+	}
+
+	add("ELASTIC_SYNTHETICS_TRACE_ID", traceID)
+	add("ELASTIC_SYNTHETICS_MONITOR_ID", sFields.ID)
+	add("ELASTIC_SYNTHETICS_MONITOR_TYPE", sFields.Type)
+	if sFields.RunFrom != nil {
+		add("ELASTIC_SYNTHETICS_MONITOR_LOCATION", sFields.RunFrom.ID)
+	}
+
+	return env
+}
+
 // runCmd runs the given command, piping stdinStr if present to the command's stdin, and supplying
 // the params var as a CLI argument.
 func runCmd(
@@ -129,6 +151,8 @@ func runCmd(
 	stdinStr *string,
 	params func() map[string]interface{},
 	filterJourneys FilterJourneyConfig,
+	sFields stdfields.StdMonitorFields,
+	traceID string,
 ) (mpx *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
@@ -142,6 +166,9 @@ func runCmd(
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
+	// Expose the monitor context to the synthetics runner so its APM plugin can
+	// cross-link the journey execution with the traced application's APM data.
+	cmd.Env = append(cmd.Env, syntheticsCrosslinkEnv(traceID, sFields)...)
 	cmd.Args = append(cmd.Args, "--rich-events")
 
 	if len(filterJourneys.Tags) > 0 {

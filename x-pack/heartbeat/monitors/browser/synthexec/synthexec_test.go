@@ -21,7 +21,52 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
+
+	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 )
+
+func TestSyntheticsCrosslinkEnv(t *testing.T) {
+	tests := []struct {
+		name    string
+		traceID string
+		sFields stdfields.StdMonitorFields
+		want    []string
+	}{
+		{
+			name:    "all fields",
+			traceID: "trace-1",
+			sFields: stdfields.StdMonitorFields{
+				ID:      "monitor-1",
+				Type:    "browser",
+				RunFrom: &hbconfig.LocationWithID{ID: "us-east"},
+			},
+			want: []string{
+				"ELASTIC_SYNTHETICS_TRACE_ID=trace-1",
+				"ELASTIC_SYNTHETICS_MONITOR_ID=monitor-1",
+				"ELASTIC_SYNTHETICS_MONITOR_TYPE=browser",
+				"ELASTIC_SYNTHETICS_MONITOR_LOCATION=us-east",
+			},
+		},
+		{
+			name:    "omits empty values and nil location",
+			traceID: "",
+			sFields: stdfields.StdMonitorFields{Type: "browser"},
+			want:    []string{"ELASTIC_SYNTHETICS_MONITOR_TYPE=browser"},
+		},
+		{
+			name:    "nil when nothing is set",
+			traceID: "",
+			sFields: stdfields.StdMonitorFields{},
+			want:    nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.want, syntheticsCrosslinkEnv(tt.traceID, tt.sFields))
+		})
+	}
+}
 
 func TestLineToSynthEventFactory(t *testing.T) {
 	testType := "mytype"
@@ -209,7 +254,7 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time
 	cmd.Dir = filepath.Join(cwd, "testcmd")
 	ctx := context.WithValue(context.TODO(), SynthexecTimeoutKey, cmdTimeout)
 
-	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{})
+	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{}, stdfields.StdMonitorFields{}, "")
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
