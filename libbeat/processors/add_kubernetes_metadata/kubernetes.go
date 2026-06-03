@@ -153,8 +153,8 @@ func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		// the k8s node is not yet ready.
 		processor.wg.Add(1)
 		go func() {
+			defer processor.wg.Done()
 			_ = processor.init(ctx, config, cfg)
-			processor.wg.Done()
 		}()
 	}
 
