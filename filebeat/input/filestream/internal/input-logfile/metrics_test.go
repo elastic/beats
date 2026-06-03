@@ -29,40 +29,25 @@ import (
 func TestFileScanMetricsUpdate(t *testing.T) {
 	metrics := NewMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
 
-	// Create an "empty" baseline
-	baseline := FileScanMetrics{
-		FilesMatched:        metrics.FilesMatched.Get(),
-		FilesUnique:         metrics.FilesUnique.Get(),
-		FilesNoIngestTarget: metrics.FilesNoIngestTarget.Get(),
-		FilesIgnored:        metrics.FilesIgnored.Get(),
-		FilesEmpty:          metrics.FilesEmpty.Get(),
-	}
-
-	metrics.UpdateFileScanMetrics(FileScanMetrics{
+	firstScan := FileScanMetrics{
 		FilesMatched:        10,
 		FilesUnique:         6,
 		FilesNoIngestTarget: 3,
 		FilesIgnored:        1,
 		FilesEmpty:          2,
-	})
-	assert.Equal(t, baseline.FilesMatched+10, metrics.FilesMatched.Get(), "files_matched")
-	assert.Equal(t, baseline.FilesUnique+6, metrics.FilesUnique.Get(), "files_unique")
-	assert.Equal(t, baseline.FilesNoIngestTarget+3, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target")
-	assert.Equal(t, baseline.FilesIgnored+1, metrics.FilesIgnored.Get(), "files_ignored")
-	assert.Equal(t, baseline.FilesEmpty+2, metrics.FilesEmpty.Get(), "files_empty")
+	}
+	metrics.UpdateFileScanMetrics(firstScan)
+	assert.Equal(t, firstScan, metrics.lastFileScanMetrics, "file scan metrics after first update")
 
-	metrics.UpdateFileScanMetrics(FileScanMetrics{
+	secondScan := FileScanMetrics{
 		FilesMatched:        12,
 		FilesUnique:         5,
 		FilesNoIngestTarget: 4,
 		FilesIgnored:        0,
 		FilesEmpty:          1,
-	})
-	assert.Equal(t, baseline.FilesMatched+12, metrics.FilesMatched.Get(), "files_matched after second update")
-	assert.Equal(t, baseline.FilesUnique+5, metrics.FilesUnique.Get(), "files_unique after second update")
-	assert.Equal(t, baseline.FilesNoIngestTarget+4, metrics.FilesNoIngestTarget.Get(), "files_no_ingest_target after second update")
-	assert.Equal(t, baseline.FilesIgnored, metrics.FilesIgnored.Get(), "files_ignored after second update")
-	assert.Equal(t, baseline.FilesEmpty+1, metrics.FilesEmpty.Get(), "files_empty after second update")
+	}
+	metrics.UpdateFileScanMetrics(secondScan)
+	assert.Equal(t, secondScan, metrics.lastFileScanMetrics, "file scan metrics after second update")
 }
 
 func TestHarvesterMetricsUpdate(t *testing.T) {
@@ -87,9 +72,11 @@ func TestHarvesterMetricsUpdate(t *testing.T) {
 		{ID: "not-active", Size: 100}, // aka: not registered with 'RegisterHarvesterOffset'
 		{ID: "zero-size", Size: 0},
 	})
-	assert.EqualValues(t, 1, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100")
-	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99")
-	assert.EqualValues(t, 1, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95")
+	assert.Equal(t, HarvesterMetrics{
+		FilesIngestedPercent100:    1,
+		FilesIngestedPercent95To99: 1,
+		FilesIngestedPercentLt95:   1,
+	}, metrics.lastHarvesterMetrics, "harvester metrics after first update")
 
 	// Simulate harvester updating the offset after publishing an event
 	completeOffset.Store(100) // continues 100% ingested
@@ -103,9 +90,10 @@ func TestHarvesterMetricsUpdate(t *testing.T) {
 		{ID: "near", Size: 100},
 		{ID: "lagging", Size: 100},
 	})
-	assert.EqualValues(t, 2, metrics.FilesIngestedPercent100.Get(), "files_ingested_percent_100 after second update")
-	assert.EqualValues(t, 1, metrics.FilesIngestedPercent95To99.Get(), "files_ingested_percent_95_99 after second update")
-	assert.EqualValues(t, 0, metrics.FilesIngestedPercentLt95.Get(), "files_ingested_percent_lt_95 after second update")
+	assert.Equal(t, HarvesterMetrics{
+		FilesIngestedPercent100:    2,
+		FilesIngestedPercent95To99: 1,
+	}, metrics.lastHarvesterMetrics, "harvester metrics after second update")
 }
 
 func TestHarvesterMetricsAddFile(t *testing.T) {
