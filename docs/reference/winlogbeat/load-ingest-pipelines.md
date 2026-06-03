@@ -17,6 +17,14 @@ Winlogbeat will send ingest pipelines automatically to {{es}} if the {{es}} outp
 
 Make sure the user specified in `winlogbeat.yml` is [authorized to set up Winlogbeat](/reference/winlogbeat/privileges-to-setup-beats.md).
 
+To disable automatic pipeline loading during normal publishing, set:
+
+```yaml
+setup.pipelines.enabled: false
+```
+
+Use this setting only when the required pipelines have already been loaded or are managed separately.
+
 If Winlogbeat is sending events to {{ls}} or another output you need to load the ingest pipelines with the `setup` command or manually.
 
 

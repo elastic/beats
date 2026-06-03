@@ -1,3 +1,3 @@
-kind: bug-fix
+kind: enhancement
 summary: Respect setup.pipelines.enabled when loading ingest pipelines during normal Beat publishing.
 component: filebeat, packetbeat, winlogbeat
