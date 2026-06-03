@@ -278,8 +278,8 @@ func TestCloseWaitsForInFlightPublish(t *testing.T) {
 func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
+	pipeline := makePipeline(t, Settings{}, q)
 	defer pipeline.Disconnect(t.Context()) //nolint:errcheck
-	defer pipeline.Disconnect(t.Context()) // nolint: errcheck // we can ignore the error here
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
 		routinesChecker := resources.NewGoroutinesChecker()
