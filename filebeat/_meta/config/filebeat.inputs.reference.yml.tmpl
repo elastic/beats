@@ -448,6 +448,16 @@ filebeat.inputs:
   # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
 
+  # Enhanced Fingerprint behavior. When enabled (the default since 9.5),
+  # files smaller than the configured fingerprint size (prospector.scanner
+  # .fingerprint offset + length) are tracked using the raw bytes available
+  # so far, instead of being skipped until they grow large enough. Once a
+  # file reaches the fingerprint size it is migrated to the regular SHA-256
+  # fingerprint with no data duplication. Set to false to restore the
+  # pre-9.5 behavior.
+  #file_identity.fingerprint:
+  #  growing: true
+
   # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
   #include_file_owner_name: false
   #include_file_owner_group_name: false

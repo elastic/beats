@@ -200,7 +200,7 @@ Any unsupported change in `file_identity` methods between runs may result in dup
 ::::
 
 
-`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile. The downside is that Filebeat will wait until the file reaches 1024 bytes before start ingesting any file.
+`fingerprint` is the default and recommended file identity because it does not rely on the file system/OS, it generates a hash from a portion of the file (the first 1024 bytes, by default) and uses that to identify the file. This works well with log rotation strategies that move/rename the file and on Windows as file identifiers might be more volatile. Before 9.5, the downside was that Filebeat waited until the file reached 1024 bytes before ingesting it; since 9.5 the [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) behavior (`file_identity.fingerprint.growing`, enabled by default) tracks files smaller than the fingerprint size, so they are ingested without delay.
 
 ::::{warning}
 Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
@@ -429,6 +429,13 @@ Please refer to the [fingerprint configuration for details](#filebeat-input-file
 
 ```yaml
 file_identity.fingerprint: ~
+```
+
+The `fingerprint` file identity accepts a `growing` sub-option {applies_to}`stack: ga 9.5`. When `true` (the default since 9.5), files smaller than the fingerprint size (`offset`+`length`) are tracked using the bytes available so far instead of being skipped until they grow large enough, and are automatically migrated to the regular SHA-256 fingerprint once they reach the threshold, with no data duplication. Set it to `false` to restore the pre-9.5 behavior. See [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+
+```yaml
+file_identity.fingerprint:
+  growing: true
 ```
 
 **`native`**
