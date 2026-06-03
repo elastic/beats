@@ -37,11 +37,11 @@ func TestCheckGroupFromEvent(t *testing.T) {
 	})
 
 	t.Run("empty when absent", func(t *testing.T) {
-		require.Equal(t, "", checkGroupFromEvent(&beat.Event{Fields: mapstr.M{}}))
+		require.Empty(t, checkGroupFromEvent(&beat.Event{Fields: mapstr.M{}}))
 	})
 
 	t.Run("empty for nil event", func(t *testing.T) {
-		require.Equal(t, "", checkGroupFromEvent(nil))
+		require.Empty(t, checkGroupFromEvent(nil))
 	})
 }
 
@@ -196,6 +196,7 @@ func goCmd(args ...string) *exec.Cmd {
 	if goRoot != "" {
 		goBinary = filepath.Join(goRoot, "bin", "go")
 	}
+	//nolint:gosec,noctx // test helper invoking the go toolchain with controlled args
 	return exec.Command(goBinary, args...)
 }
 
@@ -263,7 +264,7 @@ func TestRunTimeoutExitCodeCmd(t *testing.T) {
 	t.Run("has a cmd status event", func(t *testing.T) {
 		stdoutEvents := eventsWithType(CmdStatus, synthEvents)
 		require.Len(t, stdoutEvents, 1)
-		require.Equal(t, synthEvents[0].Error.Code, "CMD_TIMEOUT")
+		require.Equal(t, "CMD_TIMEOUT", synthEvents[0].Error.Code)
 	})
 }
 

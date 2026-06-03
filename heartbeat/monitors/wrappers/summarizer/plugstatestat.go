@@ -135,6 +135,7 @@ type commonSSP struct {
 func newCommonSSP(stateTracker *monitorstate.Tracker, sf stdfields.StdMonitorFields) *commonSSP {
 	uu, err := uuid.NewV1()
 	if err != nil {
+		//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 		logp.L().Errorf("could not create v1 UUID for retry group: %s", err)
 	}
 	js := jobsummary.NewJobSummary(1, sf.MaxAttempts, uu.String())
@@ -196,6 +197,7 @@ func (ssp *commonSSP) BeforeSummary(event *beat.Event) BeforeSummaryActions {
 
 	eventext.MergeEventFields(event, fields)
 
+	//nolint:forbidigo // pre-existing global logger use; logger threading is out of scope here
 	logp.L().Infof("attempt info: current(%v) == lastStatus(%v) && attempts(%d < %d)", ssp.js.Status, lastStatus, ssp.js.Attempt, ssp.js.MaxAttempts)
 
 	if retry {
