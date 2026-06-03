@@ -110,13 +110,9 @@ func (f *fakeStorageClient) Batch(ctx context.Context, ops ...*storage.Operation
 				op.Value = append([]byte(nil), b...)
 			}
 		case storage.Set:
-			if err := f.Set(ctx, op.Key, op.Value); err != nil {
-				return err
-			}
+			return f.Set(ctx, op.Key, op.Value)
 		case storage.Delete:
-			if err := f.Delete(ctx, op.Key); err != nil {
-				return err
-			}
+			return f.Delete(ctx, op.Key)
 		default:
 			return errors.New("wrong operation type")
 		}
