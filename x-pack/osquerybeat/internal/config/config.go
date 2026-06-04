@@ -58,6 +58,7 @@ type DatastreamConfig struct {
 }
 
 type InputConfig struct {
+	ID         string                  `config:"id"`
 	Name       string                  `config:"name"`
 	Type       string                  `config:"type"`
 	Datastream DatastreamConfig        `config:"data_stream"` // Datastream configuration

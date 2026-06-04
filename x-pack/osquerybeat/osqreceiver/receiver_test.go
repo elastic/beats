@@ -14,6 +14,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -27,12 +29,17 @@ import (
 // binary. The existing tests (config, leak, hook, benchmark) cover the receiver
 // wiring; beat-level integration testing is handled by the osquerybeat test
 // suite which has mocking infrastructure for osqueryd.
+//
+// TestReceiverStatus IS included here as a unit test because the status.Running
+// event is emitted before osqueryd setup in Run() — it fires as soon as the
+// otelStatusFactoryWrapper creates the per-input runner and calls Start() on it.
+// No osqueryd binary is required for that signal to reach the OTel host.
 
 func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"osquerybeat": map[string]any{
 				"inputs": []any{
 					map[string]any{
@@ -92,9 +99,65 @@ func TestReceiverHook(t *testing.T) {
 		},
 	}
 
-	// For osquerybeatreceiver, we expect 1 hook to be registered for beat metrics.
-	// Unlike metricbeat-based beaters, osquerybeat does not register an input metrics hook.
-	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 1)
+	// For osquerybeatreceiver, we expect 2 hooks: one for beat metrics and one for
+	// scheduled query profiles registered by osquerybeat.registerDiagnosticHooks.
+	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
+}
+
+func TestReceiverStatus(t *testing.T) {
+	// inputID is embedded in the input config and picked up by getInputId so
+	// the status attributes can reference a known, stable key.
+	const inputID = "osquery-status-test"
+
+	inputStatusAttributes := func(state, msg string) pcommon.Map {
+		attrs := pcommon.NewMap()
+		inputs := attrs.PutEmptyMap("inputs")
+		inp := inputs.PutEmptyMap(inputID)
+		inp.PutStr("status", state)
+		inp.PutStr("error", msg)
+		return attrs
+	}
+
+	t.Run("running input", func(t *testing.T) {
+		cfg := Config{
+			Beatconfig: map[string]any{
+				"osquerybeat": map[string]any{
+					"inputs": []any{
+						map[string]any{
+							"type": "osquery",
+							"id":   inputID,
+							"osquery": map[string]any{
+								"schedule": map[string]any{
+									"osquery_info": map[string]any{
+										"query":    "SELECT * FROM osquery_info",
+										"interval": 60,
+									},
+								},
+							},
+						},
+					},
+				},
+				"path.home": t.TempDir(),
+			},
+		}
+		// otelStatusFactoryWrapper fires runner.Start() before osqueryd setup, so
+		// StatusOK reaches the host without requiring the osqueryd binary.
+		oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+			T: t,
+			Receivers: []oteltest.ReceiverConfig{
+				{
+					Name:    "r1",
+					Beat:    "osquerybeat",
+					Config:  &cfg,
+					Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+				},
+			},
+			Status: componentstatus.NewEvent(
+				componentstatus.StatusOK,
+				componentstatus.WithAttributes(
+					inputStatusAttributes(componentstatus.StatusOK.String(), ""))),
+		})
+	})
 }
 
 func genSocketPath() string {

@@ -46,12 +46,17 @@ func (h *MockHost) Report(evt *componentstatus.Event) {
 	h.Evts = append(h.Evts, evt)
 }
 
-func (h *MockHost) getEvent() *componentstatus.Event {
+// GetEvent returns the most recent status event, or nil if none has been reported.
+func (h *MockHost) GetEvent() *componentstatus.Event {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	return h.Evt
+	if len(h.Evts) == 0 {
+		return nil
+	}
+	return h.Evts[len(h.Evts)-1]
 }
 
+// GetEvents returns a snapshot of all status events reported so far, oldest first.
 func (h *MockHost) GetEvents() []*componentstatus.Event {
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -214,7 +219,7 @@ func CheckReceivers(params CheckReceiversParams) {
 					"expected status %v to have been reported at least once; all events: %v",
 					params.Status.Status(), evts)
 			} else {
-				evt := host.getEvent()
+				evt := host.GetEvent()
 				require.NotNil(ct, evt, "expected not nil, got nil")
 			}
 
@@ -242,6 +247,17 @@ func VerifyNoLeaks(t *testing.T) {
 		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
 		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
+		// HTTP persistent-connection goroutines exit naturally after the TCP close
+		// handshake completes, but may still be observed by goleak immediately after
+		// a response body is closed. Seen in tests that call monitoring endpoints
+		// (assertMonitoring, monitoringGet) where the server-side FIN propagates
+		// asynchronously after the test's HTTP client has finished.
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).readLoop"),
+		goleak.IgnoreAnyFunction("net/http.(*persistConn).writeLoop"),
+		// The osquery-go extension server pings osquery every 5s. After Shutdown sets
+		// serverClient=nil the goroutine exits on the next wake-up, but goleak may
+		// observe it mid-sleep. It always exits naturally; this is not a true leak.
+		goleak.IgnoreAnyFunction("github.com/osquery/osquery-go.(*ExtensionManagerServer).Run.func2"),
 	}
 
 	goleak.VerifyNone(t, skipped...)

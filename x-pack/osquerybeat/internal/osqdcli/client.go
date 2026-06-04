@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -165,16 +166,40 @@ func (c *Client) connectWithRetry(ctx context.Context, timeout time.Duration) (c
 		log:       retryLog,
 	}
 
-	err = r.Run(ctx, func(_ context.Context) error {
-		var err error
-		cli, err = osquery.NewClient(c.socketPath, timeout)
-		if err != nil {
-			r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", err)
+	err = r.Run(ctx, func(ctx context.Context) error {
+		// Poll for the socket file with context awareness so that shutdown does
+		// not block for the full transport timeout waiting for a socket that may
+		// never appear.
+		if err := waitSocketCtx(ctx, c.socketPath); err != nil {
 			return err
+		}
+		var connErr error
+		cli, connErr = osquery.NewClient(c.socketPath, timeout)
+		if connErr != nil {
+			if r.log != nil {
+				r.log.Warnf("failed to connect, reconnect might be attempted, err: %v", connErr)
+			}
+			return connErr
 		}
 		return nil
 	})
 	return cli, err
+}
+
+// waitSocketCtx polls until the socket file at path exists or ctx is cancelled.
+func waitSocketCtx(ctx context.Context, path string) error {
+	for {
+		if _, err := os.Stat(path); err == nil {
+			return nil
+		}
+		t := time.NewTimer(retryWait)
+		select {
+		case <-ctx.Done():
+			t.Stop()
+			return ctx.Err()
+		case <-t.C:
+		}
+	}
 }
 
 func (c *Client) Close() {
