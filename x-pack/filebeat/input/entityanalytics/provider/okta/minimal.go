@@ -91,6 +91,7 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 	}
 
 	if lc.OAuth2.isEnabled() {
+		ec.Token = "" // OAuth2 takes precedence over okta_token.
 		jwk, err := resolveJWK(lc.OAuth2)
 		if err != nil {
 			return nil, 0, 0, fmt.Errorf("oauth2 jwk: %w", err)
