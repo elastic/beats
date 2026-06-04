@@ -49,6 +49,13 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 		}, nil
 	}
 
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if tlsCfg.TLS.CertificateReload.Enabled == nil {
+		enabled := false
+		tlsCfg.TLS.CertificateReload.Enabled = &enabled
+	}
+
 	tlscfg := tlsCfg.TLS
 	// validate the beats config before proceeding
 	if err := tlscfg.Validate(); err != nil {
