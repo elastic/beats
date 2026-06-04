@@ -85,6 +85,9 @@ func UnnestStream(config *conf.C, processors ...interface{}) (res *conf.C, err e
 	// through monitor mgmt. See https://github.com/elastic/beats/issues/32224
 	if origin == "" {
 		err = res.Merge(mapstr.M{"id": optS.Id})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if processors != nil {
