@@ -67,9 +67,11 @@ func newQueue[T any](pool *Pool[T]) *Queue[T] {
 	}
 }
 
-// Producer returns a producer that publishes to this queue.
+// Producer returns a producer that publishes to this queue. The caller must
+// call producer.Close() when done to return any pre-claimed magazine slots to
+// the pool; failing to do so leaks slots until the pool is shut down.
 func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
-	return &producer[T]{queue: q, cfg: cfg}
+	return &producer[T]{queue: q, cfg: cfg, magazine: make([]int, 0, magazineMaxCap)}
 }
 
 // Get blocks until at least one event is available (or the queue is closed)

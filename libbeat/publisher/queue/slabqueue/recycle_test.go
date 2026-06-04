@@ -194,6 +194,9 @@ func TestDoubleDoneIsSafe(t *testing.T) {
 
 	p := q.Producer(queue.ProducerConfig{ACK: func(int) {}})
 	p.Publish(1)
+	// Close the producer to return any pre-claimed magazine slots before
+	// checking pool availability.
+	p.Close()
 	b, err := q.Get(0)
 	require.NoError(t, err)
 
@@ -264,6 +267,7 @@ func TestConcurrentRecycleNoCorruption(t *testing.T) {
 		wg.Add(2)
 		go func(p queue.Producer[int], base int) {
 			defer wg.Done()
+			defer p.Close()
 			for j := 0; j < eventsPerPipe; j++ {
 				if _, ok := p.Publish(base*1_000_000 + j); !ok {
 					return
