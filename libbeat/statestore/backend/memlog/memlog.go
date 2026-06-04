@@ -67,9 +67,10 @@ const defaultFileMode os.FileMode = 0600
 
 const defaultBufferSize = 4 * 1024
 
+const defaultCheckpointSize = 10 * 1 << 20 // set rotation limit to 10MB by default
+
 func defaultCheckpoint(filesize uint64) bool {
-	const limit = 10 * 1 << 20 // set rotation limit to 10MB by default
-	return filesize >= limit
+	return filesize >= defaultCheckpointSize
 }
 
 // New configures a memlog Registry that can be used to open stores.
