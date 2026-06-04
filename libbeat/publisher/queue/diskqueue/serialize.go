@@ -180,6 +180,7 @@ func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
 		return publisher.Event{}, err
 	}
 
+	//nolint:gosec // G115: our encoder only writes EventFlags (uint8) values, so to.Flags is always 0-255
 	return publisher.Event{
 		Flags: publisher.EventFlags(to.Flags), //nolint:gosec // Flags field is uint32 on wire but valid values fit uint8
 		Content: beat.Event{
