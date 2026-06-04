@@ -45,6 +45,7 @@ type kafkaInputConfig struct {
 	ConsumeBackoff           time.Duration     `config:"consume_backoff" validate:"min=0"`
 	WaitClose                time.Duration     `config:"wait_close" validate:"min=0"`
 	MaxWaitTime              time.Duration     `config:"max_wait_time"`
+	ResyncTopicsTime         time.Duration     `config:"resync_topics_duration" validate:"min=0"`
 	IsolationLevel           isolationLevel    `config:"isolation_level"`
 	Fetch                    kafkaFetch        `config:"fetch"`
 	Rebalance                kafkaRebalance    `config:"rebalance"`
@@ -110,14 +111,15 @@ var (
 // were chosen to match sarama's defaults.
 func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
-		Version:        kafka.Version("2.1.0"),
-		InitialOffset:  initialOffsetOldest,
-		ClientID:       "filebeat",
-		ConnectBackoff: 30 * time.Second,
-		ConsumeBackoff: 2 * time.Second,
-		WaitClose:      2 * time.Second,
-		MaxWaitTime:    250 * time.Millisecond,
-		IsolationLevel: isolationLevelReadUncommitted,
+		Version:          kafka.Version("2.1.0"),
+		InitialOffset:    initialOffsetOldest,
+		ClientID:         "filebeat",
+		ConnectBackoff:   30 * time.Second,
+		ConsumeBackoff:   2 * time.Second,
+		WaitClose:        2 * time.Second,
+		MaxWaitTime:      250 * time.Millisecond,
+		IsolationLevel:   isolationLevelReadUncommitted,
+		ResyncTopicsTime: 5 * time.Minute,
 		Fetch: kafkaFetch{
 			Min:     1,
 			Default: (1 << 20), // 1 MB
