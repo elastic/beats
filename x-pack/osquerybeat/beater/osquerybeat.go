@@ -102,6 +102,15 @@ type osquerybeat struct {
 	osquerydFactory          osqd.RunnerFactory
 	executablePath           func() (string, error)
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+
+	// osqueryDataPath is the resolved osqueryd data directory, captured at
+	// New() time. Capturing it here (during CreateLogs) rather than in Run()
+	// prevents a race when multiple receivers are created concurrently: the
+	// libbeat paths package has global state, and a second receiver's
+	// CreateLogs call can overwrite it before the first receiver's Run()
+	// goroutine reads it, causing both osqueryd instances to share the same
+	// pidfile and kill each other.
+	osqueryDataPath string
 }
 
 type osquerybeatPublisher interface {
@@ -137,6 +146,11 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
+		// Resolve the osqueryd data path now, while b.Info.Paths still reflects
+		// this specific receiver's configuration. Run() is called in a goroutine
+		// and may execute after a concurrently-started receiver has overwritten
+		// the global paths state.
+		osqueryDataPath: b.Info.Paths.Resolve(paths.Data, "osquery"),
 	}
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
@@ -207,6 +221,29 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Watch input configuration updates
 	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
+	// Apply the OTel status factory wrapper and report Running for each
+	// configured input. This must happen before the osqueryd setup so that
+	// status events reach the host even in environments where osqueryd is
+	// unavailable. The pattern mirrors heartbeat, which wraps its monitor
+	// factory before loading monitors. osquerybeat drives the shim factory
+	// manually because it does not use cfgfile runner management.
+	if bt.otelStatusFactoryWrapper != nil {
+		factory := bt.otelStatusFactoryWrapper(&osqueryInputRunnerFactory{})
+		for i := range bt.config.Inputs {
+			rawCfg, cfgErr := conf.NewConfigFrom(&bt.config.Inputs[i])
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to build config for input %d: %v", i, cfgErr)
+				continue
+			}
+			runner, cfgErr := factory.Create(b.Publisher, rawCfg)
+			if cfgErr != nil {
+				bt.log.Warnf("otel status: failed to create status runner for input %d: %v", i, cfgErr)
+				continue
+			}
+			runner.Start()
+		}
+	}
+
 	// Create socket path
 	socketPath, cleanupFn, err := osqd.CreateSocketPath()
 	if err != nil {
@@ -229,6 +266,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+		osqd.WithDataPath(bt.osqueryDataPath),
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
@@ -247,6 +285,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
+
+	// Register diagnostic hooks before any operation that may fail so that
+	// hooks are always available regardless of whether osqueryd is reachable.
+	bt.registerDiagnosticHooks(b)
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
@@ -281,9 +323,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-	// Ensure that all the hooks and actions are ready before starting the Manager
-	// to receive configuration.
-	bt.registerDiagnosticHooks(b)
 	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err
