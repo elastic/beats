@@ -18,6 +18,7 @@
 package channel
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -127,4 +128,8 @@ func (pipelineConnectorMock) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 
 func (pipelineConnectorMock) Connect() (beat.Client, error) {
 	return &clientMock{}, nil
+}
+
+func (pipelineConnectorMock) Disconnect(ctx context.Context) error {
+	return nil
 }

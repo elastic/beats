@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !nooteloutput
+
 package pipeline
 
 import (
@@ -30,6 +32,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+var _ outputController = (*otelOutputController)(nil)
+
+// otelOutputController implements outputController for the OpenTelemetry output.
 type otelOutputController struct {
 	beatInfo beat.Info
 	logger   *logp.Logger

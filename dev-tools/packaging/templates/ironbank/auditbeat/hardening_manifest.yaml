@@ -14,7 +14,7 @@ tags:
 # Build args passed to Dockerfile ARGs
 args:
   BASE_IMAGE: "redhat/ubi/ubi9"
-  BASE_TAG: "10.1"
+  BASE_TAG: "10.2"
   ELASTIC_STACK: "{{ beat_version }}"
   ELASTIC_PRODUCT: "auditbeat"
 
@@ -55,3 +55,9 @@ maintainers:
   - email: "julien.lind@elastic.co"
     name: "Julien lind"
     username: "julien.lind"
+  - email: "eric.beahan@elastic.co"
+    name: "Eric Beahan"
+    username: "eric.beahan"
+  - email: "pierre.hilbert@elastic.co"
+    name: "Pierre Hilbert"
+    username: "pierre.hilbert"

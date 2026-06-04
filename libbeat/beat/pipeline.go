@@ -18,6 +18,7 @@
 package beat
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -28,6 +29,7 @@ import (
 type Pipeline interface {
 	ConnectWith(ClientConfig) (Client, error)
 	Connect() (Client, error)
+	Disconnect(ctx context.Context) error
 }
 
 // PipelineConnector wraps the Pipeline interface
