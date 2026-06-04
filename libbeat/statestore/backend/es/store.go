@@ -21,6 +21,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -179,7 +180,7 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 	}
 	s.cliErr = nil
 
-	cli, err := eslegclient.NewConnectedClient(ctx, c, s.name, s.log, "")
+	cli, err := eslegclient.NewConnectedClient(ctx, c, beat.Info{Beat: s.name, Logger: s.log})
 	if err != nil {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err

@@ -665,7 +665,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat, b.Info.Logger, b.Info.UserAgent)
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info)
 			if err != nil {
 				return err
 			}

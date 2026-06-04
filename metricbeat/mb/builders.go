@@ -24,6 +24,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -50,26 +51,26 @@ var (
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a Module and its configured MetricSets or an error.
-func NewModule(config *conf.C, r *Register, p *paths.Path, logger *logp.Logger, userAgent string) (Module, []MetricSet, error) {
+func NewModule(config *conf.C, r *Register, info beat.Info) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
 	}
-	if p == nil {
+	if info.Paths == nil {
 		return nil, nil, ErrPathsRequired
 	}
 
-	bm, err := newBaseModuleFromConfig(config, logger)
+	bm, err := newBaseModuleFromConfig(config, info.Logger)
 	if err != nil {
 		return nil, nil, err
 	}
-	bm.userAgent = userAgent
+	bm.userAgent = info.UserAgent
 
 	module, err := createModule(r, bm)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	metricsets, err := initMetricSets(r, module, p, logger)
+	metricsets, err := initMetricSets(r, module, info.Paths, info.Logger)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -69,9 +70,8 @@ func New(
 	conf *conf.C,
 	connector channel.Connector,
 	beatDone chan struct{},
-	userAgent string,
+	info beat.Info,
 	states []file.State,
-	logger *logp.Logger,
 ) (*Runner, error) {
 	input := &Runner{
 		config:   defaultConfig,
@@ -79,7 +79,7 @@ func New(
 		done:     make(chan struct{}),
 		Once:     false,
 		beatDone: beatDone,
-		logger:   logger,
+		logger:   info.Logger,
 	}
 
 	var err error
@@ -88,7 +88,7 @@ func New(
 	}
 
 	// log config related warnings
-	input.config.checkUnsupportedConfig(logger)
+	input.config.checkUnsupportedConfig(info.Logger)
 
 	var f Factory
 	f, err = GetFactory(input.config.Type)
@@ -101,11 +101,11 @@ func New(
 		Done:              input.done,
 		BeatDone:          input.beatDone,
 		Meta:              nil,
-		UserAgent:         userAgent,
+		UserAgent:         info.UserAgent,
 		GetStatusReporter: input.GetStatusReporter,
 	}
 	var ipt Input
-	ipt, err = f(conf, connector, context, logger)
+	ipt, err = f(conf, connector, context, info.Logger)
 	if err != nil {
 		return input, err
 	}

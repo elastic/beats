@@ -90,12 +90,16 @@ type stats struct {
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
-func NewWrapper(config *conf.C, r *mb.Register, logger *logp.Logger, monitoring beatmonitoring.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
-	module, metricSets, err := mb.NewModule(config, r, p, logger, "")
+func NewWrapper(config *conf.C, r *mb.Register, info *beat.Info, monitoring beatmonitoring.Monitoring, p *paths.Path, options ...Option) (*Wrapper, error) {
+	beatInfo := *info
+	if p != nil {
+		beatInfo.Paths = p
+	}
+	module, metricSets, err := mb.NewModule(config, r, beatInfo)
 	if err != nil {
 		return nil, err
 	}
-	return createWrapper(module, metricSets, monitoring, logger, options...)
+	return createWrapper(module, metricSets, monitoring, info.Logger, options...)
 }
 
 // NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
