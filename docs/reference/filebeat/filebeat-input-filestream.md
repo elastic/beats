@@ -767,6 +767,7 @@ Available parsers:
 * `container`
 * `syslog`
 * `include_message`
+* `auditd`
 
 In this example, Filebeat is reading multiline messages that consist of 3 lines and are encapsulated in single-line JSON objects. The multiline message is stored under the key `msg`.
 
@@ -924,6 +925,42 @@ This example shows you how to include messages that start with the string ERR or
     - "/var/log/containers/*.log"
   parsers:
     - include_message.patterns: ["^ERR", "^WARN"]
+```
+
+#### `auditd` [filebeat-input-filestream-parsers-auditd]
+
+```{applies_to}
+stack: ga 9.5.0
+```
+
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
+
+The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
+
+:::{note}
+This parser is only supported on Linux. On other platforms, configuring it returns an error.
+:::
+
+The supported configuration options are:
+
+**`log_errors`**
+:   (Optional) If `true`, parse errors are logged via the Filebeat logger. Defaults to `false`.
+
+**`add_error_key`**
+:   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
+
+Example configuration:
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: auditd-logs
+    paths:
+      - /var/log/audit/audit.log
+    parsers:
+      - auditd:
+          log_errors: true
+          add_error_key: true
 ```
 
 ### `encoding` [_encoding_2]
