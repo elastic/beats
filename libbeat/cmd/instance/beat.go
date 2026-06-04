@@ -155,7 +155,13 @@ type certReloadConfig struct {
 	Reload           cfgfile.Reload `config:"restart_on_cert_change" yaml:"restart_on_cert_change"`
 }
 
-func (c certReloadConfig) Validate() error {
+func (c *certReloadConfig) Validate() error {
+	// Certificate hot-reload was introduced after this branch was cut. Disable it
+	// by default so it does not activate silently in a patch release.
+	if c.CertificateReload.Enabled == nil {
+		c.CertificateReload.Enabled = new(false)
+	}
+
 	if c.Reload.Period < time.Second {
 		return errors.New("'restart_on_cert_change.period' must be equal or greater than 1s")
 	}
