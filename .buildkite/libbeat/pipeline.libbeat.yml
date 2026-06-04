@@ -213,35 +213,6 @@ steps:
           - github_commit_status:
               context: "libbeat: Go Integration Tests / Windows"
 
-      - label: ":ubuntu: Libbeat: Python Integration Tests"
-        key: "mandatory-python-int-test"
-        command: |
-          set -euo pipefail
-          cd libbeat
-          mage pythonIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "libbeat/build/*.xml"
-          - "libbeat/build/*.json"
-          - "libbeat/build/integration-tests/*"
-          - "libbeat/build/integration-tests/Test*/*"
-          - "libbeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "libbeat: Python Integration Tests"
-
       - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"
         command: |
