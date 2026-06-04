@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -906,9 +907,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]any{
-					"message": `failed eval: ERROR: <input>:3:21: response body too big
- |   "events": [string(body)]
- | ....................^`,
+					"message": `failed eval: ERROR: <input>:2:5: response body too big
+ |  get(state.url).Body.as(body, {
+ | ....^`,
 				},
 			},
 		},
@@ -1502,17 +1503,56 @@ var inputTests = []struct {
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
+	// Path containment for enabled tracers is tested in
+	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
+	// The input-level test only verifies that a disabled tracer does
+	// not reject an out-of-tree path (next case below).
 	{
-		name: "tracer_escaping_logs",
+		name: "tracer_disabled_escaping_logs",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.url":             "https://example.com/",
-			"resource.tracer.enabled":  true,
+			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state":                    map[string]interface{}{},
-			"program":                  "{}",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
 		},
-		wantErr: fmt.Errorf(`request tracer path must be within %q path accessing 'resource'`, inputName),
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -2116,13 +2156,11 @@ var inputTests = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
-			// Loss of location information here is a result of changes in the runtime.
-			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					"message": `failed eval: ERROR: <input>:5:14: no such overload
- |    "events": events,
- | .............^`,
+					"message": `failed eval: ERROR: <input>:3:20: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | ...................^`,
 				},
 			},
 		},
@@ -2375,7 +2413,7 @@ func TestInput(t *testing.T) {
 			}
 
 			var tempDir string
-			if conf.Resource.Tracer != nil {
+			if conf.Resource.Tracer.enabled() {
 				err := os.MkdirAll("cel", 0o700)
 				if err != nil {
 					t.Fatalf("failed to create root logging destination: %v", err)
@@ -2406,11 +2444,16 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			id := "test_id:" + test.name
+			cwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
 			v2Ctx := v2.Context{
 				Logger:          logp.NewLogger("cel_test"),
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2419,7 +2462,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
+			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}

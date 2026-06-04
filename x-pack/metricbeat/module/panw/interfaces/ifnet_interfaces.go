@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// these types apply to phyiscal interfaces
+// these types apply to physical interfaces
 var interfaceTypes = map[int]string{
 	0:  "Ethernet interface",
 	1:  "Aggregate Ethernet (AE) interface",
@@ -52,7 +52,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 	events := make([]mb.Event, 0, len(input.HW.Entries)+len(input.Ifnet.Entries))
 	timestamp := time.Now().UTC()
 
-	// First process the phyiscal interfaces
+	// First process the physical interfaces
 	for _, entry := range input.HW.Entries {
 		iftype, ok := interfaceTypes[entry.Type]
 
@@ -81,7 +81,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"physical.full_state": entry.ST,
 				"physical.ae_member":  members,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)
@@ -103,7 +103,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"logical.dyn_addr": entry.DynAddr,
 				"logical.addr6":    entry.Addr6,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)

@@ -12,7 +12,7 @@ applies_to:
 
 The Kafka output sends events to Apache Kafka.
 
-To use this output, edit the Filebeat configuration file to disable the {{es}} output by commenting it out, and enable the Kafka output by uncommenting the Kafka section.
+To use this output, edit the Filebeat configuration file to deactivate the {{es}} output by commenting it out, and enable the Kafka output by uncommenting the Kafka section.
 
 :::{admonition} Kafka timestamps and beats
 * Kafka 3.6+ introduces stricter timestamp validation with the introduction of two new broker/topic-level properties: [log.message.timestamp.before.max.ms](https://docs.confluent.io/platform/current/installation/configuration/topic-configs.html#message-timestamp-before-max-ms) and 
@@ -77,7 +77,7 @@ The list of Kafka broker addresses from where to fetch the cluster metadata. The
 
 Kafka protocol version that Filebeat will request when connecting. Defaults to 2.1.0. When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`
 
-Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `4.1.0`.
 
 The protocol version controls the Kafka client features available to Filebeat; it does not prevent Filebeat from connecting to Kafka versions newer than the protocol version.
 

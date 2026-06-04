@@ -26,8 +26,8 @@ import (
 // runLoop internal state. These fields could mostly be local variables
 // in runLoop.run(), but they're exposed here to facilitate testing. In a
 // live queue, only the runLoop goroutine should read or write these fields.
-type runLoop struct {
-	broker *broker
+type runLoop[T any] struct {
+	broker *broker[T]
 
 	// observer is a metrics observer used to report internal queue state.
 	observer queue.Observer
@@ -48,12 +48,12 @@ type runLoop struct {
 	// The list of batches that have been consumed and are waiting to be sent
 	// to ackLoop for acknowledgment handling. (This list doesn't contain all
 	// outstanding batches, only the ones not yet forwarded to ackLoop.)
-	consumedBatches batchList
+	consumedBatches batchList[T]
 
 	// If there aren't enough events ready to fill an incoming get request,
 	// the queue may block based on its flush settings. When this happens,
 	// pendingGetRequest stores the request until we're ready to handle it.
-	pendingGetRequest *getRequest
+	pendingGetRequest *getRequest[T]
 
 	// This timer tracks the configured flush timeout when we will respond
 	// to a pending getRequest even if we can't fill the requested event count.
@@ -71,7 +71,7 @@ type runLoop struct {
 	nextEntryID queue.EntryID
 }
 
-func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
+func newRunLoop[T any](broker *broker[T], observer queue.Observer) *runLoop[T] {
 	var timer *time.Timer
 
 	// Create the timer we'll use for get requests, but stop it until a
@@ -82,14 +82,14 @@ func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
 			<-timer.C
 		}
 	}
-	return &runLoop{
+	return &runLoop[T]{
 		broker:   broker,
 		observer: observer,
 		getTimer: timer,
 	}
 }
 
-func (l *runLoop) run() {
+func (l *runLoop[T]) run() {
 	for l.broker.ctx.Err() == nil {
 		l.runIteration()
 	}
@@ -97,21 +97,21 @@ func (l *runLoop) run() {
 
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
-func (l *runLoop) runIteration() {
-	var pushChan chan pushRequest
+func (l *runLoop[T]) runIteration() {
+	var pushChan chan pushRequest[T]
 	// Push requests are enabled if the queue isn't full or closing.
 	if l.eventCount < len(l.broker.buf) && !l.closing {
 		pushChan = l.broker.pushChan
 	}
 
-	var getChan chan getRequest
+	var getChan chan getRequest[T]
 	// Get requests are enabled if the queue has events that weren't yet sent
 	// to consumers, and no existing request is active.
 	if l.pendingGetRequest == nil && l.eventCount > l.consumedCount {
 		getChan = l.broker.getChan
 	}
 
-	var consumedChan chan batchList
+	var consumedChan chan batchList[T]
 	// Enable sending to the scheduled ACKs channel if we have
 	// something to send.
 	if !l.consumedBatches.empty() {
@@ -149,7 +149,7 @@ func (l *runLoop) runIteration() {
 	case consumedChan <- l.consumedBatches:
 		// We've sent all the pending batches to the ackLoop for processing,
 		// clear the pending list.
-		l.consumedBatches = batchList{}
+		l.consumedBatches = batchList[T]{}
 
 	case count := <-l.broker.deleteChan:
 		l.handleDelete(count)
@@ -168,7 +168,7 @@ func (l *runLoop) runIteration() {
 	}
 }
 
-func (l *runLoop) handleGetRequest(req *getRequest) {
+func (l *runLoop[T]) handleGetRequest(req *getRequest[T]) {
 	if req.entryCount <= 0 || req.entryCount > l.broker.settings.MaxGetRequest {
 		req.entryCount = l.broker.settings.MaxGetRequest
 	}
@@ -180,7 +180,7 @@ func (l *runLoop) handleGetRequest(req *getRequest) {
 	l.handleGetReply(req)
 }
 
-func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
+func (l *runLoop[T]) getRequestShouldBlock(req *getRequest[T]) bool {
 	if l.broker.settings.FlushTimeout <= 0 || l.closing {
 		// Never block if the flush timeout isn't positive, or during shutdown
 		return false
@@ -191,7 +191,7 @@ func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
 }
 
 // Respond to the given get request without blocking or waiting for more events
-func (l *runLoop) handleGetReply(req *getRequest) {
+func (l *runLoop[T]) handleGetReply(req *getRequest[T]) {
 	eventsAvailable := l.eventCount - l.consumedCount
 	batchSize := req.entryCount
 	if eventsAvailable < batchSize {
@@ -213,7 +213,7 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 	l.observer.ConsumeEvents(batchSize, batchBytes)
 }
 
-func (l *runLoop) handleDelete(count int) {
+func (l *runLoop[T]) handleDelete(count int) {
 	byteCount := 0
 	for i := 0; i < count; i++ {
 		entry := l.broker.buf[(l.bufPos+i)%len(l.broker.buf)]
@@ -227,7 +227,7 @@ func (l *runLoop) handleDelete(count int) {
 	l.observer.RemoveEvents(count, byteCount)
 }
 
-func (l *runLoop) handleInsert(req *pushRequest) {
+func (l *runLoop[T]) handleInsert(req *pushRequest[T]) {
 	l.insert(req, l.nextEntryID)
 	// Send back the new event id.
 	req.resp <- l.nextEntryID
@@ -240,7 +240,7 @@ func (l *runLoop) handleInsert(req *pushRequest) {
 }
 
 // Checks if we can handle pendingGetRequest yet, and handles it if so
-func (l *runLoop) maybeUnblockGetRequest() {
+func (l *runLoop[T]) maybeUnblockGetRequest() {
 	// If a get request is blocked waiting for more events, check if
 	// we should unblock it.
 	if getRequest := l.pendingGetRequest; getRequest != nil {
@@ -254,9 +254,9 @@ func (l *runLoop) maybeUnblockGetRequest() {
 	}
 }
 
-func (l *runLoop) insert(req *pushRequest, id queue.EntryID) {
+func (l *runLoop[T]) insert(req *pushRequest[T], id queue.EntryID) {
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
-	l.broker.buf[index] = queueEntry{
+	l.broker.buf[index] = queueEntry[T]{
 		event:      req.event,
 		eventSize:  req.eventSize,
 		id:         id,

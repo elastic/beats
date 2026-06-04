@@ -8,9 +8,12 @@ package browser
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfig_Validate(t *testing.T) {
@@ -53,4 +56,33 @@ func TestConfig_Validate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestHashConfig(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"name": "My Name",
+		"id":   "myId",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "script",
+			},
+		},
+		"params": mapstr.M{},
+	})
+	original, err := hashConfig(cfg)
+	assert.NoError(t, err, "failed to hash job config")
+	cfg = conf.MustNewConfigFrom(mapstr.M{
+		"name": "My Name",
+		"id":   "myId",
+		"source": mapstr.M{
+			"inline": mapstr.M{
+				"script": "script",
+			},
+		},
+		"params": mapstr.M{"key": "value"},
+	})
+	modified, err := hashConfig(cfg)
+	assert.NoError(t, err, "failed to hash job config")
+
+	require.Equal(t, original, modified, "unmatching confg hash")
 }

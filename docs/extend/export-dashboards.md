@@ -39,7 +39,7 @@ MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
 ./filebeat export dashboard --id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b --folder module/redis
 ```
 
-This generates an appropriate folder under module/redis for the dashboard, separating assets into dashboards, searches, vizualizations, etc. Each exported file is a JSON and their names are the IDs of the assets.
+This generates an appropriate folder under module/redis for the dashboard, separating assets into dashboards, searches, visualizations, etc. Each exported file is a JSON and their names are the IDs of the assets.
 
 ::::{note}
 The dashboard ID is available in the dashboard URL. For example, in case the dashboard URL is `app/kibana#/dashboard/AV4REOpp5NkDleZmzKkE?_g=()&_a=(description:'Overview%2...`, the dashboard ID is `AV4REOpp5NkDleZmzKkE`.

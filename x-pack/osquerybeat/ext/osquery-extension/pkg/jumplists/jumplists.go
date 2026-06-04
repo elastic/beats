@@ -36,28 +36,28 @@ const (
 )
 
 // jumplistMeta is metadata shared by every entry from one jump list file.
-type jumplistMeta struct {
+type Meta struct {
 	*jumpliststypes.ApplicationID
 	*jumpliststypes.UserProfile
 	*jumpliststypes.JumplistMeta
 }
 
-// jumplistEntry is a single entry in a jump list.
-type jumplistEntry struct {
+// Entry is a single entry in a jump list.
+type Entry struct {
 	*DestListEntry
 	*Lnk
 }
 
 // jumplist holds entries from one jump list source file.
 type jumplist struct {
-	*jumplistMeta
-	entries []*jumplistEntry
+	*Meta
+	entries []*Entry
 }
 
 // jumplistRow is one emitted row.
 type jumplistRow struct {
-	*jumplistMeta
-	*jumplistEntry
+	*Meta
+	*Entry
 }
 
 // toRows converts a jump list to row objects.
@@ -65,15 +65,15 @@ func (j *jumplist) toRows() []jumplistRow {
 	var rows []jumplistRow
 	for _, entry := range j.entries {
 		rows = append(rows, jumplistRow{
-			jumplistMeta:  j.jumplistMeta,
-			jumplistEntry: entry,
+			Meta:  j.Meta,
+			Entry: entry,
 		})
 	}
 	return rows
 }
 
 // matchesFilters is a helper function that checks if a row matches the given filters.
-func matchesFilters(row jumplistRow, filters []filters.Filter) bool {
+func matchesFilters(row jumplistRow, filters []filters.Filter, log *logger.Logger) bool {
 	for _, filter := range filters {
 		if !filter.Matches(row) {
 			return false
@@ -115,7 +115,7 @@ func getResults(_ context.Context, queryContext table.QueryContext, log *logger.
 	constraintFilters := filters.GetConstraintFilters(queryContext)
 	for _, jumpList := range jumplists {
 		for _, row := range jumpList.toRows() {
-			if matchesFilters(row, constraintFilters) {
+			if matchesFilters(row, constraintFilters, log) {
 				results = append(results, jumplistRowToResult(row))
 			}
 		}
@@ -132,45 +132,50 @@ func jumplistRowToResult(row jumplistRow) elasticjumplists.Result {
 
 	if row.DestListEntry != nil {
 		result.DestListEntry = &jumpliststypes.DestListEntry{
-			Hostname:              row.DestListEntry.Hostname,
-			EntryNumber:           row.DestListEntry.EntryNumber,
-			LastModifiedTime:      row.DestListEntry.LastModifiedTime,
-			IsPinned:              row.DestListEntry.PinStatus,
-			InteractionCount:      row.DestListEntry.InteractionCount,
-			DestEntryPath:         row.DestListEntry.Path,
-			DestEntryPathResolved: row.DestListEntry.ResolvedPath,
-			MacAddress:            row.DestListEntry.MacAddress,
-			CreationTime:          row.DestListEntry.CreationTime,
+			Hostname:              row.Hostname,
+			EntryNumber:           row.EntryNumber,
+			LastModifiedTime:      row.LastModifiedTime,
+			IsPinned:              row.PinStatus,
+			InteractionCount:      row.InteractionCount,
+			DestEntryPath:         row.Path,
+			DestEntryPathResolved: row.ResolvedPath,
+			MacAddress:            row.MacAddress,
+			CreationTime:          row.CreationTime,
 		}
 	}
 
 	if row.Lnk != nil {
-		fileSize := int32(row.Lnk.FileSize)
-		if row.Lnk.FileSize > math.MaxInt32 {
+		var fileSize int32
+		var volumeLabelOffset int32
+
+		if row.FileSize > uint32(math.MaxInt32) {
 			fileSize = math.MaxInt32
+		} else {
+			fileSize = int32(row.FileSize) //nolint:gosec,G115 // This is already safety checked in the code above
 		}
 
-		volumeLabelOffset := int32(row.Lnk.VolumeLabelOffset)
-		if row.Lnk.VolumeLabelOffset > math.MaxInt32 {
+		if row.VolumeLabelOffset > uint32(math.MaxInt32) {
 			volumeLabelOffset = math.MaxInt32
+		} else {
+			volumeLabelOffset = int32(row.VolumeLabelOffset) //nolint:gosec,G115 // This is already safety checked in the code above
 		}
 
 		result.LnkMetadata = &jumpliststypes.LnkMetadata{
-			LocalPath:              row.Lnk.LocalPath,
+			LocalPath:              row.LocalPath,
 			FileSize:               fileSize,
-			HotKey:                 row.Lnk.HotKey,
-			IconIndex:              row.Lnk.IconIndex,
-			ShowWindow:             row.Lnk.ShowWindow,
-			IconLocation:           row.Lnk.IconLocation,
-			CommandLineArguments:   row.Lnk.CommandLineArguments,
-			TargetModificationTime: row.Lnk.TargetModificationDate,
-			TargetLastAccessedTime: row.Lnk.TargetLastAccessedDate,
-			TargetCreationTime:     row.Lnk.TargetCreationDate,
-			VolumeSerialNumber:     row.Lnk.VolumeSerialNumber,
-			VolumeType:             row.Lnk.VolumeType,
-			VolumeLabel:            row.Lnk.VolumeLabel,
+			HotKey:                 row.HotKey,
+			IconIndex:              row.IconIndex,
+			ShowWindow:             row.ShowWindow,
+			IconLocation:           row.IconLocation,
+			CommandLineArguments:   row.CommandLineArguments,
+			TargetModificationTime: row.TargetModificationDate,
+			TargetLastAccessedTime: row.TargetLastAccessedDate,
+			TargetCreationTime:     row.TargetCreationDate,
+			VolumeSerialNumber:     row.VolumeSerialNumber,
+			VolumeType:             row.VolumeType,
+			VolumeLabel:            row.VolumeLabel,
 			VolumeLabelOffset:      volumeLabelOffset,
-			Name:                   row.Lnk.Name,
+			Name:                   row.Name,
 		}
 	}
 

@@ -131,6 +131,47 @@ func TestEnrichNodeStatsWithCachedValues(t *testing.T) {
 	}
 }
 
+func TestEnrichNodeStatsSearchLatencyClampsToInterval(t *testing.T) {
+	// 10s sampling interval
+	initCache(getNodeStats(), 10)
+
+	nodeStatsMap := getNodeStats()
+
+	for key, nodeStats := range nodeStatsMap {
+		// Small deltas for index and merge — raw latencies well below 10 000 ms
+		nodeStats["indices.indexing.index_total"] = getValue(&nodeStats, "indices.indexing.index_total") + 3
+		nodeStats["indices.indexing.index_time_in_millis"] = getValue(&nodeStats, "indices.indexing.index_time_in_millis") + 30
+		nodeStats["indices.indexing.index_failed"] = getValue(&nodeStats, "indices.indexing.index_failed") + 3
+		nodeStats["indices.merges.total"] = getValue(&nodeStats, "indices.merges.total") + 3
+		nodeStats["indices.merges.total_time_in_millis"] = getValue(&nodeStats, "indices.merges.total_time_in_millis") + 30
+		// Reproduces #2471: 3 search ops with combined query_time > interval
+		// raw latency = 120 000 / 3 = 40 000 ms/op; interval = 10 000 ms → clamped
+		nodeStats["indices.search.query_total"] = getValue(&nodeStats, "indices.search.query_total") + 3
+		nodeStats["indices.search.query_time_in_millis"] = getValue(&nodeStats, "indices.search.query_time_in_millis") + 120_000
+
+		nodeStatsMap[key] = nodeStats
+	}
+
+	nodeStatsNode1 := nodeStatsMap["node1"]
+	enrichNodeStats("node1", &nodeStatsNode1, 10_000)
+	nodeStatsMap["node1"] = nodeStatsNode1
+
+	nodeStatsNode2 := nodeStatsMap["node2"]
+	enrichNodeStats("node2", &nodeStatsNode2, 10_000)
+	nodeStatsMap["node2"] = nodeStatsNode2
+
+	for _, nodeStats := range nodeStatsMap {
+		require.EqualValues(t, 10_000, nodeStats["search_latency_in_millis"],
+			"search latency exceeding the sampling interval should be clamped to the interval")
+
+		// Index and merge latencies are well below the interval and must not be clamped
+		require.InDelta(t, 10, nodeStats["index_latency_in_millis"], 0.01,
+			"index latency below interval should not be clamped")
+		require.InDelta(t, 10, nodeStats["merge_latency_in_millis"], 0.01,
+			"merge latency below interval should not be clamped")
+	}
+}
+
 func TestEnrichNodeStatsWithCachedValuesWithNoChange(t *testing.T) {
 	// 10s ago cache
 	initCache(getNodeStats(), 10)

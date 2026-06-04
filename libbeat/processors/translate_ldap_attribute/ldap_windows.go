@@ -25,7 +25,6 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
-	"github.com/go-ldap/ldap/v3/gssapi"
 )
 
 // sspiBindTimeout is the maximum time to wait for SSPI bind operations.
@@ -50,12 +49,16 @@ func (client *ldapClient) bindPlatformSpecific(conn *ldap.Conn, spn string) erro
 		defer client.sspiTimedout.Store(false)
 
 		client.log.Debug("Creating SSPI client")
-		sspiClient, err := gssapi.NewSSPIClient()
+		sspiClient, err := newGSSAPIClientForConn(client.log, conn)
 		if err != nil {
 			resultCh <- fmt.Errorf("failed to create SSPI client: %w", err)
 			return
 		}
-		defer sspiClient.DeleteSecContext()
+		defer func() {
+			if delErr := sspiClient.DeleteSecContext(); delErr != nil {
+				client.log.Debugw("SSPI DeleteSecContext", "error", delErr)
+			}
+		}()
 
 		client.log.Debug("SSPI client created, performing GSSAPIBind")
 		err = conn.GSSAPIBind(sspiClient, spn, "")

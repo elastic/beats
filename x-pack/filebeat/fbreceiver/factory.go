@@ -24,8 +24,9 @@ const (
 	Name = "filebeatreceiver"
 )
 
-func createDefaultConfig() component.Config {
-	return &Config{}
+type Settings struct {
+	Home string
+	Data string
 }
 
 func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
@@ -53,9 +54,32 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	return &filebeatReceiver{BeatReceiver: br}, nil
 }
 
+// NewFactory creates a new receiver Factory with empty default paths.
+// It is compatible with the OpenTelemetry Collector Builder, which expects
+// parameterless NewFactory functions.
 func NewFactory() receiver.Factory {
+	return NewFactoryWithSettings(Settings{})
+}
+
+// NewFactoryWithSettings creates a new receiver Factory.  The supplied
+// Settings.Home should be the path that contains the "module"
+// directory so modules can be found and loaded.  The supplied
+// Settings.Data should point to the directory where state information
+// will be kept.  Both can be overridden by passing in path
+// information in the configuration when the receiver in instantiated.
+// This just provides defaults.
+func NewFactoryWithSettings(s Settings) receiver.Factory {
 	return receiver.NewFactory(
 		component.MustNewType(Name),
-		createDefaultConfig,
+		func() component.Config {
+			return &Config{
+				Beatconfig: map[string]any{
+					"path": map[string]any{
+						"home": s.Home,
+						"data": s.Data,
+					},
+				},
+			}
+		},
 		receiver.WithLogs(createReceiver, component.StabilityLevelAlpha))
 }

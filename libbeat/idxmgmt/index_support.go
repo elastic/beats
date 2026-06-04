@@ -218,7 +218,7 @@ func (m *indexManager) VerifySetup(loadTemplate, loadLifecycle LoadMode) (bool, 
 	}
 
 	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
-		return false, "Loading template with ILM settings whithout loading ILM " +
+		return false, "Loading template with ILM settings without loading ILM " +
 			"policy can lead to issues and is not recommended. " +
 			"Check your configuration."
 	}

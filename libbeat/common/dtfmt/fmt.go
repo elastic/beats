@@ -40,7 +40,7 @@ var ctxPool = &sync.Pool{
 }
 
 func newCtx() *ctx {
-	return ctxPool.Get().(*ctx)
+	return ctxPool.Get().(*ctx) //nolint:errcheck // Pool.New always returns *ctx
 }
 
 func newCtxWithSize(sz int) *ctx {
@@ -242,7 +242,7 @@ func parsePatternTo(b *builder, pattern string) error {
 			}
 
 		default:
-			return fmt.Errorf("unsupport format '%c'", tok)
+			return fmt.Errorf("unsupported format '%c'", tok)
 
 		}
 	}

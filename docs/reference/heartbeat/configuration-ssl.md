@@ -151,10 +151,10 @@ This check is not a replacement for the normal SSL validation, but it adds addit
 
 ## Client configuration options [ssl-client-config]
 
-You can specify the following options in the `ssl` section of each subsystem that supports SSL.
+Use these settings when `heartbeat` acts as a **client** connecting to a remote service (for example, Elasticsearch, Logstash, or Kibana). These options control how `heartbeat` verifies the server it connects to and, optionally, presents a client certificate. You can specify the following options in the `ssl` section of each subsystem that supports SSL.
 
 
-### `certificate_authorities` [client-certificate-authorities]
+### `certificate_authorities` (client) [client-certificate-authorities]
 
 The list of root certificates for verifications is required. If `certificate_authorities` is empty or not set, the system keystore is used. If `certificate_authorities` is self-signed, the host system needs to trust that CA cert as well.
 
@@ -279,7 +279,7 @@ Controls the verification of server certificates. Valid values are:
 
 ### `ca_trusted_fingerprint` [ca_trusted_fingerprint]
 
-A HEX encoded SHA-256 of a CA certificate. If this certificate is present in the chain during the handshake, it will be added to the `certificate_authorities` list and the handshake will continue normaly.
+A HEX encoded SHA-256 of a CA certificate. If this certificate is present in the chain during the handshake, it will be added to the `certificate_authorities` list and the handshake will continue normally.
 
 To get the fingerprint from a CA certificate on a Unix-like system, you can use the following command, where `ca.crt` is the certificate.
 
@@ -290,10 +290,10 @@ openssl x509 -fingerprint -sha256 -noout -in ./ca.crt | awk --field-separator="=
 
 ## Server configuration options [ssl-server-config]
 
-You can specify the following options in the `ssl` section of each subsystem that supports SSL.
+Use these settings when `heartbeat` acts as a **server** accepting incoming connections. These options control the certificate `heartbeat` presents to connecting clients and, optionally, how it verifies client certificates. You can specify the following options in the `ssl` section of each subsystem that supports SSL.
 
 
-### `certificate_authorities` [server-certificate-authorities]
+### `certificate_authorities` (server) [server-certificate-authorities]
 
 The list of root certificates for client verifications is only required if `client_authentication` is configured. If `certificate_authorities` is empty or not set, and `client_authentication` is configured, the system keystore is used.
 
@@ -481,7 +481,38 @@ This configures what types of TLS renegotiation are supported. The valid options
 
 
 
+### `certificate_reload.enabled` [certificate_reload_enabled]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+If set to `true`, Heartbeat will automatically reload TLS certificates, keys, and CA certificates from disk whenever they change, without requiring a restart. The default value is:
+
+* {applies_to}`stack: ga 9.3-9.4` `false`
+* {applies_to}`stack: ga 9.5+` `true`
+
+Certificate reload is checked on each TLS handshake. The files are re-read at most once per `certificate_reload.reload_interval`.
+
+
+### `certificate_reload.reload_interval` [certificate_reload_reload_interval]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+How often Heartbeat checks whether the certificate, key, or CA files have changed on disk. The default value is `5s`.
+
+
 ### `restart_on_cert_change.enabled` [exit_on_cert_change_enabled]
+
+```{applies_to}
+stack: deprecated 9.5+
+```
+
+:::{note}
+This setting is deprecated in 9.5.0. Use [`certificate_reload.enabled`](#certificate_reload_enabled) instead. Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart.
+:::
 
 If set to `true` Heartbeat will restart if any file listed by `key`, `certificate`, or `certificate_authorities` is modified.
 
@@ -497,6 +528,14 @@ This feature requres the `execve` system call to be enabled. If you have a custo
 
 
 ### `restart_on_cert_change.period` [restart_on_cert_change_period]
+
+```{applies_to}
+stack: deprecated 9.5+
+```
+
+:::{note}
+This setting is deprecated in 9.5.0. Use [`certificate_reload.reload_interval`](#certificate_reload_reload_interval) instead.
+:::
 
 Specifies how often the files are checked for changes. Do not set the period to less than 1s because the modification time of files is often stored in seconds. Setting the period to less than 1s will result in validation error and Heartbeat will not start. The default value is 1m.
 

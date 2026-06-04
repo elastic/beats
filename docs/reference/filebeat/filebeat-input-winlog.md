@@ -131,7 +131,7 @@ If this option is specified, the input filters events that are older than the sp
 A boolean flag to indicate that the log contains only events collected from remote hosts using the Windows Event Collector. The value defaults to true for the ForwardedEvents log and false for any other log. **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
-This settings allows Filebeat to optimize reads for forwarded events that are already rendered. When the value is true Filebeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
+This setting allows Filebeat to optimize reads for forwarded events that are already rendered. When the value is true Filebeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
 
 
 ### `event_id` [_event_id]

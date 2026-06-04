@@ -47,6 +47,7 @@ func TestNewReceiver(t *testing.T) {
 	monitorHost := hostFromSocket(monitorSocket)
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -83,7 +84,7 @@ func TestNewReceiver(t *testing.T) {
 				Name:    "r1",
 				Beat:    "filebeat",
 				Config:  &config,
-				Factory: NewFactory(),
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
@@ -150,7 +151,7 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		level)
 
-	factory := NewFactory()
+	factory := NewFactoryWithSettings(Settings{Home: tmpDir})
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
@@ -158,7 +159,9 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		rcvr, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
 }
@@ -168,6 +171,7 @@ func benchmarkFactoryWithLogLevel(b *testing.B, level zapcore.Level) {
 func multiReceiverConfig(helper multiReceiverHelper) *Config {
 	return &Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"filebeat": map[string]any{
 				"inputs": []map[string]any{
 					{
@@ -243,7 +247,7 @@ func newMultiReceiverHelper(t *testing.T, number int) multiReceiverHelper {
 func TestMultipleReceivers(t *testing.T) {
 	const nReceivers = 2
 
-	factory := NewFactory()
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 
 	helpers := make([]multiReceiverHelper, nReceivers)
 	configs := make([]oteltest.ReceiverConfig, nReceivers)
@@ -375,6 +379,7 @@ func TestReceiverStatus(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := Config{
 				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
 					"filebeat": map[string]any{
 						"inputs": []map[string]any{
 							{
@@ -403,7 +408,7 @@ func TestReceiverStatus(t *testing.T) {
 						Name:    "r1",
 						Beat:    "filebeat",
 						Config:  &config,
-						Factory: NewFactory(),
+						Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
 					},
 				},
 				Status: test.status,
@@ -686,7 +691,7 @@ func TestConsumeContract(t *testing.T) {
 	// Run the contract checker. This will trigger test failures if any problems are found.
 	receivertest.CheckConsumeContract(receivertest.CheckConsumeContractParams{
 		T:             t,
-		Factory:       NewFactory(),
+		Factory:       NewFactoryWithSettings(Settings{Home: t.TempDir()}),
 		Signal:        pipeline.SignalLogs,
 		Config:        cfg,
 		Generator:     gen,
@@ -719,7 +724,7 @@ func TestReceiverHook(t *testing.T) {
 	}
 	// For filebeatreceiver, we expect 3 hooks to be registered:
 	// 	one for beat metrics, one for input metrics and one for getting the registry.
-	oteltest.TestReceiverHook(t, &cfg, NewFactory(), receiverSettings, 3)
+	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 3)
 }
 
 func hostFromSocket(socket string) string {

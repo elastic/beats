@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const powerQuery = "<show><system><environmentals><power></power></environmentals></system></show>"
+const powerQuery = "<show><system><environmentals><power></power></environmentals></system></show>" //nolint:misspell // environmentals is the PAN-OS API endpoint name
 
 // getPowerEvents retrieves power-related events from a PAN-OS device.
 func getPowerEvents(m *MetricSet) ([]mb.Event, error) {
@@ -58,7 +58,7 @@ func formatPowerEvents(m *MetricSet, response *PowerResponse) []mb.Event {
 					"power.minimum_volts": entry.MinimumVolts,
 					"power.maximum_volts": entry.MaximumVolts,
 				},
-				RootFields: panw.MakeRootFields(m.config.HostIp),
+				RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 			}
 			events = append(events, event)
 		}

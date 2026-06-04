@@ -5,7 +5,7 @@
 set -e
 
 function usage() {
-  echo "Usage: $0 [--tags tag1,tag2,...] [--race] [package_path] TestName [stress options...]"
+  echo "Usage: $0 [--tags tag1,tag2,...] [--race] package_path TestName [stress options...]"
   echo ""
   echo "--tags: Optional comma-separated list of build tags"
   echo "--race: Enable race detection"
@@ -13,9 +13,12 @@ function usage() {
   echo "TestName: Regular expression to match the test to run, equivalent to -test.run."
   echo "[stress options]: Options to pass to the stress command."
   echo ""
+  echo "--tags and --race may appear in any order but must come before package_path."
+  echo ""
   echo "Examples:"
   echo "  $0 ./libbeat/common/backoff ^TestBackoff$ -p 32"
   echo "  $0 --tags integration --race ./libbeat/common/backoff ^TestBackoff$ -p 32"
+  echo "  $0 --race --tags integration ./libbeat/common/backoff ^TestBackoff$ -p 32"
 }
 
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
@@ -23,24 +26,35 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   exit 0
 fi
 
-# Parse optional --tags parameter
+# Parse optional --tags and --race parameters. They may appear in any order
+# but must come before the package_path argument.
 build_tags=""
-if [[ "$1" == "--tags" ]]; then
-  if [[ $# -lt 2 ]]; then
-    echo "Error: --tags requires a value."
-    usage
-    exit 1
-  fi
-  build_tags="$2"
-  shift 2
-fi
-
-# Parse optional --race parameter
 race_flag=""
-if [[ "$1" == "--race" ]]; then
-  race_flag="-race"
-  shift 1
-fi
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tags)
+      if [[ $# -lt 2 ]]; then
+        echo "Error: --tags requires a value."
+        usage
+        exit 1
+      fi
+      if [[ -n "$build_tags" ]]; then
+        echo "Error: --tags specified more than once."
+        usage
+        exit 1
+      fi
+      build_tags="$2"
+      shift 2
+      ;;
+    --race)
+      race_flag="-race"
+      shift 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 if [[ $# -lt 2 ]]; then
   echo "Error: Missing arguments."

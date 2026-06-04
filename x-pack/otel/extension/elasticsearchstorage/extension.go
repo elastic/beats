@@ -9,13 +9,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/extension"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 var _ extension.Extension = (*elasticStorage)(nil)
@@ -23,7 +22,8 @@ var _ backend.Registry = (*elasticStorage)(nil)
 
 type elasticStorage struct {
 	cfg    *Config
-	logger *zap.Logger
+	ctx    context.Context
+	logger *logp.Logger
 	client *eslegclient.Connection
 }
 
@@ -32,13 +32,12 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 	if err != nil {
 		return err
 	}
-	client, err := eslegclient.NewConnectedClient(ctx, c, "Filebeat", logp.NewLogger("", zap.WrapCore(func(zapcore.Core) zapcore.Core {
-		return e.logger.Core()
-	})))
+	client, err := eslegclient.NewConnectedClient(ctx, c, "Filebeat", e.logger)
 	if err != nil {
 		return err
 	}
 	e.client = client
+	e.ctx = ctx
 	return nil
 }
 
@@ -50,12 +49,10 @@ func (e *elasticStorage) Shutdown(ctx context.Context) error {
 }
 
 func (e *elasticStorage) Access(name string) (backend.Store, error) {
-	return openStore(e.client, name)
+	return es.NewStore(e.ctx, e.logger, e.client, name), nil
 }
 
 func (e *elasticStorage) Close() error {
-	if e.client == nil {
-		return nil
-	}
-	return e.client.Close()
+	// no-op. Client will be close in Shutdown
+	return nil
 }

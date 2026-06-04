@@ -36,7 +36,6 @@ class Test(BaseTest):
                 time.sleep(.5)
             proc.check_kill_and_wait()
 
-    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/14647")
     def test_shutdown_wait_ok(self):
         """
         Test stopping filebeat under load: wait for all events being published.
@@ -48,6 +47,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             ignore_older="1h",
             shutdown_timeout="10s",
+            rotate_every_kb=10000,
         )
         filebeat = self.start_beat()
 
@@ -60,11 +60,11 @@ class Test(BaseTest):
 
         self.get_log()
         self.wait_log_contains(
-            "Shutdown output timer started.",
+            "Output shutdown started.",
             max_timeout=15)
 
         self.wait_log_contains(
-            "Continue shutdown: All enqueued events being published.",
+            "Continue shutdown: All enqueued events have been published.",
             max_timeout=15)
 
         # validate registry entry offset matches last published event
@@ -107,11 +107,11 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         self.wait_until(
-            lambda: self.log_contains("Shutdown output timer started."),
+            lambda: self.log_contains("Output shutdown started."),
             max_timeout=15)
 
         self.wait_log_contains(
-            "Continue shutdown: Time out waiting for events being published.",
+            "Continue shutdown: Time out waiting for events to be published.",
             max_timeout=15)
 
         # check registry being really empty

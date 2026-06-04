@@ -69,7 +69,7 @@ func TestOTELCELMetrics(t *testing.T) {
 		t.Fatalf("failed to create exporter: %v", err)
 	}
 
-	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter)
+	otelCELMetrics, transport, err := newOTELCELMetrics(log, *resource, client.Transport, metricExporter, nil)
 	if err != nil {
 		t.Fatalf("failed to create otelCELMetrics: %v", err)
 	}
@@ -130,7 +130,7 @@ func TestOTELCELMetrics(t *testing.T) {
 
 	// Check for presence of expected OTEL metrics
 	expectedMetricNames := []string{
-		"input.cel.periodic.run",
+		"input.cel.periodic.run.count",
 		"input.cel.periodic.program.run.started",
 		"input.cel.periodic.program.run.success",
 		"input.cel.periodic.batch.received",

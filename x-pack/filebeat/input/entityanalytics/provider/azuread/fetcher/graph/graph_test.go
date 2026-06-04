@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
@@ -138,6 +138,40 @@ var deviceUserResponses = map[string]apiUserResponse{
 	},
 	"adbbe40a-0627-4328-89f1-88cac84dbc7f": {
 		Users: []userAPI{{"id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"}},
+	},
+}
+
+var mfaResponse1 = apiMFAResponse{
+	Details: []mfaDetails{
+		{
+			ID:                    "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+			IsMFACapable:          true,
+			IsMFARegistered:       true,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{"microsoftAuthenticatorPush", "softwareOneTimePasscode"},
+			UserPreferredMethodForSecondaryAuthentication: "push",
+			UserType: "member",
+		},
+	},
+}
+
+var mfaResponse2 = apiMFAResponse{
+	Details: []mfaDetails{
+		{
+			ID:                    "d897d560-3d17-4dae-81b3-c898fe82bf84",
+			IsMFACapable:          false,
+			IsMFARegistered:       false,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{},
+			UserPreferredMethodForSecondaryAuthentication: "",
+			UserType: "member",
+		},
 	},
 }
 
@@ -273,6 +307,29 @@ func (s *testServer) setup(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	mux.HandleFunc("/reports/authenticationMethods/userRegistrationDetails", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		var data []byte
+		var err error
+
+		skipToken := r.URL.Query().Get("$skiptoken")
+		switch skipToken {
+		case "":
+			mfaResponse1.NextLink = "http://" + s.addr + "/reports/authenticationMethods/userRegistrationDetails?$skiptoken=test"
+			data, err = json.Marshal(&mfaResponse1)
+		case "test":
+			mfaResponse2.NextLink = ""
+			data, err = json.Marshal(&mfaResponse2)
+		default:
+			err = fmt.Errorf("unknown skipToken value: %q", skipToken)
+		}
+		require.NoError(t, err)
+
+		_, err = w.Write(data)
+		require.NoError(t, err)
+	})
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "Matched unknown route")
 	})
@@ -328,7 +385,7 @@ func TestGraph_Groups(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -392,7 +449,7 @@ func TestGraph_Users(t *testing.T) {
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -502,7 +559,7 @@ func TestGraph_Devices(t *testing.T) {
 			require.NoError(t, err)
 			auth := mock.New(mock.DefaultTokenValue)
 
-			f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+			f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
 			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -521,6 +578,59 @@ func TestGraph_Devices(t *testing.T) {
 			require.Equal(t, wantDeltaLink, gotDeltaLink)
 		})
 	}
+}
+
+func TestGraph_UserMFADetails(t *testing.T) {
+	var testSrv testServer
+	testSrv.setup(t)
+	defer testSrv.srv.Close()
+
+	wantMFA := map[uuid.UUID]*fetcher.MFARegistrationDetails{
+		uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")): {
+			IsMFACapable:          true,
+			IsMFARegistered:       true,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{"microsoftAuthenticatorPush", "softwareOneTimePasscode"},
+			UserPreferredMethodForSecondaryAuthentication: "push",
+			UserType: "member",
+		},
+		uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")): {
+			IsMFACapable:          false,
+			IsMFARegistered:       false,
+			IsPasswordlessCapable: false,
+			IsSsprCapable:         false,
+			IsSsprEnabled:         false,
+			IsSsprRegistered:      false,
+			MethodsRegistered:     []string{},
+			UserPreferredMethodForSecondaryAuthentication: "",
+			UserType: "member",
+		},
+	}
+
+	rawConf := graphConf{
+		APIEndpoint: "http://" + testSrv.addr,
+	}
+	if *trace {
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
+	c, err := config.NewConfigFrom(&rawConf)
+	require.NoError(t, err)
+	auth := mock.New(mock.DefaultTokenValue)
+
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth, &paths.Path{Logs: t.TempDir()})
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	gotMFA, gotErr := f.UserMFADetails(ctx)
+
+	require.NoError(t, gotErr)
+	require.Equal(t, wantMFA, gotMFA)
 }
 
 var formatQueryTests = []struct {
@@ -627,12 +737,11 @@ var validateConfigTests = []struct {
 		},
 	},
 	{
-		name: "invalid_path",
+		name: "invalid_path_accepted_at_config_time",
 		config: map[string]any{
 			"tracer.enabled":  true,
 			"tracer.filename": "/var/logs/path.log",
 		},
-		wantErr: errors.New(`request tracer path must be within "azure-ad" path accessing 'tracer'`),
 	},
 }
 

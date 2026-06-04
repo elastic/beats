@@ -75,7 +75,7 @@ func (u *UserProfile) getJumplists(log *logger.Logger) []*jumplist {
 			}
 		case jumplistTypeAutomatic:
 			for _, file := range files {
-				jumpList, err := parseAutomaticJumpListFile(file, u, log)
+				jumpList, err := parseAutomaticJumplistFile(file, u, log)
 				if err != nil {
 					log.Errorf("%s", err)
 					continue

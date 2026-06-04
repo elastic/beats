@@ -59,6 +59,7 @@ type RunnerFactory func(socketPath string, opts ...Option) (Runner, error)
 type OSQueryD struct {
 	socketPath string
 	binPath    string
+	extPath    string
 	dataPath   string
 	certsPath  string
 	lensesPath string
@@ -83,6 +84,12 @@ func WithExtensionsTimeout(to int) Option {
 func WithBinaryPath(binPath string) Option {
 	return func(q *OSQueryD) {
 		q.binPath = binPath
+	}
+}
+
+func WithExtensionPath(extPath string) Option {
+	return func(q *OSQueryD) {
+		q.extPath = extPath
 	}
 }
 
@@ -177,7 +184,8 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 	}
 
 	//nolint:gosec // works as expected
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		osquerydPath(q.binPath),
 		"--S",
 		"--version",
@@ -199,7 +207,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	}
 	defer cleanup()
 
-	cmd := q.createCommand(flags)
+	cmd := q.createCommand(ctx, flags)
 
 	q.log.Debugf("start osqueryd process: args: %v", cmd.Args)
 
@@ -298,7 +306,10 @@ func (q *OSQueryD) prepare() (func(), error) {
 	}
 
 	// Prepare autoload osquery-extension
-	extensionPath := osqueryExtensionPath(q.binPath)
+	extensionPath := q.extPath
+	if extensionPath == "" {
+		extensionPath = osqueryExtensionPath(q.binPath)
+	}
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("extension path does not exist: %s, %w", extensionPath, err)
@@ -549,9 +560,9 @@ func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
 	return normalize(enabledTables), normalize(disabledTables)
 }
 
-func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+func (q *OSQueryD) createCommand(ctx context.Context, userFlags Flags) *exec.Cmd {
 	//nolint:gosec // works as expected
-	return exec.Command(
+	return exec.CommandContext(ctx,
 		osquerydPath(q.binPath), q.args(userFlags)...)
 }
 
@@ -560,11 +571,11 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	return QsquerydPathForPlatform(runtime.GOOS, dir)
+	return OsquerydPathForPlatform(runtime.GOOS, dir)
 }
 
-// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
-func QsquerydPathForPlatform(platform, dir string) string {
+// OsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func OsquerydPathForPlatform(platform, dir string) string {
 	if platform == "darwin" {
 		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
 
@@ -581,6 +592,18 @@ func osquerydFilename(platform string) string {
 
 func osqueryExtensionPath(dir string) string {
 	return filepath.Join(dir, extensionName)
+}
+
+// OsqueryExtensionPathForPlatform returns the full path to osquery extension binary for platform.
+func OsqueryExtensionPathForPlatform(platform, dir string) string {
+	return filepath.Join(dir, osqueryExtensionFilename(platform))
+}
+
+func osqueryExtensionFilename(platform string) string {
+	if platform == "windows" {
+		return "osquery-extension.exe"
+	}
+	return "osquery-extension.ext"
 }
 
 func (q *OSQueryD) resolveDataPath(filename string) string {
