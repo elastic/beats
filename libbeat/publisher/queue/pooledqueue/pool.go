@@ -48,6 +48,19 @@ type Pool[T any] struct {
 	closeOnce sync.Once
 	closed    chan struct{}
 
+	// batchPool recycles *batch[T] objects. Queue.Get pulls a batch from
+	// here and resets it instead of heap-allocating, and batch.Done /
+	// batch.Release return finished batches once the queue and consumer
+	// have released them. The backing arrays for `indices`,
+	// `ackProducers`, and `ackCounts` are kept across recycles, so the
+	// hot path is near zero-alloc after warmup.
+	//
+	// sync.Pool is per-P-local under the hood; cross-receiver contention
+	// is only paid in the rare case a P falls back to the shared store.
+	// In normal operation each consumer's Get and each worker's Done
+	// hit their own goroutine's local pool.
+	batchPool sync.Pool
+
 	// queues is the set of Queue façades currently connected to the pool. It
 	// is used to broadcast a shutdown notification when the pool itself is
 	// closed and is the authoritative source for ConnectedQueues(); individual
@@ -77,11 +90,36 @@ func NewPool[T any](settings Settings, observer queue.Observer) *Pool[T] {
 		closed:   make(chan struct{}),
 		queues:   make(map[*Queue[T]]struct{}),
 	}
+	p.batchPool.New = func() any { return &batch[T]{} }
 	for i := 0; i < settings.Events; i++ {
 		p.free <- i
 	}
 	p.observer.MaxEvents(settings.Events)
 	return p
+}
+
+// getBatch returns a recycled or freshly allocated *batch[T]. Callers
+// are responsible for populating it via fillBatch before exposing it.
+func (p *Pool[T]) getBatch() *batch[T] {
+	return p.batchPool.Get().(*batch[T])
+}
+
+// putBatch resets a batch's transient state and returns it to the
+// recycle pool. The backing arrays for indices/ackProducers/ackCounts
+// are kept so subsequent uses reuse the same memory. The caller must
+// guarantee that no one still holds a usable reference to b.
+func (p *Pool[T]) putBatch(b *batch[T]) {
+	// Clear strong references so the GC isn't held up by recycled
+	// batches and so a stray call into a recycled batch fails fast
+	// (b.queue == nil triggers the double-completion guards).
+	b.queue = nil
+	b.indices = b.indices[:0]
+	b.ackProducers = b.ackProducers[:0]
+	b.ackCounts = b.ackCounts[:0]
+	b.next = nil
+	b.done = false
+	b.freed = false
+	p.batchPool.Put(b)
 }
 
 // Connect returns a new per-pipeline Queue façade backed by this pool. Each

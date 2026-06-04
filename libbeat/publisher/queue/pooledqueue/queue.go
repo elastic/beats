@@ -83,10 +83,20 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 			if maxEvents > 0 && maxEvents < n {
 				n = maxEvents
 			}
-			indices := make([]int, 0, n)
+			// Pull a recycled batch from the pool. Its slices retain
+			// their backing arrays from previous uses; we reset
+			// lengths and append into them. The batch is owned solely
+			// by this Queue/consumer/worker chain until Done/Release
+			// returns it to the pool.
+			b := q.pool.getBatch()
+			b.queue = q
+			b.indices = b.indices[:0]
+			b.done = false
+			b.freed = false
+			b.next = nil
 			cur := q.head
 			for i := 0; i < n; i++ {
-				indices = append(indices, cur)
+				b.indices = append(b.indices, cur)
 				cur = q.pool.storage[cur].next
 			}
 			q.head = cur
@@ -94,7 +104,6 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 				q.tail = -1
 			}
 			q.count -= n
-			b := &batch[T]{queue: q, indices: indices}
 			if q.pendingTail != nil {
 				q.pendingTail.next = b
 			} else {
