@@ -56,16 +56,6 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-// dataStreamAttributeKeys are the data_stream sub-fields promoted to log record
-// attributes to support dynamic indexing. They double as both the mapstr lookup
-// path and the attribute key, and are kept at package scope so they aren't
-// rebuilt for every event.
-var dataStreamAttributeKeys = [...]string{
-	"data_stream.dataset",
-	"data_stream.namespace",
-	"data_stream.type",
-}
-
 type retryConfig struct {
 	init time.Duration
 	max  time.Duration
