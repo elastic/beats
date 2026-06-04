@@ -101,7 +101,8 @@ func NewPool[T any](settings Settings, observer queue.Observer) *Pool[T] {
 // getBatch returns a recycled or freshly allocated *batch[T]. Callers
 // are responsible for populating it via fillBatch before exposing it.
 func (p *Pool[T]) getBatch() *batch[T] {
-	return p.batchPool.Get().(*batch[T])
+	b, _ := p.batchPool.Get().(*batch[T])
+	return b
 }
 
 // putBatch resets a batch's transient state and returns it to the

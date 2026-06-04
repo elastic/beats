@@ -95,7 +95,8 @@ func TestRecycledBatchFieldsAreReset(t *testing.T) {
 	p.Publish(8)
 	b2, err := q.Get(0)
 	require.NoError(t, err)
-	bi := b2.(*batch[int])
+	bi, ok := b2.(*batch[int])
+	require.True(t, ok, "Get must return a *batch[int]")
 	assert.False(t, bi.freed, "freed must be reset")
 	assert.False(t, bi.done, "done must be reset")
 	assert.Nil(t, bi.next, "next must be reset")
@@ -131,7 +132,8 @@ func TestBatchRecycleResetsAckSlices(t *testing.T) {
 		// Inspect the underlying batch struct's ackProducers/Counts
 		// BEFORE Done: they should be empty (cleared by recycle or
 		// fresh on first iteration).
-		bi := b.(*batch[int])
+		bi, ok := b.(*batch[int])
+		require.True(t, ok, "Get must return a *batch[int]")
 		require.Empty(t, bi.ackProducers, "ackProducers must start empty on recycle/use")
 		require.Empty(t, bi.ackCounts, "ackCounts must start empty on recycle/use")
 
@@ -170,7 +172,9 @@ func TestRecycleAfterRelease(t *testing.T) {
 		require.True(t, ok)
 		b, err := q.Get(0)
 		require.NoError(t, err)
-		b.(*batch[int]).Release()
+		bi, ok := b.(*batch[int])
+		require.True(t, ok, "Get must return a *batch[int]")
+		bi.Release()
 	}
 
 	assert.Less(t, newCount, cycles/2,
@@ -202,8 +206,10 @@ func TestDoubleDoneIsSafe(t *testing.T) {
 	// Second Done on the stale reference: guarded by the queue == nil
 	// check, must be a no-op. If it weren't, indices would re-release
 	// to pool.free and Available would exceed Capacity.
+	bi, ok := b.(*batch[int])
+	require.True(t, ok, "Get must return a *batch[int]")
 	assert.NotPanics(t, func() { b.Done() })
-	assert.NotPanics(t, func() { b.(*batch[int]).Release() })
+	assert.NotPanics(t, func() { bi.Release() })
 	assert.Equal(t, 4, pool.Available(),
 		"second Done/Release on a recycled batch must not double-release slots")
 }

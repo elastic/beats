@@ -339,7 +339,9 @@ func TestReleaseDrainsStrandedCompletedSuccessors(t *testing.T) {
 	// pendingHead with nothing to ever drain it. With the fix Release
 	// drains the now-exposed completed prefix and fires their ACK
 	// callbacks in publish order.
-	bA.(*batch[int]).Release()
+	bAi, ok := bA.(*batch[int])
+	require.True(t, ok, "Get must return a *batch[int]")
+	bAi.Release()
 
 	for i := 0; i < 2; i++ {
 		select {
