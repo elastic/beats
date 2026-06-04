@@ -97,8 +97,6 @@ func TestSplitHostnamePort(t *testing.T) {
 		},
 	}
 	for _, test := range urlTests {
-		test := test
-
 		t.Run(test.name, func(t *testing.T) {
 			url := &url.URL{
 				Scheme: test.scheme,
@@ -120,7 +118,7 @@ func TestSplitHostnamePort(t *testing.T) {
 					t.Errorf("Unexpected host for %#v: expected %q, got %q", request, test.expectedHost, host)
 				}
 				if port != test.expectedPort {
-					t.Errorf("Unexpected port for %#v: expected %q, got %q", request, test.expectedPort, port)
+					t.Errorf("Unexpected port for %#v: expected %d, got %d", request, test.expectedPort, port)
 				}
 			}
 

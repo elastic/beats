@@ -51,6 +51,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"index_summary",
 		"ml_job",
 		"node_stats",
+		"security_stats",
 		"shard",
 	}
 	optionalXpackMetricsets := []string{"ingest_pipeline"}
@@ -63,6 +64,10 @@ var (
 
 	// EnrichStatsAPIAvailableVersion is the version of Elasticsearch since when the Enrich stats API is available.
 	EnrichStatsAPIAvailableVersion = version.MustNew("7.5.0")
+
+	// SecurityStatsAPIAvailableVersion is the version of Elasticsearch since when the Security Stats API
+	// (GET /_security/stats) is available.
+	SecurityStatsAPIAvailableVersion = version.MustNew("9.2.0")
 
 	// BulkStatsAvailableVersion is the version since when bulk indexing stats are available
 	BulkStatsAvailableVersion = version.MustNew("8.0.0")
@@ -381,6 +386,9 @@ type XPack struct {
 		ML struct {
 			Enabled bool `json:"enabled"`
 		} `json:"ml"`
+		Security struct {
+			Enabled bool `json:"enabled"`
+		} `json:"security"`
 	} `json:"features"`
 }
 

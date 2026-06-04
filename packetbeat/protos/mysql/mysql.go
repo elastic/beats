@@ -220,6 +220,11 @@ func (mysql *mysqlPlugin) setFromConfig(config *mysqlConfig) {
 	mysql.prepareStatementTimeout = config.StatementTimeout
 }
 
+func (mysql *mysqlPlugin) Close() {
+	mysql.transactions.StopJanitor()
+	mysql.prepareStatements.StopJanitor()
+}
+
 func (mysql *mysqlPlugin) getTransaction(k common.HashableTCPTuple) *mysqlTransaction {
 	v := mysql.transactions.Get(k)
 	if v != nil {

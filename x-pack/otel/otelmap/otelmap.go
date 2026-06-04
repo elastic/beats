@@ -9,6 +9,7 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"time"
 
@@ -90,7 +91,35 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 				continue
 			}
 			m[key] = string(text)
-		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
+		case float64:
+			if isFloatWholeNumber(x) {
+				m[key] = int64(x)
+			}
+		case float32:
+			if isFloatWholeNumber(float64(x)) {
+				m[key] = int64(x)
+			}
+		case []float64:
+			s := make([]any, len(x))
+			for i, v := range x {
+				if isFloatWholeNumber(v) {
+					s[i] = int64(v)
+				} else {
+					s[i] = v
+				}
+			}
+			m[key] = s
+		case []float32:
+			s := make([]any, len(x))
+			for i, v := range x {
+				if isFloatWholeNumber(float64(v)) {
+					s[i] = int64(v)
+				} else {
+					s[i] = v
+				}
+			}
+			m[key] = s
+		case []bool, []string, []int, []int8, []int16, []int32, []int64,
 			[]uint, []uint8, []uint16, []uint32, []uint64:
 			ref := reflect.ValueOf(x)
 			s := make([]any, ref.Len())
@@ -98,7 +127,7 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 				s[i] = ref.Index(i).Interface()
 			}
 			m[key] = s
-		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
+		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, bool:
 		default:
 			ref := reflect.ValueOf(x)
 			if ref.Kind() == reflect.Struct {
@@ -132,6 +161,16 @@ func ConvertNonPrimitive[T mapstrOrMap](m T) {
 			m[key] = fmt.Sprintf("unknown type: %T", x)
 		}
 	}
+}
+
+// isFloatWholeNumber reports whether f is a finite, whole number that fits in int64.
+// Used to convert whole-number floats to int64 so the OTel ES exporter
+// (ExplicitRadixPoint=true) serialises them without a trailing ".0", matching
+// the Beats Elasticsearch output behaviour.
+func isFloatWholeNumber(f float64) bool {
+	return !math.IsNaN(f) && !math.IsInf(f, 0) &&
+		f == math.Trunc(f) &&
+		f >= float64(math.MinInt64) && f < float64(math.MaxInt64)
 }
 
 // marshalUnmarshal converts an interface to a mapstr.M by marshalling to JSON
