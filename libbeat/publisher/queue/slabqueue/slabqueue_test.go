@@ -294,6 +294,82 @@ func TestCloseWaitsForInFlightBatches(t *testing.T) {
 	}
 }
 
+// TestReleaseDrainsStrandedCompletedSuccessors verifies an ordering
+// invariant in Release: if an earlier batch is still in-flight and
+// later batches have already been Done()'d (their done=true but the
+// front isn't done so the sweep stopped at the head), Releasing the
+// front must drain the now-exposed already-completed prefix.
+// Otherwise those successors sit in pendingHead with done=true
+// forever — their producer ACK callbacks never fire, their batch
+// objects never recycle, and q.Done() blocks indefinitely on the
+// stuck pendingHead.
+func TestReleaseDrainsStrandedCompletedSuccessors(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+
+	acked := make(chan int, 4)
+	p := q.Producer(queue.ProducerConfig{ACK: func(n int) { acked <- n }})
+	for i := 0; i < 4; i++ {
+		p.Publish(i)
+	}
+
+	// Pull three batches in publish order — A, B, C — each holding one
+	// of the published events.
+	bA, err := q.Get(1)
+	require.NoError(t, err)
+	bB, err := q.Get(1)
+	require.NoError(t, err)
+	bC, err := q.Get(1)
+	require.NoError(t, err)
+
+	// Complete B and C ahead of A. Their Done() sweeps walk pendingHead,
+	// see A not done, and stop — so B and C end up with done=true but
+	// still in pendingHead behind A. No ACK callbacks fire yet because
+	// publish-order isn't satisfied.
+	bB.Done()
+	bC.Done()
+	select {
+	case n := <-acked:
+		t.Fatalf("no ACK callback should fire while front-of-queue (A) is still in flight (got %d)", n)
+	case <-time.After(50 * time.Millisecond):
+	}
+
+	// Release A. Without the fix this leaves B (done) at the head of
+	// pendingHead with nothing to ever drain it. With the fix Release
+	// drains the now-exposed completed prefix and fires their ACK
+	// callbacks in publish order.
+	bA.(*batch[int]).Release()
+
+	for i := 0; i < 2; i++ {
+		select {
+		case n := <-acked:
+			assert.Equal(t, 1, n, "B and C each produced one event so each ACK should be 1")
+		case <-time.After(time.Second):
+			t.Fatalf("expected B/C ACK callback after Release drained the head prefix (got %d/2)", i)
+		}
+	}
+
+	// Drain the last published event (still in the queue's own FIFO) so
+	// q.Done() ends in a clean state.
+	bD, err := q.Get(0)
+	require.NoError(t, err)
+	bD.Done()
+	select {
+	case n := <-acked:
+		assert.Equal(t, 1, n)
+	case <-time.After(time.Second):
+		t.Fatal("last batch ACK callback did not fire")
+	}
+
+	q.Close(false)
+	select {
+	case <-q.Done():
+	case <-time.After(time.Second):
+		t.Fatal("q.Done() must fire after Release drains the stranded prefix")
+	}
+}
+
 // TestPerPipelineACKIsolation verifies that pipelines' ACK callbacks are
 // independent: acking A's batch fires A's callback, not B's.
 func TestPerPipelineACKIsolation(t *testing.T) {

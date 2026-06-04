@@ -240,9 +240,12 @@ func (b *batch[T]) Release() {
 
 	// Remove the batch from the pending FIFO if it's still there.
 	// Done's sweep relies on the per-batch `done` flag and walks from
-	// the head; for a Released batch we just splice it out wherever it
-	// sits so a later Done on an earlier batch doesn't get stuck behind
-	// us (and so the sweep can still drain the prefix that's ready).
+	// the head; for a Released batch we splice it out wherever it sits
+	// so the sweep can drain the prefix that's ready. After the splice,
+	// if any batches were already Done()'d but stuck behind us they
+	// must be drained here — otherwise a later Done() may never come
+	// to drain them and they would sit in pendingHead indefinitely,
+	// blocking q.Done() and leaking their ACK callbacks + batch object.
 	q := b.queue
 	q.mu.Lock()
 	var prev *batch[T]
@@ -261,10 +264,51 @@ func (b *batch[T]) Release() {
 		prev = cur
 	}
 	b.next = nil
+
+	// Drain the now-exposed head prefix of already-completed batches.
+	// Mirrors Done's sweep so a Release that unblocks a queue of
+	// completed-but-stalled successors gets them ACKed (or recycled
+	// under force-close) just as Done would have.
+	var toAckHead, toAckTail *batch[T]
+	for q.pendingHead != nil && q.pendingHead.done {
+		ready := q.pendingHead
+		q.pendingHead = ready.next
+		ready.next = nil
+		if toAckTail == nil {
+			toAckHead = ready
+		} else {
+			toAckTail.next = ready
+		}
+		toAckTail = ready
+	}
+	if q.pendingHead == nil {
+		q.pendingTail = nil
+	}
 	q.maybeMarkDone()
+	forced := q.forced.Load()
 	q.mu.Unlock()
 
-	// b is no longer reachable from the queue and the caller has
-	// released it (Release is the abandonment path) — safe to recycle.
+	// Fire ACK callbacks for the drained successors in publish order.
+	// Suppressed under force-close, matching Done's contract.
+	if !forced {
+		for ab := toAckHead; ab != nil; ab = ab.next {
+			for i, p := range ab.ackProducers {
+				if p.cfg.ACK != nil {
+					p.cfg.ACK(ab.ackCounts[i])
+				}
+			}
+		}
+	}
+
+	// Recycle each drained successor; capture next before putBatch
+	// clears the .next field.
+	for ab := toAckHead; ab != nil; {
+		next := ab.next
+		pool.putBatch(ab)
+		ab = next
+	}
+
+	// b itself is no longer reachable from the queue and the caller
+	// has released it — safe to recycle.
 	pool.putBatch(b)
 }
