@@ -139,7 +139,7 @@ receivers:
             - add_kubernetes_metadata: ~
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
-		management.otel.enabled: true
+        management.otel.enabled: true
 service:
     extensions:
         - beatsauth
