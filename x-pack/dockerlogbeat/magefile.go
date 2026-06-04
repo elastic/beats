@@ -421,11 +421,16 @@ func BuildAndInstall() {
 	mg.SerialDeps(Build, Install)
 }
 
-// Update copies entry.proto from the moby/moby/v2 module cache, regenerates
+// Update is currently a dummy test for the `testsuite` target
+func Update() {
+	fmt.Println(">> update: There is no Update for The Elastic Log Plugin")
+}
+
+// Generate copies entry.proto from the moby/moby/v2 module cache, regenerates
 // logdriver/entry.pb.go via go generate, adds the Elastic license header, and
 // formats the file. Run this after bumping the moby dependency.
 // Requires protoc and protoc-gen-gogofaster: go install github.com/gogo/protobuf/protoc-gen-gogofaster@latest
-func Update() error {
+func Generate() error {
 	out, err := sh.Output("go", "list", "-m", "-json", "github.com/moby/moby/v2")
 	if err != nil {
 		return fmt.Errorf("finding moby module: %w", err)
