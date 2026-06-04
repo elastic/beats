@@ -25,6 +25,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
@@ -59,6 +60,13 @@ import (
 type benchEvent struct {
 	id int
 }
+
+// benchEventPayloadSize is the in-memory size of one benchEvent — used by
+// b.SetBytes so go test -bench reports a MB/s column alongside ns/op.
+// It tracks the size of the struct stored in pool.storage, not any
+// production event payload; the number is honest for the benchmark but
+// doesn't translate to "MB/s through the queue at production scale."
+const benchEventPayloadSize = int64(unsafe.Sizeof(benchEvent{}))
 
 // benchPipelines is the set of input/receiver counts we sweep. For memqueue
 // this is the number of producers feeding the single shared queue. For
@@ -140,6 +148,10 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 	m := len(producers)
 	totalEvents := benchEventsPerIteration * b.N
 	perProducer := totalEvents / m
+	// Reports MB/s alongside ns/op so workload throughput is visible
+	// in the benchmark output. Counts the in-memory size of benchEvent
+	// (not a production payload size).
+	b.SetBytes(int64(benchEventsPerIteration) * benchEventPayloadSize)
 
 	consumed := make(chan int, 1024)
 

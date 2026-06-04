@@ -74,8 +74,7 @@ func TestPipeline(t *testing.T) {
 					fmt.Printf("%v Start stress test %v\n", start.Format(time.RFC3339), t.Name())
 				}
 				defer func() {
-					end := time.Now()
-					elapsed := end.Sub(start)
+					elapsed := time.Since(start)
 					acked := stress.AckedEventCount.Load()
 					rate := float64(acked) / elapsed.Seconds()
 					fmt.Printf("STRESS %v: acked=%d duration=%v rate=%.0f events/s\n",
