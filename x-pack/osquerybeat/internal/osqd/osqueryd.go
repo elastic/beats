@@ -399,8 +399,13 @@ func verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string) er
 }
 
 func (q *OSQueryD) prepareBinPath() error {
-	// If path to osquery was not set use the current executable path
 	if q.binPath == "" {
+		// Allow tests to override binary discovery via env var (e.g. when the
+		// receiver runs in-process and os.Executable returns a temp test binary).
+		if dir := os.Getenv("OSQUERYBEAT_BINARY_DIR"); dir != "" {
+			q.binPath = dir
+			return nil
+		}
 		exePath, err := os.Executable()
 		if err != nil {
 			return err

@@ -53,7 +53,10 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		defer mx.Unlock()
 	}
 
-	// Cleanup on exit
+	// Cleanup on exit: cancel child context first, then wait for the runfn
+	// goroutine to exit. The order matters — cancel must run before wg.Wait
+	// so the goroutine sees context cancellation and exits promptly.
+	defer wg.Wait()
 	defer cancel()
 
 	errCh := make(chan error, 1)
@@ -87,7 +90,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		if cn == nil {
 			r.log.Info("Start osqueryd")
 			inputCh = make(chan []config.InputConfig, 1)
-			ctx, cn = context.WithCancel(parentCtx)
+			ctx, cn = context.WithCancel(parentCtx) //nolint:gosec // cn is called via the cancel wrapper defined above
 
 			wg.Add(1)
 			go func() {

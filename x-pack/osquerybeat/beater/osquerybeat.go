@@ -226,6 +226,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
+		osqd.WithDataPath(b.Info.Paths.Resolve(paths.Data, "osquery")),
 	}
 	if osqueryRuntime.BinDir != "" {
 		opts = append(opts, osqd.WithBinaryPath(osqueryRuntime.BinDir))
@@ -244,6 +245,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		b.Manager.UpdateStatus(status.Failed, "Failed to create osqueryd: "+err.Error())
 		return err
 	}
+
+	// Register diagnostic hooks before any operation that may fail so that
+	// hooks are always available regardless of whether osqueryd is reachable.
+	bt.registerDiagnosticHooks(b)
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
@@ -278,9 +283,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		_ = runner.Update(ctx, bt.config.Inputs)
 	}
 
-	// Ensure that all the hooks and actions are ready before starting the Manager
-	// to receive configuration.
-	bt.registerDiagnosticHooks(b)
 	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // SA1019 will be addressed in a follow-up
 		b.Manager.UpdateStatus(status.Failed, "Failed to start manager: "+err.Error())
 		return err

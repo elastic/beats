@@ -32,7 +32,7 @@ func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
 
 	cfg := &Config{
-		Beatconfig: map[string]interface{}{
+		Beatconfig: map[string]any{
 			"osquerybeat": map[string]any{
 				"inputs": []any{
 					map[string]any{
@@ -92,9 +92,9 @@ func TestReceiverHook(t *testing.T) {
 		},
 	}
 
-	// For osquerybeatreceiver, we expect 1 hook to be registered for beat metrics.
-	// Unlike metricbeat-based beaters, osquerybeat does not register an input metrics hook.
-	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 1)
+	// For osquerybeatreceiver, we expect 2 hooks: one for beat metrics and one for
+	// scheduled query profiles registered by osquerybeat.registerDiagnosticHooks.
+	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
 }
 
 func genSocketPath() string {
