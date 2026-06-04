@@ -132,8 +132,6 @@ receivers:
                     name: {{ .Subscription }}
                   topic: test-topic-foo
                   type: gcp-pubsub
-        output:
-            otelconsumer:
         processors:
             - add_host_metadata: ~
             - add_cloud_metadata: ~
@@ -141,6 +139,7 @@ receivers:
             - add_kubernetes_metadata: ~
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
+		management.otel.enabled: true
 service:
     extensions:
         - beatsauth

@@ -126,8 +126,6 @@ receivers:
                   interval: 1s
                   resource.url: {{ .ResourceURL }}
                   program: {{ .Program }}
-        output:
-            otelconsumer:
         processors:
             - add_host_metadata: ~
             - add_cloud_metadata: ~
@@ -135,6 +133,7 @@ receivers:
             - add_kubernetes_metadata: ~
         queue.mem.flush.timeout: 0s
         setup.template.enabled: false
+		management.otel.enabled: true
 service:
     extensions:
         - beatsauth
@@ -227,7 +226,6 @@ service:
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
-		"event.created",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
