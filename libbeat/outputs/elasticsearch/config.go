@@ -99,8 +99,7 @@ func (c *ElasticsearchConfig) Validate() error {
 	// Certificate hot-reload was introduced after this branch was cut. Disable it
 	// by default so it does not activate silently in a patch release.
 	if c.Transport.TLS != nil && c.Transport.TLS.CertificateReload.Enabled == nil {
-		enabled := false
-		c.Transport.TLS.CertificateReload.Enabled = &enabled
+		c.Transport.TLS.CertificateReload.Enabled = new(false)
 	}
 
 	return nil

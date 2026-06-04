@@ -138,8 +138,7 @@ func getHttpClient(a *authenticator) (roundTripperProvider, error) {
 	// Certificate hot-reload was introduced after this branch was cut. Disable it
 	// by default so it does not activate silently in a patch release.
 	if beatAuthConfig.Transport.TLS != nil && beatAuthConfig.Transport.TLS.CertificateReload.Enabled == nil {
-		enabled := false
-		beatAuthConfig.Transport.TLS.CertificateReload.Enabled = &enabled
+		beatAuthConfig.Transport.TLS.CertificateReload.Enabled = new(false)
 	}
 
 	client, err := beatAuthConfig.Transport.Client(a.getHTTPOptions(beatAuthConfig.Transport.IdleConnTimeout)...)

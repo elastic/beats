@@ -157,8 +157,7 @@ func (c *certReloadConfig) Validate() error {
 	// Certificate hot-reload was introduced after this branch was cut. Disable it
 	// by default so it does not activate silently in a patch release.
 	if c.CertificateReload.Enabled == nil {
-		enabled := false
-		c.CertificateReload.Enabled = &enabled
+		c.CertificateReload.Enabled = new(false)
 	}
 
 	if c.Reload.Period < time.Second {

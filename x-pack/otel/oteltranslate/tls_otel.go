@@ -52,8 +52,7 @@ func TLSCommonToOTel(output *config.C, logger *logp.Logger) (map[string]any, err
 	// Certificate hot-reload was introduced after this branch was cut. Disable it
 	// by default so it does not activate silently in a patch release.
 	if tlsCfg.TLS.CertificateReload.Enabled == nil {
-		enabled := false
-		tlsCfg.TLS.CertificateReload.Enabled = &enabled
+		tlsCfg.TLS.CertificateReload.Enabled = new(false)
 	}
 
 	tlscfg := tlsCfg.TLS
