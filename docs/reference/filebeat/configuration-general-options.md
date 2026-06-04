@@ -85,7 +85,11 @@ The registry will be migrated to the new location only if a registry using the d
 The storage backend used for the registry. Supported values:
 
 - `memlog` (default): An in-memory log with periodic disk flushing. This is the original backend and is well-tested.
-- `otel_file_storage`: Persists registry state using the same on-disk layout as the OpenTelemetry Collector [file_storage](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage) extension. Registry files live under the directory specified by `registry.path`. Optional settings are configured under `registry.otel_file_storage`.
+- `otel_file_storage` {applies_to}`stack: preview 9.5`: Persists registry state using the same on-disk layout as the OpenTelemetry Collector [file_storage](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage) extension. Registry files live under the directory specified by `registry.path`. Optional settings are configured under `registry.otel_file_storage`.
+
+::::{warning}
+The `otel_file_storage` backend is in technical preview and may be changed or removed in a future release. Elastic will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features.
+::::
 
 ```yaml
 filebeat.registry.backend: memlog

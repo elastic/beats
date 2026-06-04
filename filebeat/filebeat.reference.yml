@@ -1382,6 +1382,8 @@ filebeat.inputs:
 # with periodic disk flushing. The "otel_file_storage" backend stores state
 # using the same on-disk layout as the OpenTelemetry Collector file_storage
 # extension (under registry.path).
+# NOTE: The "otel_file_storage" backend is in technical preview (available
+# since 9.5) and may be changed or removed in a future release.
 #filebeat.registry.backend: memlog
 
 # ----------------------- OTel file_storage backend settings -------------------
