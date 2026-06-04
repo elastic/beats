@@ -92,6 +92,13 @@ filebeat.registry.backend: memlog
 ```
 
 ### `registry.otel_file_storage` [_registry_otel_file_storage]
+```{applies_to}
+  stack: preview 9.5
+```
+
+::::{warning}
+This functionality is in technical preview and may be changed or removed in a future release.
+::::
 
 These settings apply only when `registry.backend` is set to `otel_file_storage`. They map directly to the OpenTelemetry Collector [file_storage extension configuration](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage). Filebeat overrides the following defaults:
 
