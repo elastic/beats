@@ -55,8 +55,8 @@ func TestLoggerWithEvent(t *testing.T) {
 			loggerLevel: zapcore.InfoLevel,
 			emit:        func(l *logp.Logger) { l.Warnf("hello") },
 			wantEntries: 1,
-			wantFields:  map[string]string{"operation": "create", "source_file": "src-1"},
-			wantAbsent:  []string{"fingerprint", "os_id", "new_path", "old_path"},
+			wantFields:  map[string]string{"operation": "create"},
+			wantAbsent:  []string{"source_file", "fingerprint", "os_id", "new_path", "old_path"},
 		},
 		{
 			name:        "warnf with all event fields populates every key",
@@ -65,13 +65,11 @@ func TestLoggerWithEvent(t *testing.T) {
 			emit:        func(l *logp.Logger) { l.Warnf("hello") },
 			wantEntries: 1,
 			wantFields: map[string]string{
-				"operation":   "rename",
-				"source_file": "src-2",
-				"fingerprint": "abc123",
-				"new_path":    "/var/log/new.log",
-				"old_path":    "/var/log/old.log",
+				"operation": "rename",
+				"new_path":  "/var/log/new.log",
+				"old_path":  "/var/log/old.log",
 			},
-			wantAbsent: []string{"os_id"},
+			wantAbsent: []string{"source_file", "fingerprint", "os_id"},
 		},
 		{
 			name:        "debugf is a no-op when debug logging is disabled",
@@ -86,7 +84,8 @@ func TestLoggerWithEvent(t *testing.T) {
 			loggerLevel: zapcore.DebugLevel,
 			emit:        func(l *logp.Logger) { l.Debugf("noisy %d", 1) },
 			wantEntries: 1,
-			wantFields:  map[string]string{"operation": "create", "source_file": "src-1"},
+			wantFields:  map[string]string{"operation": "create"},
+			wantAbsent:  []string{"source_file", "fingerprint"},
 		},
 	}
 

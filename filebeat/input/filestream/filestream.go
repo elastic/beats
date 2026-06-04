@@ -141,6 +141,10 @@ func (f *logFile) Read(buf []byte) (int, error) {
 			return totalN, err
 		}
 
+		// TODO(#50725): this message repeats the file path, which is also in the
+		// "path" log field. De-duplicating it and the similar messages below is
+		// deferred to its own PR, as it changes log lines many integration tests
+		// assert on.
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
 		f.backoff.Wait()
 	}
@@ -285,7 +289,7 @@ func (f *logFile) handleEOF() error {
 	// calling the stat function
 	info, statErr := f.file.Stat()
 	if statErr != nil {
-		f.log.Error("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
+		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
 		return statErr
 	}
 

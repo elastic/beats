@@ -32,6 +32,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -642,6 +645,66 @@ func TestCursorAllEventsPublished(t *testing.T) {
 		0,
 		cursor.resource.pending.Load(),
 		"once the harvester is done, the resource must be unlocked, 'pending' must be 0")
+}
+
+// testPathSource is a Source with a distinct name and log path.
+type testPathSource struct {
+	name string
+	path string
+}
+
+func (s *testPathSource) Name() string    { return s.name }
+func (s *testPathSource) LogPath() string { return s.path }
+
+// TestStartHarvesterLogsPathNotSourceName asserts the per-harvester logger
+// identifies the file by path and never leaks the source name / registry key
+// (which embeds the fingerprint).
+func TestStartHarvesterLogsPathNotSourceName(t *testing.T) {
+	core, observed := observer.New(zapcore.DebugLevel)
+	logger, err := logp.NewZapLogger(zap.New(core))
+	require.NoError(t, err, "constructing zap logger")
+
+	// name mimics a fingerprint identity (fingerprint::<hash>); it must never
+	// appear in the logs.
+	src := &testPathSource{name: "fingerprint::deadbeefcafe", path: "/var/log/app.log"}
+
+	var wg sync.WaitGroup
+	mockHarvester := &mockHarvester{
+		onRun: func(ctx input.Context, _ Source, _ Cursor, _ Publisher) error {
+			ctx.Logger.Info("inside harvester run")
+			return nil
+		},
+		wg: &wg,
+	}
+	hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
+
+	wg.Add(1)
+	ctx := input.Context{Logger: logger, Cancelation: t.Context()}.WithStatusReporter(mockStatusReporter{})
+	hg.Start(ctx, src)
+	wg.Wait()
+	require.NoError(t, hg.StopHarvesters(), "stopping harvesters")
+
+	entries := observed.All()
+	require.NotEmpty(t, entries, "expected the harvester to emit log entries")
+
+	sawSourceFile := false
+	for _, e := range entries {
+		fields := e.ContextMap()
+		// No log field may contain the source name (the registry key, which
+		// embeds the fingerprint).
+		for k, v := range fields {
+			if s, ok := v.(string); ok {
+				assert.NotContains(t, s, src.name,
+					"field %q of entry %q must not contain the source name", k, e.Message)
+			}
+		}
+		// The harvester identifies the file by its path, carried in source_file.
+		if sf, ok := fields["source_file"]; ok {
+			assert.Equal(t, src.path, sf, "source_file should be the file path")
+			sawSourceFile = true
+		}
+	}
+	assert.True(t, sawSourceFile, "expected a log entry to carry the source_file field")
 }
 
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester, limit uint64) *defaultHarvesterGroup {
