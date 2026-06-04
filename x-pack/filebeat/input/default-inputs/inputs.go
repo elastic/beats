@@ -13,7 +13,7 @@ import (
 
 func Init(info beat.Info, store statestore.States) []v2.Plugin {
 	return append(
-		xpackInputs(info, store),
+		xpackInputs(info, info.Logger, store),
 		ossinputs.Init(info, store)...,
 	)
 }
