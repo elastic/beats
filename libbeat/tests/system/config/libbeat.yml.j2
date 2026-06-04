@@ -53,8 +53,8 @@ processors:
 
 #================================ Queue =====================================
 
-{% if queue_type|default("mem") == "pooled" %}
-queue.pooled:
+{% if queue_type|default("mem") == "slab" %}
+queue.slab:
   events: 4096
 {% else %}
 queue.mem:

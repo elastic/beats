@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pooledqueue
+package slabqueue
 
 // batch is a queue.Batch[T] over a (possibly non-contiguous) slice of slot
 // indices into the pool's backing array.

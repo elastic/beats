@@ -11,7 +11,7 @@ Tests that Filebeat shuts down cleanly.
 
 The shutdown-time tests are parameterized over the two in-memory queue
 implementations Filebeat supports: the historical memqueue and the newer
-pooledqueue. Both must honour the same at-least-once delivery contract on
+slabqueue. Both must honour the same at-least-once delivery contract on
 shutdown (registry stays put for events that weren't successfully
 delivered) and the same drain semantics for successful shutdown.
 """
@@ -19,8 +19,8 @@ delivered) and the same drain semantics for successful shutdown.
 
 # QUEUE_TYPES lists the queue selectors injected into libbeat.yml.j2 via
 # render_config_template(queue_type=...). The libbeat template branches
-# on this to emit either `queue.mem:` or `queue.pooled:`.
-QUEUE_TYPES = [("mem",), ("pooled",)]
+# on this to emit either `queue.mem:` or `queue.slab:`.
+QUEUE_TYPES = [("mem",), ("slab",)]
 
 
 class Test(BaseTest):
@@ -53,7 +53,7 @@ class Test(BaseTest):
     def test_shutdown_wait_ok(self, queue_type):
         """
         Test stopping filebeat under load: wait for all events being published.
-        Runs under both queue implementations (memqueue and pooledqueue).
+        Runs under both queue implementations (memqueue and slabqueue).
         """
 
         self.nasa_logs()
@@ -103,7 +103,7 @@ class Test(BaseTest):
     def test_shutdown_wait_timeout(self, queue_type):
         """
         Test stopping filebeat under load: allow early shutdown.
-        Runs under both queue implementations (memqueue and pooledqueue);
+        Runs under both queue implementations (memqueue and slabqueue);
         at-least-once requires the registry stay empty/offset 0 for
         events that were never successfully delivered.
         """

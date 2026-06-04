@@ -66,7 +66,7 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			// If the request channel unblocks before we've sent our response,
 			// it means we're shutting down and the pending request can be
 			// discarded. Release the batch so the queue reclaims its
-			// backing storage (pooledqueue slot indices, memqueue ackLoop
+			// backing storage (slabqueue slot indices, memqueue ackLoop
 			// position) without firing producer ACK callbacks — Drop()
 			// would falsely signal successful delivery for an
 			// abandoned batch.

@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -139,11 +139,11 @@ func TestEventConsumerRetryAfterCloseDropsBatch(t *testing.T) {
 // when the consumer's run loop is closed while it holds in-flight batches
 // (a fresh queueBatch from the reader or batches awaiting retry), those
 // batches' done callbacks must fire so the underlying queue can release
-// its slots. For pooledqueue this is load-bearing — slot indices are
+// its slots. For slabqueue this is load-bearing — slot indices are
 // permanently leaked from the pool's semaphore if Done never runs.
 func TestEventConsumerCloseReleasesHeldBatches(t *testing.T) {
 	const capacity = 8
-	pool := pooledqueue.NewPool[publisher.Event](pooledqueue.Settings{Events: capacity}, nil)
+	pool := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: capacity}, nil)
 	defer pool.Shutdown()
 	q := pool.Connect()
 	defer q.Close(true)

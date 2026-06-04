@@ -119,7 +119,7 @@ type Batch[T any] interface {
 	//   - memqueue: marks the batch cancelled and advances ackLoop past
 	//     it so subsequent batches' ACKs aren't stalled, but does not
 	//     fire the producer ACK callback.
-	//   - pooledqueue: returns slot indices to the pool's free list and
+	//   - slabqueue: returns slot indices to the pool's free list and
 	//     removes the batch from the queue's pending list. No ACK.
 	//   - diskqueue: no-op; events stay on disk for next-process recovery.
 	//

@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package pooledqueue implements a multi-pipeline in-memory queue used
-// both by standalone Beats (selectable via queue.pooled) and by Beat
+// Package slabqueue implements a multi-pipeline in-memory queue used
+// both by standalone Beats (selectable via queue.slab) and by Beat
 // receivers (always, when running with an in-memory queue config).
 // Storage is separated from FIFO ordering:
 //
@@ -41,7 +41,7 @@
 // Unlike memqueue, Get returns whatever is available immediately; there is
 // no FlushTimeout / MaxGetRequest. Batch consolidation is left to the
 // output (e.g. the exporter's own batching).
-package pooledqueue
+package slabqueue
 
 import (
 	"fmt"
@@ -52,9 +52,9 @@ import (
 )
 
 // QueueType is the user-facing queue type selector. It mirrors
-// memqueue.QueueType / diskqueue.QueueType so pooledqueue can be selected
-// from a pipeline config (queue.pooled) just like the other implementations.
-const QueueType = "pooled"
+// memqueue.QueueType / diskqueue.QueueType so slabqueue can be selected
+// from a pipeline config (queue.slab) just like the other implementations.
+const QueueType = "slab"
 
 // Settings configures a Pool's capacity.
 type Settings struct {
@@ -64,7 +64,7 @@ type Settings struct {
 	Events int
 }
 
-// userConfig is the YAML-facing shape of pooledqueue settings. Kept separate
+// userConfig is the YAML-facing shape of slabqueue settings. Kept separate
 // from Settings so we can attach struct tags without exposing them as part
 // of the public Settings type.
 type userConfig struct {
@@ -76,19 +76,19 @@ var defaultUserConfig = userConfig{
 }
 
 // SettingsForUserConfig unpacks a ucfg config from a Beats queue
-// configuration and returns the equivalent pooledqueue.Settings.
+// configuration and returns the equivalent slabqueue.Settings.
 func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 	parsed := defaultUserConfig
 	if cfg != nil {
 		if err := cfg.Unpack(&parsed); err != nil {
-			return Settings{}, fmt.Errorf("couldn't unpack pooledqueue config: %w", err)
+			return Settings{}, fmt.Errorf("couldn't unpack slabqueue config: %w", err)
 		}
 	}
 	return Settings(parsed), nil
 }
 
 // FactoryForSettings returns a queue.QueueFactory[T] that gives each
-// pipeline its own private pooledqueue.Pool sized to settings.Events. The
+// pipeline its own private slabqueue.Pool sized to settings.Events. The
 // returned Queue is wired so closing it also shuts down the underlying
 // pool — matching the lifecycle the queue factory contract assumes (one
 // queue, one owner, Close releases all resources).
@@ -105,19 +105,19 @@ func FactoryForSettings[T any](settings Settings) queue.QueueFactory[T] {
 		_ queue.EncoderFactory[T],
 	) (queue.Queue[T], error) {
 		pool := NewPool[T](settings, observer)
-		return &poolBackedQueue[T]{Queue: pool.Connect(), pool: pool}, nil
+		return &slabBackedQueue[T]{Queue: pool.Connect(), pool: pool}, nil
 	}
 }
 
-// poolBackedQueue is a Queue whose Close also shuts down the pool that
+// slabBackedQueue is a Queue whose Close also shuts down the pool that
 // created it. Used by FactoryForSettings to give the standalone pipeline
 // path a queue.Queue[T] with single-owner lifecycle semantics.
-type poolBackedQueue[T any] struct {
+type slabBackedQueue[T any] struct {
 	*Queue[T]
 	pool *Pool[T]
 }
 
-func (q *poolBackedQueue[T]) Close(force bool) error {
+func (q *slabBackedQueue[T]) Close(force bool) error {
 	err := q.Queue.Close(force)
 	q.pool.Shutdown()
 	return err

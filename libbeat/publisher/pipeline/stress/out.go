@@ -33,7 +33,7 @@ import (
 // Reset and read by the stress harness around a timed run so callers can
 // derive an events-per-second figure for a given (gen, pipeline, out)
 // configuration. Exported so external test runners (e.g. a wrapper that
-// drives memqueue and pooledqueue side-by-side) can read it.
+// drives memqueue and slabqueue side-by-side) can read it.
 var AckedEventCount atomic.Uint64
 
 type testOutput struct {

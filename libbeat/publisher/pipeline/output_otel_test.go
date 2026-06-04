@@ -72,7 +72,7 @@ func TestOTelQueueMetrics(t *testing.T) {
 		},
 		nilObserver,
 		"TestOTelQueueMetrics",
-		nil, // queueFactory unused on the pooledqueue pool path
+		nil, // queueFactory unused on the slabqueue pool path
 		settings,
 	)
 	require.NoError(t, err, "creating OTel output controller should succeed")
@@ -95,7 +95,7 @@ func TestEmptyIntakeQueueIDJoinsGlobalPool(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"",
-		nil, // queueFactory unused on the pooledqueue pool path
+		nil, // queueFactory unused on the slabqueue pool path
 		settings,
 	)
 	require.NoError(t, err)
@@ -106,7 +106,7 @@ func TestEmptyIntakeQueueIDJoinsGlobalPool(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"",
-		nil, // queueFactory unused on the pooledqueue pool path
+		nil, // queueFactory unused on the slabqueue pool path
 		settings,
 	)
 	require.NoError(t, err)
@@ -133,7 +133,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
-		nil, // queueFactory unused on the pooledqueue pool path
+		nil, // queueFactory unused on the slabqueue pool path
 		settings,
 	)
 	require.NoError(t, err, "first controller creation should succeed")
@@ -144,7 +144,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
-		nil, // queueFactory unused on the pooledqueue pool path
+		nil, // queueFactory unused on the slabqueue pool path
 		settings,
 	)
 	require.NoError(t, err, "second controller creation should succeed")
@@ -174,7 +174,7 @@ func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 		monitorsForTest(),
 		nilObserver,
 		"mismatchID",
-		nil, // queueFactory unused on the pooledqueue pool path
+		nil, // queueFactory unused on the slabqueue pool path
 		memqueue.Settings{Events: 5},
 	)
 	require.NoError(t, err, "first output controller creation should succeed")
@@ -192,7 +192,7 @@ func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 }
 
 // TestNonMemQueueOptsOutOfPool verifies that a non-memory queue config
-// (e.g. queue.disk in production) opts the receiver out of the pooledqueue
+// (e.g. queue.disk in production) opts the receiver out of the slabqueue
 // pool and uses the user-supplied queueFactory instead. The receiver
 // controller must not be backed by a pool in this mode.
 func TestNonMemQueueOptsOutOfPool(t *testing.T) {
@@ -200,7 +200,7 @@ func TestNonMemQueueOptsOutOfPool(t *testing.T) {
 
 	// On the non-mem path the controller calls queueFactory; we substitute
 	// an in-memory factory so the test doesn't perform real disk I/O. The
-	// point of the test is that the pooledqueue pool is skipped, not what
+	// point of the test is that the slabqueue pool is skipped, not what
 	// the factory actually returns.
 	stubFactory := memqueue.FactoryForSettings[publisher.Event](memqueue.Settings{Events: 4})
 	c, err := newOTelOutputController(
@@ -215,7 +215,7 @@ func TestNonMemQueueOptsOutOfPool(t *testing.T) {
 	defer c.waitClose(cancelledContext(), false)
 
 	assert.Nil(t, c.poolForTest(),
-		"non-mem queue receiver must not be backed by an pooledqueue pool")
+		"non-mem queue receiver must not be backed by an slabqueue pool")
 }
 
 func TestSharedIntakeQueueRequiresMemqueue(t *testing.T) {

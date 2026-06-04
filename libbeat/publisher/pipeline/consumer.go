@@ -198,7 +198,7 @@ outerLoop:
 			// Release any batches we're still holding so the underlying
 			// queue can reclaim its backing storage without firing
 			// producer ACK callbacks. Release is the abandonment
-			// path: pooledqueue returns its slot indices to the pool's
+			// path: slabqueue returns its slot indices to the pool's
 			// free list; memqueue advances ackLoop past the batch
 			// without invoking input ACK handlers; diskqueue is a
 			// no-op (events stay on disk for next-process recovery).

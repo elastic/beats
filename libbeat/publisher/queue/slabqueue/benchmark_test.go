@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pooledqueue_test
+package slabqueue_test
 
 import (
 	"context"
@@ -28,7 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/pooledqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -38,7 +38,7 @@ import (
 //     (one per input) all feeding the same FIFO, and one consumer worker
 //     loop. This is what `filebeat` looks like today with M inputs.
 //
-//   - pooledqueue (Beat-receiver mode): one pooledqueue.Pool of the same total
+//   - slabqueue (Beat-receiver mode): one slabqueue.Pool of the same total
 //     capacity, but with M Queue façades — one per receiver — each with its
 //     own producer and its own consumer goroutine. This is what the receiver
 //     path looks like with M receivers.
@@ -54,7 +54,7 @@ import (
 //
 // Run locally with:
 //
-//   go test -run=^$ -bench=. -benchmem -benchtime=2s ./libbeat/publisher/queue/pooledqueue/...
+//   go test -run=^$ -bench=. -benchmem -benchtime=2s ./libbeat/publisher/queue/slabqueue/...
 
 type benchEvent struct {
 	id int
@@ -62,7 +62,7 @@ type benchEvent struct {
 
 // benchPipelines is the set of input/receiver counts we sweep. For memqueue
 // this is the number of producers feeding the single shared queue. For
-// pooledqueue it is the number of Queue façades (one per receiver).
+// slabqueue it is the number of Queue façades (one per receiver).
 var benchPipelines = []int{1, 4, 8, 16}
 
 // benchTotalCapacity is the queue/pool's total event budget — the same value
@@ -104,15 +104,15 @@ func BenchmarkMemqueueShared(b *testing.B) {
 	}
 }
 
-// BenchmarkPooledQueuePool models multi-pipeline mode: one shared pool
+// BenchmarkSlabQueuePool models multi-pipeline mode: one shared pool
 // with the same total capacity, but each pipeline gets its own Queue
 // façade and its own consumer goroutine. receivers=N means N façades,
 // N producers, N consumers.
-func BenchmarkPooledQueuePool(b *testing.B) {
+func BenchmarkSlabQueuePool(b *testing.B) {
 	for _, m := range benchPipelines {
 		b.Run(fmt.Sprintf("receivers=%d", m), func(b *testing.B) {
-			pool := pooledqueue.NewPool[benchEvent](
-				pooledqueue.Settings{Events: benchTotalCapacity}, nil,
+			pool := slabqueue.NewPool[benchEvent](
+				slabqueue.Settings{Events: benchTotalCapacity}, nil,
 			)
 
 			queues := make([]queue.Queue[benchEvent], m)
@@ -200,7 +200,7 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 // comparison: 10 producer goroutines feed a single 10,000-slot queue
 // while one consumer drains batches.
 //
-// Because pooledqueue's Get returns immediately with whatever events are
+// Because slabqueue's Get returns immediately with whatever events are
 // available (no FlushTimeout / MaxGetRequest equivalent), per-iteration
 // batch size varies. To make the comparison fair we count events actually
 // processed and report events/s via b.ReportMetric; the memqueue
@@ -210,7 +210,7 @@ func BenchmarkProducerThroughput(b *testing.B) {
 	const queueSize = 10000
 	const publishWorkers = 10
 
-	pool := pooledqueue.NewPool[int](pooledqueue.Settings{Events: queueSize}, nil)
+	pool := slabqueue.NewPool[int](slabqueue.Settings{Events: queueSize}, nil)
 	defer pool.Shutdown()
 	testQueue := pool.Connect()
 
