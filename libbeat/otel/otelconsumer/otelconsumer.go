@@ -56,6 +56,16 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
+// dataStreamAttributeKeys are the data_stream sub-fields promoted to log record
+// attributes to support dynamic indexing. They double as both the mapstr lookup
+// path and the attribute key, and are kept at package scope so they aren't
+// rebuilt for every event.
+var dataStreamAttributeKeys = [...]string{
+	"data_stream.dataset",
+	"data_stream.namespace",
+	"data_stream.type",
+}
+
 type retryConfig struct {
 	init time.Duration
 	max  time.Duration
@@ -117,29 +127,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	events := batch.Events()
 	st.NewBatch(len(events))
 
-	pLogs := plog.NewLogs()
-	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
-	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
-
-	// add bodymap mapping mode on scope attributes
-	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
-
-	logRecords := sourceLogs.LogRecords()
-
-	// Convert the batch of events to Otel plog.Logs. The encoding we
-	// choose here is to set all fields in a Map in the Body of the log
-	// record. Each log record encodes a single beats event.
-	// This way we have full control over the final structure of the log in the
-	// destination, as long as the exporter allows it.
-	// For example, the elasticsearchexporter has an encoding specifically for this.
-	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
-	logRecords.EnsureCapacity(len(events))
-	for _, event := range events {
-		logRecord := logRecords.AppendEmpty()
-		if err := fillLogRecordFromEvent(logRecord, event, out.beatInfo, out.log, out.isReceiverTest); err != nil {
-			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
-		}
-	}
+	pLogs := out.eventsToLogs(events, &out.beatInfo)
 
 	out.backoffInit.Do(func() {
 		out.retryBackoff = backoff.NewEqualJitterBackoff(ctx.Done(), out.retry.init, out.retry.max)
@@ -177,6 +165,39 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	st.AckedEvents(len(events))
 	out.retryBackoff.Reset()
 	return nil
+}
+
+// eventsToLogs converts a group of Beat events to a single plog.Logs, using the
+// given beat.Info for metadata.
+func (out *otelConsumer) eventsToLogs(events []publisher.Event, beatInfo *beat.Info) plog.Logs {
+	pLogs := plog.NewLogs()
+	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
+	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
+
+	// add bodymap mapping mode on scope attributes
+	sourceLogs.Scope().Attributes().PutStr("elastic.mapping.mode", "bodymap")
+
+	logRecords := sourceLogs.LogRecords()
+	// Pre-size the record slice so it isn't repeatedly grown as we append one
+	// record per event below.
+	logRecords.EnsureCapacity(len(events))
+
+	// Convert the batch of events to Otel plog.Logs. The encoding we
+	// choose here is to set all fields in a Map in the Body of the log
+	// record. Each log record encodes a single beats event.
+	// This way we have full control over the final structure of the log in the
+	// destination, as long as the exporter allows it.
+	// For example, the elasticsearchexporter has an encoding specifically for this.
+	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
+	logRecords.EnsureCapacity(len(events))
+	for _, event := range events {
+		logRecord := logRecords.AppendEmpty()
+		if err := fillLogRecordFromEvent(logRecord, event, out.beatInfo, out.log, out.isReceiverTest); err != nil {
+			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
+		}
+	}
+
+	return pLogs
 }
 
 func (out *otelConsumer) String() string {
