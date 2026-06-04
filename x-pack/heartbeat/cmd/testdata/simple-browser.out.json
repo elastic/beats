@@ -18,67 +18,15 @@
                     ]
                 }
             },
+            "namespace": "default",
             "type": "synthetics"
         },
         "enabled": true,
         "id": "66561b72-0b63-4948-86b5-be46a2d0e3df",
-        "index": "synthetics-browser-default",
         "max_attempts": 2,
         "name": "https://www.google.com/",
         "origin": "ui",
         "processors": [
-             {
-                "add_fields": {
-                    "fields": {
-                        "input_id": "synthetics/browser-synthetics-66561b72-0b63-4948-86b5-be46a2d0e3df-9ba26c7d-917b-465f-8461-b577fdd37a9f"
-                    },
-                    "target": "@metadata"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "dataset": "browser",
-                        "namespace": "default",
-                        "type": "synthetics"
-                    },
-                    "target": "data_stream"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "dataset": "browser"
-                    },
-                    "target": "event"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "stream_id": "66561b72-0b63-4948-86b5-be46a2d0e3df"
-                    },
-                    "target": "@metadata"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f",
-                        "snapshot": false,
-                        "version": "8.13.1"
-                    },
-                    "target": "elastic_agent"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
-                    },
-                    "target": "agent"
-                }
-            },
             {
                 "add_fields": {
                     "fields": {
@@ -97,6 +45,24 @@
                         }
                     },
                     "target": ""
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f",
+                        "snapshot": false,
+                        "version": "8.13.1"
+                    },
+                    "target": "elastic_agent"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
+                    },
+                    "target": "agent"
                 }
             }
         ],

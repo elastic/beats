@@ -19,11 +19,11 @@
                     ]
                 }
             },
+            "namespace": "default",
             "type": "synthetics"
         },
         "enabled": true,
         "id": "987e913f-952e-47fd-b658-68752b92360a",
-        "index": "synthetics-http-default",
         "ipv4": true,
         "ipv6": true,
         "max_attempts": 2,
@@ -33,38 +33,20 @@
         "origin": "ui",
         "password": "test",
         "processors": [
-             {
-                "add_fields": {
-                    "fields": {
-                        "input_id": "synthetics/http-synthetics-987e913f-952e-47fd-b658-68752b92360a-9ba26c7d-917b-465f-8461-b577fdd37a9f"
-                    },
-                    "target": "@metadata"
-                }
-            },
             {
                 "add_fields": {
                     "fields": {
-                        "dataset": "http",
-                        "namespace": "default",
-                        "type": "synthetics"
+                        "config_id": "987e913f-952e-47fd-b658-68752b92360a",
+                        "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
+                        "meta": {
+                            "space_id": "default"
+                        },
+                        "monitor": {
+                            "fleet_managed": true,
+                            "interval": 180
+                        }
                     },
-                    "target": "data_stream"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "dataset": "http"
-                    },
-                    "target": "event"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "stream_id": "987e913f-952e-47fd-b658-68752b92360a"
-                    },
-                    "target": "@metadata"
+                    "target": ""
                 }
             },
             {
@@ -83,22 +65,6 @@
                         "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
                     },
                     "target": "agent"
-                }
-            },
-            {
-                "add_fields": {
-                    "fields": {
-                        "config_id": "987e913f-952e-47fd-b658-68752b92360a",
-                        "kibanaUrl": "https://my-observability-project-d83e78.kb.us-central1.gcp.elastic.cloud",
-                        "meta": {
-                            "space_id": "default"
-                        },
-                        "monitor": {
-                            "fleet_managed": true,
-                            "interval": 180
-                        }
-                    },
-                    "target": ""
                 }
             }
         ],

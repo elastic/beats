@@ -22,6 +22,7 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-ucfg"
 )
 
 // OptionalStream represents a config that has a stream set, which in practice
@@ -42,7 +43,7 @@ type BaseStream struct {
 // UnnestStream detects configs that come from fleet and transforms the config into something compatible
 // with heartbeat, by mixing some fields (id, data_stream) with those from the first stream. It assumes
 // that there is exactly one stream associated with the input.
-func UnnestStream(config *conf.C) (res *conf.C, err error) {
+func UnnestStream(config *conf.C, processors ...interface{}) (res *conf.C, err error) {
 	optS := &OptionalStream{}
 	err = config.Unpack(optS)
 	if err != nil {
@@ -85,5 +86,10 @@ func UnnestStream(config *conf.C) (res *conf.C, err error) {
 	if origin == "" {
 		err = res.Merge(mapstr.M{"id": optS.Id})
 	}
+
+	if processors != nil {
+		err = res.MergeWithOpts(mapstr.M{"processors": processors}, ucfg.AppendValues)
+	}
+
 	return res, err
 }

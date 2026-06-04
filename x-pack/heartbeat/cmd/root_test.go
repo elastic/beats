@@ -68,7 +68,6 @@ func TestHeartbeatbeatCfg(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				writeOut("", got)
 
 				diff := cmp.Diff(want, got)
 				if diff != "" {
@@ -98,11 +97,6 @@ func readOut(filename string) (cfg []map[string]interface{}, err error) {
 		return nil, err
 	}
 	return cfg, err
-}
-
-func writeOut(filename string, cfg []map[string]interface{}) {
-	json, _ := json.Marshal(cfg)
-	os.WriteFile(filename, json, 0777)
 }
 
 func cfgToArrMap(cfg []*reload.ConfigWithMeta) ([]map[string]interface{}, error) {
