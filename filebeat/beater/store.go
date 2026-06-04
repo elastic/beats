@@ -196,9 +196,6 @@ func filestorageConfigFromRegistry(cfg config.Registry, resolvedPath string) (*f
 		}
 	}
 
-	if err := out.Validate(); err != nil {
-		return nil, err
-	}
 	return out, nil
 }
 
