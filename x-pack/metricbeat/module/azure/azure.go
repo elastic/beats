@@ -285,6 +285,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 	}
 	// Check if the channel is nil before entering the loop
 	if m.BatchClient.ResourceConfigurations.MetricDefinitionsChan == nil {
+		m.updateCursor(referenceTime.Add(-m.BatchClient.Config.Latency))
 		return fmt.Errorf("no resources were found based on all the configurations options entered")
 	}
 
