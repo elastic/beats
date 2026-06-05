@@ -225,6 +225,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
 		// error message is previously logged in the InitResources,
 		// no error event should be created
+		m.updateCursor(referenceTime.Add(-m.Client.Config.Latency))
 		return nil
 	}
 
