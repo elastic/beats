@@ -494,13 +494,15 @@ func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
 		return nil
 	}
 	if state == nil {
+		m.Logger().Infow("no prior cursor found, starting from normal collection window")
 		return nil
 	}
 	minStart := referenceTime.Add(-m.lookbackWindow)
 	if state.LastCollectionEnd.Before(minStart) {
-		// The last collection end time is too old and outside the lookback window,
-		// so we ignore it to avoid querying a very large timespan on the first
-		// collection after a long downtime.
+		m.Logger().Warnw("cursor too old, data gap possible, backfilling from normal window only",
+			"last_collection_end", state.LastCollectionEnd,
+			"lookback_window", m.lookbackWindow,
+		)
 		return nil
 	}
 	return &state.LastCollectionEnd
