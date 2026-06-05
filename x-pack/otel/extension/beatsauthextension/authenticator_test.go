@@ -425,6 +425,7 @@ func TestCertificateHotReload(t *testing.T) {
 
 		client, _ := startAuthClient(t, sslCfg(certPath, keyPath, map[string]any{
 			"certificate_reload": map[string]any{
+				"enabled":         true,
 				"reload_interval": "100ms",
 			},
 		}))
