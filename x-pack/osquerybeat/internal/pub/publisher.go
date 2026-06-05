@@ -291,7 +291,7 @@ func (p *Publisher) PublishQueryProfile(index, queryName, actionID, responseID s
 }
 
 func actionResultToEvent(req, res map[string]interface{}) map[string]interface{} {
-	m := make(map[string]interface{}, 8)
+	m := make(map[string]interface{}, 9)
 
 	copyKey := func(key string, src, dst map[string]interface{}) {
 		if v, ok := src[key]; ok {
@@ -322,6 +322,8 @@ func actionResultToEvent(req, res map[string]interface{}) map[string]interface{}
 	if v, ok := req["data"]; ok {
 		m["action_data"] = v
 	}
+
+	copyKey("space_id", req, m)
 
 	return m
 }
