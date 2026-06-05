@@ -8,9 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -19,8 +21,10 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/entcollect"
 	ecjamf "github.com/elastic/entcollect/provider/jamf"
 )
 
@@ -54,7 +58,7 @@ func TestJamfIntegration_FullLifecycle(t *testing.T) {
 	// Phase 1: first sync discovers all computers.
 
 	client1 := &fakeClient{}
-	err1 := runInputOnce(t, tmpDir, newProvider(), client1)
+	err1 := runInputOnce(t, tmpDir, "jamf", newProvider(), client1)
 	if err1 != nil {
 		t.Fatalf("first run failed: %v", err1)
 	}
@@ -75,7 +79,7 @@ func TestJamfIntegration_FullLifecycle(t *testing.T) {
 	))
 
 	client2 := &fakeClient{}
-	err2 := runInputOnce(t, tmpDir, newProvider(), client2)
+	err2 := runInputOnce(t, tmpDir, "jamf", newProvider(), client2)
 	if err2 != nil {
 		t.Fatalf("second run failed: %v", err2)
 	}
@@ -121,7 +125,7 @@ func TestJamfIntegration_CursorRoundTrip(t *testing.T) {
 	cfg.Password = "testpass"
 
 	client1 := &fakeClient{}
-	if err := runInputOnce(t, tmpDir, ecjamf.NewWithClient(cfg, srv.Client()), client1); err != nil {
+	if err := runInputOnce(t, tmpDir, "jamf", ecjamf.NewWithClient(cfg, srv.Client()), client1); err != nil {
 		t.Fatalf("first run failed: %v", err)
 	}
 	if got := len(client1.Events()); got != 1 {
@@ -131,7 +135,7 @@ func TestJamfIntegration_CursorRoundTrip(t *testing.T) {
 	// Second run: same fixture, same bbolt → cursor should be read back.
 	// The device was already seen, so action should be "modified" not "discovered".
 	client2 := &fakeClient{}
-	if err := runInputOnce(t, tmpDir, ecjamf.NewWithClient(cfg, srv.Client()), client2); err != nil {
+	if err := runInputOnce(t, tmpDir, "jamf", ecjamf.NewWithClient(cfg, srv.Client()), client2); err != nil {
 		t.Fatalf("second run failed: %v", err)
 	}
 
@@ -147,13 +151,13 @@ func TestJamfIntegration_CursorRoundTrip(t *testing.T) {
 
 // runInputOnce starts a minimalStateInput, waits for the first full sync to
 // complete (events arrive), and stops it. It returns the Run error.
-func runInputOnce(t *testing.T, dataDir string, p *ecjamf.Provider, client *fakeClient) error {
+func runInputOnce(t *testing.T, dataDir string, providerName string, p entcollect.Provider, client *fakeClient) error {
 	t.Helper()
 	log := logptest.NewTestingLogger(t, "integ")
 
 	mi := &minimalStateInput{
 		provider:         p,
-		providerName:     "jamf",
+		providerName:     providerName,
 		fullSyncInterval: time.Hour,
 		incrSyncInterval: time.Hour,
 		logger:           log,
@@ -170,7 +174,7 @@ func runInputOnce(t *testing.T, dataDir string, p *ecjamf.Provider, client *fake
 		done <- mi.Run(
 			v2.Context{
 				Logger:      log,
-				ID:          "integ-jamf",
+				ID:          "integ-" + providerName,
 				Cancelation: v2.GoContextFromCanceler(ctx),
 			},
 			connector,
@@ -205,6 +209,98 @@ func runInputOnce(t *testing.T, dataDir string, p *ecjamf.Provider, client *fake
 		t.Fatal("Run did not return after cancel")
 		return nil
 	}
+}
+
+// runIncrementalOnce opens the bbolt store written by a previous
+// runInputOnce and runs a single incremental sync via runSync. This
+// bypasses the timer loop in Run(), which always fires a full sync
+// first and cannot reliably trigger incremental-only execution.
+func runIncrementalOnce(t *testing.T, dataDir string, providerName string, p entcollect.Provider, client *fakeClient) error {
+	t.Helper()
+	log := logptest.NewTestingLogger(t, "integ-incr")
+
+	dbPath := filepath.Join(dataDir, "kvstore", "integ-"+providerName+".db")
+	store, err := kvstore.NewStore(log, dbPath, 0600)
+	if err != nil {
+		t.Fatalf("open bbolt for incremental: %v", err)
+	}
+	defer store.Close()
+
+	mi := &minimalStateInput{
+		provider:         p,
+		providerName:     providerName,
+		fullSyncInterval: time.Hour,
+		incrSyncInterval: time.Hour,
+		logger:           log,
+		path:             &paths.Path{Data: dataDir},
+	}
+
+	acking := &ackingClient{inner: client}
+	ctx := context.Background()
+	slogger := slog.New(slog.NewTextHandler(&testLogWriter{t}, nil))
+
+	return mi.runSync(
+		v2.Context{
+			Logger:      log,
+			ID:          "integ-" + providerName,
+			Cancelation: v2.GoContextFromCanceler(ctx),
+		},
+		store,
+		acking,
+		slogger,
+		"entcollect."+providerName,
+		false,
+	)
+}
+
+// assertBboltKey verifies that a key exists in the bbolt bucket used by
+// runInputOnce. It opens the store read-only and reads the key.
+func assertBboltKey(t *testing.T, dataDir, providerName, key string) {
+	t.Helper()
+	log := logptest.NewTestingLogger(t, "assert-bbolt")
+	dbPath := filepath.Join(dataDir, "kvstore", "integ-"+providerName+".db")
+	store, err := kvstore.NewStore(log, dbPath, 0600)
+	if err != nil {
+		t.Fatalf("open bbolt for assertion: %v", err)
+	}
+	defer store.Close()
+
+	bucket := "entcollect." + providerName
+	err = store.RunTransaction(false, func(tx *kvstore.Transaction) error {
+		_, err := tx.GetBytes([]byte(bucket), []byte(key))
+		return err
+	})
+	if err != nil {
+		t.Errorf("bbolt key %q not found in bucket %q: %v", key, bucket, err)
+	}
+}
+
+// deleteBboltKey removes a key from the bbolt bucket. Used by
+// corruption/recovery tests to simulate missing state.
+func deleteBboltKey(t *testing.T, dataDir, providerName, key string) {
+	t.Helper()
+	log := logptest.NewTestingLogger(t, "delete-bbolt")
+	dbPath := filepath.Join(dataDir, "kvstore", "integ-"+providerName+".db")
+	store, err := kvstore.NewStore(log, dbPath, 0600)
+	if err != nil {
+		t.Fatalf("open bbolt for deletion: %v", err)
+	}
+	defer store.Close()
+
+	bucket := "entcollect." + providerName
+	err = store.RunTransaction(true, func(tx *kvstore.Transaction) error {
+		return tx.Delete([]byte(bucket), []byte(key))
+	})
+	if err != nil {
+		t.Fatalf("delete bbolt key %q in bucket %q: %v", key, bucket, err)
+	}
+}
+
+type testLogWriter struct{ t *testing.T }
+
+func (w *testLogWriter) Write(p []byte) (int, error) {
+	w.t.Log(string(p))
+	return len(p), nil
 }
 
 // atomicFixture holds a mutable API response body that can be swapped
