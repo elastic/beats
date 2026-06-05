@@ -22,8 +22,10 @@ package config
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -120,5 +122,97 @@ func TestEnabledInputs(t *testing.T) {
 				assert.Equal(t, test.expected, config.IsInputEnabled(test.input))
 			})
 		}
+	})
+}
+
+func TestRegistryFileStorageUnpack(t *testing.T) {
+	t.Run("no otel_file_storage section leaves FileStorage nil", func(t *testing.T) {
+		raw, err := conf.NewConfigFrom(map[string]any{
+			"registry": map[string]any{
+				"backend": "otel_file_storage",
+			},
+		})
+		require.NoError(t, err)
+
+		cfg := DefaultConfig
+		require.NoError(t, raw.Unpack(&cfg))
+
+		assert.Equal(t, "otel_file_storage", cfg.Registry.Backend)
+		assert.Nil(t, cfg.Registry.FileStorage)
+	})
+
+	t.Run("explicit otel_file_storage section unpacks as map", func(t *testing.T) {
+		raw, err := conf.NewConfigFrom(map[string]any{
+			"registry": map[string]any{
+				"backend": "otel_file_storage",
+				"otel_file_storage": map[string]any{
+					"timeout":               "5s",
+					"create_directory":      true,
+					"directory_permissions": "0750",
+					"fsync":                 true,
+					"recreate":              true,
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		cfg := DefaultConfig
+		require.NoError(t, raw.Unpack(&cfg))
+
+		require.NotNil(t, cfg.Registry.FileStorage)
+		assert.Equal(t, "5s", cfg.Registry.FileStorage["timeout"])
+		assert.Equal(t, true, cfg.Registry.FileStorage["create_directory"])
+		assert.Equal(t, "0750", cfg.Registry.FileStorage["directory_permissions"])
+		assert.Equal(t, true, cfg.Registry.FileStorage["fsync"])
+		assert.Equal(t, true, cfg.Registry.FileStorage["recreate"])
+	})
+
+	t.Run("partial otel_file_storage section contains only provided keys", func(t *testing.T) {
+		raw, err := conf.NewConfigFrom(map[string]any{
+			"registry": map[string]any{
+				"backend": "otel_file_storage",
+				"otel_file_storage": map[string]any{
+					"create_directory":      true,
+					"directory_permissions": "0700",
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		cfg := DefaultConfig
+		require.NoError(t, raw.Unpack(&cfg))
+
+		require.NotNil(t, cfg.Registry.FileStorage)
+		assert.Len(t, cfg.Registry.FileStorage, 2)
+		assert.Equal(t, true, cfg.Registry.FileStorage["create_directory"])
+		assert.Equal(t, "0700", cfg.Registry.FileStorage["directory_permissions"])
+	})
+
+	t.Run("other registry fields preserved alongside otel_file_storage", func(t *testing.T) {
+		raw, err := conf.NewConfigFrom(map[string]any{
+			"registry": map[string]any{
+				"path":             "custom/path",
+				"file_permissions": 0o640,
+				"flush":            "2s",
+				"cleanup_interval": "10m",
+				"backend":          "otel_file_storage",
+				"otel_file_storage": map[string]any{
+					"create_directory":      true,
+					"directory_permissions": "0700",
+				},
+			},
+		})
+		require.NoError(t, err)
+
+		cfg := DefaultConfig
+		require.NoError(t, raw.Unpack(&cfg))
+
+		assert.Equal(t, "custom/path", cfg.Registry.Path)
+		assert.Equal(t, 0o640, int(cfg.Registry.Permissions))
+		assert.Equal(t, 2*time.Second, cfg.Registry.FlushTimeout)
+		assert.Equal(t, 10*time.Minute, cfg.Registry.CleanInterval)
+		assert.Equal(t, "otel_file_storage", cfg.Registry.Backend)
+		require.NotNil(t, cfg.Registry.FileStorage)
+		assert.Equal(t, true, cfg.Registry.FileStorage["create_directory"])
 	})
 }

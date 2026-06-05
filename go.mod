@@ -239,6 +239,7 @@ require (
 	github.com/elastic/gokrb5/v8 v8.0.0-20251105095404-23cc45e6a102
 	github.com/jimlambrt/gldap v0.1.14
 	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.153.0
 	github.com/parsiya/golnk v0.0.0-20251207220015-443df11fe4fb
 	github.com/richardlehane/mscfb v1.0.6
 	github.com/rogpeppe/go-internal v1.14.1
@@ -511,7 +512,7 @@ require (
 	go.opentelemetry.io/collector/exporter/xexporter v0.153.0 // indirect
 	go.opentelemetry.io/collector/extension/extensioncapabilities v0.153.0 // indirect
 	go.opentelemetry.io/collector/extension/extensionmiddleware v0.153.0 // indirect
-	go.opentelemetry.io/collector/extension/xextension v0.153.0 // indirect
+	go.opentelemetry.io/collector/extension/xextension v0.153.0
 	go.opentelemetry.io/collector/featuregate v1.59.0 // indirect
 	go.opentelemetry.io/collector/internal/componentalias v0.153.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.153.0 // indirect
