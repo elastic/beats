@@ -183,7 +183,6 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 	if err != nil {
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel() // intentionally cancel the context to the pipeline closes immediately
-		defer cancel()
 		pipeline.Disconnect(ctx)
 		return nil, err
 	}
@@ -207,8 +206,8 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
-	ctx, cancel := context.WithTimeout(context.Background(), 0)
-	defer cancel()
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // intentionally cancel the context to the pipeline closes immediately
 	r.pipeline.Disconnect(ctx)
 	r.wg.Wait()
 }
