@@ -65,18 +65,6 @@ func TestActionFromMap(t *testing.T) {
 			},
 		},
 		{
-<<<<<<< HEAD
-=======
-			Name: "valid profile flag",
-			Map: map[string]interface{}{
-				"id": "123456789",
-				"data": map[string]interface{}{
-					"query":   "select * from foo",
-					"profile": true,
-				},
-			},
-		},
-		{
 			Name: "valid platform",
 			Map: map[string]interface{}{
 				"id": "123456789",
@@ -98,18 +86,6 @@ func TestActionFromMap(t *testing.T) {
 			Err: ErrActionRequest,
 		},
 		{
-			Name: "invalid profile flag type",
-			Map: map[string]interface{}{
-				"id": "123456789",
-				"data": map[string]interface{}{
-					"query":   "select * from foo",
-					"profile": "true",
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
->>>>>>> 9b6da0e94 (Respect osquery live query platform filters (#50585))
 			Name: "empty id",
 			Map: map[string]interface{}{
 				"id": "",
@@ -165,14 +141,6 @@ func TestActionFromMap(t *testing.T) {
 				}
 			}
 
-<<<<<<< HEAD
-			_ = a
-=======
-			if tc.Name == "valid profile flag" {
-				if !a.Profile {
-					t.Errorf("expected Profile to be true, got false")
-				}
-			}
 			if tc.Name == "valid platform" {
 				if diff := cmp.Diff([]string{"linux", "windows"}, a.Platforms); diff != "" {
 					t.Errorf("unexpected platforms (-want +got):\n%s", diff)
@@ -212,7 +180,6 @@ func TestPlatformMatches(t *testing.T) {
 			if got != tc.want {
 				t.Fatalf("expected PlatformMatches(%q, %v) to be %v, got %v", tc.goos, tc.platforms, tc.want, got)
 			}
->>>>>>> 9b6da0e94 (Respect osquery live query platform filters (#50585))
 		})
 	}
 }

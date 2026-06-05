@@ -43,15 +43,10 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		}
 	}
 
-<<<<<<< HEAD
-	var ecsm ecs.Mapping
-=======
 	var (
 		ecsm      ecs.Mapping
 		platforms []string
-		profile   bool
 	)
->>>>>>> 9b6da0e94 (Respect osquery live query platform filters (#50585))
 	if v, ok := m["data"]; ok {
 		var data map[string]interface{}
 		if data, ok = v.(map[string]interface{}); !ok {
