@@ -119,12 +119,12 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	if e.config.Tracer.enabled() {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(ctx.Agent.Paths, inputName, path)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+			return fmt.Errorf("request tracer path %q must be within %q path", path, ctx.Agent.Paths.Resolve(paths.Logs, inputName))
 		}
 		e.config.Tracer.Filename = resolved
 	}
@@ -479,7 +479,7 @@ func (m *mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if clean != r.URL.Path {
 		url := *r.URL
 		url.Path = clean
-		http.Redirect(w, r, url.String(), http.StatusMovedPermanently)
+		http.Redirect(w, r, url.String(), http.StatusTemporaryRedirect)
 		return
 	}
 	m.mu.RLock()

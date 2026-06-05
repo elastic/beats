@@ -49,7 +49,7 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwn
 	if includeOwner {
 		o, err := user.LookupId(strconv.FormatUint(osstate.UID, 10))
 		if err != nil {
-			return fmt.Errorf("failed to lookup uid %q: %w", osstate.UID, err)
+			return fmt.Errorf("failed to lookup uid %d: %w", osstate.UID, err)
 		}
 		_, err = fields.Put(ownerKey, o.Username)
 		if err != nil {
@@ -60,7 +60,7 @@ func setFileSystemMetadata(fi file.ExtendedFileInfo, fields mapstr.M, includeOwn
 	if includeGroup {
 		g, err := user.LookupGroupId(strconv.FormatUint(osstate.GID, 10))
 		if err != nil {
-			return fmt.Errorf("failed to lookup gid %q: %w", osstate.GID, err)
+			return fmt.Errorf("failed to lookup gid %d: %w", osstate.GID, err)
 		}
 		_, err = fields.Put(groupKey, g.Name)
 		if err != nil {

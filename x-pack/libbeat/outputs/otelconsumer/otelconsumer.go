@@ -29,12 +29,16 @@ import (
 	"go.opentelemetry.io/collector/exporter/exporterhelper"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
-	"go.opentelemetry.io/collector/receiver/receivertest"
 )
 
 const (
 	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
 	esDocumentIDAttribute = "elasticsearch.document_id"
+
+	// receivertestUniqueIDAttrName mirrors receivertest.UniqueIDAttrName.
+	// It is duplicated here to avoid importing the receivertest package
+	// (and pulling its testify/testing deps) into production binaries.
+	receivertestUniqueIDAttrName = "test_id"
 
 	retryBackoffInit = 1 * time.Second
 	retryBackoffMax  = 60 * time.Second
@@ -144,7 +148,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 				// When receivertest allows this to be customized we can remove this condition.
 				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
 				if out.isReceiverTest {
-					logRecord.Attributes().PutStr(receivertest.UniqueIDAttrName, id)
+					logRecord.Attributes().PutStr(receivertestUniqueIDAttrName, id)
 				}
 			}
 		}

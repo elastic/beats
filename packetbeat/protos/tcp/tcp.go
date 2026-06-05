@@ -87,7 +87,10 @@ func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
 }
 
 func (tcp *TCP) removalListener(_ common.Key, value common.Value) {
-	conn := value.(*TCPConnection)
+	conn, ok := value.(*TCPConnection)
+	if !ok {
+		return
+	}
 	mod := conn.tcp.protocols.GetTCP(conn.protocol)
 	if mod != nil {
 		awareMod, ok := mod.(protos.ExpirationAwareTCPPlugin)
@@ -123,7 +126,12 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	}
 
 	tcpStartSeq := tcphdr.Seq
-	tcpSeq := tcpStartSeq + uint32(len(pkt.Payload))
+	payloadLen := uint64(len(pkt.Payload))
+	if payloadLen > uint64(^uint32(0)) {
+		logp.Warn("TCP payload length (%d) overflows uint32; dropping packet", len(pkt.Payload))
+		return
+	}
+	tcpSeq := tcpStartSeq + uint32(payloadLen)
 	lastSeq := conn.lastSeq[stream.dir]
 	if isDebug {
 		logp.Debug("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
@@ -222,11 +230,11 @@ func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 }
 
 func tcpSeqCompare(seq1, seq2 uint32) seqCompare {
-	i := int32(seq1 - seq2)
+	i := seq1 - seq2
 	switch {
 	case i == 0:
 		return seqEq
-	case i < 0:
+	case i >= uint32(1<<31):
 		return seqLT
 	default:
 		return seqGT
@@ -265,12 +273,15 @@ func (tcp *TCP) decideProtocol(tuple *common.IPPortTuple) protos.Protocol {
 func (tcp *TCP) findStream(k common.HashableIPPortTuple) *TCPConnection {
 	v := tcp.streams.Get(k)
 	if v != nil {
-		return v.(*TCPConnection)
+		if conn, ok := v.(*TCPConnection); ok {
+			return conn
+		}
 	}
 	return nil
 }
 
 func (tcp *TCP) Close() {
+	tcp.streams.StopJanitor()
 	if tcp.metrics == nil {
 		return
 	}
@@ -329,7 +340,8 @@ func (stream *TCPStream) gapInStream(nbytes int) (drop bool) {
 }
 
 func tcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
-	return int32(seq1-seq2) <= 0
+	delta := seq1 - seq2
+	return delta == 0 || delta >= uint32(1<<31)
 }
 
 func buildPortsMap(plugins map[protos.Protocol]protos.TCPPlugin) (map[uint16]protos.Protocol, error) {
@@ -337,7 +349,11 @@ func buildPortsMap(plugins map[protos.Protocol]protos.TCPPlugin) (map[uint16]pro
 
 	for proto, protoPlugin := range plugins {
 		for _, port := range protoPlugin.GetPorts() {
-			oldProto, exists := res[uint16(port)]
+			if port < 0 || port > int(^uint16(0)) {
+				return nil, fmt.Errorf("port %d for %s protocol: %w", port, proto, protos.ErrInvalidPort)
+			}
+			portNum := uint16(port)
+			oldProto, exists := res[portNum]
 			if exists {
 				if oldProto == proto {
 					continue
@@ -345,7 +361,7 @@ func buildPortsMap(plugins map[protos.Protocol]protos.TCPPlugin) (map[uint16]pro
 				return nil, fmt.Errorf("duplicate port (%d) exists in %s and %s protocols",
 					port, oldProto, proto)
 			}
-			res[uint16(port)] = proto
+			res[portNum] = proto
 		}
 	}
 
