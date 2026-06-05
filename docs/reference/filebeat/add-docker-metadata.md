@@ -12,6 +12,8 @@ applies_to:
 
 The `add_docker_metadata` processor annotates each event with relevant metadata from Docker containers. At startup it detects a docker environment and caches the metadata. The events are annotated with Docker metadata, only if a valid configuration is detected and the processor is able to reach Docker API.
 
+{applies_to}`stack: ga 9.5+` If Docker is unavailable at startup, the processor retries the connection every `wait_for_metadata_retry_period` (defaults to `10s`) until `wait_for_metadata_timeout` expires. By default, retries stop after `30s`. Set `wait_for_metadata` to `true` to block startup until Docker metadata is available. Set `wait_for_metadata_timeout` to `0` to retry indefinitely.
+
 Each event is annotated with:
 
 * Container ID
@@ -44,7 +46,10 @@ processors:
       #match_source_index: 4
       #match_short_id: true
       #cleanup_timeout: 60
-      #labels.dedot: false
+      #labels.dedot: true
+      #wait_for_metadata: false
+      #wait_for_metadata_timeout: 30s
+      #wait_for_metadata_retry_period: 10s
       # To connect to Docker over TLS you must specify a client and CA certificate.
       #ssl:
       #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -84,3 +89,11 @@ It has the following settings:
 `labels.dedot`
 :   (Optional) Defaults to true. When true, replaces dots (`.`) in labels with underscores (`_`).
 
+`wait_for_metadata` {applies_to}`stack: ga 9.5+`
+:   (Optional) When `true`, startup is blocked while the processor retries connecting to Docker until metadata is available. If the processor can't connect to Docker within the duration set in `wait_for_metadata_timeout`, startup fails and the process exits. When `false`, the processor starts immediately and retries the connection asynchronously until the timeout expires. Defaults to `false`.
+
+`wait_for_metadata_timeout` {applies_to}`stack: ga 9.5+`
+:   (Optional) The maximum time allowed for the initial Docker connection attempt and subsequent retries at startup. Applies regardless of `wait_for_metadata`. To retry the connection indefinitely, set to `0`. Defaults to `30s`.
+
+`wait_for_metadata_retry_period` {applies_to}`stack: ga 9.5+`
+:   (Optional) How long to wait between Docker connection retry attempts after a failed attempt. Defaults to `10s`.

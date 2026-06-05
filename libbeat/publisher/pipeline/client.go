@@ -29,6 +29,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+var _ beat.Client = (*client)(nil)
+
+// client implements beat.Client interface
 // client connects a beat with the processors and pipeline queue.
 type client struct {
 	logger     *logp.Logger

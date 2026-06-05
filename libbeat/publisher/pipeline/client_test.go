@@ -70,7 +70,7 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer pipeline.Close()
+		defer pipeline.Disconnect(t.Context())
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -186,7 +186,7 @@ func TestClient(t *testing.T) {
 		client.PublishAll(sent[3:]) // number 4
 
 		require.NoError(t, client.Close(), "failed closing pipeline client")
-		require.NoError(t, pipeline.Close(), "failed closing pipeline")
+		require.NoError(t, pipeline.Disconnect(t.Context()), "failed closing pipeline")
 
 		// waiting for all events to be consumed from the queue
 		<-done
@@ -276,7 +276,7 @@ func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(t, Settings{}, q)
-	defer pipeline.Close()
+	defer pipeline.Disconnect(t.Context())
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
 		routinesChecker := resources.NewGoroutinesChecker()
@@ -399,7 +399,7 @@ func TestMonitoring(t *testing.T) {
 		)
 
 		require.NoError(t, err)
-		defer pipeline.Close()
+		defer pipeline.Disconnect(t.Context())
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
