@@ -154,7 +154,7 @@ func TestActionHandlerExecute(t *testing.T) {
 						t.Error(diff)
 					}
 
-					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).idValue)
+					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).actionID)
 					if diff != "" {
 						t.Error(diff)
 					}
