@@ -138,6 +138,19 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	if config.LookbackWindow > 0 {
+		// Warn if lookback_window exceeds the default TSDB look_back_time (2h).
+		// Documents older than look_back_time are silently rejected by Elasticsearch TSDB,
+		// causing data loss without any visible error. Users who have raised look_back_time
+		// on their index can ignore this warning.
+		const tsdbDefaultLookBackTime = 2 * time.Hour
+		if config.LookbackWindow > tsdbDefaultLookBackTime {
+			base.Logger().Warnw(
+				"lookback_window exceeds the default Elasticsearch TSDB look_back_time of 2h; "+
+					"backfilled metrics older than look_back_time will be silently dropped — "+
+					"raise index.time_series.look_back_time on your data stream or reduce lookback_window",
+				"lookback_window", config.LookbackWindow,
+			)
+		}
 		if azMod, ok := base.Module().(Module); !ok {
 			base.Logger().Warn("azure module does not implement Module interface, lookback disabled")
 		} else {
