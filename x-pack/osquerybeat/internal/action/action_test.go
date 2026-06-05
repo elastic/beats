@@ -65,6 +65,51 @@ func TestActionFromMap(t *testing.T) {
 			},
 		},
 		{
+<<<<<<< HEAD
+=======
+			Name: "valid profile flag",
+			Map: map[string]interface{}{
+				"id": "123456789",
+				"data": map[string]interface{}{
+					"query":   "select * from foo",
+					"profile": true,
+				},
+			},
+		},
+		{
+			Name: "valid platform",
+			Map: map[string]interface{}{
+				"id": "123456789",
+				"data": map[string]interface{}{
+					"query":    "select * from foo",
+					"platform": " linux , windows ",
+				},
+			},
+		},
+		{
+			Name: "invalid platform type",
+			Map: map[string]interface{}{
+				"id": "123456789",
+				"data": map[string]interface{}{
+					"query":    "select * from foo",
+					"platform": []string{"linux"},
+				},
+			},
+			Err: ErrActionRequest,
+		},
+		{
+			Name: "invalid profile flag type",
+			Map: map[string]interface{}{
+				"id": "123456789",
+				"data": map[string]interface{}{
+					"query":   "select * from foo",
+					"profile": "true",
+				},
+			},
+			Err: ErrActionRequest,
+		},
+		{
+>>>>>>> 9b6da0e94 (Respect osquery live query platform filters (#50585))
 			Name: "empty id",
 			Map: map[string]interface{}{
 				"id": "",
@@ -120,7 +165,54 @@ func TestActionFromMap(t *testing.T) {
 				}
 			}
 
+<<<<<<< HEAD
 			_ = a
+=======
+			if tc.Name == "valid profile flag" {
+				if !a.Profile {
+					t.Errorf("expected Profile to be true, got false")
+				}
+			}
+			if tc.Name == "valid platform" {
+				if diff := cmp.Diff([]string{"linux", "windows"}, a.Platforms); diff != "" {
+					t.Errorf("unexpected platforms (-want +got):\n%s", diff)
+				}
+			}
+		})
+	}
+}
+
+func TestPlatformMatches(t *testing.T) {
+	tests := []struct {
+		name      string
+		goos      string
+		platforms []string
+		want      bool
+	}{
+		{name: "empty platform matches all", goos: "linux", want: true},
+		{name: "all platform matches", goos: "windows", platforms: []string{"all"}, want: true},
+		{name: "any platform matches", goos: "windows", platforms: []string{"any"}, want: true},
+		{name: "same platform matches", goos: "linux", platforms: []string{"linux"}, want: true},
+		{name: "comma separated platform matches", goos: "darwin", platforms: []string{"linux", "darwin"}, want: true},
+		{name: "different platform does not match", goos: "linux", platforms: []string{"windows"}, want: false},
+		{name: "empty list item is ignored", goos: "linux", platforms: []string{"windows", ""}, want: false},
+		{name: "ubuntu matches linux", goos: "linux", platforms: []string{"ubuntu"}, want: true},
+		{name: "centos matches linux", goos: "linux", platforms: []string{"centos"}, want: true},
+		{name: "ubuntu does not match windows", goos: "windows", platforms: []string{"ubuntu"}, want: false},
+		{name: "posix matches linux", goos: "linux", platforms: []string{"posix"}, want: true},
+		{name: "posix matches darwin", goos: "darwin", platforms: []string{"posix"}, want: true},
+		{name: "posix does not match windows", goos: "windows", platforms: []string{"posix"}, want: false},
+		{name: "macos matches darwin", goos: "darwin", platforms: []string{"macos"}, want: true},
+		{name: "case insensitive", goos: "linux", platforms: []string{"LINUX"}, want: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := platformMatches(tc.goos, tc.platforms)
+			if got != tc.want {
+				t.Fatalf("expected PlatformMatches(%q, %v) to be %v, got %v", tc.goos, tc.platforms, tc.want, got)
+			}
+>>>>>>> 9b6da0e94 (Respect osquery live query platform filters (#50585))
 		})
 	}
 }
