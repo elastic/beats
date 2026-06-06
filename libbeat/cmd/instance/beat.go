@@ -87,6 +87,16 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// beaterStopGracePeriod bounds how long the framework waits for a Beater's Run
+// to return after Stop before disconnecting the publisher pipeline itself, as a
+// backstop against a beater that is stuck (for example, blocked in a guaranteed
+// Publish). The disconnect is the normal (graceful) one, so already-queued
+// events still drain and the stuck publish is released so Run can return.
+// Correctly-behaved beaters return well within this window, so this timeout is
+// not reached on a normal shutdown. See
+// https://github.com/elastic/beats/issues/49794.
+const beaterStopGracePeriod = 30 * time.Second
+
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
 	beat.Beat
@@ -515,16 +525,31 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	ctxDashboards, cancelDashboards := context.WithCancel(context.Background())
 
-	// On Stop, the manager will trigger the callback to shut down the
-	// publisher pipeline and then notify the beater.
+	// runReturned is closed once beater.Run returns, letting the shutdown
+	// watchdog below tell a prompt stop from a hung beater.
+	runReturned := make(chan struct{})
+
+	// On Stop, the manager notifies the beater so it can close its inputs and
+	// finalize acknowledgments. The publisher pipeline is disconnected only
+	// after beater.Run returns (below), so the Beater owns shutdown sequencing
+	// and the pipeline is not torn down out from under still-running inputs.
+	// See issue https://github.com/elastic/beats/issues/49794.
 	var stopOnce sync.Once
 	b.Manager.SetStopCallback(
 		func() {
 			stopOnce.Do(func() {
 				b.Instrumentation.Tracer().Close()
-				// disconnect the pipeline first
-				b.Publisher.Disconnect(context.Background())
 				beater.Stop()
+				// Backstop: if Run does not return promptly (e.g. the beater is
+				// blocked in a guaranteed Publish), disconnect the pipeline
+				// after a grace period so the blocked publish is released and
+				// shutdown can complete. A prompt shutdown closes runReturned
+				// first and never reaches the timeout.
+				go runShutdownWatchdog(runReturned, beaterStopGracePeriod, func() {
+					if b.Publisher != nil {
+						_ = b.Publisher.Disconnect(context.Background())
+					}
+				})
 			})
 		})
 
@@ -540,6 +565,20 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logger.Infof("%s start running.", b.Info.Beat)
 
 	err = beater.Run(&b.Beat)
+	// Signal the watchdog that Run returned, so it does not force a disconnect.
+	close(runReturned)
+
+	// The beater has returned: it has stopped its inputs and finalized its
+	// clients. Now disconnect the publisher pipeline so it can flush and
+	// acknowledge any outstanding events before we exit. Disconnect is
+	// idempotent, so a beater that already disconnected the pipeline itself is
+	// unaffected. See https://github.com/elastic/beats/issues/49794.
+	if b.Publisher != nil {
+		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
+			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
+		}
+	}
+
 	if b.shouldReexec {
 		if err := b.reexec(); err != nil {
 			return fmt.Errorf("could not restart %s: %w", b.Info.Beat, err)
@@ -1522,4 +1561,17 @@ func (bc *beatConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// runShutdownWatchdog releases the publisher pipeline if a Beater's Run does not
+// return within grace after it was told to stop, as a backstop against a hung
+// beater (for example one blocked in a guaranteed Publish). It returns
+// immediately once runReturned is closed — the normal, prompt shutdown — and
+// otherwise calls disconnect once after the grace period.
+func runShutdownWatchdog(runReturned <-chan struct{}, grace time.Duration, disconnect func()) {
+	select {
+	case <-runReturned:
+	case <-time.After(grace):
+		disconnect()
+	}
 }

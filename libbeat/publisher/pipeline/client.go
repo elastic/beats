@@ -20,7 +20,6 @@ package pipeline
 import (
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -33,31 +32,39 @@ var _ beat.Client = (*client)(nil)
 
 // client implements beat.Client interface
 // client connects a beat with the processors and pipeline queue.
+//
+// Shutdown is two-stage. Close (stage one, called by the client's owner) stops
+// accepting new events and closes the queue producer, then returns immediately;
+// acknowledgments for already-published events keep flowing. disconnect (stage
+// two, called only by the owning Pipeline) stops accepting acknowledgments and
+// drops all references to the client. Splitting the two lets a Beater close its
+// inputs without blocking, while the Pipeline owns when acknowledgments are
+// finalized — see issues #50104 and #49794.
 type client struct {
 	logger     *logp.Logger
 	processors beat.Processor
 	producer   queue.Producer[publisher.Event]
 	mutex      sync.Mutex
-	waiter     *clientCloseWaiter
 
 	eventFlags publisher.EventFlags
 	canDrop    bool
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
-	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
+	isOpen       atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
+	disconnected atomic.Bool // set the first time disconnect runs, so the second stage is idempotent.
+
+	// onRemove, if set, unregisters this client from its owning Pipeline. It is
+	// run once, from disconnect.
+	onRemove func()
+
+	// onClosed, if set, hands this client to the owning Pipeline's reaper after
+	// Close so it is finalized (stage two) as soon as its events drain, instead
+	// of lingering until the whole pipeline disconnects. Run once, from Close.
+	requestFinalize func()
 
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
-}
-
-type clientCloseWaiter struct {
-	events  atomic.Uint32
-	closing atomic.Bool
-
-	signalAll  chan struct{} // ack loop notifies `close` that all events have been acked
-	signalDone chan struct{} // shutdown handler telling `wait` that shutdown has been completed
-	waitClose  time.Duration
 }
 
 func (c *client) PublishAll(events []beat.Event) {
@@ -132,28 +139,30 @@ func (c *client) publish(e beat.Event) {
 	}
 }
 
+// Close performs stage one of shutdown: it stops the client from accepting new
+// events and closes the underlying queue producer, then returns immediately. It
+// does NOT wait for acknowledgments — acks for already-published events keep
+// flowing through the event listener until the owning Pipeline calls disconnect.
+//
+// Note: unlike before, Close no longer blocks for ClientConfig.WaitClose. The
+// pipeline-level shutdown (Pipeline.Disconnect, bounded by its context) is now
+// responsible for waiting on outstanding acknowledgments.
 func (c *client) Close() error {
-	// Hold the mutex so any in-progress Publish finishes before
-	// signalClose checks the pending event count.
+	// Hold the mutex so any in-progress Publish finishes before we flip isOpen.
 	c.mutex.Lock()
 	if !c.isOpen.Swap(false) {
 		c.mutex.Unlock()
 		return nil
 	}
 	c.onClosing()
-	c.waiter.signalClose()
 	c.mutex.Unlock()
-
-	c.waiter.wait()
-
-	c.eventListener.ClientClosed()
-	c.logger.Debug("client: done closing acker")
 
 	c.logger.Debug("client: close queue producer")
 	c.producer.Close()
-	c.onClosed()
 	c.logger.Debug("client: done producer close")
 
+	// Processors only run on the publish path, which is now closed, so it is
+	// safe to release them here rather than deferring to disconnect.
 	if c.processors != nil {
 		c.logger.Debug("client: closing processors")
 		err := processors.Close(c.processors)
@@ -162,7 +171,31 @@ func (c *client) Close() error {
 		}
 		c.logger.Debug("client: done closing processors")
 	}
+
+	// Hand off to the pipeline reaper to finalize (stage two) once this
+	// client's already-published events are acknowledged. The Pipeline also
+	// finalizes any still-registered client on Disconnect, so this is a
+	// best-effort early cleanup.
+	if c.requestFinalize != nil {
+		c.requestFinalize()
+	}
 	return nil
+}
+
+// disconnect performs stage two of shutdown: it stops accepting acknowledgments
+// and drops all references to the client so a restarting pipeline cannot collide
+// with it or leak it. It is invoked exactly once by the owning Pipeline (never
+// by user code) and is idempotent.
+func (c *client) disconnect() {
+	if c.disconnected.Swap(true) {
+		return
+	}
+	c.eventListener.ClientClosed()
+	c.logger.Debug("client: done closing acker")
+	c.onClosed()
+	if c.onRemove != nil {
+		c.onRemove()
+	}
 }
 
 func (c *client) onClosing() {
@@ -192,68 +225,4 @@ func (c *client) onFilteredOut() {
 func (c *client) onDroppedOnPublish(e beat.Event) {
 	c.observer.failedPublishEvent()
 	c.clientListener.DroppedOnPublish(e)
-}
-
-func newClientCloseWaiter(timeout time.Duration) *clientCloseWaiter {
-	return &clientCloseWaiter{
-		signalAll:  make(chan struct{}, 1),
-		signalDone: make(chan struct{}),
-		waitClose:  timeout,
-	}
-}
-
-func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
-	if published {
-		w.events.Add(1)
-	}
-}
-
-func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Add(^uint32(n - 1)) //nolint:gosec // G115 n is always a small positive count
-	if value != 0 {
-		return
-	}
-
-	// send done signal, if close is waiting
-	if w.closing.Load() {
-		w.signalAll <- struct{}{}
-	}
-}
-
-// The client's close signal is ignored. Instead the client
-// explicitly uses `signalClose` and `wait` before it continues with the
-// closing sequence.
-func (w *clientCloseWaiter) ClientClosed() {}
-
-func (w *clientCloseWaiter) signalClose() {
-	if w == nil {
-		return
-	}
-
-	w.closing.Store(true)
-	if w.events.Load() == 0 {
-		w.finishClose()
-		return
-	}
-
-	// start routine to propagate shutdown signals or timeouts to anyone
-	// being blocked in wait.
-	go func() {
-		defer w.finishClose()
-
-		select {
-		case <-w.signalAll:
-		case <-time.After(w.waitClose):
-		}
-	}()
-}
-
-func (w *clientCloseWaiter) finishClose() {
-	close(w.signalDone)
-}
-
-func (w *clientCloseWaiter) wait() {
-	if w != nil {
-		<-w.signalDone
-	}
 }

@@ -173,11 +173,15 @@ func (b *batch[T]) Done() {
 		// to take the pool/queue locks without deadlocking us. The
 		// drained batches are no longer reachable from the queue, so
 		// visiting them here is safe.
+		// Under force-close this block is skipped: ACK callbacks are suppressed
+		// and producers' ackWait channels were already closed by Queue.Close's
+		// force fan-out, so there is nothing to resolve.
 		for ab := toAckHead; ab != nil; ab = ab.next {
 			for i, p := range ab.ackProducers {
 				if p.cfg.ACK != nil {
 					p.cfg.ACK(ab.ackCounts[i])
 				}
+				p.resolveN(ab.ackCounts[i])
 			}
 		}
 	}
@@ -218,12 +222,30 @@ func (b *batch[T]) Release() {
 	}
 	pool := b.queue.pool
 
-	// Clear slot state and gather indices for release. Mirrors the
-	// slot-cleanup section of Done but skips the ackProducers/ackCounts
-	// collection — we explicitly do not want to fire callbacks.
+	// Clear slot state and gather indices for release. Unlike Done we do not
+	// fire producer ACK callbacks for these abandoned events, but we still
+	// collect per-producer counts so we can advance each producer's resolved
+	// count below: an abandoned event is "resolved" for ackWait purposes, so a
+	// producer whose tail batch is Released does not strand its ACKWaitChan.
 	var zero T
+	b.ackProducers = b.ackProducers[:0]
+	b.ackCounts = b.ackCounts[:0]
 	for _, i := range b.indices {
 		s := &pool.storage[i]
+		if s.producer != nil {
+			found := false
+			for j, p := range b.ackProducers {
+				if p == s.producer {
+					b.ackCounts[j]++
+					found = true
+					break
+				}
+			}
+			if !found {
+				b.ackProducers = append(b.ackProducers, s.producer)
+				b.ackCounts = append(b.ackCounts, 1)
+			}
+		}
 		if !b.freed {
 			s.event = zero
 		}
@@ -288,14 +310,26 @@ func (b *batch[T]) Release() {
 	forced := q.forced.Load()
 	q.mu.Unlock()
 
-	// Fire ACK callbacks for the drained successors in publish order.
-	// Suppressed under force-close, matching Done's contract.
+	// Advance resolved accounting for this batch's own (abandoned) events so a
+	// producer whose tail batch is Released still has its ackWait closed. Done
+	// outside q.mu because resolveN may close ackWait and call removeProducer
+	// (which takes q.mu). No ACK callback fires for abandoned events. Under
+	// force-close ackWait is already closed by Queue.Close, so resolveN here is
+	// a harmless no-op.
+	for i, p := range b.ackProducers {
+		p.resolveN(b.ackCounts[i])
+	}
+
+	// Fire ACK callbacks for the drained successors in publish order, and
+	// advance their resolved accounting. Suppressed under force-close, matching
+	// Done's contract (force fan-out already closed their ackWait).
 	if !forced {
 		for ab := toAckHead; ab != nil; ab = ab.next {
 			for i, p := range ab.ackProducers {
 				if p.cfg.ACK != nil {
 					p.cfg.ACK(ab.ackCounts[i])
 				}
+				p.resolveN(ab.ackCounts[i])
 			}
 		}
 	}

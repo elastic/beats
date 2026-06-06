@@ -53,6 +53,21 @@ type broker[T any] struct {
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
+	// ackWaitProducers tracks ack-tracking producers so their ACKWaitChan can
+	// be closed when the broker shuts down — after that the ackLoop delivers no
+	// further acks, so a producer closed with unacknowledged events would
+	// otherwise strand a waiter. Producers remove themselves once fully acked.
+	// Guarded by ackWaitMu.
+	//
+	// Note: this bookkeeping exists to satisfy the queue.Producer.ACKWaitChan
+	// contract for all queue implementations (issue #50103). The standalone
+	// (process) pipeline shutdown does not consume it — it waits on Queue.Done
+	// instead — so today it is exercised mainly by the shared-pool slabqueue
+	// path. It is kept here so the memory queue honors the same interface and
+	// is ready for callers that wait per-producer.
+	ackWaitMu        sync.Mutex
+	ackWaitProducers map[*ackProducer[T]]struct{}
+
 	// The factory used to create an event encoder when creating a producer
 	encoderFactory queue.EncoderFactory[T]
 
@@ -238,6 +253,8 @@ func newQueue[T any](
 		consumedChan: make(chan batchList[T]),
 		deleteChan:   make(chan int),
 		closingChan:  make(chan struct{}),
+
+		ackWaitProducers: make(map[*ackProducer[T]]struct{}),
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
@@ -281,6 +298,39 @@ func (b *broker[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 		encoder = b.encoderFactory()
 	}
 	return newProducer(b, cfg.ACK, encoder)
+}
+
+// registerProducer adds an ack-tracking producer to the shutdown fan-out set.
+func (b *broker[T]) registerProducer(p *ackProducer[T]) {
+	b.ackWaitMu.Lock()
+	b.ackWaitProducers[p] = struct{}{}
+	b.ackWaitMu.Unlock()
+}
+
+// unregisterProducer removes a producer from the shutdown fan-out set, called
+// once its ackWait has been closed by its own ack accounting.
+func (b *broker[T]) unregisterProducer(p *ackProducer[T]) {
+	b.ackWaitMu.Lock()
+	delete(b.ackWaitProducers, p)
+	b.ackWaitMu.Unlock()
+}
+
+// closeProducerAckWaits closes the ackWait channel of every still-registered
+// producer. Called when the queue is shutting down and the ackLoop will
+// deliver no further acks, so a producer closed with unacknowledged events
+// does not strand a waiter. Snapshots under the lock and closes outside it.
+func (b *broker[T]) closeProducerAckWaits() {
+	b.ackWaitMu.Lock()
+	producers := make([]*ackProducer[T], 0, len(b.ackWaitProducers))
+	for p := range b.ackWaitProducers {
+		producers = append(producers, p)
+	}
+	b.ackWaitProducers = make(map[*ackProducer[T]]struct{})
+	b.ackWaitMu.Unlock()
+
+	for _, p := range producers {
+		p.forceCloseAckWait()
+	}
 }
 
 func (b *broker[T]) Get(count int) (queue.Batch[T], error) {

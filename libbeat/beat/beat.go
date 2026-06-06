@@ -45,6 +45,14 @@ type Creator func(*Beat, *config.C) (Beater, error)
 // The Stop() method is invoked the first time (and only the first time) a
 // shutdown signal is received. The Stop()-method normally will stop the Run()-loop,
 // such that the beat can gracefully shutdown.
+//
+// Shutdown ownership: the Beater owns shutdown sequencing. On Stop, the Beater
+// is responsible for closing the inputs/clients it connected to the publisher
+// pipeline before Run returns, so that final events can be published and their
+// acknowledgments finalized. The framework disconnects the publisher pipeline
+// only after Run returns; a Beater must not assume the pipeline is still
+// connected once it has been told to stop. See
+// https://github.com/elastic/beats/issues/49794.
 type Beater interface {
 	// The main event loop. This method should block until signalled to stop by an
 	// invocation of the Stop() method.

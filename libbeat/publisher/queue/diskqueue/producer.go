@@ -18,6 +18,8 @@
 package diskqueue
 
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -37,6 +39,12 @@ type diskQueueProducer struct {
 	// already-closed channel, which would panic.)
 	cancelled bool
 	done      chan struct{}
+
+	// ackWait is closed when Close is called. The disk queue persists events
+	// durably and does not track per-producer in-memory acknowledgments, so
+	// there is nothing to wait for beyond Close itself.
+	ackWait chan struct{}
+	ackOnce sync.Once
 }
 
 // A request sent from a producer to the core loop to add a frame to the queue.
@@ -96,9 +104,14 @@ func (producer *diskQueueProducer) publish(
 }
 
 func (producer *diskQueueProducer) Close() {
+	producer.ackOnce.Do(func() { close(producer.ackWait) })
 	if producer.cancelled {
 		return
 	}
 	producer.cancelled = true
 	close(producer.done)
+}
+
+func (producer *diskQueueProducer) ACKWaitChan() <-chan struct{} {
+	return producer.ackWait
 }

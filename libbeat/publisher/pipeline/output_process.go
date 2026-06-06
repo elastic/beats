@@ -32,6 +32,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// closedChan is a pre-closed channel returned by producers that have no events
+// to wait for, so a caller selecting on ACKWaitChan never blocks.
+var closedChan = func() chan struct{} {
+	c := make(chan struct{})
+	close(c)
+	return c
+}()
+
 var _ outputController = (*processOutputController)(nil)
 
 // processOutputController implements outputController
@@ -316,4 +324,8 @@ func (emptyProducer) TryPublish(_ publisher.Event) (queue.EntryID, bool) {
 }
 
 func (emptyProducer) Close() {
+}
+
+func (emptyProducer) ACKWaitChan() <-chan struct{} {
+	return closedChan
 }
