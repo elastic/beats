@@ -65,6 +65,7 @@ func (e ProcessorsError) Error() string {
 
 func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
 	return func(_ context.Context) []scheduler.TaskFunc {
+		// TODO: Check if context is already closed?
 		return runPublishJob(job, t.pubClient)
 	}
 }

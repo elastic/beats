@@ -66,7 +66,8 @@ func (e *ECSErr) String() string {
 }
 
 const (
-	TYPE_IO = "io"
+	TYPE_IO      = "io"
+	TYPE_SKIPPED = "skipped"
 )
 
 type SynthErrType string
@@ -84,6 +85,14 @@ func NewCmdTimeoutStatusErr(timeout time.Duration, cmd string) *ECSErr {
 		TYPE_IO,
 		"CMD_TIMEOUT",
 		fmt.Sprintf("command '%s' did not exit before extended timeout: %s", cmd, timeout.String()),
+	)
+}
+
+func NewCmdSkippedStatusErr(reason string) *ECSErr {
+	return NewECSErr(
+		TYPE_SKIPPED,
+		"MONITOR_SKIPPED_BY_CANCELLATION", // TODO: find a better code
+		fmt.Sprintf("command skipped: %s", reason),
 	)
 }
 
