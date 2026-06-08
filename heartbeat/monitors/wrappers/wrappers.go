@@ -39,7 +39,7 @@ import (
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, stateLoader monitorstate.StateLoader) []jobs.Job {
 	mst := monitorstate.NewTracker(stateLoader, false)
 	var wrapped []jobs.Job
-	if stdMonFields.Type != "browser" || stdMonFields.BadConfig {
+	if !stdMonFields.IsSyntheticsType() || stdMonFields.BadConfig {
 		wrapped = WrapLightweight(js, stdMonFields, mst)
 	} else {
 		wrapped = WrapBrowser(js, stdMonFields, mst)

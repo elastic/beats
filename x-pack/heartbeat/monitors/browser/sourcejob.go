@@ -87,6 +87,7 @@ func (sj *SourceJob) StdFields() stdfields.StdMonitorFields {
 	// Should be impossible since outer monitor.go should run this same code elsewhere
 	// TODO: Just pass stdfields in to remove second deserialize
 	if err != nil {
+		//nolint:forbidigo // StdFields() has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
 		logp.L().Warnf("Could not deserialize monitor fields for browser, this should never happen: %s", err)
 	}
 	return sFields
@@ -147,38 +148,49 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 		extraArgs = append(extraArgs, sj.browserCfg.SyntheticsArgs...)
 	}
 
+	// `--playwright-options` is honored by both browser and API journeys
+	// (the API journey applies the options to `APIRequestContext.newContext()`).
 	if len(sj.browserCfg.PlaywrightOpts) > 0 {
 		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
+			//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
 			logp.L().Warnf("could not serialize playwright options '%v': %v", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}
 	}
+	// `--ignore-https-errors` is meaningful for both browser (page-level)
+	// and API (APIRequestContext-level) journeys.
 	if sj.browserCfg.IgnoreHTTPSErrors {
 		extraArgs = append(extraArgs, "--ignore-https-errors")
 	}
-	if sj.browserCfg.Sandbox {
-		extraArgs = append(extraArgs, "--sandbox")
-	}
-	if sj.browserCfg.Screenshots != "" {
-		extraArgs = append(extraArgs, "--screenshots", sj.browserCfg.Screenshots)
-	}
-	if sj.browserCfg.Throttling != nil {
-		switch t := sj.browserCfg.Throttling.(type) {
-		case bool:
-			if !t {
-				extraArgs = append(extraArgs, "--no-throttling")
-			}
-		case string:
-			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.browserCfg.Throttling))
-		case map[string]interface{}:
-			j, err := json.Marshal(t)
-			if err != nil {
-				logp.L().Warnf("could not serialize throttling config to JSON: %s", err)
-			} else {
-				extraArgs = append(extraArgs, "--throttling", string(j))
+	// The remaining flags are browser-only — they all require Chromium.
+	// Skip them for API journeys so we don't confuse newer synthetics
+	// agents and to keep `ps` output / logs clean.
+	if !sj.browserCfg.IsAPI() {
+		if sj.browserCfg.Sandbox {
+			extraArgs = append(extraArgs, "--sandbox")
+		}
+		if sj.browserCfg.Screenshots != "" {
+			extraArgs = append(extraArgs, "--screenshots", sj.browserCfg.Screenshots)
+		}
+		if sj.browserCfg.Throttling != nil {
+			switch t := sj.browserCfg.Throttling.(type) {
+			case bool:
+				if !t {
+					extraArgs = append(extraArgs, "--no-throttling")
+				}
+			case string:
+				extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", sj.browserCfg.Throttling))
+			case map[string]interface{}:
+				j, err := json.Marshal(t)
+				if err != nil {
+					//nolint:forbidigo // extraArgs has no logger handle and the error is "should never happen"; matches the pre-existing pattern.
+					logp.L().Warnf("could not serialize throttling config to JSON: %s", err)
+				} else {
+					extraArgs = append(extraArgs, "--throttling", string(j))
+				}
 			}
 		}
 	}
@@ -214,6 +226,13 @@ func (sj *SourceJob) jobs() []jobs.Job {
 }
 
 func (sj *SourceJob) plugin() plugin.Plugin {
+	return sj.Plugin()
+}
+
+// Plugin returns the SourceJob wrapped as a monitor plugin. Exported so
+// the sibling `api` package can register its own monitor type while
+// reusing the same source/synthexec pipeline.
+func (sj *SourceJob) Plugin() plugin.Plugin {
 	return plugin.Plugin{
 		Jobs:      sj.jobs(),
 		DoClose:   sj.Close,

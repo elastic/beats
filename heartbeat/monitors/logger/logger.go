@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -73,7 +74,10 @@ func getLogger() *logp.Logger {
 	defer mtx.Unlock()
 
 	if eventLogger == nil {
-		return SetLogger(logp.L())
+		// Fall back to the global logger if SetLogger was never called.
+		// Tests and production paths call SetLogger during initialization;
+		// this branch only protects against early calls or misconfiguration.
+		return SetLogger(logp.L()) //nolint:forbidigo // intentional fallback before SetLogger is called
 	}
 
 	return eventLogger
@@ -81,22 +85,22 @@ func getLogger() *logp.Logger {
 
 func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	errors := []error{}
-	monitorID, err := event.GetValue("monitor.id")
+	monitorIDIface, err := event.GetValue("monitor.id")
 	if err != nil {
 		errors = append(errors, fmt.Errorf("could not extract monitor.id: %w", err))
 	}
 
-	durationUs, err := event.GetValue("monitor.duration.us")
+	durationUsIface, err := event.GetValue("monitor.duration.us")
 	if err != nil {
-		durationUs = int64(0)
+		durationUsIface = int64(0)
 	}
 
-	monType, err := event.GetValue("monitor.type")
+	monTypeIface, err := event.GetValue("monitor.type")
 	if err != nil {
 		errors = append(errors, fmt.Errorf("could not extract monitor.type: %w", err))
 	}
 
-	status, err := event.GetValue("monitor.status")
+	statusIface, err := event.GetValue("monitor.status")
 	if err != nil {
 		errors = append(errors, fmt.Errorf("could not extract monitor.status: %w", err))
 	}
@@ -112,18 +116,34 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 		}
 	}
 
+	monitorID, ok := monitorIDIface.(string)
+	if !ok {
+		errors = append(errors, fmt.Errorf("monitor.id is not a string, got %T", monitorIDIface))
+	}
+	monType, ok := monTypeIface.(string)
+	if !ok {
+		errors = append(errors, fmt.Errorf("monitor.type is not a string, got %T", monTypeIface))
+	}
+	durationUs, ok := durationUsIface.(int64)
+	if !ok {
+		errors = append(errors, fmt.Errorf("monitor.duration.us is not an int64, got %T", durationUsIface))
+	}
+	status, ok := statusIface.(string)
+	if !ok {
+		errors = append(errors, fmt.Errorf("monitor.status is not a string, got %T", statusIface))
+	}
+
 	if len(errors) > 0 {
 		return nil, fmt.Errorf("logErrors: %+v", errors)
 	}
 
-	networkInfo := extractNetworkInfo(event, monType.(string))
 	monitor := MonitorRunInfo{
-		MonitorID:   monitorID.(string),
-		Type:        monType.(string),
-		Duration:    durationUs.(int64),
-		Status:      status.(string),
+		MonitorID:   monitorID,
+		Type:        monType,
+		Duration:    durationUs,
+		Status:      status,
 		Attempt:     attempt,
-		NetworkInfo: networkInfo,
+		NetworkInfo: extractNetworkInfo(event, monType),
 	}
 
 	sc, _ := event.Meta.GetValue(META_STEP_COUNT)
@@ -136,8 +156,9 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 }
 
 func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
-	// Only relevant for lightweight monitors
-	if monitorType == "browser" {
+	// Only relevant for lightweight monitors. Synthetics-driven monitors
+	// (browser, api) emit their own network_info events via synthexec.
+	if stdfields.IsSyntheticsType(monitorType) {
 		return nil
 	}
 
