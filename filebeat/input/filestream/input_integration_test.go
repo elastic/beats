@@ -39,6 +39,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/testing/fs"
 )
 
 // test_close_renamed from test_harvester.py
@@ -474,6 +475,59 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func TestFilestreamDoesNotSkipEventsOnInactiveCloseReopen(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+	env.pipeline = &mockPipelineConnector{skipACK: true}
+	env.workingDir = fs.TempDir(t, "..", "..", "build", "integration-tests")
+
+	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]any{
+		"id":                                   id,
+		"paths":                                []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":    "50ms",
+		"close.on_state_change.check_interval": "25ms",
+		"close.on_state_change.inactive":       "100ms",
+		"backoff.init":                         "10ms",
+		"backoff.max":                          "10ms",
+	})
+
+	lenFirstBatch := 25
+	lenSecondBatch := 10
+	firstBatch := numberedLines("before-close", lenFirstBatch)
+	secondBatch := numberedLines("after-reopen", lenSecondBatch)
+	env.mustWriteToFile(testlogName, []byte(firstBatch))
+
+	ctx, cancelInput := context.WithCancel(t.Context())
+	env.startInput(ctx, id, inp)
+	defer func() {
+		cancelInput()
+		env.waitUntilInputStops()
+	}()
+
+	require.Eventually(
+		t,
+		func() bool {
+			return env.pipeline.clientsCount() == 1
+		},
+		time.Second, time.Millisecond, "pipeline client did not connect")
+
+	env.pipeline.clients[0].waitUntilPublishingCount(t, lenFirstBatch, 500*time.Millisecond)
+	env.waitUntilHarvesterIsDone()
+
+	env.pipeline.setSkipACK(false)
+	env.mustAppendToFile(testlogName, []byte(secondBatch))
+	env.waitUntilEventCount(lenFirstBatch + lenSecondBatch)
+	env.waitUntilHarvesterIsDone()
+
+	got := env.getOutputMessages()
+	// Split the messages into lines and remove the last line that contains
+	// only the '\n' character
+	lines := strings.Split(firstBatch+secondBatch, "\n")
+	lines = lines[:len(lines)-1]
+	requireNoMissingFilestreamEvents(t, lines, got)
 }
 
 // test_close_inactive_file_removal from test_input.py
@@ -1439,4 +1493,52 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 
 	// Ensure all events have been ingested
 	env.waitUntilEventCount(55)
+}
+
+// numberedLines returns a string with count numbered lines,
+// each line is 50 bytes long. The lines are prefixed with prefix,
+// if the prefix plus the counter is larger, then no padding is added.
+func numberedLines(prefix string, count int) string {
+	paddingLen := 50 - (len(prefix) + 6)
+	padding := ""
+	if paddingLen > 0 {
+		padding = strings.Repeat("x", paddingLen)
+	}
+
+	var lines strings.Builder
+	for i := range count {
+		fmt.Fprintf(&lines, "%s %03d %s\n", prefix, i, padding)
+	}
+
+	return lines.String()
+}
+
+func requireNoMissingFilestreamEvents(t *testing.T, expected, got []string) {
+	t.Helper()
+
+	seen := make(map[string]struct{}, len(got))
+	for _, msg := range got {
+		seen[msg] = struct{}{}
+	}
+
+	var missing []string
+	for _, msg := range expected {
+		if _, exists := seen[msg]; !exists {
+			missing = append(missing, msg)
+		}
+	}
+
+	if len(missing) > 0 {
+		t.Errorf(
+			"filestream lost events after inactive close/reopen "+
+				"lost=%d delivered=%d expected=%d. Missing events:\n",
+			len(missing),
+			len(got),
+			len(expected),
+		)
+
+		for _, l := range missing {
+			t.Log(l)
+		}
+	}
 }

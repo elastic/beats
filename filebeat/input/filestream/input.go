@@ -447,8 +447,8 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 		return state
 	}
 
-	err := c.Unpack(&state)
-	if err != nil {
+	// Unpack cursor, but use the offset from the last ACKed event
+	if err := c.UnpackACKed(&state); err != nil {
 		log.Error("Cannot serialize cursor data into file state: %+v", err)
 	}
 

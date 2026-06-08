@@ -1,0 +1,45 @@
+filebeat.inputs:
+  - type: filestream
+    id: close-eof-reopen-before-ack
+    index: "{{ .index }}"
+    paths:
+      - {{ .logfile }}
+    close.reader.on_eof: true
+    file_identity.native: ~
+    prospector:
+      scanner:
+        fingerprint:
+          enabled: false
+        check_interval: 100ms
+
+path.home: {{ .homePath }}
+filebeat.registry.flush: 100ms
+
+queue.mem:
+  events: 32
+  flush:
+    min_events: 1
+    timeout: 0s
+
+output.elasticsearch:
+  hosts:
+    - {{ .esHost }}
+  username: {{ .user }}
+  password: {{ .pass }}
+  allow_older_versions: true
+  backoff:
+    init: 10ms
+    max: 10ms
+  bulk_max_size: 32
+
+logging:
+  level: debug
+  selectors:
+    - "*"
+    - input
+    - input.filestream
+    - input.harvester
+    - prospector
+
+metrics:
+  enabled: false

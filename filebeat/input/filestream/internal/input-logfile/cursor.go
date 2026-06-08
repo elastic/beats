@@ -45,6 +45,14 @@ func (c Cursor) Unpack(to interface{}) error {
 	return c.resource.UnpackCursor(to)
 }
 
+// UnpackACKed deserializes the last ACKed cursor state into the argument 'to'.
+func (c Cursor) UnpackACKed(to any) error {
+	if c.IsNew() {
+		return nil
+	}
+	return c.resource.UnpackACKedCursor(to)
+}
+
 // AllEventsPublished returns true if there are no pending operations
 // on this cursor, which means all events have been published.
 //

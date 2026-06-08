@@ -122,3 +122,35 @@ func TestCursor_Unpack(t *testing.T) {
 		require.Equal(t, "test-state-update", st)
 	})
 }
+
+func TestCursor_UnpackACKed(t *testing.T) {
+	t.Run("nothing to unpack if resource is new", func(t *testing.T) {
+		var st string
+		cursor := makeCursor(&resource{})
+
+		require.NoError(t, cursor.UnpackACKed(&st))
+		require.Empty(t, st)
+	})
+
+	t.Run("unpack ACKed state when updates are pending", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {Cursor: "test"},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+		op, err := createUpdateOp(res, "test-state-update")
+		require.NoError(t, err)
+		defer op.done(1)
+
+		cursor := makeCursor(store.Get("test::key"))
+
+		var active string
+		require.NoError(t, cursor.Unpack(&active))
+		require.Equal(t, "test-state-update", active)
+
+		var acked string
+		require.NoError(t, cursor.UnpackACKed(&acked))
+		require.Equal(t, "test", acked)
+	})
+}
