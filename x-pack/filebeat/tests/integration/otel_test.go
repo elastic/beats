@@ -189,6 +189,15 @@ http.port: %d
 		"log.file.inode",
 		"log.file.path",
 		"log.file.device_id", // changes value between filebeat and otel receiver
+		// Cloud metadata fields are dynamic based on where tests run
+		"cloud.account.id",
+		"cloud.availability_zone",
+		"cloud.instance.id",
+		"cloud.instance.name",
+		"cloud.machine.type",
+		"cloud.provider",
+		"cloud.region",
+		"cloud.service.name",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -364,6 +373,15 @@ service:
 		"agent.ephemeral_id",
 		"agent.id",
 		"event.created",
+		// Cloud metadata fields are dynamic based on where tests run
+		"cloud.account.id",
+		"cloud.availability_zone",
+		"cloud.instance.id",
+		"cloud.instance.name",
+		"cloud.machine.type",
+		"cloud.provider",
+		"cloud.region",
+		"cloud.service.name",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
@@ -1248,6 +1266,15 @@ exporters:
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		// Cloud metadata fields are dynamic based on where tests run
+		"cloud.account.id",
+		"cloud.availability_zone",
+		"cloud.instance.id",
+		"cloud.instance.name",
+		"cloud.machine.type",
+		"cloud.provider",
+		"cloud.region",
+		"cloud.service.name",
 	}
 
 	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
