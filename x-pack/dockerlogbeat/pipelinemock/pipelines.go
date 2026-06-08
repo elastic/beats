@@ -5,6 +5,7 @@
 package pipelinemock
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -84,6 +85,20 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
+}
+
+// Disconnect disconnects all clients created by this MockPipelineConnector.
+func (pc *MockPipelineConnector) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.clients {
+		if err := c.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // HasConnectedClients returns true if there are clients connected.

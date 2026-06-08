@@ -35,8 +35,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -148,7 +148,7 @@ func New(
 	settings Settings,
 ) (*Pipeline, error) {
 	if monitors.Logger == nil {
-		monitors.Logger = logp.NewLogger("publish")
+		monitors.Logger = beat.Logger.Named("publish")
 	}
 
 	p := &Pipeline{
@@ -172,7 +172,7 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
+	queueFactory, _, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
@@ -209,12 +209,18 @@ func NewForReceiver(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	// Receiver pipelines route through the OTel output controller. With an
+	// in-memory queue configuration the controller uses the slabqueue pool
+	// (a global default pool when no intake queue ID is set, or a pool
+	// keyed by the ID when one is). With an explicit queue.disk config the
+	// controller falls back to building its queue via queueFactory, in
+	// which case sharing is not supported.
+	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, intakeQueueID)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueFactory, queueConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -222,12 +228,14 @@ func NewForReceiver(
 	return p, nil
 }
 
-// Close stops the pipeline, outputs and queue.
-// If WaitClose with WaitOnPipelineClose mode is configured, Close will block
+// Disconnect stops the pipeline, outputs and queue.
+// If WaitClose with WaitOnPipelineClose mode is configured, Disconnect will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients will no longer accept new Publish calls once Close is started,
-// and will no longer receive event acknowledgments once Close returns.
-func (p *Pipeline) Close() error {
+// Note: clients will no longer accept new Publish calls once Disconnect is started,
+// and will no longer receive event acknowledgments once Disconnect returns.
+func (p *Pipeline) Disconnect(ctx context.Context) error {
+	// Here context does not do anything for now but it will be the responsibility of the beater to determine how long to wait before full disconnection
+	// See issue: https://github.com/elastic/beats/issues/49794
 	p.closeOnce.Do(func() {
 		log := p.monitors.Logger
 
@@ -352,22 +360,31 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], error) {
+// It also returns the parsed queue settings (with defaults applied) so callers
+// can detect mismatched configs between pipelines that connect with the same
+// shared intake queue id.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], any, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return memqueue.FactoryForSettings[publisher.Event](settings), nil
+		return memqueue.FactoryForSettings[publisher.Event](settings), settings, nil
+	case slabqueue.QueueType:
+		settings, err := slabqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, nil, err
+		}
+		return slabqueue.FactoryForSettings[publisher.Event](settings), settings, nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return diskqueue.FactoryForSettings(settings, paths), nil
+		return diskqueue.FactoryForSettings(settings, paths), settings, nil
 	default:
-		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
+		return nil, nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
 }
 

@@ -1,0 +1,2 @@
+pipeline.queue.slab:
+  events: 4096
