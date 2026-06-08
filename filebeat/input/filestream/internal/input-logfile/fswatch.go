@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"time"
+
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -126,16 +128,18 @@ type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
 	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles() map[string]FileDescriptor
+	GetFiles() (map[string]FileDescriptor, FileScanMetrics)
 }
 
 // FSWatcher returns file events of the monitored files.
 type FSWatcher interface {
 	FSScanner
 
-	// Run is the event loop which watchers for changes
+	// Run is the event loop which watches for changes
 	// in the file system and returns events based on the data.
-	Run(unison.Canceler)
+	// Aside from the metrics struct it also has ignore older
+	// and ignore inactive as arguments.
+	Run(ctx unison.Canceler, metrics *Metrics, ingoreOlder time.Duration, ignoreInativeSince time.Time)
 	// Event returns the next event captured by FSWatcher.
 	Event() FSEvent
 	// NotifyChan returns the channel used to listen for
