@@ -37,6 +37,7 @@ type TransactionPublisher struct {
 	pipeline  beat.Pipeline
 	canDrop   bool
 	processor transProcessor
+	log       *logp.Logger
 }
 
 type transProcessor struct {
@@ -54,6 +55,7 @@ func NewTransactionPublisher(
 	ignoreOutgoing bool,
 	canDrop bool,
 	internalNetworks []string,
+	logger *logp.Logger,
 ) (*TransactionPublisher, error) {
 	addrs, err := common.LocalIPAddrs()
 	if err != nil {
@@ -76,6 +78,7 @@ func NewTransactionPublisher(
 			name:             name,
 			ignoreOutgoing:   ignoreOutgoing,
 		},
+		log: logger,
 	}
 	return p, nil
 }
@@ -99,7 +102,7 @@ func (p *TransactionPublisher) CreateReporter(
 		return nil, err
 	}
 
-	processors, err := processors.New(meta.Processors, nil)
+	processors, err := processors.New(meta.Processors, p.log)
 	if err != nil {
 		return nil, err
 	}

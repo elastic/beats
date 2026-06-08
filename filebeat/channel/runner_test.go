@@ -119,6 +119,9 @@ func TestProcessorsForConfig(t *testing.T) {
 		if test.event.Fields == nil {
 			test.event.Fields = mapstr.M{}
 		}
+		if test.beatInfo.Logger == nil {
+			test.beatInfo.Logger = logptest.NewTestingLogger(t, "")
+		}
 		config, err := conf.NewConfigFrom(test.configStr)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
@@ -181,7 +184,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	editor, err := newCommonConfigEditor(beat.Info{}, config)
+	editor, err := newCommonConfigEditor(beat.Info{Logger: logptest.NewTestingLogger(t, "")}, config)
 	if err != nil {
 		t.Fatal(err)
 	}
