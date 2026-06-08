@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -211,7 +212,7 @@ func TestConfigureModule(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.initConfig)
-			m, _, err := mb.NewModule(cfg, mockRegistry, logptest.NewTestingLogger(t, ""))
+			m, _, err := mb.NewModule(cfg, mockRegistry, paths.New(), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			bm, ok := m.(*mb.BaseModule)

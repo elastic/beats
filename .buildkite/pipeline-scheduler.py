@@ -73,7 +73,8 @@ def get_release_branches() -> typing.List[str]:
     try:
         release_branches = [branch for branch in resp["branches"]]
     except KeyError:
-        fail_with_error(f'''Didn't find the excepted structure ["branches"] in the response [{resp}] from [{ACTIVE_BRANCHES_URL}]''')
+        fail_with_error(
+            f'''Didn't find the excepted structure ["branches"] in the response [{resp}] from [{ACTIVE_BRANCHES_URL}]''')
 
     return release_branches
 
@@ -103,7 +104,8 @@ if __name__ == '__main__':
 
     target_branches = sorted(list(set(release_branches).difference(exclude_branches)))
     if len(target_branches) == 0 or target_branches[0].isspace():
-        fail_with_error(f"Calculated target branches were empty! You passed EXCLUDE_BRANCHES={exclude_branches} and release branches are {release_branches} the difference of which results in {target_branches}.")
+        fail_with_error(
+            f"Calculated target branches were empty! You passed EXCLUDE_BRANCHES={exclude_branches} and release branches are {release_branches} the difference of which results in {target_branches}.")
 
     pipeline = generate_pipeline(pipelines_to_trigger, branches=target_branches)
     print('# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json')

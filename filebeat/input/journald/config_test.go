@@ -38,8 +38,8 @@ func TestConfigIncludeMatches(t *testing.T) {
 		config := defaultConfig()
 		require.NoError(t, c.Unpack(&config))
 
-		assert.EqualValues(t, "_SYSTEMD_UNIT=foo.service", config.Matches.Matches[0].String())
-		assert.EqualValues(t, "_SYSTEMD_UNIT=bar.service", config.Matches.Matches[1].String())
+		assert.Equal(t, "_SYSTEMD_UNIT=foo.service", config.Matches.Matches[0].String())
+		assert.Equal(t, "_SYSTEMD_UNIT=bar.service", config.Matches.Matches[1].String())
 	}
 
 	t.Run("normal", func(t *testing.T) {

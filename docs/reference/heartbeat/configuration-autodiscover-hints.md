@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-autodiscover-hints.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Hints based autodiscover [configuration-autodiscover-hints]

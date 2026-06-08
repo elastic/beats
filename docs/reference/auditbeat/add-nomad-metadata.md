@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/add-nomad-metadata.html
 applies_to:
   stack: preview
+  serverless: preview
 ---
 
 # Add Nomad metadata [add-nomad-metadata]

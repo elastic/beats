@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-mgr_pool_disk.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Ceph mgr_pool_disk metricset [metricbeat-metricset-ceph-mgr_pool_disk]
 

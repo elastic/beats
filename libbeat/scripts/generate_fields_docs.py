@@ -24,6 +24,7 @@ def document_fields(output, section, sections, path, beat):
             output.write('  stack: ')
             output.write(', '.join(applies_to))
             output.write('\n')
+            output.write('  serverless: {}\n'.format(get_serverless_lifecycle(applies_to)))
         output.write('---\n\n')
         output.write('% This file is generated! See scripts/generate_fields_docs.py\n\n')
 
@@ -136,6 +137,22 @@ def document_field(output, field, field_path):
             document_field(output, subfield, field_path + "." +
                            subfield["name"])
 
+# Determine the serverless lifecycle from the stack applies_to list.
+# Serverless is unversioned, so we use the most advanced lifecycle state.
+
+
+def get_serverless_lifecycle(applies_to):
+    lifecycle_order = ['preview', 'beta', 'ga', 'deprecated', 'removed']
+    latest_idx = -1
+    for item in applies_to:
+        lifecycle = item.split()[0]
+        if lifecycle in lifecycle_order:
+            idx = lifecycle_order.index(lifecycle)
+            if idx > latest_idx:
+                latest_idx = idx
+    return lifecycle_order[latest_idx] if latest_idx >= 0 else 'ga'
+
+
 # Build the applies_to string: a comma-separated list
 # of all available lifecycles and versions
 # NOTE: There's almost certainly a more efficient way
@@ -196,6 +213,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/{beat}/current/exported-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 % This file is generated! See scripts/generate_fields_docs.py

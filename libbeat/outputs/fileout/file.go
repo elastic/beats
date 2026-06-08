@@ -31,6 +31,7 @@ import (
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -52,6 +53,7 @@ func makeFileout(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *c.C,
+	beatPaths *paths.Path,
 ) (outputs.Group, error) {
 	foConfig, err := readConfig(cfg)
 	if err != nil {
@@ -67,7 +69,7 @@ func makeFileout(
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(foConfig.Queue, -1, 0, nil, beat.Logger, fo)
+	return outputs.Success(foConfig.Queue, -1, 0, nil, beat.Logger, beatPaths, fo)
 }
 
 func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {

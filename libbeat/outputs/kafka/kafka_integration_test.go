@@ -47,6 +47,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -278,7 +279,7 @@ func TestKafkaPublish(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg, paths.New())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -288,7 +289,7 @@ func TestKafkaPublish(t *testing.T) {
 			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, output.index, "testbeat")
+			assert.Equal(t, "testbeat", output.index)
 			defer output.Close()
 
 			// publish test events
@@ -317,7 +318,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			// validate messages
 			if len(expected) != len(stored) {
-				assert.Equal(t, len(stored), len(expected))
+				assert.Len(t, stored, len(expected))
 				return
 			}
 
@@ -346,7 +347,7 @@ func TestKafkaPublish(t *testing.T) {
 				msg := validate(t, s.Value, expected)
 				seenMsgs[msg] = struct{}{}
 			}
-			assert.Equal(t, len(expected), len(seenMsgs))
+			assert.Len(t, seenMsgs, len(expected))
 		})
 	}
 }
@@ -396,7 +397,7 @@ func TestKafkaErrors(t *testing.T) {
 		logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
 		require.NoError(t, err)
 
-		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
+		grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg, paths.New())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -406,7 +407,7 @@ func TestKafkaErrors(t *testing.T) {
 		if err := output.Connect(context.Background()); err != nil {
 			t.Fatal(err)
 		}
-		assert.Equal(t, output.index, "testbeat")
+		assert.Equal(t, "testbeat", output.index)
 		defer output.Close()
 
 		// publish test events

@@ -388,6 +388,14 @@
                       type: long
                     - name: value_log_size
                       type: long
+                    - name: storage_limit
+                      type: long
+                    - name: disk_used
+                      type: long
+                    - name: disk_total
+                      type: long
+                    - name: disk_usage_threshold_pct
+                      type: float
             - name: transactions_dropped
               type: long
         - name: server

@@ -206,7 +206,7 @@ func testWithLumberjackServer(t *testing.T, hostname string, tlsConfig *tls.Conf
 		batch.ACK()
 
 		events := batch.Events
-		assert.Equal(t, 1, len(events))
+		assert.Len(t, events, 1)
 		msg, ok := events[0].(map[string]interface{})
 		assert.True(t, ok)
 		assert.Equal(t, "test log message", msg["value"])

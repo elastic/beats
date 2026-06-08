@@ -168,7 +168,7 @@ func (dq *diskQueue) handleReaderLoopResponse(response readerLoopResponse) {
 
 		dq.logger.Errorf(
 			"Error reading segment file %s: %v",
-			dq.settings.segmentPath(segment.id), response.err)
+			dq.settings.segmentPath(segment.id, dq.paths), response.err)
 	}
 }
 

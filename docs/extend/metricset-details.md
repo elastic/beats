@@ -143,7 +143,7 @@ You should use a combination of the three test types to test your metricsets bec
 
 #### Adding a Test Environment [_adding_a_test_environment]
 
-Integration and system tests need an environment that’s running the service. You can create this environment by using Docker and a docker-compose file. If you add a module that requires a service, you must add the service to the virtual environment. To do this, you:
+Integration and system tests need an environment that’s running the service. You can create this environment by using Docker and a docker compose file. If you add a module that requires a service, you must add the service to the virtual environment. To do this, you:
 
 * Update the `docker-compose.yml` file with your environment
 * Update the `docker-entrypoint.sh` script
@@ -155,7 +155,7 @@ redis:
   image: redis:3.2.3
 ```
 
-To allow the Beat to access your service, make sure that you define the environment variables in the docker-compose file and add the link to the container:
+To allow the Beat to access your service, make sure that you define the environment variables in the docker compose file and add the link to the container:
 
 ```yaml
 beat:
@@ -207,7 +207,7 @@ func GetEnvPort() string { <2>
 ```
 
 1. Add any additional config options your metricset needs here.
-2. The endpoint used by the metricset needs to be configurable for manual and automated testing. Environment variables should be defined in the module under `_meta/env` and included in the `docker-compose.yml` file.
+2. The endpoint used by the metricset needs to be configurable for manual and automated testing. Environment variables should be defined in the module under `_meta/env` and included in the docker compose file.
 
 
 The `TestFetch` integration test will return a single event from your metricset, which you can use to test the validity of the data. `TestData` will (re)generate the `_meta/data.json` file that documents the data reported by the metricset.

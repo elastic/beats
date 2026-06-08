@@ -4,6 +4,21 @@ import yaml
 import six
 import glob
 
+
+# Determine the serverless lifecycle from the stack applies_to string.
+# Serverless is unversioned, so we use the most advanced lifecycle state.
+def get_serverless_lifecycle(applies_to_str):
+    lifecycle_order = ['preview', 'beta', 'ga', 'deprecated', 'removed']
+    latest_idx = -1
+    for part in applies_to_str.split(','):
+        lifecycle = part.strip().split()[0]
+        if lifecycle in lifecycle_order:
+            idx = lifecycle_order.index(lifecycle)
+            if idx > latest_idx:
+                latest_idx = idx
+    return lifecycle_order[latest_idx] if latest_idx >= 0 else 'ga'
+
+
 # Collects docs for all modules
 
 
@@ -54,7 +69,8 @@ mapped_pages:
         if applies_to != "":
             module_file += """applies_to:
   stack: {}
-""".format(applies_to)
+  serverless: {}
+""".format(applies_to, get_serverless_lifecycle(applies_to))
 
         module_file += """---
 
@@ -88,6 +104,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Modules [filebeat-modules]

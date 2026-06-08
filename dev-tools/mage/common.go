@@ -216,6 +216,18 @@ func dockerInfo() (*DockerInfo, error) {
 	return &info, nil
 }
 
+// HaveDockerCompose returns an error if the docker compose plugin is unavailable.
+func HaveDockerCompose() error {
+	if err := HaveDocker(); err != nil {
+		return err
+	}
+	_, err := sh.Output("docker", "compose", "version")
+	if err != nil {
+		return fmt.Errorf("docker compose is not available: the docker compose plugin is not installed: %w", err)
+	}
+	return nil
+}
+
 // HaveKubectl returns an error if kind is not found on the PATH.
 func HaveKubectl() error {
 	_, err := exec.LookPath("kubectl")

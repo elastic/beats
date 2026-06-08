@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -598,5 +599,63 @@ func TestFormatQuery(t *testing.T) {
 				t.Errorf("unexpected query string: got=%q want=%q", got, test.want)
 			}
 		})
+	}
+}
+
+var validateConfigTests = []struct {
+	name    string
+	config  map[string]any
+	wantErr error
+}{
+	{
+		name:   "no_tracer",
+		config: map[string]any{},
+	},
+	{
+		name: "tracer_disabled",
+		config: map[string]any{
+			"tracer.enabled":  false,
+			"tracer.filename": "/var/logs/path.log",
+		},
+		wantErr: nil,
+	},
+	{
+		name: "valid_path",
+		config: map[string]any{
+			"tracer.enabled":  true,
+			"tracer.filename": "azure-ad/logs/path.log",
+		},
+	},
+	{
+		name: "invalid_path",
+		config: map[string]any{
+			"tracer.enabled":  true,
+			"tracer.filename": "/var/logs/path.log",
+		},
+		wantErr: errors.New(`request tracer path must be within "azure-ad" path accessing 'tracer'`),
+	},
+}
+
+func TestConfigValidation(t *testing.T) {
+	for _, test := range validateConfigTests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := config.MustNewConfigFrom(test.config)
+			var c graphConf
+			err := cfg.Unpack(&c)
+			if !sameError(err, test.wantErr) {
+				t.Fatalf("unexpected error from config validation: got:%v want:%v", err, test.wantErr)
+			}
+		})
+	}
+}
+
+func sameError(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
 	}
 }

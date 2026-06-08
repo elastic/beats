@@ -97,8 +97,6 @@ processors:
         logs_dynamic_pipeline:
             enabled: true
         logs_index: logs-integration-{{ .Namespace }}
-        mapping:
-            mode: bodymap
         max_conns_per_host: 1
         password: {{ .Password }}
         retry:

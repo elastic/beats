@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -624,4 +625,269 @@ func newTracerConfig(name string, cfg config, withTrace bool) config {
 		Filename: filepath.Join(traceLogsDir, name+".ndjson"),
 	}}
 	return cfg
+}
+
+func TestHysteresisAdmissionControl(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("accepts_requests_below_high_water", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 3000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		h := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics)
+
+		// Small request should be accepted.
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		h.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+	})
+
+	t.Run("rejects_requests_at_high_water", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 100 // Very low threshold.
+		c.LowWaterInFlight = 50
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate existing in-flight bytes above high water mark and
+		// set reject mode.
+		handler.inFlight.Store(150)
+		handler.accepting.Store(false)
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusServiceUnavailable, respRec.Code)
+		assert.Contains(t, respRec.Body.String(), "high water mark")
+	})
+
+	t.Run("resumes_accepting_below_low_water", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 1000
+		c.LowWaterInFlight = 500
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate having been in rejecting mode but now below low water.
+		handler.inFlight.Store(100)
+		handler.accepting.Store(false)
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		// Should be accepted because we're below low water.
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// Should have transitioned to accepting.
+		assert.True(t, handler.accepting.Load())
+	})
+
+	t.Run("hysteresis_prevents_oscillation", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 1000
+		c.LowWaterInFlight = 500
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate being in rejecting mode at a level between low and high water.
+		handler.inFlight.Store(700) // Between 500 and 1000.
+		handler.accepting.Store(false)
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		// Should still be rejecting because we're not below low water.
+		assert.Equal(t, http.StatusServiceUnavailable, respRec.Code)
+		assert.False(t, handler.accepting.Load())
+	})
+}
+
+func TestInFlightByteTracking(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("tracks_bytes_correctly_during_request", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 2000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Request with known body size.
+		body := `{"id":12345}`
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+
+		// Capture in-flight before (should be 0).
+		assert.Equal(t, int64(0), handler.inFlight.Load())
+
+		handler.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// After request completes, in-flight should return to 0.
+		assert.Equal(t, int64(0), handler.inFlight.Load())
+	})
+
+	t.Run("in_flight_returns_to_baseline_after_request", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 2000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Simulate pre-existing in-flight from other requests.
+		handler.inFlight.Store(1000)
+
+		body := `{"data":"test"}`
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(body))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		handler.ServeHTTP(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// After request completes, in-flight should return to pre-existing baseline.
+		assert.Equal(t, int64(1000), handler.inFlight.Load())
+	})
+}
+
+func TestCountReaderWithCompression(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("counts_decompressed_bytes", func(t *testing.T) {
+		c := defaultConfig()
+		c.MaxInFlight = 10000
+		c.HighWaterInFlight = 5000
+		c.LowWaterInFlight = 3000
+
+		pub := new(publisher)
+		metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+		handler := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics).(*handler)
+
+		// Create gzip compressed body.
+		body := `{"id":1,"data":"test"}`
+		var compressedBody bytes.Buffer
+		gzWriter := gzip.NewWriter(&compressedBody)
+		_, err := gzWriter.Write([]byte(body))
+		require.NoError(t, err)
+		require.NoError(t, gzWriter.Close())
+
+		req := httptest.NewRequest(http.MethodPost, "/", &compressedBody)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Content-Encoding", "gzip")
+		respRec := httptest.NewRecorder()
+
+		inFlightBefore := handler.inFlight.Load()
+		handler.ServeHTTP(respRec, req)
+		inFlightAfter := handler.inFlight.Load()
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		// After request completes, in-flight should return to original.
+		assert.Equal(t, inFlightBefore, inFlightAfter)
+	})
+}
+
+// slowReader wraps an io.Reader and adds a delay after each read.
+// It also limits the number of bytes read per call to ensure multiple reads.
+type slowReader struct {
+	r         io.Reader
+	delay     time.Duration
+	chunkSize int
+}
+
+func (s *slowReader) Read(p []byte) (int, error) {
+	// Limit read size to force multiple reads
+	if len(p) > s.chunkSize {
+		p = p[:s.chunkSize]
+	}
+	n, err := s.r.Read(p)
+	if n > 0 {
+		time.Sleep(s.delay)
+	}
+	return n, err
+}
+
+func TestConcurrentRequestsExceedHighWater(t *testing.T) {
+	ctx := context.Background()
+
+	c := defaultConfig()
+	c.MaxInFlight = 1000
+	c.HighWaterInFlight = 30 // Lower threshold to ensure we exceed it.
+	c.LowWaterInFlight = 15
+
+	pub := new(publisher)
+	metrics := newInputMetrics(monitoring.NewRegistry(), logp.NewNopLogger())
+	h := newHandler(ctx, c, nil, pub.Publish, nil, logp.NewLogger("test"), metrics)
+
+	// Create a slow request body that will hold in-flight bytes while reading.
+	// The body is large enough to exceed high water mark (50 bytes).
+	// Using small chunks and delays ensures the bytes accumulate slowly.
+	bodyContent := `{"data":"` + strings.Repeat("x", 100) + `"}`
+	slowBody := &slowReader{
+		r:         bytes.NewReader([]byte(bodyContent)),
+		delay:     50 * time.Millisecond,
+		chunkSize: 20,
+	}
+
+	var wg sync.WaitGroup
+	var slowReqStatus, fastReqStatus int
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		req := httptest.NewRequest(http.MethodPost, "/", slowBody)
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		h.ServeHTTP(respRec, req)
+		slowReqStatus = respRec.Code
+	}()
+
+	// Give the slow request time to read a few chunks and accumulate in-flight bytes.
+	// After ~150ms, it should have read at least 60 bytes, exceeding high water (30).
+	time.Sleep(150 * time.Millisecond)
+
+	// Send a fast request while the slow one is still reading.
+	// This should be rejected because in-flight is above high water mark (30).
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":1}`))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		h.ServeHTTP(respRec, req)
+		fastReqStatus = respRec.Code
+	}()
+
+	wg.Wait()
+
+	// The slow request should succeed (it started when in-flight was 0).
+	assert.Equal(t, http.StatusOK, slowReqStatus)
+	// The fast request should be rejected with 503 (in-flight was above high water).
+	assert.Equal(t, http.StatusServiceUnavailable, fastReqStatus)
 }

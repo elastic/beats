@@ -69,8 +69,6 @@ func TestMetricbeatOTelE2E(t *testing.T) {
           - '.*'
          metricsets:
           - cpu
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -101,8 +99,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -259,8 +255,6 @@ func TestMetricbeatOTelReceiverE2E(t *testing.T) {
           - '.*'
          metricsets:
           - cpu
-    output:
-      otelconsumer:
     processors:
       - add_host_metadata: ~
       - add_cloud_metadata: ~
@@ -456,8 +450,6 @@ func TestMetricbeatOTelMultipleReceiversE2E(t *testing.T) {
           target: ''
           fields:
             receiverid: "{{$i}}"
-    output:
-      otelconsumer:
     logging:
       level: info
       selectors:
@@ -486,8 +478,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -566,5 +556,5 @@ func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string
 		flatM2[k] = ""
 	}
 
-	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
+	require.Empty(t, cmp.Diff(flatM1, flatM2), msg)
 }

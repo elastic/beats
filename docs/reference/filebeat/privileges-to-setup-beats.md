@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/privileges-to-setup-beats.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Grant privileges and roles needed for setup [privileges-to-setup-beats]

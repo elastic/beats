@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-reference-yml.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # filebeat.reference.yml [filebeat-reference-yml]

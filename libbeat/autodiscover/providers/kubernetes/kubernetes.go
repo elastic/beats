@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -96,6 +97,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("kubernetes")
 
@@ -125,7 +127,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}

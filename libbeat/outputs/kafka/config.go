@@ -208,6 +208,10 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	}
 
 	k := sarama.NewConfig()
+	// If ApiVersionsRequest is set, then the client can negotiate down the
+	// version, making Version be a ceiling rather than a strict pinning.
+	// See https://github.com/IBM/sarama/releases/tag/v1.46.0 for details.
+	k.ApiVersionsRequest = false
 
 	// configure network level properties
 	timeout := config.Timeout

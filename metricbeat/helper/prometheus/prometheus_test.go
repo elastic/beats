@@ -530,7 +530,7 @@ func TestPrometheus(t *testing.T) {
 			sort.Slice(res, func(i, j int) bool {
 				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 			})
-			assert.Equal(t, len(test.expected), len(res))
+			assert.Len(t, res, len(test.expected))
 			for j, ev := range res {
 				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
 			}
@@ -593,7 +593,7 @@ func TestInfoMetricPrometheus(t *testing.T) {
 			sort.Slice(res, func(i, j int) bool {
 				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
 			})
-			assert.Equal(t, len(test.expected), len(res))
+			assert.Len(t, res, len(test.expected))
 			for j, ev := range res {
 				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
 			}
@@ -1050,7 +1050,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 		}
 
 		events := r.GetEvents()
-		if !assert.Equal(t, len(tc.expectedEvents), len(events),
+		if !assert.Len(t, events, len(tc.expectedEvents),
 			"number of returned events doesn't match expected, at %q", tc.testName) {
 			continue
 		}

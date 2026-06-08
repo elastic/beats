@@ -24,9 +24,11 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/url"
 	"os"
 	"runtime"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -54,14 +56,15 @@ func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error
 	}
 
 	if len(candidates) > 0 {
-		return candidates, nil
+		// For each discovered address, add the alternate scheme (ldap<->ldaps) so we try both.
+		candidates = expandCandidatesWithAlternateSchemes(candidates, log)
+	} else {
+		// 2. Fallback: LOGONSERVER environment variable,
+		// typically only available on Windows interactive sessions
+		log.Debug("attempting discovery via LOGONSERVER environment variable")
+		candidates = append(candidates, findLogonServer(domain, true, log)...)
+		candidates = append(candidates, findLogonServer(domain, false, log)...)
 	}
-
-	// 2. Fallback: LOGONSERVER environment variable,
-	// typically only available on Windows interactive sessions
-	log.Debug("attempting discovery via LOGONSERVER environment variable")
-	candidates = append(candidates, findLogonServer(domain, true, log)...)
-	candidates = append(candidates, findLogonServer(domain, false, log)...)
 
 	if len(candidates) == 0 {
 		log.Warnw("no LDAP servers discovered", "dns_srv_attempted", true, "logonserver_attempted", runtime.GOOS == "windows")
@@ -70,6 +73,74 @@ func discoverLDAPAddress(configDomain string, log *logp.Logger) ([]string, error
 
 	log.Infow("LDAP server auto-discovery completed", "total_candidates", len(candidates), "candidates", candidates)
 	return candidates, nil
+}
+
+const (
+	defaultLDAPPort  = 389
+	defaultLDAPSPort = 636
+)
+
+// expandCandidatesWithAlternateSchemes ensures that for every discovered address
+// we also try the other scheme. For each host, LDAPS is ordered before LDAP so we prefer TLS.
+func expandCandidatesWithAlternateSchemes(candidates []string, log *logp.Logger) []string {
+	seen := make(map[string]struct{})
+	var out []string
+	for _, addr := range candidates {
+		alt := alternateSchemeAddress(addr)
+		ldapsURL, ldapURL := alt, addr
+		if strings.HasPrefix(strings.ToLower(addr), "ldaps://") {
+			ldapsURL, ldapURL = addr, alt
+		}
+		for _, u := range []string{ldapsURL, ldapURL} {
+			if u == "" {
+				continue
+			}
+			if _, ok := seen[u]; ok {
+				continue
+			}
+			seen[u] = struct{}{}
+			out = append(out, u)
+			if u == alt && alt != addr {
+				log.Debugw("added alternate scheme for discovery", "original", addr, "alternate", alt)
+			}
+		}
+	}
+	return out
+}
+
+// alternateSchemeAddress returns the same host with the other scheme and default port (ldap<->ldaps).
+// Returns "" if the address cannot be parsed.
+func alternateSchemeAddress(addr string) string {
+	u, err := url.Parse(addr)
+	if err != nil || u.Host == "" {
+		return ""
+	}
+	host := u.Hostname()
+	port := u.Port()
+	var wantScheme string
+	var wantPort int
+	switch strings.ToLower(u.Scheme) {
+	case "ldap":
+		wantScheme = "ldaps"
+		wantPort = defaultLDAPSPort
+	case "ldaps":
+		wantScheme = "ldap"
+		wantPort = defaultLDAPPort
+	default:
+		return ""
+	}
+	if port != "" {
+		if p, err := strconv.Atoi(port); err == nil {
+			origDefault := defaultLDAPPort
+			if strings.ToLower(u.Scheme) == "ldaps" {
+				origDefault = defaultLDAPSPort
+			}
+			if p != origDefault {
+				wantPort = p // non-standard port, try same port for alternate
+			}
+		}
+	}
+	return fmt.Sprintf("%s://%s:%d", wantScheme, host, wantPort)
 }
 
 func discoverDomain(configDomain string, log *logp.Logger) string {
@@ -153,10 +224,10 @@ func findLogonServer(domain string, useTLS bool, log *logp.Logger) []string {
 	}
 
 	scheme := "ldap"
-	port := 389
+	port := defaultLDAPPort
 	if useTLS {
 		scheme = "ldaps"
-		port = 636
+		port = defaultLDAPSPort
 	}
 
 	var addresses []string

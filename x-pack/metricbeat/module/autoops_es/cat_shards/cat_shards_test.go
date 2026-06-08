@@ -18,7 +18,7 @@ import (
 
 var (
 	setupSuccessfulServer = SetupSuccessfulServer()
-	useNamedMetricSet     = auto_ops_testing.UseNamedMetricSet(CatShardsMetricSet)
+	useNamedMetricSet     = auto_ops_testing.UseNamedMetricSet(catShardsMetricSet)
 )
 
 func TestSuccessfulFetch(t *testing.T) {

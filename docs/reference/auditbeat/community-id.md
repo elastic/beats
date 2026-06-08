@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/community-id.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Community ID Network Flow Hash [community-id]

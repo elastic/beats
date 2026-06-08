@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
@@ -32,15 +33,16 @@ import (
 type managedInput struct {
 	// id is the input ID, it is defined by setting 'id'
 	// in the input configuration
-	id               string
-	metricsID        string
-	manager          *InputManager
-	ackCH            *updateChan
-	sourceIdentifier *SourceIdentifier
-	prospector       Prospector
-	harvester        Harvester
-	cleanTimeout     time.Duration
-	harvesterLimit   uint64
+	id                     string
+	metricsID              string
+	manager                *InputManager
+	ackCH                  *updateChan
+	sourceIdentifier       *SourceIdentifier
+	previousSrcIdentifiers []*SourceIdentifier
+	prospector             Prospector
+	harvester              Harvester
+	cleanTimeout           time.Duration
+	harvesterLimit         uint64
 }
 
 // Name is required to implement the v2.Input interface
@@ -56,6 +58,10 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+
+	// Notify the manager the input has stopped, currently that is used to
+	// keep track of duplicated IDs
+	defer inp.manager.StopInput(inp.id)
 	ctx.UpdateStatus(status.Starting, "")
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
@@ -89,17 +95,17 @@ func (inp *managedInput) Run(
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, nil)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
+
+	if err := inp.prospector.TakeOver(sourceStore, inp.sourceIdentifier.ID); err != nil {
+		return fmt.Errorf("prospector failed to take over states: %w", err)
+	}
 
 	// Mark it as running for now.
 	// Any errors encountered by harvester will change state to Degraded
 	ctx.UpdateStatus(status.Running, "")
 
 	inp.prospector.Run(ctx, sourceStore, hg)
-
-	// Notify the manager the input has stopped, currently that is used to
-	// keep track of duplicated IDs
-	inp.manager.StopInput(inp.id)
 
 	return nil
 }

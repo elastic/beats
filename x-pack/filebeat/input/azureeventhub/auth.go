@@ -21,6 +21,8 @@ const (
 	AuthTypeConnectionString string = "connection_string"
 	// AuthTypeClientSecret uses client secret credentials (OAuth2).
 	AuthTypeClientSecret string = "client_secret"
+	// AuthTypeManagedIdentity uses Azure Managed Identity authentication.
+	AuthTypeManagedIdentity string = "managed_identity"
 )
 
 // createCredential creates a TokenCredential if needed based on the authentication type.
@@ -34,6 +36,12 @@ func createCredential(cfg *azureInputConfig, log *logp.Logger) (azcore.TokenCred
 		credential, err := newClientSecretCredential(cfg, log)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create client secret credential: %w", err)
+		}
+		return credential, nil
+	case AuthTypeManagedIdentity:
+		credential, err := newManagedIdentityCredential(cfg, log)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create managed identity credential: %w", err)
 		}
 		return credential, nil
 	default:
@@ -61,8 +69,7 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 	}
 
 	// Set up the consumer client based on the authentication type
-	switch cfg.AuthType {
-	case AuthTypeConnectionString:
+	if cfg.AuthType == AuthTypeConnectionString {
 		// Use connection string authentication for Event Hub
 		// There is a mismatch between how the azure-eventhub input and the new
 		// Event Hub SDK expect the event hub name in the connection string.
@@ -102,44 +109,41 @@ func CreateEventHubConsumerClient(cfg *azureInputConfig, log *logp.Logger) (*aze
 			return nil, fmt.Errorf("failed to create consumer client from connection string: %w", err)
 		}
 		return consumerClient, nil
-
-	case AuthTypeClientSecret:
-		credential, err := createCredential(cfg, log)
-		if err != nil {
-			return nil, err
-		}
-		if credential == nil {
-			return nil, fmt.Errorf("credential cannot be empty when auth_type is client_secret")
-		}
-
-		consumerClient, err := azeventhubs.NewConsumerClient(
-			cfg.EventHubNamespace,
-			cfg.EventHubName,
-			cfg.ConsumerGroup,
-			credential,
-			&options,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create consumer client with credential: %w", err)
-		}
-
-		log.Infow("successfully created consumer client with credential authentication",
-			"namespace", cfg.EventHubNamespace,
-			"eventhub", cfg.EventHubName,
-		)
-
-		return consumerClient, nil
-
-	default:
-		return nil, fmt.Errorf("invalid auth_type: %s", cfg.AuthType)
 	}
+
+	// All credential-based authentication types (client_secret, managed_identity, etc.)
+	credential, err := createCredential(cfg, log)
+	if err != nil {
+		return nil, err
+	}
+	if credential == nil {
+		return nil, fmt.Errorf("credential cannot be empty when auth_type is %s", cfg.AuthType)
+	}
+
+	consumerClient, err := azeventhubs.NewConsumerClient(
+		cfg.EventHubNamespace,
+		cfg.EventHubName,
+		cfg.ConsumerGroup,
+		credential,
+		&options,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create consumer client with credential: %w", err)
+	}
+
+	log.Infow("successfully created consumer client with credential authentication",
+		"namespace", cfg.EventHubNamespace,
+		"eventhub", cfg.EventHubName,
+		"auth_type", cfg.AuthType,
+	)
+
+	return consumerClient, nil
 }
 
 // CreateStorageAccountContainerClient creates a Storage Account container client
 // using the configured authentication method from the provided config.
 func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger) (*container.Client, error) {
-	switch cfg.AuthType {
-	case AuthTypeConnectionString:
+	if cfg.AuthType == AuthTypeConnectionString {
 		// Use connection string authentication
 		cloudConfig := getAzureCloud(cfg.AuthorityHost)
 
@@ -156,34 +160,32 @@ func CreateStorageAccountContainerClient(cfg *azureInputConfig, log *logp.Logger
 			return nil, fmt.Errorf("failed to create container client from connection string: %w", err)
 		}
 		return containerClient, nil
-
-	case AuthTypeClientSecret:
-		credential, err := createCredential(cfg, log)
-		if err != nil {
-			return nil, err
-		}
-		if credential == nil {
-			return nil, fmt.Errorf("credential cannot be empty when auth_type is client_secret")
-		}
-
-		// Get the storage endpoint suffix based on the authority host.
-		storageEndpointSuffix := getStorageEndpointSuffix(cfg.AuthorityHost)
-
-		// Build the storage account URL using the correct endpoint suffix for the cloud environment
-		storageAccountURL := fmt.Sprintf("https://%s.blob.%s/%s", cfg.SAName, storageEndpointSuffix, cfg.SAContainer)
-		containerClient, err := container.NewClient(storageAccountURL, credential, nil)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create container client with credential: %w", err)
-		}
-
-		log.Infow("successfully created container client with credential authentication",
-			"storage_account", cfg.SAName,
-			"container", cfg.SAContainer,
-		)
-
-		return containerClient, nil
-
-	default:
-		return nil, fmt.Errorf("invalid auth_type: %s", cfg.AuthType)
 	}
+
+	// All credential-based authentication types (client_secret, managed_identity, etc.)
+	credential, err := createCredential(cfg, log)
+	if err != nil {
+		return nil, err
+	}
+	if credential == nil {
+		return nil, fmt.Errorf("credential cannot be empty when auth_type is %s", cfg.AuthType)
+	}
+
+	// Get the storage endpoint suffix based on the authority host.
+	storageEndpointSuffix := getStorageEndpointSuffix(cfg.AuthorityHost)
+
+	// Build the storage account URL using the correct endpoint suffix for the cloud environment
+	storageAccountURL := fmt.Sprintf("https://%s.blob.%s/%s", cfg.SAName, storageEndpointSuffix, cfg.SAContainer)
+	containerClient, err := container.NewClient(storageAccountURL, credential, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create container client with credential: %w", err)
+	}
+
+	log.Infow("successfully created container client with credential authentication",
+		"storage_account", cfg.SAName,
+		"container", cfg.SAContainer,
+		"auth_type", cfg.AuthType,
+	)
+
+	return containerClient, nil
 }

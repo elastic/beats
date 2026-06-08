@@ -4,6 +4,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html
   - https://www.elastic.co/guide/en/beats/libbeat/current/getting-started.html
   - https://www.elastic.co/guide/en/serverless/current/elasticsearch-ingest-data-through-beats.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Beats [beats-reference]

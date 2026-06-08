@@ -55,6 +55,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -173,9 +174,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
-	if cfg.Resource.Tracer != nil {
+	if cfg.Resource.Tracer.enabled() {
 		id := sanitizeFileName(env.IDWithoutName)
-		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
+		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
+		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
+		}
+		cfg.Resource.Tracer.Filename = resolved
 	}
 
 	client, trace, err := newClient(ctx, cfg, log, reg)
@@ -224,6 +233,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	} else {
 		state = cfg.State
 	}
+	if len(cfg.SecretState) > 0 {
+		state["secret"] = cfg.SecretState
+	}
+	if cfg.Redact == nil {
+		cfg.Redact = &redact{}
+	}
+	if !slices.Contains(cfg.Redact.Fields, "secret") {
+		cfg.Redact.Fields = append(cfg.Redact.Fields, "secret")
+	}
 	if cursor != nil {
 		state["cursor"] = cursor
 	}
@@ -266,7 +284,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 	err = periodically(ctx, cfg.Interval, func() error {
-		log.Info("process periodic request")
+		log.Debug("process periodic request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time

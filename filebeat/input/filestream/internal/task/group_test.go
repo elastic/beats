@@ -343,7 +343,7 @@ func TestGroup_Stop(t *testing.T) {
 		wg.Wait() // wait for the goroutine to start
 
 		err = g.Stop()
-		require.NotNil(t, err, "Stop should return a timeout error")
+		require.Error(t, err, "Stop should return a timeout error")
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
 

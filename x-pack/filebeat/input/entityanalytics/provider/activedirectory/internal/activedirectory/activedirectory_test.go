@@ -133,12 +133,12 @@ func TestBuildMemberOfFilter(t *testing.T) {
 		{
 			name:     "single group",
 			groupDNs: []string{"cn=Admin Users,ou=Groups,dc=example,dc=com"},
-			want:     "(memberOf=cn=Admin Users,ou=Groups,dc=example,dc=com)",
+			want:     "(memberOf:1.2.840.113556.1.4.1941:=cn=Admin Users,ou=Groups,dc=example,dc=com)",
 		},
 		{
 			name:     "multiple groups",
 			groupDNs: []string{"cn=Admins,dc=example,dc=com", "cn=Users,dc=example,dc=com"},
-			want:     "(|(memberOf=cn=Admins,dc=example,dc=com)(memberOf=cn=Users,dc=example,dc=com))",
+			want:     "(|(memberOf:1.2.840.113556.1.4.1941:=cn=Admins,dc=example,dc=com)(memberOf:1.2.840.113556.1.4.1941:=cn=Users,dc=example,dc=com))",
 		},
 	}
 

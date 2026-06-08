@@ -80,7 +80,7 @@ func TestProcNetUDP(t *testing.T) {
 			addr := []string{"FOO:BAR", "BAR:BAZ"}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
-			assert.EqualValues(t, addr, bad)
+			assert.Equal(t, addr, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
 			}
@@ -142,7 +142,7 @@ func TestProcNetUDP(t *testing.T) {
 			addr := []string{"FOO:BAR", "BAR:BAZ"}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
-			assert.EqualValues(t, addr, bad)
+			assert.Equal(t, addr, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
 			}

@@ -22,28 +22,38 @@ import (
 	"strconv"
 	"strings"
 
+	// unsafe is used only for unsafe.Sizeof in generic helpers to calculate
+	// type sizes. No pointer arithmetic or other unsafe memory operations
+	// are performed.
+	"unsafe"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func connectionStartMethod(m *amqpMessage, args []byte) (bool, bool) {
+	if len(args) < 2 {
+		logp.Debug("amqp", "Unexpected end of data")
+		return false, false
+	}
 	major := args[0]
 	minor := args[1]
 	properties := make(mapstr.M)
 	next, err, exists := getTable(properties, args, 2)
 	if err {
 		// failed to get de peer-properties, size may be wrong, let's quit
-		logp.Warn("Failed to parse server properties in connection.start method")
+		logp.Debug("amqp", "Failed to parse server properties in connection.start method")
 		return false, false
 	}
-	mechanisms, next, err := getShortString(args, next+4, binary.BigEndian.Uint32(args[next:next+4]))
+	mechanisms, consumed, err := getLVString[uint32](args, next)
+	next += consumed
 	if err {
-		logp.Warn("Failed to get connection mechanisms")
+		logp.Debug("amqp", "Failed to get connection mechanisms")
 		return false, false
 	}
-	locales, _, err := getShortString(args, next+4, binary.BigEndian.Uint32(args[next:next+4]))
+	locales, _, err := getLVString[uint32](args, next)
 	if err {
-		logp.Warn("Failed to get connection locales")
+		logp.Debug("amqp", "Failed to get connection locales")
 		return false, false
 	}
 	m.method = "connection.start"
@@ -66,22 +76,24 @@ func connectionStartOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 	next, err, exists := getTable(properties, args, 0)
 	if err {
 		// failed to get de peer-properties, size may be wrong, let's quit
-		logp.Warn("Failed to parse server properties in connection.start method")
+		logp.Debug("amqp", "Failed to parse server properties in connection.start method")
 		return false, false
 	}
-	mechanism, next, err := getShortString(args, next+1, uint32(args[next]))
+	mechanism, consumed, err := getLVString[uint8](args, next)
+	next += consumed
 	if err {
-		logp.Warn("Failed to get connection mechanism from client")
+		logp.Debug("amqp", "Failed to get connection mechanism from client")
 		return false, false
 	}
-	_, next, err = getShortString(args, next+4, binary.BigEndian.Uint32(args[next:next+4]))
+	_, consumed, err = getLVString[uint32](args, next)
+	next += consumed
 	if err {
-		logp.Warn("Failed to get connection response from client")
+		logp.Debug("amqp", "Failed to get connection response from client")
 		return false, false
 	}
-	locale, _, err := getShortString(args, next+1, uint32(args[next]))
+	locale, _, err := getLVString[uint8](args, next)
 	if err {
-		logp.Warn("Failed to get connection locale from client")
+		logp.Debug("amqp", "Failed to get connection locale from client")
 		return false, false
 	}
 	m.isRequest = false
@@ -105,10 +117,22 @@ func connectionTuneMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func connectionTuneOkMethod(m *amqpMessage, args []byte) (bool, bool) {
+	channelMax, err := getIntegerAt[uint16](args, 0)
+	if err {
+		return false, false
+	}
+	frameMax, err := getIntegerAt[uint32](args, 2)
+	if err {
+		return false, false
+	}
+	heartbeat, err := getIntegerAt[uint16](args, 6)
+	if err {
+		return false, false
+	}
 	m.fields = mapstr.M{
-		"channel-max": binary.BigEndian.Uint16(args[0:2]),
-		"frame-max":   binary.BigEndian.Uint32(args[2:6]),
-		"heartbeat":   binary.BigEndian.Uint16(args[6:8]),
+		"channel-max": channelMax,
+		"frame-max":   frameMax,
+		"heartbeat":   heartbeat,
 	}
 	return true, true
 }
@@ -116,9 +140,9 @@ func connectionTuneOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 func connectionOpenMethod(m *amqpMessage, args []byte) (bool, bool) {
 	m.isRequest = true
 	m.method = "connection.open"
-	host, _, err := getShortString(args, 1, uint32(args[0]))
+	host, _, err := getLVString[uint8](args, 0)
 	if err {
-		logp.Warn("Failed to get virtual host from client")
+		logp.Debug("amqp", "Failed to get virtual host from client")
 		return false, false
 	}
 	m.fields = mapstr.M{"virtual-host": host}
@@ -148,7 +172,10 @@ func channelFlowMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func channelFlowOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	params := getBitParams(args[0])
+	params, err := getBitParamsAt(args, 0)
+	if err {
+		return false, false
+	}
 	m.fields = mapstr.M{"active": params[0]}
 	return true, true
 }
@@ -165,31 +192,52 @@ func channelCloseMethod(m *amqpMessage, args []byte) (bool, bool) {
 
 // function to fetch fields from channel close and connection close
 func getCloseInfo(args []byte, m *amqpMessage) bool {
-	code := binary.BigEndian.Uint16(args[0:2])
-	m.isRequest = true
-	replyText, nextOffset, err := getShortString(args, 3, uint32(args[2]))
+	code, err := getIntegerAt[uint16](args, 0)
 	if err {
-		logp.Warn("Failed to get error reply text")
-		return true
+		logp.Debug("amqp", "Failed to get close info code")
+		return err
 	}
+	m.isRequest = true
+	replyText, consumed, err := getLVString[uint8](args, 2)
+	if err {
+		logp.Debug("amqp", "Failed to get close info reply text")
+		return err
+	}
+	classID, err := getIntegerAt[uint16](args, consumed+2)
+	if err {
+		logp.Debug("amqp", "Failed to get close info class-id")
+		return err
+	}
+	methodID, err := getIntegerAt[uint16](args, consumed+4)
+	if err {
+		logp.Debug("amqp", "Failed to get close info method-id")
+		return err
+	}
+
 	m.fields = mapstr.M{
 		"reply-code": code,
 		"reply-text": replyText,
-		"class-id":   binary.BigEndian.Uint16(args[nextOffset : nextOffset+2]),
-		"method-id":  binary.BigEndian.Uint16(args[nextOffset+2 : nextOffset+4]),
+		"class-id":   classID,
+		"method-id":  methodID,
 	}
 	return false
 }
 
 func queueDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
-	name, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	name, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue declaration")
+		logp.Debug("amqp", "Error getting name of queue in queue declaration")
 		return false, false
 	}
 	m.isRequest = true
 	m.method = "queue.declare"
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in queue declaration")
+		return false, false
+	}
 	m.request = name
 	m.fields = mapstr.M{
 		"queue":       name,
@@ -198,6 +246,10 @@ func queueDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"exclusive":   params[2],
 		"auto-delete": params[3],
 		"no-wait":     params[4],
+	}
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Expected end of frame or arguments in queue declaration")
+		return false, false
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
@@ -212,38 +264,54 @@ func queueDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func queueDeclareOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	name, nextOffset, err := getShortString(args, 1, uint32(args[0]))
+	name, offset, err := getLVString[uint8](args, 0)
 	if err {
-		logp.Warn("Error getting name of queue in queue confirmation")
+		logp.Debug("amqp", "Error getting name of queue in queue confirmation")
+		return false, false
+	}
+	messageCount, err := getIntegerAt[uint32](args, offset)
+	if err {
+		return false, false
+	}
+	consumerCount, err := getIntegerAt[uint32](args, offset+4)
+	if err {
 		return false, false
 	}
 	m.method = "queue.declare-ok"
 	m.fields = mapstr.M{
 		"queue":          name,
-		"consumer-count": binary.BigEndian.Uint32(args[nextOffset+4:]),
-		"message-count":  binary.BigEndian.Uint32(args[nextOffset : nextOffset+4]),
+		"consumer-count": consumerCount,
+		"message-count":  messageCount,
 	}
 	return true, true
 }
 
 func queueBindMethod(m *amqpMessage, args []byte) (bool, bool) {
-	queue, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	queue, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue bind")
+		logp.Debug("amqp", "Error getting name of queue in queue bind")
 		return false, false
 	}
 	m.isRequest = true
-	exchange, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue bind")
+		logp.Debug("amqp", "Error getting name of queue in queue bind")
 		return false, false
 	}
-	routingKey, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	routingKey, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue bind")
+		logp.Debug("amqp", "Error getting name of queue in queue bind")
 		return false, false
 	}
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in queue bind")
+		return false, false
+	}
 	m.method = "queue.bind"
 	m.request = strings.Join([]string{queue, exchange}, " ")
 	m.fields = mapstr.M{
@@ -253,6 +321,10 @@ func queueBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	}
 	if len(exchange) > 0 {
 		m.fields["exchange"] = exchange
+	}
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Expected end of frame or arguments in queue bind")
+		return false, false
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
@@ -267,19 +339,23 @@ func queueBindMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func queueUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
-	queue, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	queue, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue unbind")
+		logp.Debug("amqp", "Error getting name of queue in queue unbind")
 		return false, false
 	}
-	exchange, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue unbind")
+		logp.Debug("amqp", "Error getting name of queue in queue unbind")
 		return false, false
 	}
-	routingKey, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	routingKey, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue unbind")
+		logp.Debug("amqp", "Error getting name of queue in queue unbind")
 		return false, false
 	}
 	m.isRequest = true
@@ -291,6 +367,10 @@ func queueUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
 	}
 	if len(exchange) > 0 {
 		m.fields["exchange"] = exchange
+	}
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Expected end of frame or arguments in queue unbind")
+		return false, false
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
@@ -305,13 +385,19 @@ func queueUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func queuePurgeMethod(m *amqpMessage, args []byte) (bool, bool) {
-	queue, nextOffset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	queue, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue purge")
+		logp.Debug("amqp", "Error getting name of queue in queue purge")
 		return false, false
 	}
 	m.isRequest = true
-	params := getBitParams(args[nextOffset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in queue purge")
+		return false, false
+	}
 	m.method = "queue.purge"
 	m.request = queue
 	m.fields = mapstr.M{
@@ -322,21 +408,31 @@ func queuePurgeMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func queuePurgeOkMethod(m *amqpMessage, args []byte) (bool, bool) {
+	messageCount, err := getIntegerAt[uint32](args, 0)
+	if err {
+		return false, false
+	}
 	m.method = "queue.purge-ok"
 	m.fields = mapstr.M{
-		"message-count": binary.BigEndian.Uint32(args[0:4]),
+		"message-count": messageCount,
 	}
 	return true, true
 }
 
 func queueDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
-	queue, nextOffset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	queue, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in queue delete")
+		logp.Debug("amqp", "Error getting name of queue in queue delete")
 		return false, false
 	}
 	m.isRequest = true
-	params := getBitParams(args[nextOffset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in queue delete")
+		return false, false
+	}
 	m.method = "queue.delete"
 	m.request = queue
 	m.fields = mapstr.M{
@@ -349,25 +445,36 @@ func queueDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func queueDeleteOkMethod(m *amqpMessage, args []byte) (bool, bool) {
+	messageCount, err := getIntegerAt[uint32](args, 0)
+	if err {
+		return false, false
+	}
 	m.method = "queue.delete-ok"
 	m.fields = mapstr.M{
-		"message-count": binary.BigEndian.Uint32(args[0:4]),
+		"message-count": messageCount,
 	}
 	return true, true
 }
 
 func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
-	exchange, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of exchange in exchange declare")
+		logp.Debug("amqp", "Error getting name of exchange in exchange declare")
 		return false, false
 	}
-	exchangeType, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	exchangeType, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of routing key in exchange declare")
+		logp.Debug("amqp", "Error getting name of routing key in exchange declare")
 		return false, false
 	}
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in exchange declare")
+		return false, false
+	}
 	m.method = "exchange.declare"
 	m.isRequest = true
 	m.request = exchange
@@ -380,6 +487,10 @@ func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"passive":       params[0],
 		"durable":       params[1],
 		"no-wait":       params[4],
+	}
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Error getting name of routing key in exchange declare")
+		return false, false
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
@@ -394,14 +505,20 @@ func exchangeDeclareMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func exchangeDeleteMethod(m *amqpMessage, args []byte) (bool, bool) {
-	exchange, nextOffset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of exchange in exchange delete")
+		logp.Debug("amqp", "Error getting name of exchange in exchange delete")
 		return false, false
 	}
 	m.method = "exchange.delete"
 	m.isRequest = true
-	params := getBitParams(args[nextOffset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in exchange delete")
+		return false, false
+	}
 	m.request = exchange
 	m.fields = mapstr.M{
 		"exchange":  exchange,
@@ -432,29 +549,42 @@ func exchangeUnbindMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func exchangeBindUnbindInfo(m *amqpMessage, args []byte) bool {
-	destination, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	destination, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of destination in exchange bind/unbind")
+		logp.Debug("amqp", "Error getting name of destination in exchange bind/unbind")
 		return true
 	}
-	source, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	source, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of source in exchange bind/unbind")
+		logp.Debug("amqp", "Error getting name of source in exchange bind/unbind")
 		return true
 	}
-	routingKey, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	routingKey, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of routing-key in exchange bind/unbind")
+		logp.Debug("amqp", "Error getting name of routing-key in exchange bind/unbind")
 		return true
 	}
 	m.isRequest = true
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in exchange bind/unbind")
+		return true
+	}
 	m.request = strings.Join([]string{source, destination}, " ")
 	m.fields = mapstr.M{
 		"destination": destination,
 		"source":      source,
 		"routing-key": routingKey,
 		"no-wait":     params[0],
+	}
+
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Error getting args in exchange bind/unbind")
+		return true
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
@@ -469,9 +599,21 @@ func exchangeBindUnbindInfo(m *amqpMessage, args []byte) bool {
 }
 
 func basicQosMethod(m *amqpMessage, args []byte) (bool, bool) {
-	prefetchSize := binary.BigEndian.Uint32(args[0:4])
-	prefetchCount := binary.BigEndian.Uint16(args[4:6])
-	params := getBitParams(args[6])
+	prefetchSize, err := getIntegerAt[uint32](args, 0)
+	if err {
+		logp.Debug("amqp", "Error getting prefetch-size in basic qos")
+		return false, false
+	}
+	prefetchCount, err := getIntegerAt[uint16](args, 4)
+	if err {
+		logp.Debug("amqp", "Error getting prefetch-count in basic qos")
+		return false, false
+	}
+	params, err := getBitParamsAt(args, 6)
+	if err {
+		logp.Debug("amqp", "Error getting params in basic qos")
+		return false, false
+	}
 	m.isRequest = true
 	m.method = "basic.qos"
 	m.fields = mapstr.M{
@@ -483,17 +625,24 @@ func basicQosMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicConsumeMethod(m *amqpMessage, args []byte) (bool, bool) {
-	queue, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	queue, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of queue in basic consume")
+		logp.Debug("amqp", "Error getting name of queue in basic consume")
 		return false, false
 	}
-	consumerTag, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	consumerTag, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of consumer tag in basic consume")
+		logp.Debug("amqp", "Error getting name of consumer tag in basic consume")
 		return false, false
 	}
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in basic consume")
+		return false, false
+	}
 	m.method = "basic.consume"
 	m.isRequest = true
 	m.request = queue
@@ -504,6 +653,10 @@ func basicConsumeMethod(m *amqpMessage, args []byte) (bool, bool) {
 		"no-ack":       params[1],
 		"exclusive":    params[2],
 		"no-wait":      params[3],
+	}
+	if len(args) <= int(offset+1) {
+		logp.Debug("amqp", "Expected end of frame or arguments in basic consume")
+		return false, false
 	}
 	if args[offset+1] != frameEndOctet && m.parseArguments {
 		arguments := make(mapstr.M)
@@ -518,9 +671,9 @@ func basicConsumeMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicConsumeOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	consumerTag, _, err := getShortString(args, 1, uint32(args[0]))
+	consumerTag, _, err := getLVString[uint8](args, 0)
 	if err {
-		logp.Warn("Error getting name of queue in basic consume")
+		logp.Debug("amqp", "Error getting name of queue in basic consume")
 		return false, false
 	}
 	m.method = "basic.consume-ok"
@@ -531,15 +684,19 @@ func basicConsumeOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicCancelMethod(m *amqpMessage, args []byte) (bool, bool) {
-	consumerTag, offset, err := getShortString(args, 1, uint32(args[0]))
+	consumerTag, offset, err := getLVString[uint8](args, 0)
 	if err {
-		logp.Warn("Error getting consumer tag in basic cancel")
+		logp.Debug("amqp", "Error getting consumer tag in basic cancel")
 		return false, false
 	}
 	m.method = "basic.cancel"
 	m.isRequest = true
 	m.request = consumerTag
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in basic cancel")
+		return false, false
+	}
 	m.fields = mapstr.M{
 		"consumer-tag": consumerTag,
 		"no-wait":      params[0],
@@ -548,9 +705,9 @@ func basicCancelMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicCancelOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	consumerTag, _, err := getShortString(args, 1, uint32(args[0]))
+	consumerTag, _, err := getLVString[uint8](args, 0)
 	if err {
-		logp.Warn("Error getting consumer tag in basic cancel ok")
+		logp.Debug("amqp", "Error getting consumer tag in basic cancel ok")
 		return false, false
 	}
 	m.method = "basic.cancel-ok"
@@ -561,17 +718,24 @@ func basicCancelOkMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicPublishMethod(m *amqpMessage, args []byte) (bool, bool) {
-	exchange, nextOffset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting exchange in basic publish")
+		logp.Debug("amqp", "Error getting exchange in basic publish")
 		return false, false
 	}
-	routingKey, nextOffset, err := getShortString(args, nextOffset+1, uint32(args[nextOffset]))
+	routingKey, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting routing key in basic publish")
+		logp.Debug("amqp", "Error getting routing key in basic publish")
 		return false, false
 	}
-	params := getBitParams(args[nextOffset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Error getting params in basic publish")
+		return false, false
+	}
 	m.method = "basic.publish"
 	m.fields = mapstr.M{
 		"routing-key": routingKey,
@@ -586,24 +750,31 @@ func basicPublishMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicReturnMethod(m *amqpMessage, args []byte) (bool, bool) {
-	code := binary.BigEndian.Uint16(args[0:2])
+	code, err := getIntegerAt[uint16](args, 0)
+	if err {
+		logp.Debug("amqp", "Error getting code in basic return")
+		return false, false
+	}
 	if code < 300 {
 		// not an error or exception ? not interesting
 		return true, false
 	}
-	replyText, nextOffset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	replyText, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of reply text in basic return")
+		logp.Debug("amqp", "Error getting name of reply text in basic return")
 		return false, false
 	}
-	exchange, nextOffset, err := getShortString(args, nextOffset+1, uint32(args[nextOffset]))
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Error getting name of exchange in basic return")
+		logp.Debug("amqp", "Error getting name of exchange in basic return")
 		return false, false
 	}
-	routingKey, _, err := getShortString(args, nextOffset+1, uint32(args[nextOffset]))
+	routingKey, _, err := getLVString[uint8](args, offset)
 	if err {
-		logp.Warn("Error getting name of routing key in basic return")
+		logp.Debug("amqp", "Error getting name of routing key in basic return")
 		return false, false
 	}
 	m.method = "basic.return"
@@ -617,22 +788,28 @@ func basicReturnMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicDeliverMethod(m *amqpMessage, args []byte) (bool, bool) {
-	consumerTag, offset, err := getShortString(args, 1, uint32(args[0]))
+	consumerTag, offset, err := getLVString[uint8](args, 0)
 	if err {
-		logp.Warn("Failed to get consumer tag in basic deliver")
+		logp.Debug("amqp", "Failed to get consumer tag in basic deliver")
 		return false, false
 	}
+	params, err := getBitParamsAt(args, offset+8)
+	if err {
+		logp.Debug("amqp", "Failed to get params in basic deliver")
+		return false, false
+	}
+	// Saving the len check since this is before params in the args so it's guaranteed to be in bounds
 	deliveryTag := binary.BigEndian.Uint64(args[offset : offset+8])
-	params := getBitParams(args[offset+8])
 	offset = offset + 9
-	exchange, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Failed to get exchange in basic deliver")
+		logp.Debug("amqp", "Failed to get exchange in basic deliver")
 		return false, false
 	}
-	routingKey, _, err := getShortString(args, offset+1, uint32(args[offset]))
+	routingKey, _, err := getLVString[uint8](args, offset)
 	if err {
-		logp.Warn("Failed to get routing key in basic deliver")
+		logp.Debug("amqp", "Failed to get routing key in basic deliver")
 		return false, false
 	}
 	m.method = "basic.deliver"
@@ -650,13 +827,19 @@ func basicDeliverMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicGetMethod(m *amqpMessage, args []byte) (bool, bool) {
-	queue, offset, err := getShortString(args, 3, uint32(args[2]))
+	offset := uint32(2)
+	queue, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Failed to get queue in basic get method")
+		logp.Debug("amqp", "Failed to get queue in basic get method")
 		return false, false
 	}
 	m.method = "basic.get"
-	params := getBitParams(args[offset])
+	params, err := getBitParamsAt(args, offset)
+	if err {
+		logp.Debug("amqp", "Failed to get params in basic get method")
+		return false, false
+	}
 	m.isRequest = true
 	m.request = queue
 	m.fields = mapstr.M{
@@ -667,23 +850,39 @@ func basicGetMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicGetOkMethod(m *amqpMessage, args []byte) (bool, bool) {
-	params := getBitParams(args[8])
-	exchange, offset, err := getShortString(args, 10, uint32(args[9]))
+	params, err := getBitParamsAt(args, 8)
 	if err {
-		logp.Warn("Failed to get queue in basic get-ok")
+		logp.Debug("amqp", "Failed to get params in basic get-ok")
+		return false, false
+
+	}
+	offset := uint32(9)
+	exchange, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
+	if err {
+		logp.Debug("amqp", "Failed to get queue in basic get-ok")
 		return false, false
 	}
-	routingKey, offset, err := getShortString(args, offset+1, uint32(args[offset]))
+	routingKey, consumed, err := getLVString[uint8](args, offset)
+	offset += consumed
 	if err {
-		logp.Warn("Failed to get routing key in basic get-ok")
+		logp.Debug("amqp", "Failed to get routing key in basic get-ok")
 		return false, false
 	}
 	m.method = "basic.get-ok"
+	deliveryTag, err := getIntegerAt[uint64](args, 0)
+	if err {
+		return false, false
+	}
+	messageCount, err := getIntegerAt[uint32](args, offset)
+	if err {
+		return false, false
+	}
 	m.fields = mapstr.M{
-		"delivery-tag":  binary.BigEndian.Uint64(args[0:8]),
+		"delivery-tag":  deliveryTag,
 		"redelivered":   params[0],
 		"routing-key":   routingKey,
-		"message-count": binary.BigEndian.Uint32(args[offset : offset+4]),
+		"message-count": messageCount,
 	}
 	if len(exchange) > 0 {
 		m.fields["exchange"] = exchange
@@ -697,11 +896,21 @@ func basicGetEmptyMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicAckMethod(m *amqpMessage, args []byte) (bool, bool) {
-	params := getBitParams(args[8])
+	deliveryTag, err := getIntegerAt[uint64](args, 0)
+	if err {
+		logp.Debug("amqp", "Failed to get delivery-tag in basic ack")
+		return false, false
+	}
+	params, err := getBitParamsAt(args, 8)
+	if err {
+		logp.Debug("amqp", "Failed to get params in basic ack")
+		return false, false
+
+	}
 	m.method = "basic.ack"
 	m.isRequest = true
 	m.fields = mapstr.M{
-		"delivery-tag": binary.BigEndian.Uint64(args[0:8]),
+		"delivery-tag": deliveryTag,
 		"multiple":     params[0],
 	}
 	return true, true
@@ -709,11 +918,21 @@ func basicAckMethod(m *amqpMessage, args []byte) (bool, bool) {
 
 // this is a rabbitMQ specific method
 func basicNackMethod(m *amqpMessage, args []byte) (bool, bool) {
-	params := getBitParams(args[8])
+	deliveryTag, err := getIntegerAt[uint64](args, 0)
+	if err {
+		logp.Debug("amqp", "Failed to get delivery-tag in basic nack")
+		return false, false
+	}
+	params, err := getBitParamsAt(args, 8)
+	if err {
+		logp.Debug("amqp", "Failed to get params in basic nack")
+		return false, false
+
+	}
 	m.method = "basic.nack"
 	m.isRequest = true
 	m.fields = mapstr.M{
-		"delivery-tag": binary.BigEndian.Uint64(args[0:8]),
+		"delivery-tag": deliveryTag,
 		"multiple":     params[0],
 		"requeue":      params[1],
 	}
@@ -721,7 +940,12 @@ func basicNackMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicRejectMethod(m *amqpMessage, args []byte) (bool, bool) {
-	params := getBitParams(args[8])
+	params, err := getBitParamsAt(args, 8)
+	if err {
+		logp.Debug("amqp", "Failed to get params in basic reject")
+		return false, false
+	}
+	// Saving the len check since this is before params in the args so it's guaranteed to be in bounds
 	tag := binary.BigEndian.Uint64(args[0:8])
 	m.isRequest = true
 	m.method = "basic.reject"
@@ -734,7 +958,11 @@ func basicRejectMethod(m *amqpMessage, args []byte) (bool, bool) {
 }
 
 func basicRecoverMethod(m *amqpMessage, args []byte) (bool, bool) {
-	params := getBitParams(args[0])
+	params, err := getBitParamsAt(args, 0)
+	if err {
+		logp.Debug("amqp", "Failed to get params in basic recover")
+		return false, false
+	}
 	m.isRequest = true
 	m.method = "basic.recover"
 	m.fields = mapstr.M{
@@ -766,21 +994,101 @@ func okMethod(m *amqpMessage, args []byte) (bool, bool) {
 	return true, true
 }
 
-// function to get a short string. It sends back an error if slice is too short
-// for declared length. if length == 0, the function sends back an empty string and
-// advances the offset. Otherwise, it returns the string and the new offset
-func getShortString(data []byte, start uint32, length uint32) (short string, nextOffset uint32, err bool) {
-	if length == 0 {
-		return "", start, false
-	}
-	if uint32(len(data)) < start || uint32(len(data[start:])) < length {
+// Function to get a Length-Value string. It is generic over the integer length
+// of the length key. It sends back an error if slice is too short for declared
+// length and string, or if the offset itself is out of bounds. if length == 0
+// the function sends back an empty string. bytesConsumed represents the number
+// of bytes of the returned string + 1 for the length itself,
+func getLVString[T uint8 | uint16 | uint32](data []byte, offset uint32) (short string, bytesConsumed uint32, err bool) {
+	var length T
+	if len(data) == 0 {
 		return "", 0, true
 	}
-	return string(data[start : start+length]), start + length, false
+	lengthSize := uint32(unsafe.Sizeof(length))
+	offset64 := int64(offset)
+	lengthSize64 := int64(lengthSize)
+	dataLen64 := int64(len(data))
+
+	// If there's not enough data to read the length of the string return err
+	if offset64 > dataLen64 || lengthSize64 > dataLen64-offset64 {
+		return "", 0, true
+	}
+	offsetInt := int(offset64)
+	lengthSizeInt := int(lengthSize64)
+
+	switch any(length).(type) {
+	case uint8:
+		length = T(data[offsetInt])
+	case uint16:
+		length = T(binary.BigEndian.Uint16(data[offsetInt : offsetInt+lengthSizeInt]))
+	case uint32:
+		length = T(binary.BigEndian.Uint32(data[offsetInt : offsetInt+lengthSizeInt]))
+	}
+	strlen := uint32(length)
+	strlen64 := int64(strlen)
+
+	if strlen == 0 {
+		return "", lengthSize, false
+	}
+
+	start64 := offset64 + lengthSize64
+	if strlen64 > dataLen64-start64 {
+		logp.Debug("amqp", "Not enough data for string")
+		return "", 0, true
+	}
+	if strlen > ^uint32(0)-lengthSize {
+		return "", 0, true
+	}
+
+	startInt := int(start64)
+	endInt := startInt + int(strlen64)
+	return string(data[startInt:endInt]), strlen + lengthSize, false
 }
 
-// function to extract bit information in various AMQP methods
-func getBitParams(bits byte) (ret [5]bool) {
+// Attempts to get an integer from a byte slice. Returns the integer and an err boolean.
+// The err is true if there were not enough bytes to successfully read the integer type.
+// The returned integer is meaningless if err == true
+func getIntegerAt[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64](data []byte, offset uint32) (integer T, err bool) {
+	var value T
+	size := uint32(unsafe.Sizeof(value))
+	offset64 := int64(offset)
+	size64 := int64(size)
+	dataLen64 := int64(len(data))
+
+	// If there's not enough bytes to read the requested integer type
+	if offset64 > dataLen64 || size64 > dataLen64-offset64 {
+		return T(0), true
+	}
+	offsetInt := int(offset64)
+	sizeInt := int(size64)
+
+	switch any(value).(type) {
+	case uint8:
+		return T(data[offsetInt]), false
+	case uint16:
+		return T(binary.BigEndian.Uint16(data[offsetInt : offsetInt+sizeInt])), false
+	case uint32:
+		return T(binary.BigEndian.Uint32(data[offsetInt : offsetInt+sizeInt])), false
+	case uint64:
+		return T(binary.BigEndian.Uint64(data[offsetInt : offsetInt+sizeInt])), false
+	case int8:
+		return T(data[offsetInt]), false
+	case int16:
+		return T(binary.BigEndian.Uint16(data[offsetInt : offsetInt+sizeInt])), false
+	case int32:
+		return T(binary.BigEndian.Uint32(data[offsetInt : offsetInt+sizeInt])), false
+	case int64:
+		return T(binary.BigEndian.Uint64(data[offsetInt : offsetInt+sizeInt])), false
+	}
+	return T(0), true
+}
+
+// function to extract bit information in various AMQP methods at an offset in a byte slice
+func getBitParamsAt(data []byte, offset uint32) (ret [5]bool, err bool) {
+	if len(data) <= int(offset) {
+		return [5]bool{}, true
+	}
+	bits := data[offset]
 	if bits&16 == 16 {
 		ret[4] = true
 	}
@@ -796,5 +1104,5 @@ func getBitParams(bits byte) (ret [5]bool) {
 	if bits&1 == 1 {
 		ret[0] = true
 	}
-	return ret
+	return ret, false
 }
