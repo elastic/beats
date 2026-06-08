@@ -541,12 +541,30 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	crawler.Stop()
 	cancelPipelineFactoryCtx()
 
+	// In "--once" mode Filebeat is a batch run: it has read its inputs to EOF and
+	// must publish every event before exiting. When no shutdown_timeout is
+	// configured, wait unbounded for all published events to be acknowledged
+	// before disconnecting, matching the historical --once drain (issue #49794).
+	// A partial final batch is flushed by the queue's flush timeout, so this
+	// terminates once the input is fully sent; an explicit stop (fb.done) still
+	// breaks the wait. A configured shutdown_timeout instead bounds the drain via
+	// the Disconnect below. Without this, a slow output (e.g. Elasticsearch) that
+	// cannot ack within the default drain would drop events on a --once run.
+	if *once && fb.config.ShutdownTimeout <= 0 {
+		waitEvents := newSignalWait()
+		waitEvents.Add(withLog(wgEvents.Wait,
+			"Continue shutdown: All enqueued events have been published.", fb.logger))
+		waitEvents.AddChan(fb.done)
+		waitEvents.Wait()
+	}
+
 	// The Beater owns shutdown sequencing (issue #49794): now that the inputs are
 	// stopped, drain the publisher pipeline so the events we already published are
 	// acknowledged — and their cursors written to the registry and input state
 	// stores — while those stores are still running. The stores are closed by the
 	// defers above (registrar.Stop, stateStore.Close), which run only after Run
 	// returns, so the acknowledgments delivered during this drain are persisted.
+	// This also flushes any partial final batch the queue is still holding.
 	//
 	// The drain is bounded so a stuck output cannot block shutdown forever:
 	// ShutdownTimeout when configured, otherwise a short default matching the
