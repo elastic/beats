@@ -93,9 +93,17 @@ import (
 // Publish). The disconnect is the normal (graceful) one, so already-queued
 // events still drain and the stuck publish is released so Run can return.
 // Correctly-behaved beaters return well within this window, so this timeout is
-// not reached on a normal shutdown. See
+// not reached on a normal shutdown. It is used only when the Beater does not
+// report a shutdown drain bound (Beat.ShutdownTimeout); when it does, the
+// watchdog waits that drain plus beaterStopGraceMargin instead. See
 // https://github.com/elastic/beats/issues/49794.
 const beaterStopGracePeriod = 30 * time.Second
+
+// beaterStopGraceMargin is added on top of a Beater's reported shutdown drain
+// bound (Beat.ShutdownTimeout) to derive the watchdog timeout, leaving a small
+// window for the Beater's remaining cleanup after the drain before the
+// pipeline is force-disconnected.
+const beaterStopGraceMargin = time.Second
 
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
@@ -195,6 +203,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
+				//nolint:forbidigo // top-level panic handler in Run; no *logp.Logger is in scope here.
 				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
@@ -534,6 +543,17 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// after beater.Run returns (below), so the Beater owns shutdown sequencing
 	// and the pipeline is not torn down out from under still-running inputs.
 	// See issue https://github.com/elastic/beats/issues/49794.
+	// Size the watchdog grace from the Beater's reported shutdown drain (set by
+	// the Creator) so a configured shutdown_timeout is not cut short: wait the
+	// full drain plus a 1s margin for the rest of the Beater's cleanup before
+	// forcing a disconnect. Beaters that report no drain fall back to the
+	// default grace period. Read here in the main goroutine, before the stop
+	// callback can run, so there is no race with the Creator that set it.
+	watchdogGrace := beaterStopGracePeriod
+	if b.ShutdownTimeout > 0 {
+		watchdogGrace = b.ShutdownTimeout + beaterStopGraceMargin
+	}
+
 	var stopOnce sync.Once
 	b.Manager.SetStopCallback(
 		func() {
@@ -545,7 +565,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 				// after a grace period so the blocked publish is released and
 				// shutdown can complete. A prompt shutdown closes runReturned
 				// first and never reaches the timeout.
-				go runShutdownWatchdog(runReturned, beaterStopGracePeriod, func() {
+				go runShutdownWatchdog(runReturned, watchdogGrace, func() {
 					if b.Publisher != nil {
 						_ = b.Publisher.Disconnect(context.Background())
 					}
@@ -806,7 +826,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths
+	b.Info.Paths = paths.Paths //nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -1491,6 +1511,7 @@ func InitPaths(cfg *config.C) error {
 		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
+	//nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %w", err)
 	}

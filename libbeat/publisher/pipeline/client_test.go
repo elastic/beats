@@ -71,7 +71,7 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer pipeline.Disconnect(t.Context())
+		defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -383,7 +383,7 @@ func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(t, Settings{}, q)
-	defer pipeline.Disconnect(t.Context())
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 	// In the strict two-stage model (issue #50104) client.Close no longer blocks
 	// for ClientConfig.WaitClose: it stops new events, closes the producer, and
@@ -460,7 +460,7 @@ func TestMonitoring(t *testing.T) {
 		)
 
 		require.NoError(t, err)
-		defer pipeline.Disconnect(t.Context())
+		defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])

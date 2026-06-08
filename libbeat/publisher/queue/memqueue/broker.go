@@ -231,7 +231,7 @@ func newQueue[T any](
 	}
 
 	if logger == nil {
-		logger = logp.NewLogger("memqueue")
+		logger = logp.NewLogger("memqueue") //nolint:forbidigo // fallback logger when the caller does not provide one.
 	} else {
 		logger = logger.Named("memqueue")
 	}
@@ -256,7 +256,7 @@ func newQueue[T any](
 
 		ackWaitProducers: make(map[*ackProducer[T]]struct{}),
 	}
-	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
+	b.ctx, b.ctxCancel = context.WithCancel(context.Background()) //nolint:gosec // G118 false positive: ctxCancel is stored on the broker and called during shutdown.
 
 	b.runLoop = newRunLoop(b, observer)
 	b.ackLoop = newACKLoop(b)

@@ -39,7 +39,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
 
-	defer pipeline.Disconnect(t.Context())
+	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
 	n := 66000
 	clients := []beat.Client{}

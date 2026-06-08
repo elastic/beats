@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -97,6 +99,15 @@ type Beat struct {
 
 	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
+
+	// ShutdownTimeout, when set by a Creator, tells the framework how long the
+	// Beater may take to drain in-flight events (and persist their cursors)
+	// during shutdown before the publisher pipeline is force-disconnected. The
+	// framework's shutdown watchdog waits at least this long (plus a fixed grace
+	// margin) for beater.Run to return before forcing a disconnect, so a
+	// configured shutdown_timeout is not cut short. Zero means use the default
+	// grace period. See https://github.com/elastic/beats/issues/49794.
+	ShutdownTimeout time.Duration
 }
 
 func (beat *Beat) userAgentMode() useragent.AgentManagementMode {
