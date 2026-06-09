@@ -36,8 +36,8 @@ winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
 
 The default location varies:
-* {applies_to}`stack: ga 9.1` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
-* {applies_to}`stack: ga 9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
+* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
+* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
 
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.
@@ -304,7 +304,7 @@ Example:
 ```yaml
 winlogbeat.event_logs:
   - name: Application
-  - name: System 
+  - name: System
   - name: Sysmon
     ignore_missing_channel: false
 ```

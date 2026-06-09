@@ -79,12 +79,12 @@ func (h *Hub) Client() (*cfclient.Client, error) {
 	return cf, nil
 }
 
-func (h *Hub) ClientWithCache() (Client, error) {
+func (h *Hub) ClientWithCache(rootPath string) (Client, error) {
 	c, err := h.Client()
 	if err != nil {
 		return nil, err
 	}
-	return newClientCacheWrap(c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log)
+	return newClientCacheWrap(c, h.cfg.APIAddress, h.cfg.CacheDuration, h.cfg.CacheRetryDelay, h.log, rootPath)
 }
 
 // RlpListener returns a listener client that calls the passed callback when the provided events are streamed through

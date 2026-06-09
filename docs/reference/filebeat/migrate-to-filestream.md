@@ -147,8 +147,8 @@ filebeat.inputs:
 
 In order to indicate that the new `filestream` inputs are supposed to take over the files from the previously defined `log` or `container` inputs and continue where they left off, activate the [take over](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over) mode in each new `filestream` using:
 
-* {applies_to}`stack: ga 9.1` `take_over.enabled: true`
-* {applies_to}`stack: ga 9.0` `take_over: true`
+* {applies_to}`stack: ga 9.1+` `take_over.enabled: true`
+* {applies_to}`stack: ga =9.0` `take_over: true`
 
 ::::{important}
 For the "take over" mode to work the `paths` list in each new `filestream` inputs must match the `paths` list in each old `log` or `container` inputs accordingly.
@@ -156,10 +156,10 @@ For the "take over" mode to work the `paths` list in each new `filestream` input
 
 After enabling the "take over" mode the configuration should look like this:
 
-::::{tab-set}
+::::{applies-switch}
 :group: versions
-:::{tab-item} 9.1.0
-:sync: 9.1.0
+:::{applies-item} stack: ga 9.1+
+:sync: 9.1+
 ```yaml
 filebeat.inputs:
  - type: filestream
@@ -195,8 +195,8 @@ filebeat.inputs:
      - /var/log/my-old-files*.log
 ```
 :::
-:::{tab-item} 9.0.0
-:sync: 9.0.0
+:::{applies-item} stack: ga =9.0
+:sync: =9.0
 ```yaml
 filebeat.inputs:
  - type: filestream
@@ -261,10 +261,10 @@ Furthermore, the `json` parser was renamed to [`ndjson`](/reference/filebeat/fil
 
 The example configuration shown earlier needs to be adjusted according to the changes described in the table above:
 
-::::{tab-set}
+::::{applies-switch}
 :group: versions
-:::{tab-item} 9.1.0
-:sync: 9.1.0
+:::{applies-item} stack: ga 9.1+
+:sync: 9.1+
 ```yaml
 filebeat.inputs:
  - type: filestream
@@ -317,8 +317,8 @@ filebeat.inputs:
 1. Container logs often use symlinks, they should be enabled.
 2. The container parser replaces everything the container input did before.
 :::
-:::{tab-item} 9.0.0
-:sync: 9.0.0
+:::{applies-item} stack: ga =9.0
+:sync: =9.0
 ```yaml
 filebeat.inputs:
  - type: filestream

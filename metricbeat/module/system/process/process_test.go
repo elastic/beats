@@ -20,16 +20,20 @@
 package process
 
 import (
+	"errors"
 	"os"
 	"runtime"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 )
 
@@ -79,15 +83,14 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 }
 
 func TestFetchSinglePid(t *testing.T) {
-
 	cfg := getConfig()
 	cfg["process.pid"] = os.Getpid()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
-	assert.NotEmpty(t, events)
-	assert.Equal(t, os.Getpid(), events[0].RootFields["process"].(map[string]interface{})["pid"])
+	require.NotEmpty(t, events)
+	assert.Equal(t, os.Getpid(), requireGetSubMap(t, events[0].RootFields, "process")["pid"])
 	assert.NotEmpty(t, events[0].MetricSetFields["cpu"])
 }
 
@@ -104,8 +107,115 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
+func TestCgroupPressure(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("cgroup stats are only available on Linux")
+	}
+
+	cfg := getConfig()
+	cfg["process.pid"] = getTestPid(t)
+
+	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	require.NotEmpty(t, events)
+
+	// Get cgroup data from the event
+	event := events[0]
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	cgroupData, err := event.MetricSetFields.GetValue("cgroup")
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
+		t.Skip("cgroup data not available")
+	}
+	require.NoError(t, err)
+
+	cgroup, ok := cgroupData.(map[string]any)
+	require.Truef(t, ok, "unexpected cgroup data type: %T", cgroupData)
+
+	subsystems := []string{"cpu", "memory", "io"}
+	if cgroup["path"] == "/" {
+		// Sanity check: verify our assertion that the / cgroup result in no subsystem data. If these checks fail, it
+		// means a change in expected behavior and this test should be adjusted.
+		// Example command to test with / cgroup:
+		// sleep 60 &
+		// pid=$!
+		// sudo sh -c "echo $pid > /sys/fs/cgroup/cgroup.procs"
+		// cat /proc/$pid/cgroup
+		// MONITOR_PID=$pid go test -run TestCgroupPressure -v ./metricbeat/module/system/process
+		for _, subsystem := range subsystems {
+			assert.NotContains(t, cgroup, subsystem)
+		}
+		t.Skip("Process in / cgroup, skipping because of IgnoreRootCgroups")
+	}
+
+	for _, subsystem := range subsystems {
+		t.Run(subsystem, func(t *testing.T) {
+			// Subsystem might not exist depending on cgroup configuration.
+			// For example, io accounting is disabled by default in systemd:
+			// https://www.freedesktop.org/software/systemd/man/latest/systemd-system.conf.html#DefaultMemoryAccounting=
+			if _, ok := cgroup[subsystem]; !ok {
+				t.Skipf("%s subsystem not available in this cgroup", subsystem)
+			}
+			controller := requireGetSubMap(t, cgroup, subsystem)
+			t.Run("pressure", func(t *testing.T) {
+				// Pressure might not exist, be nil, or be empty depending on kernel configuration
+				if _, ok := controller["pressure"]; !ok {
+					t.Skip("pressure data not available on this cgroup")
+				}
+				pressure := requireGetSubMap(t, controller, "pressure")
+				if pressure == nil {
+					// See https://github.com/elastic/elastic-agent-system-metrics/pull/276
+					require.Equal(t, "io", subsystem, "only the io subsystem returns nil when unavailable")
+					t.Skip("pressure data not available on this cgroup")
+				}
+				for _, stall := range []string{"some", "full"} {
+					t.Run(stall, func(t *testing.T) {
+						checkPressure(t, pressure, stall)
+					})
+				}
+			})
+		})
+	}
+}
+
+func checkPressure(t *testing.T, pressure map[string]any, stall string) {
+	// Verify pressure structure has expected fields
+	stallMap := requireGetSubMap(t, pressure, stall)
+
+	// Check for time window fields (10, 60, 300 seconds)
+	for _, window := range []string{"10", "60", "300"} {
+		windowMap := requireGetSubMap(t, stallMap, window)
+
+		// Check for pct field
+		assert.Contains(t, windowMap, "pct", "expected pressure.%s.%s.pct to exist", stall, window)
+	}
+
+	// Check for total field
+	assert.Contains(t, stallMap, "total", "expected pressure.%s.total to exist", stall)
+}
+
+func requireGetSubMap(t *testing.T, m map[string]any, key string) map[string]any {
+	t.Helper()
+	require.Contains(t, m, key)
+	rawValue := m[key]
+	require.IsType(t, rawValue, map[string]any{})
+	subMap, ok := rawValue.(map[string]any)
+	require.True(t, ok)
+	return subMap
+}
+
+func getTestPid(t *testing.T) int {
+	t.Helper()
+	if targetPid := os.Getenv("MONITOR_PID"); targetPid != "" {
+		intPid, err := strconv.ParseInt(targetPid, 10, 32)
+		require.NoError(t, err, "error parsing MONITOR_PID")
+		return int(intPid)
+	}
+	return os.Getpid()
+}
+
+func getConfig() map[string]any {
+	return map[string]any{
 		"module":                        "system",
 		"metricsets":                    []string{"process"},
 		"processes":                     []string{".*"}, // in case we want a prettier looking example for data.json

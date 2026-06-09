@@ -174,12 +174,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			beatsConfig.Region = regionName
 			APIClients, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
-				m.Logger().Warn("skipping metrics list from region '%s'", regionName)
+				m.Logger().Warnf("skipping metrics list from region '%s': %v", regionName, err)
+				continue
 			}
 
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
-				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
+				m.Logger().Errorf("createEvents failed for region %s, skipping region: %v", regionName, err)
+				continue
 			}
 
 			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
@@ -272,7 +274,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
-				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
+				m.Logger().Errorf("createEvents failed for region %s and namespace %s, skipping: %v", regionName, namespace, err)
+				continue
 			}
 
 			m.logger.Debugf("Collected number of metrics = %d", len(eventsWithIdentifier))

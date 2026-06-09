@@ -30,11 +30,11 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "kube-system",
+            "namespace": "default",
             "service": {
-                "cluster_ip": "None",
-                "created": "2024-04-23T08:50:43.000Z",
-                "name": "kube-state-metrics",
+                "cluster_ip": "10.96.0.1",
+                "created": "2024-04-23T08:49:42.000Z",
+                "name": "kubernetes",
                 "type": "ClusterIP"
             }
         },
@@ -54,11 +54,11 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "default",
+            "namespace": "kube-system",
             "service": {
-                "cluster_ip": "10.96.0.1",
-                "created": "2024-04-23T08:49:42.000Z",
-                "name": "kubernetes",
+                "cluster_ip": "None",
+                "created": "2024-04-23T08:50:43.000Z",
+                "name": "kube-state-metrics",
                 "type": "ClusterIP"
             }
         },

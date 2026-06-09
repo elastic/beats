@@ -77,7 +77,7 @@ func newAutoOpsMetricSet[T any](base mb.BaseMetricSet, routePath string, mapper 
 		checkedCloudConnectedMode = true
 
 		if err := maybeRegisterCloudConnectedCluster(ms, GetInfo); err != nil {
-			return nil, fmt.Errorf("failed to register Cloud Connected Mode: %w", err)
+			return nil, fmt.Errorf("failed to register Cloud Connected cluster: %w", err)
 		}
 	}
 

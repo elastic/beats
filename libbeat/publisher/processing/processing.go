@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // SupportFactory creates a new processing Supporter that can be used with
@@ -36,7 +37,7 @@ type SupportFactory func(info beat.Info, log *logp.Logger, cfg *config.C) (Suppo
 // A Supporter needs to be closed with `Close()` to release its global resources.
 type Supporter interface {
 	// Create a running processor interface based on the given config
-	Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
+	Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error)
 	// Processors returns a list of config strings for the given processor, for debug purposes
 	Processors() []string
 	// Close the processor supporter

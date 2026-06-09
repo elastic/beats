@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 
@@ -14,15 +15,21 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func main() {
+	modulePath := flag.String(
+		"module",
+		"../x-pack/metricbeat/module",
+		"Path to Metricbeat module directory",
+	)
+
+	flag.Parse()
+
 	// Disable permission checks so it reads light modules in any case
 	os.Setenv("BEAT_STRICT_PERMS", "false")
 
-	path := paths.Resolve(paths.Home, "../x-pack/metricbeat/module")
-	lm := mb.NewLightModulesSource(logp.NewNopLogger(), path)
+	lm := mb.NewLightModulesSource(logp.NewNopLogger(), *modulePath)
 	mb.Registry.SetSecondarySource(lm)
 
 	msList := msetlists.DefaultMetricsets()

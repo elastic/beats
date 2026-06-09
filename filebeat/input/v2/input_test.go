@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -225,4 +226,11 @@ func TestContextMetricsRegistryOverride(t *testing.T) {
 				"The %q variable in MetricsRegistry was not set correctly", tc.field)
 		})
 	}
+}
+
+// TestContexStatusReporterDoesNotPanic ensures that the UpdateStatus method
+// is safe to use with a nil statusReporter
+func TestContexStatusReporterDoesNotPanic(t *testing.T) {
+	v2Ctx := Context{statusReporter: nil} // explicitly set it to nil
+	v2Ctx.UpdateStatus(status.Configuring, "it does not panic")
 }

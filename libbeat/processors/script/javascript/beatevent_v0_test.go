@@ -197,7 +197,7 @@ func TestBeatEventV0(t *testing.T) {
 			// Validate that the processor's metrics exist.
 			var found bool
 			prefix := fmt.Sprintf("processor.javascript.%s.histogram.process_time", tc.name)
-			reg.Do(monitoring.Full, func(name string, v interface{}) {
+			reg.Do(monitoring.Full, func(name string, v any) {
 				if !found && strings.HasPrefix(name, prefix) {
 					found = true
 				}
@@ -221,7 +221,7 @@ func BenchmarkBeatEventV0(b *testing.B) {
 
 			event := testEvent()
 			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				_, err := p.Run(event)
 				if err != nil {
 					b.Fatal(err)

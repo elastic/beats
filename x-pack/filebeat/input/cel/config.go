@@ -70,6 +70,21 @@ type config struct {
 	// RecordCoverage indicates whether a program should
 	// record and log execution coverage.
 	RecordCoverage bool `config:"record_coverage"`
+
+	// Package contains information about the integration package.
+	// name and version are expected.
+	Package map[string]string `config:"package"`
+}
+
+func (c config) GetPackageData(key string) string {
+	if c.Package == nil {
+		return "unknown"
+	}
+	value, ok := c.Package[key]
+	if !ok {
+		return "unknown"
+	}
+	return value
 }
 
 type redact struct {

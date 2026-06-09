@@ -20,7 +20,6 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -29,6 +28,8 @@ import (
 	"text/template"
 
 	"github.com/magefile/mage/sh"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
@@ -102,7 +103,10 @@ var funcMap = template.FuncMap{
 	"getBeatName": func() string {
 		return mage.BeatName
 	},
-	"title": strings.Title,
+	"title": func(s string) string {
+		caser := cases.Title(language.English)
+		return caser.String(s)
+	},
 }
 
 // checkXpack checks to see if the module belongs to x-pack.
@@ -127,7 +131,7 @@ func getRelease(rel string) (string, error) {
 	case "ga", "beta", "experimental":
 		return rel, nil
 	case "":
-		return "", fmt.Errorf("Missing a release string")
+		return "", fmt.Errorf("missing a release string")
 	default:
 		return "ga", fmt.Errorf("unknown release tag %s", rel)
 	}
@@ -141,19 +145,16 @@ func createDocsPath(module string) error {
 // testIfDocsInDir tests for a `_meta/docs.md` in a given directory
 func testIfDocsInDir(moduleDir string) bool {
 	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.md"))
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // compile and run the seprate go script to generate a list of default metricsets.
 // This is done so a compile-time issue in metricbeat doesn't break the docs build
 func getDefaultMetricsets() (map[string][]string, error) {
 
-	runpaths := []string{
-		mage.OSSBeatDir("scripts/msetlists/cmd/main.go"),
-		mage.XPackBeatDir("scripts/msetlists/main.go"),
+	runpaths := [][]string{
+		{"run", mage.OSSBeatDir("scripts/msetlists/cmd/main.go")},
+		{"run", mage.XPackBeatDir("scripts/msetlists/main.go"), "--module", mage.XPackBeatDir("module")},
 	}
 
 	var masterMap = make(map[string][]string)
@@ -163,11 +164,10 @@ func getDefaultMetricsets() (map[string][]string, error) {
 		return masterMap, nil
 	}
 
-	cmd := []string{"run"}
 	for _, dir := range runpaths {
-		rawMap, err := sh.OutCmd("go", append(cmd, dir)...)()
+		rawMap, err := sh.OutCmd("go", dir...)()
 		if err != nil {
-			return nil, fmt.Errorf("Error running subcommand to get metricsets: %w", err)
+			return nil, fmt.Errorf("error running subcommand to get metricsets: %w", err)
 		}
 		var msetMap = make(map[string][]string)
 		err = json.Unmarshal([]byte(rawMap), &msetMap)
@@ -199,7 +199,7 @@ func loadModuleFields(file string) (moduleData, error) {
 	if err != nil {
 		return mod[0], fmt.Errorf("file %s is missing a release string: %w", file, err)
 	}
-	applies_to, err := getVersion(fd)
+	applies_to, _ := getVersion(fd)
 
 	module.Release = rel
 	module.Applies_to = applies_to
@@ -240,7 +240,9 @@ func getVersion(raw []byte) (string, error) {
 		Path    string
 	}
 	var rel []metricset
-	yaml.Unmarshal(raw, &rel)
+	if err := yaml.Unmarshal(raw, &rel); err != nil {
+		return "", err
+	}
 	// Build the applies_to string: a comma-separated list
 	// of all available lifecycles and versions
 	// NOTE: There's almost certainly a more efficient way
@@ -300,7 +302,7 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-	raw, err := ioutil.ReadFile(goodPath)
+	raw, err := os.ReadFile(goodPath)
 	return strings.TrimSpace(string(raw)), err
 
 }
@@ -325,7 +327,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 			return nil, err
 		}
 		metricsetName := filepath.Base(metricset)
-		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
+		release, _ := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
 		raw, err := os.ReadFile(filepath.Join(metricset, "_meta/fields.yml"))
 		if err != nil {
 			return nil, err
@@ -435,8 +437,12 @@ func gatherData(modules []string) ([]moduleData, error) {
 
 // writeModuleDocs writes the module-level docs
 func writeModuleDocs(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	for _, mod := range modules {
-		filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
+		filename := filepath.Join(docsDir, "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
 		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
 			return err
@@ -447,6 +453,10 @@ func writeModuleDocs(modules []moduleData, t *template.Template) error {
 
 // writeMetricsetDocs writes the metricset-level docs
 func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	for _, mod := range modules {
 		for _, metricset := range mod.Metricsets {
 			modData := struct {
@@ -456,7 +466,7 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 				mod,
 				metricset,
 			}
-			filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
+			filename := filepath.Join(docsDir, "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
 
 			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
@@ -469,6 +479,10 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 
 // writeModuleList writes the module linked list
 func writeModuleList(modules []moduleData, t *template.Template) error {
+	docsDir, err := mage.DocsDir()
+	if err != nil {
+		return err
+	}
 	// Turn the map into a sorted list
 	//Normally the glob functions would do this sorting for us,
 	//but because we mix the regular and x-pack dirs we have to sort them again.
@@ -476,7 +490,7 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 		return modules[i].Base < modules[j].Base
 	})
 	//write and execute the template
-	filepath := filepath.Join(mage.DocsDir(), "reference", "metricbeat", "metricbeat-modules.md")
+	filepath := filepath.Join(docsDir, "reference", "metricbeat", "metricbeat-modules.md")
 	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
 
 }

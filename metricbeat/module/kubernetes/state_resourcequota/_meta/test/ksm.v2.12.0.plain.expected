@@ -5,10 +5,32 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"created": {
-				"sec": 1713862291
-			},
-			"name": "pods-high"
+			"name": "pods-high",
+			"quota": 0,
+			"resource": "pods",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"name": "pods-high",
+			"quota": 0,
+			"resource": "memory",
+			"type": "used"
 		},
 		"Index": "",
 		"ID": "",
@@ -50,8 +72,30 @@
 		},
 		"MetricSetFields": {
 			"name": "pods-high",
+			"quota": 1000,
+			"resource": "cpu",
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"name": "pods-high",
 			"quota": 0,
-			"resource": "pods",
+			"resource": "cpu",
 			"type": "used"
 		},
 		"Index": "",
@@ -93,54 +137,10 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "pods-high",
-			"quota": 0,
-			"resource": "memory",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"name": "pods-high",
-			"quota": 0,
-			"resource": "cpu",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"name": "pods-high",
-			"quota": 1000,
-			"resource": "cpu",
-			"type": "hard"
+			"created": {
+				"sec": 1713862291
+			},
+			"name": "pods-high"
 		},
 		"Index": "",
 		"ID": "",

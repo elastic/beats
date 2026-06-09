@@ -65,7 +65,6 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*MySQL fields*](/reference/metricbeat/exported-fields-mysql.md)
 * [*NATS fields*](/reference/metricbeat/exported-fields-nats.md)
 * [*Nginx fields*](/reference/metricbeat/exported-fields-nginx.md)
-* [*openai fields*](/reference/metricbeat/exported-fields-openai.md)
 * [*Openmetrics fields*](/reference/metricbeat/exported-fields-openmetrics.md)
 * [*Oracle fields*](/reference/metricbeat/exported-fields-oracle.md)
 * [*Panw fields*](/reference/metricbeat/exported-fields-panw.md)

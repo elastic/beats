@@ -48,20 +48,6 @@ func ReportEvent(r mb.ReporterV2, event mb.Event, index int, total int) {
 	r.Event(event)
 }
 
-// Report Metricbeat Events marked with the same transaction
-func ReportEvents(r mb.ReporterV2, events []mb.Event) {
-	var total = len(events)
-
-	for index, event := range events {
-		ReportEvent(r, event, index, total)
-	}
-}
-
-// Create a new Metricbeat Events with a shared, random Transaction ID
-func CreateAndReportEventsWithRandomTransactionId(r mb.ReporterV2, info *utils.ClusterInfo, metricSets []mapstr.M) {
-	CreateAndReportEvents(r, info, metricSets, utils.NewUUIDV4())
-}
-
 // Create a new Metricbeat Events
 func CreateAndReportEvents(r mb.ReporterV2, info *utils.ClusterInfo, metricSets []mapstr.M, transactionId string) {
 	var total = len(metricSets)

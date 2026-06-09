@@ -20,9 +20,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelctx"
 	"github.com/elastic/beats/v7/libbeat/outputs/logstash"
 	"github.com/elastic/beats/v7/x-pack/otel/exporter/logstashexporter/internal"
+	"github.com/elastic/beats/v7/x-pack/otel/otelctx"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"

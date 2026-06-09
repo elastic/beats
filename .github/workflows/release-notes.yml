@@ -21,6 +21,7 @@ jobs:
       bc_commit_sha: ${{ inputs.bc_commit_sha }}
       version: ${{ inputs.version }}
       release_manager: ${{ github.triggering_actor }}
+      branching_model: 'latest minor version'
     permissions:
       contents: read
       id-token: write

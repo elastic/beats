@@ -68,6 +68,7 @@ var (
 			"kube_pod_container_status_waiting_reason":            p.LabelMetric("status.reason", "reason"),
 			"kube_pod_container_status_last_terminated_reason":    p.LabelMetric("status.last_terminated_reason", "reason"),
 			"kube_pod_container_status_last_terminated_timestamp": p.Metric("status.last_terminated_timestamp"),
+			"kube_pod_container_status_last_terminated_exitcode":  p.Metric("status.last_terminated_exitcode"),
 		},
 
 		Labels: map[string]p.LabelMap{

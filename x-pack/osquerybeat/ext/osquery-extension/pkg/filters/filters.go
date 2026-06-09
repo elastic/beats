@@ -281,10 +281,36 @@ func GetValueByOsqueryTag(s any, tagValue string) (any, reflect.Kind, error) {
 	// Iterate over all fields in the struct
 	for i := 0; i < t.NumField(); i++ {
 		// Get the StructField, which contains tag info
-		field := t.Field(i)
+		fieldType := t.Field(i)
+		fieldValue := v.Field(i)
 
-		// Get the tag value for the given key
-		tag := field.Tag.Get("osquery")
+		if !fieldType.IsExported() {
+			continue
+		}
+
+		tag := fieldType.Tag.Get("osquery")
+
+		// Handle embedded structs
+		// If a struct has an embedded struct, the field will be marked as anonymous
+		// and the tag will be empty.  We need to recurse into the embedded struct and look for the tag there.
+		if fieldType.Anonymous && tag == "" {
+			// Handle pointer to struct if necessary
+			if fieldValue.Kind() == reflect.Ptr {
+				if fieldValue.IsNil() {
+					continue
+				}
+				fieldValue = fieldValue.Elem()
+			}
+
+			// Only recurse if it's a struct
+			if fieldValue.Kind() == reflect.Struct {
+				value, kind, err := GetValueByOsqueryTag(fieldValue.Interface(), tagValue)
+				if err == nil {
+					return value, kind, nil
+				}
+				continue // Skip the rest of the loop for this field
+			}
+		}
 
 		// Check if the tag value matches our target
 		if tag == tagValue {

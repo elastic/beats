@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && !agentbeat
+//go:build integration
 
 package integration
 
@@ -32,10 +32,10 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat/oteltestcol"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 	"github.com/elastic/go-elasticsearch/v8"
@@ -930,6 +930,201 @@ service:
 		2*time.Minute, 1*time.Second)
 }
 
+func TestFilebeatOTelBeatProcessorE2E(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	wantEvents := 1
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	processorIndex := "logs-processor-" + namespace
+	receiverIndex := "logs-receiver-" + namespace
+
+	configParameters := struct {
+		Index     string
+		InputFile string
+		PathHome  string
+	}{
+		Index:     processorIndex,
+		InputFile: filepath.Join(t.TempDir(), "log.log"),
+		PathHome:  t.TempDir(),
+	}
+
+	configTemplate := `
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      processors:
+        - beat
+      exporters:
+        - elasticsearch/log
+        - debug
+  telemetry:
+    metrics:
+      level: none # Disable collector's own metrics to prevent conflict on port 8888. We don't use those metrics anyway.
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    # Clear the list of default processors
+    processors: []
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: {{.PathHome}}
+processors:
+  beat:
+    processors:
+      - add_cloud_metadata:
+      - add_docker_metadata:
+      - add_fields:
+          fields:
+            custom_field: "CustomValue"
+      - add_host_metadata:
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: {{.Index}}
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+    mapping:
+      mode: bodymap
+`
+	var renderedConfig bytes.Buffer
+	require.NoError(t, template.Must(template.New("config").Parse(configTemplate)).Execute(&renderedConfig, configParameters))
+	configContents := renderedConfig.Bytes()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Processor config:\n%s", configContents)
+		}
+	})
+
+	writeEventsToLogFile(t, configParameters.InputFile, wantEvents)
+	oteltestcol.New(t, string(configContents))
+
+	receiverConfig := `
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      exporters:
+        - elasticsearch/log
+        - debug
+  telemetry:
+    metrics:
+      level: none # Disable collector's own metrics to prevent conflict on port 8888. We don't use those metrics anyway.
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-fbreceiver
+          enabled: true
+          paths:
+            - %s
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    processors:
+      - add_cloud_metadata:
+      - add_docker_metadata:
+      - add_fields:
+          fields:
+            custom_field: "CustomValue"
+      - add_host_metadata:
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: %s
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: %s
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+    mapping:
+      mode: bodymap
+`
+	logFilePath := filepath.Join(t.TempDir(), "log.log")
+	writeEventsToLogFile(t, logFilePath, wantEvents)
+	receiverRenderedConfig := fmt.Sprintf(receiverConfig,
+		logFilePath,
+		t.TempDir(),
+		receiverIndex,
+	)
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Receiver config:\n%s", receiverRenderedConfig)
+		}
+	})
+	oteltestcol.New(t, receiverRenderedConfig)
+
+	es := integration.GetESClient(t, "http")
+
+	var processorDocuments estools.Documents
+	var receiverDocuments estools.Documents
+	var err error
+
+	// wait for logs to be published
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			processorDocuments, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+processorIndex+"*")
+			assert.NoError(ct, err)
+
+			receiverDocuments, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+receiverIndex+"*")
+			assert.NoError(ct, err)
+
+			assert.GreaterOrEqual(ct, processorDocuments.Hits.Total.Value, wantEvents, "expected at least %d otel events, got %d", wantEvents, processorDocuments.Hits.Total.Value)
+			assert.GreaterOrEqual(ct, receiverDocuments.Hits.Total.Value, wantEvents, "expected at least %d filebeat events, got %d", wantEvents, receiverDocuments.Hits.Total.Value)
+		},
+		2*time.Minute, 1*time.Second, "expected at least %d events for both filebeat and otel", wantEvents)
+
+	processorDoc := processorDocuments.Hits.Hits[0].Source
+	receiverDoc := receiverDocuments.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// Expected to change between the agents
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"log.file.inode",
+		"log.file.path",
+	}
+
+	oteltest.AssertMapsEqual(t, receiverDoc, processorDoc, ignoredFields, "expected documents to be equal")
+}
+
 // setupRoleMapping sets up role mapping for the Kerberos user beats@elastic
 func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -965,4 +1160,74 @@ func setupRoleMapping(t *testing.T, client *elasticsearch.Client) {
 	defer resp.Body.Close()
 
 	require.Equal(t, resp.StatusCode, http.StatusOK, "incorrect response code")
+}
+
+func BenchmarkFilebeatOTelCollector(b *testing.B) {
+	numReceivers := 4
+
+	for b.Loop() {
+		b.StopTimer()
+		tmpDir := b.TempDir()
+
+		type receiverConfig struct {
+			Index    int
+			PathHome string
+		}
+
+		configData := struct {
+			Receivers []receiverConfig
+		}{
+			Receivers: make([]receiverConfig, numReceivers),
+		}
+
+		for i := range numReceivers {
+			configData.Receivers[i] = receiverConfig{
+				Index:    i + 1,
+				PathHome: filepath.Join(tmpDir, strconv.Itoa(i+1)),
+			}
+		}
+
+		cfgTemplate := `receivers:
+{{range .Receivers}}
+  filebeatreceiver/{{.Index}}:
+    filebeat:
+      inputs:
+        - type: benchmark
+          enabled: true
+          count: 1
+    path.home: {{.PathHome}}
+    queue.mem.flush.timeout: 0s
+{{end}}
+exporters:
+  debug:
+    verbosity: detailed
+service:
+  pipelines:
+    logs:
+      receivers:
+{{range .Receivers}}
+        - filebeatreceiver/{{.Index}}
+{{end}}
+      exporters:
+        - debug
+  telemetry:
+    logs:
+      level: DEBUG
+    metrics:
+      level: none
+`
+
+		var configBuffer bytes.Buffer
+		require.NoError(b, template.Must(template.New("config").Parse(cfgTemplate)).Execute(&configBuffer, configData))
+
+		b.StartTimer()
+
+		col := oteltestcol.New(b, configBuffer.String())
+		require.NotNil(b, col)
+		require.Eventually(b, func() bool {
+			return col.ObservedLogs().
+				FilterMessageSnippet("Publish event").Len() == numReceivers
+		}, 30*time.Second, 1*time.Millisecond, "expected all receivers to publish events")
+		col.Shutdown()
+	}
 }

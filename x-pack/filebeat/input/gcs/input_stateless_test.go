@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// This file was contributed to by generative AI
+
 package gcs
 
 import (
@@ -51,12 +53,8 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 	var source cursor.Source
 	var g errgroup.Group
 
-	stat := inputCtx.StatusReporter
-	if stat == nil {
-		stat = noopReporter{}
-	}
-	stat.UpdateStatus(status.Starting, "")
-	stat.UpdateStatus(status.Configuring, "")
+	inputCtx.UpdateStatus(status.Starting, "")
+	inputCtx.UpdateStatus(status.Configuring, "")
 
 	for _, b := range in.config.Buckets {
 		bucket := tryOverrideOrDefault(in.config, b)
@@ -86,7 +84,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {
 			<-inputCtx.Cancelation.Done()
-			stat.UpdateStatus(status.Stopping, "")
+			inputCtx.UpdateStatus(status.Stopping, "")
 			cancel()
 		}()
 
@@ -103,7 +101,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			// Since we are only reading, the operation is always idempotent
 			storage.WithPolicy(storage.RetryAlways),
 		)
-		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, stat, metrics, log)
+		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, inputCtx, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic
 		// the real world concurrent execution of multiple containers. This fix allows it to do so.

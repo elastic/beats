@@ -19,6 +19,7 @@ package cache
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -28,6 +29,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type cacheTestStep struct {
@@ -662,7 +664,19 @@ func TestCache(t *testing.T) {
 				t.Log(p)
 				c, ok := p.(*cache)
 				if !ok {
-					t.Fatalf("processor %d is not an *cache", i)
+					t.Fatalf("processor %d is not a *cache", i)
+				}
+
+				// Initialize the store with paths
+				tmpDir := t.TempDir()
+				err = c.SetPaths(&paths.Path{
+					Home:   tmpDir,
+					Config: tmpDir,
+					Data:   tmpDir,
+					Logs:   tmpDir,
+				})
+				if err != nil {
+					t.Errorf("unexpected error from SetPaths: %v", err)
 				}
 
 				defer func() {
@@ -700,5 +714,46 @@ func TestCache(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestSetPathsUninitialized(t *testing.T) {
+	cfg, err := conf.NewConfigFrom(mapstr.M{
+		"backend": mapstr.M{
+			"memory": mapstr.M{
+				"id": "test",
+			},
+		},
+		"get": mapstr.M{
+			"key_field":    "key",
+			"target_field": "target",
+		},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error from NewConfigFrom: %v", err)
+	}
+
+	p, err := New(cfg, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatalf("unexpected error from New: %v", err)
+	}
+
+	c, ok := p.(*cache)
+	if !ok {
+		t.Fatal("processor is not a *cache")
+	}
+	defer func() {
+		if err := c.Close(); err != nil {
+			t.Errorf("unexpected error from c.Close(): %v", err)
+		}
+	}()
+
+	// Try to use without SetPaths - should fail
+	event, err := c.Run(&beat.Event{})
+	if event == nil {
+		t.Error("expected non-nil event")
+	}
+	if err == nil || !strings.Contains(err.Error(), "cache processor store not initialized") {
+		t.Fatalf("expected error containing 'cache processor store not initialized', got: %v", err)
 	}
 }

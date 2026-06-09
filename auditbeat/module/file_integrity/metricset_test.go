@@ -35,6 +35,7 @@ import (
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestData(t *testing.T) {
@@ -70,7 +71,7 @@ func TestActions(t *testing.T) {
 
 	defer abtest.SetupDataDir(t)()
 
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +174,7 @@ func TestExcludedFiles(t *testing.T) {
 
 	defer abtest.SetupDataDir(t)()
 
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,7 +226,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 
 	defer abtest.SetupDataDir(t)()
 
-	bucket, err := datastore.OpenBucket(bucketName)
+	bucket, err := datastore.OpenBucket(bucketName, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}

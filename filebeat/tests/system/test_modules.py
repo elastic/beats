@@ -1,4 +1,5 @@
-from filebeat import BaseTest
+import base64
+from filebeat import BaseTest, log_as_filestream, remove_filestream_fields
 from beat.beat import INTEGRATION_TESTS
 import os
 import unittest
@@ -8,6 +9,7 @@ import subprocess
 import json
 import logging
 from parameterized import parameterized
+from elasticsearch import Elasticsearch, NotFoundError
 from deepdiff import DeepDiff
 
 # datasets for which @timestamp is removed due to date missing
@@ -121,7 +123,7 @@ def load_fileset_test_cases():
 class Test(BaseTest):
 
     def init(self):
-        self.es = self.get_elasticsearch_instance(user='admin')
+        self.es: Elasticsearch = self.get_elasticsearch_instance(user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -166,10 +168,11 @@ class Test(BaseTest):
         self.assert_explicit_ecs_version_set(module, fileset)
 
         try:
-            self.es.indices.delete_data_stream(self.index_name)
-        except BaseException:
+            resp = self.es.indices.delete_data_stream(name=self.index_name)
+        except NotFoundError:
             pass
-        self.wait_until(lambda: not self.es.indices.exists(self.index_name))
+
+        self.wait_until(lambda: not self.es.indices.exists(index=self.index_name))
 
         cmd = [
             self.filebeat, "--systemTest",
@@ -184,6 +187,16 @@ class Test(BaseTest):
                 module=module, fileset=fileset),
             "-M", "*.*.input.close_eof=true",
         ]
+
+        # if the test file contains '.journal', later it will try to remove
+        # the '--once' flag and the journald input will be used,
+        # so there is nothing to do here.
+        if log_as_filestream() and ".journal" not in test_file:
+            cmd.append("-E")
+            cmd.append("features.log_input_run_as_filestream.enabled=true")
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.input.id='id{module}-{fileset}'".format(module=module, fileset=fileset))
+            cmd.remove("--once")
         # allow connecting older versions of Elasticsearch
         if os.getenv("TESTING_FILEBEAT_ALLOW_OLDER"):
             cmd.extend(["-E", "output.elasticsearch.allow_older_versions=true"])
@@ -248,13 +261,13 @@ class Test(BaseTest):
             error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+        self.wait_until(lambda: self.es.indices.exists(index=self.index_name),
                         name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
-        res = self.es.search(index=self.index_name,
-                             body={"query": {"match_all": {}}, "size": 100, "sort": {"log.offset": {"order": "asc"}}})
+        res = self.es.search(index=self.index_name, query={"match_all": {}},
+                             size=100, sort={"log.offset": {"order": "asc"}})
         objects = [o["_source"] for o in res["hits"]["hits"]]
         assert len(objects) > 0
         for obj in objects:
@@ -273,6 +286,9 @@ class Test(BaseTest):
                 # There are dynamic fields that are not documented.
                 pass
             else:
+                # Remove some fields if running the Filestream input
+                if log_as_filestream():
+                    remove_filestream_fields(objects)
                 self.assert_fields_are_documented(obj)
 
         self._test_expected_events(test_file, objects)
@@ -334,7 +350,11 @@ def clean_keys(obj):
     # The create timestamps area always new
     time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
-    other_keys = ["log.file.path", "agent.version"]
+    other_keys = ["log.file.path",
+                  "log.file.inode",  # Filestream field
+                  "log.file.device_id",  # Filestream field
+                  "log.offset",  # Not correctly populated by the log input
+                  "agent.version"]
     # ECS versions change for any ECS release, large or small
     ecs_key = ["ecs.version"]
 
@@ -345,6 +365,11 @@ def clean_keys(obj):
 
     for key in host_keys + time_keys + other_keys + ecs_key:
         delete_key(obj, key)
+
+    if log_as_filestream() and "tags" in obj:
+        obj["tags"].remove("take_over")
+        if len(obj["tags"]) == 0:
+            delete_key(obj, "tags")
 
     # Most logs from syslog need their timestamp removed because it doesn't
     # include a year.

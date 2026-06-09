@@ -9,11 +9,35 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
+
+func TestInitializeAWSConfigCloudConnectors(t *testing.T) {
+	t.Setenv(CloudConnectorsGlobalRoleEnvVar, "arn:aws:iam::999999999999:role/elastic-global-role")
+	t.Setenv(CloudConnectorsJWTPathEnvVar, "/path/token")
+	t.Setenv(CloudConnectorsCloudResourceIDEnvVar, "abc123")
+
+	inputConfig := ConfigAWS{
+		RoleArn:            "arn:aws:iam::123456789012:role/customer-role",
+		ExternalID:         "external-id-456",
+		UseCloudConnectors: true,
+	}
+
+	awsConfig, err := InitializeAWSConfig(inputConfig, logptest.NewTestingLogger(t, ""))
+	assert.NoError(t, err)
+
+	// we cannot append to APIOptions at this point (and mock the chain responses)
+	// because a copy of config has already been passed to each sts client.
+	// So lets just check that .Credentials is CredentialsCache (so cloud connectors init was run).
+	c, isCredCache := awsConfig.Credentials.(*aws.CredentialsCache)
+	require.True(t, isCredCache)
+	require.NotNil(t, c)
+}
 
 func TestInitializeAWSConfig(t *testing.T) {
 	inputConfig := ConfigAWS{

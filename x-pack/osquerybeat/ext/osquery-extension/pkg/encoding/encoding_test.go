@@ -337,7 +337,7 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			fieldValue: reflect.ValueOf(time.Date(2023, 6, 15, 14, 30, 0, 0, time.UTC)),
 			flag:       0,
 			tag:        tagPtr(`format:"kitchen"`),
-			want:       "Jun 15 14:30:00",
+			want:       "2:30PM",
 			wantErr:    false,
 		},
 		{
@@ -402,6 +402,14 @@ func Test_formatTimeWithTagFormat(t *testing.T) {
 			flag:       EncodingFlagUseNumbersZeroValues,
 			tag:        tagPtr(`format:"rfc3339"`),
 			want:       "0001-01-01T00:00:00Z",
+			wantErr:    false,
+		},
+		{
+			name:       "Zero unix timestamp with UseNumbersZeroValues flag",
+			fieldValue: reflect.ValueOf(time.Time{}),
+			flag:       EncodingFlagUseNumbersZeroValues,
+			tag:        tagPtr(`format:"unix"`),
+			want:       "0",
 			wantErr:    false,
 		},
 		{
@@ -805,6 +813,32 @@ func TestGenerateColumnDefinitions_unexportedFields(t *testing.T) {
 	expected := []table.ColumnDefinition{
 		table.TextColumn("public"),
 		table.IntegerColumn("exported2"),
+	}
+	cols, err := GenerateColumnDefinitions(testStruct{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(cols) != len(expected) {
+		t.Fatalf("expected %d columns, got %d", len(expected), len(cols))
+	}
+	for i := range cols {
+		if cols[i].Name != expected[i].Name || cols[i].Type != expected[i].Type {
+			t.Errorf("column %d: got (%s, %s), want (%s, %s)", i, cols[i].Name, cols[i].Type, expected[i].Name, expected[i].Type)
+		}
+	}
+}
+
+func TestGenerateColumnDefinitions_embeddedStruct(t *testing.T) {
+	type EmbeddedStruct struct {
+		EmbeddedField string `osquery:"embedded_field"`
+	}
+	type testStruct struct {
+		EmbeddedStruct
+		TestField string `osquery:"test_field"`
+	}
+	expected := []table.ColumnDefinition{
+		table.TextColumn("embedded_field"),
+		table.TextColumn("test_field"),
 	}
 	cols, err := GenerateColumnDefinitions(testStruct{})
 	if err != nil {

@@ -29,13 +29,15 @@ func expectValidParsedData(t *testing.T, data metricset.FetcherData[map[string]i
 
 	// metrics exist
 	require.True(t, len(*event.MetricSetFields.FlattenKeys()) > 3)
-	require.NotNil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "defaults"))
 
 	// filename includes the "display_name" as the second part
 	displayName := strings.Split(data.File, ".")[1]
 
-	require.Equal(t, displayName, auto_ops_testing.GetObjectValue(event.MetricSetFields, "persistent.cluster.metadata.display_name"))
-	require.ElementsMatch(t, []string{"/app/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "defaults.path.data"))
+	// Settings are flattened with precedence: transient > persistent > defaults
+	require.Equal(t, "4000", auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.max_shards_per_node"))
+	require.Equal(t, displayName, auto_ops_testing.GetObjectValue(event.MetricSetFields, "cluster.metadata.display_name"))
+	require.ElementsMatch(t, []string{"/app/data"}, auto_ops_testing.GetObjectValue(event.MetricSetFields, "path.data"))
+	require.Equal(t, "3", auto_ops_testing.GetObjectValue(event.MetricSetFields, "serverless.search.search_power_min"))
 
 	// schema is expected to drop this field if it appears (it does in one file)
 	require.Nil(t, auto_ops_testing.GetObjectValue(event.MetricSetFields, "ignored_field"))

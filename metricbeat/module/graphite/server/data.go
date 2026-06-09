@@ -155,19 +155,25 @@ func (m *metricProcessor) splitMetric(metric string) (string, common.Time, float
 func (t *template) Apply(parts []string) (string, mapstr.M) {
 	tags := make(mapstr.M)
 
-	metric := make([]string, 0)
 	for tagKey, tagVal := range t.Tags {
 		tags[tagKey] = tagVal
 	}
 
+	var metric []string
 	tagsMap := make(map[string][]string)
-	for i := 0; i < len(t.Parts); i++ {
-		if t.Parts[i] == "metric" {
+
+	// Match template parts to corresponding metric parts.
+	for i := 0; i < min(len(t.Parts), len(parts)); i++ {
+		templatePart := t.Parts[i]
+		switch templatePart {
+		case "metric":
 			metric = append(metric, parts[i])
-		} else if t.Parts[i] == "metric*" {
+		case "metric*":
 			metric = append(metric, parts[i:]...)
-		} else if t.Parts[i] != "" {
-			tagsMap[t.Parts[i]] = append(tagsMap[t.Parts[i]], parts[i])
+		case "":
+			// skip empty parts
+		default:
+			tagsMap[templatePart] = append(tagsMap[templatePart], parts[i])
 		}
 	}
 
@@ -177,7 +183,6 @@ func (t *template) Apply(parts []string) (string, mapstr.M) {
 
 	if len(metric) == 0 {
 		return "", tags
-	} else {
-		return strings.Join(metric, t.Delimiter), tags
 	}
+	return strings.Join(metric, t.Delimiter), tags
 }

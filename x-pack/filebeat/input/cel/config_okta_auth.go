@@ -129,7 +129,6 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	token, err := exchangeForBearerToken(ts.ctx, oktaJWT, ts.conf)
 	if err != nil {
 		return nil, fmt.Errorf("error exchanging Okta JWT for bearer token: %w", err)
-
 	}
 
 	return token, nil
@@ -168,7 +167,6 @@ func generateOktaJWT(oktaJWK []byte, cnf *oauth2.Config) (string, error) {
 	}
 
 	return signJWT(cnf, key)
-
 }
 
 // base64int is a JSON decoding shim for base64-encoded big.Int.

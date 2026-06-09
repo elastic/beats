@@ -35,15 +35,6 @@
   "message_max_bytes": 44000,
   "parsers": [
     {
-      "multiline": {
-        "count_lines": 42,
-        "match": "after",
-        "negate": true,
-        "pattern": "reg exp goes here",
-        "type": "pattern"
-      }
-    },
-    {
       "ndjson": {
         "add_error_key": true,
         "document_id": "the_id_key",
@@ -53,6 +44,15 @@
         "message_key": "message",
         "overwrite_keys": true,
         "target": "json"
+      }
+    },
+    {
+      "multiline": {
+        "count_lines": 42,
+        "match": "after",
+        "negate": true,
+        "pattern": "reg exp goes here",
+        "type": "pattern"
       }
     }
   ],

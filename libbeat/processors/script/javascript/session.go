@@ -43,7 +43,7 @@ const (
 
 // Session is an instance of the processor.
 type Session interface {
-	// Runtime returns the Javascript runtime used for this session.
+	// Runtime returns the JavaScript runtime used for this session.
 	Runtime() *goja.Runtime
 
 	// Event returns a pointer to the current event being processed.
@@ -152,7 +152,7 @@ func (s *session) setProcessFunction() error {
 }
 
 // registerScriptParams calls the register() function and passes the params.
-func (s *session) registerScriptParams(params map[string]interface{}) error {
+func (s *session) registerScriptParams(params map[string]any) error {
 	registerFunc := s.vm.Get(registerFunction)
 	if registerFunc == nil {
 		return errors.New("params were provided but no register function was found")
@@ -250,7 +250,7 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 	return b, nil
 }
 
-// Runtime returns the Javascript runtime used for this session.
+// Runtime returns the JavaScript runtime used for this session.
 func (s *session) Runtime() *goja.Runtime {
 	return s.vm
 }
@@ -261,12 +261,12 @@ func (s *session) Event() Event {
 }
 
 func init() {
-	// Register mapstr.M as being a simple map[string]interface{} for
+	// Register mapstr.M as being a simple map[string]any for
 	// treatment within the JS VM.
 	AddSessionHook("_type_mapstr", func(s Session) {
 		s.Runtime().RegisterSimpleMapType(reflect.TypeOf(mapstr.M(nil)),
-			func(i interface{}) map[string]interface{} {
-				return map[string]interface{}(i.(mapstr.M))
+			func(i any) map[string]any {
+				return i.(mapstr.M) //nolint:errcheck //keep behavior for now
 			},
 		)
 	})

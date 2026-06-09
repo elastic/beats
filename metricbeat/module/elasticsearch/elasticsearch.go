@@ -19,7 +19,6 @@ package elasticsearch
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -70,9 +69,6 @@ var (
 	//ExpandWildcardsHiddenAvailableVersion is the version since when the "expand_wildcards" query parameter to
 	// the Indices Stats API can accept "hidden" as a value.
 	ExpandWildcardsHiddenAvailableVersion = version.MustNew("7.7.0")
-
-	// Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
-	clusterIDCache = map[string]string{}
 )
 
 // ModuleName is the name of this module.
@@ -118,22 +114,6 @@ type License struct {
 
 type licenseWrapper struct {
 	License License `json:"license"`
-}
-
-// GetClusterID fetches cluster id for given nodeID.
-func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
-	// Check if cluster id already cached. If yes, return it.
-	if clusterID, ok := clusterIDCache[nodeID]; ok {
-		return clusterID, nil
-	}
-
-	info, err := GetInfo(http, uri)
-	if err != nil {
-		return "", err
-	}
-
-	clusterIDCache[nodeID] = info.ClusterID
-	return info.ClusterID, nil
 }
 
 // isMaster checks if the given node host is a master node.
@@ -225,34 +205,6 @@ func fetchPath(http *helper.HTTP, uri, path string, query string) ([]byte, error
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
 	return http.FetchContent()
-}
-
-// GetNodeInfo returns the node information.
-func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error) {
-
-	content, err := fetchPath(http, uri, "/_nodes/_local/nodes", "")
-	if err != nil {
-		return nil, err
-	}
-
-	nodesStruct := struct {
-		Nodes map[string]*NodeInfo `json:"nodes"`
-	}{}
-
-	err = json.Unmarshal(content, &nodesStruct)
-	if err != nil {
-		return nil, err
-	}
-
-	// _local will only fetch one node info. First entry is node name
-	for k, v := range nodesStruct.Nodes {
-		// In case the nodeID is empty, first node info will be returned
-		if k == nodeID || nodeID == "" {
-			v.ID = k
-			return v, nil
-		}
-	}
-	return nil, fmt.Errorf("no node matched id %s", nodeID)
 }
 
 // GetLicense returns license information. Since we don't expect license information
@@ -397,49 +349,6 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	var xpack XPack
 	err = json.Unmarshal(content, &xpack)
 	return xpack, err
-}
-
-// IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
-func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
-	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
-	if err != nil {
-		return false, err
-	}
-
-	var response map[string]map[string]map[string]map[string]bool
-	err = json.Unmarshal(content, &response)
-	if err != nil {
-		return false, err
-	}
-
-	for _, nodeInfo := range response["nodes"] {
-		mlockall := nodeInfo["process"]["mlockall"]
-		return mlockall, nil
-	}
-
-	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
-}
-
-// GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
-func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
-	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
-	if err != nil {
-		return "", err
-	}
-
-	var response struct {
-		Nodes map[string]interface{} `json:"nodes"`
-	}
-
-	if err := json.Unmarshal(content, &response); err != nil {
-		return "", err
-	}
-
-	for nodeID := range response.Nodes {
-		return nodeID, nil
-	}
-
-	return "", errors.New("could not determine master node ID")
 }
 
 // PassThruField copies the field at the given path from the given source data object into

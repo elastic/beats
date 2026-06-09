@@ -1,4 +1,4 @@
-from filebeat import BaseTest
+from filebeat import BaseTest, log_as_filestream
 import os
 import six
 
@@ -110,7 +110,10 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
 
         output = self.read_output()[0]
-        assert sorted(output["tags"]) == ["tag1", "tag2", "tag3", "tag4"]
+        if log_as_filestream():
+            assert sorted(output["tags"]) == ["tag1", "tag2", "tag3", "tag4", "take_over"]
+        else:
+            assert sorted(output["tags"]) == ["tag1", "tag2", "tag3", "tag4"]
 
     def test_config_no_msg_key_filtering(self):
         """

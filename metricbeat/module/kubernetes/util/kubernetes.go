@@ -452,12 +452,12 @@ func addEventHandlersToWatcher(
 	nodeMetricsUpdateFunc := func(node *kubernetes.Node) {
 		nodeName := node.GetObjectMeta().GetName()
 		metrics := NewNodeMetrics()
-		if cpu, ok := node.Status.Capacity["cpu"]; ok {
+		if cpu, ok := node.Status.Allocatable["cpu"]; ok {
 			if q, err := k8sresource.ParseQuantity(cpu.String()); err == nil {
 				metrics.CoresAllocatable = NewFloat64Metric(float64(q.MilliValue()) / 1000)
 			}
 		}
-		if memory, ok := node.Status.Capacity["memory"]; ok {
+		if memory, ok := node.Status.Allocatable["memory"]; ok {
 			if q, err := k8sresource.ParseQuantity(memory.String()); err == nil {
 				metrics.MemoryAllocatable = NewFloat64Metric(float64(q.Value()))
 			}
