@@ -20,8 +20,10 @@
 package collstats
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,10 +57,10 @@ func TestFetch(t *testing.T) {
 
 		// Check a few event Fields
 		db, _ := metricsetFields["db"].(string)
-		assert.NotEqual(t, db, "")
+		assert.NotEqual(t, "", db)
 
 		collection, _ := metricsetFields["collection"].(string)
-		assert.NotEqual(t, collection, "")
+		assert.NotEqual(t, "", collection)
 	}
 }
 
@@ -156,8 +158,10 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			logIfVerbose(t, "Waiting for MongoDB to be healthy...")
 			var containerReady bool
 			for i := 0; i < 30; i++ {
-				healthCmd := exec.Command("docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}") //nolint:gosec // safe integration test
+				healthCtx, healthCancel := context.WithTimeout(context.Background(), 10*time.Second)
+				healthCmd := exec.CommandContext(healthCtx, "docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}") //nolint:gosec // safe integration test
 				output, _ := healthCmd.CombinedOutput()
+				healthCancel()
 				if strings.TrimSpace(string(output)) != "" {
 					containerReady = true
 					break
@@ -167,8 +171,10 @@ func TestFetchStandaloneVersions(t *testing.T) {
 
 			if !containerReady {
 				// Show container status for debugging
-				statusCmd := exec.Command("docker", "ps", "-a", "--filter", fmt.Sprintf("name=%s", projectName), "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}") //nolint:gosec // safe integration test
+				statusCtx, statusCancel := context.WithTimeout(context.Background(), 10*time.Second)
+				statusCmd := exec.CommandContext(statusCtx, "docker", "ps", "-a", "--filter", fmt.Sprintf("name=%s", projectName), "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}") //nolint:gosec // safe integration test
 				statusOutput, _ := statusCmd.CombinedOutput()
+				statusCancel()
 				t.Logf("Container status:\n%s", string(statusOutput))
 
 				// Show logs
@@ -204,8 +210,10 @@ func TestFetchStandaloneVersions(t *testing.T) {
 				t.Logf("Seed script error: %v", err)
 
 				// List running containers for debugging
-				listCmd := exec.Command("docker", "ps", "-a", "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
+				listCtx, listCancel := context.WithTimeout(context.Background(), 10*time.Second)
+				listCmd := exec.CommandContext(listCtx, "docker", "ps", "-a", "--format", "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}")
 				listOutput, _ := listCmd.CombinedOutput()
+				listCancel()
 				t.Logf("Current Docker containers:\n%s", string(listOutput))
 
 				// Show compose logs for debugging
@@ -230,6 +238,71 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			logIfVerbose(t, "Fetched %d collstats events", len(events))
 
 			verifyStandaloneEvents(t, events, tc.expectExtendedStats)
+		})
+	}
+}
+
+func TestFetchShardedMongos(t *testing.T) {
+	relShardedDir := filepath.Join("testing", "mongodb", "sharded")
+	absShardedDir, err := filepath.Abs(relShardedDir)
+	require.NoError(t, err, "resolve sharded directory")
+
+	composeFile := filepath.Join(absShardedDir, "docker-compose.yml")
+	if _, err := os.Stat(composeFile); errors.Is(err, os.ErrNotExist) {
+		t.Skipf("sharded docker-compose file not found: %s", composeFile)
+	}
+
+	initScript := filepath.Join(absShardedDir, "init-sharded-cluster.sh")
+	if _, err := os.Stat(initScript); errors.Is(err, os.ErrNotExist) {
+		t.Skipf("sharded init script not found: %s", initScript)
+	}
+
+	cmdName, prefixArgs := detectComposeCommand(t)
+	cases := []struct {
+		version             string
+		expectExtendedStats bool
+	}{
+		{version: "5.0", expectExtendedStats: false},
+		{version: "7.0", expectExtendedStats: true},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run("mongo_"+strings.ReplaceAll(tc.version, ".", "_"), func(t *testing.T) {
+			projectName := fmt.Sprintf("mbcollstatssharded%s", strings.ReplaceAll(tc.version, ".", ""))
+			cleanupEnv := buildComposeEnv(projectName, tc.version, "")
+
+			t.Setenv("DOCKER_COMPOSE_PROJECT_NAME", projectName)
+			t.Setenv("COMPOSE_PROJECT_NAME", projectName)
+			t.Setenv("MONGO_VERSION", tc.version)
+
+			t.Cleanup(func() {
+				downArgs := []string{"-f", "docker-compose.yml", "down", "-v"}
+				if err := runComposeCommand(cmdName, prefixArgs, absShardedDir, cleanupEnv, downArgs...); err != nil {
+					t.Logf("failed to tear down compose project %s: %v", projectName, err)
+				}
+			})
+
+			// The sharded fixture binds dedicated host ports for the mongos
+			// routers (27117 for mongos1, 27118 for mongos2) to avoid colliding
+			// with the standalone mongodb fixture on 27017. If something else
+			// already owns those ports, "compose up" fails deep inside Docker
+			// with an opaque "port is already allocated" error. Surface that
+			// clearly up front so the failure is actionable instead of flaky.
+			requireHostPortsFree(t, "27117", "27118")
+
+			upArgs := []string{"-f", "docker-compose.yml", "up", "-d"}
+			require.NoError(t, runComposeCommand(cmdName, prefixArgs, absShardedDir, cleanupEnv, upArgs...), "start sharded compose project")
+			require.NoError(t, waitForHealthyContainers(projectName, []string{"config1", "shard1-primary", "shard2-primary"}), "wait for sharded containers")
+			require.NoError(t, runSeedScript(initScript, absShardedDir, cleanupEnv), "initialize sharded cluster")
+
+			f := mbtest.NewReportingMetricSetV2Error(t, getConfig("mongodb://localhost:27117"))
+			events, errs := mbtest.ReportingFetchV2Error(f)
+			require.Empty(t, errs, "expected mongos fetch to fall back from top to listCollections")
+			require.NotEmpty(t, events, "expected collstats events from mongos")
+
+			assertShardedCollectionEvent(t, events, "coll_hash", 20000, tc.expectExtendedStats)
+			assertShardedCollectionEvent(t, events, "coll_range", 20000, tc.expectExtendedStats)
 		})
 	}
 }
@@ -369,6 +442,76 @@ func normalizeNumeric(value interface{}) (float64, bool) {
 	}
 }
 
+func assertShardedCollectionEvent(t *testing.T, events []mb.Event, collectionName string, expectedCount float64, expectExtendedStats bool) {
+	t.Helper()
+
+	for _, event := range events {
+		metricsetFields := event.MetricSetFields
+		collection, _ := metricsetFields["collection"].(string)
+		if collection != collectionName {
+			continue
+		}
+
+		statsValue, ok := metricsetFields["stats"].(mapstr.M)
+		require.True(t, ok, "stats should be map")
+		assertExactNumber(t, statsValue["count"], expectedCount, "stats.count should match sharded documents")
+		if expectExtendedStats {
+			assertExactNumber(t, statsValue["shardCount"], 2, "stats.shardCount should report both shards")
+			assertNonNegativeNumber(t, statsValue["freeStorageSize"], "stats.freeStorageSize should be non-negative")
+		}
+		return
+	}
+
+	t.Fatalf("expected event for sharded collection %s", collectionName)
+}
+
+func waitForHealthyContainers(projectName string, services []string) error {
+	deadline := time.Now().Add(2 * time.Minute)
+	for time.Now().Before(deadline) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		cmd := exec.CommandContext(ctx, "docker", "ps", "--filter", fmt.Sprintf("name=%s", projectName), "--filter", "health=healthy", "--format", "{{.Names}}") //nolint:gosec // safe integration test
+		output, _ := cmd.CombinedOutput()
+		cancel()
+
+		healthyContainers := string(output)
+		allHealthy := true
+		for _, service := range services {
+			expectedName := fmt.Sprintf("%s-%s-1", projectName, service)
+			if !strings.Contains(healthyContainers, expectedName) {
+				allHealthy = false
+				break
+			}
+		}
+		if allHealthy {
+			return nil
+		}
+		time.Sleep(2 * time.Second)
+	}
+
+	return fmt.Errorf("timed out waiting for healthy containers for project %s", projectName)
+}
+
+// requireHostPortsFree fails the test early with an actionable message if any of
+// the given TCP host ports is already bound. The sharded fixture publishes fixed
+// host ports, so a stray MongoDB (e.g. a leftover container from another module's
+// compose project) would otherwise cause an opaque "port is already allocated"
+// failure deep inside "compose up".
+func requireHostPortsFree(t *testing.T, ports ...string) {
+	t.Helper()
+	var dialer net.Dialer
+	for _, port := range ports {
+		addr := net.JoinHostPort("127.0.0.1", port)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		conn, err := dialer.DialContext(ctx, "tcp", addr)
+		cancel()
+		if err == nil {
+			conn.Close()
+			t.Fatalf("host port %s is already in use; the sharded mongos fixture needs it free. "+
+				"Stop any container/process bound to it (e.g. `docker ps --filter publish=%s`) and retry.", port, port)
+		}
+	}
+}
+
 var (
 	composeOnce    sync.Once
 	composeCommand string
@@ -381,7 +524,9 @@ func detectComposeCommand(t *testing.T) (string, []string) {
 
 	composeOnce.Do(func() {
 		if _, err := exec.LookPath("docker"); err == nil {
-			cmd := exec.Command("docker", "compose", "version")
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+			cmd := exec.CommandContext(ctx, "docker", "compose", "version")
 			if err := cmd.Run(); err == nil {
 				composeCommand = "docker"
 				composePrefix = []string{"compose"}
@@ -409,7 +554,9 @@ func runComposeCommand(cmdName string, prefixArgs []string, dir string, env []st
 	commandArgs := append([]string{}, prefixArgs...)
 	commandArgs = append(commandArgs, args...)
 
-	cmd := exec.Command(cmdName, commandArgs...)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, cmdName, commandArgs...)
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), env...)
 
@@ -425,7 +572,9 @@ func runComposeCommandOutput(cmdName string, prefixArgs []string, dir string, en
 	commandArgs := append([]string{}, prefixArgs...)
 	commandArgs = append(commandArgs, args...)
 
-	cmd := exec.Command(cmdName, commandArgs...)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, cmdName, commandArgs...)
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), env...)
 
@@ -440,8 +589,12 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 		shell = "sh"
 	}
 
+	seedTimeout := 5 * time.Minute
+
 	// Create the command - use absolute path to be safe
-	cmd := exec.Command(shell, scriptPath)
+	ctx, cancel := context.WithTimeout(context.Background(), seedTimeout)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, shell, scriptPath)
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), env...)
 
@@ -493,7 +646,6 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 		}
 	}()
 
-	// Wait for the command to finish with a timeout
 	done := make(chan error)
 	go func() {
 		done <- cmd.Wait()
@@ -501,15 +653,13 @@ func runSeedScript(scriptPath, dir string, env []string) error {
 
 	select {
 	case err := <-done:
-		// Wait for output goroutines to finish
 		wg.Wait()
 		if err != nil {
 			return fmt.Errorf("seed script failed with %s: %w\nSTDOUT:\n%s\nSTDERR:\n%s", shell, err, outputBuf.String(), errorBuf.String())
 		}
-	case <-time.After(120 * time.Second):
-		_ = cmd.Process.Kill()
+	case <-ctx.Done():
 		wg.Wait()
-		return fmt.Errorf("seed script timed out after 120 seconds with %s\nSTDOUT:\n%s\nSTDERR:\n%s", shell, outputBuf.String(), errorBuf.String())
+		return fmt.Errorf("seed script timed out after %s with %s\nSTDOUT:\n%s\nSTDERR:\n%s", seedTimeout, shell, outputBuf.String(), errorBuf.String())
 	}
 
 	return nil

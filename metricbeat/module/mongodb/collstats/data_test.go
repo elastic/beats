@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !requirefips && integration
+//go:build !requirefips
 
 package collstats
 
@@ -81,10 +81,47 @@ func TestEventMappingOptionalFields(t *testing.T) {
 	assert.Equal(t, int(1), stats["numOrphanDocs"].(int)) //nolint:errcheck // safe
 	assert.Equal(t, int(2), stats["shardCount"].(int))    //nolint:errcheck // safe
 	assert.Equal(t, 4096, stats["freeStorageSize"].(int)) //nolint:errcheck // safe
-	assert.Equal(t, false, stats["capped"].(bool))        //nolint:errcheck // safe
+	assert.False(t, stats["capped"].(bool))               //nolint:errcheck // safe
 	assert.Equal(t, 1024, stats["scaleFactor"].(int))     //nolint:errcheck // safe
 	_, hasIndexSizes := stats["indexSizes"]
 	assert.False(t, hasIndexSizes)
+}
+
+func TestEventMappingInvalidKey(t *testing.T) {
+	// A key without a "." cannot be split into db.collection and must error.
+	_, err := eventMapping("nodot", mapstr.M{})
+	assert.Error(t, err)
+}
+
+func TestEventMappingOmitsAbsentOptionalFields(t *testing.T) {
+	// When optional fields are absent from source data, they must not appear in stats.
+	data := mapstr.M{
+		"stats": mapstr.M{
+			"size":  1000,
+			"count": 5,
+		},
+	}
+
+	event, err := eventMapping("dbX.collY", data)
+	assert.NoError(t, err)
+
+	stats := event["stats"].(mapstr.M) //nolint:errcheck // safe
+	for _, k := range []string{"numOrphanDocs", "shardCount", "freeStorageSize", "capped", "scaleFactor"} {
+		_, exists := stats[k]
+		assert.Falsef(t, exists, "optional field %q must be absent when not in source", k)
+	}
+}
+
+func TestEventMappingPreservesCollectionWithDots(t *testing.T) {
+	// Collection names may contain dots; only the first dot splits db/collection.
+	data := mapstr.M{
+		"stats": mapstr.M{"count": 1},
+	}
+
+	event, err := eventMapping("mydb.my.dotted.collection", data)
+	assert.NoError(t, err)
+	assert.Equal(t, "mydb", event["db"])
+	assert.Equal(t, "my.dotted.collection", event["collection"])
 }
 
 func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {

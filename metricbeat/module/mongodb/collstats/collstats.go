@@ -121,16 +121,11 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	// Try top command first (works on mongod), fall back to listCollections (works on mongos)
 	collections, err := m.getCollectionsFromTop(client)
 	if err != nil {
-		return fmt.Errorf("top command failed (likely) mongos: %w", err)
-
-		// NOTE(shmsr): This is a specialized feature that is supposed to be for mongos, we will be in adding it
-		// after discussion in later commits. However, disabling the feature for now.
-		//
-		// m.Logger().Debugf("top command failed (likely mongos), falling back to listCollections: %v", err)
-		// collections, err = m.getCollectionsList(client)
-		// if err != nil {
-		// 	return fmt.Errorf("failed to get collections using fallback method: %w", err)
-		// }
+		m.Logger().Debugf("top command failed (likely mongos), falling back to listCollections: %v", err)
+		collections, err = m.getCollectionsList(client)
+		if err != nil {
+			return fmt.Errorf("failed to get collections using fallback method: %w", err)
+		}
 	}
 
 	collStatsErrGroup := &errgroup.Group{}
@@ -256,7 +251,7 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 		results[i] = flattenAggregationResult(results[i])
 	}
 
-	if len(results) == 1 {
+	if len(results) == 1 && !hasShardMetadata(results[0]) {
 		return results[0], nil
 	}
 
@@ -329,7 +324,7 @@ func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]in
 	sumFields := []string{
 		"count", "size", "storageSize", "totalIndexSize", "totalSize",
 		// indexSizes.* intentionally excluded (not collected currently)
-		"numOrphanDocs",
+		"freeStorageSize", "numOrphanDocs",
 	}
 
 	// Fields that should be averaged across shards (weighted by count if available)
@@ -443,6 +438,18 @@ func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]in
 	}
 
 	return merged, nil
+}
+
+func hasShardMetadata(result map[string]interface{}) bool {
+	if result == nil {
+		return false
+	}
+	for _, key := range []string{"shard", "host"} {
+		if _, exists := result[key]; exists {
+			return true
+		}
+	}
+	return false
 }
 
 // convertToFloat64 safely converts various numeric types to float64
@@ -675,36 +682,34 @@ func (m *Metricset) getCollectionsFromTop(client *mongo.Client) ([]CollectionInf
 	return collections, nil
 }
 
-// // getCollectionsList gets all collections from all databases (mongos compatible)
-// // See: https://www.mongodb.com/docs/manual/reference/command/top/
-// // The 'top' command must be run against a mongod instance and running top against a mongos
-// // instance returns an error and hence a mongos compatible implementation is required.
-// func (m *Metricset) getCollectionsList(client *mongo.Client) ([]CollectionInfo, error) {
-// 	// Get list of database names
-// 	dbNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
-// 	if err != nil {
-// 		return nil, fmt.Errorf("could not retrieve database names: %w", err)
-// 	}
+// getCollectionsList gets all collections from all databases (mongos compatible).
+// See: https://www.mongodb.com/docs/manual/reference/command/top/
+// The top command must be run against a mongod instance and running top against a mongos
+// instance returns an error, so mongos needs a listCollections-based fallback.
+func (m *Metricset) getCollectionsList(client *mongo.Client) ([]CollectionInfo, error) {
+	dbNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
+	if err != nil {
+		return nil, fmt.Errorf("could not retrieve database names: %w", err)
+	}
 
-// 	var collections []CollectionInfo
+	var collections []CollectionInfo
+	for _, dbName := range dbNames {
+		db := client.Database(dbName)
+		collNames, err := db.ListCollectionNames(context.Background(), bson.D{})
+		if err != nil {
+			m.Logger().Debugf("failed to list collections for database %s: %v", dbName, err)
+			continue
+		}
 
-// 	for _, dbName := range dbNames {
-// 		db := client.Database(dbName)
-// 		collNames, err := db.ListCollectionNames(context.Background(), bson.D{})
-// 		if err != nil {
-// 			m.Logger().Debugf("Failed to list collections for database %s: %v", dbName, err)
-// 			continue
-// 		}
+		for _, collName := range collNames {
+			collections = append(collections, CollectionInfo{
+				Database:   dbName,
+				Collection: collName,
+				TopInfo:    nil,
+			})
+		}
+	}
 
-// 		for _, collName := range collNames {
-// 			collections = append(collections, CollectionInfo{
-// 				Database:   dbName,
-// 				Collection: collName,
-// 				TopInfo:    nil, // No top info available when using listCollections
-// 			})
-// 		}
-// 	}
-
-// 	m.Logger().Debugf("Found %d collections across %d databases using listCollections", len(collections), len(dbNames))
-// 	return collections, nil
-// }
+	m.Logger().Debugf("Found %d collections across %d databases using listCollections", len(collections), len(dbNames))
+	return collections, nil
+}

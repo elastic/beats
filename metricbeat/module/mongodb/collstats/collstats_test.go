@@ -104,9 +104,9 @@ func TestApplyOptionsToStats_NoClientRescale(t *testing.T) {
 	}
 	result, err := metricset.applyOptionsToStats(stats)
 	assert.NoError(t, err)
-	assert.Equal(t, float64(2048), result["size"])           // Unchanged
-	assert.Equal(t, float64(4096), result["storageSize"])    // Unchanged
-	assert.Equal(t, float64(1024), result["totalIndexSize"]) // Unchanged
+	assert.InDelta(t, float64(2048), result["size"], 0)           // Unchanged
+	assert.InDelta(t, float64(4096), result["storageSize"], 0)    // Unchanged
+	assert.InDelta(t, float64(1024), result["totalIndexSize"], 0) // Unchanged
 	// indexSizes.* are not collected currently
 	_, hasIdx := result["indexSizes"]
 	assert.False(t, hasIdx)
@@ -243,14 +243,18 @@ func TestMergeShardedCollStats(t *testing.T) {
 				assert.Equal(t, tt.expectedSize, size)
 			}
 
-			// For multi-shard tests, verify shardCount reported but no shards breakdown
-			if len(tt.shardResults) > 1 {
+			// Verify shard count and shard metadata cleanup
+			if len(tt.shardResults) > 0 {
 				// Verify shard count
 				shardCount, exists := result["shardCount"]
 				assert.True(t, exists)
 				assert.Equal(t, len(tt.shardResults), shardCount)
 				// No shards breakdown should be present
 				_, exists = result["shards"]
+				assert.False(t, exists)
+				_, exists = result["shard"]
+				assert.False(t, exists)
+				_, exists = result["host"]
 				assert.False(t, exists)
 			}
 		})
@@ -279,6 +283,54 @@ func TestConvertToFloat64(t *testing.T) {
 		{
 			name:     "int32",
 			input:    int32(123),
+			expected: 123.0,
+			success:  true,
+		},
+		{
+			name:     "float32",
+			input:    float32(1.5),
+			expected: 1.5,
+			success:  true,
+		},
+		{
+			name:     "int",
+			input:    int(123),
+			expected: 123.0,
+			success:  true,
+		},
+		{
+			name:     "int8",
+			input:    int8(12),
+			expected: 12.0,
+			success:  true,
+		},
+		{
+			name:     "int16",
+			input:    int16(123),
+			expected: 123.0,
+			success:  true,
+		},
+		{
+			name:     "uint",
+			input:    uint(123),
+			expected: 123.0,
+			success:  true,
+		},
+		{
+			name:     "uint8",
+			input:    uint8(123),
+			expected: 123.0,
+			success:  true,
+		},
+		{
+			name:     "uint16",
+			input:    uint16(123),
+			expected: 123.0,
+			success:  true,
+		},
+		{
+			name:     "uint32",
+			input:    uint32(123),
 			expected: 123.0,
 			success:  true,
 		},
@@ -335,6 +387,138 @@ func TestMergeShardedCollStats_WeightedAverages(t *testing.T) {
 	avgObjSize, exists := result["avgObjSize"]
 	assert.True(t, exists)
 	assert.Equal(t, float64(87.5), avgObjSize)
+}
+
+func TestMergeShardedCollStats_SumsFreeStorageSize(t *testing.T) {
+	shardResults := []map[string]interface{}{
+		{
+			"shard":           "shard01",
+			"count":           int64(10),
+			"freeStorageSize": float64(128),
+		},
+		{
+			"shard":           "shard02",
+			"count":           int64(20),
+			"freeStorageSize": float64(256),
+		},
+	}
+
+	result, err := mergeShardedCollStats(shardResults)
+	assert.NoError(t, err)
+	assert.InDelta(t, float64(384), result["freeStorageSize"], 0)
+}
+
+func TestMergeShardedCollStats_ZeroDocsSetsAvgObjSizeZero(t *testing.T) {
+	// When no documents exist across shards, avgObjSize must be 0 (mongosh parity)
+	// even if a shard reports a stale avgObjSize.
+	shardResults := []map[string]interface{}{
+		{"shard": "shard01", "count": int64(0), "avgObjSize": float64(50)},
+		{"shard": "shard02", "count": int64(0), "avgObjSize": float64(75)},
+	}
+
+	result, err := mergeShardedCollStats(shardResults)
+	assert.NoError(t, err)
+	assert.Equal(t, 0, result["avgObjSize"])
+}
+
+func TestMergeShardedCollStats_WeightedAvgSkipsShardsMissingCount(t *testing.T) {
+	// A shard missing count must not contribute to the weighted avgObjSize.
+	shardResults := []map[string]interface{}{
+		{"shard": "shard01", "count": int64(100), "avgObjSize": float64(40)},
+		// no count -> excluded from weighting AND from totalDocCount
+		{"shard": "shard02", "avgObjSize": float64(1000)},
+	}
+
+	result, err := mergeShardedCollStats(shardResults)
+	assert.NoError(t, err)
+	// totalDocCount = 100, weightedSum = 40*100 -> 4000/100 = 40
+	assert.InDelta(t, float64(40), result["avgObjSize"].(float64), 0.0001) //nolint:errcheck // safe
+}
+
+func TestMergeShardedCollStats_MaxFieldsTakeMaximum(t *testing.T) {
+	shardResults := []map[string]interface{}{
+		{"shard": "shard01", "count": int64(1), "max": int64(100), "maxSize": float64(2048)},
+		{"shard": "shard02", "count": int64(1), "max": int64(500), "maxSize": float64(1024)},
+	}
+
+	result, err := mergeShardedCollStats(shardResults)
+	assert.NoError(t, err)
+	assert.InDelta(t, float64(500), result["max"].(float64), 0)      //nolint:errcheck // safe
+	assert.InDelta(t, float64(2048), result["maxSize"].(float64), 0) //nolint:errcheck // safe
+}
+
+func TestMergeShardedCollStats_RemovesLocalTimeMetadata(t *testing.T) {
+	shardResults := []map[string]interface{}{
+		{"shard": "shard01", "host": "h1", "localTime": "t1", "count": int64(5)},
+	}
+
+	result, err := mergeShardedCollStats(shardResults)
+	assert.NoError(t, err)
+	_, hasLocalTime := result["localTime"]
+	assert.False(t, hasLocalTime)
+}
+
+func TestMergeShardedCollStats_IgnoresNonNumericSummableFields(t *testing.T) {
+	// A non-numeric value for a summable field must be skipped, not crash or coerce.
+	shardResults := []map[string]interface{}{
+		{"shard": "shard01", "count": "not-a-number", "size": float64(10)},
+		{"shard": "shard02", "count": int64(7), "size": float64(20)},
+	}
+
+	result, err := mergeShardedCollStats(shardResults)
+	assert.NoError(t, err)
+	// Only the numeric count contributes.
+	assert.Equal(t, int64(7), result["count"].(int64))          //nolint:errcheck // safe
+	assert.InDelta(t, float64(30), result["size"].(float64), 0) //nolint:errcheck // safe
+}
+
+func TestHasShardMetadata(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    map[string]interface{}
+		expected bool
+	}{
+		{name: "nil", input: nil, expected: false},
+		{name: "no metadata", input: map[string]interface{}{"count": int64(1)}, expected: false},
+		{name: "has shard", input: map[string]interface{}{"shard": "s1"}, expected: true},
+		{name: "has host", input: map[string]interface{}{"host": "h1"}, expected: true},
+		{name: "has both", input: map[string]interface{}{"shard": "s1", "host": "h1"}, expected: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, hasShardMetadata(tt.input))
+		})
+	}
+}
+
+func TestFlattenAggregationResult_NilInput(t *testing.T) {
+	assert.Nil(t, flattenAggregationResult(nil))
+}
+
+func TestFlattenAggregationResult_StorageStatsWrongType(t *testing.T) {
+	// storageStats present but not a map must be returned unchanged (no panic).
+	input := map[string]interface{}{
+		"storageStats": "unexpected-string",
+		"size":         float64(5),
+	}
+	out := flattenAggregationResult(input)
+	assert.Equal(t, "unexpected-string", out["storageStats"])
+	assert.InDelta(t, float64(5), out["size"].(float64), 0) //nolint:errcheck // safe
+	// Nothing lifted, so scaleFactor default path is not applied for this branch.
+	_, hasScaleFactor := out["scaleFactor"]
+	assert.False(t, hasScaleFactor)
+}
+
+func TestFlattenAggregationResult_DefaultsScaleFactorWhenAbsent(t *testing.T) {
+	// storageStats present without scaleFactor -> default to 1.
+	input := map[string]interface{}{
+		"storageStats": map[string]interface{}{
+			"size": float64(100),
+		},
+	}
+	out := flattenAggregationResult(input)
+	assert.Equal(t, 1, out["scaleFactor"])
 }
 
 func TestParseVersion(t *testing.T) {

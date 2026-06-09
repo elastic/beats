@@ -146,7 +146,7 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.size`**
-:   The total uncompressed memory size of all records in a collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
+:   The total uncompressed size in memory of all records in a collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
 
     type: long
 
@@ -188,7 +188,7 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.nindexes`**
-:   The number of indexes in the collection. All collections have at least one index in the `_id` field. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
+:   The number of indexes on the collection. All collections have at least one index on the _id field. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
 
     type: long
 
@@ -206,7 +206,7 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.scaleFactor`** {applies_to}`stack: ga 9.2.0`
-:   Scale factor applied to size-related metrics (for example, 1 or 1024). Use to derive raw byte counts if metrics are scaled.
+:   Scale factor applied to size-related metrics (for example, `1` or `1024`). Use to derive raw byte counts if metrics are scaled.
 
     type: long
 

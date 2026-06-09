@@ -30,6 +30,8 @@ shell_cmd() {
   echo "mongo"
 }
 
+PRIMARY_CHECK='const primary = rs.status().members.find(m => m.stateStr === "PRIMARY"); if (!primary) { quit(1); }'
+
 # Container names with project prefix
 CONFIG1="${PROJECT_PREFIX}-config1-1"
 CONFIG2="${PROJECT_PREFIX}-config2-1"
@@ -53,7 +55,7 @@ docker exec "$CONFIG1" $CFG_SHELL --quiet --port 27019 --eval "rs.initiate({_id:
 
 # Wait for config RS to elect primary
 echo "Waiting for config RS to elect primary..."
-retry docker exec "$CONFIG1" $CFG_SHELL --quiet --port 27019 --eval "rs.status().members.find(m => m.stateStr === 'PRIMARY')"
+retry docker exec "$CONFIG1" $CFG_SHELL --quiet --port 27019 --eval "$PRIMARY_CHECK"
 
 # Init shard01 (without arbiters for MongoDB 7.0 compatibility)
 echo "Initializing shard01..."
@@ -62,7 +64,7 @@ docker exec "$SHARD1_PRIMARY" $S1_SHELL --quiet --port 27018 --eval "rs.initiate
 
 # Wait for shard01 primary
 echo "Waiting for shard01 primary..."
-retry docker exec "$SHARD1_PRIMARY" $S1_SHELL --quiet --port 27018 --eval "rs.status().members.find(m => m.stateStr === 'PRIMARY')"
+retry docker exec "$SHARD1_PRIMARY" $S1_SHELL --quiet --port 27018 --eval "$PRIMARY_CHECK"
 
 # Init shard02 (without arbiters for MongoDB 7.0 compatibility)
 echo "Initializing shard02..."
@@ -71,7 +73,7 @@ docker exec "$SHARD2_PRIMARY" $S2_SHELL --quiet --port 27018 --eval "rs.initiate
 
 # Wait for shard02 primary
 echo "Waiting for shard02 primary..."
-retry docker exec "$SHARD2_PRIMARY" $S2_SHELL --quiet --port 27018 --eval "rs.status().members.find(m => m.stateStr === 'PRIMARY')"
+retry docker exec "$SHARD2_PRIMARY" $S2_SHELL --quiet --port 27018 --eval "$PRIMARY_CHECK"
 
 # Wait for mongos to be reachable
 echo "Waiting for mongos to be ready..."
@@ -99,8 +101,16 @@ db.createCollection('coll_hash')
 sh.shardCollection('mbtest.coll_hash', { userId: 'hashed' })
 
 // Seed some docs
+let batch = []
 for (let i = 0; i < 20000; i++) {
-  db.coll_hash.insertOne({ _id: i, userId: i % 1000, payload: 'y'.repeat((i % 128) + 1) })
+  batch.push({ _id: i, userId: i % 1000, payload: 'y'.repeat((i % 128) + 1) })
+  if (batch.length === 1000) {
+    db.coll_hash.insertMany(batch)
+    batch = []
+  }
+}
+if (batch.length > 0) {
+  db.coll_hash.insertMany(batch)
 }
 db.coll_hash.createIndex({ userId: 1 })
 
@@ -113,11 +123,23 @@ sh.moveChunk('mbtest.coll_range', { userId: -1 }, 'shard01')
 sh.moveChunk('mbtest.coll_range', { userId: 1 }, 'shard02')
 
 // Seed ranged docs
+batch = []
 for (let i = -10000; i < 0; i++) {
-  db.coll_range.insertOne({ _id: i, userId: i, payload: 'z'.repeat(((-i) % 64) + 1) })
+  batch.push({ _id: i, userId: i, payload: 'z'.repeat(((-i) % 64) + 1) })
+  if (batch.length === 1000) {
+    db.coll_range.insertMany(batch)
+    batch = []
+  }
 }
 for (let i = 1; i <= 10000; i++) {
-  db.coll_range.insertOne({ _id: i, userId: i, payload: 'z'.repeat((i % 64) + 1) })
+  batch.push({ _id: i, userId: i, payload: 'z'.repeat((i % 64) + 1) })
+  if (batch.length === 1000) {
+    db.coll_range.insertMany(batch)
+    batch = []
+  }
+}
+if (batch.length > 0) {
+  db.coll_range.insertMany(batch)
 }
 db.coll_range.createIndex({ userId: 1 })
 
@@ -125,4 +147,4 @@ print('Sharded cluster initialized and seeded')
 JS
 
 echo "Done initializing sharded cluster."
-echo "You can now connect to mongos at localhost:27017"
+echo "You can now connect to mongos at localhost:27117"
