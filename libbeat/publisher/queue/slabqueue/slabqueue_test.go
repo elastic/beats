@@ -19,6 +19,7 @@ package slabqueue
 
 import (
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -651,9 +652,10 @@ func TestSlotMemoryClearedOnAck(t *testing.T) {
 	b.Done()
 
 	// The slot's event reference should now be nil so the GC can reclaim it.
-	for i := range pool.storage {
-		assert.Nil(t, pool.storage[i].event, "slot %d should have a nil event after Done", i)
-		assert.Nil(t, pool.storage[i].producer, "slot %d should have no producer after Done", i)
+	for i := 0; i < pool.Capacity(); i++ {
+		s := pool.slot(i)
+		assert.Nil(t, s.event, "slot %d should have a nil event after Done", i)
+		assert.Nil(t, s.producer, "slot %d should have no producer after Done", i)
 	}
 }
 
@@ -717,4 +719,475 @@ func TestConcurrentPublishersAndConsumers(t *testing.T) {
 	}
 
 	assert.Equal(t, poolSize, pool.Available(), "all slots should be released")
+}
+
+// TestSetTargetGrowsImmediately verifies raising the target adds capacity right
+// away.
+func TestSetTargetGrowsImmediately(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 2}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	p := q.Producer(queue.ProducerConfig{})
+
+	for i := 0; i < 2; i++ {
+		_, ok := p.TryPublish(i)
+		require.True(t, ok)
+	}
+	_, ok := p.TryPublish(99)
+	require.False(t, ok, "pool is full at its initial capacity")
+
+	pool.setTarget(4)
+	assert.Equal(t, 4, pool.Capacity())
+	assert.Equal(t, 4, pool.Target())
+
+	for i := 0; i < 2; i++ {
+		_, ok := p.TryPublish(100 + i)
+		require.True(t, ok, "the two slots added by the grow must be acquirable")
+	}
+	_, ok = p.TryPublish(102)
+	assert.False(t, ok, "pool is full again at the grown capacity")
+}
+
+// TestSetTargetGrowWakesBlockedProducer verifies a producer blocked on a full
+// pool is unblocked when a higher target adds a slot.
+func TestSetTargetGrowWakesBlockedProducer(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	p := q.Producer(queue.ProducerConfig{})
+
+	_, ok := p.TryPublish(1)
+	require.True(t, ok)
+	require.Equal(t, 0, pool.Available(), "pool is now full")
+
+	done := make(chan bool, 1)
+	go func() {
+		_, ok := p.Publish(2) // blocks: no slot until the pool grows
+		done <- ok
+	}()
+
+	// Give the producer time to park, then grow.
+	require.Eventually(t, func() bool {
+		// waiters is incremented under gmu once the producer parks.
+		return pool.free.waiters.Load() == 1
+	}, time.Second, time.Millisecond, "producer should park on the full pool")
+
+	pool.setTarget(2)
+
+	select {
+	case ok := <-done:
+		assert.True(t, ok, "the blocked Publish should succeed once the grow adds a slot")
+	case <-time.After(time.Second):
+		t.Fatal("growing the pool did not wake the blocked producer")
+	}
+}
+
+// TestBlockedProducerWakesOnClose verifies a parked producer returns (0,false)
+// when its queue is closed rather than blocking forever.
+func TestBlockedProducerWakesOnClose(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	p := q.Producer(queue.ProducerConfig{})
+
+	_, ok := p.TryPublish(1)
+	require.True(t, ok)
+
+	done := make(chan bool, 1)
+	go func() {
+		_, ok := p.Publish(2)
+		done <- ok
+	}()
+	require.Eventually(t, func() bool {
+		return pool.free.waiters.Load() == 1
+	}, time.Second, time.Millisecond)
+
+	q.Close(true)
+	select {
+	case ok := <-done:
+		assert.False(t, ok, "Publish must fail when the queue closes while blocked")
+	case <-time.After(time.Second):
+		t.Fatal("closing the queue did not wake the blocked producer")
+	}
+}
+
+// TestShrinkConvergesWhenFree verifies SetTarget shrinks immediately when all
+// slots are free.
+func TestShrinkConvergesWhenFree(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 8}, nil)
+	defer pool.Shutdown()
+
+	pool.setTarget(3)
+	assert.Equal(t, 3, pool.Target())
+	assert.Equal(t, 3, pool.Capacity(), "all slots free: shrink converges immediately")
+	assert.Equal(t, 3, pool.Available())
+}
+
+// TestShrinkFlooredByLiveEvents verifies the shrink cannot drop below the live
+// (unacked) events and converges once they drain.
+func TestShrinkFlooredByLiveEvents(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 8}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	p := q.Producer(queue.ProducerConfig{})
+
+	for i := 0; i < 8; i++ {
+		_, ok := p.TryPublish(i)
+		require.True(t, ok)
+	}
+	require.Equal(t, 0, pool.Available(), "pool full, all 8 live")
+
+	pool.setTarget(3)
+	assert.Equal(t, 3, pool.Target())
+	assert.Equal(t, 8, pool.Capacity(), "cannot retire slots while every slot is live")
+
+	// Draining the live events lets the shrink converge to the target.
+	drainOnce(t, q)
+	assert.Eventually(t, func() bool { return pool.Capacity() == 3 }, time.Second, time.Millisecond,
+		"capacity converges to target once the high slots are released")
+	assert.Equal(t, 3, pool.Available())
+}
+
+// TestShrinkConvergesUnderSustainedLoad guards the property that a shrink keeps
+// making progress while the pool is kept full by live traffic. The lazy shrink
+// retires only the top slot once it is free, and the free list hands slots back
+// out LIFO, so in principle a freed high slot could be re-acquired before the
+// shrink retires it. This test pins the pool full with several producers and a
+// draining consumer, then lowers the target and asserts the pool still
+// converges all the way down — i.e. the re-acquire window never stalls
+// convergence, because the shrink check runs on every release.
+func TestShrinkConvergesUnderSustainedLoad(t *testing.T) {
+	const (
+		poolSize  = 64
+		producers = 8
+		target    = 8
+	)
+	pool := NewPool[int](Settings{Events: poolSize}, nil)
+	q := pool.Connect()
+
+	stop := make(chan struct{})
+	var wg sync.WaitGroup
+
+	// Producers hammer the queue, blocking when the pool is full. With more
+	// producers than the single consumer can drain, the pool stays saturated.
+	for k := 0; k < producers; k++ {
+		p := q.Producer(queue.ProducerConfig{})
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-stop:
+					return
+				default:
+				}
+				if _, ok := p.Publish(0); !ok {
+					return
+				}
+			}
+		}()
+	}
+	// Consumer drains small batches continuously so slots keep being released
+	// (which is what drives the shrink) while the pool stays under pressure.
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			b, err := q.Get(4)
+			if err != nil {
+				return
+			}
+			b.Done()
+		}
+	}()
+
+	// Clean up regardless of assertion outcome: stop the workers, force the
+	// pool down to unblock anyone parked, and wait for the goroutines.
+	defer func() {
+		close(stop)
+		pool.Shutdown()
+		wg.Wait()
+	}()
+
+	// Make sure we are genuinely shrinking under load: wait until most of the
+	// pool is live before lowering the target, so the shrink must contend with
+	// live traffic rather than a near-empty pool.
+	require.Eventually(t, func() bool {
+		return pool.Capacity()-pool.Available() >= poolSize*3/4
+	}, 2*time.Second, time.Millisecond, "pool should be under load before shrinking")
+
+	pool.setTarget(target)
+
+	// Despite the pool being kept full, capacity must converge all the way to
+	// the target as live events drain. A generous bound keeps this robust on
+	// slow/loaded CI while still failing if convergence ever stalls.
+	require.Eventually(t, func() bool { return pool.Capacity() == target }, 10*time.Second, 5*time.Millisecond,
+		"capacity must converge to the target even under sustained load")
+	assert.Equal(t, target, pool.Target())
+}
+
+// TestTrailingChunkReclamation verifies that shrinking across a chunk boundary
+// drops the now-unused trailing chunk.
+func TestTrailingChunkReclamation(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 100}, nil)
+	defer pool.Shutdown()
+	require.Equal(t, 1, len(pool.dir.Load().chunks))
+
+	// Raise the target past one chunk so a second chunk is allocated.
+	pool.setTarget(slabChunkSize + 500)
+	require.Equal(t, 2, len(pool.dir.Load().chunks))
+
+	// Nothing is live, so shrinking back drops the trailing chunk.
+	pool.setTarget(100)
+	assert.Equal(t, 100, pool.Capacity())
+	assert.Equal(t, 1, len(pool.dir.Load().chunks), "trailing chunk must be reclaimed on shrink")
+}
+
+// TestPerQueueCapBlocksWhilePoolHasRoom verifies a queue's own cap blocks it
+// even when the pool still has free slots. A larger sibling queue keeps the
+// shared pool sized above the small queue's cap, so the small queue blocking at
+// its cap (not the pool) is observable.
+func TestPerQueueCapBlocksWhilePoolHasRoom(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	// The pool is driven by the queues: max(8, 4) = 8.
+	qBig := pool.Connect()
+	qBig.SetTarget(8)
+	qSmall := pool.Connect()
+	qSmall.SetTarget(4)
+	require.Equal(t, 8, pool.Target(), "pool tracks the largest queue cap")
+
+	p := qSmall.Producer(queue.ProducerConfig{})
+	for i := 0; i < 4; i++ {
+		_, ok := p.TryPublish(i)
+		require.True(t, ok, "publish %d within the per-queue cap should succeed", i)
+	}
+	_, ok := p.TryPublish(99)
+	assert.False(t, ok, "publishing beyond the per-queue cap must fail even with pool slots free")
+	assert.Equal(t, 4, pool.Available(), "only the per-queue cap blocked; the pool still has 4 free slots")
+}
+
+// TestPerQueueCapsAreIndependent verifies two queues on one pool each enforce
+// their own cap while the pool is sized to the larger of them (the example from
+// the design: a 4-cap and an 8-cap queue share an 8-slot pool, not 12).
+func TestPerQueueCapsAreIndependent(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	q1 := pool.Connect()
+	q1.SetTarget(4)
+	q2 := pool.Connect()
+	q2.SetTarget(8)
+	require.Equal(t, 8, pool.Target(), "pool is sized to the larger cap, not the sum")
+	p1 := q1.Producer(queue.ProducerConfig{})
+	p2 := q2.Producer(queue.ProducerConfig{})
+
+	// q1 caps at its own 4 regardless of pool room.
+	for i := 0; i < 4; i++ {
+		_, ok := p1.TryPublish(i)
+		require.True(t, ok)
+	}
+	_, ok := p1.TryPublish(99)
+	assert.False(t, ok, "q1 is capped at 4")
+
+	// q2 may use the rest of the shared 8-slot pool (4 slots remain), then the
+	// pool is full even though q2's own cap (8) is not reached.
+	for i := 0; i < 4; i++ {
+		_, ok := p2.TryPublish(i)
+		require.True(t, ok)
+	}
+	assert.Equal(t, 0, pool.Available(), "pool full: q1's 4 + q2's 4 = 8")
+	_, ok = p2.TryPublish(99)
+	assert.False(t, ok, "pool is full even though q2's own cap is not reached")
+}
+
+// TestPerQueueCapUnblocksOnDrain verifies a producer blocked on the per-queue
+// cap (while the pool still has room) resumes once an event on that queue is
+// acked.
+func TestPerQueueCapUnblocksOnDrain(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	qBig := pool.Connect()
+	qBig.SetTarget(16) // keep the shared pool roomy
+	q := pool.Connect()
+	q.SetTarget(2)
+	p := q.Producer(queue.ProducerConfig{})
+	p.Publish(1)
+	p.Publish(2)
+
+	done := make(chan bool, 1)
+	go func() { _, ok := p.Publish(3); done <- ok }() // blocks: this queue at its cap
+
+	require.Eventually(t, func() bool { return q.limWaiters.Load() == 1 }, time.Second, time.Millisecond,
+		"producer should park on the per-queue cap, not the pool")
+	require.Greater(t, pool.Available(), 0, "the pool is not the constraint here")
+
+	// Ack one event on this queue: returns a per-queue budget unit.
+	b, err := q.Get(1)
+	require.NoError(t, err)
+	b.Done()
+
+	select {
+	case ok := <-done:
+		assert.True(t, ok, "blocked Publish should resume after an event drains")
+	case <-time.After(time.Second):
+		t.Fatal("Publish blocked on the per-queue cap did not unblock after a drain")
+	}
+}
+
+// TestQueueSetTargetRaiseUnblocks verifies raising a queue's cap immediately
+// unblocks a producer parked on the old cap (and grows the pool to match).
+func TestQueueSetTargetRaiseUnblocks(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	q.SetTarget(1)
+	p := q.Producer(queue.ProducerConfig{})
+	p.Publish(1)
+
+	done := make(chan bool, 1)
+	go func() { _, ok := p.Publish(2); done <- ok }()
+	require.Eventually(t, func() bool { return q.limWaiters.Load() == 1 }, time.Second, time.Millisecond)
+
+	q.SetTarget(2) // raises the cap and grows the pool to 2
+
+	select {
+	case ok := <-done:
+		assert.True(t, ok, "raising the cap should unblock the producer")
+	case <-time.After(time.Second):
+		t.Fatal("raising the per-queue cap did not unblock the producer")
+	}
+}
+
+// TestPerQueueCapWakesOnClose verifies a producer parked on the per-queue cap
+// returns (0,false) when the queue is closed.
+func TestPerQueueCapWakesOnClose(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 1}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	q.SetTarget(1)
+	p := q.Producer(queue.ProducerConfig{})
+	p.Publish(1)
+
+	done := make(chan bool, 1)
+	go func() { _, ok := p.Publish(2); done <- ok }()
+	require.Eventually(t, func() bool { return q.limWaiters.Load() == 1 }, time.Second, time.Millisecond)
+
+	q.Close(true)
+
+	select {
+	case ok := <-done:
+		assert.False(t, ok, "Publish blocked on the per-queue cap must fail when the queue closes")
+	case <-time.After(time.Second):
+		t.Fatal("closing did not wake the producer blocked on the per-queue cap")
+	}
+}
+
+// TestSetTargetGrowAcrossChunkBoundaryPreservesEvents verifies events published
+// before a grow are still readable after the directory swap (the chunked
+// storage must not move existing slots).
+func TestSetTargetGrowAcrossChunkBoundaryPreservesEvents(t *testing.T) {
+	pool := NewPool[int](Settings{Events: 4}, nil)
+	defer pool.Shutdown()
+	q := pool.Connect()
+	p := q.Producer(queue.ProducerConfig{})
+
+	for i := 0; i < 4; i++ {
+		_, ok := p.TryPublish(i)
+		require.True(t, ok)
+	}
+	// Raise the target across the first chunk boundary while events are live.
+	pool.setTarget(slabChunkSize + 10)
+
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	require.Equal(t, 4, b.Count())
+	for i := 0; i < 4; i++ {
+		assert.Equal(t, i, b.Entry(i), "event survives the grow/directory swap")
+	}
+	b.Done()
+}
+
+// TestResizeUnderConcurrentTraffic hammers SetTarget (growing and shrinking)
+// concurrently with live producers and consumers. Run with -race; the test
+// passes if every published event is delivered and the pool never deadlocks or
+// corrupts.
+func TestResizeUnderConcurrentTraffic(t *testing.T) {
+	const (
+		pipelines = 4
+		perPipe   = 2000
+	)
+	pool := NewPool[int](Settings{Events: 64}, nil)
+
+	var delivered atomic.Int64
+	var wg sync.WaitGroup
+
+	for i := 0; i < pipelines; i++ {
+		q := pool.Connect()
+		p := q.Producer(queue.ProducerConfig{})
+
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+			for j := 0; j < perPipe; j++ {
+				if _, ok := p.Publish(j); !ok {
+					return
+				}
+			}
+		}()
+		go func(q *Queue[int]) {
+			defer wg.Done()
+			got := 0
+			for got < perPipe {
+				b, err := q.Get(0)
+				if err != nil {
+					return
+				}
+				got += b.Count()
+				delivered.Add(int64(b.Count()))
+				b.Done()
+			}
+		}(q)
+	}
+
+	// Resizer: oscillate the budget while traffic flows.
+	stop := make(chan struct{})
+	resizerDone := make(chan struct{})
+	go func() {
+		defer close(resizerDone)
+		sizes := []int{16, 256, 32, slabChunkSize + 8, 48, 8}
+		k := 0
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+			}
+			pool.setTarget(sizes[k%len(sizes)])
+			k++
+		}
+	}()
+
+	wg.Wait()
+	close(stop)
+	<-resizerDone
+
+	assert.Equal(t, int64(pipelines*perPipe), delivered.Load(),
+		"every published event must be delivered exactly once across resizes")
+	pool.Shutdown()
+}
+
+// drainOnce returns and acks all currently-queued events on q. It assumes at
+// least one event is available so Get does not block.
+func drainOnce[T any](t *testing.T, q *Queue[T]) int {
+	t.Helper()
+	b, err := q.Get(0)
+	require.NoError(t, err)
+	n := b.Count()
+	b.Done()
+	return n
 }
