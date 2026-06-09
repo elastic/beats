@@ -936,16 +936,16 @@ func TestShrinkConvergesUnderSustainedLoad(t *testing.T) {
 func TestTrailingChunkReclamation(t *testing.T) {
 	pool := NewPool[int](Settings{Events: 100}, nil)
 	defer pool.Shutdown()
-	require.Equal(t, 1, len(pool.dir.Load().chunks))
+	require.Len(t, pool.dir.Load().chunks, 1)
 
 	// Raise the target past one chunk so a second chunk is allocated.
 	pool.setTarget(slabChunkSize + 500)
-	require.Equal(t, 2, len(pool.dir.Load().chunks))
+	require.Len(t, pool.dir.Load().chunks, 2)
 
 	// Nothing is live, so shrinking back drops the trailing chunk.
 	pool.setTarget(100)
 	assert.Equal(t, 100, pool.Capacity())
-	assert.Equal(t, 1, len(pool.dir.Load().chunks), "trailing chunk must be reclaimed on shrink")
+	assert.Len(t, pool.dir.Load().chunks, 1, "trailing chunk must be reclaimed on shrink")
 }
 
 // TestPerQueueCapBlocksWhilePoolHasRoom verifies a queue's own cap blocks it
@@ -1024,7 +1024,7 @@ func TestPerQueueCapUnblocksOnDrain(t *testing.T) {
 
 	require.Eventually(t, func() bool { return q.limWaiters.Load() == 1 }, time.Second, time.Millisecond,
 		"producer should park on the per-queue cap, not the pool")
-	require.Greater(t, pool.Available(), 0, "the pool is not the constraint here")
+	require.Positive(t, pool.Available(), "the pool is not the constraint here")
 
 	// Ack one event on this queue: returns a per-queue budget unit.
 	b, err := q.Get(1)

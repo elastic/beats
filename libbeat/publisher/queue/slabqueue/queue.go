@@ -201,7 +201,7 @@ func (q *Queue[T]) isClosing() bool {
 // a pool-global counter so concurrent producers tend to land on different
 // shards.
 func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
-	home := int(q.pool.homeCounter.Add(1)-1) & q.pool.free.mask
+	home := int(q.pool.homeCounter.Add(1) & uint64(q.pool.free.mask)) //nolint:gosec // G115: masked by the shard count, always a small non-negative index
 	return &producer[T]{queue: q, cfg: cfg, home: home}
 }
 
