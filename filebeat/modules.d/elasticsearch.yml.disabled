@@ -28,6 +28,12 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  querylog:
+    enabled: false
+    # Set custom paths for the query log (NDJSON) files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
   deprecation:
     enabled: false
     # Set custom paths for the log files. If left empty,

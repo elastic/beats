@@ -77,7 +77,7 @@ func TestProcNetTCP(t *testing.T) {
 			addr := []string{"FOO:BAR", "BAR:BAZ"}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
-			assert.EqualValues(t, addr, bad)
+			assert.Equal(t, addr, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
 			}
@@ -136,7 +136,7 @@ func TestProcNetTCP(t *testing.T) {
 			addr := []string{"FOO:BAR", "BAR:BAZ"}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
 			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
-			assert.EqualValues(t, addr, bad)
+			assert.Equal(t, addr, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
 			}

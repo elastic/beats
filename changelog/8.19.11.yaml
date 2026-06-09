@@ -1,0 +1,138 @@
+version: 8.19.11
+entries:
+    - kind: bug-fix
+      summary: Add check for incorrect length values in PostgreSQL datarow parser.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/47872
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1764705900
+      file:
+        name: 1764705900-add-check-for-incorrect-length-values-in-postgres-datarow-parser.yaml
+        checksum: 29b1bc792c4927f4427176524041317a8fdb0fd1
+    - kind: bug-fix
+      summary: Fix windows install script to properly migrate legacy state data.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48293
+      issue:
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1767358805
+      file:
+        name: 1767358805-fix-windows-install-script-state-migration.yaml
+        checksum: 57f8502fbc577d358504910d7c4aa4a5105f0e78
+    - kind: bug-fix
+      summary: Remove use of github.com/elastic/elastic-agent-client from OSS Beats.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/48353
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1767906742
+      file:
+        name: 1767906742-remove-use-of-github.com-elastic-elastic-agent-client-from-oss-beats.yaml
+        checksum: 2d0b79871378511592c2bcf4ecd14e1fe624c864
+    - kind: bug-fix
+      summary: Fix AD Entity Analytics failing to fetch users when Base DN contains a group CN.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48395
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1768282953
+      file:
+        name: 1768282953-entityanalytics-bugfix.yaml
+        checksum: 7153b86f90ce007d15e7d3f0956deb68e40ae451
+    - kind: bug-fix
+      summary: Fix Filebeat goroutine leak when using harvester_limit.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48445
+      issue:
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1768571944
+      file:
+        name: 1768571944-fix-goroutine-leak-startharvester.yaml
+        checksum: be2f16a1052162efa480f72c5c19c0c080b2bbe4
+    - kind: bug-fix
+      summary: Fix procfs network parsers.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48428
+      issue:
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1768584444
+      file:
+        name: 1768584444-fix-procfs-network-parsers.yaml
+        checksum: c0770e703a6407b265073bbcd4cef246d6febc1f
+    - kind: bug-fix
+      summary: Fix Thrift struct parser oob bug.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48498
+      issue:
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1769021837
+      file:
+        name: 1769021837-fix-thrift-struct-parser-oob-bug.yaml
+        checksum: c8a64ad82f3623fab9c4d3e8c0a9d8b8d4995a35
+    - kind: other
+      summary: heartbeat-upgrade-node-lts-22
+      description: Upgrade NodeJS version to latest LTS v22.22.
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48480
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1769091139
+      file:
+        name: 1769091139-heartbeat-upgrade-node-lts-22.yaml
+        checksum: aea7266753875511c230613916aacddb977dfa7a
+    - kind: bug-fix
+      summary: Clean up and add checks to SIP parser.
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48514
+      issue:
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1769107368
+      file:
+        name: 1769107368-clean-up-sip-parsers.yaml
+        checksum: 82764c16d63d44c58320ea156c9a56e6e3e56c25
+    - kind: bug-fix
+      summary: Fix potential array access panics & infinite loops in postgres parser
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48528
+      issue:
+        - https://github.com/elastic/beats/issues/47665
+      impact: ""
+      action: ""
+      timestamp: 1769202503
+      file:
+        name: 1769202503-clean-up-postgres-array-access.yaml
+        checksum: 453dafca8ceb6137c763d3b49ed64d9bfa933fb9

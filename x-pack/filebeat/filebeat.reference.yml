@@ -818,6 +818,12 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  querylog:
+    enabled: false
+    # Set custom paths for the query log (NDJSON) files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
   deprecation:
     enabled: false
     # Set custom paths for the log files. If left empty,
@@ -1501,7 +1507,7 @@ filebeat.modules:
 # - enabled: Set to true to enable user-password authentication
 # - client.id: Client ID for user-password authentication
 # - client.secret: Client secret for user-password authentication
-# - token_url: Token URL for user-password authentication
+# - token_url: Salesforce OAuth host or canonical token endpoint for user-password authentication
 # - username: Username for user-password authentication
 # - password: Password for user-password authentication
 
@@ -1511,7 +1517,7 @@ filebeat.modules:
 # - client.username: Username for JWT authentication
 # - client.key_path: Path to client key for JWT authentication
 # - url: Audience URL for JWT authentication
-# - token_url: Token URL for JWT authentication
+# - token_url: Salesforce OAuth host or canonical token endpoint for JWT authentication
 
 # Event Monitoring:
 # - real_time: Set to true to enable real-time logging using object type data collection
@@ -1642,7 +1648,7 @@ filebeat.modules:
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
 
 #--------------------------------- Snyk Module ---------------------------------
@@ -1796,6 +1802,9 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/urls/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -1808,6 +1817,9 @@ filebeat.modules:
     # The URL used for Threat Intel API calls.
     var.url: https://urlhaus-api.abuse.ch/v1/payloads/recent/
 
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
+
     # The interval to poll the API for updates.
     var.interval: 10m
 
@@ -1819,6 +1831,9 @@ filebeat.modules:
 
     # The URL used for Threat Intel API calls.
     var.url: https://mb-api.abuse.ch/api/v1/
+
+    # The Auth Key used for Threat Intel API calls.
+    var.api_token: API_TOKEN
 
     # The interval to poll the API for updates.
     var.interval: 10m
@@ -2355,7 +2370,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -2450,7 +2465,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -3102,6 +3117,7 @@ filebeat.inputs:
   #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
 
   # Bucket Name used for polling non-AWS S3 buckets
+  # Note: `region` is required when non_aws_bucket_name is given.
   #non_aws_bucket_name: test-s3-bucket
 
   # Configures the AWS S3 API to use path style instead of virtual host style (default)
@@ -3307,6 +3323,39 @@ filebeat.inputs:
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
 
+# The storage backend for the registry. Supported values are "memlog" and
+# "otel_file_storage". The default is "memlog", which uses an in-memory log
+# with periodic disk flushing. The "otel_file_storage" backend stores state
+# using the same on-disk layout as the OpenTelemetry Collector file_storage
+# extension (under registry.path).
+# NOTE: The "otel_file_storage" backend is in technical preview (available
+# since 9.5) and may be changed or removed in a future release.
+#filebeat.registry.backend: memlog
+
+# ----------------------- OTel file_storage backend settings -------------------
+# NOTE: This configuration section is in technical preview (available since 9.5)
+# and may be changed or removed in a future release.
+# These settings apply only when filebeat.registry.backend is set to
+# "otel_file_storage". Registry data files live under filebeat.registry.path;
+# optional fields below map to the OpenTelemetry file_storage extension config.
+# The running beat name (for example "filebeat") is used as the OpenTelemetry
+# receiver identity for storage client file naming; no separate setting is used.
+#
+#filebeat.registry.otel_file_storage.timeout: 1s
+#filebeat.registry.otel_file_storage.fsync: false
+# Filebeat defaults create_directory to true when no otel_file_storage
+# section is provided. When otel_file_storage is configured explicitly,
+# the upstream default (false) applies unless overridden here.
+#filebeat.registry.otel_file_storage.create_directory: true
+# directory_permissions defaults to "0700" when create_directory is true
+# and directory_permissions is not set explicitly.
+#filebeat.registry.otel_file_storage.directory_permissions: "0700"
+#filebeat.registry.otel_file_storage.recreate: false
+#
+# See the OpenTelemetry Collector file_storage extension documentation for
+# compaction and other nested options:
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage
+
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
 # every time a new Elasticsearch connection is established.
@@ -3491,7 +3540,10 @@ filebeat.inputs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
+#      wait_for_metadata: false
+#      wait_for_metadata_timeout: 30s
+#      wait_for_metadata_retry_period: 10s
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -4149,7 +4201,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -4956,6 +5008,30 @@ logging.files:
 # Controls the fraction of mutex contention events that are reported in the
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
+
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 

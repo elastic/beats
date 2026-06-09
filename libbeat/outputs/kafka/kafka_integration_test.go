@@ -22,6 +22,7 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand/v2"
 	"os"
@@ -64,6 +65,11 @@ func TestKafkaPublish(t *testing.T) {
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
 	logType := fmt.Sprintf("log-type-%s", id)
+
+	// Topic auto-creation is asynchronous; wait for leaders before publishing to avoid
+	// "no leader for this partition" failures during leadership election.
+	ensureKafkaTopicReadyForWrites(t, testTopic)
+	ensureKafkaTopicReadyForWrites(t, logType)
 
 	tests := []struct {
 		title  string
@@ -288,13 +294,15 @@ func TestKafkaPublish(t *testing.T) {
 			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, output.index, "testbeat")
+			assert.Equal(t, "testbeat", output.index)
 			defer output.Close()
 
-			// publish test events
+			// Publish asynchronously; OnSignal runs for any terminal outcome (ACK, retry, drop, ...).
 			var wg sync.WaitGroup
+			batches := make([]*outest.Batch, 0, len(test.events))
 			for i := range test.events {
 				batch := outest.NewBatch(test.events[i].events...)
+				batches = append(batches, batch)
 				batch.OnSignal = func(_ outest.BatchSignal) {
 					wg.Done()
 				}
@@ -306,8 +314,10 @@ func TestKafkaPublish(t *testing.T) {
 				}
 			}
 
-			// wait for all published batches to be ACKed
+			// Wait until the output has finished handling every batch (not necessarily ACKed).
 			wg.Wait()
+			// Failed publishes signal BatchRetryEvents; only proceed to read the topic after ACK.
+			requiretBatchesACKed(t, batches)
 
 			expected := flatten(test.events)
 
@@ -317,7 +327,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			// validate messages
 			if len(expected) != len(stored) {
-				assert.Equal(t, len(stored), len(expected))
+				assert.Len(t, stored, len(expected))
 				return
 			}
 
@@ -346,7 +356,7 @@ func TestKafkaPublish(t *testing.T) {
 				msg := validate(t, s.Value, expected)
 				seenMsgs[msg] = struct{}{}
 			}
-			assert.Equal(t, len(expected), len(seenMsgs))
+			assert.Len(t, seenMsgs, len(expected))
 		})
 	}
 }
@@ -354,6 +364,7 @@ func TestKafkaPublish(t *testing.T) {
 func TestKafkaErrors(t *testing.T) {
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
+	ensureKafkaTopicReadyForWrites(t, testTopic)
 
 	tests := []struct {
 		title        string
@@ -406,7 +417,7 @@ func TestKafkaErrors(t *testing.T) {
 		if err := output.Connect(context.Background()); err != nil {
 			t.Fatal(err)
 		}
-		assert.Equal(t, output.index, "testbeat")
+		assert.Equal(t, "testbeat", output.index)
 		defer output.Close()
 
 		// publish test events
@@ -424,7 +435,7 @@ func TestKafkaErrors(t *testing.T) {
 			}
 		}
 
-		// wait for all published batches to be ACKed
+		// Wait until handling completes; this test expects a drop/retry, not necessarily ACK.
 		wg.Wait()
 
 		t.Cleanup(func() {
@@ -520,6 +531,51 @@ func getTestSASLKafkaHost() string {
 	)
 }
 
+func ensureKafkaTopicReadyForWrites(t *testing.T, topic string) {
+	t.Helper()
+
+	saramaCfg := sarama.NewConfig()
+	saramaCfg.Version = sarama.V2_1_0_0
+	hosts := []string{getTestKafkaHost()}
+
+	admin, err := sarama.NewClusterAdmin(hosts, saramaCfg)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, admin.Close())
+	})
+
+	topicDetail := &sarama.TopicDetail{
+		NumPartitions:     3,
+		ReplicationFactor: 1,
+	}
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		err = admin.CreateTopic(topic, topicDetail, false)
+		if err != nil && !errors.Is(err, sarama.ErrTopicAlreadyExists) {
+			require.NoError(ct, err)
+		}
+	}, 30*time.Second, 200*time.Millisecond, "failed to create topic %s", topic)
+
+	client, err := sarama.NewClient(hosts, saramaCfg)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, client.Close())
+	})
+
+	require.EventuallyWithTf(t, func(ct *assert.CollectT) {
+		require.NoError(ct, client.RefreshMetadata(topic))
+
+		partitions, err := client.Partitions(topic)
+		require.NoError(ct, err)
+		require.NotEmpty(ct, partitions)
+
+		for _, partition := range partitions {
+			leader, err := client.Leader(topic, partition)
+			require.NoError(ct, err)
+			require.NotNil(ct, leader)
+		}
+	}, 30*time.Second, 200*time.Millisecond, "topic %s is not ready for writes", topic)
+}
+
 func makeConfig(t *testing.T, in map[string]interface{}) *config.C {
 	cfg, err := config.NewConfigFrom(in)
 	if err != nil {
@@ -581,6 +637,8 @@ func (m *topicOffsetMap) SetOffset(topic string, partition int32, offset int64) 
 
 var testTopicOffsets = topicOffsetMap{}
 
+// testReadFromKafkaTopic consumes up to nMessages from topic across all partitions.
+// Returns after timeout even when fewer than nMessages were read (caller must assert count).
 func testReadFromKafkaTopic(
 	t *testing.T, topic string, nMessages int,
 	timeout time.Duration,
@@ -626,17 +684,28 @@ func testReadFromKafkaTopic(
 	var messages []*sarama.ConsumerMessage
 	timer := time.After(timeout)
 
+readLoop:
 	for len(messages) < nMessages {
 		select {
 		case msg := <-msgs:
 			messages = append(messages, msg)
 		case <-timer:
-			break
+			break readLoop
 		}
 	}
 
 	close(done)
 	return messages
+}
+
+// requiretBatchesACKed fails if the kafka client finished the batch with retry/drop instead of ACK.
+func requiretBatchesACKed(t *testing.T, batches []*outest.Batch) {
+	t.Helper()
+	for _, batch := range batches {
+		require.NotEmpty(t, batch.Signals, "expected publish batch to receive a signal")
+		last := batch.Signals[len(batch.Signals)-1]
+		require.Equal(t, outest.BatchACK, last.Tag, "expected batch to be ACKed, got %v", last.Tag)
+	}
 }
 
 func flatten(infos []eventInfo) []beat.Event {

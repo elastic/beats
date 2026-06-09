@@ -19,6 +19,7 @@ package testing
 
 // ChanClient implements Client interface, forwarding published events to some
 import (
+	"context"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -46,6 +47,10 @@ func (pub *TestPublisher) Connect() (beat.Client, error) {
 
 func (pub *TestPublisher) ConnectWith(_ beat.ClientConfig) (beat.Client, error) {
 	return pub.client, nil
+}
+
+func (pub *TestPublisher) Disconnect(ctx context.Context) error {
+	return pub.client.Close()
 }
 
 func NewChanClientWithCallback(bufSize int, callback func(event beat.Event)) *ChanClient {

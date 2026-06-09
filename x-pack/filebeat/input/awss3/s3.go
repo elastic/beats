@@ -17,17 +17,29 @@ import (
 
 func (in *s3PollerInput) createS3API(ctx context.Context) (*awsS3API, error) {
 	s3Client := s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier)
-	regionName, err := getRegionForBucket(ctx, s3Client, in.config.getBucketName())
-	if err != nil {
-		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
+
+	var regionName string
+	var err error
+
+	// For non-AWS buckets: use the user-configured region (validated in config.Validate).
+	if in.config.NonAWSBucketName != "" {
+		regionName = in.config.RegionName
+	} else {
+		// For AWS buckets: call getRegionForBucket for AWS buckets to determine the correct region
+		// even if the region is already configured in in.config.RegionName, it will be ignored
+		regionName, err = getRegionForBucket(ctx, s3Client, in.config.getBucketName())
+		if err != nil {
+			return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
+		}
 	}
-	// Can this really happen?
+
+	// If detected region differs from awsConfig region, update it
 	if regionName != in.awsConfig.Region {
 		in.awsConfig.Region = regionName
 		s3Client = s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier)
 	}
 
-	return newAWSs3API(s3Client), nil
+	return newAWSs3API(s3Client, in.log), nil
 }
 
 func createPipelineClient(pipeline beat.Pipeline, acks *awsACKHandler) (beat.Client, error) {

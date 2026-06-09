@@ -111,13 +111,13 @@ type ContainerStatus interface {
 	HostForPort(int) string
 }
 
-// Project is a docker-compose project
+// Project is a docker compose project
 type Project struct {
 	Driver
 	logger *logp.Logger
 }
 
-// NewProject creates a new docker-compose project
+// NewProject creates a new docker compose project
 func NewProject(name string, files []string, logger *logp.Logger) (*Project, error) {
 	if len(files) == 0 {
 		return nil, errors.New("project needs at least one file")

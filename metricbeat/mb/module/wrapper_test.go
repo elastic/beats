@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
@@ -112,7 +112,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -143,7 +143,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New())
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -190,7 +190,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 				"hosts":      hosts,
 			})
 
-			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 			require.NoError(t, err)
 
 			done := make(chan struct{})
@@ -221,7 +221,7 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	})
 
 	registry := newTestRegistry(t)
-	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beat.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), beatmonitoring.NewMonitoring(), paths.New(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -252,7 +252,7 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), paths.New(), logp.NewNopLogger())
 	require.NoError(t, err)
 
-	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beat.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())
+	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], beatmonitoring.NewMonitoring(), logp.NewNopLogger(), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})

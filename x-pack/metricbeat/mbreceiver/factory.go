@@ -12,7 +12,6 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
@@ -26,15 +25,15 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
 	Name = "metricbeatreceiver"
 )
 
-func createDefaultConfig() component.Config {
-	return &Config{}
+type Settings struct {
+	Home string
+	Data string
 }
 
 func createReceiver(ctx context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
@@ -43,11 +42,7 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 		return nil, fmt.Errorf("could not convert otel config to metricbeat config")
 	}
 	settings := cmd.MetricbeatSettings(Name)
-	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
-	if err != nil {
-		return nil, fmt.Errorf("error making global processors: %w", err)
-	}
-	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
+	settings.Processing = processing.MakeDefaultSupport(true, nil, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
@@ -57,31 +52,39 @@ func createReceiver(ctx context.Context, set receiver.Settings, baseCfg componen
 	}
 
 	beatCreator := beater.DefaultCreator()
-	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator)
+	br, err := xpInstance.NewBeatReceiver(ctx, b, beatCreator, set)
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 	return &metricbeatReceiver{BeatReceiver: br}, nil
 }
 
-// copied from metricbeat cmd.
-func defaultProcessors() []mapstr.M {
-	// processors:
-	//   - add_host_metadata: ~
-	//   - add_cloud_metadata: ~
-	//   - add_docker_metadata: ~
-	//   - add_kubernetes_metadata: ~
-	return []mapstr.M{
-		{"add_host_metadata": nil},
-		{"add_cloud_metadata": nil},
-		{"add_docker_metadata": nil},
-		{"add_kubernetes_metadata": nil},
-	}
+// NewFactory creates a new receiver Factory with empty default paths.
+// It is compatible with the OpenTelemetry Collector Builder, which expects
+// parameterless NewFactory functions.
+func NewFactory() receiver.Factory {
+	return NewFactoryWithSettings(Settings{})
 }
 
-func NewFactory() receiver.Factory {
+// NewFactoryWithSettings creates a new receiver Factory.  The supplied
+// Settings.Home should be the path that contains the "module"
+// directory so modules can be found and loaded.  The supplied
+// Settings.Data should point to the directory where state information
+// will be kept.  Both can be overridden by passing in path
+// information in the configuration when the receiver in instantiated.
+// This just provides defaults.
+func NewFactoryWithSettings(s Settings) receiver.Factory {
 	return receiver.NewFactory(
 		component.MustNewType(Name),
-		createDefaultConfig,
+		func() component.Config {
+			return &Config{
+				Beatconfig: map[string]any{
+					"path": map[string]any{
+						"home": s.Home,
+						"data": s.Data,
+					},
+				},
+			}
+		},
 		receiver.WithLogs(createReceiver, component.StabilityLevelAlpha))
 }

@@ -35,7 +35,7 @@ var taskSchema = s.Schema{
 }
 
 type GroupedTasks struct {
-	Tasks map[string]map[string]interface{} `json:"tasks"`
+	Tasks map[string]map[string]any `json:"tasks"`
 }
 
 // Get the value from the environment for the TASK_RUNTIME_THRESHOLD_IN_SECONDS_NAME field.
@@ -54,6 +54,14 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 
 		if err != nil {
 			errs = append(errs, fmt.Errorf("failed applying task schema for %v: %w", taskId, err))
+			continue
+		}
+
+		// the schema validated that the value exists as a string
+		taskType, _ := task.GetValue("task_type")
+
+		// skip persistent tasks
+		if taskType == "persistent" {
 			continue
 		}
 
@@ -97,13 +105,12 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 		tasks = append(tasks, mapstr.M{"task": task})
 	}
 
-	transactionId := utils.NewUUIDV4()
-	e.CreateAndReportEvents(r, info, tasks, transactionId)
+	e.CreateAndReportEventsWithoutTransactionId(r, info, tasks)
 
 	err := errors.Join(errs...)
 
 	if err != nil {
-		e.LogAndSendErrorEvent(err, info, r, TasksMetricSet, TasksPath, transactionId)
+		e.LogAndSendErrorEventWithoutTransactionId(err, info, r, TasksMetricSet, TasksPath)
 	}
 
 	return nil

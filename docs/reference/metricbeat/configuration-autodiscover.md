@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-autodiscover.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Autodiscover [configuration-autodiscover]
@@ -35,7 +36,7 @@ It has the following settings:
 :   (Optional) Specify the time of inactivity before stopping the running configuration for a container, disabled by default.
 
 `labels.dedot`
-:   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+:   (Optional) If set to `true`, replaces dots in labels with `_`. Defaults to `true`.
 
 These are the fields available within config templating. The `docker.*` fields will be available on each emitted event. event:
 

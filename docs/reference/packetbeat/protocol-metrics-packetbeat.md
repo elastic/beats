@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/protocol-metrics-packetbeat.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Protocol-Specific Metrics [protocol-metrics-packetbeat]

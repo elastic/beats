@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # filestream input [filebeat-input-filestream]
@@ -402,6 +403,8 @@ Different `file_identity` methods can be configured to suit the environment wher
 
 Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
+In 9.x, scanner fingerprinting is enabled by default. When you explicitly configure a non-fingerprint `file_identity` (for example `native`, `path`, or `inode_marker`) and do not explicitly set `prospector.scanner.fingerprint.enabled`, Filebeat automatically disables scanner fingerprinting for that input.
+
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
 ::::
@@ -418,7 +421,7 @@ $$$filebeat-input-filestream-file-identity-fingerprint$$$
 :   The default behavior of Filebeat is to identify files based on content by hashing a specific range (0 to 1024 bytes by default).
 
 ::::{warning}
-In order to use this file identity option, you must enable the [fingerprint option in the scanner](#filebeat-input-filestream-scan-fingerprint). Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+This file identity option uses file fingerprints produced by the [scanner](#filebeat-input-filestream-scan-fingerprint), which are enabled by default in 9.x. If you explicitly disable scanner fingerprinting, this file identity will not work. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
 ::::
 
 
@@ -736,6 +739,23 @@ When set to `true`, enables GZIP file reading with auto-detection.
 
 The maximum number of bytes that a single log message can have. All bytes after `message_max_bytes` are discarded and not sent. The default is 10MB (10485760).
 
+### `line_terminator` [filebeat-input-filestream-line-terminator]
+
+Specifies the characters used to separate lines in the input file. The default is `auto`.
+
+Valid values:
+
+* `auto`: Automatic detection of LF and CR+LF line endings (U+000A and U+000D U+000A).
+* `line_feed`: Line feed (LF, `\n`, U+000A).
+* `vertical_tab`: Vertical tab (VT, `\v`, U+000B).
+* `form_feed`: Form feed (FF, `\f`, U+000C).
+* `carriage_return`: Carriage return (CR, `\r`, U+000D).
+* `carriage_return_line_feed`: Carriage return followed by line feed (CR+LF, `\r\n`, U+000D U+000A).
+* `next_line`: Next line (NEL, U+0085).
+* `line_separator`: Line separator (LS, U+2028).
+* `paragraph_separator`: Paragraph separator (PS, U+2029).
+* `null_terminator`: Null character (`\u0000`, U+0000).
+
 ### `parsers` [_parsers]
 
 This option expects a list of parsers that the log line has to go through.
@@ -747,6 +767,7 @@ Available parsers:
 * `container`
 * `syslog`
 * `include_message`
+* `auditd`
 
 In this example, Filebeat is reading multiline messages that consist of 3 lines and are encapsulated in single-line JSON objects. The multiline message is stored under the key `msg`.
 
@@ -906,6 +927,42 @@ This example shows you how to include messages that start with the string ERR or
     - include_message.patterns: ["^ERR", "^WARN"]
 ```
 
+#### `auditd` [filebeat-input-filestream-parsers-auditd]
+
+```{applies_to}
+stack: ga 9.5.0
+```
+
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
+
+The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
+
+:::{note}
+This parser is only supported on Linux. On other platforms, configuring it returns an error.
+:::
+
+The supported configuration options are:
+
+**`log_errors`**
+:   (Optional) If `true`, parse errors are logged via the Filebeat logger. Defaults to `false`.
+
+**`add_error_key`**
+:   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
+
+Example configuration:
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: auditd-logs
+    paths:
+      - /var/log/audit/audit.log
+    parsers:
+      - auditd:
+          log_errors: true
+          add_error_key: true
+```
+
 ### `encoding` [_encoding_2]
 
 The file encoding to use for reading data that contains international characters. See the encoding names [recommended by the W3C for use in HTML5](http://www.w3.org/TR/encoding/).
@@ -947,7 +1004,7 @@ Valid encodings:
 * `ebcdic-1040`: IBM CodePage 1140
 * `ebcdic-1047`: IBM CodePage 1047
 * `koi8r`: KOI8-R, Russian (Cyrillic)
-* `koi8u`: KOI8-U, Ukranian (Cyrillic)
+* `koi8u`: KOI8-U, Ukrainian (Cyrillic)
 * `macintosh`: Macintosh encoding
 * `macintosh-cyrillic`: Macintosh Cyrillic encoding
 * `windows1250`: Windows1250, Central and Eastern European

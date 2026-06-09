@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-tcp.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # TCP input [filebeat-input-tcp]
@@ -69,7 +70,7 @@ Specify the characters used to split the incoming events. The default is *\n*.
 
 ### `max_connections` [filebeat-input-tcp-tcp-max-connections]
 
-The at most number of connections to accept at any given point in time.
+The maximum number of concurrent connections to accept at any given point in time. The default is `0`, which means no limit on concurrent connections.
 
 
 ### `timeout` [filebeat-input-tcp-tcp-timeout]

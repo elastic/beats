@@ -1,0 +1,337 @@
+version: 9.3.3
+entries:
+    - kind: bug-fix
+      summary: Fix possessive "its" and "currnet" typos in packetbeat configuration and field descriptions
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49641
+      issue:
+        - https://github.com/elastic/beats/issues/49600
+      impact: ""
+      action: ""
+      timestamp: 1742774400
+      file:
+        name: 1742774400-fix-typos-packetbeat.yaml
+        checksum: 8079d10cf37247239d1a027942a62cf1910477da
+    - kind: bug-fix
+      summary: Fix typos in crowdstrike, o365, okta, and santa module docs and field descriptions
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49642
+      issue:
+        - https://github.com/elastic/beats/issues/49082
+        - https://github.com/elastic/beats/issues/49156
+      impact: ""
+      action: ""
+      timestamp: 1742774400
+      file:
+        name: 1742774400-fix-typos-security-service-integrations.yaml
+        checksum: 3e4010b9c8b033d0a9fb46026c3b1ff3346f9738
+    - kind: bug-fix
+      summary: Fix Filestream take_over causing file re-ingestion when used with autodiscover.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49632
+      issue:
+        - https://github.com/elastic/beats/issues/49579
+      impact: ""
+      action: ""
+      timestamp: 1769099693
+      file:
+        name: 1769099693-filestream-takeover-autodiscover-reingest.yaml
+        checksum: 02bf52d1b46f0a82ef608bf2b6e3a17f69c676e8
+    - kind: feature
+      summary: Add retry back-off logic to streaming input CrowdStrike follower.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/48542
+      issue:
+        - https://github.com/elastic/beats/issues/46072
+      impact: ""
+      action: ""
+      timestamp: 1769459211
+      file:
+        name: 1769459211-46072-streaming.yaml
+        checksum: cd27d0f69811a5d9d8d285e515080c93f7bb9504
+    - kind: feature
+      summary: Add client secret authentication support to Azure App Insights module
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48880
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771338300
+      file:
+        name: 1771338300-app_insights_oauth2.yaml
+        checksum: 557fe880424eb18132ad13cb26662b5b0298dbad
+    - kind: feature
+      summary: Add secret_state config to CEL input for encrypted storage of secrets accessible as state.secret.
+      description: |
+        Add a secret_state configuration field to the CEL input. When configured in a
+        Fleet integration package with secret: true, the values are stored encrypted by
+        Fleet. At runtime, the contents are placed at state.secret and unconditionally
+        redacted in debug logs. The key "secret" in the plain-text state configuration
+        is reserved and rejected by validation to prevent accidental unencrypted storage
+        of values intended to be secret.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49207
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1772518423
+      file:
+        name: 1772518423-cel-secret-state.yaml
+        checksum: c9a5aa25293105b6179110a465c79469cfc34ea6
+    - kind: bug-fix
+      summary: Fix compatibility of the Journald input with journald/systemd versions < 242.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49445
+      issue:
+        - https://github.com/elastic/beats/issues/48152
+      impact: ""
+      action: ""
+      timestamp: 1772726727
+      file:
+        name: 1772726727-fix-journald-args.yaml
+        checksum: 42da1da7de918242c04279e10c156af5fa642e1e
+    - kind: enhancement
+      summary: Allow string and number arrays in httpjson chained configurations.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49391
+      issue:
+        - https://github.com/elastic/integrations/pull/16662
+      impact: ""
+      action: ""
+      timestamp: 1773196999
+      file:
+        name: 1773196999-allow-string-number-array-in-httpjson-chain.yaml
+        checksum: 6facbcbd3a399e9994ae712a7d6f35501ef4bcd1
+    - kind: bug-fix
+      summary: Fix an issue that could delay reporting shutdown of Agent components
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/49414
+      issue:
+        - https://github.com/elastic/beats/issues/49388
+      impact: ""
+      action: ""
+      timestamp: 1773263871
+      file:
+        name: 1773263871-beats-manager-shutdown.yaml
+        checksum: ce03f266ea8feba8ba256ca93ab4b42e98422b41
+    - kind: bug-fix
+      summary: Add rate-limit backoff to CrowdStrike streaming input oauth2 transport.
+      description: |
+        Wrap the oauth2 HTTP transport used by the CrowdStrike falcon streaming input
+        with a rate-limit-aware transport that intercepts 429 responses, reads the
+        Retry-After header, and backs off before retrying. This prevents the oauth2
+        token refresh from generating a burst of unauthorized requests that triggers
+        CrowdStrike's 15-per-minute rate limit. The discover endpoint also returns a
+        retry-after hint to the session-level retry loop as a minimum wait floor.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49453
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773350293
+      file:
+        name: 1773350293-crowdstrike-streaming-rate-limit.yaml
+        checksum: 192fd919deed2507eee194da678b2ad1c6248a34
+    - kind: bug-fix
+      summary: Reduce AutoOps logging from info to debug for polling
+      description: ""
+      component: elastic-agent
+      pr:
+        - https://github.com/elastic/beats/pull/49507
+      issue:
+        - https://github.com/elastic/beats/issues/49506
+      impact: ""
+      action: ""
+      timestamp: 1773700260
+      file:
+        name: 1773700260-reduce-autoops-logging-from-info-to-debug.yaml
+        checksum: 01c5fa9a899530476e29e3224297ce43e5825ad0
+    - kind: bug-fix
+      summary: Fix unnecessary Windows filesystem metricset errors from non-existent volumes.
+      description: Fixes an issue where filesystem metric collection on Windows could report errors for volumes that are no longer present. Updated to gosigar v0.14.4.
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49553
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773868374
+      file:
+        name: 1773868374-update-gosigar-to-v0.14.4.yaml
+        checksum: 96b5d86dd4f2c2211bbb3e7129b5e195b583a78d
+    - kind: enhancement
+      summary: Update OTel Collector components to v0.148.0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49578
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1773943383
+      file:
+        name: 1773943383-bump-otel-148.yaml
+        checksum: 2ffd84b282caacaf48cf45caf17f2b3a805b88e1
+    - kind: bug-fix
+      summary: Fix grammar errors in user-facing reference docs (dashboard agreement, pipelines spelling, settings agreement, configuring usage)
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49638
+      issue:
+        - https://github.com/elastic/beats/issues/49432
+      impact: ""
+      action: ""
+      timestamp: 1774377466
+      file:
+        name: 1774377466-fix-typos-docs-ingest.yaml
+        checksum: a8ee6ca4c3ee63e8420ce247235293f1f216f335
+    - kind: bug-fix
+      summary: Fix duplicated word "the the" in mysqlenterprise module documentation
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49639
+      issue:
+        - https://github.com/elastic/beats/issues/49335
+      impact: ""
+      action: ""
+      timestamp: 1774377476
+      file:
+        name: 1774377476-fix-typos-mysqlenterprise.yaml
+        checksum: 4f272cf6a884d7fc6d33a0b93c4cc3456047fee2
+    - kind: bug-fix
+      summary: Fix "realtive" → "relative" typo in heartbeat browser field description
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49640
+      issue:
+        - https://github.com/elastic/beats/issues/49496
+      impact: ""
+      action: ""
+      timestamp: 1774377534
+      file:
+        name: 1774377534-fix-typos-heartbeat-browser-fields.yaml
+        checksum: 9d953a962cecab79d78f379c6ce87e34b2470b3e
+    - kind: bug-fix
+      summary: Fix duplicated word "the the" in ECS field descriptions (7 occurrences in fields.ecs.yml)
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/49645
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+      impact: ""
+      action: ""
+      timestamp: 1774377933
+      file:
+        name: 1774377933-fix-ecs-fields-the-the.yaml
+        checksum: 6b89dd2f53ce559484d9c66a425ee9ef1815111c
+    - kind: bug-fix
+      summary: Fixed a bug where escaped characters in syslog structured data caused an EOF error.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49392
+      issue:
+        - https://github.com/elastic/beats/issues/43944
+      impact: ""
+      action: ""
+      timestamp: 1774398300
+      file:
+        name: 1774398300-fixed-bug-where-escaped-characters-in-syslog-structured-data-caused-an-eof-error.yaml
+        checksum: 4dd199cc4efd8a8b8af7b4acb265bd6c4e0b27c6
+    - kind: enhancement
+      summary: Add support for URL and URL query parsing and formatting in the Streaming input CEL environment.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49653
+      issue:
+        - https://github.com/elastic/integrations/issues/17875
+      impact: ""
+      action: ""
+      timestamp: 1774403004
+      file:
+        name: 1774403004-i17875-proofpoint_on_demand.yaml
+        checksum: 5e4f39451f2a1f5421ad299d6ecb4db08b9fcf63
+    - kind: bug-fix
+      summary: Skip request tracer path validation when tracing is disabled to prevent input startup failures.
+      description: |
+        The startup path validation in cel, httpjson, http_endpoint, and entity
+        analytics inputs checked whether the tracer config struct was non-nil rather
+        than whether tracing was enabled. Integration package templates always include
+        a tracer block (with enabled defaulting to false), so the struct is never nil.
+        Under the agentless/otel runtime the relative tracer path resolves outside the
+        permitted directory, causing all affected inputs to fail immediately even though
+        tracing was disabled. The config-level Validate methods already used the correct
+        enabled() guard; the startup paths now do the same.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49655
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774437109
+      file:
+        name: 1774437109-fix-tracer-path-disabled.yaml
+        checksum: 1291fa5be0b49c860fb7db169a156b64ec9514fd
+    - kind: other
+      summary: upgrade nodejs to v22.22.2
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49815
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774969420
+      file:
+        name: 1774969420-dependency-upgrade-nodejs-v22.22.2.yaml
+        checksum: 615f5399d69e72410168d02039f0f48c0b100a47
+    - kind: bug-fix
+      summary: Fix Filebeat crash loop when running under Elastic Agent and taking too long to initialise
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/49796
+      issue:
+        - https://github.com/elastic/beats/issues/49512
+      impact: ""
+      action: ""
+      timestamp: 1774984035
+      file:
+        name: 1774984035-move-manager-start.yaml
+        checksum: 587e23bafca6e29ff4ab0b72c8973968a9854ff6
+    - kind: bug-fix
+      summary: Skip record ID gap detection for forwarded Windows events.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49819
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1775006120
+      file:
+        name: 1775006120-winlog-forwarded-gap-detection.yaml
+        checksum: a47de04e8bc0ff6eab2e47527e5f6b236bc9c86a

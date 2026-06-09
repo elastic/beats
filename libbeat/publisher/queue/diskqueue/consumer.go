@@ -20,6 +20,7 @@ package diskqueue
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -28,7 +29,7 @@ type diskQueueBatch struct {
 	frames []*readFrame
 }
 
-func (dq *diskQueue) Get(eventCount int) (queue.Batch, error) {
+func (dq *diskQueue) Get(eventCount int) (queue.Batch[publisher.Event], error) {
 	// We can always eventually read at least one frame unless the queue or the
 	// consumer is closed.
 	frame, ok := <-dq.readerLoop.output
@@ -93,7 +94,7 @@ func (batch *diskQueueBatch) Count() int {
 	return len(batch.frames)
 }
 
-func (batch *diskQueueBatch) Entry(i int) queue.Entry {
+func (batch *diskQueueBatch) Entry(i int) publisher.Event {
 	return batch.frames[i].event
 }
 
@@ -102,4 +103,17 @@ func (batch *diskQueueBatch) FreeEntries() {
 
 func (batch *diskQueueBatch) Done() {
 	batch.queue.acks.addFrames(batch.frames)
+}
+
+// Release is a no-op for the disk queue. When the consumer abandons an
+// in-flight batch (e.g. on shutdown), the underlying frames remain on
+// disk so they can be re-delivered on the next process start. We
+// deliberately do *not* remove them: the input's registry has not
+// advanced (no ACK fired), and the next process will both re-read from
+// the input and recover the disk-queue frames, but the at-least-once
+// contract is preserved either way. Removing the frames here would
+// align disk-queue state with the input registry but is the more
+// invasive change; we defer that to a separate consideration if it
+// turns out to be needed in practice.
+func (batch *diskQueueBatch) Release() {
 }

@@ -37,13 +37,13 @@ terraformDestroy() {
 }
 
 dockerUp() {
-  echo "~~~ Run docker-compose services for emulated cloud env"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml up -d
+  echo "~~~ Run docker compose services for emulated cloud env"
+  docker compose -f .buildkite/deploy/docker/docker-compose.yml up -d
 }
 
 dockerTeardown() {
   echo "~~~ Docker Compose Teardown"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
+  docker compose -f .buildkite/deploy/docker/docker-compose.yml down -v
 }
 
 terraformSetup() {

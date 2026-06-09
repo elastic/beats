@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-kubernetes.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Kubernetes fields [exported-fields-kubernetes]
 
@@ -1501,6 +1502,12 @@ kubernetes container metrics
 
 **`kubernetes.container.id`**
 :   Container id
+
+    type: keyword
+
+
+**`kubernetes.container.type`**
+:   Container type (container or init)
 
     type: keyword
 

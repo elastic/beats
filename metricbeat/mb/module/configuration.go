@@ -20,7 +20,7 @@ package module
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -34,7 +34,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 
 	// Pass in placeholder monitoring for the module wrappers since this
 	// isn't a real beat startup.
-	mon := beat.NewMonitoring()
+	mon := beatmonitoring.NewMonitoring()
 
 	for _, moduleCfg := range modulesData {
 		module, err := NewWrapper(moduleCfg, registry, logger, mon, p, moduleOptions...)

@@ -35,12 +35,12 @@ func TestStore(t *testing.T) {
 
 	// Store meta
 	res := m.Store(0, mapstr.M{"foo": "bar"})
-	assert.Equal(t, res.Get(), mapstr.M{"foo": "bar"})
+	assert.Equal(t, mapstr.M{"foo": "bar"}, res.Get())
 
 	// Update it
 	res = m.Store(0, mapstr.M{"foo": "baz"})
-	assert.Equal(t, res.Get(), mapstr.M{"foo": "baz"})
+	assert.Equal(t, mapstr.M{"foo": "baz"}, res.Get())
 
 	m.Remove(0)
-	assert.Equal(t, len(m.meta), 0)
+	assert.Empty(t, m.meta)
 }

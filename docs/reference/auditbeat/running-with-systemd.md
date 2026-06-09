@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/running-with-systemd.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Auditbeat and systemd [running-with-systemd]

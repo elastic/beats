@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -49,6 +50,13 @@ type Registry struct {
 	FlushTimeout  time.Duration `config:"flush"`
 	CleanInterval time.Duration `config:"cleanup_interval"`
 	MigrateFile   string        `config:"migrate_file"`
+	Backend       string        `config:"backend"`
+	// FileStorage holds the raw user configuration for the OpenTelemetry file_storage
+	// extension when Backend is "otel_file_storage". The map is decoded into
+	// filestorage.Config using confmap (which honours mapstructure tags) at registry
+	// creation time. If nil, factory defaults are used.
+	FileStorage        map[string]any   `config:"otel_file_storage"`
+	ESStorageExtension backend.Registry `config:"-"`
 }
 
 var DefaultConfig = Config{
@@ -58,6 +66,7 @@ var DefaultConfig = Config{
 		MigrateFile:   "",
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
+		Backend:       "memlog",
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,

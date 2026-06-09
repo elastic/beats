@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-juniper.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Juniper JUNOS module [filebeat-module-juniper]
 
@@ -90,7 +91,7 @@ The following processes and tags are supported:
 |  | AAMW_ACTION_LOG |
 | RT_SECINTEL | SECINTEL_ACTION_LOG |
 
-The syslog format choosen should be `Default`.
+The syslog format chosen should be `Default`.
 
 
 ## Compatibility [_compatibility_18]

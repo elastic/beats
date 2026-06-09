@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -145,7 +145,7 @@ func TestMemoryServiceBadData(t *testing.T) {
 	memoryService := &MemoryService{}
 	memoryRawStats := []docker.Stat{{Stats: badMemStats}}
 	rawStats := memoryService.getMemoryStatsList(memoryRawStats, false)
-	assert.Len(t, rawStats, 0)
+	assert.Empty(t, rawStats)
 
 }
 

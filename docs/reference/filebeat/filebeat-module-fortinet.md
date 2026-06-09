@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-fortinet.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Fortinet module [filebeat-module-fortinet]
 
@@ -27,7 +28,7 @@ This is a module for Fortinet logs sent in the syslog format. It supports the fo
 
 To configure a remote syslog destination, please reference the [Fortigate/FortiOS Documentation](https://docs.fortinet.com/document/fortigate/6.0.0/cli-reference/260508/log-syslogd-syslogd2-syslogd3-syslogd4-setting).
 
-The syslog format choosen should be `Default`.
+The syslog format chosen should be `Default`.
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.

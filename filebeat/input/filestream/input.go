@@ -25,6 +25,7 @@ import (
 	"slices"
 	"time"
 
+	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -71,6 +72,7 @@ type filestream struct {
 	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
+	hasLineFilter             bool
 
 	// Function references for testing
 	waitGracePeriodFn func(
@@ -114,6 +116,10 @@ func configure(
 		return nil, nil, err
 	}
 
+	if err := normalizeConfig(cfg, &c); err != nil {
+		return nil, nil, err
+	}
+
 	// zero must also disable clean_inactive, see:
 	// https://github.com/elastic/beats/issues/45601
 	// for more details. At the same time we need to allow
@@ -146,6 +152,7 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		waitGracePeriodFn:         waitGracePeriod,
 		tickFn:                    time.Tick,
@@ -158,6 +165,30 @@ func configure(
 	filestream.scannerCheckInterval = c.FileWatcher.Interval
 
 	return prospector, filestream, nil
+}
+
+// normalizeConfig reconciles filestream defaults with file_identity semantics.
+// In 9.x, scanner fingerprinting defaults to enabled, but non-fingerprint
+// identities should turn it off unless the user explicitly sets it.
+func normalizeConfig(cfg *conf.C, c *config) error {
+	if c.FileIdentity == nil {
+		return nil
+	}
+
+	name := c.FileIdentity.Name()
+	if name == fingerprintName {
+		return nil
+	}
+
+	hasScannerFingerprint, err := cfg.Has("prospector.scanner.fingerprint.enabled", -1)
+	if err != nil {
+		return fmt.Errorf("cannot read 'prospector.scanner.fingerprint.enabled': %w", err)
+	}
+	if !hasScannerFingerprint {
+		c.FileWatcher.Scanner.Fingerprint.Enabled = false
+	}
+
+	return nil
 }
 
 func (inp *filestream) Name() string { return pluginName }
@@ -187,7 +218,7 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
 	state := initState(log, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
@@ -726,7 +757,7 @@ func (inp *filestream) readFromSource(
 		if isGZIP {
 			metrics.MessagesGZIPRead.Inc()
 		}
-		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
+		if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
 			continue
 		}
 
@@ -767,16 +798,20 @@ func (inp *filestream) readFromSource(
 
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.
-func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
+func (inp *filestream) isDroppedLine(log *logp.Logger, line []byte) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
-			log.Debug("Drop line as it does not match any of the include patterns %s", line)
+			if log.IsDebug() {
+				log.Debugf("Drop line as it does not match any of the include patterns %s", line)
+			}
 			return true
 		}
 	}
 	if len(inp.readerConfig.ExcludeLines) > 0 {
 		if matchAny(inp.readerConfig.ExcludeLines, line) {
-			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
+			if log.IsDebug() {
+				log.Debugf("Drop line as it does match one of the exclude patterns %s", line)
+			}
 			return true
 		}
 	}
@@ -784,9 +819,9 @@ func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
 	return false
 }
 
-func matchAny(matchers []match.Matcher, text string) bool {
+func matchAny(matchers []match.Matcher, text []byte) bool {
 	for _, m := range matchers {
-		if m.MatchString(text) {
+		if m.Match(text) {
 			return true
 		}
 	}

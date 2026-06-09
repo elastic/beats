@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/dissect.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Dissect strings [dissect]

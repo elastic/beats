@@ -18,6 +18,7 @@
 package channel
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -91,6 +92,7 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 		var processors []beat.Processor
 		for _, c := range r.cfgs {
 			processors = append(processors, c.Processing.Processor.All()...)
+			defer c.Processing.Processor.Close()
 		}
 
 		require.NotEmptyf(t, processors, "for this test the list of processors cannot be empty")
@@ -126,4 +128,8 @@ func (pipelineConnectorMock) ConnectWith(cfg beat.ClientConfig) (beat.Client, er
 
 func (pipelineConnectorMock) Connect() (beat.Client, error) {
 	return &clientMock{}, nil
+}
+
+func (pipelineConnectorMock) Disconnect(ctx context.Context) error {
+	return nil
 }

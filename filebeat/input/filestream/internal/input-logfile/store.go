@@ -25,11 +25,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
+	inpFile "github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
@@ -297,16 +298,15 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 // Filestream inputs or the Log input. fn should return the new registry ID
 // and new CursorMeta. If fn returns an empty string, the entry is skipped.
 //
-// When fn returns a valid ID, the old resource is removed from both,
-// the in-memory and persistent store. The operations are synchronous.
-//
-// If the resource migrated was from the Log input, `TakeOver` will
-// remove it from the persistent store, however the Log input reigstrar
-// will write it back when Filebeat is shutting down. However,
-// there is a mechanism in place to detect this situation and avoid
-// migrating the same state over and over again.
-// See the comments on this method for more details.
-func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
+// When fn returns a valid ID:
+//   - If the old resource was from a Filestream input, it is removed from both
+//     the in-memory and disk store.
+//   - If it was from a Log input, it is left untouched.
+func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
+	// Lock the ephemeral store so we can migrate the states in one go
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
 	matchPreviousFilestreamIDs := func(key string) bool {
 		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
@@ -339,69 +339,31 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// That's the only way to access the log input states.
 	// We only iterate through the whole store if we're not migrating from
 	// a Filestream input
-	fromLogInput := map[string]logInputState{}
+	fromLogInput := map[string]TakeOverState{}
 	if len(s.identifiersToTakeOver) == 0 {
 		_ = s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
-				m := mapstr.M{}
-				if err := value.Decode(&m); err != nil {
+				logSt := inpFile.State{}
+				if err := value.Decode(&logSt); err != nil {
 					return true, err
 				}
-				st, err := logInputStateFromMapM(m)
+
+				st, err := newTakeOverState(logSt, nil)
 				if err != nil {
-					// Log the error and continue
-					s.store.log.Errorf("cannot read Log input state: %s", err)
-					return true, nil
+					// This should never happen. newTakeOverState can only fail if
+					// Filestream state format has changed and when using the
+					// Log input state, the Filestream one is ignored
+					s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+					return true, err
 				}
-				// That is a workaround for the problems with the
-				// Log input Registrar (`filebeat/registrar`) and the way it
-				// handles states.
-				// There are two problems:
-				//  - 1. The Log input store/registrar does not have an API for
-				//       removing states
-				//  - 2. When `registrar.Registrar` starts, it copies all states
-				//       belonging to the Log input from the disk store into
-				//       memory and when the Registrar is shutting down, it
-				//       writes all states to the disk. This all happens even
-				//       if no Log input was ever started.
-				// This means that no matter what we do here, the states from
-				// the Log input are always re-written to disk.
-				// See: filebeat/registrar/registrar.go, deferred statement on
-				// `Registrar.Run`.
-				//
-				// However, there is a "reset state" code, that runs
-				// during the Registrar initialisation and sets the
-				// TTL to -2, once the Log input havesting that file starts
-				// the TTL is set to -1 (never expires) or the configured
-				// value.
-				// See: filebeat/registrar/registrar.go (readStatesFrom) and
-				// filebeat/beater/filebeat.go (registrar.Start())
-				//
-				// This means that while the Log input is running and the file
-				// has been active at any moment during the Filebeat's execution
-				// the TTL is never going to be -2 during the shutdown.
-				//
-				// So, if TTL == -2, then in the previous run of Filebeat, there
-				// was no Log input using this state, which likely means, it is
-				// a state that has already been migrated to Filestream.
-				//
-				// The worst case that can happen is that we re-ingest the file
-				// once, which is still better than copying an old state with
-				// an incorrect offset every time Filebeat starts.
-				if st.TTL == -2 {
-					return true, nil
-				}
-				st.key = key
+
+				st.Key = key
 				fromLogInput[key] = st
 			}
 
 			return true, nil
 		})
 	}
-
-	// Lock the ephemeral store so we can migrate the states in one go
-	s.store.ephemeralStore.mu.Lock()
-	defer s.store.ephemeralStore.mu.Unlock()
 
 	// Migrate all states from the Filestream input
 	for k := range fromFilestreamInput {
@@ -418,13 +380,28 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			continue
 		}
 
-		newKey, updatedMeta := fn(res)
+		// cleanup must be called on any "exit point" from this loop iteration.
+		// It is responsible for correctly releasing the locked resource.
+		cleanup := func() {
+			res.Release()
+			res.lock.Unlock()
+		}
+
+		st, err := newTakeOverState(inpFile.State{}, res)
+		if err != nil {
+			// This should never happen. newTakeOverState can only fail if
+			// Filestream state format has changed
+			s.store.log.Errorf("cannot initialise TakeOver state: %s", err)
+			cleanup()
+			continue
+		}
+		newKey, updatedMeta := fn(st)
 		if len(newKey) > 0 {
 			// If the new key already exists in the store, do nothing.
 			// Unlock the resource and return
 			if res := s.store.ephemeralStore.unsafeFind(newKey, false); res != nil {
 				res.Release()
-				res.lock.Unlock()
+				cleanup()
 				continue
 			}
 
@@ -454,75 +431,88 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
 
-		res.Release()
-		res.lock.Unlock()
+		cleanup()
 	}
 
 	// Migrate all states from the Log input
 	for k, v := range fromLogInput {
 		newKey, updatedMeta := fn(v)
+		if len(newKey) > 0 {
+			res := s.store.ephemeralStore.unsafeFind(newKey, true)
 
-		// Find or create a resource. It should always create a new one.
-		res := s.store.ephemeralStore.unsafeFind(newKey, true)
-		res.cursorMeta = updatedMeta
-		// Convert the offset to the correct type
-		res.cursor = struct {
-			Offset int64 `json:"offset" struct:"offset"`
-		}{
-			Offset: v.Offset,
+			// If the new key already exists in the store, the file has already
+			// been taken over. Skip it to avoid overwriting a valid Filestream
+			// state with a potentially stale Log input state.
+			if !res.IsNew() {
+				res.Release()
+				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", k, newKey)
+				continue
+			}
+
+			res.cursorMeta = updatedMeta
+			// Convert the offset to the correct type
+			res.cursor = struct {
+				Offset int64 `json:"offset" struct:"offset"`
+			}{
+				Offset: v.logInpOffset,
+			}
+
+			// Write to disk
+			s.store.writeState(res)
+
+			// Update in-memory store
+			s.store.ephemeralStore.table[newKey] = res
+
+			res.Release()
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
+		}
+	}
+}
+
+// TakeOverState is the state of a file whose state is being taken over.
+// [newTakeOverState] correctly populates the fields according to the source
+// state (Log or Filestream). Only the fields required outside of this package
+// are exported.
+type TakeOverState struct {
+	FileStateOS    file.StateOS
+	IdentifierName string
+	Key            string
+	Source         string
+
+	logInpOffset int64
+}
+
+// newTakeOverState creates a TakeOverState populated by the logSt or filestreamSt.
+// If filestreamSt is not nil, it is used, otherwise logSt is used.
+// An error is only returned if filestreamSt.UnpackCursorMeta fails, the only
+// reason for it to fail is if the data format in the store has changed.
+func newTakeOverState(logSt inpFile.State, filestreamSt *resource) (TakeOverState, error) {
+	st := TakeOverState{}
+
+	if filestreamSt != nil {
+		// This struct matches the fileMeta defined at input/filestream/input.go
+		meta := struct {
+			IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+			Source         string `json:"source" struct:"source"`
+		}{}
+		if err := filestreamSt.UnpackCursorMeta(&meta); err != nil {
+			return st, err
 		}
 
-		// Write to disk
-		s.store.writeState(res)
+		st.Source = meta.Source
+		st.IdentifierName = meta.IdentifierName
+		st.Key = filestreamSt.key
 
-		// Update in-memory store
-		s.store.ephemeralStore.table[newKey] = res
-
-		// "remove" from the disk store.
-		// It will add a remove entry in the log file for this key, however
-		// the Registrar used by the Log input will write to disk all states
-		// it read when Filebeat was starting, thus "overriding" this delete.
-		// We keep it here because when we remove the Log input we will ensure
-		// the entry is actually remove from the disk store.
-		_ = s.store.persistentStore.Remove(k)
-		res.Release()
-		s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
-	}
-}
-
-type logInputState struct {
-	ID     string        `json:"id"`
-	Offset int64         `json:"offset"`
-	TTL    time.Duration `json:"ttl" struct:"ttl"`
-	key    string        `json:"-"`
-
-	// This matches the filestream.fileMeta struct
-	// and are used by UnpackCursorMeta
-	Source         string `json:"source" struct:"source"`
-	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
-}
-
-func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
-	state := logInputState{}
-
-	// typeconf.Convert kept failing with an "unsupported" error because
-	// FileStateOS was present, we don't need it, so just delete it.
-	m.Delete("FileStateOS")
-	if err := typeconv.Convert(&state, m); err != nil {
-		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
+		return st, nil
 	}
 
-	return state, nil
-}
+	st.Source = logSt.Source
+	st.IdentifierName = logSt.IdentifierName
+	st.FileStateOS = logSt.FileStateOS
+	st.logInpOffset = logSt.Offset
+	st.Key = logSt.Id
 
-// UnpackCursorMeta unpacks the cursor metadata's into the provided struct. TBD
-func (l logInputState) UnpackCursorMeta(to any) error {
-	return typeconv.Convert(to, l)
-}
-
-// Key returns the resource's key
-func (l logInputState) Key() string {
-	return l.key
+	return st, nil
 }
 
 func (s *store) Retain() { s.refCount.Retain() }
@@ -846,7 +836,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		var st state
 		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
+			log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
 				key, err)
 			return true, nil
 		}

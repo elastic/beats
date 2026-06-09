@@ -28,8 +28,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/paths"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -45,7 +43,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
+func makePipeline(t *testing.T, settings Settings, qu queue.Queue[publisher.Event]) *Pipeline {
+	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
 	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
@@ -54,8 +53,10 @@ func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
 		settings,
 	)
 	require.NoError(t, err)
-	// Inject a test queue so the outputController doesn't create one
-	p.outputController.queue = qu
+	if outputController, ok := p.outputController.(*processOutputController); ok {
+		// Inject a test queue so the outputController doesn't create one
+		outputController.queue = qu
+	}
 
 	return p
 }
@@ -69,7 +70,7 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer pipeline.Close()
+		defer pipeline.Disconnect(t.Context())
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -91,7 +92,7 @@ func TestClient(t *testing.T) {
 		l := logptest.NewTestingLogger(t, "")
 
 		// a small in-memory queue with a very short flush interval
-		q := memqueue.NewQueue(l, nil, memqueue.Settings{
+		q := memqueue.NewQueue[publisher.Event](l, nil, memqueue.Settings{
 			Events:        5,
 			MaxGetRequest: 1,
 			FlushTimeout:  time.Millisecond,
@@ -133,8 +134,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
-					//nolint:errcheck // it always succeeds
-					e := batch.Entry(i).(publisher.Event)
+					e := batch.Entry(i)
 					received = append(received, e.Content)
 				}
 				batch.Done()
@@ -186,7 +186,7 @@ func TestClient(t *testing.T) {
 		client.PublishAll(sent[3:]) // number 4
 
 		require.NoError(t, client.Close(), "failed closing pipeline client")
-		require.NoError(t, pipeline.Close(), "failed closing pipeline")
+		require.NoError(t, pipeline.Disconnect(t.Context()), "failed closing pipeline")
 
 		// waiting for all events to be consumed from the queue
 		<-done
@@ -194,27 +194,89 @@ func TestClient(t *testing.T) {
 	})
 }
 
-func TestClientWaitClose(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
-	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
-		p, err := New(beat.Info{Logger: logger},
-			Monitors{},
-			conf.Namespace{},
-			outputs.Group{},
-			settings,
-		)
-		if err != nil {
-			panic(err)
-		}
-		// Inject a test queue so the outputController doesn't create one
-		p.outputController.queue = qu
+// TestCloseWaitsForInFlightPublish verifies that Close waits for an event
+// that is mid-Publish (past the isOpen check but before AddEvent) to be
+// tracked by the clientCloseWaiter before deciding whether to wait.
+// This is a regression test for https://github.com/elastic/beats/issues/49390.
+func TestCloseWaitsForInFlightPublish(t *testing.T) {
+	// inProcessor is closed once the processor is running, letting the
+	// test know Publish is in the race window.
+	inProcessor := make(chan struct{})
+	// releaseProcessor is closed by the test to let the processor finish,
+	// allowing Publish to proceed to AddEvent.
+	releaseProcessor := make(chan struct{})
 
-		return p
+	waiter := newClientCloseWaiter(time.Minute)
+	c := &client{
+		logger: logp.NewNopLogger(),
+		processors: &testProcessor{
+			processorFn: func(in *beat.Event) (*beat.Event, error) {
+				close(inProcessor) // signal: we are inside the processor
+				<-releaseProcessor // block until test says go
+				return in, nil
+			},
+		},
+		producer: &testProducer{
+			publish: func(_ bool, event publisher.Event) (queue.EntryID, bool) {
+				return 1, true
+			},
+		},
+		waiter:         waiter,
+		observer:       nilObserver,
+		eventListener:  waiter,
+		clientListener: &mockClientListener{},
+	}
+	c.isOpen.Store(true)
+
+	// Start Publish in a goroutine — it will block inside the processor.
+	publishDone := make(chan struct{})
+	go func() {
+		defer close(publishDone)
+		c.Publish(beat.Event{Fields: mapstr.M{"hello": "world"}})
+	}()
+
+	// Wait until Publish is inside the processor (past the isOpen check).
+	<-inProcessor
+
+	// Now call Close from the main goroutine. With the fix, Close acquires
+	// the mutex and blocks until Publish finishes, so signalClose will see
+	// the event in the counter. Without the fix, Close would see zero events
+	// and finish immediately.
+	closeDone := make(chan struct{})
+	go func() {
+		defer close(closeDone)
+		c.Close()
+	}()
+
+	// Release the processor so Publish completes and increments the counter.
+	close(releaseProcessor)
+	<-publishDone
+
+	// Close should now be waiting for the event to be ACKed (WaitClose = 1 min).
+	// Verify it has NOT returned yet — it must be blocked waiting for the ACK.
+	select {
+	case <-closeDone:
+		t.Fatal("Close returned without waiting for the in-flight event to be ACKed")
+	case <-time.After(100 * time.Millisecond):
+		// Good — Close is properly waiting.
 	}
 
-	q := memqueue.NewQueue(logger, nil, memqueue.Settings{Events: 1}, 0, nil)
-	pipeline := makePipeline(Settings{}, q)
-	defer pipeline.Close()
+	// ACK the event to unblock Close.
+	waiter.ACKEvents(1)
+
+	select {
+	case <-closeDone:
+		// Good — Close returned after ACK.
+	case <-time.After(10 * time.Second):
+		t.Fatal("Close did not return after event was ACKed")
+	}
+}
+
+func TestClientWaitClose(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
+	pipeline := makePipeline(t, Settings{}, q)
+	defer pipeline.Disconnect(t.Context())
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
 		routinesChecker := resources.NewGoroutinesChecker()
@@ -267,8 +329,18 @@ func TestClientWaitClose(t *testing.T) {
 			return nil
 		})
 		defer output.Close()
-		pipeline.outputController.Set(outputs.Group{Clients: []outputs.Client{output}})
-		defer pipeline.outputController.Set(outputs.Group{})
+
+		reloader := pipeline.OutputReloader()
+		err = reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+			return outputs.Group{Clients: []outputs.Client{output}}, nil
+		})
+		require.NoError(t, err, "Reload of output group should succeed")
+		defer func() {
+			err := reloader.Reload(nil, func(outputs.Observer, conf.Namespace) (outputs.Group, error) {
+				return outputs.Group{}, nil
+			})
+			assert.NoError(t, err, "Reload to empty output group should succeed")
+		}()
 
 		client.Publish(beat.Event{})
 
@@ -327,7 +399,7 @@ func TestMonitoring(t *testing.T) {
 		)
 
 		require.NoError(t, err)
-		defer pipeline.Close()
+		defer pipeline.Disconnect(t.Context())
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
@@ -406,7 +478,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	cc, ok := c.(*client)
 	require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
-	cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+	cc.producer = &testProducer{publish: func(try bool, event publisher.Event) (queue.EntryID, bool) {
 		return queue.EntryID(1), true
 	}}
 
@@ -477,7 +549,7 @@ type testProcessorSupporter struct {
 }
 
 // Create a running processor interface based on the given config
-func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool, paths *paths.Path) (beat.Processor, error) {
+func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	return p.Processor, nil
 }
 

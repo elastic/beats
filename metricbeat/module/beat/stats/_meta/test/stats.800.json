@@ -55,6 +55,7 @@
         "dropped": 0,
         "duplicates": 0,
         "failed": 0,
+        "failure_store": 0,
         "toomany": 0,
         "total": 0
       },

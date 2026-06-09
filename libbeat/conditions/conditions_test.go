@@ -46,7 +46,7 @@ func GetConditions(t *testing.T, configs []Config) []Condition {
 	for _, config := range configs {
 		conds = append(conds, GetCondition(t, config))
 	}
-	assert.True(t, len(conds) == len(configs))
+	assert.Len(t, configs, len(conds))
 
 	return conds
 }

@@ -36,7 +36,7 @@ include::../include/config-option-intro.asciidoc[]
 [float]
 ==== `falcon` fileset settings
 
-The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
+The fileset is by default configured to collect JSON formatted event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
 
 ["source","yaml",subs="attributes"]
 -----

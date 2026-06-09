@@ -18,6 +18,7 @@
 package pgsql
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"strings"
@@ -59,9 +60,16 @@ func (pgsql *pgsqlPlugin) parseMessageStart(s *pgsqlStream) (bool, bool) {
 	pgsql.detailf("parseMessageStart")
 
 	m := s.message
+	//malformed streams can put us in an infinite loop,
+	// just stop if we get multiple iterations where
+	// isSpecialCommand can't find the length of the command
+	lengthFailed := 0
 
-	for len(s.data[s.parseOffset:]) >= 5 {
+	for len(s.data[s.parseOffset:]) >= 5 && (lengthFailed < 100) {
 		isSpecial, length, command := pgsql.isSpecialCommand(s.data[s.parseOffset:])
+		if length == 0 {
+			lengthFailed++
+		}
 		if !isSpecial {
 			return pgsql.parseCommand(s)
 		}
@@ -340,8 +348,15 @@ func (pgsql *pgsqlPlugin) parseExtReq(s *pgsqlStream, length int) (bool, bool) {
 	}
 	m.size = uint64(msgSize)
 	m.toExport = true
+	queryRequestPoint := m.start + 6
 
-	query, err := common.ReadString(s.data[m.start+6:])
+	if len(s.data) < (queryRequestPoint) {
+		pgsql.detailf("invalid start point for extended request: len %v, start %v",
+			len(s.data), queryRequestPoint)
+		return false, false
+	}
+
+	query, err := common.ReadString(s.data[queryRequestPoint:])
 	if err != nil {
 		pgsql.detailf("Invalid extended query request")
 		return false, false
@@ -573,7 +588,7 @@ func (pgsql *pgsqlPlugin) parseMessageData(s *pgsqlStream) (bool, bool) {
 }
 
 func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
-	m := s.message
+	msg := s.message
 
 	// read field count (int16)
 	off := 2
@@ -583,8 +598,8 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 	rows := []string{}
 	rowLength := 0
 
-	if fieldCount > len(m.fieldsFormat) {
-		return fmt.Errorf("%w: DataRow field mismatch, got %d, expected %d", errFieldBufferBig, fieldCount, len(m.fieldsFormat))
+	if fieldCount > len(msg.fieldsFormat) {
+		return fmt.Errorf("%w: DataRow field mismatch, got %d, expected %d", errFieldBufferBig, fieldCount, len(msg.fieldsFormat))
 	}
 	for field := range fieldCount {
 		if len(buf) <= off {
@@ -603,7 +618,7 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 
 		// read column value (byten)
 		var columnValue []byte
-		if m.fieldsFormat[field] == 0 {
+		if msg.fieldsFormat[field] == 0 {
 			// field value in text format
 			if columnLength > 0 {
 				columnValue = buf[off : off+columnLength]
@@ -626,9 +641,9 @@ func (pgsql *pgsqlPlugin) parseDataRow(s *pgsqlStream, buf []byte) error {
 		return errFieldBufferBig
 	}
 
-	m.numberOfRows++
-	if len(m.rows) < pgsql.maxStoreRows {
-		m.rows = append(m.rows, rows)
+	msg.numberOfRows++
+	if len(msg.rows) < pgsql.maxStoreRows {
+		msg.rows = append(msg.rows, rows)
 	}
 
 	return nil
@@ -743,11 +758,12 @@ func (pgsql *pgsqlPlugin) isSpecialCommand(data []byte) (bool, int, int) {
 // length field in pgsql counts total length of length field + payload, not
 // including the message identifier. => Always check buffer size >= length + 1
 func readLength(b []byte) int {
-	return int(common.BytesNtohl(b))
+	// big endian = network byte order
+	return int(binary.BigEndian.Uint32(b))
 }
 
 func readCount(b []byte) int {
-	return int(common.BytesNtohs(b))
+	return int(binary.BigEndian.Uint16(b))
 }
 
 func pgsqlString(b []byte, sz int) (string, error) {

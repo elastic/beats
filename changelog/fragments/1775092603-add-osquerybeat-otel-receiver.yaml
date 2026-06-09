@@ -1,0 +1,8 @@
+# REQUIRED
+kind: feature
+
+# REQUIRED
+summary: Add osquerybeatreceiver to run osquerybeat under the EDOT collector
+
+# REQUIRED
+component: osquerybeat

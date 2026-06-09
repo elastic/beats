@@ -99,8 +99,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -318,8 +316,6 @@ exporters:
       enabled: true
       batch:
         flush_timeout: 1s
-    mapping:
-      mode: bodymap
 service:
   pipelines:
     logs:
@@ -398,5 +394,5 @@ func assertMapstrKeysEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string
 		flatM2[k] = ""
 	}
 
-	require.Zero(t, cmp.Diff(flatM1, flatM2), msg)
+	require.Empty(t, cmp.Diff(flatM1, flatM2), msg)
 }

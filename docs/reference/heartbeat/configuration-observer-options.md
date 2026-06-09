@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-observer-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Add observer and geo metadata [configuration-observer-options]

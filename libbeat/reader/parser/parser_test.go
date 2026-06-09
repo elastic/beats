@@ -98,7 +98,7 @@ func TestParsersConfigSuffix(t *testing.T) {
 				require.Contains(t, err.Error(), test.expectedError)
 				return
 			}
-			require.Equal(t, c.Suffix, test.expectedSuffix)
+			require.Equal(t, test.expectedSuffix, c.Suffix)
 		})
 	}
 
