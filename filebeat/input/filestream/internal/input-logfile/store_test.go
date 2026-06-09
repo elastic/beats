@@ -19,6 +19,8 @@
 package input_logfile
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"strings"
 	"testing"
@@ -312,7 +314,7 @@ func TestStore_ResetCursor(t *testing.T) {
 		}))
 		defer store.Release()
 
-		//nolint // Tests won't be refactored on this commit
+		//nolint:all // Tests won't be refactored on this commit
 		res := store.Get("test::key")
 
 		// lock before creating a new update operation
@@ -395,6 +397,51 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, backend.snapshot())
+	})
+
+	t.Run("fingerprint keys are logged with the fingerprint hashed", func(t *testing.T) {
+		// Regression test: a fingerprint registry key must be logged with the
+		// fingerprint value hashed (so logs stay correlatable with the registry
+		// via re-hashing), never with the raw fingerprint value.
+		const rawFP = "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"
+		oldKey := "test::fingerprint::" + rawFP
+		newKey := "test::fingerprint::" + rawFP + "0000" // a different fingerprint value
+
+		backend := createSampleStore(t, map[string]state{
+			oldKey: {
+				TTL:  60 * time.Second,
+				Meta: testMeta{IdentifierName: "fingerprint"},
+			},
+		})
+		logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
+		s, err := openStore(logger, backend, "test")
+		require.NoError(t, err, "failed to open the store")
+		defer s.Release()
+		store := &sourceStore{
+			identifier: &SourceIdentifier{"test"},
+			store:      s,
+		}
+
+		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
+			return newKey, testMeta{IdentifierName: "fingerprint"}
+		})
+
+		sawMigration := false
+		for _, e := range observed.All() {
+			// The raw fingerprint value must never appear in any log line.
+			assert.NotContains(t, e.Message, rawFP,
+				"log must not contain the raw fingerprint value: %q", e.Message)
+			if strings.Contains(e.Message, "migrat") {
+				sawMigration = true
+				// The hashed keys are logged so they can be matched against the
+				// registry by re-hashing the fingerprint value of each key.
+				assert.Contains(t, e.Message, keyForLog(oldKey),
+					"migration log must contain the hashed old key: %q", e.Message)
+				assert.Contains(t, e.Message, keyForLog(newKey),
+					"migration log must contain the hashed new key: %q", e.Message)
+			}
+		}
+		assert.True(t, sawMigration, "expected a migration log entry")
 	})
 }
 
@@ -750,4 +797,54 @@ func checkEqualStoreState(t *testing.T, want, got map[string]state) bool {
 		return false
 	}
 	return true
+}
+
+func TestKeyForLog(t *testing.T) {
+	hashOf := func(s string) string {
+		sum := sha256.Sum256([]byte(s))
+		return hex.EncodeToString(sum[:])
+	}
+
+	const fp = "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"
+
+	tests := map[string]struct {
+		key  string
+		want string
+	}{
+		"native key is logged in full": {
+			key:  "filestream::my-id::native::100::64768",
+			want: "filestream::my-id::native::100::64768",
+		},
+		"path key is logged in full": {
+			key:  "filestream::my-id::path::/var/log/app.log",
+			want: "filestream::my-id::path::/var/log/app.log",
+		},
+		"inode_marker key is logged in full": {
+			key:  "filestream::my-id::inode_marker::100-marker",
+			want: "filestream::my-id::inode_marker::100-marker",
+		},
+		"fingerprint value is hashed": {
+			key:  "filestream::my-id::fingerprint::" + fp,
+			want: "filestream::my-id::fingerprint::" + hashOf(fp),
+		},
+		"fingerprint suffix is preserved": {
+			key:  "filestream::my-id::fingerprint::" + fp + "-suffix",
+			want: "filestream::my-id::fingerprint::" + hashOf(fp) + "-suffix",
+		},
+		"empty input": {
+			key:  "",
+			want: "",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got := keyForLog(tc.key)
+			assert.Equal(t, tc.want, got, "keyForLog returned an unexpected value")
+			if tc.key != tc.want { // a fingerprint key: the raw value must be gone
+				assert.NotContains(t, got, fp,
+					"the raw fingerprint value must not be present in the logged key")
+			}
+		})
+	}
 }

@@ -237,6 +237,10 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 	case loginp.OpCreate, loginp.OpWrite:
 		switch event.Op {
 		case loginp.OpCreate:
+			// TODO(#50725): these event messages repeat the file path, which is
+			// also in the "new_path"/"old_path" log fields. De-duplicating them is
+			// deferred to its own PR, as it changes log lines many integration
+			// tests assert on.
 			log.Debugf("A new file %s has been found", event.NewPath)
 		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
@@ -249,7 +253,7 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 		if event.Op == loginp.OpCreate {
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
-				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+				log.Errorf("Failed to set cursor meta data for file %s: %v", event.NewPath, err)
 			}
 		}
 

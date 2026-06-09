@@ -25,7 +25,6 @@ import (
 	"slices"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -218,7 +217,9 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
+	// path is already on ctx.Logger (set by the harvester); the source name is
+	// intentionally not logged as it may embed the file fingerprint.
+	log := ctx.Logger
 	state := initState(log, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
@@ -712,6 +713,9 @@ func (inp *filestream) readFromSource(
 		// next line - r needs to be reading from a gzipped file
 		message, err := r.Next()
 		if err != nil {
+			// TODO(#50725): these messages repeat the file path, which is also in
+			// the "path" log field. De-duplicating them is deferred to its own PR,
+			// as it changes log lines many integration tests assert on.
 			if errors.Is(err, ErrFileTruncate) {
 				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {
