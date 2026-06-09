@@ -18,6 +18,7 @@
 package slabqueue
 
 import (
+	"sync"
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -32,6 +33,18 @@ type producer[T any] struct {
 
 	nextID atomic.Uint64
 	closed atomic.Bool
+
+	// published counts events successfully threaded onto the FIFO; resolved
+	// counts events whose batches have completed — either acknowledged (Done)
+	// or abandoned (Release). Abandoned events count as resolved so a producer
+	// whose tail batch is Released on shutdown does not strand ackWait. When
+	// the producer is closed and resolved has caught up with published, ackWait
+	// is closed. ackWait is also closed unconditionally when the queue is
+	// force-closed, so a waiter can never hang past teardown — see Queue.Close.
+	published atomic.Uint64
+	resolved  atomic.Uint64
+	ackWait   chan struct{}
+	ackOnce   sync.Once
 }
 
 // Publish adds an entry, blocking if the pool is empty until a slot is freed
@@ -69,7 +82,46 @@ func (p *producer[T]) TryPublish(entry T) (queue.EntryID, bool) {
 // Close marks the producer as closed. Subsequent Publish/TryPublish return
 // (0, false). The queue may still deliver ACK callbacks for events this
 // producer published before Close was called.
-func (p *producer[T]) Close() { p.closed.Store(true) }
+func (p *producer[T]) Close() {
+	p.closed.Store(true)
+	// The events published before Close may already all be acked, in which
+	// case no future Done/Release will fire to close ackWait — check now. The
+	// producer stays registered with the queue until its ackWait actually
+	// closes, so a force-close before its events drain can still unblock it.
+	p.maybeCloseAckWait()
+}
+
+// ACKWaitChan returns the channel closed once the producer is closed and all
+// of its events have been acknowledged (or immediately on force-close).
+func (p *producer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
+
+// resolveN advances this producer's resolved count (events acked or abandoned)
+// and closes ackWait if the producer is now closed and fully drained. Called
+// from batch.Done (for acked events) and batch.Release (for both abandoned and
+// drained-successor events).
+func (p *producer[T]) resolveN(n int) {
+	p.resolved.Add(uint64(n)) //nolint:gosec // G115: n is a batch event count, always a small positive value
+	p.maybeCloseAckWait()
+}
+
+// maybeCloseAckWait closes ackWait exactly once, when the producer has been
+// closed and every published event has been resolved, and unregisters the
+// producer from the queue's force-close fan-out set (it no longer needs it).
+func (p *producer[T]) maybeCloseAckWait() {
+	if p.closed.Load() && p.resolved.Load() >= p.published.Load() {
+		p.ackOnce.Do(func() {
+			close(p.ackWait)
+			p.queue.removeProducer(p)
+		})
+	}
+}
+
+// forceCloseAckWait closes ackWait unconditionally. Used by Queue.Close to
+// guarantee a waiter unblocks on queue teardown even though force-close
+// suppresses the per-event ACK callbacks that would otherwise close it.
+func (p *producer[T]) forceCloseAckWait() {
+	p.ackOnce.Do(func() { close(p.ackWait) })
+}
 
 // fill stores entry in the given slot and threads it onto the queue's FIFO.
 // If the queue is already closing, the slot is returned to the pool and the
@@ -102,6 +154,11 @@ func (p *producer[T]) fill(entry T, slotIdx int) (queue.EntryID, bool) {
 	q.tail = slotIdx
 	q.count++
 	q.mu.Unlock()
+
+	// Count the event for ack-wait accounting only on the success path, so a
+	// publish that loses the closing race (handled above) doesn't inflate the
+	// outstanding count and strand ackWait.
+	p.published.Add(1)
 
 	pool.observer.AddEvent(0)
 	q.signal()
