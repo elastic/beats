@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//nolint:gosec // There are no secrets in this file.
 package okta
 
 import (
@@ -445,5 +446,50 @@ func TestOktaTokenSource_Token(t *testing.T) {
 				t.Errorf("unexpected access token: got %q want %q", tok.AccessToken, "mock")
 			}
 		})
+	}
+}
+
+// TestFetchOktaOauthClient_JWKJSONRoundTrip exercises the full
+// fetchOktaOauthClient path with jwk_json to verify that the JWK
+// bytes survive into the token source for refresh. Previously
+// jwkData was only stored for the jwk_file case, causing token
+// refresh to fail with "unexpected end of JSON input".
+func TestFetchOktaOauthClient_JWKJSONRoundTrip(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/token":
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"access_token": "mock-access-token",
+				"token_type":   "Bearer",
+				"expires_in":   3600,
+			})
+		case "/resource":
+			w.WriteHeader(http.StatusOK)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+
+	cfg := &oAuth2Config{
+		ClientID:    "test-client-id",
+		Scopes:      []string{"okta.users.read"},
+		TokenURL:    srv.URL + "/token",
+		OktaJWKJSON: common.JSONBlob(testOktaJWKJSON),
+	}
+
+	client, err := cfg.fetchOktaOauthClient(context.Background(), srv.Client())
+	if err != nil {
+		t.Fatalf("fetchOktaOauthClient() error: %v", err)
+	}
+
+	resp, err := client.Get(srv.URL + "/resource") //nolint:noctx // No need for a context here.
+	if err != nil {
+		t.Fatalf("GET /resource error: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("GET /resource status = %d; want %d", resp.StatusCode, http.StatusOK)
 	}
 }
