@@ -437,7 +437,7 @@ func (o opLabelKeyPrefixRemover) Process(field string, value interface{}, labels
 		if len(k) < len(o.Prefix) {
 			continue
 		}
-		if k[:6] == o.Prefix {
+		if k[:len(o.Prefix)] == o.Prefix {
 			renameKeys = append(renameKeys, k)
 		}
 	}
