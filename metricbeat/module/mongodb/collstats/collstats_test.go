@@ -120,7 +120,7 @@ func TestApplyOptionsToStats_NoShardRescale(t *testing.T) {
 	}
 	result, err := metricset.applyOptionsToStats(stats)
 	assert.NoError(t, err)
-	assert.Equal(t, float64(3000), result["size"]) // Unchanged
+	assert.InDelta(t, float64(3000), result["size"], 0) // Unchanged
 	_, hasShards := result["shards"]
 	assert.False(t, hasShards)
 }
@@ -240,7 +240,7 @@ func TestMergeShardedCollStats(t *testing.T) {
 
 			// Check merged sizes
 			if size, exists := result["size"]; exists {
-				assert.Equal(t, tt.expectedSize, size)
+				assert.InDelta(t, tt.expectedSize, size, 0)
 			}
 
 			// Verify shard count and shard metadata cleanup
@@ -359,7 +359,7 @@ func TestConvertToFloat64(t *testing.T) {
 			result, success := convertToFloat64(tt.input)
 			assert.Equal(t, tt.success, success)
 			if tt.success {
-				assert.Equal(t, tt.expected, result)
+				assert.InDelta(t, tt.expected, result, 0)
 			}
 		})
 	}
@@ -386,7 +386,7 @@ func TestMergeShardedCollStats_WeightedAverages(t *testing.T) {
 	// Expected average: 350000 / 4000 = 87.5
 	avgObjSize, exists := result["avgObjSize"]
 	assert.True(t, exists)
-	assert.Equal(t, float64(87.5), avgObjSize)
+	assert.InDelta(t, float64(87.5), avgObjSize, 0)
 }
 
 func TestMergeShardedCollStats_SumsFreeStorageSize(t *testing.T) {

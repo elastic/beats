@@ -57,10 +57,10 @@ func TestFetch(t *testing.T) {
 
 		// Check a few event Fields
 		db, _ := metricsetFields["db"].(string)
-		assert.NotEqual(t, "", db)
+		assert.NotEmpty(t, db)
 
 		collection, _ := metricsetFields["collection"].(string)
-		assert.NotEqual(t, "", collection)
+		assert.NotEmpty(t, collection)
 	}
 }
 

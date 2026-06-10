@@ -41,7 +41,7 @@ func TestEventMapping(t *testing.T) {
 
 	event, _ := eventMapping("unit.test", data)
 
-	assert.Equal(t, event["total"].(mapstr.M)["count"], float64(1)) //nolint:errcheck // safe
+	assert.InDelta(t, float64(1), event["total"].(mapstr.M)["count"], 0) //nolint:errcheck // safe
 }
 
 func TestEventMappingOptionalFields(t *testing.T) {
@@ -144,8 +144,8 @@ func TestMergeShardedCollStats_WeightedAndIndexMerge(t *testing.T) {
 	merged, err := mergeShardedCollStats([]map[string]interface{}{shard1, shard2})
 	assert.NoError(t, err)
 	// Summed fields
-	assert.Equal(t, int64(30), merged["count"].(int64))      //nolint:errcheck // safe
-	assert.Equal(t, float64(4000), merged["size"].(float64)) //nolint:errcheck // safe
+	assert.Equal(t, int64(30), merged["count"].(int64))           //nolint:errcheck // safe
+	assert.InDelta(t, float64(4000), merged["size"].(float64), 0) //nolint:errcheck // safe
 	// Weighted avg: (100*10 + 150*20)/30 = (1000 + 3000)/30 = 133.333...
 	assert.InDelta(t, 133.33, merged["avgObjSize"].(float64), 0.01) //nolint:errcheck // safe
 	// No indexSizes collected
