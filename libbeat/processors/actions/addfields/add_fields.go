@@ -87,11 +87,7 @@ func (af *addFields) RunPdata(body pcommon.Map) error {
 	if len(af.fields) == 0 {
 		return nil
 	}
-	fields := af.fields
-	if af.shared {
-		fields = fields.Clone()
-	}
-	return otelmap.MergeMapstrIntoPdata(fields, body)
+	return otelmap.MergeMapstrIntoPdata(af.fields, body)
 }
 
 func (af *addFields) String() string {
