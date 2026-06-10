@@ -38,9 +38,9 @@ type PdataProcessor interface {
 }
 
 type beatProcessor struct {
-	logger      *zap.Logger
-	processors  []beat.Processor
-	pdataProcs  []PdataProcessor // non-nil only when all processors implement PdataProcessor
+	logger     *zap.Logger
+	processors []beat.Processor
+	pdataProcs []PdataProcessor // non-nil only when all processors implement PdataProcessor
 }
 
 func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, error) {
