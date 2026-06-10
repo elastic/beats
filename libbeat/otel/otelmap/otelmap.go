@@ -183,10 +183,11 @@ func FromValue(dst pcommon.Value, value any) error {
 	}
 }
 
-// putIntoMap encodes val under key in dst using direct map-typed put operations
-// for known primitive types, avoiding the PutEmpty intermediary used by
-// [FromValue]. For map-typed values the existing entry is replaced (not merged);
-// use [MergeMapstrIntoPdata] for deep-merge semantics.
+// putIntoMap encodes val under key in dst using the typed Put* methods on
+// pcommon.Map (PutStr, PutInt, PutBool, …) rather than the PutEmpty+Set*
+// two-step. PutEmpty allocates an empty AnyValue slot and Set* allocates
+// the typed wrapper, two allocations per field. The typed Put* methods fold
+// both into one.
 func putIntoMap(key string, val any, dst pcommon.Map) error {
 	switch v := val.(type) {
 	case nil:
