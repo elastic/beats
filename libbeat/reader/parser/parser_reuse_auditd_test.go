@@ -15,30 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux
+//go:build linux
 
-package auditd
+package parser
 
-import (
-	"errors"
-	"time"
-
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-// Stub for non-Linux builds
-type Parser struct{}
-
-func (p *Parser) Close() error { return nil }
-
-func (p *Parser) Next() (reader.Message, error) {
-	return reader.Message{}, errors.New("auditd parser is not supported on this platform")
+// The auditd parser only functions on Linux (it is a stub elsewhere), so its
+// decode-buffer reuse torture case and coverage requirement are registered here.
+func init() {
+	reuseTortureCases = append(reuseTortureCases, reuseCaseSpec{
+		name:    "auditd",
+		parsers: []map[string]interface{}{{"auditd": map[string]interface{}{}}},
+		input: "type=SYSCALL msg=audit(1364481363.243:24287): arch=c000003e syscall=2 success=yes exit=0\n" +
+			"type=CWD msg=audit(1364481363.243:24287): cwd=\"/home/user\"\n" +
+			"type=PATH msg=audit(1364481363.243:24287): item=0 name=\"/etc/passwd\"\n",
+	})
+	requiredReuseParsers = append(requiredReuseParsers, "auditd")
 }
-
-func NewParser(_ reader.Reader, _ Config, _ *logp.Logger) *Parser {
-	return &Parser{}
-}
-
-// SetReadDeadline is a no-op on platforms without auditd support.
-func (p *Parser) SetReadDeadline(time.Time) bool { return false }

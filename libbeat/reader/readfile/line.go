@@ -23,10 +23,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -343,4 +345,13 @@ func (r *LineReader) decode(end int) (int, error) {
 
 func (r *LineReader) Close() error {
 	return r.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped io.Reader if it honors deadlines, so
+// a synchronous timeout can bound the underlying blocking read.
+func (r *LineReader) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.reader.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
 }

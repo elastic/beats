@@ -19,7 +19,6 @@ package readfile
 
 import (
 	"errors"
-	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -29,20 +28,25 @@ var (
 	errTimeout = errors.New("timeout")
 )
 
-// TimeoutReader will signal some configurable timeout error if no
-// new line can be returned in time.
+// TimeoutReader signals a configurable timeout error if no new line can be
+// returned in time. It is fully synchronous — no goroutine, no channel handoff,
+// no read-ahead — so it is safe over a reader that reuses the buffer backing
+// Content.
+//
+// When the wrapped reader honors read deadlines (reader.DeadlineSetter — e.g.
+// filestream's file reader, journald, kafka), TimeoutReader enforces the timeout
+// by setting a deadline before each read and mapping reader.ErrReadDeadline to
+// the timeout signal. When it does not (e.g. awss3's finite object reads, which
+// return on their own via EOF or the SDK request timeout), TimeoutReader reads
+// directly without enforcing a timeout, since there is no never-returning read
+// to bound.
 type TimeoutReader struct {
 	reader  reader.Reader
 	timeout time.Duration
 	signal  error
-	running bool
-	ch      chan lineMessage
-	done    chan struct{}
-}
 
-type lineMessage struct {
-	line reader.Message
-	err  error
+	probed bool // whether deadline support has been determined
+	sync   bool // wrapped reader honors deadlines -> timeout enforced via deadline
 }
 
 // NewTimeoutReader returns a new timeout reader from an input line reader.
@@ -55,50 +59,34 @@ func NewTimeoutReader(reader reader.Reader, signal error, t time.Duration) *Time
 		reader:  reader,
 		signal:  signal,
 		timeout: t,
-		ch:      make(chan lineMessage, 1),
-		done:    make(chan struct{}),
 	}
 }
 
-// Next returns the next line. If no line was returned before timeout, the
-// configured timeout error is returned.
-// For handline timeouts a goroutine is started for reading lines from
-// configured line reader. Only when underlying reader returns an error, the
-// goroutine will be finished.
+// Next returns the next line. If no line was returned before the timeout (for a
+// deadline-aware reader), the configured timeout error is returned.
 func (r *TimeoutReader) Next() (reader.Message, error) {
-	if !r.running {
-		r.running = true
-		go func() {
-			for {
-				message, err := r.reader.Next()
-				select {
-				case <-r.done:
-					return
-				case r.ch <- lineMessage{message, err}:
-					if err != nil {
-						return
-					}
-				}
-			}
-		}()
+	if !r.probed {
+		r.probed = true
+		// Determine once whether the wrapped reader (or one it wraps) honors
+		// deadlines. The probe clears any deadline it might set.
+		r.sync = reader.SetReadDeadline(r.reader, time.Time{})
 	}
-	timer := time.NewTimer(r.timeout)
-	select {
-	case msg := <-r.ch:
-		if msg.err != nil {
-			r.running = false
-		}
-		timer.Stop()
-		return msg.line, msg.err
-	case <-timer.C:
+
+	if !r.sync {
+		// Reader does not support deadlines: it returns on its own (finite source),
+		// so no timeout is needed and no goroutine is spawned to bound it.
+		return r.reader.Next()
+	}
+
+	reader.SetReadDeadline(r.reader, time.Now().Add(r.timeout))
+	msg, err := r.reader.Next()
+	reader.SetReadDeadline(r.reader, time.Time{})
+	if errors.Is(err, reader.ErrReadDeadline) {
 		return reader.Message{}, r.signal
-	case <-r.done:
-		return reader.Message{}, io.EOF
 	}
+	return msg, err
 }
 
 func (r *TimeoutReader) Close() error {
-	close(r.done)
-
 	return r.reader.Close()
 }

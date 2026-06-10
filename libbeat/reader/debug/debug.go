@@ -20,7 +20,9 @@ package debug
 import (
 	"bytes"
 	"io"
+	"time"
 
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -179,4 +181,12 @@ func AppendReaders(reader io.ReadCloser, logger *logp.Logger) (io.ReadCloser, er
 		}
 	}
 	return reader, nil
+}
+
+// SetReadDeadline delegates to the wrapped reader if it honors deadlines.
+func (r *Reader) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.reader.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
 }

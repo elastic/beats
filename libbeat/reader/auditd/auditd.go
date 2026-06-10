@@ -23,6 +23,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -183,8 +184,7 @@ func stripNodePrefix(line string) (string, string) {
 	return line[i+1:], line[len(prefix):i]
 }
 
-// RetainsContent reports whether anything below this auditd parser retains
-// Content. The parser itself parses each line within a single Next() call.
-func (p *Parser) RetainsContent() bool { return reader.RetainsContent(p.reader) }
-
-var _ reader.ContentRetainer = (*Parser)(nil)
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
+}

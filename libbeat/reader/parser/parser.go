@@ -20,6 +20,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/dustin/go-humanize"
 
@@ -41,14 +42,9 @@ var (
 
 // parser transforms or translates the Content attribute of a Message.
 // They are able to aggregate two or more Messages into a single one.
-//
-// Every parser is also a reader.ContentRetainer: it reports, via RetainsContent,
-// whether it keeps a reference to a Message's Content beyond the Next() call
-// that produced it. This lets the caller decide whether the buffer backing
-// Content can be safely reused across reads (see reader.RetainsContent).
 type Parser interface {
-	reader.Reader
-	reader.ContentRetainer
+	io.Closer
+	Next() (reader.Message, error)
 }
 
 type CommonConfig struct {
@@ -154,11 +150,7 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 
 }
 
-// Create builds the parser chain wrapping in. The returned reader is the
-// outermost parser (or in itself when no parsers are configured). Pass the
-// result to reader.RetainsContent to learn whether any parser in the chain
-// keeps Content across reads.
-func (c *Config) Create(in reader.Reader, log *logp.Logger) reader.Reader {
+func (c *Config) Create(in reader.Reader, log *logp.Logger) Parser {
 	p := in
 	for _, ns := range c.parsers {
 		name := ns.Name()

@@ -20,6 +20,7 @@ package filter
 import (
 	"context"
 	"io"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -92,8 +93,7 @@ func (p *FilterParser) Close() error {
 	return p.r.Close()
 }
 
-// RetainsContent reports whether anything below this filter retains Content.
-// The filter itself only matches against Content within a single Next() call.
-func (p *FilterParser) RetainsContent() bool { return reader.RetainsContent(p.r) }
-
-var _ reader.ContentRetainer = (*FilterParser)(nil)
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *FilterParser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.r, t)
+}

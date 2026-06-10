@@ -78,12 +78,17 @@ func (r EncoderReader) Next() (reader.Message, error) {
 // of allocating a fresh one per line. It is ONLY safe when no downstream
 // consumer retains Content past the following Next() call: the caller must copy
 // Content before reading on (filestream's harvester does, via Message.ToEvent's
-// string(Content)) and no reader in the chain may retain it (see
-// reader.RetainsContent). Call it before reading begins.
+// string(Content)) and no reader in the chain may hold a reference into the
+// buffer across reads. Call it before reading begins.
 func (r EncoderReader) EnableDecodeBufferReuse() {
 	r.reader.enableDecodeBufferReuse()
 }
 
 func (r EncoderReader) Close() error {
 	return r.reader.Close()
+}
+
+// SetReadDeadline delegates to the underlying line reader (see reader.DeadlineSetter).
+func (r EncoderReader) SetReadDeadline(t time.Time) bool {
+	return r.reader.SetReadDeadline(t)
 }

@@ -206,8 +206,7 @@ func NewParser(r reader.Reader, cfg *Config, logger *logp.Logger) *Parser {
 	}
 }
 
-// RetainsContent reports whether anything below this syslog parser retains
-// Content. The parser itself replaces Content within a single Next() call.
-func (p *Parser) RetainsContent() bool { return reader.RetainsContent(p.reader) }
-
-var _ reader.ContentRetainer = (*Parser)(nil)
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *Parser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
+}

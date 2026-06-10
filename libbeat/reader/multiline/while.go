@@ -246,15 +246,3 @@ func (pr *whilePatternReader) Close() error {
 func (pr *whilePatternReader) readClosed() (reader.Message, error) {
 	return reader.Message{}, io.EOF
 }
-
-// RetainsContent is true conservatively. This reader accumulates lines into its
-// own backing array (a copy), matches against the current line (not the buffered
-// one), and does not read messageBuffer.last, so it would not strictly corrupt
-// under decode-buffer reuse today. But it shares messageBuffer with
-// patternReader, which stores a raw, buffer-aliasing reference to the last line
-// (messageBuffer.last) on every addLine. Reporting true keeps reuse off for all
-// multiline modes rather than relying on the non-contractual detail that this
-// mode never reads that raw slice.
-func (pr *whilePatternReader) RetainsContent() bool { return true }
-
-var _ reader.ContentRetainer = (*whilePatternReader)(nil)

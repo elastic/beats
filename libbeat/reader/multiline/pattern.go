@@ -304,9 +304,3 @@ func genPatternMatcher(
 	}
 	return matcher, nil
 }
-
-// RetainsContent reports that the pattern multiline reader keeps a reference to
-// a line's Content across reads (it compares the previous line to the next).
-func (pr *patternReader) RetainsContent() bool { return true }
-
-var _ reader.ContentRetainer = (*patternReader)(nil)

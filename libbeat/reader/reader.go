@@ -18,7 +18,9 @@
 package reader
 
 import (
+	"errors"
 	"io"
+	"time"
 )
 
 // Reader is the interface that wraps the basic Next method for
@@ -30,22 +32,25 @@ type Reader interface {
 	Next() (Message, error)
 }
 
-// ContentRetainer is an optional capability for readers that keep a reference to
-// a Message's Content beyond the Next() call that produced it — for example the
-// multiline reader, which compares the previous line against the next. Readers
-// that copy or fully transform Content within a single Next() do not implement
-// it (or report that only an inner reader retains).
-type ContentRetainer interface {
-	// RetainsContent reports whether this reader, or any reader it wraps, holds
-	// on to a Message's Content past the next Next() call.
-	RetainsContent() bool
+// ErrReadDeadline is returned by a read whose deadline (set via
+// DeadlineSetter.SetReadDeadline) elapsed before a line was available.
+var ErrReadDeadline = errors.New("read deadline exceeded")
+
+// DeadlineSetter is implemented by readers whose blocking wait for more data can
+// be bounded by a deadline, allowing a timeout to be enforced synchronously
+// without a background goroutine. Wrapping readers delegate to the reader they
+// wrap; the reader that actually blocks (e.g. the file reader) honors it.
+type DeadlineSetter interface {
+	// SetReadDeadline bounds how long the next blocking read may wait for data. A
+	// zero time clears the deadline. It returns true if the deadline is honored by
+	// this reader or one it wraps, so a caller can detect support and otherwise
+	// fall back. When the deadline elapses mid-wait, the read returns ErrReadDeadline.
+	SetReadDeadline(t time.Time) bool
 }
 
-// RetainsContent reports whether r, or any reader it wraps, retains a Message's
-// Content across Next() calls. Readers that don't implement ContentRetainer
-// return false. It lets a caller decide whether the buffer backing Content can
-// be reused across reads without corrupting an in-flight message.
-func RetainsContent(r Reader) bool {
-	c, ok := r.(ContentRetainer)
-	return ok && c.RetainsContent()
+// SetReadDeadline sets a read deadline on r if r (or a reader it wraps) supports
+// it, returning whether it was honored.
+func SetReadDeadline(r Reader, t time.Time) bool {
+	d, ok := r.(DeadlineSetter)
+	return ok && d.SetReadDeadline(t)
 }

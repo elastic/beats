@@ -255,8 +255,7 @@ func MergeJSONFields(data mapstr.M, jsonFields mapstr.M, text *string, config Co
 	return id, time.Time{}
 }
 
-// RetainsContent reports whether anything below this JSON parser retains
-// Content. The parser itself decodes Content within a single Next() call.
-func (p *JSONParser) RetainsContent() bool { return reader.RetainsContent(p.reader) }
-
-var _ reader.ContentRetainer = (*JSONParser)(nil)
+// SetReadDeadline delegates to the wrapped reader (see reader.DeadlineSetter).
+func (p *JSONParser) SetReadDeadline(t time.Time) bool {
+	return reader.SetReadDeadline(p.reader, t)
+}

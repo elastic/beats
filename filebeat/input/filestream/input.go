@@ -517,20 +517,20 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
+	// Reuse the decode buffer that backs each line's Content to avoid a per-line
+	// allocation. The harvester copies Content into the event (via
+	// Message.ToEvent's string(Content)) before reading the next line, and no
+	// reader/parser in the chain holds a reference into the decode buffer across
+	// reads, so reuse never corrupts an in-flight message. The buffer-reuse
+	// torture test in libbeat/reader/parser guards this invariant for parsers.
+	encReader.EnableDecodeBufferReuse()
+
 	var r reader.Reader = encReader
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
-
-	// Reuse the decode buffer that backs each line's Content to avoid a per-line
-	// allocation. Safe only when no reader in the chain retains Content across
-	// reads (e.g. multiline): the harvester copies Content via Message.ToEvent
-	// before the next read, so a non-retaining chain never sees a reused buffer.
-	if !reader.RetainsContent(r) {
-		encReader.EnableDecodeBufferReuse()
-	}
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 

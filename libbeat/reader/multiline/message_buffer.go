@@ -62,7 +62,7 @@ func (b *messageBuffer) load(m reader.Message) {
 // clearBuffer resets the reader buffer variables
 func (b *messageBuffer) clear() {
 	b.message = reader.Message{}
-	b.last = nil
+	b.last = b.last[:0] // keep the backing array to reuse across messages
 	b.numLines = 0
 	b.processedLines = 0
 	b.truncated = 0
@@ -112,7 +112,10 @@ func (b *messageBuffer) addLine(m reader.Message) {
 	}
 	b.processedLines++
 
-	b.last = m.Content
+	// Copy (rather than alias) the last line so the reader does not hold a
+	// reference into the decode buffer, which lets that buffer be reused across
+	// reads. The backing array is reused across lines and messages.
+	b.last = append(b.last[:0], m.Content...)
 	b.message.Bytes += m.Bytes
 	b.message.AddFields(m.Fields)
 }

@@ -19,11 +19,15 @@ package readfile
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
@@ -84,4 +88,47 @@ func TestEncodeLines(t *testing.T) {
 			assert.Equal(t, testCase.Output, output)
 		})
 	}
+}
+
+// deadlineReadCloser is an io.ReadCloser that records SetReadDeadline calls,
+// standing in for the file reader at the bottom of the readfile chain.
+type deadlineReadCloser struct {
+	deadline    time.Time
+	gotDeadline bool
+}
+
+func (d *deadlineReadCloser) Read(p []byte) (int, error) { return 0, io.EOF }
+func (d *deadlineReadCloser) Close() error               { return nil }
+func (d *deadlineReadCloser) SetReadDeadline(t time.Time) bool {
+	d.gotDeadline = true
+	d.deadline = t
+	return true
+}
+
+// TestReadersForwardReadDeadline verifies that the readfile readers used in the
+// filestream chain below multiline (EncodeReader/LineReader, StripNewline,
+// FileMetaReader) forward SetReadDeadline down to the underlying source. The
+// multiline timeout is enforced synchronously via this deadline, so a reader
+// that fails to forward it would silently leave multiline unable to time out.
+func TestReadersForwardReadDeadline(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	src := &deadlineReadCloser{}
+	codec, _ := encoding.Plain(src)
+	enc, err := NewEncodeReader(src, Config{
+		Codec:      codec,
+		BufferSize: 64,
+		Terminator: LineFeed,
+		MaxBytes:   1 << 20,
+	}, logger)
+	require.NoError(t, err)
+
+	var r reader.Reader = enc
+	r = NewStripNewline(r, LineFeed)
+	r = NewFilemeta(r, "path", createTestFileInfo(), false, false, "", 0)
+
+	deadline := time.Now().Add(time.Hour)
+	require.True(t, reader.SetReadDeadline(r, deadline),
+		"deadline did not reach the source through the readfile chain")
+	require.True(t, src.gotDeadline, "source never received SetReadDeadline")
+	require.Equal(t, deadline, src.deadline)
 }
