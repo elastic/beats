@@ -171,16 +171,15 @@ func (f *freeList) pushBatch(indices []int) {
 func (f *freeList) removeIndex(x int) bool {
 	sh := &f.shards[x&f.mask]
 	sh.mu.Lock()
+	defer sh.mu.Unlock()
 	for k := range sh.idx {
 		if sh.idx[k] == x {
 			last := len(sh.idx) - 1
 			sh.idx[k] = sh.idx[last]
 			sh.idx = sh.idx[:last]
-			sh.mu.Unlock()
 			return true
 		}
 	}
-	sh.mu.Unlock()
 	return false
 }
 
