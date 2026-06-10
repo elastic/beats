@@ -66,6 +66,11 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 	}
 
 	bp.pdataProcs = buildPdataProcs(bp.processors)
+	if bp.pdataProcs != nil {
+		bp.logger.Debug("All processors implement PdataProcessor, using pdata-native path")
+	} else {
+		bp.logger.Debug("One or more processors do not implement PdataProcessor, using legacy mapstr path")
+	}
 	return bp, nil
 }
 

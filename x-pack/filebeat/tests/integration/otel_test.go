@@ -2360,3 +2360,190 @@ exporters:
 		Len()
 	assert.Equal(t, 0, matchingNotAdded, "expected `should_not_be_added` field to be absent")
 }
+
+// TestBeatProcessorGlobalProcessorsParityWithFilebeat verifies that global
+// processors configured in the OTel beat processor produce the same enriched
+// document as a plain filebeat running the identical processors.
+func TestBeatProcessorGlobalProcessorsParityWithFilebeat(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+	wantEvents := 1
+
+	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+	otelIndex := "logs-otel-" + namespace
+	fbIndex := "logs-filebeat-" + namespace
+
+	ports := libbeattesting.MustAvailableTCP4Ports(t, 2)
+	otelMonitoringPort := int(ports[0])
+	filebeatMonitoringPort := int(ports[1])
+
+	configParameters := struct {
+		Index     string
+		InputFile string
+		PathHome  string
+		HTTPPort  int
+	}{
+		Index:     otelIndex,
+		InputFile: filepath.Join(t.TempDir(), "log.log"),
+		PathHome:  t.TempDir(),
+		HTTPPort:  otelMonitoringPort,
+	}
+
+	otelConfigTemplate := `
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filebeatreceiver
+      processors:
+        - beat
+      exporters:
+        - elasticsearch/log
+        - debug
+  telemetry:
+    metrics:
+      level: none
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          id: filestream-global-processors-parity
+          enabled: true
+          paths:
+            - {{.InputFile}}
+          prospector.scanner.fingerprint.enabled: false
+          file_identity.native: ~
+    processors: []
+    logging:
+      level: info
+      selectors:
+        - '*'
+    queue.mem.flush.timeout: 0s
+    path.home: {{.PathHome}}
+    http.enabled: true
+    http.host: localhost
+    http.port: {{.HTTPPort}}
+processors:
+  beat:
+    processors:
+      - add_fields:
+          target: ""
+          fields:
+            custom_field: "global-processors-parity-test"
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+exporters:
+  debug:
+    use_internal_logger: false
+    verbosity: detailed
+  elasticsearch/log:
+    endpoints:
+      - http://localhost:9200
+    compression: none
+    user: admin
+    password: testing
+    logs_index: {{.Index}}
+    sending_queue:
+      enabled: true
+      batch:
+        flush_timeout: 1s
+`
+
+	var renderedOtelConfig bytes.Buffer
+	require.NoError(t, template.Must(template.New("otel").Parse(otelConfigTemplate)).Execute(&renderedOtelConfig, configParameters))
+	otelConfigContents := renderedOtelConfig.String()
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("OTel config:\n%s", otelConfigContents)
+		}
+	})
+
+	writeEventsToLogFile(t, configParameters.InputFile, wantEvents)
+	col := oteltestcol.New(t, otelConfigContents)
+
+	fbLogFile := filepath.Join(t.TempDir(), "log.log")
+	writeEventsToLogFile(t, fbLogFile, wantEvents)
+
+	fbConfig := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: filestream-global-processors-parity
+    enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    paths:
+      - %s
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    username: admin
+    password: testing
+    index: %s
+queue.mem.flush.timeout: 0s
+setup.template.enabled: false
+processors:
+  - add_fields:
+      target: ""
+      fields:
+        custom_field: "global-processors-parity-test"
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+http.enabled: true
+http.host: localhost
+http.port: %d
+`, fbLogFile, fbIndex, filebeatMonitoringPort)
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Filebeat config:\n%s", fbConfig)
+		}
+	})
+
+	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	filebeat.WriteConfigFile(fbConfig)
+	filebeat.Start()
+	defer filebeat.Stop()
+
+	es := integration.GetESClient(t, "http")
+
+	var otelDocs estools.Documents
+	var filebeatDocs estools.Documents
+	var err error
+
+	require.EventuallyWithTf(t,
+		func(ct *assert.CollectT) {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+otelIndex+"*")
+			assert.NoError(ct, err)
+
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-"+fbIndex+"*")
+			assert.NoError(ct, err)
+
+			assert.GreaterOrEqual(ct, otelDocs.Hits.Total.Value, wantEvents, "expected at least %d otel events, got %d", wantEvents, otelDocs.Hits.Total.Value)
+			assert.GreaterOrEqual(ct, filebeatDocs.Hits.Total.Value, wantEvents, "expected at least %d filebeat events, got %d", wantEvents, filebeatDocs.Hits.Total.Value)
+		},
+		2*time.Minute, 1*time.Second, "expected at least %d events for both otel and filebeat", wantEvents)
+
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+
+	ignoredFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"log.file.inode",
+		"log.file.path",
+		"log.file.device_id",
+	}
+
+	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents from OTel beat processor to match filebeat output")
+
+	// Confirm the pdata-native path was actually taken (not the legacy mapstr round-trip).
+	assert.Equal(t, 1, col.ObservedLogs().FilterMessageSnippet("using pdata-native path").Len(),
+		"expected beat processor to take pdata-native path")
+}
