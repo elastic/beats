@@ -73,6 +73,17 @@ func (r EncoderReader) Next() (reader.Message, error) {
 	}, err
 }
 
+// EnableDecodeBufferReuse makes the underlying line reader reuse the backing
+// array of the decoded line (the Content returned by Next) across reads instead
+// of allocating a fresh one per line. It is ONLY safe when no downstream
+// consumer retains Content past the following Next() call: the caller must copy
+// Content before reading on (filestream's harvester does, via Message.ToEvent's
+// string(Content)) and no reader in the chain may retain it (see
+// reader.RetainsContent). Call it before reading begins.
+func (r EncoderReader) EnableDecodeBufferReuse() {
+	r.reader.enableDecodeBufferReuse()
+}
+
 func (r EncoderReader) Close() error {
 	return r.reader.Close()
 }

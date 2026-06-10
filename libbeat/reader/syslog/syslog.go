@@ -205,3 +205,9 @@ func NewParser(r reader.Reader, cfg *Config, logger *logp.Logger) *Parser {
 		logger: logger.Named("reader_syslog"),
 	}
 }
+
+// RetainsContent reports whether anything below this syslog parser retains
+// Content. The parser itself replaces Content within a single Next() call.
+func (p *Parser) RetainsContent() bool { return reader.RetainsContent(p.reader) }
+
+var _ reader.ContentRetainer = (*Parser)(nil)

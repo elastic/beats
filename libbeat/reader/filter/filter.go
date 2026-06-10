@@ -91,3 +91,9 @@ func (p *FilterParser) Close() error {
 	p.ctx.Cancel()
 	return p.r.Close()
 }
+
+// RetainsContent reports whether anything below this filter retains Content.
+// The filter itself only matches against Content within a single Next() call.
+func (p *FilterParser) RetainsContent() bool { return reader.RetainsContent(p.r) }
+
+var _ reader.ContentRetainer = (*FilterParser)(nil)

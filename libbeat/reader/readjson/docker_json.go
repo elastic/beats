@@ -309,3 +309,9 @@ func stripNewLineWin(msg *reader.Message) {
 func (p *DockerJSONReader) Close() error {
 	return p.reader.Close()
 }
+
+// RetainsContent reports that the container reader may join partial log lines
+// across reads, holding earlier Content until the line is complete.
+func (p *DockerJSONReader) RetainsContent() bool { return true }
+
+var _ reader.ContentRetainer = (*DockerJSONReader)(nil)

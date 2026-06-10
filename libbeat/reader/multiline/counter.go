@@ -152,3 +152,14 @@ func (cr *counterReader) Close() error {
 func (cr *counterReader) readClosed() (reader.Message, error) {
 	return reader.Message{}, io.EOF
 }
+
+// RetainsContent is true conservatively. This reader accumulates lines into its
+// own backing array (a copy) and does not itself read messageBuffer.last, so it
+// would not strictly corrupt under decode-buffer reuse today. But it shares
+// messageBuffer with patternReader, which stores a raw, buffer-aliasing
+// reference to the last line (messageBuffer.last) on every addLine. Reporting
+// true keeps reuse off for all multiline modes rather than relying on the
+// non-contractual detail that this mode never reads that raw slice.
+func (cr *counterReader) RetainsContent() bool { return true }
+
+var _ reader.ContentRetainer = (*counterReader)(nil)

@@ -507,8 +507,7 @@ func (inp *filestream) open(
 	// The further size limiting is performed by LimitReader at the end of the readers pipeline as needed.
 	encReaderMaxBytes := inp.readerConfig.MaxBytes * 4
 
-	var r reader.Reader
-	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
+	encReader, err := readfile.NewEncodeReader(dbgReader, readfile.Config{
 		Codec:      encoding,
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
@@ -518,11 +517,20 @@ func (inp *filestream) open(
 		return nil, truncated, err
 	}
 
+	var r reader.Reader = encReader
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
+
+	// Reuse the decode buffer that backs each line's Content to avoid a per-line
+	// allocation. Safe only when no reader in the chain retains Content across
+	// reads (e.g. multiline): the harvester copies Content via Message.ToEvent
+	// before the next read, so a non-retaining chain never sees a reused buffer.
+	if !reader.RetainsContent(r) {
+		encReader.EnableDecodeBufferReuse()
+	}
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 

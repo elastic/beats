@@ -822,3 +822,78 @@ func (r *messageReader) Close() error {
 	r.read = false
 	return nil
 }
+
+func TestRetainsContent(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	mkConfig := func(t *testing.T, parsers map[string]interface{}) Config {
+		t.Helper()
+		cfg := config.MustNewConfigFrom(parsers)
+		var pc struct {
+			Parsers []config.Namespace `config:"parsers"`
+		}
+		require.NoError(t, cfg.Unpack(&pc))
+		c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, pc.Parsers)
+		require.NoError(t, err)
+		return *c
+	}
+
+	parsersList := func(p ...map[string]interface{}) map[string]interface{} {
+		return map[string]interface{}{"parsers": p}
+	}
+
+	tests := map[string]struct {
+		parsers map[string]interface{}
+		want    bool
+	}{
+		"no parsers": {
+			parsers: map[string]interface{}{},
+			want:    false,
+		},
+		"multiline retains": {
+			parsers: parsersList(map[string]interface{}{
+				"multiline": map[string]interface{}{"type": "count", "count_lines": 3},
+			}),
+			want: true,
+		},
+		"ndjson does not retain": {
+			parsers: parsersList(map[string]interface{}{
+				"ndjson": map[string]interface{}{"keys_under_root": true},
+			}),
+			want: false,
+		},
+		"syslog does not retain": {
+			parsers: parsersList(map[string]interface{}{
+				"syslog": map[string]interface{}{"format": "auto"},
+			}),
+			want: false,
+		},
+		"include_message does not retain": {
+			parsers: parsersList(map[string]interface{}{
+				"include_message": map[string]interface{}{"patterns": []string{"foo"}},
+			}),
+			want: false,
+		},
+		"container retains": {
+			parsers: parsersList(map[string]interface{}{
+				"container": map[string]interface{}{"stream": "all", "format": "auto"},
+			}),
+			want: true,
+		},
+		"non-retaining parser over a retaining one still retains": {
+			parsers: parsersList(
+				map[string]interface{}{"multiline": map[string]interface{}{"type": "count", "count_lines": 3}},
+				map[string]interface{}{"ndjson": map[string]interface{}{"keys_under_root": true}},
+			),
+			want: true,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			c := mkConfig(t, tc.parsers)
+			chain := c.Create(testReader(""), logger)
+			require.Equal(t, tc.want, reader.RetainsContent(chain))
+		})
+	}
+}

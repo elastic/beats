@@ -182,3 +182,9 @@ func stripNodePrefix(line string) (string, string) {
 	}
 	return line[i+1:], line[len(prefix):i]
 }
+
+// RetainsContent reports whether anything below this auditd parser retains
+// Content. The parser itself parses each line within a single Next() call.
+func (p *Parser) RetainsContent() bool { return reader.RetainsContent(p.reader) }
+
+var _ reader.ContentRetainer = (*Parser)(nil)

@@ -1,0 +1,32 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user's deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: enhancement
+
+# Change summary; a 80ish characters long description of the change.
+summary: Reduce filestream memory usage and allocations by reusing the line decode buffer
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  The filestream line reader now reuses the backing array of each decoded line
+  instead of allocating a fresh one per line, removing one allocation per event
+  and lowering steady-state memory and GC pressure. The reuse is enabled only
+  when no buffering parser (e.g. multiline) is configured, since the harvester
+  copies the line into the event before reading the next one.
+
+# Affected component; a word indicating the component this changeset affects.
+component: filebeat
+
+# PR URL; optional; the PR number that added the changeset.
+#pr: https://github.com/elastic/beats/pull/XXXXX
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+#issue: https://github.com/owner/repo/1234

@@ -29,3 +29,23 @@ type Reader interface {
 	io.Closer
 	Next() (Message, error)
 }
+
+// ContentRetainer is an optional capability for readers that keep a reference to
+// a Message's Content beyond the Next() call that produced it — for example the
+// multiline reader, which compares the previous line against the next. Readers
+// that copy or fully transform Content within a single Next() do not implement
+// it (or report that only an inner reader retains).
+type ContentRetainer interface {
+	// RetainsContent reports whether this reader, or any reader it wraps, holds
+	// on to a Message's Content past the next Next() call.
+	RetainsContent() bool
+}
+
+// RetainsContent reports whether r, or any reader it wraps, retains a Message's
+// Content across Next() calls. Readers that don't implement ContentRetainer
+// return false. It lets a caller decide whether the buffer backing Content can
+// be reused across reads without corrupting an in-flight message.
+func RetainsContent(r Reader) bool {
+	c, ok := r.(ContentRetainer)
+	return ok && c.RetainsContent()
+}

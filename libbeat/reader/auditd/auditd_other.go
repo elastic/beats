@@ -38,3 +38,7 @@ func (p *Parser) Next() (reader.Message, error) {
 func NewParser(_ reader.Reader, _ Config, _ *logp.Logger) *Parser {
 	return &Parser{}
 }
+
+func (p *Parser) RetainsContent() bool { return false }
+
+var _ reader.ContentRetainer = (*Parser)(nil)
