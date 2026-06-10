@@ -261,39 +261,6 @@ func mergeIntoMap(key string, val any, dst pcommon.Map) error {
 	return FromMapstr(dst.PutEmptyMap(key), m)
 }
 
-// MergeMapstrIntoPdataNoOverwrite deep-merges src into dst without overwriting
-// existing leaf values, equivalent to mapstr.M.DeepUpdateNoOverwrite for
-// pcommon.Map. Map-typed values are recursed into; all other values are skipped
-// if the key already exists in dst.
-func MergeMapstrIntoPdataNoOverwrite(src mapstr.M, dst pcommon.Map) error {
-	for key, val := range src {
-		if err := mergeIntoMapNoOverwrite(key, val, dst); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func mergeIntoMapNoOverwrite(key string, val any, dst pcommon.Map) error {
-	switch x := val.(type) {
-	case mapstr.M:
-		if existing, ok := dst.Get(key); ok {
-			if existing.Type() == pcommon.ValueTypeMap {
-				return MergeMapstrIntoPdataNoOverwrite(x, existing.Map())
-			}
-			return nil
-		}
-		return FromMapstr(dst.PutEmptyMap(key), x)
-	case map[string]any:
-		return mergeIntoMapNoOverwrite(key, mapstr.M(x), dst)
-	default:
-		if _, exists := dst.Get(key); !exists {
-			return putIntoMap(key, val, dst)
-		}
-		return nil
-	}
-}
-
 // PdataValuesMap wraps a pcommon.Map to satisfy the conditions.ValuesMap interface,
 // allowing condition evaluation directly on a log record body without a ToMapstr call.
 type PdataValuesMap struct {
