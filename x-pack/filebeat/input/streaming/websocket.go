@@ -461,6 +461,9 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 		retryConfig := cfg.Retry
 		if !retryConfig.InfiniteRetries {
 			for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
+				if err = ctx.Err(); err != nil {
+					return nil, nil, err
+				}
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
 					stat.UpdateStatus(status.Running, "")
@@ -479,7 +482,13 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
-				time.Sleep(waitTime)
+				timer := time.NewTimer(waitTime)
+				select {
+				case <-ctx.Done():
+					timer.Stop()
+					return nil, nil, ctx.Err()
+				case <-timer.C:
+				}
 			}
 			if response == nil {
 				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
@@ -487,6 +496,9 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
 		} else {
 			for attempt := 1; ; attempt++ {
+				if err = ctx.Err(); err != nil {
+					return nil, nil, err
+				}
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
 					stat.UpdateStatus(status.Running, "")
@@ -505,7 +517,13 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
-				time.Sleep(waitTime)
+				timer := time.NewTimer(waitTime)
+				select {
+				case <-ctx.Done():
+					timer.Stop()
+					return nil, nil, ctx.Err()
+				case <-timer.C:
+				}
 			}
 		}
 	}
