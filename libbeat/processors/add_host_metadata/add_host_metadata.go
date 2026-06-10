@@ -274,7 +274,7 @@ func skipAddingHostMetadataPdata(body pcommon.Map) bool {
 	}
 	hostMap := hostVal.Map()
 	_, hasName := hostMap.Get("name")
-	return hostMap.Len() > 0 && !(hasName && hostMap.Len() == 1)
+	return hostMap.Len() > 0 && (!hasName || hostMap.Len() != 1)
 }
 
 func (p *addHostMetadata) String() string {

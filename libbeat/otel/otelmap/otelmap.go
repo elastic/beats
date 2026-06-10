@@ -208,7 +208,7 @@ func putIntoMap(key string, val any, dst pcommon.Map) error {
 	case int64:
 		dst.PutInt(key, v)
 	case uint:
-		dst.PutInt(key, int64(maskUnsignedInt(uint64(v))))
+		dst.PutInt(key, maskUnsignedInt(uint64(v)))
 	case uint8:
 		dst.PutInt(key, int64(v))
 	case uint16:

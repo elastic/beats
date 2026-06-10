@@ -248,7 +248,7 @@ func BenchmarkAddHostMetadata(b *testing.B) {
 				tc.logRecord().CopyTo(lr)
 			}
 
-				// Legacy path: wrap proc in legacyOnlyProcessor to hide PdataProcessor.
+			// Legacy path: wrap proc in legacyOnlyProcessor to hide PdataProcessor.
 			b.Run("legacy/"+name, func(b *testing.B) {
 				bp := &beatProcessor{
 					logger:     zap.NewNop(),
@@ -266,9 +266,9 @@ func BenchmarkAddHostMetadata(b *testing.B) {
 					b.Skip("processor does not implement PdataProcessor")
 				}
 				bp := &beatProcessor{
-					logger:      zap.NewNop(),
-					processors:  []beat.Processor{proc},
-					pdataProcs:  pdataProcs,
+					logger:     zap.NewNop(),
+					processors: []beat.Processor{proc},
+					pdataProcs: pdataProcs,
 				}
 				for b.Loop() {
 					_, _ = bp.ConsumeLogs(context.Background(), logs)
