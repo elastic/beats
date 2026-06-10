@@ -692,7 +692,7 @@ func TestCacheMongoVersion_RetryOnError(t *testing.T) {
 
 	// First call: getter fails → version must not be cached so next fetch retries.
 	ms.cacheMongoVersion(nil)
-	assert.Equal(t, "", ms.mongoVersion, "version must not be cached on error")
+	assert.Empty(t, ms.mongoVersion, "version must not be cached on error")
 	assert.Equal(t, 1, callCount, "getter called once")
 
 	// Second call: getter succeeds → version is now cached.
@@ -721,7 +721,7 @@ func TestCacheMongoVersion_EmptyStringNotCached(t *testing.T) {
 	}
 
 	ms.cacheMongoVersion(nil)
-	assert.Equal(t, "", ms.mongoVersion, "empty version must not be cached")
+	assert.Empty(t, ms.mongoVersion, "empty version must not be cached")
 	assert.Equal(t, 1, callCount)
 
 	ms.cacheMongoVersion(nil)
@@ -740,7 +740,7 @@ func TestCacheMongoVersion_PermanentFailureUsesLegacyPath(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 		ms.cacheMongoVersion(nil)
-		assert.Equal(t, "", ms.mongoVersion, "version must remain uncached after failure #%d", i+1)
+		assert.Empty(t, ms.mongoVersion, "version must remain uncached after failure #%d", i+1)
 		assert.False(t, isVersionAtLeast(ms.mongoVersion, "6.2.0"), "must use legacy path when version unknown")
 	}
 }

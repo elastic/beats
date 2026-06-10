@@ -62,10 +62,10 @@ type CollectionInfo struct {
 // multiple fetch calls.
 type Metricset struct {
 	*mongodb.Metricset
-	log           *logp.Logger                         // cached logger
-	mongoVersion  string                                // cached MongoDB version; empty means not yet fetched
-	options       CollStatsOptions                      // configuration options
-	versionGetter func(*mongo.Client) (string, error)  // injectable for testing; defaults to getMongoDBVersion
+	log           *logp.Logger                        // cached logger
+	mongoVersion  string                              // cached MongoDB version; empty means not yet fetched
+	options       CollStatsOptions                    // configuration options
+	versionGetter func(*mongo.Client) (string, error) // injectable for testing; defaults to getMongoDBVersion
 }
 
 // New creates a new instance of the Metricset
