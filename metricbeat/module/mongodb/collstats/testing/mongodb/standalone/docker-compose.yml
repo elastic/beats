@@ -1,7 +1,7 @@
 version: "3.8"
 
-# Generic standalone MongoDB configuration for versions 5.0 - 7.0+
-# Usage: MONGO_VERSION=6.2 docker-compose -f docker-compose.yml up -d
+# Generic standalone MongoDB configuration for versions 4.4+
+# Usage: MONGO_VERSION=6.0 docker-compose -f docker-compose.yml up -d
 
 x-mongo-image: &mongo_image ${MONGO_IMAGE:-mongo}:${MONGO_VERSION:-7.0}
 
@@ -19,7 +19,7 @@ services:
       - mongodb_data:/data/db
       - ./init-scripts:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "mongosh --eval \"db.adminCommand('ping')\" || mongo --eval \"db.adminCommand('ping')\""]
       interval: 5s
       timeout: 5s
       retries: 10

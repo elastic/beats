@@ -28,6 +28,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
@@ -60,8 +62,10 @@ type CollectionInfo struct {
 // multiple fetch calls.
 type Metricset struct {
 	*mongodb.Metricset
-	mongoVersion string           // cached MongoDB version
-	options      CollStatsOptions // configuration options
+	log           *logp.Logger                         // cached logger
+	mongoVersion  string                                // cached MongoDB version; empty means not yet fetched
+	options       CollStatsOptions                      // configuration options
+	versionGetter func(*mongo.Client) (string, error)  // injectable for testing; defaults to getMongoDBVersion
 }
 
 // New creates a new instance of the Metricset
@@ -85,9 +89,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &Metricset{
-		Metricset:    ms,
-		mongoVersion: "",
-		options:      options,
+		Metricset:     ms,
+		log:           ms.Logger(),
+		mongoVersion:  "",
+		options:       options,
+		versionGetter: getMongoDBVersion,
 	}, nil
 }
 
@@ -106,17 +112,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		}
 	}()
 
-	// Get MongoDB version if not cached
-	if m.mongoVersion == "" {
-		version, err := getMongoDBVersion(client)
-		if err != nil {
-			m.Logger().Warnf("Failed to get MongoDB version, using legacy mode: %v", err)
-			m.mongoVersion = "unknown"
-		} else {
-			m.mongoVersion = version
-			m.Logger().Debugf("Detected MongoDB version: %s", version)
-		}
-	}
+	m.cacheMongoVersion(client)
 
 	// Try top command first (works on mongod), fall back to listCollections (works on mongos)
 	collections, err := m.getCollectionsFromTop(client)
@@ -186,6 +182,32 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error processing mongodb collstats: %w", err)
 	}
 	return nil
+}
+
+// cacheMongoVersion fetches and caches the MongoDB version if not already cached.
+// Failures are intentionally not cached: the next Fetch will retry, so a transient
+// error (e.g. MongoDB not yet ready) or a later server upgrade is handled automatically.
+func (m *Metricset) cacheMongoVersion(client *mongo.Client) {
+	if m.mongoVersion != "" {
+		return
+	}
+	version, err := m.versionGetter(client)
+	if err != nil {
+		if m.log != nil {
+			m.log.Warnf("Failed to get MongoDB version, will retry next fetch: %v", err)
+		}
+		return
+	}
+	if version == "" {
+		if m.log != nil {
+			m.log.Warnf("MongoDB returned an empty version string, will retry next fetch")
+		}
+		return
+	}
+	m.mongoVersion = version
+	if m.log != nil {
+		m.log.Debugf("Detected MongoDB version: %s", version)
+	}
 }
 
 // fetchCollStatsWithVersion selects the appropriate method based on MongoDB version
@@ -574,12 +596,18 @@ func isVersionAtLeast(current, target string) bool {
 	currentParts := parseVersion(current)
 	targetParts := parseVersion(target)
 
-	// Compare major, minor, patch
-	for i := 0; i < 3 && i < len(currentParts) && i < len(targetParts); i++ {
-		if currentParts[i] > targetParts[i] {
+	// Compare major, minor, patch — treat absent parts in current as 0.
+	// This prevents a major-only string like "6" from being incorrectly
+	// accepted as >= "6.2.0" just because the loop exhausted currentParts early.
+	for i := 0; i < 3 && i < len(targetParts); i++ {
+		curr := 0
+		if i < len(currentParts) {
+			curr = currentParts[i]
+		}
+		if curr > targetParts[i] {
 			return true
 		}
-		if currentParts[i] < targetParts[i] {
+		if curr < targetParts[i] {
 			return false
 		}
 	}

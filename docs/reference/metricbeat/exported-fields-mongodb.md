@@ -147,49 +147,49 @@ MongoDB collection statistics metrics.
 
 
 **`mongodb.collstats.stats.size`**
-:   The total uncompressed size in memory of all records in a collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.size`.
+:   The total uncompressed size in memory of all records in a collection.
 
     type: long
 
 
 **`mongodb.collstats.stats.count`**
-:   The number of objects or documents in this collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.count`.
+:   The number of objects or documents in this collection.
 
     type: long
 
 
 **`mongodb.collstats.stats.avgObjSize`**
-:   The average size of an object in the collection (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.avgObjSize`.
+:   The average size of an object in the collection (in bytes).
 
     type: long
 
 
 **`mongodb.collstats.stats.storageSize`**
-:   The total amount of storage allocated to this collection for document storage (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.storageSize`.
+:   The total amount of storage allocated to this collection for document storage (in bytes).
 
     type: long
 
 
 **`mongodb.collstats.stats.totalIndexSize`**
-:   The total size of all indexes (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.totalIndexSize`.
+:   The total size of all indexes (in bytes).
 
     type: long
 
 
 **`mongodb.collstats.stats.totalSize`**
-:   The sum of the storageSize and totalIndexSize (in bytes). In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.totalSize`.
+:   The sum of the storageSize and totalIndexSize (in bytes).
 
     type: long
 
 
 **`mongodb.collstats.stats.max`**
-:   Shows the maximum number of documents that may be present in a capped collection. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.max`.
+:   Shows the maximum number of documents that may be present in a capped collection.
 
     type: long
 
 
 **`mongodb.collstats.stats.nindexes`**
-:   The number of indexes on the collection. All collections have at least one index on the _id field. In versions before 9.2.0, this field is called `mongodb.collstats.stats.stats.nindexes`.
+:   The number of indexes on the collection. All collections have at least one index on the _id field.
 
     type: long
 

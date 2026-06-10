@@ -104,8 +104,11 @@ func TestFetchStandaloneVersions(t *testing.T) {
 		port                string
 		expectExtendedStats bool
 	}{
+		{version: "4.4", port: "27516", expectExtendedStats: false}, // oldest available; uses legacy collStats command
 		{version: "5.0", port: "27518", expectExtendedStats: false},
-		{version: "7.0", port: "27519", expectExtendedStats: true},
+		{version: "6.0", port: "27520", expectExtendedStats: false}, // 6.0 < 6.2.0: uses legacy collStats command
+		{version: "7.0", port: "27519", expectExtendedStats: true},  // 7.0 > 6.2.0: uses $collStats aggregation
+		{version: "8.0", port: "27521", expectExtendedStats: true},  // latest LTS; uses $collStats aggregation
 	}
 
 	originalWD, err := os.Getwd()

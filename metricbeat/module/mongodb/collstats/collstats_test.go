@@ -20,9 +20,11 @@
 package collstats
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func TestFlattenAggregationResult_NoStorageStats(t *testing.T) {
@@ -640,6 +642,32 @@ func TestIsVersionAtLeast(t *testing.T) {
 			target:   "6.2.0",
 			expected: true,
 		},
+		// Major-only strings: missing minor/patch must be treated as 0, not as "equal so far → true".
+		{
+			name:     "major only below boundary",
+			current:  "6",
+			target:   "6.2.0",
+			expected: false, // "6" == "6.0.0", which is < 6.2.0
+		},
+		{
+			name:     "major only above boundary",
+			current:  "7",
+			target:   "6.2.0",
+			expected: true,
+		},
+		// Major.minor-only strings: missing patch treated as 0.
+		{
+			name:     "major.minor below boundary",
+			current:  "6.1",
+			target:   "6.2.0",
+			expected: false,
+		},
+		{
+			name:     "major.minor at boundary",
+			current:  "6.2",
+			target:   "6.2.0",
+			expected: true, // "6.2" == "6.2.0"
+		},
 	}
 
 	for _, tt := range tests {
@@ -647,5 +675,72 @@ func TestIsVersionAtLeast(t *testing.T) {
 			result := isVersionAtLeast(tt.current, tt.target)
 			assert.Equal(t, tt.expected, result)
 		})
+	}
+}
+
+func TestCacheMongoVersion_RetryOnError(t *testing.T) {
+	callCount := 0
+	ms := &Metricset{
+		versionGetter: func(_ *mongo.Client) (string, error) {
+			callCount++
+			if callCount == 1 {
+				return "", errors.New("temporary connection error")
+			}
+			return "7.0.0", nil
+		},
+	}
+
+	// First call: getter fails → version must not be cached so next fetch retries.
+	ms.cacheMongoVersion(nil)
+	assert.Equal(t, "", ms.mongoVersion, "version must not be cached on error")
+	assert.Equal(t, 1, callCount, "getter called once")
+
+	// Second call: getter succeeds → version is now cached.
+	ms.cacheMongoVersion(nil)
+	assert.Equal(t, "7.0.0", ms.mongoVersion, "version cached after successful retry")
+	assert.Equal(t, 2, callCount, "getter called a second time")
+
+	// Third call: already cached → getter not called again.
+	ms.cacheMongoVersion(nil)
+	assert.Equal(t, "7.0.0", ms.mongoVersion, "cached version unchanged")
+	assert.Equal(t, 2, callCount, "getter not called when version already cached")
+}
+
+func TestCacheMongoVersion_EmptyStringNotCached(t *testing.T) {
+	// If the getter returns an empty version with no error (e.g. malformed server
+	// response), the empty string must not be stored — next fetch should retry.
+	callCount := 0
+	ms := &Metricset{
+		versionGetter: func(_ *mongo.Client) (string, error) {
+			callCount++
+			if callCount == 1 {
+				return "", nil // empty but no error
+			}
+			return "6.0.0", nil
+		},
+	}
+
+	ms.cacheMongoVersion(nil)
+	assert.Equal(t, "", ms.mongoVersion, "empty version must not be cached")
+	assert.Equal(t, 1, callCount)
+
+	ms.cacheMongoVersion(nil)
+	assert.Equal(t, "6.0.0", ms.mongoVersion, "real version cached on retry")
+	assert.Equal(t, 2, callCount)
+}
+
+func TestCacheMongoVersion_PermanentFailureUsesLegacyPath(t *testing.T) {
+	// A getter that always fails must leave mongoVersion as "" so every Fetch
+	// retries and always falls through to the legacy collStats command path.
+	ms := &Metricset{
+		versionGetter: func(_ *mongo.Client) (string, error) {
+			return "", errors.New("connection refused")
+		},
+	}
+
+	for i := 0; i < 3; i++ {
+		ms.cacheMongoVersion(nil)
+		assert.Equal(t, "", ms.mongoVersion, "version must remain uncached after failure #%d", i+1)
+		assert.False(t, isVersionAtLeast(ms.mongoVersion, "6.2.0"), "must use legacy path when version unknown")
 	}
 }
