@@ -23,10 +23,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -66,6 +68,12 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		return nil, err
 	}
 
+	// inBuffer accumulates raw bytes that are only ever decoded into outBuffer
+	// (a copy), never aliased downstream, so its backing array can always be
+	// reused across reads.
+	inBuffer := streambuf.New(nil)
+	inBuffer.SetReuse(true)
+
 	return &LineReader{
 		reader:       input,
 		maxBytes:     config.MaxBytes,
@@ -73,11 +81,21 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		nl:           nl,
 		decodedNl:    terminator,
 		collectOnEOF: config.CollectOnEOF,
-		inBuffer:     streambuf.New(nil),
-		outBuffer:    streambuf.New(nil),
-		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logger,
+		inBuffer:     inBuffer,
+		// outBuffer's backing array is handed to the message Content via Collect,
+		// so reuse is opt-in via enableDecodeBufferReuse once the caller has
+		// confirmed nothing downstream retains Content across reads.
+		outBuffer:  streambuf.New(nil),
+		tempBuffer: make([]byte, config.BufferSize),
+		logger:     logger,
 	}, nil
+}
+
+// enableDecodeBufferReuse lets the reader reuse outBuffer's backing array (which
+// backs each line's Content) across reads instead of allocating per line. Only
+// safe when nothing downstream retains Content past the next Next() call.
+func (r *LineReader) enableDecodeBufferReuse() {
+	r.outBuffer.SetReuse(true)
 }
 
 // Next reads the next line until the new line character.  The return
@@ -327,4 +345,13 @@ func (r *LineReader) decode(end int) (int, error) {
 
 func (r *LineReader) Close() error {
 	return r.reader.Close()
+}
+
+// SetReadDeadline delegates to the wrapped io.Reader if it honors deadlines, so
+// a synchronous timeout can bound the underlying blocking read.
+func (r *LineReader) SetReadDeadline(t time.Time) bool {
+	if d, ok := r.reader.(reader.DeadlineSetter); ok {
+		return d.SetReadDeadline(t)
+	}
+	return false
 }

@@ -39,13 +39,13 @@ import (
 
 // Error returned if Append or Write operation is not allowed due to the buffer
 // being fixed
-var ErrOperationNotAllowed = errors.New("Operation not allowed")
+var ErrOperationNotAllowed = errors.New("operation not allowed")
 
-var ErrOutOfRange = errors.New("Data access out of range")
+var ErrOutOfRange = errors.New("data access out of range")
 
 // Parse operation can not be continued. More bytes required. Only returned if
 // buffer is not fixed
-var ErrNoMoreBytes = errors.New("No more bytes")
+var ErrNoMoreBytes = errors.New("no more bytes")
 
 // Parse operation failed cause of buffer snapped short + buffer is fixed.
 var ErrUnexpectedEOB = errors.New("unexpected end of buffer")
@@ -64,6 +64,15 @@ type Buffer struct {
 	err   error
 	fixed bool
 
+	// reuse lets doAppend reclaim the wasted front of the backing array (the
+	// space Reset's window slide leaves behind) by compacting unconsumed bytes
+	// back to the front of b.base, instead of reallocating. It is only safe for
+	// buffers that never expose an alias of their backing array that must survive
+	// the next append (e.g. via Collect/Bytes). Opt in with SetReuse; b.base
+	// retains the full array so the slid-off front can be recovered.
+	reuse bool
+	base  []byte
+
 	// Internal parser state offsets.
 	// Offset is the position a parse might continue to work at when called
 	// again (e.g. useful for parsing tcp streams.). The mark is used to remember
@@ -76,6 +85,14 @@ type Buffer struct {
 	mark, offset, available int
 }
 
+// SetReuse enables backing-array reuse for this buffer. It must only be set on
+// buffers that never hand out a long-lived alias of their backing array (one
+// that must survive the next append), otherwise reuse would overwrite data that
+// is still in use. See the reuse field for details.
+func (b *Buffer) SetReuse(v bool) {
+	b.reuse = v
+}
+
 // Init initializes a zero buffer with some byte slice being retained by the
 // buffer. Usage of Init is optional as zero value Buffer is already in valid state.
 func (b *Buffer) Init(d []byte, fixed bool) {
@@ -85,6 +102,7 @@ func (b *Buffer) Init(d []byte, fixed bool) {
 	b.mark = 0
 	b.offset = 0
 	b.available = len(d)
+	b.base = nil
 }
 
 // New creates new extensible buffer from data slice being retained by the buffer.
@@ -130,11 +148,13 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 	if b.fixed {
 		return b.SetError(ErrOperationNotAllowed)
 	}
-	if b.err != nil && b.err != ErrNoMoreBytes {
+	if b.err != nil && !errors.Is(b.err, ErrNoMoreBytes) {
 		return b.err
 	}
 
-	if len(b.data) == 0 {
+	if b.reuse {
+		b.appendReuse(data)
+	} else if len(b.data) == 0 {
 		retain := retainable && cap(data) > newCap
 		if retain {
 			b.data = data
@@ -162,11 +182,45 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 	b.available += len(data)
 
 	// reset error status (continue parsing)
-	if b.err == ErrNoMoreBytes {
+	if errors.Is(b.err, ErrNoMoreBytes) {
 		b.err = nil
 	}
 
 	return nil
+}
+
+// appendReuse implements doAppend for reuse-enabled buffers. It appends data
+// while reclaiming the front of the backing array that Reset's window slide left
+// behind, so the buffer reallocates only when its content genuinely outgrows the
+// array (amortized), not on every drain. The content always lives at b.data[0:];
+// b.base tracks the full array. Data is always copied, so this never aliases the
+// caller's slice (unlike the retainable Append fast path).
+func (b *Buffer) appendReuse(data []byte) {
+	need := len(b.data) + len(data)
+	switch {
+	case cap(b.data) >= need:
+		// Room left in the current window: append in place.
+		n := len(b.data)
+		b.data = b.data[:need]
+		copy(b.data[n:], data)
+	case b.base != nil && cap(b.base) >= need:
+		// Reclaim the front lost to Reset by compacting unconsumed bytes back to
+		// b.base[0] (copy is a memmove, safe for the overlapping case), then append.
+		n := copy(b.base[:cap(b.base)], b.data)
+		b.data = b.base[:need]
+		copy(b.data[n:], data)
+	default:
+		// Genuine growth: double the capacity and adopt the new array as base.
+		nc := need
+		if twice := 2 * cap(b.data); twice > nc {
+			nc = twice
+		}
+		na := make([]byte, need, nc)
+		n := copy(na, b.data)
+		copy(na[n:], data)
+		b.data = na
+		b.base = na[:cap(na)]
+	}
 }
 
 // Append will append the given data to the buffer. If Buffer is fixed
@@ -346,7 +400,7 @@ func (b *Buffer) Collect(count int) ([]byte, error) {
 	}
 
 	data := b.data[b.mark : b.mark+count]
-	b.Advance(count)
+	_ = b.Advance(count)
 	return data, nil
 }
 
@@ -369,7 +423,7 @@ func (b *Buffer) CollectWithSuffix(count int, delim []byte) ([]byte, error) {
 	}
 
 	data := b.data[b.mark : b.mark+count]
-	b.Advance(total)
+	_ = b.Advance(total)
 	return data, nil
 }
 
@@ -435,7 +489,7 @@ func (b *Buffer) CollectUntil(delim []byte) ([]byte, error) {
 
 	end := b.mark + idx + len(delim)
 	data := b.data[b.mark:end]
-	b.Advance(len(data))
+	_ = b.Advance(len(data))
 	return data, nil
 }
 
@@ -453,7 +507,7 @@ func (b *Buffer) CollectUntilByte(delim byte) ([]byte, error) {
 
 	end := b.offset + idx + 1
 	data := b.data[b.mark:end]
-	b.Advance(len(data))
+	_ = b.Advance(len(data))
 	return data, nil
 }
 
@@ -468,7 +522,7 @@ func (b *Buffer) CollectWhile(pred func(byte) bool) ([]byte, error) {
 		if !pred(byte) {
 			end := b.offset + i + 1
 			data := b.data[b.mark:end]
-			b.Advance(len(data))
+			_ = b.Advance(len(data))
 			return data, nil
 		}
 	}

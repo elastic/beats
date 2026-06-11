@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -119,6 +120,10 @@ type Reader struct {
 	supportsBootAll bool
 
 	backoff backoff.Backoff
+
+	// deadline is the current read deadline, applied to the underlying journalctl
+	// before each read so it survives journalctl restarts. Set via SetReadDeadline.
+	deadline time.Time
 }
 
 // maybeAddBootAll appends "--boot", "all" to args only when boot-all is
@@ -317,10 +322,27 @@ func (r *Reader) Close() error {
 	return nil
 }
 
+// SetReadDeadline bounds how long the next read waits for an entry. It returns
+// true only if the underlying journalctl honors deadlines, so callers can detect
+// support; the deadline is stored on the Reader and re-applied after a journalctl
+// restart.
+func (r *Reader) SetReadDeadline(t time.Time) bool {
+	if _, ok := r.jctl.(reader.DeadlineSetter); !ok {
+		return false
+	}
+	r.deadline = t
+	return true
+}
+
 // next reads the next entry from journalctl. It handles any errors from
 // journalctl restarting it as necessary with a backoff strategy. It either
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
 func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
+	// Apply the current read deadline to the (possibly restarted) journalctl.
+	if d, ok := r.jctl.(reader.DeadlineSetter); ok {
+		d.SetReadDeadline(r.deadline)
+	}
+
 	msg, err := r.jctl.Next(cancel)
 
 	// Check if the input has been cancelled
@@ -338,6 +360,11 @@ func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	//     backoff if necessary.
 	if err == nil {
 		return msg, nil
+	}
+	if errors.Is(err, reader.ErrReadDeadline) {
+		// The read deadline elapsed (multiline timeout) — not a journalctl
+		// failure, so propagate it without restarting.
+		return nil, err
 	}
 	r.logger.Warnf("reader error: '%s', restarting...", err)
 

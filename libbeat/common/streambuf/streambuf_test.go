@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var ErrMarkInvariant = errors.New("mark value not within limits")
@@ -319,4 +320,71 @@ func Test_CollectWithSuffixFixedNoData(t *testing.T) {
 	assert.True(t, b.Failed())
 	assert.Equal(t, ErrUnexpectedEOB, err)
 	assert.Nil(t, d)
+}
+
+// TestReuseAppendCollectCycle exercises the write/collect/reset cycle a line
+// reader performs on a reuse-enabled buffer: append a "line", collect it, copy
+// it out (a safe consumer), reset, repeat with varying sizes. It asserts the
+// collected content is always correct and that the backing array is reused
+// (capacity stabilizes) rather than reallocated on every line.
+func TestReuseAppendCollectCycle(t *testing.T) {
+	b := New(nil)
+	b.SetReuse(true)
+
+	// Line lengths chosen to grow, shrink, and occasionally exceed the current
+	// capacity so every appendReuse branch (in-place, compact, grow) is hit.
+	// The largest line (16384) appears before later smaller-or-equal lines so we
+	// can prove those reuse the existing array rather than reallocating.
+	lengths := []int{8, 200, 50, 16384, 16384, 40, 16384, 1, 9000, 9000}
+	seed := byte(0)
+
+	var baseAfterMax []byte // b.base captured right after the high-water line
+
+	for i, n := range lengths {
+		// Build the line and feed it in two writes to mimic chunked decoding.
+		line := make([]byte, n)
+		for j := range line {
+			line[j] = seed
+			seed++
+		}
+		half := n / 2
+		require.NoError(t, b.Append(line[:half]))
+		require.NoError(t, b.Append(line[half:]))
+		require.NoError(t, checkInvariants(b))
+
+		got, err := b.Collect(b.Len())
+		require.NoError(t, err)
+		// A safe consumer copies before reading on; the next iteration's append
+		// is allowed to overwrite the collected backing array.
+		require.Equal(t, line, append([]byte(nil), got...), "line %d content mismatch", i)
+
+		b.Reset()
+		require.NoError(t, checkInvariants(b))
+
+		// Once the high-water (16384) array exists, every later line that fits
+		// must keep the SAME backing array — i.e. no reallocation.
+		if n == 16384 {
+			require.GreaterOrEqual(t, cap(b.base), 16384)
+			baseAfterMax = b.base
+		} else if baseAfterMax != nil && n <= cap(baseAfterMax) {
+			require.Equal(t, cap(baseAfterMax), cap(b.base),
+				"line %d (%d bytes) reallocated instead of reusing the array", i, n)
+			require.Same(t, &baseAfterMax[:1][0], &b.base[:1][0],
+				"line %d (%d bytes) replaced the backing array", i, n)
+		}
+	}
+}
+
+// TestReuseDisabledUnchanged verifies that without SetReuse the buffer behaves
+// exactly as before (no base tracking, content still correct).
+func TestReuseDisabledUnchanged(t *testing.T) {
+	b := New(nil)
+	for _, s := range []string{"alpha\n", "beta\n", "gamma\n"} {
+		require.NoError(t, b.Append([]byte(s)))
+		got, err := b.Collect(b.Len())
+		require.NoError(t, err)
+		require.Equal(t, s, string(got))
+		b.Reset()
+		require.Nil(t, b.base, "reuse-disabled buffer must not track base")
+	}
 }
