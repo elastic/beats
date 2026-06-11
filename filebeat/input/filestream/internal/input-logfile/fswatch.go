@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"strings"
+
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -64,8 +66,24 @@ type FileDescriptor struct {
 	Filename string
 	// Info is the result of file stat
 	Info file.ExtendedFileInfo
-	// Fingerprint is a computed hash of the file header
+	// Fingerprint is used for file identity. For the "fingerprint" identity
+	// in static mode this is a SHA-256 hash of bytes[offset:offset+length].
+	// In growing mode, while the file is below offset+length this is the
+	// hex-encoded raw bytes from offset to size; at or above the threshold it
+	// becomes the SHA-256 hex (identical to the static-mode value).
 	Fingerprint string
+	// GrowingFingerprint, when non-empty, is the hex-encoded raw bytes
+	// hex(bytes[offset:offset+length]) computed at the same time as the SHA-256
+	// Fingerprint. It is set by the scanner only on the first scan in which a
+	// path reaches threshold; subsequent scans of the same path emit only the
+	// SHA-256 Fingerprint. SameFile and the prospector's prefix-matching use
+	// GrowingFingerprint to bridge the one-time transition from a raw-hex
+	// growing key to the final SHA-256 key.
+	GrowingFingerprint string
+	// FingerprintGrowing is true when Fingerprint is a raw-hex value that has
+	// not yet reached the configured threshold (offset+length). False otherwise,
+	// including for SHA-256 fingerprints and for non-growing-mode files.
+	FingerprintGrowing bool
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool
 
@@ -101,11 +119,43 @@ func (fd FileDescriptor) FileID() string {
 }
 
 // SameFile returns true if descriptors point to the same file.
-func SameFile(a, b *FileDescriptor) bool {
-	return a.FileID() == b.FileID()
+//
+// Three matching paths are tried, in order:
+//
+//  1. Exact FileID match — the common case for files whose identity has
+//     not changed between scans.
+//  2. Prefix match on Fingerprint — Enhanced Fingerprint growing phase: as a
+//     file grows below threshold, its raw-hex fingerprint grows; the previous
+//     (shorter) value is a prefix of the new one.
+//  3. Threshold-transition prefix match: file have just grown past threshold
+//     for SHA256 fingerprint. prev has the old raw-hex fingerprint, thus, do
+//     prefix using GrowingFingerprint match to check if it's still the same
+//     file. Next check will use the fast path, SHA256 exact match.
+func SameFile(prev, current *FileDescriptor) bool {
+	// 1. Fast path: exact match
+	if prev.FileID() == current.FileID() {
+		return true
+	}
+
+	if prev.Fingerprint == "" || current.Fingerprint == "" {
+		return false
+	}
+
+	// 2. Prefix match on Fingerprint: Growing-phase prefix match.
+	if strings.HasPrefix(current.Fingerprint, prev.Fingerprint) {
+		return true
+	}
+
+	// 3. Threshold-transition prefix match: prev raw-hex is a prefix of the
+	// transient GrowingFingerprint carried on the first SHA-256 scan.
+	if strings.HasPrefix(current.GrowingFingerprint, prev.Fingerprint) {
+		return true
+	}
+
+	return false
 }
 
-// FSEvent returns inforamation about file system changes.
+// FSEvent returns information about file system changes.
 type FSEvent struct {
 	// NewPath is the new path of the file.
 	NewPath string

@@ -209,6 +209,96 @@ func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
 	return s.store.resetCursor(key, cur)
 }
 
+// IterateOnPrefix iterates over all entries that match this input's prefix.
+// The callback receives the key and cursor metadata for each entry.
+// Return false from the callback to stop iteration.
+func (s *sourceStore) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if res.isDeleted() {
+			continue
+		}
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		if !fn(key, res.cursorMeta) {
+			return // stop iteration
+		}
+	}
+}
+
+// UpdateKey updates an entry from oldKey to newKey with updated metadata.
+// This is used by growing_fingerprint to update the registry key when
+// a file's fingerprint grows.
+//
+// This operation updates the key IN PLACE without requiring the resource lock.
+// This is safe because:
+//   - We hold the ephemeral store mutex, preventing concurrent table modifications
+//   - We hold the resource's stateMutex while modifying state fields
+//   - The harvester holding the resource lock continues to work with the same
+//     *resource pointer - only the key field and table entry change
+//   - Cursor updates from the harvester continue to work on the same resource
+func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	res := s.store.ephemeralStore.table[oldKey]
+	if res == nil {
+		return fmt.Errorf("old key %s not found", oldKey)
+	}
+
+	if res.isDeleted() {
+		return fmt.Errorf("old key %s is deleted", oldKey)
+	}
+
+	// Check if new key already exists
+	if existing := s.store.ephemeralStore.table[newKey]; existing != nil && !existing.isDeleted() {
+		return fmt.Errorf("new key %s already exists", newKey)
+	}
+
+	// Lock the resource's stateMutex while modifying state fields.
+	// This ensures consistency with concurrent operations like ACK handling.
+	res.stateMutex.Lock()
+	oldKeyValue := res.key
+	res.key = newKey
+	res.cursorMeta = meta
+	res.stored = false
+	res.stateMutex.Unlock()
+
+	// Update the table: remove old entry, add new entry with same resource
+	s.store.ephemeralStore.table[newKey] = res
+	delete(s.store.ephemeralStore.table, oldKey)
+
+	// Best-effort: the in-memory swap above is what makes the registry
+	// observe the new key; the persistent delete just trims the on-disk
+	// log. If it fails (transient I/O, full disk) we keep going — the new
+	// key has been written and will be persisted on the next checkpoint;
+	// the stale persistent entry for the old key will be ignored on the
+	// next read because no in-memory entry references it. Surface the
+	// error anyway.
+	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
+		s.store.log.Errorf(
+			"UpdateKey: failed to remove old key %q from persistent store: %v",
+			oldKeyValue, err)
+	}
+
+	return nil
+}
+
+// KeyExists returns true if a non-deleted entry exists for the given key.
+// Unlike FindCursorMeta, this performs no Retain/Release and no deserialization.
+func (s *sourceStore) KeyExists(key string) bool {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+	if res := s.store.ephemeralStore.table[key]; res != nil {
+		return !res.isDeleted()
+	}
+	return false
+}
+
 // CleanIf sets the TTL of a resource if the predicate return true.
 func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	s.store.ephemeralStore.mu.Lock()

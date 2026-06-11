@@ -77,6 +77,11 @@ type fileWatcher struct {
 	fileIdentifier   fileIdentifier
 	sourceIdentifier *loginp.SourceIdentifier
 
+	// growingFingerprint indicates that the growing fingerprint mode is active.
+	// When true, prefix-based rename detection is used as a fallback
+	// for files whose fingerprint grew between scans.
+	growingFingerprint bool
+
 	// closedHarvesters is a map of harvester ID to the current
 	// offset of the file
 	closedHarvesters map[string]int64
@@ -112,9 +117,10 @@ func newFileWatcher(
 		closedHarvesters: map[string]int64{},
 		// notifyChan is a buffered channel to prevent the harvester from
 		// blocking while waiting for the fileWatcher to read from the channel
-		notifyChan:       make(chan loginp.HarvesterStatus, 5), // magic number
-		fileIdentifier:   fi,
-		sourceIdentifier: srci,
+		notifyChan:         make(chan loginp.HarvesterStatus, 5), // magic number
+		fileIdentifier:     fi,
+		sourceIdentifier:   srci,
+		growingFingerprint: config.Scanner.Fingerprint.Growing,
 	}, nil
 }
 
@@ -172,6 +178,7 @@ func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
 func (w *fileWatcher) watch(ctx unison.Canceler) {
 	w.log.Debug("Start next scan")
 
+	// file identity is updated in GetFiles
 	paths := w.scanner.GetFiles()
 
 	// for debugging purposes
@@ -274,34 +281,119 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		w.closedHarvestersMutex.Unlock()
 	}
 
-	// remaining files in the prev map are the ones that are missing
-	// either because they have been deleted or renamed
+	// Remaining files in the prev map are missing from this scan — either
+	// deleted or renamed. Three rename-detection passes follow, in order:
+	//
+	//   1. Exact-FileID rename match — works for every identity including
+	//      static fingerprint. Catches a plain rename where the file's
+	//      content (and so its fingerprint) is unchanged.
+	//   2. Prefix-match rename detection (Enhanced Fingerprint / growing
+	//      mode only) — catches rename + content growth in the same scan.
+	//   3. Unmatched-leftover emission — anything still in w.prev becomes
+	//      OpDelete, anything still in newFilesByName becomes OpCreate.
+
+	// Exact-FileID rename match: For growing mode, also accumulate the
+	// short-fingerprint index from prev entries that did NOT get an exact
+	// match — they are the candidates for the next (prefix-match) pass.
+	var shortFingerprints *shortFingerprintSet
+	if w.growingFingerprint {
+		shortFingerprints = newShortFingerprintSet()
+	}
+
 	for remainingPath, remainingDesc := range w.prev {
-		var e loginp.FSEvent
+		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
 
-		id := remainingDesc.FileID()
-		srcID := w.getFileIdentity(remainingDesc)
-		if newDesc, renamed := newFilesByID[id]; renamed {
-			e = renamedEvent(remainingPath, newDesc.Filename, *newDesc, srcID)
+		switch {
+		// Exact-FileID rename match
+		case renamed:
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(
+				remainingPath, newDesc.Filename, *newDesc, srcID):
+				renamedCount++
+			}
+
 			delete(newFilesByName, newDesc.Filename)
-			delete(newFilesByID, id)
-			renamedCount++
-		} else {
-			e = deleteEvent(remainingPath, remainingDesc, srcID)
-			removedCount++
-			w.closedHarvestersMutex.Lock()
-			delete(w.closedHarvesters, srcID)
-			w.closedHarvestersMutex.Unlock()
-		}
+			delete(newFilesByID, remainingDesc.FileID())
+			delete(w.prev, remainingPath)
 
-		select {
-		case <-ctx.Done():
-			return
-		case w.events <- e:
+		// If it isn't an exact match, make it a candidate for prefix-match
+		case w.growingFingerprint:
+			shortFingerprints.Add(
+				remainingPath, remainingDesc.Fingerprint, remainingPath)
 		}
 	}
 
-	// remaining files in newFiles are newly created files
+	// Prefix-match rename detection (growing fingerprint only). For each
+	// new file that didn't match exactly, look for an unmatched prev entry
+	// whose raw-hex fingerprint is a STRICT PREFIX of the new file's
+	// fingerprint material — that means the same file was renamed AND its
+	// content grew between scans.
+	//
+	// Two prefix candidates are tried per new file:
+	//
+	//   1. newDesc.Fingerprint — handles rename + same-format growth
+	//      (raw-hex extends to longer raw-hex while still below threshold).
+	//   2. newDesc.GrowingFingerprint — handles rename + threshold-crossing
+	//      in the same scan: the new descriptor's primary Fingerprint is a
+	//      SHA-256 (no prefix relationship to the prev raw-hex), but the
+	//      GrowingFingerprint carries the raw-hex of bytes[offset:offset+length]
+	//      and prev's raw-hex IS a prefix of that.
+	if shortFingerprints.Len() > 0 {
+		type prefixMatch struct {
+			oldPath string
+			newPath string
+			newDesc *loginp.FileDescriptor
+		}
+		var matches []prefixMatch
+
+		for newPath, newDesc := range newFilesByName {
+			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint, "")
+			if !found && newDesc.GrowingFingerprint != "" {
+				oldPath, _, found = shortFingerprints.FindPrefixMatch(newDesc.GrowingFingerprint, "")
+			}
+			if found {
+				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
+				shortFingerprints.Remove(oldPath)
+			}
+		}
+
+		for _, m := range matches {
+			remainingDesc := w.prev[m.oldPath]
+			srcID := w.getFileIdentity(remainingDesc)
+			select {
+			case <-ctx.Done():
+				return
+			case w.events <- renamedEvent(m.oldPath, m.newPath, *m.newDesc, srcID):
+				renamedCount++
+			}
+
+			delete(newFilesByName, m.newPath)
+			delete(newFilesByID, m.newDesc.FileID())
+			delete(w.prev, m.oldPath)
+		}
+	}
+
+	// Unmatched-leftover deletes: prev files that weren't matched by either
+	// the exact-FileID or the prefix-match rename pass are genuinely gone.
+	for remainingPath, remainingDesc := range w.prev {
+		srcID := w.getFileIdentity(remainingDesc)
+		select {
+		case <-ctx.Done():
+			return
+		case w.events <- deleteEvent(remainingPath, remainingDesc, srcID):
+			removedCount++
+		}
+
+		w.closedHarvestersMutex.Lock()
+		delete(w.closedHarvesters, srcID)
+		w.closedHarvestersMutex.Unlock()
+	}
+
+	// Unmatched-leftover creates: new files left over after both rename
+	// passes are genuinely new.
 	for path, fd := range newFilesByName {
 		select {
 		case <-ctx.Done():
@@ -359,6 +451,18 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
+// SetHashedPaths populates the underlying scanner's set of "already-final"
+// paths. See fileScanner.setHashedPaths for details. Called by the
+// prospector at Run() start with the set of paths whose persisted state has
+// FingerprintGrowing=false, so the watch loop's first scan suppresses
+// GrowingFingerprint emission for files that are already keyed by SHA-256
+// and only emits the bridging value for files that still need to migrate.
+func (w *fileWatcher) SetHashedPaths(paths map[string]struct{}) {
+	if fs, ok := w.scanner.(*fileScanner); ok {
+		fs.setHashedPaths(paths)
+	}
+}
+
 func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
 	return w.scanner.GetFiles()
 }
@@ -367,6 +471,16 @@ type fingerprintConfig struct {
 	Enabled bool  `config:"enabled"`
 	Offset  int64 `config:"offset"`
 	Length  int64 `config:"length"`
+	// Growing enables Enhanced Fingerprint behaviour: files smaller than
+	// Offset+Length are tracked using the raw bytes from Offset to the file's
+	// end (hex-encoded). When a file reaches the threshold, its registry key
+	// migrates to the same SHA-256 hex the static fingerprint produces, so
+	// existing static-fingerprint state is preserved.
+	//
+	// Not user-configurable here: the YAML key under prospector.scanner.fingerprint
+	// is silently ignored. The user-facing knob is file_identity.fingerprint.growing;
+	// normalizeConfig in input.go propagates it here.
+	Growing bool `config:"-"`
 }
 
 type fileScannerConfig struct {
@@ -385,6 +499,9 @@ func defaultFileScannerConfig() fileScannerConfig {
 			Enabled: true,
 			Offset:  0,
 			Length:  DefaultFingerprintSize,
+			// false by default: the file identity config will set it to true if
+			// fingerprint is used
+			Growing: false,
 		},
 	}
 }
@@ -399,6 +516,13 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
+	// hashedPaths is set only when Enhanced Fingerprint (growing mode) is
+	// enabled. It records paths whose last-emitted Fingerprint was a final
+	// SHA-256 (file at or above offset+length). The scanner uses it to
+	// suppress GrowingFingerprint emission for paths whose state is already
+	// final, avoiding wasted work on every scan. Pruned at the end of each
+	// scan against the set of paths still tracked.
+	hashedPaths map[string]struct{}
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -415,8 +539,12 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 			err := fmt.Errorf("fingerprint size %d bytes cannot be smaller than %d bytes", config.Fingerprint.Length, sha256.BlockSize)
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
 		}
-		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
+		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
+			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
 		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
+		if s.cfg.Fingerprint.Growing {
+			s.hashedPaths = make(map[string]struct{})
+		}
 	}
 
 	err := s.resolveRecursiveGlobs(config)
@@ -527,6 +655,16 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 	}
 
+	// Prune hashedPaths against the paths actually observed this scan.
+	// Files that disappeared (removed, renamed away, no longer matching a
+	// glob) drop out of the set, so they don't suppress GrowingFingerprint
+	// emission if they reappear later.
+	for p := range s.hashedPaths {
+		if _, stillThere := fdByName[p]; !stillThere {
+			delete(s.hashedPaths, p)
+		}
+	}
+
 	return fdByName
 }
 
@@ -601,15 +739,35 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	return it, nil
 }
 
+// toFileDescriptor builds a FileDescriptor for the given ingest target.
+// With fingerprinting enabled, it computes the file's identity according to
+// the threshold rules:
+//
+//   - !Enabled: no fingerprint; FileID falls back to OS state.
+//   - dataSize <= offset: file is too small to read anything from offset;
+//     return errFileTooSmall.
+//   - dataSize >= offset+length: read bytes[offset:offset+length] and hash
+//     with SHA-256. In growing mode, also emit GrowingFingerprint (the hex
+//     of those same bytes) on the first scan in which this path reaches
+//     threshold; subsequent scans of the same path emit only the SHA-256.
+//   - dataSize in (offset, offset+length) under growing mode: read
+//     bytes[offset:dataSize] and emit its hex as Fingerprint with
+//     Growing=true.
+//   - dataSize in (offset, offset+length) under non-growing mode: return
+//     errFileTooSmall (today's static-fingerprint behaviour).
+//
+// GZIP is honoured: all reads are on the decompressed stream.
 func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescriptor, err error) {
 	fd.Filename = it.filename
 	fd.Info = it.info
-	var file File
 
 	if !s.cfg.Fingerprint.Enabled {
 		return fd, nil
 	}
-	minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
+
+	offset := s.cfg.Fingerprint.Offset
+	length := s.cfg.Fingerprint.Length
+	threshold := offset + length
 
 	// opener is used to open the file only once
 	opener := struct {
@@ -624,7 +782,6 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		opener.f, err = os.Open(it.originalFilename)
 		if err != nil {
 			return nil, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
-
 		}
 		return opener.f, err
 	}
@@ -653,8 +810,28 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 	}
 
-	// Check there is enough data
-	var dataSize int64
+	// Fast path for non-GZIP files we know the size from lstat and can
+	// reject too-small files in static mode without opening the file. This
+	// preserves the no-open guarantee for static fingerprint on
+	// unreadable/permission-denied small files.
+	if !fd.GZIP {
+		if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
+			return fd, fmt.Errorf(
+				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
+				fd.Filename, it.info.Size(), threshold, errFileTooSmall)
+		}
+		// size <= offset we cannot read anything from the offset, regardless of
+		// mode.
+		if it.info.Size() <= offset {
+			return fd, fmt.Errorf(
+				"filesize of %q is %d bytes, less than fingerprint offset %d: %w",
+				fd.Filename, it.info.Size(), offset, errFileTooSmall)
+		}
+	}
+
+	// Wrap the open file (plain or GZIP) so subsequent reads/seeks operate
+	// on the decompressed stream when applicable.
+	var file File
 	if fd.GZIP {
 		osFile, err := opener.Open()
 		if err != nil {
@@ -662,32 +839,12 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// Check if there is enough *decompressed* data for fingerprint
-		file, err = newGzipSeekerReader(osFile, int(minSize))
+		file, err = newGzipSeekerReader(osFile, int(threshold))
 		if err != nil {
 			return fd, fmt.Errorf("failed to create gzip seeker: %w", err)
 		}
 		defer file.Close()
-
-		dataSize, err = file.Seek(minSize, io.SeekStart)
-		if errors.Is(err, io.EOF) {
-			return fd, fmt.Errorf(
-				"filesize is %d bytes, expected at least %d bytes for fingerprinting: %w",
-				dataSize, minSize, errFileTooSmall)
-		}
-		// all good, reset the offset
-		_, err = file.Seek(0, io.SeekStart)
-		if err != nil {
-			return fd, fmt.Errorf("failed to reset gzip offset: %w", err)
-		}
 	} else {
-		dataSize = it.info.Size()
-		if dataSize < minSize {
-			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
-				fd.Filename, dataSize, minSize, errFileTooSmall)
-		}
-
-		// there is enough data wrap it on File
 		osFile, err := opener.Open()
 		if err != nil {
 			return fd, fmt.Errorf("fileScanner: failed to open %q to create FileDescriptor: %w", it.originalFilename, err)
@@ -695,27 +852,96 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		file = newPlainFile(osFile)
 	}
 
-	// calculate fingerprint
-	if s.cfg.Fingerprint.Offset != 0 {
-		_, err = file.Seek(s.cfg.Fingerprint.Offset, io.SeekStart)
-		if err != nil {
-			return fd, fmt.Errorf("failed to seek %q for fingerprinting: %w", fd.Filename, err)
+	// Seek to offset (for both growing and static paths).
+	if offset != 0 {
+		if _, err := file.Seek(offset, io.SeekStart); err != nil {
+			// Seek past EOF (file smaller than offset) — untrackable.
+			if errors.Is(err, io.EOF) {
+				return fd, fmt.Errorf(
+					"file %q is smaller than fingerprint offset %d: %w",
+					fd.Filename, offset, errFileTooSmall)
+			}
+			return fd, fmt.Errorf("failed to seek %q to offset: %w", fd.Filename, err)
 		}
 	}
 
-	s.hasher.Reset()
-	lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
-	written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
-	if err != nil {
-		return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
-	}
-	if written != s.cfg.Fingerprint.Length {
-		return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
+	// Read up to `length` bytes from offset into the read buffer.
+	n, err := io.ReadFull(file, s.readBuffer[:length])
+	if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
+		return fd, fmt.Errorf("failed to read %q for fingerprinting: %w", fd.Filename, err)
 	}
 
+	// Growing fingerprint path
+	if int64(n) < length {
+		// File is below threshold: bytes available from offset is n < length.
+		if !s.cfg.Fingerprint.Growing {
+			return fd, fmt.Errorf(
+				"filesize of %q is %d bytes (read %d from offset), expected at least %d bytes for fingerprinting: %w",
+				fd.Filename, it.info.Size(), n, length, errFileTooSmall)
+		}
+
+		if n == 0 {
+			// nothing readable from offset — also untrackable
+			return fd, fmt.Errorf(
+				"file %q has no bytes available from offset %d: %w",
+				fd.Filename, offset, errFileTooSmall)
+		}
+
+		// Growing mode small file: hex of bytes[offset:offset+n].
+		fd.Fingerprint = hex.EncodeToString(s.readBuffer[:n])
+		fd.FingerprintGrowing = true
+
+		// File is no longer at the final SHA-256 state (e.g. after a
+		// truncation that brought it back below threshold).
+		delete(s.hashedPaths, it.filename)
+
+		return fd, nil
+	}
+
+	// File at or above threshold: compute SHA-256 of bytes[offset:offset+length].
+	s.hasher.Reset()
+	s.hasher.Write(s.readBuffer[:length])
 	fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
 
+	if s.cfg.Fingerprint.Growing {
+		// Emit GrowingFingerprint on the first scan a path reaches threshold
+		// in this process. Subsequent scans of the same path emit only the
+		// SHA-256 Fingerprint, since the matching mechanism (prefix-match
+		// against an existing growing registry entry) has already had its
+		// chance to run.
+		if _, alreadyHashed := s.hashedPaths[it.filename]; !alreadyHashed {
+			fd.GrowingFingerprint = hex.EncodeToString(s.readBuffer[:length])
+			s.hashedPaths[it.filename] = struct{}{}
+		}
+	}
+
 	return fd, nil
+}
+
+// setHashedPaths replaces the per-process set of "already-final" paths with
+// the given seed. Called by the fileProspector at startup with the set of
+// paths whose persisted registry state has FingerprintGrowing=false (i.e. they
+// are already keyed by a SHA-256 hex). The result is that the watch loop's
+// first scan emits GrowingFingerprint only for files that actually need
+// migration — files that were below threshold at the previous shutdown — and
+// emits SHA-256 only for everything else. This both:
+//
+//  1. Replaces the correctness-preserving wipe of any hashedPaths entries
+//     added by enumeration-only scans run during prospector Init/take-over
+//     (those scans pollute the set but emit no events).
+//  2. Avoids a wasteful GrowingFingerprint-emission burst on restart for
+//     every file already at threshold.
+//
+// Safe to call when growing mode is disabled — hashedPaths is nil there and
+// the method is a no-op.
+func (s *fileScanner) setHashedPaths(seed map[string]struct{}) {
+	if s.hashedPaths == nil {
+		return
+	}
+	clear(s.hashedPaths)
+	for p := range seed {
+		s.hashedPaths[p] = struct{}{}
+	}
 }
 
 func (s *fileScanner) isFileExcluded(file string) bool {

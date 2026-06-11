@@ -256,7 +256,6 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 		// check if the event belongs to a rotated file
 		if p.isRotated(event) {
 			log.Debugf("File %s is rotated", event.NewPath)
-
 			p.onRotatedFile(log, ctx, event, src, group)
 
 		} else {
