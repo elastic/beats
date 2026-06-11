@@ -41,6 +41,10 @@ var (
 	ErrClosed       = errors.New("reader closed")
 	ErrFileTruncate = errors.New("detected file being truncated")
 	ErrInactive     = errors.New("inactive file, reader closed")
+
+	// ErrWouldBlock is returned by a logFile in non-blocking mode when there is
+	// no data currently available to read.
+	ErrWouldBlock = errors.New("no data available, would block")
 )
 
 // logFile contains all log related data
@@ -51,6 +55,10 @@ type logFile struct {
 
 	closeAfterInterval time.Duration
 	closeOnEOF         bool
+
+	// nonBlocking, when true, makes Read return ErrWouldBlock instead of waiting
+	// on the read backoff when the file has no data available.
+	nonBlocking bool
 
 	checkInterval time.Duration
 	closeInactive time.Duration
@@ -139,6 +147,16 @@ func (f *logFile) Read(buf []byte) (int, error) {
 		err = f.errorChecks(err)
 		if err != nil || len(buf) == 0 {
 			return totalN, err
+		}
+
+		// In non-blocking mode the read backoff is owned by the scheduler, not
+		// the read path: deliver whatever was read this call, otherwise signal
+		// that no data is currently available so the worker can yield the file.
+		if f.nonBlocking {
+			if totalN > 0 {
+				return totalN, nil
+			}
+			return 0, ErrWouldBlock
 		}
 
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())

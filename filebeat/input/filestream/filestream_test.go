@@ -225,3 +225,96 @@ func readUntilError(reader *logFile) error {
 	}
 	return err
 }
+
+// TestLogFileNonBlocking covers the Phase 0 primitive of the harvester worker
+// pool refactor (see HARVESTOR_REFACTOR.md): in non-blocking mode a logFile
+// returns ErrWouldBlock at EOF instead of waiting on the read backoff, and it
+// resumes reading once new data is appended.
+func TestLogFileNonBlocking(t *testing.T) {
+	osFile := createTestPlainLogFile(t)
+	fs := filestream{
+		readerConfig: readerConfig{BufferSize: 512},
+		compression:  CompressionAuto,
+	}
+	f, err := fs.newFile(osFile)
+	require.NoError(t, err, "could not create file for reading")
+	t.Cleanup(func() {
+		_ = f.Close()
+		_ = os.Remove(f.Name())
+	})
+
+	reader, err := newFileReader(
+		logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{})
+	require.NoError(t, err, "error while creating logReader")
+	reader.nonBlocking = true
+
+	// Drain the initial content written by createTestPlainLogFile.
+	content := readAllAvailable(t, reader)
+	require.NotEmpty(t, content, "expected to read the initial file content")
+
+	// At EOF a non-blocking reader must return ErrWouldBlock promptly instead
+	// of blocking on the read backoff.
+	n, err := readWithTimeout(t, reader, make([]byte, 1024), time.Second)
+	assert.Zero(t, n, "no bytes should be read at EOF")
+	assert.ErrorIs(t, err, ErrWouldBlock,
+		"non-blocking reader must return ErrWouldBlock at EOF")
+
+	// Once new data is appended the reader must pick it up rather than keep
+	// returning ErrWouldBlock.
+	appendToFile(t, f.Name(), "a new line\n")
+	more := readAllAvailable(t, reader)
+	assert.Equal(t, "a new line\n", string(more),
+		"non-blocking reader must read newly appended data")
+}
+
+// readWithTimeout runs reader.Read in a goroutine and fails the test if it does
+// not return within timeout, turning a blocking regression into a clear failure
+// instead of a hung test.
+func readWithTimeout(t *testing.T, reader *logFile, buf []byte, timeout time.Duration) (int, error) {
+	t.Helper()
+	type result struct {
+		n   int
+		err error
+	}
+	ch := make(chan result, 1)
+	go func() {
+		n, err := reader.Read(buf)
+		ch <- result{n: n, err: err}
+	}()
+
+	select {
+	case r := <-ch:
+		return r.n, r.err
+	case <-time.After(timeout):
+		t.Fatalf("Read did not return within %s; the non-blocking reader appears to be blocking", timeout)
+		return 0, nil
+	}
+}
+
+// readAllAvailable reads from a non-blocking reader until ErrWouldBlock and
+// returns everything read.
+func readAllAvailable(t *testing.T, reader *logFile) []byte {
+	t.Helper()
+	var out []byte
+	for {
+		buf := make([]byte, 1024)
+		n, err := readWithTimeout(t, reader, buf, time.Second)
+		out = append(out, buf[:n]...)
+		if err != nil {
+			require.ErrorIs(t, err, ErrWouldBlock,
+				"unexpected error while draining non-blocking reader")
+			return out
+		}
+	}
+}
+
+func appendToFile(t *testing.T, path, data string) {
+	t.Helper()
+	wf, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0o600)
+	require.NoError(t, err, "could not open file for appending")
+	defer wf.Close()
+
+	_, err = wf.WriteString(data)
+	require.NoError(t, err, "could not append to file")
+	require.NoError(t, wf.Sync(), "could not sync appended data")
+}
