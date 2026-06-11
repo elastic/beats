@@ -47,10 +47,10 @@ var (
 )
 
 type sharedRegistries struct {
-	refCount   int
-	registry   *statestore.Registry
-	esRegistry *statestore.Registry
-	notifier   *es.Notifier
+	refCount    int
+	registry    *statestore.Registry
+	extRegistry *statestore.Registry
+	notifier    *es.Notifier
 }
 
 type filebeatStore struct {
@@ -118,15 +118,15 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 		}
 
 		if features.IsElasticsearchStateStoreEnabled() {
-			switch cfg.ESStorageExtension {
+			switch cfg.StorageExtension {
 			case nil:
 				// The notifier is a concurrency-safe pub/sub broadcaster shared between
 				// the es.Registry (subscriber) and all filebeatStore wrappers (publishers).
 				// Multiple Notify() calls are idempotent, so sharing across wrappers is safe.
 				shared.notifier = es.NewNotifier()
-				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
+				shared.extRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
 			default:
-				shared.esRegistry = statestore.NewRegistry(cfg.ESStorageExtension)
+				shared.extRegistry = statestore.NewRegistry(cfg.StorageExtension)
 			}
 		}
 
@@ -151,8 +151,8 @@ func (s *filebeatStore) Close() {
 	s.shared.refCount--
 	if s.shared.refCount == 0 {
 		_ = s.shared.registry.Close()
-		if s.shared.esRegistry != nil {
-			_ = s.shared.esRegistry.Close()
+		if s.shared.extRegistry != nil {
+			_ = s.shared.extRegistry.Close()
 		}
 		delete(globalStores, s.storeKey)
 	}
@@ -160,8 +160,8 @@ func (s *filebeatStore) Close() {
 
 // StoreFor returns the storage registry depending on the type. Default is the file store.
 func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
-	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.esRegistry != nil {
-		return s.shared.esRegistry.Get(s.storeName)
+	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.extRegistry != nil {
+		return s.shared.extRegistry.Get(s.storeName)
 	}
 	return s.shared.registry.Get(s.storeName)
 }

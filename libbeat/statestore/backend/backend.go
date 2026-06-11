@@ -74,6 +74,6 @@ type Store interface {
 	SetID(id string)
 }
 
-type WithESStateStoreExtension interface {
-	WithESStateStoreExtension(esStoreExtension Registry)
+type WithStorageExtension interface {
+	WithStorageExtension(storeExtension Registry)
 }
