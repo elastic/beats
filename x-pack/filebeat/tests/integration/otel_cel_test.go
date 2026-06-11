@@ -10,6 +10,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"text/template"
 	"time"
@@ -19,55 +21,48 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcppubsub/testutil"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/beats/v7/x-pack/otel/oteltestcol"
 
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
-func TestGCPInputOTelE2E(t *testing.T) {
+const celProgram = `bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})`
+
+func TestCELInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
-	// Create pubsub client for setting up and communicating to emulator.
-	client, clientCancel := testutil.TestSetup(t)
-	defer func() {
-		clientCancel()
-		client.Close()
-	}()
-
-	testutil.CreateTopic(t, client)
-	testutil.CreateSubscription(t, "test-subscription-otel", client)
-	testutil.CreateSubscription(t, "test-subscription-fb", client)
-	const numMsgs = 10
-	testutil.PublishMessages(t, client, numMsgs)
+	celSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"message":"cel-test-event","ip":"10.0.0.1"}`))
+	}))
+	t.Cleanup(celSrv.Close)
 
 	host := integration.GetESURL(t, "http")
 	user := host.User.Username()
 	password, _ := host.User.Password()
 
-	// create a random uuid and make sure it doesn't contain dashes/
 	otelNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
-	fbNameSpace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
+	fbNamespace := fmt.Sprintf("%x", uuid.Must(uuid.NewV4()))
 
 	otelIndex := "logs-integration-" + otelNamespace
-	fbIndex := "logs-integration-" + fbNameSpace
+	fbIndex := "logs-integration-" + fbNamespace
 
 	type options struct {
-		Namespace       string
-		ESURL           string
-		Username        string
-		Password        string
-		Subscription    string
-		CredentialsFile string
+		Namespace   string
+		ESURL       string
+		Username    string
+		Password    string
+		ResourceURL string
+		Program     string
 	}
 
-	gcpFilebeatConfig := `filebeat.inputs:
-- type: gcp-pubsub
-  project_id: test-project-id
-  topic: test-topic-foo
-  subscription.name:  {{ .Subscription }}
-  credentials_file: "{{ .CredentialsFile }}"
+	celFilebeatConfig := `filebeat.inputs:
+- type: cel
+  id: cel-input-e2e
+  interval: 1s
+  resource.url: {{ .ResourceURL }}
+  program: {{ .Program }}
 
 output:
   elasticsearch:
@@ -86,7 +81,7 @@ processors:
     - add_kubernetes_metadata: ~
 `
 
-	gcpOTelConfig := `exporters:
+	celOTelConfig := `exporters:
     elasticsearch:
         auth:
             authenticator: beatsauth
@@ -126,12 +121,11 @@ receivers:
     filebeatreceiver:
         filebeat:
             inputs:
-                - credentials_file: "{{ .CredentialsFile }}"
-                  project_id: test-project-id
-                  subscription:
-                    name: {{ .Subscription }}
-                  topic: test-topic-foo
-                  type: gcp-pubsub
+                - type: cel
+                  id: cel-input-e2e
+                  interval: 1s
+                  resource.url: {{ .ResourceURL }}
+                  program: {{ .Program }}
         processors:
             - add_host_metadata: ~
             - add_cloud_metadata: ~
@@ -154,39 +148,38 @@ service:
             level: none
 `
 
-	optionsValue := options{
-		ESURL:           fmt.Sprintf("%s://%s", host.Scheme, host.Host),
-		Username:        user,
-		Password:        password,
-		CredentialsFile: "testdata/gcp_pubsub_fake_credentials.json",
-	}
-
 	var configBuffer bytes.Buffer
-	optionsValue.Namespace = otelNamespace
-	optionsValue.Subscription = "test-subscription-otel"
-	require.NoError(t, template.Must(template.New("config").Parse(gcpOTelConfig)).Execute(&configBuffer, optionsValue))
+	require.NoError(t, template.Must(template.New("config").Parse(celOTelConfig)).Execute(&configBuffer, options{
+		ESURL:       fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:    user,
+		Password:    password,
+		ResourceURL: celSrv.URL,
+		Program:     celProgram,
+		Namespace:   otelNamespace,
+	}))
 
 	oteltestcol.New(t, configBuffer.String())
 
-	// reset buffer
 	configBuffer.Reset()
 
-	optionsValue.Namespace = fbNameSpace
-	optionsValue.Subscription = "test-subscription-fb"
-	require.NoError(t, template.Must(template.New("config").Parse(gcpFilebeatConfig)).Execute(&configBuffer, optionsValue))
+	require.NoError(t, template.Must(template.New("config").Parse(celFilebeatConfig)).Execute(&configBuffer, options{
+		ESURL:       fmt.Sprintf("%s://%s", host.Scheme, host.Host),
+		Username:    user,
+		Password:    password,
+		ResourceURL: celSrv.URL,
+		Program:     celProgram,
+		Namespace:   fbNamespace,
+	}))
 
-	// start filebeat
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
 		"../../filebeat.test",
 	)
-
 	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	// prepare to query ES
 	es := integration.GetESClient(t, "http")
 
 	t.Cleanup(func() {
@@ -200,7 +193,7 @@ service:
 	rawQuery := map[string]any{
 		"query": map[string]any{
 			"match_phrase": map[string]any{
-				"input.type": "gcp-pubsub",
+				"input.type": "cel",
 			},
 		},
 		"sort": []map[string]any{
@@ -212,7 +205,6 @@ service:
 	var otelDocs estools.Documents
 	var err error
 
-	// wait for logs to be published
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -231,11 +223,9 @@ service:
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
 	ignoredFields := []string{
-		// Expected to change between agentDocs and OtelDocs
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
-		"event.created",
 	}
 
 	oteltest.AssertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
