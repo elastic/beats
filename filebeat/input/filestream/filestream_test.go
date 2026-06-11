@@ -265,7 +265,7 @@ func TestLogFileReadDeadline(t *testing.T) {
 	lf.SetReadDeadline(time.Now().Add(2 * time.Second))
 	n, err := lf.Read(buf)
 	require.NoError(t, err)
-	require.Greater(t, n, 0)
+	require.Positive(t, n)
 
 	lf.SetReadDeadline(time.Now().Add(50 * time.Millisecond))
 	start := time.Now()

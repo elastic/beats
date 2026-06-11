@@ -33,13 +33,13 @@ var (
 // no read-ahead — so it is safe over a reader that reuses the buffer backing
 // Content.
 //
-// When the wrapped reader honors read deadlines (reader.DeadlineSetter — e.g.
-// filestream's file reader, journald, kafka), TimeoutReader enforces the timeout
-// by setting a deadline before each read and mapping reader.ErrReadDeadline to
-// the timeout signal. When it does not (e.g. awss3's finite object reads, which
-// return on their own via EOF or the SDK request timeout), TimeoutReader reads
-// directly without enforcing a timeout, since there is no never-returning read
-// to bound.
+// It enforces the timeout via a read deadline: the wrapped reader (or one it
+// wraps) must implement reader.DeadlineSetter so the underlying blocking wait
+// can be bounded. filestream's file reader, the log input's file reader,
+// journald and kafka all honor deadlines. When the wrapped reader does not (a
+// finite source such as awss3's object reads, which return on their own via EOF
+// or the SDK request timeout), TimeoutReader reads directly: there is no
+// never-returning read to bound, so no timeout is needed.
 type TimeoutReader struct {
 	reader  reader.Reader
 	timeout time.Duration

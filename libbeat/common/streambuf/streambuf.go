@@ -39,13 +39,13 @@ import (
 
 // Error returned if Append or Write operation is not allowed due to the buffer
 // being fixed
-var ErrOperationNotAllowed = errors.New("Operation not allowed")
+var ErrOperationNotAllowed = errors.New("operation not allowed")
 
-var ErrOutOfRange = errors.New("Data access out of range")
+var ErrOutOfRange = errors.New("data access out of range")
 
 // Parse operation can not be continued. More bytes required. Only returned if
 // buffer is not fixed
-var ErrNoMoreBytes = errors.New("No more bytes")
+var ErrNoMoreBytes = errors.New("no more bytes")
 
 // Parse operation failed cause of buffer snapped short + buffer is fixed.
 var ErrUnexpectedEOB = errors.New("unexpected end of buffer")
@@ -148,7 +148,7 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 	if b.fixed {
 		return b.SetError(ErrOperationNotAllowed)
 	}
-	if b.err != nil && b.err != ErrNoMoreBytes {
+	if b.err != nil && !errors.Is(b.err, ErrNoMoreBytes) {
 		return b.err
 	}
 
@@ -182,7 +182,7 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 	b.available += len(data)
 
 	// reset error status (continue parsing)
-	if b.err == ErrNoMoreBytes {
+	if errors.Is(b.err, ErrNoMoreBytes) {
 		b.err = nil
 	}
 
@@ -400,7 +400,7 @@ func (b *Buffer) Collect(count int) ([]byte, error) {
 	}
 
 	data := b.data[b.mark : b.mark+count]
-	b.Advance(count)
+	_ = b.Advance(count)
 	return data, nil
 }
 
@@ -423,7 +423,7 @@ func (b *Buffer) CollectWithSuffix(count int, delim []byte) ([]byte, error) {
 	}
 
 	data := b.data[b.mark : b.mark+count]
-	b.Advance(total)
+	_ = b.Advance(total)
 	return data, nil
 }
 
@@ -489,7 +489,7 @@ func (b *Buffer) CollectUntil(delim []byte) ([]byte, error) {
 
 	end := b.mark + idx + len(delim)
 	data := b.data[b.mark:end]
-	b.Advance(len(data))
+	_ = b.Advance(len(data))
 	return data, nil
 }
 
@@ -507,7 +507,7 @@ func (b *Buffer) CollectUntilByte(delim byte) ([]byte, error) {
 
 	end := b.offset + idx + 1
 	data := b.data[b.mark:end]
-	b.Advance(len(data))
+	_ = b.Advance(len(data))
 	return data, nil
 }
 
@@ -522,7 +522,7 @@ func (b *Buffer) CollectWhile(pred func(byte) bool) ([]byte, error) {
 		if !pred(byte) {
 			end := b.offset + i + 1
 			data := b.data[b.mark:end]
-			b.Advance(len(data))
+			_ = b.Advance(len(data))
 			return data, nil
 		}
 	}

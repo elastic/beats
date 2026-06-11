@@ -123,11 +123,10 @@ func (r *Reader) Close() error {
 
 func makeNullCheck(log *logp.Logger, minSize int) CheckFunc {
 	// create a slice with null bytes to match on the buffer.
-	pattern := make([]byte, minSize, minSize)
+	pattern := make([]byte, minSize)
 	return func(offset int64, buf []byte) bool {
 		idx := bytes.Index(buf, pattern)
 		if idx <= 0 {
-			offset += int64(len(buf))
 			return false
 		}
 		reportNull(log, offset+int64(idx), idx, buf)

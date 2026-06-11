@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
@@ -788,7 +787,7 @@ func testReader(lines string) reader.Reader {
 	if err != nil {
 		panic(err)
 	}
-	r, err := readfile.NewEncodeReader(ioutil.NopCloser(reader), readfile.Config{
+	r, err := readfile.NewEncodeReader(io.NopCloser(reader), readfile.Config{
 		Codec:      enc,
 		BufferSize: 1024,
 		Terminator: readfile.AutoLineTerminator,
@@ -912,7 +911,7 @@ func TestDecodeBufferReuseDoesNotCorrupt(t *testing.T) {
 		// goroutine-free path (the path used in production), which is the one that
 		// must be safe under decode-buffer reuse.
 		// Tiny BufferSize forces frequent reads and thus maximal decode-buffer reuse.
-		er, err := readfile.NewEncodeReader(deadlineNopCloser{ioutil.NopCloser(sr)}, readfile.Config{
+		er, err := readfile.NewEncodeReader(deadlineNopCloser{io.NopCloser(sr)}, readfile.Config{
 			Codec:      enc,
 			BufferSize: 4,
 			Terminator: readfile.LineFeed,

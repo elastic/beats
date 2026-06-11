@@ -68,7 +68,7 @@ func TestEOFLookaheadReaderDecodeBufferReuse(t *testing.T) {
 		for {
 			m, err := r.Next()
 			if m.Bytes > 0 || len(m.Content) > 0 {
-				res = append(res, out{content: string(m.Content), eof: m.Private == io.EOF})
+				res = append(res, out{content: string(m.Content), eof: m.Private == io.EOF}) //nolint:errorlint // m.Private is interface{}; identity check, not error unwrapping
 			}
 			if err != nil {
 				break
