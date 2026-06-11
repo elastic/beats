@@ -420,14 +420,17 @@ func (p *Pool[T]) syncTargetToQueues() {
 	if p.isClosed() {
 		return
 	}
+	// Hold p.mu across both the scan and the apply so concurrent syncs serialize:
+	// otherwise two callers could each compute a max and then apply them out of
+	// order, letting a stale max overwrite a fresh one.
 	p.mu.Lock()
+	defer p.mu.Unlock()
 	max := 0
 	for q := range p.queues {
 		if l := int(q.limit.Load()); l > max {
 			max = l
 		}
 	}
-	p.mu.Unlock()
 	if max > 0 {
 		p.setTarget(max)
 	}
