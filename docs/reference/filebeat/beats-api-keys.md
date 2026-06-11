@@ -54,6 +54,8 @@ See [Create a *publishing* user](/reference/filebeat/privileges-to-publish-event
 ::::
 
 
+If the required ingest pipelines are loaded or managed separately and `setup.pipelines.enabled: false` is configured, omit `read_pipeline` from the publishing API key.
+
 The return value will look something like this:
 
 ```console-result

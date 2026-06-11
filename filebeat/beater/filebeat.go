@@ -272,7 +272,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			gzipRegistry(b.Info.Logger, b.Info.Paths))
 	}
 
-	if !fb.moduleRegistry.Empty() {
+	if !fb.moduleRegistry.Empty() && beat.SetupPipelinesEnabled(b.BeatConfig) {
 		err = fb.loadModulesPipelines(b)
 		if err != nil {
 			return err
@@ -423,11 +423,13 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// the context.
 	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
 	defer cancelPipelineFactoryCtx()
-	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
-	} else {
-		if !b.Manager.Enabled() {
-			fb.logger.Warn(pipelinesWarning)
+	if beat.SetupPipelinesEnabled(b.BeatConfig) {
+		if b.Config.Output.Name() == "elasticsearch" {
+			pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config(), fb.logger)
+		} else {
+			if !b.Manager.Enabled() {
+				fb.logger.Warn(pipelinesWarning)
+			}
 		}
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
