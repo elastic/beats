@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"context"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -39,7 +40,11 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
 
-	defer pipeline.Disconnect(t.Context())
+	defer func() {
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		pipeline.Disconnect(ctx)
+		cancel()
+	}()
 
 	n := 66000
 	clients := []beat.Client{}
@@ -99,7 +104,9 @@ func TestPipelineWaitCloseThenForce(t *testing.T) {
 		WaitClose:     time.Millisecond,
 	}
 	pipeline := makePipeline(t, settings, mockQueue)
-	require.NoError(t, pipeline.Disconnect(t.Context()))
+	ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+	defer cancel()
+	require.NoError(t, pipeline.Disconnect(ctx))
 	<-closed
 	<-forceClosed
 }

@@ -513,10 +513,19 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
-	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
-	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
-	//       or publisher might panic due to concurrent updates.
+	// only disconnect pipeline for standard run
+	// disconnecting for --once mode causes in-flight events to be dropped.
+	if !*once {
+		ctx, ctxCancel := context.WithTimeout(context.Background(), fb.config.ShutdownTimeout)
+		defer ctxCancel()
+
+		// disconnect the pipeline to ensure all pending events are flushed and acknowledged
+		err = fb.pipeline.Disconnect(ctx)
+		if err != nil {
+			fb.logger.Error("Error disconnecting pipeline:", err)
+		}
+	}
+
 	inputs.Stop()
 	modules.Stop()
 	adiscover.Stop()
@@ -536,7 +545,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		waitEvents.Add(withLog(wgEvents.Wait,
 			"Continue shutdown: All enqueued events being published.", fb.logger))
 		// Wait for either timeout or explicit shutdown.
-		if timeout > 0 {
+		if timeout > cfg.DefaultShutdownTimeout {
 			fb.logger.Infof("Shutdown output timer started. Waiting for max %v.", timeout)
 			waitEvents.Add(withLog(waitDuration(timeout),
 				"Continue shutdown: Time out waiting for events being published.", fb.logger))

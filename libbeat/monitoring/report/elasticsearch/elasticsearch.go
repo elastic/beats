@@ -173,9 +173,7 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 			Retry:     0, // no retry. Drop event on error.
 		},
 		pipeline.Settings{
-			WaitClose:     0,
-			WaitCloseMode: pipeline.NoWaitOnClose,
-			Processors:    processing,
+			Processors: processing,
 		})
 	if err != nil {
 		return nil, err
@@ -183,7 +181,9 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 
 	pipeConn, err := pipeline.Connect()
 	if err != nil {
-		pipeline.Disconnect(context.Background())
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel() // intentionally cancel the context to the pipeline closes immediately
+		pipeline.Disconnect(ctx)
 		return nil, err
 	}
 
@@ -206,7 +206,9 @@ func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report
 func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
-	r.pipeline.Disconnect(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // intentionally cancel the context to the pipeline closes immediately
+	r.pipeline.Disconnect(ctx)
 	r.wg.Wait()
 }
 

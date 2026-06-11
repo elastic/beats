@@ -67,6 +67,8 @@ const (
 	// scheduledQueryProfilesDiagTimeout is the timeout for the scheduled_query_profiles diagnostic hook.
 	// Large schedules may need a longer timeout; increase if the diagnostic returns incomplete data.
 	scheduledQueryProfilesDiagTimeout = 20 * time.Second
+
+	pipelineShutdownTimeout = time.Second
 )
 
 // osquerybeat configuration.
@@ -99,6 +101,7 @@ type osquerybeat struct {
 	osquerydFactory          osqd.RunnerFactory
 	executablePath           func() (string, error)
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+	pipeline                 beat.Pipeline
 }
 
 type osquerybeatPublisher interface {
@@ -134,6 +137,7 @@ func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 		qp:                   newQueryProfiler(log),
 		osquerydFactory:      osqd.New,
 		executablePath:       os.Executable,
+		pipeline:             b.Publisher,
 	}
 
 	profileCfg := config.GetQueryProfileStorageConfig(c.Inputs)
@@ -169,6 +173,11 @@ func (bt *osquerybeat) init() (context.Context, error) {
 }
 
 func (bt *osquerybeat) close() {
+	// close the pipeline first
+	ctx, cancel := context.WithTimeout(context.Background(), pipelineShutdownTimeout)
+	defer cancel()
+	bt.pipeline.Disconnect(ctx) //nolint:errcheck
+
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
 	if bt.pub != nil {
@@ -185,6 +194,7 @@ func (bt *osquerybeat) close() {
 		go bt.watcher.Run()
 		bt.watcher = nil
 	}
+
 }
 
 // Run starts osquerybeat.

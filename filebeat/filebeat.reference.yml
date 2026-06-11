@@ -1416,8 +1416,8 @@ filebeat.inputs:
 #filebeat.overwrite_pipelines: false
 
 # How long filebeat waits on shutdown for the publisher to finish.
-# Default is 0, not waiting.
-#filebeat.shutdown_timeout: 0
+# Default is 1s.
+#filebeat.shutdown_timeout: 1s
 
 # Enable filebeat config reloading
 #filebeat.config:

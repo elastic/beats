@@ -29,7 +29,8 @@ import (
 
 // Defaults for config variables which are not set
 const (
-	DefaultType = "log"
+	DefaultType            = "log"
+	DefaultShutdownTimeout = 1 * time.Second
 )
 
 type Config struct {
@@ -68,7 +69,7 @@ var DefaultConfig = Config{
 		FlushTimeout:  time.Second,
 		Backend:       "memlog",
 	},
-	ShutdownTimeout:    0,
+	ShutdownTimeout:    DefaultShutdownTimeout,
 	OverwritePipelines: false,
 }
 

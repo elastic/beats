@@ -19,8 +19,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	agentconfig "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
@@ -111,10 +114,11 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
+		Publisher:  makeTestPipeline(t),
 	}
 	b.Info.Paths = newTestBeatPaths(t)
 
@@ -130,15 +134,29 @@ func newStatusTestBeater(t *testing.T, overrides ...func(*osquerybeat)) (*osquer
 	return ob, b, mgr
 }
 
+func makeTestPipeline(t *testing.T) beat.Pipeline {
+	t.Helper()
+	p, err := pipeline.New(beat.Info{Logger: logptest.NewTestingLogger(t, "")},
+		pipeline.Monitors{},
+		agentconfig.Namespace{},
+		outputs.Group{},
+		pipeline.Settings{},
+	)
+	require.NoError(t, err)
+	return p
+}
+
 // TestOsquerybeatStatusReporting_Lifecycle tests the full lifecycle status reporting
 // when osqueryd is available and runs successfully.
 func TestOsquerybeatStatusReporting_Lifecycle(t *testing.T) {
 	mgr := &testManager{}
+
 	b := &beat.Beat{
 		Info:       beat.Info{Logger: logp.NewLogger("test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
+		Publisher:  makeTestPipeline(t),
 	}
 	b.Info.Paths = newTestBeatPaths(t)
 
@@ -256,10 +274,11 @@ func newTestBeatPaths(t *testing.T) *paths.Path {
 func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
+		Publisher:  makeTestPipeline(t),
 	}
 	b.Info.Paths = newTestBeatPaths(t)
 
@@ -295,10 +314,11 @@ func TestOsquerybeatStatusReporting_CheckFailure(t *testing.T) {
 func TestOsquerybeatStatusReporting_CreateOsquerydFailure(t *testing.T) {
 	mgr := &testManager{}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
+		Publisher:  makeTestPipeline(t),
 	}
 	b.Info.Paths = newTestBeatPaths(t)
 
@@ -334,10 +354,11 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 		startErr: assert.AnError, // Manager.Start() will fail
 	}
 	b := &beat.Beat{
-		Info:       beat.Info{Logger: logp.NewLogger("test")},
+		Info:       beat.Info{Logger: logptest.NewTestingLogger(t, "test")},
 		Manager:    mgr,
 		Registry:   reload.NewRegistry(),
 		Monitoring: beatmonitoring.NewMonitoring(),
+		Publisher:  makeTestPipeline(t),
 	}
 	b.Info.Paths = newTestBeatPaths(t)
 
@@ -371,9 +392,9 @@ func TestOsquerybeatStatusReporting_ManagerStartFailure(t *testing.T) {
 
 func TestOsquerybeatRegistersScheduledProfilesDiagnostics(t *testing.T) {
 	mgr := &testManager{}
-	b := &beat.Beat{Manager: mgr}
+	b := &beat.Beat{Manager: mgr, Publisher: makeTestPipeline(t)}
 	ob := &osquerybeat{
-		qp: newQueryProfiler(logp.NewLogger("test")),
+		qp: newQueryProfiler(logptest.NewTestingLogger(t, "test")),
 	}
 	ob.setDiagnosticsQueryExecutor(&diagnosticsQueryExecutor{
 		rows: []map[string]interface{}{

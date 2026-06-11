@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"context"
 	"errors"
 	"io"
 	"strings"
@@ -70,7 +71,11 @@ func TestClient(t *testing.T) {
 		defer routinesChecker.Check(t)
 
 		pipeline := makePipeline(t, Settings{}, makeTestQueue())
-		defer pipeline.Disconnect(t.Context())
+		defer func() {
+			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+			defer cancel()
+			pipeline.Disconnect(ctx) //nolint:errcheck
+		}()
 
 		client, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
@@ -112,9 +117,7 @@ func TestClient(t *testing.T) {
 		// now we create a pipeline that makes sure that all
 		// events are acked while shutting down
 		pipeline := makePipeline(t, Settings{
-			WaitClose:     100 * time.Millisecond,
-			WaitCloseMode: WaitOnPipelineClose,
-			Processors:    ps,
+			Processors: ps,
 		}, q)
 		client, err := pipeline.Connect()
 		require.NoError(t, err)
@@ -276,7 +279,7 @@ func TestClientWaitClose(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	q := memqueue.NewQueue[publisher.Event](logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(t, Settings{}, q)
-	defer pipeline.Disconnect(t.Context())
+	defer pipeline.Disconnect(t.Context()) //nolint:errcheck
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
 		routinesChecker := resources.NewGoroutinesChecker()
@@ -375,7 +378,7 @@ func TestMonitoring(t *testing.T) {
 		metrics := monitoring.NewRegistry()
 		telemetry := monitoring.NewRegistry()
 		beatInfo := beat.Info{Logger: logptest.NewTestingLogger(t, "")}
-		pipeline, err := Load(
+		pipeline, err := LoadWithSettings(
 			beatInfo,
 			Monitors{
 				Metrics:   metrics,
@@ -383,7 +386,6 @@ func TestMonitoring(t *testing.T) {
 				Logger:    logp.NewNopLogger(),
 			},
 			config,
-			processing.Supporter(nil),
 			func(outputs.Observer) (string, outputs.Group, error) {
 				clients := make([]outputs.Client, numClients)
 				for i := range clients {
@@ -396,10 +398,13 @@ func TestMonitoring(t *testing.T) {
 					Clients:   clients,
 				}, nil
 			},
+			Settings{
+				Processors: processing.Supporter(nil),
+			},
 		)
 
 		require.NoError(t, err)
-		defer pipeline.Disconnect(t.Context())
+		defer pipeline.Disconnect(t.Context()) // nolint: errcheck // we can ignore the error here
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
@@ -434,7 +439,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
 	logger := logptest.NewTestingLogger(t, "")
-	pipeline, err := Load(
+	pipeline, err := LoadWithSettings(
 		beat.Info{
 			Logger: logger,
 		},
@@ -444,31 +449,33 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 			Logger:    logger,
 		},
 		config,
-		testProcessorSupporter{
-			Processor: processorList{
-				processors: []beat.Processor{
-					&testProcessor{
-						name: "filterProcessor",
-						processorFn: func(in *beat.Event) (*beat.Event, error) {
-							rawFilterMe, err := in.Fields.GetValue(filterMeKey)
-							if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
-								require.NoError(t, err, "could not get filter_me from Fields")
-							}
-
-							filterMe, ok := rawFilterMe.(bool)
-							if filterMe && ok {
-								return nil, nil
-							}
-							return in, nil
-						},
-					},
-				},
-			},
-		},
 		func(outputs.Observer) (string, outputs.Group, error) {
 			return "output_name", outputs.Group{Clients: []outputs.Client{
 				newMockClient(func(publisher.Batch) error { return nil })},
 			}, nil
+		},
+		Settings{
+			Processors: testProcessorSupporter{
+				Processor: processorList{
+					processors: []beat.Processor{
+						&testProcessor{
+							name: "filterProcessor",
+							processorFn: func(in *beat.Event) (*beat.Event, error) {
+								rawFilterMe, err := in.Fields.GetValue(filterMeKey)
+								if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+									require.NoError(t, err, "could not get filter_me from Fields")
+								}
+
+								filterMe, ok := rawFilterMe.(bool)
+								if filterMe && ok {
+									return nil, nil
+								}
+								return in, nil
+							},
+						},
+					},
+				},
+			},
 		},
 	)
 	require.NoError(t, err)

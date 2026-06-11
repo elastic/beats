@@ -115,12 +115,13 @@ These settings apply only when `registry.backend` is set to `otel_file_storage`.
 
 How long Filebeat waits on shutdown for the publisher to finish sending events before Filebeat shuts down.
 
-By default, this option is disabled, and Filebeat does not wait for the publisher to finish sending events before shutting down. This means that any events sent to the output, but not acknowledged before Filebeat shuts down, are sent again when you restart Filebeat. For more details about how this works, see [How does Filebeat ensure at-least-once delivery?](/reference/filebeat/how-filebeat-works.md#at-least-once-delivery).
+By default, it waits for 1s. Any events sent to the output, but not acknowledged before Filebeat shuts down, are sent again when you restart Filebeat. For more details about how this works, see [How does Filebeat ensure at-least-once delivery?](/reference/filebeat/how-filebeat-works.md#at-least-once-delivery).
 
 You can configure the `shutdown_timeout` option to specify the maximum amount of time that Filebeat waits for the publisher to finish sending events before shutting down. If all events are acknowledged before `shutdown_timeout` is reached, Filebeat will shut down.
 
 There is no recommended setting for this option because determining the correct value for `shutdown_timeout` depends heavily on the environment in which Filebeat is running and the current state of the output.
 
+In `--once` mode, Filebeat will wait for all events to be acknowledged before shutting down. To apply `shutdown_timeout`, configure it greater than the default value. 
 Example configuration:
 
 ```yaml

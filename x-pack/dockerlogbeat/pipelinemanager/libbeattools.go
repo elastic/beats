@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 
 	"github.com/gofrs/uuid/v5"
 
@@ -62,9 +61,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 	idxMgr := newIndexSupporter(info)
 
 	settings := pipeline.Settings{
-		WaitClose:     time.Second * 10,
-		WaitCloseMode: pipeline.WaitOnPipelineClose,
-		Processors:    processing,
+		Processors: processing,
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
