@@ -137,3 +137,32 @@ func (ns *Namespace) Constructors() map[string]Constructor {
 }
 
 func (p plugin) Plugin() Constructor { return p.c }
+
+func (ns *Namespace) GetConstructor(name string) (Constructor, error) {
+	names := strings.Split(name, ".")
+	return ns.get(names)
+}
+
+func (ns *Namespace) get(names []string) (Constructor, error) {
+	name := names[0]
+
+	if len(names) == 1 {
+		if p, found := ns.reg[name]; found {
+			if pl, ok := p.(plugin); ok {
+				return pl.c, nil
+			}
+			return nil, fmt.Errorf("expected a plugin, found: %T", p)
+		}
+		return nil, fmt.Errorf("no constructor found with at key: %s", name)
+	}
+	// check if namespace path already exists
+	tmp, found := ns.reg[name]
+	if found {
+		ns, ok := tmp.(*Namespace)
+		if !ok {
+			return nil, fmt.Errorf("expected sub-key's value to ba namespace, found %T", tmp)
+		}
+		return ns.get(names[1:])
+	}
+	return nil, fmt.Errorf("no constructor found with at key: %s", name)
+}
