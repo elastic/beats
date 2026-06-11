@@ -100,7 +100,7 @@ func (input *kafkaInput) Test(ctx input.TestContext) error {
 	}
 
 	if len(missingTopics) > 0 {
-		return fmt.Errorf("Of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
+		return fmt.Errorf("of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
 	}
 
 	return nil
@@ -136,7 +136,6 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	// If the consumer fails to connect, we use exponential backoff with
 	// jitter up to 8 * the initial backoff interval.
 	connectDelay := backoff.NewEqualJitterBackoff(
-		ctx.Cancelation.Done(),
 		input.config.ConnectBackoff,
 		8*input.config.ConnectBackoff,
 	)
@@ -150,7 +149,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		)
 		if err != nil {
 			log.Errorw("Error initializing kafka consumer group", "error", err)
-			connectDelay.Wait()
+			connectDelay.Wait(goContext)
 			continue
 		}
 		// We've successfully connected, reset the backoff timer.
@@ -253,7 +252,6 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
-	//nolint:nakedret // omitting the return gives a build error
 	return
 }
 

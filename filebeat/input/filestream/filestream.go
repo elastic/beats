@@ -97,7 +97,7 @@ func newFileReader(
 		closeRenamed:       closerConfig.OnStateChange.Renamed,
 		offset:             offset,
 		lastTimeRead:       time.Now(),
-		backoff:            backoff.NewExpBackoff(canceler.Done(), config.Backoff.Init, config.Backoff.Max),
+		backoff:            backoff.NewExpBackoff(config.Backoff.Init, config.Backoff.Max),
 		readerCtx:          readerCtx,
 		tg:                 tg,
 	}
@@ -142,7 +142,7 @@ func (f *logFile) Read(buf []byte) (int, error) {
 		}
 
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
-		f.backoff.Wait()
+		f.backoff.Wait(f.readerCtx)
 	}
 
 	// `f.isInactive` is set in a different goroutine, however it is the same
