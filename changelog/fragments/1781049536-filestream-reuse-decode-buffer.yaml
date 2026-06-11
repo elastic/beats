@@ -18,9 +18,9 @@ summary: Reduce filestream memory usage and allocations by reusing the line deco
 description: >
   The filestream line reader now reuses the backing array of each decoded line
   instead of allocating a fresh one per line, removing one allocation per event
-  and lowering steady-state memory and GC pressure. The reuse is enabled only
-  when no buffering parser (e.g. multiline) is configured, since the harvester
-  copies the line into the event before reading the next one.
+  and lowering steady-state memory and GC pressure. multiline parser removes a
+  lock-step goroutine ping-pong that spent ~82% of multiline CPU parking/waking
+  threads.
 
 # Affected component; a word indicating the component this changeset affects.
 component: filebeat
