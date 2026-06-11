@@ -75,7 +75,7 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		collectOnEOF: config.CollectOnEOF,
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
-		tempBuffer:   make([]byte, config.BufferSize),
+		tempBuffer:   getTempBuffer(config.BufferSize),
 		logger:       logger,
 	}, nil
 }
@@ -326,5 +326,10 @@ func (r *LineReader) decode(end int) (int, error) {
 }
 
 func (r *LineReader) Close() error {
+	// Return the scratch buffer to the pool. It is no longer used after Close,
+	// and its contents have always been copied into the streambufs, so nothing
+	// downstream references it.
+	putTempBuffer(r.tempBuffer)
+	r.tempBuffer = nil
 	return r.reader.Close()
 }
