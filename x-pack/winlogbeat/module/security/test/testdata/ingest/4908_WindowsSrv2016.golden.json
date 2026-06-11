@@ -2,7 +2,7 @@
   {
     "@timestamp": "2020-08-19T06:07:25.0461779Z",
     "ecs": {
-      "version": "1.12.0"
+      "version": "8.17.0"
     },
     "event": {
       "action": "special-group-table-changed",
@@ -32,10 +32,12 @@
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
         "SidList": [
+          "",
           "%{S-1-5-32-544}",
           "%{S-1-5-32-123-54-65}"
         ],
         "SidListDesc": [
+          "",
           "Administrators",
           "S-1-5-32-123-54-65"
         ]
