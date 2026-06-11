@@ -380,8 +380,8 @@ func TestWhenProcessorRunPdataLegacyFallback(t *testing.T) {
 	assert.False(t, hasRemoved, "field deleted by inner processor must be absent")
 }
 
-// TestAddFieldsRunPdataOverwriteFalse verifies that RunPdata always overwrites,
-// regardless of the overwrite flag (pdata records are owned, no-overwrite is not needed).
+// TestAddFieldsRunPdataOverwriteFalse verifies that RunPdata respects overwrite=false:
+// existing fields are preserved and absent fields are added.
 func TestAddFieldsRunPdataOverwriteFalse(t *testing.T) {
 	proc := addfields.NewAddFields(mapstr.M{"env": "prod", "new": "val"}, false, false)
 
@@ -396,8 +396,8 @@ func TestAddFieldsRunPdataOverwriteFalse(t *testing.T) {
 	require.NoError(t, pp.RunPdata(body))
 
 	raw := body.AsRaw()
-	assert.Equal(t, "prod", raw["env"], "pdata path always overwrites")
-	assert.Equal(t, "val", raw["new"], "new field must be added")
+	assert.Equal(t, "staging", raw["env"], "overwrite=false must preserve existing field")
+	assert.Equal(t, "val", raw["new"], "absent field must be added")
 	assert.Equal(t, "hello", raw["message"], "unrelated field must be preserved")
 }
 
