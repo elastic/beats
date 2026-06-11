@@ -31,7 +31,22 @@ The `entity-analytics` input supports the following configuration options plus t
 
 ### `provider` [_provider_2]
 
-The identity provider. Must be one of: `activedirectory`, `azure-ad` or `okta`.
+The identity provider. Must be one of: `activedirectory`, `azure-ad`, `jamf`, or `okta`.
+
+
+### `use_minimal_state` [_use_minimal_state]
+
+```{applies_to}
+stack: preview 9.5.0
+```
+
+When set to `true`, the input uses the minimal-state sync implementation. This mode uses significantly less local storage than the legacy implementation and supports Elasticsearch-backed state for agentless deployments.
+
+In agentless deployments, state is stored in Elasticsearch (index `agentless-state-<input-id>`) rather than on local disk, enabling stateless pod scheduling. The routing is automatic when the `AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES` environment variable includes `entity-analytics`.
+
+When running with a local file store (the default for non-agentless deployments), state is stored in a bbolt database under the Filebeat data directory.
+
+Defaults to `false`. In Fleet-managed agentless deployments, integration packages set this to `true` automatically.
 
 
 ## Common options [filebeat-input-entity-analytics-common-options]
@@ -1376,6 +1391,60 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 | `update_total` | The total number of incremental updates. |
 | `update_error` | The number of incremental updates that failed due to an error. |
 | `update_processing_time` | Histogram of the elapsed incremental updates times in nanoseconds (time of API contact to items sent to output). |
+
+## Operational limits [_operational_limits]
+
+```{applies_to}
+stack: preview 9.5.0
+```
+
+The following scaling guidance applies to the minimal-state implementation (`use_minimal_state: true`). The legacy implementation has different characteristics.
+
+### EntraID (azure-ad) group scaling
+
+EntraID is the most complex sync path due to group membership graph expansion. The primary scaling factor is **group count**, because each active incremental sync refetches all groups regardless of how many entities changed.
+
+| Groups | API calls per sync | Projected time at 50ms/call |
+| --- | --- | --- |
+| 100 | ~103 | ~5s |
+| 1,000 | ~1,003 | ~50s |
+| 5,000 | ~5,003 | ~250s |
+| 10,000 | ~10,003 | ~500s |
+
+The ceiling is determined by API call count multiplied by per-call latency. Graph CPU (membership expansion) is negligible relative to network time at all realistic scales. At the default `update_interval` of 15 minutes (900s):
+
+- At 10ms/call latency: supports ~90,000 groups
+- At 50ms/call latency: supports ~18,000 groups
+- At 100ms/call latency: supports ~9,000 groups
+
+If a sync cannot complete within `update_interval`, the system cannot converge. Increase `update_interval` for larger environments.
+
+### Scratch storage (EntraID)
+
+The EntraID membership graph is stored in a temporary file (bbolt) rather than in-memory. This bounds Go heap usage for large directories — the heap holds only the BFS working set, not the full adjacency data. The trade-off is ephemeral disk usage:
+
+- At 2.5M edges (5,000 groups × 500 members), the scratch file is approximately 103 MB.
+- Mmap'd pages are OS-reclaimable under memory pressure and do not contribute to OOM kills in cgroup-limited containers.
+- Build time is dominated by API call latency, not local I/O.
+
+The `scratch_dir` provider configuration option overrides the default temporary directory. Files use the prefix `entcollect-scratch-*`.
+
+### Rate limiting
+
+EntraID APIs may return 429 (Too Many Requests) with `Retry-After` headers. Throttle wait time is additive to baseline sync duration. For example, at 1,000 groups with a policy of one throttle per 50 requests, expect ~20 throttle events adding ~20s total.
+
+### Document size
+
+Average per-document payload size (before Elasticsearch indexing overhead):
+
+| Provider | Typical doc size |
+| --- | --- |
+| EntraID | 93–99 B (fixture baseline; real documents larger with full attributes) |
+| Active Directory | ~264 B |
+| Okta | ~280 B |
+| Jamf | ~524 B (includes hardware/OS inventory) |
+
+At 10,000 users with ~500 B average (realistic with full attributes), each full sync produces ~5 MB of uncompressed payload — modest for Elasticsearch at a 15-minute interval.
 
 ::::{note}
 This input is experimental and is under active developement. Configuration options and behaviors may change without warning. Use with caution and do not use in production environments.
