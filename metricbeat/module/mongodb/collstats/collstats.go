@@ -273,6 +273,9 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 		results[i] = flattenAggregationResult(results[i])
 	}
 
+	// Single, non-sharded result (standalone or replica set): return as-is so we
+	// don't tag it with shardCount. A lone document carrying only "host" (which
+	// $collStats always emits) is NOT sharded — see hasShardMetadata.
 	if len(results) == 1 && !hasShardMetadata(results[0]) {
 		return results[0], nil
 	}
@@ -289,12 +292,18 @@ func (m *Metricset) fetchCollStatsAggregation(client *mongo.Client, dbName, coll
 func (m *Metricset) fetchCollStatsCommand(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
 	db := client.Database(dbName)
 
-	// Build command with options
-	command := bson.M{"collStats": collectionName}
+	// Build command with options.
+	//
+	// Use an ordered bson.D rather than bson.M: the MongoDB wire protocol
+	// requires the command name ("collStats") to be the first field of the
+	// command document. The Go driver enforces this by rejecting multi-key
+	// unordered maps ("multi-key map passed in for ordered parameter cmd"),
+	// so adding "scale" to a bson.M would break every legacy-path fetch.
+	command := bson.D{{Key: "collStats", Value: collectionName}}
 
 	// Add scale parameter if not default
 	if m.options.Scale != 1 {
-		command["scale"] = m.options.Scale
+		command = append(command, bson.E{Key: "scale", Value: m.options.Scale})
 	}
 
 	m.Logger().Debugf("collstats: running collStats command on %s.%s: %v", dbName, collectionName, command)
@@ -462,16 +471,20 @@ func mergeShardedCollStats(shardResults []map[string]interface{}) (map[string]in
 	return merged, nil
 }
 
+// hasShardMetadata reports whether a $collStats result originated from a shard.
+//
+// Only the "shard" field marks a sharded result: when $collStats runs through a
+// mongos against a sharded collection, each shard's document carries the shard
+// name. The top-level "host" field is NOT a sharding signal — $collStats always
+// includes it (the hostname of the serving node), even on a standalone mongod or
+// a replica set. Treating "host" as shard metadata would force every standalone
+// result through the sharded-merge path and emit a spurious shardCount=1.
 func hasShardMetadata(result map[string]interface{}) bool {
 	if result == nil {
 		return false
 	}
-	for _, key := range []string{"shard", "host"} {
-		if _, exists := result[key]; exists {
-			return true
-		}
-	}
-	return false
+	_, exists := result["shard"]
+	return exists
 }
 
 // convertToFloat64 safely converts various numeric types to float64

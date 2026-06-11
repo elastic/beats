@@ -483,7 +483,9 @@ func TestHasShardMetadata(t *testing.T) {
 		{name: "nil", input: nil, expected: false},
 		{name: "no metadata", input: map[string]interface{}{"count": int64(1)}, expected: false},
 		{name: "has shard", input: map[string]interface{}{"shard": "s1"}, expected: true},
-		{name: "has host", input: map[string]interface{}{"host": "h1"}, expected: true},
+		// "host" alone is NOT a sharding signal: $collStats always emits a
+		// top-level host (the serving node), including on standalone/replica set.
+		{name: "host only (standalone $collStats)", input: map[string]interface{}{"host": "h1"}, expected: false},
 		{name: "has both", input: map[string]interface{}{"shard": "s1", "host": "h1"}, expected: true},
 	}
 

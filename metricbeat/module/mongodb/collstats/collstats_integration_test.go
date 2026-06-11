@@ -81,6 +81,12 @@ func getConfig(host string) map[string]interface{} {
 	}
 }
 
+func getConfigWithScale(host string, scale int) map[string]interface{} {
+	cfg := getConfig(host)
+	cfg["scale"] = scale
+	return cfg
+}
+
 func TestFetchStandaloneVersions(t *testing.T) {
 	relStandaloneDir := filepath.Join("testing", "mongodb", "standalone")
 	absStandaloneDir, err := filepath.Abs(relStandaloneDir)
@@ -241,7 +247,44 @@ func TestFetchStandaloneVersions(t *testing.T) {
 			logIfVerbose(t, "Fetched %d collstats events", len(events))
 
 			verifyStandaloneEvents(t, events, tc.expectExtendedStats)
+
+			// Regression guard: a non-default scale must not break collection on
+			// any version. The legacy collStats command path (MongoDB < 6.2) must
+			// build an ordered command document; using an unordered multi-key map
+			// makes the driver reject every fetch ("multi-key map passed in for
+			// ordered parameter cmd"), yielding zero events.
+			const scale = 1024
+			logIfVerbose(t, "Fetching collstats events with scale=%d...", scale)
+			scaledFetcher := mbtest.NewReportingMetricSetV2Error(t, getConfigWithScale(mongoHostStr, scale))
+			scaledEvents, scaledErrs := mbtest.ReportingFetchV2Error(scaledFetcher)
+			if len(scaledErrs) > 0 {
+				t.Logf("Scaled fetch errors: %v", scaledErrs)
+			}
+			require.Empty(t, scaledErrs, "expected no fetch errors with scale=%d", scale)
+			require.NotEmpty(t, scaledEvents, "expected collstats events with scale=%d", scale)
+			verifyScaledEvents(t, scaledEvents, scale)
 		})
+	}
+}
+
+// verifyScaledEvents asserts that, for the seeded collections, a configured scale
+// is honored: scaleFactor (when reported by the server) reflects the requested
+// scale. Storage sizes are scaled server-side, so we only assert the factor.
+func verifyScaledEvents(t *testing.T, events []mb.Event, scale int) {
+	t.Helper()
+
+	for _, event := range events {
+		collection, _ := event.MetricSetFields["collection"].(string)
+		if _, seeded := seededCollectionExpectations[collection]; !seeded {
+			continue
+		}
+
+		stats, ok := event.MetricSetFields["stats"].(mapstr.M)
+		require.True(t, ok, "stats should be map")
+
+		if sf, exists := stats["scaleFactor"]; exists {
+			assertExactNumber(t, sf, float64(scale), "stats.scaleFactor should reflect configured scale")
+		}
 	}
 }
 
@@ -348,6 +391,14 @@ func verifyStandaloneEvents(t *testing.T, events []mb.Event, expectExtendedStats
 
 		statsValue, ok := metricsetFields["stats"].(mapstr.M)
 		require.True(t, ok, "stats should be map")
+
+		// Standalone deployments are never sharded: shardCount must be absent for
+		// every event, on both the legacy command path and the $collStats
+		// aggregation path. Regression guard for $collStats emitting a top-level
+		// "host" that must not be mistaken for shard metadata (which previously
+		// tagged standalone results with shardCount=1).
+		_, hasShardCount := statsValue["shardCount"]
+		require.Falsef(t, hasShardCount, "standalone event %s.%s must not report shardCount", db, collection)
 
 		totalValue, ok := metricsetFields["total"].(mapstr.M)
 		require.True(t, ok, "total should be map")
