@@ -33,9 +33,11 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string            `config:"id"`
-	Paths        []string          `config:"paths"`
-	Close        closerConfig      `config:"close"`
+	ID           string                    `config:"id"`
+	Paths        []string                  `config:"paths"`
+	Close        closerConfig              `config:"close"`
+	ReadUntilEOF loginp.ReadUntilEOFConfig `config:"read_until_eof"`
+
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
@@ -97,6 +99,7 @@ type copyTruncateConfig commonRotationConfig
 
 func defaultConfig() config {
 	return config{
+<<<<<<< HEAD
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
@@ -105,6 +108,20 @@ func defaultConfig() config {
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
 		FileWatcher:    defaultFileWatcherConfig(), // Config key: prospector.scanner
+=======
+		Reader:                    defaultReaderConfig(),
+		Paths:                     []string{},
+		Close:                     defaultCloserConfig(),
+		ReadUntilEOF:              loginp.DefaultReadUntilEOFConfig(),
+		IncludeFileOwnerName:      false,
+		IncludeFileOwnerGroupName: false,
+		CleanInactive:             -1,
+		CleanRemoved:              true,
+		HarvesterLimit:            0,
+		IgnoreOlder:               0,
+		Delete:                    defaultDeleterConfig(),
+		FileWatcher:               defaultFileWatcherConfig(), // Config key: prospector.scanner
+>>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 	}
 }
 
