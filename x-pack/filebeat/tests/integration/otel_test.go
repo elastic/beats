@@ -2430,9 +2430,11 @@ processors:
           target: ""
           fields:
             custom_field: "global-processors-parity-test"
-      - add_host_metadata: ~
+      - add_host_metadata:
+          when.not.contains.tags: forwarded
       - add_cloud_metadata: ~
       - add_docker_metadata: ~
+      - add_kubernetes_metadata: ~
 exporters:
   debug:
     use_internal_logger: false
@@ -2488,9 +2490,11 @@ processors:
       target: ""
       fields:
         custom_field: "global-processors-parity-test"
-  - add_host_metadata: ~
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
 http.enabled: true
 http.host: localhost
 http.port: %d
