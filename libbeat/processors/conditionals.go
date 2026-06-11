@@ -104,7 +104,7 @@ func (r *WhenProcessor) RunPdata(body pcommon.Map) error {
 	if !r.condition.Check(otelmap.PdataValuesMap{M: body}) {
 		return nil
 	}
-	if pp, ok := r.p.(interface{ RunPdata(pcommon.Map) error }); ok {
+	if pp, ok := r.p.(PdataProcessor); ok {
 		return pp.RunPdata(body)
 	}
 	// Inner processor is legacy-only: round-trip through mapstr.M.

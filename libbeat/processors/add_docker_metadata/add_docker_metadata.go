@@ -319,65 +319,15 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 // RunPdata enriches the given pcommon.Map directly with Docker container metadata,
 // avoiding the round-trip conversion to/from mapstr.M used by the standard Run path.
-// When sourceProcessor is set (log.file.path-based CID extraction), a minimal
-// beat.Event carrying only the log path field is used to avoid a full conversion.
 func (d *addDockerMetadata) RunPdata(body pcommon.Map) error {
 	if !d.dockerAvailable.Load() {
 		return nil
 	}
 
-	var cid string
-
-	// Extract CID from log.file.path via sourceProcessor.
-	if d.sourceProcessor != nil {
-		if lfpVal, ok := otelmap.GetAtPath("log.file.path", body); ok && lfpVal.Type() == pcommon.ValueTypeStr {
-			miniEvent := &beat.Event{Fields: mapstr.M{"log": mapstr.M{"file": mapstr.M{"path": lfpVal.Str()}}}}
-			result, err := d.sourceProcessor.Run(miniEvent)
-			if err != nil {
-				d.log.Debugf("Error while extracting container ID from source path: %v", err)
-			} else if result != nil {
-				if v, err := result.GetValue(dockerContainerIDKey); err == nil {
-					cid, _ = v.(string)
-				}
-				if cid != "" {
-					if err := otelmap.PutAtPath(dockerContainerIDKey, cid, body); err != nil {
-						return err
-					}
-				}
-			}
-		}
+	cid, err := d.resolveCIDFromPdata(body)
+	if err != nil {
+		return err
 	}
-
-	// Lookup CID via process cgroup membership.
-	if cid == "" && len(d.pidFields) > 0 {
-		miniEvent := &beat.Event{Fields: make(mapstr.M, len(d.pidFields))}
-		for _, field := range d.pidFields {
-			if v, ok := otelmap.GetAtPath(field, body); ok {
-				_, _ = miniEvent.Fields.Put(field, v.AsRaw())
-			}
-		}
-		id, err := d.lookupContainerIDByPID(miniEvent)
-		if err != nil {
-			return fmt.Errorf("error reading container ID: %w", err)
-		}
-		if id != "" {
-			cid = id
-			if err := otelmap.PutAtPath(dockerContainerIDKey, cid, body); err != nil {
-				return err
-			}
-		}
-	}
-
-	// Lookup CID from user-defined fields.
-	if cid == "" && len(d.fields) > 0 {
-		for _, field := range d.fields {
-			if v, ok := otelmap.GetAtPath(field, body); ok && v.Type() == pcommon.ValueTypeStr {
-				cid = v.Str()
-				break
-			}
-		}
-	}
-
 	if cid == "" {
 		return nil
 	}
@@ -388,7 +338,63 @@ func (d *addDockerMetadata) RunPdata(body pcommon.Map) error {
 		return nil
 	}
 
-	return d.writeContainerMetaToPdata(container, body)
+	return otelmap.MergeMapstrIntoPdata(d.buildContainerMeta(container), body)
+}
+
+// resolveCIDFromPdata extracts the container ID from a pcommon.Map using the
+// same three-path strategy as Run: sourceProcessor (log.file.path), PID-based
+// cgroup lookup, and user-defined match fields. It also writes the resolved CID
+// back into body under dockerContainerIDKey when found via the first two paths,
+// mirroring what Run does on the beat.Event.
+func (d *addDockerMetadata) resolveCIDFromPdata(body pcommon.Map) (string, error) {
+	// Extract CID from log.file.path via sourceProcessor.
+	if d.sourceProcessor != nil {
+		if lfpVal, ok := otelmap.GetAtPath("log.file.path", body); ok && lfpVal.Type() == pcommon.ValueTypeStr {
+			miniEvent := &beat.Event{Fields: mapstr.M{"log": mapstr.M{"file": mapstr.M{"path": lfpVal.Str()}}}}
+			result, err := d.sourceProcessor.Run(miniEvent)
+			if err != nil {
+				d.log.Debugf("Error while extracting container ID from source path: %v", err)
+			} else if result != nil {
+				if v, err := result.GetValue(dockerContainerIDKey); err == nil {
+					if cid, _ := v.(string); cid != "" {
+						if err := otelmap.PutAtPath(dockerContainerIDKey, cid, body); err != nil {
+							return "", err
+						}
+						return cid, nil
+					}
+				}
+			}
+		}
+	}
+
+	// Lookup CID via process cgroup membership.
+	if len(d.pidFields) > 0 {
+		miniEvent := &beat.Event{Fields: make(mapstr.M, len(d.pidFields))}
+		for _, field := range d.pidFields {
+			if v, ok := otelmap.GetAtPath(field, body); ok {
+				_, _ = miniEvent.Fields.Put(field, v.AsRaw())
+			}
+		}
+		id, err := d.lookupContainerIDByPID(miniEvent)
+		if err != nil {
+			return "", fmt.Errorf("error reading container ID: %w", err)
+		}
+		if id != "" {
+			if err := otelmap.PutAtPath(dockerContainerIDKey, id, body); err != nil {
+				return "", err
+			}
+			return id, nil
+		}
+	}
+
+	// Lookup CID from user-defined match fields.
+	for _, field := range d.fields {
+		if v, ok := otelmap.GetAtPath(field, body); ok && v.Type() == pcommon.ValueTypeStr {
+			return v.Str(), nil
+		}
+	}
+
+	return "", nil
 }
 
 func (d *addDockerMetadata) buildContainerMeta(container *docker.Container) mapstr.M {
@@ -409,32 +415,6 @@ func (d *addDockerMetadata) buildContainerMeta(container *docker.Container) maps
 	_, _ = meta.Put("container.image.name", container.Image)
 	_, _ = meta.Put("container.name", container.Name)
 	return meta
-}
-
-func (d *addDockerMetadata) writeContainerMetaToPdata(container *docker.Container, body pcommon.Map) error {
-	containerMap := getOrCreateSubMap("container", body)
-	containerMap.PutStr("id", container.ID)
-	containerMap.PutStr("name", container.Name)
-	getOrCreateSubMap("image", containerMap).PutStr("name", container.Image)
-
-	if len(container.Labels) > 0 {
-		labelsMap := containerMap.PutEmptyMap("labels")
-		for k, v := range container.Labels {
-			if d.dedot {
-				labelsMap.PutStr(common.DeDot(k), v)
-			} else {
-				labelsMap.PutStr(k, v)
-			}
-		}
-	}
-	return nil
-}
-
-func getOrCreateSubMap(key string, m pcommon.Map) pcommon.Map {
-	if existing, ok := m.Get(key); ok && existing.Type() == pcommon.ValueTypeMap {
-		return existing.Map()
-	}
-	return m.PutEmptyMap(key)
 }
 
 func (d *addDockerMetadata) Close() error {

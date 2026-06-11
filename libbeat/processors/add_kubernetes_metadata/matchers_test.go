@@ -23,7 +23,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -153,4 +155,46 @@ func TestFieldFormatMatcher(t *testing.T) {
 
 	out = matcher.MetadataIndex(event)
 	assert.Equal(t, "foo/bar", out)
+}
+
+// TestMetadataIndexPdataFieldMatcherParity verifies that MetadataIndexPdata and
+// MetadataIndex return the same result for FieldMatcher, which implements pdataMatcher.
+func TestMetadataIndexPdataFieldMatcherParity(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg, err := config.NewConfigFrom(map[string]interface{}{"lookup_fields": []string{"container.id"}})
+	require.NoError(t, err)
+	matcher, err := NewFieldMatcher(*cfg, logger)
+	require.NoError(t, err)
+
+	matchers := &Matchers{matchers: []Matcher{matcher}}
+	input := mapstr.M{"container": mapstr.M{"id": "abc123"}}
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+
+	assert.Equal(t, matcher.MetadataIndex(input), matchers.MetadataIndexPdata(body))
+}
+
+// TestMetadataIndexPdataFieldFormatMatcherFallback verifies that
+// MetadataIndexPdata falls back to a ToMapstr conversion for FieldFormatMatcher,
+// which does not implement pdataMatcher, and still returns the correct index.
+func TestMetadataIndexPdataFieldFormatMatcherFallback(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	cfg, err := config.NewConfigFrom(map[string]interface{}{"format": `%{[namespace]}/%{[pod]}`})
+	require.NoError(t, err)
+	matcher, err := NewFieldFormatMatcher(*cfg, logger)
+	require.NoError(t, err)
+
+	// FieldFormatMatcher must NOT implement pdataMatcher — the fallback path is what we are testing.
+	_, isPdata := matcher.(pdataMatcher)
+	require.False(t, isPdata, "FieldFormatMatcher must not implement pdataMatcher so the fallback is exercised")
+
+	matchers := &Matchers{matchers: []Matcher{matcher}}
+	input := mapstr.M{"namespace": "myns", "pod": "mypod"}
+
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, input))
+
+	assert.Equal(t, "myns/mypod", matchers.MetadataIndexPdata(body),
+		"FieldFormatMatcher fallback must return the same index as MetadataIndex")
 }

@@ -29,18 +29,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// PdataProcessor is an optional interface that beat processors can implement to
-// operate directly on a pcommon.Map, avoiding the round-trip conversion to/from
-// mapstr.M. When all processors in a chain implement this interface, the
-// beatprocessor skips the unpack/pack steps entirely.
-type PdataProcessor interface {
-	RunPdata(body pcommon.Map) error
-}
-
 type beatProcessor struct {
 	logger     *zap.Logger
 	processors []beat.Processor
-	pdataProcs []PdataProcessor // non-nil only when all processors implement PdataProcessor
+	pdataProcs []processors.PdataProcessor // non-nil only when all processors implement PdataProcessor
 }
 
 func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, error) {
@@ -76,10 +68,10 @@ func newBeatProcessor(set processor.Settings, cfg *Config) (*beatProcessor, erro
 
 // buildPdataProcs returns a typed slice for the fast path if every processor
 // implements PdataProcessor, or nil if any does not.
-func buildPdataProcs(procs []beat.Processor) []PdataProcessor {
-	out := make([]PdataProcessor, 0, len(procs))
+func buildPdataProcs(procs []beat.Processor) []processors.PdataProcessor {
+	out := make([]processors.PdataProcessor, 0, len(procs))
 	for _, p := range procs {
-		pp, ok := p.(PdataProcessor)
+		pp, ok := p.(processors.PdataProcessor)
 		if !ok {
 			return nil
 		}
@@ -171,7 +163,7 @@ func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Log
 	return logs, nil
 }
 
-func (p *beatProcessor) consumeLogRecordPdata(body pcommon.Map, procs []PdataProcessor) {
+func (p *beatProcessor) consumeLogRecordPdata(body pcommon.Map, procs []processors.PdataProcessor) {
 	for _, proc := range procs {
 		if err := proc.RunPdata(body); err != nil {
 			p.logger.Error("error processing Beat event", zap.Error(err))

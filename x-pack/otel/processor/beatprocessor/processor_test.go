@@ -323,7 +323,7 @@ func TestConsumeLogsPdataPath(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, proc)
 
-			_, isPdata := proc.(PdataProcessor)
+			_, isPdata := proc.(processors.PdataProcessor)
 			assert.Equal(t, tc.wantPdata, isPdata, "PdataProcessor implementation mismatch")
 
 			logs := plog.NewLogs()
@@ -364,7 +364,7 @@ func TestWhenProcessorRunPdataLegacyFallback(t *testing.T) {
 	})(cfg, testLogger())
 	require.NoError(t, err)
 
-	pp, ok := proc.(PdataProcessor)
+	pp, ok := proc.(processors.PdataProcessor)
 	require.True(t, ok, "WhenProcessor must implement PdataProcessor")
 
 	body := plog.NewLogs().ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().
@@ -385,7 +385,7 @@ func TestWhenProcessorRunPdataLegacyFallback(t *testing.T) {
 func TestAddFieldsRunPdataOverwriteFalse(t *testing.T) {
 	proc := addfields.NewAddFields(mapstr.M{"env": "prod", "new": "val"}, false, false)
 
-	pp, ok := proc.(PdataProcessor)
+	pp, ok := proc.(processors.PdataProcessor)
 	require.True(t, ok, "addFields must implement PdataProcessor")
 
 	body := plog.NewLogs().ResourceLogs().AppendEmpty().ScopeLogs().AppendEmpty().
