@@ -70,6 +70,9 @@ type config struct {
 	// Disabled by default.
 	IncludeFileOwnerName      bool `config:"include_file_owner_name"`
 	IncludeFileOwnerGroupName bool `config:"include_file_owner_group_name"`
+	// IncludeFileFingerprint controls whether log.file.fingerprint is added
+	// to published events. Disabled by default.
+	IncludeFileFingerprint bool `config:"include_file_fingerprint"`
 
 	// -1 means that registry will never be cleaned, disabling clean_inactive.
 	// Setting it to 0 also disables clean_inactive

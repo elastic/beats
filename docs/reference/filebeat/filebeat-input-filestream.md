@@ -700,6 +700,11 @@ stack: ga 9.3
 Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
 
+### `include_file_fingerprint` [filestream-input-include_file_fingerprint]
+```yaml {applies_to}
+stack: ga 9.5
+```
+Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
