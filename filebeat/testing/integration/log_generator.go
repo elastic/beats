@@ -129,7 +129,7 @@ func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGene
 	}
 	defer file.Close()
 
-	writeLines(t, file, filename, 0, lines, generator)
+	WriteLines(t, file, filename, 0, lines, generator)
 }
 
 // AppendLogFile appends a given line count to an existing file
@@ -156,13 +156,34 @@ func AppendLogFile(t *testing.T, filename string, lines int, generator LogGenera
 		t.Fatalf("failed to count lines in %q: %s", filename, err)
 	}
 
-	writeLines(t, file, filename, offset, lines, generator)
+	WriteLines(t, file, filename, offset, lines, generator)
 }
 
+<<<<<<< HEAD
 // writeLines writes generated lines to the provided writer.
+=======
+// GenerateGZIPLogFile generates a single gzip-compressed log file with the
+// given filename, lines, and generator. The file content is identical to the
+// one produced by GenerateLogFile, but compressed using gzip.
+func GenerateGZIPLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
+	file, err := os.Create(filename)
+	if err != nil {
+		t.Fatalf("failed to create a gzip log file: %q", filename)
+		return
+	}
+	defer file.Close()
+
+	gw := gzip.NewWriter(file)
+	defer gw.Close()
+
+	WriteLines(t, gw, filename, 0, lines, generator)
+}
+
+// WriteLines writes generated lines to the provided writer.
+>>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 // It is shared between GenerateLogFile and GenerateGZIPLogFile to
 // avoid duplicating the core writing logic.
-func writeLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
+func WriteLines(t *testing.T, w io.Writer, filename string, offset, lines int, generator LogGenerator) {
 	for i := offset + 1; i <= offset+lines; i++ {
 		line := generator.GenerateLine(filename, i) + "\n"
 		if _, err := w.Write([]byte(line)); err != nil {
