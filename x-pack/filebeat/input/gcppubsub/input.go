@@ -29,12 +29,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 const (
@@ -367,19 +365,18 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 		opts = append(opts, option.WithCredentialsJSON(in.CredentialsJSON))
 	}
 
-	userAgent := useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	if !in.config.Transport.Proxy.Disable && in.config.Transport.Proxy.URL != nil {
 		c, err := httpcommon.HTTPTransportSettings{Proxy: in.config.Transport.Proxy}.Client()
 		if err != nil {
 			return nil, err
 		}
 		c.Transport = userAgentDecorator{
-			UserAgent: userAgent,
+			UserAgent: beat.UserAgent(),
 			Transport: c.Transport,
 		}
 		opts = append(opts, option.WithHTTPClient(c))
 	} else {
-		opts = append(opts, option.WithUserAgent(userAgent))
+		opts = append(opts, option.WithUserAgent(beat.UserAgent()))
 	}
 
 	return pubsub.NewClient(ctx, in.ProjectID, opts...)

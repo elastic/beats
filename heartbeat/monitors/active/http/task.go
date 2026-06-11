@@ -170,7 +170,7 @@ func createPingFactory(
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
-			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": userAgent}),
+			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": beat.UserAgent()}),
 		}
 
 		end, err := execPing(event, client, req, body, timeout, validator, config.Response)

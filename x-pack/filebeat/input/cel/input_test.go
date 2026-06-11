@@ -770,9 +770,9 @@ var inputTests = []struct {
 		handler: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("content-type", "application/json")
 			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
-			if r.UserAgent() != userAgent {
+			if r.UserAgent() != beat.UserAgent() {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, userAgent)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, beat.UserAgent())
 			}
 			if r.Method != http.MethodGet {
 				w.WriteHeader(http.StatusBadRequest)

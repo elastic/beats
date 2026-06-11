@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -29,6 +31,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
+
+var userAgent atomic.Value // stores string
 
 // Creator initializes and configures a new Beater instance used to execute
 // the beat's run-loop.
@@ -136,6 +140,7 @@ func (beat *Beat) GenerateUserAgent() {
 	}
 	beat.Info.UserAgent = useragent.UserAgentWithBeatTelemetry(userAgentProduct, version.GetDefaultVersion(),
 		mode, unprivileged, beat.Info.FIPSDistribution, uaOpts...)
+	userAgent.Store(beat.Info.UserAgent)
 }
 
 // BeatConfig struct contains the basic configuration of every beat
@@ -147,3 +152,11 @@ type BeatConfig struct {
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.
 type OverwritePipelinesCallback func(*config.C) error
+
+// UserAgent returns the user agent string for the beat
+func UserAgent() string {
+	if ua, ok := userAgent.Load().(string); ok {
+		return ua
+	}
+	return ""
+}
