@@ -349,6 +349,16 @@ func (p *parser) parseString(buf *streambuf.Buffer) (common.NetString, bool, boo
 		return empty, false, false
 	}
 
+	// RESP defines -1 as nil (handled above); any other negative length
+	// is malformed. Without this guard a hostile or corrupted packet
+	// with e.g. $-2\r\n passed a negative count into CollectWithSuffix,
+	// whose streambuf.Buffer.Avail treated it as "available" and then
+	// sliced data[mark+count:] with a negative index, panicking the
+	// parser goroutine with "slice bounds out of range [-2:]".
+	if length < 0 {
+		return empty, false, false
+	}
+
 	content, err := buf.CollectWithSuffix(int(length), []byte("\r\n"))
 	if err != nil {
 		if !errors.Is(err, streambuf.ErrNoMoreBytes) {
