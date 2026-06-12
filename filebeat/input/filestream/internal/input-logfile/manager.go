@@ -157,10 +157,26 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	settings := struct {
+<<<<<<< HEAD
 		ID             string        `config:"id"`
 		CleanInactive  time.Duration `config:"clean_inactive"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
 	}{CleanInactive: cim.DefaultCleanTimeout}
+=======
+		// All those values are duplicated from the Filestream configuration
+		ID                  string             `config:"id"`
+		CleanInactive       time.Duration      `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64             `config:"harvester_limit"`
+		AllowIDDuplication  bool               `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig     `config:"take_over"`
+		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
+		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
+	}{
+		CleanInactive: cim.DefaultCleanTimeout,
+		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
+	}
+
+>>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -231,6 +247,7 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	return &managedInput{
+<<<<<<< HEAD
 		manager:          cim,
 		ackCH:            cim.ackCH,
 		id:               settings.ID,
@@ -239,7 +256,26 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		sourceIdentifier: sourceIdentifier,
 		cleanTimeout:     settings.CleanInactive,
 		harvesterLimit:   settings.HarvesterLimit,
+=======
+		manager:                cim,
+		ackCH:                  cim.ackCH,
+		id:                     settings.ID,
+		prospector:             prospector,
+		harvester:              harvester,
+		readUntilEOF:           settings.ReadUntilEOF,
+		sourceIdentifier:       srcIdentifier,
+		previousSrcIdentifiers: previousSrcIdentifiers,
+		cleanTimeout:           settings.CleanInactive,
+		harvesterLimit:         settings.HarvesterLimit,
+>>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 	}, nil
+}
+
+func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
+	return ReadUntilEOFConfig{
+		Enabled: true,
+		Timeout: time.Minute,
+	}
 }
 
 func (cim *InputManager) Delete(cfg *conf.C) error {
@@ -292,3 +328,84 @@ func (i *SourceIdentifier) ID(s Source) string {
 func (i *SourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
 }
+<<<<<<< HEAD
+=======
+
+// TakeOverConfig is the configuration for the take over mode.
+// It allows the Filestream input to take over states from the log
+// input or other Filestream inputs
+type TakeOverConfig struct {
+	Enabled bool `config:"enabled"`
+	// Filestream IDs to take over states
+	FromIDs []string `config:"from_ids"`
+	// Stream from the container input to take over from.
+	// Valid values: stderr, stdout or it can be empty. An empty stream means
+	// all streams.
+	Stream string `config:"stream"`
+
+	// legacyFormat is set to true when `Unpack` detects
+	// the legacy configuration format. It is used by
+	// `LogWarnings` to log warnings
+	legacyFormat bool
+}
+
+func (t *TakeOverConfig) Unpack(value any) error {
+	switch v := value.(type) {
+	case bool:
+		t.Enabled = v
+		t.legacyFormat = true
+	case map[string]any:
+		rawEnabled := v["enabled"]
+		enabled, ok := rawEnabled.(bool)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
+		}
+		t.Enabled = enabled
+
+		if stream, ok := v["stream"].(string); ok {
+			t.Stream = stream
+		}
+
+		rawFromIDs, exists := v["from_ids"]
+		if !exists {
+			return nil
+		}
+
+		fromIDs, ok := rawFromIDs.([]any)
+		if !ok {
+			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as []any", rawFromIDs)
+		}
+		for _, el := range fromIDs {
+			strEl, ok := el.(string)
+			if !ok {
+				return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as string", el)
+			}
+			t.FromIDs = append(t.FromIDs, strEl)
+		}
+
+	default:
+		return fmt.Errorf("cannot parse '%[1]v' (type %[1]T)", value)
+	}
+
+	return nil
+}
+
+func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
+	if t.legacyFormat {
+		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
+	}
+}
+
+func (t *TakeOverConfig) FromFilestream() bool {
+	return len(t.FromIDs) != 0
+}
+
+// ReadUntilEOFConfig configures the behaviour to keep reading the current
+// file until EOF before the input shuts down. If Timeout elapses before EOF
+// is reached, the input shuts down anyway.
+type ReadUntilEOFConfig struct {
+	Enabled bool `config:"enabled"`
+	// Timeout is the maximum time to wait for EOF to be reached.
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
+}
+>>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
