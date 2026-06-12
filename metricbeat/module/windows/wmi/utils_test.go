@@ -229,3 +229,56 @@ func mustParseTime(layout, value string) time.Time {
 	}
 	return parsed
 }
+
+// TestIsNil contains test cases for the isNil function.
+func TestIsNil(t *testing.T) {
+	// Define a custom struct for testing typed pointers
+	type MyStruct struct {
+		Name string
+	}
+
+	// Define test cases using a slice of structs
+	tests := []struct {
+		name     string      // Name of the test case
+		input    interface{} // Input value to the isNil function
+		expected bool        // Expected boolean result
+	}{
+		// --- Cases where the function should return true (is nil) ---
+		{
+			name:     "Untyped nil interface",
+			input:    nil, // Direct untyped nil
+			expected: true,
+		},
+		{
+			name:     "int32 nil interface",
+			input:    (*int32)(nil),
+			expected: true,
+		},
+		{
+			name:     "custom struct interface",
+			input:    (*MyStruct)(nil),
+			expected: true,
+		},
+		{
+			name:     "String literals are not nil",
+			input:    "test",
+			expected: false,
+		},
+		{
+			name:     "Numeric literals are not nil",
+			input:    35,
+			expected: false,
+		},
+	}
+
+	// Iterate over the test cases and run each one
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := isNil(tt.input) // Call the function under test
+			if got != tt.expected {
+				// Report an error if the actual result doesn't match the expected result
+				t.Errorf("isNil(%v) = %v; want %v (Type: %T, Kind: %s)", tt.input, got, tt.expected, tt.input, reflect.TypeOf(tt.input).Kind())
+			}
+		})
+	}
+}
