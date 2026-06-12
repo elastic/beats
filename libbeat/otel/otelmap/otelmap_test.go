@@ -515,3 +515,67 @@ func TestFromMapstrWholeFloat(t *testing.T) {
 	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f64_slice"])
 	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f32_slice"])
 }
+
+func TestMergeMapstrIntoPdata(t *testing.T) {
+	initial := mapstr.M{
+		"scalar": "old",
+		"nested": mapstr.M{"a": "old-a", "b": "old-b"},
+	}
+	src := mapstr.M{
+		"scalar": "new",
+		"nested": mapstr.M{"a": "new-a", "c": "added"},
+		"extra":  "added",
+	}
+
+	tests := []struct {
+		name      string
+		overwrite bool
+		oracle    func(dst, src mapstr.M)
+	}{
+		{
+			name:      "overwrite=true",
+			overwrite: true,
+			oracle:    func(dst, src mapstr.M) { dst.DeepUpdate(src) },
+		},
+		{
+			name:      "overwrite=false",
+			overwrite: false,
+			oracle:    func(dst, src mapstr.M) { dst.DeepUpdateNoOverwrite(src) },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Compute expected result via the mapstr oracle, then normalize through
+			// a pdata round-trip so nested maps are map[string]any (matching AsRaw output).
+			want := initial.Clone()
+			tc.oracle(want, src.Clone())
+			wantNorm := pcommon.NewMap()
+			require.NoError(t, FromMapstr(wantNorm, want))
+
+			dst := pcommon.NewMap()
+			require.NoError(t, FromMapstr(dst, initial))
+			require.NoError(t, MergeMapstrIntoPdata(src, dst, tc.overwrite))
+
+			assert.Equal(t, wantNorm.AsRaw(), dst.AsRaw())
+		})
+	}
+}
+
+func TestMergeMapstrIntoPdataNoOverwriteMapOverNonMap(t *testing.T) {
+	// When dst has a scalar under a key and src has a map, mapstr replaces the scalar
+	// with the map regardless of the overwrite flag. MergeMapstrIntoPdata matches this.
+	initial := mapstr.M{"key": "scalar"}
+	src := mapstr.M{"key": mapstr.M{"nested": "val"}}
+
+	want := initial.Clone()
+	want.DeepUpdateNoOverwrite(src.Clone())
+	wantNorm := pcommon.NewMap()
+	require.NoError(t, FromMapstr(wantNorm, want))
+
+	dst := pcommon.NewMap()
+	require.NoError(t, FromMapstr(dst, initial))
+	require.NoError(t, MergeMapstrIntoPdata(src, dst, false))
+
+	assert.Equal(t, wantNorm.AsRaw(), dst.AsRaw())
+}
