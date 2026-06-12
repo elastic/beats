@@ -1,0 +1,8 @@
+kind: bug-fix
+summary: Add timezone support to redis log module
+description: |
+  The redis log module was missing the add_locale processor in its config
+  and timezone support in its ingest pipeline. This caused log timestamps
+  without timezone information to be incorrectly parsed as UTC, resulting
+  in wrong @timestamp values for non-UTC deployments.
+component: "filebeat"
