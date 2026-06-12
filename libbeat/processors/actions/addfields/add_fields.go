@@ -87,10 +87,7 @@ func (af *addFields) RunPdata(body pcommon.Map) error {
 	if len(af.fields) == 0 {
 		return nil
 	}
-	if af.overwrite {
-		return otelmap.MergeMapstrIntoPdata(af.fields, body)
-	}
-	return otelmap.MergeMapstrIntoPdataNoOverwrite(af.fields, body)
+	return otelmap.MergeMapstrIntoPdata(af.fields, body, af.overwrite)
 }
 
 func (af *addFields) String() string {

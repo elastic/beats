@@ -338,7 +338,7 @@ func (d *addDockerMetadata) RunPdata(body pcommon.Map) error {
 		return nil
 	}
 
-	return otelmap.MergeMapstrIntoPdata(d.buildContainerMeta(container), body)
+	return otelmap.MergeMapstrIntoPdata(d.buildContainerMeta(container), body, true)
 }
 
 // resolveCIDFromPdata extracts the container ID from a pcommon.Map using the

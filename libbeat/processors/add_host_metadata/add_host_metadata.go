@@ -255,12 +255,12 @@ func (p *addHostMetadata) RunPdata(body pcommon.Map) error {
 		return fmt.Errorf("error loading data during event update: %w", err)
 	}
 
-	if err := otelmap.MergeMapstrIntoPdata(data, body); err != nil {
+	if err := otelmap.MergeMapstrIntoPdata(data, body, true); err != nil {
 		return fmt.Errorf("error merging host metadata: %w", err)
 	}
 
 	if len(p.geoData) > 0 {
-		if err := otelmap.MergeMapstrIntoPdata(p.geoData, body); err != nil {
+		if err := otelmap.MergeMapstrIntoPdata(p.geoData, body, true); err != nil {
 			return fmt.Errorf("error merging geo data: %w", err)
 		}
 	}

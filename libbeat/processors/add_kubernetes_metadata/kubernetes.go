@@ -433,11 +433,11 @@ func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) error {
 
 	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
 	if ociContainer != nil {
-		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body); err != nil {
+		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, true); err != nil {
 			return err
 		}
 	}
-	return otelmap.MergeMapstrIntoPdata(kubeMeta, body)
+	return otelmap.MergeMapstrIntoPdata(kubeMeta, body, true)
 }
 
 // prepareKubeMetadata clones the cached metadata, builds the OCI container

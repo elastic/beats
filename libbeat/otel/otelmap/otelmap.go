@@ -234,18 +234,9 @@ func putIntoMap(key string, val any, dst pcommon.Map) error {
 // MergeMapstrIntoPdata deep-merges src into dst, equivalent to
 // mapstr.M.DeepUpdate for pcommon.Map. For map-typed values, existing map
 // entries in dst are recursed into rather than replaced. All other values are
-// encoded via [putIntoMap].
-func MergeMapstrIntoPdata(src mapstr.M, dst pcommon.Map) error {
-	return mergeMapstr(src, dst, true)
-}
-
-// MergeMapstrIntoPdataNoOverwrite deep-merges src into dst without overwriting
-// existing values, equivalent to mapstr.M.DeepUpdateNoOverwrite for pcommon.Map.
-func MergeMapstrIntoPdataNoOverwrite(src mapstr.M, dst pcommon.Map) error {
-	return mergeMapstr(src, dst, false)
-}
-
-func mergeMapstr(src mapstr.M, dst pcommon.Map, overwrite bool) error {
+// encoded via [putIntoMap]. Overwrite controls whether non-map values in
+// dst are replaced when keys collide.
+func MergeMapstrIntoPdata(src mapstr.M, dst pcommon.Map, overwrite bool) error {
 	for key, val := range src {
 		if err := mergeVal(key, val, dst, overwrite); err != nil {
 			return err
@@ -263,14 +254,13 @@ func mergeVal(key string, val any, dst pcommon.Map, overwrite bool) error {
 		m = mapstr.M(x)
 	}
 	if m != nil {
-		if existing, ok := dst.Get(key); ok {
-			if existing.Type() == pcommon.ValueTypeMap {
-				return mergeMapstr(m, existing.Map(), overwrite)
-			}
-			if !overwrite {
-				return nil
-			}
+		if existing, ok := dst.Get(key); ok && existing.Type() == pcommon.ValueTypeMap {
+			// Both sides are maps: recurse, respecting overwrite.
+			return MergeMapstrIntoPdata(m, existing.Map(), overwrite)
 		}
+		// src is a map and dst key is absent or a non-map scalar: always write the map.
+		// This matches mapstr.deepUpdateValue which replaces non-map values with maps
+		// regardless of the overwrite flag.
 		return FromMapstr(dst.PutEmptyMap(key), m)
 	}
 	if _, ok := dst.Get(key); ok && !overwrite {
