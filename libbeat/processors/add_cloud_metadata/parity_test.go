@@ -67,9 +67,12 @@ func TestRunPdataOverwriteFalse(t *testing.T) {
 	require.NoError(t, p.RunPdata(body))
 
 	out := otelmap.ToMapstr(body)
-	cloud, _ := out["cloud"].(map[string]interface{})
+	cloud, ok := out["cloud"].(map[string]interface{})
+	require.True(t, ok, "cloud must be present and a map")
 	assert.Equal(t, "existing-provider", cloud["provider"], "overwrite=false must preserve existing field")
-	assert.Equal(t, "i-12345", cloud["instance"].(map[string]interface{})["id"], "overwrite=false must add absent field")
+	inst, ok := cloud["instance"].(map[string]interface{})
+	require.True(t, ok, "cloud.instance must be present and a map")
+	assert.Equal(t, "i-12345", inst["id"], "overwrite=false must add absent field")
 }
 
 // TestRunPdataOverwriteTrue verifies that when overwrite=true an existing field
