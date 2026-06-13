@@ -23,7 +23,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -268,6 +268,7 @@ func execPing(
 
 	// Send the HTTP request. We don't immediately return on error since
 	// we may want to add additional fields to contextualize the error.
+	//nolint:bodyclose // on success the body is closed by processBody->readBody; execRequest never returns a non-nil response together with an error
 	start, resp, errReason := execRequest(client, req)
 	// If we have no response object or an error was set there probably was an IO error, we can skip the rest of the logic
 	// since that logic is for adding metadata relating to completed HTTP transactions that have errored
@@ -340,7 +341,7 @@ func execPing(
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
 	req = req.WithContext(*ctx)
 	if len(body) > 0 {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
 		req.ContentLength = int64(len(body))
 	}
 

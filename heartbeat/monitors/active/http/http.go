@@ -100,6 +100,7 @@ func create(
 	} else {
 		// preload TLS configuration
 		// TODO: Use local logger
+		//nolint:forbidigo // the plugin factory signature does not provide a *logp.Logger to thread through yet (see TODO above)
 		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logp.NewLogger(""))
 		if err != nil {
 			return plugin.Plugin{}, err

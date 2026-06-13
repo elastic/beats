@@ -20,6 +20,7 @@
 package http
 
 import (
+	"context"
 	"net"
 	"net/url"
 	"os"
@@ -96,7 +97,10 @@ func requireReachable(t *testing.T, rawURL string) {
 	if u.Port() == "" {
 		host = net.JoinHostPort(u.Hostname(), "80")
 	}
-	conn, err := net.DialTimeout("tcp", host, 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	var d net.Dialer
+	conn, err := d.DialContext(ctx, "tcp", host)
 	if err != nil {
 		t.Skipf("SPNEGO target %q not reachable; start the heartbeat_kerberos fixture first: %v", rawURL, err)
 	}
