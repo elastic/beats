@@ -218,6 +218,10 @@ func VerifyNoLeaks(t *testing.T) {
 		goleak.IgnoreAnyFunction("net.(*netFD).connect"),
 		goleak.IgnoreAnyFunction("net.(*netFD).connect.func2"),
 		goleak.IgnoreAnyFunction("net/http.(*Transport).startDialConnForLocked"),
+		// The osquery-go extension server pings osquery every 5s. After Shutdown sets
+		// serverClient=nil the goroutine exits on the next wake-up, but goleak may
+		// observe it mid-sleep. It always exits naturally; this is not a true leak.
+		goleak.IgnoreAnyFunction("github.com/osquery/osquery-go.(*ExtensionManagerServer).Run.func2"),
 	}
 
 	goleak.VerifyNone(t, skipped...)
