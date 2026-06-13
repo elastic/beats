@@ -70,11 +70,14 @@ type runner struct {
 // compatible with config file based input reloading, autodiscovery, and filebeat modules.
 // The RunnerFactory is can be used to integrate v2 inputs into existing Beats.
 func RunnerFactory(
-	log *logp.Logger,
 	info beat.Info,
 	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
+	log := info.Logger
+	if log == nil {
+		log = logp.L()
+	}
 	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 

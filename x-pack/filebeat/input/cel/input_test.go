@@ -30,14 +30,18 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
+var testBeatUserAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
@@ -770,9 +774,9 @@ var inputTests = []struct {
 		handler: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("content-type", "application/json")
 			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
-			if r.UserAgent() != userAgent {
+			if r.UserAgent() != testBeatUserAgent {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, userAgent)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, testBeatUserAgent)
 			}
 			if r.Method != http.MethodGet {
 				w.WriteHeader(http.StatusBadRequest)
@@ -2453,7 +2457,7 @@ func TestInput(t *testing.T) {
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
-				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: testBeatUserAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher

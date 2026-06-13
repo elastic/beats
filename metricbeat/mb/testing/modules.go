@@ -62,6 +62,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/timed"
 
@@ -128,7 +129,7 @@ func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Re
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, metricsets, err := mb.NewModule(c, registry, paths.New(), logptest.NewTestingLogger(t, ""))
+	m, metricsets, err := mb.NewModule(c, registry, beat.Info{Paths: paths.New(), Logger: logptest.NewTestingLogger(t, "")})
 	if err != nil {
 		t.Fatal("failed to create new MetricSet", err)
 	}

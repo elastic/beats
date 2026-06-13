@@ -50,6 +50,7 @@ var debugf = logp.MakeDebug("tcp")
 func create(
 	name string,
 	cfg *conf.C,
+	_ beat.Info,
 ) (p plugin.Plugin, err error) {
 	return createWithResolver(cfg, monitors.NewStdResolver())
 }

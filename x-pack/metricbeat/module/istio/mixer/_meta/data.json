@@ -8,8 +8,8 @@
     "istio": {
         "mixer": {
             "handler": {
-                "daemons": 1,
-                "name": "prometheus.istio-system"
+                "daemons": 4,
+                "name": "kubernetesenv.istio-system"
             }
         }
     },

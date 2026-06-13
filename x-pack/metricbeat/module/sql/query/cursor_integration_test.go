@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -56,7 +57,7 @@ func newMetricSetWithPaths(t *testing.T, config map[string]interface{}, p *paths
 	require.NoError(t, err)
 
 	logger := logptest.NewTestingLogger(t, "")
-	_, metricsets, err := mb.NewModule(c, mb.Registry, p, logger)
+	_, metricsets, err := mb.NewModule(c, mb.Registry, beat.Info{Paths: p, Logger: logger})
 	require.NoError(t, err)
 	require.Len(t, metricsets, 1)
 
