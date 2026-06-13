@@ -31,6 +31,16 @@ import (
 
 const debugSelector = "synthexec"
 
+// synthexecLog returns the package logger. It centralizes access to the global
+// logger so the rest of the package doesn't reference logp.L() directly. The
+// synthetics job factory is not handed a *logp.Logger, so threading one through
+// is out of scope for this change.
+//
+//nolint:forbidigo // global logger resolved lazily; logger threading is out of scope here
+func synthexecLog() *logp.Logger {
+	return logp.L()
+}
+
 type FilterJourneyConfig struct {
 	Tags  []string `config:"tags"`
 	Match string   `config:"match"`
@@ -93,7 +103,16 @@ func InlineJourneyJob(ctx context.Context, script string, params func() map[stri
 func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
+		// Prefer the published monitor.check_group (set by the summarizer's
+		// BeforeEachEvent before this job runs) so the APM trace id matches the
+		// value stored on the heartbeat documents. Fall back to the stream
+		// enricher's own check group when running outside the summarizer (e.g.
+		// unit tests).
+		traceID := checkGroupFromEvent(event)
+		if traceID == "" {
+			traceID = senr.checkGroup
+		}
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys, sFields, traceID)
 		if err != nil {
 			err := senr.enrich(event, &SynthEvent{
 				Type:  "cmd/could_not_start",
@@ -121,6 +140,44 @@ func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich 
 	}
 }
 
+// checkGroupFromEvent extracts the monitor.check_group value from the event, if
+// present. The summarizer sets this before the synthetics process is spawned so
+// it can be used as the APM trace id, keeping it identical to the check group
+// published on the heartbeat documents.
+func checkGroupFromEvent(event *beat.Event) string {
+	if event == nil {
+		return ""
+	}
+	if v, err := event.GetValue("monitor.check_group"); err == nil {
+		if cg, ok := v.(string); ok {
+			return cg
+		}
+	}
+	return ""
+}
+
+// syntheticsCrosslinkEnv builds the environment variables consumed by the
+// @elastic/synthetics APM plugin to cross-link a synthetics journey execution
+// with the APM data of the application it traces. Only non-empty values are
+// emitted so the synthetics agent can fall back to its own defaults.
+func syntheticsCrosslinkEnv(traceID string, sFields stdfields.StdMonitorFields) []string {
+	var env []string
+	add := func(key, val string) {
+		if val != "" {
+			env = append(env, key+"="+val)
+		}
+	}
+
+	add("ELASTIC_SYNTHETICS_TRACE_ID", traceID)
+	add("ELASTIC_SYNTHETICS_MONITOR_ID", sFields.ID)
+	add("ELASTIC_SYNTHETICS_MONITOR_TYPE", sFields.Type)
+	if sFields.RunFrom != nil {
+		add("ELASTIC_SYNTHETICS_MONITOR_LOCATION", sFields.RunFrom.ID)
+	}
+
+	return env
+}
+
 // runCmd runs the given command, piping stdinStr if present to the command's stdin, and supplying
 // the params var as a CLI argument.
 func runCmd(
@@ -129,6 +186,8 @@ func runCmd(
 	stdinStr *string,
 	params func() map[string]interface{},
 	filterJourneys FilterJourneyConfig,
+	sFields stdfields.StdMonitorFields,
+	traceID string,
 ) (mpx *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
 	platformCmdMutate(cmd)
@@ -142,6 +201,9 @@ func runCmd(
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
+	// Expose the monitor context to the synthetics runner so its APM plugin can
+	// cross-link the journey execution with the traced application's APM data.
+	cmd.Env = append(cmd.Env, syntheticsCrosslinkEnv(traceID, sFields)...)
 	cmd.Args = append(cmd.Args, "--rich-events")
 
 	if len(filterJourneys.Tags) > 0 {
@@ -167,10 +229,10 @@ func runCmd(
 	// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
 	cmd.Args = append(cmd.Args, "--outfd", "3")
 
-	logp.L().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
+	synthexecLog().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
 
 	if stdinStr != nil {
-		logp.L().Debug(debugSelector, "Using stdin str %s", *stdinStr)
+		synthexecLog().Debug(debugSelector, "Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
@@ -185,7 +247,7 @@ func runCmd(
 	go func() {
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
-			logp.L().Warn("could not scan stdout events from synthetics: %s", err)
+			synthexecLog().Warn("could not scan stdout events from synthetics: %s", err)
 		}
 
 		wg.Done()
@@ -199,7 +261,7 @@ func runCmd(
 	go func() {
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
-			logp.L().Warn("could not scan stderr events from synthetics: %s", err)
+			synthexecLog().Warn("could not scan stderr events from synthetics: %s", err)
 		}
 		wg.Done()
 	}()
@@ -220,7 +282,7 @@ func runCmd(
 				break
 			}
 			if err != nil {
-				logp.L().Warnf("error decoding json for test json results: %v", err)
+				synthexecLog().Warnf("error decoding json for test json results: %v", err)
 			}
 
 			mpx.writeSynthEvent(&se)
@@ -248,7 +310,7 @@ func runCmd(
 
 	err = <-cmdStarted
 	if err != nil {
-		logp.L().Warn("Could not start command %s: %s", cmd, err)
+		synthexecLog().Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
 
@@ -265,7 +327,7 @@ func runCmd(
 
 		err := cmd.Process.Kill()
 		if err != nil {
-			logp.L().Warn("could not kill synthetics process: %s", err)
+			synthexecLog().Warn("could not kill synthetics process: %s", err)
 		}
 	}()
 
@@ -273,13 +335,13 @@ func runCmd(
 	go func() {
 		err := <-cmdDone
 		_ = jsonWriter.Close()
-		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
+		synthexecLog().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
 			// err could be generic or it could have been killed by context timeout, log and check context
 			// to decide which error to stream
-			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
+			synthexecLog().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
@@ -316,7 +378,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())
 		if err != nil {
-			logp.L().Warn("error parsing line: %s for line: %s", err, scanner.Text())
+			synthexecLog().Warn("error parsing line: %s for line: %s", err, scanner.Text())
 			continue
 		}
 		if se != nil {
@@ -325,7 +387,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	}
 
 	if scanner.Err() != nil {
-		logp.L().Warn("error scanning synthetics runner results %s", scanner.Err())
+		synthexecLog().Warn("error scanning synthetics runner results %s", scanner.Err())
 		return scanner.Err()
 	}
 
@@ -338,7 +400,7 @@ var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 // lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
-		logp.L().Info("%s: %s", typ, text)
+		synthexecLog().Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
