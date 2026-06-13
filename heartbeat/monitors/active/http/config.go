@@ -207,7 +207,7 @@ func (c *compressionConfig) Validate() error {
 		return nil
 	}
 
-	if !(0 <= c.Level && c.Level <= 9) {
+	if c.Level < 0 || c.Level > 9 {
 		return fmt.Errorf("compression level %v invalid", c.Level)
 	}
 
