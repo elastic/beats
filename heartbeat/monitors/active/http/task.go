@@ -48,9 +48,17 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 )
 
 type requestFactory func() (*http.Request, error)
+
+// httpDoer abstracts the subset of *http.Client used to execute a ping so the
+// monitor can transparently swap in the Kerberos SPNEGO client, which performs
+// the Negotiate handshake on top of a standard *http.Client.
+type httpDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 func newHTTPMonitorHostJob(
 	addr string,
@@ -72,12 +80,23 @@ func newHTTPMonitorHostJob(
 			Timeout:       config.Transport.Timeout,
 		}
 
+		// Kerberos wraps the standard client so it can transparently answer the
+		// SPNEGO 401 challenge. NTLM is handled at the transport level instead.
+		var doer httpDoer = client
+		if config.Kerberos.IsEnabled() {
+			krbClient, err := kerberos.NewClient(config.Kerberos, client)
+			if err != nil {
+				return fmt.Errorf("could not create kerberos client: %w", err)
+			}
+			doer = krbClient
+		}
+
 		req, err := reqFactory()
 		if err != nil {
 			return fmt.Errorf("could not make http request: %w", err)
 		}
 
-		_, err = execPing(event, client, req, body, config.Transport.Timeout, validator, config.Response)
+		_, err = execPing(event, doer, req, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			_, _ = event.PutValue("http.response.redirects", redirects)
 		}
@@ -204,7 +223,17 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 	}
 	request.Close = true
 
-	if config.Username != "" {
+	switch {
+	case config.NTLM.IsEnabled():
+		// NTLM negotiates over a persistent connection, so the connection must
+		// not be closed between the handshake legs. The negotiator reads the
+		// credentials from the request's Basic auth header.
+		request.Close = false
+		request.SetBasicAuth(config.NTLM.authUsername(), config.NTLM.Password)
+	case config.Kerberos.IsEnabled():
+		// The SPNEGO client sets the Authorization header during the Negotiate
+		// handshake, so nothing to add here.
+	case config.Username != "":
 		request.SetBasicAuth(config.Username, config.Password)
 	}
 	for k, v := range config.Check.Request.SendHeaders {
@@ -225,7 +254,7 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 
 func execPing(
 	event *beat.Event,
-	client *http.Client,
+	client httpDoer,
 	req *http.Request,
 	reqBody []byte,
 	timeout time.Duration,
@@ -319,7 +348,7 @@ func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *ht
 }
 
 // execute the request. Note that this does not close the resp body, which should be done by caller
-func execRequest(client *http.Client, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
+func execRequest(client httpDoer, req *http.Request) (start time.Time, resp *http.Response, errReason reason.Reason) {
 	start = time.Now()
 	resp, err := client.Do(req)
 
