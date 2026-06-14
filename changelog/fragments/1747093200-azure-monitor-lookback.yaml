@@ -1,0 +1,12 @@
+kind: feature
+
+summary: >-
+  Add lookback_window option to the azure metricbeat module to backfill metric
+  gaps after agent restarts. Defaults to 10m; set to 0 to preserve the previous
+  behavior.
+
+component: metricbeat
+
+pr: https://github.com/elastic/beats/pull/50649
+
+issue: https://github.com/elastic/beats/issues/50630

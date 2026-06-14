@@ -142,13 +142,10 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 }
 
 // GetMetricValues returns the metric values for the given cloud resources.
-func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2) []Metric {
+func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2, lookbackStart *time.Time) []Metric {
 	var result []Metric
 
 	for _, metric := range metrics {
-		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config)
-		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.
@@ -171,6 +168,9 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
 			continue
 		}
+
+		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, lookbackStart)
+		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured
 		var filter string
