@@ -80,7 +80,7 @@ protocol connections from all interfaces:
     #  key: /path/to/privatekey.pem
     #  key_passphrase: 'password for my key'
 
-    # Uncoment to keep the original syslog event under event.original.
+    # Uncomment to keep the original syslog event under event.original.
     # var.preserve_original_event: true
 
     # Set paths for the log files when file input is used.
@@ -110,7 +110,7 @@ to configure encrypted protocol in the Vault server and use `tcp` input with `va
       key: /path/to/privatekey.pem
       key_passphrase: 'password for my key'
 
-    # Uncoment to keep the original syslog event under event.original.
+    # Uncomment to keep the original syslog event under event.original.
     # var.preserve_original_event: true
 
     # Set paths for the log files when file input is used.
