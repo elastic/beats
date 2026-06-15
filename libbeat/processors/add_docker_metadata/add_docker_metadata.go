@@ -354,7 +354,9 @@ func (d *addDockerMetadata) resolveCIDFromPdata(body pcommon.Map) (string, error
 			result, err := d.sourceProcessor.Run(miniEvent)
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
-			} else if result != nil {
+				return "", nil
+			}
+			if result != nil {
 				if v, err := result.GetValue(dockerContainerIDKey); err == nil {
 					if cid, _ := v.(string); cid != "" {
 						if err := otelmap.PutAtPath(dockerContainerIDKey, cid, body); err != nil {
