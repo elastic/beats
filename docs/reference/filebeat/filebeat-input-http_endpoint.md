@@ -10,7 +10,7 @@ applies_to:
 # HTTP Endpoint input [filebeat-input-http_endpoint]
 
 
-The HTTP Endpoint input initializes a listening HTTP server that collects incoming HTTP POST requests containing a JSON body. The body must be either an object or an array of objects, otherwise a Common Expression Language expression that converts the the JSON body to these types can be provided. Any other data types will result in an HTTP 400 (Bad Request) response. For arrays, one document is created for each object in the array.
+The HTTP Endpoint input initializes a listening HTTP server that collects incoming HTTP POST requests containing a JSON body. The body must be either an object or an array of objects, otherwise a Common Expression Language expression that converts the JSON body to these types can be provided. Any other data types will result in an HTTP 400 (Bad Request) response. For arrays, one document is created for each object in the array.
 
 gzip encoded request bodies are supported if a `Content-Encoding: gzip` header is sent with the request.
 
@@ -541,5 +541,4 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 #### `publisher_pipeline.disable_host` [_publisher_pipeline_disable_host_12]
 
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
-
 
