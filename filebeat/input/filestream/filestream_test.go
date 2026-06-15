@@ -32,42 +32,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestLogFileTimedClosing(t *testing.T) {
+// TestLogFileCloseOnEOF covers the only close condition logFile still evaluates
+// itself: close.reader.on_eof (and GZIP, which always closes on EOF). The
+// on-state-change conditions (inactive/removed/renamed) and close-after-interval
+// are now evaluated by the worker pool's waker and covered by integration tests.
+func TestLogFileCloseOnEOF(t *testing.T) {
 	testCases := []struct {
-		name           string
-		createFile     func(t *testing.T) *os.File
-		waitBeforeRead time.Duration
-		inactive       time.Duration
-		closeEOF       bool
-		afterInterval  time.Duration
-		expectedErr    error
+		name       string
+		createFile func(t *testing.T) *os.File
 	}{
-		{name: "plain: read from file and close inactive",
-			createFile:  createTestPlainLogFile,
-			inactive:    2 * time.Second,
-			expectedErr: ErrInactive,
-		},
-		{name: "plain: read from file and close after interval",
-			createFile:    createTestPlainLogFile,
-			afterInterval: 3 * time.Second,
-			expectedErr:   ErrClosed,
-		},
-		{name: "plain: read from file and close on EOF",
-			createFile:  createTestPlainLogFile,
-			closeEOF:    true,
-			expectedErr: io.EOF,
-		},
-		{name: "GZIP: read from file and close on EOF",
-			createFile:  createTestGzipLogFile,
-			closeEOF:    true,
-			expectedErr: io.EOF,
-		},
-		{name: "GZIP: read from file and close after interval",
-			createFile:     createTestPlainLogFile,
-			afterInterval:  3 * time.Second,
-			waitBeforeRead: 3 * time.Second,
-			expectedErr:    ErrClosed,
-		},
+		{name: "plain: read from file and close on EOF", createFile: createTestPlainLogFile},
+		{name: "GZIP: read from file and close on EOF", createFile: createTestGzipLogFile},
 	}
 
 	for _, tc := range testCases {
@@ -87,28 +62,15 @@ func TestLogFileTimedClosing(t *testing.T) {
 				f,
 				readerConfig{},
 				closerConfig{
-					OnStateChange: stateChangeCloserConfig{
-						CheckInterval: 1 * time.Second,
-						Inactive:      tc.inactive,
-					},
-					Reader: readerCloserConfig{
-						OnEOF:         tc.closeEOF,
-						AfterInterval: tc.afterInterval,
-					},
+					Reader: readerCloserConfig{OnEOF: true},
 				},
 			)
 			if err != nil {
 				t.Fatalf("error while creating logReader: %+v", err)
 			}
 
-			if tc.waitBeforeRead > 0 {
-				// GZIP files aren't kept open, thus we need to wait for
-				// 'AfterInterval' to elapse before reading.
-				time.Sleep(tc.waitBeforeRead)
-			}
-
 			err = readUntilError(reader)
-			assert.ErrorIs(t, err, tc.expectedErr)
+			assert.ErrorIs(t, err, io.EOF)
 		})
 	}
 }
@@ -246,7 +208,6 @@ func TestLogFileNonBlocking(t *testing.T) {
 	reader, err := newFileReader(
 		logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{})
 	require.NoError(t, err, "error while creating logReader")
-	reader.nonBlocking = true
 
 	// Drain the initial content written by createTestPlainLogFile.
 	content := readAllAvailable(t, reader)

@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -65,7 +64,7 @@ func (inp *managedInput) Run(
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
-	// Setup cancellation using a custom cancel context. All workers will be
+	// Setup cancellation using a custom cancel context. All harvesters will be
 	// stopped if one failed badly by returning an error.
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
@@ -73,22 +72,19 @@ func (inp *managedInput) Run(
 
 	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
 
-	hg := &defaultHarvesterGroup{
-		pipeline:     pipeline,
-		readers:      newReaderGroup(),
-		cleanTimeout: inp.cleanTimeout,
-		harvester:    inp.harvester,
-		store:        groupStore,
-		ackCH:        inp.ackCH,
-		identifier:   inp.sourceIdentifier,
-		tg: task.NewGroup(
-			inp.harvesterLimit,
-			time.Minute, // magic number
-			ctx.Logger,
-			"harvester:"),
-		metrics: metrics,
-		inputID: inp.id,
-	}
+	hg := newHarvesterRunner(
+		ctx,
+		inp.harvesterLimit,
+		pipeline,
+		inp.harvester,
+		inp.cleanTimeout,
+		groupStore,
+		inp.ackCH,
+		inp.sourceIdentifier,
+		metrics,
+		inp.id,
+	)
+	hg.start()
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()

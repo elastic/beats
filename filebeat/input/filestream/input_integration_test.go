@@ -1389,54 +1389,21 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 	})
 
 	env.startInput(t.Context(), id, inp)
-	// File has been fully read
-	env.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
-		1*time.Second)
 
-	// File is inactive, the reader context will be cancelled
+	// The initial 50 lines are read.
+	env.waitUntilEventCount(50)
+
+	// The file becomes inactive and the harvester closes it (worker pool: the
+	// waker evaluates the parked file and closes it on close_inactive).
 	env.WaitLogsContains(
 		fmt.Sprintf("'%s' is inactive", logFilePathStr),
-		5*time.Second,
+		10*time.Second,
 		"missing 'file is inactive' logs")
 
-	// Add more data to the file while the reader is blocked
-	// on its backoff and its context has been cancelled.
+	// Add more data after the file went inactive.
 	integration.WriteLogFile(t, logFilePath, 5, true)
 
-	// Ensure the FileWatcher detected the new data and sent a write event
-	env.WaitLogsContains(
-		fmt.Sprintf("File %s has been updated", logFilePathStr),
-		3*time.Second)
-
-	// Ensure the write event did not start a new harvester
-	env.WaitLogsContains("Harvester already running", 2*time.Second)
-
-	// Wait for the harvester to close
-	env.WaitLogsContains("Stopped harvester for file", 2*time.Second)
-
-	// Wait for a new scan from the fileWatcher
-	env.WaitLogsContains("Start next scan", 2*time.Second)
-
-	// Ensure it got notified when the harvester closed and the offset
-	// is correct
-	env.WaitLogsContains(
-		"Updating previous state because harvester was closed.",
-		1*time.Second)
-
-	// Ensure the fileWatcher sent an write event
-	env.WaitLogsContains(
-		fmt.Sprintf("File %s has been updated", logFilePathStr),
-		1*time.Second)
-
-	// Wait for a new harvester to start
-	env.WaitLogsContains("Starting harvester for file", 1*time.Second)
-
-	// Wait for EOF to be reached
-	env.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePathStr),
-		2*time.Second)
-
-	// Ensure all events have been ingested
+	// The new data is eventually re-read (either by resuming the parked file or
+	// by the prospector re-harvesting it on its next scan).
 	env.waitUntilEventCount(55)
 }

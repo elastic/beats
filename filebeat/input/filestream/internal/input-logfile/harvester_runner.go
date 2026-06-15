@@ -1,0 +1,737 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package input_logfile
+
+import (
+	"container/heap"
+	"context"
+	"sync"
+	"time"
+
+	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
+
+const (
+	minWakerBackoff = 1 * time.Second
+	maxWakerBackoff = 10 * time.Second
+)
+
+// sourceStatus is the scheduling state of a source. A source is in exactly one
+// status at a time (guarded by harvesterRunner.mu), which guarantees a
+// single reader goroutine operates a source's session at any moment.
+type sourceStatus int
+
+const (
+	statusNew     sourceStatus = iota // created, no reader yet
+	statusRunning                     // a reader goroutine is reading it
+	statusParked                      // caught up to EOF; watched by the waker
+	statusPolling                     // the waker is evaluating it
+	statusClosing                     // being torn down
+)
+
+// sourceState is the passive per-source state: the open reading session plus the
+// registry resource, pipeline client, cursor and cancellation. A source's file
+// handle (in the session) stays open while it is being harvested, but it only
+// has a goroutine while it is actively reading.
+type sourceState struct {
+	srcID   string
+	src     Source
+	session HarvesterSession
+
+	resource  *resource
+	client    beat.Client
+	cursor    Cursor
+	publisher *cursorPublisher
+	ctx       inputv2.Context
+	cancel    context.CancelFunc
+
+	// Runner bookkeeping, guarded by harvesterRunner.mu.
+	status    sourceStatus
+	setUp     bool // resources (lock/client/session) acquired
+	backoff   time.Duration
+	nextCheck time.Time
+	finished  bool
+	done      chan struct{} // closed by finish; lets Restart wait for teardown
+}
+
+// harvesterRunner implements HarvesterGroup by spawning one short-lived
+// reader goroutine per source that has data to read. A reader reads its source
+// until the read would block (then parks it for the waker) or a terminal
+// condition is reached (then tears it down), and exits. The waker re-spawns a
+// reader when a parked source has new data. So the number of goroutines tracks
+// the amount of active work, not the number of files: idle/tailing files cost no
+// goroutine, while a burst of ready files gets full read concurrency.
+//
+// harvester_limit, when > 0, bounds the number of concurrently-reading sources
+// via a semaphore; 0 (the default) is unbounded — as many readers as there are
+// files with data.
+type harvesterRunner struct {
+	pipeline     beat.PipelineConnector
+	harvester    Harvester
+	cleanTimeout time.Duration
+	store        *store
+	ackCH        *updateChan
+	identifier   *SourceIdentifier
+	metrics      *Metrics
+	inputID      string
+
+	// sem bounds concurrently-reading sources when harvester_limit > 0; nil
+	// means unbounded.
+	sem chan struct{}
+
+	ctx        inputv2.Context // input lifetime context, for the waker
+	notifyChan chan HarvesterStatus
+
+	// Observability gauges (nil when no metrics registry is available).
+	mActive *monitoring.Uint // sources with a reader goroutine
+	mParked *monitoring.Uint // sources parked, watched by the waker
+
+	mu     sync.Mutex
+	states map[string]*sourceState
+	closed bool
+	// parked is a min-heap of parked sources keyed by nextCheck, so the waker
+	// processes only the sources that are actually due instead of scanning every
+	// source each tick. nActive/nParked track the gauge counts incrementally to
+	// avoid recounting under the lock. All guarded by mu.
+	parked  sourceHeap
+	nActive int
+	nParked int
+
+	wakerCh chan struct{}
+	wg      sync.WaitGroup
+}
+
+// parkedEntry is one scheduled poll of a source. Entries are immutable: when a
+// source is re-parked it gets a fresh entry, and an entry whose due time no
+// longer matches the source's nextCheck (re-parked or torn down) is stale and
+// skipped when popped.
+type parkedEntry struct {
+	ps  *sourceState
+	due time.Time
+}
+
+type sourceHeap []*parkedEntry
+
+func (h sourceHeap) Len() int           { return len(h) }
+func (h sourceHeap) Less(i, j int) bool { return h[i].due.Before(h[j].due) }
+func (h sourceHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *sourceHeap) Push(x any)        { *h = append(*h, x.(*parkedEntry)) }
+func (h *sourceHeap) Pop() any {
+	old := *h
+	n := len(old)
+	e := old[n-1]
+	old[n-1] = nil
+	*h = old[:n-1]
+	return e
+}
+
+func newHarvesterRunner(
+	ctx inputv2.Context,
+	harvesterLimit uint64,
+	pipeline beat.PipelineConnector,
+	harvester Harvester,
+	cleanTimeout time.Duration,
+	store *store,
+	ackCH *updateChan,
+	identifier *SourceIdentifier,
+	metrics *Metrics,
+	inputID string,
+) *harvesterRunner {
+	var sem chan struct{}
+	if harvesterLimit > 0 {
+		sem = make(chan struct{}, harvesterLimit)
+	}
+
+	g := &harvesterRunner{
+		pipeline:     pipeline,
+		harvester:    harvester,
+		cleanTimeout: cleanTimeout,
+		store:        store,
+		ackCH:        ackCH,
+		identifier:   identifier,
+		metrics:      metrics,
+		inputID:      inputID,
+		sem:          sem,
+		ctx:          ctx,
+		states:       map[string]*sourceState{},
+		wakerCh:      make(chan struct{}, 1),
+	}
+
+	if reg := ctx.MetricsRegistry; reg != nil {
+		g.mActive = monitoring.NewUint(reg, "harvester_active_readers")
+		g.mParked = monitoring.NewUint(reg, "harvester_parked")
+	}
+
+	return g
+}
+
+// start launches the waker goroutine. Reader goroutines are created on demand as
+// sources become ready.
+func (g *harvesterRunner) start() {
+	if g.sem != nil {
+		g.ctx.Logger.Infof("starting filestream harvester (max %d concurrent readers)", cap(g.sem))
+	} else {
+		g.ctx.Logger.Info("starting filestream harvester (one reader per file with data)")
+	}
+	g.wg.Add(1)
+	go g.waker()
+}
+
+func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
+
+// run spawns a reader goroutine for ps unless one is already reading it (or it is
+// being torn down, or the group is shutting down).
+func (g *harvesterRunner) run(ps *sourceState) {
+	g.mu.Lock()
+	if g.closed || ps.finished || ps.status == statusRunning || ps.status == statusClosing {
+		g.mu.Unlock()
+		return
+	}
+	g.setStatus(ps, statusRunning)
+	g.wg.Add(1)
+	g.mu.Unlock()
+
+	go g.readOnce(ps)
+}
+
+// readOnce reads a source until the read would block or a terminal condition is
+// reached, then parks or tears it down and exits.
+func (g *harvesterRunner) readOnce(ps *sourceState) {
+	defer g.wg.Done()
+
+	// Bound concurrent readers if harvester_limit is set.
+	if g.sem != nil {
+		select {
+		case g.sem <- struct{}{}:
+			defer func() { <-g.sem }()
+		case <-ps.ctx.Cancelation.Done():
+			g.finish(ps)
+			return
+		}
+	}
+
+	g.mu.Lock()
+	if ps.status == statusClosing || ps.finished {
+		g.mu.Unlock()
+		g.finish(ps)
+		return
+	}
+	needSetup := !ps.setUp
+	g.mu.Unlock()
+
+	// First read of a source acquires its lock, client and session. Subsequent
+	// reads (after a park/resume) reuse them, so a tailing file keeps its fd open.
+	if needSetup {
+		if err := g.setup(ps); err != nil {
+			ps.ctx.Logger.Errorf("could not set up harvester for %s: %v", ps.srcID, err)
+			g.finish(ps)
+			return
+		}
+		g.mu.Lock()
+		ps.setUp = true
+		closing := ps.status == statusClosing || ps.finished
+		g.mu.Unlock()
+		if closing {
+			g.finish(ps)
+			return
+		}
+	}
+
+	before := ps.session.Offset()
+	verdict, err := ps.session.ReadSlice(ps.ctx, ps.publisher)
+	after := ps.session.Offset()
+
+	g.mu.Lock()
+	if ps.status == statusClosing || ps.finished {
+		g.mu.Unlock()
+		g.finish(ps)
+		return
+	}
+
+	if err != nil || verdict == SliceDone {
+		g.mu.Unlock()
+		if err != nil {
+			ps.ctx.Logger.Debugf("Harvester for %s stopped: %v", ps.srcID, err)
+		}
+		g.finish(ps)
+		return
+	}
+
+	// SliceYield: caught up to EOF. Park for the waker and exit the goroutine.
+	// A slice that made progress resets the backoff; one that read nothing grows it.
+	if after > before {
+		g.park(ps, minWakerBackoff)
+	} else {
+		g.park(ps, growBackoff(ps.backoff))
+	}
+	g.mu.Unlock()
+	g.signalWaker()
+}
+
+// setup acquires the per-source resources: registry lock, pipeline client,
+// cursor/publisher and the reading session, populating ps. On error it releases
+// whatever it acquired and leaves ps's resource fields nil.
+func (g *harvesterRunner) setup(ps *sourceState) error {
+	resource, err := lock(ps.ctx, g.store, ps.srcID)
+	if err != nil {
+		return err
+	}
+
+	client, err := g.pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: newInputACKHandler(g.ackCH),
+	})
+	if err != nil {
+		releaseResource(resource)
+		return err
+	}
+
+	g.store.UpdateTTL(resource, g.cleanTimeout)
+
+	ps.resource = resource
+	ps.client = client
+	ps.cursor = makeCursor(resource)
+	ps.publisher = &cursorPublisher{canceler: ps.ctx.Cancelation, client: client, cursor: &ps.cursor}
+
+	session, err := g.harvester.OpenSession(ps.ctx, ps.src, ps.cursor, g.metrics)
+	if err != nil {
+		_ = client.Close()
+		releaseResource(resource)
+		ps.resource = nil
+		ps.client = nil
+		ps.publisher = nil
+		return err
+	}
+	ps.session = session
+
+	g.metrics.FilesActive.Inc()
+	g.metrics.HarvesterRunning.Inc()
+	g.metrics.FilesOpened.Inc()
+	g.metrics.HarvesterOpenFiles.Inc()
+	g.metrics.HarvesterStarted.Inc()
+
+	return nil
+}
+
+// Start registers a newly discovered source and starts reading it.
+func (g *harvesterRunner) Start(ctx inputv2.Context, src Source) {
+	g.enqueue(ctx, src)
+}
+
+// Restart stops a possibly-running harvester for the source and starts a fresh
+// one. It does not block.
+func (g *harvesterRunner) Restart(ctx inputv2.Context, src Source) {
+	g.spawn(func() {
+		srcID := g.identifier.ID(src)
+		g.mu.Lock()
+		ps := g.states[srcID]
+		g.mu.Unlock()
+		if ps != nil {
+			g.stopAndWait(ps)
+		}
+		g.enqueue(ctx, src)
+	})
+}
+
+// enqueue registers a source and spawns a reader for it. Repeated calls for an
+// already-known source are ignored; a parked source is resumed by the waker, not
+// here.
+func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
+	srcID := g.identifier.ID(src)
+
+	g.mu.Lock()
+	if g.closed {
+		g.mu.Unlock()
+		return
+	}
+	if _, exists := g.states[srcID]; exists {
+		g.mu.Unlock()
+		ctx.Logger.Debugf("Harvester already running for %s", srcID)
+		return
+	}
+
+	// Standalone cancel context, deliberately NOT a child of the input context:
+	// making 10k+ sources children of one parent serialises them on the parent's
+	// mutex (context.removeChild on every create/cancel). Input shutdown cancels
+	// every source explicitly via StopHarvesters (deferred in the prospector's
+	// Run), and Stop cancels individual sources, so the parent link is not needed
+	// for propagation.
+	hctx, cancel := context.WithCancel(context.Background())
+	ctx.Cancelation = hctx
+	ctx.Logger = ctx.Logger.With("source_file", srcID)
+
+	ps := &sourceState{
+		srcID:  srcID,
+		src:    src,
+		ctx:    ctx,
+		cancel: cancel,
+		status: statusNew,
+		done:   make(chan struct{}),
+	}
+	g.states[srcID] = ps
+	g.nActive++ // statusNew counts as active
+	g.mu.Unlock()
+
+	g.run(ps)
+}
+
+// waker evaluates parked sources as they come due: it resumes those with new
+// data (by spawning a reader), re-parks those still idle, and tears down those
+// that hit a close condition. It pops only due sources from the parked min-heap
+// (rather than scanning every source) and sleeps until the next one is due. It
+// centralises the read backoff and close-condition checks that the per-file
+// harvester ran per file.
+func (g *harvesterRunner) waker() {
+	defer g.wg.Done()
+
+	for {
+		g.mu.Lock()
+		if g.closed {
+			g.mu.Unlock()
+			return
+		}
+		due := g.popDue(time.Now())
+		g.publishGauges()
+		var next time.Time
+		hasNext := g.parked.Len() > 0
+		if hasNext {
+			next = g.parked[0].due
+		}
+		g.mu.Unlock()
+
+		for _, ps := range due {
+			g.pollParked(ps)
+		}
+
+		// If we processed any, loop immediately to pick up sources that became
+		// due during the polls before sleeping.
+		if len(due) > 0 {
+			continue
+		}
+
+		wait := maxWakerBackoff
+		if hasNext {
+			if d := time.Until(next); d < wait {
+				wait = d
+			}
+		}
+		if wait < 0 {
+			wait = 0
+		}
+		t := time.NewTimer(wait)
+		select {
+		case <-g.ctx.Cancelation.Done():
+			t.Stop()
+			return
+		case <-t.C:
+		case <-g.wakerCh:
+			t.Stop()
+		}
+	}
+}
+
+func statusIsActive(s sourceStatus) bool {
+	return s == statusNew || s == statusRunning || s == statusPolling
+}
+
+// setStatus transitions ps to ns and keeps the active/parked gauge counters in
+// sync. statusClosing counts as neither. Caller holds g.mu.
+func (g *harvesterRunner) setStatus(ps *sourceState, ns sourceStatus) {
+	old := ps.status
+	if old == ns {
+		return
+	}
+	switch {
+	case old == statusParked:
+		g.nParked--
+	case statusIsActive(old):
+		g.nActive--
+	}
+	switch {
+	case ns == statusParked:
+		g.nParked++
+	case statusIsActive(ns):
+		g.nActive++
+	}
+	ps.status = ns
+}
+
+// park schedules ps to be polled by the waker after backoff, recording it on the
+// parked min-heap. Caller holds g.mu.
+func (g *harvesterRunner) park(ps *sourceState, backoff time.Duration) {
+	ps.backoff = backoff
+	ps.nextCheck = time.Now().Add(backoff)
+	g.setStatus(ps, statusParked)
+	heap.Push(&g.parked, &parkedEntry{ps: ps, due: ps.nextCheck})
+}
+
+// popDue removes and returns the parked sources whose nextCheck is due, claiming
+// each (statusPolling) so nothing else touches it. Stale heap entries — a source
+// re-parked or torn down since it was pushed — are skipped. Caller holds g.mu.
+func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
+	var due []*sourceState
+	for g.parked.Len() > 0 {
+		if g.parked[0].due.After(now) {
+			break
+		}
+		e := heap.Pop(&g.parked).(*parkedEntry)
+		ps := e.ps
+		if ps.status == statusParked && ps.nextCheck.Equal(e.due) {
+			g.setStatus(ps, statusPolling)
+			due = append(due, ps)
+		}
+	}
+	return due
+}
+
+// pollParked polls one due source and acts on the result: resume (spawn a
+// reader), close (tear down) or re-park. Must be called without holding g.mu.
+func (g *harvesterRunner) pollParked(ps *sourceState) {
+	result := ps.session.Poll()
+
+	g.mu.Lock()
+	if ps.status == statusClosing || ps.finished {
+		g.mu.Unlock()
+		g.finish(ps)
+		return
+	}
+	switch result {
+	case PollResume:
+		g.mu.Unlock()
+		g.run(ps) // new data: spawn a reader
+	case PollClose:
+		g.mu.Unlock()
+		g.finish(ps)
+	default: // PollPark
+		g.park(ps, growBackoff(ps.backoff))
+		g.mu.Unlock()
+	}
+}
+
+// publishGauges updates the observability gauges from the maintained counters.
+// Caller holds g.mu.
+func (g *harvesterRunner) publishGauges() {
+	if g.mActive == nil {
+		return
+	}
+	g.mActive.Set(uint64(g.nActive)) //nolint:gosec // counters are non-negative
+	g.mParked.Set(uint64(g.nParked)) //nolint:gosec // counters are non-negative
+}
+
+// Stop stops a running harvester for a source. It does not block on an active
+// read: it cancels the source and lets the reading goroutine tear it down.
+func (g *harvesterRunner) Stop(src Source) {
+	srcID := g.identifier.ID(src)
+
+	g.mu.Lock()
+	ps := g.states[srcID]
+	if ps == nil {
+		g.mu.Unlock()
+		return
+	}
+	prev := ps.status
+	g.setStatus(ps, statusClosing)
+	cancel := ps.cancel
+	g.mu.Unlock()
+
+	if cancel != nil {
+		cancel()
+	}
+	// If the source was parked, no goroutine holds it (the waker skips closing
+	// states), so tear it down here. For running/polling/new, the reader or waker
+	// that holds it will finish it after the cancel.
+	if prev == statusParked {
+		g.finish(ps)
+	}
+}
+
+// stopAndWait stops a source and blocks until it has been fully torn down. Used
+// by Restart so the new harvester does not race the old one's resource lock.
+func (g *harvesterRunner) stopAndWait(ps *sourceState) {
+	g.mu.Lock()
+	if ps.finished {
+		g.mu.Unlock()
+		return
+	}
+	prev := ps.status
+	g.setStatus(ps, statusClosing)
+	cancel := ps.cancel
+	done := ps.done
+	g.mu.Unlock()
+
+	if cancel != nil {
+		cancel()
+	}
+	if prev == statusParked {
+		g.finish(ps)
+		return
+	}
+	<-done
+}
+
+// finish tears down a source's resources exactly once and removes it from the
+// runner. It must be called without holding g.mu and never while a goroutine
+// is inside the source's ReadSlice (the status/cancel protocol guarantees this).
+func (g *harvesterRunner) finish(ps *sourceState) {
+	g.mu.Lock()
+	if ps.finished {
+		g.mu.Unlock()
+		return
+	}
+	g.setStatus(ps, statusClosing) // adjust gauge counters from whatever it was
+	ps.finished = true
+	wasSetUp := ps.setUp
+	delete(g.states, ps.srcID)
+	g.mu.Unlock()
+
+	g.notifyObserver(ps)
+
+	if ps.session != nil {
+		_ = ps.session.Close()
+	}
+	if ps.client != nil {
+		_ = ps.client.Close()
+	}
+	if ps.resource != nil {
+		releaseResource(ps.resource)
+	}
+	if ps.cancel != nil {
+		ps.cancel()
+	}
+
+	// Only balance the metrics that setup incremented; a source torn down before
+	// it was set up never incremented them.
+	if wasSetUp {
+		g.metrics.FilesActive.Dec()
+		g.metrics.HarvesterRunning.Dec()
+		g.metrics.FilesClosed.Inc()
+		g.metrics.HarvesterOpenFiles.Dec()
+		g.metrics.HarvesterClosed.Inc()
+	}
+
+	close(ps.done)
+}
+
+func (g *harvesterRunner) notifyObserver(ps *sourceState) {
+	if g.notifyChan == nil || ps.session == nil {
+		return
+	}
+	offset := ps.session.Offset()
+	select {
+	case g.notifyChan <- HarvesterStatus{ID: ps.srcID, Size: offset}:
+	case <-g.ctx.Cancelation.Done():
+	}
+}
+
+// Continue starts a new harvester carrying over the state of a previous source.
+func (g *harvesterRunner) Continue(ctx inputv2.Context, previous, next Source) {
+	g.spawn(func() {
+		prevID := g.identifier.ID(previous)
+		nextID := g.identifier.ID(next)
+
+		previousResource, err := lock(ctx, g.store, prevID)
+		if err != nil {
+			ctx.Logger.Errorf("Continue: cannot lock previous resource %s: %v", prevID, err)
+			return
+		}
+		_ = g.store.remove(prevID)
+
+		nextResource, err := lock(ctx, g.store, nextID)
+		if err != nil {
+			releaseResource(previousResource)
+			ctx.Logger.Errorf("Continue: cannot lock next resource %s: %v", nextID, err)
+			return
+		}
+		g.store.UpdateTTL(nextResource, g.cleanTimeout)
+		previousResource.copyInto(nextResource)
+		releaseResource(previousResource)
+		releaseResource(nextResource)
+
+		g.enqueue(ctx, next)
+	})
+}
+
+// StopHarvesters stops all harvesters and the waker goroutine.
+func (g *harvesterRunner) StopHarvesters() error {
+	g.mu.Lock()
+	if g.closed {
+		g.mu.Unlock()
+		return nil
+	}
+	g.closed = true
+	for _, ps := range g.states {
+		if ps != nil {
+			g.setStatus(ps, statusClosing)
+			if ps.cancel != nil {
+				ps.cancel()
+			}
+		}
+	}
+	g.mu.Unlock()
+
+	g.signalWaker()
+	g.wg.Wait()
+
+	// Tear down any sources the readers/waker did not finish (e.g. parked ones).
+	g.mu.Lock()
+	remaining := make([]*sourceState, 0, len(g.states))
+	for _, ps := range g.states {
+		if ps != nil {
+			remaining = append(remaining, ps)
+		}
+	}
+	g.mu.Unlock()
+	for _, ps := range remaining {
+		g.finish(ps)
+	}
+
+	return nil
+}
+
+func (g *harvesterRunner) spawn(fn func()) {
+	g.mu.Lock()
+	if g.closed {
+		g.mu.Unlock()
+		return
+	}
+	g.wg.Add(1)
+	g.mu.Unlock()
+	go func() {
+		defer g.wg.Done()
+		fn()
+	}()
+}
+
+func (g *harvesterRunner) signalWaker() {
+	select {
+	case g.wakerCh <- struct{}{}:
+	default:
+	}
+}
+
+func growBackoff(cur time.Duration) time.Duration {
+	if cur <= 0 {
+		return minWakerBackoff
+	}
+	next := cur * 2
+	if next > maxWakerBackoff {
+		next = maxWakerBackoff
+	}
+	return next
+}

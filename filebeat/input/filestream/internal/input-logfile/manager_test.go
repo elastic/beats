@@ -534,3 +534,26 @@ take_over:
 		})
 	}
 }
+
+// mockHarvester is a minimal Harvester used by manager tests that only need a
+// Harvester value to construct an input; its sessions are never driven, so
+// OpenSession returns a nil session. Runner behaviour is tested with the
+// controllable fakes in harvester_runner_test.go.
+type mockHarvester struct {
+	wg    *sync.WaitGroup
+	onRun func(v2.Context, Source, Cursor, Publisher) error
+}
+
+func (m *mockHarvester) Name() string { return "mock" }
+
+func (m *mockHarvester) Test(_ Source, _ v2.TestContext) error { return nil }
+
+func (m *mockHarvester) OpenSession(
+	_ v2.Context, _ Source, _ Cursor, _ *Metrics,
+) (HarvesterSession, error) {
+	return nil, nil
+}
+
+func correctOnRun(_ v2.Context, _ Source, _ Cursor, _ Publisher) error {
+	return nil
+}
