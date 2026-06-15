@@ -26,7 +26,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -182,6 +184,23 @@ metrics_that_inform_labels{label1="I am 1", label3="I am 3"} 1
 # TYPE metrics_that_use_labels gauge
 metrics_that_use_labels{label1="I am 1"} 20
 
+`
+
+	// Simulates KSM output for state_service when *_created is denylisted.
+	promInfoOnlyService = `# HELP kube_service_info Information about service.
+# TYPE kube_service_info gauge
+kube_service_info{namespace="default",service="kubernetes",uid="b20b8a15",cluster_ip="10.96.0.1",external_name="",load_balancer_ip=""} 1
+kube_service_info{namespace="kube-system",service="kube-dns",uid="979a9342",cluster_ip="10.96.0.10",external_name="",load_balancer_ip=""} 1
+# HELP kube_service_spec_type Type about service.
+# TYPE kube_service_spec_type gauge
+kube_service_spec_type{namespace="default",service="kubernetes",type="ClusterIP"} 1
+kube_service_spec_type{namespace="kube-system",service="kube-dns",type="ClusterIP"} 1
+`
+
+	// Simulates KSM output for state_storageclass when *_created is denylisted.
+	promInfoOnlyStorageclass = `# HELP kube_storageclass_info Information about storageclass.
+# TYPE kube_storageclass_info gauge
+kube_storageclass_info{storageclass="standard",provisioner="rancher.io/local-path",reclaim_policy="Delete",volume_binding_mode="WaitForFirstConsumer"} 1
 `
 )
 
@@ -1071,5 +1090,126 @@ func TestPrometheusKeyLabels(t *testing.T) {
 			}
 			t.Logf("events: %+v", events[i].MetricSetFields)
 		}
+	}
+}
+
+// TestInfoMetricPromotionWhenNoEventsCreated verifies that InfoMetrics are
+// promoted to standalone events when no event-creating metrics produce data.
+// This reproduces the OpenShift kube-state-metrics scenario where
+// --metric-denylist blocks *_created, leaving only InfoMetric entries.
+func TestInfoMetricPromotionWhenNoEventsCreated(t *testing.T) {
+	testCases := []struct {
+		testName           string
+		prometheusResponse string
+		mapping            *MetricsMapping
+		expectedCount      int
+		validate           func(t *testing.T, events []mapstr.M)
+	}{
+		{
+			testName:           "state_service mapping without kube_service_created",
+			prometheusResponse: promInfoOnlyService,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"kube_service_info":      InfoMetric(),
+					"kube_service_created":   Metric("created", OpUnixTimestampValue()),
+					"kube_service_spec_type": InfoMetric(),
+				},
+				Labels: map[string]LabelMap{
+					"namespace":  KeyLabel(mb.ModuleDataKey + ".namespace"),
+					"service":    KeyLabel("name"),
+					"cluster_ip": Label("cluster_ip"),
+					"type":       Label("type"),
+				},
+			},
+			expectedCount: 2,
+			validate: func(t *testing.T, events []mapstr.M) {
+				for _, event := range events {
+					svcName, _ := event.GetValue("name")
+					assert.NotEmpty(t, svcName, "service name should be present")
+
+					clusterIP, _ := event.GetValue("cluster_ip")
+					assert.NotEmpty(t, clusterIP, "cluster_ip should be present")
+
+					svcType, _ := event.GetValue("type")
+					assert.NotEmpty(t, svcType, "type should be present")
+
+					_, err := event.GetValue("created")
+					assert.Error(t, err, "created field should be absent")
+				}
+			},
+		},
+		{
+			testName:           "state_storageclass mapping without kube_storageclass_created",
+			prometheusResponse: promInfoOnlyStorageclass,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"kube_storageclass_info":    InfoMetric(),
+					"kube_storageclass_created": Metric("created", OpUnixTimestampValue()),
+				},
+				Labels: map[string]LabelMap{
+					"storageclass":        KeyLabel("name"),
+					"provisioner":         Label("provisioner"),
+					"reclaim_policy":      Label("reclaim_policy"),
+					"volume_binding_mode": Label("volume_binding_mode"),
+				},
+			},
+			expectedCount: 1,
+			validate: func(t *testing.T, events []mapstr.M) {
+				event := events[0]
+
+				scName, _ := event.GetValue("name")
+				assert.Equal(t, "standard", scName)
+
+				provisioner, _ := event.GetValue("provisioner")
+				assert.Equal(t, "rancher.io/local-path", provisioner)
+
+				reclaimPolicy, _ := event.GetValue("reclaim_policy")
+				assert.Equal(t, "Delete", reclaimPolicy)
+
+				_, err := event.GetValue("created")
+				assert.Error(t, err, "created field should be absent")
+			},
+		},
+		{
+			testName:           "InfoMetrics should NOT be promoted when events exist",
+			prometheusResponse: promGaugeLabeled,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_that_inform_labels": InfoMetric(),
+					"metrics_that_use_labels":    Metric("metrics.value"),
+				},
+				Labels: map[string]LabelMap{
+					"label1": KeyLabel("metrics.label1"),
+				},
+			},
+			expectedCount: 1,
+			validate: func(t *testing.T, events []mapstr.M) {
+				val, _ := events[0].GetValue("metrics.value")
+				assert.Equal(t, 20.0, val, "regular metric value should be present")
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testName, func(t *testing.T) {
+			r := &mbtest.CapturingReporterV2{}
+			p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logptest.NewTestingLogger(t, "test")}
+			err := p.ReportProcessedMetrics(tc.mapping, r)
+			require.NoError(t, err)
+			assert.Empty(t, r.GetErrors())
+
+			events := r.GetEvents()
+			require.Len(t, events, tc.expectedCount)
+
+			msFields := make([]mapstr.M, len(events))
+			for i, ev := range events {
+				msFields[i] = ev.MetricSetFields
+			}
+			sort.Slice(msFields, func(i, j int) bool {
+				return msFields[i].String() < msFields[j].String()
+			})
+
+			tc.validate(t, msFields)
+		})
 	}
 }

@@ -250,6 +250,28 @@ func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMa
 		}
 	}
 
+	// When no event-creating metrics produced any events, promote info
+	// metrics to standalone events so their label data is not lost.
+	// This handles cases like OpenShift's kube-state-metrics where
+	// --metric-denylist blocks *_created, leaving only InfoMetrics.
+	if len(events) == 0 {
+		infoEvents := map[string]mapstr.M{}
+		for _, info := range infoMetrics {
+			key := info.Labels.String()
+			if existing, ok := infoEvents[key]; ok {
+				existing.DeepUpdate(info.Meta)
+			} else {
+				infoEvents[key] = info.Meta.Clone()
+			}
+		}
+		for _, event := range infoEvents {
+			for k, v := range mapping.ExtraFields {
+				event[k] = v
+			}
+			events = append(events, event)
+		}
+	}
+
 	return events, nil
 }
 
