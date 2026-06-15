@@ -28,6 +28,8 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -528,4 +530,97 @@ func (r *eofWithNonZeroNumberOfBytesReader) Read(d []byte) (int, error) {
 // Verify handling of the io.Reader returning n > 0 with io.EOF.
 func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
 	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
+}
+
+// spinReader feeds an endless stream of non-newline bytes so that
+// LineReader.advance never finds a line terminator and keeps re-reading the
+// LineReader.tempBuffer field in a tight loop.
+//
+// This models the production scenario: the TimeoutReader used by the multiline
+// reader (libbeat/reader/multiline, default multiline.timeout = 5s) runs the
+// inner reader's Next in a background goroutine. That goroutine can still be
+// blocked/looping inside LineReader.Next when the harvester closes the reader
+// chain, which calls LineReader.Close concurrently.
+type spinReader struct {
+	started chan struct{}
+	once    sync.Once
+	closed  atomic.Bool
+}
+
+func (r *spinReader) Read(p []byte) (int, error) {
+	if r.closed.Load() || len(p) == 0 {
+		return 0, io.EOF
+	}
+	// Signal (once) that the background goroutine is now actively looping inside
+	// Next, and is therefore repeatedly reading r.tempBuffer with no
+	// synchronization against the caller of Close.
+	r.once.Do(func() { close(r.started) })
+	// A non-newline byte keeps advance looping: it never returns a line and
+	// never blocks, so it re-reads r.tempBuffer on every iteration.
+	p[0] = 'a'
+	return 1, nil
+}
+
+func (r *spinReader) Close() error {
+	r.closed.Store(true)
+	return nil
+}
+
+// TestLineReaderCloseRaceWithNext proves that recycling the scratch buffer in
+// LineReader.Close is synchronized against a concurrent in-flight Next.
+//
+// LineReader.Close returns r.tempBuffer to a shared sync.Pool (and nils the
+// field) while a concurrent Next may still be reading the same field and the
+// same backing array in advance/decode. Without synchronization this is a data
+// race; with the in-flight read serialized against Close it is safe.
+//
+// Run with the race detector to observe a regression:
+//
+//	go test -race -run TestLineReaderCloseRaceWithNext ./libbeat/reader/readfile/
+func TestLineReaderCloseRaceWithNext(t *testing.T) {
+	codec, err := encoding.Plain(nil)
+	if err != nil {
+		t.Fatalf("failed to create codec: %v", err)
+	}
+
+	in := &spinReader{started: make(chan struct{})}
+
+	r, err := NewLineReader(in, Config{
+		Codec:      codec,
+		BufferSize: 1024,
+		Terminator: LineFeed,
+		MaxBytes:   unlimited,
+	}, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatalf("failed to initialize reader: %v", err)
+	}
+
+	done := make(chan struct{})
+	go func() {
+		// After Close nils the field, "r.tempBuffer[:n]" with n>0 could panic
+		// with an index-out-of-range. Recover so the data-race report (or a clean
+		// shutdown after the fix) is what determines the result, not a crash.
+		defer func() {
+			_ = recover()
+			close(done)
+		}()
+		for {
+			if _, _, err := r.Next(); err != nil {
+				return
+			}
+		}
+	}()
+
+	// Wait until the background goroutine is actively looping inside Next, let it
+	// iterate for a bit, then Close concurrently -- exactly what
+	// TimeoutReader.Close does to a still-running background Next.
+	<-in.started
+	time.Sleep(2 * time.Millisecond)
+	_ = r.Close()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Next goroutine did not return after Close")
+	}
 }
