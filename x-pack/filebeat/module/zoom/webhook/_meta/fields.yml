@@ -607,7 +607,7 @@
     - name: participant.sharing_details.source
       type: keyword
       description: >
-        The file source that was share
+        The file source that was shared
     - name: old_values
       type: flattened
       description: >
