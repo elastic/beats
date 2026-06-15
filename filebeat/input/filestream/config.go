@@ -49,9 +49,11 @@ const (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID           string            `config:"id"`
-	Paths        []string          `config:"paths"`
-	Close        closerConfig      `config:"close"`
+	ID           string                    `config:"id"`
+	Paths        []string                  `config:"paths"`
+	Close        closerConfig              `config:"close"`
+	ReadUntilEOF loginp.ReadUntilEOFConfig `config:"read_until_eof"`
+
 	FileWatcher  fileWatcherConfig `config:"prospector.scanner"`
 	FileIdentity *conf.Namespace   `config:"file_identity"`
 
@@ -68,6 +70,9 @@ type config struct {
 	// Disabled by default.
 	IncludeFileOwnerName      bool `config:"include_file_owner_name"`
 	IncludeFileOwnerGroupName bool `config:"include_file_owner_group_name"`
+	// IncludeFileFingerprint controls whether log.file.fingerprint is added
+	// to published events. Disabled by default.
+	IncludeFileFingerprint bool `config:"include_file_fingerprint"`
 
 	// -1 means that registry will never be cleaned, disabling clean_inactive.
 	// Setting it to 0 also disables clean_inactive
@@ -154,6 +159,7 @@ func defaultConfig() config {
 		Reader:                    defaultReaderConfig(),
 		Paths:                     []string{},
 		Close:                     defaultCloserConfig(),
+		ReadUntilEOF:              loginp.DefaultReadUntilEOFConfig(),
 		IncludeFileOwnerName:      false,
 		IncludeFileOwnerGroupName: false,
 		CleanInactive:             -1,
