@@ -21,7 +21,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -78,6 +81,13 @@ func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	return event, nil
+}
+
+func (af *addFields) RunPdata(body pcommon.Map) error {
+	if len(af.fields) == 0 {
+		return nil
+	}
+	return otelmap.MergeMapstrIntoPdata(af.fields, body, af.overwrite)
 }
 
 func (af *addFields) String() string {

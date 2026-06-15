@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"strings"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -49,6 +51,14 @@ type Closer interface {
 // with beat-specific paths. This method must be called before the processor can be used.
 type PathSetter interface {
 	SetPaths(*paths.Path) error
+}
+
+// PdataProcessor is an optional interface that beat processors can implement to
+// operate directly on a pcommon.Map, avoiding the round-trip conversion to/from
+// mapstr.M. When all processors in a chain implement this interface, the
+// beatprocessor skips the unpack/pack steps entirely.
+type PdataProcessor interface {
+	RunPdata(body pcommon.Map) error
 }
 
 // Close closes a processor if it implements the Closer interface
