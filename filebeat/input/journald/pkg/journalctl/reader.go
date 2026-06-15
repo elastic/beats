@@ -66,6 +66,11 @@ type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...str
 //
 //go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
 type Jctl interface {
+	// journalctl always honors read deadlines (its read is a channel receive),
+	// so SetReadDeadline is part of the interface rather than an optional
+	// capability detected via a type assertion.
+	reader.DeadlineSetter
+
 	// Next returns the next journal entry. If there is no entry available
 	// next will block until there is an entry or cancel is cancelled.
 	//
@@ -322,14 +327,10 @@ func (r *Reader) Close() error {
 	return nil
 }
 
-// SetReadDeadline bounds how long the next read waits for an entry. It returns
-// true only if the underlying journalctl honors deadlines, so callers can detect
-// support; the deadline is stored on the Reader and re-applied after a journalctl
-// restart.
+// SetReadDeadline bounds how long the next read waits for an entry. journalctl
+// always honors deadlines, so it returns true; the deadline is stored on the
+// Reader and re-applied after a journalctl restart.
 func (r *Reader) SetReadDeadline(t time.Time) bool {
-	if _, ok := r.jctl.(reader.DeadlineSetter); !ok {
-		return false
-	}
 	r.deadline = t
 	return true
 }
@@ -339,9 +340,7 @@ func (r *Reader) SetReadDeadline(t time.Time) bool {
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
 func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	// Apply the current read deadline to the (possibly restarted) journalctl.
-	if d, ok := r.jctl.(reader.DeadlineSetter); ok {
-		d.SetReadDeadline(r.deadline)
-	}
+	r.jctl.SetReadDeadline(r.deadline)
 
 	msg, err := r.jctl.Next(cancel)
 

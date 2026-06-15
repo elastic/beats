@@ -22,7 +22,6 @@ package readfile
 import (
 	"errors"
 	"io"
-	"sync"
 	"testing"
 	"time"
 
@@ -40,7 +39,6 @@ func msg(s string) reader.Message {
 // deadline elapses (returning reader.ErrReadDeadline) or it is closed. It
 // implements reader.DeadlineSetter, so TimeoutReader uses its synchronous path.
 type deadlineSource struct {
-	mu       sync.Mutex
 	msgs     []reader.Message
 	idx      int
 	reads    int
@@ -53,20 +51,16 @@ func newDeadlineSource(msgs ...reader.Message) *deadlineSource {
 }
 
 func (s *deadlineSource) Next() (reader.Message, error) {
-	s.mu.Lock()
 	s.reads++
 	if s.idx < len(s.msgs) {
 		m := s.msgs[s.idx]
 		s.idx++
-		s.mu.Unlock()
 		return m, nil
 	}
-	deadline := s.deadline
-	s.mu.Unlock()
 
 	var dl <-chan time.Time
-	if !deadline.IsZero() {
-		t := time.NewTimer(time.Until(deadline))
+	if !s.deadline.IsZero() {
+		t := time.NewTimer(time.Until(s.deadline))
 		defer t.Stop()
 		dl = t.C
 	}
@@ -79,17 +73,13 @@ func (s *deadlineSource) Next() (reader.Message, error) {
 }
 
 func (s *deadlineSource) SetReadDeadline(t time.Time) bool {
-	s.mu.Lock()
 	s.deadline = t
-	s.mu.Unlock()
 	return true
 }
 
 func (s *deadlineSource) Close() error { close(s.closed); return nil }
 
 func (s *deadlineSource) readCount() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
 	return s.reads
 }
 

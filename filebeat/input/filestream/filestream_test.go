@@ -564,7 +564,7 @@ func TestLogFileReadDeadline(t *testing.T) {
 	defer f.Close()
 	defer os.Remove(f.Name())
 
-	lf, err := newFileReader(logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{})
+	lf, _, err := newFileReader(logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{}, false)
 	require.NoError(t, err)
 
 	// The EncodeReader (LineReader) must forward the deadline to the logFile.
