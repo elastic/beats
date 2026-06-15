@@ -221,7 +221,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.destinationMacAddress`**
-:   Six colon-seperated hexadecimal numbers.
+:   Six colon-separated hexadecimal numbers.
 
     type: keyword
 

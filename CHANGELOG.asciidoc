@@ -939,7 +939,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 *Filebeat*
 
 - Fix endpoint path typo in the Okta entity analytics provider. {pull}44147[44147]
-- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+- Fix a WebSocket panic scenario that occurred after exhausting the maximum number of retries. {pull}44342[44342]
 
 *Osquerybeat*
 
@@ -1237,7 +1237,7 @@ include::CHANGELOG.asciidoc[tags=known-issue-8.19-filestream-clean-inactive-1]
 
 *Filebeat*
 
-- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+- Fix a WebSocket panic scenario that occurred after exhausting the maximum number of retries. {pull}44342[44342]
 
 ==== Added
 

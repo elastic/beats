@@ -159,7 +159,7 @@
 
             - name: destinationMacAddress
               type: keyword
-              description: Six colon-seperated hexadecimal numbers.
+              description: Six colon-separated hexadecimal numbers.
 
             - name: destinationNtDomain
               type: keyword
