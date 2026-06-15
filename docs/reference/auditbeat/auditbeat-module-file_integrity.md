@@ -31,7 +31,7 @@ The operating system features that power this feature are as follows.
 
     :::{note}
     Process and user information attached to ETW-backed file events can vary depending on the underlying ETW event type.
-  
+
     Create or open operations may provide richer execution context, allowing Auditbeat to attach additional process metadata and user/security information. Update operations, such as file content writes or attribute changes, may use a lighter-weight event payload that only includes basic identifiers such as the process ID (PID).
     :::
 
