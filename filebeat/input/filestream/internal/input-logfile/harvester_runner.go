@@ -99,6 +99,11 @@ type harvesterRunner struct {
 	ctx        inputv2.Context // input lifetime context, for the waker
 	notifyChan chan HarvesterStatus
 
+	// readUntilEOF, when enabled, makes StopHarvesters drain every source to EOF
+	// (bounded by its Timeout) before tearing it down, instead of cancelling
+	// in-flight reads. See StopHarvesters.
+	readUntilEOF ReadUntilEOFConfig
+
 	// Observability gauges (nil when no metrics registry is available).
 	mActive *monitoring.Uint // sources with a reader goroutine
 	mParked *monitoring.Uint // sources parked, watched by the waker
@@ -106,6 +111,9 @@ type harvesterRunner struct {
 	mu     sync.Mutex
 	states map[string]*sourceState
 	closed bool
+	// draining is set during a read_until_eof shutdown: while it is true a reader
+	// that catches up to EOF tears its source down instead of parking it.
+	draining bool
 	// parked is a min-heap of parked sources keyed by nextCheck, so the waker
 	// processes only the sources that are actually due instead of scanning every
 	// source each tick. nActive/nParked track the gauge counts incrementally to
@@ -153,6 +161,7 @@ func newHarvesterRunner(
 	identifier *SourceIdentifier,
 	metrics *Metrics,
 	inputID string,
+	readUntilEOF ReadUntilEOFConfig,
 ) *harvesterRunner {
 	var sem chan struct{}
 	if harvesterLimit > 0 {
@@ -168,6 +177,7 @@ func newHarvesterRunner(
 		identifier:   identifier,
 		metrics:      metrics,
 		inputID:      inputID,
+		readUntilEOF: readUntilEOF,
 		sem:          sem,
 		ctx:          ctx,
 		states:       map[string]*sourceState{},
@@ -200,7 +210,9 @@ func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c
 // being torn down, or the group is shutting down).
 func (g *harvesterRunner) run(ps *sourceState) {
 	g.mu.Lock()
-	if g.closed || ps.finished || ps.status == statusRunning || ps.status == statusClosing {
+	// While draining (a read_until_eof shutdown) we still spawn readers to drain
+	// parked sources, even though the runner is closed.
+	if (g.closed && !g.draining) || ps.finished || ps.status == statusRunning || ps.status == statusClosing {
 		g.mu.Unlock()
 		return
 	}
@@ -274,8 +286,16 @@ func (g *harvesterRunner) readOnce(ps *sourceState) {
 		return
 	}
 
-	// SliceYield: caught up to EOF. Park for the waker and exit the goroutine.
-	// A slice that made progress resets the backoff; one that read nothing grows it.
+	// SliceYield: caught up to EOF. During a read_until_eof shutdown the source
+	// has now been drained, so tear it down instead of parking it.
+	if g.draining {
+		g.mu.Unlock()
+		g.finish(ps)
+		return
+	}
+
+	// Park for the waker and exit the goroutine. A slice that made progress resets
+	// the backoff; one that read nothing grows it.
 	if after > before {
 		g.park(ps, minWakerBackoff)
 	} else {
@@ -511,6 +531,12 @@ func (g *harvesterRunner) pollParked(ps *sourceState) {
 		g.finish(ps)
 		return
 	}
+	if ps.status != statusPolling {
+		// Claimed by another actor (e.g. a drain reader during shutdown) while we
+		// were polling; leave it to that actor.
+		g.mu.Unlock()
+		return
+	}
 	switch result {
 	case PollResume:
 		g.mu.Unlock()
@@ -667,13 +693,24 @@ func (g *harvesterRunner) Continue(ctx inputv2.Context, previous, next Source) {
 	})
 }
 
-// StopHarvesters stops all harvesters and the waker goroutine.
+// StopHarvesters stops all harvesters and the waker goroutine. With
+// read_until_eof enabled it first drains every source to EOF (bounded by the
+// configured Timeout) so data is not left unread on shutdown.
 func (g *harvesterRunner) StopHarvesters() error {
 	g.mu.Lock()
 	if g.closed {
 		g.mu.Unlock()
 		return nil
 	}
+	if g.readUntilEOF.Enabled {
+		return g.drainAndStop() // holds and releases g.mu
+	}
+	return g.stopNow() // holds and releases g.mu
+}
+
+// stopNow cancels every source and the waker and tears the sources down without
+// draining. The caller holds g.mu; stopNow releases it.
+func (g *harvesterRunner) stopNow() error {
 	g.closed = true
 	for _, ps := range g.states {
 		if ps != nil {
@@ -687,8 +724,55 @@ func (g *harvesterRunner) StopHarvesters() error {
 
 	g.signalWaker()
 	g.wg.Wait()
+	g.finishRemaining()
+	return nil
+}
 
-	// Tear down any sources the readers/waker did not finish (e.g. parked ones).
+// drainAndStop implements the read_until_eof shutdown: it lets in-flight readers
+// finish and spawns drain readers for idle sources so every source is read to
+// EOF before teardown, instead of cancelling mid-read. A Timeout bounds the
+// drain so a stuck read or blocked output cannot hang shutdown. The caller holds
+// g.mu; drainAndStop releases it.
+func (g *harvesterRunner) drainAndStop() error {
+	g.closed = true
+	g.draining = true
+	// Running sources are already draining themselves; spawn a reader for the rest
+	// so they read any remaining data to EOF. Sources the waker is currently
+	// polling are handled by that poll (pollParked re-spawns a reader on resume).
+	toDrain := make([]*sourceState, 0, len(g.states))
+	for _, ps := range g.states {
+		if ps != nil && ps.status != statusRunning && ps.status != statusPolling {
+			toDrain = append(toDrain, ps)
+		}
+	}
+	g.mu.Unlock()
+
+	g.signalWaker() // let the waker observe closed and exit
+	for _, ps := range toDrain {
+		g.run(ps) // draining: read to EOF, then finish (not park)
+	}
+
+	// Bound the drain: cancel every source after Timeout so a stuck read or a
+	// blocked output unblocks and tears down.
+	timer := time.AfterFunc(g.readUntilEOF.Timeout, func() {
+		g.mu.Lock()
+		for _, ps := range g.states {
+			if ps != nil && ps.cancel != nil {
+				ps.cancel()
+			}
+		}
+		g.mu.Unlock()
+	})
+
+	g.wg.Wait()
+	timer.Stop()
+	g.finishRemaining()
+	return nil
+}
+
+// finishRemaining tears down any sources still registered after the readers and
+// waker have stopped (e.g. parked sources nothing drained).
+func (g *harvesterRunner) finishRemaining() {
 	g.mu.Lock()
 	remaining := make([]*sourceState, 0, len(g.states))
 	for _, ps := range g.states {
@@ -700,8 +784,6 @@ func (g *harvesterRunner) StopHarvesters() error {
 	for _, ps := range remaining {
 		g.finish(ps)
 	}
-
-	return nil
 }
 
 func (g *harvesterRunner) spawn(fn func()) {

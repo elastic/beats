@@ -22,6 +22,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -525,6 +526,93 @@ func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
 	require.False(t, g.hasID("y"))
 }
 
+// TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop asserts that, with
+// read_until_eof enabled, StopHarvesters reads a parked source again (drains it
+// to EOF) before tearing it down.
+func TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop(t *testing.T) {
+	var reads atomic.Int64
+	h := &fakeHarvester{
+		readFn: func(_ int, _ v2.Context) (SliceVerdict, error) {
+			reads.Add(1)
+			return SliceYield, nil // always caught up to EOF
+		},
+		pollFn: func(int) PollResult { return PollPark },
+	}
+	g := testHarvesterRunnerEOF(t, h, 0, ReadUntilEOFConfig{Enabled: true, Timeout: 5 * time.Second})
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id)
+		return ok && s == statusParked
+	}, "source should park after its first read")
+	readsBeforePark := reads.Load()
+
+	require.NoError(t, g.StopHarvesters())
+	require.Greater(t, reads.Load(), readsBeforePark,
+		"a parked source should be drained (read again) on read_until_eof stop")
+	require.False(t, g.hasID(id))
+	require.True(t, h.lastSession().isClosed())
+}
+
+// TestHarvesterRunner_NoDrainWhenDisabled asserts that with read_until_eof
+// disabled a parked source is torn down on stop without an extra read.
+func TestHarvesterRunner_NoDrainWhenDisabled(t *testing.T) {
+	var reads atomic.Int64
+	h := &fakeHarvester{
+		readFn: func(_ int, _ v2.Context) (SliceVerdict, error) {
+			reads.Add(1)
+			return SliceYield, nil
+		},
+		pollFn: func(int) PollResult { return PollPark },
+	}
+	g := testHarvesterRunner(t, h, 0) // read_until_eof disabled
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id)
+		return ok && s == statusParked
+	}, "source should park")
+	readsBeforeStop := reads.Load()
+
+	require.NoError(t, g.StopHarvesters())
+	require.Equal(t, readsBeforeStop, reads.Load(), "no drain read when read_until_eof is disabled")
+	require.False(t, g.hasID(id))
+}
+
+// TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain asserts that a source stuck
+// mid-read is cancelled after the configured Timeout so shutdown cannot hang.
+func TestHarvesterRunner_ReadUntilEOFTimeoutBoundsDrain(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled} // never reaches EOF on its own
+	g := testHarvesterRunnerEOF(t, h, 0, ReadUntilEOFConfig{Enabled: true, Timeout: 200 * time.Millisecond})
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	requireEventually(t, func() bool { return h.opens() == 1 }, "source should be reading")
+
+	start := time.Now()
+	require.NoError(t, g.StopHarvesters())
+	require.WithinDuration(t, start, time.Now(), 5*time.Second,
+		"a stuck drain must be bounded by the timeout, not hang")
+	require.False(t, g.hasID(id))
+}
+
 // TestGrowBackoff covers the backoff growth, including the cap at the maximum.
 func TestGrowBackoff(t *testing.T) {
 	require.Equal(t, minWakerBackoff, growBackoff(0), "non-positive grows to the minimum")
@@ -540,6 +628,11 @@ func TestGrowBackoff(t *testing.T) {
 // testHarvesterRunner builds a harvesterRunner wired to controllable fakes and a
 // fresh in-memory store and metrics.
 func testHarvesterRunner(t *testing.T, h Harvester, limit uint64) *harvesterRunner {
+	t.Helper()
+	return testHarvesterRunnerEOF(t, h, limit, ReadUntilEOFConfig{})
+}
+
+func testHarvesterRunnerEOF(t *testing.T, h Harvester, limit uint64, eof ReadUntilEOFConfig) *harvesterRunner {
 	t.Helper()
 	logger := logptest.NewTestingLogger(t, "")
 	ident, err := NewSourceIdentifier("filestream", "")
@@ -557,6 +650,7 @@ func testHarvesterRunner(t *testing.T, h Harvester, limit uint64) *harvesterRunn
 		ident,
 		NewMetrics(monitoring.NewRegistry(), logger),
 		"test-input",
+		eof,
 	)
 }
 
