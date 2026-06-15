@@ -28,7 +28,7 @@
     - name: connections.total
       type: long
       description: >
-        Numer of successful connect attempts to this server since it has been started.
+        Number of successful connect attempts to this server since it has been started.
 
     - name: get.hits
       type: long
