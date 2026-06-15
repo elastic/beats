@@ -117,7 +117,7 @@ exporters:
 connectors:
 
 service:
-  extensions: [health_check, pprof, beatsauth, elasticsearch_storage, kafkapartitioner]
+  extensions: [health_check, pprof, beatsauth, file_storage, elasticsearch_storage, kafkapartitioner]
   
   pipelines:
     logs:
