@@ -66,9 +66,7 @@ type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...str
 //
 //go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
 type Jctl interface {
-	// journalctl always honors read deadlines (its read is a channel receive),
-	// so SetReadDeadline is part of the interface rather than an optional
-	// capability detected via a type assertion.
+	// journalctl always honors read deadlines (its read is a channel receive)
 	reader.DeadlineSetter
 
 	// Next returns the next journal entry. If there is no entry available
@@ -327,9 +325,7 @@ func (r *Reader) Close() error {
 	return nil
 }
 
-// SetReadDeadline bounds how long the next read waits for an entry. journalctl
-// always honors deadlines, so it returns true; the deadline is stored on the
-// Reader and re-applied after a journalctl restart.
+// SetReadDeadline bounds how long the next read waits for an entry.
 func (r *Reader) SetReadDeadline(t time.Time) bool {
 	r.deadline = t
 	return true
