@@ -20,11 +20,22 @@
 // receivers (always, when running with an in-memory queue config).
 // Storage is separated from FIFO ordering:
 //
-//   - A Pool owns a fixed-size backing array of slots and a free list.
-//     Publish acquires a slot; batch.Done returns it. The free list also
-//     serves as a counting semaphore: total live events across all
-//     pipelines is capped by Settings.Events. There is no per-pipeline cap
-//     — one pipeline may use the full budget while others are quiet.
+//   - A Pool owns the slot storage and a free list. Publish acquires a slot;
+//     batch.Done returns it. The free list also serves as a counting
+//     semaphore: total live events across all pipelines is capped by the
+//     pool's current capacity. The capacity is resizable at runtime
+//     (Pool.SetTarget) so a shared pool can grow to the largest budget its
+//     connected receivers request and shrink back as they leave, all while
+//     traffic flows; storage is a directory of non-moving chunks and the free
+//     list is sharded for concurrency (see storage.go / freelist.go).
+//   - Each Queue may additionally have its own per-queue cap (Queue.SetTarget),
+//     bounding the live events on that one pipeline independently of the shared
+//     pool. With several queues on one pool, each enforces its own configured
+//     size while the pool is sized to the largest of them: e.g. a 4096-cap
+//     queue and an 8192-cap queue share an 8192-slot pool, and the first can
+//     never exceed 4096 live events even when the pool has room. A queue with
+//     no per-queue cap is bounded only by the pool, so a single busy pipeline
+//     can still use the whole budget while others are quiet.
 //   - Each connected pipeline gets its own Queue (implementing
 //     queue.Queue[T]) with its own FIFO over the shared array. A slow or
 //     stalled consumer on one pipeline only holds its own in-flight slots;
