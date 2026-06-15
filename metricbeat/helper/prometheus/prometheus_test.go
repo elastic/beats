@@ -1185,7 +1185,7 @@ func TestInfoMetricPromotionWhenNoEventsCreated(t *testing.T) {
 			expectedCount: 1,
 			validate: func(t *testing.T, events []mapstr.M) {
 				val, _ := events[0].GetValue("metrics.value")
-				assert.Equal(t, 20.0, val, "regular metric value should be present")
+				assert.InDelta(t, 20.0, val, 0.001, "regular metric value should be present")
 			},
 		},
 	}
