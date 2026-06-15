@@ -59,7 +59,7 @@ make mage
 Then you can compile a particular Beat by using Mage. For example, for Filebeat:
 
 ```shell
-cd beats/filebeat
+cd filebeat
 mage build
 ```
 
@@ -193,6 +193,5 @@ The following packages are required to run `go generate`:
 ## Changelog [changelog]
 
 To keep up to date with changes to the official Beats for community developers, follow the developer changelog [here](https://github.com/elastic/beats/blob/main/CHANGELOG-developer.next.asciidoc).
-
 
 
