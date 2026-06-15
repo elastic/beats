@@ -366,7 +366,7 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, l
 
 	if rewrite {
 		if err := os.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
-			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
+			return fmt.Errorf("failed to write osquery extension autoload file: %w", err)
 		}
 	}
 	return nil
