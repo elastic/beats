@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
@@ -103,5 +104,106 @@ output:
 	for _, e := range evts {
 		assert.Equal(t, logFileOwner.Username, e.Log.File.Owner)
 		assert.Equal(t, logFileGroup.Name, e.Log.File.Group)
+	}
+}
+
+func TestFilestreamIncludeFileFingerprint(t *testing.T) {
+	type fileIdentityEvent struct {
+		Log struct {
+			File struct {
+				Path        string  `json:"path"`
+				Fingerprint *string `json:"fingerprint,omitempty"`
+			} `json:"file"`
+		} `json:"log"`
+	}
+
+	tests := []struct {
+		name                   string
+		identityConfig         string
+		includeFileFingerprint string
+		expectFingerprint      bool
+	}{
+		{
+			name:                   "include_file_fingerprint_true",
+			identityConfig:         "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true",
+			includeFileFingerprint: "include_file_fingerprint: true",
+			expectFingerprint:      true,
+		},
+		{
+			name:                   "include_file_fingerprint_false",
+			identityConfig:         "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true",
+			includeFileFingerprint: "include_file_fingerprint: false",
+			expectFingerprint:      false,
+		},
+		{
+			name:                   "include_file_fingerprint_absent",
+			identityConfig:         "file_identity.fingerprint: ~\n    prospector.scanner:\n      fingerprint.enabled: true",
+			includeFileFingerprint: "",
+			expectFingerprint:      false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+
+			logFilePath := filepath.Join(filebeat.TempDir(), "input.log")
+			integration.WriteLogFile(t, logFilePath, 25, false)
+
+			cfg := fmt.Sprintf(`
+filebeat.inputs:
+  - type: filestream
+    id: filestream-include-file-fingerprint-%s
+    paths:
+      - %s
+    %s
+    %s
+
+logging:
+  level: debug
+  metrics:
+    enabled: false
+queue.mem:
+  flush.timeout: 0
+output:
+  file:
+    path: ${path.home}
+    filename: "output"
+    rotate_on_startup: false
+`, tc.name, logFilePath, tc.identityConfig, tc.includeFileFingerprint)
+
+			filebeat.WriteConfigFile(cfg)
+			filebeat.Start()
+			filebeat.WaitPublishedEvents(30*time.Second, 25)
+
+			events := integration.GetEventsFromFileOutput[fileIdentityEvent](filebeat, 25, false)
+			require.NotEmpty(t, events, "expected published events")
+
+			var failedFilePath []int
+			var failedFingerprint []int
+			for i, event := range events {
+				if tc.expectFingerprint && event.Log.File.Fingerprint == nil {
+					failedFingerprint = append(failedFingerprint, i)
+				}
+				if !tc.expectFingerprint && event.Log.File.Fingerprint != nil {
+					failedFingerprint = append(failedFingerprint, i)
+				}
+
+				if event.Log.File.Path == "" {
+					failedFilePath = append(failedFilePath, i)
+				}
+			}
+
+			assert.Empty(t, failedFingerprint,
+				"log.file.fingerprint expectation failed (expect_present=%v) on %d/%d events: %v",
+				tc.expectFingerprint, len(failedFingerprint), len(events), failedFingerprint)
+			assert.Empty(t, failedFilePath,
+				"log.file.path is empty on %d/%d events: %v",
+				len(failedFilePath), len(events), failedFilePath)
+		})
 	}
 }
