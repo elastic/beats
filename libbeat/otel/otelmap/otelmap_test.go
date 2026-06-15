@@ -517,65 +517,50 @@ func TestFromMapstrWholeFloat(t *testing.T) {
 }
 
 func TestMergeMapstrIntoPdata(t *testing.T) {
-	initial := mapstr.M{
-		"scalar": "old",
-		"nested": mapstr.M{"a": "old-a", "b": "old-b"},
-	}
-	src := mapstr.M{
-		"scalar": "new",
-		"nested": mapstr.M{"a": "new-a", "c": "added"},
-		"extra":  "added",
-	}
-
 	tests := []struct {
 		name      string
+		initial   mapstr.M
+		src       mapstr.M
 		overwrite bool
-		oracle    func(dst, src mapstr.M)
 	}{
 		{
 			name:      "overwrite=true",
+			initial:   mapstr.M{"scalar": "old", "nested": mapstr.M{"a": "old-a", "b": "old-b"}},
+			src:       mapstr.M{"scalar": "new", "nested": mapstr.M{"a": "new-a", "c": "added"}, "extra": "added"},
 			overwrite: true,
-			oracle:    func(dst, src mapstr.M) { dst.DeepUpdate(src) },
 		},
 		{
 			name:      "overwrite=false",
+			initial:   mapstr.M{"scalar": "old", "nested": mapstr.M{"a": "old-a", "b": "old-b"}},
+			src:       mapstr.M{"scalar": "new", "nested": mapstr.M{"a": "new-a", "c": "added"}, "extra": "added"},
 			overwrite: false,
-			oracle:    func(dst, src mapstr.M) { dst.DeepUpdateNoOverwrite(src) },
+		},
+		{
+			name:      "overwrite=false map over scalar replaces scalar",
+			initial:   mapstr.M{"key": "scalar"},
+			src:       mapstr.M{"key": mapstr.M{"nested": "val"}},
+			overwrite: false,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			// Compute expected result via the mapstr oracle, then normalize through
-			// a pdata round-trip so nested maps are map[string]any (matching AsRaw output).
-			want := initial.Clone()
-			tc.oracle(want, src.Clone())
+			// Oracle: apply the equivalent mapstr operation, then normalize through a
+			// pdata round-trip so nested maps are map[string]any (matching AsRaw output).
+			want := tc.initial.Clone()
+			if tc.overwrite {
+				want.DeepUpdate(tc.src.Clone())
+			} else {
+				want.DeepUpdateNoOverwrite(tc.src.Clone())
+			}
 			wantNorm := pcommon.NewMap()
 			require.NoError(t, FromMapstr(wantNorm, want))
 
 			dst := pcommon.NewMap()
-			require.NoError(t, FromMapstr(dst, initial))
-			require.NoError(t, MergeMapstrIntoPdata(src, dst, tc.overwrite))
+			require.NoError(t, FromMapstr(dst, tc.initial))
+			require.NoError(t, MergeMapstrIntoPdata(tc.src, dst, tc.overwrite))
 
 			assert.Equal(t, wantNorm.AsRaw(), dst.AsRaw())
 		})
 	}
-}
-
-func TestMergeMapstrIntoPdataNoOverwriteMapOverNonMap(t *testing.T) {
-	// When dst has a scalar under a key and src has a map, mapstr replaces the scalar
-	// with the map regardless of the overwrite flag. MergeMapstrIntoPdata matches this.
-	initial := mapstr.M{"key": "scalar"}
-	src := mapstr.M{"key": mapstr.M{"nested": "val"}}
-
-	want := initial.Clone()
-	want.DeepUpdateNoOverwrite(src.Clone())
-	wantNorm := pcommon.NewMap()
-	require.NoError(t, FromMapstr(wantNorm, want))
-
-	dst := pcommon.NewMap()
-	require.NoError(t, FromMapstr(dst, initial))
-	require.NoError(t, MergeMapstrIntoPdata(src, dst, false))
-
-	assert.Equal(t, wantNorm.AsRaw(), dst.AsRaw())
 }
