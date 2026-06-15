@@ -136,13 +136,13 @@ This setting allows Filebeat to optimize reads for forwarded events that are alr
 
 ### `event_id` [_event_id]
 
-An allowlist and blocklist of event IDs. The value is a comma-separated list. The accepted values are single event IDs to include (e.g. 4624), a range of event IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735). **{This option is only available on operating systems +
+An allowlist and blocklist of event IDs. The value is a comma-separated list. The accepted values are single event IDs to include (e.g. 4624), a range of event IDs to include (e.g. 4700-4800), single event IDs to exclude (e.g. -4735), and a range of event IDs to exclude (e.g. -4701-4710). **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
 ```yaml
 - type: winlog
   name: Security
-  event_id: 4624, 4625, 4700-4800, -4735
+  event_id: 4624, 4625, 4700-4800, -4735, -4701-4710
 ```
 
 
@@ -332,4 +332,3 @@ The action that the event log reader should take when it receives a signal from 
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
 Setting `no_more_events` to `stop` is useful when reading from archived event log files where you want to read the whole file then exit.
-
