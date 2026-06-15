@@ -171,7 +171,10 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 	assert.False(t, ok, "TryPublish should fail when the shared pool budget is exhausted")
 }
 
-func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
+// TestSharedIntakeQueueGrowsToMax verifies that receivers requesting different
+// event budgets for the same intake queue ID no longer conflict: the shared
+// pool grows to the largest requested budget and every receiver connects.
+func TestSharedIntakeQueueGrowsToMax(t *testing.T) {
 	c1, err := newOTelOutputController(
 		beatInfoForTest(t),
 		monitorsForTest(),
@@ -183,7 +186,11 @@ func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 	require.NoError(t, err, "first output controller creation should succeed")
 	defer c1.waitClose(cancelledContext(), false)
 
-	_, err = newOTelOutputController(
+	require.Equal(t, 5, c1.poolForTest().Target(), "pool starts at the first receiver's budget")
+
+	// A second receiver asks for a larger budget on the same ID. Instead of
+	// erroring on the mismatch, the shared pool must grow to the maximum.
+	c2, err := newOTelOutputController(
 		beatInfoForTest(t),
 		monitorsForTest(),
 		nilObserver,
@@ -191,7 +198,95 @@ func TestSharedIntakeQueueConfigMismatch(t *testing.T) {
 		nil,
 		memqueue.Settings{Events: 10},
 	)
-	require.Error(t, err, "connecting to a shared intake queue with a different queue config should fail")
+	require.NoError(t, err, "a differing budget must grow the shared pool, not fail")
+	defer c2.waitClose(cancelledContext(), false)
+
+	require.Same(t, c1.poolForTest(), c2.poolForTest(), "both receivers share the pool")
+	assert.Equal(t, 10, c1.poolForTest().Target(), "pool grows to the largest requested budget")
+	assert.Equal(t, 10, c1.poolForTest().Capacity(), "growth is immediate")
+
+	// A smaller late joiner rides the larger pool without changing the budget.
+	c3, err := newOTelOutputController(
+		beatInfoForTest(t),
+		monitorsForTest(),
+		nilObserver,
+		"mismatchID",
+		nil,
+		memqueue.Settings{Events: 3},
+	)
+	require.NoError(t, err)
+	defer c3.waitClose(cancelledContext(), false)
+	assert.Equal(t, 10, c1.poolForTest().Target(), "a smaller joiner does not shrink the pool")
+}
+
+// TestSharedIntakeQueueShrinksWhenLargestLeaves verifies that when the receiver
+// holding the maximum budget leaves, the pool's target drops to the new running
+// maximum (shrink converges lazily under the hood).
+func TestSharedIntakeQueueShrinksWhenLargestLeaves(t *testing.T) {
+	c1, err := newOTelOutputController(
+		beatInfoForTest(t), monitorsForTest(), nilObserver, "shrinkID", nil,
+		memqueue.Settings{Events: 4},
+	)
+	require.NoError(t, err)
+	defer c1.waitClose(cancelledContext(), false)
+
+	c2, err := newOTelOutputController(
+		beatInfoForTest(t), monitorsForTest(), nilObserver, "shrinkID", nil,
+		memqueue.Settings{Events: 20},
+	)
+	require.NoError(t, err)
+
+	pool := c1.poolForTest()
+	require.Equal(t, 20, pool.Target(), "pool sized to the larger receiver")
+
+	// The larger receiver leaves; the budget must fall back to the smaller one.
+	require.NoError(t, c2.waitClose(cancelledContext(), false))
+	assert.Equal(t, 4, pool.Target(), "budget drops to the remaining receiver's request")
+	assert.Eventually(t, func() bool { return pool.Capacity() == 4 }, time.Second, time.Millisecond,
+		"capacity converges down to the new target once high slots are free")
+}
+
+// TestSharedIntakeQueueCapsPerReceiver verifies that, on a shared pool sized to
+// the largest receiver, each receiver's own queue is still capped at its own
+// requested size: the smaller receiver cannot use more than its budget even
+// though the pool has room.
+func TestSharedIntakeQueueCapsPerReceiver(t *testing.T) {
+	c1, err := newOTelOutputController(
+		beatInfoForTest(t), monitorsForTest(), nilObserver, "capID", nil,
+		memqueue.Settings{Events: 4},
+	)
+	require.NoError(t, err)
+	defer c1.waitClose(cancelledContext(), false)
+
+	c2, err := newOTelOutputController(
+		beatInfoForTest(t), monitorsForTest(), nilObserver, "capID", nil,
+		memqueue.Settings{Events: 8},
+	)
+	require.NoError(t, err)
+	defer c2.waitClose(cancelledContext(), false)
+
+	pool := c1.poolForTest()
+	require.Same(t, pool, c2.poolForTest())
+	require.Equal(t, 8, pool.Target(), "pool sized to the larger receiver")
+
+	// The small receiver (Events=4) must cap at 4 live events even though the
+	// pool has 8 slots.
+	p1 := c1.queueProducer(queue.ProducerConfig{})
+	for i := 0; i < 4; i++ {
+		_, ok := p1.TryPublish(testEvent(i))
+		require.True(t, ok, "publish %d within the small receiver's cap should succeed", i)
+	}
+	_, ok := p1.TryPublish(testEvent(99))
+	assert.False(t, ok, "the small receiver must cap at 4 even though the pool has room")
+	assert.Equal(t, 4, pool.Available(), "pool still has 4 free slots; only the per-queue cap blocked it")
+
+	// The larger receiver (Events=8) can use the remaining pool budget.
+	p2 := c2.queueProducer(queue.ProducerConfig{})
+	for i := 0; i < 4; i++ {
+		_, ok := p2.TryPublish(testEvent(i))
+		require.True(t, ok, "the larger receiver can use the rest of the shared pool")
+	}
+	assert.Equal(t, 0, pool.Available(), "pool now fully used: 4 + 4 = 8")
 }
 
 // TestNonMemQueueOptsOutOfPool verifies that a non-memory queue config

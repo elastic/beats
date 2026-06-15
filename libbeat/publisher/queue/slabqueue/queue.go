@@ -56,6 +56,25 @@ type Queue[T any] struct {
 	// notify wakes Get when new events arrive.
 	notify chan struct{}
 
+	// Per-queue live-event cap. This bounds the events live (published but not
+	// yet acked) on this one queue, independently of and in addition to the
+	// shared pool budget: a producer blocks when this queue reaches its limit
+	// even if the pool still has free slots. It is what lets several queues on
+	// one pool each enforce their own configured size while the pool is sized to
+	// the largest of them.
+	//
+	//   live:  events published to this queue but not yet released (FIFO +
+	//          in-flight). Maintained as an atomic so the reserve fast path is
+	//          lock-free, mirroring the pool free list.
+	//   limit: this queue's cap (0 = unlimited, bounded only by the pool).
+	//   limWaiters/limMu/limCond: park point for producers blocked on the cap,
+	//          touched only on the blocking slow path.
+	live       atomic.Int64
+	limit      atomic.Int64
+	limWaiters atomic.Int64
+	limMu      sync.Mutex
+	limCond    *sync.Cond
+
 	closeOnce sync.Once
 	closeCh   chan struct{} // closed on Close
 	doneOnce  sync.Once
@@ -64,7 +83,7 @@ type Queue[T any] struct {
 }
 
 func newQueue[T any](pool *Pool[T]) *Queue[T] {
-	return &Queue[T]{
+	q := &Queue[T]{
 		pool:      pool,
 		head:      -1,
 		tail:      -1,
@@ -73,11 +92,125 @@ func newQueue[T any](pool *Pool[T]) *Queue[T] {
 		doneCh:    make(chan struct{}),
 		producers: make(map[*producer[T]]struct{}),
 	}
+	q.limCond = sync.NewCond(&q.limMu)
+	return q
 }
 
-// Producer returns a producer that publishes to this queue.
+// SetTarget sets this queue's per-queue live-event cap to n, and is safe to call
+// while the queue is in use. A producer blocks when this queue reaches n live
+// events even if the pool still has free slots. n <= 0 means uncapped (bounded
+// only by the pool). Lowering the cap takes effect lazily as in-flight events
+// drain; raising it immediately unblocks any producers parked on the old cap.
+//
+// Setting a queue's cap also resizes the shared pool to the largest cap among
+// the queues connected to it, so the pool always tracks its queues: a queue's
+// cap can never be larger than the pool that backs it, and the pool shrinks when
+// the queue holding the largest cap is lowered or leaves. The pool is therefore
+// driven entirely through the queues — callers set per-queue caps, not the pool
+// size directly.
+func (q *Queue[T]) SetTarget(n int) {
+	if n < 0 {
+		n = 0
+	}
+	q.limit.Store(int64(n))
+	// Resize the pool first (a raised cap grows the pool), then wake producers
+	// parked on the cap so they find both the budget and a pool slot available.
+	q.pool.syncTargetToQueues()
+	q.wakeLimitWaiters()
+}
+
+// tryReserve takes one unit of this queue's live-event budget if it is under the
+// cap, without blocking. It is the lock-free fast path: a CAS on the live
+// counter, with limit==0 meaning unlimited.
+func (q *Queue[T]) tryReserve() bool {
+	for {
+		lim := q.limit.Load()
+		if lim <= 0 {
+			q.live.Add(1)
+			return true
+		}
+		cur := q.live.Load()
+		if cur >= lim {
+			return false
+		}
+		if q.live.CompareAndSwap(cur, cur+1) {
+			return true
+		}
+	}
+}
+
+// reserve takes one unit of this queue's live-event budget, blocking until the
+// queue is under its cap or the queue is closed. It returns false only when the
+// queue is closing. Like the pool's acquire, it re-checks after registering as a
+// waiter so a release between the failed fast path and the park is not lost.
+func (q *Queue[T]) reserve() bool {
+	if q.tryReserve() {
+		return true
+	}
+	for {
+		q.limMu.Lock()
+		q.limWaiters.Add(1)
+		if q.tryReserve() {
+			q.limWaiters.Add(-1)
+			q.limMu.Unlock()
+			return true
+		}
+		if q.isClosing() {
+			q.limWaiters.Add(-1)
+			q.limMu.Unlock()
+			return false
+		}
+		q.limCond.Wait()
+		q.limWaiters.Add(-1)
+		q.limMu.Unlock()
+		if q.isClosing() {
+			return false
+		}
+		if q.tryReserve() {
+			return true
+		}
+	}
+}
+
+// releaseLive returns n units to this queue's live-event budget (called when
+// slots are released back to the pool) and wakes a producer parked on the cap.
+func (q *Queue[T]) releaseLive(n int) {
+	if n <= 0 {
+		return
+	}
+	q.live.Add(int64(-n))
+	q.wakeLimitWaiters()
+}
+
+// wakeLimitWaiters wakes producers parked on the per-queue cap, but only if one
+// might be waiting. The racy waiters read is safe for the same reason the pool's
+// signal is: a parked producer registers as a waiter before re-checking the cap.
+func (q *Queue[T]) wakeLimitWaiters() {
+	if q.limWaiters.Load() == 0 {
+		return
+	}
+	q.limMu.Lock()
+	q.limCond.Broadcast()
+	q.limMu.Unlock()
+}
+
+// isClosing reports whether Close has been called on this queue.
+func (q *Queue[T]) isClosing() bool {
+	select {
+	case <-q.closeCh:
+		return true
+	default:
+		return false
+	}
+}
+
+// Producer returns a producer that publishes to this queue. Each producer is
+// given a stable home shard for the pool's free list, spread across shards by
+// a pool-global counter so concurrent producers tend to land on different
+// shards.
 func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
-	p := &producer[T]{queue: q, cfg: cfg, ackWait: make(chan struct{})}
+	home := int((q.pool.homeCounter.Add(1) - 1) & uint64(q.pool.free.mask)) //nolint:gosec // G115: masked by the shard count, always a small non-negative index
+	p := &producer[T]{queue: q, cfg: cfg, home: home, ackWait: make(chan struct{})}
 	q.mu.Lock()
 	if q.closing {
 		// The queue is already (force-)closing. A producer created now will
@@ -127,7 +260,7 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 			cur := q.head
 			for i := 0; i < n; i++ {
 				b.indices = append(b.indices, cur)
-				cur = q.pool.storage[cur].next
+				cur = q.pool.slot(cur).next
 			}
 			q.head = cur
 			if cur == -1 {
@@ -208,7 +341,7 @@ func (q *Queue[T]) Close(force bool) error {
 			cur := q.head
 			for cur != -1 {
 				releaseIndices = append(releaseIndices, cur)
-				cur = q.pool.storage[cur].next
+				cur = q.pool.slot(cur).next
 			}
 			q.head = -1
 			q.tail = -1
@@ -226,8 +359,15 @@ func (q *Queue[T]) Close(force bool) error {
 	}
 	q.mu.Unlock()
 
-	// Wake any blocked Get.
-	q.closeOnce.Do(func() { close(q.closeCh) })
+	// Wake any blocked Get, and any producer parked waiting for a free slot on
+	// this queue so it can observe closeCh and return.
+	q.closeOnce.Do(func() {
+		close(q.closeCh)
+		q.pool.free.wakeAll()
+		// Wake producers parked on this queue's per-queue cap so they observe
+		// closeCh and return.
+		q.wakeLimitWaiters()
+	})
 	q.signal()
 
 	// Force-close: unblock every still-open producer's ACKWaitChan, since the
@@ -239,14 +379,15 @@ func (q *Queue[T]) Close(force bool) error {
 	if len(releaseIndices) > 0 {
 		var zero T
 		for _, i := range releaseIndices {
-			q.pool.storage[i].event = zero
-			q.pool.storage[i].producer = nil
-			q.pool.storage[i].next = -1
+			s := q.pool.slot(i)
+			s.event = zero
+			s.producer = nil
+			s.next = -1
 		}
 		q.pool.observer.RemoveEvents(len(releaseIndices), 0)
-		for _, i := range releaseIndices {
-			q.pool.free <- i
-		}
+		q.pool.releaseSlots(releaseIndices)
+		// These FIFO events left circulation; return their per-queue budget.
+		q.releaseLive(len(releaseIndices))
 	}
 
 	if force {
@@ -274,10 +415,15 @@ func (q *Queue[T]) Done() <-chan struct{} { return q.doneCh }
 // QueueType identifies the implementation.
 func (q *Queue[T]) QueueType() string { return QueueType }
 
-// BufferConfig reports the pool's capacity. Note: this is the *shared* upper
-// bound across all queues connected to the same pool, not a per-queue cap.
+// BufferConfig reports this queue's effective maximum live events: the smaller
+// of its per-queue cap (if set) and the shared pool budget. With no per-queue
+// cap it is just the pool budget.
 func (q *Queue[T]) BufferConfig() queue.BufferConfig {
-	return queue.BufferConfig{MaxEvents: q.pool.settings.Events}
+	max := q.pool.Target()
+	if lim := int(q.limit.Load()); lim > 0 && lim < max {
+		max = lim
+	}
+	return queue.BufferConfig{MaxEvents: max}
 }
 
 // signal wakes a goroutine blocked in Get. Non-blocking: at most one pending

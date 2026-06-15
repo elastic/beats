@@ -51,7 +51,7 @@ func (b *batch[T]) Count() int { return len(b.indices) }
 
 // Entry returns the i-th event. Must not be called after FreeEntries.
 func (b *batch[T]) Entry(i int) T {
-	return b.queue.pool.storage[b.indices[i]].event
+	return b.queue.pool.slot(b.indices[i]).event
 }
 
 // FreeEntries clears the event field in each slot to allow the GC to collect
@@ -68,7 +68,7 @@ func (b *batch[T]) FreeEntries() {
 	}
 	var zero T
 	for _, i := range b.indices {
-		b.queue.pool.storage[i].event = zero
+		b.queue.pool.slot(i).event = zero
 	}
 	b.freed = true
 }
@@ -97,7 +97,7 @@ func (b *batch[T]) Done() {
 	b.ackProducers = b.ackProducers[:0]
 	b.ackCounts = b.ackCounts[:0]
 	for _, i := range b.indices {
-		s := &pool.storage[i]
+		s := pool.slot(i)
 		if s.producer != nil {
 			found := false
 			for j, p := range b.ackProducers {
@@ -123,9 +123,11 @@ func (b *batch[T]) Done() {
 	// producers can make progress regardless of where this batch is in
 	// the pending list.
 	pool.observer.RemoveEvents(len(b.indices), 0)
-	for _, i := range b.indices {
-		pool.free <- i
-	}
+	n := len(b.indices)
+	pool.releaseSlots(b.indices)
+	// These events left circulation; return their per-queue budget so producers
+	// blocked on this queue's cap can proceed.
+	b.queue.releaseLive(n)
 
 	q := b.queue
 	q.mu.Lock()
@@ -231,7 +233,7 @@ func (b *batch[T]) Release() {
 	b.ackProducers = b.ackProducers[:0]
 	b.ackCounts = b.ackCounts[:0]
 	for _, i := range b.indices {
-		s := &pool.storage[i]
+		s := pool.slot(i)
 		if s.producer != nil {
 			found := false
 			for j, p := range b.ackProducers {
@@ -253,12 +255,12 @@ func (b *batch[T]) Release() {
 		s.next = -1
 	}
 
-	// Return slots to the pool. pool.free's buffer is sized to the slot
-	// count so this never blocks.
+	// Return slots to the pool.
 	pool.observer.RemoveEvents(len(b.indices), 0)
-	for _, i := range b.indices {
-		pool.free <- i
-	}
+	n := len(b.indices)
+	pool.releaseSlots(b.indices)
+	// Return the per-queue budget for the abandoned events.
+	b.queue.releaseLive(n)
 
 	// Remove the batch from the pending FIFO if it's still there.
 	// Done's sweep relies on the per-batch `done` flag and walks from

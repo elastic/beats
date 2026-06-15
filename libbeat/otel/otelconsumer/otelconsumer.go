@@ -56,16 +56,6 @@ const (
 	retryBackoffMax  = 60 * time.Second
 )
 
-// dataStreamAttributeKeys are the data_stream sub-fields promoted to log record
-// attributes to support dynamic indexing. They double as both the mapstr lookup
-// path and the attribute key, and are kept at package scope so they aren't
-// rebuilt for every event.
-var dataStreamAttributeKeys = [...]string{
-	"data_stream.dataset",
-	"data_stream.namespace",
-	"data_stream.type",
-}
-
 type retryConfig struct {
 	init time.Duration
 	max  time.Duration
@@ -189,79 +179,10 @@ func (out *otelConsumer) eventsToLogs(events []publisher.Event, beatInfo *beat.I
 	// destination, as long as the exporter allows it.
 	// For example, the elasticsearchexporter has an encoding specifically for this.
 	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
+	logRecords.EnsureCapacity(len(events))
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-
-		if id, ok := event.Content.Meta["_id"]; ok {
-			// Specify the id as an attribute used by the elasticsearchexporter
-			// to set the final document ID in Elasticsearch.
-			// When using the bodymap encoding in the exporter all attributes
-			// are stripped out of the final Elasticsearch document.
-			//
-			// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
-			switch id := id.(type) {
-			case string:
-				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
-
-				// The receivertest package needs a unique attribute to track generated ids.
-				// When receivertest allows this to be customized we can remove this condition.
-				// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
-				if out.isReceiverTest {
-					logRecord.Attributes().PutStr(receivertestUniqueIDAttrName, id)
-				}
-			}
-		}
-
-		// if pipeline field is set on event metadata
-		if pipeline, err := event.Content.Meta.GetValue("pipeline"); err == nil {
-			if s, ok := pipeline.(string); ok {
-				logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
-			}
-		}
-
-		beatEvent := event.Content.Fields.Clone()
-		if beatEvent == nil {
-			beatEvent = mapstr.M{}
-		}
-
-		if beatInfo.IncludeMetadata {
-			meta := event.Content.Meta.Clone()
-			meta["beat"] = beatInfo.Beat
-			meta["version"] = beatInfo.Version
-			meta["type"] = "_doc"
-			beatEvent["@metadata"] = meta
-		}
-
-		beatEvent["@timestamp"] = event.Content.Timestamp
-		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
-
-		// Set the timestamp for when the event was first seen by the pipeline.
-		observedTimestamp := logRecord.Timestamp()
-		if created, err := beatEvent.GetValue("event.created"); err == nil {
-			switch created := created.(type) {
-			case time.Time:
-				observedTimestamp = pcommon.NewTimestampFromTime(created)
-			case common.Time:
-				observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
-			default:
-				out.log.Warnf("Invalid 'event.created' type (%T); using log timestamp as observed timestamp.", created)
-			}
-		}
-		logRecord.SetObservedTimestamp(observedTimestamp)
-
-		otelmap.ConvertNonPrimitive(beatEvent)
-
-		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
-		if val, _ := beatEvent.GetValue("data_stream"); val != nil {
-			for _, key := range dataStreamAttributeKeys {
-				value, err := beatEvent.GetValue(key)
-				if vStr, ok := value.(string); ok && err == nil {
-					// set log record attribute only if value is non empty
-					logRecord.Attributes().PutStr(key, vStr)
-				}
-			}
-		}
-		if err := logRecord.Body().SetEmptyMap().FromRaw(map[string]any(beatEvent)); err != nil {
+		if err := fillLogRecordFromEvent(logRecord, event, out.beatInfo, out.log, out.isReceiverTest); err != nil {
 			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
 		}
 	}
@@ -271,4 +192,101 @@ func (out *otelConsumer) eventsToLogs(events []publisher.Event, beatInfo *beat.I
 
 func (out *otelConsumer) String() string {
 	return "otelconsumer"
+}
+
+func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, beatInfo beat.Info, log *logp.Logger, isReceiverTest bool) error {
+	if id, ok := event.Content.Meta["_id"]; ok {
+		// Specify the id as an attribute used by the elasticsearchexporter
+		// to set the final document ID in Elasticsearch.
+		// When using the bodymap encoding in the exporter all attributes
+		// are stripped out of the final Elasticsearch document.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
+		switch id := id.(type) {
+		case string:
+			logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+
+			// The receivertest package needs a unique attribute to track generated ids.
+			// When receivertest allows this to be customized we can remove this condition.
+			// See https://github.com/open-telemetry/opentelemetry-collector/issues/12003.
+			if isReceiverTest {
+				logRecord.Attributes().PutStr(receivertestUniqueIDAttrName, id)
+			}
+		}
+	}
+
+	// if pipeline field is set on event metadata
+	if s, ok := event.Content.Meta["pipeline"].(string); ok {
+		logRecord.Attributes().PutStr("elasticsearch.ingest_pipeline", s)
+	}
+
+	beatEvent := event.Content.Fields
+	if beatEvent == nil {
+		beatEvent = mapstr.M{}
+	}
+	logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
+
+	// Set the timestamp for when the event was first seen by the pipeline.
+	observedTimestamp := logRecord.Timestamp()
+	if eventMap, ok := tryToMapStr(beatEvent["event"]); ok {
+		switch created := eventMap["created"].(type) {
+		case time.Time:
+			observedTimestamp = pcommon.NewTimestampFromTime(created)
+		case common.Time:
+			observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+		case nil:
+			// not set
+		default:
+			log.Warnf("Invalid 'event.created' type (%T); using log timestamp as observed timestamp.", created)
+		}
+	}
+	logRecord.SetObservedTimestamp(observedTimestamp)
+
+	// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
+	if ds, ok := tryToMapStr(beatEvent["data_stream"]); ok {
+		for _, sub := range [...]string{"dataset", "namespace", "type"} {
+			if vStr, ok := ds[sub].(string); ok {
+				logRecord.Attributes().PutStr("data_stream."+sub, vStr)
+			}
+		}
+	}
+
+	bodyMap := logRecord.Body().SetEmptyMap()
+	capacity := len(beatEvent) + 1 // +1 for @timestamp added below
+	if beatInfo.IncludeMetadata {
+		capacity++ // +1 for @metadata map added below
+	}
+	bodyMap.EnsureCapacity(capacity)
+	if err := otelmap.FromMapstr(bodyMap, beatEvent); err != nil {
+		return err
+	}
+
+	bodyMap.PutStr("@timestamp", otelmap.FormatTimestamp(event.Content.Timestamp))
+	if beatInfo.IncludeMetadata {
+		extra := [...]struct{ k, v string }{
+			{"beat", beatInfo.Beat},
+			{"version", beatInfo.Version},
+			{"type", "_doc"},
+		}
+		pmeta := bodyMap.PutEmpty("@metadata").SetEmptyMap()
+		pmeta.EnsureCapacity(len(event.Content.Meta) + len(extra))
+		if err := otelmap.FromMapstr(pmeta, event.Content.Meta); err != nil {
+			return err
+		}
+		for _, kv := range extra {
+			pmeta.PutStr(kv.k, kv.v)
+		}
+	}
+	return nil
+}
+
+func tryToMapStr(v interface{}) (mapstr.M, bool) {
+	switch m := v.(type) {
+	case mapstr.M:
+		return m, true
+	case map[string]interface{}:
+		return mapstr.M(m), true
+	default:
+		return nil, false
+	}
 }

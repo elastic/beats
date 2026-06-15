@@ -124,6 +124,10 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
+	if ts.token != nil && ts.token.Valid() {
+		return ts.token, nil
+	}
+
 	var oktaJWT string
 	var err error
 	if ts.oktaJWKPEM != "" {
@@ -138,6 +142,7 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error exchanging Okta JWT for bearer token: %w", err)
 	}
+	ts.token = token
 
 	return token, nil
 }
