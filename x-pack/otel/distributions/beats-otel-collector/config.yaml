@@ -8,6 +8,7 @@ extensions:
     hosts:
       - http://localhost:9200
   kafkapartitioner:
+  file_storage:
 
 receivers:
   # Beats receivers
