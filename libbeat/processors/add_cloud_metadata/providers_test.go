@@ -20,12 +20,14 @@ package add_cloud_metadata
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
 	"sort"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -122,6 +124,29 @@ func TestProvidersFilter(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		})
 	}
+}
+
+// TestNewHTTPClientIsolatesTLSConfig guards the invariant behind the data-race
+// fix: each fetcher must get its own Transport and *tls.Config (see
+// newHTTPClient), so concurrent fetchers never share a mutable config.
+func TestNewHTTPClientIsolatesTLSConfig(t *testing.T) {
+	// tlsConfig is intentionally nil: ToConfig handles a nil receiver and must
+	// still hand out a distinct *tls.Config on every call.
+	p := &addCloudMetadata{initData: &initData{timeout: time.Second}}
+
+	c1 := p.newHTTPClient()
+	c2 := p.newHTTPClient()
+
+	tr1, ok := c1.Transport.(*http.Transport)
+	require.True(t, ok, "expected an *http.Transport")
+	tr2, ok := c2.Transport.(*http.Transport)
+	require.True(t, ok, "expected an *http.Transport")
+
+	assert.NotSame(t, tr1, tr2, "each fetcher must use its own *http.Transport")
+	require.NotNil(t, tr1.TLSClientConfig, "TLSClientConfig must be set")
+	require.NotNil(t, tr2.TLSClientConfig, "TLSClientConfig must be set")
+	assert.NotSame(t, tr1.TLSClientConfig, tr2.TLSClientConfig,
+		"each fetcher must use its own *tls.Config to avoid a data race on lazy HTTP/2 setup")
 }
 
 func Test_priorityResult(t *testing.T) {

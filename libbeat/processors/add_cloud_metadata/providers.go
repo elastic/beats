@@ -160,8 +160,35 @@ func (p *addCloudMetadata) fetchMetadata(ctx context.Context) *result {
 		p.logger.Debugf("add_cloud_metadata: fetchMetadata ran for %v", time.Since(start))
 	}()
 
-	// Create HTTP client with our timeouts and keep-alive disabled.
-	client := http.Client{
+	// Create context to enable explicit cancellation of the http requests.
+	ctx, cancel := context.WithTimeout(ctx, p.initData.timeout)
+	defer cancel()
+
+	results := make(chan result)
+	for _, fetcher := range p.initData.fetchers {
+		// Each fetcher needs its own client; see newHTTPClient for why sharing
+		// one across the concurrent goroutines below would be a data race.
+		client := p.newHTTPClient()
+		go func() {
+			select {
+			case <-ctx.Done():
+			case results <- fetcher.fetchMetadata(ctx, client, p.logger):
+			}
+		}()
+	}
+
+	return acceptFirstPriorityResult(ctx, p.logger, start, results)
+}
+
+// newHTTPClient returns a metadata-fetching HTTP client with keep-alives
+// disabled. A new client, backed by its own Transport and a freshly built
+// *tls.Config, is returned on every call: net/http lazily mutates a Transport's
+// TLSClientConfig on first use (e.g. appending "h2" to NextProtos for HTTP/2),
+// and Transport.Clone — used by the AWS SDK — triggers that mutation too. So
+// sharing one *tls.Config across the concurrent fetchers would let one mutate
+// it while another reads it, which is a data race.
+func (p *addCloudMetadata) newHTTPClient() http.Client {
+	return http.Client{
 		Timeout: p.initData.timeout,
 		Transport: &http.Transport{
 			DisableKeepAlives: true,
@@ -172,23 +199,6 @@ func (p *addCloudMetadata) fetchMetadata(ctx context.Context) *result {
 			TLSClientConfig: p.initData.tlsConfig.ToConfig(),
 		},
 	}
-
-	// Create context to enable explicit cancellation of the http requests.
-	ctx, cancel := context.WithTimeout(ctx, p.initData.timeout)
-	defer cancel()
-
-	results := make(chan result)
-	for _, fetcher := range p.initData.fetchers {
-		fetcher := fetcher
-		go func() {
-			select {
-			case <-ctx.Done():
-			case results <- fetcher.fetchMetadata(ctx, client, p.logger):
-			}
-		}()
-	}
-
-	return acceptFirstPriorityResult(ctx, p.logger, start, results)
 }
 
 func acceptFirstPriorityResult(
