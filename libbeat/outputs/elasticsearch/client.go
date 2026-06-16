@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -43,7 +44,11 @@ import (
 var (
 	errPayloadTooLarge = errors.New("the bulk payload is too large for the server. Consider to adjust `http.max_content_length` parameter in Elasticsearch or `bulk_max_size` in the beat. The batch has been dropped")
 
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive
+	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	errTooMany = errors.New("Elasticsearch returned error 429 Too Many Requests, throttling connection") //nolint:staticcheck //false positive (Elasticsearch should be capitalized)
+
+	HeaderEventCount = "X-Elastic-Event-Count"
 )
 
 // Client is an elasticsearch client.
@@ -82,12 +87,13 @@ type clientSettings struct {
 }
 
 type bulkResultStats struct {
-	acked        int // number of events ACKed by Elasticsearch
-	duplicates   int // number of events failed with `create` due to ID already being indexed
-	fails        int // number of events with retryable failures.
-	nonIndexable int // number of events with permanent failures.
-	deadLetter   int // number of failed events ingested to the dead letter index.
-	tooMany      int // number of events receiving HTTP 429 Too Many Requests
+	acked            int // number of events ACKed by Elasticsearch
+	duplicates       int // number of events failed with `create` due to ID already being indexed
+	fails            int // number of events with retryable failures.
+	nonIndexable     int // number of events with permanent failures.
+	deadLetter       int // number of failed events ingested to the dead letter index.
+	tooMany          int // number of events receiving HTTP 429 Too Many Requests
+	failureStoreUsed int // number of events sent to the Failure store
 }
 
 type bulkResult struct {
@@ -115,7 +121,7 @@ const (
 // Flags passed with the Bulk API request: we filter the response to include
 // only the fields we need for checking request/item state.
 var bulkRequestParams = map[string]string{
-	"filter_path": "errors,items.*.error,items.*.status",
+	"filter_path": "errors,items.*.error,items.*.status,items.*.failure_store",
 }
 
 // NewClient instantiates a new client.
@@ -129,7 +135,7 @@ func NewClient(
 		pipeline = nil
 	}
 
-	conn, err := eslegclient.NewConnection(s.connection)
+	conn, err := eslegclient.NewConnection(s.connection, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +145,7 @@ func NewClient(
 		defer globalCallbackRegistry.mutex.Unlock()
 
 		for _, callback := range globalCallbackRegistry.callbacks {
-			err := callback(conn)
+			err := callback(conn, logger)
 			if err != nil {
 				return err
 			}
@@ -150,7 +156,7 @@ func NewClient(
 			defer onConnect.mutex.Unlock()
 
 			for _, callback := range onConnect.callbacks {
-				err := callback(conn)
+				err := callback(conn, logger)
 				if err != nil {
 					return err
 				}
@@ -165,21 +171,19 @@ func NewClient(
 		observer = outputs.NewNilObserver()
 	}
 
-	log := logger.Named("elasticsearch")
-
 	pLogDeadLetter := periodic.NewDoer(10*time.Second,
 		func(count uint64, d time.Duration) {
-			log.Errorf(
-				"Failed to deliver to dead letter index %d events in last %s. Look at the event log to view the event and cause.", count, d)
+			logger.Errorf(
+				"Failed to deliver to dead letter index %d events in last %s. Check the event_data log (configured by logging.event_data.files.path) to view the event and cause.", count, d)
 		})
 	pLogIndex := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
-		log.Warnf(
-			"Failed to index %d events in last %s: events were dropped! Look at the event log to view the event and cause.",
+		logger.Warnf(
+			"Failed to index %d events in last %s: events were dropped! Check the event_data log (configured by logging.event_data.files.path) to view the event and cause.",
 			count, d)
 	})
 	pLogIndexTryDeadLetter := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
-		log.Warnf(
-			"Failed to index %d events in last %s: tried dead letter index. Look at the event log to view the event and cause.",
+		logger.Warnf(
+			"Failed to index %d events in last %s: tried dead letter index. Check the event_data log (configured by logging.event_data.files.path) to view the event and cause.",
 			count, d)
 	})
 
@@ -193,7 +197,7 @@ func NewClient(
 		observer:         observer,
 		deadLetterIndex:  s.deadLetterIndex,
 
-		log:                    log,
+		log:                    logger,
 		pLogDeadLetter:         pLogDeadLetter,
 		pLogIndex:              pLogIndex,
 		pLogIndexTryDeadLetter: pLogIndexTryDeadLetter,
@@ -269,6 +273,15 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	} else {
 		batch.ACK()
 	}
+	return publishResultForStats(stats)
+}
+
+func publishResultForStats(stats bulkResultStats) error {
+	if stats.tooMany > 0 {
+		// We're being throttled by Elasticsearch, return an error so we
+		// retry the connection with exponential backoff
+		return errTooMany
+	}
 	return nil
 }
 
@@ -295,8 +308,10 @@ func (client *Client) doBulkRequest(
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
 		begin := time.Now()
+		h := make(http.Header)
+		h.Set(HeaderEventCount, strconv.Itoa(len(result.events)))
 		result.status, result.response, result.connErr =
-			client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+			client.conn.Bulk(ctx, "", "", h, bulkRequestParams, bulkItems)
 		if result.connErr == nil {
 			duration := time.Since(begin)
 			client.observer.ReportLatency(duration)
@@ -347,7 +362,7 @@ func (client *Client) handleBulkResultError(
 // successfully added to the list of bulk items and the list of bulk items.
 func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
-	bulkItems := []interface{}{}
+	bulkItems := make([]interface{}, 0, len(data)*2)
 	for i := range data {
 		if data[i].EncodedEvent == nil {
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
@@ -452,7 +467,7 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 	eventsToRetry := events[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		itemStatus, itemMessage, err := bulkReadItemStatus(client.log, reader)
+		itemStatus, itemMessage, failureStoreUsed, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
 			// The response json is invalid, mark the remaining events for retry.
 			stats.fails += count - i
@@ -463,6 +478,10 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 		if client.applyItemStatus(events[i], itemStatus, itemMessage, &stats) {
 			eventsToRetry = append(eventsToRetry, events[i])
 			client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
+		}
+
+		if failureStoreUsed {
+			stats.failureStoreUsed += 1
 		}
 	}
 
@@ -556,6 +575,7 @@ func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
 	ob.PermanentErrors(stats.nonIndexable)
 	ob.DuplicateEvents(stats.duplicates)
 	ob.DeadLetterEvents(stats.deadLetter)
+	ob.FailureStoreEvents(stats.failureStoreUsed)
 
 	ob.ErrTooMany(stats.tooMany)
 }

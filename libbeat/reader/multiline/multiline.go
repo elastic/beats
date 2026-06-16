@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // New creates a new multi-line reader combining stream of
@@ -30,14 +31,15 @@ func New(
 	separator string,
 	maxBytes int,
 	config *Config,
+	logger *logp.Logger,
 ) (reader.Reader, error) {
 	switch config.Type {
 	case patternMode:
-		return newMultilinePatternReader(r, separator, maxBytes, config)
+		return newMultilinePatternReader(r, separator, maxBytes, config, logger)
 	case countMode:
 		return newMultilineCountReader(r, separator, maxBytes, config)
 	case whilePatternMode:
-		return newMultilineWhilePatternReader(r, separator, maxBytes, config)
+		return newMultilineWhilePatternReader(r, separator, maxBytes, config, logger)
 	default:
 		return nil, fmt.Errorf("unknown multiline type %d", config.Type)
 	}

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/load-kibana-dashboards.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Load Kibana dashboards [load-kibana-dashboards]
@@ -49,7 +52,7 @@ filebeat setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/filebeat:{{stack-version}} setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/filebeat:{{version.stack}} setup --dashboards
 ```
 ::::::
 
@@ -64,7 +67,7 @@ PS > .\filebeat.exe setup --dashboards
 ::::::
 
 :::::::
-For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](http://www.elastic.co/guide/en/beats/devguide/master/import-dashboards.md). If you’ve configured the Logstash output, see [Load dashboards for Logstash output](#load-dashboards-logstash).
+For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](/extend/import-dashboards.md). If you’ve configured the Logstash output, see [Load dashboards for Logstash output](#load-dashboards-logstash).
 
 
 ## Load dashboards for Logstash output [load-dashboards-logstash]
@@ -124,7 +127,7 @@ filebeat setup -e \
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/filebeat:{{stack-version}} setup -e \
+docker run --rm --net="host" docker.elastic.co/beats/filebeat:{{version.stack}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=filebeat_internal \

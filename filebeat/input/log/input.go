@@ -37,12 +37,17 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+// The Log input does not define an init function, nor registers itself
+// because the 'logv2' input already does it using 'log' as the input Name.
+// 'logv2' is a "proxy input" that can run either the Log input of Filestream
+// input depending on configuration and feature flag.
 
 const (
 	recursiveGlobDepth      = 8
@@ -59,13 +64,6 @@ var (
 
 	errDeprecated = errors.New("Log input is deprecated. Use Filestream input instead. Follow our migration guide https://www.elastic.co/guide/en/beats/filebeat/current/migrate-to-filestream.html")
 )
-
-func init() {
-	err := input.Register("log", NewInput)
-	if err != nil {
-		panic(err)
-	}
-}
 
 // Input contains the input and its config
 type Input struct {
@@ -87,7 +85,7 @@ type Input struct {
 // AllowDeprecatedUse returns true if the configuration allows using the deprecated log input
 func AllowDeprecatedUse(cfg *conf.C) bool {
 	allow, _ := cfg.Bool(allowDeprecatedUseField, -1)
-	return allow || fleetmode.Enabled() || fileset.CheckIfModuleInput(cfg)
+	return allow || management.UnderAgent() || fileset.CheckIfModuleInput(cfg)
 }
 
 // NewInput instantiates a new Log
@@ -107,7 +105,7 @@ func NewInput(
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
 			if err := f(); err != nil {
-				logger.Named("input.log").Errorf("clean up function returned an error: %w", err)
+				logger.Named("input.log").Errorf("clean up function returned an error: %v", err)
 			}
 		}
 	}
@@ -117,6 +115,9 @@ func NewInput(
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err
 	}
+
+	inputConfig.checkUnsupportedParams(logger)
+
 	if err := inputConfig.resolveRecursiveGlobs(logger); err != nil {
 		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err) //nolint:staticcheck //Keep old behavior
 	}
@@ -128,7 +129,7 @@ func NewInput(
 		return nil, fmt.Errorf("each input must have at least one path defined")
 	}
 
-	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity)
+	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize file identity generator: %w", err)
 	}
@@ -157,16 +158,16 @@ func NewInput(
 	}
 
 	uuid, _ := uuid.NewV4()
-	logger = logger.Named("input").With("input_id", uuid)
+	inputlogger := logger.Named("input").With("input_id", uuid)
 
 	p := &Input{
-		logger:              logger,
+		logger:              inputlogger,
 		config:              inputConfig,
 		cfg:                 cfg,
 		harvesters:          harvester.NewRegistry(),
 		outlet:              out,
 		stateOutlet:         stateOut,
-		states:              file.NewStates(),
+		states:              file.NewStates(logger),
 		done:                context.Done,
 		meta:                meta,
 		fileStateIdentifier: identifier,
@@ -177,7 +178,7 @@ func NewInput(
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err = p.createHarvester(logger, file.State{}, nil)
+	_, err = p.createHarvester(inputlogger, file.State{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +188,7 @@ func NewInput(
 		return nil, err
 	}
 
-	logger.Infof("Configured paths: %v", p.config.Paths)
+	inputlogger.Infof("Configured paths: %v", p.config.Paths)
 
 	cleanupNeeded = false
 	go p.stopWhenDone()
@@ -775,7 +776,7 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	// This is synchronous state update as part of the scan
 	h.SendStateUpdate()
 
-	if err = p.harvesters.Start(h); err != nil {
+	if err = p.harvesters.Start(h, p.logger); err != nil {
 		p.numHarvesters.Add(^uint32(0))
 	}
 	return err

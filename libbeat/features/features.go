@@ -22,7 +22,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -39,32 +38,8 @@ type fflags struct {
 	// TODO: Refactor to generalize for other feature flags
 	fqdnEnabled   atomic.Bool
 	fqdnCallbacks map[string]boolValueOnChangeCallback
-}
 
-// NewConfigFromProto converts the given *proto.Features object to
-// a *config.C object.
-func NewConfigFromProto(f *proto.Features) (*conf.C, error) {
-	if f == nil {
-		return nil, nil
-	}
-
-	var beatCfg struct {
-		Features *proto.Features `config:"features"`
-	}
-
-	beatCfg.Features = f
-
-	c, err := conf.NewConfigFrom(&beatCfg)
-	if err != nil {
-		return nil, fmt.Errorf("unable to parse feature flags message into beat configuration: %w", err)
-	}
-
-	_, err = c.Remove("features.source", -1)
-	if err != nil {
-		return nil, fmt.Errorf("unable to convert feature flags message to beat configuration: %w", err)
-	}
-
-	return c, nil
+	logRunAsFilestream atomic.Bool
 }
 
 // UpdateFromConfig updates the feature flags configuration. If c is nil UpdateFromConfig is no-op.
@@ -75,7 +50,8 @@ func UpdateFromConfig(c *conf.C) error {
 
 	type cfg struct {
 		Features struct {
-			FQDN *conf.C `json:"fqdn" yaml:"fqdn" config:"fqdn"`
+			FQDN               *conf.C `json:"fqdn" yaml:"fqdn" config:"fqdn"`
+			LogRunAsFilestream *conf.C `json:"log_input_run_as_filestream" config:"log_input_run_as_filestream"`
 		} `json:"features" yaml:"features" config:"features"`
 	}
 
@@ -85,6 +61,7 @@ func UpdateFromConfig(c *conf.C) error {
 	}
 
 	flags.SetFQDNEnabled(parsedFlags.Features.FQDN.Enabled())
+	flags.SetLogInputRunFilestream(parsedFlags.Features.LogRunAsFilestream.Enabled())
 
 	return nil
 }
@@ -97,7 +74,6 @@ func (f *fflags) SetFQDNEnabled(newValue bool) {
 	for _, cb := range f.fqdnCallbacks {
 		cb(newValue, oldValue)
 	}
-
 }
 
 // FQDN reports if FQDN should be used instead of hostname for host.name.
@@ -135,4 +111,12 @@ func RemoveFQDNOnChangeCallback(id string) {
 	defer flags.callbackMut.Unlock()
 
 	delete(flags.fqdnCallbacks, id)
+}
+
+func LogInputRunFilestream() bool {
+	return flags.logRunAsFilestream.Load()
+}
+
+func (f *fflags) SetLogInputRunFilestream(v bool) {
+	f.logRunAsFilestream.Store(v)
 }

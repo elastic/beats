@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -21,20 +22,29 @@ type rateLimiter struct {
 	remaining  *valueTpl
 	earlyLimit *float64
 
-	log *logp.Logger
+	status         status.StatusReporter
+	maxNonDegraded int
+	limitedCount   int
+	log            *logp.Logger
 }
 
-func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLimiter {
+func newRateLimiterFromConfig(config *rateLimitConfig, stat status.StatusReporter, log *logp.Logger) *rateLimiter {
 	if config == nil {
 		return nil
 	}
 
+	maxNonDegraded := -1
+	if config.MaxNonDegraded != nil {
+		maxNonDegraded = *config.MaxNonDegraded
+	}
 	return &rateLimiter{
-		log:        log,
-		limit:      config.Limit,
-		reset:      config.Reset,
-		remaining:  config.Remaining,
-		earlyLimit: config.EarlyLimit,
+		status:         stat,
+		log:            log,
+		limit:          config.Limit,
+		reset:          config.Reset,
+		remaining:      config.Remaining,
+		earlyLimit:     config.EarlyLimit,
+		maxNonDegraded: maxNonDegraded,
 	}
 }
 
@@ -72,9 +82,14 @@ func (r *rateLimiter) applyRateLimit(ctx context.Context, resp *http.Response) (
 	w := time.Until(t)
 	if resumeAt == 0 || w <= 0 {
 		r.log.Debugf("Rate Limit: No need to apply rate limit.")
+		r.limitedCount = 0
 		return limitReached, nil
 	}
+	r.limitedCount++
 	r.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
+	if r.maxNonDegraded >= 0 && r.limitedCount >= r.maxNonDegraded {
+		r.status.UpdateStatus(status.Degraded, "rate limited: waiting "+w.String())
+	}
 	timer := time.NewTimer(w)
 	select {
 	case <-ctx.Done():
@@ -107,7 +122,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 	ctx := emptyTransformContext()
 	ctx.updateLastResponse(response{header: resp.Header.Clone()})
 
-	remaining, _ := r.remaining.Execute(ctx, tr, "rate-limit_remaining", nil, r.log)
+	remaining, _ := r.remaining.Execute(ctx, tr, "rate-limit_remaining", nil, r.status, r.log)
 	if remaining == "" {
 		r.log.Infow("get rate limit", "error", errors.New("remaining value is empty"))
 		return false, 0, nil
@@ -123,7 +138,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 	if r.earlyLimit != nil {
 		earlyLimit := *r.earlyLimit
 		if earlyLimit > 0 && earlyLimit < 1 {
-			limit, _ := r.limit.Execute(ctx, tr, "early_limit", nil, r.log)
+			limit, _ := r.limit.Execute(ctx, tr, "early_limit", nil, r.status, r.log)
 			if limit != "" {
 				l, err := strconv.ParseInt(limit, 10, 64)
 				if err == nil {
@@ -145,7 +160,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 		return false, 0, nil
 	}
 
-	reset, _ := r.reset.Execute(ctx, tr, "rate-limit_reset", nil, r.log)
+	reset, _ := r.reset.Execute(ctx, tr, "rate-limit_reset", nil, r.status, r.log)
 	if reset == "" {
 		r.log.Infow("get rate limit", "error", errors.New("reset value is empty"))
 		return false, 0, nil

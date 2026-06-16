@@ -24,7 +24,7 @@ import (
 )
 
 // Keep in sync with NpcapVersion in magefile.go.
-const NpcapVersion = "1.80"
+const NpcapVersion = "1.87"
 
 func TestWindowsNpcapInstaller(t *testing.T) {
 	if runtime.GOOS != "windows" {

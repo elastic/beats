@@ -146,6 +146,7 @@ type Flows struct {
 	Index string `config:"index"`
 	// DeltaFlowReports when enabled will report flow network stats(bytes, packets) as delta values
 	EnableDeltaFlowReports bool `config:"enable_delta_flow_reports"`
+	AllowMismatchedEth     bool `config:"allow_mismatched_eth"`
 }
 
 type ProtocolCommon struct {

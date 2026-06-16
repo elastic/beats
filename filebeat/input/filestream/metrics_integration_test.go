@@ -26,6 +26,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -67,7 +68,7 @@ func TestFilestreamMetrics(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, id, expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -108,7 +109,7 @@ func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, id, expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -160,7 +161,7 @@ func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
-	checkMetrics(t, id, expectedMetrics{
+	checkMetrics(t, env.monitoring, id, expectedMetrics{
 		FilesOpened:       1,
 		FilesClosed:       1,
 		FilesActive:       0,
@@ -186,17 +187,17 @@ type expectedMetrics struct {
 	ProcessingErrors  uint64
 }
 
-func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
-	reg, ok := monitoring.GetNamespace("dataset").GetRegistry().Get(id).(*monitoring.Registry)
+func checkMetrics(t *testing.T, mon beatmonitoring.Monitoring, id string, expected expectedMetrics) {
+	reg, ok := mon.InputsRegistry().Get(id).(*monitoring.Registry)
 	require.True(t, ok, "registry not found")
 
-	require.Equal(t, id, reg.Get("id").(*monitoring.String).Get(), "id")
-	require.Equal(t, "filestream", reg.Get("input").(*monitoring.String).Get(), "input")
-	require.Equal(t, expected.FilesOpened, reg.Get("files_opened_total").(*monitoring.Uint).Get(), "files_opened_total")
-	require.Equal(t, expected.FilesClosed, reg.Get("files_closed_total").(*monitoring.Uint).Get(), "files_closed_total")
-	require.Equal(t, expected.MessagesRead, reg.Get("messages_read_total").(*monitoring.Uint).Get(), "messages_read_total")
-	require.Equal(t, expected.MessagesTruncated, reg.Get("messages_truncated_total").(*monitoring.Uint).Get(), "messages_truncated_total")
-	require.Equal(t, expected.BytesProcessed, reg.Get("bytes_processed_total").(*monitoring.Uint).Get(), "bytes_processed_total")
-	require.Equal(t, expected.EventsProcessed, reg.Get("events_processed_total").(*monitoring.Uint).Get(), "events_processed_total")
-	require.Equal(t, expected.ProcessingErrors, reg.Get("processing_errors_total").(*monitoring.Uint).Get(), "processing_errors_total")
+	require.Equal(t, id, reg.Get("id").(*monitoring.String).Get(), "id")                                                                   //nolint:errcheck // ignore
+	require.Equal(t, "filestream", reg.Get("input").(*monitoring.String).Get(), "input")                                                   //nolint:errcheck // ignore
+	require.Equal(t, expected.FilesOpened, reg.Get("files_opened_total").(*monitoring.Uint).Get(), "files_opened_total")                   //nolint:errcheck // ignore
+	require.Equal(t, expected.FilesClosed, reg.Get("files_closed_total").(*monitoring.Uint).Get(), "files_closed_total")                   //nolint:errcheck // ignore
+	require.Equal(t, expected.MessagesRead, reg.Get("messages_read_total").(*monitoring.Uint).Get(), "messages_read_total")                //nolint:errcheck // ignore
+	require.Equal(t, expected.MessagesTruncated, reg.Get("messages_truncated_total").(*monitoring.Uint).Get(), "messages_truncated_total") //nolint:errcheck // ignore
+	require.Equal(t, expected.BytesProcessed, reg.Get("bytes_processed_total").(*monitoring.Uint).Get(), "bytes_processed_total")          //nolint:errcheck // ignore
+	require.Equal(t, expected.EventsProcessed, reg.Get("events_processed_total").(*monitoring.Uint).Get(), "events_processed_total")       //nolint:errcheck // ignore
+	require.Equal(t, expected.ProcessingErrors, reg.Get("processing_errors_total").(*monitoring.Uint).Get(), "processing_errors_total")    //nolint:errcheck // ignore
 }

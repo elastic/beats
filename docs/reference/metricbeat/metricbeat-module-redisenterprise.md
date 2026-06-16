@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-redisenterprise.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Redis Enterprise module [metricbeat-module-redisenterprise]
 
@@ -35,7 +40,7 @@ The `redisenterprise` module includes a predefined dashboard with overview infor
 ![metricbeat redisenterprise overview](images/metricbeat-redisenterprise-overview.png)
 
 
-## Example configuration [_example_configuration_58]
+## Example configuration [_example_configuration]
 
 The Redis Enterprise module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -52,12 +57,9 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_67]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [node](/reference/metricbeat/metricbeat-metricset-redisenterprise-node.md)
-* [proxy](/reference/metricbeat/metricbeat-metricset-redisenterprise-proxy.md)
-
-
-
+* [node](/reference/metricbeat/metricbeat-metricset-redisenterprise-node.md)  {applies_to}`stack: beta`
+* [proxy](/reference/metricbeat/metricbeat-metricset-redisenterprise-proxy.md)  {applies_to}`stack: beta`

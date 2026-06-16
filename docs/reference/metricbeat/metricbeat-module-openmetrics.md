@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-openmetrics.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Openmetrics module [metricbeat-module-openmetrics]
 
@@ -31,7 +36,7 @@ In order to filter out/in metrics one can make use of `metrics_filters.include` 
 The configuration above will include only metrics that match `node_filesystem_*` pattern and do not match `node_filesystem_device_*` and are not `node_filesystem_readonly` metric.
 
 
-## Example configuration [_example_configuration_50]
+## Example configuration [_example_configuration]
 
 The Openmetrics module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -53,10 +58,8 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_57]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md)
-
-
+* [collector](/reference/metricbeat/metricbeat-metricset-openmetrics-collector.md)  {applies_to}`stack: beta`

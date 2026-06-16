@@ -32,7 +32,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
@@ -51,10 +53,12 @@ func TestGenerateProcessorList(t *testing.T) {
 	plugins, err := processors.NewPluginConfigFromList(inputCfg)
 	require.NoError(t, err)
 
-	processors, err := processors.New(plugins)
+	processors, err := processors.New(plugins, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	// make sure the processor init got the config formatted in a way it expected
-	require.Equal(t, 4, len(processors.List))
+	require.Len(t, processors.List, 4)
+
+	require.NoError(t, processors.Close())
 }
 
 func TestProcessorsConfigs(t *testing.T) {
@@ -65,6 +69,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		ID:          uuid.Must(uuid.FromString("123e4567-e89b-12d3-a456-426655440001")),
 		Name:        "test.host.name",
 		Version:     "0.1",
+		Paths:       tmpPaths(t),
 	}
 
 	ecsFields := mapstr.M{"version": ecs.Version}
@@ -322,7 +327,7 @@ func TestEventNormalizationOverride(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		builder, err := newBuilder(beat.Info{}, logp.NewLogger(""), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
+		builder, err := newBuilder(beat.Info{Paths: tmpPaths(t)}, logp.NewNopLogger(), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
 		require.NoError(t, err)
 
 		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)
@@ -366,7 +371,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logp.L(), config.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -387,7 +392,7 @@ func TestNormalization(t *testing.T) {
 }
 
 func BenchmarkNormalization(b *testing.B) {
-	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(b)}, logp.L(), config.NewConfig())
 	require.NoError(b, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -401,7 +406,7 @@ func BenchmarkNormalization(b *testing.B) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true)
@@ -416,7 +421,7 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	dynFields := mapstr.NewPointer(mapstr.M{})
@@ -439,7 +444,7 @@ func TestDynamicFields(t *testing.T) {
 }
 
 func TestProcessingClose(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	// Inject a processor in the builder that we can check if has been closed.
@@ -483,7 +488,7 @@ func TestProcessingClose(t *testing.T) {
 }
 
 func TestProcessingDiagnostics(t *testing.T) {
-	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{Paths: tmpPaths(t)}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	p := factory.Processors()
@@ -516,4 +521,14 @@ func (p *processorWithClose) Close() error {
 
 func (p *processorWithClose) String() string {
 	return "processorWithClose"
+}
+
+func tmpPaths(t testing.TB) *paths.Path {
+	dir := t.TempDir()
+	return &paths.Path{
+		Home:   dir,
+		Config: dir,
+		Data:   dir,
+		Logs:   dir,
+	}
 }

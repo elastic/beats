@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-reference-yml.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # heartbeat.reference.yml [heartbeat-reference-yml]
@@ -442,7 +445,7 @@ heartbeat.jobs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"

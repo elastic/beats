@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-gke.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Google Cloud Platform gke metricset [metricbeat-metricset-gcp-gke]
 
@@ -31,8 +36,7 @@ None
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
-## Fields [_fields_104]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-gcp.md) section.
-
 

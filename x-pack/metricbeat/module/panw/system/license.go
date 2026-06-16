@@ -86,7 +86,7 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 				"license.expired":       expired,
 				"license.auth_code":     license.AuthCode,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 		// only set the expires field if the license expires
 		if !neverExpires {

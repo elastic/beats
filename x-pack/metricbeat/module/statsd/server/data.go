@@ -31,7 +31,7 @@ type statsdMetric struct {
 	tags       map[string]string
 }
 
-func splitTags(rawTags, kvSep []byte) map[string]string {
+func splitTags(rawTags, kvSep []byte, log *logp.Logger) map[string]string {
 	tags := map[string]string{}
 	var tagSplit [][]byte
 
@@ -44,7 +44,7 @@ func splitTags(rawTags, kvSep []byte) map[string]string {
 	for _, kv := range tagSplit {
 		kvSplit := bytes.SplitN(kv, kvSep, 2)
 		if len(kvSplit) != 2 {
-			logger.Warn("could not parse tags")
+			log.Named("statd").Warn("could not parse tags")
 			continue
 		}
 		tags[string(kvSplit[0])] = string(kvSplit[1])
@@ -52,7 +52,7 @@ func splitTags(rawTags, kvSep []byte) map[string]string {
 	return tags
 }
 
-func parseSingle(b []byte) (statsdMetric, error) {
+func parseSingle(b []byte, log *logp.Logger) (statsdMetric, error) {
 	// format: <metric name>:<value>|<type>[|@samplerate][|#<k>:<v>,<k>:<v>]
 	// alternative: <metric name>[,<k>=<v>,<k>=<v>]:<value>|<type>[|@samplerate]
 	// alternative: <metric name>[;<k>=<v>;<k>=<v>]:<value>|<type>[|@samplerate]
@@ -74,7 +74,7 @@ func parseSingle(b []byte) (statsdMetric, error) {
 	}
 
 	if len(parts) > 2 && len(parts[2]) > 0 && parts[2][0] == '#' {
-		s.tags = splitTags(parts[2][1:], []byte(":"))
+		s.tags = splitTags(parts[2][1:], []byte(":"), log)
 	}
 
 	nameSplit := bytes.SplitN(parts[0], []byte{':'}, 2)
@@ -93,7 +93,7 @@ func parseSingle(b []byte) (statsdMetric, error) {
 
 	s.name = string(nameTagsSplit[0])
 	if len(nameTagsSplit) > 1 {
-		s.tags = splitTags(nameTagsSplit[1], []byte("="))
+		s.tags = splitTags(nameTagsSplit[1], []byte("="), log)
 	}
 
 	s.value = string(nameSplit[1])
@@ -103,14 +103,14 @@ func parseSingle(b []byte) (statsdMetric, error) {
 }
 
 // parse will parse statsd metrics into individual metric and then its components
-func parse(b []byte) ([]statsdMetric, error) {
+func parse(b []byte, log *logp.Logger) ([]statsdMetric, error) {
 	rawMetrics := bytes.Split(b, []byte("\n"))
 	metrics := make([]statsdMetric, 0, len(rawMetrics))
 	for i := range rawMetrics {
 		if len(rawMetrics[i]) > 0 {
-			metric, err := parseSingle(rawMetrics[i])
+			metric, err := parseSingle(rawMetrics[i], log)
 			if err != nil {
-				logger.Warnf("invalid packet: %s", err)
+				log.Named("statd").Warnf("invalid packet: %s", err)
 				continue
 			}
 			metrics = append(metrics, metric)
@@ -119,7 +119,7 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func eventMapping(metricName string, metricValue interface{}, mappings map[string]StatsdMapping) mapstr.M {
+func eventMapping(metricName string, metricValue interface{}, mappings map[string]StatsdMapping, log *logp.Logger) mapstr.M {
 	m := mapstr.M{}
 	if len(mappings) == 0 {
 		m[common.DeDot(metricName)] = metricValue
@@ -138,7 +138,7 @@ func eventMapping(metricName string, metricValue interface{}, mappings map[strin
 		// Not all labels match
 		// Skip and continue to next mapping
 		if len(res) != (len(mapping.Labels) + 1) {
-			logger.Debug("not all labels match in statsd.mappings, skipped")
+			log.Named("statd").Debug("not all labels match in statsd.mappings, skipped")
 			continue
 		}
 
@@ -161,9 +161,9 @@ func eventMapping(metricName string, metricValue interface{}, mappings map[strin
 	return m
 }
 
-func newMetricProcessor(ttl time.Duration) *metricProcessor {
+func newMetricProcessor(ttl time.Duration, log *logp.Logger) *metricProcessor {
 	return &metricProcessor{
-		registry: &registry{metrics: map[string]map[string]*metric{}, ttl: ttl},
+		registry: &registry{metrics: map[string]map[string]*metric{}, ttl: ttl, logger: log.Named("statd")},
 	}
 }
 
@@ -231,7 +231,7 @@ func (p *metricProcessor) processSingle(m statsdMetric) error {
 		c := p.registry.GetOrNewSet(m.name, m.tags)
 		c.Add(m.value)
 	default:
-		logp.NewLogger("statsd").Debugf("metric type `%s` is not supported", m.metricType)
+		p.registry.logger.Named("statsd").Debugf("metric type `%s` is not supported", m.metricType)
 	}
 	return nil
 }
@@ -247,7 +247,7 @@ func (p *metricProcessor) Process(event server.Event) error {
 		return errors.New("packet has no data")
 	}
 
-	metrics, err := parse(b)
+	metrics, err := parse(b, p.registry.logger)
 	if err != nil {
 		return err
 	}

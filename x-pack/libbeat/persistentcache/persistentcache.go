@@ -5,11 +5,11 @@
 package persistentcache
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -48,12 +48,11 @@ type Options struct {
 // not needed anymore.
 func New(name string, opts Options, logger *logp.Logger) (*PersistentCache, error) {
 	logger = logger.Named("persistentcache")
-
-	rootPath := opts.RootPath
-	if rootPath == "" {
-		rootPath = paths.Resolve(paths.Data, cacheFile)
+	if opts.RootPath == "" {
+		return nil, errors.New("no root path specified")
 	}
-	store, err := newStore(logger, rootPath, name)
+
+	store, err := newStore(logger, opts.RootPath, name)
 	if err != nil {
 		return nil, err
 	}

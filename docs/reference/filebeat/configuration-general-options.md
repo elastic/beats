@@ -2,6 +2,9 @@
 navigation_title: "General settings"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-general-options.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure general settings [configuration-general-options]
@@ -77,21 +80,35 @@ filebeat.registry.migrate_file: /path/to/old/registry_file
 The registry will be migrated to the new location only if a registry using the directory format does not already exist.
 
 
-### `config_dir` [_config_dir]
+### `registry.backend` [_registry_backend]
 
-:::{admonition} Deprecated in 6.0.0.
-Use [Input config](/reference/filebeat/filebeat-configuration-reloading.md#load-input-config) instead.
-:::
+The storage backend used for the registry. Supported values:
 
-The full path to the directory that contains additional input configuration files. Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat config hierarchy even though only the `inputs` part of each file is processed. All global options, such as `registry_file`, are ignored.
+- `memlog` (default): An in-memory log with periodic disk flushing. This is the original backend and is well-tested.
+- `otel_file_storage` {applies_to}`stack: preview 9.5`: Persists registry state using the same on-disk layout as the OpenTelemetry Collector [file_storage](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage) extension. Registry files live under the directory specified by `registry.path`. Optional settings are configured under `registry.otel_file_storage`.
 
-The `config_dir` option MUST point to a directory other than the directory where the main Filebeat config file resides.
-
-If the specified path is not absolute, it is considered relative to the configuration path. See the [Directory layout](/reference/filebeat/directory-layout.md) section for details.
+::::{warning}
+The `otel_file_storage` backend is in technical preview and may be changed or removed in a future release. Elastic will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features.
+::::
 
 ```yaml
-filebeat.config_dir: path/to/configs
+filebeat.registry.backend: memlog
 ```
+
+### `registry.otel_file_storage` [_registry_otel_file_storage]
+```{applies_to}
+  stack: preview 9.5
+```
+
+::::{warning}
+This functionality is in technical preview and may be changed or removed in a future release.
+::::
+
+These settings apply only when `registry.backend` is set to `otel_file_storage`. They map directly to the OpenTelemetry Collector [file_storage extension configuration](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage). Filebeat overrides the following defaults:
+
+- `directory` is always set to the resolved `registry.path`.
+- `create_directory` defaults to `true` when no `otel_file_storage` section is provided (upstream default is `false`).
+- `directory_permissions` defaults to `0700` when `create_directory` is `true` and `directory_permissions` is not set explicitly.
 
 
 ### `shutdown_timeout` [shutdown-timeout]
@@ -186,4 +203,3 @@ Sets the maximum number of CPUs that can be executing simultaneously. The defaul
 ### `timestamp.precision` [_timestamp_precision]
 
 Configure the precision of all timestamps. By default it is set to millisecond. Available options: millisecond, microsecond, nanosecond
-

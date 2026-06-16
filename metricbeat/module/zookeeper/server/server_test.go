@@ -70,3 +70,63 @@ func TestParser(t *testing.T) {
 	assert.Equal(t, uint32(7), mapStr["epoch"])
 	assert.Equal(t, uint32(0x601132), mapStr["count"])
 }
+
+func TestParseSrvrEdgeCases(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		expectError bool
+		checkMode   bool
+		hasMode     bool
+	}{
+		{
+			name:        "invalid version line",
+			input:       "some invalid first line\n",
+			expectError: true,
+		},
+		{
+			name: "mode line without value",
+			input: `Zookeeper version: 3.5.5, built on 05/03/2019 12:07 GMT
+Mode:
+`,
+			expectError: false,
+			checkMode:   true,
+			hasMode:     false,
+		},
+		{
+			name:        "malformed input",
+			input:       "00000000",
+			expectError: true,
+		},
+		{
+			name:        "missing date",
+			input:       ": ,00000",
+			expectError: true,
+		},
+		{
+			name:        "malformed mode line",
+			input:       ": ,built on \nMode",
+			expectError: false,
+			checkMode:   true,
+			hasMode:     false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logger := logptest.NewTestingLogger(t, "zookeeper.server")
+			mapStr, _, err := parseSrvr(bytes.NewReader([]byte(tt.input)), logger)
+
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			if tt.checkMode {
+				_, hasMode := mapStr["mode"]
+				assert.Equal(t, tt.hasMode, hasMode)
+			}
+		})
+	}
+}

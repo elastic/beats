@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-starting.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Start Filebeat [filebeat-starting]
@@ -66,7 +69,11 @@ sudo ./filebeat -e
 PS C:\Program Files\filebeat> Start-Service filebeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
+By default Windows log files are stored in `C:\Program Files\Filebeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\filebeat\logs`.
+:::
 ::::::
 
 :::::::

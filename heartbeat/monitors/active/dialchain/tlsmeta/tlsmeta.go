@@ -75,9 +75,7 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 	_, _ = x509Fields.Put("signature_algorithm", hostCert.SignatureAlgorithm.String())
 	_, _ = x509Fields.Put("public_key_algorithm", hostCert.PublicKeyAlgorithm.String())
 	_, _ = x509Fields.Put("not_before", hostCert.NotBefore)
-	_, _ = tlsFields.Put("certificate_not_valid_before", hostCert.NotBefore)
 	_, _ = x509Fields.Put("not_after", hostCert.NotAfter)
-	_, _ = tlsFields.Put("certificate_not_valid_after", hostCert.NotAfter)
 	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
 		sizeInBits := rsaKey.Size() * 8
 		_, _ = x509Fields.Put("public_key_size", sizeInBits)
@@ -115,12 +113,8 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 			latestChainExpiration = *chainNotAfter
 		}
 
-		// Legacy non-ECS field
-		_, _ = tlsFields.Put("certificate_not_valid_before", chainNotBefore)
 		_, _ = x509Fields.Put("not_before", chainNotBefore)
 		if chainNotAfter != nil {
-			// Legacy non-ECS field
-			_, _ = tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
 			_, _ = x509Fields.Put("not_after", *chainNotAfter)
 		}
 	}

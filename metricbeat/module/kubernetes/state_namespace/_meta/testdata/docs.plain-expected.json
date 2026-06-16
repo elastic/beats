@@ -6,10 +6,10 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "default",
+            "namespace": "kube-system",
             "state_namespace": {
                 "created": {
-                    "sec": 1713862181
+                    "sec": 1744036586
                 },
                 "status": {
                     "active": true,
@@ -36,7 +36,7 @@
             "namespace": "kube-node-lease",
             "state_namespace": {
                 "created": {
-                    "sec": 1713862181
+                    "sec": 1744036587
                 },
                 "status": {
                     "active": true,
@@ -60,10 +60,10 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "local-path-storage",
+            "namespace": "default",
             "state_namespace": {
                 "created": {
-                    "sec": 1713862186
+                    "sec": 1744036587
                 },
                 "status": {
                     "active": true,
@@ -90,7 +90,7 @@
             "namespace": "kube-public",
             "state_namespace": {
                 "created": {
-                    "sec": 1713862181
+                    "sec": 1744036586
                 },
                 "status": {
                     "active": true,
@@ -114,10 +114,10 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "kube-system",
+            "namespace": "local-path-storage",
             "state_namespace": {
                 "created": {
-                    "sec": 1713862181
+                    "sec": 1744036590
                 },
                 "status": {
                     "active": true,

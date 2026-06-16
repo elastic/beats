@@ -1,0 +1,79 @@
+# This file is generated! See ext/osquery-extension/cmd/gentables.
+<!-- DO NOT EDIT MANUALLY. Update specs/templates and re-run gentables. -->
+
+# Osquery Extension for Elastic
+
+This osquery extension provides additional custom tables that enhance osquery's capabilities with Elastic-specific functionality. The extension is designed to work seamlessly with Osquerybeat and provides deep system insights across Linux, macOS, and Windows platforms.
+
+## Overview
+
+The extension adds several custom tables to osquery that provide:
+- Browser history analysis across multiple browsers
+- Host system information access from containers (groups, users, processes)
+- Deep file analysis and security auditing on macOS
+- Windows Amcache inventory and normalized application view
+- Windows Jump List parsing for recent and pinned entries
+
+## Supported Platforms
+
+| Name | Type | Linux | macOS | Windows |
+|------|------|-------|-------|---------|
+{{- range .Entries}}
+| `{{.Name}}` | {{.Type}} | {{.Linux}} | {{.Darwin}} | {{.Windows}} |
+{{- end}}
+
+---
+
+## Tables
+
+{{- range .Tables}}
+- [{{.Name}}]({{.DocPath}})
+{{- end}}
+
+## Views
+
+{{- range .Views}}
+- [{{.Name}}]({{.DocPath}})
+{{- end}}
+
+---
+
+## Building and Installation
+
+### Build the Extension
+
+From the osquerybeat directory:
+
+```bash
+# Build for current platform
+mage buildext
+
+# The extension binary will be created at:
+# Linux: ext/osquery-extension/build/linux/osquery-extension
+# macOS: ext/osquery-extension/build/darwin/osquery-extension
+# Windows: ext/osquery-extension/build/windows/osquery-extension.ext
+```
+
+### Using with Osquery
+
+The extension is automatically loaded by Osquerybeat. To use it manually with osquery:
+
+```bash
+# Start osquery with the extension
+osqueryi --extension /path/to/osquery-extension [--allow-unsafe]
+
+# Verify tables are loaded
+osqueryi> .tables
+  => elastic_browser_history
+
+# Query the tables
+osqueryi> SELECT * FROM elastic_browser_history LIMIT 10;
+```
+
+---
+
+## Additional Resources
+
+- **Table Documentation**: [docs/](docs/) - Detailed documentation for each table including configuration, examples, and security considerations
+- **Development**: See the main [beats documentation](https://github.com/elastic/beats)
+- **Osquery**: [osquery.io](https://osquery.io/)

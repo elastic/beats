@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package billing
 
 import (
@@ -46,7 +48,7 @@ type UsageService struct {
 }
 
 // NewService builds a new UsageService using the given config.
-func NewService(config azure.Config) (*UsageService, error) {
+func NewService(config azure.Config, logger *logp.Logger) (*UsageService, error) {
 	cloudServicesConfig := cloud.AzurePublic.Services
 
 	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
@@ -93,7 +95,7 @@ func NewService(config azure.Config) (*UsageService, error) {
 		usageDetailsClient: usageDetailsClient,
 		forecastClient:     forecastsClient,
 		context:            context.Background(),
-		log:                logp.NewLogger("azure billing service"),
+		log:                logger.Named("azure billing service"),
 	}
 
 	return &service, nil

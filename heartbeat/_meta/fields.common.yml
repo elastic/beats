@@ -366,7 +366,7 @@
         - name: relative_trace
           type: group
           description: >
-            trace event with timing information that are realtive to
+            trace event with timing information that are relative to
             journey timings in microseconds
           fields:
             - name: name

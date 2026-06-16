@@ -2,6 +2,9 @@
 navigation_title: "Command reference"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/command-line-options.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Winlogbeat command reference [command-line-options]
@@ -65,7 +68,7 @@ $$$ilm-policy-subcommand$$$
 $$$pipeline-subcommand$$$
 
 **`pipeline`**
-:   Exports the ingest piplines.  You must specify the `--es.version` to specify which version of {{es}} the pipelines should be compatible with. You can optionally specify `--dir` to control where the pipelines are written.
+:   Exports the ingest pipelines.  You must specify the `--es.version` to specify which version of {{es}} the pipelines should be compatible with. You can optionally specify `--dir` to control where the pipelines are written.
 
 **FLAGS**
 
@@ -87,7 +90,7 @@ Also see [Global flags](#global-flags).
 
 ```sh subs=true
 winlogbeat export config
-winlogbeat export template --es.version {{stack-version}}
+winlogbeat export template --es.version {{version.stack}}
 winlogbeat export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 ```
 

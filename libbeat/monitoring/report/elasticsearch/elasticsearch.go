@@ -23,9 +23,11 @@ import (
 	"io"
 	"math/rand/v2"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
@@ -40,8 +42,9 @@ import (
 )
 
 type reporter struct {
-	done   *stopper
-	logger *logp.Logger
+	done       *stopper
+	logger     *logp.Logger
+	monitoring beatmonitoring.Monitoring
 
 	checkRetry time.Duration
 
@@ -54,6 +57,7 @@ type reporter struct {
 	client   beat.Client
 
 	out []outputs.NetworkClient
+	wg  sync.WaitGroup
 }
 
 const logSelector = "monitoring"
@@ -96,7 +100,7 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
+func makeReporter(beat beat.Info, mon beatmonitoring.Monitoring, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
 	log := beat.Logger.Named(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
@@ -135,8 +139,6 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		clients[i] = client
 	}
 
-	monitoring := monitoring.Default.GetRegistry("monitoring")
-
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
@@ -161,7 +163,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 	pipeline, err := pipeline.New(
 		beat,
 		pipeline.Monitors{
-			Metrics: monitoring,
+			Metrics: mon.StatsRegistry().GetOrCreateRegistry("monitoring"),
 			Logger:  log,
 		},
 		queueConfig,
@@ -181,12 +183,13 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 
 	pipeConn, err := pipeline.Connect()
 	if err != nil {
-		pipeline.Close()
+		pipeline.Disconnect(context.Background())
 		return nil, err
 	}
 
 	r := &reporter{
 		logger:     log,
+		monitoring: mon,
 		done:       newStopper(),
 		beatMeta:   makeMeta(beat),
 		tags:       config.Tags,
@@ -195,6 +198,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		client:     pipeConn,
 		out:        clients,
 	}
+	r.wg.Add(1)
 	go r.initLoop(config)
 	return r, nil
 }
@@ -202,12 +206,16 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 func (r *reporter) Stop() {
 	r.done.Stop()
 	r.client.Close()
-	r.pipeline.Close()
+	r.pipeline.Disconnect(context.Background())
+	r.wg.Wait()
 }
 
 func (r *reporter) initLoop(c config) {
 	r.logger.Debug("Start monitoring endpoint init loop.")
-	defer r.logger.Debug("Finish monitoring endpoint init loop.")
+	defer func() {
+		r.logger.Debug("Finish monitoring endpoint init loop.")
+		r.wg.Done()
+	}()
 
 	log := r.logger
 
@@ -240,12 +248,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod, c.ClusterUUID)
+	go r.snapshotLoop(r.monitoring.StateRegistry(), "state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
+	go r.snapshotLoop(r.monitoring.StatsRegistry(), "stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, clusterUUID string) {
+func (r *reporter) snapshotLoop(registry *monitoring.Registry, namespace, prefix string, period time.Duration, clusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -263,7 +271,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 		case ts = <-ticker.C:
 		}
 
-		snapshot := makeSnapshot(monitoring.GetNamespace(namespace).GetRegistry())
+		snapshot := makeSnapshot(registry)
 		if snapshot == nil {
 			log.Debug("Empty snapshot.")
 			continue
@@ -285,7 +293,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 		}
 
 		if clusterUUID == "" {
-			clusterUUID = getClusterUUID()
+			clusterUUID = getClusterUUID(r.monitoring)
 		}
 		if clusterUUID != "" {
 			_, _ = meta.Put("cluster_uuid", clusterUUID)
@@ -316,7 +324,7 @@ func makeClient(host string, params map[string]string, config *config, beat beat
 		CompressionLevel: config.CompressionLevel,
 		Transport:        config.Transport,
 		UserAgent:        beat.UserAgent,
-	})
+	}, beat.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -340,8 +348,8 @@ func makeMeta(beat beat.Info) mapstr.M {
 	}
 }
 
-func getClusterUUID() string {
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+func getClusterUUID(mon beatmonitoring.Monitoring) string {
+	stateRegistry := mon.StateRegistry()
 	outputsRegistry := stateRegistry.GetRegistry("outputs")
 	if outputsRegistry == nil {
 		return ""

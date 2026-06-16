@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-starting.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Start Metricbeat [metricbeat-starting]
@@ -66,7 +69,11 @@ sudo ./metricbeat -e
 PS C:\Program Files\metricbeat> Start-Service metricbeat
 ```
 
-By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
+By default Windows log files are stored in `C:\Program Files\Metricbeat-Data\logs`.
+
+:::{note}
+In versions before 9.0.6, the default location for Windows log files was `C:\ProgramData\metricbeat\logs`.
+:::
 
 ::::{note}
 On Windows, statistics about system load and swap usage are currently not captured

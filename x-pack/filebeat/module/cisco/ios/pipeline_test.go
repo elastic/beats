@@ -7,13 +7,16 @@ package ios_test
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/validator"
@@ -177,16 +180,18 @@ var testCases = []testCase{
 }
 
 func TestFilebeatSyslogCisco(t *testing.T) {
-	logp.TestingSetup()
 	testutils.SkipIfFIPSOnly(t, "javascript processor uses SHA-1.")
 
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
 		nil,
+		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	setCWDPath(t, p)
 
 	testInput(t, "syslog", p)
 	testInput(t, "log", p)
@@ -238,10 +243,14 @@ func BenchmarkPipeline(b *testing.B) {
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
 		nil,
+		logp.NewNopLogger(),
 	)
 	if err != nil {
 		b.Fatal(err)
 	}
+
+	setCWDPath(b, p)
+
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
@@ -257,6 +266,22 @@ func BenchmarkPipeline(b *testing.B) {
 		_, err := p.Run(&e)
 		if err != nil {
 			b.Fatal(err)
+		}
+	}
+}
+
+func setCWDPath(tb testing.TB, p beat.Processor) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		tb.Fatal(err)
+	}
+
+	if jsp, ok := p.(interface{ SetPaths(*paths.Path) error }); ok {
+		if err := jsp.SetPaths(&paths.Path{
+			Home:   cwd,
+			Config: cwd,
+		}); err != nil {
+			tb.Fatal(err)
 		}
 	}
 }

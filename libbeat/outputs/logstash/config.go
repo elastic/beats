@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -51,7 +50,7 @@ type Backoff struct {
 	Max  time.Duration
 }
 
-func defaultConfig() Config {
+func DefaultConfig() Config {
 	return Config{
 		LoadBalance:      false,
 		Pipelining:       2,
@@ -69,8 +68,8 @@ func defaultConfig() Config {
 	}
 }
 
-func readConfig(cfg *config.C, info beat.Info) (*Config, error) {
-	c := defaultConfig()
+func readConfig(cfg *config.C, indexPrefix string) (*Config, error) {
+	c := DefaultConfig()
 
 	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
 	if err != nil {
@@ -82,7 +81,7 @@ func readConfig(cfg *config.C, info beat.Info) (*Config, error) {
 	}
 
 	if c.Index == "" {
-		c.Index = strings.ToLower(info.IndexPrefix)
+		c.Index = strings.ToLower(indexPrefix)
 	}
 
 	return &c, nil

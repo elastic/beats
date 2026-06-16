@@ -21,7 +21,9 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -33,8 +35,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -58,13 +61,20 @@ type Pipeline struct {
 
 	monitors Monitors
 
-	outputController *outputController
+	outputController outputController
 
 	observer observer
 
 	// If waitCloseTimeout is positive, then the pipeline will wait up to the
 	// specified time when it is closed for pending events to be acknowledged.
 	waitCloseTimeout time.Duration
+
+	// forceCloseQueue causes us to force close the queue after the waitCloseTimeout
+	// elapses.
+	forceCloseQueue bool
+
+	// Close _shouldn't_ be called multiple times, but handle it gracefully if it does.
+	closeOnce sync.Once
 
 	processors processing.Supporter
 }
@@ -75,6 +85,7 @@ type Settings struct {
 	// When and how WaitClose is applied depends on WaitCloseMode.
 	WaitClose time.Duration
 
+	// This field has no effect when running as a Beats receiver.
 	WaitCloseMode WaitCloseMode
 
 	Processors processing.Supporter
@@ -94,7 +105,28 @@ const (
 	// to ACK any outstanding events. This is independent of Clients asking for
 	// ACK and/or WaitClose. Clients can still optionally configure WaitClose themselves.
 	WaitOnPipelineClose
+
+	// WaitOnPipelineCloseThenForce is identical to WaitOnPipelineClose, but it also force closes
+	// the queue after the timeout, dropping in-flight data and unprocessed acknowledgements.
+	// This is useful when we know terminating the process won't free the memory for us, such as
+	// when running in an otel receiver.
+	WaitOnPipelineCloseThenForce
 )
+
+// outputController is the interface between the Pipeline and the output,
+// which may be either the legacy Beats output pipeline (under the process
+// runtime) or a bridge to the OTel Collector (when running as a Beats
+// receiver under the otel runtime).
+type outputController interface {
+	// queueProducer creates a queue producer with the given config, blocking
+	// until the queue is created if it does not yet exist.
+	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
+
+	// Close the queue and output, waiting for pending events until all are
+	// acknowledged or the provided context expires.
+	// The force parameter has no effect when running as a Beats receiver.
+	waitClose(ctx context.Context, force bool) error
+}
 
 // OutputReloader interface, that can be queried from an active publisher pipeline.
 // The output reloader can be used to change the active output.
@@ -116,7 +148,7 @@ func New(
 	settings Settings,
 ) (*Pipeline, error) {
 	if monitors.Logger == nil {
-		monitors.Logger = logp.NewLogger("publish")
+		monitors.Logger = beat.Logger.Named("publish")
 	}
 
 	p := &Pipeline{
@@ -126,9 +158,8 @@ func New(
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
 	}
-	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
-		p.waitCloseTimeout = settings.WaitClose
-	}
+
+	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
@@ -141,34 +172,82 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
+	queueFactory, _, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	outputController, err := newProcessOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
-	p.outputController = output
-	p.outputController.Set(out)
+	outputController.Set(out)
+	p.outputController = outputController
 
 	return p, nil
 }
 
-// Close stops the pipeline, outputs and queue.
-// If WaitClose with WaitOnPipelineClose mode is configured, Close will block
+func NewForReceiver(
+	beatInfo beat.Info,
+	monitors Monitors,
+	userQueueConfig conf.Namespace,
+	settings Settings,
+	intakeQueueID string,
+) (*Pipeline, error) {
+	p := &Pipeline{
+		beatInfo:         beatInfo,
+		monitors:         monitors,
+		observer:         newMetricsObserver(monitors.Metrics),
+		waitCloseTimeout: settings.WaitClose,
+		processors:       settings.Processors,
+	}
+
+	// Convert the raw queue config to a parsed Settings object that will
+	// be used during queue creation. This lets us fail immediately on startup
+	// if there's a configuration problem.
+	queueType := defaultQueueType
+	if b := userQueueConfig.Name(); b != "" {
+		queueType = b
+	}
+	// Receiver pipelines route through the OTel output controller. With an
+	// in-memory queue configuration the controller uses the slabqueue pool
+	// (a global default pool when no intake queue ID is set, or a pool
+	// keyed by the ID when one is). With an explicit queue.disk config the
+	// controller falls back to building its queue via queueFactory, in
+	// which case sharing is not supported.
+	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	if err != nil {
+		return nil, err
+	}
+
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueFactory, queueConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}
+
+// Disconnect stops the pipeline, outputs and queue.
+// If WaitClose with WaitOnPipelineClose mode is configured, Disconnect will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients must be closed before calling Close.
-func (p *Pipeline) Close() error {
-	log := p.monitors.Logger
+// Note: clients will no longer accept new Publish calls once Disconnect is started,
+// and will no longer receive event acknowledgments once Disconnect returns.
+func (p *Pipeline) Disconnect(ctx context.Context) error {
+	// Here context does not do anything for now but it will be the responsibility of the beater to determine how long to wait before full disconnection
+	// See issue: https://github.com/elastic/beats/issues/49794
+	p.closeOnce.Do(func() {
+		log := p.monitors.Logger
 
-	log.Debug("close pipeline")
+		log.Debug("close pipeline")
 
-	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout)
+		// Note: active clients are not closed / disconnected.
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), p.waitCloseTimeout)
+		defer cancel()
+		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
 
-	p.observer.cleanup()
+		p.observer.cleanup()
+	})
 	return nil
 }
 
@@ -271,30 +350,56 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
-	return p.outputController
+	if r, ok := p.outputController.(OutputReloader); ok {
+		return r
+	}
+	return noopReloader{}
 }
 
 // Parses the given config and returns a QueueFactory based on it.
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
+// It also returns the parsed queue settings (with defaults applied) so callers
+// can detect mismatched configs between pipelines that connect with the same
+// shared intake queue id.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], any, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return memqueue.FactoryForSettings(settings), nil
+		return memqueue.FactoryForSettings[publisher.Event](settings), settings, nil
+	case slabqueue.QueueType:
+		settings, err := slabqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, nil, err
+		}
+		return slabqueue.FactoryForSettings[publisher.Event](settings), settings, nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return diskqueue.FactoryForSettings(settings), nil
+		return diskqueue.FactoryForSettings(settings, paths), settings, nil
 	default:
-		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
+		return nil, nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
+}
+
+type noopReloader struct{}
+
+func (n noopReloader) Reload(
+	cfg *reload.ConfigWithMeta,
+	_ func(outputs.Observer, conf.Namespace) (outputs.Group, error),
+) error {
+	// This function should never be called, but if it is, return an error we can troubleshoot.
+	var unitID string
+	if cfg != nil {
+		unitID = cfg.InputUnitID
+	}
+	return fmt.Errorf("unsupported reload triggered by unit '%v'", unitID)
 }
 
 type noopClientListener struct{}

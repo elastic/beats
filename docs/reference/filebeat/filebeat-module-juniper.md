@@ -1,9 +1,14 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-juniper.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
-# Juniper module [filebeat-module-juniper]
+% This file is generated! See filebeat/scripts/mage/docs.go
+
+# Juniper JUNOS module [filebeat-module-juniper]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/index.md).
@@ -86,7 +91,7 @@ The following processes and tags are supported:
 |  | AAMW_ACTION_LOG |
 | RT_SECINTEL | SECINTEL_ACTION_LOG |
 
-The syslog format choosen should be `Default`.
+The syslog format chosen should be `Default`.
 
 
 ## Compatibility [_compatibility_18]
@@ -147,7 +152,6 @@ This is a list of JunOS fields that are mapped to ECS.
 | source-zone-name | observer.ingress.zone |
 | url | url.domain |
 
-
-## Fields [_fields_25]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-juniper.md) section.

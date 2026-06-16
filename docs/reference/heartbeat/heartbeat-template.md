@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/heartbeat-template.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Load the Elasticsearch index template [heartbeat-template]
@@ -97,7 +100,7 @@ heartbeat setup --index-management -E output.logstash.enabled=false -E 'output.e
 **docker:**
 
 ```sh subs=true
-docker run --rm docker.elastic.co/beats/heartbeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm docker.elastic.co/beats/heartbeat:{{version.stack}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -109,39 +112,6 @@ From the PowerShell prompt, change to the directory where you installed Heartbea
 ```sh
 PS > .\heartbeat.exe setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
-
-
-### Force Kibana to look at newest documents [force-kibana-new]
-
-If you’ve already used Heartbeat to index data into {{es}}, the index may contain old documents. After you load the index template, you can delete the old documents from `heartbeat-*` to force Kibana to look at the newest documents.
-
-Use this command:
-
-**deb and rpm:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/heartbeat-*'
-```
-
-**mac:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/heartbeat-*'
-```
-
-**linux:**
-
-```sh
-curl -XDELETE 'http://localhost:9200/heartbeat-*'
-```
-
-**win:**
-
-```sh
-PS > Invoke-RestMethod -Method Delete "http://localhost:9200/heartbeat-*"
-```
-
-This command deletes all indices that match the pattern `heartbeat`. Before running this command, make sure you want to delete all indices that match the pattern.
 
 
 ## Load the index template manually (alternate method) [load-template-manually-alternate]
@@ -171,7 +141,7 @@ heartbeat export template > heartbeat.template.json
 **win:**
 
 ```sh subs=true
-PS > .\heartbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 heartbeat.template.json
+PS > .\heartbeat.exe export template --es.version {{version.stack}} | Out-File -Encoding UTF8 heartbeat.template.json
 ```
 
 To install the template, run:
@@ -179,50 +149,50 @@ To install the template, run:
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{stack-version}} -d@heartbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{version.stack}} -d@heartbeat.template.json
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{stack-version}} -d@heartbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{version.stack}} -d@heartbeat.template.json
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{stack-version}} -d@heartbeat.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{version.stack}} -d@heartbeat.template.json
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile heartbeat.template.json -Uri http://localhost:9200/_index_template/heartbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile heartbeat.template.json -Uri http://localhost:9200/_index_template/heartbeat-{{version.stack}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on heartbeat-{{stack-version}} index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on heartbeat-{{version.stack}} index.
 
 **deb and rpm:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{version.stack}}
 ```
 
 **mac:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{version.stack}}
 ```
 
 **linux:**
 
 ```sh subs=true
-curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
+curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{version.stack}}
 ```
 
 **win:**
 
 ```sh subs=true
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/heartbeat-{{version.stack}}
 ```
 

@@ -1,0 +1,28 @@
+[!windows] skip 'requires Windows'
+
+# Write an event, sleep 2s so it becomes older than 2s, then write a fresh event.
+write-event '>=2 seconds old' --id=20
+sleep 2s
+write-event '~0 seconds old' --id=10
+wait-for-event-log 2
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 winlog.event_id '10'
+check-event-field output 0 event.code '10'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    ignore_older: 2s
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

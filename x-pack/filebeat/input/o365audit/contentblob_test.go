@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -21,6 +22,11 @@ type contentStore struct {
 	events  []beat.Event
 	stopped bool
 }
+
+type noopReporter struct{}
+
+// UpdateStatus is no-op
+func (n noopReporter) UpdateStatus(status status.Status, msg string) {}
 
 var errStopped = errors.New("stopped")
 
@@ -76,8 +82,9 @@ func TestContentBlob(t *testing.T) {
 	var f fakePoll
 	var store contentStore
 	ctx := apiEnvironment{
-		Logger:   logp.L(),
-		Callback: store.onEvent,
+		status:   noopReporter{},
+		logger:   logp.L(),
+		callback: store.onEvent,
 	}
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx)
@@ -99,7 +106,7 @@ func TestContentBlobResumeToLine(t *testing.T) {
 	var f fakePoll
 	var store contentStore
 	ctx := testConfig()
-	ctx.Callback = store.onEvent
+	ctx.callback = store.onEvent
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	const skip = 3
 	baseCursor.Line = skip
@@ -122,8 +129,9 @@ func TestContentBlobPaged(t *testing.T) {
 	var f fakePoll
 	var store contentStore
 	ctx := apiEnvironment{
-		Logger:   logp.L(),
-		Callback: store.onEvent,
+		status:   noopReporter{},
+		logger:   logp.L(),
+		callback: store.onEvent,
 	}
 	baseCursor := checkpoint{Timestamp: time.Now()}
 	query := ContentBlob("http://test.localhost/", baseCursor, ctx)

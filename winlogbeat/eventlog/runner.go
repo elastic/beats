@@ -23,13 +23,22 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
+)
+
+var (
+	isRecoverable         = IsRecoverable
+	openRetryInitialDelay = 5 * time.Second
+	readRetryInitialDelay = 5 * time.Second
+	retryMaxDelay         = time.Minute
 )
 
 type Publisher interface {
@@ -39,50 +48,86 @@ type Publisher interface {
 func Run(
 	reporter status.StatusReporter,
 	ctx context.Context,
+	metricsRegistry *monitoring.Registry,
 	api EventLog,
 	evtCheckpoint checkpoint.EventLogState,
 	publisher Publisher,
 	log *logp.Logger,
 ) error {
+	// Pin the runner goroutine so Win32 Event Log calls execute on one OS thread.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	reporter.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
-	cancelCtx, cancelFn := ctxtool.WithFunc(ctx, func() {
-		if err := api.Close(); err != nil {
-			log.Errorw("error while closing Windows Event Log access", "error", err)
-		}
-	})
+	cancelCtx, cancelFn := ctxtool.WithFunc(
+		ctx,
+		func() {
+			if err := api.Close(); err != nil {
+				log.Errorw("error while closing Windows Event Log access", "error", err)
+			}
+		})
 	defer cancelFn()
 
-	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
-		if IsRecoverable(err, api.IsFile()) {
-			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
-			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+	openChannelNotFoundErrDetected := false
+	logChannelNotFoundOpenRetry := func(err error) {
+		if !openChannelNotFoundErrDetected {
+			log.Warnw("encountered channel not found error when opening Windows Event Log, retrying", "error", err)
+		} else {
+			log.Debugw("encountered channel not found error when opening Windows Event Log, retrying", "error", err)
+		}
+		openChannelNotFoundErrDetected = true
+	}
+
+	openErrHandler := newExponentialLimitedBackoff(log, openRetryInitialDelay, retryMaxDelay, func(err error) bool {
+		if mustIgnoreError(err, api) {
+			if isChannelNotFound(err) {
+				logChannelNotFoundOpenRetry(err)
+			} else {
+				log.Warnw("ignoring open error", "error", err, "channel", api.Channel())
+			}
 			return true
 		}
-		return false
+		if !isRecoverable(err, api.IsFile()) {
+			return false
+		}
+		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to open %s: %v", api.Channel(), err))
+		if isChannelNotFound(err) {
+			logChannelNotFoundOpenRetry(err)
+		} else {
+			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+		}
+		return true
 	})
 
-	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
-		if IsRecoverable(err, api.IsFile()) {
-			reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
-			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+	readErrHandler := newExponentialLimitedBackoff(log, readRetryInitialDelay, retryMaxDelay, func(err error) bool {
+		if mustIgnoreError(err, api) {
+			log.Warnw("ignoring read error", "error", err, "channel", api.Channel())
 			if resetErr := api.Reset(); resetErr != nil {
 				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
 			}
 			return true
 		}
-		return false
+		if !isRecoverable(err, api.IsFile()) {
+			return false
+		}
+		reporter.UpdateStatus(status.Degraded, fmt.Sprintf("Retrying to read from %s: %v", api.Channel(), err))
+		log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+		if resetErr := api.Reset(); resetErr != nil {
+			log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
+		}
+		return true
 	})
 
+	currentCheckpoint := evtCheckpoint
 runLoop:
 	for cancelCtx.Err() == nil {
-		openErr := api.Open(evtCheckpoint)
+		openErr := api.Open(currentCheckpoint, metricsRegistry)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
 				continue runLoop
 			}
-			//nolint:nilerr // only log error if we are not shutting down
 			if cancelCtx.Err() != nil {
 				break runLoop
 			}
@@ -91,24 +136,34 @@ runLoop:
 		}
 
 		log.Debug("windows event log opened successfully")
+		openChannelNotFoundErrDetected = false
 
 		// read loop
 		for cancelCtx.Err() == nil {
 			reporter.UpdateStatus(status.Running, fmt.Sprintf("Reading from %s", api.Channel()))
 			records, readErr := api.Read()
-			if readErr != nil {
-				if readErrHandler.backoff(cancelCtx, readErr) {
-					continue runLoop
-				}
 
+			if len(records) > 0 {
+				if err := publisher.Publish(records); err != nil {
+					reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
+					return err
+				}
+			}
+			currentCheckpoint = api.Checkpoint()
+
+			if readErr != nil {
+				// io.EOF signals a clean end of stream (e.g. no_more_events: stop).
 				if errors.Is(readErr, io.EOF) {
 					log.Debugw("end of Winlog event stream reached", "error", readErr)
 					break runLoop
 				}
 
-				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					break runLoop
+				}
+
+				if readErrHandler.backoff(cancelCtx, readErr) {
+					continue runLoop
 				}
 
 				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
@@ -120,11 +175,6 @@ runLoop:
 			if len(records) == 0 {
 				_ = timed.Wait(cancelCtx, time.Second)
 				continue
-			}
-
-			if err := publisher.Publish(records); err != nil {
-				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Publisher error: %v", err))
-				return err
 			}
 		}
 	}

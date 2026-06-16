@@ -14,7 +14,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/timed"
@@ -41,10 +41,9 @@ func currentTime() time.Time {
 }
 
 type inputMetrics struct {
-	registry   *monitoring.Registry
-	unregister func()
-	ctx        context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
-	cancel     context.CancelFunc // cancel cancels the ctx context.
+	registry *monitoring.Registry
+	ctx      context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
+	cancel   context.CancelFunc // cancel cancels the ctx context.
 
 	sqsMaxMessagesInflight            int                  // Maximum number of SQS workers allowed.
 	sqsWorkerUtilizationMutex         sync.Mutex           // Guards the sqs worker utilization fields.
@@ -73,12 +72,14 @@ type inputMetrics struct {
 	s3ObjectProcessingTime  metrics.Sample   // Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
 	s3ObjectSizeInBytes     metrics.Sample   // Histogram of processed S3 object size in bytes
 	s3EventsPerObject       metrics.Sample   // Histogram of events in an individual S3 object
+	s3PollingRunTime        metrics.Sample   // Histogram of the elapsed time for each S3 polling run in nanoseconds.
+	s3PollingRunTimeTotal   *monitoring.Uint // Cumulative time spent in S3 polling runs in nanoseconds.
+	s3ObjectsListedPerRun   metrics.Sample   // Histogram of the number of S3 objects listed in each polling run.
 }
 
 // Close cancels the context and removes the metrics from the registry.
 func (m *inputMetrics) Close() {
 	m.cancel()
-	m.unregister()
 }
 
 // beginSQSWorker tracks the start of a new SQS worker. The returned ID
@@ -147,13 +148,11 @@ func (m *inputMetrics) updateSqsWorkerUtilization() {
 	m.sqsWorkerUtilizationLastUpdate = now
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers int) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+func newInputMetrics(reg *monitoring.Registry, maxWorkers int, logger *logp.Logger) *inputMetrics {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
 		registry:                            reg,
-		unregister:                          unreg,
 		ctx:                                 ctx,
 		cancel:                              cancel,
 		sqsMaxMessagesInflight:              maxWorkers,
@@ -178,21 +177,28 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		s3ObjectProcessingTime:              metrics.NewUniformSample(1024),
 		s3ObjectSizeInBytes:                 metrics.NewUniformSample(1024),
 		s3EventsPerObject:                   metrics.NewUniformSample(1024),
+		s3PollingRunTime:                    metrics.NewUniformSample(1024),
+		s3PollingRunTimeTotal:               monitoring.NewUint(reg, "s3_polling_run_time_total"),
+		s3ObjectsListedPerRun:               metrics.NewUniformSample(1024),
 	}
 
 	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
 	out.sqsMessagesWaiting.Set(int64(-1))
 
-	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "sqs_message_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "sqs_lag_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
+	adapter.NewGoMetrics(reg, "s3_object_processing_time", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "s3_object_size_in_bytes", adapter.Accept).
+	adapter.NewGoMetrics(reg, "s3_object_size_in_bytes", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
-	adapter.NewGoMetrics(reg, "s3_events_per_object", adapter.Accept).
+	adapter.NewGoMetrics(reg, "s3_events_per_object", logger, adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3EventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_polling_run_time", logger, adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3PollingRunTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_objects_listed_per_run", logger, adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3ObjectsListedPerRun)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	if maxWorkers > 0 {
 		// Periodically update the sqs worker utilization metric.
@@ -225,7 +231,7 @@ func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
 
 func (m *monitoredReader) Read(p []byte) (int, error) {
 	n, err := m.reader.Read(p)
-	m.totalBytesReadMetric.Add(uint64(n))
+	m.totalBytesReadMetric.Add(uint64(n)) //nolint:gosec // n is non-negative from io.Reader contract
 	m.totalBytesReadCurrent += int64(n)
 	return n, err
 }

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -73,7 +75,7 @@ var supportedMonitorMetricsets = []string{"monitor", "container_registry", "cont
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	metricsetName := base.Name()
-	var config Config
+	config := createDefaultConfig()
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
@@ -115,13 +117,15 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// check wether metricset is part of supported metricsets and if BatchApi is enabled
 	if slices.Contains(supportedMonitorMetricsets, metricsetName) && config.EnableBatchApi {
 		// instantiate Batch Client which enables fetching metric values for multiple resources using azure batch api
-		monitorBatchClient, err = NewBatchClient(config)
+		// base.Metrics() is the Metricbeat registry for this metricset instance; the client tolerates nil for tests.
+		monitorBatchClient, err = NewBatchClient(config, base.Logger(), base.Metrics())
 		if err != nil {
 			return nil, fmt.Errorf("error initializing the monitor batch client: module azure - %s metricset: %w", metricsetName, err)
 		}
 	} else {
 		// default case
-		monitorClient, err = NewClient(config)
+		// base.Metrics() is the Metricbeat registry for this metricset instance; the client tolerates nil for tests.
+		monitorClient, err = NewClient(config, base.Logger(), base.Metrics())
 		if err != nil {
 			return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 		}

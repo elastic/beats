@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -45,7 +45,8 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 			MaxDepth: 1,
 		},
 	})
-	_, err := processors.New(processors.PluginConfig([]*conf.C{cfg}))
+	logger := logptest.NewTestingLogger(t, "")
+	_, err := processors.New(processors.PluginConfig([]*conf.C{cfg}), logger)
 	assert.NoError(t, err)
 
 	// Unknown fields should not be allowed.
@@ -55,7 +56,7 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 			"extraneous": "field",
 		},
 	})
-	_, err = processors.New(processors.PluginConfig([]*conf.C{cfg}))
+	_, err = processors.New(processors.PluginConfig([]*conf.C{cfg}), logger)
 	assert.Error(t, err)
 	assert.EqualError(t, err, "unexpected extraneous option in decode_json_fields")
 }
@@ -121,7 +122,7 @@ func TestInvalidJSONMultiple(t *testing.T) {
 }
 
 func TestDocumentID(t *testing.T) {
-	log := logp.NewLogger("decode_json_fields_test")
+	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
 
 	input := mapstr.M{
 		"msg": `{"log": "message", "myid": "myDocumentID"}`,
@@ -132,7 +133,7 @@ func TestDocumentID(t *testing.T) {
 		"document_id": "myid",
 	})
 
-	p, err := NewDecodeJSONFields(config)
+	p, err := NewDecodeJSONFields(config, log)
 	if err != nil {
 		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
@@ -274,9 +275,9 @@ func TestTargetMetadata(t *testing.T) {
 		"target":        "@metadata.json",
 	})
 
-	log := logp.NewLogger("decode_json_fields_test")
+	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
 
-	p, err := NewDecodeJSONFields(testConfig)
+	p, err := NewDecodeJSONFields(testConfig, log)
 	if err != nil {
 		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
@@ -580,9 +581,9 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 }
 
 func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
-	log := logp.NewLogger("decode_json_fields_test")
+	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
 
-	p, err := NewDecodeJSONFields(config)
+	p, err := NewDecodeJSONFields(config, log)
 	if err != nil {
 		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)

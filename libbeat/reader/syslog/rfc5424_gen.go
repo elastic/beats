@@ -19,9 +19,8 @@
 package syslog
 
 import (
+	"errors"
 	"io"
-
-	"go.uber.org/multierr"
 )
 
 const rfc5424_start int = 1
@@ -38,7 +37,7 @@ type machineState struct {
 
 // ParseRFC5424 parses an RFC 5424-formatted syslog message.
 func parseRFC5424(data string) (message, error) {
-	var errs error
+	var errs []error
 	var p, cs, tok int
 
 	pe := len(data)
@@ -121,10 +120,11 @@ func parseRFC5424(data string) (message, error) {
 		goto tr0
 	tr0:
 
-		errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+		errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 		p--
 
 		goto st0
+
 	st_case_0:
 	st0:
 		cs = 0
@@ -148,6 +148,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof3
 		}
 	st_case_3:
+
 		if data[p] == 62 {
 			goto tr4
 		}
@@ -158,7 +159,7 @@ func parseRFC5424(data string) (message, error) {
 	tr4:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st4
@@ -167,6 +168,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof4
 		}
 	st_case_4:
+
 		if data[p] == 62 {
 			goto tr6
 		}
@@ -184,6 +186,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof5
 		}
 	st_case_5:
+
 		switch data[p] {
 		case 32:
 			goto tr7
@@ -197,7 +200,7 @@ func parseRFC5424(data string) (message, error) {
 	tr7:
 
 		if err := m.setVersion(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st6
@@ -206,6 +209,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof6
 		}
 	st_case_6:
+
 		if data[p] == 45 {
 			goto st7
 		}
@@ -225,7 +229,7 @@ func parseRFC5424(data string) (message, error) {
 	tr32:
 
 		if err := m.setTimestampRFC3339(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st8
@@ -234,6 +238,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof8
 		}
 	st_case_8:
+
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr13
 		}
@@ -248,6 +253,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof9
 		}
 	st_case_9:
+
 		if data[p] == 32 {
 			goto tr14
 		}
@@ -265,6 +271,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof10
 		}
 	st_case_10:
+
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr16
 		}
@@ -279,6 +286,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof11
 		}
 	st_case_11:
+
 		if data[p] == 32 {
 			goto tr17
 		}
@@ -296,6 +304,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof12
 		}
 	st_case_12:
+
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr19
 		}
@@ -310,6 +319,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof13
 		}
 	st_case_13:
+
 		if data[p] == 32 {
 			goto tr20
 		}
@@ -327,6 +337,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof14
 		}
 	st_case_14:
+
 		if 33 <= data[p] && data[p] <= 126 {
 			goto tr22
 		}
@@ -341,6 +352,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof15
 		}
 	st_case_15:
+
 		if data[p] == 32 {
 			goto tr23
 		}
@@ -358,6 +370,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof16
 		}
 	st_case_16:
+
 		switch data[p] {
 		case 45:
 			goto st24
@@ -384,6 +397,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof25
 		}
 	st_case_25:
+
 		goto tr35
 	tr35:
 
@@ -395,6 +409,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof26
 		}
 	st_case_26:
+
 		goto st26
 	tr26:
 
@@ -406,6 +421,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof17
 		}
 	st_case_17:
+
 		switch data[p] {
 		case 92:
 			goto st19
@@ -430,10 +446,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof19
 		}
 	st_case_19:
-		if data[p] == 93 {
-			goto st18
-		}
-		goto tr0
+		goto st18
 	st27:
 		if p++; p == pe {
 			goto _test_eof27
@@ -456,6 +469,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof20
 		}
 	st_case_20:
+
 		switch data[p] {
 		case 43:
 			goto st21
@@ -526,14 +540,14 @@ func parseRFC5424(data string) (message, error) {
 	tr9:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		goto st23
 	tr6:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
-			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
+			errs = append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
 		tok = p
@@ -544,6 +558,7 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof23
 		}
 	st_case_23:
+
 		switch data[p] {
 		case 32:
 			goto tr7
@@ -645,7 +660,7 @@ func parseRFC5424(data string) (message, error) {
 
 			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
 
-				errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
+				errs = append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 				p--
 
 			case 27:
@@ -666,7 +681,7 @@ func parseRFC5424(data string) (message, error) {
 		}
 	}
 
-	return m, errs
+	return m, errors.Join(errs...)
 }
 
 const check_start int = 1
@@ -785,6 +800,7 @@ func isRFC5424(data string) bool {
 			goto _test_eof7
 		}
 	st_case_7:
+
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st8
 		}
@@ -1074,6 +1090,7 @@ func parseStructuredData(data string) map[string]interface{} {
 			goto _test_eof3
 		}
 	st_case_3:
+
 		switch data[p] {
 		case 32:
 			goto tr3
@@ -1104,6 +1121,7 @@ func parseStructuredData(data string) map[string]interface{} {
 			goto _test_eof4
 		}
 	st_case_4:
+
 		if data[p] == 33 {
 			goto tr6
 		}
@@ -1130,6 +1148,7 @@ func parseStructuredData(data string) map[string]interface{} {
 			goto _test_eof5
 		}
 	st_case_5:
+
 		switch data[p] {
 		case 33:
 			goto st6
@@ -1764,6 +1783,7 @@ func parseStructuredData(data string) map[string]interface{} {
 			goto _test_eof37
 		}
 	st_case_37:
+
 		if data[p] == 34 {
 			goto st38
 		}
@@ -1787,16 +1807,22 @@ func parseStructuredData(data string) map[string]interface{} {
 		tok = p
 
 		goto st39
+	tr47:
+
+		s.sdValueEscapes = append(s.sdValueEscapes, p-1)
+
+		goto st39
 	st39:
 		if p++; p == pe {
 			goto _test_eof39
 		}
 	st_case_39:
+
 		switch data[p] {
 		case 34:
 			goto tr43
 		case 92:
-			goto tr44
+			goto st41
 		case 93:
 			goto st0
 		}
@@ -1815,6 +1841,7 @@ func parseStructuredData(data string) map[string]interface{} {
 			goto _test_eof40
 		}
 	st_case_40:
+
 		switch data[p] {
 		case 32:
 			goto st4
@@ -1835,6 +1862,7 @@ func parseStructuredData(data string) map[string]interface{} {
 			goto _test_eof73
 		}
 	st_case_73:
+
 		if data[p] == 91 {
 			goto st2
 		}
@@ -1843,26 +1871,20 @@ func parseStructuredData(data string) map[string]interface{} {
 
 		tok = p
 
-		s.sdValueEscapes = append(s.sdValueEscapes, p)
-
-		goto st41
-	tr44:
-
-		s.sdValueEscapes = append(s.sdValueEscapes, p)
-
 		goto st41
 	st41:
 		if p++; p == pe {
 			goto _test_eof41
 		}
 	st_case_41:
+
 		if data[p] == 34 {
-			goto st39
+			goto tr47
 		}
 		if 92 <= data[p] && data[p] <= 93 {
-			goto st39
+			goto tr47
 		}
-		goto st0
+		goto st39
 	st42:
 		if p++; p == pe {
 			goto _test_eof42

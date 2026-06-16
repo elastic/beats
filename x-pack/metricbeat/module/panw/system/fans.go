@@ -14,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const fansQuery = "<show><system><environmentals><fans></fans></environmentals></system></show>"
+const fansQuery = "<show><system><environmentals><fans></fans></environmentals></system></show>" //nolint:misspell // environmentals is the PAN-OS API endpoint name
 
 func getFanEvents(m *MetricSet) ([]mb.Event, error) {
 
@@ -57,7 +57,7 @@ func formatFanEvents(m *MetricSet, response *FanResponse) []mb.Event {
 					"fan.rpm":         entry.RPMs,
 					"fan.min_rpm":     entry.Min,
 				},
-				RootFields: panw.MakeRootFields(m.config.HostIp),
+				RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 			}
 			events = append(events, event)
 		}

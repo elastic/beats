@@ -20,6 +20,7 @@ package compat
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -51,7 +53,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.NewConfig())
@@ -96,9 +98,8 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
 			log,
-			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		inputID := "filestream-kubernetes-pod-aee2af1c6365ecdd72416f44aab49cd8bdc7522ab008c39784b7fd9d46f794a4"
@@ -111,7 +112,6 @@ paths:
 prospector:
   scanner:
     symlinks: true
-take_over: true
 type: test
 `, inputID)
 
@@ -142,9 +142,8 @@ type: test
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
 		factory := RunnerFactory(
 			log,
-			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		// run
@@ -153,6 +152,16 @@ type: test
 		}))
 		assert.Error(t, err)
 	})
+}
+
+type mockStatusReporter struct {
+	status status.Status
+	desc   string
+}
+
+func (sr *mockStatusReporter) UpdateStatus(st status.Status, desc string) {
+	sr.status = st
+	sr.desc = desc
 }
 
 func TestRunnerFactory_CreateAndRun(t *testing.T) {
@@ -171,9 +180,8 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
 		factory := RunnerFactory(
 			log,
-			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
@@ -188,11 +196,41 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		assert.Equal(t, 1, countRun)
 	})
 
+	t.Run("runner with status reports stopped status after terminating", func(t *testing.T) {
+		log := logptest.NewTestingLogger(t, "")
+		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(&inputest.MockInput{
+			OnRun: func(ctx v2.Context, _ beat.PipelineConnector) error {
+				<-ctx.Cancelation.Done()
+				return nil
+			},
+		}))
+		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
+		factory := RunnerFactory(
+			log,
+			beat.Info{Logger: log},
+			monitoring.NewRegistry(),
+			loader.Loader)
+
+		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
+			"type": "test",
+		}))
+		require.NoError(t, err)
+
+		statusReporter := &mockStatusReporter{}
+		runnerWithStatus, ok := runner.(status.WithStatusReporter)
+		require.True(t, ok, "runner should allow a status reporter")
+		runnerWithStatus.SetStatusReporter(statusReporter)
+
+		runner.Start()
+		runner.Stop()
+		assert.Equal(t, status.Stopped, statusReporter.status, "runner status after Stop returns with no errors should be Stopped")
+	})
+
 	t.Run("fail if input type is unknown to loader", func(t *testing.T) {
 		log := logptest.NewTestingLogger(t, "")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
@@ -209,27 +247,36 @@ func TestGenerateCheckConfig(t *testing.T) {
 		cfg       *conf.C
 		want      *conf.C
 		wantErr   error
-		assertCfg func(t assert.TestingT, expected interface{}, actual interface{}, msgAndArgs ...interface{}) bool
+		assertCfg func(t assert.TestingT, expected any, actual *conf.C, msgAndArgs ...any)
 	}{
 		{
-			name:      "id is present",
-			cfg:       conf.MustNewConfigFrom("id: some-id"),
-			assertCfg: assert.NotEqual,
+			name: "id is present",
+			cfg:  conf.MustNewConfigFrom("id: some-id"),
+			assertCfg: func(t assert.TestingT, expect any, got *conf.C, msgAndArgs ...any) {
+				id, _ := got.String("id", -1)
+				if !strings.HasPrefix(id, "some-id") {
+					t.Errorf("'id' field must start with the original id, got %q", id)
+				}
+				assert.NotEqual(t, expect, got, msgAndArgs)
+			},
 		},
 		{
-			name:    "absent id",
-			cfg:     conf.MustNewConfigFrom(""),
-			wantErr: errors.New("failed to get 'id'"),
-			assertCfg: func(t assert.TestingT, _ interface{}, got interface{}, msgAndArgs ...interface{}) bool {
-				return assert.Nil(t, got, msgAndArgs...)
+			name: "absent id",
+			cfg:  conf.MustNewConfigFrom(""),
+			assertCfg: func(t assert.TestingT, expect any, got *conf.C, msgAndArgs ...any) {
+				if !got.HasField("id") {
+					t.Errorf("expecting 'id' to be present in %s", conf.DebugString(got, true))
+				}
+				assert.NotNil(t, got, msgAndArgs...)
+				assert.NotEqual(t, expect, got, msgAndArgs)
 			},
 		},
 		{
 			name:    "invalid config",
 			cfg:     nil,
 			wantErr: errors.New("failed to create new config"),
-			assertCfg: func(t assert.TestingT, _ interface{}, got interface{}, msgAndArgs ...interface{}) bool {
-				return assert.Nil(t, got, msgAndArgs...)
+			assertCfg: func(t assert.TestingT, _ any, got *conf.C, msgAndArgs ...any) {
+				assert.Nil(t, got, msgAndArgs...)
 			},
 		},
 	}

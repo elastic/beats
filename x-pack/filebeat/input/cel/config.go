@@ -14,7 +14,9 @@ import (
 	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v3"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/otel"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/mito/lib"
@@ -24,6 +26,10 @@ const defaultMaxExecutions = 1000
 
 // config is the top-level configuration for a cel input.
 type config struct {
+	// DataStream holds the data_stream.dataset name if it
+	// was available on configuration.
+	DataStream string
+
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -45,6 +51,12 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
+	// SecretState holds secret key-value pairs that are
+	// stored encrypted by Fleet (via secret: true) and
+	// placed at state.secret before CEL program execution.
+	// The state.secret key is unconditionally redacted in
+	// debug logs.
+	SecretState secretState `config:"secret_state"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
@@ -66,6 +78,49 @@ type config struct {
 	// RecordCoverage indicates whether a program should
 	// record and log execution coverage.
 	RecordCoverage bool `config:"record_coverage"`
+
+	// Package contains information about the integration package.
+	// name and version are expected.
+	Package map[string]string `config:"package"`
+
+	// OTel configuration for which headers and request parameters should be
+	// redacted or unredacted in span attributes.
+	OTelTraceConfig *otel.TraceConfig `config:"otel.trace"`
+}
+
+func (c config) GetPackageData(key string) string {
+	if c.Package == nil {
+		return "unknown"
+	}
+	value, ok := c.Package[key]
+	if !ok {
+		return "unknown"
+	}
+	return value
+}
+
+// secretState holds secret key-value pairs. It implements
+// the ucfg Unpacker interface to accept either a map (from
+// direct config) or a string (from Fleet secret resolution,
+// which delivers the stored YAML text as a scalar).
+//
+// The string case is needed because Fleet resolves secrets
+// to their stored string values. See
+// https://github.com/elastic/kibana/issues/267859
+type secretState struct {
+	m map[string]interface{}
+}
+
+func (s *secretState) Unpack(v interface{}) error {
+	switch v := v.(type) {
+	case map[string]interface{}:
+		s.m = v
+		return nil
+	case string:
+		return yaml.Unmarshal([]byte(v), &s.m)
+	default:
+		return fmt.Errorf("secret_state: expected string or map, got %T", v)
+	}
 }
 
 type redact struct {
@@ -91,19 +146,14 @@ func (t *dumpConfig) enabled() bool {
 }
 
 func (c config) Validate() error {
-	if c.RecordCoverage {
-		logp.L().Named("input.cel").Warn("execution coverage enabled: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
-	}
-	if c.Redact == nil {
-		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
-	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
 	}
 	if c.MaxExecutions != nil && *c.MaxExecutions <= 0 {
 		return fmt.Errorf("invalid maximum number of executions: %d <= 0", *c.MaxExecutions)
+	}
+	if _, exists := c.State["secret"]; exists {
+		return errors.New(`state must not contain a "secret" key: values intended to be secret cannot be guaranteed to be encrypted in the stored configuration; use secret_state instead`)
 	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
@@ -115,7 +165,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, lib.HTTPOptions{}, patterns, c.XSDs, logp.NewNopLogger(), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -280,7 +330,7 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c *ResourceConfig) Validate() error {
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {

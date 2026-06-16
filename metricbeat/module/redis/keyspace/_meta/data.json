@@ -16,6 +16,7 @@
         "keyspace": {
             "avg_ttl": 359459,
             "expires": 0,
+            "subexpiry": 0,
             "id": "db0",
             "keys": 1
         }

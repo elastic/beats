@@ -1,5 +1,3 @@
-version: '2.3'
-
 services:
   ceph:
     image: docker.elastic.co/integrations-ci/beats-ceph:${CEPH_VERSION:-master-97985eb-nautilus-centos-7-x86_64}-2

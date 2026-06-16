@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-netflow.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # NetFlow module [filebeat-module-netflow]
 
@@ -92,7 +97,6 @@ The fileset is by default configured to listen for UDP traffic on `localhost:205
 **`var.tags`**
 :   A list of tags to include in events. Including `forwarded` indicates that the events did not originate on this host and causes `host.name` to not be added to events. Defaults to `[forwarded]`.
 
-
-## Fields [_fields_36]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-netflow.md) section.

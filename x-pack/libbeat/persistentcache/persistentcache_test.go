@@ -168,12 +168,10 @@ func BenchmarkPut(b *testing.B) {
 		Put(key string, value interface{}) error
 		Close() error
 	}
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options, logger)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -295,11 +293,9 @@ func BenchmarkOpen(b *testing.B) {
 		Close() error
 	}
 
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options, logger)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}
@@ -350,11 +346,9 @@ func BenchmarkGet(b *testing.B) {
 		Close() error
 	}
 
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(b, err)
 	options := testOptions(b)
 	newPersistentCache := func(tb testing.TB, name string) cache {
-		cache, err := New(name, options, logger)
+		cache, err := New(name, options, logp.NewNopLogger())
 		require.NoError(tb, err)
 		return cache
 	}

@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package storage
 
 import (
@@ -65,7 +67,7 @@ func getStorageMappedResourceDefinitions(client *azure.BatchClient, resourceId s
 			filteredMetricDefinitions = append(filteredMetricDefinitions, *metricDefinition)
 		}
 		// some metrics do not support the default PT5M timegrain so they will have to be grouped in a different API call, else call will fail
-		groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions)
+		groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions, client.Config.DefaultTimeGrain)
 		for time, groupedMetricList := range groupedMetrics {
 			// metrics will have to be grouped by allowed dimensions
 			dimMetrics := groupMetricsByAllowedDimensions(groupedMetricList)

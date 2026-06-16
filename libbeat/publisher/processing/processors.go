@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type group struct {
@@ -45,7 +46,7 @@ type processorFn struct {
 
 func newGeneralizeProcessor(keepNull bool, logger *logp.Logger) *processorFn {
 	logger = logger.Named("publisher_processing")
-	g := common.NewGenericEventConverter(keepNull)
+	g := common.NewGenericEventConverter(keepNull, logger)
 	return newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
 		if len(event.Fields) == 0 {
@@ -116,6 +117,17 @@ func (p *group) All() []beat.Processor {
 	return p.list
 }
 
+func (p *group) SetPaths(paths *paths.Path) error {
+	var err error
+	for _, processor := range p.list {
+		pathSetter, ok := processor.(processors.PathSetter)
+		if ok {
+			err = errors.Join(err, pathSetter.SetPaths(paths))
+		}
+	}
+	return err
+}
+
 func (p *group) Run(event *beat.Event) (*beat.Event, error) {
 	if p == nil || len(p.list) == 0 {
 		return event, nil
@@ -168,7 +180,6 @@ func addMeta(event *beat.Event, meta mapstr.M) {
 	if event.Meta == nil {
 		event.Meta = meta
 	} else {
-		event.Meta.Clone()
 		event.Meta.DeepUpdate(meta)
 	}
 }

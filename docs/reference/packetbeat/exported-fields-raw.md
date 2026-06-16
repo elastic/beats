@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-raw.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Raw fields [exported-fields-raw]
 
@@ -10,12 +15,12 @@ These fields contain the raw transaction data.
 **`request`**
 :   For text protocols, this is the request as seen on the wire (application layer only). For binary protocols this is our representation of the request.
 
-type: text
+    type: text
 
 
 **`response`**
 :   For text protocols, this is the response as seen on the wire (application layer only). For binary protocols this is our representation of the request.
 
-type: text
+    type: text
 
 

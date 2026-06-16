@@ -32,6 +32,10 @@ type config struct {
 	// IgnoreMissing: Ignore errors if event has no matching field.
 	IgnoreMissing bool `config:"ignore_missing"`
 
+	// IgnoreFailure: Ignore errors in put, get or delete operations
+	// including missing cache entries.
+	IgnoreFailure bool `config:"ignore_failure"`
+
 	// OverwriteKeys allow target_fields to overwrite existing fields.
 	OverwriteKeys bool `config:"overwrite_keys"`
 }
@@ -83,6 +87,7 @@ type delConfig struct {
 func defaultConfig() config {
 	return config{
 		IgnoreMissing: true,
+		IgnoreFailure: false,
 		OverwriteKeys: false,
 	}
 }

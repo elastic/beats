@@ -2,6 +2,9 @@
 navigation_title: "Network flows"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-flows.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure flows to monitor network traffic [configuration-flows]
@@ -33,7 +36,7 @@ Here’s an example of a flow information sent by Packetbeat. See [*Flow Event f
   "agent": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "{{stack-version}}"
+    "version": "{{version.stack}}"
   },
   "destination": {
     "bytes": 460,

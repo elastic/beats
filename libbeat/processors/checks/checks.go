@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ConfigChecked returns a wrapper that will validate the configuration using
@@ -32,13 +33,13 @@ func ConfigChecked(
 	checks ...func(*config.C) error,
 ) processors.Constructor {
 	validator := checkAll(checks...)
-	return func(cfg *config.C) (beat.Processor, error) {
+	return func(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 		err := validator(cfg)
 		if err != nil {
 			return nil, fmt.Errorf("%w in %v", err, cfg.Path())
 		}
 
-		return constr(cfg)
+		return constr(cfg, log)
 	}
 }
 

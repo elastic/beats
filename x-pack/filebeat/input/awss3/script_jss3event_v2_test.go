@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -21,7 +22,6 @@ const (
 var log = logp.NewLogger("test")
 
 func TestJSS3EventV2(t *testing.T) {
-	logp.TestingSetup()
 
 	source := `
 	var evts = [];
@@ -37,7 +37,7 @@ func TestJSS3EventV2(t *testing.T) {
 	return evts;
 	`
 
-	p, err := newScriptFromConfig(log, &scriptConfig{Source: header + source + footer})
+	p, err := newScriptFromConfig(log, &scriptConfig{Source: header + source + footer}, paths.New())
 	if err != nil {
 		t.Fatal(err)
 	}

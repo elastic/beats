@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/generate-index-pattern.html
+applies_to:
+  stack: ga
 ---
 
 # Generating the Beat Index Pattern [generate-index-pattern]

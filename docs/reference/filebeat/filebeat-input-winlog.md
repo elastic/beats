@@ -2,6 +2,9 @@
 navigation_title: "winlog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-winlog.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
 
 # winlog input [filebeat-input-winlog]
@@ -128,7 +131,7 @@ If this option is specified, the input filters events that are older than the sp
 A boolean flag to indicate that the log contains only events collected from remote hosts using the Windows Event Collector. The value defaults to true for the ForwardedEvents log and false for any other log. **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
-This settings allows Filebeat to optimize reads for forwarded events that are already rendered. When the value is true Filebeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
+This setting allows Filebeat to optimize reads for forwarded events that are already rendered. When the value is true Filebeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
 
 
 ### `event_id` [_event_id]
@@ -213,6 +216,8 @@ Microsoft-Windows-Eventlog
 Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`, `ignore_older`, `level`, and `provider` options. These options should be included in the XML query directly. Furthermore, an `id` must be provided. Custom XML queries provide more flexibility and advanced options than the simpler query options in Filebeat. **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
+Query filters provided through custom XML queries are not always reliable across all Windows versions and forwarding scenarios. If possible, prefer non-custom queries so Filebeat can subscribe unfiltered and apply filtering in code.
+
 Here is a configuration which will collect DHCP server events from multiple channels:
 
 ```yaml
@@ -247,6 +252,29 @@ Example:
 ```
 
 * This can have a significant impact on performance that can vary depending on your system specs.
+
+
+### `ignore_missing_channel` [_ignore_missing_channel]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `true`.
+
+This option is useful when deploying Winlogbeat configurations across multiple systems where certain event log channels may not be available on all machines, or when monitoring optional channels that may not always be present.
+
+Example:
+
+```yaml
+winlogbeat.event_logs:
+  - name: Application
+  - name: System 
+  - name: Sysmon
+    ignore_missing_channel: false
+```
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error, which may be desired for critical monitoring components.
 
 
 ### `tags` [_tags_29]

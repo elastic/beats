@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/reduce-registry-size.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Registry file is too large [reduce-registry-size]

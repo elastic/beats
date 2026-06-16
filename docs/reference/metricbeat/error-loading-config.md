@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/error-loading-config.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Error loading config file [error-loading-config]

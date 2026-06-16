@@ -2,17 +2,20 @@
 navigation_title: "syslog"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/syslog.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Syslog [syslog]
 
 
-The syslog processor parses RFC 3146 and/or RFC 5424 formatted syslog messages that are stored in a field. The processor itself does not handle receiving syslog messages from external sources. This is done through an input, such as the TCP input. Certain integrations, when enabled through configuration, will embed the syslog processor to process syslog messages, such as Custom TCP Logs and Custom UDP Logs.
+The syslog processor parses RFC 3164 and/or RFC 5424 formatted syslog messages that are stored in a field. The processor itself does not handle receiving syslog messages from external sources. This is done through an input, such as the TCP input. Certain integrations, when enabled through configuration, will embed the syslog processor to process syslog messages, such as Custom TCP Logs and Custom UDP Logs.
 
 
 ## Configuration [_configuration]
 
-The `syslog` processor parses RFC 3146 and/or RFC 5424 formatted syslog messages that are stored under the `field` key.
+The `syslog` processor parses RFC 3164 and/or RFC 5424 formatted syslog messages that are stored under the `field` key.
 
 The supported configuration options are:
 
@@ -127,7 +130,7 @@ For RFC 5424-formatted logs, if the structured data cannot be parsed according t
 
 ## Metrics [_metrics]
 
-Internal metrics are available to assist with debugging efforts. The metrics are served from the metrics HTTP endpoint (for example: `http://localhost:5066/stats`) and are found under `processor.syslog.[instance ID]` or `processor.syslog.[tag]-[instance ID]` if a **tag** is provided. See [HTTP endpoint](/reference/metricbeat/http-endpoint.md) for more information on configuration the metrics HTTP endpoint.
+Internal metrics are available to assist with debugging efforts. The metrics are served from the metrics HTTP endpoint (for example: `http://localhost:5066/stats`) and are found under `processor.syslog.[instance ID]` or `processor.syslog.[tag]-[instance ID]` if a **tag** is provided. See [HTTP endpoint](/reference/metricbeat/http-endpoint.md) for more information on configuring the metrics HTTP endpoint.
 
 For example, here are metrics from a processor with a **tag** of `log-input` and an **instance ID** of `1`:
 

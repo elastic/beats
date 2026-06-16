@@ -84,7 +84,7 @@ func newV2Context() (v2.Context, func()) {
 }
 
 func createInput(t *testing.T, cfg *conf.C) *cloudwatchInput {
-	inputV2, err := Plugin().Manager.Create(cfg)
+	inputV2, err := Plugin(createTestInputStore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

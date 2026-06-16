@@ -2,6 +2,9 @@
 navigation_title: "replace"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/replace-fields.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Replace fields from events [replace-fields]

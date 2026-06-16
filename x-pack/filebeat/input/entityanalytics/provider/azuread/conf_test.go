@@ -35,6 +35,30 @@ func TestConf_Validate(t *testing.T) {
 			},
 			WantErr: "dataset must be 'all', 'users', 'devices' or empty",
 		},
+		"valid-enrich-mfa": {
+			In: conf{
+				SyncInterval:   defaultSyncInterval,
+				UpdateInterval: defaultUpdateInterval,
+				EnrichWith:     []string{"mfa"},
+			},
+			WantErr: "",
+		},
+		"valid-enrich-none": {
+			In: conf{
+				SyncInterval:   defaultSyncInterval,
+				UpdateInterval: defaultUpdateInterval,
+				EnrichWith:     []string{"none"},
+			},
+			WantErr: "",
+		},
+		"err-invalid-enrich": {
+			In: conf{
+				SyncInterval:   defaultSyncInterval,
+				UpdateInterval: defaultUpdateInterval,
+				EnrichWith:     []string{"groups"},
+			},
+			WantErr: `enrich_with value "groups" is not supported`,
+		},
 	}
 
 	for name, tc := range tests {

@@ -182,6 +182,21 @@ func TestPgsqlParser_response(t *testing.T) {
 	}
 }
 
+// Test a DataRow that that reports as having only one row, but actually has two.
+func TestPgslMaliciousDataRowLen(t *testing.T) {
+	data := "540000001a00016100000000000001000000170004ffffffff0000" + "4400000010000200000001580000000159"
+	pgsql := pgsqlModForTests(nil)
+	message, err := hex.DecodeString(string(data))
+	assert.NoError(t, err)
+
+	stream := &pgsqlStream{data: message, message: new(pgsqlMessage)}
+
+	// make sure we don't panic
+	ok, complete := pgsql.pgsqlMessageParser(stream)
+	assert.False(t, ok)
+	assert.False(t, complete)
+}
+
 // Test parsing an incomplete pgsql response
 func TestPgsqlParser_incomplete_response(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("pgsql", "pgsqldetailed"))

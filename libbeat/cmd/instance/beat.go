@@ -27,6 +27,7 @@ import (
 	"net"
 	"os"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -40,11 +41,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/locks"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
@@ -67,7 +68,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/filewatcher"
+
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -156,7 +157,7 @@ type certReloadConfig struct {
 
 func (c certReloadConfig) Validate() error {
 	if c.Reload.Period < time.Second {
-		return errors.New("'restart_on_cert_change.period' must be equal or greather than 1s")
+		return errors.New("'restart_on_cert_change.period' must be equal or greater than 1s")
 	}
 
 	if c.Reload.Enabled && runtime.GOOS == "windows" {
@@ -249,8 +250,9 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:               id,
 			FirstStart:       time.Now(),
 			StartTime:        time.Now(),
-			EphemeralID:      metricreport.EphemeralID(),
+			EphemeralID:      metricreport.EphemeralID(), //nolint:staticcheck //keep behavior for now
 			FIPSDistribution: version.FIPSDistribution,
+			Paths:            paths.New(),
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
@@ -343,18 +345,22 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	b.registerClusterUUIDFetching()
 
-	reg := monitoring.Default.GetRegistry("libbeat")
-	if reg == nil {
-		reg = monitoring.Default.NewRegistry("libbeat")
-	}
+	reg := b.Monitoring.StatsRegistry().GetOrCreateRegistry("libbeat")
 
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
+	err = metricreport.SetupMetricsOptions(metricreport.MetricOptions{
+		Name:           b.Info.Beat,
+		Version:        version.GetDefaultVersion(),
+		EphemeralID:    metricreport.EphemeralID().String(), //nolint:staticcheck //keep behavior for now
+		Logger:         b.Info.Logger.Named("metrics"),
+		SystemMetrics:  monitoring.Default.GetOrCreateRegistry("system"),
+		ProcessMetrics: monitoring.Default.GetOrCreateRegistry("beat"),
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	// Report central management state
-	mgmt := b.Info.Monitoring.StateRegistry.NewRegistry("management")
+	mgmt := b.Monitoring.StateRegistry().GetOrCreateRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	log.Debug("Initializing output plugins")
@@ -372,7 +378,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: b.Info.Monitoring.StateRegistry,
+		Telemetry: b.Monitoring.StateRegistry(),
 		Logger:    b.Info.Logger.Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
@@ -422,7 +428,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
-	if !fleetmode.Enabled() {
+	if !management.UnderAgent() {
 		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
@@ -445,7 +451,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP, api.NamespaceLookupFunc())
+		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP, b.Monitoring)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -460,12 +466,15 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 				return fmt.Errorf("failed to attach http handlers for pprof: %w", err)
 			}
 		}
+		if err := b.API.AttachStateInspector(); err != nil {
+			return fmt.Errorf("failed to attach state inspector: %w", err)
+		}
 	}
 
 	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
 	// https://github.com/elastic/beats/blob/7cf873fd340172c33f294500ccfec948afd7a47c/x-pack/osquerybeat/osquerybeat.yml#L16
 	if b.Info.Beat != "osquerybeat" {
-		if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+		if err := seccomp.LoadFilter(b.Config.Seccomp, logger); err != nil {
 			return err
 		}
 	}
@@ -484,7 +493,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
-		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging)
+		reporter, err := log.MakeReporter(b.Info, b.Config.MetricLogging, b.Monitoring)
 		if err != nil {
 			return err
 		}
@@ -504,27 +513,26 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctxDashboards, cancelDashboards := context.WithCancel(context.Background())
 
-	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
-	// Since publisher.Close is not safe to be called more than once this is necessary.
-	var once sync.Once
-	stopBeat := func() {
-		once.Do(func() {
-			b.Instrumentation.Tracer().Close()
-			// If the publisher has a Close() method, call it before stopping the beater.
-			if c, ok := b.Publisher.(io.Closer); ok {
-				c.Close()
-			}
-			beater.Stop()
+	// On Stop, the manager will trigger the callback to shut down the
+	// publisher pipeline and then notify the beater.
+	var stopOnce sync.Once
+	b.Manager.SetStopCallback(
+		func() {
+			stopOnce.Do(func() {
+				b.Instrumentation.Tracer().Close()
+				// disconnect the pipeline first
+				b.Publisher.Disconnect(context.Background())
+				beater.Stop()
+			})
 		})
-	}
-	svc.HandleSignals(stopBeat, cancel)
 
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(stopBeat)
+	// Besides a manager-initiated shutdown from Agent config state,
+	// we stop the manager explicitly on SIGINT / SIGHUP / etc.
+	svc.HandleSignals(b.Manager.Stop, cancelDashboards)
 
-	err = b.loadDashboards(ctx, false)
+	err = b.loadDashboards(ctxDashboards, false)
 	if err != nil {
 		return err
 	}
@@ -551,49 +559,49 @@ func (b *Beat) reexec() error {
 // and/or pushed to Elasticsearch through the x-pack monitoring feature.
 func (b *Beat) RegisterMetrics() {
 	// info
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "version").Set(b.Info.Version)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "beat").Set(b.Info.Beat)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uuid").Set(b.Info.ID.String())
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "binary_arch").Set(runtime.GOARCH)
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "build_commit").Set(version.Commit())
-	monitoring.NewTimestamp(b.Info.Monitoring.InfoRegistry, "build_time").Set(version.BuildTime())
-	monitoring.NewBool(b.Info.Monitoring.InfoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+	infoRegistry := b.Monitoring.InfoRegistry()
+	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
+	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
+	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
+	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
+	monitoring.NewString(infoRegistry, "build_commit").Set(version.Commit())
+	monitoring.NewTimestamp(infoRegistry, "build_time").Set(version.BuildTime())
+	monitoring.NewBool(infoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
 	// Add user metadata data asynchronously (on Windows the lookup can take up to 60s).
 	go func() {
 		if u, err := user.Current(); err != nil {
 			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
 			// if the user set securityContext.runAsUser to an arbitrary value.
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
+			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
+			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
 		} else {
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "username").Set(u.Username)
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uid").Set(u.Uid)
-			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "gid").Set(u.Gid)
+			monitoring.NewString(infoRegistry, "username").Set(u.Username)
+			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
+			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
 		}
 	}()
 
 	// state.service
-	serviceRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("service")
-	monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
-	monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
+	stateRegistry := b.Monitoring.StateRegistry()
+	monitoring.NewString(stateRegistry, "service.version").Set(b.Info.Version)
+	monitoring.NewString(stateRegistry, "service.name").Set(b.Info.Beat)
+	monitoring.NewString(stateRegistry, "service.id").Set(b.Info.ID.String())
 
 	// state.beat
-	beatRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("beat")
-	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(stateRegistry, "beat.name").Set(b.Info.Name)
 }
 
 func (b *Beat) RegisterHostname(useFQDN bool) {
 	hostname := b.Info.FQDNAwareHostname(useFQDN)
 
 	// info.hostname
-	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "hostname").Set(hostname)
+	monitoring.NewString(b.Monitoring.InfoRegistry(), "hostname").Set(hostname)
 
 	// state.host
-	monitoring.NewFunc(b.Info.Monitoring.StateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
+	monitoring.NewFunc(b.Monitoring.StateRegistry(), "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -657,7 +665,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat)
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat, b.Info.Logger)
 			if err != nil {
 				return err
 			}
@@ -754,15 +762,16 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
-	b.Info.Monitoring.SetupRegistries()
+	b.Monitoring = beatmonitoring.NewGlobalMonitoring()
 
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
+	b.Info.Paths = paths.Paths
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	store, err := LoadKeystore(cfg, b.Info.Beat)
+	store, err := LoadKeystore(cfg, b.Info.Beat, b.Info.Paths)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %w", err)
 	}
@@ -822,9 +831,9 @@ func (b *Beat) configure(settings Settings) error {
 	b.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
-	logger.Infof("%s", paths.Paths.String())
+	logger.Infof("%s", b.Info.Paths.String())
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
+	metaPath := b.Info.Paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return err
@@ -852,7 +861,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, b.Registry)
+	m, err := management.NewManager(b.Config.Management, b.Registry, logger)
 	if err != nil {
 		return err
 	}
@@ -888,8 +897,6 @@ func (b *Beat) configure(settings Settings) error {
 		debug.SetGCPercent(gcPercent)
 	}
 
-	b.Info.Monitoring.Namespace = monitoring.GetNamespace("dataset")
-
 	b.Beat.BeatConfig, err = b.BeatConfig()
 	if err != nil {
 		return err
@@ -914,7 +921,7 @@ func (b *Beat) configure(settings Settings) error {
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
 	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
 		"beat_metrics.json", "application/json", func() []byte {
-			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
+			m := monitoring.CollectStructSnapshot((b.Monitoring.StatsRegistry()), monitoring.Full, true)
 			data, err := json.MarshalIndent(m, "", "  ")
 			if err != nil {
 				logger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
@@ -953,6 +960,7 @@ func (b *Beat) LoadMeta(metaPath string) error {
 		return fmt.Errorf("meta file failed to open: %w", err)
 	}
 
+	// file exists, read and load the meta data
 	if err == nil {
 		m := meta{}
 		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
@@ -977,31 +985,29 @@ func (b *Beat) LoadMeta(metaPath string) error {
 
 	// file does not exist or ID is invalid or first start time is not defined, let's create a new one
 
-	// write temporary file first
-	tempFile := metaPath + ".new"
-	f, err = os.OpenFile(tempFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o600)
+	// write temporary file first, use same dir as destination to avoid invalid cross-device links
+	tmpFile, err := os.CreateTemp(filepath.Dir(metaPath), filepath.Base(metaPath)+".new")
 	if err != nil {
-		return fmt.Errorf("failed to create Beat meta file: %w", err)
+		return fmt.Errorf("failed to create temporary Beat meta file: %w", err)
 	}
 
-	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
-	err = f.Sync()
+	encodeErr := json.NewEncoder(tmpFile).Encode(meta{UUID: b.Info.ID, FirstStart: b.Info.FirstStart})
+	err = tmpFile.Sync()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %w", err)
+		return fmt.Errorf("beat meta file failed to sync data: %w", err)
 	}
 
-	err = f.Close()
+	err = tmpFile.Close()
 	if err != nil {
-		return fmt.Errorf("Beat meta file failed to write: %w", err)
+		return fmt.Errorf("beat meta file failed to close: %w", err)
 	}
 
 	if encodeErr != nil {
-		return fmt.Errorf("Beat meta file failed to write: %w", encodeErr)
+		return fmt.Errorf("beat meta file failed to encode values: %w", encodeErr)
 	}
 
 	// move temporary file into final location
-	err = file.SafeFileRotate(metaPath, tempFile)
-	return err
+	return file.SafeFileRotate(metaPath, tmpFile.Name())
 }
 
 func openRegular(filename string) (*os.File, error) {
@@ -1063,7 +1069,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error generating index pattern: %w", err)
 		}
 
-		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
+		err = dashboards.ImportDashboards(ctx, b.Info, b.Info.Paths.Resolve(paths.Home, ""),
 			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return fmt.Errorf("error importing Kibana dashboards: %w", err)
@@ -1078,7 +1084,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // to is at least on the same version as the Beat.
 // If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) registerESVersionCheckCallback() error {
-	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection, _ *logp.Logger) error {
 		if !isElasticsearchOutput(b.Config.Output.Name()) {
 			return errors.New("elasticsearch output is not configured")
 		}
@@ -1128,7 +1134,7 @@ func (b *Beat) registerESIndexManagement() error {
 }
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
-	return func(esClient *eslegclient.Connection) error {
+	return func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
 		if err != nil {
 			return fmt.Errorf("error creating index management handler: %w", err)
@@ -1200,65 +1206,10 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	if !extendedTLSCfg.Reload.Enabled {
 		return nil
 	}
-	logger.Debug("exit on CA certs change enabled")
 
-	possibleFilesToWatch := append(
-		extendedTLSCfg.CAs,
-		extendedTLSCfg.Certificate.Certificate,
-		extendedTLSCfg.Certificate.Key,
-	)
-
-	filesToWatch := []string{}
-	for _, f := range possibleFilesToWatch {
-		if f == "" {
-			continue
-		}
-		if tlscommon.IsPEMString(f) {
-			// That's an embedded cert, we're only interested in files
-			continue
-		}
-
-		logger.Debugf("watching '%s' for changes", f)
-		filesToWatch = append(filesToWatch, f)
-	}
-
-	// If there are no files to watch, don't do anything.
-	if len(filesToWatch) == 0 {
-		logger.Debug("no files to watch, filewatcher will not be started")
-		return nil
-	}
-
-	watcher := filewatcher.New(filesToWatch...)
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	_, _, _ = watcher.Scan()
-
-	// Watch for file changes while the Beat is alive
-	go func() {
-		ticker := time.Tick(extendedTLSCfg.Reload.Period)
-
-		for {
-			<-ticker
-			files, changed, err := watcher.Scan()
-			if err != nil {
-				logger.Warnf("could not scan certificate files: %s", err.Error())
-			}
-
-			if changed {
-				logger.Infof(
-					"some of the following files have been modified: %v, restarting %s.",
-					files, b.Info.Beat)
-
-				b.shouldReexec = true
-				b.Manager.Stop()
-
-				// we're done, finish the goroutine just for the sake of it
-				return
-			}
-		}
-	}()
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded using 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
 }
@@ -1282,10 +1233,10 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	elasticsearchRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
-	callback := func(esClient *eslegclient.Connection) error {
+	callback := func(esClient *eslegclient.Connection, _ *logp.Logger) error {
 		var response struct {
 			ClusterUUID string `json:"cluster_uuid"`
 		}
@@ -1319,7 +1270,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		monitoringRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("monitoring")
+		monitoringRegistry := b.Monitoring.StateRegistry().GetOrCreateRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}
@@ -1334,7 +1285,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			ClusterUUID:     monitoringClusterUUID,
 		}
-		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
+		reporter, err := report.New(b.Info, b.Monitoring, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return nil, err
 		}
@@ -1376,10 +1327,10 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 		"type": b.Info.Beat,
 		"uuid": b.Info.ID,
 		"path": mapstr.M{
-			"config": paths.Resolve(paths.Config, ""),
-			"data":   paths.Resolve(paths.Data, ""),
-			"home":   paths.Resolve(paths.Home, ""),
-			"logs":   paths.Resolve(paths.Logs, ""),
+			"config": b.Info.Paths.Resolve(paths.Config, ""),
+			"data":   b.Info.Paths.Resolve(paths.Data, ""),
+			"home":   b.Info.Paths.Resolve(paths.Home, ""),
+			"logs":   b.Info.Paths.Resolve(paths.Logs, ""),
 		},
 	}
 	log.Infow("Beat info", "beat", beat)

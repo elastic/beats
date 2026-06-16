@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Exported fields [exported-fields]
 
@@ -27,4 +32,3 @@ This document describes the fields that are exported by Heartbeat. They are grou
 * [*Synthetics types fields*](/reference/heartbeat/exported-fields-synthetics.md)
 * [*TCP layer fields*](/reference/heartbeat/exported-fields-tcp.md)
 * [*TLS encryption layer fields*](/reference/heartbeat/exported-fields-tls.md)
-

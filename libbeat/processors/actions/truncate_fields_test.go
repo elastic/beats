@@ -20,16 +20,16 @@ package actions
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestTruncateFields(t *testing.T) {
-	log := logp.NewLogger("truncate_fields_test")
+	log := logptest.NewTestingLogger(t, "truncate_fields_test")
 	var tests = map[string]struct {
 		MaxBytes     int
 		MaxChars     int
@@ -213,4 +213,57 @@ func TestTruncateFields(t *testing.T) {
 		assert.Equal(t, expFields, newEvent.Fields)
 		assert.Equal(t, expMeta, newEvent.Meta)
 	})
+}
+
+// TestTruncateFieldsFailOnErrorSafety verifies that when FailOnError=true and
+// the field has a non-truncatable type, the event fields are unchanged.
+func TestTruncateFieldsFailOnErrorSafety(t *testing.T) {
+	f := &truncateFields{
+		config: truncateFieldsConfig{
+			Fields:      []string{"message"},
+			MaxBytes:    5,
+			FailOnError: true,
+		},
+		truncate: (*truncateFields).truncateBytes,
+		logger:   logptest.NewTestingLogger(t, "truncate_fields"),
+	}
+
+	input := mapstr.M{"message": 42}
+	event := &beat.Event{Fields: input.Clone()}
+	original := input.Clone()
+
+	result, err := f.Run(event)
+	require.Error(t, err)
+	assert.Same(t, event, result)
+
+	assert.Equal(t, original, result.Fields,
+		"event fields must be unchanged after error (clone skip safety)")
+}
+
+// TestTruncateFieldsMultiFieldBackup verifies that when multiple fields are
+// configured and truncation of a later field fails, earlier truncations are
+// rolled back via backup.
+func TestTruncateFieldsMultiFieldBackup(t *testing.T) {
+	f := &truncateFields{
+		config: truncateFieldsConfig{
+			Fields:      []string{"f1", "f2"},
+			MaxBytes:    3,
+			FailOnError: true,
+		},
+		truncate: (*truncateFields).truncateBytes,
+		logger:   logptest.NewTestingLogger(t, "truncate_fields"),
+	}
+
+	// f1 is a long string (will be truncated on first iteration),
+	// f2 is an int (will fail the type check on second iteration).
+	input := mapstr.M{"f1": "hello", "f2": 42}
+	event := &beat.Event{Fields: input.Clone()}
+	original := input.Clone()
+
+	result, err := f.Run(event)
+	require.Error(t, err)
+
+	// Multi-field: backup was taken and restored; f1 truncation must be undone.
+	assert.Equal(t, original, result.Fields,
+		"first field's truncation must be rolled back when second field fails")
 }

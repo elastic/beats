@@ -18,8 +18,6 @@
 package locks
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -29,42 +27,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func TestMain(m *testing.M) {
-
-	tmp, err := os.MkdirTemp("", "pidfile_test")
-	defer os.RemoveAll(tmp)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating temp directory: %s\n", err)
-		os.Exit(1)
-	}
-
-	origDataPath := paths.Paths.Data
-	defer func() {
-		paths.Paths.Data = origDataPath
-	}()
-	paths.Paths.Data = tmp
-
-	exit := m.Run()
-	// cleanup tmpdir after run, but let the tests set the exit code
-	err = os.RemoveAll(tmp)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error removing tempdir %s, %s:", tmp, err)
-	}
-
-	os.Exit(exit)
-}
-
 func TestLocker(t *testing.T) {
 	// Setup two beats with same name and data path
 	const beatName = "testbeat-testlocker"
-
+	tmpPaths := newTestPaths(t)
 	logger := logptest.NewTestingLogger(t, "")
 
-	b1 := beat.Info{Logger: logger}
-	b1.Beat = beatName
-
-	b2 := beat.Info{Logger: logger}
-	b2.Beat = beatName
+	b1 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	b2 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
 
 	// Try to get a lock for the first beat. Expect it to succeed.
 	bl1 := New(b1)
@@ -76,18 +46,15 @@ func TestLocker(t *testing.T) {
 	bl2 := New(b2)
 	err = bl2.Lock()
 	require.Error(t, err)
-
 }
 
 func TestUnlock(t *testing.T) {
 	const beatName = "testbeat-testunlock"
 	logger := logptest.NewTestingLogger(t, "")
+	tmpPaths := newTestPaths(t)
 
-	b1 := beat.Info{Logger: logger}
-	b1.Beat = beatName
-
-	b2 := beat.Info{}
-	b2.Beat = beatName
+	b1 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	b2 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
 	bl2 := New(b2)
 
 	// Try to get a lock for the first beat. Expect it to succeed.
@@ -102,18 +69,15 @@ func TestUnlock(t *testing.T) {
 	// try with other lockfile
 	err = bl2.Lock()
 	require.NoError(t, err)
-
 }
 
 func TestUnlockWithRemainingFile(t *testing.T) {
 	const beatName = "testbeat-testunlockwithfile"
 	logger := logptest.NewTestingLogger(t, "")
+	tmpPaths := newTestPaths(t)
 
-	b1 := beat.Info{Logger: logger}
-	b1.Beat = beatName
-
-	b2 := beat.Info{}
-	b2.Beat = beatName
+	b1 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
+	b2 := beat.Info{Beat: beatName, Logger: logger, Paths: tmpPaths}
 	bl2 := New(b2)
 
 	// Try to get a lock for the first beat. Expect it to succeed.
@@ -128,4 +92,14 @@ func TestUnlockWithRemainingFile(t *testing.T) {
 	// now lock new handle with the same file
 	err = bl2.Lock()
 	require.NoError(t, err)
+}
+
+func newTestPaths(t *testing.T) *paths.Path {
+	t.Helper()
+	tmpDir := t.TempDir()
+	p := paths.New()
+	p.Home = tmpDir
+	err := p.InitPaths(p)
+	require.NoError(t, err, "error initializing paths")
+	return p
 }

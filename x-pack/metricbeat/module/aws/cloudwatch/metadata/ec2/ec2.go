@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -35,26 +36,32 @@ func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config
 	}
 
 	for eventIdentifier := range events {
-		eventIdentifierComponents := strings.Split(eventIdentifier, "-")
-		potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+		// Get instance ID from dimension value
+		var instanceIDForMatching string
+		if dimInstanceID, err := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId"); err == nil {
+			if idStr, ok := dimInstanceID.(string); ok {
+				instanceIDForMatching = idStr
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+			}
+		}
+		if instanceIDForMatching == "" {
+			// Fallback: parse eventIdentifier, stripping account ID prefix if present
+			// Format: {accountId}-{resourceId}-{index} or {resourceId}-{index}
+			instanceIDForMatching = metadata.ExtractResourceID(eventIdentifier)
+		}
 
 		// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
 		// account and linked source accounts if include_linked_accounts is set to true
-		addHostFields(events[eventIdentifier], potentialInstanceID)
+		addHostFields(events[eventIdentifier], instanceIDForMatching)
 		period, err := events[eventIdentifier].RootFields.GetValue(aws.CloudWatchPeriodName)
 		if err != nil {
 			logger.Warnf("can't get period information for instance %s, skipping rate calculation", eventIdentifier)
-		} else {
-			calculateRate(events[eventIdentifier], period.(int))
-		}
-
-		// add instance ID from dimension value
-		if dimInstanceID, err := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId"); err == nil {
-			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+		} else if periodInt, ok := period.(int); ok {
+			calculateRate(events[eventIdentifier], periodInt)
 		}
 
 		for instanceID, output := range instancesOutputs {
-			if instanceID != potentialInstanceID {
+			if instanceID != instanceIDForMatching {
 				continue
 			}
 			for _, tag := range output.Tags {
@@ -186,8 +193,10 @@ func calculateRate(event mb.Event, periodInSeconds int) {
 	for _, metricName := range metricList {
 		metricValue, err := event.RootFields.GetValue(metricName)
 		if err == nil && metricValue != nil {
-			rateValue := metricValue.(float64) / float64(periodInSeconds)
-			_, _ = event.RootFields.Put(strings.Replace(metricName, ".sum", ".rate", -1), rateValue)
+			if floatVal, ok := metricValue.(float64); ok {
+				rateValue := floatVal / float64(periodInSeconds)
+				_, _ = event.RootFields.Put(strings.ReplaceAll(metricName, ".sum", ".rate"), rateValue)
+			}
 		}
 	}
 }

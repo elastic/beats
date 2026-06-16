@@ -54,6 +54,7 @@ type Template struct {
 	migration       bool
 	priority        int
 	isServerless    bool
+	logger          *logp.Logger
 }
 
 // New creates a new template instance
@@ -65,6 +66,7 @@ func New(
 	esVersion version.V,
 	config TemplateConfig,
 	migration bool,
+	log *logp.Logger,
 ) (*Template, error) {
 	bV, err := version.New(beatVersion)
 	if err != nil {
@@ -139,6 +141,7 @@ func New(
 		migration:       migration,
 		priority:        config.Priority,
 		isServerless:    isServerless,
+		logger:          log,
 	}, nil
 }
 
@@ -249,6 +252,7 @@ func (t *Template) generateComponent(properties, analyzers mapstr.M, dynamicTemp
 					t.esVersion,
 					t.config.Settings.Index,
 					t.isServerless,
+					t.logger,
 				),
 			},
 		},
@@ -298,7 +302,7 @@ func buildDynTmpl(ver version.V) mapstr.M {
 	}
 }
 
-func buildIdxSettings(ver version.V, userSettings mapstr.M, isServerless bool) mapstr.M {
+func buildIdxSettings(ver version.V, userSettings mapstr.M, isServerless bool, logger *logp.Logger) mapstr.M {
 	indexSettings := mapstr.M{
 		"refresh_interval": "5s",
 		"mapping": mapstr.M{
@@ -317,7 +321,7 @@ func buildIdxSettings(ver version.V, userSettings mapstr.M, isServerless bool) m
 
 	// deal with settings that aren't available on serverless
 	if isServerless {
-		logp.L().Infof("remote instance is serverless, number_of_shards and max_docvalue_fields_search will be skipped in index template")
+		logger.Infof("remote instance is serverless, number_of_shards and max_docvalue_fields_search will be skipped in index template")
 		userSettings.Delete("number_of_shards")
 	} else {
 		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)

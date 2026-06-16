@@ -34,10 +34,6 @@ import (
 )
 
 var latencyCapturer = regexp.MustCompile(`(\d+)/(\d+)/(\d+)`)
-var ipCapturer = regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
-var thatNumberCapturer = regexp.MustCompile(`\[(\d+)\]`)
-var portCapturer = regexp.MustCompile(`:(\d+)\[`)
-var dataCapturer = regexp.MustCompile(`(\w+)=(\d+)`)
 var fieldsCapturer = regexp.MustCompile(`^([a-zA-Z\s]+):\s(\d+)`)
 var versionCapturer = regexp.MustCompile(`:\s(.*),`)
 var dateCapturer = regexp.MustCompile(`built on (.*)`)
@@ -54,8 +50,17 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 
 	output := mapstr.M{}
 
-	version := versionCapturer.FindStringSubmatch(scanner.Text())[1]
-	dateString := dateCapturer.FindStringSubmatch(scanner.Text())[1]
+	versionMatches := versionCapturer.FindStringSubmatch(scanner.Text())
+	if len(versionMatches) < 2 {
+		return nil, "", errors.New("no match found for version")
+	}
+	version := versionMatches[1]
+
+	dateStringMatches := dateCapturer.FindStringSubmatch(scanner.Text())
+	if len(dateStringMatches) < 2 {
+		return nil, "", errors.New("no match found for build date")
+	}
+	dateString := dateStringMatches[1]
 
 	date, err := time.Parse("01/02/2006 03:04 GMT", dateString)
 	if err != nil {
@@ -108,7 +113,7 @@ func parseSrvr(i io.Reader, logger *logp.Logger) (mapstr.M, string, error) {
 
 		if strings.Contains(line, "Mode") {
 			modeSplit := strings.Split(line, " ")
-			if len(modeSplit) < 1 {
+			if len(modeSplit) < 2 {
 				logger.Debugf("no tokens after splitting line '%s'", line)
 				continue
 			}

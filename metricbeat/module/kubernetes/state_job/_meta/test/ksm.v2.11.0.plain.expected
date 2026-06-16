@@ -8,6 +8,48 @@
 			"completions": {
 				"desired": 1
 			},
+			"name": "hello-28564698",
+			"owner": {
+				"is_controller": "true",
+				"kind": "CronJob",
+				"name": "hello"
+			},
+			"parallelism": {
+				"desired": 1
+			},
+			"pods": {
+				"active": 0,
+				"failed": 0,
+				"succeeded": 1
+			},
+			"status": {
+				"complete": "true"
+			},
+			"time": {
+				"completed": "2024-04-23T14:18:03.000Z",
+				"created": "2024-04-23T14:18:00.000Z"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.job",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"completions": {
+				"desired": 1
+			},
 			"name": "hello-28564697",
 			"owner": {
 				"is_controller": "true",
@@ -107,48 +149,6 @@
 			"time": {
 				"completed": "2024-04-23T14:19:02.000Z",
 				"created": "2024-04-23T14:19:00.000Z"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.job",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "default"
-		},
-		"MetricSetFields": {
-			"completions": {
-				"desired": 1
-			},
-			"name": "hello-28564698",
-			"owner": {
-				"is_controller": "true",
-				"kind": "CronJob",
-				"name": "hello"
-			},
-			"parallelism": {
-				"desired": 1
-			},
-			"pods": {
-				"active": 0,
-				"failed": 0,
-				"succeeded": 1
-			},
-			"status": {
-				"complete": "true"
-			},
-			"time": {
-				"completed": "2024-04-23T14:18:03.000Z",
-				"created": "2024-04-23T14:18:00.000Z"
 			}
 		},
 		"Index": "",

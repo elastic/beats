@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-zookeeper.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # ZooKeeper module [metricbeat-module-zookeeper]
 
@@ -34,7 +39,7 @@ The Zookeeper module comes with a predefined dashboard:
 ![metricbeat zookeeper](images/metricbeat-zookeeper.png)
 
 
-## Example configuration [_example_configuration_69]
+## Example configuration [_example_configuration]
 
 The ZooKeeper module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -48,14 +53,10 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_79]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [connection](/reference/metricbeat/metricbeat-metricset-zookeeper-connection.md)
 * [mntr](/reference/metricbeat/metricbeat-metricset-zookeeper-mntr.md)
 * [server](/reference/metricbeat/metricbeat-metricset-zookeeper-server.md)
-
-
-
-

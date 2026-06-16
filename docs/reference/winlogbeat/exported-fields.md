@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Exported fields [exported-fields]
 
@@ -20,4 +25,3 @@ This document describes the fields that are exported by Winlogbeat. They are gro
 * [*Security module fields*](/reference/winlogbeat/exported-fields-security.md)
 * [*Sysmon module fields*](/reference/winlogbeat/exported-fields-sysmon.md)
 * [*Winlogbeat fields*](/reference/winlogbeat/exported-fields-winlog.md)
-

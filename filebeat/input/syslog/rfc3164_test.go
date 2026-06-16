@@ -796,6 +796,16 @@ func TestPriority(t *testing.T) {
 	}
 }
 
+func TestParserRFC3164InvalidMonthNumeric(t *testing.T) {
+	event := newEvent()
+	ParserRFC3164([]byte("0000-20-"), event)
+}
+
+func TestParserRFC3164ShortMessage(t *testing.T) {
+	event := newEvent()
+	ParserRFC3164([]byte("Oct 1 00:00:00 \xef"), event)
+}
+
 var e *event
 
 func BenchmarkParserRFC3164r(b *testing.B) {

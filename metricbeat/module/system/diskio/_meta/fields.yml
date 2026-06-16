@@ -54,7 +54,7 @@
     - name: io.time
       type: long
       description: >
-        The total number of of milliseconds spent doing I/Os.
+        The total number of milliseconds spent doing I/Os.
     
     - name: io.ops
       type: long

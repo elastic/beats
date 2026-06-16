@@ -68,9 +68,9 @@ func (d *DockerIntegrationTester) Use(dir string) (bool, error) {
 	return false, nil
 }
 
-// HasRequirements ensures that the required docker is installed.
+// HasRequirements ensures that docker and the docker compose plugin are installed.
 func (d *DockerIntegrationTester) HasRequirements() error {
-	if err := HaveDocker(); err != nil {
+	if err := HaveDockerCompose(); err != nil {
 		return err
 	}
 	return nil
@@ -191,6 +191,8 @@ func WithGoIntegTestHostEnv(env map[string]string) map[string]string {
 	// images for the next release after a feature freeze, which causes temporary test failures.
 	env["TESTING_FILEBEAT_ALLOW_OLDER"] = "1"
 
+	env["PUBSUB_EMULATOR_HOST"] = "localhost:8432"
+
 	return env
 }
 
@@ -287,7 +289,7 @@ func BuildIntegTestContainers() error {
 		return err
 	}
 
-	args := []string{"compose", "-p", DockerComposeProjectName(), "build", "--force-rm"}
+	args := []string{"compose", "-p", DockerComposeProjectName(), "build"}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
 	}

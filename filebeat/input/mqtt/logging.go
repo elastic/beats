@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
-	"go.uber.org/zap"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -44,9 +43,9 @@ var (
 	_ libmqtt.Logger = new(warnLogger)
 )
 
-func setupLibraryLogging() {
+func setupLibraryLogging(logger *logp.Logger) {
 	setupLoggingOnce.Do(func() {
-		logger := logp.NewLogger("libmqtt", zap.AddCallerSkip(1))
+		logger = logger.Named("libmqtt")
 		libmqtt.CRITICAL = &errorLogger{log: logger}
 		libmqtt.DEBUG = &debugLogger{log: logger}
 		libmqtt.ERROR = &errorLogger{log: logger}

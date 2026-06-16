@@ -1,0 +1,27 @@
+[!windows] skip 'requires Windows'
+
+write-event 'selected' --source=$OTHER_APP_SOURCE
+write-event 'filtered'
+wait-for-event-log 2
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'selected'
+check-event-field output 0 winlog.provider_name $OTHER_APP_SOURCE
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    provider:
+      - ${OTHER_APP_SOURCE:?missing OTHER_APP_SOURCE}
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

@@ -24,13 +24,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -57,10 +56,8 @@ func generateFakeNetworkInfo() NetworkInfo {
 
 func TestLogRun(t *testing.T) {
 	t.Run("should log the monitor completion", func(t *testing.T) {
-		core, observed := observer.New(zapcore.InfoLevel)
-		SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-			return zapcore.NewTee(in, core)
-		})))
+		log, observed := logptest.NewTestingLoggerWithObserver(t, "t")
+		SetLogger(log)
 
 		durationUs := int64(5000 * time.Microsecond)
 		steps := 1337
@@ -97,10 +94,8 @@ func TestLogRun(t *testing.T) {
 	})
 
 	t.Run("should log network information if available", func(t *testing.T) {
-		core, observed := observer.New(zapcore.InfoLevel)
-		SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-			return zapcore.NewTee(in, core)
-		})))
+		log, observed := logptest.NewTestingLoggerWithObserver(t, "t")
+		SetLogger(log)
 
 		durationUs := int64(5000 * time.Microsecond)
 		steps := 1337

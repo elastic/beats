@@ -2,6 +2,9 @@
 navigation_title: "CometD"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cometd.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # CometD input [filebeat-input-cometd]
@@ -21,7 +24,7 @@ filebeat.inputs:
     client.id: my-client-id
     client.secret: my-client-secret
     token_url: https://login.salesforce.com/services/oauth2/token
-    user: my.email@mail.com
+    user: my.email@example.com
     password: my-password
 ```
 

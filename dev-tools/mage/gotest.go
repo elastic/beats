@@ -36,6 +36,7 @@ import (
 	"golang.org/x/sys/execabs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 )
 
 // GoTestArgs are the arguments used for the "go*Test" targets and they define
@@ -50,7 +51,9 @@ type GoTestArgs struct {
 	OutputFile          string            // File to write verbose test output to.
 	JUnitReportFile     string            // File to write a JUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file (enables -cover).
+	Dir                 string            // The directory the test should run from
 	Output              io.Writer         // Write stderr and stdout to Output if set
+	Timeout             string            // Timeout for tests (-timeout flag)
 }
 
 // TestBinaryArgs are the arguments used when building binary for testing.
@@ -125,11 +128,15 @@ func fetchGoPackages(module string) ([]string, error) {
 
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
-// If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
+// If the FIPS env var is set to true, the requirefips tag is injected.
 func testTagsFromEnv() []string {
-	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	testTags := strings.Trim(os.Getenv("TEST_TAGS"), ", ")
+	var tags []string
+	if testTags != "" {
+		tags = strings.Split(testTags, ",")
+	}
 	if FIPSBuild {
-		tags = append(tags, "requirefips", "ms_tls13kdf")
+		tags = append(tags, "requirefips")
 	}
 	return tags
 }
@@ -142,21 +149,40 @@ func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 // fips140=only unit tests.
 func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 	args := makeGoTestArgs("Unit-FIPS-only")
-	args.Env["GODEBUG"] = "fips140=only"
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	args.Env["GODEBUG"] = "fips140=only,tlsmlkem=0"
+	return args
+}
+
+// DefaultGoWindowsTestIntegrationArgs returns a default set of arguments for running
+// windows integration tests. We tag integration test files with 'integration'.
+func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
+	args := makeGoTestArgs("Windows-Integration")
+	args.Tags = append(args.Tags, "win_integration")
+	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.Packages = []string{"./tests/integration/windows"}
 	return args
 }
 
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
-func DefaultGoTestIntegrationArgs() GoTestArgs {
+func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
 
-	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cmdCancel()
+
+	synth := exec.CommandContext(cmdCtx, "npx", "@elastic/synthetics", "-h")
 	if synth.Run() == nil {
 		// Run an empty journey to ensure playwright can be loaded
 		// catches situations like missing playwright deps
-		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		cmd := exec.CommandContext(cmdCtx, "sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
 		var out strings.Builder
 		cmd.Stdout = &out
 		cmd.Stderr = &out
@@ -173,13 +199,14 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	// Use the non-cachable -count=1 flag to disable test caching when running integration tests.
 	// There are reasons to re-run tests even if the code is unchanged (e.g. Dockerfile changes).
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
+	args.ExtraFlags = append(args.ExtraFlags, "-timeout=15m")
 	return args
 }
 
 // DefaultGoTestIntegrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network).
-func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func DefaultGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	return args
 }
@@ -187,11 +214,17 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network) along
 // with the GODEBUG=fips140=only arg set.
-func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
-	args := DefaultGoTestIntegrationArgs()
+func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
+	args := DefaultGoTestIntegrationArgs(ctx)
 	args.Tags = append(args.Tags, "requirefips")
 	args.Env = WithGoIntegTestHostEnv(args.Env)
-	args.Env["GODEBUG"] = "fips140=only"
+
+	// We also set GODEBUG=tlsmlkem=0 to disable the X25519MLKEM768 TLS key
+	// exchange mechanism; without this setting and with the GODEBUG=fips140=only
+	// setting, we get errors in tests like so:
+	// Failed to connect: crypto/ecdh: use of X25519 is not allowed in FIPS 140-only mode
+	// Note that we are only disabling this TLS key exchange mechanism in tests!
+	args.Env["GODEBUG"] = "fips140=only,tlsmlkem=0"
 	return args
 }
 
@@ -201,6 +234,9 @@ func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+	// some test build docker images which download artifacts, and it can take a
+	// long time.
+	args.Timeout = "2h"
 
 	// add the requirefips tag when doing fips140 testing
 	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
@@ -375,12 +411,21 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 			"-coverprofile="+params.CoverageProfileFile,
 		)
 	}
+	if params.Timeout != "" {
+		testArgs = append(testArgs, "-timeout="+params.Timeout)
+	}
 	testArgs = append(testArgs, params.ExtraFlags...)
 	testArgs = append(testArgs, params.Packages...)
 
 	args := append(gotestsumArgs, append([]string{"--"}, testArgs...)...)
 
 	goTest := makeCommand(ctx, params.Env, "gotestsum", args...)
+
+	// Set execution directory
+	if params.Dir != "" {
+		goTest.Dir = params.Dir
+	}
+
 	// Wire up the outputs.
 	var outputs []io.Writer
 	if params.Output != nil {
@@ -475,27 +520,29 @@ func BuildSystemTestBinary() error {
 // testing and measuring code coverage. The binary is only instrumented for
 // coverage when TEST_COVERAGE=true (default is false).
 func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
-	args := []string{
-		"test", "-c",
-		"-o", binArgs.Name + ".test",
-	}
+	_, err := testbin.Build(binArgs.Name, ".",
+		testbin.WithExtraFlags(binArgs.ExtraFlags...),
+		testbin.WithInputFiles(binArgs.InputFiles...),
+	)
+	return err
+}
 
-	if DevBuild {
-		// Disable optimizations (-N) and inlining (-l) for debugging.
-		args = append(args, `-gcflags=all=-N -l`)
-	}
+func DefaultECHTestArgs() GoTestArgs {
+	args := makeGoTestArgs("ECH")
+	args.Tags = append(args.Tags, "ech", "integration")
+	args.Dir = "tests/ech"
 
+	// attempt to use absolute paths for filenames
+	path, err := os.Getwd()
+	if err != nil {
+		log.Printf("Unable to get working dir, using value: .")
+		path = "."
+	}
+	fileName := path + "/build/TEST-go-ech"
+	args.OutputFile = fileName + ".out"
+	args.JUnitReportFile = fileName + ".xml"
 	if TestCoverage {
-		args = append(args, "-coverpkg", "./...")
+		args.CoverageProfileFile = fileName + ".cov"
 	}
-	args = append(args, binArgs.ExtraFlags...)
-	if len(binArgs.InputFiles) > 0 {
-		args = append(args, binArgs.InputFiles...)
-	}
-
-	start := time.Now()
-	defer func() {
-		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
-	}()
-	return sh.RunV("go", args...)
+	return args
 }

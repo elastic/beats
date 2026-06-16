@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/docker/docker/client"
+	dockerclient "github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -41,7 +41,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	memoryService *MemoryService
-	dockerClient  *client.Client
+	dockerClient  *dockerclient.Client
 	dedot         bool
 	podman        bool
 	logger        *logp.Logger
@@ -55,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	dockerClient, err := docker.NewDockerClient(base.HostData().URI, config)
+	dockerClient, err := docker.NewDockerClient(base.HostData().URI, config, logger)
 	if err != nil {
 		return nil, err
 	}

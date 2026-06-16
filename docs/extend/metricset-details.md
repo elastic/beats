@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/metricset-details.html
+applies_to:
+  stack: ga
 ---
 
 # Metricset Details [metricset-details]
@@ -78,6 +80,9 @@ You can find up to 3 different types of files named `fields.yml` in the beats re
         MySQL server status metrics collected from MySQL.
       short_config: false
       release: ga
+      version: <1>
+        beta: 9.0.0
+        ga: 9.1.0
       fields:
         - name: mysql
           type: group
@@ -86,6 +91,9 @@ You can find up to 3 different types of files named `fields.yml` in the beats re
             query.
           fields:
     ```
+    1. This is used to add product lifecycle and version related tags to illustrate how the product has evolved.
+       In this example, the module was added in beta in 9.0.0 and went GA in 9.1.0.
+       Read more in [](/extend/contributing-docs.md#cumulative-docs).
 
 * `metricbeat/module/{{module}}/{metricset}/_meta/fields.yml`: Contains all fields definitions retrieved by the metricset. As field types, each field must have a core data type [supported by elasticsearch](elasticsearch://reference/elasticsearch/mapping-reference/field-data-types.md#_core_datatypes). Here’s a very basic example that shows one group from the MySQL `status` metricset:
 
@@ -94,6 +102,8 @@ You can find up to 3 different types of files named `fields.yml` in the beats re
       type: group
       description: >
         `status` contains the metrics that were obtained by the status SQL query.
+      version:
+        ga: 9.0.0 <1>
       fields:
         - name: aborted
           type: group
@@ -106,9 +116,15 @@ You can find up to 3 different types of files named `fields.yml` in the beats re
 
             - name: connects
               type: integer
+              version:
+                beta: 9.1.0 <2>
               description: >
                 The number of failed attempts to connect to the MySQL server.
     ```
+    1. This is used to add product lifecycle and version related tags to illustrate how the product has evolved.
+       In this example, the metricset was added in GA in version 9.0.0.
+       Read more in [](/extend/contributing-docs.md#cumulative-docs).
+    2. This illustrates that a new field was added to the existing metricset in beta in version 9.1.0.
 
 
 
@@ -127,7 +143,7 @@ You should use a combination of the three test types to test your metricsets bec
 
 #### Adding a Test Environment [_adding_a_test_environment]
 
-Integration and system tests need an environment that’s running the service. You can create this environment by using Docker and a docker-compose file. If you add a module that requires a service, you must add the service to the virtual environment. To do this, you:
+Integration and system tests need an environment that’s running the service. You can create this environment by using Docker and a docker compose file. If you add a module that requires a service, you must add the service to the virtual environment. To do this, you:
 
 * Update the `docker-compose.yml` file with your environment
 * Update the `docker-entrypoint.sh` script
@@ -139,7 +155,7 @@ redis:
   image: redis:3.2.3
 ```
 
-To allow the Beat to access your service, make sure that you define the environment variables in the docker-compose file and add the link to the container:
+To allow the Beat to access your service, make sure that you define the environment variables in the docker compose file and add the link to the container:
 
 ```yaml
 beat:
@@ -191,7 +207,7 @@ func GetEnvPort() string { <2>
 ```
 
 1. Add any additional config options your metricset needs here.
-2. The endpoint used by the metricset needs to be configurable for manual and automated testing. Environment variables should be defined in the module under `_meta/env` and included in the `docker-compose.yml` file.
+2. The endpoint used by the metricset needs to be configurable for manual and automated testing. Environment variables should be defined in the module under `_meta/env` and included in the docker compose file.
 
 
 The `TestFetch` integration test will return a single event from your metricset, which you can use to test the validity of the data. `TestData` will (re)generate the `_meta/data.json` file that documents the data reported by the metricset.
@@ -253,5 +269,4 @@ MODULE=apache mage integTest
 
 ## Documentation [_documentation]
 
-Each module must be documented. The documentation is based on asciidoc and is in the file `module/{{module}}/_meta/docs.asciidoc` for the module and in `module/{{module}}/{metricset}/_meta/docs.asciidoc` for the metricset. Basic documentation with the config file and an example output is automatically generated. Use these files to document specific configuration options or usage examples.
-
+Each module must be documented. The documentation is based on Markdown and is in the file `module/{{module}}/_meta/docs.md` for the module and in `module/{{module}}/{metricset}/_meta/docs.md` for the metricset. Basic documentation with the config file and an example output is automatically generated. Use these files to document specific configuration options or usage examples.

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -47,8 +48,8 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 		cfg.SetString("logs_path", -1, cfgLogsPath)
 	}
 
-	logMatcher, err := newLogsPathMatcher(*cfg)
-	assert.Nil(t, err)
+	logMatcher, err := newLogsPathMatcher(*cfg, logp.NewNopLogger())
+	assert.NoError(t, err)
 
 	input := mapstr.M{
 		"log": mapstr.M{

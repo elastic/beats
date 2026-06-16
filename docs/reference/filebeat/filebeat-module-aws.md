@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-aws.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # AWS module [filebeat-module-aws]
 
@@ -510,8 +515,6 @@ Because temporary security credentials are short term, after they expire, the us
 
 IAM policy is an entity that defines permissions to an object within your AWS environment. Specific permissions needs to be added into the IAM user’s policy to authorize Metricbeat to collect AWS monitoring metrics. Please see documentation under each metricset for required permissions.
 
-
-## Fields [_fields_6]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-aws.md) section.
-

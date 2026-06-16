@@ -21,9 +21,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -103,7 +104,7 @@ func TestDecompressGzip(t *testing.T) {
 			output: mapstr.M{
 				"field1": "invalid gzipped data",
 				"error": mapstr.M{
-					"message": "Failed to decompress field in decompress_gzip_field processor: error decompressing field field1: gzip: invalid header",
+					"message": "failed to decompress field in decompress_gzip_field processor: error decompressing field field1: gzip: invalid header",
 				},
 			},
 			error: true,
@@ -140,7 +141,7 @@ func TestDecompressGzip(t *testing.T) {
 			output: mapstr.M{
 				"field1": "my value",
 				"error": mapstr.M{
-					"message": "Failed to decompress field in decompress_gzip_field processor: could not fetch value for key: field2, Error: key not found",
+					"message": "failed to decompress field in decompress_gzip_field processor: could not fetch value for key: field2, Error: key not found",
 				},
 			},
 			error: true,
@@ -170,7 +171,7 @@ func TestDecompressGzip(t *testing.T) {
 			t.Parallel()
 
 			f := &decompressGzipField{
-				log:    logp.NewLogger("decompress_gzip_field"),
+				log:    logptest.NewTestingLogger(t, "decompress_gzip_field"),
 				config: test.config,
 			}
 
@@ -212,7 +213,7 @@ func TestDecompressGzip(t *testing.T) {
 		}
 
 		f := &decompressGzipField{
-			log:    logp.NewLogger("decompress_gzip_field"),
+			log:    logptest.NewTestingLogger(t, "decompress_gzip_field"),
 			config: config,
 		}
 
@@ -222,4 +223,46 @@ func TestDecompressGzip(t *testing.T) {
 		assert.Equal(t, expectedMeta, newEvent.Meta)
 		assert.Equal(t, event.Fields, newEvent.Fields)
 	})
+}
+
+// TestDecompressGzipFailOnErrorSafety verifies that when FailOnError=true and
+// decompression fails, the event fields are unchanged.
+func TestDecompressGzipFailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name  string
+		input mapstr.M
+	}{
+		{
+			name:  "invalid gzip data",
+			input: mapstr.M{"field1": "not gzip data"},
+		},
+		{
+			name:  "missing source field",
+			input: mapstr.M{"other": "value"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &decompressGzipField{
+				log: logptest.NewTestingLogger(t, "decompress_gzip_field"),
+				config: decompressGzipFieldConfig{
+					Field:       fromTo{From: "field1", To: "field2"},
+					FailOnError: true,
+				},
+			}
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := f.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
 }

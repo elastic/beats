@@ -22,9 +22,10 @@ package instance
 import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // LoadKeystore returns nil in FIPS mode
-func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
+func LoadKeystore(cfg *config.C, name string, beatPaths *paths.Path) (keystore.Keystore, error) {
 	return nil, nil
 }

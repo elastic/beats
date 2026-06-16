@@ -2,6 +2,9 @@
 navigation_title: "HTTP JSON"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # HTTP JSON input [filebeat-input-httpjson]
@@ -9,14 +12,17 @@ mapped_pages:
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
-If you are starting development of a new custom HTTP API input, we recommend that you use the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md) which provides greater flexibility and an improved developer experience.
+If you are starting development of a new custom HTTP API input, we recommend that you use the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md) which provides greater flexibility and an improved developer experience. Existing `httpjson` inputs can be migrated to CEL using the [`run_as_cel`](#run-as-cel) option.
 
 This input supports:
 
 * Auth
 
-    * Basic
-    * OAuth2
+  * Basic
+  * {applies_to}`stack: ga 9.3.0` File
+  * OAuth2
+  * {applies_to}`stack: ga 9.3.0` AWS
+
 
 * Retrieval at a configurable interval
 * Pagination
@@ -59,7 +65,12 @@ filebeat.inputs:
         value: 5m
 ```
 
-Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
+Additionally, it supports authentication via:
+* Basic auth
+* {applies_to}`stack: ga 9.3.0` File-based headers (`auth.file`)
+* HTTP headers
+* OAuth2
+* {applies_to}`stack: ga 9.3.0` AWS Authentication (`auth.aws`)
 
 Example configurations with authentication:
 
@@ -93,6 +104,34 @@ filebeat.inputs:
     user: user@domain.tld
     password: P@$$W0₹D
   request.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.file:
+    path: /etc/elastic/token
+    prefix: "Bearer "
+    refresh_interval: 10m
+  request.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.aws:
+    access_key_id:     "AKIAIOSFODNN7EXAMPLE"
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
+```yaml
+filebeat.inputs:
+- type: httpjson
+  auth.aws:
+    credential_profile_name: fb-aws
+    shared_credential_file: /etc/filebeat/aws_credentials
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
 ```
 
 ## Input state [input-state]
@@ -197,7 +236,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
 * `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
 * `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
-* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version}}_.
+* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version.stack}}_.
 * `div`: does the integer division of two integer values.
 * `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 * `getRFC5988Link`: extracts a specific relation from a list of [RFC5988](https://tools.ietf.org/html/rfc5988) links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
@@ -219,6 +258,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `parseTimestamp`: parses a timestamp in seconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 * `replaceAll(old, new, s)`: replaces all non-overlapping instances of `old` with `new` in `s`. Example: `[[ replaceAll "some" "my" "some value" ]]` returns `my value`.
 * `sprintf`: formats according to a format specifier and returns the resulting string. Refer to [the Go docs](https://pkg.go.dev/fmt#Sprintf) for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+* `terminate`: exits the template without falling back to the default value and without causing an error. It takes a single string argument that is logged in debug logging. {applies_to}`stack: ga 9.0.6+`
 * `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 * `toJSON`: converts a value to a JSON string. This can be used with `value_type: json` to create an object from a template. Example: `[[ toJSON .last_response.body.pagingIdentifiers ]]`.
 * `urlEncode`: URL encodes the supplied string. Example `[[urlEncode "string1"]]`. Example `[[urlEncode "<string1>"]]` will return `%3Cstring1%3E`.
@@ -256,6 +296,74 @@ The user to authenticate with.
 ### `auth.basic.password` [_auth_basic_password_2]
 
 The password to use.
+
+
+### `auth.file.enabled` [_auth_file_enabled_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file auth configuration. Default: `true`.
+
+::::{note}
+File auth settings are disabled if either `enabled` is set to `false` or the `auth.file` section is missing.
+::::
+
+
+### `auth.file.path` [_auth_file_path_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path to the file that contains the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
+
+::::{warning}
+By default, Filebeat requires the file to have `0600` permissions (read/write for owner only) and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials. To allow files with different permissions, set [`relaxed_permissions`](#_auth_file_relaxed_permissions_2) to `true`.
+
+On Windows, POSIX-style permission checking is not enforced. Ensure file security using NTFS file permissions or Access Control Lists (ACLs).
+::::
+
+
+### `auth.file.header` [_auth_file_header_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The request header that receives the value loaded from `path`. Defaults to `Authorization` when omitted or empty.
+
+
+### `auth.file.prefix` [_auth_file_prefix_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+An optional prefix that is prepended to the trimmed value from `path` before it is sent on the request header. This is commonly used for tokens that require a leading value such as `Bearer `.
+
+
+### `auth.file.refresh_interval` [_auth_file_refresh_interval_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+How frequently Filebeat rereads the file defined by `path` to pick up changes. Defaults to `1m`. The value must be greater than zero when set.
+
+
+### `auth.file.relaxed_permissions` [_auth_file_relaxed_permissions_2]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `true`, allows the authentication file to have permissions other than `0600`. By default (`false`), Filebeat requires the file to have `0600` permissions and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials.
+
+::::{warning}
+Setting this to `true` reduces security. Only enable this option if you understand the security implications and cannot set the file to `0600` permissions.
+::::
 
 
 ### `auth.oauth2.enabled` [_auth_oauth2_enabled_2]
@@ -404,11 +512,133 @@ The RSA JWK private key PEM block for your Okta Service App which is used for in
 Only one of the credentials settings can be set at once. For more information please refer to [https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/](https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/)
 ::::
 
+### `auth.oauth2.okta.dpop_key_pem` [_auth_oauth2_okta_dpop_key_pem_2]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the [Okta DPoP authentication flow](https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/).
+
+
 
 
 ### `auth.oauth2.google.delegated_account` [_auth_oauth2_google_delegated_account_2]
 
 Email of the delegated account used to create the credentials (usually an admin). Used in combination with `auth.oauth2.google.jwt_file`, `auth.oauth2.google.jwt_json`, and when defaulting to use ADC.
+
+
+### `auth.aws.enabled` [_auth_aws_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
+
+::::{note}
+AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
+::::
+
+### `auth.aws.access_key_id` [_auth_aws_access_key_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+
+### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.session_token` [_auth_aws_session_token]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS session token that can be optionally set when direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) are used.
+
+### `auth.aws.shared_credential_file` [_auth_aws_shared_credential_file]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path of the AWS shared credentials file.
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.credential_profile_name` [_auth_aws_credential_profile_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+
+### `auth.aws.role_arn` [_auth_aws_role_arn]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The IAM Role ARN to assume. Assume-role authentication is layered on top of the base credentials, which may come from a direct access key, a shared credentials file, or the default SDK configuration. The assume-role request will use whichever credentials have already been established.
+
+### `auth.aws.external_id` [_auth_aws_external_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.service_name` [_auth_aws_service_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `auth.aws.default_region` [_auth_aws_default_region]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
 
 
 ### `request.url` [request-parameters]
@@ -545,6 +775,11 @@ Under the default behavior, Requests will continue while the `remaining` value i
 It is not set by default (by default the rate-limiting as specified in the Response is followed).
 
 
+### `request.rate_limit.max_non_degraded` [_request_rate_limit_max_non_degraded]
+
+The maximum number of consecutive 429 rate limit responses from the endpoint to accept before making an input health status update. If this is not set, rate limit responses will not be reported as health updates. Default behavior is to not report rate limiting responses.
+
+
 ### `request.transforms` [request-transforms]
 
 List of transforms to apply to the request before each execution.
@@ -578,7 +813,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
   - type: httpjson
     enabled: true
     id: my-httpjson-id
-    request.url: http://xyz.com/services/data/v1.0/export_ids/page
+    request.url: http://example.com/services/data/v1.0/export_ids/page
     request.method: POST
     interval: 1h
     request.retry.max_attempts: 2
@@ -596,7 +831,7 @@ The clause `.parent_last_response.` should only be used from within chain steps 
           do_not_log_failure: true
     chain:
     - step:
-          request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
+          request.url: http://example.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
           request.method: POST
           request.transforms:
           - set:
@@ -623,7 +858,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ## `request.tracer.filename` [_request_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the httpjson directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `request.tracer.maxsize` [_request_tracer_maxsize]
@@ -1264,16 +1499,17 @@ Example:
     }
     ```
 
-    This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
+    This behavior of targeted fixed pattern replacement in the url helps solve various use cases.
 
 
 **Some useful points to remember:**
 
 1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a **single *.* (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one *.* (dot) as prefix) or `replace_with:'$.exportId,first_response.body.exportId'` (no *.* dot as prefix)
 2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be extrated becomes `"" (an empty string)`, which has no definition within any context variable.
+3. All but the last response in a chain may be an array of strings or numbers, where each element is an identifier used to construct subsequent requests. The replace expression to access the identifiers is `replace: $[:]`.
 
 ::::{note}
-Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
+Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object can only store flat JSON structures (no support for NDJSON or Gzipped JSON), except for chained configurations where an array of strings or numbers is allowed. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 ::::
 
 
@@ -1464,6 +1700,7 @@ Each cursor entry is formed by:
 * A `value` template, which will define the value to store when evaluated.
 * A `default` template, which will define the value to store when the value template fails or is empty.
 * An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
+* A `do_not_log_failure` flag. When set to `true`, will not signal a degraded Fleet health status. Default: `true`. {applies_to}`stack: ga 9.0.7+`
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 
@@ -1490,6 +1727,123 @@ filebeat.inputs:
         fields: ["message"]
         target: "json"
 ```
+
+
+### `run_as_cel` [run-as-cel]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+When set to `true`, the input is transparently redirected to the [Common Expression Language input](/reference/filebeat/filebeat-input-cel.md). This allows an existing `httpjson` configuration to run under the CEL engine without changing the input `type`. A `cel.program` must be provided when this option is enabled.
+
+Shared configuration fields are automatically translated to their CEL equivalents:
+
+| httpjson field | CEL field |
+| --- | --- |
+| `interval` | `interval` |
+| `id` | `id` |
+| `request.url` | `resource.url` |
+| `request.timeout` | `resource.timeout` |
+| `request.ssl` | `resource.ssl` |
+| `request.proxy_url` | `resource.proxy_url` |
+| `request.proxy_headers` | `resource.proxy_headers` |
+| `request.proxy_disable` | `resource.proxy_disable` |
+| `request.idle_connection_timeout` | `resource.idle_connection_timeout` |
+| `request.keep_alive` | `resource.keep_alive` |
+| `request.retry` | `resource.retry` |
+| `request.redirect` | `resource.redirect` |
+| `request.tracer` | `resource.tracer` |
+| `auth` | `auth` |
+
+Fields that are specific to httpjson (such as `request.transforms`, `response.transforms`, `response.split`, `response.pagination`, and `chain`) are not transferred and have no effect when `run_as_cel` is enabled. The CEL program is responsible for equivalent logic.
+
+If the httpjson input has existing cursor state, it is automatically carried over to the CEL input on the first run. After that first run the CEL input writes its own cursor, and all subsequent runs, whether the next interval or after a restart, read from the CEL cursor. The original httpjson cursor is not modified, so removing `run_as_cel` restores the original httpjson behavior with its last cursor intact.
+
+Default: `false`.
+
+
+### `cel.program` [cel-program]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+The CEL program to execute when [`run_as_cel`](#run-as-cel) is enabled. This is the same program format used by the [CEL input's `program` field](/reference/filebeat/filebeat-input-cel.md). Required when `run_as_cel` is `true`.
+
+
+### `cel.state` [cel-state]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Initial state for the CEL program, equivalent to the [CEL input's `state` field](/reference/filebeat/filebeat-input-cel.md). May include an initial `cursor` object that is used as the bootstrap value on the first execution when no stored cursor exists.
+
+
+### `cel.max_executions` [cel-max-executions]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+The maximum number of CEL program executions per interval. Equivalent to the [CEL input's `max_executions` field](/reference/filebeat/filebeat-input-cel.md). Default: `1000`.
+
+
+### `cel.regexp` [cel-regexp]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+A map of named regular expression patterns available to the CEL program. Equivalent to the [CEL input's `regexp` field](/reference/filebeat/filebeat-input-cel.md).
+
+
+### `cel.xsd` [cel-xsd]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+A map of named XSD schemas for XML decoding in the CEL program. Equivalent to the [CEL input's `xsd` field](/reference/filebeat/filebeat-input-cel.md).
+
+
+### `cel.redact` [cel-redact]
+
+```{applies_to}
+stack: ga 9.4.0
+```
+
+Redaction configuration for the CEL program. Equivalent to the [CEL input's `redact` field](/reference/filebeat/filebeat-input-cel.md).
+
+::::{admonition} Example: migrating an httpjson input to CEL
+```yaml
+filebeat.inputs:
+- type: httpjson
+  id: my-api-input
+  interval: 60s
+  run_as_cel: true
+  request.url: https://api.example.com/events
+  auth.oauth2:
+    client.id: my-client-id
+    client.secret: my-client-secret
+    token_url: https://auth.example.com/oauth2/token
+  request.ssl.verification_mode: full
+  request.timeout: 30s
+  cel.program: |
+    state.url.with({
+        "Header": {"Accept": ["application/json"]},
+    }).as(req, request("GET", req).as(resp,
+        bytes(resp.Body).decode_json().as(body, {
+            "events": body.items.map(e, {"message": e.encode_json()}),
+            "cursor": {"since": body.items[body.items.size()-1].updated_at},
+        })
+    ))
+  cel.state:
+    cursor:
+      since: "2024-01-01T00:00:00Z"
+```
+::::
 
 
 ## Request life cycle [_request_life_cycle]

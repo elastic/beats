@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-panw.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Palo Alto Networks module [filebeat-module-panw]
 
@@ -196,7 +201,6 @@ This module comes with two sample dashboards:
 % TO DO: Use `:class: screenshot`
 ![filebeat panw threat](images/filebeat-panw-threat.png)
 
-
-## Fields [_fields_42]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-panw.md) section.

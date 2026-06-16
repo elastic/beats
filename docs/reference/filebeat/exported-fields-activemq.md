@@ -1,38 +1,42 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-activemq.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # ActiveMQ fields [exported-fields-activemq]
 
 Module for parsing ActiveMQ log files.
 
-
 ## activemq [_activemq]
+
+
 
 **`activemq.caller`**
 :   Name of the caller issuing the logging request (class or resource).
 
-type: keyword
+    type: keyword
 
 
 **`activemq.thread`**
 :   Thread that generated the logging event.
 
-type: keyword
+    type: keyword
 
 
 **`activemq.user`**
 :   User that generated the logging event.
 
-type: keyword
-
+    type: keyword
 
 
 ## audit [_audit]
 
 Fields from ActiveMQ audit logs.
-
 
 ## log [_log]
 

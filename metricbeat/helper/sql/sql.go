@@ -21,10 +21,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
+	"regexp"
 	"strconv"
-	"time"
-
 	"strings"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,11 +64,24 @@ func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
 }
 
 // FetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
-func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, error) {
-	rows, err := d.QueryContext(ctx, q)
+func (d *DbClient) FetchTableMode(ctx context.Context, query string) ([]mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
+	defer rows.Close()
+	return d.fetchTableMode(rows)
+}
+
+// FetchTableModeWithParams executes a parameterized query and returns results in table format.
+// This is similar to FetchTableMode but accepts query parameters for safe parameter substitution.
+// Use this for cursor-based queries where the cursor value is passed as a parameter.
+func (d *DbClient) FetchTableModeWithParams(ctx context.Context, query string, args ...interface{}) ([]mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("parameterized query failed: %w", err)
+	}
+	defer rows.Close()
 	return d.fetchTableMode(rows)
 }
 
@@ -100,7 +114,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 		r := mapstr.M{}
 
 		for i, c := range cols {
-			value := getValue(vals[i].(*interface{}))
+			value := getValue(vals[i].(*interface{})) //nolint:errcheck // getValue does not return an error. Each element is guaranteed to be *interface{}.
 			r.Put(c, value)
 		}
 
@@ -115,11 +129,12 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 }
 
 // FetchVariableMode executes the provided SQL query and returns the results in a key/value format.
-func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, error) {
-	rows, err := d.QueryContext(ctx, q)
+func (d *DbClient) FetchVariableMode(ctx context.Context, query string) (mapstr.M, error) {
+	rows, err := d.QueryContext(ctx, query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
+	defer rows.Close()
 	return d.fetchVariableMode(rows)
 }
 
@@ -160,7 +175,7 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 func ReplaceUnderscores(ms mapstr.M) mapstr.M {
 	dotMap := mapstr.M{}
 	for k, v := range ms {
-		dotMap.Put(strings.Replace(k, "_", ".", -1), v)
+		dotMap.Put(strings.ReplaceAll(k, "_", "."), v)
 	}
 
 	return dotMap
@@ -204,7 +219,94 @@ func SwitchDriverName(d string) string {
 		return "postgres"
 	case "postgresql":
 		return "postgres"
+	case "mssql":
+		// Use the modern sqlserver driver instead of the deprecated mssql driver.
+		// The sqlserver driver uses native @Name or @p1..@pN parameter syntax.
+		return "sqlserver"
 	}
 
 	return d
+}
+
+// sqlSanitizedError is an internal error type for SanitizeError function to support both error message replacing and error wrapping
+type sqlSanitizedError struct {
+	sanitized string
+	err       error
+}
+
+func (err *sqlSanitizedError) Error() string {
+	return err.sanitized
+}
+
+func (err *sqlSanitizedError) Unwrap() error {
+	return err.err
+}
+
+const redacted = "(redacted)"
+
+var patterns = []struct {
+	re   *regexp.Regexp
+	repl string
+}{
+	// scheme://user:password@host -> redact password
+	{regexp.MustCompile(`([a-z][a-z0-9+\.\-]*://[^:/?#\s]+):([^@/\s]+)@`), `$1:` + redacted + `@`},
+	// user:password@... (no scheme), common in MySQL DSNs like user:pass@tcp(...)
+	// Important: Disallow '/' in the password part to avoid matching URI schemes like "postgres://..."
+	{regexp.MustCompile(`(^|[\s'\"])([^:/@\s]+):([^@/\s]+)@`), `$1$2:` + redacted + `@`},
+
+	// Key=Value forms (connection strings): handle quoted and unquoted values.
+	// Single-quoted values: Password='secret'; Token='abc';
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*'[^']*'`), `$1='` + redacted + `'`},
+	// Double-quoted values: Password="secret value";
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*"[^"]*"`), `$1="` + redacted + `"`},
+	// Unquoted values until delimiter or whitespace: Password=secret123; PASS=foo
+	{regexp.MustCompile(`(?i)\b(password|pwd|pass|passwd|token|secret)\b\s*=\s*[^;,#&\s]+`), `$1=` + redacted},
+
+	// JSON-style fields: {"password":"secret"}
+	{regexp.MustCompile(`(?i)"(password|pwd|pass|passwd|token|secret)"\s*:\s*"(?:[^"\\]|\\.)*"`), `"$1":"` + redacted + `"`},
+
+	// Query parameters in URLs: ?password=secret&...
+	{regexp.MustCompile(`(?i)([?&])(password|pwd|pass|passwd|token|secret)\s*=\s*([^&#\s]+)`), `$1$2=` + redacted},
+}
+
+// SanitizeError redacts sensitive information from an error's message, replacing it with "(redacted)".
+// It handles raw, quoted, and URL-encoded forms of the sensitive string, as well as common patterns
+// (e.g., passwords in URLs or DSNs). The returned error wraps the original error to preserve context
+// for errors.Is() and errors.As() checks.
+func SanitizeError(err error, sensitive string) error {
+	if err == nil {
+		return nil
+	}
+
+	msg := err.Error()
+
+	// First, replace the primary sensitive string if provided (raw, quoted, and URL-encoded forms)
+	if s := strings.TrimSpace(sensitive); s != "" {
+		// raw
+		msg = strings.ReplaceAll(msg, s, redacted)
+		// quoted (fmt %q style)
+		quoted := fmt.Sprintf("%q", s)
+		msg = strings.ReplaceAll(msg, quoted, redacted)
+		// URL-encoded (both query and path escaping just to be safe)
+		qEsc := url.QueryEscape(s)
+		if qEsc != s {
+			msg = strings.ReplaceAll(msg, qEsc, redacted)
+		}
+		pEsc := url.PathEscape(s)
+		if pEsc != s && pEsc != qEsc {
+			msg = strings.ReplaceAll(msg, pEsc, redacted)
+		}
+	}
+
+	// Pattern-based sanitization for common secrets in errors (URLs, DSNs, key/value strings, JSON, query params).
+	// Order matters: apply more specific URL userinfo patterns first.
+
+	for _, p := range patterns {
+		msg = p.re.ReplaceAllString(msg, p.repl)
+	}
+
+	return &sqlSanitizedError{
+		sanitized: msg,
+		err:       err,
+	}
 }

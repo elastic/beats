@@ -53,12 +53,31 @@ type pendingTemplatesCache struct {
 	events  map[SessionKey][]*bytes.Buffer
 }
 
+const (
+	// templates should be sent frequently, so expecting one to show up
+	// within 512 records seems reasonable
+	maxPendingPerKey = 512
+	// this is the culmination of 32 templates being maxed out on records
+	// before any of the templates themselves show up
+	maxTotalPending = 16384
+)
+
 func newPendingTemplatesCache() *pendingTemplatesCache {
 	cache := &pendingTemplatesCache{
 		events: make(map[SessionKey][]*bytes.Buffer),
 		hp:     pendingEventsHeap{},
 	}
 	return cache
+}
+
+// totalPendingLocked counts the total number of pending events
+// across all template IDs we have seen
+func (h *pendingTemplatesCache) totalPendingLocked() int {
+	total := 0
+	for _, queued := range h.events {
+		total += len(queued)
+	}
+	return total
 }
 
 // GetAndRemove returns all events for a given session key and removes them from the cache
@@ -81,6 +100,15 @@ func (h *pendingTemplatesCache) GetAndRemove(key SessionKey) []*bytes.Buffer {
 func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
+
+	if len(h.events[key]) > maxPendingPerKey {
+		return
+	}
+
+	totalPending := h.totalPendingLocked()
+	if totalPending >= maxTotalPending {
+		return
+	}
 
 	h.events[key] = append(h.events[key], events)
 	h.hp.Push(eventWithMissingTemplate{key: key, entryTime: time.Now()})

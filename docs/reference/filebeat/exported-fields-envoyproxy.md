@@ -1,12 +1,16 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-envoyproxy.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Envoyproxy fields [exported-fields-envoyproxy]
 
 Module for handling logs produced by envoy
-
 
 ## envoyproxy [_envoyproxy]
 
@@ -15,38 +19,38 @@ Fields from envoy proxy logs after normalization
 **`envoyproxy.log_type`**
 :   Envoy log type, normally ACCESS
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.response_flags`**
 :   Response flags
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.upstream_service_time`**
 :   Upstream service time in nanoseconds
 
-type: long
+    type: long
 
-format: duration
+    format: duration
 
 
 **`envoyproxy.request_id`**
 :   ID of the request
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.authority`**
 :   Envoy proxy authority field
 
-type: keyword
+    type: keyword
 
 
 **`envoyproxy.proxy_type`**
 :   Envoy proxy type, tcp or http
 
-type: keyword
+    type: keyword
 
 

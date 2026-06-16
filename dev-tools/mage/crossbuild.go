@@ -39,14 +39,35 @@ import (
 
 const defaultCrossBuildTarget = "golangCrossBuild"
 
+type dockerVolumeMount struct {
+	hostPath      string
+	containerPath string
+	readOnly      bool
+}
+
 // Platforms contains the set of target platforms for cross-builds. It can be
 // modified at runtime by setting the PLATFORMS environment variable.
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// SelectedPackageTypes is the list of package types. If empty, all packages types
-// are considered to be selected (see isPackageTypeSelected).
-var SelectedPackageTypes []PackageType
+// ParsePackageTypes parses a comma-separated list of package types. Invalid
+// values are ignored.
+func ParsePackageTypes(packageTypes string) []PackageType {
+	var parsed []PackageType
+	for _, packageType := range strings.Split(packageTypes, ",") {
+		packageType = strings.TrimSpace(packageType)
+		if packageType == "" {
+			continue
+		}
+
+		var p PackageType
+		if err := p.UnmarshalText([]byte(packageType)); err != nil {
+			continue
+		}
+		parsed = append(parsed, p)
+	}
+	return parsed
+}
 
 func init() {
 	// Allow overriding via PLATFORMS.
@@ -54,17 +75,6 @@ func init() {
 		Platforms = NewPlatformList(expression)
 	}
 
-	// Allow overriding via PACKAGES.
-	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
-		for _, pkgtype := range strings.Split(packageTypes, ",") {
-			var p PackageType
-			err := p.UnmarshalText([]byte(pkgtype))
-			if err != nil {
-				continue
-			}
-			SelectedPackageTypes = append(SelectedPackageTypes, p)
-		}
-	}
 }
 
 // CrossBuildOption defines an option to the CrossBuild target.
@@ -77,6 +87,13 @@ type ImageSelectorFunc func(platform string) (string, error)
 func ForPlatforms(expr string) func(params *crossBuildParams) {
 	return func(params *crossBuildParams) {
 		params.Platforms = params.Platforms.Filter(expr)
+	}
+}
+
+// WithPlatforms sets the exact platforms list to use for cross-building.
+func WithPlatforms(platforms BuildPlatformList) func(params *crossBuildParams) {
+	return func(params *crossBuildParams) {
+		params.Platforms = append(BuildPlatformList(nil), platforms...)
 	}
 }
 
@@ -238,7 +255,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "darwin/universal":
 		tagSuffix = "darwin-arm64-debian11"
 	case platform == "linux/arm64":
-		tagSuffix = "base-arm-debian9"
+		tagSuffix = "base-arm-debian11"
 	case platform == "linux/armv5":
 		tagSuffix = "armel"
 	case platform == "linux/armv6":
@@ -250,9 +267,11 @@ func CrossBuildImage(platform string) (string, error) {
 	case strings.HasPrefix(platform, "linux/ppc"):
 		tagSuffix = "ppc-debian11"
 	case platform == "linux/s390x":
-		tagSuffix = "s390x-debian11"
+		tagSuffix = "s390x-debian12"
 	case strings.HasPrefix(platform, "linux"):
 		tagSuffix = "main-debian11"
+	case platform == "windows/arm64":
+		tagSuffix = "windows-arm64-debian12"
 	}
 
 	goVersion, err := GoVersion()
@@ -341,7 +360,7 @@ func (b GolangCrossBuilder) Build() error {
 
 	args = append(args,
 		"--rm",
-		"--env", "GOFLAGS=-mod=readonly -buildvcs=false",
+		"--env", "GOFLAGS=-mod=readonly",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
@@ -349,6 +368,27 @@ func (b GolangCrossBuilder) Build() error {
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 	)
+
+	// When building from a git worktree the .git entry in the repo root is
+	// a file (not a directory) that contains an absolute path to the real
+	// git metadata on the host.  Mount both the worktree-specific git dir
+	// and the shared common git dir at their original host paths so that
+	// git can follow the reference chain inside the container.
+	gitVolumes, err := gitWorktreeVolumes(repoInfo.RootDir)
+	if err != nil {
+		return fmt.Errorf("failed to determine git worktree volumes: %w", err)
+	}
+	args = append(args, gitVolumes...)
+
+	// Buildkite reference clones keep some objects in host-side alternates.
+	// Go's VCS stamping runs inside Docker, so those object dirs must be visible.
+	gitMounts, err := gitDockerVolumeMounts(repoInfo.RootDir, mountPoint)
+	if err != nil {
+		return err
+	}
+	for _, mount := range gitMounts {
+		args = append(args, "-v", mount.dockerArg())
+	}
 
 	args = append(args,
 		image,
@@ -360,6 +400,149 @@ func (b GolangCrossBuilder) Build() error {
 	)
 
 	return dockerRun(args...)
+}
+
+// gitWorktreeVolumes returns Docker volume flags (-v) needed to make git work
+// inside a container when the host repo is a git worktree.  In a worktree the
+// .git entry is a file pointing to the real git metadata elsewhere on the host.
+// We mount both the worktree-specific git dir and the shared common git dir at
+// their original absolute paths so the reference chain is preserved.
+//
+// Returns nil (no extra volumes) when the repo is not a worktree.
+func gitWorktreeVolumes(repoRoot string) ([]string, error) {
+	dotGit := filepath.Join(repoRoot, ".git")
+	info, err := os.Lstat(dotGit)
+	if err != nil {
+		return nil, err
+	}
+	if info.IsDir() {
+		// Regular repository, no extra mounts needed.
+		return nil, nil
+	}
+
+	// .git is a file -> we are in a worktree.
+	gitDir, err := sh.Output("git", "rev-parse", "--git-dir")
+	if err != nil {
+		return nil, fmt.Errorf("failed to determine git dir: %w", err)
+	}
+	gitCommonDir, err := sh.Output("git", "rev-parse", "--git-common-dir")
+	if err != nil {
+		return nil, fmt.Errorf("failed to determine git common dir: %w", err)
+	}
+
+	// Resolve to absolute paths so the mounts are unambiguous.
+	gitDir, err = filepath.Abs(gitDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve git dir absolute path: %w", err)
+	}
+	gitCommonDir, err = filepath.Abs(gitCommonDir)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve git common dir absolute path: %w", err)
+	}
+
+	var volumes []string
+	volumes = append(volumes, "-v", gitDir+":"+gitDir+":ro")
+	if gitCommonDir != gitDir {
+		volumes = append(volumes, "-v", gitCommonDir+":"+gitCommonDir+":ro")
+	}
+	return volumes, nil
+}
+
+func (m dockerVolumeMount) dockerArg() string {
+	arg := m.hostPath + ":" + m.containerPath
+	if m.readOnly {
+		arg += ":ro"
+	}
+	return arg
+}
+
+func gitDockerVolumeMounts(repoRoot, containerRepoRoot string) ([]dockerVolumeMount, error) {
+	objectsDir, err := gitPath(repoRoot, "objects")
+	if err != nil {
+		log.Printf("crossBuild: skipping git alternate mounts: %v", err)
+		return nil, nil
+	}
+
+	alternatesPath, err := gitPath(repoRoot, "objects/info/alternates")
+	if err != nil {
+		log.Printf("crossBuild: skipping git alternate mounts: %v", err)
+		return nil, nil
+	}
+
+	alternates, err := os.ReadFile(alternatesPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to read git alternates file %q: %w", alternatesPath, err)
+	}
+
+	containerObjectsDir := containerPathForHostPath(objectsDir, repoRoot, containerRepoRoot)
+	return gitAlternateObjectDirMounts(objectsDir, containerObjectsDir, alternates), nil
+}
+
+func gitPath(repoRoot, path string) (string, error) {
+	out, err := sh.Output("git", "-C", repoRoot, "rev-parse", "--git-path", path)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve git path %q for %q: %w", path, repoRoot, err)
+	}
+
+	resolved := strings.TrimSpace(out)
+	if resolved == "" {
+		return "", fmt.Errorf("git path %q for %q resolved to an empty path", path, repoRoot)
+	}
+	if !filepath.IsAbs(resolved) {
+		resolved = filepath.Join(repoRoot, resolved)
+	}
+	return filepath.Clean(resolved), nil
+}
+
+func gitAlternateObjectDirMounts(objectsDir, containerObjectsDir string, alternates []byte) []dockerVolumeMount {
+	var mounts []dockerVolumeMount
+	seen := map[string]struct{}{}
+
+	for _, line := range strings.Split(string(alternates), "\n") {
+		alternate := strings.TrimSpace(line)
+		if alternate == "" || strings.HasPrefix(alternate, "#") {
+			continue
+		}
+
+		hostPath := alternate
+		containerPath := alternate
+		if !filepath.IsAbs(alternate) {
+			hostPath = filepath.Join(objectsDir, alternate)
+			containerPath = filepath.Join(containerObjectsDir, filepath.ToSlash(alternate))
+		}
+
+		hostPath = filepath.Clean(hostPath)
+		containerPath = filepath.ToSlash(filepath.Clean(containerPath))
+		if _, found := seen[containerPath]; found {
+			continue
+		}
+
+		info, err := os.Stat(hostPath)
+		if err != nil || !info.IsDir() {
+			continue
+		}
+
+		seen[containerPath] = struct{}{}
+		mounts = append(mounts, dockerVolumeMount{
+			hostPath:      hostPath,
+			containerPath: containerPath,
+			readOnly:      true,
+		})
+	}
+
+	return mounts
+}
+
+func containerPathForHostPath(hostPath, hostRepoRoot, containerRepoRoot string) string {
+	rel, err := filepath.Rel(hostRepoRoot, hostPath)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return filepath.ToSlash(filepath.Clean(hostPath))
+	}
+
+	return filepath.ToSlash(filepath.Join(containerRepoRoot, rel))
 }
 
 // DockerChown chowns files generated during build. EXEC_UID and EXEC_GID must

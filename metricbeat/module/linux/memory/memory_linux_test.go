@@ -36,6 +36,7 @@ func TestPercents(t *testing.T) {
 
 	assert.Equal(t, float64(1), data["page_stats"].(mapstr.M)["kswapd_efficiency"].(mapstr.M)["pct"].(float64))
 	assert.Equal(t, float64(0.7143), data["page_stats"].(mapstr.M)["direct_efficiency"].(mapstr.M)["pct"].(float64))
+	assert.Equal(t, float64(0), data["swap"].(mapstr.M)["used"].(mapstr.M)["pct"].(float64))
 }
 
 func TestPagesFields(t *testing.T) {

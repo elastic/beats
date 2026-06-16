@@ -33,12 +33,12 @@ type winDecoder struct {
 	cache  *metadataCache
 }
 
-func newDecoder(locale uint32) decoder {
+func newDecoder(locale uint32, logger *logp.Logger) decoder {
 	return &winDecoder{
 		locale: locale,
 		cache: &metadataCache{
 			store: map[string]*winevent.WinMeta{},
-			log:   logp.NewLogger(logName),
+			log:   logger.Named(logName),
 		},
 	}
 }

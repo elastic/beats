@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-graphite.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Graphite module [metricbeat-module-graphite]
 
@@ -10,7 +15,7 @@ This is the Graphite module.
 The default metricset is `server`.
 
 
-## Example configuration [_example_configuration_28]
+## Example configuration [_example_configuration]
 
 The Graphite module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -40,10 +45,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_33]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [server](/reference/metricbeat/metricbeat-metricset-graphite-server.md)
-
-
