@@ -27,7 +27,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 
@@ -383,16 +382,11 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	var testArgs []string
 
 	if params.Race {
-		// Enable the race detector for supported platforms.
-		// This is an intersection of the supported platforms for Beats and Go.
-		//
-		// See https://go.dev/doc/articles/race_detector#Requirements.
+		// Only pass -race on platforms that support it; the predicate is shared
+		// with the test binary builder (testbin) to keep the two in sync.
 		devOS := os.Getenv("DEV_OS")
 		devArch := os.Getenv("DEV_ARCH")
-		raceAmd64 := devArch == "amd64"
-		raceArm64 := devArch == "arm64" &&
-			slices.Contains([]string{"linux", "darwin"}, devOS)
-		if raceAmd64 || raceArm64 {
+		if testbin.RaceDetectorSupported(devOS, devArch) {
 			testArgs = append(testArgs, "-race")
 		} else {
 			log.Printf("Warning: skipping -race flag for unsupported platform %s/%s\n", devOS, devArch)
