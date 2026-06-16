@@ -19,9 +19,4 @@
 
 package integration
 
-// raceBuildEnabled reports whether this test binary was compiled with the Go
-// race detector. Go automatically satisfies the "race" build constraint when
-// the -race flag is passed, so this file is only included in race-enabled
-// builds (e.g. "go test -tags=integration -race"). The non-race counterpart
-// lives in racedetector_off.go.
 const raceBuildEnabled = true

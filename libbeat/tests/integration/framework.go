@@ -1100,21 +1100,21 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 
 // raceDetectorMarker is the header the Go race detector prints to stderr when
 // it detects a data race. It is only emitted when the binary was built with
-// -race (see RACE_DETECTOR in dev-tools/testbin). The marker is written as the
-// race happens, independently of the process exit code, so without explicitly
+// -race (see testbin.RaceDetectorEnvVar). The marker is written as the race
+// happens, independently of the process exit code, so without explicitly
 // scanning for it a race can go unnoticed when the Beat is stopped by a signal.
 const raceDetectorMarker = "WARNING: DATA RACE"
 
 // checkForDataRace scans the Beat's stderr for a race detector report and fails
 // the test if one is found. It only does work when the Beat binary was built
-// with the race detector (RACE_DETECTOR=true); otherwise the marker can never
-// appear, so the stderr read is skipped.
+// with the race detector (testbin.RaceDetectorEnvVar=true); otherwise the
+// marker can never appear, so the stderr read is skipped.
 //
 // It must be called after the process has exited (Cmd.Wait returned) so stderr
 // is fully flushed, and before the next startBeat truncates the file.
 func (b *BeatProc) checkForDataRace() {
 	b.t.Helper()
-	if enabled, _ := strconv.ParseBool(os.Getenv("RACE_DETECTOR")); !enabled {
+	if enabled, _ := strconv.ParseBool(os.Getenv(testbin.RaceDetectorEnvVar)); !enabled {
 		return
 	}
 	data, err := os.ReadFile(b.stderr.Name())
@@ -1328,16 +1328,14 @@ func (b *BeatProc) RemoveOutputFile() {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
 //
-// When this test binary is itself compiled with -race (e.g. a developer runs
-// "go test -tags=integration -race"), the Beat — which runs as a separate
-// process — would not be instrumented, so races inside it would go unnoticed.
-// To match the "RACE_DETECTOR=true mage" behaviour, the -race build constraint
-// is propagated through RACE_DETECTOR so testbin builds the Beat with -race and
-// the framework scans its stderr for race reports.
+// As a convenience, the -race build constraint is propagated through
+// testbin.RaceDetectorEnvVar so testbin builds the Beat with -race and the
+// framework scans its stderr for race reports. This auto-enable is skipped
+// when CI=true.
 func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
-	if raceBuildEnabled {
-		if err := os.Setenv("RACE_DETECTOR", "true"); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to enable RACE_DETECTOR for -race build: %s\n", err)
+	if raceBuildEnabled && os.Getenv("CI") != "true" {
+		if err := os.Setenv(testbin.RaceDetectorEnvVar, "true"); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to enable %s for -race build: %s\n", testbin.RaceDetectorEnvVar, err)
 			os.Exit(1)
 		}
 	}

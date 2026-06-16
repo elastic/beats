@@ -22,9 +22,11 @@
 // Environment variables respected:
 //   - DEV=true: disables optimizations for debugging (-gcflags=all=-N -l)
 //   - TEST_COVERAGE=true: enables coverage instrumentation (-coverpkg ./...)
-//   - RACE_DETECTOR=true: enables the race detector (-race) on supported
+//   - INTEG_RACE_DETECTOR=true: enables the race detector (-race) on supported
 //     platforms. This instruments the beat binary itself, so data races are
 //     detected while the beat runs under the Go integration test framework.
+//     It is deliberately separate from RACE_DETECTOR (which controls "go test
+//     -race") so CI does not implicitly race-instrument the spawned beat.
 //
 // Platform-specific flags (e.g. stripping DWARF on Windows 386) should be
 // passed by the caller via BuildOptions.ExtraFlags.
@@ -90,12 +92,12 @@ func Build(beatName, dir string, opts ...Option) (string, error) {
 		args = append(args, "-coverpkg", "./...")
 	}
 
-	if raceDetector, _ := strconv.ParseBool(os.Getenv("RACE_DETECTOR")); raceDetector {
+	if raceDetector, _ := strconv.ParseBool(os.Getenv(RaceDetectorEnvVar)); raceDetector {
 		// Only instrument with -race on platforms that support it.
 		if RaceDetectorSupported(runtime.GOOS, runtime.GOARCH) {
 			args = append(args, "-race")
 		} else {
-			log.Printf("Warning: RACE_DETECTOR=true but skipping -race for unsupported platform %s/%s", runtime.GOOS, runtime.GOARCH)
+			log.Printf("Warning: %s=true but skipping -race for unsupported platform %s/%s", RaceDetectorEnvVar, runtime.GOOS, runtime.GOARCH)
 		}
 	}
 

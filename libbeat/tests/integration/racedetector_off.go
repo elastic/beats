@@ -19,7 +19,4 @@
 
 package integration
 
-// raceBuildEnabled reports whether this test binary was compiled with the Go
-// race detector. This file is included when -race is absent. See the
-// race-enabled counterpart in racedetector_on.go.
 const raceBuildEnabled = false
