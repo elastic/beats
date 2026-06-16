@@ -157,15 +157,16 @@ func TestCalculateTimespanWithLookback(t *testing.T) {
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
 
-	t.Run("lookbackStart after normalStart does not expand window", func(t *testing.T) {
-		// 3 minutes ago — within the 5-minute normal window, no expansion needed
+	t.Run("lookbackStart after normalStart avoids overlap", func(t *testing.T) {
+		// 3 minutes ago — cursor is within the normal window; use it to avoid
+		// re-querying [normalStart, lookbackStart] which was already collected.
 		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:57:00Z")
 		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
-		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
+		require.Equal(t, "2024-07-30T18:57:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
 
-	t.Run("lookbackStart equal to normalStart does not expand window", func(t *testing.T) {
+	t.Run("lookbackStart equal to normalStart uses lookbackStart", func(t *testing.T) {
 		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:55:00Z")
 		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
 		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))

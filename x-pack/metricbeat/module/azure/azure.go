@@ -479,13 +479,14 @@ func hasConfigOptions(config []string) bool {
 //	Start                                                     End             |
 //	  │                                                        │              |
 func calculateTimespan(referenceTime time.Time, timeGrain string, config Config, lookbackStart *time.Time) (time.Time, time.Time) {
-	timespanDuration := max(asDuration(timeGrain), config.Period)
 	endTime := referenceTime.Add(config.Latency * -1)
-	normalStart := endTime.Add(timespanDuration * -1)
 
-	if lookbackStart != nil && lookbackStart.Before(normalStart) {
+	if lookbackStart != nil {
 		return *lookbackStart, endTime
 	}
+
+	timespanDuration := max(asDuration(timeGrain), config.Period)
+	normalStart := endTime.Add(timespanDuration * -1)
 	return normalStart, endTime
 }
 
