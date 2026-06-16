@@ -1,10 +1,7 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",
-        "memory": {
-            "usage": 0.9148046875
-        }
+        "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
     },
     "containerd": {
         "memory": {

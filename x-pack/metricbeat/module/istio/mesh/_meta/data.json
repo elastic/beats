@@ -13,16 +13,16 @@
                 }
             },
             "destination": {
-                "app": "ratings",
+                "app": "reviews",
                 "principal": "unknown",
                 "service": {
-                    "host": "productpage.default.svc.cluster.local",
-                    "name": "productpage",
+                    "host": "details.default.svc.cluster.local",
+                    "name": "details",
                     "namespace": "default"
                 },
                 "version": "v1",
                 "workload": {
-                    "name": "ratings-v1",
+                    "name": "reviews-v1",
                     "namespace": "default"
                 }
             },
@@ -32,20 +32,20 @@
                     "ms": {
                         "bucket": {
                             "+Inf": 1,
-                            "10": 0,
-                            "100": 0,
+                            "10": 1,
+                            "100": 1,
                             "1000": 1,
                             "10000": 1,
-                            "25": 0,
-                            "250": 0,
+                            "25": 1,
+                            "250": 1,
                             "2500": 1,
                             "5": 0,
-                            "50": 0,
-                            "500": 0,
+                            "50": 1,
+                            "500": 1,
                             "5000": 1
                         },
                         "count": 1,
-                        "sum": 657.7402890000001
+                        "sum": 5.815905
                     }
                 },
                 "protocol": "http",
@@ -78,7 +78,7 @@
                             "1": 0,
                             "10": 0,
                             "100": 0,
-                            "1000": 0,
+                            "1000": 1,
                             "10000": 1,
                             "100000": 1,
                             "1000000": 1,
@@ -86,17 +86,17 @@
                             "100000000": 1
                         },
                         "count": 1,
-                        "sum": 5183
+                        "sum": 178
                     }
                 }
             },
             "source": {
-                "app": "istio-ingressgateway",
+                "app": "productpage",
                 "principal": "unknown",
-                "version": "unknown",
+                "version": "v1",
                 "workload": {
-                    "name": "istio-ingressgateway",
-                    "namespace": "istio-system"
+                    "name": "productpage-v1",
+                    "namespace": "default"
                 }
             }
         }
