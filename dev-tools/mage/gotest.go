@@ -389,6 +389,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		if testbin.RaceDetectorSupported(devOS, devArch) {
 			testArgs = append(testArgs, "-race")
 		} else {
+			//nolint:gosec // G706: DEV_OS/DEV_ARCH are trusted build-time env vars, not untrusted input
 			log.Printf("Warning: skipping -race flag for unsupported platform %s/%s\n", devOS, devArch)
 		}
 	}
