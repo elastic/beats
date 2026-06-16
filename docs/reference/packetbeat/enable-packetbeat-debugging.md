@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/enable-packetbeat-debugging.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Debug [enable-packetbeat-debugging]

@@ -20,20 +20,40 @@
 package translate_ldap_attribute
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+)
+
+const (
+	guidTranslationAuto   = "auto"
+	guidTranslationAlways = "always"
+	guidTranslationNever  = "never"
 )
 
 type config struct {
 	Field               string            `config:"field"  validate:"required"`
 	TargetField         string            `config:"target_field"`
-	LDAPAddress         string            `config:"ldap_address" validate:"required"`
-	LDAPBaseDN          string            `config:"ldap_base_dn" validate:"required"`
+	LDAPDomain          string            `config:"ldap_domain"`
+	LDAPAddress         string            `config:"ldap_address"`
+	LDAPBaseDN          string            `config:"ldap_base_dn"`
 	LDAPBindUser        string            `config:"ldap_bind_user"`
 	LDAPBindPassword    string            `config:"ldap_bind_password"`
 	LDAPSearchAttribute string            `config:"ldap_search_attribute" validate:"required"`
 	LDAPMappedAttribute string            `config:"ldap_mapped_attribute" validate:"required"`
 	LDAPSearchTimeLimit int               `config:"ldap_search_time_limit"`
 	LDAPTLS             *tlscommon.Config `config:"ldap_ssl"`
+
+	// ADGUIDTranslation controls when GUID values get converted to the binary form
+	// expected by Active Directory. We no longer rely on server detection; the
+	// auto mode simply checks whether the configured search attribute is named
+	// objectGUID (case-insensitive).
+	// Supported values:
+	//   "auto"   (default): Convert when LDAP search attribute equals objectGUID
+	//   "always": Always apply GUID conversion regardless of attribute name
+	//   "never" : Never apply GUID conversion
+	ADGUIDTranslation string `config:"ad_guid_translation"`
 
 	IgnoreMissing bool `config:"ignore_missing"`
 	IgnoreFailure bool `config:"ignore_failure"`
@@ -43,5 +63,21 @@ func defaultConfig() config {
 	return config{
 		LDAPSearchAttribute: "objectGUID",
 		LDAPMappedAttribute: "cn",
-		LDAPSearchTimeLimit: 30}
+		LDAPSearchTimeLimit: 30,
+		ADGUIDTranslation:   guidTranslationAuto,
+	}
+}
+
+func (c *config) validate() error {
+	switch strings.ToLower(strings.TrimSpace(c.ADGUIDTranslation)) {
+	case "", guidTranslationAuto:
+		c.ADGUIDTranslation = guidTranslationAuto
+	case guidTranslationAlways:
+		c.ADGUIDTranslation = guidTranslationAlways
+	case guidTranslationNever:
+		c.ADGUIDTranslation = guidTranslationNever
+	default:
+		return fmt.Errorf("invalid ad_guid_translation value %q (expected auto|always|never)", c.ADGUIDTranslation)
+	}
+	return nil
 }

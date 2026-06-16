@@ -110,6 +110,12 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  querylog:
+    enabled: false
+    # Set custom paths for the query log (NDJSON) files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
   deprecation:
     enabled: false
     # Set custom paths for the log files. If left empty,
@@ -243,7 +249,7 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------- Mongodb Module -------------------------------
+#------------------------------- MongoDB Module -------------------------------
 #- module: mongodb
   # Logs
   #log:
@@ -392,7 +398,7 @@ filebeat.modules:
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
 
 #------------------------------- Traefik Module -------------------------------
@@ -664,7 +670,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -759,7 +765,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -845,7 +851,13 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
+  # Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
   #clean_inactive: -1
+
+  # Enable this to disable all checks regarding clean_inactive and re-ingest
+  # all data when clean_inactive: 0, effectively keeping the
+  # old behaviour.
+  #legacy_clean_inactive: false
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -854,6 +866,16 @@ filebeat.inputs:
   # a fingerprint is generated using the first 1024 bytes of the file,
   # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
+
+  # Include file owner name and group name in the event metadata.  This option is not currently supported on Windows.
+  #include_file_owner_name: false
+  #include_file_owner_group_name: false
+
+  # Whether to add log.file.fingerprint to published events. Only takes
+  # effect when file_identity.fingerprint is configured. Defaults to false.
+  # The file path (log.file.path) is always present in events regardless
+  # of this setting.
+  #include_file_fingerprint: false
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -950,6 +972,20 @@ filebeat.inputs:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
 
+  ### File deleting options
+  # Filestream cam delete the file after it has been acknowledged by the output,
+  # has reached EOF or became inactive.
+
+  # Enable deleting the file after the reader is closed
+  # and all events have been ingested.
+  #delete.enabled: false
+
+  # Grace period to wait before trying to remove a file.
+  # If data is added during the grace, deletion is cancelled.
+  # The grace period will re-start next time the close condition
+  # is reached.
+  #delete.grace_period: 30m
+
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
 #- type: stdin
@@ -982,6 +1018,9 @@ filebeat.inputs:
 #- type: udp
   #enabled: false
 
+  # Number of pipeline workers
+  #number_of_workers: 1
+
   # Maximum size of the message received over UDP
   #max_message_size: 10KiB
 
@@ -999,6 +1038,9 @@ filebeat.inputs:
 
   # Character used to split new message
   #line_delimiter: "\n"
+
+  # Number of pipeline workers
+  #number_of_workers: 1
 
   # Maximum size in bytes of the message received over TCP
   #max_message_size: 20MiB
@@ -1204,6 +1246,21 @@ filebeat.inputs:
   #paths:
     #- /var/log/custom.journal
 
+  # Specify a folder to be used as chroot when calling the journalctl binary
+  #chroot:
+
+  # The path for the `journalctl` binary. If not set, Filebeat will look for
+  # `journalctl` in PATH (defaults to `journalctl`). When using `chroot`, if
+  # `journalctl_path` is not explicitly set, it automatically defaults to
+  # `/usr/bin/journalctl`. If `journalctl_path` is explicitly set when `chroot`
+  # is configured, it must be an absolute path from within the chroot directory.
+  #journalctl_path:
+
+
+  # When enabled, log entries will be ingested interleaved from all
+  # available journals, including remote ones.
+  #merge: false
+
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.
   #  - tail: Starts reading at the end of the journal.
@@ -1325,6 +1382,39 @@ filebeat.inputs:
 # filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
+
+# The storage backend for the registry. Supported values are "memlog" and
+# "otel_file_storage". The default is "memlog", which uses an in-memory log
+# with periodic disk flushing. The "otel_file_storage" backend stores state
+# using the same on-disk layout as the OpenTelemetry Collector file_storage
+# extension (under registry.path).
+# NOTE: The "otel_file_storage" backend is in technical preview (available
+# since 9.5) and may be changed or removed in a future release.
+#filebeat.registry.backend: memlog
+
+# ----------------------- OTel file_storage backend settings -------------------
+# NOTE: This configuration section is in technical preview (available since 9.5)
+# and may be changed or removed in a future release.
+# These settings apply only when filebeat.registry.backend is set to
+# "otel_file_storage". Registry data files live under filebeat.registry.path;
+# optional fields below map to the OpenTelemetry file_storage extension config.
+# The running beat name (for example "filebeat") is used as the OpenTelemetry
+# receiver identity for storage client file naming; no separate setting is used.
+#
+#filebeat.registry.otel_file_storage.timeout: 1s
+#filebeat.registry.otel_file_storage.fsync: false
+# Filebeat defaults create_directory to true when no otel_file_storage
+# section is provided. When otel_file_storage is configured explicitly,
+# the upstream default (false) applies unless overridden here.
+#filebeat.registry.otel_file_storage.create_directory: true
+# directory_permissions defaults to "0700" when create_directory is true
+# and directory_permissions is not set explicitly.
+#filebeat.registry.otel_file_storage.directory_permissions: "0700"
+#filebeat.registry.otel_file_storage.recreate: false
+#
+# See the OpenTelemetry Collector file_storage extension documentation for
+# compaction and other nested options:
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -1510,7 +1600,10 @@ filebeat.inputs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
+#      wait_for_metadata: false
+#      wait_for_metadata_timeout: 30s
+#      wait_for_metadata_retry_period: 10s
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -2168,7 +2261,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -2975,6 +3068,30 @@ logging.files:
 # Controls the fraction of mutex contention events that are reported in the
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
+
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 

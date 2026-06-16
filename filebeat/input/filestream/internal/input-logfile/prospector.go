@@ -26,11 +26,14 @@ import (
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
 	// Init updates the store before starting the prospector.
-	// It cleans up the store, migrates file identities and takes over
-	// states from log or other filestream inputs.
+	// It cleans up the store and migrates file identities.
 	// It receives two StoreUpdater: one global and another local
 	// to this prospector instance.
 	Init(local, global StoreUpdater, newID func(Source) string) error
+	// TakeOver migrates states from other inputs (Log input or other Filestream
+	// inputs) to this prospector's input. It must be called after Init and
+	// before Run, so that it is not triggered during CheckConfig validation.
+	TakeOver(local StoreUpdater, newID func(Source) string) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
 	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
@@ -63,7 +66,7 @@ type StoreUpdater interface {
 	// TakeOver takes over states from other inputs. This allows a Filestream
 	// input to take over states from the Log input or other Filestream
 	// inputs with different IDs.
-	TakeOver(func(v Value) (string, any))
+	TakeOver(func(v TakeOverState) (string, any))
 }
 
 // Value contains the cursor metadata.

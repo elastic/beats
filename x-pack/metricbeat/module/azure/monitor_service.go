@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -49,7 +51,7 @@ const (
 )
 
 // NewService instantiates the Azure monitoring service
-func NewService(config Config) (*MonitorService, error) {
+func NewService(config Config, logger *logp.Logger) (*MonitorService, error) {
 	cloudServicesConfig := cloud.AzurePublic.Services
 
 	resourceManagerConfig := cloudServicesConfig[cloud.ResourceManager]
@@ -77,14 +79,14 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create client credentials: %w", err)
 	}
 
-	metricsClient, err := armmonitor.NewMetricsClient(credential, &arm.ClientOptions{
+	metricsClient, err := armmonitor.NewMetricsClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: clientOptions,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metrics client: %w", err)
 	}
 
-	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
+	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(config.SubscriptionId, credential, &arm.ClientOptions{
 		ClientOptions: clientOptions,
 	})
 	if err != nil {
@@ -119,7 +121,7 @@ func NewService(config Config) (*MonitorService, error) {
 		resourceClient:            resourceClient,
 		queryResourceClientConfig: queryResourceClientConfig,
 		context:                   context.Background(),
-		log:                       logp.NewLogger("azure monitor service"),
+		log:                       logger.Named("azure monitor service"),
 	}
 
 	return service, nil
@@ -351,7 +353,7 @@ func (service *MonitorService) QueryResources(
 			return nil, err
 		}
 
-		resp = append(resp, r.MetricResults.Values...)
+		resp = append(resp, r.Values...)
 	}
 
 	return resp, nil
@@ -415,6 +417,41 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 			return metrics, "", err
 		}
 
+		if resp.Interval == nil || *resp.Interval == "" {
+			// this should not happen because we have handled the wildcard
+			// timegrain config scenario. Therefore, we should not
+			// continue with data returned from the latest API call,
+			// because this data could be bad
+			err = fmt.Errorf(
+				"the returned interval (timegrain) in the list operation "+
+					"response is empty. Skipping this data. Query "+
+					"parameters: Aggregation: '%v', Filter: '%v', "+
+					"Metric Names: '%v', Timespan: '%v', "+
+					"Requested Timegrain: '%v', Result Type: '%v'",
+				aggregations, metricsFilter, metricNames, timespan,
+				timegrain, resultTypeData,
+			)
+			service.log.Error(err.Error())
+
+			return metrics, "", err // we do not record this data as it may be corrupted
+		} else if *resp.Interval != timegrain {
+			// note that the SDK says
+			// the interval "may be adjusted in the future and returned back
+			// from what was originally requested"
+			// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
+			service.log.Warnf(
+				"the interval (timegrain) in the list operation response ( %v ) "+
+					"does not match the requested timegrain ( %v ). Query "+
+					"parameters: Aggregation: '%v', Filter: '%v', "+
+					"Metric Names: '%v', Timespan: '%v', Result Type: '%v'",
+				*resp.Interval, timegrain, aggregations, metricsFilter,
+				metricNames, timespan, resultTypeData,
+			)
+			// we leverage the modified response interval
+			// as the SDK mentioned this adjusted interval
+			// is possible and therefore can be expected at times
+			// Reference: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor@v0.8.0#Response
+		}
 		interval = *resp.Interval
 
 		for _, v := range resp.Value {
@@ -423,25 +460,4 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 	}
 
 	return metrics, interval, nil
-}
-
-// getResourceNameFormId maps resource group from resource ID
-func getResourceNameFromId(path string) string {
-	params := strings.Split(path, "/")
-	if strings.HasSuffix(path, "/") {
-		return params[len(params)-2]
-	}
-	return params[len(params)-1]
-
-}
-
-// getResourceTypeFromId maps resource group from resource ID
-func getResourceTypeFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "providers" {
-			return fmt.Sprintf("%s/%s", params[i+1], params[i+2])
-		}
-	}
-	return ""
 }

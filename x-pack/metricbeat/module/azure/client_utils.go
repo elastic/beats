@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -16,9 +18,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
-
-// DefaultTimeGrain is set as default timegrain for the azure metrics
-const DefaultTimeGrain = "PT5M"
 
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 

@@ -13,14 +13,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strings"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
-	libbeatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -73,26 +70,6 @@ func SetupClusterInfoErrorServer(t *testing.T, _ []byte, _ []byte, _ string) *ht
 	}))
 }
 
-// Setup a Server with the data route set to `dataRoute` that fails via HTTP 5xx.
-func SetupDataErrorServer(dataRoute string) SetupServerCallback {
-	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/":
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(clusterInfo)
-			case dataRoute:
-				w.WriteHeader(500)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(`{"error":"Unexpected error"}`))
-			default:
-				t.Fatalf("Unrecognized request %v", r.RequestURI)
-			}
-		}))
-	}
-}
-
 // Setup a Server with the data route set to `dataRoute`.
 func SetupSuccessfulServer(dataRoute string) SetupServerCallback {
 	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
@@ -140,45 +117,6 @@ func SetupSuccessfulTemplateServer(path string, pathPrefix string, getTemplateRe
 	}
 }
 
-func SetupSuccessfulTemplateServerWithFailedRequests(path string, pathPrefix string, getTemplateResponse GetTemplateCallback, failedNames []string) SetupServerCallback {
-	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/":
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(clusterInfo)
-			case path:
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(data)
-			default:
-				if strings.HasPrefix(r.RequestURI, pathPrefix) {
-					templateNames := strings.Split(r.RequestURI[len(pathPrefix):], ",")
-
-					if slices.ContainsFunc(failedNames, func(name string) bool {
-						return slices.Contains(templateNames, name)
-					}) {
-						w.WriteHeader(500)
-						w.Header().Set("Content-Type", "application/json")
-						w.Write([]byte(`{"error":"Unexpected error"}`))
-
-						return
-					}
-
-					w.WriteHeader(200)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(getTemplateResponse(t, templateNames, []string{}))
-
-					return
-				}
-
-				t.Fatalf("Unrecognized request %v", r.RequestURI)
-			}
-		}))
-	}
-}
-
 func SetupSuccessfulTemplateServerWithIgnoredTemplates(path string, pathPrefix string, getTemplateResponse GetTemplateCallback, ignoredNames []string) SetupServerCallback {
 	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
 		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -196,33 +134,6 @@ func SetupSuccessfulTemplateServerWithIgnoredTemplates(path string, pathPrefix s
 					w.WriteHeader(200)
 					w.Header().Set("Content-Type", "application/json")
 					w.Write(getTemplateResponse(t, strings.Split(r.RequestURI[len(pathPrefix):], ","), ignoredNames))
-
-					return
-				}
-
-				t.Fatalf("Unrecognized request %v", r.RequestURI)
-			}
-		}))
-	}
-}
-
-func SetupTemplateErrorsServer(path string, pathPrefix string) SetupServerCallback {
-	return func(t *testing.T, clusterInfo []byte, data []byte, _ string) *httptest.Server {
-		return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			switch r.RequestURI {
-			case "/":
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(clusterInfo)
-			case path:
-				w.WriteHeader(200)
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(data)
-			default:
-				if strings.HasPrefix(r.RequestURI, pathPrefix) {
-					w.WriteHeader(500)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write([]byte(`{"error":"Unexpected error"}`))
 
 					return
 				}
@@ -346,33 +257,27 @@ func CheckEvent(t *testing.T, event mb.Event, info utils.ClusterInfo) {
 	require.Equal(t, info.ClusterID, GetObjectValue(event.ModuleFields, "cluster.id"))
 	require.Equal(t, info.ClusterName, GetObjectValue(event.ModuleFields, "cluster.name"))
 	require.Equal(t, info.Version.Number.String(), GetObjectValue(event.ModuleFields, "cluster.version"))
-
-	require.Equal(t, "autoops_es", GetObjectValue(event.RootFields, "service.name"))
-	require.Equal(t, libbeatversion.GetDefaultVersion(), GetObjectValue(event.RootFields, "metricbeatVersion"))
-	require.Equal(t, libbeatversion.Commit(), GetObjectValue(event.RootFields, "commit"))
 }
 
 func CheckEventWithTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo, transactionId string) {
 	CheckEvent(t, event, info)
 
 	// matching transaction ID
-	require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transactionId"))
+	require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transaction_id"))
 }
 
-func CheckEventWithRandomTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo) {
+func CheckEventWithoutTransactionId(t *testing.T, event mb.Event, info utils.ClusterInfo) {
 	CheckEvent(t, event, info)
 
-	// valid, random UUID
-	_, err := uuid.FromString(GetObjectValue(event.ModuleFields, "transactionId").(string))
-	require.NoError(t, err)
+	require.Nil(t, GetObjectValue(event.ModuleFields, "transaction_id"))
 }
 
 func CheckAllEventsUseSameTransactionId(t *testing.T, events []mb.Event) {
 	if len(events) > 1 {
-		transactionId := GetObjectValue(events[0].ModuleFields, "transactionId")
+		transactionId := GetObjectValue(events[0].ModuleFields, "transaction_id")
 
 		for _, event := range events {
-			require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transactionId"))
+			require.Equal(t, transactionId, GetObjectValue(event.ModuleFields, "transaction_id"))
 		}
 	}
 }

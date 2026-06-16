@@ -7,8 +7,6 @@ package cat_shards
 import (
 	"time"
 
-	"golang.org/x/exp/maps"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
@@ -65,7 +63,8 @@ var (
 				IsUsable: func(obj *NodeIndexShards) bool {
 					return obj.IndexingIndexTotal != nil && obj.IndexingIndexTotalTime != nil
 				},
-				WriteValue: func(obj *NodeIndexShards, value float64) { obj.IndexLatencyInMillis = &value },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.IndexLatencyInMillis = &value },
+				MaxValueMillis: utils.SamplingIntervalMillis[NodeIndexShards],
 			},
 			{
 				CalculateValue: utils.CalculateLatency,
@@ -75,7 +74,8 @@ var (
 				IsUsable: func(obj *NodeIndexShards) bool {
 					return obj.MergesTotal != nil && obj.MergesTotalTime != nil
 				},
-				WriteValue: func(obj *NodeIndexShards, value float64) { obj.MergeLatencyInMillis = &value },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.MergeLatencyInMillis = &value },
+				MaxValueMillis: utils.SamplingIntervalMillis[NodeIndexShards],
 			},
 			{
 				CalculateValue: utils.CalculateLatency,
@@ -85,7 +85,8 @@ var (
 				IsUsable: func(obj *NodeIndexShards) bool {
 					return obj.SearchQueryTotal != nil && obj.SearchQueryTime != nil
 				},
-				WriteValue: func(obj *NodeIndexShards, value float64) { obj.SearchLatencyInMillis = &value },
+				WriteValue:     func(obj *NodeIndexShards, value float64) { obj.SearchLatencyInMillis = &value },
+				MaxValueMillis: utils.SamplingIntervalMillis[NodeIndexShards],
 			},
 		},
 	}
@@ -101,19 +102,19 @@ func enrichNodeIndexShards(nodeIndexShardsMap map[string]NodeIndexShards, indexM
 		timestampDiff = &diff
 	}
 
-	nodeIndexShardsList := maps.Values(nodeIndexShardsMap)
-
-	for i := range nodeIndexShardsList {
-		nodeIndexShardsList[i].TotalFractions = size
+	nodeIndexShardsList := make([]NodeIndexShards, 0, len(nodeIndexShardsMap))
+	for _, v := range nodeIndexShardsMap {
+		v.TotalFractions = size
 
 		if timestampDiff != nil {
-			if prevNodeIndexShards, exists := cache.PreviousCache[nodeIndexShardsList[i].IndexNode]; exists {
-				utils.EnrichObject(&nodeIndexShardsList[i], &prevNodeIndexShards, cache)
-				nodeIndexShardsList[i].TimestampDiff = timestampDiff
+			if prevNodeIndexShards, exists := cache.PreviousCache[v.IndexNode]; exists {
+				utils.EnrichObject(&v, &prevNodeIndexShards, cache)
+				v.TimestampDiff = timestampDiff
 			}
 		}
 
-		enrichIndexMetadata(&nodeIndexShardsList[i], indexMetadata)
+		enrichIndexMetadata(&v, indexMetadata)
+		nodeIndexShardsList = append(nodeIndexShardsList, v)
 	}
 
 	return nodeIndexShardsList
@@ -123,6 +124,7 @@ func enrichIndexMetadata(nodeIndexShards *NodeIndexShards, indexMetadata map[str
 	if metadata, found := indexMetadata[nodeIndexShards.Index]; found {
 		nodeIndexShards.Aliases = metadata.aliases
 		nodeIndexShards.Attributes = metadata.attributes
+		nodeIndexShards.DataStream = metadata.dataStream
 		nodeIndexShards.IndexType = &metadata.indexType
 		nodeIndexShards.IsHidden = &metadata.hidden
 		nodeIndexShards.IsOpen = &metadata.open

@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/community-beats.html
+applies_to:
+  stack: deprecated 7.16.0, removed 8.0.0
 ---
 
 # Community Beats [community-beats]
@@ -119,7 +121,7 @@ Elastic provides no warranty or support for community-sourced {{beats}}.
 :   Collects GPFS metric and quota information.
 
 [hackerbeat](https://github.com/ullaakut/hackerbeat)
-:   Indexes the top stories of HackerNews into an ElasticSearch instance.
+:   Indexes the top stories of HackerNews into an Elasticsearch instance.
 
 [hsbeat](https://github.com/YaSuenag/hsbeat)
 :   Reads all performance counters in Java HotSpot VM.

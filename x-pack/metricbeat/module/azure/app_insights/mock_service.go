@@ -2,36 +2,41 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package app_insights
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Service interface for the azure monitor service and mock for testing
+// Service is the abstraction over the Application Insights metrics API used
+// by Client. A mock is provided for unit tests.
 type Service interface {
-	GetMetricValues(applicationId string, bodyMetrics []insights.MetricsPostBodySchema) (insights.ListMetricsResultsItem, error)
+	GetMetricValues(applicationId string, bodyMetrics []MetricsBatchRequestItem) (ListMetricsResultsItem, error)
 }
 
-// MockService mock for the azure monitor services
+// MockService mocks the Application Insights metrics service for unit tests.
 type MockService struct {
 	mock.Mock
 }
 
-// NewMockClient instantiates a new client with the mock billing service
-func NewMockClient() *Client {
+// NewMockClient instantiates a Client backed by a MockService.
+func NewMockClient(logger *logp.Logger) *Client {
 	return &Client{
 		new(MockService),
 		Config{},
-		logp.NewLogger("test azure appinsights"),
+		logger.Named("test azure appinsights"),
 	}
 }
 
-// GetMetricValues will return specified app insights metrics
-func (service *MockService) GetMetricValues(applicationId string, bodyMetrics []insights.MetricsPostBodySchema) (insights.ListMetricsResultsItem, error) {
+// GetMetricValues records the call and returns the configured response.
+func (service *MockService) GetMetricValues(applicationId string, bodyMetrics []MetricsBatchRequestItem) (ListMetricsResultsItem, error) {
 	args := service.Called(applicationId, bodyMetrics)
-	return args.Get(0).(insights.ListMetricsResultsItem), args.Error(1)
+	// Tests always stub this with a ListMetricsResultsItem; the comma-ok
+	// form is used purely to satisfy errcheck.check-type-assertions.
+	res, _ := args.Get(0).(ListMetricsResultsItem)
+	return res, args.Error(1)
 }

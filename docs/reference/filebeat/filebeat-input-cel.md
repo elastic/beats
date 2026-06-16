@@ -2,14 +2,19 @@
 navigation_title: "CEL"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
+sub:
+  mito_docs: https://pkg.go.dev/github.com/elastic/mito
+  mito_version: v1.25.1
+applies_to:
+  stack: ga 8.6.0
+  serverless: ga
 ---
 
 # Common Expression Language input [filebeat-input-cel]
 
+Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito]({{mito_docs}}/lib) CEL extension libraries.
 
-Use the `cel` input to read messages from a file path or HTTP API with a variety of payloads using the [Common Expression Language (CEL)](https://opensource.google.com/projects/cel) and the [mito](https://pkg.go.dev/github.com/elastic/mito/lib) CEL extension libraries.
-
-CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library. The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation. Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program. The cursor states may be used to control the behaviour of the program.
+CEL is a non-Turing complete language that can perform evaluation of expression in inputs, which can include file and API endpoints using the mito extension library. The `cel` input periodically runs a CEL program that is given an execution environment that may be configured by the user, and publishes the set of events that result from the program evaluation. Optionally the CEL program may return cursor states that will be provided to the next execution of the CEL program. The cursor states may be used to control the behavior of the program.
 
 This input supports:
 
@@ -17,7 +22,9 @@ This input supports:
 
     * Basic
     * Digest
+    * {applies_to}`stack: ga 9.3.0` File
     * OAuth2
+    * {applies_to}`stack: ga 9.3.0` AWS
 
 * Retrieval at a configurable interval
 * Pagination
@@ -77,7 +84,7 @@ filebeat.inputs:
 
 ## Execution [_execution]
 
-The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library. A single JSON object is provided as an input accessible through a `state` variable. `state` contains a string `url` field and may contain arbitrary other fields configured via the input’s `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
+The execution environment provided for the input includes the functions, macros, and global variables provided by the mito library. A single JSON object is provided as an input accessible through a `state` variable. `state` contains a string `url` field and may contain arbitrary other fields configured via the input’s `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
 
 On start the `state` is will be something like this:
 
@@ -115,9 +122,9 @@ After completion of a program’s execution it should return a single object wit
 }
 ```
 
-1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures.
+1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced.
 2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
-3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Limit), and [Okta Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#OktaRateLimit) and [Draft Rate Limit policy](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#DraftRateLimit) documentation show how to construct this field.
+3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit), and [Okta Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and [Draft Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) documentation show how to construct this field.
 4. The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
 
 
@@ -126,125 +133,153 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 
 ## Debug state logging [_debug_state_logging]
 
-The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See [`redact`](#cel-state-redact) configuration parameters for settings to exclude sensitive fields from DEBUG logs.
+The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. Values under `state.secret` are always redacted automatically (see [`secret_state`](#secret-state-cel)). See [`redact`](#cel-state-redact) configuration parameters for settings to exclude other sensitive fields from DEBUG logs.
 
 
 ## CEL extension libraries [_cel_extension_libraries]
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [Collections](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Collections)
+* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 9.1+`
 
-    * [Collate](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Collate-Collections)
-    * [Drop](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Drop-Collections)
-    * [Drop Empty](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Drop_Empty-Collections)
-    * [Flatten](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Flatten-Collections)
-    * [Front](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Front-Collections)
-    * [Keys](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Keys-Collections)
-    * [Max](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Max-Collections)
-    * [Min](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Min-Collections)
-    * [Sum](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Sum-Collections)
-    * [Tail](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Tail-Collections)
-    * [Values](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Values-Collections)
-    * [With](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-With-Collections)
-    * [With Replace](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-With_Replace-Collections)
-    * [With Update](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-With_Update-Collections)
-    * [Zip](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Zip-Collections)
+    * [Sign AWS from env]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
+    * [Sign AWS from shared credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
+    * [Sign AWS from static credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
-* [Crypto](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Crypto)
+* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections)
 
-    * [Base64](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64-Crypto)
-    * [Base64 Decode](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64_Decode-Crypto)
-    * [Base64 Raw](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64_Raw-Crypto)
-    * [Base64 Raw Decode](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Base64_Raw_Decode-Crypto)
-    * [Hex](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Hex-Crypto)
-    * [Hex Decode](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Hex_Decode-Crypto)
-    * [MD5](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-MD5-Crypto)
-    * [SHA-1](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-SHA_1-Crypto)
-    * [SHA-256](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-SHA_256-Crypto)
-    * [HMAC](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-HMAC-Crypto)
-    * [UUID](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-UUID-Crypto)
+    * [Collate]({{mito_docs}}@{{mito_version}}/lib#hdr-Collate-Collections)
+    * [Drop]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop-Collections)
+    * [Drop Empty]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop_Empty-Collections)
+    * [Flatten]({{mito_docs}}@{{mito_version}}/lib#hdr-Flatten-Collections)
+    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections)
+    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections)
+    * [Max]({{mito_docs}}@{{mito_version}}/lib#hdr-Max-Collections)
+        * list maximum
+        * pair maximum
+    * [Min]({{mito_docs}}@{{mito_version}}/lib#hdr-Min-Collections)
+        * list minimum
+        * pair minimum
+    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections)
+    * [Tail]({{mito_docs}}@{{mito_version}}/lib#hdr-Tail-Collections)
+        * one parameter
+        * two parameter
+    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections)
+    * [With]({{mito_docs}}@{{mito_version}}/lib#hdr-With-Collections)
+    * [With Replace]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Replace-Collections)
+    * [With Update]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Update-Collections)
+    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections)
 
-* [File](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVHeader).
+* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto)
 
-    * [Dir](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Dir-File)
-    * [File](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-File-File)
+    * [Base64]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64-Crypto)
+    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto)
+    * [Base64 Raw]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw-Crypto)
+    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto)
+    * [Hex]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex-Crypto)
+    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto)
+    * [MD5]({{mito_docs}}@{{mito_version}}/lib#hdr-MD5-Crypto)
+    * [SHA-1]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_1-Crypto)
+    * [SHA-256]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_256-Crypto)
+    * [HMAC]({{mito_docs}}@{{mito_version}}/lib#hdr-HMAC-Crypto)
+    * [UUID]({{mito_docs}}@{{mito_version}}/lib#hdr-UUID-Crypto)
 
-* [HTTP](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#HTTP)
+* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
 
-    * [HEAD](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-HEAD-HTTP)
-    * [GET](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-GET-HTTP)
-    * [GET Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-GET_Request-HTTP)
-    * [POST](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-POST-HTTP)
-    * [POST Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-POST_Request-HTTP)
-    * [Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Request-HTTP)
-    * [Basic Authentication](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Basic_Authentication-HTTP)
-    * [Do Request](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Do_Request-HTTP)
-    * [Parse URL](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Parse_URL-HTTP)
-    * [Format URL](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Format_URL-HTTP)
-    * [Parse Query](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Parse_Query-HTTP)
-    * [Format Query](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Format_Query-HTTP)
+    * [Dir]({{mito_docs}}@{{mito_version}}/lib#hdr-Dir-File)
+    * [File]({{mito_docs}}@{{mito_version}}/lib#hdr-File-File)
 
-* [JSON](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#JSON)
+* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP)
 
-    * [Encode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Encode_JSON-JSON)
-    * [Decode JSON](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Decode_JSON-JSON)
-    * [Decode JSON Stream](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Decode_JSON_Stream-JSON)
+    * [HEAD]({{mito_docs}}@{{mito_version}}/lib#hdr-HEAD-HTTP)
+    * [GET]({{mito_docs}}@{{mito_version}}/lib#hdr-GET-HTTP)
+    * [GET Request]({{mito_docs}}@{{mito_version}}/lib#hdr-GET_Request-HTTP)
+    * [POST]({{mito_docs}}@{{mito_version}}/lib#hdr-POST-HTTP)
+    * [POST Request]({{mito_docs}}@{{mito_version}}/lib#hdr-POST_Request-HTTP)
+    * [Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Request-HTTP)
+    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP)
+    * [Do Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Do_Request-HTTP)
+    * [Parse URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_URL-HTTP)
+    * [Format URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_URL-HTTP)
+    * [Parse Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Query-HTTP)
+    * [Format Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_Query-HTTP)
 
-* [XML](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
+* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON)
 
-    * [Decode XML](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Decode_XML-XML)
+    * [Encode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Encode_JSON-JSON)
+    * [Decode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON-JSON)
+    * [Decode JSON Stream]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream-JSON)
 
-* [Limit](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#DraftRateLimit) policies.
+* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
 
-    * [Rate Limit](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Rate_Limit-Limit)
+    * [Decode XML]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_XML-XML)
+        * Optional XSD definition in one-parameter form.
 
-* [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#NDJSON), ["application/zip"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Zip), ["text/csv; header=absent"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVNoHeader), and ["text/csv; header=present"](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#CSVHeader).
+* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies.
 
-    * [MIME](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-MIME-MIME)
+    * [Rate Limit]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit)
 
-* [Regexp](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
+* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
 
-    * [RE Match](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Match)
-    * [RE Find](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find)
-    * [RE Find All](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find_All)
-    * [RE Find Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find_Submatch)
-    * [RE Find All Submatch](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Find_All_Submatch)
-    * [RE Replace All](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-RE_Replace_All)
+    * [MIME]({{mito_docs}}@{{mito_version}}/lib#hdr-MIME-MIME)
 
-* [Printf](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Printf)
+* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
 
-    * [Sprintf](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Sprintf-Printf)
+    * [RE Match]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Match)
+    * [RE Find]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find)
+    * [RE Find All]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find_All)
+    * [RE Find Submatch]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find_Submatch)
+    * [RE Find All Submatch]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find_All_Submatch)
+    * [RE Replace All]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Replace_All)
 
-* [Strings](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Strings)
+* [Printf]({{mito_docs}}@{{mito_version}}/lib#Printf)
 
-    * [String Methods](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-String_Methods-Strings)
-    * [String List Methods](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-String_List_Methods-Strings)
-    * [Bytes Methods](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Bytes_Methods-Strings)
+    * [Sprintf]({{mito_docs}}@{{mito_version}}/lib#hdr-Sprintf-Printf)
 
-* [Time](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Time)
+* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings)
 
-    * [Format](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Format-Time)
-    * [Parse Time](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Parse_Time-Time)
-    * [Global Variables](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Global_Variables-Time)
+    * [String Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_Methods-Strings)
+    * [String List Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_List_Methods-Strings)
+    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings)
 
-* [Try](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Try)
+* [Time]({{mito_docs}}@{{mito_version}}/lib#Time)
 
-    * [Try](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Try-Try)
-    * [Is Error](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Is_Error-Try)
+    * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
+    * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
+    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 9.1+`
+    * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3+`
+    * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
+        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats.
 
-* [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+* [Try]({{mito_docs}}@{{mito_version}}/lib#Try)
 
-    * [Debug](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#hdr-Debug)
+    * [Try]({{mito_docs}}@{{mito_version}}/lib#hdr-Try-Try)
+    * [Is Error]({{mito_docs}}@{{mito_version}}/lib#hdr-Is_Error-Try)
+
+* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
+
+    * [Debug]({{mito_docs}}@{{mito_version}}/lib#hdr-Debug)
 
 
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the filebeat user-agent string. By default, this value is assigned to all requests' user-agent headers unless the CEL program has already set the user-agent header value. Programs wishing to not provide a user-agent, should set this header to the empty string, `""`.
 
 Host environment variables are made available via the global map `env`. Only environment variables that have been allow listed via the `allowed_environment` configuration list are visible to the CEL program.
 
-The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here](https://pkg.go.dev/github.com/elastic/mito@v1.19.0/lib#OptionalTypesVersion).
+The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
-Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
+* Optional types
+* Two-variable comprehensions {applies_to}`stack: ga 9.1+`
+
+Additionally, it supports authentication via:
+
+* Basic Authentication
+* Digest Authentication
+* OAuth2
+* file-based headers {applies_to}`stack: ga 9.3+`
+* token authentication {applies_to}`stack: ga 9.1+`
+* AWS Authentication {applies_to}`stack: ga 9.3+`
+
+As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
 
 Example configurations with authentication:
 
@@ -288,6 +323,51 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.file:
+    path: /etc/elastic/token
+    prefix: "Bearer "
+    refresh_interval: 10m
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Bearer
+    value: supersecret_bearer_token
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.token:
+    type: Token
+    value: supersecret_token
+  resource.url: http://localhost
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    access_key_id:     "AKIAIOSFODNN7EXAMPLE"
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    credential_profile_name: fb-aws
+    shared_credential_file: /etc/filebeat/aws_credentials
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
 
 ## Input state [input-state-cel]
 
@@ -296,6 +376,34 @@ The `cel` input keeps a runtime state between requests. This state can be access
 The state must contain a `url` string and may contain any object the user wishes to store in it.
 
 All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
+
+
+## HTTP rate limit handling [_cel_rate_limiting]
+
+CEL evaluations may return a `rate_limit` object as noted in the [Execution](#_execution) section.
+This can either be calculated explicitly in CEL code, or by using the
+[`rate_limit`]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit) extension function.
+
+If the `rate_limit` extension is used, calculated rate limits are applied directly to the HTTP client
+used by the CEL input. This includes uses of `rate_limit` that do not return their results from the
+CEL context. {applies_to}`stack: ga 9.3+`
+
+
+## CEL input and handling numbers [_cel_input_and_numbers]
+
+Numeric values passed in to and out of a CEL evaluation environment are passed as floating point
+values. This can sometimes cause issues when the numbers in the input state are expected to be
+integers, and may result in unexpected field values being ingested into Elasticsearch documents when
+other parts of the ingest pipeline render floating point values with E-notation or add decimal
+points to numbers that are expected to be integers. This is most likely to happen when numbers are
+large (not within ±10^7^). Above the maximum exact integer representation threshold for double
+precision floating point values, within ±2^53^ (±9×10^15^), integer values will lose precision when
+they are returned from the CEL evaluation environment. The CEL input will automatically convert
+integers outside of the ±2^53^ range to strings in order to prevent loss of precision in these
+values, but potentially leading to a situation where some numbers received by the ingest pipeline
+are numbers and some are strings. To avoid these issues, when you have large integer values as part
+of an evaluation result, convert the field value to a string before returning it, and convert input
+numbers to integers explicitly at the start of a CEL program.
 
 
 ## Configuration options [_configuration_options_3]
@@ -317,10 +425,11 @@ The CEL program that is executed each polling period. This field is required.
 
 `max_executions` is the maximum number of times a CEL program can request to be re-run with a `want_more` field. This is used to ensure that accidental infinite loops do not halt processing. When the execution budget is exceeded, execution will be restarted at the next interval and a warning will be written into the logs. Default: 1000.
 
+The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2+`
 
 ### `state` [state-cel]
 
-`state` is an optional object that is passed to the CEL program on the first execution. It is available to the executing program as the `state` variable. It is made available to subsequent executions of the program during the life of input as the returned value of the previous execution, but with the `state.events` field removed. Except for the `state.cursor` field, `state` does not persist over restarts.
+`state` is an optional object that is passed to the CEL program as the `state` variable on the first execution. Subsequent executions of the program during the life of the input will populate the `state` variable with the return value of the previous execution, but with the `state.events` field removed. Except for the `state.cursor` field, returned `state` data does not persist over restarts.
 
 
 ### `state.cursor` [cursor-cel]
@@ -346,7 +455,51 @@ filebeat.inputs:
 ```
 
 
-## `allowed_environment` [environ-cel]
+### `secret_state` [secret-state-cel]
+
+```{applies_to}
+stack: ga 9.2+
+```
+
+`secret_state` is an optional object holding secret key-value pairs. When configured in a Fleet integration package with `secret: true`, the values are stored encrypted by Fleet and decrypted before being passed to the input.
+
+At runtime, the contents of `secret_state` are placed at `state.secret`, making them available to the CEL program as `state.secret.<key>`. The key `secret` in the top-level `state` configuration is reserved — the input rejects any configuration where `state` contains a `secret` key, since values in `state` cannot be guaranteed to be encrypted in the stored configuration.
+
+`state.secret` is unconditionally added to the redaction list for debug logging, regardless of whether `secret_state` is configured. This means:
+
+- Secrets from `secret_state` are automatically redacted without any `redact` configuration.
+- CEL programs that stash sensitive runtime values (such as session tokens) into `state.secret` during execution will also have those values redacted in debug logs.
+- If `state.secret` is absent at log time, the redaction is a no-op.
+- Values explicitly emitted by CEL `debug()` may include secrets.
+
+```yaml
+filebeat.inputs:
+- type: cel
+  interval: 1m
+  resource.url: https://api.example.com/data
+  secret_state:
+    api_key: "my-secret-api-key"
+  program: |
+    request("GET", state.url).with({
+        "Header": {"X-API-Key": [state.secret.api_key]}
+    }).do_request().as(resp, {
+        "events": [resp.Body.decode_json()],
+        "secret": state.secret,
+    })
+```
+
+In this example, `state.secret.api_key` holds the API key used in request headers. The `"secret": state.secret` line in the return value preserves the secret state across evaluation loops; like any other state field, it must be included in the program's return value to persist between evaluations.
+
+::::{note}
+Enabling `failure_dump` can write secrets (including `state.secret`) to disk, since the dump captures the full CEL evaluation state. This applies to any secrets in state, not only those from `secret_state`.
+::::
+
+
+### `allowed_environment` [environ-cel]
+
+```{applies_to}
+stack: ga 8.16.0
+```
 
 A list of host environment variable that will be made visible to the CEL execution environment. By default, no environment variables are visible.
 
@@ -387,6 +540,10 @@ filebeat.inputs:
 
 ### `xsd` [xsd-cel]
 
+```{applies_to}
+stack: ga 8.9.0
+```
+
 XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definitions (XSD) for XML documents using the `xsd` option. The key under which the XSD information is provided is accessed via the `decode_xml` CEL extension.
 
 ```yaml
@@ -407,6 +564,8 @@ filebeat.inputs:
                      <xs:element name="company" type="xs:string"/>
 ```
 
+The `xsd` for an XML document structure may be omitted.
+
 
 ### `auth.basic.enabled` [_auth_basic_enabled]
 
@@ -416,6 +575,9 @@ When set to `false`, disables the basic auth configuration. Default: `true`.
 Basic auth settings are disabled if either `enabled` is set to `false` or the `auth.basic` section is missing.
 ::::
 
+::::{note}
+Basic auth settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
 
 
 ### `auth.basic.user` [_auth_basic_user]
@@ -430,6 +592,10 @@ The password to use.
 
 ### `auth.digest.enabled` [_auth_digest_enabled]
 
+```{applies_to}
+stack: ga 8.12.0
+```
+
 When set to `false`, disables the digest auth configuration. Default: `true`.
 
 ::::{note}
@@ -440,17 +606,97 @@ digest auth settings are disabled if either `enabled` is set to `false` or the `
 
 ### `auth.digest.user` [_auth_digest_user]
 
+```{applies_to}
+stack: ga 8.12.0
+```
+
 The user to authenticate with.
 
 
 ### `auth.digest.password` [_auth_digest_password]
+
+```{applies_to}
+stack: ga 8.12.0
+```
 
 The password to use.
 
 
 ### `auth.digest.no_reuse` [_auth_digest_no_reuse]
 
+```{applies_to}
+stack: ga 8.12.0
+```
+
 When set to `true`, Digest Authentication challenges are not reused.
+
+
+### `auth.file.enabled` [_auth_file_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file auth configuration. Default: `true`.
+
+::::{note}
+File auth settings are disabled if either `enabled` is set to `false` or the `auth.file` section is missing.
+::::
+
+
+### `auth.file.path` [_auth_file_path]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path to the file containing the authentication value. The file contents are trimmed before use. This field is required when file auth is enabled.
+
+::::{warning}
+By default, Filebeat requires the file to have `0600` permissions (read/write for owner only) and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials. To allow files with different permissions, set [`relaxed_permissions`](#_auth_file_relaxed_permissions) to `true`.
+
+On Windows, POSIX-style permission checking is not enforced. Ensure file security using NTFS file permissions or Access Control Lists (ACLs).
+::::
+
+
+### `auth.file.header` [_auth_file_header]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The request header that receives the value loaded from `path`. Defaults to `Authorization` when omitted or empty.
+
+
+### `auth.file.prefix` [_auth_file_prefix]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+An optional prefix that is prepended to the trimmed value from `path` before it is set on the request header. This is commonly used for tokens that require a leading value such as `Bearer `.
+
+
+### `auth.file.refresh_interval` [_auth_file_refresh_interval]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+How frequently Filebeat rereads the file defined by `path` to pick up changes. Defaults to `1m`. The value must be greater than zero when set.
+
+
+### `auth.file.relaxed_permissions` [_auth_file_relaxed_permissions]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `true`, allows the authentication file to have permissions other than `0600`. By default (`false`), Filebeat requires the file to have `0600` permissions and will fail to start if the file is more permissive. This security measure helps prevent unauthorized access to credentials.
+
+::::{warning}
+Setting this to `true` reduces security. Only enable this option if you understand the security implications and cannot set the file to `0600` permissions.
+::::
 
 
 ### `auth.oauth2.enabled` [_auth_oauth2_enabled]
@@ -611,6 +857,171 @@ Only one of the credentials settings can be set at once. For more information pl
 
 
 
+### `auth.oauth2.okta.dpop_key_pem` [_auth_oauth2_okta_dpop_key_pem]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The Demonstrating Proof-of-Possession private key PEM block for your Okta authentication token. When this key is provided, Okta authentication will make use of the [Okta DPoP authentication flow](https://www.okta.com/blog/product-innovation/a-leap-forward-in-token-security-okta-adds-support-for-dpop/).
+
+
+
+### `auth.token.enabled` [_auth_token_enabled]
+
+When set to `false`, disables the token authentication configuration. Default: `true`.
+
+::::{note}
+Token authentication settings are disabled if either `enabled` is set to `false` or the `auth.token` section is missing.
+::::
+
+::::{note}
+Token authentication settings do not affect requests run with `.do_request()`, as explained in [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP).
+::::
+
+
+### `auth.token.type` [_auth_token_type]
+
+The type of token to authenticate with, for example "Token" or "Bearer".
+
+
+### `auth.token.value` [_auth_token_value]
+
+The token value to use.
+
+
+### `auth.aws.enabled` [_auth_aws_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
+
+::::{note}
+AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
+::::
+
+### `auth.aws.access_key_id` [_auth_aws_access_key_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+
+### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.session_token` [_auth_aws_session_token]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS session token that can be optionally set when direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) are used.
+
+### `auth.aws.shared_credential_file` [_auth_aws_shared_credential_file]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path of the AWS shared credentials file.
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.credential_profile_name` [_auth_aws_credential_profile_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+
+### `auth.aws.role_arn` [_auth_aws_role_arn]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The IAM Role ARN to assume. Assume-role authentication is layered on top of the base credentials, which may come from a direct access key, a shared credentials file, or the default SDK configuration. The assume-role request will use whichever credentials have already been established.
+
+### `auth.aws.external_id` [_auth_aws_external_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.service_name` [_auth_aws_service_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `auth.aws.default_region` [_auth_aws_default_region]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `otel.trace` [_otel_trace]
+
+```{applies_to}
+stack: beta 9.4.0
+```
+
+OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
+
+By default, the value of an HTTP header or query string parameter will be redacted in span attributes if its name contains a word that suggests sensitive data and its full name isn't in a list of known-safe names.
+
+The following settings can override the default behavior for specific full names.
+
+### `otel.trace.redacted` [_otel_trace_redacted]
+
+A list of headers and query string parameters that should have their values redacted in OpenTelemetry tracing span attributes. Not case sensitive.
+
+### `otel.trace.unredacted` [_otel_trace_unredacted]
+
+A list of headers and query string parameters that should not have their values redacted in OpenTelemetry tracing span attributes. Not case sensitive.
+
 ### `resource.url` [resource-parameters]
 
 The URL of the HTTP API. Required.
@@ -619,6 +1030,10 @@ The API endpoint may be accessed via unix socket and Windows named pipes by addi
 
 
 ### `resource.headers` [_resource_headers]
+
+```{applies_to}
+stack: ga 8.18.1
+```
 
 Headers to be added to all requests. Headers are added before authentication headers, so any collision between headers in this configuration and authentication headers will result in the colliding headers here not being included in requests. Header values must be provided as an array.
 
@@ -720,6 +1135,10 @@ The maximum number of redirects to follow for a request. Default: `10`.
 
 ### `resource.max_body_size` [_resource_max_body_size]
 
+```{applies_to}
+stack: ga 8.18.1
+```
+
 The maximum size of a response body that will be accepted by the client if non-zero. Bodies that are too large will result in an error, "response body too big". Default: `0`.
 
 
@@ -742,7 +1161,9 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the cel directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
+
+Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
 
 
 ### `resource.tracer.maxsize` [_resource_tracer_maxsize]
@@ -772,7 +1193,13 @@ This determines whether rotated logs should be gzip compressed.
 
 ### `redact` [cel-state-redact]
 
-During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behaviour. For safety reasons if the `redact` configuration is missing a warning is logged.
+```{applies_to}
+stack: ga 8.7.0
+```
+
+During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
+
+The `state.secret` field is always redacted automatically (see [`secret_state`](#secret-state-cel)). When `secret_state` is configured and `redact` is not, the missing-redact warning is suppressed.
 
 In the case of no-required redaction an empty `redact.fields` configuration should be used to silence the logged warning.
 
@@ -812,6 +1239,10 @@ This specifies whether fields should be replaced with a `*` or deleted entirely 
 
 ### `failure_dump.enabled` [_failure_dump_enabled]
 
+```{applies_to}
+stack: ga 8.18.0
+```
+
 It is possible to log CEL program evaluation failures to a local file-system for debugging configurations. This option is enabled by setting `failure_dump.enabled` to true and setting the `failure_dump.filename` value. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
@@ -819,10 +1250,18 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `failure_dump.filename` [_failure_dump_filename]
 
+```{applies_to}
+stack: ga 8.18.0
+```
+
 This specifies a directory path to write failure dumps to. If it is not empty and a CEL program evaluation fails, the complete set of states for the CEL program’s evaluation will be written as a JSON file, along with the error that was reported. This option should only be used when debugging a failure as it imposes a significant performance impact on the input and may potentially use large quantities of memory to hold the full set of states. If a failure dump is configured, it is recommended that data input sizes be reduced to avoid excessive memory consumption, and making dumps that are intractable to analysis. To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
 
 
 ### `record_coverage` [cel-record-coverage]
+
+```{applies_to}
+stack: ga 8.18.0
+```
 
 This specifies that CEL code evaluation coverage should be recorded and logged in debug logs. This is a developer-only option.
 
@@ -948,5 +1387,4 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 #### `publisher_pipeline.disable_host` [_publisher_pipeline_disable_host_4]
 
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
-
 

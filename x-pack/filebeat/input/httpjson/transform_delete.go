@@ -7,6 +7,7 @@ package httpjson
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -26,7 +27,7 @@ type delete struct {
 
 func (delete) transformName() string { return deleteName }
 
-func newDeleteRequest(cfg *conf.C, _ *logp.Logger) (transform, error) {
+func newDeleteRequest(cfg *conf.C, _ status.StatusReporter, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -46,7 +47,7 @@ func newDeleteRequest(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	return &delete, nil
 }
 
-func newDeleteResponse(cfg *conf.C, _ *logp.Logger) (transform, error) {
+func newDeleteResponse(cfg *conf.C, _ status.StatusReporter, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func newDeleteResponse(cfg *conf.C, _ *logp.Logger) (transform, error) {
 	return &delete, nil
 }
 
-func newDeletePagination(cfg *conf.C, _ *logp.Logger) (transform, error) {
+func newDeletePagination(cfg *conf.C, _ status.StatusReporter, _ *logp.Logger) (transform, error) {
 	delete, err := newDelete(cfg)
 	if err != nil {
 		return nil, err

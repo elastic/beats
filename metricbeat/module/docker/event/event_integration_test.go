@@ -26,22 +26,24 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestData(t *testing.T) {
+	pullBusyboxImage(t)
+
 	ms := mbtest.NewPushMetricSetV2WithContext(t, getConfig())
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2WithContext(10*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2WithContext(30*time.Second, 1, ms)
 		close(done)
 	}()
 
@@ -70,28 +72,44 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 }
 
 func createEvent(t *testing.T) {
-	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil)
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
+	resp, err := c.ContainerCreate(context.Background(), client.ContainerCreateOptions{
+		Config: &container.Config{
+			Image: "busybox",
+			Cmd:   []string{"echo", "foo"},
+		},
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	io.Copy(os.Stdout, reader)
+
+	_, err = c.ContainerRemove(context.Background(), resp.ID, client.ContainerRemoveOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func pullBusyboxImage(t *testing.T) {
+	c, err := docker.NewClient(client.DefaultDockerHost, nil, nil, logptest.NewTestingLogger(t, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	reader, err := c.ImagePull(t.Context(), "busybox", client.ImagePullOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = io.Copy(os.Stdout, reader)
+	if err != nil {
+		t.Fatal(err)
+	}
 	reader.Close()
-
-	resp, err := c.ContainerCreate(context.Background(), &container.Config{
-		Image: "busybox",
-		Cmd:   []string{"echo", "foo"},
-	}, nil, nil, nil, "")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
 }
 
 func getConfig() map[string]interface{} {

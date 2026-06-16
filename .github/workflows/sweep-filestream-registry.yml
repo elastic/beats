@@ -1,0 +1,101 @@
+name: "Sweeper: Filestream Registry and State Machine"
+on:
+  schedule:
+    - cron: "0 9 * * 2"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
+    with:
+      title-prefix: "[filestream-registry]"
+      severity-threshold: "high"
+      additional-instructions: |
+        You are a **re-ingestion and data-loss sweeper** for the Filestream input. Your goal is
+        to find every code path that can cause a file to be re-read from the beginning or events
+        to be silently dropped — and write a test or reproduction scenario for each one.
+
+        ## The component
+
+        The Filestream input lives under `filebeat/input/filestream/`. Its registry (which tracks
+        how far each file has been read) is implemented under
+        `filebeat/input/filestream/internal/input-logfile/`. The registry is the heart of
+        Filestream's correctness guarantee: if it loses a file's offset, that file will be
+        re-ingested from the beginning, producing duplicate data in the output.
+
+        ## The bug class
+
+        There are two failure modes that have produced bugs repeatedly in this component:
+
+        **Re-ingestion**: A file's offset is lost or reset to zero. This happens when a registry
+        entry is prematurely cleaned, when a file is matched to the wrong registry entry (identity
+        mismatch), when a cursor update is silently discarded, or when a migration path
+        (take_over, identifier type change) fails to preserve the offset.
+
+        **Silent data loss**: Events are published to the pipeline but the cursor is never
+        advanced. This happens when an ACK callback is discarded due to a version mismatch,
+        when a resource is cleaned while events are still in-flight, or when an error path
+        exits without calling the event's done/ACK callback.
+
+        ## How to investigate
+
+        Read the registry store, the harvester lifecycle, and the ACK/publish path end-to-end.
+        Understand how a file's state flows from "new file discovered" through "harvesting"
+        through "ACK received" to "registry updated on disk". Then ask: at each transition,
+        what can go wrong?
+
+        Key areas to focus on:
+
+        **Identity and matching**: How does the input decide which registry entry belongs to a
+        given file? There are two identity modes (inode-based and fingerprint-based). What
+        happens when files are rotated, renamed, or when the identity mode is changed in config?
+        Can a file end up matched to the wrong entry?
+
+        **Cursor update lifecycle**: When an event is ACKed, how does the cursor get written
+        to the persistent registry? Are there conditions (version mismatch, resource marked
+        deleted, concurrent cleanup) where a valid ACK silently discards the cursor update?
+        If so, the input will re-read from the last successfully persisted offset on next start.
+
+        **Cleanup timing**: The `clean_inactive` and `clean_removed` settings delete registry
+        entries after some time. What is the earliest moment an entry can be cleaned? Is it
+        possible for an entry to be cleaned while a harvester for that file is still running
+        or while events from that file are in-flight in the pipeline?
+
+        **Migration paths**: When filestream takes over from another input type, or when
+        `harvester_limit` causes files to be queued, are there windows where the state for a
+        file can be lost or reset?
+
+        ## For each risk you confirm
+
+        Write a unit test using the existing test infrastructure in the package (look at existing
+        `*_test.go` files for helper patterns). The test should set up the registry in the
+        relevant state, trigger the problematic transition, and assert that the cursor is
+        preserved. Run `go test ./filebeat/input/filestream/...` to confirm the failure.
+
+        ## The bar for filing
+
+        Only report findings that a real user could encounter with a realistic Filestream
+        configuration. The bug must be triggerable through normal user actions: starting and
+        stopping Filebeat, rotating log files, changing config, hitting harvester limits, or
+        running on a filesystem that performs renames. Do not file findings that require
+        manually corrupting the registry store or calling internal functions in an order that
+        the real code path never produces. If you cannot describe a concrete sequence of
+        user-observable events that leads to the bug, it is not worth filing.
+
+        ## Output
+
+        File a single issue containing:
+        - Confirmed risks with test code or reproduction steps, the exact code path, and the
+          fix direction
+        - A description of any scenarios you investigated and found safe, so reviewers know
+          the coverage
+        - A priority ranking: which risks are most likely to affect users in production vs
+          only in edge-case configurations
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -36,7 +37,7 @@ func TestMimeTypeFromTo(t *testing.T) {
 	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "bar.baz.zoiks",
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)
@@ -58,7 +59,7 @@ func TestMimeTypeFromToMetadata(t *testing.T) {
 	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "@metadata.field",
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	observed, err := p.Run(&evt)
@@ -76,7 +77,7 @@ func TestMimeTypeTestNoMatch(t *testing.T) {
 	p, err := NewDetectMimeType(conf.MustNewConfigFrom(map[string]interface{}{
 		"field":  "foo.bar.baz",
 		"target": "bar.baz.zoiks",
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	observed, err := p.Run(&evt)
 	require.NoError(t, err)

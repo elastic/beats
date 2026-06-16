@@ -31,6 +31,7 @@ wait4
 execve
 
 # Jounrald input
+chroot
 dup3
 faccessat2
 prctl

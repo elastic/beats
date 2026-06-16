@@ -6,6 +6,7 @@ package beater
 
 import (
 	"context"
+	"runtime"
 	"testing"
 	"time"
 
@@ -32,22 +33,29 @@ func (e *mockExecutor) Query(ctx context.Context, sql string, to time.Duration) 
 
 type mockPublisher struct {
 	index      string
-	actionID   string
+	idValue    string
+	idFieldKey string
 	responseID string
 	meta       map[string]interface{}
 	hits       []map[string]interface{}
 	ecsm       ecs.Mapping
 	reqData    interface{}
+	profile    map[string]interface{}
 }
 
-func (p *mockPublisher) Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+func (p *mockPublisher) Publish(index, idValue, idFieldKey, responseID, spaceID, packID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	p.index = index
-	p.actionID = actionID
+	p.idValue = idValue
+	p.idFieldKey = idFieldKey
 	p.responseID = responseID
 	p.meta = meta
 	p.hits = hits
 	p.ecsm = ecsm
 	p.reqData = reqData
+}
+
+func (p *mockPublisher) PublishQueryProfile(index, queryName, actionID, responseID string, profile map[string]interface{}, reqData interface{}) {
+	p.profile = profile
 }
 
 func TestActionHandlerExecute(t *testing.T) {
@@ -58,6 +66,10 @@ func TestActionHandlerExecute(t *testing.T) {
 
 	actionID := uuid.Must(uuid.NewV4()).String()
 	actionSQL := "select * from uptime"
+	nonMatchingPlatform := "windows"
+	if runtime.GOOS == "windows" {
+		nonMatchingPlatform = "linux"
+	}
 	request := map[string]interface{}{
 		"id": actionID,
 		"data": map[string]interface{}{
@@ -68,10 +80,11 @@ func TestActionHandlerExecute(t *testing.T) {
 	tests := []struct {
 		Name          string
 		QueryExecutor queryExecutor
-		Publisher     publisher
+		Publisher     actionQueryPublisher
 
 		Request map[string]interface{}
 		Err     error
+		Skipped bool
 	}{
 		{
 			Name:    "no executor",
@@ -89,6 +102,19 @@ func TestActionHandlerExecute(t *testing.T) {
 			QueryExecutor: &mockExecutor{},
 			Publisher:     &mockPublisher{},
 			Request:       request,
+		},
+		{
+			Name:          "skips non matching platform",
+			QueryExecutor: &mockExecutor{},
+			Publisher:     &mockPublisher{},
+			Request: map[string]interface{}{
+				"id": actionID,
+				"data": map[string]interface{}{
+					"query":    actionSQL,
+					"platform": nonMatchingPlatform,
+				},
+			},
+			Skipped: true,
 		},
 		{
 			Name:          "executor error",
@@ -129,13 +155,32 @@ func TestActionHandlerExecute(t *testing.T) {
 			if tc.Err == nil {
 				if ok {
 					t.Fatal("Unexpected error:", errVal)
+				} else if tc.Skipped {
+					diff := cmp.Diff("", tc.QueryExecutor.(*mockExecutor).receivedSql)
+					if diff != "" {
+						t.Error(diff)
+					}
+
+					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).idValue)
+					if diff != "" {
+						t.Error(diff)
+					}
+
+					diff = cmp.Diff(0, res["count"])
+					if diff != "" {
+						t.Error(diff)
+					}
 				} else {
 					diff := cmp.Diff(tc.QueryExecutor.(*mockExecutor).receivedSql, actionSQL)
 					if diff != "" {
 						t.Error(diff)
 					}
 
-					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).actionID)
+					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).idValue)
+					if diff != "" {
+						t.Error(diff)
+					}
+					diff = cmp.Diff("action_id", tc.Publisher.(*mockPublisher).idFieldKey)
 					if diff != "" {
 						t.Error(diff)
 					}
@@ -158,7 +203,6 @@ func TestActionHandlerExecute(t *testing.T) {
 					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
-			_ = res
 		})
 	}
 }

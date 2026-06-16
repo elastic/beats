@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/require"
@@ -69,7 +70,7 @@ function process(evt) {
 `
 
 	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	evt, err := p.Run(testEvent())
@@ -104,8 +105,7 @@ function process(evt) {
 }
 `
 
-	logp.TestingSetup()
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	evt, err := p.Run(testEvent())
@@ -129,8 +129,7 @@ function process(evt) {
 }
 `
 
-	logp.TestingSetup()
-	_, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	_, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logptest.NewTestingLogger(t, ""))
 	require.Error(t, err, "processor that implements Closer() shouldn't be allowed")
 }
 
@@ -150,7 +149,7 @@ type mockProcessor struct {
 	fields mapstr.M
 }
 
-func newMock(c *config.C) (beat.Processor, error) {
+func newMock(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields mapstr.M `config:"fields" validate:"required"`
 	}{}
@@ -176,7 +175,7 @@ func (m *mockProcessor) String() string {
 
 type mockProcessorWithCloser struct{}
 
-func newMockWithCloser(c *config.C) (beat.Processor, error) {
+func newMockWithCloser(c *config.C, log *logp.Logger) (beat.Processor, error) {
 	return &mockProcessorWithCloser{}, nil
 }
 

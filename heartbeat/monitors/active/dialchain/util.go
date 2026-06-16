@@ -40,13 +40,6 @@ func ConstAddrLayer(address string) Layer {
 	}
 }
 
-// MakeConstAddrLayer always passes the same address to the original Layer.
-// This is useful if a lookup did return multiple IPs for the same hostname,
-// but the IP use to connect shall be fixed.
-func MakeConstAddrLayer(addr string, origLayer Layer) Layer {
-	return withLayerDialer(origLayer, constAddr(addr))
-}
-
 // MakeConstAddrDialer always passes the same address to the original NetDialer.
 // This is useful if a lookup did return multiple IPs for the same hostname,
 // but the IP use to connect shall be fixed.
@@ -102,16 +95,6 @@ func constAddr(addr string) func(transport.Dialer) transport.Dialer {
 func withNetDialer(layer NetDialer, fn func(transport.Dialer) transport.Dialer) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
 		origDialer, err := layer.build(event)
-		if err != nil {
-			return nil, err
-		}
-		return fn(origDialer), nil
-	}
-}
-
-func withLayerDialer(layer Layer, fn func(transport.Dialer) transport.Dialer) Layer {
-	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
-		origDialer, err := layer.build(event, next)
 		if err != nil {
 			return nil, err
 		}

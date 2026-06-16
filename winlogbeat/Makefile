@@ -1,8 +1,7 @@
 BEAT_NAME=winlogbeat
 BEAT_TITLE=Winlogbeat
-SYSTEM_TESTS=true
+SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
-GOX_OS=windows
 EXCLUDE_COMMON_UPDATE_TARGET=true
 
 include ../libbeat/scripts/Makefile

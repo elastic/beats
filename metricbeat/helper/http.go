@@ -26,6 +26,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
 
@@ -49,6 +50,7 @@ type HTTP struct {
 	uri        string
 	method     string
 	body       []byte
+	logger     *logp.Logger
 }
 
 // NewHTTP creates new http helper
@@ -58,11 +60,11 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 		return nil, err
 	}
 
-	return NewHTTPFromConfig(config, base.HostData())
+	return NewHTTPFromConfig(config, base.HostData(), base.Logger())
 }
 
 // NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
-func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
+func NewHTTPFromConfig(config Config, hostData mb.HostData, logger *logp.Logger) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
@@ -83,6 +85,8 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	}
 
 	client, err := config.Transport.Client(
+		// also sets a local logger for use by http transport
+		httpcommon.WithLogger(logger),
 		httpcommon.WithBaseDialer(dialer),
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
@@ -108,6 +112,7 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		method:     "GET",
 		uri:        hostData.SanitizedURI,
 		body:       nil,
+		logger:     logger,
 	}, nil
 }
 
@@ -121,6 +126,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 		reader = bytes.NewReader(h.body)
 	}
 
+	h.logger.Debugf("Making HTTP request: %s %s", h.method, h.uri)
 	req, err := http.NewRequestWithContext(context.Background(), h.method, h.uri, reader) // TODO: get context from caller
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
@@ -132,7 +138,16 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 	resp, err := h.client.Do(req)
 	if err != nil {
+		h.logger.Debugf("%s %s request failed: %v", h.method, h.uri, err)
 		return nil, fmt.Errorf("error making http request: %w", err)
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 399 {
+		h.logger.Debugf("%s %s request failed with status code: %d", h.method, h.uri, resp.StatusCode)
+	}
+
+	if resp.ContentLength == 0 {
+		h.logger.Debugf("%s %s request returned empty body", h.method, h.uri)
 	}
 
 	return resp, nil

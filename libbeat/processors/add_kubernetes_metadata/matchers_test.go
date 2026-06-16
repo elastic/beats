@@ -25,24 +25,27 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFieldMatcher(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
 	testCfg := map[string]interface{}{
 		"lookup_fields": []string{},
 	}
 	fieldCfg, err := config.NewConfigFrom(testCfg)
 
 	assert.NoError(t, err)
-	matcher, err := NewFieldMatcher(*fieldCfg)
+	matcher, err := NewFieldMatcher(*fieldCfg, logger)
 	assert.Error(t, err)
 	assert.Nil(t, matcher)
 
 	testCfg["lookup_fields"] = "foo"
 	fieldCfg, _ = config.NewConfigFrom(testCfg)
 
-	matcher, err = NewFieldMatcher(*fieldCfg)
+	matcher, err = NewFieldMatcher(*fieldCfg, logger)
 	assert.NotNil(t, matcher)
 	assert.NoError(t, err)
 
@@ -51,38 +54,39 @@ func TestFieldMatcher(t *testing.T) {
 	}
 
 	out := matcher.MetadataIndex(input)
-	assert.Equal(t, out, "bar")
+	assert.Equal(t, "bar", out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
 	}
 
 	out = matcher.MetadataIndex(nonMatchInput)
-	assert.Equal(t, out, "")
+	assert.Empty(t, out)
 }
 
 func TestFieldMatcherRegex(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	testCfg := map[string]interface{}{
 		"lookup_fields": []string{"foo"},
 		"regex_pattern": "(?!)",
 	}
 	fieldCfg, err := config.NewConfigFrom(testCfg)
 	assert.NoError(t, err)
-	matcher, err := NewFieldMatcher(*fieldCfg)
+	matcher, err := NewFieldMatcher(*fieldCfg, logger)
 	assert.ErrorContains(t, err, "invalid regex:")
 	assert.Nil(t, matcher)
 
 	testCfg["regex_pattern"] = "(?P<invalid>.*)"
 	fieldCfg, _ = config.NewConfigFrom(testCfg)
 
-	matcher, err = NewFieldMatcher(*fieldCfg)
+	matcher, err = NewFieldMatcher(*fieldCfg, logger)
 	assert.ErrorContains(t, err, "regex missing required capture group `key`")
 	assert.Nil(t, matcher)
 
 	testCfg["regex_pattern"] = "bar-(?P<key>[^-]+)-suffix"
 	fieldCfg, _ = config.NewConfigFrom(testCfg)
 
-	matcher, err = NewFieldMatcher(*fieldCfg)
+	matcher, err = NewFieldMatcher(*fieldCfg, logger)
 	require.NoError(t, err)
 	require.NotNil(t, matcher)
 
@@ -91,7 +95,7 @@ func TestFieldMatcherRegex(t *testing.T) {
 	}
 
 	out := matcher.MetadataIndex(input)
-	assert.Equal(t, out, "keyvalue")
+	assert.Equal(t, "keyvalue", out)
 
 	nonMatchInput := mapstr.M{
 		"not": "match",
@@ -99,22 +103,24 @@ func TestFieldMatcherRegex(t *testing.T) {
 	}
 
 	out = matcher.MetadataIndex(nonMatchInput)
-	assert.Equal(t, out, "")
+	assert.Empty(t, out)
 }
 
 func TestFieldFormatMatcher(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
 	testCfg := map[string]interface{}{}
 	fieldCfg, err := config.NewConfigFrom(testCfg)
 
 	assert.NoError(t, err)
-	matcher, err := NewFieldFormatMatcher(*fieldCfg)
+	matcher, err := NewFieldFormatMatcher(*fieldCfg, logger)
 	assert.Error(t, err)
 	assert.Nil(t, matcher)
 
 	testCfg["format"] = `%{[namespace]}/%{[pod]}`
 	fieldCfg, _ = config.NewConfigFrom(testCfg)
 
-	matcher, err = NewFieldFormatMatcher(*fieldCfg)
+	matcher, err = NewFieldFormatMatcher(*fieldCfg, logger)
 	assert.NotNil(t, matcher)
 	assert.NoError(t, err)
 
@@ -134,7 +140,7 @@ func TestFieldFormatMatcher(t *testing.T) {
 
 	testCfg["format"] = `%{[dimensions.namespace]}/%{[dimensions.pod]}`
 	fieldCfg, _ = config.NewConfigFrom(testCfg)
-	matcher, err = NewFieldFormatMatcher(*fieldCfg)
+	matcher, err = NewFieldFormatMatcher(*fieldCfg, logger)
 	assert.NotNil(t, matcher)
 	assert.NoError(t, err)
 

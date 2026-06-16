@@ -37,10 +37,10 @@ type splitConfig struct {
 }
 
 func (c *responseConfig) Validate() error {
-	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, noopReporter{}, nil); err != nil {
 		return err
 	}
-	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Pagination, paginationNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Pagination, paginationNamespace, noopReporter{}, nil); err != nil {
 		return err
 	}
 	if c.DecodeAs != "" {
@@ -52,7 +52,7 @@ func (c *responseConfig) Validate() error {
 }
 
 func (c *splitConfig) Validate() error {
-	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, noopReporter{}, nil); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (c *splitConfig) Validate() error {
 		return fmt.Errorf("invalid split type: %s", c.Type)
 	}
 
-	if _, err := newSplitResponse(c, nil); err != nil {
+	if _, err := newSplitResponse(c, noopReporter{}, nil); err != nil {
 		return err
 	}
 

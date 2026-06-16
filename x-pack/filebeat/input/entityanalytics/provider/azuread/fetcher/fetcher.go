@@ -9,6 +9,8 @@ package fetcher
 import (
 	"context"
 
+	"github.com/gofrs/uuid/v5"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -32,6 +34,12 @@ type Fetcher interface {
 	// from the last query. A slice of Devices and a new delta link may be
 	// returned, or an error if a failure occurred.
 	Devices(ctx context.Context, deltaLink string) ([]*Device, string, error)
+
+	// UserMFADetails fetches MFA registration details for all users from the
+	// /reports/authenticationMethods/userRegistrationDetails endpoint. A map
+	// from user UUID to MFARegistrationDetails is returned, or an error if a
+	// failure occurred. This endpoint does not support delta queries.
+	UserMFADetails(ctx context.Context) (map[uuid.UUID]*MFARegistrationDetails, error)
 
 	// SetLogger sets the logger on the Fetcher.
 	SetLogger(logger *logp.Logger)

@@ -7,22 +7,24 @@ package aws
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
-
-	"github.com/aws/aws-sdk-go-v2/service/sts"
-
-	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/identityfederation"
 )
 
 // OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
@@ -52,11 +54,16 @@ type ConfigAWS struct {
 	// AssumeRoleExpiryWindow will allow the credentials to trigger refreshing prior to the credentials
 	// actually expiring. If expiry_window is less than or equal to zero, the setting is ignored.
 	AssumeRoleExpiryWindow time.Duration `config:"assume_role.expiry_window"`
+
+	// UseCloudConnectors enables the Identity Federation flow. When true,
+	// InitializeAWSConfig sets up the OIDC role-chaining credentials using
+	// environment variables provided by the agentless controller.
+	UseCloudConnectors bool `config:"use_cloud_connectors"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
-func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
-	awsConfig, _ := getAWSCredentials(beatsConfig)
+func InitializeAWSConfig(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
+	awsConfig, _ := getAWSCredentials(beatsConfig, logger)
 	if awsConfig.Region == "" {
 		if beatsConfig.DefaultRegion != "" {
 			awsConfig.Region = beatsConfig.DefaultRegion
@@ -66,8 +73,15 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	}
 
 	// Assume IAM role if iam_role config parameter is given
-	if beatsConfig.RoleArn != "" {
-		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig)
+	if beatsConfig.RoleArn != "" && !beatsConfig.UseCloudConnectors {
+		addAssumeRoleProviderToAwsConfig(beatsConfig, &awsConfig, logger)
+	}
+
+	// If identity federation is enabled, set up the OIDC role-chaining credentials.
+	if beatsConfig.UseCloudConnectors {
+		if err := applyIdentityFederationChain(beatsConfig, &awsConfig, logger); err != nil {
+			return awsConfig, err
+		}
 	}
 
 	var proxy func(*http.Request) (*url.URL, error)
@@ -80,7 +94,7 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	}
 	var tlsConfig *tls.Config
 	if beatsConfig.TLS != nil {
-		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS)
+		TLSConfig, _ := tlscommon.LoadTLSConfig(beatsConfig.TLS, logger)
 		tlsConfig = TLSConfig.ToConfig()
 	}
 	awsConfig.HTTPClient = &http.Client{
@@ -97,13 +111,13 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 // If access keys are not given, then load from AWS config file. If credential_profile_name is not
 // given, default profile will be used.
 // If role_arn is given, assume the IAM role either with access keys or default profile.
-func getAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
+func getAWSCredentials(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if beatsConfig.AccessKeyID != "" || beatsConfig.SecretAccessKey != "" || beatsConfig.SessionToken != "" {
 		return getConfigForKeys(beatsConfig), nil
 	}
 
-	return getConfigSharedCredentialProfile(beatsConfig)
+	return getConfigSharedCredentialProfile(beatsConfig, logger)
 }
 
 // getConfigForKeys creates a default AWS config and adds a CredentialsProvider using the provided Beats config.
@@ -121,8 +135,8 @@ func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
 // then load from default config // Please see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html
 //
 //	with more details. If credential_profile_name is empty, then default profile is used.
-func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, error) {
-	logger := logp.NewLogger("WithSharedConfigProfile")
+func getConfigSharedCredentialProfile(beatsConfig ConfigAWS, logger *logp.Logger) (awssdk.Config, error) {
+	logger = logger.Named("WithSharedConfigProfile")
 
 	var options []func(*awsConfig.LoadOptions) error
 	if beatsConfig.ProfileName != "" {
@@ -142,13 +156,17 @@ func getConfigSharedCredentialProfile(beatsConfig ConfigAWS) (awssdk.Config, err
 		return cfg, fmt.Errorf("awsConfig.LoadDefaultConfig failed with shared credential profile given: [%w]", err)
 	}
 
-	logger.Debug("Using shared credential profile for AWS credential")
+	if beatsConfig.ProfileName != "" || beatsConfig.SharedCredentialFile != "" {
+		logger.Debug("Using shared credential profile for AWS credential")
+	} else {
+		logger.Debug("Using default config for AWS")
+	}
 	return cfg, nil
 }
 
 // addAssumeRoleProviderToAwsConfig adds the credentials provider to the current AWS config by using the role ARN stored in Beats config
-func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config) {
-	logger := logp.NewLogger("addAssumeRoleProviderToAwsConfig")
+func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) {
+	logger = logger.Named("addAssumeRoleProviderToAwsConfig")
 	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.NewFromConfig(*awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn, func(aro *stscreds.AssumeRoleOptions) {
@@ -164,4 +182,101 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 			options.ExpiryWindow = config.AssumeRoleExpiryWindow
 		}
 	})
+}
+
+// defaultIntermediateDuration is the session duration for the intermediate Elastic Global Role.
+// It is intentionally short because it is only used as a stepping stone to the customer's remote role.
+const defaultIntermediateDuration = 20 * time.Minute
+
+// applyIdentityFederationChain configures awsConfig with Identity Federation role-chaining
+// credentials. It reads the required env vars set by the agentless controller and builds a
+// two-step STS chain. Two paths are supported:
+//
+// IRSA path (AWS_WEB_IDENTITY_TOKEN_FILE is set — EKS pod with IRSA):
+//  1. AssumeRole → Elastic Global Role (using IRSA pod credentials from LoadDefaultConfig)
+//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
+//
+// OIDC path (default — agentless controller with JWT token file):
+//  1. AssumeRoleWithWebIdentity → Elastic Global Role (using OIDC JWT from IDTokenFileEnvVar)
+//  2. AssumeRole → customer's remote role (RoleArn + ExternalID from ConfigAWS)
+func applyIdentityFederationChain(config ConfigAWS, awsConfig *awssdk.Config, logger *logp.Logger) error {
+	logger = logger.Named("applyIdentityFederationChain")
+
+	globalRoleARN := os.Getenv(identityfederation.AWSGlobalRoleARNEnvVar)
+	idTokenPath := os.Getenv(identityfederation.AWSIDTokenFileEnvVar)
+	cloudResourceID := os.Getenv(identityfederation.AWSCloudResourceIDEnvVar)
+	irsaTokenFile := os.Getenv(identityfederation.AWSIRSATokenFileEnvVar)
+
+	var errs []error
+	if globalRoleARN == "" {
+		errs = append(errs, errors.New("elastic global role arn is not configured"))
+	}
+	// idTokenPath is only required for the OIDC path; IRSA uses pod credentials instead.
+	if idTokenPath == "" && irsaTokenFile == "" {
+		errs = append(errs, errors.New("id token path is not configured"))
+	}
+	if cloudResourceID == "" {
+		errs = append(errs, errors.New("cloud resource id is not configured"))
+	}
+	if config.RoleArn == "" {
+		errs = append(errs, errors.New("role_arn is not configured"))
+	}
+	// AWS enforces a hard 1-hour maximum on DurationSeconds when AssumeRole is
+	// called using credentials from another assumed role (role chaining).
+	if config.AssumeRoleDuration > time.Hour {
+		errs = append(errs, errors.New("assume role duration cannot exceed 1h for identity federation role chaining"))
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("identity federation config is invalid: %w", errors.Join(errs...))
+	}
+
+	var step1 identityfederation.AWSRoleChainingStep
+	if irsaTokenFile != "" {
+		// IRSA flow: LoadDefaultConfig already loaded IRSA pod credentials via
+		// AWS_WEB_IDENTITY_TOKEN_FILE/AWS_ROLE_ARN. Use AssumeRole directly.
+		logger.Debug("Switching credentials provider to Identity Federation (IRSA)")
+		step1 = &identityfederation.AWSAssumeRoleStep{
+			RoleARN: globalRoleARN,
+			Options: func(aro *stscreds.AssumeRoleOptions) {
+				aro.Duration = defaultIntermediateDuration
+			},
+		}
+	} else {
+		// OIDC flow: assume the Elastic Global Role with web identity using the ID token
+		// provided by the agentless OIDC issuer.
+		logger.Debug("Switching credentials provider to Identity Federation (OIDC)")
+		step1 = &identityfederation.AWSWebIdentityRoleStep{
+			RoleARN:              globalRoleARN,
+			WebIdentityTokenFile: idTokenPath,
+			Options: func(opt *stscreds.WebIdentityRoleOptions) {
+				opt.Duration = defaultIntermediateDuration
+			},
+		}
+	}
+
+	chain := []identityfederation.AWSRoleChainingStep{
+		step1,
+		// Step 2: Assume the remote role (the user's configured role), using the
+		// previously assumed Elastic Global Role credentials.
+		&identityfederation.AWSAssumeRoleStep{
+			RoleARN: config.RoleArn,
+			Options: func(aro *stscreds.AssumeRoleOptions) {
+				if config.AssumeRoleDuration > 0 {
+					aro.Duration = config.AssumeRoleDuration
+				}
+				if config.ExternalID != "" {
+					aro.ExternalID = awssdk.String(identityfederation.AWSFormatExternalID(cloudResourceID, config.ExternalID))
+				}
+			},
+			CacheOptions: func(options *awssdk.CredentialsCacheOptions) {
+				if config.AssumeRoleExpiryWindow > 0 {
+					options.ExpiryWindow = config.AssumeRoleExpiryWindow
+				}
+			},
+		},
+	}
+
+	result := identityfederation.AWSConfigRoleChaining(*awsConfig, chain)
+	awsConfig.Credentials = result.Credentials
+	return nil
 }

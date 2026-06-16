@@ -31,45 +31,73 @@ import (
 // getTable updates fields with the table data at the given offset.
 // fields must be non_nil on entry.
 func getTable(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	length := binary.BigEndian.Uint32(data[offset : offset+4])
+	offset64 := int64(offset)
+	dataLen64 := int64(len(data))
+	if offset64 > dataLen64 || 4 > dataLen64-offset64 {
+		logp.Debug("amqp", "Error while parsing a field table")
+		return 0, true, false
+	}
+	offsetInt := int(offset64)
+	length := binary.BigEndian.Uint32(data[offsetInt : offsetInt+4])
+	tableStart64 := offset64 + 4
 
 	// size declared too big
-	if length > uint32(len(data[offset+4:])) {
+	if int64(length) > dataLen64-tableStart64 {
+		return 0, true, false
+	}
+	if length > ^uint32(0)-offset-4 {
 		return 0, true, false
 	}
 	if length > 0 {
 		exists = true
 		table := mapstr.M{}
-		err := fieldUnmarshal(table, data[offset+4:offset+4+length], 0, length, -1)
+		tableStartInt := int(tableStart64)
+		tableEndInt := tableStartInt + int(length)
+		err := fieldUnmarshal(table, data[tableStartInt:tableEndInt], 0, length, -1)
 		if err {
-			logp.Warn("Error while parsing a field table")
+			logp.Debug("amqp", "Error while parsing a field table")
 			return 0, true, false
 		}
 		fields.Update(table)
 	}
-	return length + 4 + offset, false, exists
+	return offset + 4 + length, false, exists
 }
 
 // getTable updates fields with the array data at the given offset.
 // fields must be non_nil on entry.
 func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err bool, exists bool) {
-	length := binary.BigEndian.Uint32(data[offset : offset+4])
+	length, err := getIntegerAt[uint32](data, offset)
+	if err {
+		logp.Debug("amqp", "Error while parsing a field table")
+		return 0, true, false
+	}
+	offset64 := int64(offset)
+	dataLen64 := int64(len(data))
 
-	// size declared too big
-	if length > uint32(len(data[offset+4:])) {
+	// less actual data than the transmitted length indicates
+	if offset64 > dataLen64 || 4 > dataLen64-offset64 {
+		return 0, true, false
+	}
+	arrayStart64 := offset64 + 4
+	if int64(length) > dataLen64-arrayStart64 {
+		return 0, true, false
+	}
+	if length > ^uint32(0)-offset-4 {
 		return 0, true, false
 	}
 	if length > 0 {
 		exists = true
 		array := mapstr.M{}
-		err := fieldUnmarshal(array, data[offset+4:offset+4+length], 0, length, 0)
+		arrayStartInt := int(arrayStart64)
+		arrayEndInt := arrayStartInt + int(length)
+		err := fieldUnmarshal(array, data[arrayStartInt:arrayEndInt], 0, length, 0)
 		if err {
-			logp.Warn("Error while parsing a field array")
+			logp.Debug("amqp", "Error while parsing a field array")
 			return 0, true, false
 		}
 		fields.Update(array)
 	}
-	return length + 4 + offset, false, exists
+	return offset + 4 + length, false, exists
 }
 
 // The index parameter, when set at -1, indicates that the entry is a field table.
@@ -77,19 +105,20 @@ func getArray(fields mapstr.M, data []byte, offset uint32) (next uint32, err boo
 func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, index int) (err bool) {
 	var name string
 
+	// Why is this returning false if attempting to offset past the length of the data?
 	if offset >= length {
 		return false
 	}
 	// get name of the field. If it's an array, it will be the index parameter as a
 	// string. If it's a table, it will be the name of the field.
 	if index < 0 {
-		fieldName, offsetTemp, err := getShortString(data, offset+1, uint32(data[offset]))
+		fieldName, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get short string in table")
+			logp.Debug("amqp", "Failed to get short string in table")
 			return true
 		}
 		name = fieldName
-		offset = offsetTemp
+		offset += consumed
 	} else {
 		name = strconv.Itoa(index)
 		index++
@@ -104,38 +133,90 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		}
 		offset += 2
 	case shortShortInt:
-		table[name] = int8(data[offset+1])
+		v, err := getIntegerAt[int8](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get int8 in table")
+			return true
+		}
+		table[name] = v
 		offset += 2
 	case shortShortUint:
-		table[name] = uint8(data[offset+1])
+		v, err := getIntegerAt[uint8](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get uint8 in table")
+			return true
+		}
+		table[name] = v
 		offset += 2
 	case shortInt:
-		table[name] = int16(binary.BigEndian.Uint16(data[offset+1 : offset+3]))
+		v, err := getIntegerAt[int16](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get int16 in table")
+			return true
+		}
+		table[name] = v
 		offset += 3
 	case shortUint:
-		table[name] = binary.BigEndian.Uint16(data[offset+1 : offset+3])
+		v, err := getIntegerAt[uint16](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get uint16 in table")
+			return true
+		}
+		table[name] = v
 		offset += 3
 	case longInt:
-		table[name] = int(binary.BigEndian.Uint32(data[offset+1 : offset+5]))
+		v, err := getIntegerAt[int32](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get int32 in table")
+			return true
+		}
+		table[name] = v
 		offset += 5
 	case longUint:
-		table[name] = binary.BigEndian.Uint32(data[offset+1 : offset+5])
+		v, err := getIntegerAt[uint32](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get uint32 in table")
+			return true
+		}
+		table[name] = v
 		offset += 5
 	case longLongInt:
-		table[name] = int64(binary.BigEndian.Uint64(data[offset+1 : offset+9]))
+		v, err := getIntegerAt[int64](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get int64 in table")
+			return true
+		}
+		table[name] = v
 		offset += 9
 	case longLongUint:
-		table[name] = binary.BigEndian.Uint64(data[offset+1 : offset+9])
+		v, err := getIntegerAt[uint64](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get uint64 in table")
+			return true
+		}
+		table[name] = v
 		offset += 9
 	case float:
-		bits := binary.BigEndian.Uint32(data[offset+1 : offset+5])
-		table[name] = math.Float32frombits(bits)
+		v, err := getIntegerAt[uint32](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get float32 in table")
+			return true
+		}
+		table[name] = math.Float32frombits(v)
 		offset += 5
 	case double:
-		bits := binary.BigEndian.Uint64(data[offset+1 : offset+9])
-		table[name] = math.Float64frombits(bits)
+		v, err := getIntegerAt[uint64](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get float64 in table")
+			return true
+		}
+		table[name] = math.Float64frombits(v)
 		offset += 9
 	case decimal:
+		if len(data) < int(offset)+6 {
+			logp.Debug("amqp", "Failed to get decimal in table")
+			return true
+		}
 		scale := data[offset+1]
 		val := strings.Split(strconv.Itoa(int(binary.BigEndian.Uint32(data[offset+2:offset+6]))), "")
 		ret := make([]string, len(val)+1)
@@ -150,21 +231,21 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		table[name] = strings.Join(ret, "")
 		offset += 6
 	case shortString:
-		s, next, err := getShortString(data, offset+2, uint32(data[offset+1]))
+		s, consumed, err := getLVString[uint8](data, offset+1)
 		if err {
-			logp.Warn("Failed to get short string in table")
+			logp.Debug("amqp", "Failed to get short string in table")
 			return true
 		}
 		table[name] = s
-		offset = next
+		offset += consumed + 1
 	case longString:
-		s, next, err := getShortString(data, offset+5, binary.BigEndian.Uint32(data[offset+1:offset+5]))
+		s, consumed, err := getLVString[uint32](data, offset+1)
 		if err {
-			logp.Warn("Failed to get long string in table")
+			logp.Debug("amqp", "Failed to get long string in table")
 			return true
 		}
 		table[name] = s
-		offset = next
+		offset += consumed + 1
 	case fieldArray:
 		newMap := mapstr.M{}
 		next, err, _ := getArray(newMap, data, offset+1)
@@ -174,7 +255,12 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		table[name] = newMap
 		offset = next
 	case timestamp:
-		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset+1:offset+9])), 0)
+		ts, err := getIntegerAt[int64](data, offset+1)
+		if err {
+			logp.Debug("amqp", "Failed to get timestamp in table")
+			return true
+		}
+		t := time.Unix(ts, 0)
 		table[name] = t.Format(amqpTimeLayout)
 		offset += 9
 	case fieldTable:
@@ -189,8 +275,12 @@ func fieldUnmarshal(table mapstr.M, data []byte, offset uint32, length uint32, i
 		table[name] = nil
 		offset++
 	case byteArray:
-		size := binary.BigEndian.Uint32(data[offset+1 : offset+5])
-		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
+		size, err := getIntegerAt[uint32](data, offset+1)
+		if err || len(data) < int(offset+5+size) {
+			logp.Debug("amqp", "Failed to get byte array in table")
+			return true
+		}
+		table[name] = bodyToByteArray(data[offset+5 : offset+5+size])
 		offset += 5 + size
 	default:
 		// unknown field

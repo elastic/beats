@@ -2,6 +2,9 @@
 navigation_title: "add_cloud_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/add-cloud-metadata.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Add cloud metadata [add-cloud-metadata]

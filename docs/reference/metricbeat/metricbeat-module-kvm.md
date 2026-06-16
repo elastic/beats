@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-kvm.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # KVM module [metricbeat-module-kvm]
 
@@ -13,7 +18,7 @@ This functionality is in beta and is subject to change. The design and code is l
 This is the kvm module.
 
 
-## Example configuration [_example_configuration_38]
+## Example configuration [_example_configuration]
 
 The KVM module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -33,12 +38,9 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_44]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [dommemstat](/reference/metricbeat/metricbeat-metricset-kvm-dommemstat.md)
-* [status](/reference/metricbeat/metricbeat-metricset-kvm-status.md)
-
-
-
+* [dommemstat](/reference/metricbeat/metricbeat-metricset-kvm-dommemstat.md)  {applies_to}`stack: beta`
+* [status](/reference/metricbeat/metricbeat-metricset-kvm-status.md)  {applies_to}`stack: beta`

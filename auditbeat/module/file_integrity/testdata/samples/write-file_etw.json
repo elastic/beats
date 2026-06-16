@@ -1,0 +1,110 @@
+[
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "attributes_modified"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:32:30.4921831Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:32:22.4549559Z",
+        "ctime": "2025-09-01T10:32:22.4549559Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "58828270132527366",
+        "mtime": "2025-09-01T10:32:30.4921831Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-file2254555294\\001\\mainfile.txt",
+        "size": 14,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 40548,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:32:30.4924614Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 1011600,
+    "Period": 0,
+    "DisableTimeSeries": false
+  },
+  {
+    "RootFields": null,
+    "ModuleFields": null,
+    "MetricSetFields": {
+      "event": {
+        "action": [
+          "updated"
+        ],
+        "category": [
+          "file"
+        ],
+        "kind": "event",
+        "type": [
+          "change"
+        ]
+      },
+      "file": {
+        "accessed": "2025-09-01T10:32:32.2044123Z",
+        "attributes": [
+          "archive"
+        ],
+        "created": "2025-09-01T10:32:22.4549559Z",
+        "ctime": "2025-09-01T10:32:22.4549559Z",
+        "drive_letter": "C",
+        "extension": "txt",
+        "inode": "58828270132527366",
+        "mtime": "2025-09-01T10:32:30.4921831Z",
+        "name": "mainfile.txt",
+        "owner": "tp\\Marc",
+        "path": "C:\\Users\\Marc\\AppData\\Local\\Temp\\TestRegenerateSamplesetwwrite-file2254555294\\001\\mainfile.txt",
+        "size": 14,
+        "type": "file",
+        "uid": "S-1-5-21-789196611-1251633920-2913052371-1001"
+      },
+      "process": {
+        "pid": 40548,
+        "user": {
+          "domain": "tp",
+          "id": "S-1-5-21-789196611-1251633920-2913052371-1001",
+          "name": "Marc"
+        }
+      }
+    },
+    "Index": "",
+    "ID": "",
+    "Namespace": "",
+    "Timestamp": "2025-09-01T10:32:30.5694184Z",
+    "Error": null,
+    "Host": "",
+    "Service": "",
+    "Took": 734900,
+    "Period": 0,
+    "DisableTimeSeries": false
+  }
+]

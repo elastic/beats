@@ -19,6 +19,7 @@ package input_logfile
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
@@ -30,15 +31,18 @@ import (
 )
 
 type managedInput struct {
-	userID           string
-	metricsID        string
-	manager          *InputManager
-	ackCH            *updateChan
-	sourceIdentifier *sourceIdentifier
-	prospector       Prospector
-	harvester        Harvester
-	cleanTimeout     time.Duration
-	harvesterLimit   uint64
+	// id is the input ID, it is defined by setting 'id'
+	// in the input configuration
+	id                     string
+	manager                *InputManager
+	ackCH                  *updateChan
+	sourceIdentifier       *SourceIdentifier
+	previousSrcIdentifiers []*SourceIdentifier
+	prospector             Prospector
+	harvester              Harvester
+	cleanTimeout           time.Duration
+	harvesterLimit         uint64
+	readUntilEOF           ReadUntilEOFConfig
 }
 
 // Name is required to implement the v2.Input interface
@@ -54,6 +58,10 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+
+	// Notify the manager the input has stopped, currently that is used to
+	// keep track of duplicated IDs
+	defer inp.manager.StopInput(inp.id)
 	ctx.UpdateStatus(status.Starting, "")
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
@@ -64,27 +72,38 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(ctx.MetricsRegistry)
-
+	metrics := NewMetrics(ctx.MetricsRegistry, inp.manager.Logger)
+	harvesterGroupStopTimeout := time.Minute // magic number
+	if inp.readUntilEOF.Enabled {
+		// keep the magic alive
+		harvesterGroupStopTimeout +=
+			inp.readUntilEOF.Timeout + 100*time.Millisecond
+	}
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
 		readers:      newReaderGroup(),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
+		readUntilEOF: inp.readUntilEOF,
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
 		tg: task.NewGroup(
 			inp.harvesterLimit,
-			time.Minute, // magic number
+			harvesterGroupStopTimeout,
 			ctx.Logger,
 			"harvester:"),
 		metrics: metrics,
+		inputID: inp.id,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, nil)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, inp.previousSrcIdentifiers)
+
+	if err := inp.prospector.TakeOver(sourceStore, inp.sourceIdentifier.ID); err != nil {
+		return fmt.Errorf("prospector failed to take over states: %w", err)
+	}
 
 	// Mark it as running for now.
 	// Any errors encountered by harvester will change state to Degraded
@@ -92,18 +111,14 @@ func (inp *managedInput) Run(
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 
-	// Notify the manager the input has stopped, currently that is used to
-	// keep track of duplicated IDs
-	inp.manager.StopInput(inp.userID)
-
 	return nil
 }
 
 func newInputACKHandler(ch *updateChan) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		var n uint
 		var last int
-		for i := 0; i < len(private); i++ {
+		for i := range private {
 			current := private[i]
 			if current == nil {
 				continue
@@ -121,6 +136,7 @@ func newInputACKHandler(ch *updateChan) beat.EventListener {
 			return
 		}
 
+		//nolint:errcheck // We know it is alwys the correct type
 		op := private[last].(*updateOp)
 		ch.Send(scheduledUpdate{op: op, n: n})
 	})

@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -62,7 +63,7 @@ func TestMapper(t *testing.T) {
 			URI:          server.URL,
 			SanitizedURI: server.URL,
 			Host:         server.URL,
-		})
+		}, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -73,7 +74,7 @@ func TestMapper(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{})
+	httpClient, err := helper.NewHTTPFromConfig(helper.Config{}, mb.HostData{}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +83,7 @@ func TestEmpty(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	eventsMapping(reporter, httpClient, info, input, true)
+	eventsMapping(reporter, httpClient, info, input, true, logptest.NewTestingLogger(t, ""))
 	require.Equal(t, 0, len(reporter.GetEvents()))
 }
 

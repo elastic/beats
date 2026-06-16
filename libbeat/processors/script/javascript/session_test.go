@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +36,7 @@ func TestSessionTagOnException(t *testing.T) {
 	p, err := NewFromConfig(Config{
 		Source:         header + script + footer,
 		TagOnException: defaultConfig().TagOnException,
-	}, nil)
+	}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,10 +49,11 @@ func TestSessionTagOnException(t *testing.T) {
 }
 
 func TestSessionScriptParams(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	t.Run("register method is optional", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: header + footer,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -61,10 +62,10 @@ func TestSessionScriptParams(t *testing.T) {
 	t.Run("register required for params", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: header + footer,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"threshold": 42,
 			},
-		}, nil)
+		}, nil, logger)
 		if assert.Error(t, err) {
 			assert.Contains(t, err.Error(), "params were provided")
 		}
@@ -82,15 +83,17 @@ func TestSessionScriptParams(t *testing.T) {
 		`
 		_, err := NewFromConfig(Config{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"threshold": 42,
 			},
-		}, nil)
+		}, nil, logger)
 		assert.NoError(t, err)
 	})
 }
 
 func TestSessionTestFunction(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
 	const script = `
 		var fail = false;
 
@@ -118,7 +121,7 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test method is optional", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: header + footer,
-		}, nil)
+		}, nil, logger)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -127,30 +130,28 @@ func TestSessionTestFunction(t *testing.T) {
 	t.Run("test success", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"fail": false,
 			},
-		}, nil)
+		}, nil, logger)
 		assert.NoError(t, err)
 	})
 
 	t.Run("test failure", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
 			Source: script,
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"fail": true,
 			},
-		}, nil)
+		}, nil, logger)
 		assert.Error(t, err)
 	})
 }
 
 func TestSessionTimeout(t *testing.T) {
-	logp.TestingSetup()
-
 	const runawayLoop = `
 		while (!evt.fields.stop) {
-			evt.Put("hello", "world");			
+			evt.Put("hello", "world");
 		}
     `
 
@@ -158,7 +159,7 @@ func TestSessionTimeout(t *testing.T) {
 		Source:         header + runawayLoop + footer,
 		Timeout:        500 * time.Millisecond,
 		TagOnException: "_js_exception",
-	}, nil)
+	}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,20 +183,21 @@ func TestSessionTimeout(t *testing.T) {
 	}
 
 	// Verify that any internal runtime interrupt state has been cleared.
-	evt.PutValue("stop", true)
+	_, err = evt.PutValue("stop", true)
+	assert.NoError(t, err)
 	_, err = p.Run(evt)
 	assert.NoError(t, err)
 }
 
 func TestSessionParallel(t *testing.T) {
 	const script = `
-		evt.Put("host.name", "workstation");			
+		evt.Put("host.name", "workstation");
     `
 
 	p, err := NewFromConfig(Config{
 		Source:         header + script + footer,
 		TagOnException: "_js_exception",
-	}, nil)
+	}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -206,7 +208,7 @@ func TestSessionParallel(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(goroutines)
-	for i := 0; i < goroutines; i++ {
+	for range goroutines {
 		go func() {
 			defer wg.Done()
 			for ctx.Err() == nil {

@@ -19,12 +19,14 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory/internal/activedirectory"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -57,7 +59,7 @@ type adInput struct {
 }
 
 // New creates a new instance of an Active Directory identity provider.
-func New(logger *logp.Logger) (provider.Provider, error) {
+func New(logger *logp.Logger, path *paths.Path) (provider.Provider, error) {
 	p := adInput{
 		cfg: defaultConfig(),
 	}
@@ -65,6 +67,7 @@ func New(logger *logp.Logger) (provider.Provider, error) {
 		Logger:    logger,
 		Type:      FullName,
 		Configure: p.configure,
+		Path:      path,
 	}
 
 	return &p, nil
@@ -85,7 +88,7 @@ func (p *adInput) configure(cfg *config.C) (kvstore.Input, error) {
 		return nil, err
 	}
 	if p.cfg.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS)
+		tlsConfig, err := tlscommon.LoadTLSConfig(p.cfg.TLS, p.logger)
 		if err != nil {
 			return nil, err
 		}
@@ -115,9 +118,10 @@ func (*adInput) Test(v2.TestContext) error { return nil }
 
 // Run will start data collection on this provider.
 func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+	inputCtx.UpdateStatus(status.Starting, "")
+
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.URL)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx.MetricsRegistry, inputCtx.Logger)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
@@ -130,6 +134,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
+	inputCtx.UpdateStatus(status.Running, "")
 	var (
 		last time.Time
 		err  error
@@ -138,14 +143,21 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		select {
 		case <-inputCtx.Cancelation.Done():
 			if !errors.Is(inputCtx.Cancelation.Err(), context.Canceled) {
-				return inputCtx.Cancelation.Err()
+				err := inputCtx.Cancelation.Err()
+				inputCtx.UpdateStatus(status.Stopping, err.Error())
+				return err
 			}
+			inputCtx.UpdateStatus(status.Stopping, "Deadline passed")
 			return nil
 		case start := <-syncTimer.C:
 			last, err = p.runFullSync(inputCtx, store, client)
 			if err != nil {
-				p.logger.Errorw("Error running full sync", "error", err)
+				msg := "Error running full sync"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.syncError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful full sync")
 			}
 			p.metrics.syncTotal.Inc()
 			p.metrics.syncProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -164,8 +176,12 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 		case start := <-updateTimer.C:
 			last, err = p.runIncrementalUpdate(inputCtx, store, last, client)
 			if err != nil {
-				p.logger.Errorw("Error running incremental update", "error", err)
+				msg := "Error running incremental update"
+				p.logger.Errorw(msg, "error", err)
+				inputCtx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", msg, err))
 				p.metrics.updateError.Inc()
+			} else {
+				inputCtx.UpdateStatus(status.Running, "Successful incremental update")
 			}
 			p.metrics.updateTotal.Inc()
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -214,8 +230,9 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 
 	wantUsers := p.cfg.wantUsers()
 	wantDevices := p.cfg.wantDevices()
-	if wantUsers || wantDevices {
-		var users, devices []*User
+	wantEmptyGroups := p.cfg.wantEmptyGroups()
+	if wantUsers || wantDevices || wantEmptyGroups {
+		var users, devices, groups []*User
 		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 		p.logger.Debugf("Starting fetch...")
 		if wantUsers {
@@ -230,6 +247,12 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 				return time.Time{}, err
 			}
 		}
+		if wantEmptyGroups {
+			groups, err = p.doFetchEmptyGroups(ctx, state, true)
+			if err != nil {
+				return time.Time{}, err
+			}
+		}
 
 		tracker := kvstore.NewTxTracker(ctx)
 		start := time.Now()
@@ -240,6 +263,9 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		}
 		for _, d := range p.unifyState(ctx, state.devices, devices) {
 			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		}
+		for _, g := range p.unifyState(ctx, state.groups, groups) {
+			p.publishGroup(g, inputCtx.ID, client, tracker)
 		}
 
 		end := time.Now()
@@ -328,7 +354,7 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		}
 	}()
 
-	var updatedUsers, updatedDevices []*User
+	var updatedUsers, updatedDevices, updatedGroups []*User
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	if p.cfg.wantUsers() {
 		updatedUsers, err = p.doFetchUsers(ctx, state, false)
@@ -342,14 +368,23 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 			return last, err
 		}
 	}
+	if p.cfg.wantEmptyGroups() {
+		updatedGroups, err = p.doFetchEmptyGroups(ctx, state, false)
+		if err != nil {
+			return last, err
+		}
+	}
 
-	if len(updatedUsers) != 0 || len(updatedDevices) != 0 {
+	if len(updatedUsers) != 0 || len(updatedDevices) != 0 || len(updatedGroups) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 		for _, u := range updatedUsers {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
 		}
 		for _, d := range updatedDevices {
 			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		}
+		for _, g := range updatedGroups {
+			p.publishGroup(g, inputCtx.ID, client, tracker)
 		}
 		tracker.Wait()
 	}
@@ -385,7 +420,7 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 	if p.cfg.UserQuery != "" {
 		query = p.cfg.UserQuery
 	}
-	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig, "user")
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
@@ -417,7 +452,7 @@ func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSyn
 	if p.cfg.DeviceQuery != "" {
 		query = p.cfg.DeviceQuery
 	}
-	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig, "device")
 	p.logger.Debugf("received %d devices from API", len(entries))
 	if err != nil {
 		return nil, err
@@ -432,6 +467,62 @@ func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSyn
 	}
 	p.logger.Debugf("processed %d devices from API", len(devices))
 	return devices, nil
+}
+
+// doFetchEmptyGroups handles fetching groups with no direct members from
+// Active Directory. If fullSync is true, then any existing whenChanged will
+// be ignored, forcing a full synchronization. The whenChanged time of state
+// is modified to be the time stamp of the latest WhenChanged value.
+func (p *adInput) doFetchEmptyGroups(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	var since time.Time
+	if !fullSync {
+		since = state.whenChanged
+	}
+
+	entries, err := activedirectory.GetEmptyGroups(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	p.logger.Debugf("received %d empty groups from API", len(entries))
+	if err != nil {
+		return nil, err
+	}
+
+	groups := make([]*User, 0, len(entries))
+	for _, g := range entries {
+		groups = append(groups, state.storeGroup(g))
+		if g.WhenChanged.After(state.whenChanged) {
+			state.whenChanged = g.WhenChanged
+		}
+	}
+	p.logger.Debugf("processed %d empty groups from API", len(groups))
+	return groups, nil
+}
+
+// publishGroup will publish an empty-group document using the given beat.Client.
+func (p *adInput) publishGroup(g *User, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+	doc := mapstr.M{}
+
+	_, _ = doc.Put("activedirectory", g.Entry)
+	_, _ = doc.Put("labels.identity_source", inputID)
+	_, _ = doc.Put("group.id", g.ID)
+
+	switch g.State {
+	case Deleted:
+		_, _ = doc.Put("event.action", "group-deleted")
+	case Discovered:
+		_, _ = doc.Put("event.action", "group-discovered")
+	case Modified:
+		_, _ = doc.Put("event.action", "group-modified")
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    doc,
+		Private:   tracker,
+	}
+	tracker.Add()
+
+	p.logger.Debugf("Publishing group %q", g.ID)
+
+	client.Publish(event)
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.

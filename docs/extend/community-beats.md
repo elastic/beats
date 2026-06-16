@@ -1,6 +1,8 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/devguide/current/community-beats.html
+applies_to:
+  stack: ga
 ---
 
 # Community {{beats}} [community-beats]
@@ -19,7 +21,7 @@ This page lists some of the {{beats}} developed by the open source community.
 
 Have a question about developing a community Beat? You can post questions and discuss issues in the [{{beats}} discussion forum](https://discuss.elastic.co/tags/c/elastic-stack/beats/28/beats-development).
 
-Have you created a Beat that’s not listed? Add the name and description of your Beat to the source document for [Community {{beats}}](https://github.com/elastic/beats/blob/main/libbeat/docs/communitybeats.asciidoc) and [open a pull request](https://help.github.com/articles/using-pull-requests) in the [{{beats}} GitHub repository](https://github.com/elastic/beats) to get your change merged. When you’re ready, go ahead and [announce](https://discuss.elastic.co/c/announcements) your new Beat in the Elastic discussion forum.
+Have you created a Beat that’s not listed? Add the name and description of your Beat to the source document for [Community {{beats}}](https://github.com/elastic/beats/blob/main/docs/extend/community-beats.md) and [open a pull request](https://help.github.com/articles/using-pull-requests) in the [{{beats}} GitHub repository](https://github.com/elastic/beats) to get your change merged. When you’re ready, go ahead and [announce](https://discuss.elastic.co/c/announcements) your new Beat in the Elastic discussion forum.
 
 ::::{note}
 Elastic provides no warranty or support for community-sourced {{beats}}.
@@ -117,7 +119,7 @@ Elastic provides no warranty or support for community-sourced {{beats}}.
 :   Collects GPFS metric and quota information.
 
 [hackerbeat](https://github.com/ullaakut/hackerbeat)
-:   Indexes the top stories of HackerNews into an ElasticSearch instance.
+:   Indexes the top stories of HackerNews into an Elasticsearch instance.
 
 [hsbeat](https://github.com/YaSuenag/hsbeat)
 :   Reads all performance counters in Java HotSpot VM.

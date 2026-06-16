@@ -8,8 +8,10 @@ package azureeventhub
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Azure/go-autorest/autorest/azure"
+	"github.com/devigned/tab"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -46,6 +48,13 @@ func Plugin(log *logp.Logger) v2.Plugin {
 		Manager: &eventHubInputManager{
 			log: log,
 		},
+
+		// ExcludeFromFIPS = true to prevent this input from being used in FIPS-capable
+		// Filebeat distributions. This input indirectly uses algorithms that are not
+		// FIPS-compliant. Specifically, the input depends on the
+		// github.com/Azure/azure-sdk-for-go/sdk/azidentity package which, in turn,
+		// depends on the golang.org/x/crypto/pkcs12 package, which is not FIPS-compliant.
+		ExcludeFromFIPS: true,
 	}
 }
 
@@ -62,10 +71,20 @@ func (m *eventHubInputManager) Init(unison.Group) error {
 
 // Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
+
+	// Register the logs tracer only if the environment variable is
+	// set to avoid the overhead of the tracer in environments where
+	// it's not needed.
+	if os.Getenv("BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED") == "true" {
+		tab.Register(&logsOnlyTracer{logger: m.log})
+	}
+
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
+
+	config.checkUnsupportedParams(m.log)
 
 	switch config.ProcessorVersion {
 	case processorV1:

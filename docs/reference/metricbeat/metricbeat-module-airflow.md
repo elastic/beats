@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-airflow.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Airflow module [metricbeat-module-airflow]
 
@@ -33,7 +38,7 @@ statsd_prefix =
 ```
 
 
-## Example configuration [_example_configuration_3]
+## Example configuration [_example_configuration]
 
 The Airflow module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -47,10 +52,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_4]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
-* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)
-
-
+* [statsd](/reference/metricbeat/metricbeat-metricset-airflow-statsd.md)  {applies_to}`stack: beta`

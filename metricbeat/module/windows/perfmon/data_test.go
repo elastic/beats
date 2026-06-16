@@ -389,3 +389,81 @@ func TestMatchesParentProcess(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, val, "svchost (test) another #54")
 }
+
+func TestExtractObjectFromCounter(t *testing.T) {
+	_true := true
+	_false := false
+
+	reader := Reader{
+		query:  pdh.Query{},
+		log:    nil,
+		config: Config{},
+		counters: []PerfCounter{
+			{
+				QueryField:    "working_set",
+				QueryName:     `\Process(*)\% Processor Time`,
+				Format:        "float",
+				ObjectName:    "Process",
+				ObjectField:   "object",
+				InstanceName:  "*",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\Process(chrome)\% Processor Time`},
+			},
+		},
+	}
+
+	counters := map[string][]pdh.CounterValue{
+		`\Process(chrome)\% Processor Time`: {
+			{
+				Instance:    "chrome",
+				Measurement: 123,
+			},
+		},
+	}
+	// unset
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 1, len(events))
+
+		ok, err := events[0].MetricSetFields.HasKey("object")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		val, err := events[0].MetricSetFields.GetValue("object")
+		assert.NoError(t, err)
+		assert.Equal(t, "Process", val)
+	}
+
+	// ExtractObjectFromCounter = true
+	reader.config.ExtractObjectFromCounter = &_true
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 1, len(events))
+
+		ok, err := events[0].MetricSetFields.HasKey("object")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		val, err := events[0].MetricSetFields.GetValue("object")
+		assert.NoError(t, err)
+		assert.Equal(t, "Process(chrome)", val)
+	}
+
+	// ExtractObjectFromCounter = false
+	reader.config.ExtractObjectFromCounter = &_false
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 1, len(events))
+
+		ok, err := events[0].MetricSetFields.HasKey("object")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+
+		val, err := events[0].MetricSetFields.GetValue("object")
+		assert.NoError(t, err)
+		assert.Equal(t, "Process", val)
+	}
+}

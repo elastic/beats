@@ -1,0 +1,16 @@
+filebeat.inputs:
+  - type: filestream
+    id: my-filestream-id
+    clean_inactive: 0
+    legacy_clean_inactive: true
+    paths:
+      - {{.logFilePath}}
+
+queue.mem:
+  flush.timeout: 0
+
+output:
+  file:
+    path: ${path.home}
+    filename: "output"
+    rotate_on_startup: false

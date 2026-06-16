@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 const (
@@ -68,15 +69,7 @@ type Autodiscover struct {
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(
-	name string,
-	pipeline beat.PipelineConnector,
-	factory cfgfile.RunnerFactory,
-	configurer EventConfigurer,
-	c *Config,
-	keystore keystore.Keystore,
-	logger *logp.Logger,
-) (*Autodiscover, error) {
+func NewAutodiscover(name string, pipeline beat.PipelineConnector, factory cfgfile.RunnerFactory, configurer EventConfigurer, c *Config, keystore keystore.Keystore, logger *logp.Logger, path *paths.Path) (*Autodiscover, error) {
 	logger = logger.Named("autodiscover")
 
 	// Init Event bus
@@ -85,7 +78,7 @@ func NewAutodiscover(
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range c.Providers {
-		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
+		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore, path)
 		if err != nil {
 			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}
@@ -166,6 +159,9 @@ func (a *Autodiscover) worker() {
 
 				a.logger.Debugf("calling reload with %d config(s)", len(configs))
 				err := a.runners.Reload(configs)
+
+				// Cleanup metadata no longer in use
+				a.cleanupMetadata()
 
 				// reset updated status
 				updated = false
@@ -288,14 +284,33 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 		updated = true
 	}
 
-	// Cleanup meta references for this eventID
-	for configHash := range a.configs[eventID] {
-		a.meta.Remove(configHash)
-	}
-
 	delete(a.configs, eventID)
 
 	return updated
+}
+
+// cleanupMetadata removes metadata for config hashes that are no longer active
+func (a *Autodiscover) cleanupMetadata() {
+	activeHashes := make(map[uint64]struct{})
+	for _, configs := range a.configs {
+		for hash := range configs {
+			activeHashes[hash] = struct{}{}
+		}
+	}
+
+	storedHashes := a.meta.Keys()
+	removedCount := 0
+	for _, hash := range storedHashes {
+		if _, ok := activeHashes[hash]; ok {
+			continue
+		}
+
+		a.meta.Remove(hash)
+		removedCount++
+	}
+
+	a.logger.Debugf("Metadata cleanup: %d before, %d after, %d removed",
+		len(storedHashes), len(activeHashes), removedCount)
 }
 
 func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {

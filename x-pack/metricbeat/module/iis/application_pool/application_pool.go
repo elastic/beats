@@ -8,6 +8,7 @@ package application_pool
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,13 +45,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	// instantiate reader object
-	reader, err := newReader(config)
+	reader, err := newReader(config, base.Logger())
 	if err != nil {
 		return nil, err
 	}
 	ms := &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger("application pool"),
+		log:           base.Logger().Named("application pool"),
 		reader:        reader,
 	}
 
@@ -77,6 +78,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	for _, event := range events {
+		event.MetricSetFields.Put("host.cpu.count", runtime.NumCPU())
 		isOpen := report.Event(event)
 		if !isOpen {
 			break

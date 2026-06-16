@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-stan.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # Stan module [metricbeat-module-stan]
 
@@ -34,7 +39,7 @@ Dashboards for topic message count and queue depth are included:
 ![metricbeat stan overview](images/metricbeat-stan-overview.png)
 
 
-### Example configuration [_example_configuration_60]
+## Example configuration [_example_configuration]
 
 The Stan module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -52,14 +57,10 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-### Metricsets [_metricsets_69]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [channels](/reference/metricbeat/metricbeat-metricset-stan-channels.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-stan-stats.md)
 * [subscriptions](/reference/metricbeat/metricbeat-metricset-stan-subscriptions.md)
-
-
-
-

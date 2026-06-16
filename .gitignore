@@ -11,6 +11,7 @@
 *beat/logs
 *beat/data
 **/ironbank/build/
+x-pack/otel/distributions/beats-otel-collector/_build
 
 # Files
 .DS_Store
@@ -43,5 +44,15 @@ x-pack/dockerlogbeat/temproot.tar
 *.terraform
 *.tfstate*
 
+# AI agent config (copy AGENTS.md to your agent-specific instructions file)
+/.claude
+/.cursor
+/.gemini
+CLAUDE.md
+GEMINI.md
+
 # Files generated with the bump version automations
 *.bck
+
+# Local-only Salesforce live-test credentials (copy from sf-creds.env.example)
+x-pack/filebeat/input/salesforce/sf-creds*.env

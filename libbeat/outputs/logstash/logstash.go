@@ -21,6 +21,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -41,24 +43,36 @@ func makeLogstash(
 	observer outputs.Observer,
 	cfg *conf.C,
 ) (outputs.Group, error) {
-	lsConfig, err := readConfig(cfg, beat)
+	log := beat.Logger.Named("logstash")
+	return MakeLogstashClients(beat.Version, log, observer, cfg, beat.IndexPrefix, beat.Paths)
+}
+
+func MakeLogstashClients(
+	beatVersion string,
+	logger *logp.Logger,
+	observer outputs.Observer,
+	rawCfg *conf.C,
+	beatIndexPrefix string,
+	beatPaths *paths.Path,
+) (outputs.Group, error) {
+	config, err := readConfig(rawCfg, beatIndexPrefix)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	hosts, err := outputs.ReadHostList(cfg)
+	hosts, err := outputs.ReadHostList(rawCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(lsConfig.TLS)
+	tls, err := tlscommon.LoadTLSConfig(config.TLS, logger)
 	if err != nil {
-		return outputs.Fail(err)
+		return outputs.Group{}, err
 	}
 
 	transp := transport.Config{
-		Timeout: lsConfig.Timeout,
-		Proxy:   &lsConfig.Proxy,
+		Timeout: config.Timeout,
+		Proxy:   &config.Proxy,
 		TLS:     tls,
 		Stats:   observer,
 	}
@@ -67,23 +81,23 @@ func makeLogstash(
 	for i, host := range hosts {
 		var client outputs.NetworkClient
 
-		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
+		conn, err := transport.NewClient(transp, "tcp", host, defaultPort, logger)
 		if err != nil {
 			return outputs.Fail(err)
 		}
 
-		if lsConfig.Pipelining > 0 {
-			client, err = newAsyncClient(beat, conn, observer, lsConfig)
+		if config.Pipelining > 0 {
+			client, err = newAsyncClient(logger, beatVersion, conn, observer, config)
 		} else {
-			client, err = newSyncClient(beat, conn, observer, lsConfig)
+			client, err = newSyncClient(logger, beatVersion, conn, observer, config)
 		}
 		if err != nil {
 			return outputs.Fail(err)
 		}
 
-		client = outputs.WithBackoff(client, lsConfig.Backoff.Init, lsConfig.Backoff.Max)
+		client = outputs.WithBackoff(client, config.Backoff.Init, config.Backoff.Max)
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, clients)
+	return outputs.SuccessNet(config.Queue, config.LoadBalance, config.BulkMaxSize, config.MaxRetries, nil, logger, beatPaths, clients)
 }

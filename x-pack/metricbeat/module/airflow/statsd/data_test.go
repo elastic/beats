@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"runtime"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -19,10 +20,11 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/statsd/server"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource(logp.NewNopLogger(), "../../../module"))
 }
 
 const (
@@ -42,7 +44,7 @@ func getConfig() map[string]interface{} {
 }
 
 func createEvent(data string, t *testing.T) {
-	udpAddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", STATSD_HOST, STATSD_PORT))
+	udpAddr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(STATSD_HOST, strconv.Itoa(int(STATSD_PORT))))
 	require.NoError(t, err)
 
 	conn, err := net.DialUDP("udp", nil, udpAddr)

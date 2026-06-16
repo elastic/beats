@@ -38,18 +38,6 @@ func SetSqlValue(logger *logp.Logger, output mapstr.M, targetFieldName string, v
 	return
 }
 
-func NewSqlWrapper(fieldName string, value SqlValue) *SqlValueWrapper {
-	return &SqlValueWrapper{
-		Field:    fieldName,
-		SqlValue: value,
-	}
-}
-
-type SqlValueWrapper struct {
-	Field    string
-	SqlValue SqlValue
-}
-
 type SqlValue interface {
 	isValid() bool
 	Value() interface{}

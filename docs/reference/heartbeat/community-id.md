@@ -2,6 +2,9 @@
 navigation_title: "community_id"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/community-id.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Community ID Network Flow Hash [community-id]

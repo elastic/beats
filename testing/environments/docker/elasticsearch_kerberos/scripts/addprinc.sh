@@ -29,17 +29,16 @@ fi
 PRINC="$1"
 PASSWD="$2"
 USER=$(echo $PRINC | tr "/" "_")
-REALM=ELASTIC
 
 VDIR=/usr/share/kerberos
 BUILD_DIR=/var/build
 LOCALSTATEDIR=/etc
 LOGDIR=/var/log/krb5
 
-ADMIN_PRIN=admin/admin@$REALM
+ADMIN_PRIN=root/admin
 ADMIN_KTAB=$LOCALSTATEDIR/admin.keytab
 
-USER_PRIN=$PRINC@$REALM
+USER_PRIN=$PRINC
 USER_KTAB=$LOCALSTATEDIR/$USER.keytab
 
 if [ -f $USER_KTAB ] && [ -z "$PASSWD" ]; then
@@ -48,14 +47,14 @@ if [ -f $USER_KTAB ] && [ -z "$PASSWD" ]; then
 else
   if [ -z "$PASSWD" ]; then
     echo "Provisioning '${PRINC}@${REALM}' principal and keytab..."
-    sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -randkey $USER_PRIN"
-    sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "ktadd -k $USER_KTAB $USER_PRIN"
+    sudo kadmin.local -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -randkey $USER_PRIN"
+    sudo kadmin.local -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "ktadd -k $USER_KTAB $USER_PRIN"
     sudo chmod 777 $USER_KTAB
     sudo cp $USER_KTAB /usr/share/elasticsearch/config
     sudo chown elasticsearch:elasticsearch /usr/share/elasticsearch/config/$USER.keytab
   else
     echo "Provisioning '${PRINC}@${REALM}' principal with password..."
-    sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -pw $PASSWD $PRINC"
+    sudo kadmin.local -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -pw $PASSWD $PRINC"
   fi
 fi
 

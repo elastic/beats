@@ -82,6 +82,8 @@ type udpMessage struct {
 	datagrams    [][]byte
 }
 
+const maxUDPMemcacheFragments = 1024
+
 func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	buffer := streambuf.NewFixed(pkt.Payload)
 	header, err := parseUDPHeader(buffer)
@@ -114,8 +116,13 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 
 	// get UDP transaction stream combining datagram packets in transaction
 	udpMsg := trans.udpMessageForDir(&header, dir)
+	if udpMsg == nil {
+		debug("dropping memcache(UDP) transaction with invalid fragment metadata")
+		connection.killTransaction(trans)
+		return
+	}
 	if udpMsg.numDatagrams != header.numDatagrams {
-		logp.Warn("number of datagram mismatches in stream")
+		debug("number of datagram mismatches in stream")
 		connection.killTransaction(trans)
 		return
 	}
@@ -127,7 +134,7 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 		// parse memcached message
 		msg, err := parseUDP(&mc.config, pkt.Ts, payload)
 		if err != nil {
-			logp.Warn("failed to parse memcached(UDP) message: %s", err)
+			debug("failed to parse memcached(UDP) message: %s", err)
 			connection.killTransaction(trans)
 			return
 		}
@@ -135,7 +142,7 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 		// apply memcached to transaction
 		done, err = mc.onUDPMessage(trans, &pkt.Tuple, dir, msg)
 		if err != nil {
-			logp.Warn("error processing memcache message: %s", err)
+			debug("error processing memcache message: %s", err)
 			connection.killTransaction(trans)
 			done = true
 		}
@@ -143,7 +150,9 @@ func (mc *memcache) ParseUDP(pkt *protos.Packet) {
 	if !done {
 		trans.timer = time.AfterFunc(mc.udpConfig.transTimeout, func() {
 			debug("transaction timeout -> forward")
-			mc.onUDPTrans(trans)
+			if err := mc.onUDPTrans(trans); err != nil {
+				debug("error processing timeout memcache transaction: %s", err)
+			}
 			mc.udpExpTrans.push(trans)
 		})
 	}
@@ -283,18 +292,22 @@ func (t *udpTransaction) udpMessageForDir(
 	udpMsg := t.messages[dir]
 	if udpMsg == nil {
 		udpMsg = newUDPMessage(header)
+		if udpMsg == nil {
+			return nil
+		}
 		t.messages[dir] = udpMsg
 	}
 	return udpMsg
 }
 
 func newUDPMessage(header *mcUDPHeader) *udpMessage {
-	udpMsg := &udpMessage{
-		numDatagrams: header.numDatagrams,
-		count:        0,
+	count := header.numDatagrams
+	if count == 0 || count > maxUDPMemcacheFragments {
+		return nil
 	}
-	if header.numDatagrams > 1 {
-		udpMsg.datagrams = make([][]byte, header.numDatagrams)
+	udpMsg := &udpMessage{numDatagrams: count}
+	if count > 1 {
+		udpMsg.datagrams = make([][]byte, count)
 	}
 	return udpMsg
 }
@@ -313,10 +326,14 @@ func (msg *udpMessage) addDatagram(
 	}
 
 	if msg.count < msg.numDatagrams {
-		if msg.datagrams[header.seqNumber] != nil {
+		idx := int(header.seqNumber)
+		if idx >= len(msg.datagrams) {
 			return nil
 		}
-		msg.datagrams[header.seqNumber] = data
+		if msg.datagrams[idx] != nil {
+			return nil
+		}
+		msg.datagrams[idx] = data
 		msg.count++
 	}
 
@@ -326,7 +343,9 @@ func (msg *udpMessage) addDatagram(
 
 	buffer := streambuf.New(nil)
 	for _, payload := range msg.datagrams {
-		buffer.Append(payload)
+		if err := buffer.Append(payload); err != nil {
+			return nil
+		}
 	}
 	msg.isComplete = true
 	msg.datagrams = nil
@@ -339,7 +358,9 @@ func parseUDPHeader(buf *streambuf.Buffer) (mcUDPHeader, error) {
 	h.requestID, _ = buf.ReadNetUint16()
 	h.seqNumber, _ = buf.ReadNetUint16()
 	h.numDatagrams, _ = buf.ReadNetUint16()
-	buf.Advance(2) // ignore reserved
+	if err := buf.Advance(2); err != nil { // ignore reserved
+		return h, err
+	}
 	return h, buf.Err()
 }
 

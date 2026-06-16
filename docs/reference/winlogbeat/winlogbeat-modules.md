@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-modules.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See winlogbeat/scripts/mage/docs.go
 
 # Modules [winlogbeat-modules]
 
@@ -54,8 +59,6 @@ output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing
 
 
 ## Modules [_modules]
-
 * [Powershell](/reference/winlogbeat/winlogbeat-module-powershell.md)
 * [Security](/reference/winlogbeat/winlogbeat-module-security.md)
 * [Sysmon](/reference/winlogbeat/winlogbeat-module-sysmon.md)
-

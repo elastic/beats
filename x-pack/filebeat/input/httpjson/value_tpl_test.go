@@ -76,6 +76,14 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "25",
 		},
 		{
+			name:        "terminate",
+			value:       `[[if false]]ok[[else]][[terminate "because reasons"]][[end]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			paramDefVal: "this should not be seen",
+			expectedVal: "",
+		},
+		{
 			name:          "returns error if result is empty and no default is set",
 			value:         "",
 			paramCtx:      emptyTransformContext(),
@@ -808,7 +816,7 @@ func TestValueTpl(t *testing.T) {
 				assert.NoError(t, defTpl.Unpack(tc.paramDefVal))
 			}
 
-			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, tc.name, defTpl, logp.NewLogger(""))
+			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, tc.name, defTpl, noopReporter{}, logp.NewLogger(""))
 			assert.Equal(t, tc.expectedVal, got)
 			if tc.expectedError == "" {
 				assert.NoError(t, err)

@@ -18,7 +18,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	template2 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template/tmpltest"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
@@ -28,7 +28,7 @@ func init() {
 
 func TestTemplates(t *testing.T) {
 	for code, template := range templates {
-		if !template2.ValidateTemplate(t, template) {
+		if !tmpltest.ValidateTemplate(t, template) {
 			t.Fatal("Failed validating template for V8 record", code)
 		}
 	}

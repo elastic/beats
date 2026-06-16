@@ -23,10 +23,11 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestLoadKeystore(t *testing.T) {
-	ks, err := LoadKeystore(config.NewConfig(), "test")
+	ks, err := LoadKeystore(config.NewConfig(), "test", paths.New())
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}

@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-system.html
+applies_to:
+  stack: beta
+  serverless: beta
 ---
+
+% This file is generated! See auditbeat/scripts/mage/docs.go
 
 # System Module [auditbeat-module-system]
 
@@ -153,8 +158,7 @@ On the other hand, host and user information is unlikely to change frequently, s
   period: 1s
 ```
 
-
-## Example configuration [_example_configuration_3]
+## Example configuration [_example_configuration]
 
 The System module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
 
@@ -189,7 +193,6 @@ auditbeat.modules:
   login.btmp_file_pattern: /var/log/btmp*
 ```
 
-
 ## Datasets [_datasets]
 
 The following datasets are available:
@@ -200,10 +203,4 @@ The following datasets are available:
 * [process](/reference/auditbeat/auditbeat-dataset-system-process.md)
 * [socket](/reference/auditbeat/auditbeat-dataset-system-socket.md)
 * [user](/reference/auditbeat/auditbeat-dataset-system-user.md)
-
-
-
-
-
-
 

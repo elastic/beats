@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-microsoft.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Microsoft module [filebeat-module-microsoft]
 
@@ -219,7 +224,6 @@ For alerts, go to Detections → External alerts.
 
 And for all other Defender ATP event types, go to Host → Events.
 
-
-## Fields [_fields_29]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-microsoft.md) section.

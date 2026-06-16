@@ -19,26 +19,39 @@ package readfile
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Reader produces lines by reading lines from an io.Reader
-// through a decoder converting the reader it's encoding to utf-8.
+// FileMetaReader enriches every message with per-file metadata.
+// OS metadata strings (device_id, inode, etc.) are cached after the
+// first call to Next because they are constant for the file's lifetime.
 type FileMetaReader struct {
-	reader      reader.Reader
-	path        string
-	fi          file.ExtendedFileInfo
-	fingerprint string
-	offset      int64
+	reader       reader.Reader
+	path         string
+	fi           file.ExtendedFileInfo
+	includeOwner bool
+	includeGroup bool
+	fingerprint  string
+	offset       int64
+	cachedMeta   mapstr.M // lazily populated on first Next()
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, fingerprint string, offset int64) reader.Reader {
-	return &FileMetaReader{r, path, fi, fingerprint, offset}
+func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, includeOwner bool, includeGroup bool, fingerprint string, offset int64) reader.Reader {
+	return &FileMetaReader{
+		reader:       r,
+		path:         path,
+		fi:           fi,
+		includeOwner: includeOwner,
+		includeGroup: includeGroup,
+		fingerprint:  fingerprint,
+		offset:       offset,
+	}
 }
 
 // Next reads the next line from it's initial io.Reader
@@ -52,25 +65,47 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
-	message.Fields.DeepUpdate(mapstr.M{
-		"log": mapstr.M{
-			"offset": r.offset,
-			"file": mapstr.M{
-				"path": r.path,
-			},
-		},
-	})
-
-	err = setFileSystemMetadata(r.fi, message.Fields)
-	if err != nil {
-		return message, fmt.Errorf("failed to set file system metadata: %w", err)
+	// On first call, compute and cache the per-file OS metadata (device_id,
+	// inode, etc.) since they are constant for this file's lifetime.
+	// Build into a local variable so a failed setFileSystemMetadata does not
+	// leave r.cachedMeta in a partial state.
+	if r.cachedMeta == nil {
+		// Pre-size exactly: path + platform-invariant fields + optional fields.
+		// platformFileFields is defined per-platform in fs_metafields_*.go.
+		// On Windows, includeOwner/includeGroup are not supported so they add
+		// no fields; the slight over-allocation is harmless.
+		size := 1 + platformFileFields // path + platform fields
+		if r.includeOwner {
+			size++
+		}
+		if r.includeGroup {
+			size++
+		}
+		if r.fingerprint != "" {
+			size++
+		}
+		m := make(mapstr.M, size)
+		m["path"] = r.path
+		if err := setFileSystemMetadata(r.fi, m, r.includeOwner, r.includeGroup); err != nil {
+			return message, fmt.Errorf("failed to set file system metadata: %w", err)
+		}
+		if r.fingerprint != "" {
+			m["fingerprint"] = r.fingerprint
+		}
+		r.cachedMeta = m
 	}
 
-	if r.fingerprint != "" {
-		_, err = message.Fields.Put("log.file.fingerprint", r.fingerprint)
-		if err != nil {
-			return message, fmt.Errorf("failed to set fingerprint: %w", err)
-		}
+	// Copy cached fields into a fresh map for this event.
+	fileMap := make(mapstr.M, len(r.cachedMeta))
+	maps.Copy(fileMap, r.cachedMeta)
+	// Direct assignment replaces any existing "log" key rather than merging.
+	// This is intentional and safe: FileMetaReader is always the first component
+	// in the pipeline to write log.* fields. Downstream readers (parsers,
+	// LimitReader) run after this and merge into the map we write here via
+	// AddFields() / Update(), so nothing is lost.
+	message.Fields["log"] = mapstr.M{
+		"offset": r.offset,
+		"file":   fileMap,
 	}
 	r.offset += int64(message.Bytes)
 

@@ -20,16 +20,14 @@
 package procs
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFindSocketsOfPid(t *testing.T) {
-	logp.TestingSetup()
 
 	proc := []testProcFile{
 		{path: "/proc/766/fd/0", isLink: true, contents: "/dev/null"},
@@ -44,7 +42,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("", "find-sockets")
+	pathPrefix, err := os.MkdirTemp("", "find-sockets")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -63,6 +61,11 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	assertUint64ArraysAreEqual(t, []uint64{7619, 7620}, inodes)
+}
+
+func TestParseInvalidIp6Addr(t *testing.T) {
+	_, err := hexToIpv6("B80D012000000000FFFF2301EFCD")
+	require.Error(t, err)
 }
 
 func TestParse_Proc_Net_Tcp(t *testing.T) {
@@ -116,7 +119,7 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 		}
 
 		if !file.isLink {
-			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
+			err = os.WriteFile(filepath.Join(prefix, file.path),
 				[]byte(file.contents), 0o644)
 			if err != nil {
 				return err

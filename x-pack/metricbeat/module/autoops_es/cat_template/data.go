@@ -36,15 +36,15 @@ type CatTemplate struct {
 	IndexPattern string `json:"t"`
 }
 
-func getNamedTemplates(transactionId string, info *utils.ClusterInfo, templates *map[string]any, reporter t.ReportNamedTemplate) (errs []error) {
+func getNamedTemplates(info *utils.ClusterInfo, templates *map[string]any, reporter t.ReportNamedTemplate) (errs []error) {
 	for name, templateData := range *templates {
 		if data, ok := templateData.(map[string]any); !ok {
 			errs = append(errs, fmt.Errorf("failed casting template data %v", templateData))
 		} else if template, err := templateSchema.Apply(data); err != nil {
 			errs = append(errs, fmt.Errorf("failed applying template schema for %v: %w", name, err))
 		} else {
-			template["templateName"] = name
-			reporter(transactionId, info, template)
+			template["template_name"] = name
+			reporter(info, template)
 		}
 	}
 
@@ -63,10 +63,8 @@ func eventsMapping(m *elasticsearch.MetricSet, r mb.ReporterV2, info *utils.Clus
 		},
 	)
 
-	transactionId, err := t.HandlePartitionedTemplates(m, r, info, templatePathPrefix, partitionedTemplates, getNamedTemplates)
-	if err != nil {
-		events.SendErrorEvent(err, info, r, CatTemplateMetricSet, CatTemplatePath, transactionId)
-		return err
+	if err := t.HandlePartitionedTemplates(m, r, info, templatePathPrefix, partitionedTemplates, getNamedTemplates); err != nil {
+		events.LogAndSendErrorEventWithoutTransactionId(err, info, r, CatTemplateMetricSet, CatTemplatePath)
 	}
 
 	return nil

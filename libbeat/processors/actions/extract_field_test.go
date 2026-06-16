@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -130,7 +131,7 @@ func TestCommonPaths(t *testing.T) {
 			"field": "bar",
 		}
 
-		p, err := NewExtractField(config)
+		p, err := NewExtractField(config, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatalf("error initializing extract_field: %s", err)
 		}
@@ -145,7 +146,7 @@ func TestCommonPaths(t *testing.T) {
 func runExtractField(t *testing.T, config *conf.C, input mapstr.M) (*beat.Event, error) {
 	logp.TestingSetup()
 
-	p, err := NewExtractField(config)
+	p, err := NewExtractField(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("error initializing extract_field: %s", err)
 	}

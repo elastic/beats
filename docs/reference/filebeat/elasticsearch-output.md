@@ -2,6 +2,9 @@
 navigation_title: "Elasticsearch"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/elasticsearch-output.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure the Elasticsearch output [elasticsearch-output]
@@ -77,6 +80,10 @@ The list of Elasticsearch nodes to connect to. The events are distributed to the
 
 ::::{note}
 When a node is defined as an `IP:PORT`, the *scheme* and *path* are taken from the [`protocol`](#protocol-option) and [`path`](#path-option) config options.
+::::
+
+::::{warning}
+All configured hosts must belong to the same Elasticsearch cluster; using nodes from different clusters may result in split or inconsistent data.
 ::::
 
 
@@ -448,10 +455,19 @@ output.elasticsearch:
 
 #### `dead_letter_index` [_dead_letter_index]
 
-::::{warning}
-This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
-::::
+```{applies_to}
+stack: deprecated 9.5.0+, beta 9.0-9.4
+```
 
+::::{warning}
+:applies_to: {"stack": "deprecated 9.5.0+, beta 9.0-9.4" }
+
+Starting in version 9.5.0, this functionality is deprecated.
+
+In versions 9.0-9.4, it is in beta. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.
+
+To handle documents that fail to index, use the data stream [failure store](docs-content://manage-data/data-store/data-streams/failure-store.md#use-failure-store).
+::::
 
 On an explicit rejection, this policy will retry the event in the next batch. However, the target index will change to index specified. In addition, the structure of the event will be change to the following fields:
 

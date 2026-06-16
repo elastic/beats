@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -40,7 +41,7 @@ type mimeTypeProcessor struct {
 }
 
 // NewDetectMimeType constructs a new mime processor.
-func NewDetectMimeType(cfg *conf.C) (beat.Processor, error) {
+func NewDetectMimeType(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	mimeType := &mimeTypeProcessor{}
 	if err := cfg.Unpack(mimeType); err != nil {
 		return nil, fmt.Errorf("fail to unpack the detect_mime_type configuration: %w", err)

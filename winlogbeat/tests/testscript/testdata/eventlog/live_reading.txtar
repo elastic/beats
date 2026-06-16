@@ -1,0 +1,35 @@
+[!windows] skip 'requires Windows'
+
+# Write an event before winlogbeat starts so we verify it reads historical events.
+write-event 'Before start'
+wait-for-event-log 1
+
+# Start winlogbeat in the background. No no_more_events: stop — it keeps polling
+# the channel until the test ends and testscript kills the process.
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data &
+
+# Wait until the pre-start event appears in the output (polls every 100ms, 30s timeout).
+wait-for-event-count output 1
+check-event-field output 0 message 'Before start'
+
+# Write a second event while winlogbeat is still running.
+write-event 'While running'
+
+# Wait until winlogbeat picks up the live event.
+wait-for-event-count output 2
+check-event-field output 0 message 'Before start'
+check-event-field output 1 message 'While running'
+
+-- winlogbeat.yml --
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

@@ -2,6 +2,9 @@
 navigation_title: "Cassandra"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-cassandra.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Capture Cassandra traffic [configuration-cassandra]

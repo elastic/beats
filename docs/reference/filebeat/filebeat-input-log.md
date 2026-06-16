@@ -2,6 +2,9 @@
 navigation_title: "Log"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-log.html
+applies_to:
+  stack: deprecated 7.16.0, removed 9.0.0
+  serverless: removed
 ---
 
 # Log input [filebeat-input-log]
@@ -155,7 +158,7 @@ Valid encodings:
 * `ebcdic-1040`: IBM CodePage 1140
 * `ebcdic-1047`: IBM CodePage 1047
 * `koi8r`: KOI8-R, Russian (Cyrillic)
-* `koi8u`: KOI8-U, Ukranian (Cyrillic)
+* `koi8u`: KOI8-U, Ukrainian (Cyrillic)
 * `macintosh`: Macintosh encoding
 * `macintosh-cyrillic`: Macintosh Cyrillic encoding
 * `windows1250`: Windows1250, Central and Eastern European
@@ -234,6 +237,24 @@ The size in bytes of the buffer that each harvester uses when fetching a file. T
 #### `max_bytes` [_max_bytes_2]
 
 The maximum number of bytes that a single log message can have. All bytes after `max_bytes` are discarded and not sent. This setting is especially useful for multiline log messages, which can get large. The default is 10MB (10485760).
+
+
+#### `line_terminator` [filebeat-input-log-line-terminator]
+
+Specifies the characters used to separate lines in the input file. The default is `auto`.
+
+Valid values:
+
+* `auto`: Automatic detection of LF and CR+LF line endings (U+000A and U+000D U+000A).
+* `line_feed`: Line feed (LF, `\n`, U+000A).
+* `vertical_tab`: Vertical tab (VT, `\v`, U+000B).
+* `form_feed`: Form feed (FF, `\f`, U+000C).
+* `carriage_return`: Carriage return (CR, `\r`, U+000D).
+* `carriage_return_line_feed`: Carriage return followed by line feed (CR+LF, `\r\n`, U+000D U+000A).
+* `next_line`: Next line (NEL, U+0085).
+* `line_separator`: Line separator (LS, U+2028).
+* `paragraph_separator`: Paragraph separator (PS, U+2029).
+* `null_terminator`: Null character (`\u0000`, U+0000).
 
 
 #### `json` [filebeat-input-log-config-json]

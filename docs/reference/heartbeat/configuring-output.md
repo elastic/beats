@@ -2,6 +2,9 @@
 navigation_title: "Output"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuring-output.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure the output [configuring-output]
@@ -20,9 +23,8 @@ The following topics describe how to configure each supported output. If you’v
 * [Console](/reference/heartbeat/console-output.md)
 * [Discard](/reference/heartbeat/discard-output.md)
 
-
-
-
+::::{include} /reference/_snippets/serverless-output-tip.md
+::::
 
 
 

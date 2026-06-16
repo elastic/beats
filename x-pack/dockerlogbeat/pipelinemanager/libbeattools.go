@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // load pipeline starts up a new pipeline with the given config
@@ -42,7 +43,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		return nil, fmt.Errorf("unpacking config failed: %w", err)
 	}
 
-	info, err := getBeatInfo(logOptsConfig, hostname)
+	info, err := getBeatInfo(logOptsConfig, hostname, log)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 }
 
 // getBeatInfo returns the beat.Info type needed to start the pipeline
-func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, error) {
+func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string, logger *logp.Logger) (beat.Info, error) {
 	vers := version.GetDefaultVersion()
 
 	eid, err := uuid.NewV4()
@@ -105,6 +106,10 @@ func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, 
 
 	beatName := "elastic-log-driver"
 
+	// dockerlogbeat runs as a Docker plugin inside a minimal container with
+	// no configurable data directory — all paths are hardcoded (/tmp for
+	// metadata, /var/log/docker/containers for logs). There is no
+	// paths.InitPaths() call and no CLI flags to set path.home/data/etc.
 	info := beat.Info{
 		Beat:        beatName,
 		Name:        pluginOpts.BeatName,
@@ -113,6 +118,8 @@ func getBeatInfo(pluginOpts ContainerOutputConfig, hostname string) (beat.Info, 
 		Version:     vers,
 		EphemeralID: eid,
 		ID:          id,
+		Logger:      logger,
+		Paths:       paths.New(),
 	}
 
 	return info, nil
@@ -133,7 +140,7 @@ func loadMeta(metaPath string) (uuid.UUID, error) {
 	//return the UUID if it exists
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
 			return uuid.Nil, fmt.Errorf("error reading %s: %w", metaPath, err)
 		}

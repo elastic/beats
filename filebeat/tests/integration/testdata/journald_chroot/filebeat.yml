@@ -1,0 +1,17 @@
+filebeat.inputs:
+  - type: journald
+    id: journald-input-id
+    chroot: /hostfs
+    journalctl_path: /usr/bin/journalctl
+    syslog_identifiers:
+      - ${SYSLOG_ID}
+
+queue.mem:
+  flush.timeout: 0s
+
+output.console:
+  enabled: true
+  pretty: false
+
+logging:
+  to_stderr: true

@@ -1,0 +1,4 @@
+redirects:
+  'reference/metricbeat/exported-fields-openai.md': 'release-notes/index.md'
+  'reference/metricbeat/metricbeat-metricset-openai-usage.md': 'release-notes/index.md'
+  'reference/metricbeat/metricbeat-module-openai.md': 'release-notes/index.md'

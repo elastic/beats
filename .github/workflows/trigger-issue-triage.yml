@@ -1,0 +1,57 @@
+name: Issue Triage
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: read
+  discussions: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  run:
+    # Access control is enforced by the upstream reusable workflow pre_activation
+    # check (required roles: admin, maintainer, write).
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-issue-triage.lock.yml@v0
+    with:
+      setup-commands: |
+        sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
+        export GOTOOLCHAIN=auto
+        make mage
+      allowed-bot-users: "github-actions[bot],elastic-vault-github-plugin-prod[bot]"
+      additional-instructions: |
+        Use `triaged` label when the triage action has provided the triage response.
+
+        For issues with the `flaky-test` label, automatically add the appropriate team label based on the following process:
+
+        1. Extract the file path or scope from the issue:
+           - Look for "File: <path>" in the issue body (e.g., "File: metricbeat/module/redis/test_redis.py")
+           - If the file is "N/A" or not available, look for "Scope: <path>" (e.g., "Scope: github.com/elastic/beats/v7/libbeat/publisher/pipeline")
+           - For Scope paths, extract the relevant directory path after "beats/v7/" or "beats/"
+
+        2. Match the path against `.github/CODEOWNERS`:
+           - Find the most specific matching path in CODEOWNERS (longest matching prefix)
+           - Extract the team handle from the CODEOWNERS entry (e.g., @elastic/obs-infraobs-integrations)
+
+        3. Map the CODEOWNERS team to the appropriate GitHub label starting with "Team:":
+           - @elastic/obs-infraobs-integrations → Team:Integrations
+           - @elastic/elastic-agent-data-plane → Team:Elastic-Agent-Data-Plane
+           - @elastic/elastic-agent-control-plane → Team:Elastic-Agent-Control-Plane
+           - @elastic/obs-ds-hosted-services → Team:obs-ds-hosted-services
+           - @elastic/sec-windows-platform → Team:Security-Windows-Platform (or closest match)
+           - @elastic/sec-linux-platform → Team:Security-Linux Platform
+           - @elastic/security-service-integrations → Team:Service-Integrations
+           - @elastic/integration-experience → Team:Integrations (or closest match)
+           - @elastic/stack-monitoring → Team:Integrations (or closest match)
+           - For other teams, find the closest matching Team: label by comparing the team name to available labels
+
+        4. Add the determined Team: label to the issue
+
+        Examples:
+        - File: metricbeat/module/redis/test_redis.py → CODEOWNERS: /metricbeat/module/redis @elastic/obs-infraobs-integrations → Label: Team:Integrations
+        - File: N/A, Scope: github.com/elastic/beats/v7/libbeat/publisher/pipeline → CODEOWNERS: /libbeat/ @elastic/elastic-agent-data-plane → Label: Team:Elastic-Agent-Data-Plane
+        - Scope: github.com/elastic/beats/v7/x-pack/metricbeat/module/cockroachdb/status → CODEOWNERS: /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations → Label: Team:Integrations
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}

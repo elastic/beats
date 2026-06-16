@@ -54,6 +54,7 @@ type ISource interface {
 	Fetch() error
 	Workdir() string
 	Close() error
+	Decode() error
 }
 
 type BaseSource struct {

@@ -2,6 +2,9 @@
 navigation_title: "decode_base64_field"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/decode-base64-field.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Decode Base64 fields [decode-base64-field]

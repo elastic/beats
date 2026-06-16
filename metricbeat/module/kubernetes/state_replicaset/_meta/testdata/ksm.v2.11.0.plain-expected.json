@@ -6,15 +6,15 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "local-path-storage",
+            "namespace": "kube-system",
             "replicaset": {
-                "name": "local-path-provisioner-7577fdbbfb",
+                "name": "kube-state-metrics-5bcd4898",
                 "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "labeled": 1,
-                    "observed": 1,
-                    "ready": 1
+                    "available": 0,
+                    "desired": 0,
+                    "labeled": 0,
+                    "observed": 2,
+                    "ready": 0
                 }
             }
         },
@@ -36,13 +36,13 @@
         "kubernetes": {
             "namespace": "kube-system",
             "replicaset": {
-                "name": "kube-state-metrics-885b7d5c8",
+                "name": "kube-state-metrics-cbc966f68",
                 "replicas": {
-                    "available": 0,
-                    "desired": 0,
-                    "labeled": 0,
-                    "observed": 2,
-                    "ready": 0
+                    "available": 1,
+                    "desired": 1,
+                    "labeled": 1,
+                    "observed": 1,
+                    "ready": 1
                 }
             }
         },
@@ -92,7 +92,7 @@
         "kubernetes": {
             "namespace": "kube-system",
             "replicaset": {
-                "name": "kube-state-metrics-5bcd4898",
+                "name": "kube-state-metrics-885b7d5c8",
                 "replicas": {
                     "available": 0,
                     "desired": 0,
@@ -118,9 +118,9 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "kube-system",
+            "namespace": "local-path-storage",
             "replicaset": {
-                "name": "kube-state-metrics-cbc966f68",
+                "name": "local-path-provisioner-7577fdbbfb",
                 "replicas": {
                     "available": 1,
                     "desired": 1,

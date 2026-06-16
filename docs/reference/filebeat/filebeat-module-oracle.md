@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-oracle.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Oracle module [filebeat-module-oracle]
 
@@ -80,7 +85,6 @@ Oracle Database fields are mapped to the current ECS Fields:
 | userhost | client.ip/domain |
 | database_user | server.user.name |
 
-
-## Fields [_fields_40]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-oracle.md) section.

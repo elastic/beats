@@ -1,1 +1,0 @@
-This is the `mgr_osd_perf` metricset of the Ceph module.

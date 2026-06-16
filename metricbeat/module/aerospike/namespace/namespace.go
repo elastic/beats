@@ -62,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("Invalid host format, expected hostname:port: %w", err)
 	}
 
-	clientPolicy, err := aerospike.ParseClientPolicy(config)
+	clientPolicy, err := aerospike.ParseClientPolicy(config, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize aerospike client policy: %w", err)
 	}

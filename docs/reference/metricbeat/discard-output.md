@@ -2,6 +2,9 @@
 navigation_title: "Discard"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/discard-output.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure the Discard output [discard-output]

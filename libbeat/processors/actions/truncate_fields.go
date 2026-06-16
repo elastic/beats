@@ -60,7 +60,7 @@ func init() {
 }
 
 // NewTruncateFields returns a new truncate_fields processor.
-func NewTruncateFields(c *conf.C) (beat.Processor, error) {
+func NewTruncateFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -77,13 +77,13 @@ func NewTruncateFields(c *conf.C) (beat.Processor, error) {
 	return &truncateFields{
 		config:   config,
 		truncate: truncateFunc,
-		logger:   logp.NewLogger("truncate_fields"),
+		logger:   log.Named("truncate_fields"),
 	}, nil
 }
 
 func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 	var backup *beat.Event
-	if f.config.FailOnError {
+	if f.config.FailOnError && len(f.config.Fields) > 1 {
 		backup = event.Clone()
 	}
 
@@ -92,7 +92,9 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Failed to truncate fields: %s", err)
 			if f.config.FailOnError {
-				event = backup
+				if backup != nil {
+					event = backup
+				}
 				return event, err
 			}
 		}

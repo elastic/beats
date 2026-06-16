@@ -7,6 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"context"
+	"crypto"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
@@ -24,20 +25,23 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/dpop"
 )
 
 // oktaTokenSource is a custom implementation of the oauth2.TokenSource interface.
 // for more information, see https://pkg.go.dev/golang.org/x/oauth2#TokenSource
 type oktaTokenSource struct {
-	mu      sync.Mutex
-	ctx     context.Context
-	conf    *oauth2.Config
-	token   *oauth2.Token
-	oktaJWK []byte
+	mu         sync.Mutex
+	ctx        context.Context
+	conf       *oauth2.Config
+	token      *oauth2.Token
+	oktaJWK    []byte
+	oktaJWKPEM string
 }
 
 // fetchOktaOauthClient fetches an OAuth2 client using the Okta JWK credentials.
-func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client) (*http.Client, error) {
+func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context) (*http.Client, error) {
 	conf := &oauth2.Config{
 		ClientID: o.ClientID,
 		Scopes:   o.Scopes,
@@ -46,11 +50,41 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 		},
 	}
 
+	oauthCtx := ctx
+	var (
+		claim  dpop.ClaimerFunc
+		key    crypto.Signer
+		method jwt.SigningMethod
+	)
+	if o.DPoPKeyPEM != "" {
+		claim = func() *jwt.RegisteredClaims {
+			now := time.Now()
+			return &jwt.RegisteredClaims{
+				Audience:  []string{conf.Endpoint.TokenURL},
+				Issuer:    conf.ClientID,
+				Subject:   conf.ClientID,
+				IssuedAt:  jwt.NewNumericDate(now),
+				ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour)),
+				ID:        dpop.RandomJTI(),
+			}
+		}
+		var err error
+		key, err = pemPKCS8PrivateKey([]byte(o.DPoPKeyPEM))
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode dpop signer: %w", err)
+		}
+		cli, err := dpop.NewTokenClient(claim, key, jwt.SigningMethodRS256, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to make token client: %w", err)
+		}
+		oauthCtx = context.WithValue(oauthCtx, oauth2.HTTPClient, cli)
+	}
+
 	var (
 		oktaJWT string
 		err     error
 	)
-	if len(o.OktaJWKPEM) != 0 {
+	if o.OktaJWKPEM != "" {
 		oktaJWT, err = generateOktaJWTPEM(o.OktaJWKPEM, conf)
 		if err != nil {
 			return nil, fmt.Errorf("oauth2 client: error generating Okta JWT PEM: %w", err)
@@ -62,20 +96,23 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 		}
 	}
 
-	token, err := exchangeForBearerToken(ctx, oktaJWT, conf)
+	token, err := exchangeForBearerToken(oauthCtx, oktaJWT, conf)
 	if err != nil {
 		return nil, fmt.Errorf("oauth2 client: error exchanging Okta JWT for bearer token: %w", err)
 	}
 
 	tokenSource := &oktaTokenSource{
-		conf:    conf,
-		ctx:     ctx,
-		oktaJWK: o.OktaJWKJSON,
-		token:   token,
+		conf:       conf,
+		ctx:        ctx,
+		oktaJWK:    o.OktaJWKJSON,
+		oktaJWKPEM: o.OktaJWKPEM,
+		token:      token,
 	}
 	// reuse the tokenSource to refresh the token (automatically calls the custom Token() method when token is no longer valid).
 	client := oauth2.NewClient(ctx, oauth2.ReuseTokenSource(token, tokenSource))
-
+	if claim != nil {
+		return dpop.NewResourceClient(claim, key, method, tokenSource, client)
+	}
 	return client, nil
 }
 
@@ -85,15 +122,25 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
 
-	oktaJWT, err := generateOktaJWT(ts.oktaJWK, ts.conf)
+	if ts.token != nil && ts.token.Valid() {
+		return ts.token, nil
+	}
+
+	var oktaJWT string
+	var err error
+	if ts.oktaJWKPEM != "" {
+		oktaJWT, err = generateOktaJWTPEM(ts.oktaJWKPEM, ts.conf)
+	} else {
+		oktaJWT, err = generateOktaJWT(ts.oktaJWK, ts.conf)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("error generating Okta JWT: %w", err)
 	}
 	token, err := exchangeForBearerToken(ts.ctx, oktaJWT, ts.conf)
 	if err != nil {
 		return nil, fmt.Errorf("error exchanging Okta JWT for bearer token: %w", err)
-
 	}
+	ts.token = token
 
 	return token, nil
 }
@@ -165,7 +212,7 @@ func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
 	return signJWT(cnf, key)
 }
 
-func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
+func pemPKCS8PrivateKey(pemdata []byte) (crypto.Signer, error) {
 	blk, rest := pem.Decode(pemdata)
 	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
 		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
@@ -173,7 +220,15 @@ func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
 	if blk == nil {
 		return nil, errors.New("no PEM data")
 	}
-	return x509.ParsePKCS8PrivateKey(blk.Bytes)
+	key, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	signer, ok := key.(crypto.Signer)
+	if !ok {
+		return nil, fmt.Errorf("key is not a signer: %T", key)
+	}
+	return signer, nil
 }
 
 // signJWT creates a JWT token using required claims and sign it with the private key.

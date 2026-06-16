@@ -24,8 +24,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-
-	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // init registers the MetricSet with the central registry.
@@ -38,10 +36,9 @@ func init() {
 }
 
 const (
-	statsPath = "/_stats"
+	nodeStatsPath = "/_nodes/stats"
 
-	onlyClusterLevel   = "level=cluster"
-	allowClosedIndices = "&forbid_closed_indices=false"
+	nodeStatsParameters = "level=node&filter_path=nodes.*.indices.docs,nodes.*.indices.indexing.index_total,nodes.*.indices.indexing.index_time_in_millis,nodes.*.indices.search.query_total,nodes.*.indices.search.query_time_in_millis,nodes.*.indices.segments.count,nodes.*.indices.segments.memory_in_bytes,nodes.*.indices.store.size_in_bytes,nodes.*.indices.store.total_data_set_size_in_bytes"
 )
 
 var (
@@ -59,7 +56,7 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get the stats from the local node
-	ms, err := elasticsearch.NewMetricSet(base, statsPath)
+	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
 	if err != nil {
 		return nil, err
 	}
@@ -76,16 +73,16 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+statsPath)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
 	if err != nil {
 		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
-	if err := m.updateServicePath(*info.Version.Number); err != nil {
+	if err := m.updateServicePath(); err != nil {
 		return err
 	}
 
-	content, err := m.HTTP.FetchContent()
+	content, err := m.FetchContent()
 	if err != nil {
 		return err
 	}
@@ -93,8 +90,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return eventMapping(r, info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) updateServicePath(esVersion version.V) error {
-	p, err := getServicePath(esVersion)
+func (m *MetricSet) updateServicePath() error {
+	p, err := getServicePath()
 	if err != nil {
 		return err
 	}
@@ -103,17 +100,14 @@ func (m *MetricSet) updateServicePath(esVersion version.V) error {
 	return nil
 }
 
-func getServicePath(esVersion version.V) (string, error) {
-	currPath := statsPath
+func getServicePath() (string, error) {
+	currPath := nodeStatsPath
 	u, err := url.Parse(currPath)
 	if err != nil {
 		return "", err
 	}
 
-	u.RawQuery += onlyClusterLevel
-	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		u.RawQuery += allowClosedIndices
-	}
+	u.RawQuery += nodeStatsParameters
 
 	return u.String(), nil
 }
