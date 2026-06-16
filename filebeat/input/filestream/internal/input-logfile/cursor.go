@@ -17,6 +17,10 @@
 
 package input_logfile
 
+import (
+	"github.com/elastic/go-concert/unison"
+)
+
 // Cursor allows the input to check if cursor status has been stored
 // in the past and unpack the status into a custom structure.
 type Cursor struct {
@@ -39,4 +43,58 @@ func (c Cursor) Unpack(to interface{}) error {
 		return nil
 	}
 	return c.resource.UnpackCursor(to)
+}
+
+// AllEventsPublished returns true if there are no pending operations
+// on this cursor, which means all events have been published.
+//
+// Owners of an resource can be active inputs or pending update operations
+// (not yet written to disk).
+//
+// The harvester locks this resource (see `startHarvester`) and only releases
+// when it is shutdown. So if there is only one 'owner' of this resource, it
+// is safe to assume it is the harvester, therefore all events have been
+// published.
+//
+// There is a test ensuring this behaviour, see TestCursorAllEventsPublished
+func (c Cursor) AllEventsPublished() bool {
+	pending := c.resource.pending.Load()
+	if pending == 1 || pending == 0 {
+		return true
+	}
+
+	return false
+}
+
+// NewCursorForTest returns a Cursor for testing. It MUST NOT be used
+// on production code. `key` and `pending` will be directly set into the
+// underlying resource
+//
+// If `pending` is -1, then the default is applied, which results in the
+// same state that `filestream.Run` expects.
+//
+// The resource associated with this cursor is created with the same
+// logic `states.unsafeFind` uses.
+func NewCursorForTest(key string, offset int64, pending int) Cursor {
+	res := resource{
+		stored: false,
+		key:    key,
+		lock:   unison.MakeMutex(),
+		cursor: struct {
+			Offset int64 `json:"offset" struct:"offset"`
+		}{
+			Offset: offset,
+		},
+	}
+
+	if pending == -1 {
+		res.Retain()
+	} else {
+		//nolint:gosec // 'pending' is always positive
+		res.pending.Store(uint64(pending))
+	}
+
+	res.internalState.TTL = -1
+
+	return makeCursor(&res)
 }

@@ -15,7 +15,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -43,10 +42,12 @@ type FilterJourneyConfig struct {
 // where these are unsupported
 var platformCmdMutate func(*SynthCmd) = func(*SynthCmd) {}
 
-var SynthexecTimeout struct{}
+type SynthexecTimeout string
+
+var SynthexecTimeoutKey = SynthexecTimeout("synthexec_timeout")
 
 // ProjectJob will run a single journey by name from the given project.
-func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
+func ProjectJob(ctx context.Context, projectPath string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, fields stdfields.StdMonitorFields, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given projectPath, use '.' as the first arg since the command runs
 	// in the correct dir
 	cmdFactory, err := projectCommandFactory(projectPath, extraArgs...)
@@ -69,7 +70,7 @@ func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd
 		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
 		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
 		// to the end.
-		cmd := exec.Command(bin, append([]string{projectPath}, args...)...)
+		cmd := exec.Command(bin, append([]string{projectPath}, args...)...) //nolint:noctx // cmd context is already handled out of band
 		cmd.Dir = npmRoot
 		return &SynthCmd{cmd}
 	}
@@ -78,9 +79,9 @@ func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params func() map[string]interface{}, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *SynthCmd {
-		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec // we are safely building a command here, users can add args at their own risk
+		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec,noctx // we are safely building a command here, users can add args at their own risk
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
@@ -89,7 +90,7 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params func() map[string]interface{}, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
@@ -126,7 +127,7 @@ func runCmd(
 	ctx context.Context,
 	cmd *SynthCmd,
 	stdinStr *string,
-	params mapstr.M,
+	params func() map[string]interface{},
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
 	// Attach sysproc attrs to ensure subprocesses are properly killed
@@ -151,9 +152,12 @@ func runCmd(
 		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
 	}
 
-	if len(params) > 0 {
-		paramsBytes, _ := json.Marshal(params)
-		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
+	if params != nil {
+		p := params()
+		if len(p) > 0 {
+			paramsBytes, _ := json.Marshal(p)
+			cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
+		}
 	}
 
 	// We need to pass both files in here otherwise we get a broken pipe, even
@@ -216,7 +220,7 @@ func runCmd(
 				break
 			}
 			if err != nil {
-				logp.L().Warnf("error decoding json for test json results: %w", err)
+				logp.L().Warnf("error decoding json for test json results: %v", err)
 			}
 
 			mpx.writeSynthEvent(&se)
@@ -249,7 +253,7 @@ func runCmd(
 	}
 
 	// Get timeout from parent ctx
-	timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+	timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
@@ -278,7 +282,7 @@ func runCmd(
 			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
+				timeout, _ := ctx.Value(SynthexecTimeoutKey).(time.Duration)
 				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))
@@ -343,29 +347,6 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 			},
 		}, nil
 	}
-}
-
-var emptyStringRegexp = regexp.MustCompile(`^\s*$`)
-
-// jsonToSynthEvent can take a line from the scanner and transform it into a *SynthEvent. Will return
-// nil res on empty lines.
-func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
-	// Skip empty lines
-	if emptyStringRegexp.Match(bytes) {
-		return nil, nil
-	}
-
-	res = &SynthEvent{}
-	err = json.Unmarshal(bytes, res)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if res.Type == "" {
-		return nil, fmt.Errorf("unmarshal succeeded, but no type found for: %s", text)
-	}
-	return res, err
 }
 
 // getNpmRoot gets the closest ancestor path that contains package.json.

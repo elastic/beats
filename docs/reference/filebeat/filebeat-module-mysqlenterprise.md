@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-mysqlenterprise.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # MySQL Enterprise module [filebeat-module-mysqlenterprise]
 
@@ -12,7 +17,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 This is a module for different types of MySQL logs. Currently focusing on data from the MySQL Enterprise Audit Plugin in JSON format.
 
-To configure the the Enterprise Audit Plugin to output in JSON format please follow the directions in the [MySQL Documentation.](https://dev.mysql.com/doc/refman/8.0/en/audit-log-file-formats.md)
+To configure the Enterprise Audit Plugin to output in JSON format please follow the directions in the [MySQL Documentation.](https://dev.mysql.com/doc/refman/8.0/en/audit-log-file-formats.md)
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.
@@ -77,7 +82,6 @@ MySQL Enterprise Audit fields are mapped to ECS in the following way:
 | connection_attributes._pid | process.pid |
 | timestamp | @timestamp |
 
-
-## Fields [_fields_34]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-mysqlenterprise.md) section.

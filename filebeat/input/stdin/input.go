@@ -79,7 +79,7 @@ func (p *Input) Run() {
 			p.logger.Errorf("Error setting up stdin harvester: %s", err)
 			return
 		}
-		if err = p.registry.Start(p.harvester); err != nil {
+		if err = p.registry.Start(p.harvester, p.logger); err != nil {
 			p.logger.Errorf("Error starting the harvester: %s", err)
 		}
 		p.started = true

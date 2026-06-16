@@ -53,7 +53,7 @@ const (
 )
 
 // New creates a new instance of the add_observer_metadata processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
@@ -62,7 +62,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 	p := &observerMetadata{
 		config: config,
 		data:   mapstr.NewPointer(nil),
-		logger: logp.NewLogger("add_observer_metadata"),
+		logger: log.Named("add_observer_metadata"),
 	}
 	_ = p.loadData()
 

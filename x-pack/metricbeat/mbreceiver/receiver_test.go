@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand/v2"
@@ -21,12 +22,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -44,7 +47,9 @@ func TestNewReceiver(t *testing.T) {
 	}
 	config := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -55,18 +60,16 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
 				},
 			},
-			"path.home":    t.TempDir(),
-			"http.enabled": true,
-			"http.host":    monitorHost,
+			"path.home":               t.TempDir(),
+			"http.enabled":            true,
+			"http.host":               monitorHost,
+			"management.otel.enabled": true,
 		},
 	}
 
@@ -75,8 +78,9 @@ func TestNewReceiver(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
+				Beat:    "metricbeat",
 				Config:  &config,
-				Factory: NewFactory(),
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
@@ -84,6 +88,8 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field in to be 'metricbeat'")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket, "stats")
@@ -92,16 +98,15 @@ func TestNewReceiver(t *testing.T) {
 				return getFromSocket(t, &lastError, monitorSocket, "inputs")
 			}, "failed to connect to monitoring socket inputs endpoint, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
-				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
-					FilterMessageSnippet("add_host_metadata").
-					FilterMessageSnippet("add_cloud_metadata").
-					FilterMessageSnippet("add_docker_metadata").
-					FilterMessageSnippet("add_kubernetes_metadata").
-					Len() == 1
-				assert.True(c, processorsLoaded, "processors not loaded")
-				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
-				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").Len() > 0
+				assert.False(c, processorsLoaded, "processors loaded but none expected")
+				// Check that add_host_metadata enrichment is not done.
+				return assert.NotContains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
+			assert.Condition(c, func() bool {
+				metricsStarted := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s")
+				return assert.NotEmpty(t, metricsStarted.All(), "metrics logging not started")
+			}, "failed to check metrics logging")
 		},
 	})
 }
@@ -123,7 +128,9 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 	config1 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -133,9 +140,6 @@ func TestMultipleReceivers(t *testing.T) {
 						"metricsets": []string{"cpu"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -151,7 +155,9 @@ func TestMultipleReceivers(t *testing.T) {
 
 	config2 := Config{
 		Beatconfig: map[string]any{
+			"queue.mem.flush.timeout": "0s",
 			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
 				"modules": []map[string]any{
 					{
 						"module":     "system",
@@ -161,9 +167,6 @@ func TestMultipleReceivers(t *testing.T) {
 						"metricsets": []string{"cpu"},
 					},
 				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
 			},
 			"logging": map[string]any{
 				"level": "debug",
@@ -177,26 +180,45 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
-	factory := NewFactory()
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
 		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
+				Beat:    "metricbeat",
 				Config:  &config1,
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
+				Beat:    "metricbeat",
 				Config:  &config2,
 				Factory: factory,
 			},
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(c, func() bool {
+			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
+			assert.Equal(c, "metricbeat", logs["r1"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r1")
+			assert.Equal(c, "metricbeat", logs["r2"][0].Flatten()["agent.type"], "expected agent.type field to be 'metricbeat' in r2")
+
+			// Make sure that each receiver has a separate logger
+			// instance and does not interfere with others. Previously, the
+			// logger in Beats was global, causing logger fields to be
+			// overwritten when multiple receivers started in the same process.
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r2"))
+			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+
+			r1StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r1StartMetricsLogs.Len(), "r1 should have a single start metrircs logging every 30s")
+			r2StartMetricsLogs := zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").FilterField(zap.String("otelcol.component.id", "metricbeatreceiver/r1"))
+			assert.Equalf(c, 1, r2StartMetricsLogs.Len(), "r2 should have a single start metrircs logging every 30s")
+
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
@@ -231,11 +253,12 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, endpoin
 	}
 	client := http.Client{
 		Transport: &http.Transport{
-			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-				return net.Dial("unix", socketPath)
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", socketPath)
 			},
 		},
 	}
+	defer client.CloseIdleConnections()
 	url, err := url.JoinPath("http://unix", endpoint)
 	if err != nil {
 		sb.Reset()
@@ -314,9 +337,6 @@ func BenchmarkFactory(b *testing.B) {
 					},
 				},
 			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
 			"logging": map[string]any{
 				"level": "info",
 				"selectors": []string{
@@ -333,7 +353,7 @@ func BenchmarkFactory(b *testing.B) {
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		zapcore.InfoLevel)
 
-	factory := NewFactory()
+	factory := NewFactoryWithSettings(Settings{Home: tmpDir})
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
@@ -341,7 +361,110 @@ func BenchmarkFactory(b *testing.B) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		rcvr, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+		err = rcvr.Shutdown(b.Context())
 		require.NoError(b, err)
 	}
+}
+
+func TestReceiverStatus(t *testing.T) {
+	benchmarkInputId := "benchmark-id"
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		benchmarkStatus := inputStatuses.PutEmptyMap(benchmarkInputId)
+		benchmarkStatus.PutStr("status", state)
+		benchmarkStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+	expectedDegradedErrorMessage := "Error fetching data for metricset benchmark.info: benchmark input degraded"
+	testCases := []struct {
+		name    string
+		status  *componentstatus.Event
+		degrade bool
+	}{
+		{
+			name: "degraded input",
+			status: componentstatus.NewEvent(
+				componentstatus.StatusRecoverableError,
+				componentstatus.WithError(errors.New(expectedDegradedErrorMessage)),
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusRecoverableError.String(), expectedDegradedErrorMessage)),
+			),
+			degrade: true,
+		},
+		{
+			name: "running input",
+			status: componentstatus.NewEvent(componentstatus.StatusOK,
+				componentstatus.WithAttributes(inputStatusAttributes(
+					componentstatus.StatusOK.String(), ""))),
+		},
+	}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			config := Config{
+				Beatconfig: map[string]any{
+					"queue.mem.flush.timeout": "0s",
+					"metricbeat": map[string]any{
+						"max_start_delay": "0s",
+						"modules": []map[string]any{
+							{
+								"id":         benchmarkInputId,
+								"module":     "benchmark",
+								"enabled":    true,
+								"period":     "1s",
+								"degrade":    test.degrade,
+								"metricsets": []string{"info"},
+							},
+						},
+					},
+					"path.home": t.TempDir(),
+				},
+			}
+			oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+				T: t,
+				Receivers: []oteltest.ReceiverConfig{
+					{
+						Name:    "r1",
+						Beat:    "metricbeat",
+						Config:  &config,
+						Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+					},
+				},
+				Status: test.status,
+			})
+		})
+	}
+}
+
+func TestReceiverHook(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"max_start_delay": "0s",
+				"modules": []map[string]any{
+					{
+						"module":     "benchmark",
+						"enabled":    true,
+						"period":     "1s",
+						"metricsets": []string{"info"},
+					},
+				},
+			},
+			"management.otel.enabled": true,
+			"path.home":               t.TempDir(),
+		},
+	}
+	receiverSettings := receiver.Settings{
+		ID: component.MustNewID(Name),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+
+	// For metricbeatreceiver, we expect 2 hooks to be registered:
+	// 	one for beat metrics and one for input metrics.
+	oteltest.TestReceiverHook(t, &cfg, NewFactoryWithSettings(Settings{Home: t.TempDir()}), receiverSettings, 2)
 }

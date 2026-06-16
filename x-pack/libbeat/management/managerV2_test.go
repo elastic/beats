@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -46,7 +47,8 @@ func TestManagerV2(t *testing.T) {
 	fqdnEnabled := atomic.Bool{}
 	allStopped := atomic.Bool{}
 	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
-		if currentIdx == 1 {
+		switch currentIdx {
+		case 1:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -54,7 +56,7 @@ func TestManagerV2(t *testing.T) {
 				configsSet.Store(true)
 				t.Log("output, inputs, and APM configuration set")
 			}
-		} else if currentIdx == 2 {
+		case 2:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -63,7 +65,7 @@ func TestManagerV2(t *testing.T) {
 				configsSet.Store(false)
 				t.Log("output, inputs, and APM configuration cleared (should not happen)")
 			}
-		} else {
+		default:
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -254,9 +256,10 @@ func TestManagerV2(t *testing.T) {
 
 	m, err := NewV2AgentManagerWithClient(&Config{
 		Enabled: true,
-	}, r, client)
+	}, r, client, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
+	//nolint:staticcheck // We want to ensure Start still has the same behaviour
 	err = m.Start()
 	require.NoError(t, err)
 	defer m.Stop()
@@ -388,7 +391,7 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 
 	m, err := NewV2AgentManagerWithClient(&Config{
 		Enabled: true,
-	}, r, client)
+	}, r, client, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	err = m.Start()
@@ -399,6 +402,124 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 	assert.Equal(t, 1, output.reloadCount) // initial load
 	assert.Equal(t, 2, inputs.reloadCount) // initial load + config update
 	assert.Equal(t, 0, apm.reloadCount)    // no apm tracing config applied
+}
+
+func TestManagerV2_PreInitAppliesBufferedUnitsAfterPostInit(t *testing.T) {
+	beatReady := atomic.Bool{}
+
+	r := reload.NewRegistry()
+	output := &reloadable{}
+	r.MustRegisterOutput(output)
+	inputs := &reloadableList{}
+	r.MustRegisterInput(inputs)
+
+	agentInfo := &proto.AgentInfo{
+		Id:      "elastic-agent-id",
+		Version: version.GetDefaultVersion(),
+	}
+	units := []*proto.UnitExpected{
+		{
+			Id:       "output-unit",
+			Type:     proto.UnitType_OUTPUT,
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "elasticsearch",
+				Name: "elasticsearch",
+			},
+		},
+		{
+			Id:       "input-unit-1",
+			Type:     proto.UnitType_INPUT,
+			State:    proto.State_HEALTHY,
+			LogLevel: proto.UnitLogLevel_INFO,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "filestram-unit-id",
+				Type: "filestream",
+				Name: "filesteam",
+				Streams: []*proto.Stream{
+					{
+						Id: "filestream-input-id",
+						Source: integration.RequireNewStruct(t, map[string]any{
+							"id":    "filestream-input-id",
+							"paths": []any{"/foo/bar"},
+						}),
+					},
+				},
+			},
+		},
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if !beatReady.Load() {
+				for _, u := range observed.Units {
+					if u.State != proto.State_STARTING {
+						t.Errorf(
+							"Unit %q is not in %q state, got %q",
+							u.GetId(), proto.State_STARTING,
+							u.GetState().String())
+					}
+				}
+			}
+
+			return &proto.CheckinExpected{
+				AgentInfo:   agentInfo,
+				Units:       units,
+				Features:    nil,
+				FeaturesIdx: 1,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+	require.NoError(t, server.Start())
+	defer server.Stop()
+
+	client := client.NewV2(
+		fmt.Sprintf(":%d", server.Port),
+		"",
+		client.VersionInfo{},
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{
+			Enabled: true,
+		},
+		r,
+		client,
+		logp.NewNopLogger(),
+	)
+	require.NoError(t, err)
+	defer m.Stop()
+
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok, "NewV2AgentManagerWithClient must return a BeatV2Manager")
+
+	mm.changeDebounce = 10 * time.Millisecond
+	mm.forceReloadDebounce = 20 * time.Millisecond
+
+	require.NoError(t, m.PreInit())
+
+	// Ensure unit changes are received while the beat is not ready.
+	require.Eventually(t, func() bool {
+		mm.mx.Lock()
+		defer mm.mx.Unlock()
+		return len(mm.units) == len(units)
+	}, 5*time.Second, 10*time.Millisecond, "expected manager to receive units before PostInit")
+
+	// Wait for debounce windows to pass while not ready; nothing should be reloaded.
+	time.Sleep(mm.changeDebounce + 2*mm.forceReloadDebounce)
+	assert.Nil(t, output.Config(), "output should not be reloaded before PostInit")
+	assert.Empty(t, inputs.Configs(), "inputs should not be reloaded before PostInit")
+
+	// Once ready, previously buffered unit state should eventually be applied.
+	m.PostInit()
+	beatReady.Store(true)
+	require.Eventually(t, func() bool {
+		return output.Config() != nil && len(inputs.Configs()) > 0
+	}, 5*time.Second, 10*time.Millisecond,
+		"expected buffered units to be applied after PostInit without requiring new unit changes")
 }
 
 func TestOutputError(t *testing.T) {
@@ -505,6 +626,7 @@ func TestOutputError(t *testing.T) {
 		},
 		r,
 		client,
+		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatalf("could not instantiate ManagerV2: %s", err)
@@ -672,6 +794,7 @@ func TestErrorPerUnit(t *testing.T) {
 		},
 		r,
 		client,
+		logptest.NewTestingLogger(t, ""),
 	)
 	if err != nil {
 		t.Fatalf("could not instantiate ManagerV2: %s", err)
@@ -685,6 +808,32 @@ func TestErrorPerUnit(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return stateReached.Load()
 	}, 10*time.Second, 100*time.Millisecond, "desired state, was not reached")
+}
+
+// TestReloadNilOutputUnit verifies reload does not panic when no output unit is present.
+func TestReloadNilOutputUnit(t *testing.T) {
+	r := reload.NewRegistry()
+	output := &mockOutput{
+		ReloadFn: func(config *reload.ConfigWithMeta) error {
+			return nil
+		},
+	}
+	r.MustRegisterOutput(output)
+
+	m, err := NewV2AgentManagerWithClient(
+		&Config{Enabled: false},
+		r,
+		nil,
+		logptest.NewTestingLogger(t, ""),
+	)
+	require.NoError(t, err, "could not instantiate ManagerV2")
+
+	mm, ok := m.(*BeatV2Manager)
+	require.True(t, ok, "unexpected type for BeatV2Manager: %T", m)
+
+	require.NotPanics(t, func() {
+		mm.reload(map[unitKey]*agentUnit{})
+	}, "reload must not panic when there is no output unit")
 }
 
 type reloadable struct {

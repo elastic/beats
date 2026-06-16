@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/_set_up_the_oauth_app_in_the_salesforce_2.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Set up the OAuth App in the Salesforce [_set_up_the_oauth_app_in_the_salesforce_2]
@@ -83,6 +86,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -125,6 +129,9 @@ Example config:
 **`var.authentication.jwt_bearer_flow.url`**
 :   The audience URL for JWT authentication.
 
+**`var.authentication.jwt_bearer_flow.token_url`**
+:   Optional Salesforce OAuth host or canonical token endpoint override for JWT authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
+
 **`var.authentication.user_password_flow.enabled`**
 :   Set to true to use user-password authentication.
 
@@ -135,7 +142,7 @@ Example config:
 :   The client secret for user-password authentication.
 
 **`var.authentication.user_password_flow.token_url`**
-:   The Salesforce token URL for user-password authentication.
+:   The Salesforce OAuth host or canonical token endpoint for user-password authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value.
 
 **`var.authentication.user_password_flow.username`**
 :   The Salesforce username for authentication.
@@ -180,6 +187,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -222,6 +230,9 @@ Example config:
 **`var.authentication.jwt_bearer_flow.url`**
 :   The audience URL for JWT authentication.
 
+**`var.authentication.jwt_bearer_flow.token_url`**
+:   Optional Salesforce OAuth host or canonical token endpoint override for JWT authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
+
 **`var.authentication.user_password_flow.enabled`**
 :   Set to true to use user-password authentication.
 
@@ -232,7 +243,7 @@ Example config:
 :   The client secret for user-password authentication.
 
 **`var.authentication.user_password_flow.token_url`**
-:   The Salesforce token URL for user-password authentication.
+:   The Salesforce OAuth host or canonical token endpoint for user-password authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value.
 
 **`var.authentication.user_password_flow.username`**
 :   The Salesforce username for authentication.
@@ -277,6 +288,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -315,6 +327,9 @@ Example config:
 **`var.authentication.jwt_bearer_flow.url`**
 :   The audience URL for JWT authentication.
 
+**`var.authentication.jwt_bearer_flow.token_url`**
+:   Optional Salesforce OAuth host or canonical token endpoint override for JWT authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
+
 **`var.authentication.user_password_flow.enabled`**
 :   Set to true to use user-password authentication.
 
@@ -325,7 +340,7 @@ Example config:
 :   The client secret for user-password authentication.
 
 **`var.authentication.user_password_flow.token_url`**
-:   The Salesforce token URL for user-password authentication.
+:   The Salesforce OAuth host or canonical token endpoint for user-password authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value.
 
 **`var.authentication.user_password_flow.username`**
 :   The Salesforce username for authentication.
@@ -362,6 +377,7 @@ Example config:
         client.username: "my.email@here.com"
         client.key_path: client_key.pem
         url: https://login.salesforce.com
+        token_url: "<custom-token-url>"
       user_password_flow:
         enabled: true
         client.id: "my-client-id"
@@ -401,6 +417,9 @@ Example config:
 **`var.authentication.jwt_bearer_flow.url`**
 :   The audience URL for JWT authentication.
 
+**`var.authentication.jwt_bearer_flow.token_url`**
+:   Optional Salesforce OAuth host or canonical token endpoint override for JWT authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value. If empty, this defaults to `var.authentication.jwt_bearer_flow.url`.
+
 **`var.authentication.user_password_flow.enabled`**
 :   Set to true to use user-password authentication.
 
@@ -411,7 +430,7 @@ Example config:
 :   The client secret for user-password authentication.
 
 **`var.authentication.user_password_flow.token_url`**
-:   The Salesforce token URL for user-password authentication.
+:   The Salesforce OAuth host or canonical token endpoint for user-password authentication. You can provide either a host URL such as `https://login.salesforce.com`, `https://test.salesforce.com`, or your My Domain host, or the canonical full endpoint ending in `https://login.salesforce.com/services/oauth2/token`. Avoid query parameters and fragments on this value.
 
 **`var.authentication.user_password_flow.username`**
 :   The Salesforce username for authentication.

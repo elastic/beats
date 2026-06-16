@@ -22,6 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
@@ -45,8 +47,10 @@ function process(evt) {
 }
 `
 
-	logp.DevelopmentSetup(logp.ToObserverOutput())
-	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
+	observedCore, observedLogs := observer.New(zapcore.DebugLevel)
+	logger, err := logp.ConfigureWithCoreLocal(logp.Config{}, observedCore)
+
+	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,21 +60,21 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	logs := logp.ObserverLogs().FilterMessageSnippet("TestConsole").TakeAll()
+	logs := observedLogs.FilterMessageSnippet("TestConsole").TakeAll()
 	if assert.Len(t, logs, 5) {
 		assert.Contains(t, logs[0].Message, "Debug")
-		assert.Equal(t, logs[0].Level, zap.DebugLevel)
+		assert.Equal(t, zap.DebugLevel, logs[0].Level)
 
 		assert.Contains(t, logs[1].Message, "Log/Info")
-		assert.Equal(t, logs[1].Level, zap.InfoLevel)
+		assert.Equal(t, zap.InfoLevel, logs[1].Level)
 
 		assert.Contains(t, logs[2].Message, "Info")
-		assert.Equal(t, logs[2].Level, zap.InfoLevel)
+		assert.Equal(t, zap.InfoLevel, logs[2].Level)
 
 		assert.Contains(t, logs[3].Message, "Warning")
-		assert.Equal(t, logs[3].Level, zap.WarnLevel)
+		assert.Equal(t, zap.WarnLevel, logs[3].Level)
 
 		assert.Contains(t, logs[4].Message, "Error")
-		assert.Equal(t, logs[4].Level, zap.ErrorLevel)
+		assert.Equal(t, zap.ErrorLevel, logs[4].Level)
 	}
 }

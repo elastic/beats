@@ -2,6 +2,9 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/log-driver-overview.html
   - https://www.elastic.co/guide/en/beats/loggingplugin/current/index.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Elastic logging plugin for Docker [log-driver-overview]

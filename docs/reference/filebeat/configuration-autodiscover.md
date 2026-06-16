@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-autodiscover.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Autodiscover [configuration-autodiscover]
@@ -39,7 +42,7 @@ It has the following settings:
 :   (Optional) Specify the time of inactivity before stopping the running configuration for a container, 60s by default.
 
 `labels.dedot`
-:   (Optional) Default to be false. If set to true, replace dots in labels with `_`.
+:   (Optional) Defaults to true. When true, replaces dots (`.`) in labels with underscores (`_`).
 
 These are the fields available within config templating. The `docker.*` fields will be available on each emitted event. event:
 
@@ -90,6 +93,7 @@ filebeat.autodiscover:
             - type: filestream
               id: container-${data.docker.container.id}
               prospector.scanner.symlinks: true
+              close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
               parsers:
                 - container: ~
               paths:
@@ -116,10 +120,34 @@ filebeat.autodiscover:
                   type: filestream
                   id: container-${data.docker.container.id}
                   prospector.scanner.symlinks: true
+                  close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
                   parsers:
                     - container: ~
                   paths:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
+```
+
+Here is an example of how a configuration using Kubernetes secrets would look:
+
+```yaml
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: false
+      templates:
+        - condition:
+            and:
+            - equals:
+                kubernetes.labels.app: "redis"
+          config:
+            - module: redis
+              log:
+                enabled: true
+                var.paths: ["/var/log/containers/*-${data.kubernetes.container.id}.log"]
+              slowlog:
+                enabled: true
+                var.hosts: ["${data.host}:6379"]
+                var.password: "${kubernetes.default.somesecret.value}"
 ```
 
 ::::{warning}
@@ -155,6 +183,7 @@ autodiscover.providers:
         config:
           - type: filestream
             id: container-${data.docker.container.id}
+            close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
             paths:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 ```
@@ -344,6 +373,7 @@ filebeat.autodiscover:
             - type: filestream
               id: container-${data.kubernetes.container.id}
               prospector.scanner.symlinks: true
+              close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
               parsers:
                 - container: ~
               paths:
@@ -370,6 +400,7 @@ filebeat.autodiscover:
                   type: filestream
                   id: container-${data.kubernetes.container.id}
                   prospector.scanner.symlinks: true
+                  close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
                   parsers:
                     - container: ~
                   paths:
@@ -562,6 +593,7 @@ filebeat.autodiscover:
           config:
             - type: filestream
               id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
+              close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
               paths:
                 - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.stderr.[0-9]*
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
@@ -585,6 +617,7 @@ filebeat.autodiscover:
                 input:
                   type: filestream
                   id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
+                  close.on_state_change.removed: false # The file can be removed before Filebeat fully ingests it, so we force keeping the file open even when it has been removed.
                   paths:
                     - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 ```

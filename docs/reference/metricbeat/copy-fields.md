@@ -2,6 +2,9 @@
 navigation_title: "copy_fields"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/copy-fields.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Copy fields [copy-fields]

@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-reference-yml.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # metricbeat.reference.yml [metricbeat-reference-yml]
@@ -288,7 +291,7 @@ metricbeat.modules:
   enabled: true
 
   # If set to true, replace dots in labels with `_`.
-  #labels.dedot: false
+  #labels.dedot: true
 
   # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
   # podman: false
@@ -1303,7 +1306,7 @@ metricbeat.modules:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"

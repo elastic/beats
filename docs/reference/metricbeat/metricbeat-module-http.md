@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-http.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # HTTP module [metricbeat-module-http]
 
@@ -18,8 +23,7 @@ As the HTTP metricsets also fetch headers, this can lead to lots of fields in El
 ::::
 
 
-
-## Example configuration [_example_configuration_30]
+## Example configuration [_example_configuration]
 
 The HTTP module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -57,12 +61,9 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_35]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [json](/reference/metricbeat/metricbeat-metricset-http-json.md)
 * [server](/reference/metricbeat/metricbeat-metricset-http-server.md)
-
-
-

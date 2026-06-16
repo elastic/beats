@@ -145,7 +145,7 @@ func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 				"filesystem.use_percent": used,
 				"filesystem.mounted":     filesystem.Mounted,
 			},
-			RootFields: panw.MakeRootFields(m.config.HostIp),
+			RootFields: panw.MakeRootFields(m.config.HostIp, m.hostname),
 		}
 
 		events = append(events, event)

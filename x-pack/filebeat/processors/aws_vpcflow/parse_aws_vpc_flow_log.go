@@ -41,17 +41,17 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)
 	}
 
-	return newParseAWSVPCFlowLog(c)
+	return newParseAWSVPCFlowLog(c, log)
 }
 
-func newParseAWSVPCFlowLog(c config) (*processor, error) {
-	log := logp.NewLogger(logName)
+func newParseAWSVPCFlowLog(c config, logger *logp.Logger) (*processor, error) {
+	log := logger.Named(logName)
 	if c.ID != "" {
 		log = log.With("instance_id", c.ID)
 	}

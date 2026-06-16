@@ -27,7 +27,7 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/mitchellh/hashstructure"
+	"github.com/gohugoio/hashstructure"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -44,6 +45,8 @@ type factory struct {
 	log    *logp.Logger
 	info   beat.Info
 	loader *v2.Loader
+
+	rootInputsRegistry *monitoring.Registry
 }
 
 // runner wraps a v2.Input, starting a go-routine
@@ -52,14 +55,15 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
-	id             string
-	log            *logp.Logger
-	agent          *beat.Info
-	wg             sync.WaitGroup
-	sig            ctxtool.CancelContext
-	input          v2.Input
-	connector      beat.PipelineConnector
-	statusReporter status.StatusReporter
+	id                 string
+	log                *logp.Logger
+	agent              *beat.Info
+	wg                 sync.WaitGroup
+	sig                ctxtool.CancelContext
+	input              v2.Input
+	connector          beat.PipelineConnector
+	statusReporter     status.StatusReporter
+	rootInputsRegistry *monitoring.Registry
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -68,9 +72,10 @@ type runner struct {
 func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
+	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
-	return &factory{log: log, info: info, loader: loader}
+	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
@@ -110,12 +115,13 @@ func (f *factory) Create(
 	}
 
 	return &runner{
-		id:        id,
-		log:       f.log.Named(input.Name()).With("id", id),
-		agent:     &f.info,
-		sig:       ctxtool.WithCancelContext(context.Background()),
-		input:     input,
-		connector: p,
+		id:                 id,
+		log:                f.log.Named(input.Name()).With("id", id),
+		agent:              &f.info,
+		sig:                ctxtool.WithCancelContext(context.Background()),
+		input:              input,
+		connector:          p,
+		rootInputsRegistry: f.rootInputsRegistry,
 	}, nil
 }
 
@@ -137,7 +143,7 @@ func (r *runner) Start() {
 		reg, pc, cancelMetrics := v2.PrepareInputMetrics(
 			r.id,
 			r.input.Name(),
-			r.agent.Monitoring.NamespaceRegistry(),
+			r.rootInputsRegistry,
 			r.connector,
 			r.log)
 		defer cancelMetrics()
@@ -148,16 +154,19 @@ func (r *runner) Start() {
 			Name:            r.input.Name(),
 			Agent:           *r.agent,
 			Cancelation:     r.sig,
-			StatusReporter:  r.statusReporter,
 			MetricsRegistry: reg,
 			Logger:          log,
 		}
+		ctx = ctx.WithStatusReporter(r.statusReporter)
 
 		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {
-			log.Errorf("Input '%s' failed with: %+v", name, err)
+			errMsg := fmt.Sprintf("Input '%s' failed with: %+v", name, err)
+			log.Error(errMsg)
+			ctx.UpdateStatus(status.Failed, errMsg)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
+			ctx.UpdateStatus(status.Stopped, "")
 		}
 	}()
 }
@@ -206,18 +215,23 @@ func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
 		return nil, fmt.Errorf("failed to create new config: %w", err)
 	}
 
-	// let's try to override the `id` field, if it fails, give up
-	inputID, err := testCfg.String("id", -1)
+	uid, err := uuid.NewV4()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get 'id': %w", err)
+		return nil, fmt.Errorf("failed to generate check config id: %w", err)
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate check congig id: %w", err)
+	finalID := uid.String()
+	// if 'id' is present, use it as a prefix
+	if testCfg.HasField("id") {
+		inputID, err := testCfg.String("id", -1)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get 'id': %w", err)
+		}
+
+		finalID = inputID + "-" + finalID
 	}
-	err = testCfg.SetString("id", -1, inputID+"-"+id.String())
-	if err != nil {
+
+	if err := testCfg.SetString("id", -1, finalID); err != nil {
 		return nil, fmt.Errorf("failed to set 'id': %w", err)
 	}
 

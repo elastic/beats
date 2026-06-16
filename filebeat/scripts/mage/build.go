@@ -18,7 +18,7 @@
 package mage
 
 import (
-	"go.uber.org/multierr"
+	"errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -27,7 +27,7 @@ import (
 // checks the binaries GLIBC requirements for RHEL compatibility.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return multierr.Combine(
+	return errors.Join(
 		golangCrossBuild(),
 		// Test the linked glibc version requirement of the binary.
 		devtools.TestLinuxForCentosGLIBC(),
@@ -43,5 +43,23 @@ func golangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild(devtools.ImageSelector(devtools.CrossBuildImage))
+	args, err := devtools.DefaultPackageArgsFromEnv()
+	if err != nil {
+		return err
+	}
+	return crossBuildWithArgs(args)
+}
+
+// CrossBuildWithArgs cross-builds the beat using the provided package args.
+func CrossBuildWithArgs(args devtools.PackageArgs) func() error {
+	return func() error {
+		return crossBuildWithArgs(args)
+	}
+}
+
+func crossBuildWithArgs(args devtools.PackageArgs) error {
+	return devtools.CrossBuild(
+		devtools.ImageSelector(devtools.CrossBuildImage),
+		devtools.WithPlatforms(args.Platforms),
+	)
 }

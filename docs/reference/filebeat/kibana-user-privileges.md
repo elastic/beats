@@ -2,6 +2,9 @@
 navigation_title: "Create a _reader_ user"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/kibana-user-privileges.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Grant privileges and roles needed to read Filebeat data from {{kib}} [kibana-user-privileges]

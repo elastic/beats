@@ -1,0 +1,56 @@
+type: view
+name: host_users
+description: "(Deprecated.) Backward-compatible view over elastic_host_users; use elastic_host_users instead."
+platforms:
+  - linux
+  - darwin
+
+required_tables:
+  - elastic_host_users
+
+columns:
+  - name: uid
+    type: BIGINT
+    description: User ID (unsigned)
+  - name: gid
+    type: BIGINT
+    description: Default group ID (unsigned)
+  - name: uid_signed
+    type: BIGINT
+    description: User ID as int64 signed (for Apple systems)
+  - name: gid_signed
+    type: BIGINT
+    description: Default group ID as int64 signed (for Apple systems)
+  - name: username
+    type: TEXT
+    description: Username / login name
+  - name: description
+    type: TEXT
+    description: Optional user description / full name (GECOS field)
+  - name: directory
+    type: TEXT
+    description: User's home directory path
+  - name: shell
+    type: TEXT
+    description: User's configured default shell
+  - name: uuid
+    type: TEXT
+    description: User's UUID (Apple) or SID (Windows); typically empty on Linux
+
+query: |
+  SELECT * FROM elastic_host_users;
+
+documentation:
+  description: |
+    **Deprecated.** This view is deprecated in favor of the elastic_host_users table.
+    It exists only for backward compatibility (SELECT * FROM elastic_host_users).
+    Use elastic_host_users directly in new use cases.
+  examples:
+    - title: Query host users (same as elastic_host_users)
+      query: |
+        SELECT * FROM host_users;
+  notes:
+    - "Deprecated in favor of elastic_host_users; use the table directly for new queries."
+  related_tables:
+    - elastic_host_users
+    - elastic_host_groups

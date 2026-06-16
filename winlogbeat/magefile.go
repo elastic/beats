@@ -20,6 +20,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/magefile/mage/mg"
@@ -39,13 +40,10 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
 	winlogbeat "github.com/elastic/beats/v7/winlogbeat/scripts/mage"
 )
 
 func init() {
-	unittest.RegisterGoTestDeps(winlogbeat.Update.Fields)
 	winlogbeat.SelectLogic = devtools.OSSProject
 }
 
@@ -56,6 +54,17 @@ func Update() { mg.Deps(winlogbeat.Update.All) }
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards()
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() { mg.Deps(GoUnitTest) }
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	mg.SerialCtxDeps(ctx, winlogbeat.Update.Fields)
+	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
 }
 
 // Package packages the Beat for IronBank distribution.

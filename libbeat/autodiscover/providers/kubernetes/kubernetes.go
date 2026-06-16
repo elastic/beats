@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func init() {
@@ -96,6 +97,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("kubernetes")
 
@@ -110,6 +112,9 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
+	// log warning about any unsupported params
+	config.checkUnsupportedParams(logger)
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, errWrap(err)
@@ -117,12 +122,12 @@ func AutodiscoverBuilder(
 
 	k8sKeystoreProvider := k8skeystore.NewKubernetesKeystoresRegistry(logger, client)
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, k8sKeystoreProvider, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, k8sKeystoreProvider, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -352,7 +357,7 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("error while creating Leader Elector: %w", err)
+		p.logger.Errorf("error while creating Leader Elector: %v", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 

@@ -407,6 +407,11 @@ metricbeat.modules:
   enabled: true
   period: 300s
   application_id: ''
+  # auth_type: "api_key" (default) or "client_secret"
+  #auth_type: "api_key"
+  #client_id: '${AZURE_CLIENT_ID:""}'
+  #client_secret: '${AZURE_CLIENT_SECRET:""}'
+  #tenant_id: '${AZURE_TENANT_ID:""}'
   api_key: ''
   metrics:
     - id: ["requests/count", "requests/duration"]
@@ -622,6 +627,8 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  metadata_cache: true
+  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:
@@ -696,6 +703,18 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
   collect_dataproc_user_labels: true
+
+- module: gcp
+  metricsets:
+    - vertexai_logs
+  period: 300s  # 5 minutes
+  project_id: "your-project-id"
+  table_id: "your-project-id.dataset.id.table_name"
+  credentials_file_path: "/path/to/service-account.json"
+  # credentials_json: '{"type": "service_account", ...}'
+  time_lookback_hours: 1  # How many hours back to look for initial data fetch
+
+
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -1176,16 +1195,17 @@ metricbeat.modules:
 
 #----------------------------- Cisco Meraki Module -----------------------------
 - module: meraki
-  metricsets: ["device_health"]
+  metricsets: ["device_health", "network_health"]
   enabled: true
   period: 300s
   apiKey: "Meraki dashboard API key"
-  organizations: ["Meraki organization ID"]  
+  organizations: ["Meraki organization ID"]
+  switchport_statuses: ["connected"]
 
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
-  period: 10s
+  period: 60s
   enabled: true
 
   # The hosts must be passed as MongoDB URLs in the format:
@@ -1328,42 +1348,6 @@ metricbeat.modules:
 
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
-
-#-------------------------------- Openai Module --------------------------------
-- module: openai
-  metricsets: ["usage"]
-  enabled: false
-  period: 1h
-
-  # # Project API Keys - Multiple API keys can be specified for different projects
-  # api_keys:
-  # - key: "api_key1"
-  # - key: "api_key2"
-
-  # # API Configuration
-  # ## Base URL for the OpenAI usage API endpoint
-  # api_url: "https://api.openai.com/v1/usage"
-  # ## Custom headers to be included in API requests
-  # headers:
-  # - "k1: v1"
-  # - "k2: v2"
-  ## Rate Limiting Configuration
-  # rate_limit:
-  #   limit: 12 # seconds between requests
-  #   burst: 1  # max concurrent requests
-  # ## Request Timeout Duration
-  # timeout: 30s
-
-  # # Data Collection Configuration
-  # collection:
-  #   ## Number of days to look back when collecting usage data
-  #   lookback_days: 30
-  #   ## Whether to collect usage data in realtime. Defaults to false as how
-  #   # OpenAI usage data is collected will end up adding duplicate data to ES
-  #   # and also making it harder to do analytics. Best approach is to avoid
-  #   # realtime collection and collect only upto last day (in UTC). So, there's
-  #   # at most 24h delay.
-  #   realtime: false
 
 #----------------------------- Openmetrics Module -----------------------------
 - module: openmetrics
@@ -1667,11 +1651,40 @@ metricbeat.modules:
   metricsets:
     - query
   period: 10s
-  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
+  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
+  # Example of using SSL parameters manually in the Postgres connection string (with ssl.* parameters unset). The Postgres SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
+  # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
+  # Example for SQL server
+  # hosts: ["sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=%2Fpath%2Fto%2Fca.pem&database=mydb&encrypt=true"]
+
 
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
+
+  # Cursor-based incremental data fetching. When enabled, the cursor tracks the
+  # last fetched row value and uses it to retrieve only new data on subsequent
+  # collection cycles. Requires sql_response_format: table and a single sql_query
+  # with exactly one :cursor placeholder.
+  #cursor:
+  #  enabled: true
+  #  column: id
+  #  type: integer
+  #  #state_id: payments-prod  # optional: stable identity across DSN changes
+  #  default: "0"
+  #  #direction: asc
+
+  # List of root certificates for SSL/TLS server verification
+  # ssl.certificate_authorities: ["/path/to/ca.pem"]
+
+  # Certificate for SSL/TLS client authentication
+  # ssl.certificate: "/path/to/client-cert.pem"
+
+  # Client certificate key file
+  # ssl.key: "/path/to/client-key.pem"
+
+  # Controls the verification of server certificate
+  # ssl.verification_mode: full
 
 #--------------------------------- Stan Module ---------------------------------
 - module: stan
@@ -1966,7 +1979,10 @@ metricbeat.modules:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
+#      wait_for_metadata: false
+#      wait_for_metadata_timeout: 30s
+#      wait_for_metadata_retry_period: 10s
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -2624,7 +2640,7 @@ output.elasticsearch:
   # Path to the Kerberos configuration.
   #kerberos.config_path: /etc/krb5.conf
 
-  # The service name. Service principal name is contructed from
+  # The service name. Service principal name is constructed from
   # service_name/hostname@realm.
   #kerberos.service_name: kafka
 
@@ -3431,6 +3447,30 @@ logging.files:
 # Controls the fraction of mutex contention events that are reported in the
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
+
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 

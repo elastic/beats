@@ -18,6 +18,7 @@
 package dns
 
 import (
+	"math"
 	"sync"
 	"time"
 
@@ -34,6 +35,7 @@ func (r successRecord) IsExpired(now time.Time) bool {
 }
 
 type successCache struct {
+	enabled bool
 	sync.RWMutex
 	data          map[string]successRecord
 	maxSize       int
@@ -41,6 +43,9 @@ type successCache struct {
 }
 
 func (c *successCache) set(now time.Time, key string, result *result) {
+	if !c.enabled {
+		return
+	}
 	c.Lock()
 	defer c.Unlock()
 
@@ -65,12 +70,15 @@ func (c *successCache) evict() {
 }
 
 func (c *successCache) get(now time.Time, key string) *result {
+	if !c.enabled {
+		return nil
+	}
 	c.RLock()
 	defer c.RUnlock()
 
 	r, found := c.data[key]
 	if found && !r.IsExpired(now) {
-		return &result{r.data, uint32(r.expires.Sub(now) / time.Second)}
+		return &result{r.data, safeUint32(r.expires.Sub(now).Seconds())}
 	}
 	return nil
 }
@@ -85,6 +93,7 @@ func (r failureRecord) IsExpired(now time.Time) bool {
 }
 
 type failureCache struct {
+	enabled bool
 	sync.RWMutex
 	data       map[string]failureRecord
 	maxSize    int
@@ -92,6 +101,9 @@ type failureCache struct {
 }
 
 func (c *failureCache) set(now time.Time, key string, err error) {
+	if !c.enabled {
+		return
+	}
 	c.Lock()
 	defer c.Unlock()
 	if len(c.data) >= c.maxSize {
@@ -115,6 +127,9 @@ func (c *failureCache) evict() {
 }
 
 func (c *failureCache) get(now time.Time, key string) error {
+	if !c.enabled {
+		return nil
+	}
 	c.RLock()
 	defer c.RUnlock()
 
@@ -155,11 +170,13 @@ func newLookupCache(reg *monitoring.Registry, conf cacheConfig, resolver resolve
 
 	c := &lookupCache{
 		success: &successCache{
+			enabled:       conf.FailureCache.Enabled,
 			data:          make(map[string]successRecord, conf.SuccessCache.InitialCapacity),
 			maxSize:       conf.SuccessCache.MaxCapacity,
 			minSuccessTTL: conf.SuccessCache.MinTTL,
 		},
 		failure: &failureCache{
+			enabled:    conf.FailureCache.Enabled,
 			data:       make(map[string]failureRecord, conf.FailureCache.InitialCapacity),
 			maxSize:    conf.FailureCache.MaxCapacity,
 			failureTTL: conf.FailureCache.TTL,
@@ -200,7 +217,7 @@ func (c lookupCache) Lookup(q string, qt queryType) (*result, error) {
 	}
 
 	// We set the result TTL to the minimum TTL in case it is less than that.
-	r.TTL = max(r.TTL, uint32(c.success.minSuccessTTL/time.Second))
+	r.TTL = max(r.TTL, safeUint32(c.success.minSuccessTTL.Seconds()))
 
 	c.success.set(now, q, r)
 	return r, nil
@@ -211,4 +228,13 @@ func max(a, b uint32) uint32 {
 		return a
 	}
 	return b
+}
+
+// safeUint32 converts a float64 to a uint32, protecting against out-of-bounds
+// values. It takes the absolute value to prevent negative numbers and caps the
+// result at math.MaxUint32 to avoid integer overflows.
+//
+// This function is used to satisfy the gosec security scanner rule G115.
+func safeUint32(float float64) uint32 {
+	return uint32(math.Min(math.Abs(float), float64(math.MaxUint32)))
 }

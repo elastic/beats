@@ -20,12 +20,12 @@ import (
 
 func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
-		entityanalytics.Plugin(log),
-		http_endpoint.Plugin(),
+		entityanalytics.Plugin(log, store, info.Paths),
+		http_endpoint.Plugin(log),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
-		awss3.Plugin(store),
-		lumberjack.Plugin(),
+		awss3.Plugin(log, store, info.Paths),
+		lumberjack.Plugin(log),
 		salesforce.Plugin(log, store),
 	}
 }

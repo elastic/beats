@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -217,12 +217,78 @@ func TestReplaceRun(t *testing.T) {
 			IgnoreMissing: false,
 			FailOnError:   true,
 		},
+		{
+			description: "non-string value: nil",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`.*`),
+					Replacement: ptr("b"),
+				},
+			},
+			Input: mapstr.M{
+				"f": nil,
+			},
+			Output: mapstr.M{
+				"f": nil,
+				"error": mapstr.M{
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got <nil> with value '<nil>'",
+				},
+			},
+			error:         true,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
+		{
+			description: "non-string value: float64",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`.*`),
+					Replacement: ptr("b"),
+				},
+			},
+			Input: mapstr.M{
+				"f": 123.45,
+			},
+			Output: mapstr.M{
+				"f": 123.45,
+				"error": mapstr.M{
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got float64 with value '123.45'",
+				},
+			},
+			error:         true,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
+		{
+			description: "non-string value: integer",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`.*`),
+					Replacement: ptr("b"),
+				},
+			},
+			Input: mapstr.M{
+				"f": 123,
+			},
+			Output: mapstr.M{
+				"f": 123,
+				"error": mapstr.M{
+					"message": "Failed to replace fields in processor: key 'f' expected type string, but got int with value '123'",
+				},
+			},
+			error:         true,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			f := &replaceString{
-				log: logp.NewLogger("replace"),
+				log: logptest.NewTestingLogger(t, "replace"),
 				config: replaceStringConfig{
 					Fields:        test.Fields,
 					IgnoreMissing: test.IgnoreMissing,
@@ -246,6 +312,92 @@ func TestReplaceRun(t *testing.T) {
 }
 
 func ptr[T any](v T) *T { return &v }
+
+// TestReplaceFailOnErrorSafety verifies that when FailOnError=true and the
+// field is missing, the event fields are unchanged.
+func TestReplaceFailOnErrorSafety(t *testing.T) {
+	tests := []struct {
+		name  string
+		input mapstr.M
+	}{
+		{
+			name:  "missing field",
+			input: mapstr.M{"other": "value"},
+		},
+		{
+			name:  "non-string field value",
+			input: mapstr.M{"f": 42},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := &replaceString{
+				log: logptest.NewTestingLogger(t, "replace"),
+				config: replaceStringConfig{
+					Fields: []replaceConfig{
+						{
+							Field:       "f",
+							Pattern:     regexp.MustCompile(`abc`),
+							Replacement: ptr("xyz"),
+						},
+					},
+					FailOnError: true,
+				},
+			}
+
+			input := tc.input.Clone()
+			event := &beat.Event{Fields: input}
+			original := input.Clone()
+
+			result, err := f.Run(event)
+			require.Error(t, err)
+			assert.Same(t, event, result)
+
+			result.Fields.Delete("error")
+			assert.Equal(t, original, result.Fields,
+				"event fields must be unchanged after error (clone skip safety)")
+		})
+	}
+}
+
+// TestReplaceMultiFieldBackup verifies that when multiple fields are configured
+// and a later field fails, the changes from earlier fields are rolled back via backup.
+func TestReplaceMultiFieldBackup(t *testing.T) {
+	f := &replaceString{
+		log: logptest.NewTestingLogger(t, "replace"),
+		config: replaceStringConfig{
+			Fields: []replaceConfig{
+				{
+					Field:       "f1",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: ptr("X"),
+				},
+				{
+					Field:       "f2",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: ptr("X"),
+				},
+			},
+			FailOnError: true,
+		},
+	}
+
+	// f1 is a string (replaces "abc" → "Xbc" on first iteration),
+	// f2 is an int (will fail the string type check on second iteration).
+	input := mapstr.M{"f1": "abc", "f2": 42}
+	event := &beat.Event{Fields: input.Clone()}
+	original := input.Clone()
+
+	result, err := f.Run(event)
+	require.Error(t, err)
+
+	// Multi-field: backup was taken and restored; result is the backup pointer.
+	// f1 change must be undone.
+	result.Fields.Delete("error")
+	assert.Equal(t, original, result.Fields,
+		"first field's replacement must be rolled back when second field fails")
+}
 
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
@@ -324,7 +476,7 @@ func TestReplaceField(t *testing.T) {
 
 			err := f.replaceField(test.Field, test.Pattern, test.Replacement, &beat.Event{Fields: test.Input})
 			if err != nil {
-				assert.Equal(t, test.error, true)
+				assert.True(t, test.error)
 			}
 
 			assert.True(t, reflect.DeepEqual(test.Input, test.Output))

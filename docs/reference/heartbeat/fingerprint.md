@@ -2,6 +2,9 @@
 navigation_title: "fingerprint"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/fingerprint.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Generate a fingerprint of an event [fingerprint]

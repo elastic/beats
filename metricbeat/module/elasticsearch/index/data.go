@@ -45,6 +45,8 @@ type Index struct {
 	TierPreference string     `json:"tier_preference,omitempty"`
 	CreationDate   string     `json:"creation_date,omitempty"`
 	Version        string     `json:"version,omitempty"`
+	Mode           string     `json:"mode,omitempty"`
+	Codec          string     `json:"codec,omitempty"`
 	Shards         shardStats `json:"shards"`
 }
 
@@ -181,9 +183,13 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-var logger = logp.NewLogger("elasticsearch.index")
-
-func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventsMapping(
+	r mb.ReporterV2,
+	httpClient *helper.HTTP,
+	info elasticsearch.Info,
+	content []byte,
+	isXpack bool,
+	log *logp.Logger) error {
 	clusterStateMetrics := []string{"routing_table"}
 	clusterStateFilterPaths := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, clusterStateFilterPaths)
@@ -192,7 +198,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	}
 
 	indicesSettingsPattern := "*,-.*"
-	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
+	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created", "*.settings.index.mode", "*.settings.index.codec"}
 	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
 	if err != nil {
 		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
@@ -225,7 +231,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		if err != nil {
 			// Failure to add index settings is sometimes expected and won't be breaking,
 			// so we log it as debug and carry on with regular processing.
-			logger.Debugf("failure adding index settings: %v", err)
+			log.Named("elasticsearch.index").Debugf("failure adding index settings: %v", err)
 		}
 
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
@@ -331,6 +337,13 @@ func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
 	}
 
 	idx.Version = indexVersion
+
+	if indexMode, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.mode"); err == nil {
+		idx.Mode = indexMode
+	}
+	if indexCodec, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.codec"); err == nil {
+		idx.Codec = indexCodec
+	}
 
 	return nil
 }

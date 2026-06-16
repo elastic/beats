@@ -23,27 +23,39 @@ func (r *retry) Run(ctx context.Context, fn tryFunc) (err error) {
 	maxAttempts := r.maxRetry + 1
 	for i := 0; i < maxAttempts; i++ {
 		attempt := i + 1
-		r.log.Debugf("attempt %v out of %v", attempt, maxAttempts)
+		if r.log != nil {
+			r.log.Debugf("attempt %v out of %v", attempt, maxAttempts)
+		}
 
 		err = fn(ctx)
 
 		if err != nil {
-			r.log.Debugf("attempt %v out of %v failed, err: %v", attempt, maxAttempts, err)
+			if r.log != nil {
+				r.log.Debugf("attempt %v out of %v failed, err: %v", attempt, maxAttempts, err)
+			}
 			if i != maxAttempts {
 				if r.retryWait > 0 {
-					r.log.Debugf("wait for %v before next retry", r.retryWait)
+					if r.log != nil {
+						r.log.Debugf("wait for %v before next retry", r.retryWait)
+					}
 					err = waitWithContext(ctx, retryWait)
 					if err != nil {
-						r.log.Debugf("wait returned err: %v", err)
+						if r.log != nil {
+							r.log.Debugf("wait returned err: %v", err)
+						}
 						return err
 					}
 				}
 			} else {
-				r.log.Debugf("no more attempts, return err: %v", err)
+				if r.log != nil {
+					r.log.Debugf("no more attempts, return err: %v", err)
+				}
 				return err
 			}
 		} else {
-			r.log.Debugf("attempt %v out of %v succeeded", attempt, maxAttempts)
+			if r.log != nil {
+				r.log.Debugf("attempt %v out of %v succeeded", attempt, maxAttempts)
+			}
 			return nil
 		}
 	}

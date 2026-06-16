@@ -2,6 +2,9 @@
 navigation_title: "Entity Analytics"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-entity-analytics.html
+applies_to:
+  stack: preview
+  serverless: preview
 ---
 
 # Entity Analytics Input [filebeat-input-entity-analytics]
@@ -117,8 +120,7 @@ By default, all events contain `host.name`. This option can be set to `true` to 
 
 ## Active Directory (`activedirectory`) [provider-activedirectory]
 
-The `activedirectory` provider allows the input to retrieve users, with group memberships, from Active Directory.
-
+The `activedirectory` provider allows the input to retrieve users and devices, with group memberships, from Active Directory.
 
 ### Setup [_setup]
 
@@ -130,14 +132,20 @@ A user with appropriate permissions must be set up in the Active Directory Serve
 
 #### Overview [_overview]
 
-The Active Directory provider periodically queries the Active Directory server, retrieving updates for users and groups, updates its internal cache of user and group metadata and group membership information, and ships updated user metadata to Elasticsearch.
+The Active Directory provider periodically:
 
-Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users and group membership in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users during that event. Changes on a user can come in many forms, whether it be a change to the user metadata, a user was added or modified, or group membership was changed.
+* Queries the Active Directory server, retrieving updates for users, devices, and groups.
+
+* Updates its internal cache of user, device, and group metadata and group membership information.
+
+* Ships updated user and device metadata to Elasticsearch.
+
+Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users, devices, and group membership in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user or device metadata, a user or device was added or modified, or group membership was changed.
 
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch]
 
-During a full synchronization, all users and groups stored in state will be sent to the output, while incremental updates will only send users and group that have been updated. Full synchronizations will be bounded on either side by write marker documents, which will look something like this:
+During a full synchronization, all users, devices, and groups stored in state will be sent to the output, while incremental updates will only send users, devices, and groups that have been updated. Full synchronizations will be bounded on either side by write marker documents, which will look something like this:
 
 ```json
 {
@@ -214,6 +222,71 @@ Example user document:
 }
 ```
 
+Device documents will show the current state of the device.
+
+Example device document:
+
+```json
+{
+    "@timestamp": "2024-02-05T06:37:40.876026-05:00",
+    "event": {
+        "action": "device-discovered",
+    },
+    "activedirectory": {
+        "id": "CN=DESKTOP-ABC123,CN=Computers,DC=testserver,DC=local",
+        "user": {
+            "accountExpires": "2185-07-21T23:34:33.709551516Z",
+            "badPasswordTime": "0",
+            "badPwdCount": "0",
+            "cn": "DESKTOP-ABC123",
+            "codePage": "0",
+            "countryCode": "0",
+            "dSCorePropagationData": [
+                "2024-01-22T06:37:40Z",
+                "1601-01-01T00:00:01Z"
+            ],
+            "description": "Computer account",
+            "distinguishedName": "CN=DESKTOP-ABC123,CN=Computers,DC=testserver,DC=local",
+            "instanceType": "4",
+            "isCriticalSystemObject": false,
+            "lastLogoff": "0",
+            "lastLogon": "2185-07-21T23:34:33.709551616Z",
+            "logonCount": "0",
+            "memberOf": "CN=Domain Computers,CN=Users,DC=testserver,DC=local",
+            "name": "DESKTOP-ABC123",
+            "objectCategory": "CN=Computer,CN=Schema,CN=Configuration,DC=testserver,DC=local",
+            "objectClass": [
+                "top",
+                "person",
+                "organizationalPerson",
+                "user",
+                "computer"
+            ],
+            "objectGUID": "hSt/40XJQU6cf+J2XoYMHw==",
+            "objectSid": "AQUAAAAAAAUVAAAA0JU2Fq1k30YZ7UPx9QEAAA==",
+            "operatingSystem": "Windows 10 Enterprise",
+            "operatingSystemVersion": "10.0 (19041)",
+            "primaryGroupID": "515",
+            "pwdLastSet": "2185-07-21T23:34:33.709551616Z",
+            "sAMAccountName": "DESKTOP-ABC123$",
+            "sAMAccountType": "805306369",
+            "uSNChanged": "8197",
+            "uSNCreated": "8197",
+            "userAccountControl": "4096",
+            "whenChanged": "2024-01-22T06:36:59Z",
+            "whenCreated": "2024-01-22T06:36:59Z"
+        },
+        "whenChanged": "2024-01-22T06:36:59Z"
+    },
+    "device": {
+        "id": "CN=DESKTOP-ABC123,CN=Computers,DC=testserver,DC=local"
+    },
+    "labels": {
+        "identity_source": "activedirectory-1"
+    }
+}
+```
+
 
 ### Configuration [_configuration_2]
 
@@ -225,6 +298,7 @@ filebeat.inputs:
   enabled: true
   id: activedirectory-1
   provider: activedirectory
+  dataset: "all"
   sync_interval: "12h"
   update_interval: "30m"
   ad_url: "ldaps://host.domain.tld"
@@ -233,7 +307,7 @@ filebeat.inputs:
   ad_password: "PASSWORD"
 ```
 
-The `azure-ad` provider supports the following configuration:
+The `activedirectory` provider supports the following configuration:
 
 
 #### `ad_url` [_ad_url]
@@ -270,6 +344,19 @@ The number of records to request from the Active Directory server for each page,
 
 The client’s password, used for authentication. Field is required.
 
+#### `dataset` [_ad_dataset]
+
+The datasets to collect from Active Directory. This can be one of "all", "users" or "devices", or may be left empty for the default behavior, which is to collect all entities. When the `dataset` is set to "devices", some user entity data is collected in order to populate the registered users and registered owner fields for each device.
+
+#### `include_empty_groups` [_include_empty_groups]
+
+```{applies_to}
+stack: preview 9.4+
+```
+
+When set to `true`, the provider will also report groups that have no direct members. Each empty group is published as a separate document with `event.action` set to one of `group-discovered`, `group-modified`, or `group-deleted`. The group's attributes are available under `activedirectory.group` and the group's distinguished name is set in `group.id`. Defaults to `false`.
+
+This is useful for identifying legacy or unused groups in Active Directory that may need cleanup or that represent a security risk.
 
 #### `sync_interval` [_sync_interval]
 
@@ -296,6 +383,12 @@ The necessary API permissions need to be granted in Azure in order for the provi
 | User.Read.All | Application |
 | Device.Read.All | Application |
 
+When using the `enrich_with: ["mfa"]` option, an additional permission is required:
+
+| Permission | Type |
+| --- | --- |
+| AuditLog.Read.All | Application |
+
 For a full guide on how to set up the necessary App Registration, permission granting, and secret configuration, follow this [guide](https://learn.microsoft.com/en-us/graph/auth-v2-service).
 
 
@@ -304,7 +397,13 @@ For a full guide on how to set up the necessary App Registration, permission gra
 
 #### Overview [_overview_2]
 
-The Azure AD provider periodically contacts Azure Active Directory, retrieving updates for users, devices and groups, updates its internal cache of user and device metadata and group membership information, and ships updated user metadata to Elasticsearch.
+The Azure AD provider periodically:
+
+* Contacts Azure Active Directory, retrieving updates for users, devices and groups.
+
+* Updates its internal cache of user and device metadata and group membership information.
+
+* Ships updated user metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users and devices in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user or device metadata, a user/device was added or deleted, or group membership was changed (either direct or transitive).
 
@@ -323,6 +422,14 @@ The `/delta` endpoint will provide changes that have occurred since the last cal
 * If a `@odata.deltaLink` is returned, then there are currently no more results, and the value of this field (a URL) should be saved for the next time updates need to be fetched (the delta token).
 
 The group metadata will be used to enrich users and devices with group membership information. Direct memberships, along with transitive memberships, will be provided for users and devices.
+
+When the `enrich_with: ["mfa"]` option is set, an additional call is made each sync/update cycle to:
+
+* [/reports/authenticationMethods/userRegistrationDetails](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http)
+
+This endpoint returns MFA registration state for all users and does not support delta queries, so the full list is fetched on every cycle. The result is merged into each user document under the `azure_ad.mfa` field.
+
+Note that MFA enrichment is **best-effort**: a change to a user's MFA registration state alone will not trigger an incremental user update. Updated MFA data is only included in a published user event when that user is already being published due to an identity delta (a change to the user record, group membership, or device). A full synchronization will always include the latest MFA state for all users.
 
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch_2]
@@ -372,6 +479,52 @@ Example user document:
             {
                 "id": "d140978f-d641-4f01-802f-4ecc1acf8935",
                 "name": "group2"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+```
+
+When the `enrich_with: ["mfa"]` option is set, user documents will also include an `azure_ad.mfa` field with MFA registration details:
+
+```json
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"],
+        "mfa": {
+            "isMfaCapable": true,
+            "isMfaRegistered": true,
+            "isPasswordlessCapable": false,
+            "isSsprCapable": false,
+            "isSsprEnabled": false,
+            "isSsprRegistered": false,
+            "isSystemPreferredAuthenticationMethodEnabled": false,
+            "methodsRegistered": ["microsoftAuthenticatorPush", "softwareOneTimePasscode"],
+            "systemPreferredAuthenticationMethods": [],
+            "userPreferredMethodForSecondaryAuthentication": "push",
+            "userType": "member"
+        }
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
             }
         ]
     },
@@ -468,7 +621,15 @@ filebeat.inputs:
   client_id: "CLIENT_ID"
   tenant_id: "TENANT_ID"
   secret: "SECRET"
+  expand: <1>
+    users:
+      manager:
+        - displayName
+        - id
+      directReports:
+        - id
 ```
+1. {applies_to}`stack: preview 9.1.0`
 
 The `azure-ad` provider supports the following configuration:
 
@@ -528,6 +689,46 @@ Override the default [group query selections](https://learn.microsoft.com/en-us/
 Override the default [device query selections](https://learn.microsoft.com/en-us/graph/api/device-get?view=graph-rest-1.0&tabs=http#optional-query-parameters). This is a list of optional query parameters. The default is `["accountEnabled", "deviceId", "displayName", "operatingSystem", "operatingSystemVersion", "physicalIds", "extensionAttributes", "alternativeSecurityIds"]`.
 
 
+#### `expand.users` [_expand_users]
+
+```{applies_to}
+stack: preview 9.1.0
+```
+
+Add [user query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the users query.
+
+
+#### `expand.groups` [_expand_groups]
+
+```{applies_to}
+stack: preview 9.1.0
+```
+
+Add [group query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the groups query.
+
+
+#### `expand.devices` [_expand_devices]
+
+```{applies_to}
+stack: preview 9.1.0
+```
+
+Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
+
+
+#### `enrich_with` [_enrich_with_azuread]
+
+Additional data to fetch and merge into user documents. This is an array of enrichment types. Currently only `"mfa"` is supported. If not set, no additional enrichment is performed.
+
+When `"mfa"` is included, the provider calls the [`/reports/authenticationMethods/userRegistrationDetails`](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http) endpoint on each sync/update cycle and merges the result into each matching user document under the `azure_ad.mfa` field. This requires the `AuditLog.Read.All` application permission.
+
+Example:
+
+```yaml
+enrich_with: ["mfa"]
+```
+
+
 ### `tracer.enabled` [_tracer_enabled]
 
 It is possible to log HTTP requests and responses to the EntraID API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
@@ -537,7 +738,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the azure-ad directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ## Jamf Computer Management (`jamf`) [provider-jamf]
@@ -550,7 +751,13 @@ The `jamf` provider allows the input to retrieve computer records from the Jamf 
 
 #### Overview [_overview_3]
 
-The Jamf provider periodically contacts the Jamf API, retrieving updates for computers, updates its internal cache of managed computer metadata, and ships updated metadata to Elasticsearch.
+The Jamf provider periodically:
+
+* Contacts the Jamf API, retrieving updates for computers.
+
+* Updates its internal cache of managed computer metadata.
+
+* Ships updated metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of computers in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed computers records during that event. Changes on a user or device can come in many forms, whether it be a change to the user’s metadata, or a user was added or deleted.
 
@@ -683,19 +890,56 @@ Enabling this option compromises security and should only be used for debugging.
 
 ### `tracer.filename` [_tracer_filename_2]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the jamf directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ## Okta User Identities (`okta`) [provider-okta]
 
-The `okta` provider allows the input to retrieve users and devices from the Okta user API.
+The Okta provider allows the input to retrieve users and devices from the Okta user API.
 
 
 ### Setup [_setup_3]
 
-The necessary API permissions need to be granted in Okta in order for the provider to function properly. In the administration dashboard for your Okta account, navigate to Security>API and in the Tokens tab click the "Create token" button to create a new token. Copy the token value and retain this to configure the provider. Note that the token will not be presented again, so it must be copied now. This value will use given to the provider via the `okta_token` configuration field.
+The Okta provider supports two authentication methods:
 
-Devices API access needs to be activated by Okta support.
+#### API Token Authentication (Traditional)
+
+In the administration dashboard for your Okta account, navigate to Security>API and in the Tokens tab click the "Create token" button to create a new token. Copy the token value and retain this to configure the provider. Note that the token will not be presented again, so it must be copied now. This value will use given to the provider via the `okta_token` configuration field.
+
+#### OAuth2 Authentication (Recommended)
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+For enhanced security, the provider supports OAuth2 authentication using two methods:
+
+##### JWT-Based Authentication
+
+This method uses a private key to sign JWTs for authentication:
+
+1. Create an OAuth2 application in your Okta admin console
+2. Configure the application with the required scopes:
+   - `okta.users.read`: Read user information
+   - `okta.devices.read`: Read device information (if collecting devices information is enabled)
+3. Generate a private key (RSA) for the application
+4. Register the corresponding public key with Okta
+5. Configure the provider with the private key
+
+##### Client Secret Authentication
+
+This method uses a client secret for authentication:
+
+1. Create an OAuth2 application in your Okta admin console
+2. Configure the application with the required scopes:
+   - `okta.users.read`: Read user information
+   - `okta.devices.read`: Read device information (if collecting devices information is enabled)
+3. Note the client secret from the application configuration
+4. Configure the provider with the client secret
+
+This authentication method can also be used for OIN (Okta Integration Network) applications, where the client secret is provided as part of the OIN integration setup.
+
+The necessary API permissions need to be granted in Okta in order for the provider to function properly. Devices API access needs to be activated by Okta support.
 
 
 ### How It Works [_how_it_works_4]
@@ -703,7 +947,13 @@ Devices API access needs to be activated by Okta support.
 
 #### Overview [_overview_4]
 
-The Okta provider periodically contacts the Okta API, retrieving updates for users and devices, updates its internal cache of user metadata, and ships updated user/device metadata to Elasticsearch.
+The Okta provider periodically:
+
+* Contacts the Okta API, retrieving updates for users and devices.
+
+* Updates its internal cache of user metadata.
+
+* Ships updated user/device metadata to Elasticsearch.
 
 Fetching and shipping updates occurs in one of two processes: **full synchronizations** and **incremental updates**. Full synchronizations will send the entire list of users and devices in state, along with write markers to indicate the start and end of the synchronization event. Incremental updates will only send data for changed users and devices during that event. Changes on a user or device can come in many forms, whether it be a change to the user’s metadata, or a user was added or deleted.
 
@@ -714,6 +964,10 @@ The provider periodically retrieves changes to user/device metadata from the Okt
 
 * [/api/v1/users](https://developer.okta.com/docs/reference/api/users/#list-users)
 * [/api/v1/devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices)
+
+It also read roles permissions, only when the `perms` enrichment is enabled. In that case, the following API is also targeted:
+
+* [/api/v1/iam/roles](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/roleecustompermission)
 
 Updates are tracked by the provider by retaining a record of the time of the last noted update in the returned user list. During provider updates the Okta provider makes use of the Okta API’s query filtering to only request records updated at or since the provider’s recorded last update.
 
@@ -890,7 +1144,7 @@ Example device document:
 
 ### Configuration [_configuration_5]
 
-Example configuration:
+Example configuration with API token authentication:
 
 ```yaml
 filebeat.inputs:
@@ -902,9 +1156,53 @@ filebeat.inputs:
   enrich_with: ["groups", "roles"]
   sync_interval: "12h"
   update_interval: "30m"
-  okta_domain: "OKTA_DOMAIN"
-  okta_token: "OKTA_TOKEN"
+  okta_domain: "your-domain.okta.com"
+  okta_token: "your-okta-token"
 ```
+
+Example configuration with OAuth2 JWT-based authentication:
+
+```yaml
+filebeat.inputs:
+- type: entity-analytics
+  enabled: true
+  id: okta-1
+  provider: okta
+  dataset: "all"
+  enrich_with: ["groups", "roles"]
+  sync_interval: "12h"
+  update_interval: "30m"
+  okta_domain: "your-domain.okta.com"
+  oauth2: <1>
+    enabled: true
+    client.id: "your-client-id"
+    scopes: ["okta.users.read", "okta.devices.read"]
+    token_url: "https://your-domain.okta.com/oauth2/v1/token"
+    jwk_file: "/path/to/private-key.jwk"
+```
+1. {applies_to}`stack: ga 9.2`
+
+Example configuration with OAuth2 client secret authentication:
+
+```yaml
+filebeat.inputs:
+- type: entity-analytics
+  enabled: true
+  id: okta-1
+  provider: okta
+  dataset: "all"
+  enrich_with: ["groups", "roles"]
+  sync_interval: "12h"
+  update_interval: "30m"
+  okta_domain: "your-domain.okta.com"
+  oauth2: <1>
+    enabled: true
+    client.id: "your-client-id"
+    client.secret: "your-client-secret"
+    scopes: ["okta.users.read", "okta.devices.read"]
+    token_url: "https://your-domain.okta.com/oauth2/v1/token"
+```
+1. {applies_to}`stack: ga 9.2`
 
 The `okta` provider supports the following configuration:
 
@@ -916,7 +1214,87 @@ The Okta domain. Field is required.
 
 #### `okta_token` [_okta_token]
 
-The Okta secret token, used for authentication. Field is required.
+The Okta secret token, used for authentication. Field is required when using API token authentication.
+
+
+#### `oauth2` [_oauth2]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+OAuth2 configuration for enhanced security authentication. When configured, OAuth2 authentication takes precedence over API token authentication.
+
+##### `oauth2.enabled`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Enable OAuth2 authentication. Defaults to true if the oauth2 block is present.
+
+##### `oauth2.client.id`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The OAuth2 client ID from your Okta application.
+
+##### `oauth2.client.secret`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The OAuth2 client secret from your Okta application.
+
+##### `oauth2.scopes`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+List of OAuth2 scopes required for the application. Common scopes include:
+- `okta.users.read`: Read user information
+- `okta.devices.read`: Read devices information (if collecting devices information is enabled in `dataset` option)
+- `okta.roles.read`: Read role permissions (required when `perms` enrichment is enabled)
+
+##### `oauth2.token_url`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+The OAuth2 token endpoint URL. Typically `https://your-domain.okta.com/oauth2/v1/token`.
+
+##### `oauth2.jwk_file`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Path to the JWK file containing the private key.
+
+##### `oauth2.jwk_json`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+JWK JSON content containing the private key.
+
+##### `oauth2.jwk_pem`
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+PEM-formatted private key content.
+
+::::{note}
+Only one of `oauth2.jwk_file`, `oauth2.jwk_json`, or `oauth2.jwk_pem` must be provided for JWT authentication, or `oauth2.client.secret` must be provided for client secret authentication. The authentication method is automatically determined based on which credentials are provided.
+::::
 
 
 #### `collect_device_details` [_collect_device_details]
@@ -931,7 +1309,13 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 
 #### `enrich_with` [_enrich_with]
 
-The metadata to enrich users with. This is an array of values that may contain "groups", "roles" and "factors", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+The metadata to enrich users with. This is an array of values that may contain "groups", "roles", "factors", "perms", "devices", "supervises", or "none". If the array only contains "none", no metadata is collected for users. The default behavior is to collect "groups".
+
+Including "perms" causes role permissions to be fetched for each assigned role and stored under `roles[].permissions` in the published event. Because permissions depend on roles, adding "perms" implicitly enables role enrichment even if "roles" is not listed explicitly. This option requires the `okta.roles.read` OAuth2 scope and results in one additional API call per role per user, so it should be enabled with care on large tenants due to Okta API rate limits.
+
+When "devices" is included, each user is enriched with the list of devices enrolled for that user by calling the [List User Devices](https://developer.okta.com/docs/api/openapi/okta-management/management/tags/userresources/other/listuserdevices) API. This requires one additional API request per user, it is disabled by default to help mitigate Okta rate-limit pressure.
+
+The "supervises" option populates the `supervises` field on each user with the list of users they manage. Each entry contains the managed user's `id`, `email`, and `username`. The relationship is derived from the `profile.managerId` field already present in the bulk user fetch, so no additional API calls are required. This option is disabled by default.
 
 
 #### `sync_interval` [_sync_interval_4]
@@ -951,6 +1335,10 @@ The time between Okta API rate limit resets. Expressed as a duration string (e.g
 
 #### `batch_size` [_batch_size]
 
+```{applies_to}
+stack: preview 9.0.1
+```
+
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
 
 
@@ -968,7 +1356,7 @@ Enabling this option compromises security and should only be used for debugging.
 
 #### `tracer.filename` [_tracer_filename_3]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the okta directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
 
 ### `tracer.maxsize` [_tracer_maxsize]
@@ -992,6 +1380,3 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 ::::{note}
 This input is experimental and is under active developement. Configuration options and behaviors may change without warning. Use with caution and do not use in production environments.
 ::::
-
-
-

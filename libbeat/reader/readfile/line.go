@@ -19,6 +19,7 @@ package readfile
 
 import (
 	"bytes"
+	"compress/gzip"
 	"errors"
 	"fmt"
 	"io"
@@ -28,8 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-const unlimited = 0
 
 // LineReader reads lines from underlying reader, decoding the input stream
 // using the configured codec. The reader keeps track of bytes consumed
@@ -53,7 +52,7 @@ type LineReader struct {
 }
 
 // NewLineReader creates a new reader object
-func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
+func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*LineReader, error) {
 	encoder := config.Codec.NewEncoder()
 
 	// Create newline char based on encoding
@@ -77,7 +76,7 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 		inBuffer:     streambuf.New(nil),
 		outBuffer:    streambuf.New(nil),
 		tempBuffer:   make([]byte, config.BufferSize),
-		logger:       logp.NewLogger("reader_line"),
+		logger:       logger,
 	}, nil
 }
 
@@ -184,8 +183,9 @@ func (r *LineReader) advance() error {
 		// Try to read more bytes into buffer
 		n, err := r.reader.Read(r.tempBuffer)
 
-		if errors.Is(err, io.EOF) && n > 0 {
-			// Continue processing the returned bytes. The next call will yield EOF with 0 bytes.
+		if (errors.Is(err, io.EOF) || errors.Is(err, gzip.ErrChecksum)) && n > 0 {
+			// Continue processing the returned bytes. The next call will yield
+			// EOF with 0 bytes.
 			err = nil
 		}
 

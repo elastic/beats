@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -38,6 +39,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
@@ -60,6 +62,7 @@ type Provider struct {
 	stoppers      map[string]*time.Timer
 	stopTrigger   chan *dockerContainerMetadata
 	logger        *logp.Logger
+	stopWg        sync.WaitGroup
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
@@ -70,6 +73,7 @@ func AutodiscoverBuilder(
 	c *config.C,
 	keystore keystore.Keystore,
 	logger *logp.Logger,
+	path *paths.Path,
 ) (autodiscover.Provider, error) {
 	logger = logger.Named("docker")
 
@@ -88,7 +92,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
+	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil, logger)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -96,7 +100,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(fmt.Errorf("no configs or hints defined for autodiscover provider"))
 	}
 
-	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil)
+	builders, err := autodiscover.NewBuilders(config.Builders, config.Hints, nil, path)
 	if err != nil {
 		return nil, errWrap(err)
 	}
@@ -127,17 +131,19 @@ func AutodiscoverBuilder(
 		stoppers:      make(map[string]*time.Timer),
 		stopTrigger:   make(chan *dockerContainerMetadata),
 		logger:        logger,
+		stopWg:        sync.WaitGroup{},
 	}, nil
 }
 
 // Start the autodiscover process
 func (d *Provider) Start() {
-	go func() {
+	d.stopWg.Go(func() {
 		for {
 			select {
 			case <-d.stop:
 				d.startListener.Stop()
 				d.stopListener.Stop()
+				d.watcher.Stop()
 
 				// Stop all timers before closing the channel
 				for _, stopper := range d.stoppers {
@@ -156,7 +162,7 @@ func (d *Provider) Start() {
 				d.stopContainer(target.container, target.metadata)
 			}
 		}
-	}()
+	})
 }
 
 type dockerContainerMetadata struct {
@@ -384,7 +390,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints)
+		hints, incorrecthints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, true, AllSupportedHints) //nolint:errcheck // preserve existing behaviour
 		// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
 		for _, value := range incorrecthints {
 			d.logger.Debugf("provided hint: %s/%s is not in the supported list", d.config.Prefix, value)
@@ -397,6 +403,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 // Stop the autodiscover process
 func (d *Provider) Stop() {
 	close(d.stop)
+	d.stopWg.Wait()
 }
 
 func (d *Provider) String() string {

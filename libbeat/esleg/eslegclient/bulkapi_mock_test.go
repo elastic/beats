@@ -33,6 +33,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestOneHostSuccessResp_Bulk(t *testing.T) {
@@ -65,7 +66,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, _, err := client.Bulk(context.Background(), index, "type1", params, body)
+	_, _, err := client.Bulk(context.Background(), index, "type1", nil, params, body)
 	if err != nil {
 		t.Errorf("Bulk() returns error: %s", err)
 	}
@@ -100,7 +101,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, _, err := client.Bulk(context.Background(), index, "type1", params, body)
+	_, _, err := client.Bulk(context.Background(), index, "type1", nil, params, body)
 	if err == nil {
 		t.Errorf("Bulk() should return error.")
 	}
@@ -139,7 +140,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 	params := map[string]string{
 		"refresh": "true",
 	}
-	_, _, err := client.Bulk(context.Background(), index, "type1", params, body)
+	_, _, err := client.Bulk(context.Background(), index, "type1", nil, params, body)
 	if err == nil {
 		t.Errorf("Bulk() should return error.")
 	}
@@ -225,7 +226,7 @@ func TestEnforceParameters(t *testing.T) {
 			client, _ := NewConnection(ConnectionSettings{
 				Parameters: test.preconfigured,
 				URL:        "http://localhost",
-			})
+			}, logptest.NewTestingLogger(t, ""))
 
 			client.Encoder = NewJSONEncoder(nil, false)
 
@@ -239,12 +240,79 @@ func TestEnforceParameters(t *testing.T) {
 				},
 			}
 
-			_, _, err := client.Bulk(context.Background(), index, "type1", test.reqParams, body)
+			_, _, err := client.Bulk(context.Background(), index, "type1", nil, test.reqParams, body)
 			require.Equal(t, errShort, err)
 			require.Equal(t, len(recParams), len(test.expected))
 
 			for k, v := range test.expected {
 				assert.Equal(t, recParams.Get(k), v)
+			}
+		})
+	}
+}
+
+func TestEnforceHeaders(t *testing.T) {
+	// Prepare the test bulk request.
+	index := "what"
+
+	ops := []map[string]interface{}{
+		{
+			"index": map[string]interface{}{
+				"_index": index,
+				"_type":  "type1",
+				"_id":    "1",
+			},
+		},
+		{
+			"field1": "value1",
+		},
+	}
+
+	body := make([]interface{}, 0, 10)
+	for _, op := range ops {
+		body = append(body, op)
+	}
+
+	tests := []struct {
+		name   string
+		header http.Header
+	}{
+		{
+			name: "additional custom header",
+			header: http.Header{
+				"X-Elastic-Event-Count": []string{"123"},
+			},
+		},
+		{
+			name: "standard header",
+			header: http.Header{
+				"Content-Type": []string{"123"},
+			},
+		},
+	}
+
+	params := make(map[string]string)
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client, _ := NewConnection(ConnectionSettings{
+				URL: "http://localhost",
+			}, logptest.NewTestingLogger(t, ""))
+
+			expErr := errors.New("canceled")
+			client.Encoder = NewJSONEncoder(nil, false)
+			var actualHeader http.Header
+			client.HTTP = &reqInspector{
+				assert: func(req *http.Request) (*http.Response, error) {
+					actualHeader = req.Header
+					return nil, expErr
+				},
+			}
+
+			_, _, err := client.Bulk(context.Background(), index, "type1", tc.header, params, body)
+			require.ErrorIs(t, err, expErr)
+			for name := range tc.header {
+				assert.Equal(t, tc.header[name], actualHeader[name], "header %q does not match", name)
 			}
 		})
 	}

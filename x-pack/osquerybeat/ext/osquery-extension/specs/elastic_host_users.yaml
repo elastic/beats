@@ -1,0 +1,62 @@
+type: table
+name: elastic_host_users
+description: Host system user account information from /etc/passwd (e.g. when running in a container with hostfs mounted)
+platforms:
+  - linux
+  - darwin
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/hostusers
+
+columns:
+  - name: uid
+    type: BIGINT
+    description: User ID (unsigned)
+  - name: gid
+    type: BIGINT
+    description: Default group ID (unsigned)
+  - name: uid_signed
+    type: BIGINT
+    description: User ID as int64 signed (for Apple systems)
+  - name: gid_signed
+    type: BIGINT
+    description: Default group ID as int64 signed (for Apple systems)
+  - name: username
+    type: TEXT
+    description: Username / login name
+  - name: description
+    type: TEXT
+    description: Optional user description / full name (GECOS field)
+  - name: directory
+    type: TEXT
+    description: User's home directory path
+  - name: shell
+    type: TEXT
+    description: User's configured default shell
+  - name: uuid
+    type: TEXT
+    description: User's UUID (Apple) or SID (Windows); typically empty on Linux
+
+documentation:
+  description: |
+    Query user account information from the host system's /etc/passwd file when running in a container.
+    Reads from the path given by hostfs (default /hostfs); set ELASTIC_OSQUERY_HOSTFS to override.
+    Use for container security auditing, host user inventory, and compliance checks.
+  examples:
+    - title: Get all host users
+      query: |
+        SELECT * FROM elastic_host_users;
+    - title: Find user by username
+      query: |
+        SELECT * FROM elastic_host_users WHERE username = 'root';
+    - title: Find user by UID
+      query: |
+        SELECT * FROM elastic_host_users WHERE uid = 1000;
+    - title: List system users (UID < 1000)
+      query: |
+        SELECT username, uid, shell, directory FROM elastic_host_users WHERE uid < 1000 ORDER BY uid;
+  notes:
+    - "Linux and macOS. Requires host filesystem mounted (e.g. -v /:/hostfs:ro)."
+    - "Use ELASTIC_OSQUERY_HOSTFS to override the hostfs root (default /hostfs)."
+  related_tables:
+    - elastic_host_groups
+    - users

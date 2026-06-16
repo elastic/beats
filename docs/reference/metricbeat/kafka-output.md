@@ -2,6 +2,9 @@
 navigation_title: "Kafka"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/kafka-output.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure the Kafka output [kafka-output]
@@ -9,11 +12,22 @@ mapped_pages:
 
 The Kafka output sends events to Apache Kafka.
 
-To use this output, edit the Metricbeat configuration file to disable the {{es}} output by commenting it out, and enable the Kafka output by uncommenting the Kafka section.
+To use this output, edit the Metricbeat configuration file to deactivate the {{es}} output by commenting it out, and enable the Kafka output by uncommenting the Kafka section.
 
-::::{note}
-For Kafka version 0.10.0.0+ the message creation timestamp is set by beats and equals to the initial timestamp of the event. This affects the retention policy in Kafka: for example, if a beat event was created 2 weeks ago, the retention policy is set to 7 days and the message from beats arrives to Kafka today, it’s going to be immediately discarded since the timestamp value is before the last 7 days. It’s possible to change this behavior by setting timestamps on message arrival instead, so the message is not discarded but kept for 7 more days. To do that, please set `log.message.timestamp.type` to `LogAppendTime` (default `CreateTime`) in the Kafka configuration.
-::::
+:::{admonition} Kafka timestamps and beats
+* Kafka 3.6+ introduces stricter timestamp validation with the introduction of two new broker/topic-level properties: [log.message.timestamp.before.max.ms](https://docs.confluent.io/platform/current/installation/configuration/topic-configs.html#message-timestamp-before-max-ms) and 
+[log.message.timestamp.after.max.ms](https://docs.confluent.io/platform/current/installation/configuration/topic-configs.html#message-timestamp-after-max-ms).
+
+  These properties limit the time difference between the message timestamp (from beats) and the Kafka broker receive time. 
+  Messages can be rejected if the values are exceeded and `log.message.timestamp.type=CreateTime` is set. 
+
+  These checks are ignored if `log.message.timestamp.type=LogAppendTime` is set. 
+
+* For Kafka version 0.10.0.0+ the message creation timestamp is set by beats and equals the initial timestamp of the event. This behavior affects the retention policy in Kafka. For example, if a beat event was created 2 weeks ago, the retention policy is set to 7 days and the message from beats arrives to Kafka today, it is immediately discarded because the timestamp value is before the last 7 days. 
+
+  You can change this behavior by setting timestamps on message arrival instead.
+  The message is not discarded but kept for 7 more days. Set `log.message.timestamp.type` to `LogAppendTime` (default `CreateTime`) in the Kafka configuration.
+:::
 
 
 Example configuration:
@@ -63,7 +77,7 @@ The list of Kafka broker addresses from where to fetch the cluster metadata. The
 
 Kafka protocol version that Metricbeat will request when connecting. Defaults to 2.1.0. When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`
 
-Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
+Valid values are all kafka releases in between `0.8.2.0` and `4.1.0`.
 
 The protocol version controls the Kafka client features available to Metricbeat; it does not prevent Metricbeat from connecting to Kafka versions newer than the protocol version.
 
@@ -97,7 +111,21 @@ To use `GSSAPI` mechanism to authenticate with Kerberos, you must leave this fie
 
 The Kafka topic used for produced events.
 
-You can set the topic dynamically by using a format string to access any event field. For example, this configuration uses a custom field, `fields.log_topic`, to set the topic for each event:
+You can set a static topic, for example `metricbeat`, or you can use a format string to set a topic dynamically based on one or more [Elastic Common Schema (ECS)](ecs://reference/index.md) fields. Available fields include:
+
+* `data_stream.type`
+* `data_stream.dataset`
+* `data_stream.namespace`
+* `@timestamp`
+* `event.dataset`
+
+For example:
+
+```yaml
+topic: '%{[data_stream.type]}-%{[data_stream.dataset]}-%{[data_stream.namespace]}'
+```
+
+You can also set a custom field. This is useful if you need to construct a more complex or structured topic name. For example, this configuration uses the `fields.log_topic` custom field to set the topic for each event:
 
 ```yaml
 topic: '%{[fields.log_topic]}'
@@ -107,6 +135,19 @@ topic: '%{[fields.log_topic]}'
 To learn how to add custom fields to events, see the [`fields`](/reference/metricbeat/configuration-general-options.md#libbeat-configuration-fields) option.
 ::::
 
+To set a dynamic topic value for outputting {{metricbeat}} data to Kafka, you can add the [`add_fields` processor](/reference/metricbeat/add-fields.md) to {{metricbeat}}'s input configuration settings.
+    
+For example, the following `add_fields` processor creates a dynamic topic value for the `fields.log_topic` field by combining multiple [ECS data stream fields](ecs://reference/ecs-data_stream.md):
+
+  ```yaml
+  - add_fields:
+      target: ''
+      fields:
+        log_topic: '%{[data_stream.type]}-%{[data_stream.dataset]}-%{[data_stream.namespace]}' <1>
+  ```
+  1. Depending on the values of the data stream fields, this generates topic names such as `logs-nginx.access-production` or `metrics-system.cpu-staging` as the value of the custom `log_topic` field.
+
+  For more information, refer to [Filter and enhance data with processors](/reference/metricbeat/filtering-enhancing-data.md).
 
 See the [`topics`](#topics-option-kafka) setting for other ways to set the topic dynamically.
 

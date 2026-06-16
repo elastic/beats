@@ -24,12 +24,13 @@ import "time"
 type Observer interface {
 	NewBatch(int) // report new batch being processed with number of events
 
-	RetryableErrors(int)  // report number of events with retryable errors
-	PermanentErrors(int)  // report number of events dropped due to permanent errors
-	DuplicateEvents(int)  // report number of events detected as duplicates (e.g. on resends)
-	DeadLetterEvents(int) // report number of failed events ingested to dead letter index
-	AckedEvents(int)      // report number of acked events
-	ErrTooMany(int)       // report too many requests response
+	RetryableErrors(int)    // report number of events with retryable errors
+	PermanentErrors(int)    // report number of events dropped due to permanent errors
+	DuplicateEvents(int)    // report number of events detected as duplicates (e.g. on resends)
+	DeadLetterEvents(int)   // report number of failed events ingested to dead letter index
+	AckedEvents(int)        // report number of acked events
+	ErrTooMany(int)         // report too many requests response
+	FailureStoreEvents(int) // report number of events sent to the Failure store
 
 	BatchSplit() // report a batch was split for being too large to ingest
 
@@ -63,3 +64,4 @@ func (*emptyObserver) WriteBytes(int)                {}
 func (*emptyObserver) ReadError(error)               {}
 func (*emptyObserver) ReadBytes(int)                 {}
 func (*emptyObserver) ErrTooMany(int)                {}
+func (*emptyObserver) FailureStoreEvents(int)        {}

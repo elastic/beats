@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/load-kibana-dashboards.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Load Kibana dashboards [load-kibana-dashboards]
@@ -44,7 +47,7 @@ auditbeat setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{stack-version}} setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{version.stack}} setup --dashboards
 ```
 ::::::
 
@@ -120,7 +123,7 @@ auditbeat setup -e \
 
 ::::::{tab-item} Docker
 ```sh subs=true
-docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{stack-version}} setup -e \
+docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{version.stack}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \

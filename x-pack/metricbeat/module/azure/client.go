@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package azure
 
 import (
@@ -15,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // MetricCollectionInfo contains information about the last time
@@ -43,18 +46,20 @@ type Client struct {
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
 type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
-// NewClient instantiates the Azure monitoring client
-func NewClient(config Config) (*Client, error) {
-	azureMonitorService, err := NewService(config)
+// NewClient instantiates the Azure monitoring client. Pass nil for metrics
+// to disable API instrumentation (e.g. in tests).
+func NewClient(config Config, logger *logp.Logger, metrics *monitoring.Registry) (*Client, error) {
+	azureMonitorService, err := NewService(config, logger)
 	if err != nil {
 		return nil, err
 	}
+	observedAzureMonitorService := newObservedAzureMonitorService(azureMonitorService, metrics, logger)
 
-	logger := logp.NewLogger("azure monitor client")
+	logger = logger.Named("azure monitor client")
 
 	client := &Client{
 		BaseClient: &BaseClient{
-			AzureMonitorService: azureMonitorService,
+			AzureMonitorService: observedAzureMonitorService,
 			Config:              config,
 			Log:                 logger,
 			MetricRegistry:      NewMetricRegistry(logger),
@@ -123,6 +128,14 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	if len(metrics) == 0 {
 		client.Log.Debug("no resources were found based on all the configurations options entered")
 	}
+	if client.Log.IsDebug() {
+		metricCount := 0
+		for _, metric := range metrics {
+			metricCount += len(metric.Names)
+		}
+		client.Log.Debugf("unique metric definition count: %v", metricCount)
+	}
+
 	client.ResourceConfigurations.Metrics = metrics
 
 	return nil
@@ -215,6 +228,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 				// In this case, we track the time grain returned by the API. Azure
 				// provides a default time grain for each metric.
 				if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
+					// this should not be hit anymore - we grab the first timegrain reported
 					client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
 				}
 
@@ -435,9 +449,9 @@ func (client *BaseClient) MapToEvents(metrics []Metric, reporter mb.ReporterV2) 
 }
 
 // NewMockClient instantiates a new client with the mock azure service
-func NewMockClient() *Client {
+func NewMockClient(logger *logp.Logger) *Client {
 	azureMockService := new(MockService)
-	logger := logp.NewLogger("test azure monitor")
+	logger = logger.Named("test azure monitor")
 	client := &Client{
 		BaseClient: &BaseClient{
 			AzureMonitorService: azureMockService,

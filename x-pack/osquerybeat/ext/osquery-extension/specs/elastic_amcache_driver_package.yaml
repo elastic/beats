@@ -1,0 +1,80 @@
+type: table
+name: elastic_amcache_driver_package
+description: Windows Amcache inventory driver package entries (Root\InventoryDriverPackage)
+platforms:
+  - windows
+group: amcache
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/amcache
+
+columns:
+  - name: timestamp
+    type: BIGINT
+    description: Last write time as Unix timestamp
+    go_type: time.Time
+    format: unix
+  - name: date_time
+    type: TEXT
+    description: Last write time in RFC3339
+    go_type: time.Time
+    format: rfc3339
+    timezone: UTC
+  - name: class_guid
+    type: TEXT
+    description: Class GUID
+  - name: class
+    type: TEXT
+    description: Driver class
+  - name: directory
+    type: TEXT
+    description: Directory path
+  - name: date
+    type: TEXT
+    description: Date
+  - name: version
+    type: TEXT
+    description: Version
+  - name: provider
+    type: TEXT
+    description: Provider
+  - name: submission_id
+    type: TEXT
+    description: Submission ID
+  - name: driver_in_box
+    type: TEXT
+    description: In-box driver flag
+  - name: inf
+    type: TEXT
+    description: INF path
+  - name: flight_ids
+    type: TEXT
+    description: Flight IDs
+  - name: recovery_ids
+    type: TEXT
+    description: Recovery IDs
+  - name: is_active
+    type: TEXT
+    description: Is active flag
+  - name: hwids
+    type: TEXT
+    description: Hardware IDs
+  - name: sysfile
+    type: TEXT
+    description: SYS file path
+
+documentation:
+  description: |
+    Driver package inventory from Windows Amcache.
+    Queries Root\InventoryDriverPackage from the Amcache.hve registry hive.
+  examples:
+    - title: List all amcache driver packages
+      query: |
+        SELECT * FROM elastic_amcache_driver_package;
+    - title: Packages by provider
+      query: |
+        SELECT class_guid, version, provider, directory FROM elastic_amcache_driver_package WHERE provider != '';
+  notes:
+    - "Windows only. Requires Amcache.hve."
+  related_tables:
+    - elastic_amcache_driver_binary
+    - elastic_amcache_device_pnp

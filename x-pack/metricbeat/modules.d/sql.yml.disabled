@@ -1,12 +1,41 @@
 # Module: sql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-sql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-sql.html
 
 - module: sql
   metricsets:
     - query
   period: 10s
-  hosts: ["user=myuser password=mypassword dbname=mydb sslmode=disable"]
+  hosts: ["postgres://postgres:mysecretpassword@localhost:5432"]
+  # Example of using SSL parameters manually in the Postgres connection string (with ssl.* parameters unset). The Postgres SSL parameters "sslmode", "sslcert", "sslkey", and "sslrootcert" are passed in the connection string with slashes "/" being url-encoded to "%2F"
+  # hosts: ["postgres://postgres:mysecretpassword@localhost:5432?sslmode=verify-full&sslcert=%2Fpath%2Fto%2Fcert.pem&sslkey=%2Fpath%2Fto%2Fkey.pem&sslrootcert=%2Fpath%2Fto%2Fca.pem"]
+  # Example for SQL server
+  # hosts: ["sqlserver://myuser:mypassword@localhost:1433?TrustServerCertificate=false&certificate=%2Fpath%2Fto%2Fca.pem&database=mydb&encrypt=true"]
+
 
   driver: "postgres"
   sql_query: "select now()"
   sql_response_format: table
+
+  # Cursor-based incremental data fetching. When enabled, the cursor tracks the
+  # last fetched row value and uses it to retrieve only new data on subsequent
+  # collection cycles. Requires sql_response_format: table and a single sql_query
+  # with exactly one :cursor placeholder.
+  #cursor:
+  #  enabled: true
+  #  column: id
+  #  type: integer
+  #  #state_id: payments-prod  # optional: stable identity across DSN changes
+  #  default: "0"
+  #  #direction: asc
+
+  # List of root certificates for SSL/TLS server verification
+  # ssl.certificate_authorities: ["/path/to/ca.pem"]
+
+  # Certificate for SSL/TLS client authentication
+  # ssl.certificate: "/path/to/client-cert.pem"
+
+  # Client certificate key file
+  # ssl.key: "/path/to/client-key.pem"
+
+  # Controls the verification of server certificate
+  # ssl.verification_mode: full

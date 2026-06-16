@@ -20,21 +20,24 @@
 package filestream
 
 import (
-	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
@@ -42,18 +45,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
-	logger       *logp.Logger
-	loggerBuffer *bytes.Buffer
-	t            *testing.T
-	workingDir   string
-	stateStore   statestore.States
-	pipeline     *mockPipelineConnector
+	testLogger *logptest.Logger
+	t          *testing.T
+	workingDir string
+	stateStore statestore.States
+
+	pipeline   *mockPipelineConnector
+	monitoring beatmonitoring.Monitoring
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -70,37 +73,18 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	// logp.NewInMemoryLocal will always use a console encoder, passing a
-	// JSONEncoderConfig will only change the keys, not the final encoding.
-	logger, buff := logp.NewInMemoryLocal("", logp.ConsoleEncoderConfig())
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			f, err := os.CreateTemp("", t.Name()+"-*")
-			if err != nil {
-				t.Errorf("cannot create temp file for logs: %s", err)
-			}
-
-			defer f.Close()
-
-			data := buff.Bytes()
-			t.Logf("Debug Logs:%s\n", string(data))
-			t.Logf("Logs written to %s", f.Name())
-			if _, err := f.Write(data); err != nil {
-				t.Logf("could not write log file for debugging: %s", err)
-			}
-
-			return
-		}
-	})
+	logger := logptest.NewFileLogger(
+		t,
+		filepath.Join("..", "..", "build", "integration-tests"),
+	)
 
 	return &inputTestingEnvironment{
-		logger:       logger,
-		loggerBuffer: buff,
-		t:            t,
-		workingDir:   t.TempDir(),
-		stateStore:   openTestStatestore(),
-		pipeline:     &mockPipelineConnector{},
+		testLogger: logger,
+		t:          t,
+		workingDir: t.TempDir(),
+		stateStore: openTestStatestore(),
+		pipeline:   &mockPipelineConnector{},
+		monitoring: beatmonitoring.NewMonitoring(),
 	}
 }
 
@@ -132,7 +116,7 @@ func (e *inputTestingEnvironment) createInput(config map[string]any) (v2.Input, 
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(e.logger, e.stateStore)
+		e.plugin = Plugin(e.testLogger.Logger, e.stateStore)
 	})
 	return e.plugin.Manager
 }
@@ -143,23 +127,19 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
-		info := beat.Info{Monitoring: beat.Monitoring{
-			Namespace: monitoring.GetNamespace("dataset")},
-		}
+		logger := e.testLogger.Named("metrics-registry")
 		reg := inputmon.NewMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 		defer inputmon.CancelMetricsRegistry(
-			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+			id, inp.Name(), e.monitoring.InputsRegistry(), logger)
 
 		inputCtx := v2.Context{
 			ID:              id,
 			IDWithoutName:   id,
 			Name:            inp.Name(),
-			Agent:           info,
 			Cancelation:     ctx,
-			StatusReporter:  nil,
 			MetricsRegistry: reg,
-			Logger:          e.logger,
+			Logger:          e.testLogger.Named("input.filestream"),
 		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
@@ -169,12 +149,15 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 	e.wg.Wait()
 }
 
-func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) {
+// mustWriteToFile writes data to file and returns the full path
+func (e *inputTestingEnvironment) mustWriteToFile(filename string, data []byte) string {
 	path := e.abspath(filename)
 	err := os.WriteFile(path, data, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
+
+	return path
 }
 
 func (e *inputTestingEnvironment) mustAppendToFile(filename string, data []byte) {
@@ -237,39 +220,32 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 		e.t.Fatalf("error while iterating through registry: %+v", err)
 	}
 
-	require.Equal(e.t, actual, expectedCount)
+	require.Equal(e.t, expectedCount, actual)
 }
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	e.t.Helper()
-	var offsetStr strings.Builder
+	require.EventuallyWithT(e.t, func(ct *assert.CollectT) {
+		var offsetStr strings.Builder
 
-	filepath := e.abspath(filename)
-	fi, err := os.Stat(filepath)
-	if err != nil {
-		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
-	}
+		filepath := e.abspath(filename)
+		fi, err := os.Stat(filepath)
+		assert.NoError(ct, err, "cannot stat file when checking for offset")
 
-	id := getIDFromPath(filepath, inputID, fi)
-	var entry registryEntry
-	require.Eventuallyf(e.t, func() bool {
+		id := getIDFromPath(filepath, inputID, fi)
+		var entry registryEntry
 		offsetStr.Reset()
 
 		entry, err = e.getRegistryState(id)
-		if err != nil {
-			e.t.Fatalf("could not get state for '%s' from registry, err: %s", id, err)
-		}
+		assert.NoError(ct, err, "error getting state for ID '%s' from the registry", id)
 
 		fmt.Fprint(&offsetStr, entry.Cursor.Offset)
-
-		return expectedOffset == entry.Cursor.Offset
+		assert.Equal(ct, expectedOffset, entry.Cursor.Offset, "expected offset does not match")
 	},
-		time.Second,
+		10*time.Second,
 		100*time.Millisecond,
-		"expected offset: '%d', cursor offset: '%s'",
-		expectedOffset,
-		&offsetStr)
+		"failed to get expected registry offset")
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
@@ -343,8 +319,8 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(
 			e.t.Fatalf("could not stat '%s', err: %s", filepath, err)
 		}
 
-		fileSizeString.WriteString(fmt.Sprint(fi.Size()))
-		cursorString.WriteString(fmt.Sprint(entry.Cursor.Offset))
+		fmt.Fprint(&fileSizeString, fi.Size())
+		fmt.Fprint(&cursorString, entry.Cursor.Offset)
 
 		return entry.Cursor.Offset == expectedOffset
 	},
@@ -394,7 +370,6 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 			keys = append(keys, key)
 			return false, nil
 		})
-		e.t.Logf("keys in store: %v", keys)
 
 		return registryEntry{},
 			fmt.Errorf("error when getting expected key '%s' from store: %w",
@@ -405,7 +380,7 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 }
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
-	identifier, _ := newINodeDeviceIdentifier(nil)
+	identifier, _ := newINodeDeviceIdentifier(nil, nil)
 	src := identifier.GetSource(loginp.FSEvent{
 		Descriptor: loginp.FileDescriptor{
 			Info: file.ExtendFileInfo(fi),
@@ -419,20 +394,10 @@ func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
-	msg := &strings.Builder{}
-	require.Eventuallyf(e.t, func() bool {
-		msg.Reset()
-
+	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		events := e.pipeline.GetAllEvents()
-		sum := len(events)
-		if sum == count {
-			return true
-		}
-		fmt.Fprintf(msg, "unexpected number of events; expected: %d, actual: %d\n",
-			count, sum)
-
-		return false
-	}, 2*time.Minute, 10*time.Millisecond, "%s", msg)
+		require.Equal(t, count, len(events), "unexpected number of events")
+	}, 2*time.Minute, 10*time.Millisecond)
 }
 
 // waitUntilEventCountCtx calls waitUntilEventCount, but fails if ctx is cancelled.
@@ -490,7 +455,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	require.Eventually(
 		e.t,
 		func() bool {
-			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed.Load()
 		},
 		time.Second*10,
 		time.Millisecond*10,
@@ -518,13 +483,13 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	}
 
 	var missingEvents []string
-	for i, found := range foundEvents {
-		if !found {
-			missingEvents = append(missingEvents, events[i])
+	for i, ev := range events {
+		if !foundEvents[i] {
+			missingEvents = append(missingEvents, ev)
 		}
 	}
 
-	require.Equal(e.t, 0, len(missingEvents),
+	require.Empty(e.t, missingEvents,
 		"following events are missing: %+v", missingEvents)
 }
 
@@ -572,6 +537,18 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+// logContains ensures s is a sub string on any log line.
+// If s is not found, the test fails
+func (e *inputTestingEnvironment) logContains(s string) {
+	e.t.Helper()
+	e.testLogger.LogContains(e.t, s)
+}
+
+func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
+	e.t.Helper()
+	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
+}
+
 var _ statestore.States = (*testInputStore)(nil)
 
 type testInputStore struct {
@@ -600,9 +577,91 @@ type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
 	ackHandler beat.EventListener
-	closed     bool
-	mtx        sync.Mutex
-	canceler   context.CancelFunc
+	closed     atomic.Bool
+	// publishingStarted is set the first time PublishAll is called. It must
+	// be readable without holding mtx because PublishAll keeps mtx while
+	// invoking ackHandler.ACKEvents, which can block (e.g. with a blocking
+	// ack handler used in TestFilestreamTruncateBlockedOutput).
+	publishingStarted atomic.Bool
+	mtx               sync.Mutex
+	// done is closed by cancel() to release a blocked ack handler. Tests call
+	// cancel either directly (via this client) or via
+	// mockPipelineConnector.cancelAllClients.
+	done       chan struct{}
+	cancelOnce sync.Once
+
+	allowedEventsSet bool          // make the zero value unblocked
+	allowedEvents    int           // Maximum number of events to accept before blocking
+	eventsAccepted   int           // Current number of events accepted
+	blocked          bool          // Whether the client is currently blocked
+	blockChan        chan struct{} // Channel to signal when blocking should be released
+}
+
+// SetAllowedEvents sets the maximum number of events the client will accept
+// before blocking.
+func (c *mockClient) SetAllowedEvents(limit int) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.allowedEventsSet = true
+	c.allowedEvents = limit
+	c.eventsAccepted = 0
+	c.blocked = false
+	c.blockChan = make(chan struct{}, 1)
+}
+
+// AllowMoreEvents allows the client to accept more n events.
+func (c *mockClient) AllowMoreEvents(n int) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.allowedEventsSet = true
+	c.allowedEvents += n
+	if c.blocked && c.eventsAccepted < c.allowedEvents {
+		c.blocked = false
+		select {
+		case c.blockChan <- struct{}{}:
+		default:
+		}
+	}
+}
+
+// Unblock removes all event count restrictions and unblocks the client
+func (c *mockClient) Unblock() {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
+
+	c.allowedEventsSet = false
+	c.allowedEvents = 0
+
+	c.blocked = false
+	select {
+	case c.blockChan <- struct{}{}:
+	default:
+	}
+}
+
+// cancel releases a blocked ack handler. Safe to call from multiple goroutines
+// and idempotent.
+func (c *mockClient) cancel() {
+	c.cancelOnce.Do(func() { close(c.done) })
+}
+
+// waitIfBlocked acquires c.mtx.
+func (c *mockClient) waitIfBlocked() {
+	c.mtx.Lock()
+	unlock := sync.OnceFunc(func() {
+		c.mtx.Unlock()
+	})
+	defer unlock()
+
+	if c.allowedEventsSet &&
+		c.eventsAccepted >= c.allowedEvents {
+
+		c.blocked = true
+		unlock()
+		<-c.blockChan
+	}
 }
 
 // GetEvents returns the published events
@@ -620,10 +679,20 @@ func (c *mockClient) Publish(e beat.Event) {
 
 // PublishAll mocks the Client PublishAll method
 func (c *mockClient) PublishAll(events []beat.Event) {
+	c.waitIfBlocked()
+
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
+	c.eventsAccepted += len(events)
+
 	c.publishing = append(c.publishing, events...)
+	if len(events) > 0 {
+		// Only flag as started for non-empty batches so an empty PublishAll
+		// does not wake waitUntilPublishingHasStarted prematurely (preserving
+		// the pre-fix semantics of `len(c.publishing) > 0`).
+		c.publishingStarted.Store(true)
+	}
 	for _, event := range events {
 		c.ackHandler.AddEvent(event, true)
 	}
@@ -633,7 +702,7 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 }
 
 func (c *mockClient) waitUntilPublishingHasStarted() {
-	for len(c.publishing) == 0 {
+	for !c.publishingStarted.Load() {
 		time.Sleep(10 * time.Millisecond)
 	}
 }
@@ -643,11 +712,11 @@ func (c *mockClient) Close() error {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	if c.closed {
+	if c.closed.Load() {
 		return fmt.Errorf("mock client already closed")
 	}
 
-	c.closed = true
+	c.closed.Store(true)
 	return nil
 }
 
@@ -656,6 +725,9 @@ type mockPipelineConnector struct {
 	blocking bool
 	clients  []*mockClient
 	mtx      sync.Mutex
+
+	allowedEventsSet bool // make the zero value unblocked
+	allowedEvents    int
 }
 
 // GetAllEvents returns all events associated with a pipeline
@@ -681,15 +753,33 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	c := &mockClient{
-		canceler:   cancel,
-		ackHandler: newMockACKHandler(ctx, pc.blocking, config),
+	c := newMockClient(pc.blocking, config)
+	pc.clients = append(pc.clients, c)
+	if pc.allowedEventsSet {
+		c.SetAllowedEvents(pc.allowedEvents)
+	}
+	return c, nil
+}
+
+func (pc *mockPipelineConnector) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	var err error
+	for _, c := range pc.clients {
+		err = errors.Join(err, c.Close())
 	}
 
-	pc.clients = append(pc.clients, c)
+	return err
+}
 
-	return c, nil
+func newMockClient(blocking bool, config beat.ClientConfig) *mockClient {
+	done := make(chan struct{})
+	return &mockClient{
+		done:       done,
+		ackHandler: newMockACKHandler(done, blocking, config),
+		blockChan:  make(chan struct{}, 1),
+	}
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
@@ -697,22 +787,61 @@ func (pc *mockPipelineConnector) cancelAllClients() {
 	defer pc.mtx.Unlock()
 
 	for _, client := range pc.clients {
-		client.canceler()
+		client.cancel()
 	}
 }
 
-func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
+// SetAllowedEvents sets the maximum number of events the client will accept
+// before blocking. The limit is propagated to every existing client and to
+// any client that connects afterward.
+func (pc *mockPipelineConnector) SetAllowedEvents(limit int) {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.allowedEventsSet = true
+	pc.allowedEvents = limit
+	for _, client := range pc.clients {
+		client.SetAllowedEvents(limit)
+	}
+}
+
+// AllowMoreEvents allows the client to accept more n events.
+func (pc *mockPipelineConnector) AllowMoreEvents(n int) {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.allowedEventsSet = true
+	pc.allowedEvents += n
+	for _, client := range pc.clients {
+		client.AllowMoreEvents(n)
+	}
+}
+
+// UnblockClients removes all event count restrictions and unblocks the client
+func (pc *mockPipelineConnector) UnblockClients() {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.allowedEventsSet = false
+	for _, client := range pc.clients {
+		client.Unblock()
+	}
+}
+
+func newMockACKHandler(done <-chan struct{}, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
 		return config.EventListener
 	}
 
-	return acker.Combine(blockingACKer(starter), config.EventListener)
+	return acker.Combine(blockingACKer(done), config.EventListener)
 }
 
-func blockingACKer(starter context.Context) beat.EventListener {
+// blockingACKer blocks the publisher's ack call until done is closed. Tests
+// rely on this to hold cursorPublisher.forward in PublishAll long enough to
+// observe back-pressure scenarios.
+func blockingACKer(done <-chan struct{}) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []any) {
-		for starter.Err() == nil {
-		}
+		<-done
 	})
 }
 

@@ -54,7 +54,7 @@ func fetchGroupInfo(
 		return nil
 	}
 
-	logger.Named("kafka").Debugf("known consumer groups: ", groups)
+	logger.Named("kafka").Debugf("known consumer groups: %s", groups)
 
 	assignments, err := fetchGroupAssignments(b, groups)
 	if err != nil {

@@ -30,7 +30,8 @@ func newWatcher(
 	fetcher fetcher,
 	period time.Duration,
 	onStart func(uuid string, instanceMap *ec2Instance),
-	onStop func(uuid string)) *watcher {
+	onStop func(uuid string),
+	log *logp.Logger) *watcher {
 	return &watcher{
 		fetcher:      fetcher,
 		onStart:      onStart,
@@ -39,7 +40,7 @@ func newWatcher(
 		ticker:       time.NewTicker(period),
 		period:       period,
 		ec2Instances: map[string]uint64{},
-		logger:       logp.NewLogger("autodiscover-ec2-watcher"),
+		logger:       log.Named("autodiscover-ec2-watcher"),
 	}
 }
 

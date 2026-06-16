@@ -19,26 +19,45 @@ package beater
 
 import (
 	"context"
+	"fmt"
+	"sync"
 	"time"
 
+	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/confmap"
+
 	"github.com/elastic/beats/v7/filebeat/config"
-	"github.com/elastic/beats/v7/filebeat/features"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/otelstorage"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-var _ statestore.States = (*filebeatStore)(nil)
+var (
+	_ statestore.States = (*filebeatStore)(nil)
+
+	globalMu     sync.Mutex
+	globalStores = map[string]*sharedRegistries{}
+)
+
+type sharedRegistries struct {
+	refCount   int
+	registry   *statestore.Registry
+	esRegistry *statestore.Registry
+	notifier   *es.Notifier
+}
 
 type filebeatStore struct {
-	registry      *statestore.Registry
-	esRegistry    *statestore.Registry
+	shared        *sharedRegistries
 	storeName     string
 	cleanInterval time.Duration
+	storeKey      string // key into globalStores (path + backend)
 
 	// Notifies the Elasticsearch store about configuration change
 	// which is available only after the beat runtime manager connects to the Agent
@@ -46,54 +65,147 @@ type filebeatStore struct {
 	notifier *es.Notifier
 }
 
+func storeKey(resolvedPath, backendName string) string {
+	if backendName == "" {
+		backendName = "memlog"
+	}
+	return backendName + "://" + resolvedPath
+}
+
 func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
-	var (
-		reg backend.Registry
-		err error
+	resolvedPath := info.Paths.Resolve(paths.Data, cfg.Path)
+	key := storeKey(resolvedPath, cfg.Backend)
 
-		esreg    *es.Registry
-		notifier *es.Notifier
-	)
+	globalMu.Lock()
+	defer globalMu.Unlock()
 
-	if features.IsElasticsearchStateStoreEnabled() {
-		notifier = es.NewNotifier()
-		esreg = es.New(ctx, logger, notifier)
+	shared, ok := globalStores[key]
+	if !ok {
+		var (
+			reg backend.Registry
+			err error
+		)
+
+		switch cfg.Backend {
+		case "otel_file_storage":
+			fsCfg, fsErr := filestorageConfigFromRegistry(cfg, resolvedPath)
+			if fsErr != nil {
+				return nil, fsErr
+			}
+			recvID, idErr := otelReceiverIDFromBeat(info)
+			if idErr != nil {
+				return nil, idErr
+			}
+			reg, err = otelstorage.NewFileStorage(ctx, otelstorage.Settings{
+				Config:     fsCfg,
+				ReceiverID: recvID,
+				Logger:     logger,
+			})
+		case "memlog", "":
+			reg, err = memlog.New(logger, memlog.Settings{
+				Root:     resolvedPath,
+				FileMode: cfg.Permissions,
+			})
+		default:
+			return nil, fmt.Errorf("unknown registry backend: %q", cfg.Backend)
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		shared = &sharedRegistries{
+			registry: statestore.NewRegistry(reg),
+		}
+
+		if features.IsElasticsearchStateStoreEnabled() {
+			switch cfg.ESStorageExtension {
+			case nil:
+				// The notifier is a concurrency-safe pub/sub broadcaster shared between
+				// the es.Registry (subscriber) and all filebeatStore wrappers (publishers).
+				// Multiple Notify() calls are idempotent, so sharing across wrappers is safe.
+				shared.notifier = es.NewNotifier()
+				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier))
+			default:
+				shared.esRegistry = statestore.NewRegistry(cfg.ESStorageExtension)
+			}
+		}
+
+		globalStores[key] = shared
 	}
 
-	reg, err = memlog.New(logger, memlog.Settings{
-		Root:     paths.Resolve(paths.Data, cfg.Path),
-		FileMode: cfg.Permissions,
-	})
-	if err != nil {
-		return nil, err
-	}
+	shared.refCount++
 
-	store := &filebeatStore{
-		registry:      statestore.NewRegistry(reg),
+	return &filebeatStore{
+		shared:        shared,
 		storeName:     info.Beat,
 		cleanInterval: cfg.CleanInterval,
-		notifier:      notifier,
-	}
-
-	if esreg != nil {
-		store.esRegistry = statestore.NewRegistry(esreg)
-	}
-
-	return store, nil
+		storeKey:      key,
+		notifier:      shared.notifier,
+	}, nil
 }
 
 func (s *filebeatStore) Close() {
-	s.registry.Close()
+	globalMu.Lock()
+	defer globalMu.Unlock()
+
+	s.shared.refCount--
+	if s.shared.refCount == 0 {
+		_ = s.shared.registry.Close()
+		if s.shared.esRegistry != nil {
+			_ = s.shared.esRegistry.Close()
+		}
+		delete(globalStores, s.storeKey)
+	}
 }
 
 // StoreFor returns the storage registry depending on the type. Default is the file store.
 func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
-	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.esRegistry != nil {
-		return s.esRegistry.Get(s.storeName)
+	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.shared.esRegistry != nil {
+		return s.shared.esRegistry.Get(s.storeName)
 	}
-	return s.registry.Get(s.storeName)
+	return s.shared.registry.Get(s.storeName)
 }
 
 func (s *filebeatStore) CleanupInterval() time.Duration {
 	return s.cleanInterval
+}
+
+// filestorageConfigFromRegistry builds a filestorage.Config from the user's
+// registry configuration. When no otel_file_storage section is provided,
+// factory defaults are used with CreateDirectory defaulting to true and
+// DirectoryPermissions defaulting to 0700 so that standalone Filebeat creates
+// its registry directory automatically.
+// When the user provides an explicit otel_file_storage section, their
+// CreateDirectory value is honored as-is.
+func filestorageConfigFromRegistry(cfg config.Registry, resolvedPath string) (*filestorage.Config, error) {
+	out := otelstorage.DefaultFileStorageConfig()
+	out.Directory = resolvedPath
+
+	const defaultDirPerms = "0700"
+	if cfg.FileStorage == nil {
+		out.CreateDirectory = true
+		out.DirectoryPermissions = defaultDirPerms
+	} else {
+		cm := confmap.NewFromStringMap(cfg.FileStorage)
+		if err := cm.Unmarshal(out); err != nil {
+			return nil, fmt.Errorf("failed to parse otel_file_storage config: %w", err)
+		}
+		out.Directory = resolvedPath
+		if out.CreateDirectory && cfg.FileStorage["directory_permissions"] == nil {
+			out.DirectoryPermissions = defaultDirPerms
+		}
+	}
+
+	return out, nil
+}
+
+// otelReceiverIDFromBeat returns the OpenTelemetry receiver [component.ID] used by the
+// file_storage backend for per-client file naming. Standalone Filebeat does not expose a
+// separate config key; the running beat name (e.g. "filebeat") is used.
+func otelReceiverIDFromBeat(info beat.Info) (component.ID, error) {
+	var id component.ID
+	if err := id.UnmarshalText([]byte(info.Beat)); err != nil {
+		return id, fmt.Errorf("invalid beat name for otel_file_storage registry: %w", err)
+	}
+	return id, nil
 }

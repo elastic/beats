@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"sync"
@@ -61,7 +62,6 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
 	}
-	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,
@@ -158,6 +158,16 @@ func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	return c, nil
 }
 
+func (pc *MockPipeline) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.Clients {
+		c.Close()
+	}
+
+	return nil
+}
 func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()

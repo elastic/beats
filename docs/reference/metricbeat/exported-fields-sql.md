@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-sql.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # SQL fields [exported-fields-sql]
 
@@ -10,30 +15,30 @@ SQL module fetches metrics from a SQL database
 **`sql.driver`**
 :   Driver used to execute the query.
 
-type: keyword
+    type: keyword
 
 
 **`sql.query`**
 :   Query executed to collect metrics.
 
-type: keyword
+    type: keyword
 
 
 **`sql.metrics.numeric.*`**
 :   Numeric metrics collected.
 
-type: object
+    type: object
 
 
 **`sql.metrics.string.*`**
 :   Non-numeric values collected.
 
-type: object
+    type: object
 
 
 **`sql.metrics.boolean.*`**
 :   Boolean values collected.
 
-type: object
+    type: object
 
 

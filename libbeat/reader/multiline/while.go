@@ -18,7 +18,9 @@
 package multiline
 
 import (
+	"errors"
 	"io"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -41,6 +43,7 @@ type whilePatternReader struct {
 	matcher   lineMatcherFunc
 	logger    *logp.Logger
 	msgBuffer *messageBuffer
+	stateMu   sync.Mutex
 	state     func(*whilePatternReader) (reader.Message, error)
 }
 
@@ -49,6 +52,7 @@ func newMultilineWhilePatternReader(
 	separator string,
 	maxBytes int,
 	config *Config,
+	logger *logp.Logger,
 ) (reader.Reader, error) {
 	maxLines := defaultMaxLines
 	if config.MaxLines != nil {
@@ -61,7 +65,7 @@ func newMultilineWhilePatternReader(
 	}
 
 	if tout > 0 {
-		r = readfile.NewTimeoutReader(r, sigMultilineTimeout, tout)
+		r = readfile.NewTimeoutReader(r, errSigMultilineTimeout, tout)
 	}
 
 	matcherFunc := lineMatcher(*config.Pattern)
@@ -73,7 +77,7 @@ func newMultilineWhilePatternReader(
 		reader:    r,
 		matcher:   matcherFunc,
 		msgBuffer: newMessageBuffer(maxBytes, maxLines, []byte(separator), config.SkipNewLine),
-		logger:    logp.NewLogger("reader_multiline"),
+		logger:    logger.Named("reader_multiline"),
 		state:     (*whilePatternReader).readFirst,
 	}
 	return pr, nil
@@ -81,7 +85,13 @@ func newMultilineWhilePatternReader(
 
 // Next returns next multi-line event.
 func (pr *whilePatternReader) Next() (reader.Message, error) {
-	return pr.state(pr)
+	return pr.loadState()(pr)
+}
+
+func (pr *whilePatternReader) loadState() func(*whilePatternReader) (reader.Message, error) {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
+	return pr.state
 }
 
 func (pr *whilePatternReader) readFirst() (reader.Message, error) {
@@ -89,7 +99,7 @@ func (pr *whilePatternReader) readFirst() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// no lines buffered -> ignore timeout
-			if err == sigMultilineTimeout {
+			if errors.Is(err, errSigMultilineTimeout) {
 				continue
 			}
 
@@ -120,7 +130,7 @@ func (pr *whilePatternReader) readNext() (reader.Message, error) {
 		message, err := pr.reader.Next()
 		if err != nil {
 			// handle multiline timeout signal
-			if err == sigMultilineTimeout {
+			if errors.Is(err, errSigMultilineTimeout) {
 				// no lines buffered -> ignore timeout
 				if pr.msgBuffer.isEmpty() {
 					continue
@@ -209,6 +219,8 @@ func (pr *whilePatternReader) resetState() {
 
 // setState sets state to the given function
 func (pr *whilePatternReader) setState(next func(pr *whilePatternReader) (reader.Message, error)) {
+	pr.stateMu.Lock()
+	defer pr.stateMu.Unlock()
 	pr.state = next
 }
 

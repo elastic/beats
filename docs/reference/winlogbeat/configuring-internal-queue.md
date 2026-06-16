@@ -2,6 +2,9 @@
 navigation_title: "Internal queue"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuring-internal-queue.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure the internal queue [configuring-internal-queue]

@@ -18,19 +18,13 @@
 package config
 
 import (
-	"fmt"
-	"log"
 	"os"
-	"path/filepath"
 	"sort"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 // Defaults for config variables which are not set
@@ -56,6 +50,13 @@ type Registry struct {
 	FlushTimeout  time.Duration `config:"flush"`
 	CleanInterval time.Duration `config:"cleanup_interval"`
 	MigrateFile   string        `config:"migrate_file"`
+	Backend       string        `config:"backend"`
+	// FileStorage holds the raw user configuration for the OpenTelemetry file_storage
+	// extension when Backend is "otel_file_storage". The map is decoded into
+	// filestorage.Config using confmap (which honours mapstructure tags) at registry
+	// creation time. If nil, factory defaults are used.
+	FileStorage        map[string]any   `config:"otel_file_storage"`
+	ESStorageExtension backend.Registry `config:"-"`
 }
 
 var DefaultConfig = Config{
@@ -65,90 +66,10 @@ var DefaultConfig = Config{
 		MigrateFile:   "",
 		CleanInterval: 5 * time.Minute,
 		FlushTimeout:  time.Second,
+		Backend:       "memlog",
 	},
 	ShutdownTimeout:    0,
 	OverwritePipelines: false,
-}
-
-// getConfigFiles returns list of config files.
-// In case path is a file, it will be directly returned.
-// In case it is a directory, it will fetch all .yml files inside this directory
-func getConfigFiles(path string) (configFiles []string, err error) {
-	// Check if path is valid file or dir
-	stat, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create empty slice for config file list
-	configFiles = make([]string, 0)
-
-	if stat.IsDir() {
-		files, err := filepath.Glob(path + "/*.yml")
-		if err != nil {
-			return nil, err
-		}
-
-		configFiles = append(configFiles, files...)
-
-	} else {
-		// Only 1 config file
-		configFiles = append(configFiles, path)
-	}
-
-	return configFiles, nil
-}
-
-// mergeConfigFiles reads in all config files given by list configFiles and merges them into config
-func mergeConfigFiles(configFiles []string, config *Config) error {
-	for _, file := range configFiles {
-		logp.Info("Additional configs loaded from: %s", file)
-
-		tmpConfig := struct {
-			Filebeat Config
-		}{}
-		//nolint:staticcheck // Let's keep the logic here
-		err := cfgfile.Read(&tmpConfig, file)
-		if err != nil {
-			return fmt.Errorf("failed to read %s: %w", file, err)
-		}
-
-		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)
-	}
-
-	return nil
-}
-
-// FetchConfigs fetches and merges all config files given by configDir. All are put into one config object
-func (config *Config) FetchConfigs() error {
-	configDir := config.ConfigDir
-
-	// If option not set, do nothing
-	if configDir == "" {
-		return nil
-	}
-
-	cfgwarn.Deprecate("7.0.0", "config_dir is deprecated. Use `filebeat.config.inputs` instead.")
-
-	// If configDir is relative, consider it relative to the config path
-	configDir = paths.Resolve(paths.Config, configDir)
-
-	// Check if optional configDir is set to fetch additional config files
-	logp.Info("Additional config files are fetched from: %s", configDir)
-
-	configFiles, err := getConfigFiles(configDir)
-	if err != nil {
-		log.Fatal("Could not use config_dir of: ", configDir, err)
-		return err
-	}
-
-	err = mergeConfigFiles(configFiles, config)
-	if err != nil {
-		log.Fatal("Error merging config files: ", err)
-		return err
-	}
-
-	return nil
 }
 
 // ListEnabledInputs returns a list of enabled inputs sorted by alphabetical order.

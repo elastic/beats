@@ -87,18 +87,23 @@ func TestDissectConversion(t *testing.T) {
 			},
 			Fail: false,
 		},
+		{
+			Name:     "Invalid field name should fail gracefully",
+			Tok:      "%{\n}",
+			Msg:      "test message",
+			Expected: map[string]interface{}{},
+			Fail:     true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			d, err := New(test.Tok)
-			if !assert.NoError(t, err) {
+			if test.Fail {
+				assert.Error(t, err)
 				return
 			}
-
-			if test.Fail {
-				_, err := d.DissectConvert(test.Msg)
-				assert.Error(t, err)
+			if !assert.NoError(t, err) {
 				return
 			}
 

@@ -28,7 +28,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
@@ -62,7 +61,6 @@ var (
 
 	// XPack are all x-pack beats projects, including libbeat
 	XPack = []string{
-		"agentbeat",
 		"auditbeat",
 		"dockerlogbeat",
 		"filebeat",
@@ -136,7 +134,7 @@ func AddLicenseHeaders() error {
 
 	licenser := gotool.Licenser
 
-	return multierr.Combine(
+	return errors.Join(
 		licenser(
 			licenser.License("ASL2"),
 			licenser.Exclude("x-pack"),
@@ -159,7 +157,7 @@ func CheckLicenseHeaders() error {
 
 	licenser := gotool.Licenser
 
-	return multierr.Combine(
+	return errors.Join(
 		licenser(
 			licenser.Check(),
 			licenser.License("ASL2"),
@@ -201,10 +199,6 @@ func UnitTest() error {
 		beats = append(beats, filepath.Join(wd, d))
 	}
 	for _, d := range XPack {
-		if d == "agentbeat" {
-			fmt.Println(">> skipping x-pack/agentbeat")
-			continue
-		}
 		beats = append(beats, filepath.Join(wd, "x-pack", d))
 	}
 

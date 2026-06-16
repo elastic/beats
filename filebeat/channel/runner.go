@@ -144,7 +144,7 @@ func newCommonConfigEditor(
 			indexProcessor = add_formatted_index.New(timestampFormat)
 		}
 
-		userProcessors, err := processors.New(config.Processors)
+		userProcessors, err := processors.New(config.Processors, beatInfo.Logger)
 		if err != nil {
 			return clientCfg, err
 		}

@@ -25,8 +25,8 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	"github.com/elastic/beats/v7/filebeat/features"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -61,11 +61,12 @@ type InputManager struct {
 
 	// Configure returns an array of Sources, and a configured Input instances
 	// that will be used to collect events from each source.
-	Configure func(cfg *conf.C) ([]Source, Input, error)
+	Configure func(cfg *conf.C, log *logp.Logger) ([]Source, Input, error)
 
-	initedFull bool
-	initErr    error
-	store      *store
+	initedFull   bool
+	initErr      error
+	store        *store
+	cleanerGroup unison.Group // saved from Init() for deferred cleaner start
 }
 
 // Source describe a source the input can collect data from.
@@ -80,12 +81,8 @@ var (
 	errNoInputRunner      = errors.New("no input runner available")
 )
 
-// init initializes the state store
-// This function is called from:
-// 1. InputManager::Init on beat start
-// 2. InputManager::Create when the input is initialized with configuration
-// When Elasticsearch state storage is used for the input it will be only fully configured on InputManager::Create,
-// so skip reading the state from the storage on InputManager::Init in this case
+// init initializes the state store with a full init (reading all states).
+// For ES-backed inputs, this is deferred until Create() where the inputID is known.
 func (cim *InputManager) init(inputID string) error {
 	if cim.initedFull {
 		return nil
@@ -96,35 +93,48 @@ func (cim *InputManager) init(inputID string) error {
 	}
 
 	log := cim.Logger.With("input_type", cim.Type)
-	var store *store
-	useES := features.IsElasticsearchStateStoreEnabledForInput(cim.Type)
-	fullInit := !useES || inputID != ""
-	store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, fullInit)
+	cim.store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, true)
 	if cim.initErr != nil {
 		return cim.initErr
 	}
+	cim.initedFull = true
 
-	cim.store = store
-	if fullInit {
-		cim.initedFull = true
-	}
-
-	return cim.initErr
+	return nil
 }
 
 // Init starts background processes for deleting old entries from the
 // persistent store if mode is ModeRun.
+// For ES-backed inputs, store creation is deferred to Create() where the
+// inputID is known, so Init() only saves the group for later use.
 func (cim *InputManager) Init(group unison.Group) error {
+	if features.IsElasticsearchStateStoreEnabledForInput(cim.Type) {
+		cim.cleanerGroup = group
+		return nil
+	}
+
 	if err := cim.init(""); err != nil {
 		return err
 	}
+	return cim.startCleaner(group)
+}
 
+// startCleaner launches the background cleaner goroutine that removes stale
+// entries from the persistent store.
+func (cim *InputManager) startCleaner(group unison.Group) error {
 	log := cim.Logger.With("input_type", cim.Type)
 
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
+	// TL;DR: If Filebeat shuts down too quickly, the function passed to
+	// `group.Go` will never run, therefore this instance of store will
+	// never be released, locking Filebeat's shutdown process.
+	//
+	// To circumvent that, we wait for `group.Go` to start our function.
+	// See https://github.com/elastic/beats/issues/45034#issuecomment-3238261126
+	waitRunning := make(chan struct{})
 	err := group.Go(func(canceler context.Context) error {
+		waitRunning <- struct{}{}
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -137,9 +147,10 @@ func (cim *InputManager) Init(group unison.Group) error {
 	if err != nil {
 		store.Release()
 		cim.shutdown()
-		return fmt.Errorf("Can not start registry cleanup process: %w", err)
+		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 
+	<-waitRunning
 	return nil
 }
 
@@ -162,7 +173,16 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	sources, inp, err := cim.Configure(config)
+	// For ES-backed inputs, the cleaner is deferred from Init() to here
+	// because the store isn't created until init() is called with the inputID.
+	if cim.cleanerGroup != nil {
+		if err := cim.startCleaner(cim.cleanerGroup); err != nil {
+			return nil, err
+		}
+		cim.cleanerGroup = nil
+	}
+
+	sources, inp, err := cim.Configure(config, cim.Logger)
 	if err != nil {
 		return nil, err
 	}

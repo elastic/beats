@@ -63,10 +63,12 @@ type bulkRequest struct {
 type BulkResponse json.RawMessage
 
 // Bulk performs many index/delete operations in a single API call.
+// `header` is an additional set of custom HTTP headers that will be set to the HTTP request
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
 func (conn *Connection) Bulk(
 	ctx context.Context,
 	index, docType string,
+	header http.Header,
 	params map[string]string, body []interface{},
 ) (int, BulkResponse, error) {
 	if len(body) == 0 {
@@ -80,7 +82,7 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 
-	mergedParams := mergeParams(conn.ConnectionSettings.Parameters, params)
+	mergedParams := mergeParams(conn.Parameters, params)
 
 	requ, err := newBulkRequest(conn.URL, index, docType, mergedParams, enc)
 	if err != nil {
@@ -88,6 +90,10 @@ func (conn *Connection) Bulk(
 		return 0, nil, err
 	}
 	requ.requ = apmHttpV2.RequestWithContext(ctx, requ.requ)
+	// multiple values per header are not supported
+	for name := range header {
+		requ.requ.Header.Set(name, header.Get(name))
+	}
 
 	return conn.sendBulkRequest(requ)
 }

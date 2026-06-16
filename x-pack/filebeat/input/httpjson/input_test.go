@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -19,10 +20,13 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var testCases = []struct {
@@ -33,6 +37,7 @@ var testCases = []struct {
 	expected       []string
 	expectedFile   string
 	expectedNoFile string
+	wantErr        error
 
 	skipReason string
 }{
@@ -56,6 +61,16 @@ var testCases = []struct {
 		},
 		handler:  defaultHandler(http.MethodGet, "", ""),
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name:        "simple_GET_request_returns_an_array_of_strings_no_events",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  defaultHandler(http.MethodGet, "", `["123", "456"]`),
+		expected: nil,
 	},
 	{
 		name:        "request_honors_rate_limit",
@@ -337,7 +352,7 @@ var testCases = []struct {
 					"value": `[[index .last_response.body "@timestamp"]]`,
 				},
 			},
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -345,7 +360,7 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -379,7 +394,7 @@ var testCases = []struct {
 				},
 			},
 			"request.tracer.enabled":  true,
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -387,7 +402,7 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+		expectedFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -421,7 +436,7 @@ var testCases = []struct {
 				},
 			},
 			"request.tracer.enabled":  false,
-			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"request.tracer.filename": "httpjson/logs/http-request-trace-*.ndjson",
 		},
 		handler: dateCursorHandler(),
 		expected: []string{
@@ -429,7 +444,51 @@ var testCases = []struct {
 			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
 			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
 		},
-		expectedNoFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+		expectedNoFile: filepath.Join("httpjson", "logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+	},
+	// Path containment for enabled tracers is tested in
+	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
+	// The input-level test only verifies that a disabled tracer does
+	// not reject an out-of-tree path (next case below).
+	{
+		name: "tracer_disabled_escaping_logs",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			timeNow = func() time.Time {
+				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+				return t
+			}
+
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+			t.Cleanup(func() { timeNow = time.Now })
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"request.transforms": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":  "url.params.$filter",
+						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+					},
+				},
+			},
+			"cursor": map[string]interface{}{
+				"timestamp": map[string]interface{}{
+					"value": `[[index .last_response.body "@timestamp"]]`,
+				},
+			},
+			"request.tracer.enabled":  false,
+			"request.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+		},
+		handler: dateCursorHandler(),
+		expected: []string{
+			`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+		},
 	},
 	{
 		name: "pagination",
@@ -588,6 +647,69 @@ var testCases = []struct {
 		},
 		handler:  oauth2Handler,
 		expected: []string{`{"hello": "world"}`},
+	},
+	{
+		name: "aws auth",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":                   1,
+			"request.method":             http.MethodGet,
+			"auth.aws.access_key_id":     "AKIAIOSFODNN7EXAMPLE",
+			"auth.aws.secret_access_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+			"auth.aws.default_region":    "us-east-1",
+			"auth.aws.service_name":      "guardduty",
+		},
+		handler:  awsAuthHandler("AKIAIOSFODNN7EXAMPLE", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "file_auth_default_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			secret := "file-secret"
+			path := filepath.Join(dir, "auth_token")
+			if err := os.WriteFile(path, []byte(secret+"\n"), 0o600); err != nil {
+				t.Fatalf("failed to write auth token: %v", err)
+			}
+			config["auth.file.path"] = path
+			config["auth.file.prefix"] = "Bearer "
+			config["auth.file.refresh_interval"] = "100ms"
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  tokenAuthHandler("Bearer file-secret", "", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name: "file_auth_custom_header",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			dir := t.TempDir()
+			tokenPath := filepath.Join(dir, "api_token")
+			if err := os.WriteFile(tokenPath, []byte("secret-api-token\n"), 0o600); err != nil {
+				t.Fatalf("failed to write token file: %v", err)
+			}
+			config["auth.file.path"] = tokenPath
+			config["auth.file.header"] = "X-API-Key"
+			config["auth.file.prefix"] = "ApiToken "
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+		},
+		handler:  tokenAuthHandler("ApiToken secret-api-token", "X-API-Key", defaultHandler(http.MethodGet, "", "")),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 	},
 	{
 		name: "request_transforms_can_access_state_from_previous_transforms",
@@ -957,6 +1079,114 @@ var testCases = []struct {
 						"request.method": http.MethodGet,
 						"replace":        "$.files[:].id",
 						"replace_with":   "$.exportId,.first_response.body.exportId",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_with_clause_with_values_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `{"text":["1", "2"]}`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$.text[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$.text[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_string_from_string_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `["1", "2"]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
+					},
+				},
+			},
+		},
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name: "replace_clause_with_int_from_int_array",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/":
+					fmt.Fprintln(w, `[1, 2]`)
+				case "/2212/1":
+					fmt.Fprintln(w, `{"hello":{"world":"moon"}}`)
+				case "/2212/2":
+					fmt.Fprintln(w, `{"space":{"cake":"pumpkin"}}`)
+				}
+			})
+			server := httptest.NewServer(r)
+			config["request.url"] = server.URL
+			config["chain.0.step.request.url"] = server.URL + "/$.exportId/$[:]"
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$[:]",
+						"replace_with":   "$.exportId,2212",
 					},
 				},
 			},
@@ -1444,11 +1674,29 @@ func TestInput(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.baseConfig)
 
 			conf := defaultConfig()
-			assert.NoError(t, cfg.Unpack(&conf))
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
+			}
 
 			var tempDir string
-			if conf.Request.Tracer != nil {
-				tempDir = t.TempDir()
+			if conf.Request.Tracer.enabled() {
+				err := os.MkdirAll("httpjson", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("httpjson", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("httpjson")
 				conf.Request.Tracer.Filename = filepath.Join(tempDir, conf.Request.Tracer.Filename)
 			}
 
@@ -1460,8 +1708,11 @@ func TestInput(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(test.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
+			ctx, cancel, err := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			var g errgroup.Group
 			g.Go(func() error {
@@ -1539,8 +1790,11 @@ func BenchmarkInput(b *testing.B) {
 				chanClient := beattest.NewChanClient(len(test.expected))
 				b.Cleanup(func() { _ = chanClient.Close() })
 
-				ctx, cancel := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
+				ctx, cancel, err := newV2Context(fmt.Sprintf("%s-%d", test.name, i))
 				b.Cleanup(cancel)
+				if err != nil {
+					b.Fatal(err)
+				}
 
 				var g errgroup.Group
 				g.Go(func() error {
@@ -1656,14 +1910,20 @@ func newChainPaginationTestServer(
 	}
 }
 
-func newV2Context(id string) (v2.Context, func()) {
+func newV2Context(id string) (v2.Context, func(), error) {
 	ctx, cancel := context.WithCancel(context.Background())
+	cwd, err := os.Getwd()
+	if err != nil {
+		return v2.Context{}, cancel, fmt.Errorf("failed to get working directory: %w", err)
+	}
 	return v2.Context{
-		Logger:        logp.NewLogger("httpjson_test"),
-		ID:            id,
-		IDWithoutName: id,
-		Cancelation:   ctx,
-	}, cancel
+		Logger:          logp.NewLogger("httpjson_test"),
+		ID:              id,
+		IDWithoutName:   id,
+		Cancelation:     ctx,
+		Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
+		MetricsRegistry: monitoring.NewRegistry(),
+	}, cancel, nil
 }
 
 //nolint:errcheck // We can safely ignore errors here
@@ -1695,6 +1955,38 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 		}
 
 		_, _ = w.Write([]byte(msg))
+	}
+}
+
+func awsAuthHandler(expectedTokenID string, handle http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=%s/", expectedTokenID)) {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		amzDate := r.Header.Get("X-Amz-Date")
+		if amzDate == "" {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusBadRequest)
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+func tokenAuthHandler(expectedValue, headerName string, handle http.HandlerFunc) http.HandlerFunc {
+	if headerName == "" {
+		headerName = "Authorization"
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		value := r.Header.Get(headerName)
+		if value != expectedValue {
+			http.Error(w, `{"error":"not authorized"}`, http.StatusUnauthorized)
+			return
+		}
+		handle(w, r)
 	}
 }
 

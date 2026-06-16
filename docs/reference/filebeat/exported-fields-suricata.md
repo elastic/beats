@@ -1,17 +1,20 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-suricata.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Suricata fields [exported-fields-suricata]
 
 Module for handling the EVE JSON logs produced by Suricata.
 
-
 ## suricata [_suricata]
 
 Fields from the Suricata EVE log file.
-
 
 ## eve [_eve]
 
@@ -160,7 +163,7 @@ Fields exported by the EVE JSON logs
 **`suricata.eve.alert.metadata`**
 :   Metadata about the alert.
 
-type: flattened
+    type: flattened
 
 
 **`suricata.eve.alert.category`**

@@ -20,6 +20,7 @@ package memqueue
 import (
 	"context"
 	"io"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -41,7 +41,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	// filled do not wait for the flush timer.
 
 	logger := logptest.NewTestingLogger(t, "")
-	broker := newQueue(
+	broker := newQueue[int](
 		logger.Named("testing"),
 		nil,
 		Settings{
@@ -53,10 +53,16 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
+	// iterLock is used to ensure distinct runIteration calls can never overlap
+	iterLock := sync.Mutex{}
 	for i := 0; i < 100; i++ {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
-		go rl.runIteration()
+		go func() {
+			iterLock.Lock()
+			rl.runIteration()
+			iterLock.Unlock()
+		}()
 		_, ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish call must succeed")
 	}
@@ -70,7 +76,11 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 		// there's a logical error.
 		_, _ = broker.Get(100)
 	}()
+	// Still have to lock here even though we aren't running asynchronously,
+	// since it's possible that the last asynchronous call is still running.
+	iterLock.Lock()
 	rl.runIteration()
+	iterLock.Unlock()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
 	assert.Equal(t, 100, rl.consumedCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
 }
@@ -80,7 +90,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	// there are enough events. This one uses the same setup to confirm that
 	// Get requests are delayed if there aren't enough events.
 	logger := logptest.NewTestingLogger(t, "")
-	broker := newQueue(
+	broker := newQueue[string](
 		logger.Named("testing"),
 		nil,
 		Settings{
@@ -121,8 +131,8 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 }
 
 func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
-	broker := newQueue(
-		logp.NewLogger("testing"),
+	broker := newQueue[int](
+		logptest.NewTestingLogger(t, ""),
 		nil,
 		Settings{
 			Events:        1000,
@@ -133,7 +143,7 @@ func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
 	rl := broker.runLoop
 
 	// Signal close, and execute the run loop to make sure it's processed
-	go broker.Close()
+	go broker.Close(false)
 	rl.runIteration()
 
 	// Calling Get on the queue now should immediately return io.EOF, since
@@ -156,13 +166,13 @@ func TestObserverAddEvent(t *testing.T) {
 	// Confirm that an entry inserted into the queue is reported in
 	// queue.added.events and queue.added.bytes.
 	reg := monitoring.NewRegistry()
-	rl := &runLoop{
+	rl := &runLoop[publisher.Event]{
 		observer: queue.NewQueueObserver(reg),
-		broker: &broker{
-			buf: make([]queueEntry, 100),
+		broker: &broker[publisher.Event]{
+			buf: make([]queueEntry[publisher.Event], 100),
 		},
 	}
-	request := &pushRequest{
+	request := &pushRequest[publisher.Event]{
 		event:     publisher.Event{},
 		eventSize: 123,
 	}
@@ -175,10 +185,10 @@ func TestObserverConsumeEvents(t *testing.T) {
 	// Confirm that event batches sent to the output are reported in
 	// queue.consumed.events and queue.consumed.bytes.
 	reg := monitoring.NewRegistry()
-	rl := &runLoop{
+	rl := &runLoop[int]{
 		observer: queue.NewQueueObserver(reg),
-		broker: &broker{
-			buf: make([]queueEntry, 100),
+		broker: &broker[int]{
+			buf: make([]queueEntry[int], 100),
 		},
 		eventCount: 50,
 	}
@@ -186,9 +196,9 @@ func TestObserverConsumeEvents(t *testing.T) {
 	for i := range rl.broker.buf {
 		rl.broker.buf[i].eventSize = 123
 	}
-	request := &getRequest{
+	request := &getRequest[int]{
 		entryCount:   len(rl.broker.buf),
-		responseChan: make(chan *batch, 1),
+		responseChan: make(chan *batch[int], 1),
 	}
 	rl.handleGetReply(request)
 	// We should have gotten back 50 events, everything in the queue, so we expect the size
@@ -199,11 +209,11 @@ func TestObserverConsumeEvents(t *testing.T) {
 
 func TestObserverRemoveEvents(t *testing.T) {
 	reg := monitoring.NewRegistry()
-	rl := &runLoop{
+	rl := &runLoop[int]{
 		observer: queue.NewQueueObserver(reg),
-		broker: &broker{
+		broker: &broker[int]{
 			ctx:        context.Background(),
-			buf:        make([]queueEntry, 100),
+			buf:        make([]queueEntry[int], 100),
 			deleteChan: make(chan int, 1),
 		},
 		eventCount: 50,

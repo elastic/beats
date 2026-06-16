@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -37,8 +38,8 @@ type fakeInput struct {
 	OnRun  func(Context, beat.PipelineConnector) error
 }
 
-func makeConfigFakeInput(prototype fakeInput) func(*conf.C) (Input, error) {
-	return func(cfg *conf.C) (Input, error) {
+func makeConfigFakeInput(prototype fakeInput) func(*conf.C, *logp.Logger) (Input, error) {
+	return func(cfg *conf.C, _ *logp.Logger) (Input, error) {
 		tmp := prototype
 		return &tmp, nil
 	}
@@ -69,6 +70,30 @@ func (f *fakeInput) Test(ctx TestContext) error {
 func (f *fakeInput) Run(ctx Context, pipeline beat.PipelineConnector) error {
 	if f.OnRun != nil {
 		return f.OnRun(ctx, pipeline)
+	}
+	return nil
+}
+
+type fakeRedirectManager struct {
+	fakeInputManager
+	OnRedirect func(*conf.C) (string, *conf.C, error)
+}
+
+func (m *fakeRedirectManager) Redirect(cfg *conf.C) (string, *conf.C, error) {
+	if m.OnRedirect != nil {
+		return m.OnRedirect(cfg)
+	}
+	return "", nil, nil
+}
+
+type fakeDeleteManager struct {
+	fakeInputManager
+	OnDelete func(*conf.C) error
+}
+
+func (m *fakeDeleteManager) Delete(cfg *conf.C) error {
+	if m.OnDelete != nil {
+		return m.OnDelete(cfg)
 	}
 	return nil
 }

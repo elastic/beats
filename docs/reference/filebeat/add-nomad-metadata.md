@@ -2,6 +2,9 @@
 navigation_title: "add_nomad_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/add-nomad-metadata.html
+applies_to:
+  stack: preview
+  serverless: preview
 ---
 
 # Add Nomad metadata [add-nomad-metadata]
@@ -82,7 +85,7 @@ Indexers and matchers are used to correlate fields in events with actual metadat
 
 Indexers use allocation metadata to create unique identifiers for each one of the pods.
 
-Avaliable indexers are:
+Available indexers are:
 
 `allocation_name`
 :   Identifies allocations by its name and namespace (as `<namespace>/<name>`)

@@ -24,31 +24,32 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type testManager struct {
 	isUnpriv  bool
-	mgmtMode  proto.AgentManagedMode
+	mgmtMode  management.AgentManagedMode
 	isEnabled bool
 }
 
 func (tm testManager) UpdateStatus(_ status.Status, _ string) {}
 func (tm testManager) Enabled() bool                          { return tm.isEnabled }
 func (tm testManager) Start() error                           { return nil }
+func (tm testManager) PreInit() error                         { return nil }
+func (tm testManager) PostInit()                              {}
 func (tm testManager) Stop()                                  {}
-func (tm testManager) AgentInfo() client.AgentInfo {
-	return client.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
+func (tm testManager) AgentInfo() management.AgentInfo {
+	return management.AgentInfo{Unprivileged: tm.isUnpriv, ManagedMode: tm.mgmtMode}
 }
-func (tm testManager) SetStopCallback(_ func())            {}
-func (tm testManager) CheckRawConfig(_ *config.C) error    { return nil }
-func (tm testManager) RegisterAction(_ client.Action)      {}
-func (tm testManager) UnregisterAction(_ client.Action)    {}
-func (tm testManager) SetPayload(_ map[string]interface{}) {}
-func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+func (tm testManager) SetStopCallback(_ func())             {}
+func (tm testManager) CheckRawConfig(_ *config.C) error     { return nil }
+func (tm testManager) RegisterAction(_ management.Action)   {}
+func (tm testManager) UnregisterAction(_ management.Action) {}
+func (tm testManager) SetPayload(_ map[string]interface{})  {}
+func (tm testManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ management.DiagnosticHook) {
 }
 
 func TestUserAgentString(t *testing.T) {
@@ -60,37 +61,53 @@ func TestUserAgentString(t *testing.T) {
 		{
 			name: "managed-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_MANAGED}},
+				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_MANAGED}},
 			expectedComments: []string{"Managed", "Unprivileged"},
 		},
 		{
 			name: "managed-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_MANAGED}},
+				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_MANAGED}},
 			expectedComments: []string{"Managed"},
 		},
 		{
 			name: "unmanaged-privileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone"},
+				Manager: testManager{isEnabled: true, isUnpriv: false, mgmtMode: management.AgentManagedMode_STANDALONE}},
+			expectedComments: []string{"Unmanaged"},
 		},
 		{
 			name: "unmanaged-unprivileged",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
-				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: proto.AgentManagedMode_STANDALONE}},
-			expectedComments: []string{"Standalone", "Unprivileged"},
+				Manager: testManager{isEnabled: true, isUnpriv: true, mgmtMode: management.AgentManagedMode_STANDALONE}},
+			expectedComments: []string{"Unmanaged", "Unprivileged"},
 		},
 		{
 			name: "management-disabled",
 			beat: &Beat{Info: Info{Beat: "testbeat"},
 				Manager: testManager{isEnabled: false}},
+			expectedComments: []string{"Standalone"},
+		},
+		{
+			name: "no-management",
+			beat: &Beat{Info: Info{Beat: "testbeat"},
+				Manager: nil},
+			expectedComments: []string{},
+		},
+		{
+			name:             "fips-distribution",
+			beat:             &Beat{Info: Info{Beat: "testbeat", FIPSDistribution: true}, Manager: nil},
+			expectedComments: []string{"FIPS"},
+		},
+		{
+			name:             "not-fips-distribution",
+			beat:             &Beat{Info: Info{Beat: "testbeat", FIPSDistribution: false}, Manager: nil},
 			expectedComments: []string{},
 		},
 	}
 
 	// User-Agent will take the form of
-	// Elastic-testbeat/8.15.0 (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC; Standalone; Unprivileged)
+	// Elastic-testbeat/9.2.0 (linux; arm64; Managed; Unprivileged)
 	// the RFC (https://www.rfc-editor.org/rfc/rfc9110#name-user-agent) says the comment field can basically be anything,
 	// but we put metadata in it, delimited by '; '
 	uaReg := regexp.MustCompile(`Elastic-testbeat/([\d.]+) \(([\w-:+; ]+)\)`)

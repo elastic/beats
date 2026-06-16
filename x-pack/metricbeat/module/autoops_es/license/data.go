@@ -39,11 +39,11 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, data *map[string]an
 
 	if err != nil {
 		err = fmt.Errorf("failed applying license schema: %w", err)
-		events.SendErrorEventWithRandomTransactionId(err, info, r, LicenseMetricsSet, LicensePath)
-		return err
+		events.LogAndSendErrorEventWithoutTransactionId(err, info, r, LicenseMetricsSet, LicensePath)
+		return nil
 	}
 
-	r.Event(events.CreateEventWithRandomTransactionId(info, metricSetFields))
+	r.Event(events.CreateEventWithoutTransactionId(info, metricSetFields))
 
 	return nil
 }

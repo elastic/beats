@@ -34,6 +34,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -131,7 +133,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 		s.Transport.Proxy.URL = proxyURI
 	}
 
-	return NewConnection(s)
+	return NewConnection(s, logptest.NewTestingLogger(t, ""))
 }
 
 // getTestingElasticsearch creates a test client.
@@ -141,7 +143,7 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *Connection {
 		Username:         eslegtest.GetUser(),
 		Password:         eslegtest.GetPass(),
 		CompressionLevel: 3,
-	})
+	}, logp.NewNopLogger())
 	conn.Transport.Timeout = 60 * time.Second
 
 	eslegtest.InitConnection(t, conn, err)

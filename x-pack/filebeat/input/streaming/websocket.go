@@ -24,6 +24,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -117,13 +118,13 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 // NewWebsocketFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a websocket
 // stream follower.
-func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
 	if stat == nil {
 		stat = noopReporter{}
 	}
 	stat.UpdateStatus(status.Configuring, "")
 	s := websocketStream{
-		id:     id,
+		id:     env.ID,
 		cfg:    cfg,
 		cursor: cursor,
 		status: stat,
@@ -132,7 +133,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id, nil),
+			metrics: newInputMetrics(env.MetricsRegistry, log),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
@@ -282,6 +283,15 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			s.cfg.Auth.OAuth2.accessToken = token.AccessToken
 			// set the new token expiry channel with 2 mins buffer
 			s.tokenExpiry = time.After(time.Until(token.Expiry) - s.cfg.Auth.OAuth2.TokenExpiryBuffer)
+			// Re-evaluate url_program before reconnecting so that cursor
+			// changes since the last connection are reflected in the URL.
+			updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to re-evaluate url_program on token refresh, using previous url", "error", err)
+			} else {
+				url = updatedURL
+			}
 			// establish a new connection with the new token
 			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 			handleConnectionResponse(resp, s.metrics, s.log)
@@ -318,6 +328,15 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 					}
 				}
+				// Re-evaluate url_program before reconnecting so that cursor
+				// changes since the last connection are reflected in the URL.
+				updatedURL, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("failed to re-evaluate url_program on reconnect, using previous url", "error", err)
+				} else {
+					url = updatedURL
+				}
 				// Since c is already a pointer, we can reassign it to the new connection
 				// and the defer func will still handle it.
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
@@ -339,7 +358,14 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
 			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
-			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
+			currentCursor, ok := state["cursor"].(map[string]any)
+			if !ok {
+				currentCursor = s.cursor
+			}
+			newCursor, err := s.process(ctx, state, currentCursor, s.now().In(time.UTC))
+			if newCursor != nil {
+				state["cursor"] = newCursor
+			}
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
@@ -427,7 +453,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 	var response *http.Response
 	var err error
 	headers := formHeader(cfg)
-	dialer, err := createWebSocketDialer(cfg)
+	dialer, err := createWebSocketDialer(cfg, log)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -530,11 +556,10 @@ func (s *websocketStream) now() time.Time {
 }
 
 func (s *websocketStream) Close() error {
-	s.metrics.Close()
 	return nil
 }
 
-func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
+func createWebSocketDialer(cfg config, logger *logp.Logger) (*websocket.Dialer, error) {
 	var tlsConfig *tls.Config
 	dialer := &websocket.Dialer{
 		Proxy: http.ProxyFromEnvironment,
@@ -562,7 +587,7 @@ func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
 	}
 	// load TLS config if available
 	if cfg.Transport.TLS != nil {
-		TLSConfig, err := tlscommon.LoadTLSConfig(cfg.Transport.TLS)
+		TLSConfig, err := tlscommon.LoadTLSConfig(cfg.Transport.TLS, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load TLS config: %w", err)
 		}

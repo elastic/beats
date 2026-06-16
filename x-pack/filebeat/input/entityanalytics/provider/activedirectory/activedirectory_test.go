@@ -56,7 +56,7 @@ func TestActiveDirectoryDoFetch(t *testing.T) {
 			Password: pass,
 		},
 		baseDN: base,
-		logger: logp.L(),
+		logger: logp.NewNopLogger(),
 	}
 
 	ss, err := newStateStore(store)

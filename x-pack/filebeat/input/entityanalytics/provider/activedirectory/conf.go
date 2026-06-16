@@ -6,8 +6,6 @@ package activedirectory
 
 import (
 	"errors"
-	"net"
-	"net/url"
 	"strings"
 	"time"
 
@@ -42,6 +40,11 @@ type conf struct {
 	// but are included for future behavior expansion.
 	UserQuery   string `config:"user_query"`
 	DeviceQuery string `config:"device_query"`
+
+	// IncludeEmptyGroups controls whether groups with
+	// no direct members are reported as individual
+	// documents.
+	IncludeEmptyGroups bool `config:"include_empty_groups"`
 
 	UserAttrs []string `config:"user_attributes"`
 	GrpAttrs  []string `config:"group_attributes"`
@@ -84,27 +87,7 @@ func (c *conf) Validate() error {
 	if err != nil {
 		return err
 	}
-	u, err := url.Parse(c.URL)
-	if err != nil {
-		return err
-	}
-	if c.TLS.IsEnabled() && u.Scheme == "ldaps" {
-		_, err := tlscommon.LoadTLSConfig(c.TLS)
-		if err != nil {
-			return err
-		}
-		_, _, err = net.SplitHostPort(u.Host)
-		var addrErr *net.AddrError
-		switch {
-		case err == nil:
-		case errors.As(err, &addrErr):
-			if addrErr.Err != "missing port in address" {
-				return err
-			}
-		default:
-			return err
-		}
-	}
+
 	return nil
 }
 
@@ -124,4 +107,8 @@ func (c *conf) wantDevices() bool {
 	default:
 		return false
 	}
+}
+
+func (c *conf) wantEmptyGroups() bool {
+	return c.IncludeEmptyGroups
 }

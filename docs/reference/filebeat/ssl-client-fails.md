@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/ssl-client-fails.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # SSL client fails to connect to Logstash [ssl-client-fails]
@@ -21,7 +24,7 @@ The host running {{ls}} might be unreachable or the certificate may not be valid
     ::::
 
 * Use OpenSSL to test connectivity to the {{ls}} server and diagnose problems. See the [OpenSSL documentation](https://www.openssl.org/docs/manmaster/man1/openssl-s_client.md) for more info.
-* Make sure that you have enabled SSL (set `ssl => true`) when configuring the [Beats input plugin for {{ls}}](logstash-docs-md://lsr/plugins-inputs-beats.md).
+* Make sure that you have enabled SSL (set `ssl_enabled => true`) when configuring the [Beats input plugin for {{ls}}](logstash-docs-md://lsr/plugins-inputs-beats.md).
 
 ## Common SSL-Related Errors and Resolutions [_common_ssl_related_errors_and_resolutions]
 
@@ -55,12 +58,12 @@ To resolve this problem, try one of these solutions:
 
 ### getsockopt: no route to host [getsockopt-no-route-to-host]
 
-This is not a SSL problem. It’s a networking problem. Make sure the two hosts can communicate.
+This is not an SSL problem. It’s a networking problem. Make sure the two hosts can communicate.
 
 
 ### getsockopt: connection refused [getsockopt-connection-refused]
 
-This is not a SSL problem. Make sure that {{ls}} is running and that there is no firewall blocking the traffic.
+This is not an SSL problem. Make sure that {{ls}} is running and that there is no firewall blocking the traffic.
 
 
 ### No connection could be made because the target machine actively refused it [target-machine-refused-connection]

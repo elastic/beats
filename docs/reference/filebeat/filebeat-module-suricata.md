@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-suricata.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # Suricata module [filebeat-module-suricata]
 
@@ -87,7 +92,6 @@ This module comes with sample dashboards. For example:
 % TO DO: Use `:class: screenshot`
 ![filebeat suricata alerts](images/filebeat-suricata-alerts.png)
 
-
-## Fields [_fields_51]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-suricata.md) section.

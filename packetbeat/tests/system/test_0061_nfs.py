@@ -110,3 +110,12 @@ class Test(BaseTest):
 
         assert o["nfs.opcode"] == "CLONE"
         assert o["nfs.status"] == "NFSERR_NOTSUPP"
+
+    def test_rpc_fragment(self):
+        """
+        Should not crash
+        """
+        self.render_config_template(
+            nfs_ports=[12049],
+        )
+        self.run_packetbeat(pcap="rpc_fragment.pcap")

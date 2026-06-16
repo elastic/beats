@@ -2,10 +2,9 @@
 package syslog
 
 import (
+    "errors"
     "io"
     "time"
-
-    "go.uber.org/multierr"
 )
 
 %%{
@@ -17,7 +16,7 @@ import (
 // parseRFC3164 parses an RFC 3164-formatted syslog message. loc is used to enrich
 // timestamps that lack a time zone.
 func parseRFC3164(data string, loc *time.Location) (message, error) {
-    var errs error
+    var errs []error
     var p, cs, tok int
 
     pe := len(data)
@@ -36,5 +35,5 @@ func parseRFC3164(data string, loc *time.Location) (message, error) {
         write exec;
     }%%
 
-    return m, errs
+    return m, errors.Join(errs...)
 }

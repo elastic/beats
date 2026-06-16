@@ -1,7 +1,12 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-coredns.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
+
+% This file is generated! See filebeat/scripts/mage/docs.go
 
 # CoreDNS module [filebeat-module-coredns]
 
@@ -63,7 +68,6 @@ This module comes with a sample dashboard.
 % TO DO: Use `:class: screenshot`
 ![kibana coredns](images/kibana-coredns.jpg)
 
-
-## Fields [_fields_12]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-coredns.md) section.

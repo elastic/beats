@@ -2,6 +2,9 @@
 navigation_title: "Instrumentation"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-instrumentation.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure APM instrumentation [configuration-instrumentation]

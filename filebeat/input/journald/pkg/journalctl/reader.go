@@ -15,15 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// This file was contributed to by generative AI
+
 //go:build linux
 
 package journalctl
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -54,7 +59,7 @@ type JournalEntry struct {
 
 // JctlFactory is a function that returns an instance of journalctl ready to use.
 // It exists to allow testing
-type JctlFactory func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error)
+type JctlFactory func(canceller input.Canceler, logger *logp.Logger, args ...string) (Jctl, error)
 
 // Jctl abstracts the call to journalctl, it exists only for testing purposes
 //
@@ -65,19 +70,13 @@ type Jctl interface {
 	//
 	// If cancel is cancelled, Next returns a zero value JournalEntry
 	// and ErrCancelled.
-	//
-	// If finished is true, then journalctl returned all messages
-	// and exited successfully
-	Next(input.Canceler) (data []byte, finished bool, err error)
+	Next(input.Canceler) (data []byte, err error)
+
+	// Kill terminates the journalctl process and blocks until all
+	// background goroutines (stdout/stderr readers and the process-wait
+	// goroutine) have exited.
 	Kill() error
 }
-
-type readerState uint8
-
-const (
-	readingOldEntriesState readerState = iota
-	followingState
-)
 
 // Reader reads entries from journald by calling `jouranlctl`
 // and reading its output.
@@ -102,10 +101,10 @@ type Reader struct {
 	// like the message filters, format, etc
 	args []string
 
-	// firstRunArgs are the arguments used in the first call to
+	// extraArgs are the arguments used in the first call to
 	// journalctl that will be replaced by the cursor argument
 	// once data has been ingested
-	firstRunArgs []string
+	extraArgs []string
 
 	// cursor is the jornalctl cursor, it is also stored in Filebeat's registry
 	cursor string
@@ -115,30 +114,80 @@ type Reader struct {
 	jctl        Jctl
 	jctlFactory JctlFactory
 
+	// supportsBootAll indicates whether the running journalctl supports
+	// `--boot all` (introduced in systemd/journalctl v242).
+	supportsBootAll bool
+
 	backoff backoff.Backoff
-	state   readerState
+}
+
+// maybeAddBootAll appends "--boot", "all" to args only when boot-all is
+// supported by the running journalctl.
+func maybeAddBootAll(args []string, supportsBootAll bool) []string {
+	if !supportsBootAll {
+		return args
+	}
+
+	return append(args, "--boot", "all")
+}
+
+// journalctlSupportsBootAll reports whether `--boot all` should be used.
+// On any detection failure, it safely falls back to false.
+func journalctlSupportsBootAll(logger *logp.Logger, factory JctlFactory) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	jctl, err := factory(ctx, logger, "--version")
+	if err != nil {
+		logger.Warnf("cannot call journalctl to get its version: %s. Omitting '--boot all'", err)
+		return false
+	}
+
+	defer jctl.Kill() //nolint:errcheck // there is nothing we can do with this error
+
+	out, err := jctl.Next(ctx)
+	if err != nil {
+		logger.Warnf("cannot read journalctl output: %s", err)
+		return false
+	}
+	// first line: "systemd 239 (239-82.el8_10.2)"
+	firstLine := strings.SplitN(string(out), "\n", 2)[0]
+	fields := strings.Fields(firstLine)
+	if len(fields) < 2 {
+		logger.Warnf("journalctl version invalid format: %q", strings.TrimSpace(string(out)))
+		return false
+	}
+
+	version, err := strconv.Atoi(fields[1])
+	if err != nil {
+		logger.Warnf("cannot convert journalctl version to int: %s", err)
+		return false
+	}
+
+	logger.Debugf("journalctl version: %d", version)
+	return version >= 242
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
 // If there is a cursor, only the cursor is used, seek is ignored.
-// If there is no cursor, then seek is used
-// The bool parameter indicates whether there might be messages from
-// the previous boots
-func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string) ([]string, bool) {
+// If there is no cursor, then seek is used.
+// --boot all is only added when the journalctl version supports it (>= 242).
+func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string, supportsBootAll bool) []string {
 	if cursor != "" {
-		return []string{"--after-cursor", cursor}, true
+		return maybeAddBootAll([]string{"--after-cursor", cursor}, supportsBootAll)
 	}
 
 	switch mode {
 	case SeekSince:
-		return []string{"--since", time.Now().Add(since).Format(sinceTimeFormat)}, true
+		return maybeAddBootAll([]string{
+			"--since", time.Now().Add(since).Format(sinceTimeFormat),
+		}, supportsBootAll)
 	case SeekTail:
-		return []string{"--since", "now"}, false
+		return []string{"--since", "now"}
 	case SeekHead:
-		return []string{"--no-tail"}, true
+		return maybeAddBootAll([]string{"--no-tail"}, supportsBootAll)
 	default:
 		// That should never happen
-		return []string{}, false
+		return []string{}
 	}
 }
 
@@ -177,15 +226,31 @@ func New(
 	cursor string,
 	since time.Duration,
 	file string,
+	merge bool,
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
 	logger = logger.Named("reader")
 
-	args := []string{"--utc", "--output=json", "--no-pager"}
+	args := []string{"--utc", "--output=json", "--no-pager", "--all", "--follow"}
 
 	if file != "" && file != localSystemJournalID {
-		args = append(args, "--file", file)
+
+		st, err := os.Stat(file)
+		if err != nil {
+			logger.Debugf("cannot stat file: %s. Using '--file %s'", err, file)
+			args = append(args, "--file", file)
+		} else {
+			if st.IsDir() {
+				args = append(args, "--directory", file)
+			} else {
+				args = append(args, "--file", file)
+			}
+		}
+	}
+
+	if merge {
+		args = append(args, "--merge")
 	}
 
 	for _, u := range units {
@@ -208,28 +273,22 @@ func New(
 		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
-	firstRunArgs, prevBoots := handleSeekAndCursor(mode, since, cursor)
-	state := readingOldEntriesState // Initial state
-	if !prevBoots {
-		state = followingState
-	}
+	supportsBootAll := journalctlSupportsBootAll(logger, newJctl)
+	extraArgs := handleSeekAndCursor(mode, since, cursor, supportsBootAll)
 
 	r := Reader{
-		logger:     logger,
-		jctlLogger: logger.Named("journalctl-runner"),
-
-		args:         args,
-		firstRunArgs: firstRunArgs,
-
-		state:  state,
-		cursor: cursor,
-
-		canceler:    canceler,
-		jctlFactory: newJctl,
-		backoff:     backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
+		logger:          logger,
+		jctlLogger:      logger.Named("journalctl-runner"),
+		args:            args,
+		extraArgs:       extraArgs,
+		cursor:          cursor,
+		canceler:        canceler,
+		jctlFactory:     newJctl,
+		supportsBootAll: supportsBootAll,
+		backoff:         backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
 	}
 
-	if err := r.newJctl(firstRunArgs...); err != nil {
+	if err := r.newJctl(extraArgs...); err != nil {
 		return &Reader{}, err
 	}
 
@@ -239,15 +298,15 @@ func New(
 func (r *Reader) newJctl(extraArgs ...string) error {
 	args := append(r.args, extraArgs...)
 
-	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, "journalctl", args...)
+	jctl, err := r.jctlFactory(r.canceler, r.jctlLogger, args...)
 	r.jctl = jctl
 
 	return err
 }
 
-// Close stops the `journalctl` process and waits for all
-// goroutines to return, the canceller passed to `New` should
-// be cancelled before `Close` is called
+// Close stops the `journalctl` process and waits for all goroutines to
+// return. The canceller passed to `New` should be cancelled before `Close`
+// is called so that the reader goroutines can drain.
 func (r *Reader) Close() error {
 	r.logger.Infof("shutting down journalctl, waiting up to: %s", time.Minute)
 
@@ -262,94 +321,59 @@ func (r *Reader) Close() error {
 // journalctl restarting it as necessary with a backoff strategy. It either
 // returns a valid journald entry or ErrCancelled when the input is cancelled.
 func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
-	msg, finished, err := r.jctl.Next(cancel)
+	msg, err := r.jctl.Next(cancel)
 
 	// Check if the input has been cancelled
-	select {
-	case <-cancel.Done():
+	if cancel.Err() != nil {
 		// The caller is responsible for calling Reader.Close to terminate
 		// journalctl. Cancelling this canceller only means this Next call was
 		// cancelled. Because the input has been cancelled, we ignore the message
 		// and any error it might have returned.
 		return nil, ErrCancelled
-	default:
-		// Three options:
-		//   - Journalctl finished reading messages from previous boots
-		//       successfully, restart it with --follow flag.
-		//   - Error, journalctl exited with an error, restart it in the same
-		//       mode it was running.
-		//   - No error, skip the default block and go parse the message
-
-		var extraArgs []string
-		var restart bool
-
-		// First of all: handle the error, if any
-		if err != nil {
-			r.logger.Warnf("reader error: '%s', restarting...", err)
-			restart = true
-
-			if r.cursor == "" && r.state == readingOldEntriesState {
-				// Corner case: journalctl exited with an error before reading the
-				// 1st message. This means we don't have a cursor and need to restart
-				// it with the initial arguments.
-				extraArgs = append(extraArgs, r.firstRunArgs...)
-			} else if r.cursor != "" {
-				// There is a cursor, so just append it to our arguments
-				extraArgs = append(extraArgs, "--after-cursor", r.cursor)
-
-				// Last, but not least, add "--follow" if we're in following mode
-				if r.state == followingState {
-					extraArgs = append(extraArgs, "--follow")
-				}
-			}
-
-			// Handle backoff
-			//
-			// If the last restart (if any) was more than 5s ago,
-			// recreate the backoff and do not wait.
-			// We recreate the backoff so r.backoff.Last().IsZero()
-			// will return true next time it's called making us to
-			// wait in case jouranlctl crashes in less than 5s.
-			if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
-				r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
-			} else {
-				r.backoff.Wait()
-			}
-		}
-
-		// If journalctl finished reading the messages from previous boots
-		// and exited successfully
-		if finished {
-			restart = true
-			extraArgs = append(extraArgs, "--follow")
-			if r.cursor != "" {
-				// If there is a cursor, only use the cursor and the follow argument
-				extraArgs = append(extraArgs, "--after-cursor", r.cursor)
-			} else {
-				// If there is no cursor, it means the first successfully run
-				// did not return any event, so we have to restart with the
-				// --follow and all the initial args.
-
-				extraArgs = append(extraArgs, r.firstRunArgs...)
-			}
-
-			r.state = followingState
-			r.logger.Info("finished reading journal entries from all boots, restarting journalctl with follow flag")
-		}
-
-		// Restart journalctl if needed
-		if restart {
-			if err := r.newJctl(extraArgs...); err != nil {
-				// If we cannot restart journalct, there is nothing we can do.
-				return nil, fmt.Errorf("cannot restart journalctl: %w", err)
-			}
-
-			// Return an empty message and wait for the caller to call us again
-			return nil, ErrRestarting
-		}
 	}
 
-	return msg, nil
+	// Two options:
+	//   - No error, return the message
+	//   - Error, journalctl exited with an error, restart with
+	//     backoff if necessary.
+	if err == nil {
+		return msg, nil
+	}
+	r.logger.Warnf("reader error: '%s', restarting...", err)
+
+	// Handle backoff
+	//
+	// If the last restart (if any) was more than 5s ago,
+	// recreate the backoff and do not wait.
+	// We recreate the backoff so r.backoff.Last().IsZero()
+	// will return true next time it's called making us to
+	// wait in case jouranlctl crashes in less than 5s.
+	if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
+		r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
+	} else {
+		r.backoff.Wait()
+	}
+
+	var extraArgs []string
+	// Corner case: journalctl exited with an error before reading the
+	// 1st message. This means we don't have a cursor and need to restart
+	// it with the initial arguments.
+	if r.cursor == "" {
+		extraArgs = r.extraArgs
+	} else {
+		// We have a cursor, set it instead of the other options that select
+		// where in the journal to start reading because they are incompatible
+		// with setting the cursor.
+		extraArgs = maybeAddBootAll([]string{"--after-cursor", r.cursor}, r.supportsBootAll)
+	}
+
+	if err := r.newJctl(extraArgs...); err != nil {
+		// If we cannot restart journalct, there is nothing we can do.
+		return nil, fmt.Errorf("cannot restart journalctl: %w", err)
+	}
+
+	// Return an empty message and wait for the caller to call us again
+	return nil, ErrRestarting
 }
 
 // Next returns the next journal entry. If there is no entry available

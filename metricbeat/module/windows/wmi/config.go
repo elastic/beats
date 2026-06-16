@@ -31,13 +31,17 @@ import (
 )
 
 type Config struct {
+	IncludeQueryClass            bool                     `config:"wmi.include_query_class"`             // Determines if the queried class should be included in the output document (Useful if querying super-classes)
 	IncludeQueries               bool                     `config:"wmi.include_queries"`                 // Determines if the query string should be included in the output document
 	IncludeNullProperties        bool                     `config:"wmi.include_null_properties"`         // Specifies whether to include properties with nil values in the final document
 	IncludeEmptyStringProperties bool                     `config:"wmi.include_empty_string_properties"` // Specifies whether to include properties with empty string values in the final document
 	Namespace                    string                   `config:"wmi.namespace"`                       // Default WMI namespace for executing queries, used if not overridden by individual query configurations
 	Queries                      []QueryConfig            `config:"wmi.queries"`                         // List of WMI query configurations
+	MaxRowsPerQuery              uint32                   `config:"wmi.max_rows_per_query"`              // Max number of rows to return in a single query to safeguard from an unexpected number of results.
+	SchemaCacheSize              uint32                   `config:"wmi.schema_cache_size"`               // Max size of the class schema size
 	WarningThreshold             time.Duration            `config:"wmi.warning_threshold"`               // Maximum duration to wait for query results before logging a warning. The query will continue running in WMI but will no longer be awaited
 	NamespaceQueryIndex          map[string][]QueryConfig // Internal structure indexing queries by namespace to reduce the number of WMI connections required per execution
+
 	// Remote WMI Parameters
 	// These parameters are intentionally hidden to discourage their use.
 	// If you need access, please open a support ticket to request exposure.
@@ -48,21 +52,37 @@ type Config struct {
 }
 
 type QueryConfig struct {
-	QueryStr   string   // The compiled query string generated internally (not user-configurable)
-	Class      string   `config:"class"`      // WMI class to query (used in the FROM clause)
-	Properties []string `config:"properties"` // List of properties to retrieve (used in the SELECT clause). If omitted, all properties of the class are fetched
-	Where      string   `config:"where"`      // Custom WHERE clause to filter query results. The provided string is used directly in the query
-	Namespace  string   `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
+	QueryStr           string     // The compiled query string generated internally (not user-configurable)
+	UnrecoverableError error      // An unrecoverable error. When different from nil, the query execution will be skipped (not user-configurable)
+	WmiSchema          *WMISchema // Cached class definitions fetched from WMI framework (not user-configurable)
+	Class              string     `config:"class"`      // WMI class to query (used in the FROM clause)
+	Properties         []string   `config:"properties"` // List of properties to retrieve (used in the SELECT clause). If omitted, all properties of the class are fetched
+	Where              string     `config:"where"`      // Custom WHERE clause to filter query results. The provided string is used directly in the query
+	Namespace          string     `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
 }
+
+var wmiDefaultMaxRows uint32 = 0
+var wmiDefaultCacheSize uint32 = 1000
 
 func NewDefaultConfig() Config {
 	return Config{
+		IncludeQueryClass:            false,
 		IncludeQueries:               false,
 		IncludeNullProperties:        false,
 		IncludeEmptyStringProperties: false,
 		Host:                         "localhost",
 		Namespace:                    WMIDefaultNamespace,
+		MaxRowsPerQuery:              wmiDefaultMaxRows,
+		SchemaCacheSize:              wmiDefaultCacheSize,
 	}
+}
+
+// Function that verifies existence conditions
+func (c *Config) Validate() error {
+	if c.SchemaCacheSize == 0 {
+		return fmt.Errorf("cache size should be greater than 0")
+	}
+	return nil
 }
 
 func (c *Config) ValidateConnectionParameters() error {

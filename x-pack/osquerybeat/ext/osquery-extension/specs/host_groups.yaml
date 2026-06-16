@@ -1,0 +1,38 @@
+type: view
+name: host_groups
+description: "(Deprecated.) Backward-compatible view over elastic_host_groups; use elastic_host_groups instead."
+platforms:
+  - linux
+  - darwin
+
+required_tables:
+  - elastic_host_groups
+
+columns:
+  - name: gid
+    type: BIGINT
+    description: Unsigned int64 group ID
+  - name: gid_signed
+    type: BIGINT
+    description: Signed int64 version of gid
+  - name: groupname
+    type: TEXT
+    description: Canonical local group name
+
+query: |
+  SELECT * FROM elastic_host_groups;
+
+documentation:
+  description: |
+    **Deprecated.** This view is deprecated in favor of the elastic_host_groups table.
+    It exists only for backward compatibility (SELECT * FROM elastic_host_groups).
+    Use elastic_host_groups directly in new use cases.
+  examples:
+    - title: Query host groups (same as elastic_host_groups)
+      query: |
+        SELECT * FROM host_groups;
+  notes:
+    - "Deprecated in favor of elastic_host_groups; use the table directly for new queries."
+  related_tables:
+    - elastic_host_groups
+    - host_users

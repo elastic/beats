@@ -10,6 +10,15 @@ BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
 # shellcheck source=/dev/null
 source .buildkite/scripts/qemu.sh
 
+# shellcheck source=/dev/null
+source .buildkite/scripts/docker.sh
+
+echo "~~~ Packaging : $BEAT_DIR"
+
+# Make Docker builds less verbose
+BUILDKIT_PROGRESS=plain
+export BUILDKIT_PROGRESS
+
 cd $BEAT_DIR
 mage package
 

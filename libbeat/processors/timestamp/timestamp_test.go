@@ -28,20 +28,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var expected = time.Date(2015, 3, 7, 11, 6, 39, 0, time.UTC)
 
 func TestParsePatterns(t *testing.T) {
-	logp.TestingSetup()
-
 	c := defaultConfig()
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.ANSIC, time.RFC3339Nano, time.RFC3339)
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +53,8 @@ func TestParsePatterns(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			evt.Timestamp = time.Time{}
-			evt.PutValue("ts", expected.Format(format))
+			_, putErr := evt.PutValue("ts", expected.Format(format))
+			require.NoError(t, putErr)
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -79,7 +78,8 @@ func TestParsePatterns(t *testing.T) {
 
 		for _, timeValue := range times {
 			evt.Timestamp = time.Time{}
-			evt.PutValue("ts", timeValue)
+			_, putErr := evt.PutValue("ts", timeValue)
+			require.NoError(t, putErr)
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -93,7 +93,7 @@ func TestParsePatterns(t *testing.T) {
 	t.Run("UNIX_MS", func(t *testing.T) {
 		p.Layouts = []string{"UNIX_MS"}
 
-		epochMs := int64(expected.UnixNano()) / int64(time.Millisecond)
+		epochMs := expected.UnixNano() / int64(time.Millisecond)
 		times := []interface{}{
 			epochMs,
 			float64(epochMs),
@@ -103,7 +103,8 @@ func TestParsePatterns(t *testing.T) {
 
 		for _, timeValue := range times {
 			evt.Timestamp = time.Time{}
-			evt.PutValue("ts", timeValue)
+			_, putErr := evt.PutValue("ts", timeValue)
+			require.NoError(t, putErr)
 
 			evt, err = p.Run(evt)
 			if err != nil {
@@ -121,7 +122,7 @@ func TestParseNoYear(t *testing.T) {
 	c.Layouts = append(c.Layouts, time.StampMilli)
 	c.Timezone = cfgtype.MustNewTimezone("EST")
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,7 +150,7 @@ func TestIgnoreMissing(t *testing.T) {
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.RFC3339)
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +172,7 @@ func TestIgnoreFailure(t *testing.T) {
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.RFC3339)
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,7 +198,7 @@ func TestBuiltInTest(t *testing.T) {
 		"2015-03-07T11:06:39Z",
 	}
 
-	_, err := newFromConfig(c)
+	_, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "failed to parse test timestamp")
 	}
@@ -280,7 +281,7 @@ func TestTimezone(t *testing.T) {
 				"layouts":  []string{time.ANSIC},
 			})
 
-			processor, err := New(config)
+			processor, err := New(config, logptest.NewTestingLogger(t, ""))
 			if c.Error {
 				require.Error(t, err)
 				return
@@ -312,7 +313,7 @@ func TestMetadataTarget(t *testing.T) {
 	c.Layouts = append(c.Layouts, time.RFC3339)
 	c.Timezone = cfgtype.MustNewTimezone("EST")
 
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -337,4 +338,55 @@ func TestMetadataTarget(t *testing.T) {
 	assert.Equal(t, expMeta, newEvt.Meta)
 	assert.Equal(t, evt.Fields, newEvt.Fields)
 	assert.Equal(t, evt.Timestamp, newEvt.Timestamp)
+}
+
+// BenchmarkTimestampSingleLayout measures the common case: one layout that
+// matches every event. This is the hot path in most filebeat deployments.
+func BenchmarkTimestampSingleLayout(b *testing.B) {
+	c := defaultConfig()
+	c.Field = "ts"
+	c.Layouts = []string{time.RFC3339Nano}
+
+	p, err := newFromConfig(c, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	tsStr := time.Date(2025, 3, 7, 11, 6, 39, 123456789, time.UTC).Format(time.RFC3339Nano)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{Fields: mapstr.M{"ts": tsStr}}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkTimestampMultipleLayouts measures the case where multiple layouts
+// are configured and the matching layout is the last one tried.
+func BenchmarkTimestampMultipleLayouts(b *testing.B) {
+	c := defaultConfig()
+	c.Field = "ts"
+	c.Layouts = []string{time.ANSIC, time.RFC822, time.RFC3339Nano}
+
+	p, err := newFromConfig(c, logptest.NewTestingLogger(b, ""))
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	// Use RFC3339Nano format so the first two layouts fail.
+	tsStr := time.Date(2025, 3, 7, 11, 6, 39, 123456789, time.UTC).Format(time.RFC3339Nano)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		event := &beat.Event{Fields: mapstr.M{"ts": tsStr}}
+		_, err := p.Run(event)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
 }

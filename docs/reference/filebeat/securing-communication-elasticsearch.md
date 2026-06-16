@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/securing-communication-elasticsearch.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Secure communication with Elasticsearch [securing-communication-elasticsearch]

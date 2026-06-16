@@ -48,18 +48,18 @@ func TestCmdTest(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
 	mockbeat.Start("test", "config")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("Config OK", 10*time.Second)
 }
 
 func TestCmdTestNoConfig(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.Start("test", "config")
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err)
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with an error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 }
 
 func TestCmdTestOutput(t *testing.T) {
@@ -67,9 +67,9 @@ func TestCmdTestOutput(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, esURL.String()))
 	mockbeat.Start("test", "output")
-	procState, err := mockbeat.Process.Wait()
+	err := mockbeat.Cmd.Wait()
 	require.NoError(t, err)
-	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
+	require.Equal(t, 0, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
 	mockbeat.WaitStdOutContains("TLS... WARN secure connection disabled", 10*time.Second)
 	mockbeat.WaitStdOutContains("talk to server... OK", 10*time.Second)
@@ -79,9 +79,9 @@ func TestCmdTestOutputBadHost(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(fmt.Sprintf(CmdTestCfg, "badhost:9200"))
 	mockbeat.Start("test", "output")
-	procState, err := mockbeat.Process.Wait()
-	require.NoError(t, err)
-	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
+	err := mockbeat.Cmd.Wait()
+	require.Error(t, err, "mockbeat must exit with error")
+	require.Equal(t, 1, mockbeat.Cmd.ProcessState.ExitCode(), "incorrect exit code")
 	mockbeat.WaitStdOutContains("parse url... OK", 10*time.Second)
 	mockbeat.WaitStdOutContains("dns lookup... ERROR", 10*time.Second)
 }

@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -33,7 +34,7 @@ func TestConvert(t *testing.T) {
 		c := defaultConfig()
 		c.Fields = append(c.Fields, field{From: "src", To: "dst", Type: Integer})
 
-		p, err := newConvert(c)
+		p, err := newConvert(c, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -74,7 +75,7 @@ func TestConvert(t *testing.T) {
 		c := defaultConfig()
 		c.Fields = append(c.Fields, field{From: "source.address", To: "source.ip", Type: IP})
 
-		p, err := newConvert(c)
+		p, err := newConvert(c, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -97,7 +98,7 @@ func TestConvert(t *testing.T) {
 		c := defaultConfig()
 		c.Fields = append(c.Fields, field{From: "source.address", To: "source.ip", Type: IP})
 
-		p, err := newConvert(c)
+		p, err := newConvert(c, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -137,7 +138,7 @@ func TestConvert(t *testing.T) {
 		c.Tag = "convert_ip"
 		c.Fields = append(c.Fields, field{From: "source.address", To: "source.ip", Type: IP})
 
-		p, err := newConvert(c)
+		p, err := newConvert(c, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -163,7 +164,7 @@ func TestConvert(t *testing.T) {
 			"dest":   int32(1),
 		}
 
-		p, err := newConvert(c)
+		p, err := newConvert(c, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		newEvt, err := p.Run(evt)
@@ -262,7 +263,7 @@ func TestConvertRun(t *testing.T) {
 
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			processor, err := New(conf.MustNewConfigFrom(tt.config))
+			processor, err := New(conf.MustNewConfigFrom(tt.config), logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -431,7 +432,7 @@ func TestDataTypes(t *testing.T) {
 			c := defaultConfig()
 			c.Fields = append(c.Fields, field{From: key, Type: tc.Type})
 
-			p, err := newConvert(c)
+			p, err := newConvert(c, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -466,7 +467,7 @@ func BenchmarkTestConvertRun(b *testing.B) {
 		field{From: "o", To: "p"},
 	)
 
-	p, err := newConvert(c)
+	p, err := newConvert(c, logptest.NewTestingLogger(b, ""))
 	if err != nil {
 		b.Fatal(err)
 	}

@@ -2,12 +2,12 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.96.0.10",
-			"created": "2024-04-23T08:49:44.000Z",
-			"name": "kube-dns",
+			"cluster_ip": "10.96.0.1",
+			"created": "2024-04-23T08:49:42.000Z",
+			"name": "kubernetes",
 			"type": "ClusterIP"
 		},
 		"Index": "",
@@ -46,12 +46,12 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "default"
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.96.0.1",
-			"created": "2024-04-23T08:49:42.000Z",
-			"name": "kubernetes",
+			"cluster_ip": "10.96.0.10",
+			"created": "2024-04-23T08:49:44.000Z",
+			"name": "kube-dns",
 			"type": "ClusterIP"
 		},
 		"Index": "",

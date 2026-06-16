@@ -9,6 +9,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,15 +20,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
@@ -53,10 +52,10 @@ var (
 	dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
 
 	platformMap = map[string]map[string]interface{}{
-		"amd64": map[string]interface{}{
+		"amd64": {
 			"from": "alpine:3.10",
 		},
-		"arm64": map[string]interface{}{
+		"arm64": {
 			"from": "arm64v8/alpine:3.10",
 		},
 	}
@@ -113,7 +112,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 	}
 	defer buildContext.Close()
 
-	buildOpts := types.ImageBuildOptions{
+	buildOpts := client.ImageBuildOptions{
 		Tags:       []string{rootImageName},
 		Dockerfile: dockerfile,
 	}
@@ -167,7 +166,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// create the container that will become our rootfs
-		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, nil, "")
+		CreatedContainerBody, err := cli.ContainerCreate(ctx, client.ContainerCreateOptions{Config: &container.Config{Image: rootImageName}})
 		if err != nil {
 			return fmt.Errorf("error creating container: %w", err)
 		}
@@ -190,7 +189,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// export the container to a tar file
-		exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID)
+		exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID, client.ContainerExportOptions{})
 		if err != nil {
 			return fmt.Errorf("error exporting container: %w", err)
 		}
@@ -219,12 +218,12 @@ func BuildContainer(ctx context.Context) error {
 
 func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.Client) error {
 	fmt.Printf("Removing container %s\n", containerID)
-	err := cli.ContainerRemove(ctx, containerID, container.RemoveOptions{RemoveVolumes: true, Force: true})
+	_, err := cli.ContainerRemove(ctx, containerID, client.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	if err != nil {
 		return fmt.Errorf("error removing container: %w", err)
 	}
 
-	resp, err := cli.ImageRemove(ctx, rootImageName, image.RemoveOptions{Force: true})
+	resp, err := cli.ImageRemove(ctx, rootImageName, client.ImageRemoveOptions{Force: true})
 	if err != nil {
 		return fmt.Errorf("error removing image: %w", err)
 	}
@@ -240,13 +239,13 @@ func Uninstall(ctx context.Context) error {
 	}
 
 	// check to see if we have a plugin we need to remove
-	plugins, err := cli.PluginList(ctx, filters.Args{})
+	pluginResult, err := cli.PluginList(ctx, client.PluginListOptions{})
 	if err != nil {
 		return fmt.Errorf("error getting list of plugins: %w", err)
 	}
 
 	toRemoveName := ""
-	for _, plugin := range plugins {
+	for _, plugin := range pluginResult.Items {
 		if strings.Contains(plugin.Name, logDriverName) {
 			toRemoveName = plugin.Name
 			break
@@ -256,11 +255,11 @@ func Uninstall(ctx context.Context) error {
 		return nil
 	}
 
-	err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
+	_, err = cli.PluginDisable(ctx, toRemoveName, client.PluginDisableOptions{Force: true})
 	if err != nil {
 		return fmt.Errorf("error disabling plugin: %w", err)
 	}
-	err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
+	_, err = cli.PluginRemove(ctx, toRemoveName, client.PluginRemoveOptions{Force: true})
 	if err != nil {
 		return fmt.Errorf("error removing plugin: %w", err)
 	}
@@ -290,12 +289,12 @@ func Install(ctx context.Context) error {
 		return fmt.Errorf("error creating archive of work dir: %w", err)
 	}
 
-	err = cli.PluginCreate(ctx, archive, types.PluginCreateOptions{RepoName: name})
+	_, err = cli.PluginCreate(ctx, archive, client.PluginCreateOptions{RepoName: name})
 	if err != nil {
 		return fmt.Errorf("error creating plugin: %w", err)
 	}
 
-	err = cli.PluginEnable(ctx, name, types.PluginEnableOptions{})
+	_, err = cli.PluginEnable(ctx, name, client.PluginEnableOptions{})
 	if err != nil {
 		return fmt.Errorf("error enabling plugin: %w", err)
 	}
@@ -360,6 +359,10 @@ func CrossBuild() error {
 
 // Build builds the base container used by the docker plugin
 func Build() {
+	if !filterPlatformsForNativeArch() {
+		fmt.Println(">> build: skipping because no supported platform is enabled")
+		return
+	}
 	mg.SerialDeps(CrossBuild, BuildContainer)
 }
 
@@ -381,7 +384,7 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	if !isSupportedPlatform() {
+	if !filterPlatformsForNativeArch() {
 		fmt.Println(">> package: skipping because no supported platform is enabled")
 		return
 	}
@@ -397,7 +400,9 @@ func Ironbank() error {
 	return nil
 }
 
-func isSupportedPlatform() bool {
+// filterPlatformsForNativeArch removes cross-architecture platforms that
+// can't be built on the current host, and reports whether any remain.
+func filterPlatformsForNativeArch() bool {
 	_, isAMD64Selected := devtools.Platforms.Get("linux/amd64")
 	_, isARM64Selected := devtools.Platforms.Get("linux/arm64")
 	arch := runtime.GOARCH
@@ -421,11 +426,34 @@ func Update() {
 	fmt.Println(">> update: There is no Update for The Elastic Log Plugin")
 }
 
+// Generate copies entry.proto from the moby/moby/v2 module cache, regenerates
+// logdriver/entry.pb.go via go generate, adds the Elastic license header, and
+// formats the file. Run this after bumping the moby dependency.
+// Requires protoc and protoc-gen-gogofaster: go install github.com/gogo/protobuf/protoc-gen-gogofaster@latest
+func Generate() error {
+	out, err := sh.Output("go", "list", "-m", "-json", "github.com/moby/moby/v2")
+	if err != nil {
+		return fmt.Errorf("finding moby module: %w", err)
+	}
+	var mod struct{ Dir string }
+	if err := json.Unmarshal([]byte(out), &mod); err != nil {
+		return fmt.Errorf("parsing module info: %w", err)
+	}
+	src := filepath.Join(mod.Dir, "daemon", "logger", "internal", "logdriver", "entry.proto")
+	if err := devtools.Copy(src, filepath.Join("logdriver", "entry.proto")); err != nil {
+		return fmt.Errorf("copying entry.proto: %w", err)
+	}
+	if err := sh.Run("go", "generate", "./logdriver/..."); err != nil {
+		return fmt.Errorf("running go generate: %w", err)
+	}
+	devtools.Format()
+	return nil
+}
+
 func newDockerClient(ctx context.Context) (*client.Client, error) {
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := client.New(client.FromEnv)
 	if err != nil {
 		return nil, err
 	}
-	cli.NegotiateAPIVersion(ctx)
 	return cli, nil
 }

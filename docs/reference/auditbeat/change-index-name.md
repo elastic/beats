@@ -1,6 +1,9 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/change-index-name.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Change the index name [change-index-name]

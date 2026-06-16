@@ -2,6 +2,9 @@
 navigation_title: "add_kubernetes_metadata"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/add-kubernetes-metadata.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Add Kubernetes metadata [add-kubernetes-metadata]
@@ -53,7 +56,7 @@ The configuration below enables the processor on a Beat running as a process on 
 ```yaml
 processors:
   - add_kubernetes_metadata:
-      host: <hostname>
+      node: <kubernetes_node_name>
       # If kube_config is not set, KUBECONFIG environment variable will be checked
       # and if not present it will fall back to InCluster
       kube_config: $Heartbeat Reference/.kube/config
@@ -72,7 +75,7 @@ The configuration below has the default indexers and matchers disabled and enabl
 ```yaml
 processors:
   - add_kubernetes_metadata:
-      host: <hostname>
+      node: <kubernetes_node_name>
       # If kube_config is not set, KUBECONFIG environment variable will be checked
       # and if not present it will fall back to InCluster
       kube_config: ~/.kube/config
@@ -89,7 +92,7 @@ processors:
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
 
-`host`
+`node`
 :   (Optional) Specify the node to scope heartbeat to in case it cannot be accurately detected, as when running heartbeat in host network mode.
 
 `scope`
@@ -156,6 +159,14 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `annotations.dedot`
 :   (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
 
+`wait_for_metadata` {applies_to}`stack: ga 9.5`
+:   When `true`, startup is blocked until the processor is initialized. If the processor can't connect to the Kubernetes API within the duration set in `wait_for_metadata_timeout`, startup fails and the process exits. When `false`, the processor is initialized asynchronously. Defaults to `false`.
+
+`wait_for_metadata_timeout` {applies_to}`stack: ga 9.5`
+:   The maximum time allowed for the processor to connect to the Kubernetes API and fetch metadata. Applies regardless of `wait_for_metadata`. To retry the connection indefinitely, set to `0`. Defaults to `30s`.
+
+`wait_for_metadata_retry_period` {applies_to}`stack: ga 9.5`
+:   Time to wait before retrying the metadata request. The retry period must not be greater than `wait_for_metadata_timeout` unless retrying indefinitely. Defaults to `3s`.
 
 ## Indexers and matchers [kubernetes-indexers-and-matchers]
 

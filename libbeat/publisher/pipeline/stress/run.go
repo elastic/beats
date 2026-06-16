@@ -18,6 +18,7 @@
 package stress
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type config struct {
@@ -61,31 +63,43 @@ func RunTests(
 
 	log := logp.L()
 
+	info.Paths = paths.New()
+	info.Paths.Home = "."
+	info.Paths.Config = "."
+	info.Paths.Data = "."
+	info.Paths.Logs = "."
+
 	processing, err := processing.MakeDefaultSupport(false, nil)(info, log, cfg)
 	if err != nil {
 		return err
 	}
 
-	pipeline, err := pipeline.Load(info,
+	pipelineSettings := pipeline.Settings{
+		WaitClose:     0,
+		WaitCloseMode: pipeline.NoWaitOnClose,
+		Processors:    processing,
+	}
+
+	pipeline, err := pipeline.LoadWithSettings(info,
 		pipeline.Monitors{
 			Metrics:   nil,
 			Telemetry: nil,
 			Logger:    log,
 		},
 		config.Pipeline,
-		processing,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
 			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
 			return cfg.Name(), out, err
 		},
+		pipelineSettings,
 	)
 	if err != nil {
 		return fmt.Errorf("loading pipeline failed: %w", err)
 	}
 	defer func() {
 		log.Info("Stop pipeline")
-		pipeline.Close()
+		pipeline.Disconnect(context.Background())
 		log.Info("pipeline closed")
 	}()
 

@@ -2,6 +2,9 @@
 navigation_title: "Create a _publishing_ user"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/privileges-to-publish-events.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Grant privileges and roles needed for publishing [privileges-to-publish-events]

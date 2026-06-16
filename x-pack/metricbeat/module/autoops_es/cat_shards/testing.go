@@ -26,11 +26,11 @@ func SetupSuccessfulServerWithResolvedIndexes(resolvedIndexes []byte) auto_ops_t
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(clusterInfo)
-			case CatShardsPath:
+			case catShardsPath:
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(data)
-			case ResolveIndexPath:
+			case resolveIndexPath:
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(resolvedIndexes)
@@ -53,11 +53,11 @@ func SetupSuccessfulServerWithVersionedResolvedIndex() auto_ops_testing.SetupSer
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(clusterInfo)
-			case CatShardsPath:
+			case catShardsPath:
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(data)
-			case ResolveIndexPath:
+			case resolveIndexPath:
 				resolvedIndexes, err := os.ReadFile("./_meta/test/resolved_indices." + version + ".json")
 				require.NoError(t, err)
 

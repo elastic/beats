@@ -2,6 +2,9 @@
 navigation_title: "Winlogbeat"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configuration-winlogbeat-options.html
+applies_to:
+  stack: ga
+  serverless: ga
 ---
 
 # Configure Winlogbeat [configuration-winlogbeat-options]
@@ -27,11 +30,15 @@ You can specify the following options in the `winlogbeat` section of the `winlog
 
 ### `registry_file` [_registry_file]
 
-The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default the file is stored as `.winlogbeat.yml` in the directory where the Beat was started. When you run the process as a Windows service, it’s recommended that you set the value to `C:/ProgramData/winlogbeat/.winlogbeat.yml`.
+The name of the file where Winlogbeat stores information that it uses to resume monitoring after a restart. By default, the file is stored as `.winlogbeat.yml` in the directory where Beat was started. When you run the process as a Windows service, set the value to `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`.
 
 ```yaml
-winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
+winlogbeat.registry_file: C:/Program Files/Winlogbeat-Data/.winlogbeat.yml
 ```
+
+The default location varies:
+* {applies_to}`stack: ga 9.1+` `C:/Program Files/Winlogbeat-Data/.winlogbeat.yml`
+* {applies_to}`stack: ga =9.0` `C:/ProgramData/winlogbeat/.winlogbeat.yml`
 
 ::::{note}
 The forward slashes (/) in the path are automatically changed to backslashes (\) for Windows compatibility. You can use either forward or backslashes. Forward slashes are easier to work with in YAML because there is no need to escape them.
@@ -167,7 +174,7 @@ winlogbeat.event_logs:
 
 A boolean flag to indicate that the log contains only events collected from remote hosts using the Windows Event Collector. The value defaults to true for the ForwardedEvents log and false for any other log. **This option is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer).**
 
-This settings allows Winlogbeat to optimize reads for forwarded events that are already rendered. When the value is true Winlogbeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
+This setting allows Winlogbeat to optimize reads for forwarded events that are already rendered. When the value is true Winlogbeat does not attempt to render the event using message files from the host computer. The Windows Event Collector subscription should be configured to use the "RenderedText" format (this is the default) to ensure that the events are distributed with messages and descriptions.
 
 
 ### `event_logs.event_id` [_event_logs_event_id]
@@ -248,6 +255,8 @@ Microsoft-Windows-Eventlog
 
 Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`, `ignore_older`, `level`, and `provider` options. These options should be included in the XML query directly. Furthermore, an `id` must be provided. Custom XML queries provide more flexibility and advanced options than the simpler query options in Winlogbeat. **This option is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer).**
 
+Query filters provided through custom XML queries are not always reliable across all Windows versions and forwarding scenarios. If possible, prefer non-custom queries so Winlogbeat can subscribe unfiltered and apply filtering in code.
+
 Here is a configuration which will collect DHCP server events from multiple channels:
 
 ```yaml
@@ -281,6 +290,29 @@ winlogbeat.event_logs:
 ```
 
 * This can have a significant impact on performance that can vary depending on your system specs.
+
+
+### `event_logs.ignore_missing_channel` [_event_logs_ignore_missing_channel]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Boolean option that controls whether Winlogbeat should ignore missing event log channels and continue monitoring other configured channels. When set to `true`, if a specified event log channel doesn't exist or cannot be accessed, Winlogbeat will log a warning and continue processing other event logs instead of stopping with an error. The default is `true`.
+
+This option is useful when deploying Winlogbeat configurations across multiple systems where certain event log channels may not be available on all machines, or when monitoring optional channels that may not always be present.
+
+Example:
+
+```yaml
+winlogbeat.event_logs:
+  - name: Application
+  - name: System
+  - name: Sysmon
+    ignore_missing_channel: false
+```
+
+In this example, if the Sysmon channel is missing, Winlogbeat will stop with an error, which may be desired for critical monitoring components.
 
 
 ### `event_logs.tags` [_event_logs_tags]

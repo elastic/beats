@@ -30,7 +30,7 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 	for s.parseOffset < len(s.data) {
 
 		if len(s.data[s.parseOffset:]) < 8 {
-			logp.Warn("AMQP message smaller than a frame, waiting for more data")
+			logp.Debug("amqp", "AMQP message smaller than a frame, waiting for more data")
 			return true, false
 		}
 
@@ -60,7 +60,7 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 		case heartbeatType:
 			detailedf("Heartbeat frame received")
 		default:
-			logp.Warn("Received unknown AMQP frame")
+			logp.Debug("amqp", "Received unknown AMQP frame")
 			return false, false
 		}
 
@@ -87,16 +87,16 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
 	if len(data) < 8 {
-		logp.Warn("Partial frame header, waiting for more data")
+		logp.Debug("amqp", "Partial frame header, waiting for more data")
 		return nil, false
 	}
 	frame.size = binary.BigEndian.Uint32(data[3:7])
 	if len(data) < int(frame.size)+8 {
-		logp.Warn("Frame shorter than declared size, waiting for more data")
+		logp.Debug("amqp", "Frame shorter than declared size, waiting for more data")
 		return nil, false
 	}
 	if data[frame.size+7] != frameEndOctet {
-		logp.Warn("Missing frame end octet in frame, discarding it")
+		logp.Debug("amqp", "Missing frame end octet in frame, discarding it")
 		return nil, true
 	}
 	frame.Type = frameType(data[0])
@@ -120,7 +120,7 @@ The Method Payload, according to official doc :
 
 func (amqp *amqpPlugin) decodeMethodFrame(s *amqpStream, buf []byte) (bool, bool) {
 	if len(buf) < 4 {
-		logp.Warn("Method frame too small, waiting for more data")
+		logp.Debug("amqp", "Method frame too small, waiting for more data")
 		return true, false
 	}
 	class := codeClass(binary.BigEndian.Uint16(buf[0:2]))
@@ -151,7 +151,7 @@ Structure of a content header, according to official doc :
 
 func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
 	if len(buf) < 14 {
-		logp.Warn("Header frame too small, waiting for mode data")
+		logp.Debug("amqp", "Header frame too small, waiting for mode data")
 		return true
 	}
 	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
@@ -192,50 +192,74 @@ func hasProperty(prop, flag byte) bool {
 func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
 
+	if len(data) < 2 {
+		logp.Debug("amqp", "Malformed packet: unexpected end of data")
+		return true
+	}
+
 	// properties are coded in the two first bytes
 	prop1 := data[0]
 	prop2 := data[1]
 	var offset uint32 = 2
 
 	// while last bit set, we have another property flag field
-	for lastbit := 1; data[lastbit]&1 == 1; {
-		lastbit += 2
-		offset += 2
+	lastbit := 1
+	for {
+		if data[lastbit]&1 == 1 {
+			lastbit += 2
+			offset += 2
+		} else {
+			break
+		}
+		if lastbit >= len(data) {
+			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			return true
+		}
 	}
 
+	logp.Debug("amqp", "offset:%d, lastbit:%d", offset, lastbit)
+
 	if hasProperty(prop1, contentTypeProp) {
-		contentType, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		contentType, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get content type in header frame")
+			logp.Debug("amqp", "Failed to get content type in header frame")
 			return true
 		}
 		m.fields["content-type"] = contentType
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop1, contentEncodingProp) {
-		contentEncoding, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		contentEncoding, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get content encoding in header frame")
+			logp.Debug("amqp", "Failed to get content encoding in header frame")
 			return true
 		}
 		m.fields["content-encoding"] = contentEncoding
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop1, headersProp) {
+		if int(offset) >= len(data) {
+			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			return true
+		}
 		headers := mapstr.M{}
 		next, err, exists := getTable(headers, data, offset)
 		if !err && exists {
 			m.fields["headers"] = headers
 		} else if err {
-			logp.Warn("Failed to get headers")
+			logp.Debug("amqp", "Failed to get headers")
 			return true
 		}
 		offset = next
 	}
 
 	if hasProperty(prop1, deliveryModeProp) {
+		if int(offset) >= len(data) {
+			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			return true
+		}
 		switch data[offset] {
 		case 1:
 			m.fields["delivery-mode"] = "non-persistent"
@@ -246,80 +270,89 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, priorityProp) {
+		if int(offset) >= len(data) {
+			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			return true
+		}
 		m.fields["priority"] = data[offset]
 		offset++
 	}
 
 	if hasProperty(prop1, correlationIDProp) {
-		correlationID, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		correlationID, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get correlation-id in header frame")
+			logp.Debug("amqp", "Failed to get correlation-id in header frame")
 			return true
 		}
 		m.fields["correlation-id"] = correlationID
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop1, replyToProp) {
-		replyTo, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		replyTo, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get reply-to in header frame")
+			logp.Debug("amqp", "Failed to get reply-to in header frame")
 			return true
 		}
 		m.fields["reply-to"] = replyTo
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop1, expirationProp) {
-		expiration, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		expiration, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get expiration in header frame")
+			logp.Debug("amqp", "Failed to get expiration in header frame")
 			return true
 		}
 		m.fields["expiration"] = expiration
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop2, messageIDProp) {
-		messageID, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		messageID, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get message id in header frame")
+			logp.Debug("amqp", "Failed to get message id in header frame")
 			return true
 		}
 		m.fields["message-id"] = messageID
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop2, timestampProp) {
-		t := time.Unix(int64(binary.BigEndian.Uint64(data[offset:offset+8])), 0)
+		timeInt, err := getIntegerAt[int64](data, offset)
+		if err {
+			logp.Debug("amqp", "Malformed packet: unexpected end of data")
+			return true
+		}
+		t := time.Unix(timeInt, 0)
 		m.fields["timestamp"] = t.Format(amqpTimeLayout)
 		offset += 8
 	}
 
 	if hasProperty(prop2, typeProp) {
-		msgType, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		msgType, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get message type in header frame")
+			logp.Debug("amqp", "Failed to get message type in header frame")
 			return true
 		}
 		m.fields["type"] = msgType
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop2, userIDProp) {
-		userID, next, err := getShortString(data, offset+1, uint32(data[offset]))
+		userID, consumed, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get user id in header frame")
+			logp.Debug("amqp", "Failed to get user id in header frame")
 			return true
 		}
 		m.fields["user-id"] = userID
-		offset = next
+		offset += consumed
 	}
 
 	if hasProperty(prop2, appIDProp) {
-		appID, _, err := getShortString(data, offset+1, uint32(data[offset]))
+		appID, _, err := getLVString[uint8](data, offset)
 		if err {
-			logp.Warn("Failed to get app-id in header frame")
+			logp.Debug("amqp", "Failed to get app-id in header frame")
 			return true
 		}
 		m.fields["app-id"] = appID
