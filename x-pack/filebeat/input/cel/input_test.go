@@ -563,6 +563,156 @@ var inputTests = []struct {
 		}},
 	},
 
+	// Emit tests.
+	{
+		name: "emit_no_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello"},{"message":"world"}].emit(e, e)}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+	},
+	{
+		name: "emit_with_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello","id":1},{"message":"world","id":2}].emit(e, {"message":e.message}, {"id":e.id})}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": int64(1)},
+			{"id": int64(2)},
+		},
+	},
+
+	// Stream decode tests.
+	{
+		name: "decode_csv_stream_lazy_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  name,age,city
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA8tLzE3VSUxP1UnOLKnkcszJTE7VMTbQ8UstV4jML8rmcspP0jEy1fHJz0vJz+MCACmhrnIuAAAA"
+	).stream_gzip().decode_csv_stream_lazy().map(row,
+		row
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"name": "Alice", "age": "30", "city": "New York"},
+			{"name": "Bob", "age": "25", "city": "London"},
+		},
+	},
+	{
+		name: "decode_csv_stream_lazy_no_header_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA3PMyUxO1TE20PFLLVeIzC/K5nLKT9IxMtXxyc9Lyc/jAgAMH1FQIAAAAA=="
+	).stream_gzip().decode_csv_stream_lazy_no_header().map(row,
+		{"fields": row}
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"fields": []interface{}{"Alice", "30", "New York"}},
+			{"fields": []interface{}{"Bob", "25", "London"}},
+		},
+	},
+	{
+		name: "decode_lines_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().map(line,
+		{"line": line}
+	).as(lines,
+		{"events": lines}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+	{
+		name: "emit_with_decode_lines_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().emit(line,
+		{"line": line}
+	).as(result,
+		{
+			"events": [],
+			"emit_result": result,
+		}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+
 	// FS-based tests.
 	{
 		name: "ndjson_log_file_simple",

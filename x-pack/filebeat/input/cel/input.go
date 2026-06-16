@@ -251,7 +251,18 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		Headers:     cfg.Resource.Headers,
 		MaxBodySize: cfg.Resource.MaxBodySize,
 	}
-	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov)
+	// The emitter is created here but not yet bound to a session. The
+	// factory closure captures a pointer that is set after the runSession
+	// is constructed, because newProgram runs before the session exists.
+	var emitter *sessionEmitter
+	emitOpt := lib.Emit(func() lib.Emitter {
+		if emitter == nil {
+			return nil
+		}
+		emitter.reset()
+		return emitter
+	})
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov, emitOpt)
 	if err != nil {
 		return err
 	}
@@ -312,6 +323,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
+	emitter = &sessionEmitter{pub: pub}
 	s := &runSession{
 		cfg:      cfg,
 		prg:      prg,
@@ -326,7 +338,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		env: env,
 		now: i.now,
 
-		pub: pub,
+		pub:     pub,
+		emitter: emitter,
 
 		log:      log,
 		health:   health,
@@ -364,7 +377,8 @@ type runSession struct {
 	env v2.Context
 	now func() time.Time
 
-	pub inputcursor.Publisher
+	pub     inputcursor.Publisher
+	emitter *sessionEmitter
 
 	log      *logp.Logger
 	health   status.StatusReporter
@@ -376,6 +390,43 @@ type runSession struct {
 	cursor     map[string]any
 	goodCursor map[string]any
 	goodURL    string
+}
+
+var _ lib.Emitter = (*sessionEmitter)(nil)
+
+// sessionEmitter adapts inputcursor.Publisher to the lib.Emitter interface,
+// allowing the emit macro to publish events during CEL evaluation.
+type sessionEmitter struct {
+	pub inputcursor.Publisher
+
+	// count tracks events published during a single eval for metrics.
+	count int64
+	// hadCursor records whether any Emit call included a non-nil cursor.
+	hadCursor bool
+}
+
+func (e *sessionEmitter) Emit(value, cursor any) error {
+	event, ok := value.(map[string]any)
+	if !ok {
+		return fmt.Errorf("emit: event must be a map, got %T", value)
+	}
+	err := e.pub.Publish(beat.Event{
+		Timestamp: time.Now(),
+		Fields:    event,
+	}, cursor)
+	if err != nil {
+		return err
+	}
+	e.count++
+	if cursor != nil {
+		e.hadCursor = true
+	}
+	return nil
+}
+
+func (e *sessionEmitter) reset() {
+	e.count = 0
+	e.hadCursor = false
 }
 
 func (s *runSession) runCycle(ctx context.Context) error {
@@ -610,6 +661,11 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		execLog.Debugw("adding missing url from last valid value: state did not contain a url", "last_valid_url", s.goodURL)
 	}
 
+	emitCount := s.emitter.count
+	if emitCount > 0 {
+		s.metrics.AddPublishedEvents(execCtx, uint(emitCount))
+	}
+
 	e, ok := s.state["events"]
 	if !ok {
 		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
@@ -663,6 +719,11 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
 		errorSpans(err, execSpan)
 		return result, err
+	}
+
+	if s.emitter.hadCursor && len(events) != 1 {
+		execLog.Warnw("emit macro published events with cursors but state.events does not contain exactly one element; state.events should be a single-element array or object for cursor bookkeeping",
+			"emit_count", emitCount, "state_events_count", len(events))
 	}
 
 	// We have a non-empty batch of events to process.
@@ -1502,7 +1563,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limit *rate.Limiter, httpOptions lib.HTTPOptions, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool, emitOpt cel.EnvOption) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1523,6 +1584,9 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
+		lib.Stream(),
+		lib.CSV(),
+		lib.Lines(),
 		lib.HTTPWithContextOpts(ctx, client, httpOptions),
 		lib.LimitWithApply(limitPolicies, func(m map[string]any, h http.Header) map[string]any {
 			waitUntil := handleRateLimit(log, m, h, limit)
@@ -1536,6 +1600,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 			"env":                  vars,
 			"remaining_executions": 0, // placeholder
 		}),
+		emitOpt,
 	}
 	if len(patterns) != 0 {
 		opts = append(opts, lib.Regexp(patterns))
