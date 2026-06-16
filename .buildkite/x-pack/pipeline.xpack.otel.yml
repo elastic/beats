@@ -58,7 +58,7 @@ steps:
           go install go.opentelemetry.io/collector/cmd/builder@v0.150.0
           mv $(go env GOPATH)/bin/builder $(go env GOPATH)/bin/ocb
           cd x-pack/otel
-          mage buildOtelDistro
+          RACE=1 mage buildOtelDistro
           timeout 30s mage runOtelDistro > /tmp/collector.log 2>&1 || true
           echo "--- Collector output (errors below are expected if external services are unavailable)"
           cat /tmp/collector.log
