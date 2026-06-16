@@ -36,7 +36,7 @@ func init() {
 }
 
 // BuildOtelDistro builds the beats-otel-collector distribution using ocb.
-// Set RACE=1 to build with the race detector (passes --gcflags=-race to ocb).
+// Set RACE=1 to build with the race detector
 func BuildOtelDistro() error {
 	if _, err := exec.LookPath("ocb"); err != nil {
 		return errors.New("ocb not found: please install ocb https://opentelemetry.io/docs/collector/extend/ocb")
