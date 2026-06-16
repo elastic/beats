@@ -57,3 +57,23 @@ func TestMinimalConfigRoundTrip(t *testing.T) {
 		t.Errorf("update_interval: got %v, want %v", gotUpdate, wantUpdate)
 	}
 }
+
+func TestMinimalProvider_DualAuth(t *testing.T) {
+	cfg := config.MustNewConfigFrom(map[string]any{
+		"okta_domain":          "test.okta.com",
+		"okta_token":           "legacy-token", //nolint:gosec // This is not a secret.
+		"oauth2.enabled":       true,
+		"oauth2.client.id":     "client-id",
+		"oauth2.client.secret": "client-secret",
+		"oauth2.token_url":     "https://test.okta.com/oauth2/v1/token",
+		"oauth2.scopes":        []string{"okta.users.read"},
+		"sync_interval":        "24h",
+		"update_interval":      "15m",
+	})
+
+	_, _, _, err := minimalProvider(cfg, nil)
+	if err != nil {
+		t.Fatalf("minimalProvider rejected dual-auth config: %v — "+
+			"OAuth2 should take precedence over okta_token", err)
+	}
+}

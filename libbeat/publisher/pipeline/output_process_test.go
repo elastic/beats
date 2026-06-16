@@ -68,7 +68,7 @@ func TestOutputReload(t *testing.T) {
 
 				logger := logptest.NewTestingLogger(t, "")
 
-				queueFactory, err := queueFactoryForUserConfig(
+				queueFactory, _, err := queueFactoryForUserConfig(
 					"mem",
 					conf.MustNewConfigFrom(fmt.Sprintf("events: %v", numEventsToPublish)),
 					nil)

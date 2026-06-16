@@ -10,10 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/docker/docker/api/types/plugins/logdriver"
-	"github.com/docker/docker/daemon/logger"
+	"github.com/moby/moby/v2/daemon/logger"
 
-	"github.com/docker/docker/api/types/backend"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/logdriver"
+
+	"github.com/moby/moby/v2/daemon/server/backend"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -46,14 +47,13 @@ type ClientLogger struct {
 }
 
 // newClientFromPipeline creates a new Client logger with a FIFO reader and beat client
-func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger, hostname string) (*ClientLogger, error) {
+func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereader.PipeReader, hash uint64, info logger.Info, localLog logger.Logger, hostname string, log *logp.Logger) (*ClientLogger, error) {
 	// setup the beat client
 	settings := beat.ClientConfig{
 		WaitClose: 0,
 	}
-	clientLogger := logp.NewLogger("clientLogReader")
 	settings.EventListener = acker.Counting(func(n int) {
-		clientLogger.Debugf("Pipeline client ACKS; %v", n)
+		log.Debugf("Pipeline client ACKS; %v", n)
 	})
 	settings.PublishMode = beat.DefaultGuarantees
 	client, err := pipeline.ConnectWith(settings)
@@ -61,7 +61,7 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		return nil, err
 	}
 
-	clientLogger.Debugf("Created new logger for %d", hash)
+	log.Debugf("Created new logger for %d", hash)
 
 	return &ClientLogger{logFile: inputFile,
 		client:           client,
@@ -69,7 +69,7 @@ func newClientFromPipeline(pipeline beat.PipelineConnector, inputFile *pipereade
 		ContainerMeta:    info,
 		ContainerECSMeta: constructECSContainerData(info),
 		localLog:         localLog,
-		logger:           clientLogger,
+		logger:           log,
 		hostname:         hostname}, nil
 }
 
