@@ -17,6 +17,6 @@
 
 package server
 
-type V3 struct { 
+type V3 struct {
 	V2
 }
