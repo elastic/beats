@@ -540,6 +540,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
+	defer resource.Release()
 	return resource.UnpackCursorMeta(to)
 }
 
