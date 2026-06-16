@@ -550,15 +550,13 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 	if resource == nil {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
+	defer resource.Release()
 
-	// cursorMeta and the state written by writeState are guarded by
-	// stateMutex; the ACK handler reads them concurrently (see updateOp.Execute).
 	resource.stateMutex.Lock()
+	defer resource.stateMutex.Unlock()
+
 	resource.cursorMeta = meta
 	s.writeState(resource)
-	resource.stateMutex.Unlock()
-
-	resource.Release()
 	return nil
 }
 
