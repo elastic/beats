@@ -30,7 +30,7 @@ func newOTelOutputController(
 	monitors Monitors,
 	retryObserver retryObserver,
 	queueFactory queue.QueueFactory[publisher.Event],
-	queueConfig any,
+	intakeQueueID string,
 ) (outputController, error) {
 	return nil, nil
 }
