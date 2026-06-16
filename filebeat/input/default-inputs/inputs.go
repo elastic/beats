@@ -43,10 +43,5 @@ func genericInputs(log *logp.Logger, components statestore.States) []v2.Plugin {
 		tcp.Plugin(),
 		udp.Plugin(),
 		unix.Plugin(),
-<<<<<<< HEAD
-=======
-		logv2.LogPluginV2(log),
-		logv2.ContainerPluginV2(log),
->>>>>>> 39bdcbe67 (filebeat/input/{v2,logv2}: add Redirector interface for general input migration (#49613))
 	}
 }

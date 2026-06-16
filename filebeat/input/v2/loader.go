@@ -131,11 +131,7 @@ func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
 // If the plugin's InputManager implements Redirector, Delete follows
 // the redirect and calls the target's Delete with the translated config.
 func (l *Loader) Delete(cfg *conf.C) error {
-<<<<<<< HEAD
-	_, p, _, err := l.loadFromCfg(cfg)
-=======
-	name, p, err := l.loadFromCfg(cfg)
->>>>>>> 39bdcbe67 (filebeat/input/{v2,logv2}: add Redirector interface for general input migration (#49613))
+	name, p, _, err := l.loadFromCfg(cfg)
 	if err != nil {
 		return err
 	}
