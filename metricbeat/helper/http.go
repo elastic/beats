@@ -57,8 +57,8 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	}
 
 	userAgent := ""
-	if bm, ok := base.Module().(*mb.BaseModule); ok {
-		userAgent = bm.UserAgent()
+	if ua, ok := base.Module().(interface{ UserAgent() string }); ok {
+		userAgent = ua.UserAgent()
 	}
 	return NewHTTPFromConfig(config, base.HostData(), base.Logger(), userAgent)
 }
