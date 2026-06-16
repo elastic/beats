@@ -1114,7 +1114,7 @@ const raceDetectorMarker = "WARNING: DATA RACE"
 // is fully flushed, and before the next startBeat truncates the file.
 func (b *BeatProc) checkForDataRace() {
 	b.t.Helper()
-	if enabled, _ := strconv.ParseBool(os.Getenv(testbin.RaceDetectorEnvVar)); !enabled {
+	if !testbin.RaceDetectorEnabled() {
 		return
 	}
 	data, err := os.ReadFile(b.stderr.Name())

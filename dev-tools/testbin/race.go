@@ -17,6 +17,11 @@
 
 package testbin
 
+import (
+	"os"
+	"strconv"
+)
+
 // RaceDetectorEnvVar is the environment variable that opts the beat-under-test
 // into the race detector during Go integration tests. When set to a truthy
 // value, Build compiles the beat test binary with -race so data races are
@@ -27,6 +32,15 @@ package testbin
 // implicitly race-instrument every spawned beat in CI. Keeping a separate
 // variable makes the beat-under-test instrumentation an explicit opt-in.
 const RaceDetectorEnvVar = "INTEG_RACE_DETECTOR"
+
+// RaceDetectorEnabled reports whether RaceDetectorEnvVar requests race
+// instrumentation of the beat-under-test. A missing or unparseable value is
+// treated as disabled, matching how Build reads DEV and TEST_COVERAGE. It is
+// the single source of truth shared by Build and the integration framework.
+func RaceDetectorEnabled() bool {
+	enabled, _ := strconv.ParseBool(os.Getenv(RaceDetectorEnvVar))
+	return enabled
+}
 
 // RaceDetectorSupported reports whether the Go race detector (-race) is
 // available for the given GOOS/GOARCH. The race detector only supports a
