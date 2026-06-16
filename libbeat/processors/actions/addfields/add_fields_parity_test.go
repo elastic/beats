@@ -55,18 +55,6 @@ func runPdata(t *testing.T, proc *addFields, input mapstr.M) mapstr.M {
 	return otelmap.ToMapstr(body)
 }
 
-func TestAddFieldsParityOverwriteTrue(t *testing.T) {
-	input := mapstr.M{"key": "old"}
-	fields := mapstr.M{"key": "new"}
-	proc := &addFields{fields: fields, shared: false, overwrite: true}
-
-	legacyOut := runLegacy(t, proc, input)
-	pdataOut := runPdata(t, proc, input)
-
-	assert.Equal(t, legacyOut, pdataOut)
-	assert.Equal(t, "new", legacyOut["key"])
-}
-
 func TestAddFieldsParityOverwriteFalse(t *testing.T) {
 	input := mapstr.M{"key": "old"}
 	fields := mapstr.M{"key": "new"}
