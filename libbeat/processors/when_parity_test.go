@@ -93,7 +93,9 @@ func TestWhenProcessorPdataParityConditionFalse(t *testing.T) {
 	// RunPdata path.
 	body := pcommon.NewMap()
 	require.NoError(t, otelmap.FromMapstr(body, input))
-	require.NoError(t, wp.RunPdata(body))
+	drop, err := wp.RunPdata(body)
+	require.NoError(t, err)
+	assert.False(t, drop)
 	pdataFields := otelmap.ToMapstr(body)
 
 	assert.Equal(t, legacyFields, pdataFields,
@@ -119,7 +121,9 @@ func TestWhenProcessorPdataParityConditionTrue(t *testing.T) {
 	// RunPdata path.
 	body := pcommon.NewMap()
 	require.NoError(t, otelmap.FromMapstr(body, input))
-	require.NoError(t, wp.RunPdata(body))
+	drop, err := wp.RunPdata(body)
+	require.NoError(t, err)
+	assert.False(t, drop)
 	pdataFields := otelmap.ToMapstr(body)
 
 	assert.Equal(t, legacyFields, pdataFields,
@@ -141,9 +145,10 @@ func TestWhenProcessorPdataParityDrop(t *testing.T) {
 	require.NoError(t, err)
 	assert.Nil(t, legacyOut, "Run must return nil when inner processor drops the event")
 
-	// RunPdata path: empty body signals a drop.
+	// RunPdata path: drop=true signals the event should be dropped.
 	body := pcommon.NewMap()
 	require.NoError(t, otelmap.FromMapstr(body, input))
-	require.NoError(t, wp.RunPdata(body))
-	assert.Equal(t, 0, body.Len(), "RunPdata must clear the body when inner processor drops the event")
+	drop, err := wp.RunPdata(body)
+	require.NoError(t, err)
+	assert.True(t, drop, "RunPdata must return drop=true when inner processor drops the event")
 }

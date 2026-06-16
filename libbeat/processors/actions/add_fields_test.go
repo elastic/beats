@@ -154,7 +154,9 @@ func TestAddFields(t *testing.T) {
 				for _, proc := range p.List {
 					pp, ok := proc.(processors.PdataProcessor)
 					require.True(t, ok, "processor %T does not implement PdataProcessor", proc)
-					require.NoError(t, pp.RunPdata(body))
+					drop, err := pp.RunPdata(body)
+					require.NoError(t, err)
+					require.False(t, drop)
 				}
 			}
 			// Normalize legacy output through a pdata round-trip so nested map

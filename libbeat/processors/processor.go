@@ -57,8 +57,11 @@ type PathSetter interface {
 // operate directly on a pcommon.Map, avoiding the round-trip conversion to/from
 // mapstr.M. When all processors in a chain implement this interface, the
 // beatprocessor skips the unpack/pack steps entirely.
+//
+// RunPdata returns (false, nil) on success, (true, nil) to signal that the
+// event should be dropped, and (false, err) on error.
 type PdataProcessor interface {
-	RunPdata(body pcommon.Map) error
+	RunPdata(body pcommon.Map) (drop bool, err error)
 }
 
 // Close closes a processor if it implements the Closer interface

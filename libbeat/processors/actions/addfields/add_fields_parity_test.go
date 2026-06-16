@@ -51,7 +51,9 @@ func runPdata(t *testing.T, proc *addFields, input mapstr.M) mapstr.M {
 	t.Helper()
 	body := pcommon.NewMap()
 	require.NoError(t, otelmap.FromMapstr(body, input))
-	require.NoError(t, proc.RunPdata(body))
+	drop, err := proc.RunPdata(body)
+	require.NoError(t, err)
+	require.False(t, drop)
 	return otelmap.ToMapstr(body)
 }
 

@@ -100,9 +100,9 @@ func (r *WhenProcessor) String() string {
 // If the inner processor only supports the legacy Run path, a round-trip
 // conversion is performed only when the condition passes (saving the conversion
 // on the fast-reject path).
-func (r *WhenProcessor) RunPdata(body pcommon.Map) error {
+func (r *WhenProcessor) RunPdata(body pcommon.Map) (bool, error) {
 	if !r.condition.Check(otelmap.PdataValuesMap{M: body}) {
-		return nil
+		return false, nil
 	}
 	if pp, ok := r.p.(PdataProcessor); ok {
 		return pp.RunPdata(body)
@@ -111,15 +111,13 @@ func (r *WhenProcessor) RunPdata(body pcommon.Map) error {
 	event := &beat.Event{Fields: otelmap.ToMapstr(body)}
 	out, err := r.p.Run(event)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if out == nil {
-		// Inner processor dropped the event; clear the body to signal the drop.
-		body.Clear()
-		return nil
+		return true, nil
 	}
 	body.Clear()
-	return otelmap.FromMapstr(body, out.Fields)
+	return false, otelmap.FromMapstr(body, out.Fields)
 }
 
 // ClosingWhenProcessor is the same as WhenProcessor but has the Close
