@@ -1327,7 +1327,21 @@ func (b *BeatProc) RemoveOutputFile() {
 //	func TestMain(m *testing.M) {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
+//
+// When this test binary is itself compiled with -race (e.g. a developer runs
+// "go test -tags=integration -race"), the Beat — which runs as a separate
+// process — would not be instrumented, so races inside it would go unnoticed.
+// To match the "RACE_DETECTOR=true mage" behaviour, the -race build constraint
+// is propagated through RACE_DETECTOR so testbin builds the Beat with -race and
+// the framework scans its stderr for race reports.
 func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
+	if raceBuildEnabled {
+		if err := os.Setenv("RACE_DETECTOR", "true"); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to enable RACE_DETECTOR for -race build: %s\n", err)
+			os.Exit(1)
+		}
+	}
+
 	beatRoot, err := filepath.Abs("../../")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
