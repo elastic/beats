@@ -42,7 +42,12 @@ func poolForSize(size int) *sync.Pool {
 	if p, ok := tempBufferPools.Load(size); ok {
 		return p.(*sync.Pool) //nolint:errcheck // the map only ever holds *sync.Pool
 	}
-	p, _ := tempBufferPools.LoadOrStore(size, &sync.Pool{})
+	p, _ := tempBufferPools.LoadOrStore(size, &sync.Pool{
+		New: func() any {
+			b := make([]byte, size)
+			return &b
+		},
+	})
 	return p.(*sync.Pool) //nolint:errcheck // the map only ever holds *sync.Pool
 }
 
@@ -53,10 +58,8 @@ func getTempBuffer(size int) []byte {
 	if size <= 0 {
 		return nil
 	}
-	if v := poolForSize(size).Get(); v != nil {
-		return (*v.(*[]byte))[:size] //nolint:errcheck // the pool only ever holds *[]byte
-	}
-	return make([]byte, size)
+	b := poolForSize(size).Get().(*[]byte) //nolint:errcheck // the pool only ever holds *[]byte
+	return (*b)[:size]
 }
 
 // putTempBuffer returns a scratch buffer to the pool matching its capacity.

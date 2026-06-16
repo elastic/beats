@@ -551,9 +551,8 @@ func (r *spinReader) Read(p []byte) (int, error) {
 	if r.closed.Load() || len(p) == 0 {
 		return 0, io.EOF
 	}
-	// Signal (once) that the background goroutine is now actively looping inside
-	// Next, and is therefore repeatedly reading r.tempBuffer with no
-	// synchronization against the caller of Close.
+	// Signal once that the background goroutine is now looping inside Next,
+	// repeatedly reading r.tempBuffer.
 	r.once.Do(func() { close(r.started) })
 	// A non-newline byte keeps advance looping: it never returns a line and
 	// never blocks, so it re-reads r.tempBuffer on every iteration.
@@ -566,17 +565,10 @@ func (r *spinReader) Close() error {
 	return nil
 }
 
-// TestLineReaderCloseRaceWithNext proves that recycling the scratch buffer in
-// LineReader.Close is synchronized against a concurrent in-flight Next.
-//
-// LineReader.Close returns r.tempBuffer to a shared sync.Pool (and nils the
-// field) while a concurrent Next may still be reading the same field and the
-// same backing array in advance/decode. Without synchronization this is a data
-// race; with the in-flight read serialized against Close it is safe.
-//
-// Run with the race detector to observe a regression:
-//
-//	go test -race -run TestLineReaderCloseRaceWithNext ./libbeat/reader/readfile/
+// TestLineReaderCloseRaceWithNext runs LineReader.Close concurrently with an
+// in-flight Next. Close returns r.tempBuffer to a shared sync.Pool and nils the
+// field, while Next may still be reading that field and its backing array in
+// advance/decode.
 func TestLineReaderCloseRaceWithNext(t *testing.T) {
 	codec, err := encoding.Plain(nil)
 	if err != nil {
@@ -597,13 +589,10 @@ func TestLineReaderCloseRaceWithNext(t *testing.T) {
 
 	done := make(chan struct{})
 	go func() {
-		// After Close nils the field, "r.tempBuffer[:n]" with n>0 could panic
-		// with an index-out-of-range. Recover so the data-race report (or a clean
-		// shutdown after the fix) is what determines the result, not a crash.
-		defer func() {
-			_ = recover()
-			close(done)
-		}()
+		defer close(done)
+		// Drive Next continuously until it returns an error. Close closes the
+		// source first, so the in-flight Read returns EOF and Next returns
+		// before Close recycles tempBuffer.
 		for {
 			if _, _, err := r.Next(); err != nil {
 				return
