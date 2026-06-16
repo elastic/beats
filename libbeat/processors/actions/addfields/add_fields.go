@@ -87,6 +87,10 @@ func (af *addFields) RunPdata(body pcommon.Map) error {
 	if len(af.fields) == 0 {
 		return nil
 	}
+	// af.shared is not needed here: pcommon.Map is an owned type whose values
+	// are copied by value into pdata storage, so no aliasing back into
+	// af.fields is possible. mapstr.M requires the clone because nested maps
+	// are reference types that downstream processors can mutate.
 	return otelmap.MergeMapstrIntoPdata(af.fields, body, af.overwrite)
 }
 
