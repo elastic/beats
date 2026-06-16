@@ -54,9 +54,10 @@ type harvestSession struct {
 	cursor  loginp.Cursor
 	metrics *loginp.Metrics
 
-	file  File              // kept open across slices; nil when done/closed
-	enc   encoding.Encoding // detected once at open, reused per slice
-	state state
+	file       File              // kept open across slices; nil when done/closed
+	enc        encoding.Encoding // detected once at open, reused per slice
+	state      state
+	readOffset int64
 
 	done          bool      // terminal reached at open (e.g. GZIP already at EOF)
 	closed        bool      // Close has been called
@@ -112,6 +113,7 @@ func (inp *filestream) OpenSession(
 	}
 	s.file = f
 	s.enc = enc
+	s.readOffset = s.state.Offset
 
 	return s, nil
 }
@@ -147,7 +149,7 @@ func (s *harvestSession) ReadSlice(
 		return loginp.SliceDone,
 			fmt.Errorf("cannot seek '%s' to offset %d: %w", s.src.newPath, s.state.Offset, err)
 	}
-	r, err := s.inp.buildPipeline(s.log, ctx.Cancelation, s.file, s.enc, s.src, s.state.Offset)
+	r, logReader, err := s.inp.buildPipeline(s.log, ctx.Cancelation, s.file, s.enc, s.src, s.state.Offset)
 	if err != nil {
 		return loginp.SliceDone,
 			fmt.Errorf("cannot build reader pipeline for '%s': %w", s.src.newPath, err)
@@ -160,11 +162,13 @@ func (s *harvestSession) ReadSlice(
 			switch {
 			case errors.Is(err, ErrWouldBlock):
 				// No complete message available right now: park.
+				s.readOffset = logReader.ReadOffset()
+				s.log.Debugf("End of file reached: %s; Backoff now.", s.src.newPath)
 				return loginp.SliceYield, nil
 			case errors.Is(err, io.EOF):
 				// EOF only reaches here for closeable files (close_eof, GZIP,
 				// archived); tailing files yield via ErrWouldBlock instead.
-				s.log.Debugf("EOF reached. Closing. Path='%s'", s.src.newPath)
+				s.log.Debugf("EOF has been reached. Closing. Path='%s'", s.src.newPath)
 				if s.inp.deleterConfig.Enabled {
 					if derr := s.inp.deleteFile(ctx, s.log, s.cursor, s.src.newPath); derr != nil {
 						return loginp.SliceDone,
@@ -265,12 +269,12 @@ func (s *harvestSession) Poll() loginp.PollResult {
 
 	// GZIP offsets are tracked on the decompressed stream, so a size comparison
 	// is invalid; resume until the session reads to EOF (SliceDone).
-	if s.src.desc.GZIP || fi.Size() != s.state.Offset {
+	if s.src.desc.GZIP || fi.Size() != s.readOffset {
 		return loginp.PollResume
 	}
 
 	if closer.Inactive > 0 && time.Since(s.lastData) > closer.Inactive {
-		s.log.Debugf("'%s' is inactive", s.src.newPath)
+		s.log.Debugf("File is inactive. Closing. Path='%s'", s.src.newPath)
 		if s.inp.deleterConfig.Enabled {
 			// Hand the file to a worker to run the (possibly blocking) delete
 			// rather than deleting on the waker goroutine.

@@ -88,48 +88,48 @@ func newFileReader(
 //   - ErrWouldBlock when an active file has no data right now;
 //   - ErrClosed when the reader's context was cancelled.
 func (f *logFile) Read(buf []byte) (int, error) {
-	totalN := 0
-
-	for f.readerCtx.Err() == nil {
-		n, err := f.file.Read(buf)
-		if n > 0 {
-			f.updateOffset(n)
-		}
-		totalN += n
-
-		// Read from source completed without error
-		// Either end reached or buffer full
-		if err == nil {
-			return totalN, nil
-		}
-
-		// Move buffer forward for next read
-		buf = buf[n:]
-
-		// Checks if an error happened or buffer is full
-		// If buffer is full, cannot continue reading.
-		// Can happen if n == bufferSize + io.EOF error
-		err = f.errorChecks(err)
-		if err != nil || len(buf) == 0 {
-			return totalN, err
-		}
-
-		// Active file at EOF: deliver whatever was read this call, otherwise
-		// signal that no data is available right now so the worker can yield.
-		//
-		// ErrWouldBlock must mean "zero progress this read": if we returned it
-		// together with bytes, LineReader.advance buffers those bytes but then
-		// returns early on the error, skipping the newline scan that may have
-		// just completed a line. Returning nil whenever totalN > 0 lets the
-		// pipeline process the data and reserves ErrWouldBlock for a truly empty
-		// read. (totalN is never negative: it only accumulates io.Reader counts.)
-		if totalN > 0 {
-			return totalN, nil
-		}
-		return 0, ErrWouldBlock
+	if f.readerCtx.Err() != nil {
+		return 0, ErrClosed
 	}
 
-	return 0, ErrClosed
+	totalN := 0
+
+	n, err := f.file.Read(buf)
+	if n > 0 {
+		f.updateOffset(n)
+	}
+	totalN += n
+
+	// Read from source completed without error
+	// Either end reached or buffer full
+	if err == nil {
+		return totalN, nil
+	}
+
+	// Move buffer forward for next read
+	buf = buf[n:]
+
+	// Checks if an error happened or buffer is full
+	// If buffer is full, cannot continue reading.
+	// Can happen if n == bufferSize + io.EOF error
+	err = f.errorChecks(err)
+	if err != nil || len(buf) == 0 {
+		return totalN, err
+	}
+
+	// Active file at EOF: deliver whatever was read this call, otherwise
+	// signal that no data is available right now so the worker can yield.
+	//
+	// ErrWouldBlock must mean "zero progress this read": if we returned it
+	// together with bytes, LineReader.advance buffers those bytes but then
+	// returns early on the error, skipping the newline scan that may have
+	// just completed a line. Returning nil whenever totalN > 0 lets the
+	// pipeline process the data and reserves ErrWouldBlock for a truly empty
+	// read. (totalN is never negative: it only accumulates io.Reader counts.)
+	if totalN > 0 {
+		return totalN, nil
+	}
+	return 0, ErrWouldBlock
 }
 
 func isSameFile(path string, info os.FileInfo) bool {
@@ -195,4 +195,13 @@ func (f *logFile) updateOffset(delta int) {
 	f.offsetMutx.Lock()
 	f.offset += int64(delta)
 	f.offsetMutx.Unlock()
+}
+
+// ReadOffset returns how far into the file the reader has consumed: the start
+// offset plus every byte handed to the pipeline, including bytes buffered for an
+// as-yet-incomplete trailing line.
+func (f *logFile) ReadOffset() int64 {
+	f.offsetMutx.Lock()
+	defer f.offsetMutx.Unlock()
+	return f.offset
 }

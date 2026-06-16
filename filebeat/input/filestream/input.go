@@ -202,7 +202,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 	}
 	defer f.Close()
 
-	r, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0)
+	r, _, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0)
 	if err != nil {
 		return err
 	}
@@ -399,7 +399,7 @@ func (inp *filestream) buildPipeline(
 	encoding encoding.Encoding,
 	fs fileSource,
 	offset int64,
-) (reader.Reader, error) {
+) (reader.Reader, *logFile, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// if the file is archived, it means that it is not going to be updated in the future
@@ -419,12 +419,12 @@ func (inp *filestream) buildPipeline(
 	// don't require 'complicated' logic.
 	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, closerCfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	dbgReader, err := debug.AppendReaders(logReader, log)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Configure MaxBytes limit for EncodeReader as multiplied by 4
@@ -441,7 +441,7 @@ func (inp *filestream) buildPipeline(
 		MaxBytes:   encReaderMaxBytes,
 	}, log)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
@@ -456,7 +456,7 @@ func (inp *filestream) buildPipeline(
 		r = NewEOFLookaheadReader(r, io.EOF)
 	}
 
-	return r, nil
+	return r, logReader, nil
 }
 
 // openFile opens a file and checks for the encoding. In case the encoding cannot be detected

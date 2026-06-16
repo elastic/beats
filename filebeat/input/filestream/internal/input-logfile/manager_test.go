@@ -433,7 +433,7 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
+	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core { //nolint:forbidigo // test helper builds a buffer-backed logger to assert on emitted logs
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))
 	return log, buf

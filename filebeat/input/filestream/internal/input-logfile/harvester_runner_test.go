@@ -526,6 +526,72 @@ func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
 	require.False(t, g.hasID("y"))
 }
 
+// TestHarvesterRunner_StopFinishesNewSource asserts that stopping a source that
+// is still in statusNew (registered by enqueue but not yet picked up by run)
+// tears it down instead of leaking it.
+func TestHarvesterRunner_StopFinishesNewSource(t *testing.T) {
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+	src := &testSource{name: "/path/to/new"}
+	id := g.identifier.ID(src)
+
+	_, cancel := context.WithCancel(context.Background())
+	ps := &sourceState{
+		srcID:  id,
+		src:    src,
+		cancel: cancel,
+		status: statusNew,
+		done:   make(chan struct{}),
+	}
+	g.mu.Lock()
+	g.states[id] = ps
+	g.nActive++ // enqueue counts statusNew as active
+	g.mu.Unlock()
+
+	g.Stop(src)
+
+	require.False(t, g.hasID(id), "a stopped new source must be removed")
+	select {
+	case <-ps.done:
+	default:
+		t.Fatal("done channel must be closed after stopping a new source")
+	}
+	active, parked := g.counts()
+	require.Equal(t, 0, active, "active gauge must return to zero")
+	require.Equal(t, 0, parked, "parked gauge must return to zero")
+}
+
+// TestHarvesterRunner_StopAndWaitFinishesNewSource asserts that stopAndWait (the
+// path Restart uses) does not block forever on a statusNew source whose done
+// channel will never be closed by a reader.
+func TestHarvesterRunner_StopAndWaitFinishesNewSource(t *testing.T) {
+	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
+	id := "new-src"
+
+	_, cancel := context.WithCancel(context.Background())
+	ps := &sourceState{
+		srcID:  id,
+		cancel: cancel,
+		status: statusNew,
+		done:   make(chan struct{}),
+	}
+	g.mu.Lock()
+	g.states[id] = ps
+	g.nActive++
+	g.mu.Unlock()
+
+	done := make(chan struct{})
+	go func() {
+		g.stopAndWait(ps)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(eventuallyTimeout):
+		t.Fatal("stopAndWait must not block on a statusNew source")
+	}
+	require.False(t, g.hasID(id), "stopAndWait must remove the new source")
+}
+
 // TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop asserts that, with
 // read_until_eof enabled, StopHarvesters reads a parked source again (drains it
 // to EOF) before tearing it down.

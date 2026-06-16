@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//nolint:errcheck // It's a test file
 package filestream
 
 import (
@@ -51,8 +50,14 @@ func TestHarvestSession_Poll(t *testing.T) {
 
 	t.Run("grown file resumes", func(t *testing.T) {
 		s := newPollSession(t, closerConfig{}, "hello\n")
-		s.state.Offset = 0 // file has more data than we have read
+		s.readOffset = 0 // file has more data than we have read
 		require.Equal(t, loginp.PollResume, s.Poll())
+	})
+
+	t.Run("unpublished trailing partial line still parks", func(t *testing.T) {
+		s := newPollSession(t, closerConfig{}, "hello\npartial")
+		s.state.Offset = int64(len("hello\n")) // only the terminated line published
+		require.Equal(t, loginp.PollPark, s.Poll())
 	})
 
 	t.Run("done session closes", func(t *testing.T) {
@@ -123,6 +128,22 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		require.Equal(t, loginp.SliceDone, verdict)
 		require.Len(t, pub.events, 3, "all three lines should be published")
 		require.Equal(t, int64(6), s.state.Offset, "offset should advance to EOF")
+	})
+
+	t.Run("a trailing partial line is read but yields and then parks", func(t *testing.T) {
+		content := "a\nb\npartial"
+		closer := closerConfig{OnStateChange: stateChangeCloserConfig{Inactive: time.Minute}}
+		s := newReadSession(t, closer, content, 0)
+		pub := &countingPublisher{}
+
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceYield, verdict)
+		require.Len(t, pub.events, 2, "only the two terminated lines are published")
+		require.Equal(t, int64(len("a\nb\n")), s.state.Offset, "published offset lags the partial line")
+		require.Equal(t, int64(len(content)), s.readOffset, "readOffset reaches EOF including the partial line")
+
+		require.Equal(t, loginp.PollPark, s.Poll(), "an unchanged file must park, not resume")
 	})
 
 	t.Run("a done session reads nothing", func(t *testing.T) {
@@ -302,7 +323,7 @@ func newPollSession(t *testing.T, closer closerConfig, content string) *harvestS
 	t.Helper()
 	inp := testFilestream(t, closer)
 	path := writeTempFile(t, content)
-	rawFile, err := os.Open(path)
+	rawFile, err := file.ReadOpen(path)
 	require.NoError(t, err)
 	t.Cleanup(func() { rawFile.Close() })
 	f, err := inp.newFile(rawFile)
@@ -317,11 +338,12 @@ func newPollSession(t *testing.T, closer closerConfig, content string) *harvestS
 			fileID:  "id",
 			desc:    loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		},
-		file:     f,
-		metrics:  testMetrics(t),
-		state:    state{Offset: int64(len(content))},
-		openedAt: time.Now(),
-		lastData: time.Now(),
+		file:       f,
+		metrics:    testMetrics(t),
+		state:      state{Offset: int64(len(content))},
+		readOffset: int64(len(content)), // caught up to EOF
+		openedAt:   time.Now(),
+		lastData:   time.Now(),
 	}
 }
 

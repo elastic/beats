@@ -140,7 +140,10 @@ type sourceHeap []*parkedEntry
 func (h sourceHeap) Len() int           { return len(h) }
 func (h sourceHeap) Less(i, j int) bool { return h[i].due.Before(h[j].due) }
 func (h sourceHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
-func (h *sourceHeap) Push(x any)        { *h = append(*h, x.(*parkedEntry)) }
+func (h *sourceHeap) Push(x any) {
+	e, _ := x.(*parkedEntry)
+	*h = append(*h, e)
+}
 func (h *sourceHeap) Pop() any {
 	old := *h
 	n := len(old)
@@ -251,6 +254,7 @@ func (g *harvesterRunner) readOnce(ps *sourceState) {
 	// First read of a source acquires its lock, client and session. Subsequent
 	// reads (after a park/resume) reuse them, so a tailing file keeps its fd open.
 	if needSetup {
+		ps.ctx.Logger.Debug("Starting harvester for file")
 		if err := g.setup(ps); err != nil {
 			ps.ctx.Logger.Errorf("could not set up harvester for %s: %v", ps.srcID, err)
 			g.finish(ps)
@@ -510,7 +514,7 @@ func (g *harvesterRunner) popDue(now time.Time) []*sourceState {
 		if g.parked[0].due.After(now) {
 			break
 		}
-		e := heap.Pop(&g.parked).(*parkedEntry)
+		e, _ := heap.Pop(&g.parked).(*parkedEntry)
 		ps := e.ps
 		if ps.status == statusParked && ps.nextCheck.Equal(e.due) {
 			g.setStatus(ps, statusPolling)
@@ -579,10 +583,12 @@ func (g *harvesterRunner) Stop(src Source) {
 	if cancel != nil {
 		cancel()
 	}
-	// If the source was parked, no goroutine holds it (the waker skips closing
-	// states), so tear it down here. For running/polling/new, the reader or waker
-	// that holds it will finish it after the cancel.
-	if prev == statusParked {
+	// If the source was parked or still new, no goroutine holds it: a parked
+	// source is skipped by the waker, and a new source's run() will hit the
+	// statusClosing guard and return without spawning a reader. Tear it down
+	// here. For running/polling, the reader or waker that holds it finishes it
+	// after the cancel.
+	if prev == statusParked || prev == statusNew {
 		g.finish(ps)
 	}
 }
@@ -592,7 +598,12 @@ func (g *harvesterRunner) Stop(src Source) {
 func (g *harvesterRunner) stopAndWait(ps *sourceState) {
 	g.mu.Lock()
 	if ps.finished {
+		// A finish is already in flight; wait for it to fully tear down (done is
+		// closed last, after the source is removed) so a following enqueue does
+		// not see the dying source and skip the restart.
+		done := ps.done
 		g.mu.Unlock()
+		<-done
 		return
 	}
 	prev := ps.status
@@ -604,7 +615,9 @@ func (g *harvesterRunner) stopAndWait(ps *sourceState) {
 	if cancel != nil {
 		cancel()
 	}
-	if prev == statusParked {
+	// A parked or still-new source has no goroutine that will finish it (see
+	// Stop), so tear it down here; otherwise wait for the holder to do it.
+	if prev == statusParked || prev == statusNew {
 		g.finish(ps)
 		return
 	}
@@ -623,12 +636,17 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 	g.setStatus(ps, statusClosing) // adjust gauge counters from whatever it was
 	ps.finished = true
 	wasSetUp := ps.setUp
-	delete(g.states, ps.srcID)
 	g.mu.Unlock()
 
 	g.notifyObserver(ps)
 
+	// ps.ctx.Logger is nil only for hand-built test states; production sources
+	// always carry a logger set by enqueue.
+	log := ps.ctx.Logger
 	if ps.session != nil {
+		if log != nil {
+			log.Debug("Closing reader of filestream")
+		}
 		_ = ps.session.Close()
 	}
 	if ps.client != nil {
@@ -649,7 +667,17 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 		g.metrics.FilesClosed.Inc()
 		g.metrics.HarvesterOpenFiles.Dec()
 		g.metrics.HarvesterClosed.Inc()
+		if log != nil {
+			log.Debug("Stopped harvester for file")
+		}
 	}
+
+	// Remove the source from the runner only after its resources are released,
+	// so anything that observes the removal (Restart's <-done wait, hasID) sees a
+	// fully torn-down source rather than one still closing its session.
+	g.mu.Lock()
+	delete(g.states, ps.srcID)
+	g.mu.Unlock()
 
 	close(ps.done)
 }
@@ -745,7 +773,16 @@ func (g *harvesterRunner) drainAndStop() error {
 			toDrain = append(toDrain, ps)
 		}
 	}
+	// Only an actual in-flight drain is worth announcing: if every source already
+	// reached EOF and tore itself down, there is nothing to wait for.
+	draining := len(g.states) > 0
 	g.mu.Unlock()
+
+	if draining {
+		g.ctx.Logger.Infof(
+			"input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
+			g.readUntilEOF.Timeout)
+	}
 
 	g.signalWaker() // let the waker observe closed and exit
 	for _, ps := range toDrain {
@@ -765,8 +802,20 @@ func (g *harvesterRunner) drainAndStop() error {
 	})
 
 	g.wg.Wait()
-	timer.Stop()
+	// Stop reports true only if it cancelled the timer before it fired, i.e. the
+	// drain reached EOF on its own; false means the Timeout elapsed first.
+	reachedEOF := timer.Stop()
 	g.finishRemaining()
+
+	if draining {
+		if reachedEOF {
+			g.ctx.Logger.Info("read_until_eof enabled, EOF reached. closing input")
+		} else {
+			g.ctx.Logger.Infof(
+				"read_until_eof enabled, %s timeout reached. closing input",
+				g.readUntilEOF.Timeout)
+		}
+	}
 	return nil
 }
 
