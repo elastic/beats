@@ -41,7 +41,7 @@ import (
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
 
-var testBeatUserAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
+var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), "", "", "")
 
 var inputTests = []struct {
 	name          string
@@ -774,9 +774,9 @@ var inputTests = []struct {
 		handler: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("content-type", "application/json")
 			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
-			if r.UserAgent() != testBeatUserAgent {
+			if r.UserAgent() != userAgent {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, testBeatUserAgent)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, userAgent)
 			}
 			if r.Method != http.MethodGet {
 				w.WriteHeader(http.StatusBadRequest)
@@ -2457,7 +2457,7 @@ func TestInput(t *testing.T) {
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
-				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: testBeatUserAgent},
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}, Beat: "Filebeat", Version: version.GetDefaultVersion(), UserAgent: userAgent},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
