@@ -35,7 +35,7 @@ import (
 // TestLogFileCloseOnEOF covers the only close condition logFile still evaluates
 // itself: close.reader.on_eof (and GZIP, which always closes on EOF). The
 // on-state-change conditions (inactive/removed/renamed) and close-after-interval
-// are now evaluated by the worker pool's waker and covered by integration tests.
+// are now evaluated by the harvester runner's waker and covered by integration tests.
 func TestLogFileCloseOnEOF(t *testing.T) {
 	testCases := []struct {
 		name       string

@@ -39,10 +39,12 @@ const (
 type sourceStatus int
 
 const (
-	statusNew     sourceStatus = iota // created, no reader yet
+	statusUnset   sourceStatus = iota // zero value: created, not yet scheduled
+	statusNew                         // admitted with an open slot, no reader yet
 	statusRunning                     // a reader goroutine is reading it
 	statusParked                      // caught up to EOF; watched by the waker
 	statusPolling                     // the waker is evaluating it
+	statusWaiting                     // admitted but queued: no slot, no fd, no reader
 	statusClosing                     // being torn down
 )
 
@@ -64,6 +66,7 @@ type sourceState struct {
 
 	// Runner bookkeeping, guarded by harvesterRunner.mu.
 	status    sourceStatus
+	holdsSlot bool // occupies one of the harvesterLimit open slots
 	setUp     bool // resources (lock/client/session) acquired
 	backoff   time.Duration
 	nextCheck time.Time
@@ -79,9 +82,11 @@ type sourceState struct {
 // the amount of active work, not the number of files: idle/tailing files cost no
 // goroutine, while a burst of ready files gets full read concurrency.
 //
-// harvester_limit, when > 0, bounds the number of concurrently-reading sources
-// via a semaphore; 0 (the default) is unbounded — as many readers as there are
-// files with data.
+// harvester_limit, when > 0, is a hard cap on the number of simultaneously open
+// files: sources holding a file descriptor, whether actively reading or parked.
+// A source that cannot get an open slot is queued and promoted (FIFO) when an
+// open file closes, so the fd count never exceeds the limit; 0 (the default) is
+// unbounded.
 type harvesterRunner struct {
 	pipeline     beat.PipelineConnector
 	harvester    Harvester
@@ -92,9 +97,9 @@ type harvesterRunner struct {
 	metrics      *Metrics
 	inputID      string
 
-	// sem bounds concurrently-reading sources when harvester_limit > 0; nil
-	// means unbounded.
-	sem chan struct{}
+	// harvesterLimit, when > 0, is a hard cap on the number of simultaneously
+	// open files. Sources that cannot get an open slot are queued (see waiting).
+	harvesterLimit uint64
 
 	ctx        inputv2.Context // input lifetime context, for the waker
 	notifyChan chan HarvesterStatus
@@ -105,8 +110,9 @@ type harvesterRunner struct {
 	readUntilEOF ReadUntilEOFConfig
 
 	// Observability gauges (nil when no metrics registry is available).
-	mActive *monitoring.Uint // sources with a reader goroutine
-	mParked *monitoring.Uint // sources parked, watched by the waker
+	mActive  *monitoring.Uint // sources with a reader goroutine
+	mParked  *monitoring.Uint // sources parked, watched by the waker
+	mWaiting *monitoring.Uint // sources queued, waiting for an open slot
 
 	mu     sync.Mutex
 	states map[string]*sourceState
@@ -121,6 +127,13 @@ type harvesterRunner struct {
 	parked  sourceHeap
 	nActive int
 	nParked int
+	// nOpen counts sources holding an open slot (an open fd, reading or parked).
+	// waiting is the FIFO of sources admitted but not yet opened because the
+	// limit was reached; they are promoted as slots free. nWaiting mirrors the
+	// live waiting count for the gauge. All guarded by mu.
+	nOpen    uint64
+	waiting  []*sourceState
+	nWaiting int
 
 	wakerCh chan struct{}
 	wg      sync.WaitGroup
@@ -166,30 +179,26 @@ func newHarvesterRunner(
 	inputID string,
 	readUntilEOF ReadUntilEOFConfig,
 ) *harvesterRunner {
-	var sem chan struct{}
-	if harvesterLimit > 0 {
-		sem = make(chan struct{}, harvesterLimit)
-	}
-
 	g := &harvesterRunner{
-		pipeline:     pipeline,
-		harvester:    harvester,
-		cleanTimeout: cleanTimeout,
-		store:        store,
-		ackCH:        ackCH,
-		identifier:   identifier,
-		metrics:      metrics,
-		inputID:      inputID,
-		readUntilEOF: readUntilEOF,
-		sem:          sem,
-		ctx:          ctx,
-		states:       map[string]*sourceState{},
-		wakerCh:      make(chan struct{}, 1),
+		pipeline:       pipeline,
+		harvester:      harvester,
+		cleanTimeout:   cleanTimeout,
+		store:          store,
+		ackCH:          ackCH,
+		identifier:     identifier,
+		metrics:        metrics,
+		inputID:        inputID,
+		readUntilEOF:   readUntilEOF,
+		harvesterLimit: harvesterLimit,
+		ctx:            ctx,
+		states:         map[string]*sourceState{},
+		wakerCh:        make(chan struct{}, 1),
 	}
 
 	if reg := ctx.MetricsRegistry; reg != nil {
 		g.mActive = monitoring.NewUint(reg, "harvester_active_readers")
 		g.mParked = monitoring.NewUint(reg, "harvester_parked")
+		g.mWaiting = monitoring.NewUint(reg, "harvester_waiting")
 	}
 
 	return g
@@ -198,10 +207,10 @@ func newHarvesterRunner(
 // start launches the waker goroutine. Reader goroutines are created on demand as
 // sources become ready.
 func (g *harvesterRunner) start() {
-	if g.sem != nil {
-		g.ctx.Logger.Infof("starting filestream harvester (max %d concurrent readers)", cap(g.sem))
+	if g.harvesterLimit > 0 {
+		g.ctx.Logger.Infof("starting filestream harvester (max %d open files)", g.harvesterLimit)
 	} else {
-		g.ctx.Logger.Info("starting filestream harvester (one reader per file with data)")
+		g.ctx.Logger.Info("starting filestream harvester (unlimited open files)")
 	}
 	g.wg.Add(1)
 	go g.waker()
@@ -230,17 +239,6 @@ func (g *harvesterRunner) run(ps *sourceState) {
 // reached, then parks or tears it down and exits.
 func (g *harvesterRunner) readOnce(ps *sourceState) {
 	defer g.wg.Done()
-
-	// Bound concurrent readers if harvester_limit is set.
-	if g.sem != nil {
-		select {
-		case g.sem <- struct{}{}:
-			defer func() { <-g.sem }()
-		case <-ps.ctx.Cancelation.Done():
-			g.finish(ps)
-			return
-		}
-	}
 
 	g.mu.Lock()
 	if ps.status == statusClosing || ps.finished {
@@ -405,14 +403,50 @@ func (g *harvesterRunner) enqueue(ctx inputv2.Context, src Source) {
 		src:    src,
 		ctx:    ctx,
 		cancel: cancel,
-		status: statusNew,
 		done:   make(chan struct{}),
 	}
 	g.states[srcID] = ps
-	g.nActive++ // statusNew counts as active
+
+	// Hard open-files limit: if every slot is taken, queue the source instead of
+	// opening it. It holds no fd and no goroutine until finish() promotes it when
+	// an open file closes.
+	if g.harvesterLimit > 0 && g.nOpen >= g.harvesterLimit {
+		g.setStatus(ps, statusWaiting)
+		g.waiting = append(g.waiting, ps)
+		g.mu.Unlock()
+		ctx.Logger.Debugf("harvester_limit (%d) reached, queueing %s", g.harvesterLimit, srcID)
+		return
+	}
+
+	ps.holdsSlot = true
+	g.nOpen++
+	g.setStatus(ps, statusNew)
 	g.mu.Unlock()
 
 	g.run(ps)
+}
+
+// promoteLocked moves the next live waiting source into an open slot and returns
+// it so the caller can spawn a reader (outside g.mu). Stale entries — sources
+// stopped while queued — are skipped. Returns nil if nothing is waiting. Caller
+// holds g.mu.
+func (g *harvesterRunner) promoteLocked() *sourceState {
+	for len(g.waiting) > 0 {
+		next := g.waiting[0]
+		g.waiting[0] = nil
+		g.waiting = g.waiting[1:]
+		if len(g.waiting) == 0 {
+			g.waiting = nil
+		}
+		if next.finished || next.status != statusWaiting {
+			continue // stopped or already claimed while queued
+		}
+		next.holdsSlot = true
+		g.nOpen++
+		g.setStatus(next, statusNew)
+		return next
+	}
+	return nil
 }
 
 // waker evaluates parked sources as they come due: it resumes those with new
@@ -484,12 +518,16 @@ func (g *harvesterRunner) setStatus(ps *sourceState, ns sourceStatus) {
 	switch {
 	case old == statusParked:
 		g.nParked--
+	case old == statusWaiting:
+		g.nWaiting--
 	case statusIsActive(old):
 		g.nActive--
 	}
 	switch {
 	case ns == statusParked:
 		g.nParked++
+	case ns == statusWaiting:
+		g.nWaiting++
 	case statusIsActive(ns):
 		g.nActive++
 	}
@@ -560,8 +598,9 @@ func (g *harvesterRunner) publishGauges() {
 	if g.mActive == nil {
 		return
 	}
-	g.mActive.Set(uint64(g.nActive)) //nolint:gosec // counters are non-negative
-	g.mParked.Set(uint64(g.nParked)) //nolint:gosec // counters are non-negative
+	g.mActive.Set(uint64(g.nActive))   //nolint:gosec // counters are non-negative
+	g.mParked.Set(uint64(g.nParked))   //nolint:gosec // counters are non-negative
+	g.mWaiting.Set(uint64(g.nWaiting)) //nolint:gosec // counters are non-negative
 }
 
 // Stop stops a running harvester for a source. It does not block on an active
@@ -583,12 +622,12 @@ func (g *harvesterRunner) Stop(src Source) {
 	if cancel != nil {
 		cancel()
 	}
-	// If the source was parked or still new, no goroutine holds it: a parked
-	// source is skipped by the waker, and a new source's run() will hit the
-	// statusClosing guard and return without spawning a reader. Tear it down
-	// here. For running/polling, the reader or waker that holds it finishes it
-	// after the cancel.
-	if prev == statusParked || prev == statusNew {
+	// If the source was parked, queued or still new, no goroutine holds it: a
+	// parked source is skipped by the waker, a queued source has no reader at
+	// all, and a new source's run() will hit the statusClosing guard and return
+	// without spawning a reader. Tear it down here. For running/polling, the
+	// reader or waker that holds it finishes it after the cancel.
+	if prev == statusParked || prev == statusNew || prev == statusWaiting {
 		g.finish(ps)
 	}
 }
@@ -615,9 +654,9 @@ func (g *harvesterRunner) stopAndWait(ps *sourceState) {
 	if cancel != nil {
 		cancel()
 	}
-	// A parked or still-new source has no goroutine that will finish it (see
-	// Stop), so tear it down here; otherwise wait for the holder to do it.
-	if prev == statusParked || prev == statusNew {
+	// A parked, queued or still-new source has no goroutine that will finish it
+	// (see Stop), so tear it down here; otherwise wait for the holder to do it.
+	if prev == statusParked || prev == statusNew || prev == statusWaiting {
 		g.finish(ps)
 		return
 	}
@@ -674,12 +713,26 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 
 	// Remove the source from the runner only after its resources are released,
 	// so anything that observes the removal (Restart's <-done wait, hasID) sees a
-	// fully torn-down source rather than one still closing its session.
+	// fully torn-down source rather than one still closing its session. Releasing
+	// the slot here (after the fd is closed) and promoting the next queued source
+	// keeps the open-files count at or below harvesterLimit at all times.
 	g.mu.Lock()
 	delete(g.states, ps.srcID)
+	var promoted *sourceState
+	if ps.holdsSlot {
+		ps.holdsSlot = false
+		g.nOpen--
+		if !g.closed {
+			promoted = g.promoteLocked()
+		}
+	}
 	g.mu.Unlock()
 
 	close(ps.done)
+
+	if promoted != nil {
+		g.run(promoted)
+	}
 }
 
 func (g *harvesterRunner) notifyObserver(ps *sourceState) {
@@ -769,7 +822,9 @@ func (g *harvesterRunner) drainAndStop() error {
 	// polling are handled by that poll (pollParked re-spawns a reader on resume).
 	toDrain := make([]*sourceState, 0, len(g.states))
 	for _, ps := range g.states {
-		if ps != nil && ps.status != statusRunning && ps.status != statusPolling {
+		// Queued sources were never opened; shutdown should not open new files to
+		// drain them. finishRemaining tears them down.
+		if ps != nil && ps.status != statusRunning && ps.status != statusPolling && ps.status != statusWaiting {
 			toDrain = append(toDrain, ps)
 		}
 	}

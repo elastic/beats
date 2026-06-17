@@ -79,18 +79,66 @@ func TestHarvesterRunner_StartReadsToEOFAndTearsDown(t *testing.T) {
 	require.NoError(t, g.StopHarvesters())
 }
 
-// TestHarvesterRunner_RespectsHarvesterLimit asserts that with harvester_limit=1
-// only one source reads at a time: a second source's reader blocks on the
-// semaphore before it even opens its session, and only proceeds once the first
-// finishes.
-func TestHarvesterRunner_RespectsHarvesterLimit(t *testing.T) {
+// TestHarvesterRunner_HarvesterLimitQueuesAndPromotes asserts harvester_limit is
+// a hard cap on open files: no more than `limit` sources are open at once, the
+// rest are queued in statusWaiting (registered, holding no fd and no goroutine),
+// and queued sources are promoted as slots free until every source is harvested
+// and torn down.
+func TestHarvesterRunner_HarvesterLimitQueuesAndPromotes(t *testing.T) {
+	const limit = 2
+	const total = 5
+
 	release := make(chan struct{})
 	h := &fakeHarvester{
 		readFn: func(_ int, _ v2.Context) (SliceVerdict, error) {
-			<-release // hold the single permit until the test releases it
+			<-release // hold the slot until the test releases it
 			return SliceDone, nil
 		},
 	}
+	g := testHarvesterRunner(t, h, limit)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.WaitUntilOriginalCount()
+
+	g.start()
+	srcs := make([]*testSource, total)
+	for i := range total {
+		srcs[i] = &testSource{name: fmt.Sprintf("/path/to/test/%d", i)}
+		g.Start(startContext(t), srcs[i])
+	}
+
+	// At most `limit` sessions are open at once; the rest are queued.
+	requireEventually(t, func() bool { return h.opens() == limit },
+		"exactly the limit number of harvesters should open")
+	requireEventually(t, func() bool { return g.countWaiting() == total-limit },
+		"the remaining sources should be queued")
+	assert.Never(t, func() bool { return h.opens() > limit }, 200*time.Millisecond, eventuallyInterval,
+		"never more than the limit may be open at once")
+
+	// Each queued source is registered but parked in statusWaiting: no fd, no
+	// reader, just waiting for an open slot.
+	waiting := 0
+	for _, src := range srcs {
+		if s, ok := g.statusOf(g.identifier.ID(src)); ok && s == statusWaiting {
+			waiting++
+		}
+	}
+	require.Equal(t, total-limit, waiting, "queued sources should be in statusWaiting")
+
+	// Release everything: queued sources are promoted as slots free until all are
+	// harvested and torn down.
+	close(release)
+	requireEventually(t, func() bool {
+		return h.opens() == total && g.countStates() == 0
+	}, "all sources should eventually be harvested and torn down")
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_StopHarvestersTearsDownQueued asserts a shutdown tears
+// down queued (never-opened) sources too, without leaking goroutines.
+func TestHarvesterRunner_StopHarvestersTearsDownQueued(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
 	g := testHarvesterRunner(t, h, 1)
 
 	goroutines := resources.NewGoroutinesChecker()
@@ -99,23 +147,20 @@ func TestHarvesterRunner_RespectsHarvesterLimit(t *testing.T) {
 	g.start()
 	src1 := &testSource{name: "/path/to/test/1"}
 	src2 := &testSource{name: "/path/to/test/2"}
+	id1 := g.identifier.ID(src1)
+	id2 := g.identifier.ID(src2)
 	g.Start(startContext(t), src1)
 	g.Start(startContext(t), src2)
 
-	// One source acquires the permit and opens its session; the other must wait.
-	requireEventually(t, func() bool { return h.opens() == 1 },
-		"exactly one harvester should run under the limit")
-	assert.Never(t, func() bool { return h.opens() > 1 }, 200*time.Millisecond, eventuallyInterval,
-		"the second harvester must not open a session while the limit is reached")
-
-	// Release the first; the second now acquires the permit and runs.
-	close(release)
+	// src1 takes the slot and blocks reading; src2 is queued.
 	requireEventually(t, func() bool {
-		return h.opens() == 2 &&
-			!g.hasID(g.identifier.ID(src1)) && !g.hasID(g.identifier.ID(src2))
-	}, "the second harvester should run and both should tear down")
+		s, ok := g.statusOf(id2)
+		return h.opens() == 1 && ok && s == statusWaiting
+	}, "one source open, the other queued")
 
 	require.NoError(t, g.StopHarvesters())
+	require.False(t, g.hasID(id1), "running source should be torn down")
+	require.False(t, g.hasID(id2), "queued source should be torn down")
 }
 
 // TestHarvesterRunner_StopCancelsRunningHarvester asserts Stop cancels an
@@ -470,30 +515,26 @@ func TestHarvesterRunner_StartAfterShutdownIsIgnored(t *testing.T) {
 // TestHarvesterRunner_StopWhileQueuedOnLimit asserts a source cancelled while it
 // is waiting for a harvester-limit permit is torn down without ever reading.
 func TestHarvesterRunner_StopWhileQueuedOnLimit(t *testing.T) {
-	release := make(chan struct{})
-	defer close(release)
-	h := &fakeHarvester{
-		readFn: func(_ int, ctx v2.Context) (SliceVerdict, error) {
-			select {
-			case <-release:
-			case <-ctx.Cancelation.Done():
-			}
-			return SliceDone, nil
-		},
-	}
-	g := testHarvesterRunner(t, h, 1) // single permit
+	// src1 holds the only slot; src2 is queued (statusWaiting, no goroutine), so
+	// readFn only ever runs for src1 — src2 never opens a session while queued.
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 1) // single open-file slot
 
 	g.start()
 	src1 := &testSource{name: "/path/to/test/1"}
 	src2 := &testSource{name: "/path/to/test/2"}
+	id2 := g.identifier.ID(src2)
 	g.Start(startContext(t), src1)
-	requireEventually(t, func() bool { return h.opens() == 1 }, "src1 should hold the only permit")
+	requireEventually(t, func() bool { return h.opens() == 1 }, "src1 should hold the only slot")
 
-	g.Start(startContext(t), src2) // queues on the semaphore
-	requireEventually(t, func() bool { return g.hasID(g.identifier.ID(src2)) }, "src2 should be registered")
+	g.Start(startContext(t), src2) // no slot: queued
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id2)
+		return ok && s == statusWaiting
+	}, "src2 should be queued in statusWaiting")
 
-	g.Stop(src2) // cancel while queued: must tear down without opening a session
-	requireEventually(t, func() bool { return !g.hasID(g.identifier.ID(src2)) },
+	g.Stop(src2) // stop while queued: must tear down without opening a session
+	requireEventually(t, func() bool { return !g.hasID(id2) },
 		"src2 should be removed while still queued")
 	require.Equal(t, 1, h.opens(), "src2 must not open a session while queued")
 
@@ -880,6 +921,18 @@ func (g *harvesterRunner) counts() (active, parked int) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	return g.nActive, g.nParked
+}
+
+func (g *harvesterRunner) countWaiting() int {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.nWaiting
+}
+
+func (g *harvesterRunner) countStates() int {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return len(g.states)
 }
 
 // popDueNow pops the single parked source as if its backoff had elapsed,

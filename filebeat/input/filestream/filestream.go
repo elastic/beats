@@ -35,8 +35,8 @@ var (
 	ErrFileTruncate = errors.New("detected file being truncated")
 
 	// ErrWouldBlock is returned by Read when the file has no data available
-	// right now. Reading is non-blocking: the worker pool's waker decides when
-	// to retry, so the read path never waits on a backoff.
+	// right now. Reading is non-blocking: the harvester runner's waker decides
+	// when to retry, so the read path never waits on a backoff.
 	ErrWouldBlock = errors.New("no data available, would block")
 )
 
