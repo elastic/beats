@@ -68,6 +68,7 @@ type MetricSet struct {
 	cursorStore    *cursor.Store                // nil when lookback_window == 0
 	cursorKey      string
 	lookbackWindow time.Duration
+	latency        time.Duration
 	cursorLogger   *logp.Logger // separate from BaseMetricSet.Logger() so tests can inject a nop logger
 }
 
@@ -137,6 +138,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Client:         monitorClient,
 		BatchClient:    monitorBatchClient,
 		lookbackWindow: config.LookbackWindow,
+		latency:        config.Latency,
 		cursorLogger:   base.Logger(),
 	}
 
@@ -516,7 +518,11 @@ func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
 		m.cursorLogger.Infow("no prior cursor found, starting from normal collection window")
 		return nil
 	}
-	minStart := referenceTime.Add(-m.lookbackWindow)
+	// Anchor minStart to the current collection's endTime (referenceTime - latency),
+	// not referenceTime, so the full lookback_window is available as downtime budget.
+	// Without this, a non-zero latency would shrink the effective window by latency.
+	endTime := referenceTime.Add(-m.latency)
+	minStart := endTime.Add(-m.lookbackWindow)
 	if state.LastCollectionEnd.Before(minStart) {
 		m.cursorLogger.Warnw("cursor too old, data gap possible, backfilling from normal window only",
 			"last_collection_end", state.LastCollectionEnd,

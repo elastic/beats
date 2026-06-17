@@ -96,6 +96,58 @@ func TestComputeLookbackStart(t *testing.T) {
 		result := ms.computeLookbackStart(referenceTime)
 		assert.Nil(t, result)
 	})
+
+	// With latency=5m the cursor is saved at referenceTime-latency, so the
+	// effective downtime budget should still be the full lookback_window, not
+	// lookback_window - latency.
+	t.Run("latency: cursor within window relative to endTime returns cursor time", func(t *testing.T) {
+		ms, _ := newTestMetricSetWithCursor(t, lookbackWindow)
+		defer ms.Close()
+		ms.latency = 5 * time.Minute
+
+		// referenceTime=19:00, latency=5m → endTime=18:55
+		// cursor=18:50 is 5m before endTime, well within the 10m window
+		// (it is 10m before referenceTime — old code would accept it; new code also accepts it)
+		lastEnd, _ := time.Parse(time.RFC3339, "2024-07-30T18:50:00Z")
+		state := &cursor.State{Version: cursor.StateVersion, LastCollectionEnd: lastEnd, UpdatedAt: time.Now()}
+		require.NoError(t, ms.cursorStore.Save(ms.cursorKey, state))
+
+		result := ms.computeLookbackStart(referenceTime)
+		require.NotNil(t, result)
+		assert.True(t, lastEnd.Equal(*result))
+	})
+
+	t.Run("latency: cursor 12m before referenceTime is within 10m window relative to endTime", func(t *testing.T) {
+		ms, _ := newTestMetricSetWithCursor(t, lookbackWindow)
+		defer ms.Close()
+		ms.latency = 5 * time.Minute
+
+		// referenceTime=19:00, latency=5m → endTime=18:55, minStart=18:45
+		// cursor=18:48 is 12m before referenceTime but only 7m before endTime → within window
+		// old code (minStart=referenceTime-10m=18:50) would have rejected this cursor
+		lastEnd, _ := time.Parse(time.RFC3339, "2024-07-30T18:48:00Z")
+		state := &cursor.State{Version: cursor.StateVersion, LastCollectionEnd: lastEnd, UpdatedAt: time.Now()}
+		require.NoError(t, ms.cursorStore.Save(ms.cursorKey, state))
+
+		result := ms.computeLookbackStart(referenceTime)
+		require.NotNil(t, result, "cursor within lookback_window relative to endTime should be accepted")
+		assert.True(t, lastEnd.Equal(*result))
+	})
+
+	t.Run("latency: cursor beyond window relative to endTime returns nil", func(t *testing.T) {
+		ms, _ := newTestMetricSetWithCursor(t, lookbackWindow)
+		defer ms.Close()
+		ms.latency = 5 * time.Minute
+
+		// referenceTime=19:00, latency=5m → endTime=18:55, minStart=18:45
+		// cursor=18:40 is 15m before endTime → beyond the 10m window
+		lastEnd, _ := time.Parse(time.RFC3339, "2024-07-30T18:40:00Z")
+		state := &cursor.State{Version: cursor.StateVersion, LastCollectionEnd: lastEnd, UpdatedAt: time.Now()}
+		require.NoError(t, ms.cursorStore.Save(ms.cursorKey, state))
+
+		result := ms.computeLookbackStart(referenceTime)
+		assert.Nil(t, result)
+	})
 }
 
 func TestUpdateCursor(t *testing.T) {
