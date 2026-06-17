@@ -41,7 +41,10 @@ class Test(BaseTest):
         General function so that we do not have to define settings each time
         """
         host = "127.0.0.1"
-        port = 8081
+        # Offset the listen port per pytest-xdist worker so parallel workers
+        # each bind a distinct port. Serial runs (no worker id) keep 8081.
+        worker = os.getenv("PYTEST_XDIST_WORKER", "")
+        port = 8081 + (int(worker[2:]) if worker.startswith("gw") else 0)
         input_raw = """
 - type: http_endpoint
   enabled: true

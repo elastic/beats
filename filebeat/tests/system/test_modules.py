@@ -118,6 +118,9 @@ def load_fileset_test_cases():
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
+    # pytest-xdist requires every worker to collect the same tests in the same order;
+    # os.listdir/glob order is not guaranteed to be stable across workers.
+    test_cases.sort()
     return test_cases
 
 
@@ -139,7 +142,11 @@ class Test(BaseTest):
         self.filebeat = os.path.abspath(self.working_dir +
                                         "/../../../../filebeat.test")
 
-        self.index_name = "test-filebeat-modules"
+        # Isolate the index per pytest-xdist worker so tests running in
+        # parallel do not clobber each other's data stream. Serial runs have no
+        # worker id and keep the original name.
+        worker = os.getenv("PYTEST_XDIST_WORKER", "")
+        self.index_name = "test-filebeat-modules" + ("-" + worker if worker else "")
 
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,

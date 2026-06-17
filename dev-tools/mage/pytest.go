@@ -87,6 +87,7 @@ type PythonTestArgs struct {
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
 	ForceCreateVenv     bool              // Set to true to always install required dependencies in the test virtual environment.
+	NumWorkers 			string 			  // Controls pytest-xdist parallelism.
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
@@ -157,6 +158,10 @@ func PythonTest(params PythonTestArgs) error {
 	}
 	if mg.Verbose() {
 		pytestOptions = append(pytestOptions, "-v")
+	}
+	numWorkers := EnvOr("PYTEST_NUMPROCESSES", params.NumWorkers)
+	if numWorkers != "" && numWorkers != "0" {
+		pytestOptions = append(pytestOptions, "-n", numWorkers)
 	}
 	if params.XUnitReportFile != "" {
 		pytestOptions = append(pytestOptions,

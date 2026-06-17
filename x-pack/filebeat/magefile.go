@@ -198,7 +198,9 @@ func GoWindowsIntegTest(ctx context.Context) error {
 // PythonIntegTest starts the docker containers and executes the Python integration tests.
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
-	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+	args := devtools.DefaultPythonTestIntegrationFromHostArgs()
+	args.NumWorkers = "auto"
+	return devtools.PythonIntegTestFromHost(args)
 }
 
 // FipsECHTest runs a smoke test using a FIPS enabled binary targetting an ECH deployment.
