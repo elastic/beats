@@ -39,15 +39,15 @@ type producer[T any] struct {
 	nextID atomic.Uint64
 	closed atomic.Bool
 
-	// published counts events successfully threaded onto the FIFO; resolved
+	// published counts events successfully threaded onto the FIFO; finished
 	// counts events whose batches have completed — either acknowledged (Done)
-	// or abandoned (Release). Abandoned events count as resolved so a producer
+	// or abandoned (Release). Abandoned events count as finished so a producer
 	// whose tail batch is Released on shutdown does not strand ackWait. When
-	// the producer is closed and resolved has caught up with published, ackWait
+	// the producer is closed and finished has caught up with published, ackWait
 	// is closed. ackWait is also closed unconditionally when the queue is
 	// force-closed, so a waiter can never hang past teardown — see Queue.Close.
 	published atomic.Uint64
-	resolved  atomic.Uint64
+	finished  atomic.Uint64
 	ackWait   chan struct{}
 	ackOnce   sync.Once
 }
@@ -106,20 +106,20 @@ func (p *producer[T]) Close() {
 // of its events have been acknowledged (or immediately on force-close).
 func (p *producer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
 
-// resolveN advances this producer's resolved count (events acked or abandoned)
+// finishN advances this producer's finished count (events acked or abandoned)
 // and closes ackWait if the producer is now closed and fully drained. Called
 // from batch.Done (for acked events) and batch.Release (for both abandoned and
 // drained-successor events).
-func (p *producer[T]) resolveN(n int) {
-	p.resolved.Add(uint64(n)) //nolint:gosec // G115: n is a batch event count, always a small positive value
+func (p *producer[T]) finishN(n int) {
+	p.finished.Add(uint64(n)) //nolint:gosec // G115: n is a batch event count, always a small positive value
 	p.maybeCloseAckWait()
 }
 
 // maybeCloseAckWait closes ackWait exactly once, when the producer has been
-// closed and every published event has been resolved, and unregisters the
+// closed and every published event has finished, and unregisters the
 // producer from the queue's force-close fan-out set (it no longer needs it).
 func (p *producer[T]) maybeCloseAckWait() {
-	if p.closed.Load() && p.resolved.Load() >= p.published.Load() {
+	if p.closed.Load() && p.finished.Load() >= p.published.Load() {
 		p.ackOnce.Do(func() {
 			close(p.ackWait)
 			p.queue.removeProducer(p)

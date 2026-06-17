@@ -566,6 +566,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 				// shutdown can complete. A prompt shutdown closes runReturned
 				// first and never reaches the timeout.
 				go runShutdownWatchdog(runReturned, watchdogGrace, func() {
+					logger.Warnf("Beater did not return within %s of being told to stop; forcing publisher pipeline disconnect", watchdogGrace)
 					if b.Publisher != nil {
 						_ = b.Publisher.Disconnect(context.Background())
 					}
@@ -591,8 +592,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// The beater has returned: it has stopped its inputs and finalized its
 	// clients. Now disconnect the publisher pipeline so it can flush and
 	// acknowledge any outstanding events before we exit. Disconnect is
-	// idempotent, so a beater that already disconnected the pipeline itself is
-	// unaffected. See https://github.com/elastic/beats/issues/49794.
+	// idempotent, so a beater that already drained the pipeline itself with its
+	// own bounded timeout reaches this as a harmless no-op.
 	if b.Publisher != nil {
 		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
 			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
