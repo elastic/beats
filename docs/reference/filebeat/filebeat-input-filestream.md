@@ -96,7 +96,7 @@ filebeat.inputs:
 ```
 
 Reading GZIP files requires the [`file_identity`](#filebeat-input-filestream-file-identity)
-to be [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint), which is the default behaviour.
+to be [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint), which is the default behavior.
 
 The fingerprinting is done on the decompressed data, and log rotation is handled automatically.
 
@@ -307,7 +307,7 @@ Changing input ID may cause data duplication because the state of the files will
 
 ### `allow_deprecated_id_duplication` [filestream-input-allow_deprecated_id_duplication]
 
-This allows Filebeat to run multiple instances of the filestream input with the same ID. This is intended to add backwards compatibility with the behaviour prior to 9.0. It defaults to `false` and is **not recommended** in new configurations.
+This allows Filebeat to run multiple instances of the filestream input with the same ID. This is intended to add backwards compatibility with the behavior prior to 9.0. It defaults to `false` and is **not recommended** in new configurations.
 
 This setting is per input, so make sure to enable it in all filestream inputs that use duplicated IDs.
 
@@ -549,6 +549,60 @@ When you use `close.reader.after_interval` for logs that contain multiline event
 
 This option is set to 0 by default which means it is disabled.
 
+### `read_until_eof` [filebeat-input-filestream-read-until-eof]
+```{applies_to}
+stack: beta 9.5.0
+```
+
+When `read_until_eof.enabled` is `true` and a shutdown signal arrives while the
+input is reading a file, the input continues reading until EOF or
+`read_until_eof.timeout` elapses, instead of stopping immediately.
+The shutdown signal can come from {{filebeat}} reloading its
+configuration (for example, an autodiscover provider removing the input when a
+Kubernetes pod terminates) or from any other path that cancels the input.
+
+Without this option, an input that is stopped while still reading a file leaves
+unread bytes behind. With this option, the harvester reads to EOF and only then
+exits.
+
+`read_until_eof.enabled` defaults to `true` and `read_until_eof.timeout`
+defaults to `1m`. The timeout must be greater than zero.
+
+To preserve the previous behavior and have the input exit immediately on
+cancellation, set:
+
+```yaml
+- type: filestream
+  id: my-filestream-id
+  paths:
+    - /var/log/some-app/*.log
+  read_until_eof:
+    enabled: false
+```
+
+To customise the timeout, set `read_until_eof.timeout`:
+
+```yaml
+- type: filestream
+  id: my-filestream-id
+  paths:
+    - /var/log/some-app/*.log
+  read_until_eof:
+    enabled: true
+    timeout: 30s
+```
+
+This option works alongside the `close.*` options. While the input is draining
+to EOF, the close-on-state-change checks (`close.on_state_change.removed`,
+`close.on_state_change.renamed`) and `close.reader.after_interval` are
+suspended for that file so they cannot cut the drain short. Once the file is
+fully read (or the timeout fires), the input shuts down normally.
+
+This option does not change {{filebeat}}'s event delivery guarantees. The
+guarantee is at the input level: the input does not exit while there are still
+bytes to read on the open file.
+
+
 ### `clean_*` [filebeat-input-filestream-clean-options]
 
 The `clean_*` options are used to clean up the state entries in the registry file. These settings help to reduce the size of the registry file and can prevent a potential [inode reuse issue](/reference/filebeat/inode-reuse-issue.md).
@@ -577,7 +631,7 @@ To disable, set `clean_inactive` to either:
 {applies_to}`stack: ga 9.2.0` Filebeat enforces the restrictions by
 failing to start if `clean_inactive <= ignore_older +
 prospector.scanner.check_interval` or if `ignore_older` is disabled.
-To restore the old behaviour of not enforcing the
+To restore the old behavior of not enforcing the
 configuration restriction and re-ingesting files if `clean_inactive:
 0`, set `legacy_clean_inactive: true`.
 
@@ -646,6 +700,11 @@ stack: ga 9.3
 Includes the log file group to `log.file` metadata.
 This option is not supported on Windows.
 
+### `include_file_fingerprint` [filestream-input-include_file_fingerprint]
+```yaml {applies_to}
+stack: ga 9.5
+```
+Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
 ### `exclude_lines` [filebeat-input-filestream-exclude-lines]
 
@@ -767,6 +826,7 @@ Available parsers:
 * `container`
 * `syslog`
 * `include_message`
+* `auditd`
 
 In this example, Filebeat is reading multiline messages that consist of 3 lines and are encapsulated in single-line JSON objects. The multiline message is stored under the key `msg`.
 
@@ -926,6 +986,42 @@ This example shows you how to include messages that start with the string ERR or
     - include_message.patterns: ["^ERR", "^WARN"]
 ```
 
+#### `auditd` [filebeat-input-filestream-parsers-auditd]
+
+```{applies_to}
+stack: ga 9.5.0
+```
+
+Use the `auditd` parser to decode lines from Linux audit log files (typically `/var/log/audit/audit.log`). The parser extracts audit record fields and adds them to the event under `auditd.log.*`.
+
+The parser sets the event timestamp from the audit record header, so `@timestamp` reflects when the audit event occurred rather than when Filebeat read it.
+
+:::{note}
+This parser is only supported on Linux. On other platforms, configuring it returns an error.
+:::
+
+The supported configuration options are:
+
+**`log_errors`**
+:   (Optional) If `true`, parse errors are logged via the Filebeat logger. Defaults to `false`.
+
+**`add_error_key`**
+:   (Optional) If `true`, a parse error is added to the event under `error.message`. Defaults to `true`.
+
+Example configuration:
+
+```yaml
+filebeat.inputs:
+  - type: filestream
+    id: auditd-logs
+    paths:
+      - /var/log/audit/audit.log
+    parsers:
+      - auditd:
+          log_errors: true
+          add_error_key: true
+```
+
 ### `encoding` [_encoding_2]
 
 The file encoding to use for reading data that contains international characters. See the encoding names [recommended by the W3C for use in HTML5](http://www.w3.org/TR/encoding/).
@@ -1065,7 +1161,7 @@ The default setting is 10s.
 
 #### `prospector.scanner.fingerprint` [filebeat-input-filestream-scan-fingerprint]
 
-Instead of relying on the device ID and inode values when comparing files, compare hashes of the given byte ranges of files. This is the default behaviour for Filebeat.
+Instead of relying on the device ID and inode values when comparing files, compare hashes of the given byte ranges of files. This is the default behavior for Filebeat.
 
 Following are some scenarios where this can happen:
 

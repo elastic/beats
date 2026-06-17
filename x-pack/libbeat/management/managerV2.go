@@ -706,15 +706,19 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		cm.logger.Errorw("could not start output", "error", err)
 
 		msg := fmt.Sprintf("could not start output: %s", err)
-		if err := outputUnit.UpdateState(status.Failed, msg, nil); err != nil {
-			cm.logger.Errorw("setting output state", "error", err)
+		if outputUnit != nil {
+			if err := outputUnit.UpdateState(status.Failed, msg, nil); err != nil {
+				cm.logger.Errorw("setting output state", "error", err)
+			}
 		}
 
 		return
 	}
 
-	if err := outputUnit.UpdateState(status.Running, "Healthy", nil); err != nil {
-		cm.logger.Errorw("setting output state", "error", err)
+	if outputUnit != nil {
+		if err := outputUnit.UpdateState(status.Running, "Healthy", nil); err != nil {
+			cm.logger.Errorw("setting output state", "error", err)
+		}
 	}
 
 	// reload APM tracing configuration
