@@ -150,6 +150,57 @@ func TestComputeLookbackStart(t *testing.T) {
 	})
 }
 
+func TestUpdateCursorKey(t *testing.T) {
+	const (
+		metricsetName  = "storage"
+		subscriptionID = "sub-123"
+	)
+
+	t.Run("key changes when resources are updated", func(t *testing.T) {
+		ms, _ := newTestMetricSetWithCursor(t, 30*time.Minute)
+		defer ms.Close()
+
+		initialKey := ms.cursorKey
+
+		resources := []ResourceConfig{
+			{Query: "resourceType eq 'Microsoft.Storage/storageAccounts'"},
+		}
+		ms.UpdateCursorKey(metricsetName, subscriptionID, resources)
+
+		assert.NotEqual(t, initialKey, ms.cursorKey,
+			"cursor key should change after UpdateCursorKey is called with non-empty resources")
+	})
+
+	t.Run("two metricsets with equivalent configs share the same key", func(t *testing.T) {
+		// Simulate a default-config storage metricset: NewMetricSet runs with
+		// empty Resources, then storage.New() injects the default resource query.
+		msDefault, _ := newTestMetricSetWithCursor(t, 30*time.Minute)
+		defer msDefault.Close()
+
+		defaultResources := []ResourceConfig{
+			{Query: "resourceType eq 'Microsoft.Storage/storageAccounts'"},
+		}
+		msDefault.UpdateCursorKey(metricsetName, subscriptionID, defaultResources)
+
+		// Simulate an explicit-config storage metricset: NewMetricSet runs with
+		// Resources already matching the default, no update needed — but the key
+		// should equal the one produced by the default path.
+		msExplicit, _ := newTestMetricSetWithCursor(t, 30*time.Minute)
+		defer msExplicit.Close()
+		msExplicit.UpdateCursorKey(metricsetName, subscriptionID, defaultResources)
+
+		assert.Equal(t, msDefault.cursorKey, msExplicit.cursorKey,
+			"default and equivalent explicit storage configs should produce the same cursor key")
+	})
+
+	t.Run("no-op when cursorStore is nil", func(t *testing.T) {
+		ms := &MetricSet{cursorStore: nil, lookbackWindow: 10 * time.Minute}
+		before := ms.cursorKey
+		ms.UpdateCursorKey("storage", "sub-123", []ResourceConfig{{Query: "resourceType eq 'X'"}})
+		assert.Equal(t, before, ms.cursorKey)
+	})
+}
+
 func TestUpdateCursor(t *testing.T) {
 	endTime, _ := time.Parse(time.RFC3339, "2024-07-30T19:00:00Z")
 

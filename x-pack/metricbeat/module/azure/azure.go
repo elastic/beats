@@ -503,6 +503,17 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
+// UpdateCursorKey recomputes the cursor key from the given (final) resources.
+// Call this after any post-construction mutation of the resource list — e.g.
+// when a metricset injects default resources after NewMetricSet returns — so
+// the key reflects the actual effective collection scope.
+func (m *MetricSet) UpdateCursorKey(metricsetName, subscriptionID string, resources []ResourceConfig) {
+	if m.cursorStore == nil {
+		return
+	}
+	m.cursorKey = cursor.GenerateStateKey(metricsetName, subscriptionID, resourcesFingerprint(resources))
+}
+
 // computeLookbackStart returns the start time for a lookback query, or nil if
 // no lookback is needed (disabled, no cursor, or cursor too old).
 func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {

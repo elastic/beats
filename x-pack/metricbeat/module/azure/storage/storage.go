@@ -75,6 +75,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
+	// Recompute the cursor key now that default resources have been injected.
+	// NewMetricSet builds the key before storage defaults are applied, so a
+	// default config (empty Resources) and an explicit but equivalent config
+	// would otherwise hash to different keys for the same collection scope.
+	ms.UpdateCursorKey(base.Name(), baseClient.Config.SubscriptionId, baseClient.Config.Resources)
+
 	ms.MapMetrics = mapMetrics
 	ms.ConcMapMetrics = concurrentMapMetrics
 	return &MetricSet{
