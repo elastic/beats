@@ -96,8 +96,7 @@ func (inp *filestream) OpenSession(
 	}
 
 	if st.EOF {
-		// TODO: change it to debug once GZIP isn't experimental anymore.
-		log.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
+		log.Debugf("GZIP file already read to EOF, not reading it again, file name '%s'",
 			fs.newPath)
 		s.done = true
 		return s, nil
