@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/cursor"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -67,6 +68,7 @@ type MetricSet struct {
 	cursorStore    *cursor.Store                // nil when lookback_window == 0
 	cursorKey      string
 	lookbackWindow time.Duration
+	cursorLogger   *logp.Logger                 // separate from BaseMetricSet.Logger() so tests can inject a nop logger
 }
 
 var supportedMonitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account", "storage"}
@@ -135,6 +137,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		Client:         monitorClient,
 		BatchClient:    monitorBatchClient,
 		lookbackWindow: config.LookbackWindow,
+		cursorLogger:   base.Logger(),
 	}
 
 	if config.LookbackWindow > 0 {
@@ -506,16 +509,16 @@ func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
 	}
 	state, err := m.cursorStore.Load(m.cursorKey)
 	if err != nil {
-		m.Logger().Warnw("failed to load azure cursor, using normal window", "error", err)
+		m.cursorLogger.Warnw("failed to load azure cursor, using normal window", "error", err)
 		return nil
 	}
 	if state == nil {
-		m.Logger().Infow("no prior cursor found, starting from normal collection window")
+		m.cursorLogger.Infow("no prior cursor found, starting from normal collection window")
 		return nil
 	}
 	minStart := referenceTime.Add(-m.lookbackWindow)
 	if state.LastCollectionEnd.Before(minStart) {
-		m.Logger().Warnw("cursor too old, data gap possible, backfilling from normal window only",
+		m.cursorLogger.Warnw("cursor too old, data gap possible, backfilling from normal window only",
 			"last_collection_end", state.LastCollectionEnd,
 			"lookback_window", m.lookbackWindow,
 		)
@@ -592,6 +595,6 @@ func (m *MetricSet) updateCursor(endTime time.Time) {
 		UpdatedAt:         time.Now().UTC(),
 	}
 	if err := m.cursorStore.Save(m.cursorKey, state); err != nil {
-		m.Logger().Warnw("failed to persist azure cursor", "error", err)
+		m.cursorLogger.Warnw("failed to persist azure cursor", "error", err)
 	}
 }

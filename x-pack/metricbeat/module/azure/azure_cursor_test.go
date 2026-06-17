@@ -44,6 +44,7 @@ func newTestMetricSetWithCursor(t *testing.T, lookbackWindow time.Duration) (*Me
 		cursorStore:    store,
 		cursorKey:      "test-key",
 		lookbackWindow: lookbackWindow,
+		cursorLogger:   logger,
 	}
 	return ms, registry
 }
