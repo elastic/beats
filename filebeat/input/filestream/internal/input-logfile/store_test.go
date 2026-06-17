@@ -435,9 +435,9 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 				sawMigration = true
 				// The hashed keys are logged so they can be matched against the
 				// registry by re-hashing the fingerprint value of each key.
-				assert.Contains(t, e.Message, keyForLog(oldKey),
+				assert.Contains(t, e.Message, KeyForLog(oldKey),
 					"migration log must contain the hashed old key: %q", e.Message)
-				assert.Contains(t, e.Message, keyForLog(newKey),
+				assert.Contains(t, e.Message, KeyForLog(newKey),
 					"migration log must contain the hashed new key: %q", e.Message)
 			}
 		}
@@ -827,11 +827,11 @@ func TestKeyForLog(t *testing.T) {
 			key:  "filestream::my-id::fingerprint::" + fp,
 			want: "filestream::my-id::fingerprint::" + hashOf(fp),
 		},
-		"fingerprint suffix is preserved": {
+		"fingerprint value with suffix is hashed whole": {
 			key:  "filestream::my-id::fingerprint::" + fp + "-suffix",
-			want: "filestream::my-id::fingerprint::" + hashOf(fp) + "-suffix",
+			want: "filestream::my-id::fingerprint::" + hashOf(fp+"-suffix"),
 		},
-		"empty input": {
+		"empty key": {
 			key:  "",
 			want: "",
 		},
@@ -839,11 +839,11 @@ func TestKeyForLog(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got := keyForLog(tc.key)
-			assert.Equal(t, tc.want, got, "keyForLog returned an unexpected value")
-			if tc.key != tc.want { // a fingerprint key: the raw value must be gone
+			got := KeyForLog(tc.key)
+			assert.Equal(t, tc.want, got, "KeyForLog returned an unexpected value")
+			if strings.Contains(tc.key, fingerprintKeyMarker) {
 				assert.NotContains(t, got, fp,
-					"the raw fingerprint value must not be present in the logged key")
+					"the raw fingerprint value must not appear in the logged key")
 			}
 		})
 	}

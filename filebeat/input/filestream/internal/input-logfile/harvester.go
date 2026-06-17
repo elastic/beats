@@ -413,11 +413,11 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 
 func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Canceler) error {
 	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", keyForLog(resource.key))
+		log.Infof("Resource '%v' currently in use, waiting...", KeyForLog(resource.key))
 		err := resource.lock.LockContext(canceler)
-		log.Infof("Resource '%v' finally released. Lock acquired", keyForLog(resource.key))
+		log.Infof("Resource '%v' finally released. Lock acquired", KeyForLog(resource.key))
 		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", keyForLog(resource.key))
+			log.Infof("Input for resource '%v' has been stopped while waiting", KeyForLog(resource.key))
 			return err
 		}
 	}

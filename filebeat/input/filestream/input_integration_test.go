@@ -1554,7 +1554,7 @@ func fingerprintHex(b []byte) string {
 // values never appear in the logs, and neither does the removed state-id field.
 // Note: source_file now carries the file path (not the registry key), and
 // registry keys for the fingerprint identity may legitimately appear as
-// "fingerprint::<hash-of-the-fingerprint>" (see keyForLog), so the raw
+// "fingerprint::<hash-of-the-fingerprint>" (see KeyForLog), so the raw
 // fingerprint value is what must be absent.
 func requireFilestreamLogsDoNotLeakFingerprint(env *inputTestingEnvironment, fingerprints ...string) {
 	env.t.Helper()
