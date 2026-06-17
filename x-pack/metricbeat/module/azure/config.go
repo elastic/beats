@@ -71,7 +71,7 @@ type Config struct {
 func createDefaultConfig() Config {
 	return Config{
 		DefaultTimeGrain: "PT5M",
-		LookbackWindow:   0,
+		LookbackWindow:   30 * time.Minute,
 	}
 }
 
