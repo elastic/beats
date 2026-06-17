@@ -180,7 +180,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
   resources:
     - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
       metrics:
@@ -196,7 +196,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -207,7 +207,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -218,7 +218,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -229,7 +229,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -240,7 +240,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -251,7 +251,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
@@ -262,7 +262,7 @@ metricbeat.modules:
   client_secret: '${AZURE_CLIENT_SECRET:""}'
   tenant_id: '${AZURE_TENANT_ID:""}'
   subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
-  lookback_window: 10m
+  lookback_window: 30m
 
 - module: azure
   metricsets:
