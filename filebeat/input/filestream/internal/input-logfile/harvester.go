@@ -153,17 +153,15 @@ type HarvesterStatus struct {
 	// Size is the amount of data ingested, in other words the size of the file
 	// when the harvester closed.
 	Size int64
-	// Path is the file path, used for logging only. It must not be used as an.
-	Path string
 }
 
-func (hg *defaultHarvesterGroup) notifyObserver(canceler inputv2.Canceler, srcID, path string, size int64) {
+func (hg *defaultHarvesterGroup) notifyObserver(canceler inputv2.Canceler, srcID string, size int64) {
 	if hg.notifyChan == nil {
 		return
 	}
 
 	select {
-	case hg.notifyChan <- HarvesterStatus{ID: srcID, Size: size, Path: path}:
+	case hg.notifyChan <- HarvesterStatus{ID: srcID, Size: size}:
 	case <-canceler.Done():
 	}
 }
@@ -324,7 +322,8 @@ func startHarvester(
 				return
 			}
 
-			hg.notifyObserver(canceler, srcID, logPath, st.Offset)
+			hg.notifyObserver(canceler, srcID, st.Offset)
+			// source_file (the path) is already on ctx.Logger; do not log srcID.
 			ctx.Logger.Debugf("Harvester closed with offset: %d", st.Offset)
 		}()
 
