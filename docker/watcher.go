@@ -44,6 +44,8 @@ const (
 	dockerRequestTimeout               = 10 * time.Second
 	dockerEventsWatchPityTimerInterval = 10 * time.Second
 	dockerEventsWatchPityTimerTimeout  = 10 * time.Minute
+	dockerEventsRetryBackoffInitial    = 1 * time.Second
+	dockerEventsRetryBackoffMax        = 60 * time.Second
 )
 
 // Watcher reads docker events and keeps a list of known containers
@@ -259,6 +261,7 @@ func (w *watcher) watch() {
 	defer tickChan.Stop()
 
 	lastValidTimestamp := w.clock.Now()
+	retryDelay := dockerEventsRetryBackoffInitial
 
 	watch := func() bool {
 		lastReceivedEventTime := w.clock.Now()
@@ -277,6 +280,7 @@ func (w *watcher) watch() {
 		for {
 			select {
 			case event := <-result.Messages:
+				retryDelay = dockerEventsRetryBackoffInitial
 				w.log.Debugf("Got a new docker event: %v", event)
 				if event.TimeNano > 0 {
 					lastValidTimestamp = time.Unix(0, event.TimeNano)
@@ -321,8 +325,19 @@ func (w *watcher) watch() {
 		if done {
 			return
 		}
-		// Wait before trying to reconnect
-		time.Sleep(1 * time.Second)
+		// Wait before trying to reconnect, using exponential backoff to avoid
+		// log spam when the Docker daemon is unavailable (e.g. Docker Desktop on macOS).
+		select {
+		case <-w.ctx.Done():
+			return
+		case <-time.After(retryDelay):
+		}
+		if retryDelay < dockerEventsRetryBackoffMax {
+			retryDelay *= 2
+			if retryDelay > dockerEventsRetryBackoffMax {
+				retryDelay = dockerEventsRetryBackoffMax
+			}
+		}
 	}
 }
 
