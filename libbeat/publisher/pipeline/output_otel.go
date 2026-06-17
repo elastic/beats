@@ -59,12 +59,9 @@ type otelOutputController struct {
 
 	// pool is non-nil whenever the receiver uses the slabqueue pool (i.e.
 	// queue.mem); it is nil when the receiver was configured with queue.disk
-	// and owns its queue outright via queueFactory.
+	// and owns its queue outright via queueFactory. It therefore also marks
+	// whether this controller joined a shared pool that must be released.
 	pool *slabqueue.Pool[publisher.Event]
-
-	// sharedPoolQueue is this controller's connection to the shared pool, used
-	// to drop its budget contribution on release. Non-nil iff pool is non-nil.
-	sharedPoolQueue *slabqueue.Queue[publisher.Event]
 
 	consumer *eventConsumer
 
@@ -152,8 +149,8 @@ func newOTelOutputController(
 	// we go through acquireOTelPool. Anything else (in practice
 	// diskqueue.Settings from an explicit queue.disk) opts out and builds
 	// its queue from the user-supplied queueFactory.
-	var sharedQueue *slabqueue.Queue[publisher.Event]
 	if settings, isMem := queueConfig.(memqueue.Settings); isMem {
+		var sharedQueue *slabqueue.Queue[publisher.Event]
 		pool, sharedQueue = acquireOTelPool(intakeQueueID, settings, monitors)
 		pipelineQueue = sharedQueue
 	} else {
@@ -177,7 +174,7 @@ func newOTelOutputController(
 	})
 	if err != nil {
 		closePipelineQueue(pipelineQueue)
-		if sharedQueue != nil {
+		if pool != nil {
 			releaseOTelPool(intakeQueueID)
 		}
 		return nil, err
@@ -199,17 +196,16 @@ func newOTelOutputController(
 	})
 
 	return &otelOutputController{
-		beatInfo:        beatInfo,
-		logger:          beatInfo.Logger.Named("otelOutputController"),
-		monitors:        monitors,
-		intakeQueueID:   intakeQueueID,
-		queue:           pipelineQueue,
-		pool:            pool,
-		sharedPoolQueue: sharedQueue,
-		consumer:        consumer,
-		workers:         workers,
-		workerChan:      workerChan,
-		producers:       make(map[*trackedProducer]struct{}),
+		beatInfo:      beatInfo,
+		logger:        beatInfo.Logger.Named("otelOutputController"),
+		monitors:      monitors,
+		intakeQueueID: intakeQueueID,
+		queue:         pipelineQueue,
+		pool:          pool,
+		consumer:      consumer,
+		workers:       workers,
+		workerChan:    workerChan,
+		producers:     make(map[*trackedProducer]struct{}),
 	}, nil
 }
 
@@ -333,7 +329,7 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 	// time the last pipeline reaches here it has already waited for its own —
 	// and therefore all remaining — events above. Receivers on the non-mem
 	// (disk) path own their queue outright and never joined a pool.
-	if c.sharedPoolQueue != nil {
+	if c.pool != nil {
 		releaseOTelPool(c.intakeQueueID)
 	}
 	return nil

@@ -53,6 +53,22 @@ func beatInfoForTest(t *testing.T) beat.Info {
 	return beat.Info{Logger: logp.NewNopLogger(), LogConsumer: nopLogConsumer(t)}
 }
 
+// beatInfoNoDrain returns a beat.Info whose LogConsumer blocks until its
+// context is cancelled (which the output worker does on Close). This keeps the
+// controller's background consumer and workers from acking events while a test
+// inspects the queue or pool budget: nopLogConsumer acks almost immediately,
+// which races budget assertions and makes them flaky. Published events stay
+// live until cleanup, where waitClose cancels the worker context to release it.
+func beatInfoNoDrain(t *testing.T) beat.Info {
+	t.Helper()
+	c, err := consumer.NewLogs(func(ctx context.Context, _ plog.Logs) error {
+		<-ctx.Done()
+		return ctx.Err()
+	})
+	require.NoError(t, err)
+	return beat.Info{Logger: logp.NewNopLogger(), LogConsumer: c}
+}
+
 // monitorsForTest returns a fresh Monitors with its own metrics registry. Each
 // controller must get its own registry because loadOutput registers stats
 // under fixed names that would collide if reused.
@@ -132,7 +148,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 	}
 
 	c1, err := newOTelOutputController(
-		beatInfoForTest(t),
+		beatInfoNoDrain(t),
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
@@ -143,7 +159,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 	defer c1.waitClose(cancelledContext(), false)
 
 	c2, err := newOTelOutputController(
-		beatInfoForTest(t),
+		beatInfoNoDrain(t),
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
@@ -252,14 +268,14 @@ func TestSharedIntakeQueueShrinksWhenLargestLeaves(t *testing.T) {
 // though the pool has room.
 func TestSharedIntakeQueueCapsPerReceiver(t *testing.T) {
 	c1, err := newOTelOutputController(
-		beatInfoForTest(t), monitorsForTest(), nilObserver, "capID", nil,
+		beatInfoNoDrain(t), monitorsForTest(), nilObserver, "capID", nil,
 		memqueue.Settings{Events: 4},
 	)
 	require.NoError(t, err)
 	defer c1.waitClose(cancelledContext(), false)
 
 	c2, err := newOTelOutputController(
-		beatInfoForTest(t), monitorsForTest(), nilObserver, "capID", nil,
+		beatInfoNoDrain(t), monitorsForTest(), nilObserver, "capID", nil,
 		memqueue.Settings{Events: 8},
 	)
 	require.NoError(t, err)

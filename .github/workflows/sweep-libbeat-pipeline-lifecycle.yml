@@ -7,6 +7,7 @@ on:
 permissions:
   actions: read
   contents: read
+  copilot-requests: write
   issues: write
   pull-requests: read
 
@@ -96,5 +97,3 @@ jobs:
           the fix direction
         - A note on which issues are only detectable under `-race` vs reproducible deterministically
         - Any components you audited and found clean
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
