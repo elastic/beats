@@ -68,7 +68,7 @@ type MetricSet struct {
 	cursorStore    *cursor.Store                // nil when lookback_window == 0
 	cursorKey      string
 	lookbackWindow time.Duration
-	cursorLogger   *logp.Logger                 // separate from BaseMetricSet.Logger() so tests can inject a nop logger
+	cursorLogger   *logp.Logger // separate from BaseMetricSet.Logger() so tests can inject a nop logger
 }
 
 var supportedMonitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account", "storage"}
