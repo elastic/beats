@@ -713,9 +713,6 @@ func (inp *filestream) readFromSource(
 		// next line - r needs to be reading from a gzipped file
 		message, err := r.Next()
 		if err != nil {
-			// TODO(#50725): these messages repeat the file path, which is also in
-			// the "path" log field. De-duplicating them is deferred to its own PR,
-			// as it changes log lines many integration tests assert on.
 			if errors.Is(err, ErrFileTruncate) {
 				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {

@@ -294,10 +294,6 @@ func (p *fileProspector) Init(
 			// a new registry key and return it alongside the updated meta.
 			newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 			fm.IdentifierName = identifierName
-			// TODO(#50725): this message is kept verbatim because integration tests
-			// assert on it. The logged keys are always the old native/path identity
-			// (see the guard above), so they carry no fingerprint; removing these
-			// identifiers from the log is deferred to its own PR.
 			p.logger.Infof("registry key: '%s' and previous file identity key: '%s', are the same, migrating. Source: '%s'",
 				registryKey, previousIdentifierKey, fm.Source)
 
@@ -386,10 +382,6 @@ func (p *fileProspector) onFSEvent(
 	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		switch event.Op {
 		case loginp.OpCreate:
-			// TODO(#50725): these event messages repeat the file path, which is
-			// also in the "new_path"/"old_path" log fields. De-duplicating them is
-			// deferred to its own PR, as it changes log lines many integration
-			// tests assert on.
 			log.Debugf("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})

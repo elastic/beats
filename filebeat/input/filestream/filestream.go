@@ -141,10 +141,6 @@ func (f *logFile) Read(buf []byte) (int, error) {
 			return totalN, err
 		}
 
-		// TODO(#50725): this message repeats the file path, which is also in the
-		// "path" log field. De-duplicating it and the similar messages below is
-		// deferred to its own PR, as it changes log lines many integration tests
-		// assert on.
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
 		f.backoff.Wait()
 	}
