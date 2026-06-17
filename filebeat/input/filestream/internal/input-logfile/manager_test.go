@@ -40,7 +40,8 @@ import (
 const testPluginName = "my_test_plugin"
 
 type testSource struct {
-	name string
+	name    string
+	logPath string
 }
 
 func (s *testSource) Name() string {
@@ -48,6 +49,9 @@ func (s *testSource) Name() string {
 }
 
 func (s *testSource) LogPath() string {
+	if s.logPath != "" {
+		return s.logPath
+	}
 	return s.name
 }
 
@@ -75,8 +79,8 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}{
 		"plugin with no user configured ID": {
 			sources: []*testSource{
-				{"unique_name"},
-				{"another_unique_name"},
+				{name: "unique_name"},
+				{name: "another_unique_name"},
 			},
 			expectedSourceIDs: []string{
 				testPluginName + "::.global::unique_name",
@@ -182,7 +186,7 @@ func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
 
-	src := &testSource{"test"}
+	src := &testSource{name: "test"}
 	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
 	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
 	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
@@ -437,7 +441,7 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
+	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core { //nolint:forbidigo // test helper needs a logger writing JSON to an in-memory buffer for assertions
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))
 	return log, buf
