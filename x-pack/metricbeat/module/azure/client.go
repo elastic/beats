@@ -169,7 +169,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 			continue
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config, lookbackStart)
+		startTime, endTime := computeQueryWindow(referenceTime, metric.TimeGrain, client.Config, lookbackStart)
 		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		// build the 'filter' parameter which will contain any dimensions configured

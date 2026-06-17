@@ -381,7 +381,7 @@ func hasConfigOptions(config []string) bool {
 	return true
 }
 
-// calculateTimespan returns the start and end times for the metric values given
+// computeQueryWindow returns the start and end times for the metric values given
 // the reference time, time grain, collection period, and service latency.
 //
 // (1) When the collection period is greater than the time grain, the timespan
@@ -483,15 +483,24 @@ func hasConfigOptions(config []string) bool {
 //	  │                                                        │              |
 //	Start                                                     End             |
 //	  │                                                        │              |
-func calculateTimespan(referenceTime time.Time, timeGrain string, config Config, lookbackStart *time.Time) (time.Time, time.Time) {
+//
+// The function determines the start and end time range ("timespan") to query Azure metrics,
+// factoring in reference time, collection period, latency, time grain, and optional lookback window.
+// A more accurate name would be computeQueryWindow or computeTimespanWindow.
+func computeQueryWindow(referenceTime time.Time, timeGrain string, config Config, lookbackStart *time.Time) (time.Time, time.Time) {
+	timespanDuration := max(asDuration(timeGrain), config.Period)
 	endTime := referenceTime.Add(config.Latency * -1)
+	normalStart := endTime.Add(timespanDuration * -1)
 
-	if lookbackStart != nil {
+	// Only expand the window when the cursor is genuinely older than the normal
+	// start — i.e. backfilling after a gap. When the cursor is more recent than
+	// normalStart (fast or on-time cycle) we keep the fixed-size window so that
+	// every cycle covers exactly max(timegrain, period) and Azure always returns
+	// the expected number of data points. TSDB deduplication handles the small
+	// overlap harmlessly.
+	if lookbackStart != nil && lookbackStart.Before(normalStart) {
 		return *lookbackStart, endTime
 	}
-
-	timespanDuration := max(asDuration(timeGrain), config.Period)
-	normalStart := endTime.Add(timespanDuration * -1)
 	return normalStart, endTime
 }
 

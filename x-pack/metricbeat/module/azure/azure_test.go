@@ -42,7 +42,7 @@ func TestGroupMetricsDefinitionsByResourceId(t *testing.T) {
 	})
 }
 
-func TestCalculateTimespan(t *testing.T) {
+func TestComputeQueryWindow(t *testing.T) {
 	t.Run("Collection period greater than the time grain (PT1M metric every 5 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGrain := "PT1M"
@@ -50,7 +50,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 5 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:51:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -63,7 +63,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 1 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -76,7 +76,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 5 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:51:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -89,7 +89,7 @@ func TestCalculateTimespan(t *testing.T) {
 			Period: 60 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T17:56:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -101,7 +101,7 @@ func TestCalculateTimespan(t *testing.T) {
 		cfg := Config{
 			Period: 5 * time.Minute,
 		}
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T17:56:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:56:00Z", endTime.Format(time.RFC3339))
@@ -109,7 +109,7 @@ func TestCalculateTimespan(t *testing.T) {
 
 }
 
-func TestCalculateTimespanWithLatency(t *testing.T) {
+func TestComputeQueryWindowWithLatency(t *testing.T) {
 	t.Run("Collection period greater than the time grain (PT1M metric every 5 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGrain := "PT1M"
@@ -118,7 +118,7 @@ func TestCalculateTimespanWithLatency(t *testing.T) {
 			Latency: 1 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:50:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:55:00Z", endTime.Format(time.RFC3339))
@@ -132,19 +132,19 @@ func TestCalculateTimespanWithLatency(t *testing.T) {
 			Latency: 1 * time.Minute,
 		}
 
-		startTime, endTime := calculateTimespan(referenceTime, timeGrain, cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, timeGrain, cfg, nil)
 
 		require.Equal(t, "2024-07-30T18:54:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T18:55:00Z", endTime.Format(time.RFC3339))
 	})
 }
 
-func TestCalculateTimespanWithLookback(t *testing.T) {
+func TestComputeQueryWindowWithLookback(t *testing.T) {
 	referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T19:00:00Z")
 	cfg := Config{Period: 5 * time.Minute}
 
 	t.Run("nil lookbackStart uses normal window", func(t *testing.T) {
-		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, nil)
+		startTime, endTime := computeQueryWindow(referenceTime, "PT5M", cfg, nil)
 		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
@@ -152,23 +152,26 @@ func TestCalculateTimespanWithLookback(t *testing.T) {
 	t.Run("lookbackStart before normalStart expands window", func(t *testing.T) {
 		// 7 minutes ago — older than the 5-minute normal window
 		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:53:00Z")
-		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
+		startTime, endTime := computeQueryWindow(referenceTime, "PT5M", cfg, &lookback)
 		require.Equal(t, "2024-07-30T18:53:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
 
-	t.Run("lookbackStart after normalStart avoids overlap", func(t *testing.T) {
-		// 3 minutes ago — cursor is within the normal window; use it to avoid
-		// re-querying [normalStart, lookbackStart] which was already collected.
+	t.Run("lookbackStart after normalStart uses normalStart to keep consistent window", func(t *testing.T) {
+		// 3 minutes ago — cursor is more recent than normalStart (18:55).
+		// Keep the fixed max(timegrain,period) window so every cycle covers
+		// exactly 5 minutes and Azure returns the expected number of data
+		// points. The small overlap [lookbackStart, normalStart] is harmless
+		// because TSDB deduplicates by document ID.
 		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:57:00Z")
-		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
-		require.Equal(t, "2024-07-30T18:57:00Z", startTime.Format(time.RFC3339))
+		startTime, endTime := computeQueryWindow(referenceTime, "PT5M", cfg, &lookback)
+		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
 
-	t.Run("lookbackStart equal to normalStart uses lookbackStart", func(t *testing.T) {
+	t.Run("lookbackStart equal to normalStart uses normalStart", func(t *testing.T) {
 		lookback, _ := time.Parse(time.RFC3339, "2024-07-30T18:55:00Z")
-		startTime, endTime := calculateTimespan(referenceTime, "PT5M", cfg, &lookback)
+		startTime, endTime := computeQueryWindow(referenceTime, "PT5M", cfg, &lookback)
 		require.Equal(t, "2024-07-30T18:55:00Z", startTime.Format(time.RFC3339))
 		require.Equal(t, "2024-07-30T19:00:00Z", endTime.Format(time.RFC3339))
 	})
