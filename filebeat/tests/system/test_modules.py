@@ -272,6 +272,7 @@ class Test(BaseTest):
                     proc.wait(MODULE_INGEST_TIMEOUT)
                 except subprocess.TimeoutExpired:
                     proc.kill()
+                    proc.wait()
             else:
                 # The journald and filestream inputs do not support --once and
                 # tail the file forever. Stop filebeat once elasticsearch has
@@ -322,15 +323,18 @@ class Test(BaseTest):
     def _wait_for_events_then_stop(self, proc, test_file, timeout):
         expected = self._expected_event_count(test_file)
         deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            if proc.poll() is not None:
-                # Filebeat exited on its own; nothing left to stop.
-                return
-            if expected is not None and self._indexed_event_count() >= expected:
-                break
-            time.sleep(0.5)
-        # force cleanup
-        proc.kill()
+        try:
+            while time.monotonic() < deadline:
+                if proc.poll() is not None:
+                    # Filebeat exited on its own; nothing left to stop.
+                    return
+                if expected is not None and self._indexed_event_count() >= expected:
+                    break
+                time.sleep(0.5)
+        finally:
+            if proc.poll() is None:
+                proc.kill()
+            proc.wait()
 
     def _expected_event_count(self, test_file):
         if os.getenv("GENERATE"):
