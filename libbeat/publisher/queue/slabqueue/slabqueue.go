@@ -23,11 +23,12 @@
 //   - A Pool owns the slot storage and a free list. Publish acquires a slot;
 //     batch.Done returns it. The free list also serves as a counting
 //     semaphore: total live events across all pipelines is capped by the
-//     pool's current capacity. The capacity is resizable at runtime
-//     (Pool.SetTarget) so a shared pool can grow to the largest budget its
-//     connected receivers request and shrink back as they leave, all while
-//     traffic flows; storage is a directory of non-moving chunks and the free
-//     list is sharded for concurrency (see storage.go / freelist.go).
+//     pool's current capacity. The capacity is resizable at runtime (driven by
+//     the connected queues' caps via Queue.SetTarget) so a shared pool can grow
+//     to the largest budget its connected receivers request and shrink back as
+//     they leave, all while traffic flows; storage is a directory of non-moving
+//     chunks and the free list is sharded for concurrency (see storage.go /
+//     freelist.go).
 //   - Each Queue may additionally have its own per-queue cap (Queue.SetTarget),
 //     bounding the live events on that one pipeline independently of the shared
 //     pool. With several queues on one pool, each enforces its own configured
@@ -67,11 +68,13 @@ import (
 // from a pipeline config (queue.slab) just like the other implementations.
 const QueueType = "slab"
 
-// Settings configures a Pool's capacity.
+// Settings configures a Pool's initial capacity.
 type Settings struct {
-	// Events is the total number of slots in the pool's backing array. It
-	// is the upper bound on events live (published but not yet ack'd) across
-	// every pipeline connected to the pool.
+	// Events is the pool's initial slot count: the starting bound on events
+	// live (published but not yet ack'd) across every pipeline connected to the
+	// pool. It is not a fixed ceiling — the pool is resizable at runtime, driven
+	// by the connected queues' caps (see Queue.SetTarget), and its storage grows
+	// and shrinks in chunks rather than being a single backing array.
 	Events int
 }
 
