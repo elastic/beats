@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -51,6 +52,12 @@ type LineReader struct {
 	decoder      transform.Transformer
 	tempBuffer   []byte
 	logger       *logp.Logger
+
+	// mu serializes Next against Close. The multiline TimeoutReader runs Next in
+	// a background goroutine and can call Close while that goroutine is still
+	// inside Next; without this lock Close would recycle tempBuffer (returning it
+	// to the shared pool and niling the field) while Next is still reading it.
+	mu sync.Mutex
 }
 
 // NewLineReader creates a new reader object
@@ -86,7 +93,7 @@ func NewLineReader(input io.ReadCloser, config Config, logger *logp.Logger) (*Li
 		// so reuse is opt-in via enableDecodeBufferReuse once the caller has
 		// confirmed nothing downstream retains Content across reads.
 		outBuffer:  streambuf.New(nil),
-		tempBuffer: make([]byte, config.BufferSize),
+		tempBuffer: getTempBuffer(config.BufferSize),
 		logger:     logger,
 	}, nil
 }
@@ -105,6 +112,12 @@ func (r *LineReader) enableDecodeBufferReuse() {
 // configured with maxBytes n may be larger than the length of b due
 // to skipped lines.
 func (r *LineReader) Next() (b []byte, n int, err error) {
+	// Hold mu for the duration of the read so a concurrent Close cannot recycle
+	// tempBuffer out from under us. mu is uncontended unless this reader is being
+	// driven by the multiline TimeoutReader's background goroutine.
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
@@ -344,7 +357,21 @@ func (r *LineReader) decode(end int) (int, error) {
 }
 
 func (r *LineReader) Close() error {
-	return r.reader.Close()
+	// Close the underlying reader first. If a Next is in flight (e.g. the
+	// multiline TimeoutReader's background goroutine), closing the source
+	// unblocks its pending Read so that Next returns and releases r.mu.
+	err := r.reader.Close()
+
+	// Now reclaim the scratch buffer. Taking r.mu guarantees no Next is still
+	// reading tempBuffer before we return it to the pool. Its contents have
+	// always been copied into the streambufs, so nothing downstream references
+	// it.
+	r.mu.Lock()
+	putTempBuffer(r.tempBuffer)
+	r.tempBuffer = nil
+	r.mu.Unlock()
+
+	return err
 }
 
 // SetReadDeadline delegates to the wrapped io.Reader if it honors deadlines, so
