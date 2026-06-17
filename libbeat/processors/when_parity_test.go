@@ -54,6 +54,22 @@ func (a *addFieldsInner) Run(event *beat.Event) (*beat.Event, error) {
 
 func (a *addFieldsInner) String() string { return "addFieldsInner" }
 
+// metaProcessor is a beat.Processor that adds a fixed key/value to event.Meta.
+type metaProcessor struct {
+	key   string
+	value string
+}
+
+func (m *metaProcessor) Run(event *beat.Event) (*beat.Event, error) {
+	if event.Meta == nil {
+		event.Meta = mapstr.M{}
+	}
+	event.Meta[m.key] = m.value
+	return event, nil
+}
+
+func (m *metaProcessor) String() string { return "metaProcessor" }
+
 // dropProcessor is a beat.Processor that drops every event by returning nil.
 type dropProcessor struct{}
 
@@ -130,6 +146,30 @@ func TestWhenProcessorPdataParityConditionTrue(t *testing.T) {
 		"condition true: both paths must produce identical output fields")
 	assert.Equal(t, "yes", pdataFields["added"],
 		"field 'added' must be set to 'yes' when condition is true")
+}
+
+// TestWhenProcessorPdataLegacyFallbackMetadata verifies that @metadata
+// (serialized into the body by otelconsumer) is correctly round-tripped when
+// the inner processor does not implement PdataProcessor. The fallback path must
+// extract @metadata into event.Meta before calling Run, and write it back
+// afterward so that changes by the inner processor survive.
+func TestWhenProcessorPdataLegacyFallbackMetadata(t *testing.T) {
+	// metaProcessor does not implement PdataProcessor, forcing the round-trip.
+	wp := makeWhenProcessor(t, 10, &metaProcessor{key: "op_type", value: "index"})
+
+	// Seed the body with @metadata as otelconsumer would.
+	body := pcommon.NewMap()
+	require.NoError(t, otelmap.FromMapstr(body, mapstr.M{"i": 10}))
+	require.NoError(t, otelmap.FromMapstr(body.PutEmptyMap("@metadata"), mapstr.M{"_id": "abc123"}))
+
+	drop, err := wp.RunPdata(body)
+	require.NoError(t, err)
+	assert.False(t, drop)
+
+	meta, ok := otelmap.ToMapstr(body)["@metadata"].(map[string]interface{})
+	require.True(t, ok, "@metadata must survive the round-trip as a map")
+	assert.Equal(t, "abc123", meta["_id"], "existing @metadata fields must be preserved")
+	assert.Equal(t, "index", meta["op_type"], "inner processor must have written op_type to @metadata")
 }
 
 // TestWhenProcessorPdataParityDrop verifies that when the inner processor drops
