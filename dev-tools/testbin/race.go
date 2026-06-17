@@ -22,15 +22,12 @@ import (
 	"strconv"
 )
 
-// RaceDetectorEnvVar is the environment variable that opts the beat-under-test
-// into the race detector during Go integration tests. When set to a truthy
-// value, Build compiles the beat test binary with -race so data races are
-// detected while the beat runs under the integration framework.
+// RaceDetectorEnvVar is the single switch that turns on the race detector for
+// Go integration tests. When truthy, both the integration test process and the
+// beat-under-test are built with -race.
 //
-// It is intentionally distinct from RACE_DETECTOR (which controls "go test
-// -race"): CI sets RACE_DETECTOR=true for unit tests, and reusing it here would
-// implicitly race-instrument every spawned beat in CI. Keeping a separate
-// variable makes the beat-under-test instrumentation an explicit opt-in.
+// It is intentionally separate from RACE_DETECTOR (which CI sets for unit
+// tests), so that integration tests are not automatically run there.
 const RaceDetectorEnvVar = "INTEG_RACE_DETECTOR"
 
 // RaceDetectorEnabled reports whether RaceDetectorEnvVar requests race

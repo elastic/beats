@@ -1328,12 +1328,11 @@ func (b *BeatProc) RemoveOutputFile() {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
 //
-// As a convenience, the -race build constraint is propagated through
-// testbin.RaceDetectorEnvVar so testbin builds the Beat with -race and the
-// framework scans its stderr for race reports. This auto-enable is skipped
-// when CI=true.
+// Running with -race (go test -race) auto-enables INTEG_RACE_DETECTOR so the
+// Beat is also built with -race and its stderr is scanned for race reports;
+// setting INTEG_RACE_DETECTOR=true directly has the same effect.
 func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
-	if raceBuildEnabled && os.Getenv("CI") != "true" {
+	if raceBuildEnabled {
 		if err := os.Setenv(testbin.RaceDetectorEnvVar, "true"); err != nil {
 			fmt.Fprintf(os.Stderr, "failed to enable %s for -race build: %s\n", testbin.RaceDetectorEnvVar, err)
 			os.Exit(1)

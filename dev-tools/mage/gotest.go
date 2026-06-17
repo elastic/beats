@@ -162,6 +162,7 @@ func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
 // windows integration tests. We tag integration test files with 'integration'.
 func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Windows-Integration")
+	args.Race = testbin.RaceDetectorEnabled()
 	args.Tags = append(args.Tags, "win_integration")
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
 	args.Packages = []string{"./tests/integration/windows"}
@@ -172,6 +173,7 @@ func DefaultGoWindowsTestIntegrationArgs() GoTestArgs {
 // all integration tests. We tag integration test files with 'integration'.
 func DefaultGoTestIntegrationArgs(ctx context.Context) GoTestArgs {
 	args := makeGoTestArgs("Integration")
+	args.Race = testbin.RaceDetectorEnabled()
 	args.Tags = append(args.Tags, "integration")
 
 	cmdCtx, cmdCancel := context.WithTimeout(ctx, 5*time.Second)
@@ -232,6 +234,7 @@ func FIPSOnlyGoTestIntegrationFromHostArgs(ctx context.Context) GoTestArgs {
 func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
+	args.Race = testbin.RaceDetectorEnabled()
 	args.Tags = append(args.Tags, "integration")
 	// some test build docker images which download artifacts, and it can take a
 	// long time.
@@ -261,7 +264,7 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 //
 // This method executes integration tests for a single module at a time.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
+// Use INTEG_RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	modules := EnvOr("MODULE", "")
