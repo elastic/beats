@@ -7,6 +7,7 @@ on:
 permissions:
   actions: read
   contents: read
+  copilot-requests: write
   issues: write
   pull-requests: read
 
@@ -97,5 +98,3 @@ jobs:
           the coverage
         - A priority ranking: which risks are most likely to affect users in production vs
           only in edge-case configurations
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
