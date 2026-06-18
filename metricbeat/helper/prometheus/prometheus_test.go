@@ -20,6 +20,7 @@ package prometheus
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
@@ -1210,6 +1211,69 @@ func TestInfoMetricPromotionWhenNoEventsCreated(t *testing.T) {
 			})
 
 			tc.validate(t, msFields)
+		})
+	}
+}
+
+// generateStateContainerMetrics builds a Prometheus text exposition that
+// resembles a kube-state-metrics state_container response with the given
+// number of containers and InfoMetric entries per container.
+func generateStateContainerMetrics(containers, infosPerContainer int) string {
+	var buf bytes.Buffer
+	buf.WriteString("# HELP kube_pod_container_info Information about a container in a pod.\n")
+	buf.WriteString("# TYPE kube_pod_container_info gauge\n")
+	for i := 0; i < containers; i++ {
+		for j := 0; j < infosPerContainer; j++ {
+			fmt.Fprintf(&buf,
+				"kube_pod_container_info{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\",image=\"img-%d:%d\"} 1\n",
+				i%10, i, i, i, j)
+		}
+	}
+	buf.WriteString("# HELP kube_pod_container_status_ready Describes whether the containers readiness check succeeded.\n")
+	buf.WriteString("# TYPE kube_pod_container_status_ready gauge\n")
+	for i := 0; i < containers; i++ {
+		fmt.Fprintf(&buf,
+			"kube_pod_container_status_ready{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\"} 1\n",
+			i%10, i, i)
+	}
+	buf.WriteString("# HELP kube_pod_container_status_running Describes whether the container is in running state.\n")
+	buf.WriteString("# TYPE kube_pod_container_status_running gauge\n")
+	for i := 0; i < containers; i++ {
+		fmt.Fprintf(&buf,
+			"kube_pod_container_status_running{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\"} 1\n",
+			i%10, i, i)
+	}
+	return buf.String()
+}
+
+func BenchmarkProcessMetricsInfoMerge(b *testing.B) {
+	for _, containers := range []int{100, 500, 1000} {
+		b.Run(fmt.Sprintf("containers=%d", containers), func(b *testing.B) {
+			response := generateStateContainerMetrics(containers, 1)
+			mapping := &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"kube_pod_container_info":            InfoMetric(),
+					"kube_pod_container_status_ready":    BooleanMetric("status.ready"),
+					"kube_pod_container_status_running":  BooleanMetric("status.running"),
+				},
+				Labels: map[string]LabelMap{
+					"namespace": KeyLabel("namespace"),
+					"pod":       KeyLabel("pod"),
+					"container": KeyLabel("container"),
+					"image":     Label("image"),
+				},
+			}
+
+			p := &prometheus{mockFetcher{response: response}, logptest.NewTestingLogger(b, "bench")}
+
+			b.ResetTimer()
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				_, err := p.GetProcessedMetrics(mapping)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
 		})
 	}
 }

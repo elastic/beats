@@ -233,9 +233,10 @@ func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMa
 
 	// fill info from infoMetrics
 	for _, info := range infoMetrics {
+		flatLabels := info.Labels.Flatten()
 		for _, event := range events {
 			found := true
-			for k, v := range info.Labels.Flatten() {
+			for k, v := range flatLabels {
 				value, err := event.GetValue(k)
 				if err != nil || v != value {
 					found = false
