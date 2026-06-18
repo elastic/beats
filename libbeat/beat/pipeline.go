@@ -24,11 +24,32 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Pipeline provides access to libbeat event publishing by creating a Client
-// instance.
+// Pipeline is the entry point for publishing events in libbeat. A Beater
+// connects to it to obtain Clients, which it uses to publish events; the
+// Pipeline applies processing, batches the events into the queue, forwards them
+// to the configured outputs, and tracks their acknowledgments.
+//
+// A Beater owns the lifecycle of what it connects: it must Close every Client
+// it created and Disconnect the Pipeline as part of its own shutdown. See
+// https://github.com/elastic/beats/issues/49794.
 type Pipeline interface {
+	// ConnectWith creates a new Client that publishes events to the Pipeline,
+	// configured by the given ClientConfig (publish mode, processors,
+	// acknowledgment callbacks, etc.). The caller owns the returned Client and
+	// must Close it when finished.
 	ConnectWith(ClientConfig) (Client, error)
+
+	// Connect creates a new Client using the default configuration. It is
+	// shorthand for ConnectWith(ClientConfig{}).
 	Connect() (Client, error)
+
+	// Disconnect tears the Pipeline down. The Beater is expected to Close the
+	// clients it created before disconnecting (Close stops a client from
+	// accepting new events and closes its queue producer immediately, but acks
+	// for already-published events keep being delivered). Disconnect then waits
+	// — bounded by the supplied context's deadline, or the Pipeline's configured
+	// WaitClose if the context has none — for outstanding acknowledgments before
+	// finalizing the clients and releasing resources.
 	Disconnect(ctx context.Context) error
 }
 
@@ -54,7 +75,11 @@ type ClientConfig struct {
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
 	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
-	// is configured
+	// is configured.
+	//
+	// Note: as of the two-stage client shutdown (issue #50104), Client.Close no
+	// longer blocks for WaitClose. Waiting for outstanding acknowledgments is now
+	// performed by Pipeline.Disconnect, bounded by its context.
 	WaitClose time.Duration
 
 	// Callbacks for when events are added / acknowledged
