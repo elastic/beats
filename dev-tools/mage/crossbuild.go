@@ -278,9 +278,6 @@ func CrossBuildImage(platform string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if FIPSBuild {
-		tagSuffix += "-fips"
-	}
 
 	return BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
 }

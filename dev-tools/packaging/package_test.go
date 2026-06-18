@@ -28,7 +28,6 @@ import (
 	"compress/gzip"
 	"context"
 	"debug/buildinfo"
-	"debug/elf"
 	"errors"
 	"flag"
 	"fmt"
@@ -903,41 +902,29 @@ func checkFIPS(t *testing.T, beatName, path string) {
 	require.NoError(t, err)
 
 	foundTags := false
-	foundExperiment := false
+	foundFIPS := false
+	foundFIPSDefault := false
 	for _, setting := range info.Settings {
 		switch setting.Key {
 		case "-tags":
 			foundTags = true
 			require.Contains(t, setting.Value, "requirefips")
 			continue
-		case "GOEXPERIMENT":
-			foundExperiment = true
-			require.Contains(t, setting.Value, "systemcrypto")
+		case "GOFIPS140":
+			foundFIPS = true
+			require.NotEmpty(t, setting.Value, "GOFIPS140 must be set in binary build info")
+			continue
+		case "DefaultGODEBUG":
+			if strings.Contains(setting.Value, "fips140=on") {
+				foundFIPSDefault = true
+			}
 			continue
 		}
 	}
 
 	require.True(t, foundTags, "Did not find -tags within binary version information")
-	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
-
-	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
-	f, err := elf.Open(binaryPath)
-	require.NoError(t, err, "unable to open ELF file")
-
-	symbols, err := f.Symbols()
-	if err != nil {
-		t.Logf("no symbols present in %q: %v", binaryPath, err)
-		return
-	}
-
-	hasOpenSSL := false
-	for _, symbol := range symbols {
-		if strings.Contains(symbol.Name, "OpenSSL_version") {
-			hasOpenSSL = true
-			break
-		}
-	}
-	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
+	require.True(t, foundFIPS, "Did not find GOFIPS140 within binary version information")
+	require.True(t, foundFIPSDefault, "Did not find fips140=on in DefaultGODEBUG — binary will not enforce FIPS mode at runtime")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file
