@@ -92,7 +92,6 @@ func (p *producer[T]) fill(entry T, slotIdx int) (queue.EntryID, bool) {
 	s.event = entry
 	s.next = -1
 	s.producer = p
-	s.producerID = id
 
 	q := p.queue
 	q.mu.Lock()

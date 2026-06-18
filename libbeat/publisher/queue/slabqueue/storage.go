@@ -73,6 +73,13 @@ func newDirectory[T any](capacity int) *directory[T] {
 	return d
 }
 
+// slot returns a stable pointer to slot i within this directory. Callers that
+// touch many slots in a loop (batch.Done, Queue.Get, ...) load the directory
+// once and call this, instead of reloading the atomic per slot.
+func (d *directory[T]) slot(i int) *slot[T] {
+	return &d.chunks[i>>slabChunkShift].slots[i&slabChunkMask]
+}
+
 // slot returns a stable pointer to slot i. The directory is loaded atomically
 // so this is safe to call concurrently with grow/shrink: any index a goroutine
 // legitimately holds (one it acquired from the free list, or reached by
@@ -80,6 +87,5 @@ func newDirectory[T any](capacity int) *directory[T] {
 // because indices are published to the free list only after the directory that
 // contains them has been stored.
 func (p *Pool[T]) slot(i int) *slot[T] {
-	d := p.dir.Load()
-	return &d.chunks[i>>slabChunkShift].slots[i&slabChunkMask]
+	return p.dir.Load().slot(i)
 }

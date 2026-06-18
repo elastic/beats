@@ -187,14 +187,7 @@ func (q *Queue[T]) wakeLimitWaiters() {
 }
 
 // isClosing reports whether Close has been called on this queue.
-func (q *Queue[T]) isClosing() bool {
-	select {
-	case <-q.closeCh:
-		return true
-	default:
-		return false
-	}
-}
+func (q *Queue[T]) isClosing() bool { return chClosed(q.closeCh) }
 
 // Producer returns a producer that publishes to this queue. Each producer is
 // given a stable home shard for the pool's free list, spread across shards by
@@ -213,24 +206,20 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 		q.mu.Lock()
 		if q.count > 0 {
 			n := q.count
-			if maxEvents > 0 && maxEvents < n {
-				n = maxEvents
+			if maxEvents > 0 {
+				n = min(n, maxEvents)
 			}
-			// Pull a recycled batch from the pool. Its slices retain
-			// their backing arrays from previous uses; we reset
-			// lengths and append into them. The batch is owned solely
-			// by this Queue/consumer/worker chain until Done/Release
-			// returns it to the pool.
+			// Pull a batch from the recycle pool (already fully reset; see
+			// getBatch) and append our slot indices into its retained backing
+			// array. The batch is owned solely by this Queue/consumer/worker
+			// chain until Done/Release returns it to the pool.
 			b := q.pool.getBatch()
 			b.queue = q
-			b.indices = b.indices[:0]
-			b.done = false
-			b.freed = false
-			b.next = nil
+			d := q.pool.dir.Load()
 			cur := q.head
 			for i := 0; i < n; i++ {
 				b.indices = append(b.indices, cur)
-				cur = q.pool.slot(cur).next
+				cur = d.slot(cur).next
 			}
 			q.head = cur
 			if cur == -1 {
@@ -286,14 +275,12 @@ func (q *Queue[T]) Close(force bool) error {
 		q.forced.Store(true)
 	}
 	q.mu.Lock()
-	if !q.closing {
-		q.closing = true
-	}
+	q.closing = true
 	var releaseIndices []int
 	if force {
 		if q.count > 0 {
 			// Walk the FIFO and gather the slots so we can release them back to
-			// the pool below (outside the lock, since pool.free is a channel).
+			// the pool below, outside the lock, to keep the critical section short.
 			cur := q.head
 			for cur != -1 {
 				releaseIndices = append(releaseIndices, cur)
@@ -369,11 +356,11 @@ func (q *Queue[T]) QueueType() string { return QueueType }
 // of its per-queue cap (if set) and the shared pool budget. With no per-queue
 // cap it is just the pool budget.
 func (q *Queue[T]) BufferConfig() queue.BufferConfig {
-	max := q.pool.Target()
-	if lim := int(q.limit.Load()); lim > 0 && lim < max {
-		max = lim
+	maxEvents := q.pool.Target()
+	if lim := int(q.limit.Load()); lim > 0 {
+		maxEvents = min(maxEvents, lim)
 	}
-	return queue.BufferConfig{MaxEvents: max}
+	return queue.BufferConfig{MaxEvents: maxEvents}
 }
 
 // signal wakes a goroutine blocked in Get. Non-blocking: at most one pending
@@ -397,4 +384,30 @@ func (q *Queue[T]) maybeMarkDone() {
 // markDone closes doneCh idempotently.
 func (q *Queue[T]) markDone() {
 	q.doneOnce.Do(func() { close(q.doneCh) })
+}
+
+// drainReadyLocked peels every already-Done() batch off the head of the pending
+// FIFO and returns them as a list in publish order, the prefix whose producer
+// ACK callbacks are now ready to fire. Anything from a not-yet-done batch onward
+// stays in the list. It also re-checks whether the queue is now fully drained.
+// Returned batches are no longer reachable from the queue, so the caller may ACK
+// and recycle them once it releases q.mu. Must be called with q.mu held.
+func (q *Queue[T]) drainReadyLocked() *batch[T] {
+	var head, tail *batch[T]
+	for q.pendingHead != nil && q.pendingHead.done {
+		ready := q.pendingHead
+		q.pendingHead = ready.next
+		ready.next = nil
+		if tail == nil {
+			head = ready
+		} else {
+			tail.next = ready
+		}
+		tail = ready
+	}
+	if q.pendingHead == nil {
+		q.pendingTail = nil
+	}
+	q.maybeMarkDone()
+	return head
 }
