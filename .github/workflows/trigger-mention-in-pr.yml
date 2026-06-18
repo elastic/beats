@@ -8,6 +8,7 @@ on:
 permissions:
   actions: read
   contents: write
+  copilot-requests: write
   discussions: write
   issues: write
   pull-requests: write
@@ -25,5 +26,3 @@ jobs:
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         export GOTOOLCHAIN=auto
         make mage
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
