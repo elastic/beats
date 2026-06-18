@@ -194,13 +194,12 @@ func (w *fileWatcher) watch(
 ) {
 	w.log.Debug("Start next scan")
 
-	paths, scanMetrics := w.scanner.GetFiles()
-
-	// The ignored/inactive logic is handled by the prospector,
-	// so we "duplicate" it here for the sake of metrics.
-	// countIgnoredFiles calls the same function as the prospector
-	// so the logic is not duplicated
-	scanMetrics.FilesIgnored += countIgnoredFiles(paths, ignoreOlder, ignoreInactiveSince)
+	now := time.Now()
+	paths, scanMetrics := w.scanner.GetFiles(loginp.FileScanOptions{
+		Now:                 now,
+		IgnoreOlder:         ignoreOlder,
+		IgnoreInactiveSince: ignoreInactiveSince,
+	})
 	metrics.UpdateFileScanMetrics(scanMetrics)
 
 	// for debugging purposes
@@ -352,30 +351,14 @@ func (w *fileWatcher) watch(
 	w.prev = paths
 }
 
-// countIgnoredFiles returns the number of ignored files based on
-// activity and modification time.
-// The logic for ignoring files in the prospector and runs for each fsEvent,
-// so we apply it here. Because the metrics are a snapshot of the file system
-// at a specific point in time, it is ok if our calculations are off by a small
-// delta.
-func countIgnoredFiles(
-	paths map[string]loginp.FileDescriptor,
+// isFileIgnored returns true when a file is ignored, no matter the reason.
+func isFileIgnored(
+	fd loginp.FileDescriptor,
+	now time.Time,
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
-) int64 {
-	if ignoreOlder <= 0 && ignoreInactiveSince.IsZero() {
-		return 0
-	}
-
-	now := time.Now()
-	var ignored int64
-	for _, fd := range paths {
-		if fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored {
-			ignored++
-		}
-	}
-
-	return ignored
+) bool {
+	return fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored
 }
 
 // getFileIdentity mimics the same algorithm used by the harvester to generate
@@ -414,8 +397,8 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
-func (w *fileWatcher) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
-	return w.scanner.GetFiles()
+func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	return w.scanner.GetFiles(opts)
 }
 
 type fingerprintConfig struct {
@@ -525,7 +508,11 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 
 // GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
-func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+	if opts.Now.IsZero() {
+		opts.Now = time.Now()
+	}
+
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
 	uniqueIDs := map[string]string{}
@@ -594,6 +581,9 @@ func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileS
 			}
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
+			if isFileIgnored(fd, opts.Now, opts.IgnoreOlder, opts.IgnoreInactiveSince) {
+				scanMetrics.FilesIgnored++
+			}
 		}
 	}
 
