@@ -186,6 +186,40 @@ func TestActionResultToEvent(t *testing.T) {
 				}
 			  }`),
 		},
+		{
+			name: "successful with space id",
+			req: toMap(t, `{
+				"data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"input_type": "osquery",
+				"space_id": "production",
+				"type": "INPUT_ACTION"
+			}`),
+			res: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"count": 1,
+				"started_at": "2024-04-18T19:39:39.532125Z"
+			} `),
+			want: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"action_response": {
+					"osquery": {
+						"count": 1
+					}
+				},
+				"action_id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"started_at": "2024-04-18T19:39:39.532125Z",
+				"action_input_type": "osquery",
+				"action_data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"space_id": "production"
+			}`),
+		},
 	}
 
 	for _, tc := range tests {
