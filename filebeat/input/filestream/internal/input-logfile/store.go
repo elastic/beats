@@ -272,13 +272,19 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 	s.store.ephemeralStore.table[newKey] = res
 	delete(s.store.ephemeralStore.table, oldKey)
 
-	// Best-effort: the in-memory swap above is what makes the registry
-	// observe the new key; the persistent delete just trims the on-disk
-	// log. If it fails (transient I/O, full disk) we keep going — the new
-	// key has been written and will be persisted on the next checkpoint;
-	// the stale persistent entry for the old key will be ignored on the
-	// next read because no in-memory entry references it. Surface the
-	// error anyway.
+	// Persist the entry under the new key BEFORE removing the old one, so a
+	// crash between the two leaves the state recoverable under newKey. This
+	// mirrors the ordering in UpdateIdentifiers/TakeOver. Without it the only
+	// durable record of the migration would be the opRemove of oldKey, and a
+	// crash before the next cursor write/checkpoint would lose the entry and
+	// re-harvest the file from offset 0. writeState sets res.stored=true on
+	// success.
+	s.store.writeState(res)
+
+	// Best-effort: the new key is already durable above; this just trims the
+	// stale on-disk entry for the old key. A failure here is harmless — the
+	// stale record is ignored on the next read because no in-memory entry
+	// references it — but surface it anyway.
 	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
 		s.store.log.Errorf(
 			"UpdateKey: failed to remove old key %q from persistent store: %v",
