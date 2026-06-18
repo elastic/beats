@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix Azure Monitor batch client silently ignoring aggregation type when grouping metrics, causing data loss when multiple aggregations are configured for the same metric
+component: metricbeat
