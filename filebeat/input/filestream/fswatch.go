@@ -163,9 +163,6 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 }
 
 func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
-	// evt.ID is the registry key, which may embed the fingerprint, so it is
-	// redacted. Guard the call so KeyForLog (which hashes) only runs when the
-	// message is actually emitted; this runs once per harvester close.
 	if w.log.IsDebug() {
 		w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", loginp.KeyForLog(evt.ID), evt.Size)
 	}
