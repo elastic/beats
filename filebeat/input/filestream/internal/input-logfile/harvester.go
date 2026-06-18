@@ -216,10 +216,6 @@ func startHarvester(
 	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
-	// logPath identifies the file in logs. It is computed here (a cheap string,
-	// no logger clone) so the early-return below can name the file without
-	// cloning the logger, and reused for the per-harvester logger clone past the
-	// reservation guard.
 	logPath := src.LogPath()
 	if !restart && !hg.readers.reserve(srcID) {
 		// A harvester is already running for this source, no need to start another.
