@@ -464,7 +464,7 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	}
 
 	if c.Tracer.enabled() {
-		id = sanitizeFileName(id)
+		id = httplog.SanitizeFileName(id)
 		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(p, inputName, path)
 		if err != nil {
@@ -589,16 +589,6 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	maxBodyLen := max(1, cfg.Tracer.MaxSize) * 1e6 / 10 // 10% of file max
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 func formatQuery(name string, query []string, dflt string, expand map[string][]string) (string, error) {

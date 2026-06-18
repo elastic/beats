@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/testing/integration"
 )
 
-func TestFilestreamBboltBackendResumesIngestion(t *testing.T) {
+func TestFilestreamOtelFileStorageResumesIngestion(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	EnsureCompiled(ctx, t)
@@ -48,19 +48,19 @@ func TestFilestreamBboltBackendResumesIngestion(t *testing.T) {
 	logFile := filepath.Join(inputDir, "test.log")
 
 	lineCount := 100
-	prefix := "bbolt-test-log-line-prefix"
+	prefix := "otel-file-storage-test-log-line-prefix"
 	generator := NewPlainTextGenerator(prefix)
 	GenerateLogFile(t, logFile, lineCount, generator)
 
 	config := fmt.Sprintf(`
 filebeat.inputs:
   - type: filestream
-    id: "test-bbolt-backend"
+    id: "test-otel-file-storage"
     paths:
       - %s
 
 filebeat.registry:
-  backend: bbolt
+  backend: otel_file_storage
   flush: 10ms
 
 output.console:
