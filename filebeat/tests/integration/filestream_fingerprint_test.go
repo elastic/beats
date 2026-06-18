@@ -555,6 +555,80 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_dele
 	assertFileEvents(t, events, file2)
 }
 
+// TestFilestreamGrowingFingerprint_supersetFileNotConflated verifies that a
+// file which appears already containing another file's full content PLUS more
+// — so the existing file's fingerprint is a strict PREFIX of the new file's —
+// is tracked as its own file and ingested from the beginning. The prefix
+// relationship must NOT be mistaken for "the existing file grew".
+//
+// This is distinct from do_not_mix_up_files, where the second file first
+// appears identical (a collision) and only later diverges: here the new file is
+// never identical to the existing one, so the prefix relationship is present
+// from the first time it is seen. It is covered both while Filebeat is running
+// (b.log) and across a restart (c.log), which exercise different code paths:
+// the watch loop's rename detection vs. the prospector's startup
+// reconstruction of the short-fingerprint set.
+func TestFilestreamGrowingFingerprint_supersetFileNotConflated(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0755), "failed to create log directory")
+
+	aLog := filepath.Join(logDir, "a.log")
+	bLog := filepath.Join(logDir, "b.log")
+	cLog := filepath.Join(logDir, "c.log")
+
+	// 4 lines, well below the 1024-byte threshold => tracked in the growing phase.
+	shared := generateLines("shared line", 4)
+
+	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// ===== Phase 1: a.log is ingested (4 lines) =====
+	writeTruncatingFile(t, aLog, shared)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", aLog),
+		10*time.Second, "a.log was not read to EOF")
+	filebeat.WaitPublishedEvents(5*time.Second, 4)
+
+	// ===== Phase 2 (running): b.log = a.log's content + a unique line =====
+	// b.log is never identical to a.log, but a.log's fingerprint is a strict
+	// prefix of b.log's. b.log must be ingested in full (5 lines), not skipped
+	// or conflated with a.log.
+	writeTruncatingFile(t, bLog, shared+generateLines("b unique line", 1))
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", bLog),
+		10*time.Second, "b.log was not read to EOF")
+	// 9 events: 4 (a.log) + 5 (b.log).
+	filebeat.WaitPublishedEvents(10*time.Second, 9)
+
+	// ===== Phase 3: stop, then create c.log (another superset) while stopped ==
+	// c.log first appears to the prospector's startup reconstruction rather than
+	// to the running watch loop.
+	filebeat.Stop()
+	writeTruncatingFile(t, cLog, shared+generateLines("c unique line", 1))
+
+	// ===== Phase 4: restart; c.log is ingested in full, a/b not re-ingested ===
+	filebeat.Start()
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", cLog),
+		10*time.Second, "c.log was not read to EOF")
+	// 14 events: 9 (previous) + 5 (c.log).
+	filebeat.WaitPublishedEvents(10*time.Second, 14)
+
+	events := readOutputEvents(t, tempDir)
+	assertFileEvents(t, events, aLog)
+	assertFileEvents(t, events, bLog)
+	assertFileEvents(t, events, cLog)
+	require.Len(t, messagesForFile(events, aLog), 4, "a.log must not be re-ingested")
+	require.Len(t, messagesForFile(events, bLog), 5, "b.log must be ingested in full")
+	require.Len(t, messagesForFile(events, cLog), 5, "c.log must be ingested in full")
+}
+
 // TestFilestreamGrowingFingerprintTruncation tests that truncation with
 // different content is treated as a new file (no prefix match = new entry).
 func TestFilestreamGrowingFingerprintTruncation(t *testing.T) {
