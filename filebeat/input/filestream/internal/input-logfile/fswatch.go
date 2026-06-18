@@ -123,12 +123,22 @@ type FSEvent struct {
 	SrcID string
 }
 
+// FileScanOptions contains scan-time settings that influence file metrics.
+type FileScanOptions struct {
+	// Now is the reference time for scan-time age comparisons.
+	Now time.Time
+	// IgnoreOlder is the ignore_older threshold.
+	IgnoreOlder time.Duration
+	// IgnoreInactiveSince is the ignore_inactive reference time.
+	IgnoreInactiveSince time.Time
+}
+
 // FSScanner retrieves a list of files from the file system.
 type FSScanner interface {
 	// GetFiles returns the list of monitored files.
 	// The keys of the map are the paths to the files and
 	// the values are the file descriptors that contain all necessary information about the file.
-	GetFiles() (map[string]FileDescriptor, FileScanMetrics)
+	GetFiles(FileScanOptions) (map[string]FileDescriptor, FileScanMetrics)
 }
 
 // FSWatcher returns file events of the monitored files.

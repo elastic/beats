@@ -114,7 +114,7 @@ func TestFileScannerSymlinks(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			files := fs.GetFiles()
+			files, _ := fs.GetFiles(loginp.FileScanOptions{})
 			paths := make([]string, 0)
 			for p := range files {
 				paths = append(paths, p)

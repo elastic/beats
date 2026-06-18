@@ -1150,7 +1150,7 @@ scanner:
 		t.Run(tc.name, func(t *testing.T) {
 			logger := logptest.NewTestingLogger(t, "")
 			s := createScannerWithConfig(t, logger, paths, tc.cfgStr, tc.compression)
-			files, _ := s.GetFiles()
+			files, _ := s.GetFiles(loginp.FileScanOptions{})
 			requireEqualFiles(t, tc.expDesc, files)
 		})
 	}
@@ -1168,11 +1168,11 @@ scanner:
 		// the glob for the very small files
 		paths := []string{filepath.Join(dir, undersizedGlob)}
 		s := createScannerWithConfig(t, logger, paths, cfgStr, CompressionNone)
-		files, _ := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Empty(t, files)
-		files, _ = s.GetFiles()
+		files, _ = s.GetFiles(loginp.FileScanOptions{})
 		require.Empty(t, files)
-		files, _ = s.GetFiles()
+		files, _ = s.GetFiles(loginp.FileScanOptions{})
 		require.Empty(t, files)
 
 		logs := parseLogs(buffer.String())
@@ -1246,7 +1246,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files, _ := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		assert.Len(t, files, 1, "empty.log must be excluded")
 		assert.Contains(t, files, nonEmpty, "nonempty.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1278,7 +1278,7 @@ scanner:
 		s, err := newFileScanner(inMemoryLog, []string{filepath.Join(dir, "*.log")}, cfg, CompressionNone)
 		require.NoError(t, err)
 
-		files, _ := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		assert.Len(t, files, 1, "empty_link.log must be excluded")
 		assert.Contains(t, files, nonEmptyLink, "nonempty_link.log should be included")
 		assert.NotContains(t, buff.String(), "GetFiles") // every line has a source prefix
@@ -1293,13 +1293,17 @@ func TestFileScannerScanMetrics(t *testing.T) {
 	smallLog := filepath.Join(dir, "small.log")
 	dirLog := filepath.Join(dir, "directory.log")
 	linkLog := filepath.Join(dir, "link.log")
+	oldLog := filepath.Join(dir, "old.log")
 
+	now := time.Now()
 	require.NoError(t, os.WriteFile(keepLog, []byte(strings.Repeat("k", 128)), 0644), "failed to write keep log")
 	require.NoError(t, os.WriteFile(excludedLog, []byte(strings.Repeat("e", 128)), 0644), "failed to write excluded log")
 	require.NoError(t, os.WriteFile(emptyLog, nil, 0644), "failed to write empty log")
 	require.NoError(t, os.WriteFile(smallLog, []byte("small"), 0644), "failed to write small log")
+	require.NoError(t, os.WriteFile(oldLog, []byte(strings.Repeat("o", 128)), 0644), "failed to write old log")
 	require.NoError(t, os.Mkdir(dirLog, 0755), "failed to create directory")
 	require.NoError(t, os.Symlink(keepLog, linkLog), "failed to create symlink")
+	require.NoError(t, os.Chtimes(oldLog, now.Add(-2*time.Hour), now.Add(-2*time.Hour)), "failed to age old log")
 
 	paths := []string{
 		filepath.Join(dir, "*.log"),
@@ -1316,16 +1320,20 @@ scanner:
 `
 
 	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
-	files, scanMetrics := scanner.GetFiles()
+	files, scanMetrics := scanner.GetFiles(loginp.FileScanOptions{
+		Now:         now,
+		IgnoreOlder: time.Hour,
+	})
 	require.Contains(t, files, keepLog, "keep log must be ingestible")
-	require.Len(t, files, 1, "only keep log should be ingestible")
+	require.Contains(t, files, oldLog, "old log must still be returned")
+	require.Len(t, files, 2, "keep and old logs should be ingestible scan targets")
 
 	assert.Equal(t, loginp.FileScanMetrics{
-		FilesIgnored:        1,
-		FilesMatched:        6,
+		FilesIgnored:        2,
+		FilesMatched:        7,
 		FilesNoIngestTarget: 3,
 		FilesEmpty:          1,
-		FilesUnique:         1,
+		FilesUnique:         2,
 	}, scanMetrics, "unexpected scan metrics")
 }
 
@@ -1520,7 +1528,7 @@ type testFileScanner struct {
 }
 
 // GetFiles return s.files and empty metrics
-func (s *testFileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+func (s *testFileScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
 	return s.files, loginp.FileScanMetrics{}
 }
 
@@ -1546,7 +1554,7 @@ func BenchmarkGetFiles(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files, _ := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
@@ -1574,7 +1582,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
-		files, _ := s.GetFiles()
+		files, _ := s.GetFiles(loginp.FileScanOptions{})
 		require.Len(b, files, benchmarkFileCount)
 	}
 }
