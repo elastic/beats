@@ -15,23 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build nooteloutput
-
-package pipeline
+package diskqueue
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"testing"
 )
 
-func newOTelOutputController(
-	beatInfo beat.Info,
-	monitors Monitors,
-	retryObserver retryObserver,
-	intakeQueueID string,
-	queueFactory queue.QueueFactory[publisher.Event],
-	queueConfig any,
-) (outputController, error) {
-	return nil, nil
+// TestACKWaitClosesOnClose verifies the disk queue producer's ack-wait channel
+// is open until Close and closed afterward. The disk queue persists events
+// durably and does not track in-memory acknowledgments, so Close is the only
+// signal to wait for, and repeated Close calls must remain safe.
+func TestACKWaitClosesOnClose(t *testing.T) {
+	p := &diskQueueProducer{
+		done:    make(chan struct{}),
+		ackWait: make(chan struct{}),
+	}
+
+	select {
+	case <-p.ACKWaitChan():
+		t.Fatal("ackWait must be open before Close")
+	default:
+	}
+
+	p.Close()
+
+	select {
+	case <-p.ACKWaitChan():
+	default:
+		t.Fatal("ackWait must be closed after Close")
+	}
+
+	// Close is idempotent: a second call must not panic on the already-closed
+	// channels.
+	p.Close()
 }

@@ -34,7 +34,7 @@ func (ob *osquerybeatReceiver) Start(ctx context.Context, host component.Host) e
 
 func (ob *osquerybeatReceiver) Shutdown(ctx context.Context) error {
 	ob.Logger.Info("stopping osquerybeat receiver")
-	if err := ob.BeatReceiver.Shutdown(); err != nil {
+	if err := ob.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping osquerybeat receiver: %w", err)
 	}
 	ob.wg.Wait()
