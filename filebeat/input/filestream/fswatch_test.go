@@ -1717,3 +1717,107 @@ func parseLogs(buff string) []logEntry {
 
 	return logEntries
 }
+
+// scriptedScanner is an FSScanner that returns a fixed sequence of scan
+// results, one per GetFiles call, so the fileWatcher's rename detection can be
+// driven deterministically (no dependency on real scan timing).
+type scriptedScanner struct {
+	scans []map[string]loginp.FileDescriptor
+	idx   int
+}
+
+func (s *scriptedScanner) GetFiles() map[string]loginp.FileDescriptor {
+	if s.idx >= len(s.scans) {
+		return map[string]loginp.FileDescriptor{}
+	}
+	files := s.scans[s.idx]
+	s.idx++
+	return files
+}
+
+// TestFileWatcher_GrowingPrefixRename_DistinctFilesNotConflated verifies that
+// the growing-fingerprint rename detection does not conflate two distinct files
+// that merely share a header prefix.
+//
+// While a file is below the fingerprint threshold it is identified by the raw
+// hex of its bytes, so a file that grew has its previous (shorter) fingerprint
+// as a prefix of its new one — that is how a rename combined with growth in a
+// single scan is detected. A prefix relationship alone is ambiguous, though:
+// two different files (e.g. container logs that share an identical preamble) can
+// have one's fingerprint be a prefix of the other's. A true rename preserves the
+// file's OS identity (inode/device); deleting one file and creating another does
+// not. So when file A vanishes and a distinct file C (different inode) whose
+// fingerprint has A's as a prefix appears in the same scan, the watcher must
+// emit delete(A)+create(C), not a rename — otherwise C inherits A's read offset
+// (skipping C's start) and A's state is lost.
+func TestFileWatcher_GrowingPrefixRename_DistinctFilesNotConflated(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	dir := t.TempDir()
+
+	// Two distinct on-disk files -> distinct inodes. Their content is
+	// irrelevant to the watcher here (the descriptors below carry explicit
+	// fingerprints); the files exist only to provide real, distinct OS
+	// identifiers, the signal a correct fix must use.
+	aPath := filepath.Join(dir, "a.log")
+	cPath := filepath.Join(dir, "c.log")
+	require.NoError(t, os.WriteFile(aPath, []byte("a"), 0o644))
+	require.NoError(t, os.WriteFile(cPath, []byte("c"), 0o644))
+	aInfo, err := os.Stat(aPath)
+	require.NoError(t, err)
+	cInfo, err := os.Stat(cPath)
+	require.NoError(t, err)
+
+	// A is a still-growing file; C is a DIFFERENT still-growing file whose
+	// fingerprint has A's as a strict prefix.
+	descA := loginp.FileDescriptor{
+		Filename:           aPath,
+		Fingerprint:        "41414141",
+		FingerprintGrowing: true,
+		Info:               file.ExtendFileInfo(aInfo),
+	}
+	descC := loginp.FileDescriptor{
+		Filename:           cPath,
+		Fingerprint:        "41414141ffff", // A's fingerprint is a strict prefix
+		FingerprintGrowing: true,
+		Info:               file.ExtendFileInfo(cInfo),
+	}
+	require.NotEqual(t,
+		descA.Info.GetOSState().Identifier(), descC.Info.GetOSState().Identifier(),
+		"test precondition: the two files must have distinct OS identifiers (inodes)")
+
+	scanner := &scriptedScanner{scans: []map[string]loginp.FileDescriptor{
+		{aPath: descA}, // scan 1: only A
+		{cPath: descC}, // scan 2: A gone, C new (distinct file, shared header prefix)
+	}}
+
+	cfg := defaultFileWatcherConfig()
+	cfg.Scanner.Fingerprint.Enabled = true
+	cfg.Scanner.Fingerprint.Growing = true
+	fw, err := newFileWatcher(logger, []string{filepath.Join(dir, "*.log")}, cfg,
+		CompressionNone, false, mustPathIdentifier(false), mustSourceIdentifier("foo-id"))
+	require.NoError(t, err)
+	fw.scanner = scanner // drive scans deterministically
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Scan 1: A appears -> OpCreate(A). Wait for the scan to fully complete
+	// (w.prev is updated at the end of watch) before driving scan 2.
+	watch1Done := make(chan struct{})
+	go func() { fw.watch(ctx); close(watch1Done) }()
+	e1 := fw.Event()
+	<-watch1Done
+	require.Equal(t, loginp.OpCreate, e1.Op, "scan 1 should create file A")
+	require.Equal(t, aPath, e1.NewPath)
+
+	// Scan 2: A vanishes and C appears in the same scan.
+	watch2Done := make(chan struct{})
+	go func() { fw.watch(ctx); close(watch2Done) }()
+	e2 := fw.Event()
+	cancel()     // release watch2 if it is mid-emitting a second event (a correct fix emits OpDelete+OpCreate)
+	<-watch2Done // ensure the watch goroutine returns before the test ends (logptest writes via t.Log)
+
+	assert.NotEqualf(t, loginp.OpRename, e2.Op,
+		"distinct files (different inodes) that merely share a header prefix must not be "+
+			"conflated as a rename; got OpRename %s -> %s", e2.OldPath, e2.NewPath)
+}
