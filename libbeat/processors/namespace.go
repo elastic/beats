@@ -153,16 +153,16 @@ func (ns *Namespace) get(names []string) (Constructor, error) {
 			}
 			return nil, fmt.Errorf("expected a plugin, found: %T", p)
 		}
-		return nil, fmt.Errorf("no constructor found with at key: %s", name)
+		return nil, fmt.Errorf("no constructor found for key: %s", name)
 	}
 	// check if namespace path already exists
 	tmp, found := ns.reg[name]
 	if found {
 		ns, ok := tmp.(*Namespace)
 		if !ok {
-			return nil, fmt.Errorf("expected sub-key's value to ba namespace, found %T", tmp)
+			return nil, fmt.Errorf("expected sub-key %q to be a namespace, found %T", name, tmp)
 		}
 		return ns.get(names[1:])
 	}
-	return nil, fmt.Errorf("no constructor found with at key: %s", name)
+	return nil, fmt.Errorf("no constructor found for key: %s", name)
 }
