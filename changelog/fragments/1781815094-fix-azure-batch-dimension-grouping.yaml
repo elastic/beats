@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix Azure Monitor batch client silently ignoring dimension values when grouping metrics, causing data loss when multiple dimension filters are configured for the same metric
+component: metricbeat
