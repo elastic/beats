@@ -15,6 +15,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -65,14 +66,10 @@ func TestHeartbeatbeatCfg(t *testing.T) {
 					t.Fatal(err)
 				}
 				got, err := cfgToArrMap(cfg)
-				if err != nil {
-					t.Fatal(err)
-				}
+				require.NoError(t, err)
 
 				diff := cmp.Diff(want, got)
-				if diff != "" {
-					t.Fatal(diff)
-				}
+				assert.Empty(t, diff)
 			}
 		}(match, out))
 	}
