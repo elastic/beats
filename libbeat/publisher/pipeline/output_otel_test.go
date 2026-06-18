@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -50,6 +51,22 @@ func nopLogConsumer(t *testing.T) consumer.Logs {
 // otelconsumer worker does not panic when receiving batches.
 func beatInfoForTest(t *testing.T) beat.Info {
 	return beat.Info{Logger: logp.NewNopLogger(), LogConsumer: nopLogConsumer(t)}
+}
+
+// beatInfoNoDrain returns a beat.Info whose LogConsumer blocks until its
+// context is cancelled (which the output worker does on Close). This keeps the
+// controller's background consumer and workers from acking events while a test
+// inspects the queue or pool budget: nopLogConsumer acks almost immediately,
+// which races budget assertions and makes them flaky. Published events stay
+// live until cleanup, where waitClose cancels the worker context to release it.
+func beatInfoNoDrain(t *testing.T) beat.Info {
+	t.Helper()
+	c, err := consumer.NewLogs(func(ctx context.Context, _ plog.Logs) error {
+		<-ctx.Done()
+		return ctx.Err()
+	})
+	require.NoError(t, err)
+	return beat.Info{Logger: logp.NewNopLogger(), LogConsumer: c}
 }
 
 // monitorsForTest returns a fresh Monitors with its own metrics registry. Each
@@ -131,7 +148,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 	}
 
 	c1, err := newOTelOutputController(
-		beatInfoForTest(t),
+		beatInfoNoDrain(t),
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
@@ -142,7 +159,7 @@ func TestSharedPoolBudgetIsolatesPipelines(t *testing.T) {
 	defer c1.waitClose(cancelledContext(), false)
 
 	c2, err := newOTelOutputController(
-		beatInfoForTest(t),
+		beatInfoNoDrain(t),
 		monitorsForTest(),
 		nilObserver,
 		"sharedID",
@@ -251,14 +268,14 @@ func TestSharedIntakeQueueShrinksWhenLargestLeaves(t *testing.T) {
 // though the pool has room.
 func TestSharedIntakeQueueCapsPerReceiver(t *testing.T) {
 	c1, err := newOTelOutputController(
-		beatInfoForTest(t), monitorsForTest(), nilObserver, "capID", nil,
+		beatInfoNoDrain(t), monitorsForTest(), nilObserver, "capID", nil,
 		memqueue.Settings{Events: 4},
 	)
 	require.NoError(t, err)
 	defer c1.waitClose(cancelledContext(), false)
 
 	c2, err := newOTelOutputController(
-		beatInfoForTest(t), monitorsForTest(), nilObserver, "capID", nil,
+		beatInfoNoDrain(t), monitorsForTest(), nilObserver, "capID", nil,
 		memqueue.Settings{Events: 8},
 	)
 	require.NoError(t, err)
@@ -432,6 +449,138 @@ func TestConcurrentControllerCreate(t *testing.T) {
 	_, stillRegistered := allOTelPools.lookup["concurrent-id"]
 	allOTelPools.Unlock()
 	assert.False(t, stillRegistered, "pool must be deregistered once every controller closes")
+}
+
+// TestProducerTrackingUntracksOnClose verifies that a producer the client
+// closes itself is removed from the controller's tracking set, so the
+// controller does not hold or re-close producers that are already gone.
+func TestProducerTrackingUntracksOnClose(t *testing.T) {
+	settings := memqueue.Settings{Events: 8}
+	c, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "track-close-id", nil, settings)
+	require.NoError(t, err)
+	defer c.waitClose(cancelledContext(), false)
+
+	prod := c.queueProducer(queue.ProducerConfig{})
+	assert.Equal(t, 1, c.trackedProducerCountForTest(), "vended producer must be tracked")
+
+	prod.Close()
+	assert.Equal(t, 0, c.trackedProducerCountForTest(), "closing a producer must untrack it")
+
+	// Close is idempotent and must not corrupt the tracking set.
+	prod.Close()
+	assert.Equal(t, 0, c.trackedProducerCountForTest(), "double close must be a no-op")
+}
+
+// TestWaitCloseClosesOpenProducers verifies that producers a client never
+// closed are closed by the controller when the pipeline disconnects: the
+// tracking set is emptied and the closed producers reject further publishes.
+func TestWaitCloseClosesOpenProducers(t *testing.T) {
+	settings := memqueue.Settings{Events: 8}
+	c, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "track-waitclose-id", nil, settings)
+	require.NoError(t, err)
+
+	prod := c.queueProducer(queue.ProducerConfig{})
+	require.Equal(t, 1, c.trackedProducerCountForTest(), "vended producer must be tracked")
+
+	// Disconnect the pipeline without the client closing its producer.
+	require.NoError(t, c.waitClose(cancelledContext(), false))
+
+	assert.Equal(t, 0, c.trackedProducerCountForTest(),
+		"waitClose must close and untrack every still-open producer")
+	_, ok := prod.TryPublish(testEvent(1))
+	assert.False(t, ok, "a producer closed by waitClose must reject further publishes")
+}
+
+// TestWaitCloseGracefulSuccess verifies the graceful drain path: with this
+// pipeline's events resolved, waitClose completes via success (its producers'
+// ACKWaitChans close and the queue drains) before the context deadline, rather
+// than via the force-close timeout path.
+func TestWaitCloseGracefulSuccess(t *testing.T) {
+	settings := memqueue.Settings{Events: 8}
+	c, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "phase4-graceful-id", nil, settings)
+	require.NoError(t, err)
+
+	// A vended-but-unused producer: waitClose closes it (0 events, so its
+	// ACKWaitChan resolves immediately) and the empty queue's Done fires at
+	// once, so a graceful waitClose succeeds well within the deadline.
+	c.queueProducer(queue.ProducerConfig{})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	require.NoError(t, c.waitClose(ctx, false))
+
+	assert.NoError(t, ctx.Err(), "graceful waitClose must complete before the context deadline (success path, not timeout)")
+	assert.Equal(t, 0, c.trackedProducerCountForTest(), "producers must be closed and untracked")
+}
+
+// TestWaitCloseIsBoundedByContext verifies that disconnecting a pipeline with
+// still-pending events does not hang: waitClose is bounded by the context, and
+// when it expires it force-closes this pipeline's queue, untracks its producers
+// and releases the shared pool — without ever blocking on another pipeline.
+func TestWaitCloseIsBoundedByContext(t *testing.T) {
+	settings := memqueue.Settings{Events: 8}
+	c1, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "phase4-bound-id", nil, settings)
+	require.NoError(t, err)
+	c2, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "phase4-bound-id", nil, settings)
+	require.NoError(t, err)
+	defer c2.waitClose(cancelledContext(), false)
+
+	// Publish events into c1 that may not drain before the deadline.
+	prod := c1.queueProducer(queue.ProducerConfig{})
+	for i := 0; i < 4; i++ {
+		_, _ = prod.TryPublish(testEvent(i))
+	}
+	require.Equal(t, 1, c1.trackedProducerCountForTest(), "vended producer must be tracked")
+
+	// An already-expired context must not cause waitClose to hang.
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_ = c1.waitClose(cancelledContext(), false)
+	}()
+	select {
+	case <-done:
+	case <-time.After(10 * time.Second):
+		t.Fatal("waitClose must be bounded by its context and not hang on pending events")
+	}
+
+	assert.Equal(t, 0, c1.trackedProducerCountForTest(), "all producers must be closed and untracked after waitClose")
+
+	// The shared pool must remain registered for the still-connected c2.
+	allOTelPools.Lock()
+	_, stillRegistered := allOTelPools.lookup["phase4-bound-id"]
+	allOTelPools.Unlock()
+	assert.True(t, stillRegistered, "disconnecting one pipeline must not shut down the shared pool")
+}
+
+// TestCloseProducersClosesTracked verifies closeProducers closes and untracks
+// every still-open producer (the safety-net path that runs when producers were
+// not already closed earlier in waitClose).
+func TestCloseProducersClosesTracked(t *testing.T) {
+	settings := memqueue.Settings{Events: 4}
+	c, err := newOTelOutputController(beatInfoForTest(t), monitorsForTest(), nilObserver, "closeproducers-id", nil, settings)
+	require.NoError(t, err)
+	defer c.waitClose(cancelledContext(), false)
+
+	c.queueProducer(queue.ProducerConfig{})
+	require.Equal(t, 1, c.trackedProducerCountForTest(), "vended producer must be tracked")
+
+	c.closeProducers()
+	assert.Equal(t, 0, c.trackedProducerCountForTest(), "closeProducers must close and untrack tracked producers")
+}
+
+// TestNewForReceiverConnects verifies the receiver pipeline constructor wires up
+// a working pipeline backed by the slabqueue pool and can be disconnected.
+func TestNewForReceiverConnects(t *testing.T) {
+	p, err := NewForReceiver(beatInfoForTest(t), monitorsForTest(), conf.Namespace{}, Settings{}, "receiver-ctor-id")
+	require.NoError(t, err, "NewForReceiver should succeed with a default (in-memory) queue config")
+	require.NotNil(t, p)
+
+	client, err := p.ConnectWith(beat.ClientConfig{})
+	require.NoError(t, err)
+	require.NoError(t, client.Close())
+
+	require.NoError(t, p.Disconnect(context.Background()))
 }
 
 func testEvent(i int) publisher.Event {

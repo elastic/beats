@@ -100,6 +100,21 @@ type Producer[T any] interface {
 	// Note: A queue may still send ACK signals even after Close is called on
 	// the originating Producer. The pipeline client must accept these ACKs.
 	Close()
+
+	// ACKWaitChan returns a channel that is closed once this producer has been
+	// Closed AND every event it published has been acknowledged. Producers that
+	// do not track in-memory acknowledgments (the disk queue, where events are
+	// durably persisted, or producers created without an ACK callback) close it
+	// as soon as Close is called.
+	//
+	// The channel is also closed if the underlying queue is force-closed, so a
+	// caller waiting on it can never hang past queue teardown. It is never
+	// closed while the producer is still open, even if every event published so
+	// far has been acknowledged.
+	//
+	// The same channel instance is returned across calls. ACKWaitChan is safe to
+	// call concurrently with Publish, TryPublish and Close.
+	ACKWaitChan() <-chan struct{}
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.
