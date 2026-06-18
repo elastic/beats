@@ -88,7 +88,7 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 		_, _ = x509Fields.Put("public_key_size", sizeInBits)
 		_, _ = x509Fields.Put("public_key_exponent", rsaKey.E)
 	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
-		if dsaKey.Parameters.P != nil {
+		if dsaKey.P != nil {
 			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
 		} else {
 			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
