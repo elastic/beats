@@ -99,4 +99,7 @@ func TestPlatformAndVersionMatches(t *testing.T) {
 	assert.True(t, versionMatches("5.11.0", "5.12.0"))
 	assert.True(t, versionMatches("5.12.0", "5.12.0"))
 	assert.False(t, versionMatches("5.13.0", "5.12.0"))
+	assert.False(t, versionMatches("not-semver", "5.12.0"))
+	assert.False(t, versionMatches("5.12.0", "not-semver"))
+	assert.False(t, versionMatches("5.12.0", ""))
 }

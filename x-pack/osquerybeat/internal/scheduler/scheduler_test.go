@@ -147,7 +147,7 @@ func TestScheduler_QueryWithSplay(t *testing.T) {
 	// Test duration-based splay
 	startDate := time.Now().Add(24 * time.Hour)
 	schedule := &RecurrenceSchedule{
-		RRule:     "FREQ=HOURLY",
+		RRule:     "FREQ=DAILY",
 		StartDate: &startDate,
 		Splay:     30 * time.Minute,
 	}

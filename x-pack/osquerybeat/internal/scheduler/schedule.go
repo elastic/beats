@@ -19,6 +19,8 @@ var (
 	ErrInvalidRRule = errors.New("invalid rrule expression")
 )
 
+const minRecurrenceInterval = 24 * time.Hour
+
 // RecurrenceSchedule represents an RRULE-based schedule with optional time window and splay
 type RecurrenceSchedule struct {
 	// RRule is the RFC 5545 recurrence rule string
@@ -69,6 +71,10 @@ func (s *RecurrenceSchedule) Parse() error {
 	}
 
 	s.rule = rule
+
+	if minInterval, ok := s.minimumInterval(); ok && minInterval < minRecurrenceInterval {
+		return fmt.Errorf("rrule minimum interval must be at least %v, got: %v", minRecurrenceInterval, minInterval)
+	}
 
 	// Validate splay constraints
 	if err := s.ValidateSplay(); err != nil {

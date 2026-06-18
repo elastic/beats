@@ -64,19 +64,19 @@ func TestRecurrenceSchedule_Parse(t *testing.T) {
 			errType: ErrInvalidRRule,
 		},
 		{
-			name:    "valid hourly",
+			name:    "hourly below minimum interval",
 			rrule:   "FREQ=HOURLY",
-			wantErr: false,
+			wantErr: true,
 		},
 		{
-			name:    "valid every 5 hours",
+			name:    "every 5 hours below minimum interval",
 			rrule:   "FREQ=HOURLY;INTERVAL=5",
-			wantErr: false,
+			wantErr: true,
 		},
 		{
-			name:    "valid minutely",
+			name:    "minutely below minimum interval",
 			rrule:   "FREQ=MINUTELY",
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 
@@ -367,7 +367,7 @@ func TestRecurrenceSchedule_MonthlyPattern(t *testing.T) {
 func TestRecurrenceSchedule_Splay(t *testing.T) {
 	startDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	s := &RecurrenceSchedule{
-		RRule:     "FREQ=HOURLY",
+		RRule:     "FREQ=DAILY",
 		StartDate: &startDate,
 		Splay:     30 * time.Minute,
 	}
@@ -385,20 +385,20 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 	}{
 		{
 			name:    "zero splay",
-			rrule:   "FREQ=HOURLY",
+			rrule:   "FREQ=DAILY",
 			splay:   0,
 			wantErr: false,
 		},
 		{
 			name:    "small splay",
-			rrule:   "FREQ=HOURLY",
+			rrule:   "FREQ=DAILY",
 			splay:   5 * time.Minute,
 			wantErr: false,
 		},
 		{
 			name:    "half minimum interval",
-			rrule:   "FREQ=HOURLY",
-			splay:   30 * time.Minute,
+			rrule:   "FREQ=DAILY",
+			splay:   12 * time.Hour,
 			wantErr: false,
 		},
 		{
@@ -408,12 +408,6 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "over half minimum interval",
-			rrule:   "FREQ=HOURLY",
-			splay:   31 * time.Minute,
-			wantErr: true,
-		},
-		{
 			name:    "over max splay",
 			rrule:   "FREQ=DAILY",
 			splay:   config.MaxSplay + time.Hour,
@@ -421,7 +415,7 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 		},
 		{
 			name:    "negative splay",
-			rrule:   "FREQ=HOURLY",
+			rrule:   "FREQ=DAILY",
 			splay:   -1 * time.Minute,
 			wantErr: true,
 		},
@@ -449,7 +443,7 @@ func TestRecurrenceSchedule_ValidateSplay(t *testing.T) {
 
 func TestRecurrenceSchedule_Unpack(t *testing.T) {
 	cfg := map[string]interface{}{
-		"rrule":      "FREQ=HOURLY",
+		"rrule":      "FREQ=DAILY",
 		"start_date": "2024-01-15T09:00:00Z",
 		"end_date":   "2024-12-31T23:59:59Z",
 		"splay":      "30m",
@@ -459,7 +453,7 @@ func TestRecurrenceSchedule_Unpack(t *testing.T) {
 	err := s.Unpack(cfg)
 	require.NoError(t, err)
 
-	assert.Equal(t, "FREQ=HOURLY", s.RRule)
+	assert.Equal(t, "FREQ=DAILY", s.RRule)
 	assert.NotNil(t, s.StartDate)
 	assert.NotNil(t, s.EndDate)
 	assert.Equal(t, 30*time.Minute, s.Splay)
@@ -511,11 +505,11 @@ func TestRecurrenceSchedule_UnpackInvalidSplay(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "splay exceeds half minimum interval",
+			name: "splay exceeds max",
 			cfg: map[string]interface{}{
-				"rrule":      "FREQ=HOURLY",
+				"rrule":      "FREQ=DAILY",
 				"start_date": "2024-01-15T09:00:00Z",
-				"splay":      "45m",
+				"splay":      "13h",
 			},
 			wantErr: true,
 		},

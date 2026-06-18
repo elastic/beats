@@ -213,15 +213,15 @@ func versionMatches(minVersion, currentVersion string) bool {
 	}
 	currentVersion = strings.TrimSpace(currentVersion)
 	if currentVersion == "" {
-		return true
+		return false
 	}
 	min, err := semver.NewVersion(minVersion)
 	if err != nil {
-		return true
+		return false
 	}
 	current, err := semver.NewVersion(currentVersion)
 	if err != nil {
-		return true
+		return false
 	}
 	return !current.LessThan(min)
 }
