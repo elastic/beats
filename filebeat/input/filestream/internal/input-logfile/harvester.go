@@ -246,7 +246,6 @@ func startHarvester(
 		}()
 
 		// We clone the logger here where we need it to avoid redundant copies that increase memory pressure.
-		// source_file carries the file path, never the registry key (srcID), which may embed the fingerprint.
 		ctx.Logger = ctx.Logger.With("source_file", logPath)
 
 		if restart {
@@ -338,7 +337,6 @@ func startHarvester(
 			}
 
 			hg.notifyObserver(canceler, srcID, st.Offset)
-			// source_file (the path) is already on ctx.Logger; do not log srcID.
 			ctx.Logger.Debugf("Harvester closed with offset: %d", st.Offset)
 		}()
 
