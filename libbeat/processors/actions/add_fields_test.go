@@ -37,10 +37,7 @@ type addFieldsCase struct {
 	eventMeta   mapstr.M
 	wantFields  mapstr.M
 	wantMeta    mapstr.M
-	// skipPdata is set for cases that write to event.Meta via @metadata; that
-	// target has no equivalent in a pcommon.Map body.
-	skipPdata bool
-	cfg       []string
+	cfg         []string
 }
 
 func TestAddFields(t *testing.T) {
@@ -66,7 +63,6 @@ func TestAddFields(t *testing.T) {
 		"merge with existing meta": {
 			eventMeta: mapstr.M{"_id": "unique"},
 			wantMeta:  mapstr.M{"_id": "unique", "op_type": "index"},
-			skipPdata: true,
 			cfg:       single(`{add_fields: {target: "@metadata", fields: {op_type: "index"}}}`),
 		},
 		"merge with existing fields": {
@@ -140,15 +136,15 @@ func TestAddFields(t *testing.T) {
 			assert.Equal(t, tc.wantFields, current.Fields)
 			assert.Equal(t, tc.wantMeta, current.Meta)
 
-			if tc.skipPdata {
-				return
-			}
-
-			// RunPdata path: assert Run == RunPdata (fields only; meta has no
-			// pdata equivalent).
+			// RunPdata path: assert Run == RunPdata.
+			// otelconsumer serializes beat.Event.Meta into the body under "@metadata",
+			// so seed it there and include it in the expected output comparison.
 			body := pcommon.NewMap()
 			if tc.eventFields != nil {
 				require.NoError(t, otelmap.FromMapstr(body, tc.eventFields))
+			}
+			if tc.eventMeta != nil {
+				require.NoError(t, otelmap.FromMapstr(body.PutEmptyMap("@metadata"), tc.eventMeta))
 			}
 			for _, p := range ps {
 				for _, proc := range p.List {
@@ -159,10 +155,14 @@ func TestAddFields(t *testing.T) {
 					require.False(t, drop)
 				}
 			}
-			// Normalize legacy output through a pdata round-trip so nested map
-			// types agree with what ToMapstr produces.
+			// Build the expected output from the legacy result. event.Meta maps to
+			// "@metadata" in the pdata body, so merge it in before normalizing.
+			expectedFields := current.Fields.Clone()
+			if len(current.Meta) > 0 {
+				expectedFields["@metadata"] = current.Meta
+			}
 			legacyNorm := pcommon.NewMap()
-			require.NoError(t, otelmap.FromMapstr(legacyNorm, current.Fields))
+			require.NoError(t, otelmap.FromMapstr(legacyNorm, expectedFields))
 			wantPdata := otelmap.ToMapstr(legacyNorm)
 			gotPdata := otelmap.ToMapstr(body)
 			assert.Equal(t, wantPdata, gotPdata)
