@@ -278,7 +278,11 @@ func (b *BeatProc) waitBeatToExit() {
 	}
 	defer b.waitingMutex.Unlock()
 
-	if err := b.Cmd.Wait(); err != nil {
+	err := b.Cmd.Wait()
+	// Check before any potential Fatalf so a data race is reported with a
+	// clear message even when it also caused a non-zero exit code.
+	b.checkForDataRace()
+	if err != nil {
 		exitCode := "unknown"
 		if b.Cmd.ProcessState != nil {
 			exitCode = strconv.Itoa(b.Cmd.ProcessState.ExitCode())
@@ -316,6 +320,7 @@ func (b *BeatProc) stopNonsynced() {
 		}
 		defer b.waitingMutex.Unlock()
 		err := b.Cmd.Wait()
+		b.checkForDataRace()
 		if err != nil {
 			if b.expectedErrorCode != 0 {
 				if b.Cmd.ProcessState.ExitCode() != b.expectedErrorCode {
@@ -1093,6 +1098,36 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 	return io.ReadAll(f)
 }
 
+// raceDetectorMarker is the header the Go race detector prints to stderr when
+// it detects a data race. It is only emitted when the binary was built with
+// -race (see testbin.RaceDetectorEnvVar). The marker is written as the race
+// happens, independently of the process exit code, so without explicitly
+// scanning for it a race can go unnoticed when the Beat is stopped by a signal.
+const raceDetectorMarker = "WARNING: DATA RACE"
+
+// checkForDataRace scans the Beat's stderr for a race detector report and fails
+// the test if one is found. It only does work when the Beat binary was built
+// with the race detector (testbin.RaceDetectorEnvVar=true); otherwise the
+// marker can never appear, so the stderr read is skipped.
+//
+// It must be called after the process has exited (Cmd.Wait returned) so stderr
+// is fully flushed, and before the next startBeat truncates the file.
+func (b *BeatProc) checkForDataRace() {
+	b.t.Helper()
+	if !testbin.RaceDetectorEnabled() {
+		return
+	}
+	data, err := os.ReadFile(b.stderr.Name())
+	if err != nil {
+		b.t.Logf("could not read stderr to check for data races: %s", err)
+		return
+	}
+	if idx := bytes.Index(data, []byte(raceDetectorMarker)); idx != -1 {
+		b.t.Errorf("data race detected while running %q (binary built with -race):\n%s",
+			b.beatName, data[idx:])
+	}
+}
+
 func reportErrors(t *testing.T, tempDir string, beatName string) {
 	var maxlen int64 = 1024
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
@@ -1292,7 +1327,18 @@ func (b *BeatProc) RemoveOutputFile() {
 //	func TestMain(m *testing.M) {
 //	    integration.TestMainWithBuild(m, "filebeat")
 //	}
+//
+// Running with -race (go test -race) auto-enables INTEG_RACE_DETECTOR so the
+// Beat is also built with -race and its stderr is scanned for race reports;
+// setting INTEG_RACE_DETECTOR=true directly has the same effect.
 func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
+	if raceBuildEnabled {
+		if err := os.Setenv(testbin.RaceDetectorEnvVar, "true"); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to enable %s for -race build: %s\n", testbin.RaceDetectorEnvVar, err)
+			os.Exit(1)
+		}
+	}
+
 	beatRoot, err := filepath.Abs("../../")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
