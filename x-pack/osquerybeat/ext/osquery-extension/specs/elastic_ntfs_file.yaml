@@ -1,0 +1,115 @@
+type: table
+name: elastic_ntfs_file
+description: Returns information about files on NTFS volumes, parsed from the $MFT file on Windows systems.
+platforms:
+  - windows
+group: ntfs
+
+implementation_package: github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/ntfs
+
+columns:
+  - name: drive
+    type: TEXT
+    description: Volume drive letter (e.g. C)
+  - name: device
+    type: TEXT
+    description: Physical device path (e.g. \\\\.\PhysicalDrive0)
+  - name: partition
+    type: INTEGER
+    description: Partition number of the volume (e.g. 1)
+  - name: inode
+    type: BIGINT
+    description: MFT record number (inode)
+  - name: sequence_number
+    type: INTEGER
+    description: MFT entry sequence number
+  - name: parent_inode
+    type: BIGINT
+    description: MFT record number of the parent directory
+  - name: path
+    type: TEXT
+    description: Full file path (e.g. C:\Windows\system32\ntoskrnl.exe)
+  - name: directory
+    type: TEXT
+    description: Full path of the parent directory
+  - name: filename
+    type: TEXT
+    description: File name component from the $FILE_NAME attribute
+  - name: type
+    type: TEXT
+    description: Entry type ("file" or "directory")
+  - name: hard_link_count
+    type: INTEGER
+    description: Number of hard links to this MFT entry
+  - name: active
+    type: INTEGER
+    description: 1 if the MFT entry is allocated (active), 0 if not
+  - name: size
+    type: BIGINT
+    description: Logical file size in bytes (from the default $DATA attribute)
+  - name: allocated_size
+    type: BIGINT
+    description: Allocated size in bytes (from the $FILE_NAME attribute)
+  - name: flags
+    type: INTEGER
+    description: File attribute flags from $STANDARD_INFORMATION
+  - name: ads
+    type: INTEGER
+    description: 1 if the file has one or more Alternate Data Streams, 0 otherwise
+  - name: object_id
+    type: TEXT
+    description: Object identifier GUID from the $OBJECT_ID attribute
+  - name: security_id
+    type: INTEGER
+    description: Security descriptor identifier from $STANDARD_INFORMATION
+  - name: owner_id
+    type: INTEGER
+    description: Owner identifier from $STANDARD_INFORMATION
+  - name: btime
+    type: BIGINT
+    description: File creation time (Unix epoch) from $STANDARD_INFORMATION
+  - name: mtime
+    type: BIGINT
+    description: File last-modified time (Unix epoch) from $STANDARD_INFORMATION
+  - name: ctime
+    type: BIGINT
+    description: MFT entry last-modified time (Unix epoch) from $STANDARD_INFORMATION
+  - name: atime
+    type: BIGINT
+    description: File last-accessed time (Unix epoch) from $STANDARD_INFORMATION
+  - name: fn_btime
+    type: BIGINT
+    description: File creation time (Unix epoch) from $FILE_NAME
+  - name: fn_mtime
+    type: BIGINT
+    description: File last-modified time (Unix epoch) from $FILE_NAME
+  - name: fn_ctime
+    type: BIGINT
+    description: MFT entry last-modified time (Unix epoch) from $FILE_NAME
+  - name: fn_atime
+    type: BIGINT
+    description: File last-accessed time (Unix epoch) from $FILE_NAME
+
+documentation:
+  description: |
+    Returns information about files on NTFS volumes, parsed from the $MFT file on Windows systems.
+     The $MFT file contains metadata about all files and directories on an NTFS volume, including their names, sizes, timestamps, and attributes. This table parses the $MFT file to extract this information and present it in a structured format.
+     Note that this table is Windows-only, as the $MFT file is specific to the NTFS file system used by Windows.
+  examples:
+    - title: Path lookup
+      query: |
+        SELECT * FROM elastic_ntfs_file WHERE path = 'C:\Windows\System32\ntoskrnl.exe';
+    - title: Inode lookup (drive constraint required)
+      query: |
+        SELECT * FROM elastic_ntfs_file WHERE inode = 1972769 AND drive = 'C';
+    - title: Directory + filename glob
+      query: |
+        SELECT * FROM elastic_ntfs_file
+        WHERE directory = 'C:\Windows\System32' AND filename GLOB '*.exe';
+  notes:
+    - "Windows only"
+    - "Glob patterns are not recursive. A query like `WHERE directory = 'C:\\Windows' AND filename GLOB '*.exe'` will not find `C:\\Windows\\System32\\notepad.exe`"
+    - "Integer columns with value 0 are returned as empty string by the osquery wire protocol, not \"0\". Use numeric comparison (e.g. WHERE ads = 0, not ads = '0')."
+  related_tables:
+    - elastic_ntfs_partitions
+    - elastic_ntfs_volumes
