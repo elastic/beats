@@ -1252,9 +1252,9 @@ func BenchmarkProcessMetricsInfoMerge(b *testing.B) {
 			response := generateStateContainerMetrics(containers, 1)
 			mapping := &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"kube_pod_container_info":            InfoMetric(),
-					"kube_pod_container_status_ready":    BooleanMetric("status.ready"),
-					"kube_pod_container_status_running":  BooleanMetric("status.running"),
+					"kube_pod_container_info":           InfoMetric(),
+					"kube_pod_container_status_ready":   BooleanMetric("status.ready"),
+					"kube_pod_container_status_running": BooleanMetric("status.running"),
 				},
 				Labels: map[string]LabelMap{
 					"namespace": KeyLabel("namespace"),
