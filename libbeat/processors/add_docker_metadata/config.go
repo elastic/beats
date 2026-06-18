@@ -20,6 +20,7 @@
 package add_docker_metadata
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
@@ -27,15 +28,18 @@ import (
 
 // Config for docker processor.
 type Config struct {
-	Host         string            `config:"host"`               // Docker socket (UNIX or TCP socket).
-	TLS          *docker.TLSConfig `config:"ssl"`                // TLS settings for connecting to Docker.
-	Fields       []string          `config:"match_fields"`       // A list of fields to match a container ID.
-	MatchSource  bool              `config:"match_source"`       // Match container ID from a log path present in source field.
-	MatchShortID bool              `config:"match_short_id"`     // Match to container short ID from a log path present in source field.
-	SourceIndex  int               `config:"match_source_index"` // Index in the source path split by / to look for container ID.
-	MatchPIDs    []string          `config:"match_pids"`         // A list of fields containing process IDs (PIDs).
-	HostFS       string            `config:"hostfs"`             // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
-	DeDot        bool              `config:"labels.dedot"`       // If set to true, replace dots in labels with `_`.
+	Host                string            `config:"host"`                           // Docker socket (UNIX or TCP socket).
+	TLS                 *docker.TLSConfig `config:"ssl"`                            // TLS settings for connecting to Docker.
+	Fields              []string          `config:"match_fields"`                   // A list of fields to match a container ID.
+	MatchSource         bool              `config:"match_source"`                   // Match container ID from a log path present in source field.
+	MatchShortID        bool              `config:"match_short_id"`                 // Match to container short ID from a log path present in source field.
+	SourceIndex         int               `config:"match_source_index"`             // Index in the source path split by / to look for container ID.
+	MatchPIDs           []string          `config:"match_pids"`                     // A list of fields containing process IDs (PIDs).
+	HostFS              string            `config:"hostfs"`                         // Specifies the mount point of the host’s filesystem for use in monitoring a host from within a container.
+	DeDot               bool              `config:"labels.dedot"`                   // If set to true, replace dots in labels with `_`.
+	WaitMetadata        bool              `config:"wait_for_metadata"`              // Block initialization when Docker is unavailable until metadata is available.
+	WaitMetadataTimeout time.Duration     `config:"wait_for_metadata_timeout"`      // Maximum time to wait for Docker metadata, 0 means wait indefinitely.
+	WaitMetadataRetry   time.Duration     `config:"wait_for_metadata_retry_period"` // How long to wait between retries.
 
 	// Annotations are kept after container is killed, until they haven't been
 	// accessed for a full `cleanup_timeout`:
@@ -44,10 +48,25 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		Host:        "unix:///var/run/docker.sock",
-		MatchSource: true,
-		SourceIndex: 4, // Use 4 to match the CID in /var/lib/docker/containers/<container_id>/*.log.
-		MatchPIDs:   []string{"process.pid", "process.parent.pid"},
-		DeDot:       true,
+		Host:                "unix:///var/run/docker.sock",
+		MatchSource:         true,
+		SourceIndex:         4, // Use 4 to match the CID in /var/lib/docker/containers/<container_id>/*.log.
+		MatchPIDs:           []string{"process.pid", "process.parent.pid"},
+		DeDot:               true,
+		WaitMetadata:        false,
+		WaitMetadataTimeout: 30 * time.Second,
+		WaitMetadataRetry:   10 * time.Second,
 	}
+}
+
+func (c Config) Validate() error {
+	if c.WaitMetadataTimeout < 0 {
+		return fmt.Errorf("wait_for_metadata_timeout must be zero or greater (zero means wait indefinitely)")
+	}
+
+	if c.WaitMetadataRetry <= 0 {
+		return fmt.Errorf("wait_for_metadata_retry_period must be greater than zero")
+	}
+
+	return nil
 }
