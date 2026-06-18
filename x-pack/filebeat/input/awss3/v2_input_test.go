@@ -89,22 +89,8 @@ func TestInputV2_resolveSQSRegion(t *testing.T) {
 }
 
 func TestFeatureFlag_routes_to_V2(t *testing.T) {
-	cfg := conf.MustNewConfigFrom(map[string]interface{}{
-		"features": map[string]interface{}{
-			"aws_s3_v2": map[string]interface{}{"enabled": true},
-		},
-	})
-	require.NoError(t, features.UpdateFromConfig(cfg))
-	t.Cleanup(func() {
-		off := conf.MustNewConfigFrom(map[string]interface{}{
-			"features": map[string]interface{}{
-				"aws_s3_v2": map[string]interface{}{"enabled": false},
-			},
-		})
-		_ = features.UpdateFromConfig(off)
-	})
-
-	assert.True(t, features.AwsS3V2(), "V2 flag should be enabled")
+	// The default is V2-enabled; verify that Plugin.Create returns *inputV2.
+	assert.True(t, features.AwsS3V2(), "V2 flag should be enabled by default")
 
 	inputCfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": "https://sqs.us-east-1.amazonaws.com/123456789012/test-queue",
@@ -113,4 +99,31 @@ func TestFeatureFlag_routes_to_V2(t *testing.T) {
 	require.NoError(t, err, "Plugin.Create should succeed")
 	_, ok := in.(*inputV2)
 	assert.True(t, ok, "expected *inputV2 when flag is enabled, got %T", in)
+}
+
+func TestFeatureFlag_routes_to_legacy(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"features": map[string]interface{}{
+			"aws_s3_v2": map[string]interface{}{"enabled": false},
+		},
+	})
+	require.NoError(t, features.UpdateFromConfig(cfg))
+	t.Cleanup(func() {
+		on := conf.MustNewConfigFrom(map[string]interface{}{
+			"features": map[string]interface{}{
+				"aws_s3_v2": map[string]interface{}{"enabled": true},
+			},
+		})
+		_ = features.UpdateFromConfig(on)
+	})
+
+	assert.False(t, features.AwsS3V2(), "V2 flag should be disabled")
+
+	inputCfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"queue_url": "https://sqs.us-east-1.amazonaws.com/123456789012/test-queue",
+	})
+	in, err := Plugin(logp.NewLogger(inputName), openTestStatestore(), nil).Manager.Create(inputCfg)
+	require.NoError(t, err, "Plugin.Create should succeed with legacy path")
+	_, ok := in.(*inputV2)
+	assert.False(t, ok, "expected legacy input when flag is disabled, got %T", in)
 }

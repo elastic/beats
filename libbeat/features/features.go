@@ -29,6 +29,10 @@ var (
 	flags = fflags{}
 )
 
+func init() {
+	flags.awsS3V2.Store(true)
+}
+
 type boolValueOnChangeCallback func(new, old bool)
 
 type fflags struct {
@@ -64,7 +68,9 @@ func UpdateFromConfig(c *conf.C) error {
 
 	flags.SetFQDNEnabled(parsedFlags.Features.FQDN.Enabled())
 	flags.SetLogInputRunFilestream(parsedFlags.Features.LogRunAsFilestream.Enabled())
-	flags.SetAwsS3V2(parsedFlags.Features.AwsS3V2.Enabled())
+	if parsedFlags.Features.AwsS3V2 != nil {
+		flags.SetAwsS3V2(parsedFlags.Features.AwsS3V2.Enabled())
+	}
 
 	return nil
 }
@@ -125,7 +131,8 @@ func (f *fflags) SetLogInputRunFilestream(v bool) {
 }
 
 // AwsS3V2 reports whether the aws-s3 input should use the V2
-// implementation. Defaults to false (legacy implementation).
+// implementation. Defaults to true; set features.aws_s3_v2.enabled: false
+// to revert to the legacy implementation.
 func AwsS3V2() bool {
 	return flags.awsS3V2.Load()
 }

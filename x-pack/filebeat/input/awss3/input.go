@@ -50,6 +50,23 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return newInputV2(config, im.store, im.path, im.logger)
 	}
 
+	// Legacy path — deprecated. When removing this code path, delete these
+	// legacy-only files (and their corresponding _test.go files):
+	//
+	//   sqs_input.go        — sqsReaderInput, sqsWorker orchestration
+	//   s3_input.go         — s3PollerInput orchestration
+	//   s3_objects.go       — s3ObjectProcessor, s3ObjectProcessorFactory
+	//   polling_strategy.go — normalPollingStrategy, lexicographicalPollingStrategy
+	//
+	// Also delete input_integration_test.go and input_benchmark_test.go, and
+	// remove the legacy branch below (+ this comment) from this file.
+	//
+	// Shared files reused by V2 (keep): interfaces.go, s3.go, sqs.go,
+	// sqs_s3_event.go, acks.go, metrics.go, state.go, states.go, config.go,
+	// script.go, script_session.go, script_jss3event_v2.go, s3_filters.go.
+	im.logger.Warn("The legacy aws-s3 input implementation is deprecated and will be removed in a future release. " +
+		"Remove 'features.aws_s3_v2.enabled: false' from your configuration to use the new implementation.")
+
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig, im.logger)
 	if err != nil {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)

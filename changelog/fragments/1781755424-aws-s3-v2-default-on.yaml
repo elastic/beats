@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Enable the rewritten aws-s3 input (V2) by default with adaptive flow control.
+description: |
+  The aws-s3 input has been rewritten with a simpler architecture, adaptive
+  concurrency control, and unified state management. The new implementation is
+  now enabled by default. The legacy implementation remains available for
+  rollback by setting features.aws_s3_v2.enabled: false in the beat
+  configuration.
+component: filebeat
