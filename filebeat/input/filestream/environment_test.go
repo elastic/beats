@@ -396,7 +396,7 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
 	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		events := e.pipeline.GetAllEvents()
-		require.Equal(t, count, len(events), "unexpected number of events")
+		require.Len(t, events, count, "unexpected number of events")
 	}, 2*time.Minute, 10*time.Millisecond)
 }
 
