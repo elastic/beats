@@ -112,7 +112,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_2204_X86_64}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
@@ -139,7 +139,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_2204_X86_64}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
