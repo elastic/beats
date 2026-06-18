@@ -100,6 +100,18 @@ func newProspector(
 		return nil, err
 	}
 
+	// Growing fingerprint is not supported by the copytruncate rotation
+	// prospector: it overrides onFSEvent and never runs the prefix-match/migrate
+	// logic, so a still-growing file (whose bounded key changes every scan as it
+	// grows) would be re-keyed and re-ingested from offset 0 on each scan and
+	// never migrate to its final SHA-256. Fall back to static fingerprint
+	// behaviour for copytruncate, matching the pre-growing-fingerprint semantics.
+	if config.FileWatcher.Scanner.Fingerprint.Growing && isCopyTruncate(config) {
+		logger.Warn("growing fingerprint is not supported with copytruncate rotation; " +
+			"disabling it for this input (small files below the fingerprint threshold will not be ingested)")
+		config.FileWatcher.Scanner.Fingerprint.Growing = false
+	}
+
 	identifier, err := newFileIdentifier(
 		config.FileIdentity,
 		config.Reader.Parsers.Suffix,
@@ -183,6 +195,21 @@ func newProspector(
 	default:
 	}
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
+}
+
+// isCopyTruncate reports whether the input is configured with external
+// copytruncate rotation. It mirrors the rotation parsing done in newProspector
+// and returns false (rather than erroring) on any malformed rotation config —
+// the error is surfaced later when newProspector parses it for real.
+func isCopyTruncate(config config) bool {
+	if config.Rotation == nil || config.Rotation.Name() != externalMode {
+		return false
+	}
+	var cfg rotationConfig
+	if err := config.Rotation.Config().Unpack(&cfg); err != nil {
+		return false
+	}
+	return cfg.Strategy.Name() == copytruncateStrategy
 }
 
 func checkConfigCompatibility(config config) error {
