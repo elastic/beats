@@ -113,7 +113,6 @@ func DefaultBuildArgs() BuildArgs {
 		for _, tag := range FIPSConfig.Compile.Tags {
 			args.ExtraFlags = append(args.ExtraFlags, "-tags="+tag)
 		}
-		args.CGO = args.CGO || FIPSConfig.Compile.CGO
 		for varName, value := range FIPSConfig.Compile.Env {
 			args.Env[varName] = value
 		}
