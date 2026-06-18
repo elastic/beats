@@ -454,9 +454,10 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 // SetHashedPaths populates the underlying scanner's set of "already-final"
 // paths. See fileScanner.setHashedPaths for details. Called by the
 // prospector at Run() start with the set of paths whose persisted state has
-// FingerprintGrowing=false, so the watch loop's first scan suppresses
-// GrowingFingerprint emission for files that are already keyed by SHA-256
-// and only emits the bridging value for files that still need to migrate.
+// an empty Fingerprint (final SHA-256 entries), so the watch loop's first scan
+// suppresses GrowingFingerprint emission for files that are already keyed by
+// SHA-256 and only emits the bridging value for files that still need to
+// migrate.
 func (w *fileWatcher) SetHashedPaths(paths map[string]struct{}) {
 	if fs, ok := w.scanner.(*fileScanner); ok {
 		fs.setHashedPaths(paths)
@@ -920,7 +921,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 // setHashedPaths replaces the per-process set of "already-final" paths with
 // the given seed. Called by the fileProspector at startup with the set of
-// paths whose persisted registry state has FingerprintGrowing=false (i.e. they
+// paths whose persisted registry state has an empty Fingerprint (i.e. they
 // are already keyed by a SHA-256 hex). The result is that the watch loop's
 // first scan emits GrowingFingerprint only for files that actually need
 // migration — files that were below threshold at the previous shutdown — and

@@ -1569,10 +1569,10 @@ func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testin
 		if e.source != logFile || e.removed {
 			continue
 		}
-		if len(e.fingerprint) == 64 {
-			activeSHA256 = append(activeSHA256, e.key)
-		} else {
+		if e.growing {
 			activeRawHex = append(activeRawHex, e.key)
+		} else {
+			activeSHA256 = append(activeSHA256, e.key)
 		}
 	}
 	assert.NotEmpty(t, activeRawHex,
@@ -1585,10 +1585,16 @@ func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testin
 // fingerprintRegistryEntry holds the parts of a fingerprint registry entry
 // the Enhanced Fingerprint tests care about.
 type fingerprintRegistryEntry struct {
-	key         string // full registry key: filestream::<inputID>::fingerprint::<fp>
-	fingerprint string // the value after ::fingerprint::
+	key         string // full registry key: filestream::<inputID>::fingerprint::<keypart>
+	fingerprint string // the key part after ::fingerprint:: (a SHA-256 for final, a bounded hash for growing)
 	source      string // Meta.Source
 	removed     bool   // true if the latest op for this key was "remove"
+	// growing is true while the entry is in the growing phase. With the
+	// bounded-key optimization the key part is always a 64-char hash (so its
+	// length no longer distinguishes growing from final); the raw-hex
+	// fingerprint lives in the value (Meta.Fingerprint) and a non-empty value
+	// is the marker of a still-growing entry.
+	growing bool
 }
 
 // readFingerprintRegistry returns the latest state of every fingerprint
@@ -1620,6 +1626,7 @@ func readFingerprintRegistry(t *testing.T, tempDir string) map[string]fingerprin
 			fingerprint: fp,
 			source:      source,
 			removed:     e.Op == "remove",
+			growing:     e.Fingerprint != "",
 		}
 	}
 	return state
@@ -1636,36 +1643,50 @@ func assertFingerprintMigratedToSHA256(t *testing.T, homeDir, filePath string) {
 	state := readFingerprintRegistry(t, homeDir)
 
 	var (
-		activeSHA256Keys []string
-		activeOtherKeys  []string
-		removedNonSHA256 []string
+		activeFinal   []fingerprintRegistryEntry
+		activeGrowing []string
+		removedKeys   []string
 	)
 	for _, e := range state {
-		// "Removed raw-hex" check is source-path-agnostic: the migration
-		// removes the old entry under whatever Source it was stored with,
-		// which for a rename is the OLD path, not filePath.
-		if e.removed && len(e.fingerprint) != 64 {
-			removedNonSHA256 = append(removedNonSHA256, e.key)
+		// "Migration removed the old key" check is source-path-agnostic: the
+		// migration removes the old entry under whatever Source it was stored
+		// with, which for a rename is the OLD path, not filePath.
+		if e.removed {
+			removedKeys = append(removedKeys, e.key)
 			continue
 		}
 		// "Active entry for this file" check is path-filtered.
-		if e.source != filePath || e.removed {
+		if e.source != filePath {
 			continue
 		}
-		if len(e.fingerprint) == 64 {
-			activeSHA256Keys = append(activeSHA256Keys, e.key)
+		// With the bounded-key optimization the growing key is also 64 chars,
+		// so we classify by the value-side marker (Meta.Fingerprint), not key
+		// length.
+		if e.growing {
+			activeGrowing = append(activeGrowing, e.key)
 		} else {
-			activeOtherKeys = append(activeOtherKeys, e.key)
+			activeFinal = append(activeFinal, e)
 		}
 	}
 
-	assert.Len(t, activeSHA256Keys, 1,
-		"expected exactly one active SHA-256 registry entry for %q; got SHA-256 keys=%v other-length keys=%v",
-		filePath, activeSHA256Keys, activeOtherKeys)
-	assert.Empty(t, activeOtherKeys,
-		"expected no active raw-hex (non-SHA-256) entries for %q after migration", filePath)
-	assert.NotEmpty(t, removedNonSHA256,
-		"expected at least one removed raw-hex entry (proof of migration); none found")
+	require.Len(t, activeFinal, 1,
+		"expected exactly one active final (SHA-256) registry entry for %q; got final=%d growing=%v",
+		filePath, len(activeFinal), activeGrowing)
+	assert.Empty(t, activeGrowing,
+		"expected no active growing entries for %q after migration", filePath)
+	assert.Len(t, activeFinal[0].fingerprint, 64,
+		"expected the active entry to be keyed by a 64-char SHA-256; got %q", activeFinal[0].fingerprint)
+	// Proof of migration: the old growing key (distinct from the final SHA-256
+	// key) was removed from the registry.
+	var removedOldKeys []string
+	for _, k := range removedKeys {
+		if k != activeFinal[0].key {
+			removedOldKeys = append(removedOldKeys, k)
+		}
+	}
+	assert.NotEmpty(t, removedOldKeys,
+		"expected at least one removed key distinct from the final SHA-256 key (proof of migration); removed=%v",
+		removedKeys)
 }
 
 // assertSingleSHA256RegistryEntry asserts that the file has exactly one
@@ -1689,6 +1710,8 @@ func assertSingleSHA256RegistryEntry(t *testing.T, tempDir, filePath string) {
 	assert.Len(t, activeKeysForFile, 1,
 		"expected exactly one active fingerprint registry entry for %q; got %d",
 		filePath, len(activeKeysForFile))
+	assert.False(t, activeKeysForFile[0].growing,
+		"expected the active entry to be final (not growing)")
 	assert.Len(t, activeKeysForFile[0].fingerprint, 64,
 		"expected the active entry to be keyed by a SHA-256 (64-char) fingerprint; got len=%d",
 		len(activeKeysForFile[0].fingerprint))
@@ -1715,7 +1738,7 @@ func assertGrowingRegistryEntry(t *testing.T, tempDir, filePath string) {
 	require.Len(t, activeKeysForFile, 1,
 		"expected exactly one active fingerprint registry entry for %q; got %d",
 		filePath, len(activeKeysForFile))
-	assert.NotEqual(t, 64, len(activeKeysForFile[0].fingerprint),
-		"expected the active entry to be keyed by raw-hex (NOT a 64-char SHA-256); got len=%d — file is treated as final, not growing",
-		len(activeKeysForFile[0].fingerprint))
+	assert.True(t, activeKeysForFile[0].growing,
+		"expected the active entry to be in the growing phase (Meta.Fingerprint set); "+
+			"got a final entry — file is treated as final, not growing")
 }

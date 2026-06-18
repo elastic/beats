@@ -18,7 +18,10 @@
 package filestream
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -191,4 +194,47 @@ func TestFileIdentifier(t *testing.T) {
 			assert.Equal(t, test.expectedSrc, src.Name())
 		}
 	})
+}
+
+// TestBoundFingerprintKey documents the bounded-key optimization: a final
+// SHA-256 fingerprint is used verbatim in the registry key (preserving
+// byte-identical state with static fingerprint), while a growing raw-hex
+// fingerprint is hashed to a fixed 64-char key so it cannot bloat the memlog
+// WAL or leak file content via the key.
+func TestBoundFingerprintKey(t *testing.T) {
+	const sha = "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"
+
+	t.Run("final SHA-256 is used as-is", func(t *testing.T) {
+		got := boundFingerprintKey(loginp.FileDescriptor{Fingerprint: sha, FingerprintGrowing: false})
+		assert.Equal(t, sha, got, "a final fingerprint must be byte-identical to the static-fingerprint key")
+	})
+
+	t.Run("growing raw-hex is hashed to a bounded 64-char key", func(t *testing.T) {
+		raw := hex.EncodeToString([]byte("small file header that is below the threshold"))
+		got := boundFingerprintKey(loginp.FileDescriptor{Fingerprint: raw, FingerprintGrowing: true})
+		sum := sha256.Sum256([]byte(raw))
+		assert.Equal(t, hex.EncodeToString(sum[:]), got, "growing key must be sha256(rawHex)")
+		assert.Len(t, got, 64, "bounded key must be a fixed 64-char hex string")
+		assert.NotContains(t, got, raw, "the raw file bytes must not appear in the key")
+	})
+
+	t.Run("a long growing fingerprint stays bounded", func(t *testing.T) {
+		raw := strings.Repeat("ab", 1024) // 2048 chars, as a near-threshold raw-hex fp
+		got := boundFingerprintKey(loginp.FileDescriptor{Fingerprint: raw, FingerprintGrowing: true})
+		assert.Len(t, got, 64, "the key length must not grow with the fingerprint length")
+	})
+
+	t.Run("empty fingerprint passes through", func(t *testing.T) {
+		assert.Empty(t, boundFingerprintKey(loginp.FileDescriptor{Fingerprint: "", FingerprintGrowing: true}))
+	})
+}
+
+// TestGrowingRawFingerprint verifies the value-side helper: the raw fingerprint
+// is persisted (in fileMeta.Fingerprint) only while the file is still growing.
+func TestGrowingRawFingerprint(t *testing.T) {
+	raw := "41414141"
+	assert.Equal(t, raw, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: raw, FingerprintGrowing: true}),
+		"a growing descriptor must persist its raw fingerprint for prefix matching")
+	assert.Empty(t, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: raw, FingerprintGrowing: false}),
+		"a final descriptor must not persist a raw fingerprint (keeps the entry byte-identical to static)")
 }

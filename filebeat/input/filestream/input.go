@@ -57,13 +57,18 @@ type state struct {
 type fileMeta struct {
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
-	// FingerprintGrowing is true while the fingerprint is the raw-hex encoded
-	// content of the file. It's cleared when the file reaches the necessary
-	// size (offset+length) for the SHA-256 fingerprint.
-	// Legacy entries from registries written before this field existed read as
-	// the zero value (false) and are treated as final, with no special-case
-	// handling required.
-	FingerprintGrowing bool `json:"fingerprint_growing,omitzero" struct:"fingerprint_growing,omitempty"`
+	// Fingerprint holds the raw (hex-encoded) growing fingerprint while the file
+	// is still below the threshold (offset+length). With the bounded-key
+	// optimization the registry key is a fixed-size hash of this value, so the
+	// raw fingerprint—which prefix matching needs—must be persisted in the value
+	// instead of the key.
+	//
+	// A non-empty Fingerprint is the single source of truth for "this entry is
+	// still growing": final SHA-256 entries (and legacy/static entries written
+	// before this feature) leave it empty, so they serialize to exactly the same
+	// {source, identifier_name} shape as before and need no migration. omitempty
+	// guarantees that byte-identical form on disk.
+	Fingerprint string `json:"fingerprint,omitempty" struct:"fingerprint,omitempty"`
 }
 
 // filestream is the input for reading from files which
@@ -80,6 +85,7 @@ type filestream struct {
 	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
+	includeFileFingerprint    bool
 	hasLineFilter             bool
 
 	// Function references for testing
@@ -161,6 +167,7 @@ func configure(
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
+		includeFileFingerprint:    c.IncludeFileFingerprint,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		waitGracePeriodFn:         waitGracePeriod,
@@ -549,17 +556,18 @@ func (inp *filestream) open(
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	// TODO(AndersonQ): The raw-hex encoded fingerprint CANNOT be on the logs as
-	//  it exposes the file content on the logs. Which might leak sensitive
-	//  information.
-	//  https://github.com/elastic/beats/issues/50725 addresses removing it from logs
-	//
-	//  also, the possibility to have a fingerprint that changes
-	//  becomes an issue here: the fingerprint cannot be updated as the file grows.
-	//  It's only updated on file open, not on OpWrite. It's already an issue for
-	//  the path: if a file is renamed, the events are published with the old path.
-	//  think if we want to address it here on this PR or not.
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
+	// log.file.fingerprint is opt-in (include_file_fingerprint, default false).
+	// A growing file's descriptor fingerprint is the RAW hex of the file header,
+	// not a SHA-256, so publishing it would expose file content. Only publish
+	// once the fingerprint is final (FingerprintGrowing == false); below the
+	// threshold we publish no fingerprint at all. A renamed file may still carry
+	// the old path until the next open — that pre-existing limitation is
+	// unchanged here.
+	var fingerprint string
+	if inp.includeFileFingerprint && !fs.desc.FingerprintGrowing {
+		fingerprint = fs.desc.Fingerprint
+	}
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 

@@ -245,16 +245,14 @@ func (p *fileProspector) Init(
 			// the same content, one of them deleted) is ambiguous without
 			// the threshold signal, and preserving in that case would
 			// cause incorrect state reuse for the surviving file.
-			if !fm.FingerprintGrowing {
+			// A non-empty Fingerprint (held in the entry VALUE, since the key
+			// is only a bounded hash of it) marks an entry as still growing.
+			// Final/static entries leave it empty and are not eligible for
+			// this rename+threshold-crossing preservation.
+			storedFP := fm.Fingerprint
+			if storedFP == "" {
 				return true
 			}
-			key := v.Key()
-			delim := identitySep + fingerprintName + identitySep
-			idx := strings.LastIndex(key, delim)
-			if idx < 0 {
-				return true
-			}
-			storedFP := key[idx+len(delim):]
 			for _, desc := range files {
 				if isStrictPrefix(desc.GrowingFingerprint, storedFP) {
 					return false // possible rename + threshold crossing, preserve
@@ -376,12 +374,12 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
 	// Bootstrap the scanner's hashedPaths set from the persisted registry.
-	// The seed contains paths whose registry state has FingerprintGrowing=false
-	// (or absent — legacy entries read as zero-value). Those files are already
-	// keyed by a SHA-256 hex; their next scan should emit only SHA-256 and not
-	// the (transient, large) GrowingFingerprint. Files in the growing phase
-	// (FingerprintGrowing=true) are NOT in the seed and so will emit
-	// GrowingFingerprint on the watch loop's first scan, enabling the
+	// The seed contains paths whose registry state has an empty Fingerprint
+	// (final SHA-256 entries, and legacy/static entries). Those files are
+	// already keyed by a SHA-256 hex; their next scan should emit only SHA-256
+	// and not the (transient, large) GrowingFingerprint. Files in the growing
+	// phase (non-empty Fingerprint in the value) are NOT in the seed and so will
+	// emit GrowingFingerprint on the watch loop's first scan, enabling the
 	// prospector's prefix-match-and-migrate path. Also subsumes the wipe of
 	// any pollution caused by the enumeration-only GetFiles calls in
 	// Init/takeover above (they touch the same hashedPaths set).
@@ -455,9 +453,9 @@ func (p *fileProspector) onFSEvent(
 			log.Debugf("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{
-				Source:             event.NewPath,
-				IdentifierName:     p.identifier.Name(),
-				FingerprintGrowing: event.Descriptor.FingerprintGrowing,
+				Source:         event.NewPath,
+				IdentifierName: p.identifier.Name(),
+				Fingerprint:    growingRawFingerprint(event.Descriptor),
 			})
 			if err != nil {
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
@@ -595,7 +593,11 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 
 		hg.Start(ctx, src)
 	} else {
-		// update file metadata as the path has changed
+		// The path changed; update the persisted metadata but PRESERVE the raw
+		// growing Fingerprint. Reconstructing the fileMeta with only
+		// Source+IdentifierName would drop the raw Fingerprint that prefix
+		// matching relies on, so a still-growing file that is renamed would look
+		// final on disk and be re-ingested from offset 0 after a restart.
 		var meta fileMeta
 		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
@@ -604,7 +606,8 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 				"Error while getting cursor meta data of entry '%s': '%v', using prospector's identifier: '%s'",
 				src.Name(), err, meta.IdentifierName)
 		}
-		err = s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: meta.IdentifierName})
+		meta.Source = fe.NewPath
+		err = s.UpdateMetadata(src, meta)
 		if err != nil {
 			log.Errorf("Failed to update cursor meta data of entry %s: %v", src.Name(), err)
 		}
@@ -625,16 +628,27 @@ func isStrictPrefix(target, prefix string) bool {
 	return prefix != "" && len(prefix) < len(target) && strings.HasPrefix(target, prefix)
 }
 
+// growingRawFingerprint returns the raw (hex) fingerprint to persist in the
+// entry value while a file is still growing. With the bounded-key optimization
+// the registry key is only a hash of this value, so prefix matching relies on
+// the raw fingerprint being stored in fileMeta.Fingerprint. It returns an empty
+// string for final SHA-256 entries, which don't participate in prefix matching.
+func growingRawFingerprint(d loginp.FileDescriptor) string {
+	if !d.FingerprintGrowing {
+		return ""
+	}
+	return d.Fingerprint
+}
+
 // initFileWatcherHashedPaths reads the registry and populates the fileWatcher's
 // scanner-side "already-final" path set so that on the next scan we only emit
 // GrowingFingerprint for files that actually still need to migrate.
 //
-// Selection: a fingerprint entry whose persisted state has
-// FingerprintGrowing=false (the omitzero default, also the value legacy
-// entries from registries written before the field existed read as) is a
-// final SHA-256 entry; its source path goes into the seed. Entries with
-// FingerprintGrowing=true are deliberately excluded — they need
-// GrowingFingerprint emitted on the next scan to bridge to their SHA-256.
+// Selection: a fingerprint entry with an empty persisted Fingerprint (final
+// SHA-256 entries, and legacy/static entries from registries written before
+// this feature) is already final; its source path goes into the seed. Entries
+// with a non-empty Fingerprint (still growing) are deliberately excluded — they
+// need GrowingFingerprint emitted on the next scan to bridge to their SHA-256.
 //
 // Returns nil and is a no-op when growing mode is disabled. Returns an error
 // when growing mode is enabled but p.filewatcher does not expose
@@ -664,7 +678,7 @@ func (p *fileProspector) initFileWatcherHashedPaths(updater loginp.StateMetadata
 		if err := typeconv.Convert(&fm, meta); err != nil {
 			return true
 		}
-		if fm.FingerprintGrowing {
+		if fm.Fingerprint != "" {
 			return true // still growing; needs GrowingFingerprint on next scan
 		}
 		if fm.Source == "" {
@@ -805,12 +819,16 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 				key, err)
 			return true
 		}
-		if !fm.FingerprintGrowing {
-			return true // final SHA-256 entry; not eligible for prefix matching
+		// The registry key holds only a fixed-size hash of the fingerprint
+		// (bounded-key optimization), so the raw fingerprint needed for prefix
+		// matching is read from the persisted value, not parsed from the key.
+		// A non-empty Fingerprint is exactly the set of still-growing entries;
+		// final SHA-256 and legacy/static entries leave it empty and are not
+		// eligible for prefix matching.
+		if fm.Fingerprint == "" {
+			return true
 		}
-
-		fingerprint := key[seps[2]+2:]
-		p.shortFingerprints.Add(key, fingerprint, fm.Source)
+		p.shortFingerprints.Add(key, fm.Fingerprint, fm.Source)
 		return true
 	})
 }
@@ -833,9 +851,9 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 // across all growing entries, which makes accidental collisions extremely
 // unlikely for SHA-256-length raw-hex fingerprints (~2048 chars).
 //
-// Only entries in shortFingerprintSet (those whose state has
-// FingerprintGrowing == true) are searched, making this O(K) where K is
-// the number of still-growing entries.
+// Only entries in shortFingerprintSet (the still-growing entries, i.e. those
+// with a non-empty persisted Fingerprint) are searched, making this O(K) where
+// K is the number of still-growing entries.
 func (p *fileProspector) findGrowingFingerprintMatch(
 	updater loginp.StateMetadataUpdater,
 	currentFingerprint string,
@@ -904,18 +922,16 @@ func (p *fileProspector) migrateGrowingFingerprint(
 	newSrc loginp.Source,
 	event loginp.FSEvent,
 ) (string, error) {
-	// Carry the current descriptor's FingerprintGrowing flag into the migrated
-	// meta.
-	// On fingerprint growth bellow threshold the fingerprint is the raw-hex and
-	// FingerprintGrowing=true.
-	// On a threshold-crossing migration the new value is the final SHA-256
-	// (FingerprintGrowing=false). FingerprintGrowing=false is not serialized,
-	// making the migrated entry indistinguishable from a static fingerprint
-	// entry on disk.
+	// Carry the raw growing fingerprint into the migrated meta.
+	// On growth below threshold it is the (longer) raw-hex, keeping the entry
+	// marked as growing. On a threshold-crossing migration the descriptor is
+	// final SHA-256, so growingRawFingerprint returns "" and the field is
+	// omitted on disk — making the migrated entry byte-identical to a static
+	// fingerprint entry.
 	newMeta := fileMeta{
-		Source:             event.NewPath,
-		IdentifierName:     fingerprintName,
-		FingerprintGrowing: event.Descriptor.FingerprintGrowing,
+		Source:         event.NewPath,
+		IdentifierName: fingerprintName,
+		Fingerprint:    growingRawFingerprint(event.Descriptor),
 	}
 
 	// Find the boundary between input ID and identity name. We can't
