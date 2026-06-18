@@ -64,6 +64,43 @@ func TestInitResourcesForBatch(t *testing.T) {
 	})
 }
 
+func TestGroupAndStoreMetrics(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	t.Run("metrics with different aggregations are placed in separate groups", func(t *testing.T) {
+		client := NewMockBatchClient(logger)
+		referenceTime := time.Now().UTC()
+
+		metrics := []Metric{
+			{
+				ResourceId:     "resourceId1",
+				ResourceSubId:  "resourceId1",
+				Namespace:      "Microsoft.Compute/virtualMachines",
+				Names:          []string{"Percentage CPU"},
+				Aggregations:   "Average",
+				TimeGrain:      "PT1M",
+				Location:       "West Europe",
+				SubscriptionId: "subscription",
+			},
+			{
+				ResourceId:     "resourceId1",
+				ResourceSubId:  "resourceId1",
+				Namespace:      "Microsoft.Compute/virtualMachines",
+				Names:          []string{"Percentage CPU"},
+				Aggregations:   "Maximum",
+				TimeGrain:      "PT1M",
+				Location:       "West Europe",
+				SubscriptionId: "subscription",
+			},
+		}
+
+		store := make(map[ResDefGroupingCriteria]*MetricStore)
+		client.GroupAndStoreMetrics(metrics, referenceTime, store)
+
+		require.Equal(t, 2, len(store), "metrics with different aggregations must be in separate groups")
+	})
+}
+
 func TestGetMetricsInBatch(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	client := NewMockBatchClient(logger)

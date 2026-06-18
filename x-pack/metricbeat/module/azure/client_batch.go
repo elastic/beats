@@ -277,6 +277,7 @@ func (client *BatchClient) GroupAndStoreMetrics(metricsDefinitions []Metric, ref
 			SubscriptionID: metric.SubscriptionId,
 			Location:       metric.Location,
 			Names:          strings.Join(metric.Names, ","),
+			Aggregations:   metric.Aggregations,
 			TimeGrain:      metric.TimeGrain,
 			Dimensions:     getDimensionKey(metric.Dimensions),
 		}
