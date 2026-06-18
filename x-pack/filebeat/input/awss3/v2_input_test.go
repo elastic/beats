@@ -11,7 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/features"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNewInputV2_validates_config(t *testing.T) {
@@ -84,4 +87,31 @@ func TestInputV2_resolveSQSRegion(t *testing.T) {
 			assert.Equal(t, tt.want, got, "resolved region should match")
 		})
 	}
+}
+
+func TestFeatureFlag_routes_to_V2(t *testing.T) {
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"features": map[string]interface{}{
+			"aws_s3_v2": map[string]interface{}{"enabled": true},
+		},
+	})
+	require.NoError(t, features.UpdateFromConfig(cfg))
+	t.Cleanup(func() {
+		off := conf.MustNewConfigFrom(map[string]interface{}{
+			"features": map[string]interface{}{
+				"aws_s3_v2": map[string]interface{}{"enabled": false},
+			},
+		})
+		_ = features.UpdateFromConfig(off)
+	})
+
+	assert.True(t, features.AwsS3V2(), "V2 flag should be enabled")
+
+	inputCfg := conf.MustNewConfigFrom(map[string]interface{}{
+		"queue_url": "https://sqs.us-east-1.amazonaws.com/123456789012/test-queue",
+	})
+	in, err := Plugin(logptest.NewTestingLogger(t, inputName), openTestStatestore(), nil).Manager.Create(inputCfg)
+	require.NoError(t, err, "Plugin.Create should succeed")
+	_, ok := in.(*inputV2)
+	assert.True(t, ok, "expected *inputV2 when flag is enabled, got %T", in)
 }
