@@ -52,8 +52,8 @@ func TestPublishReusesResponseChannel(t *testing.T) {
 		defer p.Close()
 		ap, ok := p.(*ackProducer[int])
 		require.True(t, ok, "producer should be of type ackProducer")
-		r1 := ap.makePushRequest(1)
-		r2 := ap.makePushRequest(2)
+		r1 := ap.makePushRequest(1, 1)
+		r2 := ap.makePushRequest(2, 2)
 		require.Equal(t, r1.resp, r2.resp,
 			"ackProducer should reuse the same response channel across requests")
 	})

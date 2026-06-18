@@ -321,14 +321,11 @@ func (b *broker[T]) unregisterProducer(p *ackProducer[T]) {
 // does not strand a waiter. Snapshots under the lock and closes outside it.
 func (b *broker[T]) closeProducerAckWaits() {
 	b.ackWaitMu.Lock()
-	producers := make([]*ackProducer[T], 0, len(b.ackWaitProducers))
-	for p := range b.ackWaitProducers {
-		producers = append(producers, p)
-	}
+	producers := b.ackWaitProducers
 	b.ackWaitProducers = make(map[*ackProducer[T]]struct{})
 	b.ackWaitMu.Unlock()
 
-	for _, p := range producers {
+	for p := range producers {
 		p.forceCloseAckWait()
 	}
 }

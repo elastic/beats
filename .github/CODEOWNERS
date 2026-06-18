@@ -123,6 +123,7 @@ changelog/fragments/
 /tools/ @elastic/elastic-agent-data-plane
 /winlogbeat/ @elastic/sec-windows-platform
 /x-pack/auditbeat/ @elastic/sec-linux-platform
+/x-pack/auditbeat/abreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
@@ -206,6 +207,7 @@ changelog/fragments/
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/integration-experience
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
+/x-pack/heartbeat/hbreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/libbeat/common/identityfederation/ @elastic/cloud-services
 /x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
@@ -275,5 +277,8 @@ changelog/fragments/
 /x-pack/metricbeat/module/stan/ @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
 /x-pack/osquerybeat/ @elastic/sec-windows-platform
+/x-pack/osquerybeat/osqreceiver/ @elastic/elastic-agent-data-plane
+/x-pack/osquerybeat/beater/receiver.go @elastic/elastic-agent-data-plane
 /x-pack/packetbeat/ @elastic/sec-linux-platform
+/x-pack/packetbeat/pbreceiver/ @elastic/elastic-agent-data-plane
 /x-pack/winlogbeat/ @elastic/sec-windows-platform

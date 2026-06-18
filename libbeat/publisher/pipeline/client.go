@@ -57,7 +57,7 @@ type client struct {
 	// run once, from disconnect.
 	onRemove func()
 
-	// onClosed, if set, hands this client to the owning Pipeline's reaper after
+	// requestFinalize, if set, hands this client to the owning Pipeline's reaper after
 	// Close so it is finalized (stage two) as soon as its events drain, instead
 	// of lingering until the whole pipeline disconnects. Run once, from Close.
 	requestFinalize func()

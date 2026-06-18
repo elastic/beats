@@ -267,24 +267,25 @@ func TestReaperFinalizesClientThatDrainsAfterClose(t *testing.T) {
 	pipeline := makePipeline(t, Settings{}, tq)
 	defer func() { _ = pipeline.Disconnect(t.Context()) }()
 
-	// Close one client; it is handed to the reaper but cannot drain yet, so the
-	// reaper re-polls it on its ticker.
+	// Close one client; it is handed to the reaper but cannot drain yet (the
+	// test holds ackWait open). Close a second while the first is still pending
+	// so the reaper also sees it via the notify path.
 	c1, err := pipeline.ConnectWith(beat.ClientConfig{})
 	require.NoError(t, err)
 	require.NoError(t, c1.Close())
-	time.Sleep(3 * reaperInterval) // let the reaper tick while c1 is pending
 
-	// Close a second client while the first is still pending: the reaper picks
-	// it up via the notify path.
 	c2, err := pipeline.ConnectWith(beat.ClientConfig{})
 	require.NoError(t, err)
 	require.NoError(t, c2.Close())
-	time.Sleep(reaperInterval)
 
-	pipeline.clientsMu.Lock()
-	stillPending := len(pipeline.clients)
-	pipeline.clientsMu.Unlock()
-	require.Equal(t, 2, stillPending, "clients must stay registered until their events drain")
+	// Across several reaper ticks both clients must stay registered: their
+	// events have not drained, so the reaper's re-poll must not finalize them.
+	require.Never(t, func() bool {
+		pipeline.clientsMu.Lock()
+		defer pipeline.clientsMu.Unlock()
+		return len(pipeline.clients) != 2
+	}, 3*reaperInterval, reaperInterval/2,
+		"clients must stay registered until their events drain")
 
 	// Drain: now both clients' events are acknowledged.
 	close(ackWait)

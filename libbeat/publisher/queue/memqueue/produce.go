@@ -138,30 +138,44 @@ func (p *forgetfulProducer[T]) Close() {
 
 func (p *forgetfulProducer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
 
-func (p *ackProducer[T]) makePushRequest(event T) pushRequest[T] {
+func (p *ackProducer[T]) makePushRequest(event T, id producerID) pushRequest[T] {
 	return pushRequest[T]{
-		event:    event,
-		producer: p,
-		// We add 1 to the id so the default lastACK of 0 is a
-		// valid initial state and 1 is the first real id.
-		producerID: producerID(p.producedCount.Load() + 1),
+		event:      event,
+		producer:   p,
+		producerID: id,
 		resp:       p.openState.resp}
 }
 
+// Publish adds an event to the queue, blocking until there is room. It returns
+// the assigned entry ID and whether the event was accepted (false if the queue
+// closed first).
 func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
-	id, published := p.openState.publish(p.makePushRequest(event))
-	if published {
-		p.producedCount.Add(1)
+	// Count the event before enqueuing it, else a concurrent Close could see
+	// ackedCount >= producedCount and close ackWait while it's still pending. The
+	// count doubles as the 1-based producerID.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, published := p.openState.publish(p.makePushRequest(event, id))
+	if !published {
+		// Never enqueued: undo the count and re-check so it can't strand ackWait.
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
 	}
-	return id, published
+	return entryID, published
 }
 
+// TryPublish adds an event to the queue only if there is room right now, never
+// blocking. It returns the assigned entry ID and whether the event was accepted.
 func (p *ackProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
-	id, published := p.openState.tryPublish(p.makePushRequest(event))
-	if published {
-		p.producedCount.Add(1)
+	// Count the event before enqueuing it, else a concurrent Close could see
+	// ackedCount >= producedCount and close ackWait while it's still pending. The
+	// count doubles as the 1-based producerID.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, published := p.openState.tryPublish(p.makePushRequest(event, id))
+	if !published {
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
 	}
-	return id, published
+	return entryID, published
 }
 
 func (p *ackProducer[T]) Close() {

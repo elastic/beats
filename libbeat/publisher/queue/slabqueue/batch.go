@@ -92,12 +92,15 @@ func (b *batch[T]) Done() {
 	// Walk slots: collect per-producer counts, clear slot state. Most
 	// batches come from a single producer so the linear search stays
 	// small. Reuse b's own slice backing arrays (set by Get from a
-	// recycled batch) to avoid allocating per Done.
+	// recycled batch) to avoid allocating per Done. The directory only
+	// grows under growMu and always covers an index this batch holds, so
+	// load it once instead of per slot.
 	var zero T
 	b.ackProducers = b.ackProducers[:0]
 	b.ackCounts = b.ackCounts[:0]
+	d := pool.dir.Load()
 	for _, i := range b.indices {
-		s := pool.slot(i)
+		s := d.slot(i)
 		if s.producer != nil {
 			found := false
 			for j, p := range b.ackProducers {
@@ -129,72 +132,52 @@ func (b *batch[T]) Done() {
 	// blocked on this queue's cap can proceed.
 	b.queue.releaseLive(n)
 
+	// Mark this batch done and drain the now-ready prefix of the pending FIFO.
+	// forced is read under the same lock so the snapshot is consistent with the
+	// drain. Slots are already back in the pool; the only work left is firing
+	// the drained prefix's ACK callbacks (in publish order) and recycling them.
 	q := b.queue
 	q.mu.Lock()
 	b.done = true
-	// Walk the pending FIFO from the head, peeling off every batch that
-	// has completed. toAck holds the prefix to ACK in publish order
-	// outside the lock. Anything from a not-yet-done batch onward stays
-	// in the list. Batches in toAck are no longer reachable from the
-	// queue once they're spliced out, so it's safe to recycle them
-	// after callbacks fire.
-	var toAckHead, toAckTail *batch[T]
-	for q.pendingHead != nil && q.pendingHead.done {
-		ready := q.pendingHead
-		q.pendingHead = ready.next
-		ready.next = nil
-		if toAckTail == nil {
-			toAckHead = ready
-		} else {
-			toAckTail.next = ready
-		}
-		toAckTail = ready
-	}
-	if q.pendingHead == nil {
-		q.pendingTail = nil
-	}
-	q.maybeMarkDone()
+	toAck := q.drainReadyLocked()
 	forced := q.forced.Load()
 	q.mu.Unlock()
 
-	// Slots are already back in the pool above; the remaining work is
-	// invoking producer ACK callbacks for any batches whose turn in the
-	// publish-order FIFO has come up.
-	//
-	// Suppress ACK callbacks once the queue has been force-closed.
-	// Force-close means the caller explicitly abandoned in-flight events
-	// (Close(true) released FIFO slots without acking them); reporting
-	// ACKs for the parallel set of in-flight batches that were already
-	// out at workers would be inconsistent and could mislead
-	// order-sensitive consumers (e.g. filestream's registry tracker).
-	// This matches memqueue's behaviour: its ackLoop exits on force-
-	// close and no further producer ACK callbacks fire.
+	pool.fireAndRecycle(toAck, forced)
+}
+
+// fireAndRecycle invokes producer ACK callbacks for each batch in the
+// publish-order list, then returns the batches to the recycle pool. The list
+// comes from Queue.drainReadyLocked and is no longer reachable from the queue,
+// so visiting it after q.mu is released is safe; a callback that re-publishes
+// through the queue is free to take the pool/queue locks without deadlocking.
+//
+// ACK callbacks are suppressed once the queue has been force-closed: the caller
+// explicitly abandoned in-flight events (Close(true) released FIFO slots without
+// acking them), so reporting ACKs for the parallel set of batches already out at
+// workers would be inconsistent and could mislead order-sensitive consumers
+// (e.g. filestream's registry tracker). This matches memqueue, whose ackLoop
+// exits on force-close and fires no further callbacks.
+func (p *Pool[T]) fireAndRecycle(head *batch[T], forced bool) {
 	if !forced {
-		// Invoke ACK callbacks outside the lock in publish (Get) order.
-		// A callback that re-publishes through this queue will be free
-		// to take the pool/queue locks without deadlocking us. The
-		// drained batches are no longer reachable from the queue, so
-		// visiting them here is safe.
-		// Under force-close this block is skipped: ACK callbacks are suppressed
-		// and producers' ackWait channels were already closed by Queue.Close's
-		// force fan-out, so there is nothing to resolve.
-		for ab := toAckHead; ab != nil; ab = ab.next {
-			for i, p := range ab.ackProducers {
-				if p.cfg.ACK != nil {
-					p.cfg.ACK(ab.ackCounts[i])
+		// Invoke ACK callbacks outside the lock in publish (Get) order, and
+		// advance each producer's finished count so its ackWait can close. Under
+		// force-close this block is skipped: ACK callbacks are suppressed and
+		// producers' ackWait channels were already closed by Queue.Close's force
+		// fan-out, so there is nothing to finish.
+		for ab := head; ab != nil; ab = ab.next {
+			for i, pr := range ab.ackProducers {
+				if pr.cfg.ACK != nil {
+					pr.cfg.ACK(ab.ackCounts[i])
 				}
-				p.resolveN(ab.ackCounts[i])
+				pr.finishN(ab.ackCounts[i])
 			}
 		}
 	}
-
-	// Recycle every swept batch back to the batch pool now that no one
-	// else holds a reference (sweep took them out of pendingHead, and
-	// callbacks have been delivered). We capture next before putBatch
-	// because putBatch clears the .next field.
-	for ab := toAckHead; ab != nil; {
+	// Capture next before putBatch clears the .next field.
+	for ab := head; ab != nil; {
 		next := ab.next
-		pool.putBatch(ab)
+		p.putBatch(ab)
 		ab = next
 	}
 }
@@ -224,20 +207,21 @@ func (b *batch[T]) Release() {
 	}
 	pool := b.queue.pool
 
-	// Clear slot state and gather indices for release. Unlike Done we do not
-	// fire producer ACK callbacks for these abandoned events, but we still
-	// collect per-producer counts so we can advance each producer's resolved
-	// count below: an abandoned event is "resolved" for ackWait purposes, so a
-	// producer whose tail batch is Released does not strand its ACKWaitChan.
+	// Clear slot state and gather per-producer counts. Unlike Done we do not fire
+	// producer ACK callbacks for these abandoned events, but we still collect
+	// counts so we can advance each producer's finished count below: an abandoned
+	// event is "finished" for ackWait purposes, so a producer whose tail batch is
+	// Released does not strand its ACKWaitChan.
 	var zero T
+	d := pool.dir.Load()
 	b.ackProducers = b.ackProducers[:0]
 	b.ackCounts = b.ackCounts[:0]
 	for _, i := range b.indices {
-		s := pool.slot(i)
+		s := d.slot(i)
 		if s.producer != nil {
 			found := false
-			for j, p := range b.ackProducers {
-				if p == s.producer {
+			for j, pr := range b.ackProducers {
+				if pr == s.producer {
 					b.ackCounts[j]++
 					found = true
 					break
@@ -262,14 +246,12 @@ func (b *batch[T]) Release() {
 	// Return the per-queue budget for the abandoned events.
 	b.queue.releaseLive(n)
 
-	// Remove the batch from the pending FIFO if it's still there.
-	// Done's sweep relies on the per-batch `done` flag and walks from
-	// the head; for a Released batch we splice it out wherever it sits
-	// so the sweep can drain the prefix that's ready. After the splice,
-	// if any batches were already Done()'d but stuck behind us they
-	// must be drained here — otherwise a later Done() may never come
-	// to drain them and they would sit in pendingHead indefinitely,
-	// blocking q.Done() and leaking their ACK callbacks + batch object.
+	// Remove the batch from the pending FIFO if it's still there. Done's sweep
+	// relies on the per-batch `done` flag and walks from the head; for a Released
+	// batch we splice it out wherever it sits, then drain the now-exposed ready
+	// prefix exactly as Done would — otherwise completed-but-stalled successors
+	// behind us would sit in pendingHead indefinitely, blocking q.Done() and
+	// leaking their ACK callbacks + batch objects.
 	q := b.queue
 	q.mu.Lock()
 	var prev *batch[T]
@@ -288,63 +270,28 @@ func (b *batch[T]) Release() {
 		prev = cur
 	}
 	b.next = nil
-
-	// Drain the now-exposed head prefix of already-completed batches.
-	// Mirrors Done's sweep so a Release that unblocks a queue of
-	// completed-but-stalled successors gets them ACKed (or recycled
-	// under force-close) just as Done would have.
-	var toAckHead, toAckTail *batch[T]
-	for q.pendingHead != nil && q.pendingHead.done {
-		ready := q.pendingHead
-		q.pendingHead = ready.next
-		ready.next = nil
-		if toAckTail == nil {
-			toAckHead = ready
-		} else {
-			toAckTail.next = ready
-		}
-		toAckTail = ready
-	}
-	if q.pendingHead == nil {
-		q.pendingTail = nil
-	}
-	q.maybeMarkDone()
+	toAck := q.drainReadyLocked()
 	forced := q.forced.Load()
 	q.mu.Unlock()
 
-	// Advance resolved accounting for this batch's own (abandoned) events so a
+	// Advance finished accounting for this batch's own (abandoned) events so a
 	// producer whose tail batch is Released still has its ackWait closed. Done
-	// outside q.mu because resolveN may close ackWait and call removeProducer
+	// outside q.mu because finishN may close ackWait and call removeProducer
 	// (which takes q.mu). No ACK callback fires for abandoned events. Under
-	// force-close ackWait is already closed by Queue.Close, so resolveN here is
+	// force-close ackWait is already closed by Queue.Close, so finishN here is
 	// a harmless no-op.
-	for i, p := range b.ackProducers {
-		p.resolveN(b.ackCounts[i])
+	for i, pr := range b.ackProducers {
+		pr.finishN(b.ackCounts[i])
 	}
 
-	// Fire ACK callbacks for the drained successors in publish order, and
-	// advance their resolved accounting. Suppressed under force-close, matching
-	// Done's contract (force fan-out already closed their ackWait).
-	if !forced {
-		for ab := toAckHead; ab != nil; ab = ab.next {
-			for i, p := range ab.ackProducers {
-				if p.cfg.ACK != nil {
-					p.cfg.ACK(ab.ackCounts[i])
-				}
-				p.resolveN(ab.ackCounts[i])
-			}
-		}
-	}
-
-	// Recycle each drained successor; capture next before putBatch
-	// clears the .next field.
-	for ab := toAckHead; ab != nil; {
-		next := ab.next
-		pool.putBatch(ab)
-		ab = next
-	}
+	// Fire ACK callbacks and advance finished accounting for the drained
+	// successors in publish order (suppressed under force-close, inside
+	// fireAndRecycle), then recycle them.
+	pool.fireAndRecycle(toAck, forced)
 
 	// b itself is no longer reachable from the queue and the caller
-	// has released it — safe to recycle.
+	// has released it — safe to recycle. It is never part of toAck (it was
+	// spliced out above and never marked done), so it is recycled here without
+	// firing its producer callbacks, which is the whole point of Release.
 	pool.putBatch(b)
 }

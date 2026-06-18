@@ -55,12 +55,9 @@ type otelOutputController struct {
 
 	// pool is non-nil whenever the receiver uses the slabqueue pool (i.e.
 	// queue.mem); it is nil when the receiver was configured with queue.disk
-	// and owns its queue outright via queueFactory.
+	// and owns its queue outright via queueFactory. It therefore also marks
+	// whether this controller joined a shared pool that must be released.
 	pool *slabqueue.Pool[publisher.Event]
-
-	// sharedPoolQueue is this controller's connection to the shared pool, used
-	// to drop its budget contribution on release. Non-nil iff pool is non-nil.
-	sharedPoolQueue *slabqueue.Queue[publisher.Event]
 
 	consumer *eventConsumer
 
@@ -71,9 +68,10 @@ type otelOutputController struct {
 	// that has not yet been closed. Each pipeline's clients normally close
 	// their own producer, but on pipeline disconnection any producer still
 	// open here is closed by waitClose so no producer outlives the queue it
-	// publishes into. Protected by producersMu.
+	// publishes into.
 	producersMu sync.Mutex
 	producers   map[*trackedProducer]struct{}
+	closing     bool
 }
 
 // trackedProducer wraps a queue.Producer so the owning otelOutputController
@@ -135,8 +133,8 @@ func newOTelOutputController(
 	// we go through acquireOTelPool. Anything else (in practice
 	// diskqueue.Settings from an explicit queue.disk) opts out and builds
 	// its queue from the user-supplied queueFactory.
-	var sharedQueue *slabqueue.Queue[publisher.Event]
 	if settings, isMem := queueConfig.(memqueue.Settings); isMem {
+		var sharedQueue *slabqueue.Queue[publisher.Event]
 		pool, sharedQueue = acquireOTelPool(settings, monitors)
 		pipelineQueue = sharedQueue
 	} else {
@@ -157,7 +155,7 @@ func newOTelOutputController(
 	})
 	if err != nil {
 		closePipelineQueue(pipelineQueue)
-		if sharedQueue != nil {
+		if pool != nil {
 			releaseOTelPool()
 		}
 		return nil, err
@@ -179,16 +177,15 @@ func newOTelOutputController(
 	})
 
 	return &otelOutputController{
-		beatInfo:        beatInfo,
-		logger:          beatInfo.Logger.Named("otelOutputController"),
-		monitors:        monitors,
-		queue:           pipelineQueue,
-		pool:            pool,
-		sharedPoolQueue: sharedQueue,
-		consumer:        consumer,
-		workers:         workers,
-		workerChan:      workerChan,
-		producers:       make(map[*trackedProducer]struct{}),
+		beatInfo:      beatInfo,
+		logger:        beatInfo.Logger.Named("otelOutputController"),
+		monitors:      monitors,
+		queue:         pipelineQueue,
+		pool:          pool,
+		consumer:      consumer,
+		workers:       workers,
+		workerChan:    workerChan,
+		producers:     make(map[*trackedProducer]struct{}),
 	}, nil
 }
 
@@ -267,10 +264,10 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 	// published events are acknowledged. Clients normally close their own
 	// producers first (stage one of client shutdown); this covers any that
 	// did not.
-	producers := c.snapshotProducers()
-	for _, p := range producers {
-		p.Close()
-	}
+	c.producersMu.Lock()
+	c.closing = true
+	c.producersMu.Unlock()
+	producers := c.closeProducers()
 
 	// Begin a graceful close of this pipeline's queue so the consumer keeps
 	// delivering already-enqueued events and their acks fire while we wait.
@@ -297,10 +294,6 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 		out.Close()
 	}
 
-	// Idempotently close any producer vended concurrently with the snapshot
-	// above, so none outlives the queue it publishes into.
-	c.closeProducers()
-
 	// Release this pipeline's claim on the shared pool. Ref-counting means only
 	// the LAST connected pipeline actually shuts the pool down (Pool.Shutdown
 	// force-closes any remaining queues and drains the full shared budget);
@@ -308,7 +301,7 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 	// time the last pipeline reaches here it has already waited for its own —
 	// and therefore all remaining — events above. Receivers on the non-mem
 	// (disk) path own their queue outright and never joined a pool.
-	if c.sharedPoolQueue != nil {
+	if c.pool != nil {
 		releaseOTelPool()
 	}
 	return nil
@@ -320,6 +313,12 @@ func (c *otelOutputController) queueProducer(config queue.ProducerConfig) queue.
 		controller: c,
 	}
 	c.producersMu.Lock()
+	if c.closing {
+		// The pipeline is already shutting down.
+		c.producersMu.Unlock()
+		p.Close()
+		return p
+	}
 	c.producers[p] = struct{}{}
 	c.producersMu.Unlock()
 	return p
@@ -349,11 +348,14 @@ func (c *otelOutputController) snapshotProducers() []*trackedProducer {
 }
 
 // closeProducers closes every producer that is still open when the pipeline
-// disconnects.
-func (c *otelOutputController) closeProducers() {
-	for _, p := range c.snapshotProducers() {
+// disconnects and returns the set it closed, so the caller can wait on their
+// acknowledgments.
+func (c *otelOutputController) closeProducers() []*trackedProducer {
+	producers := c.snapshotProducers()
+	for _, p := range producers {
 		p.Close()
 	}
+	return producers
 }
 
 // waitForPipelineAcks waits — bounded by ctx — for acknowledgments of THIS

@@ -104,6 +104,8 @@ func (producer *diskQueueProducer) publish(
 }
 
 func (producer *diskQueueProducer) Close() {
+	// Resolve ackWait immediately rather than waiting for the queue to drain.
+	// The disk queue is durable and can hold a very large (multi-GB) backlog.
 	producer.ackOnce.Do(func() { close(producer.ackWait) })
 	if producer.cancelled {
 		return

@@ -6,6 +6,7 @@ on:
 permissions:
   actions: read
   contents: write
+  copilot-requests: write
   discussions: write
   issues: write
   pull-requests: write
@@ -25,5 +26,3 @@ jobs:
         make mage
       additional-instructions: |
         If you do make a pull request, please add the label "ai" to it.
-    secrets:
-      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
