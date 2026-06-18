@@ -47,11 +47,20 @@ const (
 )
 
 var (
-	errFileTooSmall    = errors.New("file size is too small for ingestion")
-	errFileEmpty       = errors.New("file is empty")
-	errFileExcluded    = errors.New("excluded from ingestion")
-	errFileNotIncluded = errors.New("not included in ingestion")
+	errFileTooSmall = errors.New("file size is too small for ingestion")
+	errFileEmpty    = errors.New("file is empty")
+	errFileIgnored  = errors.New("ignored by scanner configuration")
 )
+
+type ignoredFileError string
+
+func (e ignoredFileError) Error() string {
+	return string(e)
+}
+
+func (e ignoredFileError) Unwrap() error {
+	return errFileIgnored
+}
 
 // fileWatcherConfig is the prospector.scanner configuration
 type fileWatcherConfig struct {
@@ -548,7 +557,7 @@ func (s *fileScanner) GetFiles() (map[string]loginp.FileDescriptor, loginp.FileS
 				}
 
 				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
-				if errors.Is(err, errFileNotIncluded) || errors.Is(err, errFileExcluded) {
+				if errors.Is(err, errFileIgnored) {
 					scanMetrics.FilesIgnored++
 					continue
 				}
@@ -601,11 +610,11 @@ type ingestTarget struct {
 
 func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
 	if s.isFileExcluded(filename) {
-		return it, fmt.Errorf("file %q is %w", filename, errFileExcluded)
+		return it, ignoredFileError(fmt.Sprintf("file %q is excluded from ingestion", filename))
 	}
 
 	if !s.isFileIncluded(filename) {
-		return it, fmt.Errorf("file %q is %w", filename, errFileNotIncluded)
+		return it, ignoredFileError(fmt.Sprintf("file %q is not included in ingestion", filename))
 	}
 
 	it.filename = filename
@@ -652,11 +661,11 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		}
 
 		if s.isFileExcluded(it.originalFilename) {
-			return it, fmt.Errorf("file %q->%q is %w", it.filename, it.originalFilename, errFileExcluded)
+			return it, ignoredFileError(fmt.Sprintf("file %q->%q is excluded from ingestion", it.filename, it.originalFilename))
 		}
 
 		if !s.isFileIncluded(it.originalFilename) {
-			return it, fmt.Errorf("file %q->%q is %w", it.filename, it.originalFilename, errFileNotIncluded)
+			return it, ignoredFileError(fmt.Sprintf("file %q->%q is not included in ingestion", it.filename, it.originalFilename))
 		}
 	}
 
