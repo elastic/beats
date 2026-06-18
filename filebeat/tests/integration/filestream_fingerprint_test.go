@@ -21,6 +21,8 @@ package integration
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -1044,6 +1046,141 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	// FingerprintGrowing=true (it's still below threshold).
 	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
 	assertGrowingRegistryEntry(t, tempDir, smallFile)
+}
+
+// seedLegacyFingerprintRegistry writes a filestream registry in the exact
+// on-disk format a pre-growing-fingerprint Filebeat produced: a single static
+// fingerprint entry keyed by the SHA-256 of the file's first 1024 bytes (the
+// default fingerprint length at offset 0), with the cursor at the file's size
+// and a meta of only {source, identifier_name} — no growing-fingerprint fields.
+//
+// The cursor carries only `offset` (no `eof`): the cursor's `eof` field was
+// introduced by the later GZIP feature, so a pre-growing-fingerprint registry
+// never set it. Seeding `eof:true` would also wrongly trip the "GZIP file
+// already read to EOF, not reading it again" guard under compression:auto and
+// prevent the file from being tailed.
+//
+// The `updated` timestamp uses go-structform's time encoding (what the memlog
+// writes); its exact value is immaterial here because clean_inactive is disabled.
+func seedLegacyFingerprintRegistry(t *testing.T, tempDir, inputID, filePath string, fileSize int64, sha256hex string) {
+	t.Helper()
+	regDir := filepath.Join(tempDir, "data", "registry", "filebeat")
+	require.NoError(t, os.MkdirAll(regDir, 0o755), "failed to create registry dir")
+
+	key := fmt.Sprintf("filestream::%s::fingerprint::%s", inputID, sha256hex)
+	// The literal memlog log.json format: an op header line followed by the
+	// entry line.
+	op := `{"op":"set","id":1}`
+	entry := fmt.Sprintf(
+		`{"k":%q,"v":{"ttl":-1,"updated":[515683809191,1781771002],"cursor":{"offset":%d},"meta":{"source":%q,"identifier_name":"fingerprint"}}}`,
+		key, fileSize, filePath)
+	require.NoError(t,
+		os.WriteFile(filepath.Join(regDir, "log.json"), []byte(op+"\n"+entry+"\n"), 0o644),
+		"failed to write registry log.json")
+	require.NoError(t,
+		os.WriteFile(filepath.Join(regDir, "meta.json"), []byte(`{"version":"1"}`), 0o644),
+		"failed to write registry meta.json")
+}
+
+// TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry is the
+// cross-version backwards-compatibility guarantee: a registry written by a
+// Filebeat from BEFORE growing fingerprint existed is read correctly by the new
+// growing-fingerprint-by-default Filebeat. It covers both kinds of pre-existing
+// file, and that ingestion continues for each after the upgrade:
+//
+//  1. A file SMALLER than the fingerprint threshold. The old static Filebeat
+//     dropped it (errFileTooSmall, no registry entry), so growing mode ingests
+//     it for the first time, then keeps ingesting as it grows.
+//  2. A file LARGER than the threshold, already fully ingested by the old
+//     Filebeat (a legacy SHA-256 entry at EOF). It must NOT be re-ingested, and
+//     newly appended bytes must be ingested, continuing from the legacy offset.
+//
+// Unlike the config-switch upgrade tests (which write the registry with the new
+// binary in static mode), this seeds the registry from raw bytes in the exact
+// legacy on-disk format, so it pins on-disk format compatibility itself,
+// independent of what the new binary writes.
+func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	require.NoError(t, os.MkdirAll(logDir, 0o755), "failed to create log directory")
+
+	// Case 2: a file above the 1024-byte threshold, already fully ingested by
+	// the old (static) Filebeat -> a legacy SHA-256 registry entry at EOF.
+	largeFile := filepath.Join(logDir, "large.log")
+	largeOld := generateLines("large-old", 40) // ~2000 bytes, > 1024
+	writeTruncatingFile(t, largeFile, largeOld)
+	largeInfo, err := os.Stat(largeFile)
+	require.NoError(t, err, "failed to stat the large file")
+	// The legacy key is the SHA-256 of the first 1024 bytes (offset 0, default
+	// length) — identical to what static fingerprinting computed.
+	sum := sha256.Sum256([]byte(largeOld)[:1024])
+	largeSHA := hex.EncodeToString(sum[:])
+	seedLegacyFingerprintRegistry(t, tempDir, "test-enhanced-fingerprint", largeFile, largeInfo.Size(), largeSHA)
+
+	// Case 1: a file below the threshold. The old (static) Filebeat dropped it,
+	// so it has NO registry entry; growing mode ingests it now.
+	smallFile := filepath.Join(logDir, "small.log")
+	smallOld := generateLines("small-old", 5) // ~250 bytes, < 1024
+	writeTruncatingFile(t, smallFile, smallOld)
+
+	// Start the new Filebeat with growing enabled by default, over the legacy registry.
+	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.Start()
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// The legacy SHA-256 entry is loaded from the persisted registry as an
+	// already-final path — proof the old-format entry was read.
+	filebeat.WaitLogsContains(
+		"seeded fileWatcher hashedPaths with 1 already-final paths",
+		15*time.Second, "the legacy registry entry was not loaded")
+
+	// Phase 1: only the small file's 5 pre-existing lines are ingested. The
+	// large file resumes from its legacy EOF offset and contributes nothing;
+	// re-ingestion would publish its 40 lines and overshoot this exact count.
+	filebeat.WaitPublishedEvents(20*time.Second, 5)
+
+	// Phase 2: append to both files. The new bytes must be ingested, continuing
+	// from each file's current offset (the large file from its legacy offset,
+	// without re-reading its pre-existing content).
+	appendToFile(t, largeFile, generateLines("large-new", 10))
+	appendToFile(t, smallFile, generateLines("small-new", 10))
+
+	// Total = 5 (small old) + 10 (small new) + 10 (large new) = 25.
+	filebeat.WaitPublishedEvents(30*time.Second, 25)
+
+	filebeat.Stop()
+
+	events := readOutputEvents(t, tempDir)
+	require.Len(t, events, 25,
+		"expected 25 events (5 small-old + 10 small-new + 10 large-new); more means the large file was re-ingested")
+
+	// The large file contributes ONLY its 10 appended lines — its pre-existing
+	// 40 lines (from the legacy registry) are never re-ingested.
+	largeMsgs := messagesForFile(events, largeFile)
+	assert.Len(t, largeMsgs, 10, "the large file must contribute only its 10 appended lines, not its pre-existing content")
+	for _, m := range largeMsgs {
+		assert.Contains(t, m, "large-new",
+			"the large file must not re-ingest pre-existing content; got %q", m)
+	}
+
+	// The small file contributes all 15 lines (5 pre-existing + 10 appended):
+	// it had no legacy entry, so growing mode ingests it from the start and
+	// continues as it grows.
+	smallMsgs := messagesForFile(events, smallFile)
+	assert.Len(t, smallMsgs, 15, "the small file must contribute its 5 pre-existing + 10 appended lines")
+
+	// The large file's entry remains a single active SHA-256 entry keyed by the
+	// original fingerprint (the appends stayed above threshold; no new key).
+	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
+	state := readFingerprintRegistry(t, tempDir)
+	wantKey := fmt.Sprintf("filestream::test-enhanced-fingerprint::fingerprint::%s", largeSHA)
+	e, ok := state[wantKey]
+	require.True(t, ok, "the original legacy key %q must still be present", wantKey)
+	assert.False(t, e.removed, "the original legacy key must remain active (not removed/migrated)")
 }
 
 // TestFilestreamEnhancedFingerprint_NoDuplicationConfigReload is
