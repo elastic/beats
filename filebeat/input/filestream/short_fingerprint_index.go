@@ -17,8 +17,6 @@
 
 package filestream
 
-import "strings"
-
 // shortFingerprintSet manages a set of entries whose fingerprint is still
 // in the growing phase (raw-hex, below the configured threshold). Used by both
 // the filewatcher (for rename+grow detection) and the prospector (for key
@@ -39,10 +37,9 @@ func newShortFingerprintSet() *shortFingerprintSet {
 	}
 }
 
-// Add adds an entry. Callers must only add entries that are currently in
-// the growing phase; the index does not enforce
-// this. Returns true if the entry was added (fingerprint non-empty).
-// Safe to call on a nil receiver.
+// Add adds an entry. Callers must only add entries that are currently in the
+// growing phase; the index does not enforce this. Entries with an empty
+// fingerprint are ignored. Safe to call on a nil receiver.
 func (idx *shortFingerprintSet) Add(key, fingerprint, source string) {
 	if idx == nil || fingerprint == "" {
 		return
@@ -97,10 +94,7 @@ func (idx *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource s
 		return "", shortFingerprintEntry{}, false
 	}
 	for k, e := range idx.entries {
-		if len(e.Fingerprint) >= len(targetFingerprint) {
-			continue // stored is not shorter
-		}
-		if !strings.HasPrefix(targetFingerprint, e.Fingerprint) {
+		if !isStrictPrefix(targetFingerprint, e.Fingerprint) {
 			continue
 		}
 
