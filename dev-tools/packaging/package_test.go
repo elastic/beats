@@ -42,7 +42,6 @@ import (
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
 	"github.com/moby/moby/api/types/container"
-	"github.com/moby/moby/api/types/strslice"
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/require"
 
@@ -615,7 +614,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath, imageRef strin
 			}
 		}
 
-		var caps strslice.StrSlice
+		var caps []string
 		if strings.Contains(imageID, "packetbeat") {
 			caps = append(caps, "NET_ADMIN")
 		}
