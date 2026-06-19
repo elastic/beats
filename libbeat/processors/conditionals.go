@@ -136,6 +136,9 @@ func (r *WhenProcessor) RunPdata(body pcommon.Map) (bool, error) {
 	}
 	// Write Meta back under "@metadata" so it survives the round-trip.
 	if len(out.Meta) > 0 {
+		if out.Fields == nil {
+			out.Fields = mapstr.M{}
+		}
 		out.Fields["@metadata"] = out.Meta
 	}
 	body.Clear()
