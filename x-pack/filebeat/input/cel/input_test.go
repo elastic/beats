@@ -1878,7 +1878,14 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		handler: oauth2Handler,
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
 		want: []map[string]interface{}{
 			{"hello": "world"},
 		},
