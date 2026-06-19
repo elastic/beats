@@ -969,62 +969,12 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		return authClient, trace, nil
 	}
 
-<<<<<<< HEAD
 	c.Transport = userAgentDecorator{
 		UserAgent: userAgent,
 		Transport: c.Transport,
 	}
 
 	return c, trace, nil
-=======
-	return c, trace, otelMetrics, contextInjector, nil
-}
-
-func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper, otelhttpOptions []otelhttp.Option) (*otelCELMetrics, *otelhttp.Transport, error) {
-	resource := resource.NewWithAttributes(
-		semconv.SchemaURL, getResourceAttributes(env, cfg)...,
-	)
-
-	log.Infof("created cel input resource %s", resource.String())
-	exporter, exporterType, err := otel.GetGlobalMetricsExporterFactory().GetExporter(ctx, true)
-	if err != nil {
-		log.Errorw("failed to get exporter", "error", err)
-	}
-	log.Infof("created OTEL cel input exporter %s for input %s", exporterType, env.IDWithoutName)
-
-	return newOTELCELMetrics(log, *resource, tripper, exporter, otelhttpOptions)
-}
-
-func getResourceAttributes(env v2.Context, cfg config) []attribute.KeyValue {
-	attrs := []attribute.KeyValue{
-		semconv.ServiceInstanceID(env.IDWithoutName),
-		attribute.String("package.name", cfg.GetPackageData("name")),
-		attribute.String("package.version", cfg.GetPackageData("version")),
-		attribute.String("package.data_stream", cfg.DataStream),
-		attribute.String("agent.version", env.Agent.Version),
-		attribute.String("agent.id", env.Agent.ID.String()),
-	}
-
-	attributes := os.Getenv("OTEL_RESOURCE_ATTRIBUTES")
-	if attributes == "" {
-		return attrs
-	}
-
-	seen := make(map[attribute.Key]bool)
-	for _, attr := range attrs {
-		seen[attr.Key] = true
-	}
-
-	pairs := strings.Split(attributes, ",")
-	for _, pair := range pairs {
-		key, val, ok := strings.Cut(pair, "=")
-		if !ok || key == "" || seen[attribute.Key(key)] {
-			continue
-		}
-		attrs = append(attrs, attribute.String(key, val))
-	}
-	return attrs
->>>>>>> e65f3d9b8 (x-pack/filebeat/input/cel: fix user-agent handling for OAuth2.0 authentication path (#51228))
 }
 
 func wantClient(cfg config) bool {
