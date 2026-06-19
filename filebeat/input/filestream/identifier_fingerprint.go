@@ -71,7 +71,7 @@ func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              fingerprintName + identitySep + boundFingerprintKey(e.Descriptor),
+		fileID:              formatIdentity(fingerprintName, boundFingerprintKey(e.Descriptor)),
 		identifierGenerator: fingerprintName,
 	}
 }
