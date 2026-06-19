@@ -51,7 +51,8 @@ const (
 	apiUserType   = "#microsoft.graph.user"
 	apiDeviceType = "#microsoft.graph.device"
 
-	mfaDetailsPath = "/reports/authenticationMethods/userRegistrationDetails"
+	mfaDetailsPath     = "/reports/authenticationMethods/userRegistrationDetails"
+	signInActivityPath = "/users"
 )
 
 // apiUserResponse matches the format of a user response from the Graph API.
@@ -79,6 +80,28 @@ type apiDeviceResponse struct {
 type apiMFAResponse struct {
 	NextLink string       `json:"@odata.nextLink"`
 	Details  []mfaDetails `json:"value"`
+}
+
+// apiSignInActivityResponse matches the format of a sign-in activity response from the Graph API.
+type apiSignInActivityResponse struct {
+	NextLink string             `json:"@odata.nextLink"`
+	Users    []signInActivityAPI `json:"value"`
+}
+
+// signInActivityAPI matches the format of a single user entry in a sign-in activity response.
+type signInActivityAPI struct {
+	ID             string                 `json:"id"`
+	SignInActivity *signInActivityDetails `json:"signInActivity"`
+}
+
+// signInActivityDetails matches the format of the signInActivity object from the API.
+type signInActivityDetails struct {
+	LastSignInDateTime                string `json:"lastSignInDateTime"`
+	LastSignInRequestId               string `json:"lastSignInRequestId"`
+	LastNonInteractiveSignInDateTime  string `json:"lastNonInteractiveSignInDateTime"`
+	LastNonInteractiveSignInRequestId string `json:"lastNonInteractiveSignInRequestId"`
+	LastSuccessfulSignInDateTime      string `json:"lastSuccessfulSignInDateTime"`
+	LastSuccessfulSignInRequestId     string `json:"lastSuccessfulSignInRequestId"`
 }
 
 // mfaDetails matches the format of a single userRegistrationDetails entry from the API.
@@ -192,11 +215,12 @@ type graph struct {
 	logger *logp.Logger
 	auth   authenticator.Authenticator
 
-	usersURL           string
-	groupsURL          string
-	devicesURL         string
-	deviceOwnerUserURL string
-	mfaDetailsURL      string
+	usersURL            string
+	groupsURL           string
+	devicesURL          string
+	deviceOwnerUserURL  string
+	mfaDetailsURL       string
+	signInActivityURL   string
 }
 
 // SetLogger sets the logger on this fetcher.
@@ -426,6 +450,58 @@ func (f *graph) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFAR
 	}
 }
 
+// UserSignInActivity retrieves sign-in activity for all users from Azure
+// Active Directory using Microsoft's Graph API. Returns a map from user UUID
+// to SignInActivityDetails, or an error if a failure occurred.
+func (f *graph) UserSignInActivity(ctx context.Context) (map[uuid.UUID]*fetcher.SignInActivityDetails, error) {
+	result := make(map[uuid.UUID]*fetcher.SignInActivityDetails)
+	fetchURL := f.signInActivityURL
+
+	for {
+		var response apiSignInActivityResponse
+
+		body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch sign-in activity: %w", err)
+		}
+
+		dec := json.NewDecoder(body)
+		if err = dec.Decode(&response); err != nil {
+			_ = body.Close()
+			return nil, fmt.Errorf("unable to decode sign-in activity response: %w", err)
+		}
+		_ = body.Close()
+
+		for _, u := range response.Users {
+			if u.SignInActivity == nil {
+				continue
+			}
+			id, err := uuid.FromString(u.ID)
+			if err != nil {
+				f.logger.Warnf("Skipping sign-in activity entry with invalid user ID %q: %v", u.ID, err)
+				continue
+			}
+			result[id] = &fetcher.SignInActivityDetails{
+				LastSignInDateTime:                u.SignInActivity.LastSignInDateTime,
+				LastSignInRequestId:               u.SignInActivity.LastSignInRequestId,
+				LastNonInteractiveSignInDateTime:  u.SignInActivity.LastNonInteractiveSignInDateTime,
+				LastNonInteractiveSignInRequestId: u.SignInActivity.LastNonInteractiveSignInRequestId,
+				LastSuccessfulSignInDateTime:      u.SignInActivity.LastSuccessfulSignInDateTime,
+				LastSuccessfulSignInRequestId:     u.SignInActivity.LastSuccessfulSignInRequestId,
+			}
+			f.logger.Debugf("Got sign-in activity for user %q from API", id)
+		}
+
+		if response.NextLink == "" {
+			return result, nil
+		}
+		if response.NextLink == fetchURL {
+			return result, nextLinkLoopError{"sign_in_activity"}
+		}
+		fetchURL = response.NextLink
+	}
+}
+
 // doRequest is a convenience function for making HTTP requests to the Graph API.
 // It will automatically handle requesting a token using the authenticator attached
 // to this fetcher.
@@ -536,6 +612,13 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 		return nil, fmt.Errorf("invalid MFA details URL endpoint: %w", err)
 	}
 	f.mfaDetailsURL = mfaDetailsURL.String()
+
+	signInActivityURL, err := url.Parse(f.conf.APIEndpoint + signInActivityPath)
+	if err != nil {
+		return nil, fmt.Errorf("invalid sign-in activity URL endpoint: %w", err)
+	}
+	signInActivityURL.RawQuery = "$select=id,signInActivity"
+	f.signInActivityURL = signInActivityURL.String()
 
 	return &f, nil
 }
