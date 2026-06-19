@@ -74,6 +74,7 @@ func (c *RRuleScheduleConfig) ParseStartDate() (*time.Time, error) {
 	if err != nil {
 		return nil, err
 	}
+	t = t.UTC()
 	return &t, nil
 }
 
@@ -86,6 +87,7 @@ func (c *RRuleScheduleConfig) ParseEndDate() (*time.Time, error) {
 	if err != nil {
 		return nil, err
 	}
+	t = t.UTC()
 	return &t, nil
 }
 

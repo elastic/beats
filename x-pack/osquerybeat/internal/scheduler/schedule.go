@@ -117,21 +117,25 @@ func (s *RecurrenceSchedule) minimumInterval() (time.Duration, bool) {
 	return minInterval, true
 }
 
-// Next returns the next execution time after the given time, considering the schedule window
-// Returns zero time if no next execution exists within the window
+// Next returns the next scheduled occurrence at or after t, respecting start_date and end_date.
+// Returns zero time if no next execution exists within the window.
 func (s *RecurrenceSchedule) Next(t time.Time) time.Time {
 	if s.rule == nil {
 		return time.Time{}
 	}
 
-	// If before start date, use start date as reference
-	if s.StartDate != nil && t.Before(*s.StartDate) {
-		t = s.StartDate.Add(-time.Second) // Subtract a second so After() can return start time if it matches
+	first := s.rule.GetDTStart()
+
+	// First occurrence: while t has not passed start_date, the next run is start_date itself.
+	// We return it directly instead of calling rrule.After, which only returns times strictly after t.
+	if !t.After(first) {
+		if s.EndDate != nil && first.After(*s.EndDate) {
+			return time.Time{}
+		}
+		return first
 	}
 
 	next := s.rule.After(t, false)
-
-	// If after end date, return zero time
 	if s.EndDate != nil && !next.IsZero() && next.After(*s.EndDate) {
 		return time.Time{}
 	}
@@ -249,6 +253,7 @@ func (s *RecurrenceSchedule) Unpack(cfg map[string]interface{}) error {
 		if err != nil {
 			return fmt.Errorf("invalid start_date: %w", err)
 		}
+		t = t.UTC()
 		s.StartDate = &t
 	}
 	if s.StartDate == nil {
@@ -260,6 +265,7 @@ func (s *RecurrenceSchedule) Unpack(cfg map[string]interface{}) error {
 		if err != nil {
 			return fmt.Errorf("invalid end_date: %w", err)
 		}
+		t = t.UTC()
 		s.EndDate = &t
 	}
 

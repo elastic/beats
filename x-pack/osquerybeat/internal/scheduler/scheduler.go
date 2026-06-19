@@ -262,29 +262,7 @@ func (s *Scheduler) runJob(ctx context.Context, job *scheduledJob) {
 	}
 
 	for {
-		now := time.Now()
-
-		// Check if we're within the schedule window
-		if !schedule.IsWithinWindow(now) {
-			// If we haven't reached the start date yet, wait until then
-			if schedule.StartDate != nil && now.Before(*schedule.StartDate) {
-				waitDuration := schedule.StartDate.Sub(now)
-				s.log.Debugf("Query '%s' waiting until start date: %v", sq.Name, schedule.StartDate)
-
-				select {
-				case <-ctx.Done():
-					return
-				case <-time.After(waitDuration):
-					continue
-				}
-			}
-			// If we're past the end date, stop
-			s.log.Infof("Query '%s' has passed its end date, stopping", sq.Name)
-			return
-		}
-
-		// Calculate next execution time
-		nextRun := schedule.Next(now)
+		nextRun := schedule.Next(time.Now())
 		if nextRun.IsZero() {
 			s.log.Infof("Query '%s' has no more scheduled runs, stopping", sq.Name)
 			return

@@ -182,6 +182,14 @@ func TestRRuleScheduleConfig_ParseDates(t *testing.T) {
 		assert.Equal(t, 1, parsed.Day())
 	})
 
+	t.Run("normalizes start date to utc", func(t *testing.T) {
+		c := &RRuleScheduleConfig{StartDate: "2024-01-01T02:30:00+02:00"}
+		parsed, err := c.ParseStartDate()
+		require.NoError(t, err)
+		require.NotNil(t, parsed)
+		assert.Equal(t, "2024-01-01T00:30:00Z", parsed.Format(time.RFC3339))
+	})
+
 	t.Run("parse empty start date", func(t *testing.T) {
 		c := &RRuleScheduleConfig{StartDate: ""}
 		_, err := c.ParseStartDate()
@@ -202,6 +210,14 @@ func TestRRuleScheduleConfig_ParseDates(t *testing.T) {
 		assert.Equal(t, 2024, parsed.Year())
 		assert.Equal(t, 12, int(parsed.Month()))
 		assert.Equal(t, 31, parsed.Day())
+	})
+
+	t.Run("normalizes end date to utc", func(t *testing.T) {
+		c := &RRuleScheduleConfig{EndDate: "2025-01-01T01:59:59+02:00"}
+		parsed, err := c.ParseEndDate()
+		require.NoError(t, err)
+		require.NotNil(t, parsed)
+		assert.Equal(t, "2024-12-31T23:59:59Z", parsed.Format(time.RFC3339))
 	})
 
 	t.Run("parse empty end date", func(t *testing.T) {

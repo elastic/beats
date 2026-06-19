@@ -127,8 +127,41 @@ func TestRecurrenceSchedule_NextWithStartDate(t *testing.T) {
 	ref := time.Date(2024, 1, 10, 0, 0, 0, 0, time.UTC)
 	next := s.Next(ref)
 
-	// Should be at or after start date
-	assert.True(t, next.Equal(startDate) || next.After(startDate))
+	assert.Equal(t, startDate, next)
+}
+
+func TestRecurrenceSchedule_NextAfterStartDate(t *testing.T) {
+	s := &RecurrenceSchedule{RRule: "FREQ=DAILY"}
+	startDate := time.Date(2024, 1, 15, 12, 0, 0, 0, time.UTC)
+	s.StartDate = &startDate
+	require.NoError(t, s.Parse())
+
+	// Once t has passed start_date, rrule.After(t, false) returns the following occurrence.
+	ref := startDate.Add(time.Minute)
+	next := s.Next(ref)
+	expected := time.Date(2024, 1, 16, 12, 0, 0, 0, time.UTC)
+	assert.Equal(t, expected, next)
+}
+
+func TestRecurrenceSchedule_NextAtStartDate(t *testing.T) {
+	s := &RecurrenceSchedule{RRule: "FREQ=DAILY"}
+	startDate := time.Date(2024, 1, 15, 12, 0, 0, 0, time.UTC)
+	s.StartDate = &startDate
+	require.NoError(t, s.Parse())
+
+	next := s.Next(startDate)
+	assert.Equal(t, startDate, next)
+}
+
+func TestRecurrenceSchedule_NextBeforeFutureStartDate(t *testing.T) {
+	s := &RecurrenceSchedule{RRule: "FREQ=DAILY"}
+	startDate := time.Date(2024, 1, 15, 12, 0, 0, 0, time.UTC)
+	s.StartDate = &startDate
+	require.NoError(t, s.Parse())
+
+	ref := startDate.Add(-10 * time.Minute)
+	next := s.Next(ref)
+	assert.Equal(t, startDate, next)
 }
 
 func TestRecurrenceSchedule_NextWithEndDate(t *testing.T) {
@@ -458,6 +491,23 @@ func TestRecurrenceSchedule_Unpack(t *testing.T) {
 	assert.NotNil(t, s.EndDate)
 	assert.Equal(t, 30*time.Minute, s.Splay)
 	assert.True(t, s.IsActive())
+}
+
+func TestRecurrenceSchedule_UnpackNormalizesDatesToUTC(t *testing.T) {
+	cfg := map[string]interface{}{
+		"rrule":      "FREQ=DAILY",
+		"start_date": "2024-01-15T11:00:00+02:00",
+		"end_date":   "2025-01-01T01:59:59+02:00",
+	}
+
+	s := &RecurrenceSchedule{}
+	err := s.Unpack(cfg)
+	require.NoError(t, err)
+	require.NotNil(t, s.StartDate)
+	require.NotNil(t, s.EndDate)
+
+	assert.Equal(t, "2024-01-15T09:00:00Z", s.StartDate.Format(time.RFC3339))
+	assert.Equal(t, "2024-12-31T23:59:59Z", s.EndDate.Format(time.RFC3339))
 }
 
 func TestRecurrenceSchedule_UnpackDefaults(t *testing.T) {
