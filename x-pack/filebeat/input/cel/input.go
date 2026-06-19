@@ -1004,6 +1004,11 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}).StandardClient()
 	}
 
+	c.Transport = userAgentDecorator{
+		UserAgent: userAgent,
+		Transport: c.Transport,
+	}
+
 	if cfg.Auth.OAuth2.isEnabled() {
 		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
@@ -1011,12 +1016,16 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 	}
 
+<<<<<<< HEAD
 	c.Transport = userAgentDecorator{
 		UserAgent: userAgent,
 		Transport: c.Transport,
 	}
 
 	return c, trace, otelMetrics, nil
+=======
+	return c, trace, otelMetrics, contextInjector, nil
+>>>>>>> e65f3d9b8 (x-pack/filebeat/input/cel: fix user-agent handling for OAuth2.0 authentication path (#51228))
 }
 
 func createOTELMetrics(ctx context.Context, cfg config, log *logp.Logger, env v2.Context, tripper http.RoundTripper) (*otelCELMetrics, *otelhttp.Transport, error) {
