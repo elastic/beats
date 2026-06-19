@@ -20,13 +20,30 @@ package input_logfile
 import (
 	"container/heap"
 	"context"
+	"errors"
+	"fmt"
 	"sync"
 	"time"
 
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+// permanentHarvesterError marks a harvester setup failure that should degrade
+// the input's status rather than being silently retried on the next scan.
+type permanentHarvesterError struct {
+	err error
+}
+
+func (e permanentHarvesterError) Error() string { return e.err.Error() }
+func (e permanentHarvesterError) Unwrap() error { return e.err }
+
+func isPermanentHarvesterError(err error) bool {
+	var permanentErr permanentHarvesterError
+	return errors.As(err, &permanentErr)
+}
 
 const (
 	minWakerBackoff = 1 * time.Second
@@ -68,6 +85,7 @@ type sourceState struct {
 	status    sourceStatus
 	holdsSlot bool // occupies one of the harvesterLimit open slots
 	setUp     bool // resources (lock/client/session) acquired
+	isGZIP    bool // source reads a GZIP file; for the GZIP lifecycle metrics
 	backoff   time.Duration
 	nextCheck time.Time
 	finished  bool
@@ -219,13 +237,25 @@ func (g *harvesterRunner) start() {
 func (g *harvesterRunner) SetObserver(c chan HarvesterStatus) { g.notifyChan = c }
 
 // run spawns a reader goroutine for ps unless one is already reading it (or it is
-// being torn down, or the group is shutting down).
+// being torn down, or the group is shutting down). While draining (read_until_eof
+// shutdown) a closed runner still spawns readers for parked sources.
 func (g *harvesterRunner) run(ps *sourceState) {
 	g.mu.Lock()
-	// While draining (a read_until_eof shutdown) we still spawn readers to drain
-	// parked sources, even though the runner is closed.
-	if (g.closed && !g.draining) || ps.finished || ps.status == statusRunning || ps.status == statusClosing {
+	switch {
+	// Shutting down without draining: finishRemaining sweeps remaining sources.
+	case g.closed && !g.draining:
 		g.mu.Unlock()
+		return
+	// A reader goroutine already owns ps and will tear it down.
+	case ps.status == statusRunning:
+		g.mu.Unlock()
+		return
+	// PollResume hand-off holder: Stop/stopAndWait may set statusClosing on a
+	// polling source without finishing (see Stop); tear down here. finish() is
+	// idempotent.
+	case ps.finished || ps.status == statusClosing:
+		g.mu.Unlock()
+		g.finish(ps)
 		return
 	}
 	g.setStatus(ps, statusRunning)
@@ -254,7 +284,14 @@ func (g *harvesterRunner) readOnce(ps *sourceState) {
 	if needSetup {
 		ps.ctx.Logger.Debug("Starting harvester for file")
 		if err := g.setup(ps); err != nil {
-			ps.ctx.Logger.Errorf("could not set up harvester for %s: %v", ps.srcID, err)
+			ps.ctx.Logger.Errorf("could not set up harvester: %v", err)
+			// Report permanent setup failures as a degraded state for the input.
+			if isPermanentHarvesterError(err) {
+				ps.ctx.UpdateStatus(
+					status.Degraded,
+					fmt.Sprintf("Harvester for Filestream input %q failed: %s", g.inputID, err),
+				)
+			}
 			g.finish(ps)
 			return
 		}
@@ -282,7 +319,7 @@ func (g *harvesterRunner) readOnce(ps *sourceState) {
 	if err != nil || verdict == SliceDone {
 		g.mu.Unlock()
 		if err != nil {
-			ps.ctx.Logger.Debugf("Harvester for %s stopped: %v", ps.srcID, err)
+			ps.ctx.Logger.Debugf("Harvester stopped: %v", err)
 		}
 		g.finish(ps)
 		return
@@ -321,7 +358,11 @@ func (g *harvesterRunner) setup(ps *sourceState) error {
 	})
 	if err != nil {
 		releaseResource(resource)
-		return err
+		// A pipeline connection failure is not transient; surface it as a
+		// degraded input status rather than silently retrying each scan.
+		return permanentHarvesterError{
+			err: fmt.Errorf("error while connecting to output with pipeline: %w", err),
+		}
 	}
 
 	g.store.UpdateTTL(resource, g.cleanTimeout)
@@ -341,12 +382,20 @@ func (g *harvesterRunner) setup(ps *sourceState) error {
 		return err
 	}
 	ps.session = session
+	ps.isGZIP = session.IsGZIP()
 
 	g.metrics.FilesActive.Inc()
 	g.metrics.HarvesterRunning.Inc()
 	g.metrics.FilesOpened.Inc()
 	g.metrics.HarvesterOpenFiles.Inc()
 	g.metrics.HarvesterStarted.Inc()
+	if ps.isGZIP {
+		g.metrics.FilesGZIPActive.Inc()
+		g.metrics.HarvesterGZIPRunning.Inc()
+		g.metrics.FilesGZIPOpened.Inc()
+		g.metrics.HarvesterOpenGZIPFiles.Inc()
+		g.metrics.HarvesterGZIPStarted.Inc()
+	}
 
 	return nil
 }
@@ -624,9 +673,9 @@ func (g *harvesterRunner) Stop(src Source) {
 	}
 	// If the source was parked, queued or still new, no goroutine holds it: a
 	// parked source is skipped by the waker, a queued source has no reader at
-	// all, and a new source's run() will hit the statusClosing guard and return
-	// without spawning a reader. Tear it down here. For running/polling, the
-	// reader or waker that holds it finishes it after the cancel.
+	// all, and a new source's run() will finish it without spawning a reader.
+	// For running/polling, the reader or waker that holds it finishes it after
+	// the cancel.
 	if prev == statusParked || prev == statusNew || prev == statusWaiting {
 		g.finish(ps)
 	}
@@ -706,6 +755,13 @@ func (g *harvesterRunner) finish(ps *sourceState) {
 		g.metrics.FilesClosed.Inc()
 		g.metrics.HarvesterOpenFiles.Dec()
 		g.metrics.HarvesterClosed.Inc()
+		if ps.isGZIP {
+			g.metrics.FilesGZIPActive.Dec()
+			g.metrics.HarvesterGZIPRunning.Dec()
+			g.metrics.FilesGZIPClosed.Inc()
+			g.metrics.HarvesterOpenGZIPFiles.Dec()
+			g.metrics.HarvesterGZIPClosed.Inc()
+		}
 		if log != nil {
 			log.Debug("Stopped harvester for file")
 		}
@@ -915,9 +971,5 @@ func growBackoff(cur time.Duration) time.Duration {
 	if cur <= 0 {
 		return minWakerBackoff
 	}
-	next := cur * 2
-	if next > maxWakerBackoff {
-		next = maxWakerBackoff
-	}
-	return next
+	return min(cur*2, maxWakerBackoff)
 }

@@ -34,6 +34,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -130,6 +131,24 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		require.Equal(t, int64(6), s.state.Offset, "offset should advance to EOF")
 	})
 
+	t.Run("a GZIP source updates the GZIP-specific metrics", func(t *testing.T) {
+		s := newReadSession(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}}, "a\nb\nc\n", 0)
+		// Mark the source as GZIP. buildPipeline branches on the file's detected
+		// compression, not on this flag, so a plain-text body still reads while
+		// the GZIP metric counters are exercised.
+		s.src.desc.GZIP = true
+		pub := &countingPublisher{}
+
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceDone, verdict)
+		require.Len(t, pub.events, 3)
+
+		require.Equal(t, uint64(3), s.metrics.MessagesGZIPRead.Get(), "gzip_messages_read_total")
+		require.Equal(t, uint64(3), s.metrics.EventsGZIPProcessed.Get(), "gzip_events_processed_total")
+		require.Greater(t, s.metrics.BytesGZIPProcessed.Get(), uint64(0), "gzip_bytes_processed_total")
+	})
+
 	t.Run("a trailing partial line is read but yields and then parks", func(t *testing.T) {
 		content := "a\nb\npartial"
 		closer := closerConfig{OnStateChange: stateChangeCloserConfig{Inactive: time.Minute}}
@@ -144,6 +163,23 @@ func TestHarvestSession_ReadSlice(t *testing.T) {
 		require.Equal(t, int64(len(content)), s.readOffset, "readOffset reaches EOF including the partial line")
 
 		require.Equal(t, loginp.PollPark, s.Poll(), "an unchanged file must park, not resume")
+	})
+
+	t.Run("reading filtered-out lines still counts as activity for close_inactive", func(t *testing.T) {
+		s := newReadSession(t, closerConfig{Reader: readerCloserConfig{OnEOF: true}}, "drop1\ndrop2\n", 0)
+		// Exclude every line, so nothing is published.
+		s.inp.hasLineFilter = true
+		s.inp.readerConfig.ExcludeLines = []match.Matcher{match.MustCompile("drop")}
+		// Make lastData stale; reading the (dropped) lines must refresh it.
+		s.lastData = time.Now().Add(-time.Hour)
+
+		pub := &countingPublisher{}
+		verdict, err := s.ReadSlice(backgroundCtx(), pub)
+		require.NoError(t, err)
+		require.Equal(t, loginp.SliceDone, verdict)
+		require.Empty(t, pub.events, "all lines are excluded, nothing is published")
+		require.WithinDuration(t, time.Now(), s.lastData, time.Minute,
+			"reading filtered-out lines must refresh close_inactive activity")
 	})
 
 	t.Run("a done session reads nothing", func(t *testing.T) {

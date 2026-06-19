@@ -31,6 +31,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -324,6 +325,67 @@ func TestHarvesterRunner_ConnectErrorTearsDown(t *testing.T) {
 	require.NoError(t, g.StopHarvesters())
 }
 
+// TestHarvesterRunner_ConnectErrorDegradesStatus asserts that a pipeline connect
+// failure during setup is a permanent harvester error and degrades the input's
+// status (rather than being silently retried).
+func TestHarvesterRunner_ConnectErrorDegradesStatus(t *testing.T) {
+	h := &fakeHarvester{readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+	g.pipeline = &MockPipeline{connectErr: errPipelineConnect}
+
+	g.start()
+	rec := &recordingStatusReporter{}
+	src := &testSource{name: "/path/to/test"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t).WithStatusReporter(rec), src)
+
+	requireEventually(t, func() bool { return !g.hasID(id) },
+		"source should be removed when the pipeline connect fails")
+	requireEventually(t, func() bool { return rec.last() == status.Degraded },
+		"a permanent setup failure must degrade the input status")
+	require.Contains(t, rec.lastMsg(), "test-input",
+		"the degraded message should identify the input")
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_GZIPLifecycleMetrics asserts the GZIP-specific lifecycle
+// gauges/counters are incremented when a GZIP source opens and balanced when it
+// is torn down.
+func TestHarvesterRunner_GZIPLifecycleMetrics(t *testing.T) {
+	h := &fakeHarvester{gzip: true, readFn: blockUntilCancelled}
+	g := testHarvesterRunner(t, h, 0)
+	m := g.metrics
+
+	g.start()
+	src := &testSource{name: "/path/to/test.gz"}
+	id := g.identifier.ID(src)
+	g.Start(startContext(t), src)
+
+	// setup() runs in the reader goroutine, so wait until it has incremented the
+	// GZIP open metrics before asserting the rest.
+	requireEventually(t, func() bool { return m.HarvesterGZIPStarted.Get() == 1 },
+		"GZIP source should be opened")
+
+	require.Equal(t, uint64(1), m.FilesGZIPActive.Get(), "gzip_files_active")
+	require.Equal(t, int64(1), m.HarvesterGZIPRunning.Get(), "harvester gzip_running")
+	require.Equal(t, uint64(1), m.FilesGZIPOpened.Get(), "gzip_files_opened_total")
+	require.Equal(t, int64(1), m.HarvesterOpenGZIPFiles.Get(), "harvester gzip_open_files")
+	require.Equal(t, int64(1), m.HarvesterGZIPStarted.Get(), "harvester gzip_started")
+
+	g.Stop(src)
+	requireEventually(t, func() bool { return !g.hasID(id) },
+		"GZIP source should be torn down after Stop")
+
+	require.Equal(t, uint64(0), m.FilesGZIPActive.Get(), "gzip_files_active must return to zero")
+	require.Equal(t, int64(0), m.HarvesterGZIPRunning.Get(), "harvester gzip_running must return to zero")
+	require.Equal(t, int64(0), m.HarvesterOpenGZIPFiles.Get(), "harvester gzip_open_files must return to zero")
+	require.Equal(t, uint64(1), m.FilesGZIPClosed.Get(), "gzip_files_closed_total")
+	require.Equal(t, int64(1), m.HarvesterGZIPClosed.Get(), "harvester gzip_closed")
+
+	require.NoError(t, g.StopHarvesters())
+}
+
 // TestHarvesterRunner_ParkAndResume drives the park/resume lifecycle directly
 // (without the time-based waker): a read that yields parks the source, a poll
 // that reports new data resumes it, and the resumed read reaching EOF tears it
@@ -376,16 +438,7 @@ func TestHarvesterRunner_ParkThenClose(t *testing.T) {
 	}
 	g := testHarvesterRunner(t, h, 0)
 	src := &testSource{name: "/path/to/test"}
-	id := g.identifier.ID(src)
-	g.Start(startContext(t), src)
-
-	requireEventually(t, func() bool {
-		s, ok := g.statusOf(id)
-		return ok && s == statusParked
-	}, "source should park")
-
-	ps := g.popDueNow()
-	require.NotNil(t, ps)
+	id, ps := startParkedAndClaimDue(t, g, src)
 	g.pollParked(ps)
 
 	requireEventually(t, func() bool { return !g.hasID(id) },
@@ -546,25 +599,35 @@ func TestHarvesterRunner_StopWhileQueuedOnLimit(t *testing.T) {
 func TestHarvesterRunner_RunSkipsAlreadyActive(t *testing.T) {
 	g := testHarvesterRunner(t, &fakeHarvester{}, 0)
 
-	for _, st := range []sourceStatus{statusRunning, statusClosing} {
-		ps := &sourceState{srcID: "x", status: st, done: make(chan struct{})}
-		g.mu.Lock()
-		g.states["x"] = ps
-		g.mu.Unlock()
+	// A reader goroutine already owns a running source: run must be a no-op (no
+	// new goroutine, status unchanged) and leave teardown to that reader.
+	ps := &sourceState{srcID: "x", status: statusRunning, done: make(chan struct{})}
+	g.mu.Lock()
+	g.states["x"] = ps
+	g.mu.Unlock()
 
-		g.run(ps) // must be a no-op: no new goroutine, status unchanged
-
-		got, _ := g.statusOf("x")
-		require.Equal(t, st, got, "run must not change the status of an already-active source")
-
-		g.mu.Lock()
-		delete(g.states, "x")
-		g.mu.Unlock()
-	}
-	// A finished source is also skipped.
-	ps := &sourceState{srcID: "y", finished: true, done: make(chan struct{})}
 	g.run(ps)
+
+	got, _ := g.statusOf("x")
+	require.Equal(t, statusRunning, got, "run must not disturb a source a reader already owns")
+
+	g.mu.Lock()
+	delete(g.states, "x")
+	g.mu.Unlock()
+
+	// A finished source is skipped: finish() is idempotent, so run must not panic
+	// or re-tear-down.
+	fin := &sourceState{srcID: "y", finished: true, done: make(chan struct{})}
+	g.run(fin)
 	require.False(t, g.hasID("y"))
+
+	// A closing source with no holder must be torn down by run().
+	closing := &sourceState{srcID: "z", status: statusClosing, done: make(chan struct{})}
+	g.mu.Lock()
+	g.states["z"] = closing
+	g.mu.Unlock()
+	g.run(closing)
+	require.False(t, g.hasID("z"), "run must finish a closing source with no holder")
 }
 
 // TestHarvesterRunner_StopFinishesNewSource asserts that stopping a source that
@@ -631,6 +694,60 @@ func TestHarvesterRunner_StopAndWaitFinishesNewSource(t *testing.T) {
 		t.Fatal("stopAndWait must not block on a statusNew source")
 	}
 	require.False(t, g.hasID(id), "stopAndWait must remove the new source")
+}
+
+// TestHarvesterRunner_RunFinishesSourceClosedDuringPollHandoff asserts run()
+// tears down a polling source when Stop races the PollResume hand-off (leak fix).
+func TestHarvesterRunner_RunFinishesSourceClosedDuringPollHandoff(t *testing.T) {
+	h := parkYieldResumeHarvester()
+	g := testHarvesterRunner(t, h, 0)
+	src := &testSource{name: "/path/to/test"}
+	id, ps := startParkedAndClaimDue(t, g, src)
+
+	g.Stop(src)
+	require.True(t, g.hasID(id), "Stop must hand a polling source to its holder, not finish it")
+	s, _ := g.statusOf(id)
+	require.Equal(t, statusClosing, s)
+
+	g.run(ps)
+	requireEventually(t, func() bool { return !g.hasID(id) },
+		"run() must finish a source closed during the poll hand-off")
+	require.True(t, h.lastSession().isClosed(), "session must be closed on teardown")
+	active, parked := g.counts()
+	require.Equal(t, 0, active, "active gauge must return to zero")
+	require.Equal(t, 0, parked, "parked gauge must return to zero")
+
+	require.NoError(t, g.StopHarvesters())
+}
+
+// TestHarvesterRunner_StopAndWaitUnblockedByPollHandoff asserts run() unblocks
+// stopAndWait when Stop races the PollResume hand-off (deadlock fix).
+func TestHarvesterRunner_StopAndWaitUnblockedByPollHandoff(t *testing.T) {
+	g := testHarvesterRunner(t, parkYieldResumeHarvester(), 0)
+	src := &testSource{name: "/path/to/test"}
+	id, ps := startParkedAndClaimDue(t, g, src)
+
+	done := make(chan struct{})
+	go func() {
+		g.stopAndWait(ps) // sets statusClosing, then blocks on <-ps.done
+		close(done)
+	}()
+
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id)
+		return ok && s == statusClosing
+	}, "stopAndWait should mark the source closing and wait for its holder")
+
+	g.run(ps)
+
+	select {
+	case <-done:
+	case <-time.After(eventuallyTimeout):
+		t.Fatal("stopAndWait deadlocked: run() did not finish the polling source")
+	}
+	require.False(t, g.hasID(id))
+
+	require.NoError(t, g.StopHarvesters())
 }
 
 // TestHarvesterRunner_ReadUntilEOFDrainsParkedOnStop asserts that, with
@@ -769,6 +886,29 @@ func startContext(t *testing.T) v2.Context {
 	return v2.Context{Logger: logptest.NewTestingLogger(t, ""), Cancelation: context.Background()}
 }
 
+// parkYieldResumeHarvester parks on yield and reports new data on poll.
+func parkYieldResumeHarvester() *fakeHarvester {
+	return &fakeHarvester{
+		readFn: func(_ int, _ v2.Context) (SliceVerdict, error) { return SliceYield, nil },
+		pollFn: func(_ int) PollResult { return PollResume },
+	}
+}
+
+// startParkedAndClaimDue starts src, waits until parked, then pops it as
+// statusPolling (waker hand-off point before pollParked/run).
+func startParkedAndClaimDue(t *testing.T, g *harvesterRunner, src *testSource) (id string, ps *sourceState) {
+	t.Helper()
+	id = g.identifier.ID(src)
+	g.Start(startContext(t), src)
+	requireEventually(t, func() bool {
+		s, ok := g.statusOf(id)
+		return ok && s == statusParked
+	}, "source should park after a yielding read")
+	ps = g.popDueNow()
+	require.NotNil(t, ps, "the parked source should be due")
+	return id, ps
+}
+
 // blockUntilCancelled is a readFn that blocks until the source's context is
 // cancelled (by Stop/Restart/StopHarvesters), modelling a long-running read.
 func blockUntilCancelled(_ int, ctx v2.Context) (SliceVerdict, error) {
@@ -781,6 +921,7 @@ func blockUntilCancelled(_ int, ctx v2.Context) (SliceVerdict, error) {
 type fakeHarvester struct {
 	mu       sync.Mutex
 	openErr  error
+	gzip     bool // sessions report IsGZIP() == true
 	readFn   func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn   func(call int) PollResult
 	sessions []*fakeSession
@@ -797,7 +938,7 @@ func (h *fakeHarvester) OpenSession(
 	if h.openErr != nil {
 		return nil, h.openErr
 	}
-	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn}
+	s := &fakeSession{readFn: h.readFn, pollFn: h.pollFn, gzip: h.gzip}
 	h.sessions = append(h.sessions, s)
 	return s, nil
 }
@@ -829,6 +970,7 @@ type fakeSession struct {
 	polls  int
 	offset int64
 	closed bool
+	gzip   bool
 
 	readFn func(call int, ctx v2.Context) (SliceVerdict, error)
 	pollFn func(call int) PollResult
@@ -872,6 +1014,12 @@ func (s *fakeSession) Offset() int64 {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.offset
+}
+
+func (s *fakeSession) IsGZIP() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.gzip
 }
 
 func (s *fakeSession) Close() error {
@@ -1008,4 +1156,36 @@ func (mp *MockPipeline) Disconnect(_ context.Context) error {
 		return nil
 	}
 	return mp.c.Close()
+}
+
+// recordingStatusReporter is a status.StatusReporter that captures the last
+// reported status and message, so a test can assert the input was degraded.
+type recordingStatusReporter struct {
+	mu     sync.Mutex
+	status status.Status
+	msg    string
+	set    bool
+}
+
+func (r *recordingStatusReporter) UpdateStatus(s status.Status, msg string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.status = s
+	r.msg = msg
+	r.set = true
+}
+
+func (r *recordingStatusReporter) last() status.Status {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if !r.set {
+		return status.Unknown
+	}
+	return r.status
+}
+
+func (r *recordingStatusReporter) lastMsg() string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.msg
 }

@@ -63,7 +63,7 @@ type harvestSession struct {
 	closed        bool      // Close has been called
 	pendingDelete bool      // a worker must delete the file on the next slice
 	openedAt      time.Time // when the session was opened; for close.reader.after_interval
-	lastData      time.Time // last time a slice published an event; for close_inactive
+	lastData      time.Time // last time a slice read a message; for close_inactive
 }
 
 // OpenSession opens (or resumes) a reading session for the source. It opens the
@@ -185,6 +185,9 @@ func (s *harvestSession) ReadSlice(
 			default:
 				s.log.Errorf("Read line error: %v", err)
 				s.metrics.ProcessingErrors.Inc()
+				if isGZIP {
+					s.metrics.ProcessingGZIPErrors.Inc()
+				}
 				return loginp.SliceDone, nil
 			}
 		}
@@ -194,9 +197,23 @@ func (s *harvestSession) ReadSlice(
 		if flags, ferr := message.Fields.GetValue("log.flags"); ferr == nil {
 			if flagsList, ok := flags.([]string); ok && slices.Contains(flagsList, "truncated") {
 				s.metrics.MessagesTruncated.Add(1)
+				if isGZIP {
+					// Truncation shouldn't happen for GZIP files, but as
+					// we cannot guarantee it, we account for it anyway.
+					s.metrics.MessagesGZIPTruncated.Add(1)
+				}
 			}
 		}
 		s.metrics.MessagesRead.Inc()
+		if isGZIP {
+			s.metrics.MessagesGZIPRead.Inc()
+		}
+
+		// close_inactive measures time since the file last produced data to read,
+		// not since an event was last published: a file whose lines are all
+		// filtered out (include_lines/exclude_lines) is still active and must not
+		// be closed as inactive. Mark activity here, before the drop check.
+		s.lastData = time.Now()
 
 		if message.IsEmpty() || (s.inp.hasLineFilter && s.inp.isDroppedLine(s.log, message.Content)) {
 			continue
@@ -204,6 +221,10 @@ func (s *harvestSession) ReadSlice(
 
 		//nolint:gosec // message.Bytes is always positive
 		s.metrics.BytesProcessed.Add(uint64(message.Bytes))
+		if isGZIP {
+			//nolint:gosec // message.Bytes is always positive
+			s.metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
+		}
 
 		if s.inp.takeOver.Enabled {
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
@@ -217,12 +238,18 @@ func (s *harvestSession) ReadSlice(
 
 		if err := p.Publish(message.ToEvent(), s.state); err != nil {
 			s.metrics.ProcessingErrors.Inc()
+			if isGZIP {
+				s.metrics.ProcessingGZIPErrors.Inc()
+			}
 			return loginp.SliceDone, err
 		}
-		s.lastData = time.Now()
 
 		s.metrics.EventsProcessed.Inc()
 		s.metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
+		if isGZIP {
+			s.metrics.EventsGZIPProcessed.Inc()
+			s.metrics.ProcessingGZIPTime.Update(time.Since(message.Ts).Nanoseconds())
+		}
 	}
 
 	return loginp.SliceDone, ctx.Cancelation.Err()
@@ -261,6 +288,9 @@ func (s *harvestSession) Poll() loginp.PollResult {
 		return loginp.PollClose
 	}
 
+	// On Unix, a removed (unlinked) file can still be stat-able while its fd
+	// remains open, so the stat above won't fail; also check the fd-level
+	// removed state to catch that case.
 	if closer.Removed && file.IsRemoved(s.file.OSFile()) {
 		s.log.Debugf("close.on_state_change.removed and file %s has been removed", s.src.newPath)
 		return loginp.PollClose
@@ -288,6 +318,9 @@ func (s *harvestSession) Poll() loginp.PollResult {
 
 // Offset returns the current read offset.
 func (s *harvestSession) Offset() int64 { return s.state.Offset }
+
+// IsGZIP reports whether the session reads a GZIP-compressed source.
+func (s *harvestSession) IsGZIP() bool { return s.src.desc.GZIP }
 
 // Close releases the file handle held by the session.
 func (s *harvestSession) Close() error {

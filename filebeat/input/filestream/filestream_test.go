@@ -188,10 +188,9 @@ func readUntilError(reader *logFile) error {
 	return err
 }
 
-// TestLogFileNonBlocking covers the Phase 0 primitive of the harvester worker
-// pool refactor (see HARVESTOR_REFACTOR.md): in non-blocking mode a logFile
-// returns ErrWouldBlock at EOF instead of waiting on the read backoff, and it
-// resumes reading once new data is appended.
+// TestLogFileNonBlocking tests logFile is non-blocking: it returns ErrWouldBlock
+// at EOF instead of waiting on the read backoff, and it resumes reading once new
+// data is appended.
 func TestLogFileNonBlocking(t *testing.T) {
 	osFile := createTestPlainLogFile(t)
 	fs := filestream{

@@ -81,6 +81,9 @@ type HarvesterSession interface {
 	// Offset returns the current read offset; the runner uses it to detect
 	// whether a slice made progress.
 	Offset() int64
+	// IsGZIP reports whether the session reads a GZIP-compressed source, so the
+	// runner can maintain the GZIP-specific lifecycle metrics.
+	IsGZIP() bool
 	// Close releases the file handle and resources held by the session.
 	Close() error
 }
