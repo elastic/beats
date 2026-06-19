@@ -97,7 +97,7 @@ func TestGroupAndStoreMetrics(t *testing.T) {
 		store := make(map[ResDefGroupingCriteria]*MetricStore)
 		client.GroupAndStoreMetrics(metrics, referenceTime, store)
 
-		require.Equal(t, 2, len(store), "metrics with different aggregations must be in separate groups")
+		require.Len(t, store, 2, "metrics with different aggregations must be in separate groups")
 	})
 }
 
