@@ -1,0 +1,3 @@
+kind: enhancement
+summary: Add pdata-native processing path to the OTel beat processor. Processors add_fields, add_host_metadata, add_cloud_metadata, add_docker_metadata, add_kubernetes_metadata, and when conditionals all support the new path.
+component: elastic-agent

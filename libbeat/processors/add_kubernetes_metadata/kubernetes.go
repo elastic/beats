@@ -31,6 +31,8 @@ import (
 
 	k8sclient "k8s.io/client-go/kubernetes"
 
+	"go.opentelemetry.io/collector/pdata/pcommon"
+
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -38,6 +40,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/shared"
 )
@@ -396,34 +399,68 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	// One full clone for the kubernetes field; one cheap sub-map clone for the OCI
-	// container field. This replaces the original three full clones.
-	kubeMeta := metadata.Clone()
+	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
+	if ociContainer != nil {
+		event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
+	}
+	event.Fields.DeepUpdate(kubeMeta)
 
-	// Build the OCI container field by cloning only the container sub-map —
-	// much cheaper than cloning the full metadata. Transform it in place:
-	// drop container.name and rewrite container.image -> container.image.name.
+	return event, nil
+}
+
+// RunPdata enriches the given pcommon.Map directly with Kubernetes metadata,
+// avoiding the round-trip conversion to/from mapstr.M used by the standard Run path.
+// MetadataIndex requires a mapstr.M, so ToMapstr (body.AsRaw) is called once
+// for the index lookup; the write path operates directly on pcommon.Map.
+func (k *kubernetesAnnotator) RunPdata(body pcommon.Map) error {
+	if _, ok := body.Get("kubernetes"); ok {
+		return nil
+	}
+	if !k.kubernetesAvailable {
+		return nil
+	}
+
+	index := k.matchers.MetadataIndexPdata(body)
+	if index == "" {
+		k.log.Debug("No container match string, not adding kubernetes data")
+		return nil
+	}
+
+	metadata := k.cache.get(index)
+	if metadata == nil {
+		return nil
+	}
+
+	kubeMeta, ociContainer := prepareKubeMetadata(metadata)
+	if ociContainer != nil {
+		if err := otelmap.MergeMapstrIntoPdata(mapstr.M{"container": ociContainer}, body, true); err != nil {
+			return err
+		}
+	}
+	return otelmap.MergeMapstrIntoPdata(kubeMeta, body, true)
+}
+
+// prepareKubeMetadata clones the cached metadata, builds the OCI container
+// sub-map from kubernetes.container (dropping name, rewriting image), and
+// strips the kubernetes-only container fields. container.name is kept in
+// kubeMeta to match original behaviour.
+// ociContainer is nil when the kubernetes.container sub-map is absent.
+func prepareKubeMetadata(metadata mapstr.M) (kubeMeta mapstr.M, ociContainer mapstr.M) {
+	kubeMeta = metadata.Clone()
 	if containerVal, err := kubeMeta.GetValue("kubernetes.container"); err == nil {
 		if cm, ok := containerVal.(mapstr.M); ok {
-			ociContainer := cm.Clone()
+			ociContainer = cm.Clone()
 			_ = ociContainer.Delete("name")
 			if img, imgErr := ociContainer.GetValue("image"); imgErr == nil {
 				_ = ociContainer.Delete("image")
 				ociContainer["image"] = mapstr.M{"name": img}
 			}
-			event.Fields.DeepUpdate(mapstr.M{"container": ociContainer})
 		}
 	}
-
-	// Remove container fields that belong only in the OCI section before writing
-	// kubernetes metadata to the event. container.name is intentionally kept here
-	// to match original behaviour.
 	_ = kubeMeta.Delete("kubernetes.container.id")
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
-	event.Fields.DeepUpdate(kubeMeta)
-
-	return event, nil
+	return
 }
 
 func (k *kubernetesAnnotator) Close() error {
