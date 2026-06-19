@@ -1536,8 +1536,13 @@ func TestFindGrowingFingerprintMatch(t *testing.T) {
 			}
 
 			p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
-			key, found := p.findGrowingFingerprintMatch(
-				store, tc.currentFingerprint, "", tc.currentPath)
+			event := loginp.FSEvent{
+				NewPath: tc.currentPath,
+				Descriptor: loginp.FileDescriptor{
+					Fingerprint: tc.currentFingerprint,
+				},
+			}
+			key, found := p.findGrowingFingerprintMatch(store, event)
 
 			assert.Equal(t, tc.expectedFound, found, "found mismatch")
 			if tc.expectedFound {

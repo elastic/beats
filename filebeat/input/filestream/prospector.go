@@ -512,17 +512,13 @@ func (p *fileProspector) onFSEvent(
 		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
 
 		// For growing fingerprint mode: if the fingerprint grew during the rename,
-		// migrate the registry key BEFORE onRename. We use event.OldPath for
-		// the prefix lookup because shortFingerprintEntries still has the old
-		// source path at this point.
+		// migrate the registry key BEFORE onRename. (findGrowingFingerprintMatch
+		// matches on event.OldPath for renames, since shortFingerprints still
+		// holds the old source path at this point.)
 		// Migration must happen first so onRename's UpdateMetadata finds the
 		// entry under the new key (which uses the new fingerprint from src).
 		if p.growingFingerprint {
-			oldKey, found := p.findGrowingFingerprintMatch(
-				updater,
-				event.Descriptor.Fingerprint,
-				event.Descriptor.GrowingFingerprint,
-				event.OldPath)
+			oldKey, found := p.findGrowingFingerprintMatch(updater, event)
 			if found {
 				newKey, err := p.migrateGrowingFingerprint(updater, oldKey, src, event)
 				if err != nil {
@@ -746,8 +742,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 	}
 
 	// Try to find a prefix match across both Fingerprint and GrowingFingerprint.
-	oldKey, found := p.findGrowingFingerprintMatch(
-		updater, event.Descriptor.Fingerprint, event.Descriptor.GrowingFingerprint, event.NewPath)
+	oldKey, found := p.findGrowingFingerprintMatch(updater, event)
 	if !found {
 		return src
 	}
@@ -833,80 +828,76 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 	})
 }
 
-// findGrowingFingerprintMatch looks for an existing registry entry whose
-// raw-hex fingerprint is a prefix of the current scan's raw-hex fingerprint.
-// Two prefix candidates are tried, in order:
+// ensureShortFingerprintSet lazily builds the growing-entry index from the
+// persisted registry on first use. Idempotent: a no-op once the set exists.
+
+// isLikelyRename reports whether a path-agnostic prefix match looks like a
+// rename rather than a collision between two distinct files: the stored
+// entry's source path no longer exists on disk, so the growing file most
+// likely moved to the path in the current event. If the old path still
+// exists it is probably a different file that merely shares a content prefix.
+func isLikelyRename(entry shortFingerprintEntry) bool {
+	_, err := os.Stat(entry.Source)
+	return err != nil
+}
+
+// findGrowingFingerprintMatch looks for an existing growing-phase registry
+// entry whose raw-hex fingerprint is a prefix of the event's fingerprint —
+// i.e. the same file seen earlier with fewer bytes — and returns its key so
+// the caller can migrate it to the current identity. Only still-growing
+// entries are searched, making this O(K) in the number of growing entries.
 //
-//  1. currentFingerprint — handles same-format growth (raw-hex extending
-//     while the file is still below threshold).
-//  2. currentGrowingFingerprint — handles the one-time threshold-crossing
-//     scan, where the primary Fingerprint has flipped to SHA-256 but the
-//     descriptor also carries the raw-hex GrowingFingerprint for matching.
+// Two prefix candidates from the descriptor are tried, in order (see
+// loginp.FileDescriptor for the field semantics):
 //
-// For each candidate the lookup is tried first with same-source-path
-// matching (high-confidence: stored entry's Source path == currentPath) and
-// then with path-agnostic matching (handles restart + rename, where the
-// stored entry's Source is the OLD path but the descriptor only has the
-// NEW path). The path-agnostic fallback returns the longest prefix match
-// across all growing entries, which makes accidental collisions extremely
-// unlikely for SHA-256-length raw-hex fingerprints (~2048 chars).
+//  1. Fingerprint — same-format growth (raw-hex extending below threshold).
+//  2. GrowingFingerprint — the one-time threshold-crossing scan, where the
+//     primary Fingerprint has flipped to SHA-256 but the descriptor still
+//     carries the raw-hex value for matching.
 //
-// Only entries in shortFingerprintSet (the still-growing entries, i.e. those
-// with a non-empty persisted Fingerprint) are searched, making this O(K) where
-// K is the number of still-growing entries.
+// Each candidate is first matched against the entry sharing the event's path
+// (high-confidence) and then, only for the threshold-crossing candidate,
+// path-agnostically to recover a restart+rename where the stored entry still
+// holds the OLD path. The path-agnostic fallback is gated by isLikelyRename so
+// two distinct files that merely share a content prefix are not confused.
 func (p *fileProspector) findGrowingFingerprintMatch(
 	updater loginp.StateMetadataUpdater,
-	currentFingerprint string,
-	currentGrowingFingerprint string,
-	currentPath string,
+	event loginp.FSEvent,
 ) (oldKey string, found bool) {
-	if currentFingerprint == "" && currentGrowingFingerprint == "" {
+	if event.Descriptor.Fingerprint == "" && event.Descriptor.GrowingFingerprint == "" {
 		return "", false
 	}
 
-	// Build short fingerprint set on first use
 	if p.shortFingerprints == nil {
 		p.buildShortFingerprintSet(updater)
 	}
 
-	tryMatch := func(target string, allowPathAgnostic bool) (string, bool) {
-		if target == "" {
-			return "", false
-		}
-		// High-confidence: same source path.
-		if key, _, ok := p.shortFingerprints.FindPrefixMatch(target, currentPath); ok {
-			return key, true
-		}
-		if !allowPathAgnostic {
-			return "", false
-		}
-		// Path-agnostic fallback: only enabled for the threshold-crossing
-		// case (caller passes the descriptor's GrowingFingerprint here).
-		// Restricted to this case because GrowingFingerprint is set only
-		// on the one-time scan a file's primary Fingerprint flips from
-		// raw-hex to SHA-256 — i.e. it carries strong evidence of an
-		// identity transition. Ordinary same-format growth (raw-hex
-		// extending below threshold) does NOT get the fallback, so two
-		// distinct files with a shared header content prefix are not
-		// confused for renames of one another.
-		//
-		// Additional guard: refuse if the stored entry's Source path still
-		// exists on disk — a likely collision (the old file is still
-		// there), not a rename.
-		if key, entry, ok := p.shortFingerprints.FindPrefixMatch(target, ""); ok {
-			if _, err := os.Stat(entry.Source); err != nil {
-				return key, true
-			}
-		}
-		return "", false
+	// shortFingerprints still holds the pre-rename source path, so on rename
+	// we match against OldPath; for in-place growth the entry already carries
+	// the current path.
+	matchPath := event.NewPath
+	if event.Op == loginp.OpRename {
+		matchPath = event.OldPath
 	}
 
-	// Ordinary same-format growth: no path-agnostic fallback.
-	if key, ok := tryMatch(currentFingerprint, false); ok {
+	// Ordinary same-format growth: require the matched entry to share the
+	// event's path, so two distinct files with a shared header prefix are not
+	// mistaken for renames of one another. (FindPrefixMatch is a no-op for an
+	// empty target, so non-growing events fall through.)
+	if key, _, ok := p.shortFingerprints.FindPrefixMatch(event.Descriptor.Fingerprint, matchPath); ok {
 		return key, true
 	}
-	// Threshold-crossing: path-agnostic fallback enabled.
-	if key, ok := tryMatch(currentGrowingFingerprint, true); ok {
+
+	// Threshold-crossing: GrowingFingerprint is strong evidence of an identity
+	// transition, so beyond the same-path match we also allow a path-agnostic
+	// fallback to recover a restart+rename where the stored entry still holds
+	// the OLD path. isLikelyRename guards against colliding with a file that is
+	// still present on disk.
+	growing := event.Descriptor.GrowingFingerprint
+	if key, _, ok := p.shortFingerprints.FindPrefixMatch(growing, matchPath); ok {
+		return key, true
+	}
+	if key, entry, ok := p.shortFingerprints.FindPrefixMatch(growing, ""); ok && isLikelyRename(entry) {
 		return key, true
 	}
 
