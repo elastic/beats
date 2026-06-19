@@ -177,15 +177,15 @@ func newOTelOutputController(
 	})
 
 	return &otelOutputController{
-		beatInfo:      beatInfo,
-		logger:        beatInfo.Logger.Named("otelOutputController"),
-		monitors:      monitors,
-		queue:         pipelineQueue,
-		pool:          pool,
-		consumer:      consumer,
-		workers:       workers,
-		workerChan:    workerChan,
-		producers:     make(map[*trackedProducer]struct{}),
+		beatInfo:   beatInfo,
+		logger:     beatInfo.Logger.Named("otelOutputController"),
+		monitors:   monitors,
+		queue:      pipelineQueue,
+		pool:       pool,
+		consumer:   consumer,
+		workers:    workers,
+		workerChan: workerChan,
+		producers:  make(map[*trackedProducer]struct{}),
 	}, nil
 }
 
