@@ -497,11 +497,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 				} else {
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
-<<<<<<< HEAD
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
-				time.Sleep(waitTime)
-=======
-				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
 				timer := time.NewTimer(waitTime)
 				select {
 				case <-ctx.Done():
@@ -509,7 +505,6 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 					return nil, nil, ctx.Err()
 				case <-timer.C:
 				}
->>>>>>> b5915bacc (x-pack/filebeat/input/streaming: fix websocket context cancellation handling with infinite retries (#51194))
 			}
 			if response == nil {
 				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
@@ -537,11 +532,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 				} else {
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
-<<<<<<< HEAD
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
-				time.Sleep(waitTime)
-=======
-				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
 				timer := time.NewTimer(waitTime)
 				select {
 				case <-ctx.Done():
@@ -549,7 +540,6 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 					return nil, nil, ctx.Err()
 				case <-timer.C:
 				}
->>>>>>> b5915bacc (x-pack/filebeat/input/streaming: fix websocket context cancellation handling with infinite retries (#51194))
 			}
 		}
 	}
