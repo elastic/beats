@@ -1735,56 +1735,41 @@ func (s *scriptedScanner) GetFiles() map[string]loginp.FileDescriptor {
 	return files
 }
 
-// TestFileWatcher_GrowingPrefixRename_PrefixSupersetMatchedAsRename documents
-// the growing-fingerprint matching policy: a file is identified by the content
-// of its first bytes, and while it is below the fingerprint threshold that
-// content is compared by PREFIX. A vanished file whose fingerprint is a strict
-// prefix of a newly-appearing file's is therefore treated as the SAME file that
-// rotated and grew, so the watcher emits a single OpRename (continuation), not
-// delete+create.
-//
-// This holds even for two files that merely share a header prefix: the matching
-// is purely content-based and deliberately does NOT consult the OS file
-// identity (inode/device), which is unreliable on the container/overlay
-// filesystems this feature targets. The earlier idea of an inode guard to split
-// such files apart was dropped in favor of this content-only policy.
-//
-// Emitting the rename is the watch loop's correct contribution. The separate,
-// downstream requirement — that the harvester then resumes the new file from
-// the migrated offset so its new bytes (the delta past the shared prefix) are
-// ingested rather than lost — is covered by the integration tests, not here.
-func TestFileWatcher_GrowingPrefixRename_PrefixSupersetMatchedAsRename(t *testing.T) {
+// newGrowingFile creates a file named name in dir (its content is irrelevant
+// because fingerprints are supplied explicitly) and returns its path together
+// with a growing FileDescriptor carrying the given fingerprint.
+func newGrowingFile(t *testing.T, dir, name, fingerprint string) (string, loginp.FileDescriptor) {
+	t.Helper()
+	path := filepath.Join(dir, name)
+	require.NoError(t, os.WriteFile(path, []byte(name), 0o644))
+	info, err := os.Stat(path)
+	require.NoError(t, err)
+	return path, loginp.FileDescriptor{
+		Filename:           path,
+		Fingerprint:        fingerprint,
+		FingerprintGrowing: true,
+		Info:               file.ExtendFileInfo(info),
+	}
+}
+
+// TestFileWatcher_GrowingPrefixMatchDifferentFiles verifies that when a growing
+// file vanishes and a different file appears whose fingerprint has the vanished
+// file's fingerprint as a strict prefix, the watcher reports a rename
+// (continuation) rather than a delete + create. Content-only identity treats
+// the new file as the original grown further, regardless of the distinct
+// underlying files on disk.
+func TestFileWatcher_GrowingPrefixMatchDifferentFiles(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
 	dir := t.TempDir()
 
-	aPath := filepath.Join(dir, "a.log")
-	cPath := filepath.Join(dir, "c.log")
-	require.NoError(t, os.WriteFile(aPath, []byte("a"), 0o644))
-	require.NoError(t, os.WriteFile(cPath, []byte("c"), 0o644))
-	aInfo, err := os.Stat(aPath)
-	require.NoError(t, err)
-	cInfo, err := os.Stat(cPath)
-	require.NoError(t, err)
-
-	// A is a still-growing file; C appears with A's fingerprint as a strict
-	// prefix (A's content + more), so content-based identity treats C as A grown
-	// — regardless of the (distinct) underlying files.
-	descA := loginp.FileDescriptor{
-		Filename:           aPath,
-		Fingerprint:        "41414141",
-		FingerprintGrowing: true,
-		Info:               file.ExtendFileInfo(aInfo),
-	}
-	descC := loginp.FileDescriptor{
-		Filename:           cPath,
-		Fingerprint:        "41414141ffff", // A's fingerprint is a strict prefix
-		FingerprintGrowing: true,
-		Info:               file.ExtendFileInfo(cInfo),
-	}
+	// originalFile is the growing file seen first; grownFile appears later with
+	// originalFile's fingerprint as a strict prefix (its content plus more).
+	originalPath, originalDesc := newGrowingFile(t, dir, "a.log", "41414141")
+	grownPath, grownDesc := newGrowingFile(t, dir, "c.log", "41414141ffff")
 
 	scanner := &scriptedScanner{scans: []map[string]loginp.FileDescriptor{
-		{aPath: descA}, // scan 1: only A
-		{cPath: descC}, // scan 2: A gone, C present with A's fingerprint as a prefix
+		{originalPath: originalDesc}, // scan 1: only the original file
+		{grownPath: grownDesc},       // scan 2: original gone, grown file present with its fingerprint as a prefix
 	}}
 
 	cfg := defaultFileWatcherConfig()
@@ -1798,26 +1783,24 @@ func TestFileWatcher_GrowingPrefixRename_PrefixSupersetMatchedAsRename(t *testin
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Scan 1: A appears -> OpCreate(A). Wait for the scan to fully complete
-	// (w.prev is updated at the end of watch) before driving scan 2.
-	watch1Done := make(chan struct{})
-	go func() { fw.watch(ctx); close(watch1Done) }()
-	e1 := fw.Event()
-	<-watch1Done
-	require.Equal(t, loginp.OpCreate, e1.Op, "scan 1 should create file A")
-	require.Equal(t, aPath, e1.NewPath)
+	// Scan 1: the original file appears.
+	scan1Done := make(chan struct{})
+	go func() { fw.watch(ctx); close(scan1Done) }()
+	createEvent := fw.Event()
+	<-scan1Done
+	require.Equal(t, loginp.OpCreate, createEvent.Op, "scan 1 should create the original file")
+	require.Equal(t, originalPath, createEvent.NewPath)
 
-	// Scan 2: A vanishes and C (prefix superset) appears -> treated as A rotated
-	// and grown: a single OpRename(A -> C).
-	watch2Done := make(chan struct{})
-	go func() { fw.watch(ctx); close(watch2Done) }()
-	e2 := fw.Event()
+	// Scan 2: the original file vanishes and the grown (prefix superset) file appears.
+	scan2Done := make(chan struct{})
+	go func() { fw.watch(ctx); close(scan2Done) }()
+	renameEvent := fw.Event()
 	cancel()
-	<-watch2Done
+	<-scan2Done
 
-	assert.Equal(t, loginp.OpRename, e2.Op,
+	assert.Equal(t, loginp.OpRename, renameEvent.Op,
 		"a vanished file whose fingerprint is a prefix of a newly-appearing file must be matched "+
 			"as a rename (continuation), using content-only identity")
-	assert.Equal(t, aPath, e2.OldPath, "rename should be from A")
-	assert.Equal(t, cPath, e2.NewPath, "rename should be to C")
+	assert.Equal(t, originalPath, renameEvent.OldPath, "rename should be from the original file")
+	assert.Equal(t, grownPath, renameEvent.NewPath, "rename should be to the grown file")
 }
