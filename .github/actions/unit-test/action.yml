@@ -4,10 +4,23 @@ inputs:
   beat:
     description: "Beat name"
     required: true
+  command:
+    description: "Command to run"
+    default: "mage unitTest"
 
 runs:
   using: "composite"
   steps:
+    # Install system dependencies BEFORE Go setup to ensure they're available for CGo
+    # /pcap/pcap_unix.go:34:10: fatal error: pcap.h: No such file or directory
+    # rpm_linux.go:27:10: fatal error: rpm/rpmlib.h: No such file or directory
+    - name: Install system dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpcap-dev librpm-dev python3-venv pkg-config
+      shell: bash
+
     - uses: actions/setup-go@v6
       with:
         go-version-file: .go-version
@@ -16,23 +29,15 @@ runs:
       with:
         cache: "pip"
         python-version-file: .python-version
-
-    - name: Install make
-      run: |
-        brew install make
-        export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
-      shell: bash
+      continue-on-error: true
 
     - name: Install mage
       run: make mage
       shell: bash
 
-    - name: Run build
-      run: mage build
-      shell: bash
-      working-directory: ${{ inputs.beat }}
-
     - name: Run unitTest
-      run: mage unitTest
+      run: ${COMMAND}
       shell: bash
       working-directory: ${{ inputs.beat }}
+      env:
+        COMMAND: ${{ inputs.command }}

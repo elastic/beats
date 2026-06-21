@@ -124,6 +124,15 @@ processors:
 		"agent.id",
 		"log.file.inode",
 		"log.file.device_id",
+		// Cloud metadata fields are dynamic based on where tests run
+		"cloud.account.id",
+		"cloud.availability_zone",
+		"cloud.instance.id",
+		"cloud.instance.name",
+		"cloud.machine.type",
+		"cloud.provider",
+		"cloud.region",
+		"cloud.service.name",
 	}
 
 	oteltest.AssertMapsEqual(t, fbBody, otelBody, ignoredFields, "expected documents to be equal")
