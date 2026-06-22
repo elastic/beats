@@ -12,7 +12,7 @@ applies_to:
 ::::{warning}
 The `log` input is deprecated in version 7.16 and disabled in version 9.0.
 
-Please use the the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input for sending log files to outputs. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
+Please use the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input for sending log files to outputs. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
 
 After deprecation it’s possible to use this input type (e.g. for migration to `filestream`) only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
 ::::
