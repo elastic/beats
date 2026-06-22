@@ -611,8 +611,8 @@
     - name: old_values
       type: flattened
       description: >
-        Includes the old values when updating a object like user, meeting, account or webinar
+        Includes the old values when updating an object like user, meeting, account or webinar
     - name: settings
       type: flattened
       description: >
-        The current active settings related to a object like user, meeting, account or webinar
+        The current active settings related to an object like user, meeting, account or webinar

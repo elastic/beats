@@ -23,7 +23,7 @@
         - name: type
           type: keyword
           example: application
-          description: Whether this is an application or network loadbalancer
+          description: Whether this is an application or network load balancer
         - name: protocol
           type: keyword
           example: HTTP
@@ -67,5 +67,4 @@
           type: number
           example: 8080
           description: Port number for this listener
-
 
