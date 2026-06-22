@@ -328,7 +328,7 @@ var findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams
 func (o *oAuth2Config) validateGoogleProvider() error {
 	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != nil ||
 		o.AzureTenantID != "" || o.AzureResource != "" || len(o.EndpointParams) != 0 {
-		return errors.New("none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead")
+		return errors.New("token_url and client credentials cannot be used with the Google provider; use google.credentials_file, google.jwt_file, google.credentials_json, or ADC instead")
 	}
 
 	// credentials_json
