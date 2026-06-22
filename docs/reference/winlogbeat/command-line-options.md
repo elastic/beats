@@ -54,7 +54,7 @@ $$$dashboard-subcommand$$$**`dashboard`**
 
     To load the dashboard, copy the generated `dashboard.json` file into the `kibana/6/dashboard` directory of Winlogbeat, and run `winlogbeat setup --dashboards` to import the dashboard.
 
-    If {{kib}} is not running on `localhost:5061`, you must also adjust the Winlogbeat configuration under `setup.kibana`.
+    If {{kib}} is not running on `localhost:5601`, you must also adjust the Winlogbeat configuration under `setup.kibana`.
 
 
 $$$template-subcommand$$$**`template`**
