@@ -304,6 +304,13 @@ type requestFactory struct {
 	chainResponseProcessor *responseProcessor
 	saveFirstResponse      bool
 	log                    *logp.Logger
+
+	// originURL and allowedOrigins constrain the URL that transforms
+	// can produce. When originURL is non-nil, newHTTPRequest validates
+	// the post-transform URL against originURL and allowedOrigins. Set
+	// only on pagination factories.
+	originURL      *url.URL
+	allowedOrigins []*url.URL
 }
 
 func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
@@ -441,6 +448,16 @@ func (rf *requestFactory) newHTTPRequest(ctx context.Context, trCtx *transformCo
 		return nil, err
 	}
 
+	if rf.originURL != nil {
+		target := trReq.url()
+		if !allowedOrigin(rf.originURL, rf.allowedOrigins, &target) {
+			return nil, fmt.Errorf(
+				"pagination URL origin %q does not match configured origin %q",
+				target.Hostname(), rf.originURL.Hostname(),
+			)
+		}
+	}
+
 	var body []byte
 	if rf.method == http.MethodPost {
 		if rf.encoder != nil {
@@ -502,6 +519,35 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	rf.log.Debugw("new request", "req", redact{value: mapstrM(req), fields: []string{"header.Authorization"}})
 
 	return req, nil
+}
+
+// allowedOrigin returns true if target shares the same origin as base,
+// or if it matches any of the additional allowed origins. An allowed
+// origin only matches when the target also does not downgrade from the
+// base scheme, so an HTTP entry in the allowlist cannot bypass HTTPS
+// enforcement on the configured request URL.
+func allowedOrigin(base *url.URL, allowed []*url.URL, target *url.URL) bool {
+	if sameOrigin(base, target) {
+		return true
+	}
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	for _, a := range allowed {
+		if sameOrigin(a, target) {
+			return true
+		}
+	}
+	return false
+}
+
+// sameOrigin returns true when target does not downgrade from HTTPS to
+// HTTP and shares the same hostname as base.
+func sameOrigin(base, target *url.URL) bool {
+	if base.Scheme == "https" && target.Scheme != "https" {
+		return false
+	}
+	return base.Hostname() == target.Hostname()
 }
 
 type requester struct {
