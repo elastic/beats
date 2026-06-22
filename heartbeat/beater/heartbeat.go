@@ -54,12 +54,12 @@ type Heartbeat struct {
 	config             *config.Config
 	scheduler          *scheduler.Scheduler
 	monitorReloader    *cfgfile.Reloader
-	monitorFactory     *monitors.RunnerFactory
+	monitorFactory     cfgfile.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
 
-	otelStatusFactoryWrapper cfgfile.FactoryWrapper
+	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
 // New creates a new heartbeat.
@@ -165,6 +165,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	logp.L().Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+
+	if bt.otelStatusFactoryWrapper != nil {
+		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
+	}
 
 	waitMonitors := monitors.NewSignalWait()
 
