@@ -23,6 +23,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelconsumer"
@@ -66,6 +67,37 @@ type otelOutputController struct {
 
 	workers    []outputWorker
 	workerChan chan publisher.Batch
+
+	// producers tracks every queue producer vended through queueProducer
+	// that has not yet been closed. Each pipeline's clients normally close
+	// their own producer, but on pipeline disconnection any producer still
+	// open here is closed by waitClose so no producer outlives the queue it
+	// publishes into.
+	producersMu sync.Mutex
+	producers   map[*trackedProducer]struct{}
+	closing     bool
+}
+
+// trackedProducer wraps a queue.Producer so the owning otelOutputController
+// can close any producers their clients never closed themselves when the
+// pipeline disconnects. It removes itself from the controller's tracking set
+// the first time Close is called — whether by the client or by the controller
+// during shutdown — so Close is safe to call from both paths and only ever
+// closes the underlying producer once.
+//
+// Publish and TryPublish are promoted from the embedded producer unchanged.
+type trackedProducer struct {
+	queue.Producer[publisher.Event]
+	controller *otelOutputController
+	closed     atomic.Bool
+}
+
+func (p *trackedProducer) Close() {
+	if p.closed.Swap(true) {
+		return
+	}
+	p.controller.untrackProducer(p)
+	p.Producer.Close()
 }
 
 // sharedPool tracks one slabqueue.Pool together with a ref count, for
@@ -173,6 +205,7 @@ func newOTelOutputController(
 		consumer:      consumer,
 		workers:       workers,
 		workerChan:    workerChan,
+		producers:     make(map[*trackedProducer]struct{}),
 	}, nil
 }
 
@@ -247,13 +280,36 @@ func observerForMonitors(monitors Monitors) queue.Observer {
 	return queue.NewQueueObserver(pipelineMetrics)
 }
 
+// waitClose disconnects this receiver pipeline. The force parameter from the
+// outputController interface is ignored: a receiver always does a graceful
+// drain bounded by ctx and then force-closes its own queue on timeout, so there
+// is no separate force mode (a receiver must never drop a co-tenant's events).
 func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 	c.logger.Infof("Output shutdown started. Waiting for enqueued events to be published.")
+
+	// Stop this pipeline's intake: close every producer it vended so no new
+	// events enter and each producer's ACKWaitChan can resolve as its already-
+	// published events are acknowledged. Clients normally close their own
+	// producers first (stage one of client shutdown); this covers any that
+	// did not.
+	c.producersMu.Lock()
+	c.closing = true
+	c.producersMu.Unlock()
+	producers := c.closeProducers()
+
+	// Begin a graceful close of this pipeline's queue so the consumer keeps
+	// delivering already-enqueued events and their acks fire while we wait.
 	c.queue.Close(false)
-	select {
-	case <-c.queue.Done():
+
+	// Wait — bounded by ctx — for acknowledgments of THIS pipeline's events
+	// only. Because each receiver pipeline owns its own queue and producers,
+	// this never delays on another pipeline still connected to the shared pool.
+	if c.waitForPipelineAcks(ctx, producers) {
 		c.logger.Infof("Continue shutdown: All enqueued events have been published.")
-	case <-ctx.Done():
+	} else {
+		// ctx expired: force-close this pipeline's queue, dropping in-flight
+		// events. The queue's force-close fan-out also unblocks any producer
+		// ACKWaitChan still open (see slabqueue Queue.Close).
 		c.logger.Infof("Continue shutdown: Time out waiting for events to be published.")
 		c.queue.Close(true)
 		<-c.queue.Done()
@@ -266,9 +322,13 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 		out.Close()
 	}
 
-	// Release this pipeline's claim on the shared pool. When the last
-	// connected pipeline releases, the pool is shut down. Receivers on the
-	// non-mem (disk) path own their queue outright and never joined a pool.
+	// Release this pipeline's claim on the shared pool. Ref-counting means only
+	// the LAST connected pipeline actually shuts the pool down (Pool.Shutdown
+	// force-closes any remaining queues and drains the full shared budget);
+	// non-last pipelines leave the pool and other pipelines untouched. By the
+	// time the last pipeline reaches here it has already waited for its own —
+	// and therefore all remaining — events above. Receivers on the non-mem
+	// (disk) path own their queue outright and never joined a pool.
 	if c.pool != nil {
 		releaseOTelPool(c.intakeQueueID)
 	}
@@ -276,11 +336,88 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 }
 
 func (c *otelOutputController) queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event] {
-	return c.queue.Producer(config)
+	p := &trackedProducer{
+		Producer:   c.queue.Producer(config),
+		controller: c,
+	}
+	c.producersMu.Lock()
+	if c.closing {
+		// The pipeline is already shutting down.
+		c.producersMu.Unlock()
+		p.Close()
+		return p
+	}
+	c.producers[p] = struct{}{}
+	c.producersMu.Unlock()
+	return p
+}
+
+// untrackProducer removes a producer from the tracking set once it has been
+// closed. Called from trackedProducer.Close, so it must not itself call back
+// into Close.
+func (c *otelOutputController) untrackProducer(p *trackedProducer) {
+	c.producersMu.Lock()
+	delete(c.producers, p)
+	c.producersMu.Unlock()
+}
+
+// snapshotProducers returns the set of currently-tracked producers. Callers
+// iterate the returned slice without holding producersMu, which is required
+// because trackedProducer.Close calls back into untrackProducer (taking the
+// same lock) and waiting on a producer must not hold the lock either.
+func (c *otelOutputController) snapshotProducers() []*trackedProducer {
+	c.producersMu.Lock()
+	defer c.producersMu.Unlock()
+	producers := make([]*trackedProducer, 0, len(c.producers))
+	for p := range c.producers {
+		producers = append(producers, p)
+	}
+	return producers
+}
+
+// closeProducers closes every producer that is still open when the pipeline
+// disconnects and returns the set it closed, so the caller can wait on their
+// acknowledgments.
+func (c *otelOutputController) closeProducers() []*trackedProducer {
+	producers := c.snapshotProducers()
+	for _, p := range producers {
+		p.Close()
+	}
+	return producers
+}
+
+// waitForPipelineAcks waits — bounded by ctx — for acknowledgments of THIS
+// pipeline's events only. Each producer's ACKWaitChan closes once the producer
+// is closed and its events are acknowledged; the per-pipeline queue's Done
+// closes once its FIFO has fully drained. Because each receiver pipeline owns
+// its own queue and producers, this never blocks on another pipeline's events.
+// Returns true if everything drained, false if ctx expired first.
+func (c *otelOutputController) waitForPipelineAcks(ctx context.Context, producers []*trackedProducer) bool {
+	for _, p := range producers {
+		select {
+		case <-p.ACKWaitChan():
+		case <-ctx.Done():
+			return false
+		}
+	}
+	select {
+	case <-c.queue.Done():
+		return true
+	case <-ctx.Done():
+		return false
+	}
 }
 
 // poolForTest exposes the underlying pool for tests; it is not part of the
 // outputController interface and must not be used outside tests.
 func (c *otelOutputController) poolForTest() *slabqueue.Pool[publisher.Event] {
 	return c.pool
+}
+
+// trackedProducerCountForTest reports how many vended producers are still
+// open. For tests only; not part of the outputController interface.
+func (c *otelOutputController) trackedProducerCountForTest() int {
+	c.producersMu.Lock()
+	defer c.producersMu.Unlock()
+	return len(c.producers)
 }

@@ -40,6 +40,7 @@ var (
 	defaultPassthroughEnvVars = []string{
 		"TEST_COVERAGE",
 		"RACE_DETECTOR",
+		"INTEG_RACE_DETECTOR",
 		"TEST_TAGS",
 		"PYTHON_EXE",
 		"MODULE",

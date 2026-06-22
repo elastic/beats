@@ -18,6 +18,9 @@
 package memqueue
 
 import (
+	"sync"
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -25,13 +28,30 @@ import (
 type forgetfulProducer[T any] struct {
 	broker    *broker[T]
 	openState openState[T]
+
+	// A forgetful producer has no ACK callback, so ackWait is closed as soon as
+	// Close is called — there are no acknowledgments to wait for.
+	ackWait chan struct{}
+	ackOnce sync.Once
 }
 
 type ackProducer[T any] struct {
-	broker        *broker[T]
-	producedCount uint64
-	state         produceState
-	openState     openState[T]
+	broker    *broker[T]
+	state     produceState
+	openState openState[T]
+
+	// producedCount / ackedCount track this producer's published vs
+	// acknowledged events for ackWait accounting. producedCount is written on
+	// the publishing goroutine, ackedCount on the broker's ackLoop goroutine,
+	// so both are atomic. closed is set by Close. ackWait is closed once the
+	// producer is closed and ackedCount has caught up with producedCount (in
+	// maybeCloseAckWait), or by the broker on shutdown (the ackLoop stops then,
+	// so no further acks would arrive) — see broker.closeProducerAckWaits.
+	producedCount atomic.Uint64
+	ackedCount    atomic.Uint64
+	closed        atomic.Bool
+	ackWait       chan struct{}
+	ackOnce       sync.Once
 }
 
 type openState[T any] struct {
@@ -72,11 +92,29 @@ func newProducer[T any](b *broker[T], cb ackHandler, encoder queue.Encoder[T]) q
 	}
 
 	if cb != nil {
-		p := &ackProducer[T]{broker: b, openState: openState}
-		p.state.cb = cb
+		p := &ackProducer[T]{
+			broker:    b,
+			openState: openState,
+			ackWait:   make(chan struct{}),
+		}
+		// Wrap the user callback so the producer's ack accounting advances on
+		// the ackLoop goroutine alongside delivery, without changing the
+		// callback the caller sees.
+		p.state.cb = func(n int) {
+			p.ackedCount.Add(uint64(n)) //nolint:gosec // G115: n is an ack count, always a small positive value
+			cb(n)
+			p.maybeCloseAckWait()
+		}
+		// Register so the broker can close ackWait on shutdown if the producer
+		// is closed before its events are acked (the ackLoop stops on shutdown).
+		b.registerProducer(p)
 		return p
 	}
-	return &forgetfulProducer[T]{broker: b, openState: openState}
+	return &forgetfulProducer[T]{
+		broker:    b,
+		openState: openState,
+		ackWait:   make(chan struct{}),
+	}
 }
 
 func (p *forgetfulProducer[T]) makePushRequest(event T) pushRequest[T] {
@@ -94,37 +132,80 @@ func (p *forgetfulProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
 }
 
 func (p *forgetfulProducer[T]) Close() {
+	p.ackOnce.Do(func() { close(p.ackWait) })
 	p.openState.Close()
 }
 
-func (p *ackProducer[T]) makePushRequest(event T) pushRequest[T] {
+func (p *forgetfulProducer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
+
+func (p *ackProducer[T]) makePushRequest(event T, id producerID) pushRequest[T] {
 	return pushRequest[T]{
-		event:    event,
-		producer: p,
-		// We add 1 to the id so the default lastACK of 0 is a
-		// valid initial state and 1 is the first real id.
-		producerID: producerID(p.producedCount + 1),
+		event:      event,
+		producer:   p,
+		producerID: id,
 		resp:       p.openState.resp}
 }
 
+// Publish adds an event to the queue, blocking until there is room. It returns
+// the assigned entry ID and whether the event was accepted (false if the queue
+// closed first).
 func (p *ackProducer[T]) Publish(event T) (queue.EntryID, bool) {
-	id, published := p.openState.publish(p.makePushRequest(event))
-	if published {
-		p.producedCount++
+	// Count the event before enqueuing it, else a concurrent Close could see
+	// ackedCount >= producedCount and close ackWait while it's still pending. The
+	// count doubles as the 1-based producerID.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, published := p.openState.publish(p.makePushRequest(event, id))
+	if !published {
+		// Never enqueued: undo the count and re-check so it can't strand ackWait.
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
 	}
-	return id, published
+	return entryID, published
 }
 
+// TryPublish adds an event to the queue only if there is room right now, never
+// blocking. It returns the assigned entry ID and whether the event was accepted.
 func (p *ackProducer[T]) TryPublish(event T) (queue.EntryID, bool) {
-	id, published := p.openState.tryPublish(p.makePushRequest(event))
-	if published {
-		p.producedCount++
+	// Count the event before enqueuing it, else a concurrent Close could see
+	// ackedCount >= producedCount and close ackWait while it's still pending. The
+	// count doubles as the 1-based producerID.
+	id := producerID(p.producedCount.Add(1)) //nolint:gosec // G115: monotonic per-producer publish count
+	entryID, published := p.openState.tryPublish(p.makePushRequest(event, id))
+	if !published {
+		p.producedCount.Add(^uint64(0)) // -1
+		p.maybeCloseAckWait()
 	}
-	return id, published
+	return entryID, published
 }
 
 func (p *ackProducer[T]) Close() {
+	p.closed.Store(true)
+	// Events published before Close may already be fully acked, in which case
+	// no further callback will fire to close ackWait — check now.
+	p.maybeCloseAckWait()
 	p.openState.Close()
+}
+
+func (p *ackProducer[T]) ACKWaitChan() <-chan struct{} { return p.ackWait }
+
+// maybeCloseAckWait closes ackWait exactly once, when the producer has been
+// closed and every published event has been acknowledged, and unregisters the
+// producer from the broker (it no longer needs the shutdown fan-out).
+func (p *ackProducer[T]) maybeCloseAckWait() {
+	if p.closed.Load() && p.ackedCount.Load() >= p.producedCount.Load() {
+		p.ackOnce.Do(func() {
+			close(p.ackWait)
+			p.broker.unregisterProducer(p)
+		})
+	}
+}
+
+// forceCloseAckWait closes ackWait unconditionally. Used by the broker on
+// shutdown to unblock a waiter even though the producer's events were never
+// acknowledged (the ackLoop has stopped). Unregistration is handled by the
+// broker's snapshot, so this does not call unregisterProducer.
+func (p *ackProducer[T]) forceCloseAckWait() {
+	p.ackOnce.Do(func() { close(p.ackWait) })
 }
 
 func (st *openState[T]) Close() {
