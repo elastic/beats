@@ -158,15 +158,6 @@ func (r namedStatusReporter) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
-// The request.tracer.filename may have ":" when a cel input has cursor config and
-// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
-}
-
 func (i input) run(env v2.Context, src *source, cursor map[string]any, pub inputcursor.Publisher, health status.StatusReporter) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
@@ -192,7 +183,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
 	if cfg.Resource.Tracer.enabled() {
-		id := sanitizeFileName(env.IDWithoutName)
+		id := httplog.SanitizeFileName(env.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(env.Agent.Paths, inputName, path)
 		if err != nil {
@@ -568,7 +559,7 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 			errorSpans(err, execSpan)
 			return result, err
 		case errors.As(err, &dump):
-			path := strings.ReplaceAll(s.cfg.FailureDump.Filename, "*", sanitizeFileName(s.env.IDWithoutName))
+			path := strings.ReplaceAll(s.cfg.FailureDump.Filename, "*", httplog.SanitizeFileName(s.env.IDWithoutName))
 			dir := filepath.Dir(path)
 			base := filepath.Base(path)
 			ext := filepath.Ext(base)
@@ -1251,18 +1242,18 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}).StandardClient()
 	}
 
-	if cfg.Auth.OAuth2.isEnabled() {
-		c, err = cfg.Auth.OAuth2.client(ctx, c)
-		if err != nil {
-			return nil, nil, nil, nil, err
-		}
-	}
-
 	c.Transport = userAgentDecorator{
 		// The Filebeat user-agent is provided to the program as useragent. If a request
 		// is not given a user-agent string, this user agent is added to the request.
 		UserAgent: env.Agent.UserAgent,
 		Transport: c.Transport,
+	}
+
+	if cfg.Auth.OAuth2.isEnabled() {
+		c, err = cfg.Auth.OAuth2.client(ctx, c)
+		if err != nil {
+			return nil, nil, nil, nil, err
+		}
 	}
 
 	return c, trace, otelMetrics, contextInjector, nil

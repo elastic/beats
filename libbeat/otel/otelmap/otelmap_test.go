@@ -515,3 +515,52 @@ func TestFromMapstrWholeFloat(t *testing.T) {
 	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f64_slice"])
 	assert.Equal(t, []any{float64(1.5), int64(2), int64(0)}, raw["f32_slice"])
 }
+
+func TestMergeMapstrIntoPdata(t *testing.T) {
+	tests := []struct {
+		name      string
+		initial   mapstr.M
+		src       mapstr.M
+		overwrite bool
+	}{
+		{
+			name:      "overwrite=true",
+			initial:   mapstr.M{"scalar": "old", "nested": mapstr.M{"a": "old-a", "b": "old-b"}},
+			src:       mapstr.M{"scalar": "new", "nested": mapstr.M{"a": "new-a", "c": "added"}, "extra": "added"},
+			overwrite: true,
+		},
+		{
+			name:      "overwrite=false",
+			initial:   mapstr.M{"scalar": "old", "nested": mapstr.M{"a": "old-a", "b": "old-b"}},
+			src:       mapstr.M{"scalar": "new", "nested": mapstr.M{"a": "new-a", "c": "added"}, "extra": "added"},
+			overwrite: false,
+		},
+		{
+			name:      "overwrite=false map over scalar replaces scalar",
+			initial:   mapstr.M{"key": "scalar"},
+			src:       mapstr.M{"key": mapstr.M{"nested": "val"}},
+			overwrite: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Oracle: apply the equivalent mapstr operation, then normalize through a
+			// pdata round-trip so nested maps are map[string]any (matching AsRaw output).
+			want := tc.initial.Clone()
+			if tc.overwrite {
+				want.DeepUpdate(tc.src.Clone())
+			} else {
+				want.DeepUpdateNoOverwrite(tc.src.Clone())
+			}
+			wantNorm := pcommon.NewMap()
+			require.NoError(t, FromMapstr(wantNorm, want))
+
+			dst := pcommon.NewMap()
+			require.NoError(t, FromMapstr(dst, tc.initial))
+			require.NoError(t, MergeMapstrIntoPdata(tc.src, dst, tc.overwrite))
+
+			assert.Equal(t, wantNorm.AsRaw(), dst.AsRaw())
+		})
+	}
+}

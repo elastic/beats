@@ -63,6 +63,8 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 
 		LimitWindow time.Duration `config:"limit_window"`
 		LimitFixed  *int          `config:"limit_fixed"`
+
+		ScratchDir string `json:"scratch_dir"`
 	}
 
 	d := ecokta.DefaultConfig()
@@ -88,6 +90,7 @@ func minimalProvider(cfg *config.C, _ *logp.Logger) (entcollect.Provider, time.D
 		IDSetShards:    lc.IDSetShards,
 		LimitWindow:    lc.LimitWindow,
 		LimitFixed:     lc.LimitFixed,
+		ScratchDir:     lc.ScratchDir,
 	}
 
 	if lc.OAuth2.isEnabled() {

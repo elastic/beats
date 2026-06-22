@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Fix WebSocket reconnect loop ignoring context cancellation with infinite retries.
+component: filebeat

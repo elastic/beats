@@ -385,8 +385,8 @@ github.com/elastic/elastic-agent-system-metrics v0.14.4 h1:XGGepNVOxhtfJmanQsgqC
 github.com/elastic/elastic-agent-system-metrics v0.14.4/go.mod h1:NyNMrdqMfznb/Zy8EmIAHlJpX6HuRlNW+bBL9UN7WQY=
 github.com/elastic/elastic-transport-go/v8 v8.8.0 h1:7k1Ua+qluFr6p1jfJjGDl97ssJS/P7cHNInzfxgBQAo=
 github.com/elastic/elastic-transport-go/v8 v8.8.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
-github.com/elastic/entcollect v0.0.0-20260525234839-d7d7a2bf1510 h1:UOtItuwg13cYHSHaK6iIMaBlw9hWIFPWb/xVbYYBnK8=
-github.com/elastic/entcollect v0.0.0-20260525234839-d7d7a2bf1510/go.mod h1:geO9V37Ibo+caL/8JpeqUE5ZJd8jzHjvOcEvAGEaZgI=
+github.com/elastic/entcollect v0.0.0-20260617022524-00a42d67f0df h1:SVO1bpxnpZmVkgzqcLImLkVVWWfFZASPdTYrJ9hWZ6k=
+github.com/elastic/entcollect v0.0.0-20260617022524-00a42d67f0df/go.mod h1:ZcfSL3oNJg0mhiYrWNJnf/NeetQHr7HlkY4iWCjSGWo=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
 github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3 h1:UyNbxdkQiSfyipwsOCWAlO+ju3xXC61Z4prx/HBTtFk=
