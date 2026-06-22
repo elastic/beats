@@ -126,5 +126,5 @@ func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, expectedValue, v) //nolint:testifylint // we don't care if types are different
+	assert.EqualValues(t, expectedValue, v)
 }
