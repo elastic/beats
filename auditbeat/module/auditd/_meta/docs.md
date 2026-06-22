@@ -146,7 +146,7 @@ This module also supports the [standard configuration options](#module-standard-
 :   A string containing the audit rules that should be installed to the kernel. There should be one rule per line. Comments can be embedded in the string using `#` as a prefix. The format for rules is the same used by the Linux `auditctl` utility. Auditbeat supports adding file watches (`-w`) and syscall rules (`-a` or `-A`). For more information, see [Audit rules](#audit-rules).
 
 **`audit_rule_files`**
-:   A list of files to load audit rules from. This files are loaded after the rules declared in `audit_rules` are loaded. Wildcards are supported and will expand in lexicographical order. The format is the same as that of the `audit_rules` field.
+:   A list of files to load audit rules from. These files are loaded after the rules declared in `audit_rules` are loaded. Wildcards are supported and will expand in lexicographical order. The format is the same as that of the `audit_rules` field.
 
 **`ignore_errors`**
 :   This setting allows errors during rule loading and parsing to be ignored, but logged as warnings.
