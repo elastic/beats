@@ -37,7 +37,7 @@ func TestLoggerWithEvent(t *testing.T) {
 		SrcID:      "src-2",
 		NewPath:    "/var/log/new.log",
 		OldPath:    "/var/log/old.log",
-		Descriptor: loginp.FileDescriptor{Fingerprint: "abc123"},
+		Descriptor: loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Sum: "abc123"}},
 	}
 
 	cases := []struct {

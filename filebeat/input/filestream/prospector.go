@@ -230,13 +230,12 @@ func (p *fileProspector) Init(
 			// rename while filebeat was stopped (the entry needs to stay
 			// alive so the next scan's migrate path can pick it up).
 			//
-			// We preserve ONLY when there's a current file whose
-			// GrowingFingerprint has this entry's stored fingerprint as a
-			// STRICT prefix. GrowingFingerprint is emitted by the scanner
-			// on the one-time scan a path crosses threshold, so a hit
-			// here means a file has bridged from a (potentially renamed)
-			// raw-hex identity to a final SHA-256 identity — strong
-			// evidence of a rename + threshold crossing.
+			// We preserve ONLY when there's a current file that has already
+			// crossed the threshold (Fingerprint.Complete) and whose raw
+			// header has this entry's stored fingerprint as a STRICT prefix.
+			// A completed file carrying raw material that extends a stored
+			// growing entry is strong evidence of a rename + threshold
+			// crossing while filebeat was stopped.
 			//
 			// Ordinary growing-phase rename across restart is intentionally
 			// NOT covered by this skip: distinguishing it from a
@@ -253,7 +252,7 @@ func (p *fileProspector) Init(
 				return true
 			}
 			for _, desc := range files {
-				if isStrictPrefix(desc.GrowingFingerprint, storedFP) {
+				if desc.Fingerprint.Complete && isStrictPrefix(desc.Fingerprint.Raw, storedFP) {
 					return false // possible rename + threshold crossing, preserve
 				}
 			}
@@ -372,27 +371,6 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	// we use this logger instead of the prospector logger.
 	defer p.stopHarvesterGroup(ctx.Logger, hg)
 
-	// Bootstrap the scanner's hashedPaths set from the persisted registry.
-	// The seed contains paths whose registry state has an empty Fingerprint
-	// (final SHA-256 entries, and legacy/static entries). Those files are
-	// already keyed by a SHA-256 hex; their next scan should emit only SHA-256
-	// and not the (transient, large) GrowingFingerprint. Files in the growing
-	// phase (non-empty Fingerprint in the value) are NOT in the seed and so will
-	// emit GrowingFingerprint on the watch loop's first scan, enabling the
-	// prospector's prefix-match-and-migrate path. Also subsumes the wipe of
-	// any pollution caused by the enumeration-only GetFiles calls in
-	// Init/takeover above (they touch the same hashedPaths set).
-	//
-	// Best-effort: a seed failure (filewatcher doesn't implement
-	// hashedPathsSetter) is logged and the input continues. Not initializing
-	// HashedPaths will cause the file watcher to emmit a growing fingerprint
-	// for files that are already using the SHA-256 version of the fingerprint.
-	// The error causes a performanhce hit at startup, later the HashedPaths is
-	// populated as the input runs.
-	if err := p.initFileWatcherHashedPaths(s); err != nil {
-		p.logger.Errorf("failed to seed fileWatcher hashedPaths: %v", err)
-	}
-
 	var tg unison.MultiErrGroup
 
 	// The harvester needs to notify the FileWatcher
@@ -460,11 +438,7 @@ func (p *fileProspector) onFSEvent(
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
 
-			// Only growing entries participate in prefix-matching. Final
-			// SHA-256 entries (Growing=false) don't need to be in the index.
-			if event.Descriptor.FingerprintGrowing {
-				p.shortFingerprints.Add(event.SrcID, event.Descriptor.Fingerprint, event.NewPath)
-			}
+			p.indexGrowingFingerprint(event.SrcID, event.Descriptor, event.NewPath)
 
 		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
@@ -524,9 +498,7 @@ func (p *fileProspector) onFSEvent(
 					log.Errorf("failed to migrate growing fingerprint on rename: %v", err)
 				} else {
 					p.shortFingerprints.Remove(oldKey)
-					if event.Descriptor.FingerprintGrowing {
-						p.shortFingerprints.Add(newKey, event.Descriptor.Fingerprint, event.NewPath)
-					}
+					p.indexGrowingFingerprint(newKey, event.Descriptor, event.NewPath)
 				}
 			}
 		}
@@ -627,64 +599,24 @@ func isStrictPrefix(target, prefix string) bool {
 // entry value while a file is still growing. With the bounded-key optimization
 // the registry key is only a hash of this value, so prefix matching relies on
 // the raw fingerprint being stored in fileMeta.Fingerprint. It returns an empty
-// string for final SHA-256 entries, which don't participate in prefix matching.
+// string for completed (final SHA-256) entries, which don't participate in
+// prefix matching and must be byte-identical on disk to static fingerprint
+// entries.
 func growingRawFingerprint(d loginp.FileDescriptor) string {
-	if !d.FingerprintGrowing {
+	if d.Fingerprint.Complete {
 		return ""
 	}
-	return d.Fingerprint
+	return d.Fingerprint.Raw
 }
 
-// initFileWatcherHashedPaths reads the registry and populates the fileWatcher's
-// scanner-side "already-final" path set so that on the next scan we only emit
-// GrowingFingerprint for files that actually still need to migrate.
-//
-// Selection: a fingerprint entry with an empty persisted Fingerprint (final
-// SHA-256 entries, and legacy/static entries from registries written before
-// this feature) is already final; its source path goes into the seed. Entries
-// with a non-empty Fingerprint (still growing) are deliberately excluded — they
-// need GrowingFingerprint emitted on the next scan to bridge to their SHA-256.
-//
-// Returns nil and is a no-op when growing mode is disabled. Returns an error
-// when growing mode is enabled but p.filewatcher does not expose
-// SetHashedPaths — the only capability needed here.
-func (p *fileProspector) initFileWatcherHashedPaths(updater loginp.StateMetadataUpdater) error {
-	if !p.growingFingerprint {
-		return nil
+// indexGrowingFingerprint adds an entry to the prefix-matching index, but only
+// while the file is still growing. Completed (final SHA-256) entries match by
+// their exact identity and must not participate in prefix matching, so they are
+// skipped.
+func (p *fileProspector) indexGrowingFingerprint(key string, d loginp.FileDescriptor, source string) {
+	if raw := growingRawFingerprint(d); raw != "" {
+		p.shortFingerprints.Add(key, raw, source)
 	}
-
-	fw, ok := p.filewatcher.(interface {
-		SetHashedPaths(paths map[string]struct{})
-	})
-	if !ok {
-		return fmt.Errorf(
-			"filewatcher of type %T does not implement SetHashedPaths(map[string]struct{}); "+
-				"hashedPaths cannot be seeded",
-			p.filewatcher)
-	}
-
-	fullyGrownPaths := make(map[string]struct{})
-	updater.IterateOnPrefix(func(key string, meta interface{}) bool {
-		if rk, ok := parseRegistryKey(key); !ok || !rk.isFingerprint() {
-			return true
-		}
-		var fm fileMeta
-		if err := typeconv.Convert(&fm, meta); err != nil {
-			return true
-		}
-		if fm.Fingerprint != "" {
-			return true // still growing; needs GrowingFingerprint on next scan
-		}
-		if fm.Source == "" {
-			return true
-		}
-		fullyGrownPaths[fm.Source] = struct{}{}
-		return true
-	})
-
-	fw.SetHashedPaths(fullyGrownPaths)
-	p.logger.Debugf("seeded fileWatcher hashedPaths with %d already-final paths", len(fullyGrownPaths))
-	return nil
 }
 
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
@@ -720,16 +652,18 @@ func (t *ignoreInactiveType) Unpack(v string) error {
 
 // handleGrowingFingerprintLookup handles the lookup logic for growing-mode
 // fingerprint events. Two transitions are reconciled here: continued growth
-// below threshold (raw-hex extending) and the one-time threshold crossing
-// where the primary Fingerprint flips from raw-hex to SHA-256 (with the
-// descriptor carrying GrowingFingerprint as the bridging value).
+// below threshold (raw header extending) and the one-time threshold crossing
+// where the identity becomes a SHA-256 (the descriptor still carries the raw
+// header in Fingerprint.Raw to bridge the transition).
 func (p *fileProspector) handleGrowingFingerprintLookup(
 	log *logp.Logger,
 	event loginp.FSEvent,
 	src loginp.Source,
 	updater loginp.StateMetadataUpdater) loginp.Source {
-	// Empty fingerprint - nothing to match
-	if event.Descriptor.Fingerprint == "" {
+	// No fingerprint material - nothing to match. Check the fields directly
+	// instead of Key(), which would hash Raw on every growing-mode event.
+	fp := event.Descriptor.Fingerprint
+	if !fp.Complete && fp.Raw == "" {
 		return src
 	}
 
@@ -739,7 +673,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 		return src
 	}
 
-	// Try to find a prefix match across both Fingerprint and GrowingFingerprint.
+	// Try to find a prefix match against the event's raw fingerprint material.
 	oldKey, found := p.findGrowingFingerprintMatch(updater, event)
 	if !found {
 		return src
@@ -754,13 +688,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 
 	// Update short fingerprint set after successful migration.
 	p.shortFingerprints.Remove(oldKey)
-	// Only re-add the new entry to the growing index if the migrated value
-	// is itself still in the growing phase. After a threshold-crossing
-	// migration the new key holds a final SHA-256 (Growing=false) and must
-	// not participate in prefix matching.
-	if event.Descriptor.FingerprintGrowing {
-		p.shortFingerprints.Add(event.SrcID, event.Descriptor.Fingerprint, event.NewPath)
-	}
+	p.indexGrowingFingerprint(event.SrcID, event.Descriptor, event.NewPath)
 
 	// Migration succeeded - the old harvester is still running and will continue
 	// reading. We should NOT start a new harvester.
@@ -768,11 +696,10 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 }
 
 // buildShortFingerprintSet scans the store once and populates shortFingerprints
-// with entries whose persisted state has Growing == true (their Fingerprint is
-// a raw-hex value still below the configured threshold).
-// Entries whose state has Growing == false (default, including legacy entries
-// written before this field existed) are skipped: they are final SHA-256 keys
-// and don't participate in prefix matching.
+// with the still-growing entries: those whose persisted fileMeta.Fingerprint is
+// a non-empty raw-hex value (still below the configured threshold). Completed
+// (final SHA-256) and legacy/static entries leave Fingerprint empty and are
+// skipped, since they match by exact identity rather than prefix.
 func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUpdater) {
 	p.shortFingerprints = newShortFingerprintSet()
 
@@ -809,9 +736,6 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 	})
 }
 
-// ensureShortFingerprintSet lazily builds the growing-entry index from the
-// persisted registry on first use. Idempotent: a no-op once the set exists.
-
 // isLikelyRename reports whether a path-agnostic prefix match looks like a
 // rename rather than a collision between two distinct files: the stored
 // entry's source path no longer exists on disk, so the growing file most
@@ -823,29 +747,30 @@ func isLikelyRename(entry shortFingerprintEntry) bool {
 }
 
 // findGrowingFingerprintMatch looks for an existing growing-phase registry
-// entry whose raw-hex fingerprint is a prefix of the event's fingerprint —
-// i.e. the same file seen earlier with fewer bytes — and returns its key so
-// the caller can migrate it to the current identity. Only still-growing
-// entries are searched, making this O(K) in the number of growing entries.
+// entry whose raw-hex fingerprint is a prefix of the event's raw fingerprint
+// material — i.e. the same file seen earlier with fewer bytes — and returns
+// its key so the caller can migrate it to the current identity. Only still
+// growing entries are searched, making this O(K) in the number of growing
+// entries.
 //
-// Two prefix candidates from the descriptor are tried, in order (see
-// loginp.FileDescriptor for the field semantics):
+// A single candidate, the descriptor's raw fingerprint material
+// (Fingerprint.Raw), covers both transitions: below threshold it is the
+// extending raw header, and on the scan a file crosses the threshold it still
+// carries the full raw header (with the SHA-256 in Fingerprint.Sum), so the
+// stored raw-hex remains a prefix of it.
 //
-//  1. Fingerprint — same-format growth (raw-hex extending below threshold).
-//  2. GrowingFingerprint — the one-time threshold-crossing scan, where the
-//     primary Fingerprint has flipped to SHA-256 but the descriptor still
-//     carries the raw-hex value for matching.
-//
-// Each candidate is first matched against the entry sharing the event's path
-// (high-confidence) and then, only for the threshold-crossing candidate,
-// path-agnostically to recover a restart+rename where the stored entry still
-// holds the OLD path. The path-agnostic fallback is gated by isLikelyRename so
-// two distinct files that merely share a content prefix are not confused.
+// The match is first attempted against the entry sharing the event's path
+// (high-confidence). Only for a completed (threshold-crossing) event — strong
+// evidence of an identity transition — a path-agnostic fallback then recovers
+// a restart+rename where the stored entry still holds the OLD path. The
+// fallback is gated by isLikelyRename so two distinct files that merely share
+// a content prefix are not confused.
 func (p *fileProspector) findGrowingFingerprintMatch(
 	updater loginp.StateMetadataUpdater,
 	event loginp.FSEvent,
 ) (oldKey string, found bool) {
-	if event.Descriptor.Fingerprint == "" && event.Descriptor.GrowingFingerprint == "" {
+	raw := event.Descriptor.Fingerprint.Raw
+	if raw == "" {
 		return "", false
 	}
 
@@ -861,25 +786,21 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 		matchPath = event.OldPath
 	}
 
-	// Ordinary same-format growth: require the matched entry to share the
-	// event's path, so two distinct files with a shared header prefix are not
-	// mistaken for renames of one another. (FindPrefixMatch is a no-op for an
-	// empty target, so non-growing events fall through.)
-	if key, _, ok := p.shortFingerprints.FindPrefixMatch(event.Descriptor.Fingerprint, matchPath); ok {
+	// Require the matched entry to share the event's path, so two distinct
+	// files with a shared header prefix are not mistaken for renames of one
+	// another.
+	if key, _, ok := p.shortFingerprints.FindPrefixMatch(raw, matchPath); ok {
 		return key, true
 	}
 
-	// Threshold-crossing: GrowingFingerprint is strong evidence of an identity
-	// transition, so beyond the same-path match we also allow a path-agnostic
-	// fallback to recover a restart+rename where the stored entry still holds
-	// the OLD path. isLikelyRename guards against colliding with a file that is
-	// still present on disk.
-	growing := event.Descriptor.GrowingFingerprint
-	if key, _, ok := p.shortFingerprints.FindPrefixMatch(growing, matchPath); ok {
-		return key, true
-	}
-	if key, entry, ok := p.shortFingerprints.FindPrefixMatch(growing, ""); ok && isLikelyRename(entry) {
-		return key, true
+	// A completed fingerprint is strong evidence of an identity transition, so
+	// beyond the same-path match we also allow a path-agnostic fallback to
+	// recover a restart+rename where the stored entry still holds the OLD path.
+	// isLikelyRename guards against colliding with a file still present on disk.
+	if event.Descriptor.Fingerprint.Complete {
+		if key, entry, ok := p.shortFingerprints.FindPrefixMatch(raw, ""); ok && isLikelyRename(entry) {
+			return key, true
+		}
 	}
 
 	return "", false

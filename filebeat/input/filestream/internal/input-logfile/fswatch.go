@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"strings"
 
 	"github.com/elastic/go-concert/unison"
@@ -58,6 +60,59 @@ func (o Operation) String() string {
 	return name
 }
 
+// FingerprintID is the file-identity material derived from the fingerprint
+// region bytes[offset:offset+length]. It is self-describing: a single value
+// carries everything the watcher, the prospector and the registry key need,
+// so no caller has to branch on a separate "is this growing?" flag.
+type FingerprintID struct {
+	// Raw is the hex-encoded fingerprint region read so far
+	// (bytes[offset:offset+min(size,length)]). It is the matching material: a
+	// growing file extends Raw, so a previous (shorter) Raw is a prefix of the
+	// current one. The scanner sets Raw only in growing mode; static-mode and
+	// retained-but-completed descriptors leave it empty (matching falls back
+	// to the SHA-256 identity). Empty when no fingerprint was computed.
+	Raw string
+	// Complete is true once Raw covers the full configured length, i.e. the
+	// file reached offset+length and Sum holds the final SHA-256.
+	Complete bool
+	// Sum is hex(sha256(bytes[offset:offset+length])), set only when Complete.
+	// It is the durable registry identity — byte-identical to the value the
+	// static (non-growing) fingerprint produces.
+	Sum string
+}
+
+// Key returns the registry/identity key for this fingerprint, or "" when no
+// fingerprint is available (the caller then falls back to the OS file state).
+//
+// A completed fingerprint keys on its SHA-256, identical to the static
+// fingerprint identity so existing state is reused with no duplication. A
+// still-growing fingerprint keys on a bounded hash of Raw: the raw header can
+// be up to 2*length characters and the registry key is rewritten on every
+// cursor checkpoint, so hashing keeps the memlog WAL small. The raw value is
+// persisted in the entry instead, so prefix matching survives restarts.
+func (f FingerprintID) Key() string {
+	switch {
+	case f.Complete:
+		return f.Sum
+	case f.Raw != "":
+		sum := sha256.Sum256([]byte(f.Raw))
+		return hex.EncodeToString(sum[:])
+	default:
+		return ""
+	}
+}
+
+// Continues reports whether current represents the same file as f observed
+// later with at least as much content: f's raw fingerprint material is a
+// prefix of current's. This single relation drives growing-mode rename and
+// threshold-crossing detection — current.Raw still carries the full header on
+// the scan a file crosses the threshold, so the same prefix test bridges the
+// transition to the SHA-256 identity. Returns false when f has no raw material
+// (a completed entry whose Raw was dropped, or a static-mode entry).
+func (f FingerprintID) Continues(current FingerprintID) bool {
+	return f.Raw != "" && strings.HasPrefix(current.Raw, f.Raw)
+}
+
 // FileDescriptor represents full information about a file.
 type FileDescriptor struct {
 	// Filename is an original filename this descriptor was created from.
@@ -66,24 +121,9 @@ type FileDescriptor struct {
 	Filename string
 	// Info is the result of file stat
 	Info file.ExtendedFileInfo
-	// Fingerprint is used for file identity. For the "fingerprint" identity
-	// in static mode this is a SHA-256 hash of bytes[offset:offset+length].
-	// In growing mode, while the file is below offset+length this is the
-	// hex-encoded raw bytes from offset to size; at or above the threshold it
-	// becomes the SHA-256 hex (identical to the static-mode value).
-	Fingerprint string
-	// GrowingFingerprint, when non-empty, is the hex-encoded raw bytes
-	// hex(bytes[offset:offset+length]) computed at the same time as the SHA-256
-	// Fingerprint. It is set by the scanner only on the first scan in which a
-	// path reaches threshold; subsequent scans of the same path emit only the
-	// SHA-256 Fingerprint. SameFile and the prospector's prefix-matching use
-	// GrowingFingerprint to bridge the one-time transition from a raw-hex
-	// growing key to the final SHA-256 key.
-	GrowingFingerprint string
-	// FingerprintGrowing is true when Fingerprint is a raw-hex value that has
-	// not yet reached the configured threshold (offset+length). False otherwise,
-	// including for SHA-256 fingerprints and for non-growing-mode files.
-	FingerprintGrowing bool
+	// Fingerprint is the file-identity material for the "fingerprint" identity.
+	// It is the zero value when fingerprinting is disabled or produced nothing.
+	Fingerprint FingerprintID
 	// GZIP indicates if the file is compressed with GZIP.
 	GZIP bool
 
@@ -108,51 +148,41 @@ func (fd FileDescriptor) SizeOrBytesIngested() int64 {
 	return fd.Info.Size()
 }
 
-// FileID returns a unique file ID
-// If fingerprint is computed it's used as the ID.
-// Otherwise, a combination of the device ID and inode is used.
+// FileID returns a unique in-memory identifier used by the scanner and watcher
+// to recognise the same file across scans. If a fingerprint is computed it is
+// used as the ID, otherwise a combination of the device ID and inode.
+//
+// Unlike Key (the persistent registry key), this identifier is never stored, so
+// it does not need to be bounded: a still-growing file is identified by its raw
+// fingerprint hex directly, avoiding a per-scan hash on the watcher hot path. A
+// completed file uses its SHA-256, so the identity changes exactly once when the
+// file crosses the threshold — SameFile bridges that transition via Continues.
 func (fd FileDescriptor) FileID() string {
-	if fd.Fingerprint != "" {
-		return fd.Fingerprint
+	switch {
+	case fd.Fingerprint.Complete:
+		return fd.Fingerprint.Sum
+	case fd.Fingerprint.Raw != "":
+		return fd.Fingerprint.Raw
+	default:
+		return fd.Info.GetOSState().Identifier()
 	}
-	return fd.Info.GetOSState().Identifier()
 }
 
 // SameFile returns true if descriptors point to the same file.
 //
-// Three matching paths are tried, in order:
+// Two matching paths are tried, in order:
 //
-//  1. Exact FileID match — the common case for files whose identity has
-//     not changed between scans.
-//  2. Prefix match on Fingerprint — Enhanced Fingerprint growing phase: as a
-//     file grows below threshold, its raw-hex fingerprint grows; the previous
-//     (shorter) value is a prefix of the new one.
-//  3. Threshold-transition prefix match: file have just grown past threshold
-//     for SHA256 fingerprint. prev has the old raw-hex fingerprint, thus, do
-//     prefix using GrowingFingerprint match to check if it's still the same
-//     file. Next check will use the fast path, SHA256 exact match.
+//  1. Exact FileID match — the common case for files whose identity has not
+//     changed between scans (and the only path used by the static fingerprint
+//     and OS-state identities).
+//  2. Growing-phase prefix match — the previous raw fingerprint material is a
+//     prefix of the current one. This covers both below-threshold growth and
+//     the one-time crossing to the SHA-256 identity (see FingerprintID.Continues).
 func SameFile(prev, current *FileDescriptor) bool {
-	// 1. Fast path: exact match
 	if prev.FileID() == current.FileID() {
 		return true
 	}
-
-	if prev.Fingerprint == "" || current.Fingerprint == "" {
-		return false
-	}
-
-	// 2. Prefix match on Fingerprint: Growing-phase prefix match.
-	if strings.HasPrefix(current.Fingerprint, prev.Fingerprint) {
-		return true
-	}
-
-	// 3. Threshold-transition prefix match: prev raw-hex is a prefix of the
-	// transient GrowingFingerprint carried on the first SHA-256 scan.
-	if strings.HasPrefix(current.GrowingFingerprint, prev.Fingerprint) {
-		return true
-	}
-
-	return false
+	return prev.Fingerprint.Continues(current.Fingerprint)
 }
 
 // FSEvent returns information about file system changes.

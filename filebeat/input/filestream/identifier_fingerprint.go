@@ -18,9 +18,6 @@
 package filestream
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -71,26 +68,9 @@ func (i *fingerprintIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              formatIdentity(fingerprintName, boundFingerprintKey(e.Descriptor)),
+		fileID:              formatIdentity(fingerprintName, e.Descriptor.Fingerprint.Key()),
 		identifierGenerator: fingerprintName,
 	}
-}
-
-// boundFingerprintKey returns the fixed-size component used in the registry key.
-//
-// A final SHA-256 fingerprint (FingerprintGrowing == false) is already a
-// 64-char hex string and is used as-is, preserving compatibility with static
-// fingerprint state. A growing fingerprint is the raw hex of the file header
-// and grows up to 2*length characters; hashing it keeps the registry key (and
-// therefore every frequent cursor write to the memlog WAL and every checkpoint)
-// bounded. The raw growing fingerprint is persisted separately in the entry
-// value (fileMeta.Fingerprint) so prefix matching still works after a restart.
-func boundFingerprintKey(d loginp.FileDescriptor) string {
-	if !d.FingerprintGrowing || d.Fingerprint == "" {
-		return d.Fingerprint
-	}
-	sum := sha256.Sum256([]byte(d.Fingerprint))
-	return hex.EncodeToString(sum[:])
 }
 
 func (i *fingerprintIdentifier) Name() string {

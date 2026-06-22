@@ -319,28 +319,25 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			delete(newFilesByID, remainingDesc.FileID())
 			delete(w.prev, remainingPath)
 
-		// If it isn't an exact match, make it a candidate for prefix-match
+		// If it isn't an exact match, make it a candidate for prefix-match.
+		// growingRawFingerprint keeps only still-growing predecessors in the
+		// index; completed entries match by their SHA-256 identity instead.
 		case w.growingFingerprint:
-			shortFingerprints.Add(
-				remainingPath, remainingDesc.Fingerprint, remainingPath)
+			if raw := growingRawFingerprint(remainingDesc); raw != "" {
+				shortFingerprints.Add(remainingPath, raw, remainingPath)
+			}
 		}
 	}
 
-	// Prefix-match rename detection (growing fingerprint only). For each
-	// new file that didn't match exactly, look for an unmatched prev entry
-	// whose raw-hex fingerprint is a STRICT PREFIX of the new file's
-	// fingerprint material — that means the same file was renamed AND its
-	// content grew between scans.
+	// Prefix-match rename detection (growing fingerprint only). For each new
+	// file that didn't match exactly, look for an unmatched prev entry whose
+	// raw fingerprint is a STRICT PREFIX of the new file's raw material — that
+	// means the same file was renamed AND its content grew between scans.
 	//
-	// Two prefix candidates are tried per new file:
-	//
-	//   1. newDesc.Fingerprint — handles rename + same-format growth
-	//      (raw-hex extends to longer raw-hex while still below threshold).
-	//   2. newDesc.GrowingFingerprint — handles rename + threshold-crossing
-	//      in the same scan: the new descriptor's primary Fingerprint is a
-	//      SHA-256 (no prefix relationship to the prev raw-hex), but the
-	//      GrowingFingerprint carries the raw-hex of bytes[offset:offset+length]
-	//      and prev's raw-hex IS a prefix of that.
+	// A single candidate, newDesc.Fingerprint.Raw, covers both cases: below
+	// threshold it is the (extended) raw header, and on the scan a file crosses
+	// the threshold it still carries the full raw header (the SHA-256 lives in
+	// Sum), so the prev raw-hex is a prefix of it.
 	if shortFingerprints.Len() > 0 {
 		type prefixMatch struct {
 			oldPath string
@@ -350,10 +347,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		var matches []prefixMatch
 
 		for newPath, newDesc := range newFilesByName {
-			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint, "")
-			if !found && newDesc.GrowingFingerprint != "" {
-				oldPath, _, found = shortFingerprints.FindPrefixMatch(newDesc.GrowingFingerprint, "")
-			}
+			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint.Raw, "")
 			if found {
 				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
 				shortFingerprints.Remove(oldPath)
@@ -412,6 +406,21 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		"created", createdCount,
 	)
 
+	// Retain raw fingerprint material only for still-growing files. A completed
+	// file is matched by its SHA-256 identity, so dropping Raw keeps w.prev
+	// small and avoids carrying the full header for every tracked file across
+	// scans. This is what makes the per-process "already final" suppression set
+	// unnecessary: the events for this scan were already emitted above with the
+	// full descriptor, so trimming here only affects retained state.
+	if w.growingFingerprint {
+		for p, fd := range paths {
+			if fd.Fingerprint.Complete && fd.Fingerprint.Raw != "" {
+				fd.Fingerprint.Raw = ""
+				paths[p] = fd
+			}
+		}
+	}
+
 	w.prev = paths
 }
 
@@ -449,19 +458,6 @@ func notChangedEvent(path string, fd loginp.FileDescriptor, srcID string) loginp
 
 func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
-}
-
-// SetHashedPaths populates the underlying scanner's set of "already-final"
-// paths. See fileScanner.setHashedPaths for details. Called by the
-// prospector at Run() start with the set of paths whose persisted state has
-// an empty Fingerprint (final SHA-256 entries), so the watch loop's first scan
-// suppresses GrowingFingerprint emission for files that are already keyed by
-// SHA-256 and only emits the bridging value for files that still need to
-// migrate.
-func (w *fileWatcher) SetHashedPaths(paths map[string]struct{}) {
-	if fs, ok := w.scanner.(*fileScanner); ok {
-		fs.setHashedPaths(paths)
-	}
 }
 
 func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
@@ -517,13 +513,13 @@ type fileScanner struct {
 	hasher           hash.Hash
 	readBuffer       []byte
 	compression      string
-	// hashedPaths is set only when Enhanced Fingerprint (growing mode) is
-	// enabled. It records paths whose last-emitted Fingerprint was a final
-	// SHA-256 (file at or above offset+length). The scanner uses it to
-	// suppress GrowingFingerprint emission for paths whose state is already
-	// final, avoiding wasted work on every scan. Pruned at the end of each
-	// scan against the set of paths still tracked.
-	hashedPaths map[string]struct{}
+	// completedFingerprints holds the paths whose fingerprint was already a
+	// final SHA-256 on the previous scan (growing mode only). The bridging raw
+	// header is only useful on the scan a file crosses the threshold, so for
+	// paths in this set toFileDescriptor skips recomputing it. Rebuilt every
+	// scan in GetFiles, which prunes paths that are gone or fell back below the
+	// threshold.
+	completedFingerprints map[string]struct{}
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -543,9 +539,6 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d, growing %t",
 			s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length, s.cfg.Fingerprint.Growing)
 		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
-		if s.cfg.Fingerprint.Growing {
-			s.hashedPaths = make(map[string]struct{})
-		}
 	}
 
 	err := s.resolveRecursiveGlobs(config)
@@ -656,14 +649,18 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 	}
 
-	// Prune hashedPaths against the paths actually observed this scan.
-	// Files that disappeared (removed, renamed away, no longer matching a
-	// glob) drop out of the set, so they don't suppress GrowingFingerprint
-	// emission if they reappear later.
-	for p := range s.hashedPaths {
-		if _, stillThere := fdByName[p]; !stillThere {
-			delete(s.hashedPaths, p)
+	// Refresh the set of paths whose fingerprint is final so the next scan can
+	// skip recomputing the bridging raw header for them. Rebuilding from the
+	// paths observed this scan prunes files that are gone or dropped below the
+	// threshold.
+	if s.cfg.Fingerprint.Growing {
+		completed := make(map[string]struct{}, len(fdByName))
+		for name, fd := range fdByName {
+			if fd.Fingerprint.Complete {
+				completed[name] = struct{}{}
+			}
 		}
+		s.completedFingerprints = completed
 	}
 
 	return fdByName
@@ -748,12 +745,13 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 //   - dataSize <= offset: file is too small to read anything from offset;
 //     return errFileTooSmall.
 //   - dataSize >= offset+length: read bytes[offset:offset+length] and hash
-//     with SHA-256. In growing mode, also emit GrowingFingerprint (the hex
-//     of those same bytes) on the first scan in which this path reaches
-//     threshold; subsequent scans of the same path emit only the SHA-256.
+//     with SHA-256 (FingerprintID.Sum, Complete=true). In growing mode the
+//     raw header bytes are also carried in FingerprintID.Raw so the one-time
+//     crossing to the SHA-256 identity can be prefix-matched against a still
+//     growing predecessor.
 //   - dataSize in (offset, offset+length) under growing mode: read
-//     bytes[offset:dataSize] and emit its hex as Fingerprint with
-//     Growing=true.
+//     bytes[offset:dataSize] and carry its hex as FingerprintID.Raw with
+//     Complete=false.
 //   - dataSize in (offset, offset+length) under non-growing mode: return
 //     errFileTooSmall (today's static-fingerprint behaviour).
 //
@@ -889,12 +887,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		}
 
 		// Growing mode small file: hex of bytes[offset:offset+n].
-		fd.Fingerprint = hex.EncodeToString(s.readBuffer[:n])
-		fd.FingerprintGrowing = true
-
-		// File is no longer at the final SHA-256 state (e.g. after a
-		// truncation that brought it back below threshold).
-		delete(s.hashedPaths, it.filename)
+		fd.Fingerprint = loginp.FingerprintID{Raw: hex.EncodeToString(s.readBuffer[:n])}
 
 		return fd, nil
 	}
@@ -902,47 +895,26 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// File at or above threshold: compute SHA-256 of bytes[offset:offset+length].
 	s.hasher.Reset()
 	s.hasher.Write(s.readBuffer[:length])
-	fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
+	fd.Fingerprint = loginp.FingerprintID{
+		Complete: true,
+		Sum:      hex.EncodeToString(s.hasher.Sum(nil)),
+	}
 
+	// In growing mode the raw header is carried alongside the SHA-256 so the
+	// one-time transition to the final identity can be prefix-matched against a
+	// still-growing predecessor (in-place growth or rename+grow). It is only
+	// needed on the scan a file crosses the threshold: a path already known to
+	// be complete (it was complete on the previous scan) has no growing
+	// predecessor left to bridge, so recomputing the ~2*length-byte hex header
+	// every scan would be wasted work. New and just-crossed paths are absent
+	// from the set and get the bridging header.
 	if s.cfg.Fingerprint.Growing {
-		// Emit GrowingFingerprint on the first scan a path reaches threshold
-		// in this process. Subsequent scans of the same path emit only the
-		// SHA-256 Fingerprint, since the matching mechanism (prefix-match
-		// against an existing growing registry entry) has already had its
-		// chance to run.
-		if _, alreadyHashed := s.hashedPaths[it.filename]; !alreadyHashed {
-			fd.GrowingFingerprint = hex.EncodeToString(s.readBuffer[:length])
-			s.hashedPaths[it.filename] = struct{}{}
+		if _, done := s.completedFingerprints[it.filename]; !done {
+			fd.Fingerprint.Raw = hex.EncodeToString(s.readBuffer[:length])
 		}
 	}
 
 	return fd, nil
-}
-
-// setHashedPaths replaces the per-process set of "already-final" paths with
-// the given seed. Called by the fileProspector at startup with the set of
-// paths whose persisted registry state has an empty Fingerprint (i.e. they
-// are already keyed by a SHA-256 hex). The result is that the watch loop's
-// first scan emits GrowingFingerprint only for files that actually need
-// migration — files that were below threshold at the previous shutdown — and
-// emits SHA-256 only for everything else. This both:
-//
-//  1. Replaces the correctness-preserving wipe of any hashedPaths entries
-//     added by enumeration-only scans run during prospector Init/take-over
-//     (those scans pollute the set but emit no events).
-//  2. Avoids a wasteful GrowingFingerprint-emission burst on restart for
-//     every file already at threshold.
-//
-// Safe to call when growing mode is disabled — hashedPaths is nil there and
-// the method is a no-op.
-func (s *fileScanner) setHashedPaths(seed map[string]struct{}) {
-	if s.hashedPaths == nil {
-		return
-	}
-	clear(s.hashedPaths)
-	for p := range seed {
-		s.hashedPaths[p] = struct{}{}
-	}
 }
 
 func (s *fileScanner) isFileExcluded(file string) bool {
