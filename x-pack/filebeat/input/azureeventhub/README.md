@@ -389,7 +389,7 @@ I see we have the following folder:
 filebeat-activitylogs-zmoog-0005 / mbranca-general.servicebus.windows.net / eventhubsdkupgrade / $Default / checkpoint
 ```
 
-The folder containts four blobs `0`, `1`, `2`, and `3`
+The folder contains four blobs `0`, `1`, `2`, and `3`
 
 The metadata of blobs `0`, `2`, and `3`:
 

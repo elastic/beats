@@ -41,7 +41,7 @@ https://github.com/elastic/beats/tree/master/metricbeat/module/kubernetes/_meta/
 It will create
 
 - named `rqtest` namespace, which will be assigned the resource quotas
-- named `resources` resource quota, which will limit the ammount of CPU and memory that can be assigned to the namespace. (This settings won't be put to test) 
+- named `resources` resource quota, which will limit the amount of CPU and memory that can be assigned to the namespace. (This settings won't be put to test)
 - `objects` resource quota, which will limit the quantity of objects that can be created at this namespace:
   - 3 Pods
   - 1 Configmap

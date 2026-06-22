@@ -49,7 +49,7 @@ services.
 
 Configuration files can be found in `_meta/terraform`, and deployed with
 `terraform apply`. It will get credentials from your configuration, some
-settings can be overriden using Terraform variables (see `vars.tf` file).
+settings can be overridden using Terraform variables (see `vars.tf` file).
 
 Once deployed, information about the resources can be queried with `terraform
 output`, for example to query the different load balancers: 

@@ -7893,7 +7893,7 @@ https://github.com/elastic/beats/compare/v7.2.0\...v7.3.0[View commits]
 
 *Filebeat*
 
-- `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
+- `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overridden with processors. {pull}12410[12410]
 
 ==== Bugfixes
 
