@@ -229,7 +229,7 @@ packetbeat [FLAGS]
 :   Writes memory profile data to the specified output file. This option is useful for troubleshooting Packetbeat.
 
 **`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
+:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is deprecated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 **`-t`**
 :   Reads packets from the pcap file as fast as possible without sleeping. Use this option in combination with the `-I` option. The `-t` option is useful only for testing Packetbeat.
