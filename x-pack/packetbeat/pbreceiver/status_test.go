@@ -67,30 +67,40 @@ func TestReceiverStatus(t *testing.T) {
 	require.NoError(t, rec.Start(t.Context(), host))
 
 	// Wait for StatusOK to be reported. The sniffer starts, emits Running
-	// (→ StatusOK), reads the pcap, then stops — all within milliseconds.
-	// We poll the full event history so we catch StatusOK even if the
-	// receiver has already transitioned to Stopped by the first tick.
+	// (→ StatusOK), reads the pcap, then the sub-runner records Stopped —
+	// all within milliseconds. The aggregate reporter ignores Stopped and
+	// keeps reporting StatusOK (Running), so we poll the full event history
+	// to catch the first StatusOK even if the pcap finished before the first
+	// poll tick.
+	// Scan all events looking for one where both the top-level component status
+	// and the sub-runner's reported status are StatusOK. The aggregate reporter
+	// always emits StatusOK (it treats Stopped sub-runners as Running), so we
+	// must also check the inputs map to confirm the receiver was actually running,
+	// not just stopped.
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
 		evts := host.GetEvents()
 		var found bool
 		for _, evt := range evts {
-			if evt.Status() == componentstatus.StatusOK {
+			if evt.Status() != componentstatus.StatusOK {
+				continue
+			}
+			attrs := evt.Attributes().AsRaw()
+			inputs, ok := attrs["inputs"].(map[string]any)
+			if !ok {
+				continue
+			}
+			entry, ok := inputs[inputID].(map[string]any)
+			if !ok {
+				continue
+			}
+			if entry["status"] == componentstatus.StatusOK.String() {
 				found = true
-				// Verify the expected input-status attributes are present.
-				attrs := evt.Attributes().AsRaw()
-				inputs, ok := attrs["inputs"].(map[string]any)
-				assert.True(c, ok, "expected 'inputs' map in status attributes")
-				if ok {
-					entry, ok := inputs[inputID].(map[string]any)
-					assert.True(c, ok, "expected entry for %q in inputs", inputID)
-					if ok {
-						assert.Equal(c, componentstatus.StatusOK.String(), entry["status"])
-					}
-				}
 				break
 			}
 		}
-		assert.True(c, found, "StatusOK never reported; all events: %v", evts)
+		assert.True(c, found,
+			"no event found where both component status and input %q status are StatusOK; all events: %v",
+			inputID, evts)
 	}, 30*time.Second, 10*time.Millisecond,
 		"timeout waiting for StatusOK from packetbeat receiver")
 

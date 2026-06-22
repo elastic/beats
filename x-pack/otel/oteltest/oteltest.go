@@ -196,6 +196,9 @@ func CheckReceivers(params CheckReceiversParams) {
 				break
 			}
 			if params.Status != nil {
+				// Check the full event history rather than only the last event.
+				// Fast-finishing receivers (e.g. pcap replay) may transition
+				// through StatusOK and into Stopped before the first poll tick.
 				evts := host.GetEvents()
 				require.NotEmpty(ct, evts, "expected at least one status event, got none")
 				var matched bool
