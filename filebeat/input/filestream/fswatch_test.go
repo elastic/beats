@@ -1382,15 +1382,6 @@ func mustSourceIdentifier(inputID string) *loginp.SourceIdentifier {
 	return si
 }
 
-type testFileScanner struct {
-	files map[string]loginp.FileDescriptor
-}
-
-// GetFiles return s.files and empty metrics
-func (s *testFileScanner) GetFiles(loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
-	return s.files, loginp.FileScanMetrics{}
-}
-
 const benchmarkFileCount = 1000
 
 func BenchmarkGetFiles(b *testing.B) {
