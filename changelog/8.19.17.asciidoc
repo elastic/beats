@@ -1,0 +1,127 @@
+// begin 8.19.17 relnotes
+
+[[release-notes-8.19.17]]
+==  8.19.17
+
+Review important information about the  8.19.17 release.
+
+[discrete]
+[[security-updates-8.19.17]]
+=== Security updates
+
+
+
+
+**All**
+
+* Upgrade to Go 1.26.4. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+
+
+
+[discrete]
+[[deprecations-8.19.17]]
+=== Deprecations
+
+The following functionality is deprecated in 8.19.17, and will be removed in
+8.19.17. Deprecated functionality does not have an immediate impact on your
+application, but we strongly recommend you make the necessary updates after you
+upgrade to 8.19.17.
+
+
+
+
+**Beats**
+
+* Deprecate ssl.restart_on_cert_change in favor of ssl.certificate_reload. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] { $k | section}}::$k }}::
+
+[discrete]
+[[new-features-8.19.17]]
+=== New features
+
+The 8.19.17 release adds the following new and notable features.
+
+
+
+
+**All**
+
+* Update Go to 1.26.3. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+**Beats**
+
+* Allow TLS certificate and CA hot-reload without restarting. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+[discrete]
+[[enhancements-8.19.17]]
+=== Enhancements
+
+
+
+
+**All**
+
+* Migrate from deprecated github.com/docker/docker to github.com/moby/moby split modules. https://github.com/elastic/beats/pull/50300[#50300] 
+
+
+**Filebeat**
+
+* Add input redirection support through a new Redirector mechanism. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+**Metricbeat**
+
+* Migrate azure/app_insights metricset off the deprecated track-1 Azure SDK and go-autorest, using azcore directly. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+
+
+[discrete]
+[[bug-fixes-8.19.17]]
+=== Bug fixes
+
+
+
+
+**Beats**
+
+* Disable TLS certificate hot-reload by default on patch branches. https://github.com/elastic/beats/pull/51105[#51105] 
+* Fix panic in the Elastic Agent V2 manager when reloading with no output unit. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+**Filebeat**
+
+* Fix token refresh for jwk_pem/jwk_file in cel, httpjson inputs. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] https://github.com/elastic/beats/issues/50426[#50426]
+* Respect max_bytes/message_max_bytes when reading the first chunk of CRI partial lines. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+* Fix request tracer path validation for cel, httpjson, http_endpoint, and entityanalytics inputs when filebeat runs as an OTel receiver. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+* Make CrowdStrike streaming input cancel refresh goroutines on session reconnect. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+* Fix goroutine leak in filestream task group. https://github.com/elastic/beats/pull/50839[#50839] https://github.com/elastic/beats/issues/50824[#50824]
+* Cache Okta OAuth2 token in cel and httpjson to avoid unnecessary JWT regeneration. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+* Fix filestream registry leak on file renames. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+* Guard event.original rename in azure module ingest pipelines to prevent &#34;field already exists&#34; error when the field is pre-populated. https://github.com/elastic/beats/pull/51271[#51271] 
+
+
+**Libbeat**
+
+* Fix bulk indexing failures that could occur when using the Elasticsearch output with some non-Elastic backends. https://github.com/elastic/beats/pull/49557[#49557] https://github.com/elastic/beats/issues/49558[#49558]
+* Fix data race in add_cloud_metadata processor when fetching metadata from multiple providers concurrently. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+**Osquerybeat**
+
+* Respect osquery pack query platform filters for Live Query actions. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+
+**Packetbeat**
+
+* Fix janitor goroutine leaks and decoder cleanup lifecycle on route changes. https://github.com/elastic/beats/pull/48836[#48836] 
+
+
+**Winlogbeat**
+
+* Treat RPC_S_UNKNOWN_IF (1717) as a recoverable error so Winlogbeat reopens the event log session instead of exiting on this transient RPC error. https://github.com/elastic/beats/pull/51318[#51318] https://github.com/elastic/beats/pull/51364[#51364] https://github.com/elastic/beats/pull/51365[#51365] https://github.com/elastic/beats/pull/51366[#51366] https://github.com/elastic/beats/pull/51367[#51367] 
+
+// end 8.19.17 relnotes

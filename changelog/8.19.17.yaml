@@ -1,0 +1,393 @@
+version: 8.19.17
+entries:
+    - kind: deprecation
+      summary: Deprecate ssl.restart_on_cert_change in favor of ssl.certificate_reload
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1746484800
+      file:
+        name: 1746484800-deprecate-restart-on-cert-change.yaml
+        checksum: 322dfb67373da676d7404115e016414320f4fb47
+    - kind: bug-fix
+      summary: Fix janitor goroutine leaks and decoder cleanup lifecycle on route changes
+      description: ""
+      component: packetbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48836
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1771343134
+      file:
+        name: 1771343134-packetbeat-libbeat-janitor-cleanup-lifecycle-fix.yaml
+        checksum: 3d26a29ec837a2f230c5e8e1ef521e08cadf6188
+    - kind: bug-fix
+      summary: Fix bulk indexing failures that could occur when using the Elasticsearch output with some non-Elastic backends.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/49557
+      issue:
+        - https://github.com/elastic/beats/issues/49558
+      impact: ""
+      action: ""
+      timestamp: 1773900000
+      file:
+        name: 1773900000-fix-bulk-raw-encoding-double-newline.yaml
+        checksum: ebc2c2cee40a5f0448ebcd50f4b28ef019fea5f6
+    - kind: enhancement
+      summary: Add input redirection support through a new Redirector mechanism.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1774300895
+      file:
+        name: 1774300895-id6318-filebeat-director.yaml
+        checksum: 5f1adae73505f60b2dcfca3c69dfafee3ebaf974
+    - kind: enhancement
+      summary: Migrate from deprecated github.com/docker/docker to github.com/moby/moby split modules
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/50300
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1776996952
+      file:
+        name: 1776996952-migrate-docker-to-moby.yaml
+        checksum: b4dc0665bf10ca09407e35c4ac0b68929a59de26
+    - kind: enhancement
+      summary: Migrate azure/app_insights metricset off the deprecated track-1 Azure SDK and go-autorest, using azcore directly.
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777275227
+      file:
+        name: 1777275227-azure-app-insights-drop-deprecated-sdk.yaml
+        checksum: 7808b52b2b30e779ed56c76a2b6a901591b567fa
+    - kind: bug-fix
+      summary: Fix token refresh for jwk_pem/jwk_file in cel, httpjson inputs
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue:
+        - https://github.com/elastic/beats/issues/50426
+      impact: ""
+      action: ""
+      timestamp: 1777549938
+      file:
+        name: 1777549938-fix-okta-oauth2-pem-file-auth-token-refresh.yaml
+        checksum: 9f27629a87a9b218ad19b5c9194f63fdc743c270
+    - kind: feature
+      summary: Allow TLS certificate and CA hot-reload without restarting
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1777589170
+      file:
+        name: 1777589170-tls-cert-reload.yaml
+        checksum: 38e8df56e160df5b2870ce424aabd453d89f2c59
+    - kind: bug-fix
+      summary: Respect max_bytes/message_max_bytes when reading the first chunk of CRI partial lines
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778172750
+      file:
+        name: 1778172750-fix-cri-max-bytes-first-chunk.yaml
+        checksum: e92b3915f385dc62592a814d6995c86feb74320b
+    - kind: bug-fix
+      summary: Fix request tracer path validation for cel, httpjson, http_endpoint, and entityanalytics inputs when filebeat runs as an OTel receiver.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778461362
+      file:
+        name: 1778461362-i18803-tracer-path-receiver-runtime.yaml
+        checksum: 32dbca958aba6cfb0b75dca2b8e70f84689db540
+    - kind: bug-fix
+      summary: respect osquery pack query platform filters for Live Query actions
+      description: ""
+      component: osquerybeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778485141
+      file:
+        name: 1778485141-osquerybeat-live-query-platform-filter.yaml
+        checksum: 0f846165ff76c475db24fe9b43112742afeefc8b
+    - kind: feature
+      summary: Update Go to 1.26.3
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1778788830
+      file:
+        name: 1778788830-update-go-to-1.26.yaml
+        checksum: 6e90a46e8a3271a33dca99e3f1ee16bebdd138c5
+    - kind: bug-fix
+      summary: Make CrowdStrike streaming input cancel refresh goroutines on session reconnect.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779249109
+      file:
+        name: 1779249109-fix-crowdstrike-refresh-goroutine-leak.yaml
+        checksum: 5f2e5ed8be0cff3b3a103e3b1823d0b6929a355d
+    - kind: bug-fix
+      summary: Fix goroutine leak in filestream task group.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/50839
+      issue:
+        - https://github.com/elastic/beats/issues/50824
+      impact: ""
+      action: ""
+      timestamp: 1779367798
+      file:
+        name: 1779367798-fix-goroutine-leak-in-filestream-task-group.yaml
+        checksum: 0ec9fe01e7bb5507225b1822295ee5fc69119f53
+    - kind: other
+      summary: upgrade heartbeat NPM to 11.14.1 on wolfi images
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779396482
+      file:
+        name: 1779396482-heartbeat-bump-npm-11.14.1.yaml
+        checksum: 4aed7339ae5da717d3f4007b6cfae3606965e11c
+    - kind: bug-fix
+      summary: Treat RPC_S_UNKNOWN_IF (1717) as a recoverable error so Winlogbeat reopens the event log session instead of exiting on this transient RPC error.
+      description: ""
+      component: winlogbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1779464496
+      file:
+        name: 1779464496-treat-rpc_s_unknown_if-as-a-recoverable-error-in-winlogbeat.yaml
+        checksum: 11dfc2198556f7035d1e61dc2ce591bbadd37de6
+    - kind: bug-fix
+      summary: Cache Okta OAuth2 token in cel and httpjson to avoid unnecessary JWT regeneration.
+      description: |
+        The oktaTokenSource.Token() method in the cel and httpjson inputs
+        unconditionally regenerated a JWT and exchanged it for a bearer token
+        on every call, even when the cached token was still valid. Add a
+        token validity check to skip regeneration when unnecessary.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1780465909
+      file:
+        name: 1780465909-okta-oauth2-token-cache.yaml
+        checksum: fee3faafc609425f5afb7b3cec6e2e53a0185651
+    - kind: bug-fix
+      summary: Disable TLS certificate hot-reload by default on patch branches
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/51105
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1780583553
+      file:
+        name: 1780583553-disable-tls-certificate-hot-reload-by-default-on-patch-branches.yaml
+        checksum: cec1edd1d9fedeabbf8f4a29635c6f975ffb0862
+    - kind: security
+      summary: Upgrade to Go 1.26.4.
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1780929136
+      file:
+        name: 1780929136-upgrade-to-go-1.26.4.yaml
+        checksum: de3dc420881b5c63b2e71429f41ac423730cfadc
+    - kind: bug-fix
+      summary: Fix filestream registry leak on file renames.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781341755
+      file:
+        name: 1781341755-fix-filestream-findcursormeta-leak.yaml
+        checksum: 5db76d84402f79057fbcc4531bed4229eec59d3f
+    - kind: bug-fix
+      summary: Fix panic in the Elastic Agent V2 manager when reloading with no output unit.
+      description: ""
+      component: beats
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781341838
+      file:
+        name: 1781341838-fix-managerv2-nil-output-unit-panic.yaml
+        checksum: 8796c3cedbeb144b05c407838f1e9a3eed39ed4d
+    - kind: bug-fix
+      summary: Guard event.original rename in azure module ingest pipelines to prevent "field already exists" error when the field is pre-populated
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51271
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781544098
+      file:
+        name: 1781544098-filebeat-azure-event-original-guard.yaml
+        checksum: 1ef8963f844b3c4b289ca32a26034482c5485d19
+    - kind: bug-fix
+      summary: Fix data race in add_cloud_metadata processor when fetching metadata from multiple providers concurrently.
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781613127
+      file:
+        name: 1781613127-fix-add-cloud-metadata-tls-config-race.yaml
+        checksum: e2bd28b197f77a3a3d650a777fa5849cb55326cf
+    - kind: other
+      summary: Bump heartbeat NPM to 11.17.0
+      description: ""
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51318
+        - https://github.com/elastic/beats/pull/51364
+        - https://github.com/elastic/beats/pull/51365
+        - https://github.com/elastic/beats/pull/51366
+        - https://github.com/elastic/beats/pull/51367
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1781628613
+      file:
+        name: 1781628613-heartbeat-bump-npm-11.17.0.yaml
+        checksum: de2106d6fc33e34cce15fcbc23ea458e5b7e0c0c
