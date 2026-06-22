@@ -406,12 +406,6 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
 	}
 }
-<<<<<<< HEAD
-=======
-
-func (t *TakeOverConfig) FromFilestream() bool {
-	return len(t.FromIDs) != 0
-}
 
 // ReadUntilEOFConfig configures the behaviour to keep reading the current
 // file until EOF before the input shuts down. If Timeout elapses before EOF
@@ -421,4 +415,3 @@ type ReadUntilEOFConfig struct {
 	// Timeout is the maximum time to wait for EOF to be reached.
 	Timeout time.Duration `config:"timeout" validate:"min=1"`
 }
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))

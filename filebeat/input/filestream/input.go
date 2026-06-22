@@ -713,86 +713,9 @@ func (inp *filestream) readFromSource(
 
 	var err error
 	for ctx.Cancelation.Err() == nil {
-<<<<<<< HEAD
-		// next line - r needs to be reading from a gzipped file
-		message, err := r.Next()
-		if err != nil {
-			if errors.Is(err, ErrFileTruncate) {
-				log.Infof("File was truncated, nothing to read. Path='%s'", path)
-			} else if errors.Is(err, ErrClosed) {
-				log.Debugf("Reader was closed. Closing. Path='%s'", path)
-			} else if errors.Is(err, io.EOF) {
-				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
-				if inp.deleterConfig.Enabled {
-					return err
-				}
-			} else if errors.Is(err, ErrInactive) {
-				log.Debugf("File is inactive. Closing. Path='%s'", path)
-				return err
-			} else {
-				log.Errorf("Read line error: %v", err)
-				metrics.ProcessingErrors.Inc()
-				if isGZIP {
-					metrics.ProcessingGZIPErrors.Inc()
-				}
-			}
-
-			return nil
-		}
-
-		// sate offset increase
-		s.Offset += int64(message.Bytes) + int64(message.Offset)
-
-		flags, err := message.Fields.GetValue("log.flags")
-		if err == nil {
-			if flags, ok := flags.([]string); ok {
-				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
-					metrics.MessagesTruncated.Add(1)
-					if isGZIP {
-						// Truncation shouldn't happen for GZIP files, but as
-						// there it the overall metric for filestream, this case
-						// is handled for completeness.
-						metrics.MessagesGZIPTruncated.Add(1)
-					}
-				}
-			}
-		}
-
-		metrics.MessagesRead.Inc()
-		if isGZIP {
-			metrics.MessagesGZIPRead.Inc()
-		}
-		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
-			continue
-		}
-
-		//nolint:gosec // message.Bytes is always positive
-		metrics.BytesProcessed.Add(uint64(message.Bytes))
-		if isGZIP {
-			//nolint:gosec // message.Bytes is always positive, no risk of overflow here
-			metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
-		}
-
-		// add "take_over" tag if `take_over` is set to true
-		if inp.takeOver.Enabled {
-			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
-		}
-
-		if isGZIP {
-			if err, ok := (message.Private).(error); ok && errors.Is(err, io.EOF) {
-				s.EOF = true
-			}
-		}
-		if err := p.Publish(message.ToEvent(), s); err != nil {
-			metrics.ProcessingErrors.Inc()
-			if isGZIP {
-				metrics.ProcessingGZIPErrors.Inc()
-			}
-=======
 		err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
 		err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
 		if !shouldContinue {
->>>>>>> 14ddacbbc (filebeat: add `read_until_eof` to filestream (#50324))
 			return err
 		}
 	}
@@ -857,7 +780,7 @@ func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, met
 	if isGZIP {
 		metrics.MessagesGZIPRead.Inc()
 	}
-	if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
+	if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 		return nil
 	}
 
