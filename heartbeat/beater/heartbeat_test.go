@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestMakeESClient(t *testing.T) {
@@ -40,7 +41,7 @@ func TestMakeESClient(t *testing.T) {
 		anyAttempt := 1
 		anyDuration := 1 * time.Second
 
-		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration)
+		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration, logp.NewLogger("test"))
 
 		timeout, err := origCfg.Int("timeout", -1)
 		require.NoError(t, err)
