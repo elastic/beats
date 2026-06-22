@@ -170,11 +170,7 @@ shared:
   - &docker_spec
     <<: *binary_spec
     extra_vars:
-<<<<<<< HEAD
       from: '--platform=linux/amd64 ubuntu:24.04'
-=======
-      from: '--platform=linux/amd64 redhat/ubi10-minimal'
->>>>>>> 518836217 (deps: Bump UBI images to 10.2 (#51377))
       buildFrom: '--platform=linux/amd64 cgr.dev/chainguard/wolfi-base'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
@@ -187,11 +183,7 @@ shared:
   - &docker_arm_spec
     <<: *docker_spec
     extra_vars:
-<<<<<<< HEAD
       from: '--platform=linux/arm64 ubuntu:24.04'
-=======
-      from: '--platform=linux/arm64 redhat/ubi10-minimal'
->>>>>>> 518836217 (deps: Bump UBI images to 10.2 (#51377))
       buildFrom: '--platform=linux/arm64 cgr.dev/chainguard/wolfi-base'
 
   - &docker_ubi_spec

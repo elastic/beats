@@ -169,11 +169,7 @@ USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
-<<<<<<< HEAD
 {{- if (and (eq .BeatName "heartbeat") (contains .from "ubuntu")) }}
-=======
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
->>>>>>> 518836217 (deps: Bump UBI images to 10.2 (#51377))
 USER root
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
