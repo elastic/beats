@@ -21,6 +21,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -28,24 +29,26 @@ import (
 type Registry struct {
 	ctx context.Context
 
-	log *logp.Logger
-	mx  sync.Mutex
+	log  *logp.Logger
+	mx   sync.Mutex
+	info *beat.Info
 
 	notifier *Notifier
 }
 
-func New(ctx context.Context, log *logp.Logger, notifier *Notifier) *Registry {
+func New(ctx context.Context, log *logp.Logger, notifier *Notifier, info *beat.Info) *Registry {
 	return &Registry{
 		ctx:      ctx,
 		log:      log,
 		notifier: notifier,
+		info:     info,
 	}
 }
 
 func (r *Registry) Access(name string) (backend.Store, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
-	return openStore(r.ctx, r.log, name, r.notifier)
+	return openStore(r.ctx, r.log, name, r.notifier, r.info)
 }
 
 func (r *Registry) Close() error {
