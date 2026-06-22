@@ -29,7 +29,6 @@ func newOTelOutputController(
 	beatInfo beat.Info,
 	monitors Monitors,
 	retryObserver retryObserver,
-	intakeQueueID string,
 	queueFactory queue.QueueFactory[publisher.Event],
 	queueConfig any,
 ) (outputController, error) {
