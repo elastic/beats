@@ -20,13 +20,16 @@ package prometheus
 import (
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"net/http"
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -182,6 +185,23 @@ metrics_that_inform_labels{label1="I am 1", label3="I am 3"} 1
 # TYPE metrics_that_use_labels gauge
 metrics_that_use_labels{label1="I am 1"} 20
 
+`
+
+	// Simulates KSM output for state_service when *_created is denylisted.
+	promInfoOnlyService = `# HELP kube_service_info Information about service.
+# TYPE kube_service_info gauge
+kube_service_info{namespace="default",service="kubernetes",uid="b20b8a15",cluster_ip="10.96.0.1",external_name="",load_balancer_ip=""} 1
+kube_service_info{namespace="kube-system",service="kube-dns",uid="979a9342",cluster_ip="10.96.0.10",external_name="",load_balancer_ip=""} 1
+# HELP kube_service_spec_type Type about service.
+# TYPE kube_service_spec_type gauge
+kube_service_spec_type{namespace="default",service="kubernetes",type="ClusterIP"} 1
+kube_service_spec_type{namespace="kube-system",service="kube-dns",type="ClusterIP"} 1
+`
+
+	// Simulates KSM output for state_storageclass when *_created is denylisted.
+	promInfoOnlyStorageclass = `# HELP kube_storageclass_info Information about storageclass.
+# TYPE kube_storageclass_info gauge
+kube_storageclass_info{storageclass="standard",provisioner="rancher.io/local-path",reclaim_policy="Delete",volume_binding_mode="WaitForFirstConsumer"} 1
 `
 )
 
@@ -1071,5 +1091,189 @@ func TestPrometheusKeyLabels(t *testing.T) {
 			}
 			t.Logf("events: %+v", events[i].MetricSetFields)
 		}
+	}
+}
+
+// TestInfoMetricPromotionWhenNoEventsCreated verifies that InfoMetrics are
+// promoted to standalone events when no event-creating metrics produce data.
+// This reproduces the OpenShift kube-state-metrics scenario where
+// --metric-denylist blocks *_created, leaving only InfoMetric entries.
+func TestInfoMetricPromotionWhenNoEventsCreated(t *testing.T) {
+	testCases := []struct {
+		testName           string
+		prometheusResponse string
+		mapping            *MetricsMapping
+		expectedCount      int
+		validate           func(t *testing.T, events []mapstr.M)
+	}{
+		{
+			testName:           "state_service mapping without kube_service_created",
+			prometheusResponse: promInfoOnlyService,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"kube_service_info":      InfoMetric(),
+					"kube_service_created":   Metric("created", OpUnixTimestampValue()),
+					"kube_service_spec_type": InfoMetric(),
+				},
+				Labels: map[string]LabelMap{
+					"namespace":  KeyLabel(mb.ModuleDataKey + ".namespace"),
+					"service":    KeyLabel("name"),
+					"cluster_ip": Label("cluster_ip"),
+					"type":       Label("type"),
+				},
+			},
+			expectedCount: 2,
+			validate: func(t *testing.T, events []mapstr.M) {
+				for _, event := range events {
+					svcName, _ := event.GetValue("name")
+					assert.NotEmpty(t, svcName, "service name should be present")
+
+					clusterIP, _ := event.GetValue("cluster_ip")
+					assert.NotEmpty(t, clusterIP, "cluster_ip should be present")
+
+					svcType, _ := event.GetValue("type")
+					assert.NotEmpty(t, svcType, "type should be present")
+
+					_, err := event.GetValue("created")
+					assert.Error(t, err, "created field should be absent")
+				}
+			},
+		},
+		{
+			testName:           "state_storageclass mapping without kube_storageclass_created",
+			prometheusResponse: promInfoOnlyStorageclass,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"kube_storageclass_info":    InfoMetric(),
+					"kube_storageclass_created": Metric("created", OpUnixTimestampValue()),
+				},
+				Labels: map[string]LabelMap{
+					"storageclass":        KeyLabel("name"),
+					"provisioner":         Label("provisioner"),
+					"reclaim_policy":      Label("reclaim_policy"),
+					"volume_binding_mode": Label("volume_binding_mode"),
+				},
+			},
+			expectedCount: 1,
+			validate: func(t *testing.T, events []mapstr.M) {
+				event := events[0]
+
+				scName, _ := event.GetValue("name")
+				assert.Equal(t, "standard", scName)
+
+				provisioner, _ := event.GetValue("provisioner")
+				assert.Equal(t, "rancher.io/local-path", provisioner)
+
+				reclaimPolicy, _ := event.GetValue("reclaim_policy")
+				assert.Equal(t, "Delete", reclaimPolicy)
+
+				_, err := event.GetValue("created")
+				assert.Error(t, err, "created field should be absent")
+			},
+		},
+		{
+			testName:           "InfoMetrics should NOT be promoted when events exist",
+			prometheusResponse: promGaugeLabeled,
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"metrics_that_inform_labels": InfoMetric(),
+					"metrics_that_use_labels":    Metric("metrics.value"),
+				},
+				Labels: map[string]LabelMap{
+					"label1": KeyLabel("metrics.label1"),
+				},
+			},
+			expectedCount: 1,
+			validate: func(t *testing.T, events []mapstr.M) {
+				val, _ := events[0].GetValue("metrics.value")
+				assert.InDelta(t, 20.0, val, 0.001, "regular metric value should be present")
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.testName, func(t *testing.T) {
+			r := &mbtest.CapturingReporterV2{}
+			p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logptest.NewTestingLogger(t, "test")}
+			err := p.ReportProcessedMetrics(tc.mapping, r)
+			require.NoError(t, err)
+			assert.Empty(t, r.GetErrors())
+
+			events := r.GetEvents()
+			require.Len(t, events, tc.expectedCount)
+
+			msFields := make([]mapstr.M, len(events))
+			for i, ev := range events {
+				msFields[i] = ev.MetricSetFields
+			}
+			sort.Slice(msFields, func(i, j int) bool {
+				return msFields[i].String() < msFields[j].String()
+			})
+
+			tc.validate(t, msFields)
+		})
+	}
+}
+
+// generateStateContainerMetrics builds a Prometheus text exposition that
+// resembles a kube-state-metrics state_container response with the given
+// number of containers and InfoMetric entries per container.
+func generateStateContainerMetrics(containers, infosPerContainer int) string {
+	var buf bytes.Buffer
+	buf.WriteString("# HELP kube_pod_container_info Information about a container in a pod.\n")
+	buf.WriteString("# TYPE kube_pod_container_info gauge\n")
+	for i := 0; i < containers; i++ {
+		for j := 0; j < infosPerContainer; j++ {
+			fmt.Fprintf(&buf,
+				"kube_pod_container_info{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\",image=\"img-%d:%d\"} 1\n",
+				i%10, i, i, i, j)
+		}
+	}
+	buf.WriteString("# HELP kube_pod_container_status_ready Describes whether the containers readiness check succeeded.\n")
+	buf.WriteString("# TYPE kube_pod_container_status_ready gauge\n")
+	for i := 0; i < containers; i++ {
+		fmt.Fprintf(&buf,
+			"kube_pod_container_status_ready{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\"} 1\n",
+			i%10, i, i)
+	}
+	buf.WriteString("# HELP kube_pod_container_status_running Describes whether the container is in running state.\n")
+	buf.WriteString("# TYPE kube_pod_container_status_running gauge\n")
+	for i := 0; i < containers; i++ {
+		fmt.Fprintf(&buf,
+			"kube_pod_container_status_running{namespace=\"ns-%d\",pod=\"pod-%d\",container=\"ctr-%d\"} 1\n",
+			i%10, i, i)
+	}
+	return buf.String()
+}
+
+func BenchmarkProcessMetricsInfoMerge(b *testing.B) {
+	for _, containers := range []int{100, 500, 1000} {
+		b.Run(fmt.Sprintf("containers=%d", containers), func(b *testing.B) {
+			response := generateStateContainerMetrics(containers, 1)
+			mapping := &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"kube_pod_container_info":           InfoMetric(),
+					"kube_pod_container_status_ready":   BooleanMetric("status.ready"),
+					"kube_pod_container_status_running": BooleanMetric("status.running"),
+				},
+				Labels: map[string]LabelMap{
+					"namespace": KeyLabel("namespace"),
+					"pod":       KeyLabel("pod"),
+					"container": KeyLabel("container"),
+					"image":     Label("image"),
+				},
+			}
+
+			p := &prometheus{mockFetcher{response: response}, logptest.NewTestingLogger(b, "bench")}
+
+			b.ResetTimer()
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				_, err := p.GetProcessedMetrics(mapping)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }
