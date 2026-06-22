@@ -16,7 +16,7 @@ request.proxy_url: {{ .proxy_url }}
 request.transforms:
   - set:
       target: url.params.startTime
-      # If last pagination cycle was finished successully
+      # If last pagination cycle was finished successfully
       # we move the startDate pointer forward
       # else we reprocess the last interval from the beginning.
       # If none of the values are in the cursor it means is a fresh start
