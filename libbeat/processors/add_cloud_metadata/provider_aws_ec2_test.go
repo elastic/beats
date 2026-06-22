@@ -38,7 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -139,7 +138,6 @@ var genericInstanceIDResponse getInstanceIDFunc = func(ctx context.Context, para
 }
 
 func TestMain(m *testing.M) {
-	logp.TestingSetup()
 	code := m.Run()
 	os.Exit(code)
 }
@@ -536,7 +534,7 @@ func Test_getTags(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tags := getTags(ctx, tt.imdsClient, tt.ec2Client, instanceId, logger)
-			assert.Equal(t, tags, tt.want)
+			assert.Equal(t, tt.want, tags)
 		})
 	}
 }
