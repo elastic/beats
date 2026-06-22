@@ -258,6 +258,9 @@ func (p *prometheus) ProcessMetrics(families []*MetricFamily, mapping *MetricsMa
 	if len(events) == 0 {
 		infoEvents := map[string]mapstr.M{}
 		for _, info := range infoMetrics {
+			// Multiple metrics can be declared as InfoMetric() with the same
+			// key labels but different metadata (e.g. kube_service_info and
+			// kube_service_spec_type). Group by key labels and merge metadata.
 			key := info.Labels.String()
 			if existing, ok := infoEvents[key]; ok {
 				existing.DeepUpdate(info.Meta)
