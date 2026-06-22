@@ -369,7 +369,7 @@ func TestFetch_MergeResultsRejectsMultipleRowsPerQuery(t *testing.T) {
 		{Query: "SELECT id FROM t", ResponseFormat: tableResponseFormat},
 	})
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "cannot merge query resulting with more than one rows")
+	assert.Contains(t, err.Error(), "cannot merge query resulting in more than one row")
 }
 
 func TestFetch_TableAndVariableErrorsAreWrapped(t *testing.T) {
