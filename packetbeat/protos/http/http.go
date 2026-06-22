@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -105,8 +106,8 @@ type httpPlugin struct {
 }
 
 var (
-	isDebug    = false
-	isDetailed = false
+	isDebug    atomic.Bool
+	isDetailed atomic.Bool
 )
 
 func init() {
@@ -137,8 +138,8 @@ func New(
 func (http *httpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *httpConfig) error {
 	http.setFromConfig(config)
 
-	isDebug = logp.IsDebug("http")
-	isDetailed = logp.IsDebug("httpdetailed")
+	isDebug.Store(logp.IsDebug("http"))
+	isDetailed.Store(logp.IsDebug("httpdetailed"))
 	http.results = results
 	http.watcher = watcher
 	return nil
@@ -198,7 +199,7 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 		// we know we cannot recover from these
 		return false, false
 	case stateBody:
-		if isDebug {
+		if isDebug.Load() {
 			debugf("gap in body: %d", nbytes)
 		}
 
@@ -301,7 +302,7 @@ func (http *httpPlugin) doParse(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *httpConnectionData {
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("Payload received: [%s]", pkt.Payload)
 	}
 
@@ -319,7 +320,7 @@ func (http *httpPlugin) doParse(
 			totalLength += len(msg.body)
 		}
 		if totalLength > http.maxMessageSize {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Stream data too large, ignoring message")
 			}
 			extraMsgSize = len(pkt.Payload)
@@ -410,7 +411,7 @@ func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	}
 
 	ok, complete := http.messageGap(stream, nbytes)
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("messageGap returned ok=%v complete=%v", ok, complete)
 	}
 	if !ok {
@@ -445,12 +446,12 @@ func (http *httpPlugin) handleHTTP(
 	http.hideHeaders(m)
 
 	if m.isRequest {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Received request with tuple: %s", m.tcpTuple)
 		}
 		conn.requests.append(m)
 	} else {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Received response with tuple: %s", m.tcpTuple)
 		}
 		conn.responses.append(m)
@@ -497,7 +498,7 @@ func (http *httpPlugin) correlate(conn *httpConnectionData) {
 		resp := conn.responses.pop()
 		event := http.newTransaction(requ, resp)
 
-		if isDebug {
+		if isDebug.Load() {
 			debugf("HTTP transaction completed")
 		}
 		http.publishTransaction(event)
@@ -695,7 +696,7 @@ func (http *httpPlugin) decodeBody(m *message) {
 }
 
 func decodeBody(body []byte, encodings []string, maxSize int) (result []byte, err error) {
-	if isDebug {
+	if isDebug.Load() {
 		debugf("decoding body with encodings=%v", encodings)
 	}
 	for idx := len(encodings) - 1; idx >= 0; idx-- {
@@ -784,7 +785,7 @@ func (http *httpPlugin) hideHeaders(m *message) {
 	authHeaderEndX := limit
 
 	for authHeaderStartX < limit {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("looking for authorization from %d to %d",
 				authHeaderStartX, authHeaderEndX)
 		}
@@ -801,7 +802,7 @@ func (http *httpPlugin) hideHeaders(m *message) {
 					authHeaderEndX = limit
 				}
 
-				if isDebug {
+				if isDebug.Load() {
 					debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
 				}
 
@@ -863,7 +864,7 @@ func (http *httpPlugin) extractParameters(m *message) (path string, params strin
 	}
 
 	params = paramsMap.Encode()
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("Form parameters: %s", params)
 	}
 	return
@@ -883,14 +884,14 @@ func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolD
 	if conn == nil {
 		return
 	}
-	if isDebug {
+	if isDebug.Load() {
 		debugf("expired connection %s", tuple)
 	}
 	// terminate streams
 	for dir, s := range conn.streams {
 		// Do not send incomplete or empty messages
 		if s != nil && s.message != nil && s.message.headersReceived() {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("got message %+v", s.message)
 			}
 			http.handleHTTP(conn, s.message, tuple, uint8(dir))

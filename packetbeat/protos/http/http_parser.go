@@ -182,7 +182,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 	var err error
 	fline := s.data[s.parseOffset:i]
 	if len(fline) < 9 {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("First line too small")
 		}
 		return false, false, false
@@ -197,7 +197,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			return false, false, false
 		}
 
-		if isDebug {
+		if isDebug.Load() {
 			debugf("HTTP status_code=%d, status_phrase=%s", m.statusCode, m.statusPhrase)
 		}
 	} else {
@@ -207,7 +207,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 
 		// Make sure we have the VERB + URI + HTTP_VERSION
 		if afterMethodIdx == -1 || afterRequestURIIdx == -1 || afterMethodIdx == afterRequestURIIdx {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Couldn't understand HTTP request: %s", fline)
 			}
 			return false, false, false
@@ -221,7 +221,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 			m.isRequest = true
 			version = fline[versionIdx:]
 		} else {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Couldn't understand HTTP version: %s", fline)
 			}
 			return false, false, false
@@ -230,13 +230,13 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 
 	m.version.major, m.version.minor, err = parseVersion(version)
 	if err != nil {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Failed to understand HTTP version: %v", version)
 		}
 		m.version.major = 1
 		m.version.minor = 0
 	}
-	if isDebug {
+	if isDebug.Load() {
 		debugf("HTTP version %d.%d", m.version.major, m.version.minor)
 	}
 
@@ -249,7 +249,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 }
 
 func parseResponseStatus(s []byte) (uint16, []byte, error) {
-	if isDebug {
+	if isDebug.Load() {
 		debugf("parseResponseStatus: %s", s)
 	}
 
@@ -300,7 +300,7 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		if !m.isRequest && ((100 <= m.statusCode && m.statusCode < 200) || m.statusCode == 204 || m.statusCode == 304) {
 			// response with a 1xx, 204 , or 304 status  code is always terminated
 			// by the first empty line after the  header fields
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Terminate response, status code %d", m.statusCode)
 			}
 			return false, true, true
@@ -316,7 +316,7 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		if m.isChunked {
 			// support for HTTP/1.1 Chunked transfer
 			// Transfer-Encoding overrides the Content-Length
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Read chunked body")
 			}
 			s.parseState = stateBodyChunkedStart
@@ -324,14 +324,14 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		}
 
 		if m.contentLength == 0 && (m.isRequest || m.hasContentLength) {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Empty content length, ignore body")
 			}
 			// Ignore body for request that contains a message body but not a Content-Length
 			return false, true, true
 		}
 
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Read body")
 		}
 		s.parseState = stateBody
@@ -361,7 +361,7 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 	config := parser.config
 
 	// enabled if required. Allocs for parameters slow down parser big times
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("Data: %s", data)
 		detailedf("Header: %s", data[:i])
 	}
@@ -380,7 +380,7 @@ func (parser *parser) parseHeader(m *message, data []byte) (bool, bool, int) {
 			var headerNameBuf [140]byte
 			headerName := toLower(headerNameBuf[:], data[:i])
 			headerVal := trim(data[i+1 : p])
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Header: '%s' Value: '%s'\n", data[:i], headerVal)
 			}
 
@@ -468,7 +468,7 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 		m.contentLength += nbytes
 
 		// HTTP/1.0 no content length. Add until the end of the connection
-		if isDebug {
+		if isDebug.Load() {
 			debugf("http conn close, received %d", len(s.data))
 		}
 		if m.saveBody {
@@ -496,7 +496,7 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 		s.data = nil
 		s.bodyReceived += nbytes
 		m.size += uint64(nbytes)
-		if isDebug {
+		if isDebug.Load() {
 			debugf("bodyReceived: %d", s.bodyReceived)
 		}
 		return true, false
@@ -506,14 +506,14 @@ func (*parser) parseBody(s *stream, m *message) (ok, complete bool) {
 // eatBody acts as if size bytes were received, without having access to
 // those bytes.
 func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
-	if isDebug {
+	if isDebug.Load() {
 		debugf("eatBody body")
 	}
 	if !m.hasContentLength && (bytes.Equal(m.connection, constClose) ||
 		(isVersion(m.version, 1, 0) && !bytes.Equal(m.connection, constKeepAlive))) {
 
 		// HTTP/1.0 no content length. Add until the end of the connection
-		if isDebug {
+		if isDebug.Load() {
 			debugf("http conn close, received %d", size)
 		}
 		if size < 0 {
@@ -537,7 +537,7 @@ func (*parser) eatBody(s *stream, m *message, size int) (ok, complete bool) {
 	} else {
 		s.bodyReceived += size
 		m.size += uint64(size)
-		if isDebug {
+		if isDebug.Load() {
 			debugf("bodyReceived: %d", s.bodyReceived)
 		}
 		return true, false
@@ -637,14 +637,14 @@ func (*parser) parseBodyChunkedWaitFinalCRLF(s *stream, m *message) (ok, complet
 func (parser *parser) shouldIncludeInBody(contenttype []byte, capturedContentTypes []string) bool {
 	for _, include := range capturedContentTypes {
 		if bytes.Contains(contenttype, []byte(include)) {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Should Include Body = true Content-Type %s include_body %s",
 					contenttype, include)
 			}
 			return true
 		}
 	}
-	if isDebug {
+	if isDebug.Load() {
 		debugf("Should Include Body = false Content-Type %s", contenttype)
 	}
 	return false
