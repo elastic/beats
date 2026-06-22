@@ -114,7 +114,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	updateTimer := time.NewTimer(updateWaitTime)
 
 	if p.cfg.Tracer.enabled() {
-		id := sanitizeFileName(inputCtx.IDWithoutName)
+		id := httplog.SanitizeFileName(inputCtx.IDWithoutName)
 		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(inputCtx.Agent.Paths, Name, path)
 		if err != nil {
@@ -256,16 +256,6 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // clientOption returns constructed client configuration options, including
