@@ -1,0 +1,36 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: bug-fix
+
+# Change summary; a 80ish characters long description of the change.
+summary: Prevent filestream from re-ingesting files when the scanner cannot read paths
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  When the filestream scanner could not read a directory or open a file because
+  of file-descriptor exhaustion or a permission error, those were treated as
+  deleted. With clean_removed enabled (the default) their registry state was
+  removed, so once file descriptors freed up the files were rediscovered and
+  re-ingested from the beginning, duplicating data. The scanner now distinguishes
+  "could not observe this path" from "this path is gone": removal detection is
+  postponed for files under paths it could not read, so their offsets are 
+  preserved and they resume instead of being re-ingested. A new scan_errors
+  metric reports how many paths a scan could not observe.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: filebeat
+
+# PR URL; optional; the PR number that added the changeset.
+pr: https://github.com/elastic/beats/pull/51694
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+#issue: https://github.com/owner/repo/1234

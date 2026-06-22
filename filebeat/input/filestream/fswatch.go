@@ -26,8 +26,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/elastic/go-concert/unison"
@@ -64,6 +67,39 @@ func (e ignoredFileError) Error() string {
 
 func (e ignoredFileError) Unwrap() error {
 	return errFileIgnored
+}
+
+// isObservationError reports whether err means the scanner could not observe a
+// path this scan, as opposed to the path being genuinely gone. It is true for
+// filesystem syscall failures such as EMFILE/ENFILE (file-descriptor
+// exhaustion), EACCES or EIO, and false for a missing file/dir or a path
+// component that is no longer a directory (real deletion signals), and for
+// logical rejections that carry no syscall error (e.g. "file is a directory",
+// "symlink and they're disabled") — those wrap a plain error, not an
+// *os.PathError.
+func isObservationError(err error) bool {
+	if err == nil || errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTDIR) {
+		return false
+	}
+	var pathErr *os.PathError
+	return errors.As(err, &pathErr)
+}
+
+// underAnyUnobservable reports whether path is equal to, or nested under, any of
+// the given unobservable path prefixes. The comparison is separator-aware so
+// "/a/b" is not considered a prefix of "/a/bc".
+func underAnyUnobservable(path string, prefixes map[string]struct{}) bool {
+	if _, ok := prefixes[path]; ok {
+		return true
+	}
+	for i := len(path) - 1; i > 0; i-- {
+		if path[i] == filepath.Separator {
+			if _, ok := prefixes[path[:i]]; ok {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // fileWatcherConfig is the prospector.scanner configuration
@@ -206,7 +242,7 @@ func (w *fileWatcher) watch(
 
 	// file identity is updated in GetFiles
 	now := time.Now()
-	paths, scanMetrics := w.scanner.GetFiles(loginp.FileScanOptions{
+	paths, scanMetrics, unobservable := w.scanner.GetFiles(loginp.FileScanOptions{
 		CurrentTime:         now,
 		IgnoreOlder:         ignoreOlder,
 		IgnoreInactiveSince: ignoreInactiveSince,
@@ -320,17 +356,28 @@ func (w *fileWatcher) watch(
 	}
 
 	// Remaining files in the prev map are missing from this scan — either
-	// deleted or renamed. Three rename-detection passes follow, in order:
+	// deleted, renamed, or under a path this scan could not observe. The passes
+	// below run in a deliberate priority order, because a positive rename match
+	// (the file's content was seen at a new path this scan) is stronger evidence
+	// than "the old location was unobservable", which is in turn stronger than
+	// "the file is gone":
 	//
 	//   1. Exact-FileID rename match — works for every identity including
 	//      static fingerprint. Catches a plain rename where the file's
 	//      content (and so its fingerprint) is unchanged.
 	//   2. Prefix-match rename detection (Enhanced Fingerprint / growing
 	//      mode only) — catches rename + content growth in the same scan.
-	//   3. Unmatched-leftover emission — anything still in w.prev becomes
+	//   3. Postpone deletes for entries under an unobservable prefix. Runs
+	//      AFTER both rename passes so a file renamed out of a directory that
+	//      became unobservable this scan is still detected as a rename, instead
+	//      of being carried forward here AND re-created from offset 0.
+	//   4. Unmatched-leftover emission — anything still in w.prev becomes
 	//      OpDelete, anything still in newFilesByName becomes OpCreate.
 
 	// Exact-FileID rename match.
+
+	// remaining files in the prev map are the ones that are missing
+	// either because they have been deleted or renamed
 	for remainingPath, remainingDesc := range w.prev {
 		newDesc, renamed := newFilesByID[remainingDesc.FileID()]
 		if !renamed {
@@ -418,8 +465,33 @@ func (w *fileWatcher) watch(
 		}
 	}
 
+	// Postpone deletes for entries still unmatched after both rename passes
+	// whose path is under a prefix this scan could not observe (e.g. a directory
+	// that hit EMFILE). We cannot tell whether these files are really gone;
+	// treating them as deleted would wipe their registry state and re-ingest from
+	// offset 0 once the resource frees up. Running this after the rename
+	// passes is what prevents double-ingestion of a file renamed out of a now
+	// unobservable directory: it was already emitted as a rename above, so only
+	// entries that matched no rename reach this point.
+	postponed := 0
+	if len(unobservable) > 0 {
+		unobservableSet := make(map[string]struct{}, len(unobservable))
+		for _, p := range unobservable {
+			unobservableSet[p] = struct{}{}
+		}
+		for remainingPath, remainingDesc := range w.prev {
+			if !underAnyUnobservable(remainingPath, unobservableSet) {
+				continue
+			}
+			paths[remainingPath] = remainingDesc
+			delete(w.prev, remainingPath)
+			postponed++
+		}
+	}
+
 	// Unmatched-leftover deletes: prev files that weren't matched by either
-	// the exact-FileID or the prefix-match rename pass are genuinely gone.
+	// the exact-FileID or the prefix-match rename pass, and are not under an
+	// unobservable prefix, are genuinely gone.
 	for remainingPath, remainingDesc := range w.prev {
 		srcID := w.getFileIdentity(remainingDesc)
 		select {
@@ -451,6 +523,12 @@ func (w *fileWatcher) watch(
 		harvesterFiles = appendHarvesterFile(harvesterFiles, *fd, srcID, now, ignoreOlder, ignoreInactiveSince)
 	}
 
+	if postponed > 0 {
+		w.log.Warnf("%d previously seen file(s) are under paths this scan could "+
+			"not observe (e.g. file-descriptor exhaustion); postponing their "+
+			"delete detection to avoid re-ingestion", postponed)
+	}
+
 	w.log.Debugw("File scan complete",
 		"total", len(paths),
 		"written", writtenCount,
@@ -458,6 +536,7 @@ func (w *fileWatcher) watch(
 		"renamed", renamedCount,
 		"removed", removedCount,
 		"created", createdCount,
+		"postponed", postponed,
 	)
 
 	// In growing mode, do a single pass over this scan's descriptors to:
@@ -573,7 +652,7 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 // advance the scanner's completedFingerprints set, so these pre-watch scans
 // cannot suppress the bridging raw header a still-growing entry needs to
 // migrate its registry key after a restart.
-func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+func (w *fileWatcher) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
 	return w.scanner.GetFiles(opts)
 }
 
@@ -635,6 +714,12 @@ type fileScanner struct {
 	// prospector runs in Init/TakeOver cannot suppress the header a
 	// still-growing entry needs to migrate across a restart.
 	completedFingerprints map[string]struct{}
+
+	// walkGroups and literals are derived from paths once (buildWalkGroups) and
+	// drive GetFiles: walkGroups are glob patterns grouped by the base directory
+	// to walk, literals are paths without any glob metacharacter.
+	walkGroups map[string]*walkGroup
+	literals   []string
 }
 
 func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfig, compression string) (*fileScanner, error) {
@@ -669,6 +754,8 @@ func newFileScanner(logger *logp.Logger, paths []string, config fileScannerConfi
 	if err != nil {
 		return nil, err
 	}
+
+	s.buildWalkGroups()
 
 	return &s, nil
 }
@@ -710,9 +797,15 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 	return nil
 }
 
-// GetFiles returns a map of file descriptors by filenames that
-// match the configured paths.
-func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
+// GetFiles returns a map of file descriptors by filenames that match the
+// configured paths.
+//
+// Instead of calling filepath.Glob for every (** expanded) pattern — which
+// materialises the full match list and re-reads shared parent directories once
+// per pattern — it walks each pattern's base directory a single time and filters
+// inline, so excluded files never enter an intermediate slice.
+// See https://github.com/elastic/beats/issues/48686.
+func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics, []string) {
 	if opts.CurrentTime.IsZero() {
 		opts.CurrentTime = time.Now()
 	}
@@ -724,75 +817,446 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 	uniqueFiles := map[string]struct{}{}
 	scanMetrics := loginp.FileScanMetrics{}
 
-	for _, path := range s.paths {
-		matches, err := filepath.Glob(path)
-		if err != nil {
-			s.log.Errorf("glob(%s) failed: %v", path, err)
-			continue
+	// unobservable collects path prefixes the scan could not read/stat/open due
+	// to a resource or permission error (e.g. file-descriptor exhaustion) rather
+	// than the path being gone. The watcher uses them to postpone delete detection
+	// so a transient failure does not wipe registry state and re-ingest files.
+	unobservable := map[string]struct{}{}
+	recordUnobservable := func(path string) {
+		if _, ok := unobservable[path]; ok {
+			return
 		}
-		scanMetrics.FilesMatched += int64(len(matches))
+		unobservable[path] = struct{}{}
+		scanMetrics.ScanErrors++
+	}
 
-		for _, filename := range matches {
-			// in case multiple globs match on the same file we filter out duplicates
-			if _, knownFile := uniqueFiles[filename]; knownFile {
-				scanMetrics.FilesNoIngestTarget++
-				continue
-			}
-			uniqueFiles[filename] = struct{}{}
+	// process mirrors the per-match handling of the previous filepath.Glob based
+	// implementation: dedup by name, exclude/include and symlink resolution
+	// (getIngestTarget), descriptor/fingerprint creation (toFileDescriptor) and
+	// dedup by file identity.
+	process := func(filename string) {
+		scanMetrics.FilesMatched++
 
-			it, err := s.getIngestTarget(filename)
-			if err != nil {
-				if errors.Is(err, errFileEmpty) {
-					scanMetrics.FilesEmpty++
-					continue
-				}
+		// in case multiple globs match on the same file we filter out duplicates
+		if _, knownFile := uniqueFiles[filename]; knownFile {
+			scanMetrics.FilesNoIngestTarget++
+			return
+		}
+		uniqueFiles[filename] = struct{}{}
 
-				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
-				if errors.Is(err, errFileIgnored) {
-					scanMetrics.FilesIgnored++
-					continue
-				}
-
-				scanMetrics.FilesNoIngestTarget++
-				continue
+		it, err := s.getIngestTarget(filename)
+		if err != nil {
+			if errors.Is(err, errFileEmpty) {
+				scanMetrics.FilesEmpty++
+				return
 			}
 
-			fd, err := s.toFileDescriptor(&it)
-			if errors.Is(err, errFileTooSmall) {
-				scanMetrics.FilesNoIngestTarget++
-				if s.smallFilesWarned.CompareAndSwap(false, true) {
-					s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
-						"least %d in size for ingestion to start. To change this "+
-						"behaviour set 'prospector.scanner.fingerprint.length' and "+
-						"'prospector.scanner.fingerprint.offset'. "+
-						"Enable debug logging to see all file names of delayed files.",
-						s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
-				}
-				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
-				continue
-			}
-			if err != nil {
-				scanMetrics.FilesNoIngestTarget++
-				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
-				continue
-			}
-
-			fileID := fd.FileID()
-			if knownFilename, exists := uniqueIDs[fileID]; exists {
-				scanMetrics.FilesNoIngestTarget++
-				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
-				continue
-			}
-			uniqueIDs[fileID] = fd.Filename
-			fdByName[filename] = fd
-			if isFileIgnored(fd, opts) {
+			s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
+			if errors.Is(err, errFileIgnored) {
 				scanMetrics.FilesIgnored++
+				return
 			}
+
+			// A stat/lstat that failed for a reason other than the file being
+			// gone (e.g. EMFILE) means we could not observe this path this scan.
+			if isObservationError(err) {
+				recordUnobservable(filename)
+			}
+			scanMetrics.FilesNoIngestTarget++
+			return
+		}
+
+		fd, err := s.toFileDescriptor(&it)
+		if errors.Is(err, errFileTooSmall) {
+			scanMetrics.FilesNoIngestTarget++
+			if s.smallFilesWarned.CompareAndSwap(false, true) {
+				s.log.Warnf("ingestion from some files will be delayed, files need to be at "+
+					"least %d in size for ingestion to start. To change this "+
+					"behaviour set 'prospector.scanner.fingerprint.length' and "+
+					"'prospector.scanner.fingerprint.offset'. "+
+					"Enable debug logging to see all file names of delayed files.",
+					s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length)
+			}
+			s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
+			return
+		}
+		if err != nil {
+			scanMetrics.FilesNoIngestTarget++
+			// Fingerprinting opens the file; under fd exhaustion the open fails
+			// with EMFILE, which is an observation failure, not a missing file.
+			if isObservationError(err) {
+				recordUnobservable(filename)
+			}
+			s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
+			return
+		}
+
+		fileID := fd.FileID()
+		if knownFilename, exists := uniqueIDs[fileID]; exists {
+			scanMetrics.FilesNoIngestTarget++
+
+			// The same file (same fingerprint, or device+inode) is reachable via
+			// more than one path — e.g. a hardlink, or a directory reached both
+			// directly and through a symlink. Keep the path the previous
+			// filepath.Glob implementation would have kept, so the returned filename
+			// is stable across scans and releases; otherwise the "path" file identity
+			// would change and the file would be re-ingested. matchedEarlier
+			// reproduces that order (config-path order, then ascending depth) and is
+			// independent of traversal order.
+			if !s.matchedEarlier(filename, knownFilename) {
+				s.log.Warnf("%q points to an already known ingest target %q [%s==%s]. Skipping", fd.Filename, knownFilename, fileID, fileID)
+				return
+			}
+			s.log.Debugf("%q supersedes already matched ingest target %q for the same file", filename, knownFilename)
+			// the superseded descriptor was already counted as ignored if it
+			// matched the ignore options; take that back so FilesIgnored counts
+			// only the descriptors actually returned
+			if oldFd, ok := fdByName[knownFilename]; ok && isFileIgnored(oldFd, opts) {
+				scanMetrics.FilesIgnored--
+			}
+			delete(fdByName, knownFilename)
+		}
+		uniqueIDs[fileID] = filename
+		fdByName[filename] = fd
+		if isFileIgnored(fd, opts) {
+			scanMetrics.FilesIgnored++
 		}
 	}
 
+	// Literal paths (no glob metacharacter) are matched directly, exactly like
+	// filepath.Glob's base case.
+	for _, lit := range s.literals {
+		if _, err := os.Lstat(lit); err != nil {
+			if isObservationError(err) {
+				recordUnobservable(lit)
+			}
+			continue
+		}
+		process(lit)
+	}
+
+	for _, g := range s.walkGroups {
+		s.walk(g, process, recordUnobservable)
+	}
+
 	scanMetrics.FilesUnique = int64(len(fdByName))
-	return fdByName, scanMetrics
+
+	var prefixes []string
+	if len(unobservable) > 0 {
+		prefixes = make([]string, 0, len(unobservable))
+		for p := range unobservable {
+			prefixes = append(prefixes, p)
+		}
+		slices.Sort(prefixes)
+
+		sample := prefixes
+		maxSamples := 5
+		if len(sample) > maxSamples {
+			sample = sample[:maxSamples]
+		}
+		s.log.Debugf("scan could not observe %d path(s) (permissions or file-descriptor exhaustion); first %d: %v",
+			len(prefixes), maxSamples, sample)
+	}
+
+	return fdByName, scanMetrics, prefixes
+}
+
+// walkGroup is a set of (absolute, ** expanded) glob patterns that share the same
+// base directory, indexed by their depth below that directory so the walker only
+// tests a file against the patterns that can possibly match it.
+type walkGroup struct {
+	root     string
+	maxDepth int
+	byDepth  map[int][]string
+}
+
+// buildWalkGroups partitions s.paths into literal paths and walk groups keyed by
+// their base directory. Patterns that share a base are walked together so the tree
+// is read only once. Invalid patterns detectable upfront are dropped and reported
+// once here; malformed patterns that escape this check (a bad token behind a
+// literal prefix never reaches the parser when matching "") are reported once per
+// scan by walk.
+func (s *fileScanner) buildWalkGroups() {
+	groups := map[string]*walkGroup{}
+	var literals []string
+
+	for _, path := range s.paths {
+		if !hasGlobMeta(path) {
+			literals = append(literals, path)
+			continue
+		}
+
+		if _, err := filepath.Match(path, ""); err != nil {
+			s.log.Errorf("invalid glob pattern %q: %v", path, err)
+			continue
+		}
+
+		root := globRoot(path)
+		g := groups[root]
+		if g == nil {
+			g = &walkGroup{root: root, byDepth: map[int][]string{}}
+			groups[root] = g
+		}
+		d := depthBelow(root, path)
+		g.byDepth[d] = append(g.byDepth[d], path)
+		if d > g.maxDepth {
+			g.maxDepth = d
+		}
+	}
+	s.walkGroups = groups
+	s.literals = literals
+}
+
+// walkPattern is a group pattern together with its path components below the
+// group root, used to decide component-wise whether a directory can lead to a
+// match.
+type walkPattern struct {
+	pattern string
+	comps   []string
+}
+
+// walk traverses g.root once and invokes process for every entry matching one of
+// the group's patterns. It mirrors filepath.Glob semantics: entries are matched by
+// name regardless of their type — directories and symlinks are filtered later by
+// getIngestTarget, exactly as with filepath.Glob's match list — symlinked
+// directories are followed (filepath.Glob stats path components with os.Stat),
+// and a directory is only descended into when its name matches the next component
+// of some pattern, the same pruning filepath.Glob gets by resolving patterns
+// component by component. Pattern depth bounds the recursion, which preserves the
+// RecursiveGlobDepth cap and makes symlink cycles safe.
+func (s *fileScanner) walk(g *walkGroup, process func(filename string), recordUnobservable func(prefix string)) {
+	patterns := make([]walkPattern, 0, len(g.byDepth))
+	for _, list := range g.byDepth {
+		for _, p := range list {
+			patterns = append(patterns, walkPattern{pattern: p, comps: patternComponents(g.root, p)})
+		}
+	}
+
+	// badPatterns dedups ErrBadPattern logs: filepath.Match reports a malformed
+	// pattern for every candidate name, but one line per scan is enough (the
+	// previous filepath.Glob implementation logged it once per scan too).
+	badPatterns := map[string]struct{}{}
+	logBadPattern := func(pattern string, err error) {
+		if _, seen := badPatterns[pattern]; !seen {
+			badPatterns[pattern] = struct{}{}
+			s.log.Errorf("glob match(%q) failed: %v", pattern, err)
+		}
+	}
+
+	// rec reads dir, whose entries are at childDepth below the root. alive holds
+	// the patterns whose components matched every ancestor directory of dir.
+	var rec func(dir string, depth int, alive []walkPattern)
+	rec = func(dir string, depth int, alive []walkPattern) {
+		childDepth := depth + 1
+
+		// Patterns ending at this level match entries; deeper ones may match
+		// below it.
+		var exact, deeper []walkPattern
+		for _, p := range alive {
+			switch {
+			case len(p.comps) == childDepth:
+				exact = append(exact, p)
+			case len(p.comps) > childDepth:
+				deeper = append(deeper, p)
+			}
+		}
+
+		onReadError := func(err error) {
+			// Skip unreadable directories instead of aborting the whole scan, as
+			// filepath.Glob did. But if the reason is an observation failure
+			// (e.g. EMFILE) rather than the directory being gone, record the
+			// subtree as unobservable so the watcher postpones deleting the files
+			// under it — otherwise fd exhaustion would wipe their state and
+			// re-ingest them once fds free up.
+			if isObservationError(err) {
+				recordUnobservable(dir)
+			}
+			s.log.Debugf("cannot read directory %q: %s", dir, err)
+		}
+
+		// matchLeaf matches one entry name against the exact patterns. Every
+		// ancestor component was already matched on the way down, so only the last
+		// component is checked here, and the full path is built (once) only when a
+		// match is emitted.
+		matchLeaf := func(name string) {
+			for _, p := range exact {
+				matched, matchErr := filepath.Match(p.comps[childDepth-1], name)
+				if matchErr != nil {
+					logBadPattern(p.pattern, matchErr)
+					continue
+				}
+				if matched {
+					process(filepath.Join(dir, name))
+					break
+				}
+			}
+		}
+
+		// With nothing deeper to descend into, entry types are irrelevant, so read
+		// only the names (like filepath.Glob) rather than os.ReadDir, which would
+		// allocate an os.DirEntry per entry.
+		if len(deeper) == 0 {
+			names, err := readDirNames(dir)
+			if err != nil {
+				onReadError(err)
+				return
+			}
+			for _, name := range names {
+				matchLeaf(name)
+			}
+			return
+		}
+
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			onReadError(err)
+			return
+		}
+
+		for _, e := range entries {
+			matchLeaf(e.Name())
+
+			isDir := e.IsDir()
+			isSymlink := e.Type()&os.ModeSymlink != 0
+			if !isDir && !isSymlink {
+				continue
+			}
+			// Keep the patterns whose next component matches this directory name;
+			// none matching means nothing below this directory can ever match.
+			var childAlive []walkPattern
+			for _, p := range deeper {
+				ok, matchErr := filepath.Match(p.comps[childDepth-1], e.Name())
+				if matchErr != nil {
+					logBadPattern(p.pattern, matchErr)
+					continue
+				}
+				if ok {
+					childAlive = append(childAlive, p)
+				}
+			}
+			if len(childAlive) == 0 {
+				continue
+			}
+			full := filepath.Join(dir, e.Name())
+			if !isDir {
+				// Resolve the symlink to decide whether to descend, like
+				// filepath.Glob. A broken symlink cannot be descended into; if it
+				// matched a pattern it was already yielded above, again like
+				// filepath.Glob.
+				info, statErr := os.Stat(full)
+				if statErr != nil {
+					continue
+				}
+				isDir = info.IsDir()
+			}
+			if isDir {
+				rec(full, childDepth, childAlive)
+			}
+		}
+	}
+	rec(g.root, 0, patterns)
+}
+
+// readDirNames returns the sorted entry names of dir. Like the helper
+// filepath.Glob uses, it reads names only and so avoids the per-entry os.DirEntry
+// allocation of os.ReadDir; the walker uses it for leaf directories, where entry
+// types are not needed. Names are sorted to keep traversal order stable.
+func readDirNames(dir string) ([]string, error) {
+	f, err := os.Open(dir)
+	if err != nil {
+		return nil, err
+	}
+	names, err := f.Readdirnames(-1)
+	_ = f.Close()
+	if err != nil {
+		return nil, err
+	}
+	slices.Sort(names)
+	return names, nil
+}
+
+// hasGlobMeta reports whether path contains any glob metacharacter, mirroring the
+// unexported path/filepath.hasMeta.
+func hasGlobMeta(path string) bool {
+	magic := `*?[`
+	if filepath.Separator != '\\' {
+		magic = `*?[\`
+	}
+	return strings.ContainsAny(path, magic)
+}
+
+// globRoot returns the longest leading directory of pattern that has no glob
+// metacharacter — the directory from which the tree is walked.
+func globRoot(pattern string) string {
+	dir := pattern
+	for hasGlobMeta(dir) {
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return dir
+}
+
+// depthBelow returns the number of path segments of pattern below root, including
+// the trailing filename segment. root must be an ancestor of pattern.
+func depthBelow(root, pattern string) int {
+	return len(patternComponents(root, pattern))
+}
+
+// patternComponents returns pattern's path segments below root. root must be an
+// ancestor of pattern.
+func patternComponents(root, pattern string) []string {
+	rel := strings.TrimPrefix(pattern, root)
+	rel = strings.TrimPrefix(rel, string(filepath.Separator))
+	if rel == "" {
+		return nil
+	}
+	return strings.Split(rel, string(filepath.Separator))
+}
+
+// scanOrderIndex returns the index of the first configured (** expanded) pattern
+// in s.paths that matches filename. This reproduces the order in which the
+// previous filepath.Glob implementation processed matches: it globbed s.paths in
+// order, and s.paths is ordered by configured path, then by ascending recursive
+// depth. Scanning the whole of s.paths (rather than a single group) keeps the
+// result correct even when configured paths overlap.
+func (s *fileScanner) scanOrderIndex(filename string) int {
+	for i, p := range s.paths {
+		if ok, _ := filepath.Match(p, filename); ok {
+			return i
+		}
+	}
+	// Sentinel: rank a non-matching path after every real match (valid indices
+	// are 0..len(s.paths)-1, so len(s.paths) sorts strictly last). Unreachable in
+	// practice — callers only pass paths the walker already matched against a
+	// pattern in s.paths.
+	return len(s.paths)
+}
+
+// matchedEarlier reports whether path a would have been processed before path b by
+// the previous filepath.Glob implementation: the path matched by the earlier
+// pattern wins; ties are broken comparing path components, mirroring Glob's
+// per-directory sort. Used only to resolve the rare case where two paths resolve
+// to the same file, so the kept path matches main.
+func (s *fileScanner) matchedEarlier(a, b string) bool {
+	ia, ib := s.scanOrderIndex(a), s.scanOrderIndex(b)
+	if ia != ib {
+		return ia < ib
+	}
+	// filepath.Glob sorts names within each directory and concatenates, so its
+	// order is lexicographic on path components, not on full-path bytes: the two
+	// diverge when a sibling name is a byte-prefix of another and the next byte
+	// sorts before '/' (e.g. Glob visits "d" before "d-x", yet "d-x/a" < "d/z").
+	as := strings.Split(a, string(filepath.Separator))
+	bs := strings.Split(b, string(filepath.Separator))
+	for i := 0; i < len(as) && i < len(bs); i++ {
+		if as[i] != bs[i] {
+			return as[i] < bs[i]
+		}
+	}
+	return len(as) < len(bs)
 }
 
 type ingestTarget struct {
