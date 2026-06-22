@@ -125,8 +125,9 @@ type FSEvent struct {
 
 // FileScanOptions contains scan-time settings that influence file metrics.
 type FileScanOptions struct {
-	// Now is the reference time for scan-time age comparisons.
-	Now time.Time
+	// CurrentTime is the reference (current) time for a set of
+	// older/inactive time comparisons.
+	CurrentTime time.Time
 	// IgnoreOlder is the ignore_older threshold.
 	IgnoreOlder time.Duration
 	// IgnoreInactiveSince is the ignore_inactive reference time.

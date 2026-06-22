@@ -196,7 +196,7 @@ func (w *fileWatcher) watch(
 
 	now := time.Now()
 	paths, scanMetrics := w.scanner.GetFiles(loginp.FileScanOptions{
-		Now:                 now,
+		CurrentTime:         now,
 		IgnoreOlder:         ignoreOlder,
 		IgnoreInactiveSince: ignoreInactiveSince,
 	})
@@ -509,8 +509,8 @@ func (s *fileScanner) normalizeGlobPatterns() error {
 // GetFiles returns a map of file descriptors by filenames that
 // match the configured paths.
 func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.FileDescriptor, loginp.FileScanMetrics) {
-	if opts.Now.IsZero() {
-		opts.Now = time.Now()
+	if opts.CurrentTime.IsZero() {
+		opts.CurrentTime = time.Now()
 	}
 
 	fdByName := map[string]loginp.FileDescriptor{}
@@ -581,7 +581,7 @@ func (s *fileScanner) GetFiles(opts loginp.FileScanOptions) (map[string]loginp.F
 			}
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
-			if isFileIgnored(fd, opts.Now, opts.IgnoreOlder, opts.IgnoreInactiveSince) {
+			if isFileIgnored(fd, opts.CurrentTime, opts.IgnoreOlder, opts.IgnoreInactiveSince) {
 				scanMetrics.FilesIgnored++
 			}
 		}

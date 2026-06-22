@@ -1321,7 +1321,7 @@ scanner:
 
 	scanner := createScannerWithConfig(t, logp.NewNopLogger(), paths, cfgStr, CompressionNone)
 	files, scanMetrics := scanner.GetFiles(loginp.FileScanOptions{
-		Now:         now,
+		CurrentTime: now,
 		IgnoreOlder: time.Hour,
 	})
 	require.Contains(t, files, keepLog, "keep log must be ingestible")
