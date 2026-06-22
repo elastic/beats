@@ -204,7 +204,7 @@ func CheckReceivers(params CheckReceiversParams) {
 				var matched bool
 				for _, evt := range evts {
 					if evt.Status() == params.Status.Status() &&
-						assert.ObjectsAreEqual(evt.Err(), params.Status.Err()) && //nolint:errorlint // deep equality, not chain check
+						assert.ObjectsAreEqual(evt.Err(), params.Status.Err()) &&
 						assert.ObjectsAreEqual(params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw()) {
 						matched = true
 						break
