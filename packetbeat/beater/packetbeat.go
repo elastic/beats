@@ -159,7 +159,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			"input_metrics.json", "application/json", func() []byte {
 				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.InputsRegistry())
 				if err != nil {
-					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
 				}
 				return data
@@ -181,7 +181,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 				return err
 			}
 		} else {
-			logp.L().Warn(pipelinesWarning)
+			b.Info.Logger.Warn(pipelinesWarning)
 		}
 
 		return pb.runStatic(b, factory)
@@ -224,9 +224,10 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory cfgfile.RunnerFactory) er
 
 	// Start the manager after all the hooks are registered and terminates when
 	// the function return.
-	if err := b.Manager.Start(); err != nil {
+	if err := b.Manager.PreInit(); err != nil {
 		return err
 	}
+	b.Manager.PostInit()
 
 	defer func() {
 		runner.Stop()
