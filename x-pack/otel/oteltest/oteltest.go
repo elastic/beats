@@ -7,7 +7,6 @@ package oteltest
 
 import (
 	"context"
-	"errors"
 	"strings"
 	"sync"
 	"testing"
@@ -205,7 +204,7 @@ func CheckReceivers(params CheckReceiversParams) {
 				var matched bool
 				for _, evt := range evts {
 					if evt.Status() == params.Status.Status() &&
-						errors.Is(evt.Err(), params.Status.Err()) &&
+						assert.ObjectsAreEqual(evt.Err(), params.Status.Err()) && //nolint:errorlint // deep equality, not chain check
 						assert.ObjectsAreEqual(params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw()) {
 						matched = true
 						break
