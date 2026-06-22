@@ -1,0 +1,98 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+package pbreceiver
+
+import (
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/consumer/consumertest"
+	"go.opentelemetry.io/collector/receiver"
+	"go.uber.org/zap"
+
+	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
+)
+
+// TestReceiverStatus verifies that the packetbeat receiver propagates
+// component status events to the OTel host when running under the OTel
+// collector. It checks that a StatusOK event is reported at least once
+// while the receiver processes a pre-recorded pcap file — no live
+// packet-capture capability (root / npcap) required.
+func TestReceiverStatus(t *testing.T) {
+	inputID := "pb-status-test"
+
+	config := Config{
+		Beatconfig: map[string]any{
+			"packetbeat": map[string]any{
+				// "id" is read by otelstatus.getInputId from pb.config
+				// (the packetbeat sub-section), producing the sub-reporter key.
+				"id": inputID,
+				"interfaces": map[string]any{
+					// Read from a pre-recorded pcap file; no libpcap / root required.
+					"file": "../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
+				},
+				"protocols": []map[string]any{
+					{
+						"type":  "http",
+						"ports": []int{80},
+					},
+				},
+			},
+			"logging": map[string]any{
+				"level":     "info",
+				"selectors": []string{"*"},
+			},
+			"path.home":               t.TempDir(),
+			"management.otel.enabled": true,
+		},
+	}
+
+	factory := NewFactoryWithSettings(Settings{Home: t.TempDir()})
+	set := receiver.Settings{
+		ID: component.NewIDWithName(factory.Type(), "r1"),
+		TelemetrySettings: component.TelemetrySettings{
+			Logger: zap.NewNop(),
+		},
+	}
+
+	host := &oteltest.MockHost{}
+	rec, err := factory.CreateLogs(t.Context(), set, &config, consumertest.NewNop())
+	require.NoError(t, err)
+	require.NoError(t, rec.Start(t.Context(), host))
+
+	// Wait for StatusOK to be reported. The sniffer starts, emits Running
+	// (→ StatusOK), reads the pcap, then stops — all within milliseconds.
+	// We poll the full event history so we catch StatusOK even if the
+	// receiver has already transitioned to Stopped by the first tick.
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		evts := host.GetEvents()
+		var found bool
+		for _, evt := range evts {
+			if evt.Status() == componentstatus.StatusOK {
+				found = true
+				// Verify the expected input-status attributes are present.
+				attrs := evt.Attributes().AsRaw()
+				inputs, ok := attrs["inputs"].(map[string]any)
+				assert.True(c, ok, "expected 'inputs' map in status attributes")
+				if ok {
+					entry, ok := inputs[inputID].(map[string]any)
+					assert.True(c, ok, "expected entry for %q in inputs", inputID)
+					if ok {
+						assert.Equal(c, componentstatus.StatusOK.String(), entry["status"])
+					}
+				}
+				break
+			}
+		}
+		assert.True(c, found, "StatusOK never reported; all events: %v", evts)
+	}, 30*time.Second, 10*time.Millisecond,
+		"timeout waiting for StatusOK from packetbeat receiver")
+
+	require.NoError(t, rec.Shutdown(t.Context()))
+}

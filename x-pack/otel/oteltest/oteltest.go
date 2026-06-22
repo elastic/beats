@@ -30,8 +30,9 @@ import (
 )
 
 type MockHost struct {
-	mu  sync.Mutex
-	Evt *componentstatus.Event
+	mu   sync.Mutex
+	Evt  *componentstatus.Event
+	Evts []*componentstatus.Event
 }
 
 func (*MockHost) GetExtensions() map[component.ID]component.Component {
@@ -42,12 +43,21 @@ func (h *MockHost) Report(evt *componentstatus.Event) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.Evt = evt
+	h.Evts = append(h.Evts, evt)
 }
 
 func (h *MockHost) getEvent() *componentstatus.Event {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	return h.Evt
+}
+
+func (h *MockHost) GetEvents() []*componentstatus.Event {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	out := make([]*componentstatus.Event, len(h.Evts))
+	copy(out, h.Evts)
+	return out
 }
 
 type ReceiverConfig struct {
@@ -185,13 +195,24 @@ func CheckReceivers(params CheckReceiversParams) {
 				require.Equal(ct, beatForCompName(compName), zl.ContextMap()["service.name"])
 				break
 			}
-			evt := host.getEvent()
-			require.NotNil(ct, evt, "expected not nil, got nil")
-
 			if params.Status != nil {
-				assert.Equal(ct, params.Status.Status(), evt.Status())
-				assert.Equal(ct, params.Status.Err(), evt.Err())
-				assert.Equal(ct, params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw())
+				evts := host.GetEvents()
+				require.NotEmpty(ct, evts, "expected at least one status event, got none")
+				var matched bool
+				for _, evt := range evts {
+					if evt.Status() == params.Status.Status() &&
+						evt.Err() == params.Status.Err() &&
+						assert.ObjectsAreEqual(params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw()) {
+						matched = true
+						break
+					}
+				}
+				assert.True(ct, matched,
+					"expected status %v to have been reported at least once; all events: %v",
+					params.Status.Status(), evts)
+			} else {
+				evt := host.getEvent()
+				require.NotNil(ct, evt, "expected not nil, got nil")
 			}
 
 			if params.AssertFunc != nil {

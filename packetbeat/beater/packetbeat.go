@@ -166,6 +166,11 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			})
 	}
 
+	var factory cfgfile.RunnerFactory = pb.factory
+	if pb.otelStatusFactoryWrapper != nil {
+		factory = pb.otelStatusFactoryWrapper(factory)
+	}
+
 	if !b.Manager.Enabled() {
 		if b.Config.Output.Name() == "elasticsearch" {
 			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection, _ *logp.Logger) error {
@@ -179,9 +184,9 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.L().Warn(pipelinesWarning)
 		}
 
-		return pb.runStatic(b, pb.factory)
+		return pb.runStatic(b, factory)
 	}
-	return pb.runManaged(b, pb.factory)
+	return pb.runManaged(b, factory)
 }
 
 const pipelinesWarning = "Packetbeat is unable to load the ingest pipelines for the configured" +
@@ -191,7 +196,7 @@ const pipelinesWarning = "Packetbeat is unable to load the ingest pipelines for 
 
 // runStatic constructs a packetbeat runner and starts it, returning on cancellation
 // or the first fatal error.
-func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
+func (pb *packetbeat) runStatic(b *beat.Beat, factory cfgfile.RunnerFactory) error {
 	runner, err := factory.Create(b.Publisher, pb.config)
 	if err != nil {
 		return err
@@ -203,7 +208,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 
 	select {
 	case <-pb.done:
-	case err := <-factory.err:
+	case err := <-pb.factory.err:
 		pb.stopOnce.Do(func() { close(pb.done) })
 		return err
 	}
@@ -212,7 +217,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 
 // runManaged registers a packetbeat runner with the reload.Registry and starts
 // the runner by starting the beat's manager. It returns on the first fatal error.
-func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
+func (pb *packetbeat) runManaged(b *beat.Beat, factory cfgfile.RunnerFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
@@ -231,7 +236,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 		select {
 		case <-pb.done:
 			return nil
-		case err := <-factory.err:
+		case err := <-pb.factory.err:
 			// when we're managed we don't want
 			// to stop if the sniffer(s) exited without an error
 			// this would happen during a configuration reload

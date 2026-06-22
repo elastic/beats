@@ -22,6 +22,8 @@ import (
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	//mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
@@ -124,6 +126,14 @@ func Ironbank() error {
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
+}
+
+// GoIntegTest starts the docker containers and executes the Go integration tests.
+func GoIntegTest(ctx context.Context) error {
+	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
+	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
+	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
 func SystemTest(ctx context.Context) error {

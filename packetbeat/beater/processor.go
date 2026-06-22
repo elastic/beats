@@ -114,6 +114,12 @@ func (p *processor) UpdateStatus(status status.Status, message string) {
 	}
 }
 
+// SetStatusReporter implements status.WithStatusReporter so the OTel
+// factory wrapper can inject a sub-reporter after the runner is created.
+func (p *processor) SetStatusReporter(reporter status.StatusReporter) {
+	p.status = reporter
+}
+
 // processorFactory controls construction of modules runners.
 type processorFactory struct {
 	name         string
