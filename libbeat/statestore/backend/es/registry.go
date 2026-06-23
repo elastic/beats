@@ -31,12 +31,12 @@ type Registry struct {
 
 	log  *logp.Logger
 	mx   sync.Mutex
-	info *beat.Info
+	info beat.Info
 
 	notifier *Notifier
 }
 
-func New(ctx context.Context, log *logp.Logger, notifier *Notifier, info *beat.Info) *Registry {
+func New(ctx context.Context, log *logp.Logger, notifier *Notifier, info beat.Info) *Registry {
 	return &Registry{
 		ctx:      ctx,
 		log:      log,

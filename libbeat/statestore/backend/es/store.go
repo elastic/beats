@@ -43,7 +43,7 @@ type store struct {
 	log      *logp.Logger
 	name     string
 	notifier *Notifier
-	info     *beat.Info
+	info     beat.Info
 
 	chReady chan struct{}
 	once    sync.Once
@@ -56,7 +56,7 @@ type store struct {
 	base *baseStore
 }
 
-func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier, info *beat.Info) (*store, error) {
+func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier, info beat.Info) (*store, error) {
 	ctx, cn := context.WithCancel(ctx)
 	s := &store{
 		ctx:      ctx,
@@ -182,7 +182,7 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 	}
 	s.cliErr = nil
 
-	cli, err := eslegclient.NewConnectedClient(ctx, c, *s.info)
+	cli, err := eslegclient.NewConnectedClient(ctx, c, s.info)
 	if err != nil {
 		s.log.Errorf("ES store, failed to create elasticsearch client: %v", err)
 		s.cliErr = err

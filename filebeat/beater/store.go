@@ -124,7 +124,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 				// the es.Registry (subscriber) and all filebeatStore wrappers (publishers).
 				// Multiple Notify() calls are idempotent, so sharing across wrappers is safe.
 				shared.notifier = es.NewNotifier()
-				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier, &info))
+				shared.esRegistry = statestore.NewRegistry(es.New(ctx, logger, shared.notifier, info))
 			default:
 				shared.esRegistry = statestore.NewRegistry(cfg.ESStorageExtension)
 			}
