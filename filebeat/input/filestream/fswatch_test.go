@@ -1359,10 +1359,11 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 // The "static" and "growing" sub-benchmarks fingerprint the identical
 // above-threshold files; their only difference is growing mode. The delta is the
 // per-scan raw-header re-encode that growing mode performs on every completed
-// file to bridge a possible threshold crossing. The pre-refactor design
-// suppressed this after the first crossing via a hashedPaths set, so this
-// benchmark quantifies the cost the FingerprintID refactor trades for dropping
-// that machinery.
+// file to bridge a possible threshold crossing. It calls GetFiles directly
+// without advancing the completedFingerprints set, so it models the UNSUPPRESSED
+// cost — exactly the work the watch loop elides on stable files by tracking
+// completed paths. It therefore quantifies the per-scan cost that suppression
+// removes after a file's first crossing scan.
 func BenchmarkGetFilesWithFingerprintGrowing(b *testing.B) {
 	cases := []struct {
 		name    string
@@ -1664,12 +1665,19 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 		"step 4: no SHA-256 Sum while below threshold")
 }
 
-// TestGetFiles_GrowingRawSuppression verifies the GetFiles-level optimization
-// that avoids recomputing the bridging raw header for files that are already
-// complete: the header is emitted on the scan a file crosses the threshold (so
-// the transition can still be prefix-matched) and dropped on subsequent scans
-// of the now-stable file. If the file is truncated back below the threshold the
-// suppression is lifted, and a fresh crossing re-emits the header.
+// TestGetFiles_GrowingRawSuppression verifies the optimization that avoids
+// recomputing the bridging raw header for files that are already complete: the
+// header is emitted on the scan a file crosses the threshold (so the transition
+// can still be prefix-matched) and dropped on subsequent scans of the now-stable
+// file. If the file is truncated back below the threshold the suppression is
+// lifted, and a fresh crossing re-emits the header.
+//
+// GetFiles is pure with respect to the completedFingerprints set; the watch
+// loop is what advances it. The scan helper below reproduces that contract:
+// run GetFiles, then hand the scanner the paths that are now complete, exactly
+// as fileWatcher.watch does. The enumeration scans in the prospector's
+// Init/TakeOver phases deliberately skip that second step, which is why they
+// never suppress the header.
 func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 	dir := t.TempDir()
 	filename := filepath.Join(dir, "growing.log")
@@ -1693,7 +1701,17 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 	scan := func() loginp.FingerprintID {
 		files := s.GetFiles()
 		require.Contains(t, files, filename, "file must be scanned")
-		return files[filename].Fingerprint
+		fp := files[filename].Fingerprint
+		// Mirror the watch loop: tell the scanner which paths are now complete
+		// so the next scan can skip recomputing their bridging raw header.
+		completed := map[string]struct{}{}
+		for p, fd := range files {
+			if fd.Fingerprint.Complete {
+				completed[p] = struct{}{}
+			}
+		}
+		s.completedFingerprints = completed
+		return fp
 	}
 
 	// Sub-threshold: growing, raw-hex carried as the identity.

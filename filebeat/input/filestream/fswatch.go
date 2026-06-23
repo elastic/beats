@@ -406,18 +406,29 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		"created", createdCount,
 	)
 
-	// Retain raw fingerprint material only for still-growing files. A completed
-	// file is matched by its SHA-256 identity, so dropping Raw keeps w.prev
-	// small and avoids carrying the full header for every tracked file across
-	// scans. This is what makes the per-process "already final" suppression set
-	// unnecessary: the events for this scan were already emitted above with the
-	// full descriptor, so trimming here only affects retained state.
+	// In growing mode, do a single pass over this scan's descriptors to:
+	//   - Drop the bridging raw header from completed descriptors before they
+	//     go into w.prev: a completed file is matched by its SHA-256 identity,
+	//     so retaining the full header for every tracked file would bloat
+	//     w.prev. The events above already carried the full descriptor, so
+	//     trimming here only affects retained state.
+	//   - Refresh the scanner's completedFingerprints set so its next scan can
+	//     skip recomputing the (now redundant) raw header. fileWatcher.watch is
+	//     the only writer of that set — see the completedFingerprints field for
+	//     why the prospector's enumeration scans must not seed it.
 	if w.growingFingerprint {
+		completed := make(map[string]struct{}, len(paths))
 		for p, fd := range paths {
-			if fd.Fingerprint.Complete && fd.Fingerprint.Raw != "" {
-				fd.Fingerprint.Raw = ""
-				paths[p] = fd
+			if fd.Fingerprint.Complete {
+				completed[p] = struct{}{}
+				if fd.Fingerprint.Raw != "" {
+					fd.Fingerprint.Raw = ""
+					paths[p] = fd
+				}
 			}
+		}
+		if fs, ok := w.scanner.(*fileScanner); ok {
+			fs.completedFingerprints = completed
 		}
 	}
 
@@ -460,6 +471,11 @@ func (w *fileWatcher) Event() loginp.FSEvent {
 	return <-w.events
 }
 
+// GetFiles runs a one-off enumeration scan for the prospector's Init and
+// TakeOver phases. It is side-effect free: unlike the watch loop it does not
+// advance the scanner's completedFingerprints set, so these pre-watch scans
+// cannot suppress the bridging raw header a still-growing entry needs to
+// migrate its registry key after a restart.
 func (w *fileWatcher) GetFiles() map[string]loginp.FileDescriptor {
 	return w.scanner.GetFiles()
 }
@@ -514,11 +530,13 @@ type fileScanner struct {
 	readBuffer       []byte
 	compression      string
 	// completedFingerprints holds the paths whose fingerprint was already a
-	// final SHA-256 on the previous scan (growing mode only). The bridging raw
-	// header is only useful on the scan a file crosses the threshold, so for
-	// paths in this set toFileDescriptor skips recomputing it. Rebuilt every
-	// scan in GetFiles, which prunes paths that are gone or fell back below the
-	// threshold.
+	// final SHA-256 on the previous watch-loop scan (growing mode only). The
+	// bridging raw header is only useful on the scan a file crosses the
+	// threshold, so for paths in this set toFileDescriptor skips recomputing it.
+	// GetFiles itself is pure with respect to this set: only fileWatcher.watch
+	// advances it (after each scan), so the enumeration-only scans the
+	// prospector runs in Init/TakeOver cannot suppress the header a
+	// still-growing entry needs to migrate across a restart.
 	completedFingerprints map[string]struct{}
 }
 
@@ -647,20 +665,6 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
-	}
-
-	// Refresh the set of paths whose fingerprint is final so the next scan can
-	// skip recomputing the bridging raw header for them. Rebuilding from the
-	// paths observed this scan prunes files that are gone or dropped below the
-	// threshold.
-	if s.cfg.Fingerprint.Growing {
-		completed := make(map[string]struct{}, len(fdByName))
-		for name, fd := range fdByName {
-			if fd.Fingerprint.Complete {
-				completed[name] = struct{}{}
-			}
-		}
-		s.completedFingerprints = completed
 	}
 
 	return fdByName
@@ -903,11 +907,11 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// In growing mode the raw header is carried alongside the SHA-256 so the
 	// one-time transition to the final identity can be prefix-matched against a
 	// still-growing predecessor (in-place growth or rename+grow). It is only
-	// needed on the scan a file crosses the threshold: a path already known to
-	// be complete (it was complete on the previous scan) has no growing
-	// predecessor left to bridge, so recomputing the ~2*length-byte hex header
-	// every scan would be wasted work. New and just-crossed paths are absent
-	// from the set and get the bridging header.
+	// needed on the scan a file crosses the threshold: a path the watch loop
+	// already saw complete on its previous scan has no growing predecessor left
+	// to bridge, so recomputing the ~2*length-byte hex header every scan would
+	// be wasted work. New and just-crossed paths are absent from
+	// completedFingerprints and get the bridging header.
 	if s.cfg.Fingerprint.Growing {
 		if _, done := s.completedFingerprints[it.filename]; !done {
 			fd.Fingerprint.Raw = hex.EncodeToString(s.readBuffer[:length])

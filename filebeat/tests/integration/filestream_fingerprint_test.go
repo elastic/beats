@@ -1206,15 +1206,11 @@ func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not start")
 
-	// The legacy SHA-256 entry is loaded from the persisted registry as an
-	// already-final path — proof the old-format entry was read.
-	filebeat.WaitLogsContains(
-		"seeded fileWatcher hashedPaths with 1 already-final paths",
-		15*time.Second, "the legacy registry entry was not loaded")
-
 	// Phase 1: only the small file's 5 pre-existing lines are ingested. The
-	// large file resumes from its legacy EOF offset and contributes nothing;
-	// re-ingestion would publish its 40 lines and overshoot this exact count.
+	// large file is matched to its legacy SHA-256 registry entry, resumes from
+	// its EOF offset and contributes nothing — proof the old-format entry was
+	// read and reused. WaitPublishedEvents asserts an exact count, so
+	// re-ingesting the large file's 40 lines would overshoot 5 and fail here.
 	filebeat.WaitPublishedEvents(20*time.Second, 5)
 
 	// Phase 2: append to both files. The new bytes must be ingested, continuing
@@ -1394,16 +1390,12 @@ logging:
 // TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart covers
 // the case where a file crosses the threshold while Filebeat is stopped.
 // On restart, the scanner sees a file at/above threshold whose registry
-// entry still has FingerprintGrowing=true (raw-hex key). The prospector
-// must migrate the entry to the final SHA-256 key without re-ingesting
-// the content already harvested before the stop.
-//
-// TODO: remove the comment below once all in implemented
-// Step 6 has no `hashedPaths` bootstrap from the registry yet, so the
-// scanner emits GrowingFingerprint on every file at/above threshold on
-// the first post-restart scan. That's transient over-emission; the
-// migration mechanism still produces correct results. Step 7 optimises
-// the burst away.
+// entry is still a raw-hex (growing) key. On the watch loop's first scan the
+// descriptor carries both the final SHA-256 (Fingerprint.Sum) and the raw
+// header (Fingerprint.Raw); the prospector prefix-matches the raw header
+// against the raw-hex registry entry and migrates the key to the final
+// SHA-256, resuming from the stored offset without re-ingesting content
+// already harvested before the stop.
 func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testing.T) {
 	filebeat := integration.NewFilebeat(t)
 
@@ -1431,9 +1423,8 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testi
 	filebeat.Stop()
 	appendToFile(t, logFile, generateLines("after-restart", 25)) // total ~1500 bytes, above threshold
 
-	// Phase 3: restart. The scanner emits SHA-256 + GrowingFingerprint on
-	// the first scan; the prospector matches GrowingFingerprint against the
-	// raw-hex registry entry and migrates.
+	// Phase 3: restart. The first-scan migration described above runs and the
+	// harvester resumes from the stored offset.
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not restart")
@@ -1564,8 +1555,8 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) 
 // nor the prefix-match pass) can help; the match has to come from the
 // prospector's lazy short-fingerprint set, which is built from the
 // persistent registry. The prospector finds the prior raw-hex entry by
-// path-agnostic prefix match against the new descriptor's GrowingFingerprint
-// and migrates the registry key.
+// path-agnostic prefix match against the new descriptor's raw header
+// (Fingerprint.Raw) and migrates the registry key.
 func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testing.T) {
 	filebeat := integration.NewFilebeat(t)
 
@@ -1596,11 +1587,12 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 	appendToFile(t, appLogRenamed, generateLines("after-restart line", 25)) // total ~1500 bytes
 
 	// Phase 3: restart. fileWatcher sees app.log.1 as new (w.prev empty).
-	// Scanner emits SHA-256 + GrowingFingerprint for the new path. The
-	// prospector's findGrowingFingerprintMatch first tries source==NewPath
-	// against the registry, fails (stored Source is the OLD path), then
-	// falls back to path-agnostic prefix matching against GrowingFingerprint
-	// and finds the prior raw-hex entry. Migration completes.
+	// The descriptor carries the SHA-256 (Fingerprint.Sum) plus the raw header
+	// (Fingerprint.Raw) for the new path. The prospector's
+	// findGrowingFingerprintMatch first tries source==NewPath against the
+	// registry, fails (stored Source is the OLD path), then falls back to
+	// path-agnostic prefix matching against the raw header and finds the prior
+	// raw-hex entry. Migration completes.
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not restart")
