@@ -329,7 +329,7 @@ func TestHTTPMonitorDelayed(t *testing.T) {
 func TestSmokeTCPMonitorUp(t *testing.T) {
 	// A bare listener is sufficient: heartbeat only checks that the TCP
 	// handshake completes; it does not exchange application data.
-	ln, err := net.Listen("tcp", "localhost:0")
+	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "localhost:0")
 	require.NoError(t, err)
 	defer ln.Close()
 
@@ -449,7 +449,7 @@ func TestEventDataset(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ln, err := net.Listen("tcp", "localhost:0")
+	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "localhost:0")
 	require.NoError(t, err)
 	defer ln.Close()
 
@@ -498,9 +498,9 @@ func TestMonitorFieldsUnderRoot(t *testing.T) {
 	rec, snapshot := startSmokeReceiver(t, []map[string]any{{
 		"type": "http", "id": "test-http",
 		"schedule": "@every 1s", "timeout": "3s",
-		"urls":             []string{server.URL},
+		"urls":              []string{server.URL},
 		"fields_under_root": true,
-		"fields":           map[string]any{"custom_env": "staging", "custom_team": "ops"},
+		"fields":            map[string]any{"custom_env": "staging", "custom_team": "ops"},
 	}})
 	defer func() { require.NoError(t, rec.Shutdown(context.Background())) }()
 
@@ -529,7 +529,7 @@ func TestMonitorFieldsNotUnderRoot(t *testing.T) {
 	defer func() { require.NoError(t, rec.Shutdown(context.Background())) }()
 
 	assertMonitorEvent(t, snapshot, map[string]any{
-		"monitor.type":        "http",
+		"monitor.type":      "http",
 		"fields.custom_env": "staging",
 	})
 }
