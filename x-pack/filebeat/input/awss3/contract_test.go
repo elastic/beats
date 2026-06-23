@@ -239,58 +239,41 @@ func TestContract_StateJSON_FailedFieldName(t *testing.T) {
 	assert.NotContains(t, string(data), `"error"`)
 }
 
-func TestContract_StateRegistry_Persistence(t *testing.T) {
-	log := logptest.NewTestingLogger(t, t.Name())
-	store := openTestStatestore()
+func TestContract_StateRegistry_PersistsThroughReload(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(*state)
+	}{
+		{name: "stored", mutate: func(s *state) { s.Stored = true }},
+		{name: "failed", mutate: func(s *state) { s.Failed = true }},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			log := logptest.NewTestingLogger(t, t.Name())
+			store := openTestStatestore()
 
-	bucket := "test-bucket"
-	key := "test-key"
-	etag := "test-etag"
-	lastModified := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+			bucket := "test-bucket"
+			key := "test-key"
+			etag := "test-etag"
+			lastModified := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	// Create registry, add a state, close.
-	reg, err := newStateRegistry(log, store, "", false, 100)
-	require.NoError(t, err)
+			reg, err := newStateRegistry(log, store, "", false, 100)
+			require.NoError(t, err)
 
-	st := newState(bucket, key, etag, lastModified)
-	st.Stored = true
-	require.NoError(t, reg.AddState(st))
-	reg.Close()
+			st := newState(bucket, key, etag, lastModified)
+			test.mutate(&st)
+			require.NoError(t, reg.AddState(st))
 
-	// Reopen and verify persistence.
-	reg2, err := newStateRegistry(log, store, "", false, 100)
-	require.NoError(t, err)
-	defer reg2.Close()
+			id := stateID(bucket, key, etag, lastModified, false)
+			assert.True(t, reg.IsProcessed(id), "%s state must be treated as processed", test.name)
+			reg.Close()
 
-	id := stateID(bucket, key, etag, lastModified, false)
-	assert.True(t, reg2.IsProcessed(id), "stored state must survive registry reload")
-}
-
-func TestContract_StateRegistry_FailedIsPermanent(t *testing.T) {
-	log := logptest.NewTestingLogger(t, t.Name())
-	store := openTestStatestore()
-
-	bucket := "test-bucket"
-	key := "test-key"
-	etag := "test-etag"
-	lastModified := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
-
-	reg, err := newStateRegistry(log, store, "", false, 100)
-	require.NoError(t, err)
-
-	st := newState(bucket, key, etag, lastModified)
-	st.Failed = true
-	require.NoError(t, reg.AddState(st))
-
-	id := stateID(bucket, key, etag, lastModified, false)
-	assert.True(t, reg.IsProcessed(id), "failed state must be treated as permanently processed")
-	reg.Close()
-
-	// Reload — failed state must persist.
-	reg2, err := newStateRegistry(log, store, "", false, 100)
-	require.NoError(t, err)
-	defer reg2.Close()
-	assert.True(t, reg2.IsProcessed(id), "failed state must survive reload")
+			reg2, err := newStateRegistry(log, store, "", false, 100)
+			require.NoError(t, err)
+			defer reg2.Close()
+			assert.True(t, reg2.IsProcessed(id), "%s state must survive registry reload", test.name)
+		})
+	}
 }
 
 // --- Notification parsing contract ---
