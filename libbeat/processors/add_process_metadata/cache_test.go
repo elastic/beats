@@ -20,6 +20,7 @@ package add_process_metadata
 import (
 	"math/rand"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -93,19 +94,23 @@ var cacheEvictionTests = []struct {
 
 func TestCacheEviction(t *testing.T) {
 	for _, test := range cacheEvictionTests {
-		rnd := rand.New(rand.NewSource(1))
-		c := newProcessCache(test.expire, test.cap, test.effort, emptyProvider{})
+		// The cache expires entries based on time.Now. Run each case in its own synctest bubble so those sleeps
+		// advance a fake clock instead of real time.
+		synctest.Test(t, func(t *testing.T) {
+			rnd := rand.New(rand.NewSource(1))
+			c := newProcessCache(test.expire, test.cap, test.effort, emptyProvider{})
 
-		for i := 0; i < test.iters; i++ {
-			pid := rnd.Intn(test.maxPID)
-			_, err := c.GetProcessMetadata(pid)
-			require.NoError(t, err)
-			if len(c.cache) > test.cap {
-				t.Errorf("cache overflow for %s after %d iterations", test.name, i)
-				break
+			for i := 0; i < test.iters; i++ {
+				pid := rnd.Intn(test.maxPID)
+				_, err := c.GetProcessMetadata(pid)
+				require.NoError(t, err)
+				if len(c.cache) > test.cap {
+					t.Errorf("cache overflow for %s after %d iterations", test.name, i)
+					break
+				}
+				time.Sleep(test.delay)
 			}
-			time.Sleep(test.delay)
-		}
+		})
 	}
 }
 
