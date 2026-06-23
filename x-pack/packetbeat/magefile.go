@@ -133,6 +133,7 @@ func GoIntegTest(ctx context.Context) error {
 	args := devtools.DefaultGoTestIntegrationFromHostArgs(ctx)
 	args.Env["ES_USER"] = args.Env["ES_SUPERUSER_USER"]
 	args.Env["ES_PASS"] = args.Env["ES_SUPERUSER_PASS"]
+	args.Packages = []string{"./tests/integration/"}
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
