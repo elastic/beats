@@ -185,7 +185,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if cfg.Request.Tracer.enabled() {
-		id := sanitizeFileName(ctx.IDWithoutName)
+		id := httplog.SanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(ctx.Agent.Paths, inputName, path)
 		if err != nil {
@@ -286,15 +286,6 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 type noopReporter struct{}
 
 func (noopReporter) UpdateStatus(status.Status, string) {}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
-// The request.tracer.filename may have ":" when a httpjson input has cursor config and
-// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
-}
 
 // newHTTPClient returns a new httpClient based on the provided configuration values and
 // sharing common OAuth2 client if it is configured. If authCfg.OAuth2.isEnabled() is true

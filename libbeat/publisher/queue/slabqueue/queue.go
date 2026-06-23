@@ -37,6 +37,13 @@ type Queue[T any] struct {
 	count   int
 	closing bool
 
+	// producers is the set of open producers publishing into this queue. It
+	// exists so Close can fan out and unblock every producer's ACKWaitChan on
+	// (force-)close — force-close suppresses per-event ACK callbacks, so the
+	// ack accounting alone would never close those channels. Producers add
+	// themselves in Producer and remove themselves in Close; guarded by mu.
+	producers map[*producer[T]]struct{}
+
 	// pendingHead/pendingTail is the intrusive FIFO of batches that have been
 	// returned from Get but not yet Done()'d, threaded through batch.next in
 	// publish (== Get) order. We use it to fire producer ACK callbacks in
@@ -77,12 +84,13 @@ type Queue[T any] struct {
 
 func newQueue[T any](pool *Pool[T]) *Queue[T] {
 	q := &Queue[T]{
-		pool:    pool,
-		head:    -1,
-		tail:    -1,
-		notify:  make(chan struct{}, 1),
-		closeCh: make(chan struct{}),
-		doneCh:  make(chan struct{}),
+		pool:      pool,
+		head:      -1,
+		tail:      -1,
+		notify:    make(chan struct{}, 1),
+		closeCh:   make(chan struct{}),
+		doneCh:    make(chan struct{}),
+		producers: make(map[*producer[T]]struct{}),
 	}
 	q.limCond = sync.NewCond(&q.limMu)
 	return q
@@ -195,7 +203,29 @@ func (q *Queue[T]) isClosing() bool { return chClosed(q.closeCh) }
 // shards.
 func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
 	home := int((q.pool.homeCounter.Add(1) - 1) & uint64(q.pool.free.mask)) //nolint:gosec // G115: masked by the shard count, always a small non-negative index
-	return &producer[T]{queue: q, cfg: cfg, home: home}
+	p := &producer[T]{queue: q, cfg: cfg, home: home, ackWait: make(chan struct{})}
+	q.mu.Lock()
+	if q.closing {
+		// The queue is already (force-)closing. A producer created now will
+		// never see its events drain, so hand back one whose ackWait is
+		// already closed rather than registering it for a fan-out that has
+		// already happened.
+		q.mu.Unlock()
+		p.forceCloseAckWait()
+		return p
+	}
+	q.producers[p] = struct{}{}
+	q.mu.Unlock()
+	return p
+}
+
+// removeProducer unregisters a producer from the force-close fan-out set. Called
+// from producer.Close; safe to call for a producer that was never registered
+// (e.g. one created after the queue began closing).
+func (q *Queue[T]) removeProducer(p *producer[T]) {
+	q.mu.Lock()
+	delete(q.producers, p)
+	q.mu.Unlock()
 }
 
 // Get blocks until at least one event is available (or the queue is closed)
@@ -276,8 +306,22 @@ func (q *Queue[T]) Close(force bool) error {
 	}
 	q.mu.Lock()
 	q.closing = true
+	// On force-close, snapshot and clear the producer set so we can fan out an
+	// unconditional ackWait close outside the lock — force-close suppresses the
+	// per-event ACK callbacks that would otherwise close those channels. A
+	// graceful close leaves the set intact: events keep draining and each
+	// producer's ackWait closes naturally as its events are acked (and a later
+	// force-close, e.g. on timeout, can still fan out to them).
+	var ackWaitProducers []*producer[T]
 	var releaseIndices []int
 	if force {
+		if len(q.producers) > 0 {
+			ackWaitProducers = make([]*producer[T], 0, len(q.producers))
+			for p := range q.producers {
+				ackWaitProducers = append(ackWaitProducers, p)
+			}
+			q.producers = make(map[*producer[T]]struct{})
+		}
 		if q.count > 0 {
 			// Walk the FIFO and gather the slots so we can release them back to
 			// the pool below, outside the lock, to keep the critical section short.
@@ -312,6 +356,12 @@ func (q *Queue[T]) Close(force bool) error {
 		q.wakeLimitWaiters()
 	})
 	q.signal()
+
+	// Force-close: unblock every still-open producer's ACKWaitChan, since the
+	// suppressed ACK callbacks will never advance their ack accounting.
+	for _, p := range ackWaitProducers {
+		p.forceCloseAckWait()
+	}
 
 	if len(releaseIndices) > 0 {
 		var zero T
