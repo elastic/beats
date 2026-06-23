@@ -146,7 +146,15 @@ func (r *reporter) Stop() {
 	r.wg.Wait()
 }
 
+<<<<<<< HEAD
 func (r *reporter) snapshotLoop() {
+=======
+func (r *Reporter) snapshotLoop() {
+	if r.Period == 0 {
+		r.logger.Infof("Skipping metrics logging")
+		return
+	}
+>>>>>>> ef5e2f029 (fix panic when logging.metrics.period is 0 (#51462))
 	r.logger.Infof("Starting metrics logging every %v", r.Period)
 	defer r.logger.Infof("Stopping metrics logging.")
 	defer func() {
