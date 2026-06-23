@@ -2,7 +2,7 @@ version: 9.3.6
 entries:
     - kind: deprecation
       summary: Deprecate ssl.restart_on_cert_change in favor of ssl.certificate_reload
-      description: ""
+      description: "Certificates, keys, and CA certificates are now automatically reloaded on each TLS handshake without requiring a process restart."
       component: beats
       pr:
         - https://github.com/elastic/beats/pull/50444
