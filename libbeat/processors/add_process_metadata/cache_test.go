@@ -18,7 +18,7 @@
 package add_process_metadata
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -97,11 +97,10 @@ func TestCacheEviction(t *testing.T) {
 		// The cache expires entries based on time.Now. Run each case in its own synctest bubble so those sleeps
 		// advance a fake clock instead of real time.
 		synctest.Test(t, func(t *testing.T) {
-			rnd := rand.New(rand.NewSource(1))
 			c := newProcessCache(test.expire, test.cap, test.effort, emptyProvider{})
 
 			for i := 0; i < test.iters; i++ {
-				pid := rnd.Intn(test.maxPID)
+				pid := rand.IntN(test.maxPID)
 				_, err := c.GetProcessMetadata(pid)
 				require.NoError(t, err)
 				if len(c.cache) > test.cap {
