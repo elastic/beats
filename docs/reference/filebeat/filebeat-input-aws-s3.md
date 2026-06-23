@@ -20,6 +20,16 @@ The S3 input manages SQS message visibility to prevent messages from being repro
 
 If an error occurs during the processing of the S3 object, the processing will be stopped, and the SQS message will be returned to the queue for reprocessing.
 
+::::{note}
+The `aws-s3` input uses a rewritten implementation (V2) by default. The new implementation provides adaptive concurrency control and simplified internal architecture while remaining fully compatible with existing configurations and persistent state. If you encounter issues, you can revert to the legacy implementation by adding the following to your beat configuration:
+
+```yaml
+features.aws_s3_v2.enabled: false
+```
+
+The legacy implementation is deprecated and will be removed in a future release.
+::::
+
 
 ## Configuration Examples [_configuration_examples]
 
