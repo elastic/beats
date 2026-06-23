@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import unittest
 import platform
@@ -16,6 +17,7 @@ def is_root():
 
 
 def is_version_below(version, target):
+    version = re.sub(r"\+deb\d+$", '', version)
     t = list(map(int, target.split('.')))
     v = list(map(int, version.split('.')))
     v += [0] * (len(t) - len(v))
@@ -72,6 +74,17 @@ def file_events(objs, path, expected):
             wanted, path, evts)
 
 
+def file_event_set(objs, path):
+    evts = set()
+    for obj in objs:
+        if 'file.path' in obj and 'event.action' in obj and obj['file.path'].lower() == path.lower():
+            if isinstance(obj['event.action'], list):
+                evts = evts.union(set(obj['event.action']))
+            else:
+                evts.add(obj['event.action'])
+    return evts
+
+
 def wrap_except(expr):
     try:
         return expr()
@@ -82,13 +95,13 @@ def wrap_except(expr):
 class Test(BaseTest):
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
-        # wait for the number of lines in the file to stay constant for 10 seconds
+        # Wait for output to settle.
         prev_lines = -1
         while True:
             num_lines = self.output_lines()
             if prev_lines < num_lines:
                 prev_lines = num_lines
-                time.sleep(10)
+                time.sleep(2)
             else:
                 break
 
@@ -103,6 +116,12 @@ class Test(BaseTest):
             # Case must be ignored under windows as capitalisation of paths
             # may differ
             self.wait_log_contains(escape_path(dir), max_timeout=30, ignore_case=True)
+
+    def wait_file_events(self, path, expected):
+        self.wait_until(
+            lambda: wrap_except(lambda: set(expected).issubset(file_event_set(self.read_output(), path))),
+            max_timeout=60,
+        )
 
     def _assert_process_data(self, event, backend):
         if backend != "ebpf":
@@ -162,7 +181,8 @@ class Test(BaseTest):
                 self.wait_output(4)
             else:
                 # ebpf backend doesn't catch directory creation
-                self.wait_output(3)
+                self.wait_file_events(file1, ['created', 'deleted'])
+                self.wait_file_events(file2, ['created'])
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -193,7 +213,6 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 
@@ -247,7 +266,8 @@ class Test(BaseTest):
                     'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
             else:
                 # ebpf backend doesn't catch directory creation
-                self.wait_output(2)
+                self.wait_file_events(file1, ['created'])
+                self.wait_file_events(file2, ['created'])
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -274,7 +294,6 @@ class Test(BaseTest):
         self._test_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_recursive__ebpf(self):
         self._test_recursive("ebpf")
 
@@ -310,27 +329,29 @@ class Test(BaseTest):
             f = os.path.join(dirs[0], f'file_{backend}.txt')
             self.create_file(f, "hello world!")
 
-            # Wait for file creation to be reported
-            self.wait_output(1)
+            if backend == "ebpf":
+                self.wait_file_events(f, ['created'])
+            else:
+                self.wait_output(1)
 
-            # Event 2: chmod
             os.chmod(f, 0o777)
 
-            # Wait for mode change to be reported
-            self.wait_output(2)
+            if backend != "ebpf":
+                self.wait_output(2)
 
             with open(f, "w") as fd:
-                # Event 3: write
                 fd.write("data")
                 fd.flush()
-                # Wait for write to be reported
-                self.wait_output(3)
+                if backend != "ebpf":
+                    self.wait_output(3)
 
-                # Event 4: truncate
                 fd.truncate(0)
                 fd.flush()
-                # Wait for truncate to be reported
-                self.wait_output(4)
+                if backend != "ebpf":
+                    self.wait_output(4)
+
+            if backend == "ebpf":
+                self.wait_file_events(f, ['created', 'updated'])
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -346,7 +367,6 @@ class Test(BaseTest):
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("Flaky test: https://github.com/elastic/beats/issues/46719")
     def test_file_modified__ebpf(self):
         self._test_file_modified("ebpf")
 
