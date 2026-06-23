@@ -46,7 +46,7 @@ RUN for iter in {1..10}; do \
     (exit $exit_code)
 {{- end }}
 
-{{- if contains .from "ubi-minimal" }}
+{{- if and (contains .from "ubi") (contains .from "minimal") }}
 RUN for iter in {1..10}; do \
         microdnf -y update && \
         microdnf -y install findutils shadow-utils && \
