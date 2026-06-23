@@ -171,7 +171,11 @@ func TestZeroPeriodConfig(t *testing.T) {
 	}
 	defer rep.Stop()
 
-	assert.Equal(t, time.Duration(0), rep.(*Reporter).Period)
+	reporter, ok := rep.(*Reporter)
+	if !ok {
+		t.Fatal("MakeReporter did not return a *Reporter")
+	}
+	assert.Equal(t, time.Duration(0), reporter.Period)
 }
 
 func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
@@ -180,5 +184,5 @@ func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, expectedValue, v) //nolint:testifylint // we don't care if types are different
+	assert.EqualValues(t, expectedValue, v)
 }
