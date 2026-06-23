@@ -89,6 +89,7 @@ type packetbeat struct {
 	overwritePipelines bool
 	done               chan struct{}
 	stopOnce           sync.Once
+	logger             *logp.Logger
 
 	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
@@ -139,11 +140,12 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 // reload.Registry and handled by fleet. Otherwise it is run until cancelled or a
 // fatal error.
 func (pb *packetbeat) Run(b *beat.Beat) error {
+	pb.logger = b.Info.Logger
 	defer func() {
 		if service.ProfileEnabled() {
-			logp.Debug("main", "Waiting for streams and transactions to expire...")
+			pb.logger.Debug("Waiting for streams and transactions to expire...")
 			time.Sleep(time.Duration(float64(protos.DefaultTransactionExpiration) * 1.2))
-			logp.Debug("main", "Streams and transactions should all be expired now.")
+			pb.logger.Debug("Streams and transactions should all be expired now.")
 		}
 	}()
 
@@ -204,7 +206,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory cfgfile.RunnerFactory) err
 	runner.Start()
 	defer runner.Stop()
 
-	logp.Debug("main", "Waiting for the runner to finish")
+	pb.logger.Debug("Waiting for the runner to finish")
 
 	select {
 	case <-pb.done:
@@ -220,7 +222,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory cfgfile.RunnerFactory) err
 func (pb *packetbeat) runManaged(b *beat.Beat, factory cfgfile.RunnerFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(runner)
-	logp.Debug("main", "Waiting for the runner to finish")
+	pb.logger.Debug("Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when
 	// the function return.
@@ -251,7 +253,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory cfgfile.RunnerFactory) er
 
 // Called by the Beat stop function
 func (pb *packetbeat) Stop() {
-	logp.Info("Packetbeat send stop signal")
+	pb.logger.Info("Packetbeat send stop signal")
 	pb.stopOnce.Do(func() { close(pb.done) })
 }
 
