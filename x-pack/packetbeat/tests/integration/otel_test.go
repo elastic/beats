@@ -76,6 +76,22 @@ func sendHTTPRequests(url string, numRequests int) {
 	}
 }
 
+// keepSendingHTTPRequests sends HTTP requests to url every interval until ctx
+// is cancelled.  The packetbeat sniffer starts asynchronously, so traffic must
+// be generated continuously rather than in a one-shot burst.
+func keepSendingHTTPRequests(ctx context.Context, url string, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			sendHTTPRequests(url, 5)
+		}
+	}
+}
+
 func renderOtelConfig(tb testing.TB, cfgTemplate string, data any) string {
 	tb.Helper()
 	var buf bytes.Buffer
@@ -470,8 +486,9 @@ service:
 
 	oteltestcol.New(t, cfg)
 
-	// Generate HTTP traffic for packetbeat to capture.
-	sendHTTPRequests(srv.URL, 20)
+	// Generate HTTP traffic continuously: the packetbeat sniffer starts
+	// asynchronously, so a one-shot burst would race with capture startup.
+	go keepSendingHTTPRequests(t.Context(), srv.URL, 500*time.Millisecond)
 
 	es := integration.GetESClient(t, "http")
 
@@ -577,9 +594,10 @@ service:
 
 	oteltestcol.New(t, cfg)
 
-	// Generate HTTP traffic on each server for packetbeat to capture.
+	// Generate HTTP traffic continuously on each server: the packetbeat sniffer
+	// starts asynchronously, so a one-shot burst would race with capture startup.
 	for _, srv := range servers {
-		sendHTTPRequests(srv.URL, 20)
+		go keepSendingHTTPRequests(t.Context(), srv.URL, 500*time.Millisecond)
 	}
 
 	es := integration.GetESClient(t, "http")
