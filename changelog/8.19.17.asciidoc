@@ -14,7 +14,7 @@ Review important information about the  8.19.17 release.
 
 **All**
 
-* Upgrade to Go 1.26.4. https://github.com/elastic/beats/pull/51163[#51163]
+* Upgrade Go to v1.26.4. https://github.com/elastic/beats/pull/51163[#51163]
 
 
 
@@ -33,7 +33,7 @@ upgrade to 8.19.17.
 
 **Beats**
 
-* Deprecate ssl.restart_on_cert_change in favor of ssl.certificate_reload. https://github.com/elastic/beats/pull/51022[#51022]
+* Deprecate `ssl.restart_on_cert_change` in favor of `ssl.certificate_reload`. https://github.com/elastic/beats/pull/51022[#51022]
 
 [discrete]
 [[new-features-8.19.17]]
@@ -46,7 +46,7 @@ The 8.19.17 release adds the following new and notable features.
 
 **All**
 
-* Update Go to 1.26.3. https://github.com/elastic/beats/pull/50843[#50843]
+* Update Go to v1.26.3. https://github.com/elastic/beats/pull/50843[#50843]
 
 
 **Beats**
@@ -63,7 +63,7 @@ The 8.19.17 release adds the following new and notable features.
 
 **All**
 
-* Migrate from deprecated github.com/docker/docker to github.com/moby/moby split modules. https://github.com/elastic/beats/pull/50300[#50300]
+* Migrate from the deprecated `github.com/docker/docker` module to the `github.com/moby/moby` split modules. https://github.com/elastic/beats/pull/50300[#50300]
 
 
 **Filebeat**
@@ -73,7 +73,7 @@ The 8.19.17 release adds the following new and notable features.
 
 **Metricbeat**
 
-* Migrate azure/app_insights metricset off the deprecated track-1 Azure SDK and go-autorest, using azcore directly. https://github.com/elastic/beats/pull/50648[#50648]
+* Migrate `azure/app_insights` metricset off the deprecated track-1 Azure SDK and `go-autorest`, using `azcore` directly. https://github.com/elastic/beats/pull/50648[#50648]
 
 
 
@@ -93,25 +93,25 @@ The 8.19.17 release adds the following new and notable features.
 
 **Filebeat**
 
-* Fix token refresh for jwk_pem/jwk_file in cel, httpjson inputs. https://github.com/elastic/beats/pull/50826[#50826] https://github.com/elastic/beats/issues/50426[#50426]
-* Respect max_bytes/message_max_bytes when reading the first chunk of CRI partial lines. https://github.com/elastic/beats/pull/50796[#50796]
-* Fix request tracer path validation for cel, httpjson, http_endpoint, and entityanalytics inputs when filebeat runs as an OTel receiver. https://github.com/elastic/beats/pull/51026[#51026]
+* Fix token refresh for `jwk_pem/jwk_file` in the `cel` and `httpjson` inputs. https://github.com/elastic/beats/pull/50826[#50826] https://github.com/elastic/beats/issues/50426[#50426]
+* Respect `max_bytes`/`message_max_bytes` when reading the first chunk of CRI partial lines. https://github.com/elastic/beats/pull/50796[#50796]
+* Fix request tracer path validation for the `cel`, `httpjson`, `http_endpoint`, and `entityanalytics` inputs when Filebeat runs as an OTel receiver. https://github.com/elastic/beats/pull/51026[#51026]
 * Make CrowdStrike streaming input cancel refresh goroutines on session reconnect. https://github.com/elastic/beats/pull/50864[#50864]
 * Fix goroutine leak in filestream task group. https://github.com/elastic/beats/pull/50839[#50839] https://github.com/elastic/beats/issues/50824[#50824]
 * Cache Okta OAuth2 token in cel and httpjson to avoid unnecessary JWT regeneration. https://github.com/elastic/beats/pull/51177[#51177]
 * Fix filestream registry leak on file renames. https://github.com/elastic/beats/pull/51290[#51290]
-* Guard event.original rename in azure module ingest pipelines to prevent &#34;field already exists&#34; error when the field is pre-populated. https://github.com/elastic/beats/pull/51271[#51271]
+* Guard `event.original` rename in Azure module ingest pipelines to prevent a "field already exists" error when the field is pre-populated. https://github.com/elastic/beats/pull/51271[#51271]
 
 
 **Libbeat**
 
 * Fix bulk indexing failures that could occur when using the Elasticsearch output with some non-Elastic backends. https://github.com/elastic/beats/pull/49557[#49557] https://github.com/elastic/beats/issues/49558[#49558]
-* Fix data race in add_cloud_metadata processor when fetching metadata from multiple providers concurrently. https://github.com/elastic/beats/pull/51317[#51317]
+* Fix a data race in `add_cloud_metadata` processor when fetching metadata from multiple providers concurrently. https://github.com/elastic/beats/pull/51317[#51317]
 
 
 **Osquerybeat**
 
-* Respect osquery pack query platform filters for Live Query actions. https://github.com/elastic/beats/pull/51118[#51118]
+* Respect Osquery pack query platform filters for Live Query actions. https://github.com/elastic/beats/pull/51118[#51118]
 
 
 **Packetbeat**
