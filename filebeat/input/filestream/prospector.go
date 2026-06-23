@@ -466,7 +466,16 @@ func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, igno
 		return false
 	}
 
-	switch fileIgnoreReason(fe.Descriptor.Info.ModTime(), time.Now(), p.ignoreOlder, ignoreInactiveSince) {
+	var reason ignoreReason
+	if p.ignoreOlder > 0 && time.Since(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
+		reason = ignoredByIgnoreOlder
+	}
+
+	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+		reason = ignoredByIgnoreInactive
+	}
+
+	switch reason {
 	case ignoredByIgnoreOlder:
 		log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
 		return true

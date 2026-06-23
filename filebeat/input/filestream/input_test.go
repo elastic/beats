@@ -138,6 +138,7 @@ prospector.scanner.fingerprint.enabled: true
 file_identity.fingerprint: ~`
 	}
 	return fmt.Sprintf(`
+id: benchmark
 type: filestream
 prospector.scanner.check_interval: 100ms
 close.reader.on_eof: true%s
