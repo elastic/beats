@@ -132,6 +132,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		factory:            factory,
 		overwritePipelines: overwritePipelines,
 		done:               make(chan struct{}),
+		logger:             b.Info.Logger,
 	}, nil
 }
 
@@ -140,7 +141,6 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 // reload.Registry and handled by fleet. Otherwise it is run until cancelled or a
 // fatal error.
 func (pb *packetbeat) Run(b *beat.Beat) error {
-	pb.logger = b.Info.Logger
 	defer func() {
 		if service.ProfileEnabled() {
 			pb.logger.Debug("Waiting for streams and transactions to expire...")
