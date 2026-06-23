@@ -114,13 +114,10 @@ func TestReporterLog(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
-=======
 func TestZeroPeriodSkipsLogging(t *testing.T) {
 	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
 
-	r := &Reporter{
+	r := &reporter{
 		config:     config{Period: 0},
 		done:       make(chan struct{}),
 		logger:     logger.Named("monitoring"),
@@ -167,21 +164,20 @@ func TestZeroPeriodConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rep, err := MakeReporter(beat.Info{Logger: logger}, cfg, beatmonitoring.NewGlobalMonitoring())
+	rep, err := MakeReporter(beat.Info{Logger: logger}, cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer rep.Stop()
 
-	reporter, ok := rep.(*Reporter)
+	reporter, ok := rep.(*reporter)
 	if !ok {
 		t.Fatal("MakeReporter did not return a *Reporter")
 	}
 	assert.Equal(t, time.Duration(0), reporter.Period)
 }
 
-func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
->>>>>>> ef5e2f029 (fix panic when logging.metrics.period is 0 (#51462))
+func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {
