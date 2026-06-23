@@ -32,6 +32,8 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumertest"
 	"go.opentelemetry.io/collector/receiver"
 
+	"go.opentelemetry.io/collector/component/componentstatus"
+	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
@@ -357,6 +359,57 @@ func BenchmarkFactory(b *testing.B) {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
+}
+
+func TestReceiverStatus(t *testing.T) {
+	inputID := "pb-status-test"
+
+	inputStatusAttributes := func(state string, msg string) pcommon.Map {
+		eventAttributes := pcommon.NewMap()
+		inputStatuses := eventAttributes.PutEmptyMap("inputs")
+		inputStatus := inputStatuses.PutEmptyMap(inputID)
+		inputStatus.PutStr("status", state)
+		inputStatus.PutStr("error", msg)
+		return eventAttributes
+	}
+
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"packetbeat": map[string]any{
+				"id": inputID,
+				"interfaces": map[string]any{
+					"file": "../../../packetbeat/tests/system/pcaps/http_x_forwarded_for.pcap",
+				},
+				"protocols": []map[string]any{
+					{
+						"type":  "http",
+						"ports": []int{80},
+					},
+				},
+			},
+			"logging": map[string]any{
+				"level":     "info",
+				"selectors": []string{"*"},
+			},
+			"path.home":               t.TempDir(),
+			"management.otel.enabled": true,
+		},
+	}
+
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Beat:    "packetbeat",
+				Config:  &cfg,
+				Factory: NewFactoryWithSettings(Settings{Home: t.TempDir()}),
+			},
+		},
+		Status: componentstatus.NewEvent(componentstatus.StatusOK,
+			componentstatus.WithAttributes(inputStatusAttributes(
+				componentstatus.StatusOK.String(), "running packetbeat processor"))),
+	})
 }
 
 func TestReceiverHook(t *testing.T) {
