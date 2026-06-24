@@ -18,8 +18,10 @@ import (
 	"go.opentelemetry.io/collector/extension"
 )
 
-var _ extension.Extension = (*elasticStorage)(nil)
-var _ backend.Registry = (*elasticStorage)(nil)
+var (
+	_ extension.Extension = (*elasticStorage)(nil)
+	_ backend.Registry    = (*elasticStorage)(nil)
+)
 
 type elasticStorage struct {
 	cfg    *Config
@@ -52,6 +54,8 @@ func (e *elasticStorage) Shutdown(ctx context.Context) error {
 	if e.client == nil {
 		return nil
 	}
+	e.clientMu.Lock()
+	defer e.clientMu.Unlock()
 	return e.client.Close()
 }
 
