@@ -70,8 +70,8 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 	t.Cleanup(func() { _ = ext.Shutdown(context.Background()) })
 
 	const (
-		numStores      = 4
-		opsPerStore    = 50
+		numStores       = 4
+		opsPerStore     = 50
 		writersPerStore = 2 // one Each loop + one Set loop per store == higher race odds
 	)
 
