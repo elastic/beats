@@ -19,16 +19,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-/*
-struct mq_attr {
-	long mq_flags;
-	long mq_maxmsg;
-	long mq_msgsize;
-	long mq_curmsgs;
-	long __reserved[4];
-};
-*/
-import "C"
+type MqAttr struct {
+	_       int
+	Maxmsg  int
+	Msgsize int
+	_       int
+}
 
 /*
 	creds guess discovers the offsets of (E)UID/(E)GID fields within a
@@ -120,7 +116,10 @@ func (g *guessStructCreds) Terminate() error {
 
 // Extract receives the struct cred dump and discovers the offsets.
 func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
-	raw := ev.([]byte)
+	raw, ok := ev.([]byte)
+	if !ok {
+		return nil, false
+	}
 	if len(raw) != credDumpBytes {
 		return nil, false
 	}
@@ -157,9 +156,9 @@ func (g *guessStructCreds) Trigger() error {
 	if err != nil {
 		return err
 	}
-	attr := C.struct_mq_attr{
-		mq_maxmsg:  1,
-		mq_msgsize: 8,
+	attr := MqAttr{
+		Maxmsg:  1,
+		Msgsize: 8,
 	}
 	mqd, _, errno := syscall.Syscall6(unix.SYS_MQ_OPEN,
 		uintptr(unsafe.Pointer(name)),
