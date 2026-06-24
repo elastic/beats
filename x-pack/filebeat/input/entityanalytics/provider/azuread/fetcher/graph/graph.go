@@ -84,7 +84,7 @@ type apiMFAResponse struct {
 
 // apiSignInActivityResponse matches the format of a sign-in activity response from the Graph API.
 type apiSignInActivityResponse struct {
-	NextLink string             `json:"@odata.nextLink"`
+	NextLink string              `json:"@odata.nextLink"`
 	Users    []signInActivityAPI `json:"value"`
 }
 
@@ -215,12 +215,12 @@ type graph struct {
 	logger *logp.Logger
 	auth   authenticator.Authenticator
 
-	usersURL            string
-	groupsURL           string
-	devicesURL          string
-	deviceOwnerUserURL  string
-	mfaDetailsURL       string
-	signInActivityURL   string
+	usersURL           string
+	groupsURL          string
+	devicesURL         string
+	deviceOwnerUserURL string
+	mfaDetailsURL      string
+	signInActivityURL  string
 }
 
 // SetLogger sets the logger on this fetcher.
