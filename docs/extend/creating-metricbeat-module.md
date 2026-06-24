@@ -98,7 +98,7 @@ To test a Metricbeat module manually, follow the steps below.
 
 First we have to build the Docker image which is available for the modules. The Dockerfile is located inside a `_meta` folder within each module folder. As an example let’s take MySQL module.
 
-These steps assume you have checked out the Beats repository from Github and are inside `beats` directory. First, we have to enter in the `_meta` folder mentioned above and build the Docker image called `metricbeat-mysql`:
+These steps assume you have checked out the Beats repository from GitHub and are inside the `beats` directory. First, we have to enter in the `_meta` folder mentioned above and build the Docker image called `metricbeat-mysql`:
 
 ```bash
 $ cd metricbeat/module/mysql/_meta/

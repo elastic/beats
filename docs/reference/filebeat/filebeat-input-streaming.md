@@ -541,5 +541,5 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
 
 ::::{note}
-The `streaming` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the [Github](https://github.com/elastic/beats) repository.
+The `streaming` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the [GitHub](https://github.com/elastic/beats) repository.
 ::::
