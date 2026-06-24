@@ -20,6 +20,7 @@ package redis
 import (
 	"bytes"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -61,8 +62,11 @@ type redisPlugin struct {
 }
 
 var (
-	debugf  = logp.MakeDebug("redis")
-	isDebug = false
+	debugf = logp.MakeDebug("redis")
+	// isDebug caches whether the "redis" debug selector is enabled. It is an
+	// atomic.Bool because multiple plugin instances may initialize it
+	// concurrently (e.g. several packetbeat receivers in one process).
+	isDebug atomic.Bool
 )
 
 var (
@@ -99,7 +103,7 @@ func (redis *redisPlugin) init(results protos.Reporter, watcher *procs.Processes
 
 	redis.results = results
 	redis.watcher = watcher
-	isDebug = logp.IsDebug("redis")
+	isDebug.Store(logp.IsDebug("redis"))
 
 	return nil
 }
@@ -175,18 +179,18 @@ func (redis *redisPlugin) doParse(
 	if st == nil {
 		st = newStream(pkt.Ts, tcptuple)
 		conn.streams[dir] = st
-		if isDebug {
+		if isDebug.Load() {
 			debugf("new stream: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 		}
 	}
 
 	if err := st.Append(pkt.Payload); err != nil {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("%v, dropping TCP stream: ", err)
 		}
 		return nil
 	}
-	if isDebug {
+	if isDebug.Load() {
 		debugf("stream add data: %p (dir=%v, len=%v)", st, dir, len(pkt.Payload))
 	}
 
@@ -200,7 +204,7 @@ func (redis *redisPlugin) doParse(
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.streams[dir] = nil
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Ignore Redis message. Drop tcp stream. Try parsing with the next segment")
 			}
 			return conn
@@ -212,7 +216,7 @@ func (redis *redisPlugin) doParse(
 		}
 
 		msg := st.parser.message
-		if isDebug {
+		if isDebug.Load() {
 			if msg.isRequest {
 				debugf("REDIS (%p) request message: %s", conn, msg.message)
 			} else {

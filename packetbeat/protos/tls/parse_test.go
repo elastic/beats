@@ -127,7 +127,7 @@ func mapGet(t *testing.T, m mapstr.M, key string) interface{} {
 
 func TestParseRecordHeader(t *testing.T) {
 	if testing.Verbose() {
-		isDebug = true
+		isDebug.Store(true)
 		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
@@ -154,7 +154,7 @@ func TestParseRecordHeader(t *testing.T) {
 
 func TestParseHandshakeHeader(t *testing.T) {
 	if testing.Verbose() {
-		isDebug = true
+		isDebug.Store(true)
 		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
@@ -174,7 +174,7 @@ func TestParseHandshakeHeader(t *testing.T) {
 
 func TestParserParse(t *testing.T) {
 	if testing.Verbose() {
-		isDebug = true
+		isDebug.Store(true)
 		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 
@@ -201,7 +201,7 @@ func TestParserParse(t *testing.T) {
 
 func TestParserHello(t *testing.T) {
 	if testing.Verbose() {
-		isDebug = true
+		isDebug.Store(true)
 		logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 	}
 

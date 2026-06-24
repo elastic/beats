@@ -104,9 +104,27 @@ func NewBeatReceiver(ctx context.Context, b *instance.Beat, creator beat.Creator
 		return BeatReceiver{}, fmt.Errorf("error acquiring system bridge: %w", err)
 	}
 
+	// Create the metric logging reporter here rather than in Start so that
+	// reporter is set once during construction and is never mutated by the
+	// background goroutine that runs Start. Start and Shutdown both run
+	// concurrently, so a write in Start would race with the read in Shutdown.
+	var reporter *log.Reporter
+	if b.Config.MetricLogging == nil || b.Config.MetricLogging.Enabled() {
+		r, err := log.MakeReporter(b.Info, b.Config.MetricLogging, b.Monitoring)
+		if err != nil {
+			return BeatReceiver{}, fmt.Errorf("error creating metric reporter: %w", err)
+		}
+		rep, ok := r.(*log.Reporter)
+		if !ok {
+			return BeatReceiver{}, fmt.Errorf("error creating metric log reporter")
+		}
+		reporter = rep
+	}
+
 	return BeatReceiver{
 		beat:                b,
 		beater:              beater,
+		reporter:            reporter,
 		Logger:              b.Info.Logger,
 		bridge:              bridge,
 		releaseSystemBridge: releaseSystem,
@@ -157,20 +175,6 @@ func (br *BeatReceiver) Start(host component.Host) error {
 			}
 			w.WithESStateStoreExtension(esStorageExtension)
 		}
-	}
-
-	if br.beat.Config.MetricLogging == nil || br.beat.Config.MetricLogging.Enabled() {
-		r, err := log.MakeReporter(br.beat.Info,
-			br.beat.Config.MetricLogging,
-			br.beat.Monitoring)
-		if err != nil {
-			return fmt.Errorf("error creating metric reporter: %w", err)
-		}
-		rep, ok := r.(*log.Reporter)
-		if !ok {
-			return fmt.Errorf("error creating metric log reporter")
-		}
-		br.reporter = rep
 	}
 
 	if err := br.beater.Run(&br.beat.Beat); err != nil {

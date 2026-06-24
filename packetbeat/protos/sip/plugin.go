@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -35,10 +36,14 @@ import (
 )
 
 var (
-	debugf     = logp.MakeDebug("sip")
-	detailedf  = logp.MakeDebug("sipdetailed")
-	isDebug    = false
-	isDetailed = false
+	debugf    = logp.MakeDebug("sip")
+	detailedf = logp.MakeDebug("sipdetailed")
+	// isDebug and isDetailed cache whether the "sip"/"sipdetailed" debug
+	// selectors are enabled. They are atomic.Bool because multiple plugin
+	// instances may initialize them concurrently (e.g. several packetbeat
+	// receivers in one process).
+	isDebug    atomic.Bool
+	isDetailed atomic.Bool
 
 	_ protos.UDPPlugin                = &plugin{}
 	_ protos.ExpirationAwareTCPPlugin = &plugin{}
@@ -68,8 +73,8 @@ func New(
 	// TODO: https://github.com/elastic/ingest-dev/issues/6000
 	logp.NewLogger("").Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
 
-	isDebug = logp.IsDebug("sip")
-	isDetailed = logp.IsDebug("sipdetailed")
+	isDebug.Store(logp.IsDebug("sip"))
+	isDetailed.Store(logp.IsDebug("sipdetailed"))
 
 	config := defaultConfig
 	if !testMode {
@@ -217,7 +222,7 @@ func (p *plugin) GapInStream(
 	}
 
 	ok, complete := p.messageGap(st, nbytes)
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("messageGap returned ok=%v complete=%v", ok, complete)
 	}
 	if !ok {
@@ -250,7 +255,7 @@ func (p *plugin) messageGap(pi *parsingInfo, nbytes int) (ok bool, complete bool
 		// we know we cannot recover from these
 		return false, false
 	case stateBody:
-		if isDebug {
+		if isDebug.Load() {
 			debugf("gap in body: %d", nbytes)
 		}
 		if len(pi.data)+nbytes >= m.contentLength-pi.bodyReceived {
@@ -275,14 +280,14 @@ func (p *plugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
 	if conn == nil {
 		return
 	}
-	if isDebug {
+	if isDebug.Load() {
 		debugf("expired connection %s", tuple)
 	}
 	// terminate streams
 	for _, st := range conn.streams {
 		// Do not send incomplete or empty messages
 		if st != nil && st.message != nil && st.message.headerOffset > 0 {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("got message %+v", st.message)
 			}
 			// Current message is complete, we need to publish from here
@@ -300,7 +305,7 @@ func (p *plugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
 }
 
 func (p *plugin) doParse(pi *parsingInfo) (bool, error) {
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("Payload received: [%s]", pi.pkt.Payload)
 	}
 
@@ -559,20 +564,20 @@ func populateEventFields(cfg *config, pi *parsingInfo, pbf *pb.Fields, fields Pr
 func populateAuthFields(m *message, evt beat.Event, pbf *pb.Fields, fields *ProtocolFields) {
 	auths, found := m.headers["authorization"]
 	if !found || len(auths) == 0 {
-		if isDetailed {
+		if isDetailed.Load() {
 			detailedf("sip packet without authorization header")
 		}
 		return
 	}
 
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("sip packet with authorization header")
 	}
 
 	auth := bytes.TrimSpace(auths[0])
 	pos := bytes.IndexByte(auth, ' ')
 	if pos == -1 {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("malformed authorization header: missing scheme")
 		}
 		return
@@ -614,14 +619,14 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields) {
 	}
 
 	if !bytes.Equal(msg.contentType, constSDPContentType) {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("body content-type: %s is not supported", msg.contentType)
 		}
 		return
 	}
 
 	if _, found := msg.headers["content-encoding"]; found {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("body decoding is not supported yet if content-encoding is present")
 		}
 		return
@@ -666,7 +671,7 @@ func populateBodyFields(msg *message, pbf *pb.Fields, fields *ProtocolFields) {
 			}()
 			parts := bytes.SplitN(kv[1][pos:], []byte(" "), nParts)
 			if len(parts) != nParts {
-				if isDebug {
+				if isDebug.Load() {
 					debugf("malformed owner SDP line")
 				}
 				continue

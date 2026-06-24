@@ -164,7 +164,7 @@ func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 	const minStatusLineLength = len("SIP/2.0 XXX OK")
 	fline := pi.data[pi.parseOffset:i]
 	if len(fline) < minStatusLineLength {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("First line too small")
 		}
 		return false, false, false
@@ -178,13 +178,13 @@ func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 		version = fline[4:7]
 		m.statusCode, m.statusPhrase, err = parseResponseStatus(fline[8:])
 		if err != nil {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Failed to understand SIP response status: %s", fline[8:])
 			}
 			return false, false, false
 		}
 
-		if isDebug {
+		if isDebug.Load() {
 			debugf("SIP status_code=%d, status_phrase=%s", m.statusCode, m.statusPhrase)
 		}
 	} else {
@@ -194,7 +194,7 @@ func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 
 		// Make sure we have the VERB + URI + SIP_VERSION
 		if afterMethodIdx == -1 || afterRequestURIIdx == -1 || afterMethodIdx == afterRequestURIIdx {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Couldn't understand SIP request: %s", fline)
 			}
 			return false, false, false
@@ -208,7 +208,7 @@ func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 			m.isRequest = true
 			version = fline[versionIdx:]
 		} else {
-			if isDebug {
+			if isDebug.Load() {
 				debugf("Couldn't understand SIP version: %s", fline)
 			}
 			return false, false, false
@@ -217,12 +217,12 @@ func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 
 	m.version.major, m.version.minor, err = parseVersion(version)
 	if err != nil {
-		if isDebug {
+		if isDebug.Load() {
 			debugf(err.Error(), version)
 		}
 		return false, false, false
 	}
-	if isDebug {
+	if isDebug.Load() {
 		debugf("SIP version %d.%d", m.version.major, m.version.minor)
 	}
 
@@ -235,7 +235,7 @@ func parseSIPLine(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 }
 
 func parseResponseStatus(s []byte) (uint16, []byte, error) {
-	if isDebug {
+	if isDebug.Load() {
 		debugf("parseResponseStatus: %s", s)
 	}
 
@@ -293,13 +293,13 @@ func parseHeaders(pi *parsingInfo, m *message) (ok, cont, complete bool) {
 	pi.parseOffset = 0
 
 	if m.contentLength == 0 && (m.isRequest || m.hasContentLength) {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Empty content length, ignore body")
 		}
 		return true, false, true
 	}
 
-	if isDebug {
+	if isDebug.Load() {
 		debugf("Read body")
 	}
 
@@ -322,7 +322,7 @@ func parseHeader(pi *parsingInfo, m *message) (ok, complete bool, offset int) {
 	}
 
 	// enabled if required. Allocs for parameters slow down parser big times
-	if isDetailed {
+	if isDetailed.Load() {
 		detailedf("Data: %s", data)
 		detailedf("Header: %s", data[:i])
 	}
@@ -343,7 +343,7 @@ func parseHeader(pi *parsingInfo, m *message) (ok, complete bool, offset int) {
 
 		headerName := getExpandedHeaderName(bytes.ToLower(data[:i]))
 		headerVal := bytes.TrimSpace(data[i+1 : p])
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Header: '%s' Value: '%s'\n", data[:i], headerVal)
 		}
 
@@ -415,7 +415,7 @@ func parseBody(pi *parsingInfo, m *message) (ok, complete bool) {
 	pi.data = nil
 	pi.bodyReceived += numBytes
 	m.size += uint64(numBytes)
-	if isDebug {
+	if isDebug.Load() {
 		debugf("bodyReceived: %d", pi.bodyReceived)
 	}
 	return true, false
