@@ -25,6 +25,7 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -58,7 +59,7 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 func FromMapstr[T mapstrOrMap](dst pcommon.Map, src T) error {
 	dst.EnsureCapacity(len(src))
 	for key, value := range src {
-		if err := FromValue(dst.PutEmpty(key), value); err != nil {
+		if err := putIntoMap(key, value, dst); err != nil {
 			return err
 		}
 	}
@@ -180,6 +181,137 @@ func FromValue(dst pcommon.Value, value any) error {
 	default:
 		return fromReflective(dst, value)
 	}
+}
+
+// putIntoMap encodes val under key in dst using the typed Put* methods on
+// pcommon.Map (PutStr, PutInt, PutBool, …) rather than the PutEmpty+Set*
+// two-step. PutEmpty allocates an empty AnyValue slot and Set* allocates
+// the typed wrapper, two allocations per field. The typed Put* methods fold
+// both into one.
+func putIntoMap(key string, val any, dst pcommon.Map) error {
+	switch v := val.(type) {
+	case nil:
+		dst.PutEmpty(key)
+		return nil
+	case string:
+		dst.PutStr(key, v)
+	case bool:
+		dst.PutBool(key, v)
+	case int:
+		dst.PutInt(key, int64(v))
+	case int8:
+		dst.PutInt(key, int64(v))
+	case int16:
+		dst.PutInt(key, int64(v))
+	case int32:
+		dst.PutInt(key, int64(v))
+	case int64:
+		dst.PutInt(key, v)
+	case uint:
+		dst.PutInt(key, maskUnsignedInt(uint64(v)))
+	case uint8:
+		dst.PutInt(key, int64(v))
+	case uint16:
+		dst.PutInt(key, int64(v))
+	case uint32:
+		dst.PutInt(key, int64(v))
+	case uint64:
+		dst.PutInt(key, maskUnsignedInt(v))
+	case float32:
+		setFloat32Value(dst.PutEmpty(key), v)
+	case float64:
+		setFloat64Value(dst.PutEmpty(key), v)
+	case mapstr.M:
+		return FromMapstr(dst.PutEmptyMap(key), v)
+	case map[string]any:
+		return FromMapstr(dst.PutEmptyMap(key), v)
+	default:
+		return FromValue(dst.PutEmpty(key), val)
+	}
+	return nil
+}
+
+// MergeMapstrIntoPdata deep-merges src into dst, equivalent to
+// mapstr.M.DeepUpdate for pcommon.Map. For map-typed values, existing map
+// entries in dst are recursed into rather than replaced. All other values are
+// encoded via [putIntoMap]. Overwrite controls whether non-map values in
+// dst are replaced when keys collide.
+func MergeMapstrIntoPdata(src mapstr.M, dst pcommon.Map, overwrite bool) error {
+	for key, val := range src {
+		if err := mergeVal(key, val, dst, overwrite); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func mergeVal(key string, val any, dst pcommon.Map, overwrite bool) error {
+	var m mapstr.M
+	switch x := val.(type) {
+	case mapstr.M:
+		m = x
+	case map[string]any:
+		m = mapstr.M(x)
+	}
+	if m != nil {
+		if existing, ok := dst.Get(key); ok && existing.Type() == pcommon.ValueTypeMap {
+			// Both sides are maps: recurse, respecting overwrite.
+			return MergeMapstrIntoPdata(m, existing.Map(), overwrite)
+		}
+		// src is a map and dst key is absent or a non-map scalar: always write the map.
+		// This matches mapstr.deepUpdateValue which replaces non-map values with maps
+		// regardless of the overwrite flag.
+		return FromMapstr(dst.PutEmptyMap(key), m)
+	}
+	if _, ok := dst.Get(key); ok && !overwrite {
+		return nil
+	}
+	return putIntoMap(key, val, dst)
+}
+
+// PdataValuesMap wraps a pcommon.Map to satisfy the conditions.ValuesMap interface,
+// allowing condition evaluation directly on a log record body without a ToMapstr call.
+type PdataValuesMap struct {
+	M pcommon.Map
+}
+
+// GetValue retrieves the value at the given dotted key path and returns it as
+// a Go primitive (string, int64, float64, bool, []interface{}, or map[string]interface{}).
+func (p PdataValuesMap) GetValue(key string) (interface{}, error) {
+	v, ok := GetAtPath(key, p.M)
+	if !ok {
+		return nil, mapstr.ErrKeyNotFound
+	}
+	return v.AsRaw(), nil
+}
+
+// GetAtPath retrieves the value at a dotted key path (e.g. "cloud.instance.id")
+// from m, traversing nested maps as needed.
+func GetAtPath(key string, m pcommon.Map) (pcommon.Value, bool) {
+	dot := strings.IndexByte(key, '.')
+	if dot < 0 {
+		return m.Get(key)
+	}
+	parent, ok := m.Get(key[:dot])
+	if !ok || parent.Type() != pcommon.ValueTypeMap {
+		return pcommon.Value{}, false
+	}
+	return GetAtPath(key[dot+1:], parent.Map())
+}
+
+// PutAtPath encodes val at a dotted key path (e.g. "cloud.instance.id") in m,
+// creating intermediate maps as needed. Existing intermediate maps are
+// preserved (not replaced).
+func PutAtPath(key string, val any, m pcommon.Map) error {
+	dot := strings.IndexByte(key, '.')
+	if dot < 0 {
+		return putIntoMap(key, val, m)
+	}
+	head, rest := key[:dot], key[dot+1:]
+	if existing, ok := m.Get(head); ok && existing.Type() == pcommon.ValueTypeMap {
+		return PutAtPath(rest, val, existing.Map())
+	}
+	return PutAtPath(rest, val, m.PutEmptyMap(head))
 }
 
 // FormatTimestamp renders t in the layout the elasticsearchexporter's

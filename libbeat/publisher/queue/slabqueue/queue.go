@@ -37,6 +37,13 @@ type Queue[T any] struct {
 	count   int
 	closing bool
 
+	// producers is the set of open producers publishing into this queue. It
+	// exists so Close can fan out and unblock every producer's ACKWaitChan on
+	// (force-)close — force-close suppresses per-event ACK callbacks, so the
+	// ack accounting alone would never close those channels. Producers add
+	// themselves in Producer and remove themselves in Close; guarded by mu.
+	producers map[*producer[T]]struct{}
+
 	// pendingHead/pendingTail is the intrusive FIFO of batches that have been
 	// returned from Get but not yet Done()'d, threaded through batch.next in
 	// publish (== Get) order. We use it to fire producer ACK callbacks in
@@ -49,6 +56,25 @@ type Queue[T any] struct {
 	// notify wakes Get when new events arrive.
 	notify chan struct{}
 
+	// Per-queue live-event cap. This bounds the events live (published but not
+	// yet acked) on this one queue, independently of and in addition to the
+	// shared pool budget: a producer blocks when this queue reaches its limit
+	// even if the pool still has free slots. It is what lets several queues on
+	// one pool each enforce their own configured size while the pool is sized to
+	// the largest of them.
+	//
+	//   live:  events published to this queue but not yet released (FIFO +
+	//          in-flight). Maintained as an atomic so the reserve fast path is
+	//          lock-free, mirroring the pool free list.
+	//   limit: this queue's cap (0 = unlimited, bounded only by the pool).
+	//   limWaiters/limMu/limCond: park point for producers blocked on the cap,
+	//          touched only on the blocking slow path.
+	live       atomic.Int64
+	limit      atomic.Int64
+	limWaiters atomic.Int64
+	limMu      sync.Mutex
+	limCond    *sync.Cond
+
 	closeOnce sync.Once
 	closeCh   chan struct{} // closed on Close
 	doneOnce  sync.Once
@@ -57,19 +83,149 @@ type Queue[T any] struct {
 }
 
 func newQueue[T any](pool *Pool[T]) *Queue[T] {
-	return &Queue[T]{
-		pool:    pool,
-		head:    -1,
-		tail:    -1,
-		notify:  make(chan struct{}, 1),
-		closeCh: make(chan struct{}),
-		doneCh:  make(chan struct{}),
+	q := &Queue[T]{
+		pool:      pool,
+		head:      -1,
+		tail:      -1,
+		notify:    make(chan struct{}, 1),
+		closeCh:   make(chan struct{}),
+		doneCh:    make(chan struct{}),
+		producers: make(map[*producer[T]]struct{}),
+	}
+	q.limCond = sync.NewCond(&q.limMu)
+	return q
+}
+
+// SetTarget sets this queue's per-queue live-event cap to n, and is safe to call
+// while the queue is in use. A producer blocks when this queue reaches n live
+// events even if the pool still has free slots. n <= 0 means uncapped (bounded
+// only by the pool). Lowering the cap takes effect lazily as in-flight events
+// drain; raising it immediately unblocks any producers parked on the old cap.
+//
+// Setting a queue's cap also resizes the shared pool to the largest cap among
+// the queues connected to it, so the pool always tracks its queues: a queue's
+// cap can never be larger than the pool that backs it, and the pool shrinks when
+// the queue holding the largest cap is lowered or leaves. The pool is therefore
+// driven entirely through the queues — callers set per-queue caps, not the pool
+// size directly.
+func (q *Queue[T]) SetTarget(n int) {
+	if n < 0 {
+		n = 0
+	}
+	q.limit.Store(int64(n))
+	// Resize the pool first (a raised cap grows the pool), then wake producers
+	// parked on the cap so they find both the budget and a pool slot available.
+	q.pool.syncTargetToQueues()
+	q.wakeLimitWaiters()
+}
+
+// tryReserve takes one unit of this queue's live-event budget if it is under the
+// cap, without blocking. It is the lock-free fast path: a CAS on the live
+// counter, with limit==0 meaning unlimited.
+func (q *Queue[T]) tryReserve() bool {
+	for {
+		lim := q.limit.Load()
+		if lim <= 0 {
+			q.live.Add(1)
+			return true
+		}
+		cur := q.live.Load()
+		if cur >= lim {
+			return false
+		}
+		if q.live.CompareAndSwap(cur, cur+1) {
+			return true
+		}
 	}
 }
 
-// Producer returns a producer that publishes to this queue.
+// reserve takes one unit of this queue's live-event budget, blocking until the
+// queue is under its cap or the queue is closed. It returns false only when the
+// queue is closing. Like the pool's acquire, it re-checks after registering as a
+// waiter so a release between the failed fast path and the park is not lost.
+func (q *Queue[T]) reserve() bool {
+	if q.tryReserve() {
+		return true
+	}
+	for {
+		q.limMu.Lock()
+		q.limWaiters.Add(1)
+		if q.tryReserve() {
+			q.limWaiters.Add(-1)
+			q.limMu.Unlock()
+			return true
+		}
+		if q.isClosing() {
+			q.limWaiters.Add(-1)
+			q.limMu.Unlock()
+			return false
+		}
+		q.limCond.Wait()
+		q.limWaiters.Add(-1)
+		q.limMu.Unlock()
+		if q.isClosing() {
+			return false
+		}
+		if q.tryReserve() {
+			return true
+		}
+	}
+}
+
+// releaseLive returns n units to this queue's live-event budget (called when
+// slots are released back to the pool) and wakes a producer parked on the cap.
+func (q *Queue[T]) releaseLive(n int) {
+	if n <= 0 {
+		return
+	}
+	q.live.Add(int64(-n))
+	q.wakeLimitWaiters()
+}
+
+// wakeLimitWaiters wakes producers parked on the per-queue cap, but only if one
+// might be waiting. The racy waiters read is safe for the same reason the pool's
+// signal is: a parked producer registers as a waiter before re-checking the cap.
+func (q *Queue[T]) wakeLimitWaiters() {
+	if q.limWaiters.Load() == 0 {
+		return
+	}
+	q.limMu.Lock()
+	q.limCond.Broadcast()
+	q.limMu.Unlock()
+}
+
+// isClosing reports whether Close has been called on this queue.
+func (q *Queue[T]) isClosing() bool { return chClosed(q.closeCh) }
+
+// Producer returns a producer that publishes to this queue. Each producer is
+// given a stable home shard for the pool's free list, spread across shards by
+// a pool-global counter so concurrent producers tend to land on different
+// shards.
 func (q *Queue[T]) Producer(cfg queue.ProducerConfig) queue.Producer[T] {
-	return &producer[T]{queue: q, cfg: cfg}
+	home := int((q.pool.homeCounter.Add(1) - 1) & uint64(q.pool.free.mask)) //nolint:gosec // G115: masked by the shard count, always a small non-negative index
+	p := &producer[T]{queue: q, cfg: cfg, home: home, ackWait: make(chan struct{})}
+	q.mu.Lock()
+	if q.closing {
+		// The queue is already (force-)closing. A producer created now will
+		// never see its events drain, so hand back one whose ackWait is
+		// already closed rather than registering it for a fan-out that has
+		// already happened.
+		q.mu.Unlock()
+		p.forceCloseAckWait()
+		return p
+	}
+	q.producers[p] = struct{}{}
+	q.mu.Unlock()
+	return p
+}
+
+// removeProducer unregisters a producer from the force-close fan-out set. Called
+// from producer.Close; safe to call for a producer that was never registered
+// (e.g. one created after the queue began closing).
+func (q *Queue[T]) removeProducer(p *producer[T]) {
+	q.mu.Lock()
+	delete(q.producers, p)
+	q.mu.Unlock()
 }
 
 // Get blocks until at least one event is available (or the queue is closed)
@@ -80,24 +236,20 @@ func (q *Queue[T]) Get(maxEvents int) (queue.Batch[T], error) {
 		q.mu.Lock()
 		if q.count > 0 {
 			n := q.count
-			if maxEvents > 0 && maxEvents < n {
-				n = maxEvents
+			if maxEvents > 0 {
+				n = min(n, maxEvents)
 			}
-			// Pull a recycled batch from the pool. Its slices retain
-			// their backing arrays from previous uses; we reset
-			// lengths and append into them. The batch is owned solely
-			// by this Queue/consumer/worker chain until Done/Release
-			// returns it to the pool.
+			// Pull a batch from the recycle pool (already fully reset; see
+			// getBatch) and append our slot indices into its retained backing
+			// array. The batch is owned solely by this Queue/consumer/worker
+			// chain until Done/Release returns it to the pool.
 			b := q.pool.getBatch()
 			b.queue = q
-			b.indices = b.indices[:0]
-			b.done = false
-			b.freed = false
-			b.next = nil
+			d := q.pool.dir.Load()
 			cur := q.head
 			for i := 0; i < n; i++ {
 				b.indices = append(b.indices, cur)
-				cur = q.pool.storage[cur].next
+				cur = d.slot(cur).next
 			}
 			q.head = cur
 			if cur == -1 {
@@ -153,18 +305,30 @@ func (q *Queue[T]) Close(force bool) error {
 		q.forced.Store(true)
 	}
 	q.mu.Lock()
-	if !q.closing {
-		q.closing = true
-	}
+	q.closing = true
+	// On force-close, snapshot and clear the producer set so we can fan out an
+	// unconditional ackWait close outside the lock — force-close suppresses the
+	// per-event ACK callbacks that would otherwise close those channels. A
+	// graceful close leaves the set intact: events keep draining and each
+	// producer's ackWait closes naturally as its events are acked (and a later
+	// force-close, e.g. on timeout, can still fan out to them).
+	var ackWaitProducers []*producer[T]
 	var releaseIndices []int
 	if force {
+		if len(q.producers) > 0 {
+			ackWaitProducers = make([]*producer[T], 0, len(q.producers))
+			for p := range q.producers {
+				ackWaitProducers = append(ackWaitProducers, p)
+			}
+			q.producers = make(map[*producer[T]]struct{})
+		}
 		if q.count > 0 {
 			// Walk the FIFO and gather the slots so we can release them back to
-			// the pool below (outside the lock, since pool.free is a channel).
+			// the pool below, outside the lock, to keep the critical section short.
 			cur := q.head
 			for cur != -1 {
 				releaseIndices = append(releaseIndices, cur)
-				cur = q.pool.storage[cur].next
+				cur = q.pool.slot(cur).next
 			}
 			q.head = -1
 			q.tail = -1
@@ -182,21 +346,35 @@ func (q *Queue[T]) Close(force bool) error {
 	}
 	q.mu.Unlock()
 
-	// Wake any blocked Get.
-	q.closeOnce.Do(func() { close(q.closeCh) })
+	// Wake any blocked Get, and any producer parked waiting for a free slot on
+	// this queue so it can observe closeCh and return.
+	q.closeOnce.Do(func() {
+		close(q.closeCh)
+		q.pool.free.wakeAll()
+		// Wake producers parked on this queue's per-queue cap so they observe
+		// closeCh and return.
+		q.wakeLimitWaiters()
+	})
 	q.signal()
+
+	// Force-close: unblock every still-open producer's ACKWaitChan, since the
+	// suppressed ACK callbacks will never advance their ack accounting.
+	for _, p := range ackWaitProducers {
+		p.forceCloseAckWait()
+	}
 
 	if len(releaseIndices) > 0 {
 		var zero T
 		for _, i := range releaseIndices {
-			q.pool.storage[i].event = zero
-			q.pool.storage[i].producer = nil
-			q.pool.storage[i].next = -1
+			s := q.pool.slot(i)
+			s.event = zero
+			s.producer = nil
+			s.next = -1
 		}
 		q.pool.observer.RemoveEvents(len(releaseIndices), 0)
-		for _, i := range releaseIndices {
-			q.pool.free <- i
-		}
+		q.pool.releaseSlots(releaseIndices)
+		// These FIFO events left circulation; return their per-queue budget.
+		q.releaseLive(len(releaseIndices))
 	}
 
 	if force {
@@ -224,10 +402,15 @@ func (q *Queue[T]) Done() <-chan struct{} { return q.doneCh }
 // QueueType identifies the implementation.
 func (q *Queue[T]) QueueType() string { return QueueType }
 
-// BufferConfig reports the pool's capacity. Note: this is the *shared* upper
-// bound across all queues connected to the same pool, not a per-queue cap.
+// BufferConfig reports this queue's effective maximum live events: the smaller
+// of its per-queue cap (if set) and the shared pool budget. With no per-queue
+// cap it is just the pool budget.
 func (q *Queue[T]) BufferConfig() queue.BufferConfig {
-	return queue.BufferConfig{MaxEvents: q.pool.settings.Events}
+	maxEvents := q.pool.Target()
+	if lim := int(q.limit.Load()); lim > 0 {
+		maxEvents = min(maxEvents, lim)
+	}
+	return queue.BufferConfig{MaxEvents: maxEvents}
 }
 
 // signal wakes a goroutine blocked in Get. Non-blocking: at most one pending
@@ -251,4 +434,30 @@ func (q *Queue[T]) maybeMarkDone() {
 // markDone closes doneCh idempotently.
 func (q *Queue[T]) markDone() {
 	q.doneOnce.Do(func() { close(q.doneCh) })
+}
+
+// drainReadyLocked peels every already-Done() batch off the head of the pending
+// FIFO and returns them as a list in publish order, the prefix whose producer
+// ACK callbacks are now ready to fire. Anything from a not-yet-done batch onward
+// stays in the list. It also re-checks whether the queue is now fully drained.
+// Returned batches are no longer reachable from the queue, so the caller may ACK
+// and recycle them once it releases q.mu. Must be called with q.mu held.
+func (q *Queue[T]) drainReadyLocked() *batch[T] {
+	var head, tail *batch[T]
+	for q.pendingHead != nil && q.pendingHead.done {
+		ready := q.pendingHead
+		q.pendingHead = ready.next
+		ready.next = nil
+		if tail == nil {
+			head = ready
+		} else {
+			tail.next = ready
+		}
+		tail = ready
+	}
+	if q.pendingHead == nil {
+		q.pendingTail = nil
+	}
+	q.maybeMarkDone()
+	return head
 }
