@@ -7,5 +7,5 @@ description: |
   returned store in a locking proxy that serializes the full
   `Marshal → execRequest → HTTP.Do` path on a
   per-extension mutex, preventing the buffer races.
-component: x-pack/otel
-#pr: https://github.com/owner/repo/1234
+component: elastic-agent
+pr: https://github.com/elastic/beats/pull/51501
