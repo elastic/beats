@@ -53,7 +53,7 @@ type client struct {
 	done     chan struct{}
 
 	producerMux sync.RWMutex
-	producer sarama.AsyncProducer
+	producer    sarama.AsyncProducer
 
 	recordHeaders []sarama.RecordHeader
 
