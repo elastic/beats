@@ -199,6 +199,22 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 			}
 		}
 	}
+	for i, c := range cfg.Chain {
+		if c.Step != nil && c.Step.Request.Tracer != nil { // Request is validated as required.
+			resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, c.Step.Request.Tracer.Filename)
+			if err != nil {
+				return err
+			}
+			cfg.Chain[i].Step.Request.Tracer.Filename = resolved
+		}
+		if c.While != nil && c.While.Request.Tracer != nil { // Request is validated as required.
+			resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, c.While.Request.Tracer.Filename)
+			if err != nil {
+				return err
+			}
+			cfg.Chain[i].While.Request.Tracer.Filename = resolved
+		}
+	}
 
 	metrics := newInputMetrics(reg, ctx.Logger)
 	client, err := newHTTPClient(stdCtx, cfg.Auth, cfg.Request, ctx, log, reg, nil)

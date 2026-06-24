@@ -193,6 +193,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		}
 		cfg.Resource.Tracer.Filename = resolved
 	}
+	if cfg.FailureDump != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.FailureDump.Filename)
+		if err != nil {
+			return err
+		}
+		cfg.FailureDump.Filename = resolved
+	}
 
 	client, trace, otelMetrics, contextInjector, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
 	if err != nil {
