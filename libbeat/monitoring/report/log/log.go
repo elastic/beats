@@ -122,7 +122,7 @@ func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 		registries: map[string]*monitoring.Registry{},
 	}
 
-	for _, ns := range r.config.Namespaces {
+	for _, ns := range r.Namespaces {
 		reg := monitoring.GetNamespace(ns).GetRegistry()
 
 		// That 'stats' namespace is reported as 'metrics' in the Elasticsearch
@@ -147,6 +147,10 @@ func (r *reporter) Stop() {
 }
 
 func (r *reporter) snapshotLoop() {
+	if r.Period == 0 {
+		r.logger.Infof("Skipping metrics logging")
+		return
+	}
 	r.logger.Infof("Starting metrics logging every %v", r.Period)
 	defer r.logger.Infof("Stopping metrics logging.")
 	defer func() {
