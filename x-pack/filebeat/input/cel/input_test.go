@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -1503,56 +1504,22 @@ var inputTests = []struct {
 		},
 		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
 	},
-	// Path containment for enabled tracers is tested in
-	// x-pack/filebeat/input/internal/httplog.TestResolvePathInLogsFor.
-	// The input-level test only verifies that a disabled tracer does
-	// not reject an out-of-tree path (next case below).
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
 	{
-		name: "tracer_disabled_escaping_logs",
-		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-			server := httptest.NewServer(h)
-			config["resource.url"] = server.URL
-			t.Cleanup(server.Close)
-		},
+		name:   "tracer_disabled_escaping_logs",
+		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
 			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
-			"state": map[string]interface{}{
-				"fake_now": "2002-10-02T15:00:00Z",
-			},
-			"program": `
-	// Use terse non-standard check for presence of timestamp. The standard
-	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
-	(!is_error(state.cursor.timestamp) ?
-		state.cursor.timestamp
-	:
-		timestamp(state.fake_now)-duration('10m')
-	).as(time_cursor,
-	string(state.url).parse_url().with_replace({
-		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
-	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
-		"events": [event],
-		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
-		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
-		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
-
-		// Just for testing, cycle this back into the next state.
-		"fake_now": state.fake_now
-	}))
-	`,
+			"program":                  `bytes(get(state.url).Body).as(body, {"events": [body.decode_json()]})`,
 		},
-		handler: dateCursorHandler(),
-		want: []map[string]interface{}{
-			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
-			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
-		},
-		wantCursor: []map[string]interface{}{
-			{"timestamp": "2002-10-02T15:00:00Z"},
-			{"timestamp": "2002-10-02T15:00:01Z"},
-			{"timestamp": "2002-10-02T15:00:02Z"},
-		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -2470,7 +2437,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+			if !sameErrorOrContains(err, test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
@@ -3075,5 +3042,18 @@ func TestRedactor(t *testing.T) {
 				t.Errorf("unexpected redaction:\n--- got\n--- want\n%s", cmp.Diff(got, test.wantRedact))
 			}
 		})
+	}
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }
