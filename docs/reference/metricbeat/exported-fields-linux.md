@@ -59,7 +59,7 @@ summary of nf_conntrack statistics, summed across CPU cores
 
 
 **`linux.conntrack.summary.insert_failed`**
-:   Number of entries where list insert insert failed
+:   Number of entries where list insert failed
 
     type: long
 
