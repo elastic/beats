@@ -327,7 +327,7 @@ This group contains statistics related to huge pages usage on the system.
 
 
 **`linux.memory.hugepages.surplus`**
-:   Number of overcommited huge pages.
+:   Number of overcommitted huge pages.
 
     type: long
 
