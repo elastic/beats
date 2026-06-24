@@ -1131,16 +1131,16 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}).StandardClient()
 	}
 
+	c.Transport = userAgentDecorator{
+		UserAgent: userAgent,
+		Transport: c.Transport,
+	}
+
 	if cfg.Auth.OAuth2.isEnabled() {
 		c, err = cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-	}
-
-	c.Transport = userAgentDecorator{
-		UserAgent: userAgent,
-		Transport: c.Transport,
 	}
 
 	return c, trace, otelMetrics, contextInjector, nil
