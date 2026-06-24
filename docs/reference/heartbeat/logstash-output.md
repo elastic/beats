@@ -148,7 +148,7 @@ output.logstash:
 
 ### `ttl` [_ttl]
 
-Time to live for a connection to {{ls}} after which the connection will be re-established. Useful when {{ls}} hosts represent load balancers. Since the connections to {{ls}} hosts are sticky, operating behind load balancers can lead to uneven load distribution between the instances. Specifying a TTL on the connection allows to achieve equal connection distribution between the instances.  Specifying a TTL of 0 will disable this feature.
+Time to live for a connection to {{ls}} after which the connection will be re-established. Useful when {{ls}} hosts represent load balancers. Since the connections to {{ls}} hosts are sticky, operating behind load balancers can lead to uneven load distribution between the instances. Specifying a TTL on the connection allows you to achieve equal connection distribution between the instances.  Specifying a TTL of 0 will disable this feature.
 
 The default value is 0. This setting accepts [duration](/reference/libbeat/config-file-format-type.md#_duration) data type values.
 

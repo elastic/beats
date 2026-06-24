@@ -779,7 +779,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -970,7 +970,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.

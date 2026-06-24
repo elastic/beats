@@ -490,7 +490,7 @@ You can use the following translated names in filter expressions to reference jo
 :   `host.boot_id`
 
 `_CAP_EFFECTIVE`
-:   `process.capabilites`
+:   `journald.process.capabilities`
 
 `_CMDLINE`
 :   `process.cmd`
