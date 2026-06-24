@@ -2189,7 +2189,7 @@ var inputTests = []struct {
 			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
 		want: []map[string]interface{}{{
 			"message": map[string]interface{}{
 				"value": "division by zero",
@@ -2211,7 +2211,7 @@ var inputTests = []struct {
 			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2239,13 +2239,13 @@ var inputTests = []struct {
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
 		prepare: func() error {
 			// Make a file that the configuration should delete.
-			err := os.MkdirAll("failure_dumps", 0o700)
+			err := os.MkdirAll(filepath.Join("cel", "failure_dumps"), 0o700)
 			if err != nil {
 				return err
 			}
-			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+			return os.WriteFile(filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
 		},
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2349,7 +2349,7 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
-	err := os.RemoveAll("failure_dumps")
+	err := os.RemoveAll(filepath.Join("cel", "failure_dumps"))
 	if err != nil {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
