@@ -120,8 +120,8 @@ func (c *CloudID) decodeCloudID() error {
 
 	// Reject components containing URL-special characters (#, @, ?, /).
 	for _, component := range []string{host, esID, kbID} {
-		if strings.ContainsAny(component, "#@?/") {
-			return fmt.Errorf("cloud ID component contains invalid character: %q", component)
+		if i := strings.IndexAny(component, "#@?/"); i >= 0 {
+			return fmt.Errorf("cloud ID component %q contains invalid character %q", component, component[i])
 		}
 	}
 
