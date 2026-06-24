@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Respect max_bytes/message_max_bytes when reading the first chunk of CRI partial lines
-component: filebeat

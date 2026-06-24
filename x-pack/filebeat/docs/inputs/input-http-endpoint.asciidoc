@@ -351,6 +351,8 @@ The relationship between the three limits must be: `low_water_in_flight_bytes` <
 
 The maximum body length allowed for a single request. If present, the input will truncate request bodies at the configured limit. The default value for this option is unset, no limit.
 
+NOTE: In Filebeat versions prior to 8.19.18, `max_body_bytes` was only enforced for HMAC-authenticated requests. The limit now applies to all HTTP endpoint requests regardless of the authentication method.
+
 [float]
 ==== `retry_after`
 

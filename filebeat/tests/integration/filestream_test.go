@@ -21,6 +21,7 @@ package integration
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -111,6 +112,123 @@ func TestFilestreamCleanInactive(t *testing.T) {
 
 	// 6. Then assess it has been removed in the registry
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
+	filebeat.WaitFileContains(registryFile, `"op":"remove"`, time.Second)
+}
+
+// filestreamCleanInactiveRenamedCfg is the config for
+// TestFilestreamCleanInactiveRenamed. clean_removed is disabled so that
+// clean_inactive is the only mechanism that can remove the registry entry,
+// which isolates the rename code path under test.
+var filestreamCleanInactiveRenamedCfg = `
+filebeat.inputs:
+  - type: filestream
+    id: "test-clean-inactive-renamed"
+    paths:
+      - %s
+
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
+    clean_inactive: 3.1s
+    ignore_older: 2s
+    clean_removed: false
+    close.on_state_change.inactive: 1s
+    prospector.scanner.check_interval: 1s
+
+filebeat.registry:
+  cleanup_interval: 5s
+  flush: 1s
+
+queue.mem:
+  events: 32
+  flush.min_events: 8
+  flush.timeout: 0.1s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_every_kb: 10000
+
+logging:
+  level: debug
+  selectors:
+    - "input"
+    - "input.filestream"
+    - "input.filestream.file_watcher"
+    - "input.filestream.prospector"
+    - "input.filestream.scanner"
+  metrics:
+    enabled: false
+`
+
+// TestFilestreamCleanInactiveRenamed is a regression test for a registry
+// resource leak in store.findCursorMeta.
+//
+// When a file tracked by a file_identity that supports rename tracking (e.g.
+// native) is renamed, fileProspector.onRename calls FindCursorMeta to read the
+// previous metadata. FindCursorMeta acquires a reference on the in-memory
+// resource through states.Find. Before the fix that reference was never
+// released, so the resource stayed permanently active (pending > 0), the
+// registry GC could never collect it and the entry leaked forever, even after
+// clean_inactive expired.
+//
+// This test renames a harvested file, lets it become inactive and asserts the
+// registry entry is eventually garbage collected. Without the fix the entry is
+// never removed and the test times out.
+func TestFilestreamCleanInactiveRenamed(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("renaming files while Filebeat is running is not supported on Windows")
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	tempDir := filebeat.TempDir()
+
+	// Harvest from a sub-folder so the configured glob keeps matching the file
+	// after it is renamed. path.home (registry + output) lives in tempDir, the
+	// glob only matches the logs sub-folder.
+	logsDir := filepath.Join(tempDir, "logs")
+	if err := os.MkdirAll(logsDir, 0o700); err != nil {
+		t.Fatalf("cannot create logs directory: %s", err)
+	}
+	logFilePath := filepath.Join(logsDir, "log.log")
+	renamedLogFilePath := filepath.Join(logsDir, "log.log.renamed")
+
+	filebeat.WriteConfigFile(
+		fmt.Sprintf(filestreamCleanInactiveRenamedCfg, filepath.Join(logsDir, "*"), tempDir))
+	filebeat.Start()
+
+	integration.WriteLogFile(t, logFilePath, 10, false)
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("A new file %s has been found", logFilePath),
+		10*time.Second,
+		"Filebeat did not start harvesting the log file")
+
+	// Renaming is what triggers fileProspector.onRename -> FindCursorMeta.
+	if err := os.Rename(logFilePath, renamedLogFilePath); err != nil {
+		t.Fatalf("cannot rename log file: %s", err)
+	}
+
+	// Guard: confirm the change was detected as a rename (not a removal),
+	// otherwise onRename/FindCursorMeta never ran and the test would silently
+	// stop exercising the leak.
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("has been renamed to %s", renamedLogFilePath),
+		10*time.Second,
+		"Filebeat did not detect the rename")
+
+	// After clean_inactive expires the GC must collect the entry. With the leak
+	// the resource is never "finished", so this never happens.
+	filebeat.WaitLogsContains(
+		"1 entries removed",
+		30*time.Second,
+		"registry entry for the renamed file was not garbage collected")
+
+	registryFile := filepath.Join(tempDir, "data", "registry", "filebeat", "log.json")
 	filebeat.WaitFileContains(registryFile, `"op":"remove"`, time.Second)
 }
 
