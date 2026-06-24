@@ -21,6 +21,7 @@ import (
 var (
 	_ extension.Extension = (*elasticStorage)(nil)
 	_ backend.Registry    = (*elasticStorage)(nil)
+	_ backend.Store       = (*lockedStore)(nil)
 )
 
 type elasticStorage struct {

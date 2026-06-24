@@ -153,8 +153,7 @@ func TestElasticStorage_Access_Concurrent_Race(t *testing.T) {
 // This is the realistic deployment shape: an EDOT/hybrid agent runs
 // Filebeat httpjson streams (Access path) alongside entcollect identity
 // providers (Store path), pointing at the same elasticsearch_storage
-// extension. The test fails on the current code (only *lockedStore is
-// locked) and should pass once both factories share clientMu.
+// extension.
 func TestElasticStorage_MixedRegistry_Concurrent_Race(t *testing.T) {
 	srv := newFakeES(t)
 	defer srv.Close()
