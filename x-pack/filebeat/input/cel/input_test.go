@@ -599,6 +599,61 @@ var inputTests = []struct {
 		},
 	},
 
+	// Emit error-handling pattern (mirrors the documented example).
+	{
+		name: "emit_error_handling_success",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"},{"msg":"b"}].emit(e, e, {"id": e.msg}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"msg": "a"},
+			{"msg": "b"},
+			{"published": float64(2), "cursor": map[string]interface{}{"id": "b"}},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": "a"},
+			{"id": "b"},
+			{"id": "b"},
+		},
+	},
+	{
+		name: "emit_error_handling_failure",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"}, "bad"].emit(e, e, {"id": "x"}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"msg": "a"},
+			{"error": "emit: event must be a map, got string"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": "x"},
+		},
+	},
+
 	// Stream decode tests.
 	{
 		name: "decode_csv_stream_lazy_gzip",

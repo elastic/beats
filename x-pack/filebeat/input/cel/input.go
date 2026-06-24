@@ -259,7 +259,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 		if emitter == nil {
 			return nil
 		}
-		emitter.reset()
 		return emitter
 	})
 	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, httpOptions, patterns, cfg.XSDs, log, trace, wantDump, doCov, emitOpt)
@@ -612,6 +611,7 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 	s.metrics.AddProgramExecution(execCtx)
 	start := s.now().In(time.UTC)
 
+	s.emitter.reset()
 	var err error
 	s.state, err = evalWith(execCtx, s.injector, s.prg, s.ast, s.state, start, s.wantDump, budget-1)
 	s.metrics.AddCELDuration(execCtx, time.Since(start))
@@ -673,6 +673,23 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		errorSpans(err, execSpan)
 		return result, err
 	}
+
+	if s.emitter.hadCursor {
+		var n int
+		switch ev := e.(type) {
+		case []any:
+			n = len(ev)
+		case map[string]any:
+			if ev != nil {
+				n = 1
+			}
+		}
+		if n != 1 {
+			execLog.Warnw("emit macro published events with cursors but state.events does not contain exactly one element; state.events should be a single-element array or object for cursor bookkeeping",
+				"emit_count", emitCount, "state_events_count", n)
+		}
+	}
+
 	var events []any
 	switch e := e.(type) {
 	case []any:
@@ -719,11 +736,6 @@ func (s *runSession) execute(ctx context.Context, executionNumber, budget int) (
 		s.metrics.AddProgramRunDuration(execCtx, time.Since(start))
 		errorSpans(err, execSpan)
 		return result, err
-	}
-
-	if s.emitter.hadCursor && len(events) != 1 {
-		execLog.Warnw("emit macro published events with cursors but state.events does not contain exactly one element; state.events should be a single-element array or object for cursor bookkeeping",
-			"emit_count", emitCount, "state_events_count", len(events))
 	}
 
 	// We have a non-empty batch of events to process.

@@ -156,7 +156,7 @@ The `emit` macro provides an alternative to collecting events in the `events` ar
 
 The range must be a list or iterable (such as the result of `decode_json_stream_lazy`). For each element, the macro evaluates the value expression, optionally the cursor expression, and publishes the event. Iteration is sequential and cursor ordering is preserved.
 
-The macro returns `{"published": <int>}`. If a cursor expression was provided and at least one event was published, the result also contains `{"cursor": <lastCursor>}`.
+The macro returns `{"published": <int>}`. If a cursor expression was provided and at least one event was published, the result also contains `{"cursor": <lastCursor>}`. If iteration stops early due to a decode error, an evaluation error, or a publish failure, the result includes `{"error": <message>}`.
 
 ### Cursor bookkeeping
 
@@ -173,15 +173,21 @@ filebeat.inputs:
 - type: cel
   resource.url: https://example.com/api/export
   program: |
-    bytes(state.url.get(state.header).Body).as(body, {
-      "events": [body.stream_gzip().decode_json_stream_lazy().emit(e, e)],
-      "cursor": [{"exported": true}],
-    })
+    bytes(state.url.get(state.header).Body).as(body,
+      body.stream_gzip().decode_json_stream_lazy().emit(e, e, state.cursor).as(r,
+        has(r.error) ?
+          {"events": [{"error": r.error}]}
+        :
+          {"events": [r], "cursor": [r.cursor]}
+      )
+    )
   processors:
     - drop_event:
         when:
           has_fields: ["published"]
 ```
+
+When emit encounters an error, the result map contains an `"error"` key. The example above checks for this with `has(r.error)` and returns an error object instead of advancing the cursor. This prevents the input from skipping past data that was not fully processed.
 
 
 ## CEL extension libraries [_cel_extension_libraries]
