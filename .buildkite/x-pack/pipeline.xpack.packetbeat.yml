@@ -134,6 +134,32 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu x86_64 System Tests"
 
+      - label: ":ubuntu: x-pack/packetbeat: Ubuntu x86_64 Go Integration Tests"
+        key: "x-pack-packetbeat-mandatory-int-test"
+        command: |
+          cd x-pack/packetbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+          - "x-pack/packetbeat/build/integration-tests/**"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Ubuntu x86_64 Go Integration Tests"
+
       - label: ":rhel: x-pack/packetbeat: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
         command: |
