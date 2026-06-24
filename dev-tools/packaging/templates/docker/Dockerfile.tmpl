@@ -46,7 +46,7 @@ RUN for iter in {1..10}; do \
     (exit $exit_code)
 {{- end }}
 
-{{- if contains .from "ubi-minimal" }}
+{{- if and (contains .from "ubi") (contains .from "minimal") }}
 RUN for iter in {1..10}; do \
         microdnf -y update && \
         microdnf -y install findutils shadow-utils ca-certificates \
@@ -158,7 +158,7 @@ USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi9-minimal")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
 USER root
 
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
