@@ -60,7 +60,7 @@ type Heartbeat struct {
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
 
-	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
+	otelStatusFactoryWrapper cfgfile.FactoryWrapper
 }
 
 // New creates a new heartbeat.
