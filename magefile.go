@@ -38,7 +38,7 @@ import (
 )
 
 var (
-	otelDistroBuildDir = filepath.Join("otel", "distributions", "beats-otel-collector", "_build")
+	otelDistroBuildDir = "otel/distributions/beats-otel-collector/_build"
 
 	// BeatsWithDashboards is a list of Beats to collect dashboards from.
 	BeatsWithDashboards = []string{
