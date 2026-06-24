@@ -51,11 +51,11 @@ func (e *elasticStorage) Start(ctx context.Context, host component.Host) error {
 }
 
 func (e *elasticStorage) Shutdown(ctx context.Context) error {
+	e.clientMu.Lock()
+	defer e.clientMu.Unlock()
 	if e.client == nil {
 		return nil
 	}
-	e.clientMu.Lock()
-	defer e.clientMu.Unlock()
 	return e.client.Close()
 }
 
