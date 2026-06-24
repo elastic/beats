@@ -29,7 +29,7 @@ conntrack
 summary of nf_conntrack statistics, summed across CPU cores
 
 **`linux.conntrack.summary.drop`**
-:   packets dropped due to conntrack failiure
+:   packets dropped due to conntrack failure
 
     type: long
 
@@ -197,7 +197,7 @@ KSM statistics
 
 
 **`linux.ksm.stats.full_scans`**
-:   Number of times mergable pages have been scanned.
+:   Number of times mergeable pages have been scanned.
 
     type: long
 

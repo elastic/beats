@@ -12,7 +12,7 @@
         - name: drop
           type: long
           description: >
-            packets dropped due to conntrack failiure
+            packets dropped due to conntrack failure
         - name: early_drop
           type: long
           description: >
