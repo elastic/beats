@@ -142,6 +142,10 @@ func (r *Reporter) Stop() {
 }
 
 func (r *Reporter) snapshotLoop() {
+	if r.Period == 0 {
+		r.logger.Infof("Skipping metrics logging")
+		return
+	}
 	r.logger.Infof("Starting metrics logging every %v", r.Period)
 	defer r.logger.Infof("Stopping metrics logging.")
 	defer func() {

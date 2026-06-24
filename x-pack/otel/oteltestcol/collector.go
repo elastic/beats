@@ -57,7 +57,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		&zapBuf,
+		zapcore.Lock(zapcore.AddSync(&zapBuf)),
 		zapcore.DebugLevel,
 	)
 	observed, observer := observer.New(zapcore.DebugLevel)

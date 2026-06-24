@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -50,6 +51,7 @@ type websocketStream struct {
 	tokenExpiry <-chan time.Time
 	time        func() time.Time
 	keepAlive   *keepAlive
+	conn        atomic.Pointer[websocket.Conn]
 }
 
 type loggingRoundTripper struct {
@@ -232,6 +234,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		s.status.UpdateStatus(status.Failed, "failed to establish websocket connection: "+err.Error())
 		return err
 	}
+	s.conn.Store(c)
 	// Start the keep-alive routine if enabled and the connection is established successfully
 	// this is for the initial connection only, the keep-alive will be restarted during the reconnect
 	// logic/token refresh.
@@ -241,11 +244,25 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	// ensures this is the last connection closed when the function returns
 	defer func() {
+		s.conn.Store(nil)
 		if c != nil {
 			if err := c.Close(); err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 			}
+		}
+	}()
+
+	// Force-close the connection when context is cancelled so that a
+	// blocked ReadMessage is unblocked. Without this, a stalled server
+	// with keep_alive disabled can prevent shutdown indefinitely.
+	stop := make(chan struct{})
+	defer close(stop)
+	go func() {
+		select {
+		case <-ctx.Done():
+			s.Close()
+		case <-stop:
 		}
 	}()
 
@@ -301,6 +318,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				s.log.Errorw("failed to establish a new websocket connection on token refresh", "error", err)
 				return err
 			}
+			s.conn.Store(c)
 			// Restart the keep-alive routine on a token refresh if enabled and the
 			// connection is established successfully.
 			if s.keepAlive != nil {
@@ -314,6 +332,9 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				// new connection via our reconnect logic.
 				if s.keepAlive != nil {
 					heartBeatCancel()
+				}
+				if err := ctx.Err(); err != nil {
+					return err
 				}
 				if !s.cfg.Retry.BlanketRetries && !isRetryableError(err) {
 					s.status.UpdateStatus(status.Failed, "failed to read websocket data: "+err.Error())
@@ -347,6 +368,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					s.log.Errorw("failed to reconnect websocket connection", "error", err)
 					return err
 				}
+				s.conn.Store(c)
 				// Restart the keep-alive routine if enabled after a successful reconnection.
 				if s.keepAlive != nil {
 					heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
@@ -461,6 +483,9 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 		retryConfig := cfg.Retry
 		if !retryConfig.InfiniteRetries {
 			for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
+				if err = ctx.Err(); err != nil {
+					return nil, nil, err
+				}
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
 					stat.UpdateStatus(status.Running, "")
@@ -479,7 +504,13 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
-				time.Sleep(waitTime)
+				timer := time.NewTimer(waitTime)
+				select {
+				case <-ctx.Done():
+					timer.Stop()
+					return nil, nil, ctx.Err()
+				case <-timer.C:
+				}
 			}
 			if response == nil {
 				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
@@ -487,6 +518,9 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
 		} else {
 			for attempt := 1; ; attempt++ {
+				if err = ctx.Err(); err != nil {
+					return nil, nil, err
+				}
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
 					stat.UpdateStatus(status.Running, "")
@@ -505,7 +539,13 @@ func connectWebSocket(ctx context.Context, cfg config, url string, stat status.S
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
-				time.Sleep(waitTime)
+				timer := time.NewTimer(waitTime)
+				select {
+				case <-ctx.Done():
+					timer.Stop()
+					return nil, nil, ctx.Err()
+				case <-timer.C:
+				}
 			}
 		}
 	}
@@ -556,6 +596,10 @@ func (s *websocketStream) now() time.Time {
 }
 
 func (s *websocketStream) Close() error {
+	conn := s.conn.Swap(nil)
+	if conn != nil {
+		return conn.Close()
+	}
 	return nil
 }
 

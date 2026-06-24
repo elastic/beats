@@ -1,7 +1,0 @@
-kind: bug-fix
-
-summary: Guard event.original rename in azure module ingest pipelines to prevent "field already exists" error when the field is pre-populated
-
-component: filebeat
-
-pr: https://github.com/elastic/beats/pull/51271
