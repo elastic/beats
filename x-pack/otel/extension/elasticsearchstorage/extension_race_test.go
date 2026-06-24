@@ -41,8 +41,7 @@ import (
 //
 // This test stands up a fake ES (httptest.Server) and drives concurrent Set
 // and Each from multiple goroutines against multiple stores produced by one
-// extension. It is expected to FAIL today, and should pass once Access
-// returns stores that serialize access to the underlying connection.
+// extension.
 //
 // Under `go test -race` the data race is detected directly on the encoder's
 // shared *bytes.Buffer. Without -race the test still catches the bug
