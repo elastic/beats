@@ -1,0 +1,11 @@
+kind: bug-fix
+summary: Fix data race in the elasticsearch_storage OTel extension.
+description: |
+  The `elasticsearch_storage` OTel extension shared a single
+  `eslegclient.Connection` across every store returned by `Access`, but
+  that connection is not thread-safe.  The extension now wraps each
+  returned store in a locking proxy that serializes the full
+  `Marshal → execRequest → HTTP.Do` path on a
+  per-extension mutex, preventing the buffer races.
+component: x-pack/otel
+#pr: https://github.com/owner/repo/1234
