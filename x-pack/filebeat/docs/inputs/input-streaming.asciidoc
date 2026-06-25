@@ -26,6 +26,8 @@ NOTE: The `streaming` input websocket handler does not currently support XML mes
 
 The Crowdstrike streaming input requires OAuth2.0 as described in the Crowdstrike documentation for the API. When using the Crowdstrike streaming type, the `crowdstrike_app_id` configuration field must be set. This field specifies the `appId` parameter sent to the Crowdstrike API. See the Crowdstrike documentation for details.
 
+The feed and refresh URLs returned by the Crowdstrike discover endpoint are validated against the configured URL's origin before any request is made. By default, both URLs must share the same registrable domain (e.g. `crowdstrike.com`) as the configured `url`. If the discover response returns URLs on a different domain, you can allowlist additional origins with the `resource_origins` option.
+
 The `stream_type` configuration field specifies which type of streaming input to use, "websocket" or "crowdstrike". If it is not set, the input defaults to websocket streaming  .
 
 ==== Execution
@@ -238,9 +240,28 @@ The `streaming` input supports the following configuration options plus the
 
 The flavor of streaming to use. This may be either "websocket", "crowdstrike", or unset. If the field is unset, websocket streaming is used.
 
+<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
 [[program-streaming]]
 [float]
 ==== `program`
+=======
+
+### `resource_origins` [resource-origins-streaming]
+
+An optional list of additional origins (scheme and host) to accept for CrowdStrike resource URLs. This only applies when `stream_type` is `crowdstrike`.
+
+By default, the `dataFeedURL` and `refreshActiveSessionURL` returned by the discover endpoint must share the same registrable domain as the configured `url` (for example, both `api.crowdstrike.com` and `firehose.crowdstrike.com` share the registrable domain `crowdstrike.com`). HTTPS-to-HTTP scheme downgrades are always rejected.
+
+If CrowdStrike returns resource URLs on a different registrable domain, add them here to allow those origins without waiting for a code change. Each entry must include a scheme and host.
+
+```yaml
+resource_origins:
+  - "https://firehose.newdomain.com"
+```
+
+
+### `program` [program-streaming]
+>>>>>>> 40d532bc2 (x-pack/filebeat/input/streaming: validate CrowdStrike resource URL origins (#51435)):docs/reference/filebeat/filebeat-input-streaming.md
 
 The CEL program that is executed on each message received. This field should ideally be present but if not the default program given below is used.
 

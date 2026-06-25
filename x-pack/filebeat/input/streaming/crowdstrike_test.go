@@ -7,6 +7,7 @@ package streaming
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -15,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -411,6 +413,275 @@ func TestFollowStreamCancelsRefreshOnReconnect(t *testing.T) {
 	if growth >= totalSessions/2 {
 		t.Errorf("goroutine growth = %d; want < %d (samples: %v)",
 			growth, totalSessions/2, samples)
+	}
+}
+
+func TestSameOrigin(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		base string
+		tgt  string
+		want bool
+	}{
+		{
+			name: "same_host",
+			base: "https://api.crowdstrike.com/sensors",
+			tgt:  "https://api.crowdstrike.com/other",
+			want: true,
+		},
+		{
+			name: "same_registrable_domain_different_subdomains",
+			base: "https://api.crowdstrike.com/sensors",
+			tgt:  "https://firehose.crowdstrike.com/feed",
+			want: true,
+		},
+		{
+			name: "different_registrable_domain",
+			base: "https://api.crowdstrike.com/sensors",
+			tgt:  "https://evil.example.com/capture",
+			want: false,
+		},
+		{
+			name: "scheme_downgrade_https_to_http",
+			base: "https://api.crowdstrike.com/sensors",
+			tgt:  "http://api.crowdstrike.com/sensors",
+			want: false,
+		},
+		{
+			name: "scheme_upgrade_http_to_https",
+			base: "http://api.crowdstrike.com/sensors",
+			tgt:  "https://api.crowdstrike.com/sensors",
+			want: true,
+		},
+		{
+			name: "same_IP_address",
+			base: "https://192.168.1.1:8080/api",
+			tgt:  "https://192.168.1.1:9090/feed",
+			want: true,
+		},
+		{
+			name: "different_IP_addresses",
+			base: "https://192.168.1.1:8080/api",
+			tgt:  "https://10.0.0.1:8080/api",
+			want: false,
+		},
+		{
+			name: "regional_subdomains_same_domain",
+			base: "https://api.us-2.crowdstrike.com/sensors",
+			tgt:  "https://firehose.us-2.crowdstrike.com/feed",
+			want: true,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			base, err := url.Parse(test.base)
+			if err != nil {
+				t.Fatalf("failed to parse base URL: %v", err)
+			}
+			tgt, err := url.Parse(test.tgt)
+			if err != nil {
+				t.Fatalf("failed to parse target URL: %v", err)
+			}
+			if got := sameOrigin(base, tgt); got != test.want {
+				t.Errorf("sameOrigin(%q, %q) = %v, want %v", test.base, test.tgt, got, test.want)
+			}
+		})
+	}
+}
+
+func TestAllowedOrigin(t *testing.T) {
+	t.Parallel()
+
+	parse := func(t *testing.T, raw string) *url.URL {
+		t.Helper()
+		u, err := url.Parse(raw)
+		if err != nil {
+			t.Fatalf("failed to parse URL %q: %v", raw, err)
+		}
+		return u
+	}
+
+	tests := []struct {
+		name    string
+		base    string
+		allowed []string
+		tgt     string
+		want    bool
+	}{
+		{
+			name: "same_origin_no_allowlist",
+			base: "https://api.crowdstrike.com",
+			tgt:  "https://firehose.crowdstrike.com/feed",
+			want: true,
+		},
+		{
+			name: "different_origin_no_allowlist",
+			base: "https://api.crowdstrike.com",
+			tgt:  "https://evil.example.com/capture",
+			want: false,
+		},
+		{
+			name:    "different_origin_allowed_by_allowlist",
+			base:    "https://api.crowdstrike.com",
+			allowed: []string{"https://evil.example.com"},
+			tgt:     "https://evil.example.com/capture",
+			want:    true,
+		},
+		{
+			name:    "allowlist_scheme_mismatch",
+			base:    "https://api.crowdstrike.com",
+			allowed: []string{"https://streaming.newdomain.com"},
+			tgt:     "http://streaming.newdomain.com/feed",
+			want:    false,
+		},
+		{
+			name:    "allowlist_host_mismatch",
+			base:    "https://api.crowdstrike.com",
+			allowed: []string{"https://streaming.newdomain.com"},
+			tgt:     "https://other.newdomain.com/feed",
+			want:    false,
+		},
+		{
+			name:    "allowlist_matches_with_explicit_default_port",
+			base:    "https://api.crowdstrike.com",
+			allowed: []string{"https://streaming.newdomain.com"},
+			tgt:     "https://streaming.newdomain.com:443/feed",
+			want:    true,
+		},
+		{
+			name:    "allowlist_rejects_non_default_port",
+			base:    "https://api.crowdstrike.com",
+			allowed: []string{"https://streaming.newdomain.com"},
+			tgt:     "https://streaming.newdomain.com:8443/feed",
+			want:    false,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			base := parse(t, test.base)
+			tgt := parse(t, test.tgt)
+			allowed := make([]*url.URL, len(test.allowed))
+			for i, a := range test.allowed {
+				allowed[i] = parse(t, a)
+			}
+			if got := allowedOrigin(base, allowed, tgt); got != test.want {
+				t.Errorf("allowedOrigin(%q, %v, %q) = %v, want %v", test.base, test.allowed, test.tgt, got, test.want)
+			}
+		})
+	}
+}
+
+func TestFollowSessionRejectsCrossOriginResourceURLs(t *testing.T) {
+	t.Parallel()
+
+	tokenSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"access_token":"tok","token_type":"bearer","expires_in":3600}`)
+	}))
+	t.Cleanup(tokenSrv.Close)
+
+	tests := []struct {
+		name       string
+		feedHost   string
+		refreshURL string
+		wantErr    string
+	}{
+		{
+			name:     "cross_origin_feed_URL",
+			feedHost: "https://evil.example.com",
+			wantErr:  "feed url origin",
+		},
+		{
+			name:       "cross_origin_refresh_URL",
+			refreshURL: "https://evil.example.com/refresh",
+			wantErr:    "refresh url origin",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			feedSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = io.WriteString(w, `{"metadata":{"offset":1,"eventType":"test"}}`)
+			}))
+			defer feedSrv.Close()
+
+			refreshSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}))
+			defer refreshSrv.Close()
+
+			feedURL := feedSrv.URL
+			if test.feedHost != "" {
+				feedURL = test.feedHost + "/feed"
+			}
+			refreshURL := refreshSrv.URL
+			if test.refreshURL != "" {
+				refreshURL = test.refreshURL
+			}
+
+			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = fmt.Fprintf(w, `{
+					"resources": [{
+						"dataFeedURL": %q,
+						"sessionToken": {"token": "tok", "expiration": "2099-01-01T00:00:00Z"},
+						"refreshActiveSessionURL": %q,
+						"refreshActiveSessionInterval": 30
+					}],
+					"meta": {}
+				}`, feedURL, refreshURL)
+			}))
+			defer discoverSrv.Close()
+
+			u, err := url.Parse(discoverSrv.URL)
+			if err != nil {
+				t.Fatalf("failed to parse discover URL: %v", err)
+			}
+			cfg := config{
+				Type: "crowdstrike",
+				URL:  &urlConfig{u},
+				Auth: authConfig{
+					OAuth2: oAuth2Config{
+						ClientID:     "id",
+						ClientSecret: "secret",
+						TokenURL:     tokenSrv.URL,
+					},
+				},
+				CrowdstrikeAppID: "test",
+				Retry:            &retry{MaxAttempts: 1, WaitMin: time.Millisecond, WaitMax: time.Millisecond},
+				Program:          `state.response.decode_json().as(body, {"events": [body]})`,
+			}
+
+			log := logptest.NewTestingLogger(t, "origin")
+			env := v2.Context{
+				ID:              "origin_test",
+				MetricsRegistry: monitoring.NewRegistry(),
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			s, err := NewFalconHoseFollower(ctx, env, cfg, nil, &testPublisher{log}, nil, log, time.Now)
+			if err != nil {
+				t.Fatalf("failed to construct follower: %v", err)
+			}
+
+			err = s.FollowStream(ctx)
+			if err == nil {
+				t.Fatal("expected FollowStream to fail with origin mismatch, but it succeeded")
+			}
+			if !errors.Is(err, hardError{}) {
+				t.Errorf("expected hardError, got: %v", err)
+			}
+			if got := err.Error(); !strings.Contains(got, test.wantErr) {
+				t.Errorf("error %q does not contain %q", got, test.wantErr)
+			}
+		})
 	}
 }
 
