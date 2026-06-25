@@ -1020,9 +1020,9 @@ If set to true, the values in `request.body` are sent for pagination requests. D
 
 ### `response.pagination_allowed_hosts` [response-pagination-allowed-hosts]
 
-An optional list of additional origins that pagination URLs are allowed to target. By default, pagination URLs derived from API responses (via `set` with `target: url.value`) must share the same hostname as the configured `request.url`. If a remote API legitimately returns pagination URLs on a different host (for example, a CDN), list those origins here.
+An optional list of additional origins that pagination URLs are allowed to target. By default, pagination URLs derived from API responses (via `set` with `target: url.value`) must share the same origin (scheme, hostname, and port) as the configured `request.url`. If a remote API legitimately returns pagination URLs on a different origin (for example, a CDN), list those origins here.
 
-Each entry must include both a scheme and a host. Example:
+Each entry must include a scheme and a host, and may include a port. Example:
 
 ```yaml
 response:
@@ -1031,7 +1031,7 @@ response:
     - "https://api-secondary.provider.com:8443"
 ```
 
-Default: empty (only URLs matching the configured `request.url` hostname are accepted).
+Default: empty (only URLs matching the configured `request.url` origin are accepted).
 
 
 ### `response.pagination` [response-pagination]

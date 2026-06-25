@@ -307,8 +307,7 @@ type requestFactory struct {
 
 	// originURL and allowedOrigins constrain the URL that transforms
 	// can produce. When originURL is non-nil, newHTTPRequest validates
-	// the post-transform URL against originURL and allowedOrigins. Set
-	// only on pagination factories.
+	// the post-transform URL against originURL and allowedOrigins.
 	originURL      *url.URL
 	allowedOrigins []*url.URL
 }
@@ -342,6 +341,14 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 		}
 	}
 	rfs = append(rfs, rf)
+	var chainAllowedOrigins []*url.URL
+	for _, s := range config.Response.PaginationAllowedHosts {
+		u, err := url.Parse(s)
+		if err != nil {
+			continue // already validated by responseConfig.Validate
+		}
+		chainAllowedOrigins = append(chainAllowedOrigins, u)
+	}
 	for _, ch := range config.Chain {
 		var rf *requestFactory
 		// chain calls requestFactory object
@@ -354,8 +361,9 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
+			stepURL := ch.Step.Request.URL.URL
 			rf = &requestFactory{
-				url:                    *ch.Step.Request.URL.URL,
+				url:                    *stepURL,
 				method:                 ch.Step.Request.Method,
 				body:                   ch.Step.Request.Body,
 				transforms:             ts,
@@ -366,6 +374,10 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.Step.Replace == "" {
+				rf.originURL = stepURL
+				rf.allowedOrigins = chainAllowedOrigins
 			}
 			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
 				rf.user = ch.Step.Auth.Basic.User
@@ -381,8 +393,9 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
+			whileURL := ch.While.Request.URL.URL
 			rf = &requestFactory{
-				url:                    *ch.While.Request.URL.URL,
+				url:                    *whileURL,
 				method:                 ch.While.Request.Method,
 				body:                   ch.While.Request.Body,
 				transforms:             ts,
@@ -394,6 +407,10 @@ func newRequestFactory(ctx context.Context, config config, stat status.StatusRep
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.While.Replace == "" {
+				rf.originURL = whileURL
+				rf.allowedOrigins = chainAllowedOrigins
 			}
 			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
 				rf.user = ch.While.Auth.Basic.User
@@ -453,7 +470,7 @@ func (rf *requestFactory) newHTTPRequest(ctx context.Context, trCtx *transformCo
 		if !allowedOrigin(rf.originURL, rf.allowedOrigins, &target) {
 			return nil, fmt.Errorf(
 				"pagination URL origin %q does not match configured origin %q",
-				target.Hostname(), rf.originURL.Hostname(),
+				target.Host, rf.originURL.Host,
 			)
 		}
 	}
@@ -541,13 +558,30 @@ func allowedOrigin(base *url.URL, allowed []*url.URL, target *url.URL) bool {
 	return false
 }
 
-// sameOrigin returns true when target does not downgrade from HTTPS to
-// HTTP and shares the same hostname as base.
+// sameOrigin returns true when target shares the same origin (scheme,
+// hostname, and port) as base. HTTPS-to-HTTP downgrades are rejected
+// explicitly; scheme upgrades also fail because the default ports
+// differ (80 vs 443). Explicit default ports are normalised so that
+// https://example.com and https://example.com:443 are the same origin.
 func sameOrigin(base, target *url.URL) bool {
 	if base.Scheme == "https" && target.Scheme != "https" {
 		return false
 	}
-	return base.Hostname() == target.Hostname()
+	return base.Hostname() == target.Hostname() && portOrDefault(base) == portOrDefault(target)
+}
+
+func portOrDefault(u *url.URL) string {
+	if p := u.Port(); p != "" {
+		return p
+	}
+	switch u.Scheme {
+	case "https":
+		return "443"
+	case "http":
+		return "80"
+	default:
+		return ""
+	}
 }
 
 type requester struct {
