@@ -41,9 +41,6 @@ type fingerprintIdentityConfig struct {
 	Growing bool `config:"growing"`
 }
 
-// defaultFingerprintIdentityConfig returns the default configuration for the
-// fingerprint file identity. Growing defaults to `true` on 9.5+; and on
-// 8.19.x it defaults to `false`.
 func defaultFingerprintIdentityConfig() fingerprintIdentityConfig {
 	return fingerprintIdentityConfig{
 		Growing: true,

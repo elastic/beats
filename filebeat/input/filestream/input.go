@@ -205,8 +205,6 @@ func normalizeConfig(cfg *conf.C, c *config) error {
 
 	name := c.FileIdentity.Name()
 	if name == fingerprintName {
-		// Start from the file-identity defaults (growing=true on 9.5+) and
-		// let any explicit user setting (true/false) override.
 		fingerprintCfg := defaultFingerprintIdentityConfig()
 		if sub := c.FileIdentity.Config(); sub != nil {
 			if err := sub.Unpack(&fingerprintCfg); err != nil {
