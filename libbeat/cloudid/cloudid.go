@@ -118,6 +118,13 @@ func (c *CloudID) decodeCloudID() error {
 	esID, esPort := extractPortFromName(words[1], port)
 	kbID, kbPort := extractPortFromName(words[2], port)
 
+	// Reject components containing URL-special characters (#, @, ?, /).
+	for _, component := range []string{host, esID, kbID} {
+		if i := strings.IndexAny(component, "#@?/"); i >= 0 {
+			return fmt.Errorf("cloud ID component %q contains invalid character %q", component, component[i])
+		}
+	}
+
 	// 5. form the URLs
 	esURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:%s", esID, host, esPort)}
 	kibanaURL := url.URL{Scheme: "https", Host: fmt.Sprintf("%s.%s:%s", kbID, host, kbPort)}
