@@ -466,6 +466,13 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
 		req.Header = prev.Header.Clone()
 
+		if req.URL.Host != prev.URL.Host || (prev.URL.Scheme == "https" && req.URL.Scheme == "http") {
+			for _, k := range config.RedirectSensitiveHeaders {
+				log.Debugf("http client: cross-origin redirect to %s: removing sensitive header %s", req.URL.Host, k)
+				req.Header.Del(k)
+			}
+		}
+
 		for _, k := range config.RedirectHeadersBanList {
 			log.Debugf("http client: ban header %v", k)
 			req.Header.Del(k)
