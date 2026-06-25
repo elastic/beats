@@ -105,6 +105,79 @@ logging:
     enabled: false
 `
 
+// defaultFingerprintCfg is the DEFAULT filestream configuration: it sets no
+// file_identity at all, so it exercises the post-9.0 default identity
+// (fingerprint) with the 9.5+ growing default — the configuration the majority
+// of users run and the one #44780 targets. Format args: logDir, checkInterval,
+// pathHome.
+var defaultFingerprintCfg = `
+filebeat.inputs:
+  - type: filestream
+    id: test-default-fingerprint
+    enabled: true
+    paths:
+      - %s/*.log
+    prospector.scanner:
+      check_interval: %s
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
+
+// TestFilestreamEnhancedFingerprint_DefaultConfigIngestsSmallFiles verifies the
+// headline promise of Enhanced Fingerprint: with the DEFAULT configuration (no
+// file_identity set), the default fingerprint identity has growing enabled on
+// 9.5+, so a file smaller than the fingerprint size (1024 bytes) is ingested
+// immediately. It guards the regression where growing was applied only when
+// file_identity.fingerprint was configured explicitly (normalizeConfig
+// early-returned for the implicit default identity, leaving growing=false).
+func TestFilestreamEnhancedFingerprint_DefaultConfigIngestsSmallFiles(t *testing.T) {
+	filebeat := integration.NewFilebeat(t)
+
+	tempDir := filebeat.TempDir()
+	printOutputOnFailure(t, tempDir)
+	logDir := filepath.Join(tempDir, "logs")
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		t.Fatalf("failed to create log directory: %s", err)
+	}
+
+	file1 := filepath.Join(logDir, "file1.log")
+
+	filebeat.WriteConfigFile(fmt.Sprintf(defaultFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.Start()
+
+	filebeat.WaitLogsContains("Input 'filestream' starting",
+		10*time.Second, "filestream did not start")
+
+	// A file well under the 1024-byte fingerprint threshold must be ingested
+	// immediately under the default config, not held back as it was before
+	// growing defaulted on for the implicit fingerprint identity.
+	appendToFile(t, file1, generateLines("small file line", 1))
+
+	filebeat.WaitLogsContains(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
+		10*time.Second,
+		"small file was not read to EOF under the default config",
+	)
+	filebeat.WaitPublishedEvents(5*time.Second, 1)
+
+	events := readOutputEvents(t, tempDir)
+	require.Len(t, messagesForFile(events, file1), 1,
+		"the small file should have produced exactly one event under the default config")
+}
+
 // TestFilestreamFingerprintSmallFiles tests that files smaller than the
 // fingerprint size (default 1024 bytes) are not ingested until they grow
 // large enough.
