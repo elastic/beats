@@ -1,0 +1,9 @@
+kind: enhancement
+summary: Add emit macro, stream producers, and lazy JSON decode to the CEL input.
+description: |
+  Add the emit macro for publishing events during CEL evaluation instead of
+  collecting them in the state.events array. Combined with stream_gzip,
+  stream_zip, and decode_json_stream_lazy, this enables streaming
+  decompression and decoding of large payloads without holding all records
+  in memory.
+component: filebeat
