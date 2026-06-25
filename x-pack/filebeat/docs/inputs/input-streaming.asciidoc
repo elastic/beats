@@ -240,13 +240,9 @@ The `streaming` input supports the following configuration options plus the
 
 The flavor of streaming to use. This may be either "websocket", "crowdstrike", or unset. If the field is unset, websocket streaming is used.
 
-<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
-[[program-streaming]]
+[[resource-origins-streaming]]
 [float]
-==== `program`
-=======
-
-### `resource_origins` [resource-origins-streaming]
+==== `resource_origins`
 
 An optional list of additional origins (scheme and host) to accept for CrowdStrike resource URLs. This only applies when `stream_type` is `crowdstrike`.
 
@@ -254,14 +250,15 @@ By default, the `dataFeedURL` and `refreshActiveSessionURL` returned by the disc
 
 If CrowdStrike returns resource URLs on a different registrable domain, add them here to allow those origins without waiting for a code change. Each entry must include a scheme and host.
 
-```yaml
+["source","yaml",subs="attributes"]
+----
 resource_origins:
   - "https://firehose.newdomain.com"
-```
+----
 
-
-### `program` [program-streaming]
->>>>>>> 40d532bc2 (x-pack/filebeat/input/streaming: validate CrowdStrike resource URL origins (#51435)):docs/reference/filebeat/filebeat-input-streaming.md
+[[program-streaming]]
+[float]
+==== `program`
 
 The CEL program that is executed on each message received. This field should ideally be present but if not the default program given below is used.
 
