@@ -136,12 +136,6 @@ func (r *Registrar) Run() {
 
 	defer r.store.Close()
 
-	defer func() {
-		if err := writeStates(r.store, r.states.GetStates()); err != nil {
-			r.log.Errorf("Error writing stopping registrar state to statestore: %v", err)
-		}
-	}()
-
 	var (
 		timer  *time.Timer
 		flushC <-chan time.Time
