@@ -60,8 +60,8 @@ type StateMetadataUpdater interface {
 	IterateOnPrefix(fn func(key string, meta interface{}) bool)
 
 	// UpdateKey updates an entry from oldKey to newKey with updated metadata.
-	// This is used by growing_fingerprint to update the registry key when
-	// a file's fingerprint grows.
+	// This is used by the growing fingerprint migration to update the registry
+	// key when a file's fingerprint grows.
 	UpdateKey(oldKey, newKey string, meta interface{}) error
 
 	// KeyExists returns true if the given key already has an entry in the

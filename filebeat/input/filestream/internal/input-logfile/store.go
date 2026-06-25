@@ -231,7 +231,8 @@ func (s *sourceStore) IterateOnPrefix(fn func(key string, meta interface{}) bool
 }
 
 // UpdateKey updates an entry from oldKey to newKey with updated metadata.
-// This is used by growing_fingerprint to update the registry key when
+// This is used by the growing fingerprint migration (see
+// fileProspector.migrateGrowingFingerprint) to update the registry key when
 // a file's fingerprint grows.
 //
 // This operation updates the key IN PLACE without requiring the resource lock.
