@@ -431,11 +431,11 @@ This endpoint returns MFA registration state for all users and does not support 
 
 Note that MFA enrichment is **best-effort**: a change to a user's MFA registration state alone will not trigger an incremental user update. Updated MFA data is only included in a published user event when that user is already being published due to an identity delta (a change to the user record, group membership, or device). A full synchronization will always include the latest MFA state for all users.
 
-When the `enrich_with: ["sign_in_activity"]` option is set, an additional call is made each sync/update cycle to:
+When the `enrich_with: ["sign_in_activity"]` option is set, an additional call is made on each full synchronization and on incremental updates that include at least one user identity change to:
 
 * [/users?$select=id,signInActivity](https://learn.microsoft.com/en-us/graph/api/resources/signinactivity?view=graph-rest-1.0)
 
-This endpoint returns the last sign-in timestamps for all users. The `signInActivity` property cannot be included in `/users/delta` queries because Microsoft Graph stores it outside the main directory data store; a separate non-delta request is required. The result is merged into each user document under the `azure_ad.signInActivity` field.
+This endpoint returns the last sign-in timestamps for all users. The `signInActivity` property cannot be included in `/users/delta` queries because Microsoft Graph stores it outside the main directory data store. A separate non-delta request is required. The result is merged into each user document under the `azure_ad.signInActivity` field.
 
 Note that sign-in activity enrichment is **best-effort** and follows the same semantics as MFA enrichment: a sign-in event alone will not trigger an incremental user update. Updated sign-in activity is only included in a published user event when that user is already being published due to an identity delta. A full synchronization will always include the latest sign-in timestamps for all users.
 
@@ -771,11 +771,15 @@ Additional data to fetch and merge into user documents. This is an array of enri
 
 When `"mfa"` is included, the provider calls the [`/reports/authenticationMethods/userRegistrationDetails`](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http) endpoint on each sync/update cycle and merges the result into each matching user document under the `azure_ad.mfa` field. This requires the `AuditLog.Read.All` application permission.
 
-When `"sign_in_activity"` is included, the provider calls `/users?$select=id,signInActivity` on each sync/update cycle and merges the last sign-in timestamps into each matching user document under the `azure_ad.signInActivity` field. The `signInActivity` property cannot be requested via the `/users/delta` endpoint because Microsoft Graph stores it outside the main directory data store; this separate non-delta call is therefore required. This also requires the `AuditLog.Read.All` application permission.
+```{applies_to}
+stack: ga 9.4.4
+```
+
+When `"sign_in_activity"` is included, the provider calls `/users?$select=id,signInActivity` on each full synchronization and on incremental updates that include at least one user identity change, then merges the last sign-in timestamps into each matching user document under the `azure_ad.signInActivity` field. The `signInActivity` property cannot be requested via the `/users/delta` endpoint because Microsoft Graph stores it outside the main directory data store. This separate non-delta call is therefore required. This also requires the `AuditLog.Read.All` application permission.
 
 Both enrichments are **best-effort**: they are skipped on no-op incremental updates (cycles where no user identity deltas occurred) and will not themselves trigger user update events.
 
-Both values may be specified together:
+Both values can be specified together:
 
 ```yaml
 enrich_with: ["mfa", "sign_in_activity"]
