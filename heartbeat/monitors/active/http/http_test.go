@@ -742,7 +742,7 @@ func TestRedirectWithTLS(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect-tls", config)
+	p, err := create("redirect-tls", config, beat.Info{})
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
