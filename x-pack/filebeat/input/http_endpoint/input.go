@@ -112,15 +112,8 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
 
-<<<<<<< HEAD
-	if e.config.Tracer.enabled() {
-		id := sanitizeFileName(ctx.IDWithoutName)
-		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(ctx.Agent.Paths, inputName, path)
-=======
 	if e.config.Tracer != nil {
 		resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, e.config.Tracer.Filename)
->>>>>>> 9d5d63c11 (x-pack/filebeat/input: validate request tracer and dump path regardless of enabled state (#51479))
 		if err != nil {
 			return err
 		}
@@ -142,15 +135,6 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 	ctx.UpdateStatus(status.Stopped, "")
 	return nil
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
-// The request.tracer.filename may have ":" when a http_endpoint input has cursor config and
-// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // servers is the package-level server pool.

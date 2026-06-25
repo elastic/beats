@@ -115,15 +115,8 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	// Allow a single fetch operation to obtain limits from the API.
 	p.lim = okta.NewRateLimiter(p.cfg.LimitWindow, p.cfg.LimitFixed)
 
-<<<<<<< HEAD
-	if p.cfg.Tracer.enabled() {
-		id := sanitizeFileName(inputCtx.IDWithoutName)
-		path := strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputCtx.Agent.Paths, Name, path)
-=======
 	if p.cfg.Tracer != nil {
 		resolved, err := httplog.ResolveTraceFilename(inputCtx.Agent.Paths, Name, inputCtx.IDWithoutName, p.cfg.Tracer.Filename)
->>>>>>> 9d5d63c11 (x-pack/filebeat/input: validate request tracer and dump path regardless of enabled state (#51479))
 		if err != nil {
 			return err
 		}
@@ -250,16 +243,6 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Log
 	maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // clientOption returns constructed client configuration options, including

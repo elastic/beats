@@ -195,15 +195,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	}
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
-<<<<<<< HEAD
-	if cfg.Resource.Tracer.enabled() {
-		id := sanitizeFileName(env.IDWithoutName)
-		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(env.Agent.Paths, inputName, path)
-=======
 	if cfg.Resource.Tracer != nil {
 		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.Resource.Tracer.Filename)
->>>>>>> 9d5d63c11 (x-pack/filebeat/input: validate request tracer and dump path regardless of enabled state (#51479))
 		if err != nil {
 			return err
 		}

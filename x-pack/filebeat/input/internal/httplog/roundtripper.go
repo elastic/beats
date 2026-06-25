@@ -143,6 +143,16 @@ func resolveSymlinks(path string) (string, error) {
 	return targ, nil
 }
 
+// SanitizeFileName returns name with ":" and path separators replaced with "_",
+// collapsing repeated separators. Input IDs may contain ":" which macOS Finder
+// treats as a path separator, producing confusing file paths in request-tracer
+// output.
+func SanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger. Transaction creation is logged to log.
 func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
