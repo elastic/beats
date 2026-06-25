@@ -365,9 +365,13 @@ func TestNormalizeConfig(t *testing.T) {
 			wantEnabled: false,
 		},
 		{
-			name:        "no file_identity keeps default scanner fingerprint",
+			// Omitting file_identity resolves to the fingerprint identity
+			// (see newFileIdentifier), so the growing default must apply just
+			// as it does for an explicit file_identity.fingerprint.
+			name:        "no file_identity defaults to fingerprint identity with growing enabled (9.5+)",
 			cfg:         map[string]interface{}{},
 			wantEnabled: true,
+			wantGrowing: true,
 		},
 		{
 			name: "file_identity.fingerprint.growing true propagates to scanner growing",

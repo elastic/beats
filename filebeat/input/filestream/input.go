@@ -192,8 +192,14 @@ func configure(
 // mode — and propagates it to the scanner's fingerprint config so the
 // scanner-side computation honours growing mode. Any value set under
 // `prospector.scanner.fingerprint.growing` in YAML is silently ignored.
+//
+// When file_identity is omitted, the default identity is the fingerprint
+// identity (see newFileIdentifier), so the same growing default is applied.
 func normalizeConfig(cfg *conf.C, c *config) error {
 	if c.FileIdentity == nil {
+		// Default (no file_identity): the fingerprint identity is used, so
+		// apply its growing default just like the explicit branch below.
+		c.FileWatcher.Scanner.Fingerprint.Growing = defaultFingerprintIdentityConfig().Growing
 		return nil
 	}
 
