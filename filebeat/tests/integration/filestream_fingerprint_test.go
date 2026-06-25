@@ -436,9 +436,11 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files(t *testing.T) {
 	appendToFile(t, file1, headerContent)
 	appendToFile(t, file2, headerContent)
 
-	// file1 is ingested (first detected wins the collision)
+	// One of the colliding files is ingested first; which one wins is not
+	// deterministic (scan iteration order), so match the EOF log without
+	// binding it to a specific path (only the winner's harvester runs here).
 	filebeat.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
+		"End of file reached:",
 		10*time.Second,
 		"file was not read to EOF",
 	)
