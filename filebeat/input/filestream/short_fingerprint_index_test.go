@@ -41,7 +41,10 @@ func TestShortFingerprintIndex_Add(t *testing.T) {
 	t.Run("adds entry regardless of fingerprint length", func(t *testing.T) {
 		key := "key2"
 		want := shortFingerprintEntry{
-			Fingerprint: "aabb",
+			// A full-length (64-char) fingerprint, so this subtest actually
+			// exercises length-independent insertion rather than re-using the
+			// 4-char value above.
+			Fingerprint: "aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899",
 			Source:      "/a.log",
 		}
 		set.Add(key, want.Fingerprint, want.Source)

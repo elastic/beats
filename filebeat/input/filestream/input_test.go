@@ -195,6 +195,7 @@ type: filestream
 id: foo
 prospector.scanner.check_interval: 1s
 prospector.scanner.fingerprint.enabled: false
+file_identity.native: ~
 take_over.enabled: %t
 paths:
     - %s`, testCase.takeOver, filename)

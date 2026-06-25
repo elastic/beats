@@ -217,14 +217,25 @@ func (s *sourceStore) IterateOnPrefix(fn func(key string, meta interface{}) bool
 	defer s.store.ephemeralStore.mu.Unlock()
 
 	for key, res := range s.store.ephemeralStore.table {
-		if res.isDeleted() {
-			continue
-		}
+		// MatchesInput is a cheap, lock-free key check, so filter on it first to
+		// avoid locking resources that belong to other inputs.
 		if !s.identifier.MatchesInput(key) {
 			continue
 		}
 
-		if !fn(key, res.cursorMeta) {
+		// Take the resource lock once to both check deletion and snapshot
+		// cursorMeta: writers (updateOp.Execute, updateMetadata, UpdateKey) mutate
+		// these while holding only stateMutex, not ephemeralStore.mu, so reading
+		// them without the resource lock would be a data race on the interface value.
+		res.stateMutex.Lock()
+		deleted := res.unsafeIsDeleted()
+		meta := res.cursorMeta
+		res.stateMutex.Unlock()
+		if deleted {
+			continue
+		}
+
+		if !fn(key, meta) {
 			return // stop iteration
 		}
 	}
@@ -260,27 +271,38 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 		return fmt.Errorf("new key %s already exists", newKey)
 	}
 
-	// Lock the resource's stateMutex while modifying state fields.
-	// This ensures consistency with concurrent operations like ACK handling.
+	// Hold the resource's stateMutex while modifying state fields AND while
+	// persisting, so a concurrent ACK (updateOp.Execute, which holds only
+	// stateMutex) cannot race with writeState reading the cursor snapshot via
+	// inSyncStateSnapshot. This matches the stateMutex-held-across-writeState
+	// pattern used by updateMetadata/resetCursor.
 	res.stateMutex.Lock()
+	defer res.stateMutex.Unlock()
+
 	oldKeyValue := res.key
 	res.key = newKey
 	res.cursorMeta = meta
 	res.stored = false
-	res.stateMutex.Unlock()
 
-	// Update the table: remove old entry, add new entry with same resource
+	// Update the table: remove old entry, add new entry with same resource.
+	// The table mutation is protected by ephemeralStore.mu, held for the whole call.
 	s.store.ephemeralStore.table[newKey] = res
 	delete(s.store.ephemeralStore.table, oldKey)
 
 	// Persist the entry under the new key BEFORE removing the old one, so a
 	// crash between the two leaves the state recoverable under newKey. This
-	// mirrors the ordering in UpdateIdentifiers/TakeOver. Without it the only
-	// durable record of the migration would be the opRemove of oldKey, and a
-	// crash before the next cursor write/checkpoint would lose the entry and
-	// re-harvest the file from offset 0. writeState sets res.stored=true on
-	// success.
+	// mirrors the ordering in UpdateIdentifiers/TakeOver. writeState sets
+	// res.stored=true only on a successful write.
 	s.store.writeState(res)
+	if !res.stored {
+		// The write under newKey failed (already logged by writeState). Do NOT
+		// remove the old key: it is still the only durable record of this entry.
+		// The in-memory resource now lives under newKey and will be re-persisted
+		// on the next cursor checkpoint, so we do not lose state in memory either.
+		return fmt.Errorf(
+			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
+			newKey, oldKeyValue)
+	}
 
 	// Best-effort: the new key is already durable above; this just trims the
 	// stale on-disk entry for the old key. A failure here is harmless — the

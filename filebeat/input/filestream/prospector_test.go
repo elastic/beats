@@ -27,6 +27,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -782,7 +783,7 @@ type mockMetadataUpdater struct {
 	mu    sync.RWMutex
 	table map[string]interface{}
 
-	FindCursorMetaCalled  int
+	FindCursorMetaCalled  atomic.Int64
 	ResetCursorCalled     int
 	UpdateMetadataCalled  int
 	RemoveCalled          int
@@ -843,7 +844,7 @@ func (mu *mockMetadataUpdater) checkOffset(id string, offset int64) bool {
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v any) error {
 	mu.mu.RLock()
 	defer mu.mu.RUnlock()
-	mu.FindCursorMetaCalled++
+	mu.FindCursorMetaCalled.Add(1)
 	meta, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id [%q]", s.Name())
@@ -876,6 +877,8 @@ func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
 }
 
 func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	mu.IterateOnPrefixCalled++
 	for key, meta := range mu.table {
 		if !fn(key, meta) {
@@ -885,12 +888,16 @@ func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interfac
 }
 
 func (mu *mockMetadataUpdater) KeyExists(key string) bool {
+	mu.mu.RLock()
+	defer mu.mu.RUnlock()
 	mu.KeyExistsCalled++
 	_, ok := mu.table[key]
 	return ok
 }
 
 func (mu *mockMetadataUpdater) UpdateKey(oldKey, newKey string, meta interface{}) error {
+	mu.mu.Lock()
+	defer mu.mu.Unlock()
 	mu.UpdateKeyCalled++
 	if _, ok := mu.table[oldKey]; !ok {
 		return fmt.Errorf("old key %s not found", oldKey)
@@ -1590,16 +1597,29 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			identifier: identifier,
 		}
 
-		result := p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
-		assert.Equal(t, src.Name(), result.Name(), "fast path should return original src unchanged")
+		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+
+		// The fast path returns as soon as the exact key is found, so it must
+		// never scan the registry or migrate anything.
+		assert.Equal(t, 0, store.IterateOnPrefixCalled, "fast path must not scan the registry")
+		assert.Equal(t, 0, store.UpdateKeyCalled, "fast path must not migrate")
+		assert.Positive(t, store.KeyExistsCalled, "fast path must check key existence")
+		// The pre-seeded prefix entry must remain untouched.
+		assert.True(t, store.has("filestream::my-input::fingerprint::aabb"),
+			"prefix entry must remain since migration did not run")
 	})
 
 	t.Run("slow path: key does not exist falls through to scan", func(t *testing.T) {
+		const oldKey = "filestream::my-input::fingerprint::aabb"
 		store := newMockMetadataUpdater()
-		// Only a prefix match exists, not the exact key.
-		store.table["filestream::my-input::fingerprint::aabb"] = fileMeta{
+		// Only a prefix match exists, not the exact key. The stored entry must
+		// carry a real growing-phase raw fingerprint ("aabb") that is a strict
+		// prefix of the event's raw fingerprint ("aabbccdd") so that
+		// buildShortFingerprintSet indexes it and the prefix match succeeds.
+		store.table[oldKey] = fileMeta{
 			Source:         currentPath,
 			IdentifierName: fingerprintName,
+			Fingerprint:    "aabb",
 		}
 
 		p := &fileProspector{
@@ -1607,10 +1627,20 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			identifier: identifier,
 		}
 
-		result := p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
-		// The function returns src (it always does). Migration succeeds via
-		// the short fingerprint set prefix match.
-		assert.Equal(t, src.Name(), result.Name())
+		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+
+		// Migration succeeds via the short fingerprint set prefix match: the
+		// registry is scanned, the old key is migrated to the new identity, and
+		// the old key is removed.
+		assert.Positive(t, store.IterateOnPrefixCalled, "slow path must scan the registry")
+		assert.Positive(t, store.UpdateKeyCalled, "slow path must migrate the matched entry")
+		assert.False(t, store.has(oldKey), "old key must be removed after migration")
+		// migrateGrowingFingerprint keeps the old key's plugin/input prefix and
+		// swaps in the new identity (src.Name()), which is the SHA-256-derived
+		// key, not the literal raw value used for event.SrcID.
+		newKey := "filestream::my-input::" + src.Name()
+		assert.NotEqual(t, oldKey, newKey)
+		assert.True(t, store.has(newKey), "migrated entry must exist under the new key")
 	})
 }
 

@@ -328,7 +328,9 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	appendToFile(t, file2, headerContent)
 	appendToFile(t, file3, headerContent)
 
-	// Create gzipped file with same header content
+	// Create a gzipped file with DIFFERENT header content. The fingerprint is
+	// computed on the decompressed bytes, so file4 has its own fingerprint and
+	// is NOT part of the file1-3 collision; it is tracked as a distinct file.
 	headerGZ := gziptest.Compress(t,
 		[]byte(generateLines("gzip header line", 1)), gziptest.CorruptNone)
 	require.NoError(t, os.WriteFile(file4, headerGZ, 0644), "failed to write gzipped file")
@@ -342,7 +344,8 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 		"file was not read to EOF",
 	)
 
-	// Only one event from whichever file was processed first
+	// Two events: one from the file1-3 collision winner, plus one from the
+	// distinct gzip file4.
 	filebeat.WaitPublishedEvents(5*time.Second, 2)
 
 	// ===== Phase 2: Grow all 4 files to make them diverge =====
@@ -437,11 +440,10 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 	// With collision, we get 1 event (from whichever file was processed first)
 	filebeat.WaitPublishedEvents(5*time.Second, 1)
 
-	// ===== Phase 2: Grow all 3 files to make them diverge =====
-	// Each file gets unique content so they each get a unique fingerprint.
-	// Due to collision handling:
-	// - The file that created the collision entry (first detected) will get migration
-	// - The other 2 files will be treated as NEW files (path doesn't match)
+	// ===== Phase 2: Grow only file1 =====
+	// Only file1 is appended to (file2 and file3 stay at the shared header).
+	// file1 grows past the collision header and publishes its additional lines;
+	// the settled total is 5 published events (1 from Phase 1 + file1's growth).
 	appendToFile(t, file1, generateLines("file1 unique line", 4))
 
 	filebeat.WaitPublishedEvents(5*time.Second, 5)
@@ -1983,7 +1985,7 @@ func assertSingleSHA256RegistryEntry(t *testing.T, tempDir, filePath string) {
 		activeKeysForFile = append(activeKeysForFile, e)
 	}
 
-	assert.Len(t, activeKeysForFile, 1,
+	require.Len(t, activeKeysForFile, 1,
 		"expected exactly one active fingerprint registry entry for %q; got %d",
 		filePath, len(activeKeysForFile))
 	assert.False(t, activeKeysForFile[0].growing,

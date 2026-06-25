@@ -56,8 +56,11 @@ func (idx *shortFingerprintSet) Remove(key string) {
 	delete(idx.entries, key)
 }
 
-// RemoveBySource removes the first entry whose source matches.
-// Used on truncation where the key is unknown (fingerprint changed).
+// RemoveBySource removes every entry whose source matches.
+// Used on truncation where the key is unknown (fingerprint changed). The set is
+// keyed by registry key, not source, and the one-entry-per-source property is
+// not enforced, so all matching entries must be removed — otherwise a stale
+// entry would survive and keep participating in prefix matching.
 // Safe to call on a nil receiver.
 func (idx *shortFingerprintSet) RemoveBySource(source string) {
 	if idx == nil {
@@ -66,7 +69,6 @@ func (idx *shortFingerprintSet) RemoveBySource(source string) {
 	for key, entry := range idx.entries {
 		if entry.Source == source {
 			delete(idx.entries, key)
-			return
 		}
 	}
 }
@@ -83,13 +85,29 @@ func (idx *shortFingerprintSet) UpdateSource(key, newSource string) {
 	}
 }
 
-// FindPrefixMatch finds an entry whose fingerprint is a prefix of targetFingerprint.
-// If matchSource is non-empty, also requires entry.Source == matchSource and returns
-// immediately on the first match (there is at most one entry per source path).
-// If matchSource is empty, returns the longest prefix match to avoid ambiguity when
-// multiple entries have prefix-related fingerprints.
+// FindPrefixMatch finds the entry whose fingerprint is the longest strict
+// prefix of targetFingerprint. If matchSource is non-empty, only entries with
+// entry.Source == matchSource are considered. Picking the longest prefix (in
+// both branches) avoids returning a shorter, less-specific entry when more than
+// one entry shares a source: the set is keyed by registry key, not source, and
+// the one-entry-per-source property is not enforced.
 // Returns the key and entry on match. Safe to call on a nil receiver.
 func (idx *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource string) (key string, entry shortFingerprintEntry, found bool) {
+	keep := func(e shortFingerprintEntry) bool {
+		return matchSource == "" || e.Source == matchSource
+	}
+	return idx.FindPrefixMatchFunc(targetFingerprint, keep)
+}
+
+// FindPrefixMatchFunc finds the entry with the longest fingerprint that is a
+// strict prefix of targetFingerprint and for which keep(entry) returns true
+// (a nil keep accepts every entry). It lets callers apply an arbitrary filter:
+// the path-agnostic rename fallback uses it to select the longest
+// rename-eligible candidate instead of testing only the single longest prefix
+// match (which could discard a genuine rename in favor of a still-present
+// distinct file that merely shares a longer header).
+// Returns the key and entry on match. Safe to call on a nil receiver.
+func (idx *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, keep func(shortFingerprintEntry) bool) (key string, entry shortFingerprintEntry, found bool) {
 	if idx == nil || targetFingerprint == "" {
 		return "", shortFingerprintEntry{}, false
 	}
@@ -97,16 +115,10 @@ func (idx *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource s
 		if !isStrictPrefix(targetFingerprint, e.Fingerprint) {
 			continue
 		}
-
-		if matchSource != "" {
-			if e.Source == matchSource {
-				return k, e, true // exact path — at most one match, return immediately
-			}
+		if keep != nil && !keep(e) {
 			continue
 		}
-
-		// No source filter: pick the longest prefix to avoid ambiguity.
-		if len(e.Fingerprint) > len(entry.Fingerprint) {
+		if !found || len(e.Fingerprint) > len(entry.Fingerprint) {
 			key, entry, found = k, e, true
 		}
 	}

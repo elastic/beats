@@ -213,8 +213,12 @@ func isCopyTruncate(config config) bool {
 }
 
 func checkConfigCompatibility(config config) error {
-	if config.FileIdentity != nil &&
-		config.FileIdentity.Name() == fingerprintName &&
+	// A nil FileIdentity defaults to the fingerprint identity (see
+	// newFileIdentifier), so the scanner-fingerprint requirement applies to the
+	// implicit case too. Without this, omitting file_identity while disabling
+	// the scanner fingerprint is silently accepted, and at runtime every file
+	// collapses to a single empty-fingerprint registry key (data loss).
+	if (config.FileIdentity == nil || config.FileIdentity.Name() == fingerprintName) &&
 		!config.FileWatcher.Scanner.Fingerprint.Enabled {
 		return fmt.Errorf("fingerprint file identity can be used only when fingerprint is enabled in the scanner")
 	}

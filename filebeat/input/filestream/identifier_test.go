@@ -215,7 +215,7 @@ func TestFingerprintIDKey(t *testing.T) {
 		sum := sha256.Sum256([]byte(raw))
 		assert.Equal(t, hex.EncodeToString(sum[:]), got, "growing key must be sha256(rawHex)")
 		assert.Len(t, got, 64, "bounded key must be a fixed 64-char hex string")
-		assert.NotContains(t, got, raw, "the raw file bytes must not appear in the key")
+		assert.NotContains(t, got, raw[:40], "the raw file bytes must not appear in the key")
 	})
 
 	t.Run("a long growing fingerprint stays bounded", func(t *testing.T) {
@@ -235,6 +235,6 @@ func TestGrowingRawFingerprint(t *testing.T) {
 	raw := "41414141"
 	assert.Equal(t, raw, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw}}),
 		"a growing descriptor must persist its raw fingerprint for prefix matching")
-	assert.Empty(t, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Sum: raw}}),
+	assert.Empty(t, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Raw: raw, Sum: raw}}),
 		"a completed descriptor must not persist a raw fingerprint (keeps the entry byte-identical to static)")
 }

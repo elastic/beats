@@ -45,9 +45,12 @@ func TestCreateProspector(t *testing.T) {
 		for name, test := range testCases {
 			test := test
 			t.Run(name, func(t *testing.T) {
-				c := config{
-					IgnoreInactive: ignoreInactiveSettings[test.ignore_inactive_since],
-				}
+				// Start from the real defaults so the config is valid: a bare
+				// config{} leaves prospector.scanner.fingerprint.enabled=false
+				// with the (implicit) fingerprint identity, which is now
+				// (correctly) rejected by checkConfigCompatibility.
+				c := defaultConfig()
+				c.IgnoreInactive = ignoreInactiveSettings[test.ignore_inactive_since]
 				p, _ := newProspector(c, logp.NewNopLogger(), mustSourceIdentifier("foo-id"))
 				fileProspector := p.(*fileProspector) //nolint:errcheck // we know the type
 				assert.Equal(t, fileProspector.ignoreInactiveSince, ignoreInactiveSettings[test.ignore_inactive_since])
