@@ -160,6 +160,15 @@ func (r *Registrar) Run() {
 		select {
 		case <-r.done:
 			r.log.Info("Ending Registrar")
+			// Persist any pending batch on shutdown so its events are not replayed on restart.
+			// Channel has buffer=1, so it holds at most one pending batch. A single
+			// non-blocking receive is enough to drain it.
+			select {
+			case states := <-r.Channel:
+				r.onEvents(states)
+			default:
+			}
+			r.commitStateUpdates()
 			return
 
 		case states := <-directIn:
