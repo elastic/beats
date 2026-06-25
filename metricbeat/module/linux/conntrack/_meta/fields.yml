@@ -32,10 +32,10 @@
         - name: insert_failed
           type: long
           description: >
-            Number of entries where list insert failed 
+            Number of entries where list insert failed
         - name: invalid
           type: long
-          description: > 
+          description: >
             packets seen that cannot be tracked
         - name: search_restart
           type: long
