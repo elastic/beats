@@ -190,7 +190,7 @@ The stability of this file identity makes it a recommended and default option.
 #### Enhanced Fingerprint [file-identity-fingerprint-growing]
 
 ```{applies_to}
-stack: ga 9.5
+stack: ga 9.5.0
 ```
 
 Enhanced Fingerprint, controlled by `file_identity.fingerprint.growing`, lets the filestream input track files that are smaller than the fingerprint size (`offset`+`length`) instead of skipping them until they grow large enough. It is enabled by default since 9.5.
@@ -202,6 +202,8 @@ The practical effects are:
 * Files smaller than the fingerprint size are ingested without delay.
 * Deployments upgrading to 9.5 keep using their existing fingerprint registry entries. Files already at or above the fingerprint size are not re-ingested.
 * Files smaller than `offset` still cannot be tracked, because there are no bytes to read past the offset.
+
+Enhanced Fingerprint is not supported with `rotation.external.strategy: copytruncate` and is automatically disabled for those inputs, so files smaller than `offset`+`length` are not ingested there until they reach that size.
 
 To opt out and restore the pre-9.5 behavior, where files smaller than `offset`+`length` are not ingested until they reach that size, set `growing` to `false`:
 

@@ -431,7 +431,7 @@ Please refer to the [fingerprint configuration for details](#filebeat-input-file
 file_identity.fingerprint: ~
 ```
 
-The `fingerprint` file identity accepts a `growing` sub-option {applies_to}`stack: ga 9.5`. When `true` (the default since 9.5), files smaller than the fingerprint size (`offset`+`length`) are tracked using the bytes available so far instead of being skipped until they grow large enough, and are automatically migrated to the regular SHA-256 fingerprint once they reach the threshold, with no data duplication. Set it to `false` to restore the pre-9.5 behavior. See [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
+The `fingerprint` file identity accepts a `growing` sub-option {applies_to}`stack: ga 9.5.0`. When `true` (the default since 9.5), files smaller than the fingerprint size (`offset`+`length`) are tracked using the bytes available so far instead of being skipped until they grow large enough, and are automatically migrated to the regular SHA-256 fingerprint once they reach the threshold, with no data duplication. Set it to `false` to restore the pre-9.5 behavior. See [Enhanced Fingerprint](/reference/filebeat/file-identity.md#file-identity-fingerprint-growing) for details.
 
 ```yaml
 file_identity.fingerprint:
@@ -709,7 +709,7 @@ This option is not supported on Windows.
 
 ### `include_file_fingerprint` [filestream-input-include_file_fingerprint]
 ```yaml {applies_to}
-stack: ga 9.5
+stack: ga 9.5.0
 ```
 Controls whether `log.file.fingerprint` is added to published events. Only takes effect when `file_identity.fingerprint` is configured. Defaults to `false`. The file path (`log.file.path`) is always present in events regardless of this setting.
 
