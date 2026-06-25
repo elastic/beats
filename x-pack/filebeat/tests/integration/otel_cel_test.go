@@ -207,7 +207,7 @@ service:
 
 	require.EventuallyWithTf(t,
 		func(ct *assert.CollectT) {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			findCtx, findCancel := context.WithTimeout(t.Context(), 900*time.Millisecond)
 			defer findCancel()
 
 			otelDocs, err = estools.PerformQueryForRawQuery(findCtx, rawQuery, ".ds-"+otelIndex+"*", es)
