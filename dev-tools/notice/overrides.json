@@ -16,7 +16,11 @@
 {"name": "kernel.org/pub/linux/libs/security/libcap/cap", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
 {"name": "kernel.org/pub/linux/libs/security/libcap/psx", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
 {"name": "github.com/awslabs/kinesis-aggregation/go/v2", "licenceType": "Apache-2.0", "url": "https://github.com/awslabs/kinesis-aggregation/blob/master/LICENSE.txt"}
+{"name": "github.com/awslabs/kinesis-aggregation/go", "licenceType": "Apache-2.0", "url": "https://github.com/awslabs/kinesis-aggregation/blob/master/LICENSE.txt"}
+{"name": "github.com/pascaldekloe/goe", "licenceType": "CC0-1.0", "url": "https://github.com/pascaldekloe/goe/blob/master/LICENSE"}
+{"name": "github.com/bmizerany/assert", "licenceType": "MIT"}
 {"name": "github.com/dnaeon/go-vcr", "licenceType": "BSD-2-Clause"}
 {"name": "github.com/JohnCGriffin/overflow", "licenceType": "MIT"}
 {"name": "github.com/elastic/ebpfevents", "licenceType": "Apache-2.0"}
 {"name": "go.opentelemetry.io/collector/config/configopaque", "licenceType": "Apache-2.0"}
+{"name": "github.com/garyburd/redigo", "licenceType": "Apache-2.0", "url": "https://github.com/garyburd/redigo/blob/master/LICENSE"}
