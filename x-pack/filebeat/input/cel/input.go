@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"maps"
 	"net"
 	"net/http"
@@ -59,7 +58,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -188,17 +186,19 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	}
 	otelTracer := otelTracerProvider.Tracer(importPath)
 
-	if cfg.Resource.Tracer.enabled() {
-		id := httplog.SanitizeFileName(env.IDWithoutName)
-		path := strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(env.Agent.Paths, inputName, path)
+	if cfg.Resource.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.Resource.Tracer.Filename)
 		if err != nil {
 			return err
 		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, env.Agent.Paths.Resolve(paths.Logs, inputName))
-		}
 		cfg.Resource.Tracer.Filename = resolved
+	}
+	if cfg.FailureDump != nil {
+		resolved, err := httplog.ResolveTraceFilename(env.Agent.Paths, inputName, env.IDWithoutName, cfg.FailureDump.Filename)
+		if err != nil {
+			return err
+		}
+		cfg.FailureDump.Filename = resolved
 	}
 
 	client, trace, otelMetrics, contextInjector, err := newClient(ctx, cfg, log, reg, env, otelTracerProvider)
@@ -1189,11 +1189,6 @@ func getLimit(which string, rateLimit map[string]any, log *logp.Logger) (limit r
 	return limit, true
 }
 
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
-
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry, env v2.Context, tp *sdktrace.TracerProvider) (*http.Client, *httplog.LoggingRoundTripper, *otelCELMetrics, *otel.ContextInjector, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings(), log)...)
 	if err != nil {
@@ -1249,42 +1244,12 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err = os.Remove(cfg.Resource.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Resource.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Resource.Tracer.Filename, log)
 	}
 	if !cfg.FailureDump.enabled() && cfg.FailureDump != nil && cfg.FailureDump.Filename != "" {
 		// We have a fail-dump name, but we are not enabled,
 		// so remove all dumps we own.
-		err = os.Remove(cfg.FailureDump.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.FailureDump.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.FailureDump.Filename)
-		base := strings.TrimSuffix(cfg.FailureDump.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.FailureDump.Filename, log)
 	}
 
 	// inside the otel RoundTripper
