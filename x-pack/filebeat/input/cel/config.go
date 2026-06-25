@@ -190,9 +190,10 @@ func defaultConfig() config {
 				WaitMin:     &waitMin,
 				WaitMax:     &waitMax,
 			},
-			RedirectForwardHeaders: false,
-			RedirectMaxRedirects:   10,
-			Transport:              transport,
+			RedirectForwardHeaders:   false,
+			RedirectSensitiveHeaders: []string{"Authorization", "Proxy-Authorization", "Cookie"},
+			RedirectMaxRedirects:     10,
+			Transport:                transport,
 		},
 	}
 }
@@ -284,15 +285,16 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 }
 
 type ResourceConfig struct {
-	URL                    *urlConfig       `config:"url" validate:"required"`
-	Headers                http.Header      `config:"headers"`
-	Retry                  retryConfig      `config:"retry"`
-	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
-	MaxBodySize            int64            `config:"max_body_size"`
-	RateLimit              *rateLimitConfig `config:"rate_limit"`
-	KeepAlive              keepAlive        `config:"keep_alive"`
+	URL                      *urlConfig       `config:"url" validate:"required"`
+	Headers                  http.Header      `config:"headers"`
+	Retry                    retryConfig      `config:"retry"`
+	RedirectForwardHeaders   bool             `config:"redirect.forward_headers"`
+	RedirectHeadersBanList   []string         `config:"redirect.headers_ban_list"`
+	RedirectSensitiveHeaders []string         `config:"redirect.sensitive_headers"`
+	RedirectMaxRedirects     int              `config:"redirect.max_redirects"`
+	MaxBodySize              int64            `config:"max_body_size"`
+	RateLimit                *rateLimitConfig `config:"rate_limit"`
+	KeepAlive                keepAlive        `config:"keep_alive"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
