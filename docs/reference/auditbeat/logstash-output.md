@@ -132,9 +132,10 @@ The default value is `1`.
 ### `loadbalance` [loadbalance]
 
 When `loadbalance: true` is set, Auditbeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Auditbeat can connect to at least one of its configured hosts.
-Use the `worker` or `workers` setting to specify the number of connections per host.
 
 When `loadbalance: false` is set, Auditbeat sends data to a single host at a time. Auditbeat connects to the first configured host and sends all data to that host until the connection fails, then fails over to the next configured host in order. Data will still be sent as long as Auditbeat can connect to at least one of its configured hosts. To rotate through the list of configured hosts over time, use this option in conjunction with the `ttl` setting to close the connection at the configured interval and reconnect to the next host in the list.
+
+Use the `worker` or `workers` setting to specify the number of concurrent connections per active host.
 
 The default value is `false`.
 

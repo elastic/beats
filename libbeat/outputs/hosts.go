@@ -80,16 +80,8 @@ func ReadHostList(cfg *config.C) ([]string, error) {
 
 func NumofWorker(cfg *config.C) int {
 	var config HostWorkerCfg
-	err := cfg.Unpack(&config)
-	// If there was error unpacking, just return 1 worker as fallback
-	if err != nil {
+	if err := cfg.Unpack(&config); err != nil {
 		return 1
 	}
-
-	// Default to one worker
-	if config.NumWorkers() < 1 {
-		config.Worker = 1
-	}
-
-	return config.NumWorkers()
+	return max(config.NumWorkers(), 1)
 }
