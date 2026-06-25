@@ -31,6 +31,7 @@ The extension adds several custom tables to osquery that provide:
 | `elastic_host_processes` | table | ✅ | ❌ | ❌ |
 | `elastic_host_users` | table | ✅ | ✅ | ❌ |
 | `elastic_jumplists` | table | ❌ | ❌ | ✅ |
+| `elastic_ntfs_file` | table | ❌ | ❌ | ✅ |
 | `elastic_ntfs_partitions` | table | ❌ | ❌ | ✅ |
 | `elastic_ntfs_volumes` | table | ❌ | ❌ | ✅ |
 | `host_groups` | view | ✅ | ✅ | ❌ |
@@ -52,6 +53,7 @@ The extension adds several custom tables to osquery that provide:
 - [elastic_host_processes](docs/tables/elastic_host_processes.md)
 - [elastic_host_users](docs/tables/elastic_host_users.md)
 - [elastic_jumplists](docs/tables/elastic_jumplists.md)
+- [elastic_ntfs_file](docs/tables/elastic_ntfs_file.md)
 - [elastic_ntfs_partitions](docs/tables/elastic_ntfs_partitions.md)
 - [elastic_ntfs_volumes](docs/tables/elastic_ntfs_volumes.md)
 

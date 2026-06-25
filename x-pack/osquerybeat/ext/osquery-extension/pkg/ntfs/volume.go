@@ -14,6 +14,8 @@ import (
 	"sync/atomic"
 	"unsafe"
 
+	"www.velocidex.com/golang/go-ntfs/parser"
+
 	"github.com/osquery/osquery-go/plugin/table"
 	"golang.org/x/sys/windows"
 
@@ -80,6 +82,15 @@ func (v *Volume) Close() {
 			session.Close()
 		}
 	}
+}
+
+// ntfsContext returns the underlying NTFSContext for this volume, initializing the NTFS session if needed.
+func (v *Volume) ntfsContext() (*parser.NTFSContext, error) {
+	session, err := v.ntfsSession()
+	if err != nil {
+		return nil, err
+	}
+	return session.Context(), nil
 }
 
 // getAllDriveLetters retrieves a list of all drive letters currently in use
