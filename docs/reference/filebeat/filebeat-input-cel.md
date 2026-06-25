@@ -1120,12 +1120,23 @@ The maximum time to wait before a retry is attempted. Default: `60s`.
 
 ### `resource.redirect.forward_headers` [_resource_redirect_forward_headers]
 
-When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
+When set to `true` request headers are forwarded in case of a redirect. Headers listed in `redirect.sensitive_headers` are removed automatically on cross-origin or HTTPS-to-HTTP redirects. Default: `false`.
 
 
 ### `resource.redirect.headers_ban_list` [_resource_redirect_headers_ban_list]
 
 When `redirect.forward_headers` is set to `true`, all headers *except* the ones defined in this list will be forwarded. Default: `[]`.
+
+
+### `resource.redirect.sensitive_headers` [_resource_redirect_sensitive_headers]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+A list of header names that are automatically removed when a redirect crosses to a different host or downgrades from HTTPS to HTTP. This prevents credential leakage to unintended origins. Default: `["Authorization", "Proxy-Authorization", "Cookie"]`.
+
+Set to `[]` to disable cross-origin header stripping and forward all headers regardless of the redirect target (not recommended unless the target shares the same authentication domain).
 
 
 ### `resource.redirect.max_redirects` [_resource_redirect_max_redirects]
