@@ -24,7 +24,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -513,46 +512,58 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_dele
 
 	// ===== Phase 1: Create 2 files with identical content =====
 	// Both files have the same content, creating a fingerprint collision.
-	// Only one file will be tracked initially.
+	// Only one of them is tracked initially; which one wins the collision
+	// depends on scan iteration order and is not deterministic, so we don't
+	// assume file1 wins — we wait for either file to reach EOF and then
+	// identify the winner from the published events.
 	headerContent := generateLines("header line", 1)
 	appendToFile(t, file1, headerContent)
 	appendToFile(t, file2, headerContent)
 
-	// file1 is ingested (first detected wins the collision)
-	// TODO: could this assertion be flaky?
+	// Either file may win the collision, so match the EOF log without binding
+	// it to a specific path (only the winner's harvester runs at this point).
 	filebeat.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", file1),
+		"End of file reached:",
 		10*time.Second,
-		"file was not read to EOF",
+		"no file was read to EOF",
 	)
 	filebeat.WaitPublishedEvents(5*time.Second, 1)
+
+	// Identify which file won the collision (got the single event). The
+	// other file is the "loser" whose distinct identity is only established
+	// once it diverges with unique content.
+	phase1 := readOutputEvents(t, tempDir)
+	winner, loser := file1, file2
+	if len(messagesForFile(phase1, file2)) > 0 {
+		winner, loser = file2, file1
+	}
 
 	// ===== Phase 2: Stop Filebeat =====
 	filebeat.Stop()
 
-	// ===== Phase 3: Delete file1 and grow file2 while Filebeat is stopped =====
-	// file1 is removed, and file2 grows with unique content.
-	// This tests that file2 is correctly identified as a different file
-	// and not confused with file1's registry entry.
-	require.NoError(t, os.Remove(file1), "failed to remove file 1")
-	appendToFile(t, file2, generateLines("file2 unique line", 4))
+	// ===== Phase 3: Delete the winner and grow the loser while stopped =====
+	// The already-ingested file is removed, and the colliding file grows with
+	// unique content. This tests that the survivor is correctly identified as
+	// a different file and not confused with the deleted file's registry entry.
+	require.NoError(t, os.Remove(winner), "failed to remove the ingested file")
+	appendToFile(t, loser, generateLines("loser unique line", 4))
 
-	// ===== Phase 4: Restart Filebeat and verify file2 is fully ingested =====
-	// Events: 1 (file1 before deletion) + 5 (file2: 1 header + 4 unique) = 6 total
+	// ===== Phase 4: Restart Filebeat and verify the survivor is fully ingested =====
+	// Events: 1 (winner before deletion) + 5 (loser: 1 header + 4 unique) = 6 total
 	filebeat.Start()
 	filebeat.WaitLogsContains(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", file2),
+		fmt.Sprintf("End of file reached: %s; Backoff now.", loser),
 		10*time.Second, "file was not read to EOF")
 
 	filebeat.WaitPublishedEvents(10*time.Second, 6)
 
 	// Verify events match the actual file contents, in order.
-	// file1 was deleted, so only check file2; also verify file1 got
-	// exactly 1 event (the header ingested before deletion).
+	// The winner was deleted, so only check the loser; also verify the
+	// winner got exactly 1 event (the header ingested before deletion).
 	events := readOutputEvents(t, tempDir)
-	f1Msgs := messagesForFile(events, file1)
-	require.Len(t, f1Msgs, 1, "file1 should have 1 event (before deletion)")
-	assertFileEvents(t, events, file2)
+	winnerMsgs := messagesForFile(events, winner)
+	require.Len(t, winnerMsgs, 1, "the deleted file should have 1 event (before deletion)")
+	assertFileEvents(t, events, loser)
 }
 
 // TestFilestreamGrowingFingerprint_supersetFileNotConflated verifies that a
@@ -740,19 +751,6 @@ type outputEvent struct {
 		} `json:"file"`
 	} `json:"log"`
 	rawLine string
-}
-
-// TestPrintOutputFileSorted is a helper test to print output files sorted.
-// Usage: go test -v -run TestPrintOutputFileSorted -temp-dir=/path/to/temp/dir
-// Or: TEMP_DIR=/path/to/temp/dir go test -v -run TestPrintOutputFileSorted
-var tempDirFlag = flag.String("dir", "", "path to the temp directory containing output files")
-
-func TestPrintOutputFileSorted(t *testing.T) {
-	tempDir := *tempDirFlag
-	if tempDir == "" {
-		t.Skip("no dir flag or TEMP_DIR environment variable provided")
-	}
-	printOutputFileSorted(t, tempDir)
 }
 
 // readOutputEvents reads all output files and returns parsed events sorted
@@ -1116,8 +1114,8 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	filebeat.Stop()
 
 	// Registry state: largeFile keyed by the same SHA-256 from the static
-	// phase (no extra entries on upgrade); smallFile keyed by raw-hex with
-	// FingerprintGrowing=true (it's still below threshold).
+	// phase (no extra entries on upgrade); smallFile keyed by raw-hex with a
+	// non-empty meta.fingerprint (still growing, below threshold).
 	assertSingleSHA256RegistryEntry(t, tempDir, largeFile)
 	assertGrowingRegistryEntry(t, tempDir, smallFile)
 }
@@ -1635,7 +1633,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 //
 // Two files exist from the start:
 //   - smallGz: decompressed ~250 bytes → below threshold → growing tracking
-//     (raw-hex registry key, FingerprintGrowing=true).
+//     (raw-hex registry key with a non-empty meta.fingerprint).
 //   - largeGz: decompressed ~1500 bytes → above threshold → SHA-256 tracking.
 //
 // Both must be ingested completely under growing mode.
