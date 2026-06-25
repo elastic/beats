@@ -15,13 +15,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
-	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -43,7 +40,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -116,15 +112,17 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	metrics := newInputMetrics(ctx.MetricsRegistry, ctx.Logger)
 
+<<<<<<< HEAD
 	if e.config.Tracer.enabled() {
 		id := sanitizeFileName(ctx.IDWithoutName)
 		path := strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
 		resolved, ok, err := httplog.ResolvePathInLogsFor(ctx.Agent.Paths, inputName, path)
+=======
+	if e.config.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(ctx.Agent.Paths, inputName, ctx.IDWithoutName, e.config.Tracer.Filename)
+>>>>>>> 9d5d63c11 (x-pack/filebeat/input: validate request tracer and dump path regardless of enabled state (#51479))
 		if err != nil {
 			return err
-		}
-		if !ok {
-			return fmt.Errorf("request tracer path %q must be within %q path", path, ctx.Agent.Paths.Resolve(paths.Logs, inputName))
 		}
 		e.config.Tracer.Filename = resolved
 	}
@@ -589,22 +587,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 	} else if c.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err := os.Remove(c.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", c.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(c.Tracer.Filename)
-		base := strings.TrimSuffix(c.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(c.Tracer.Filename, log)
 	}
 	return h
 }
@@ -612,11 +595,6 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 type noopReporter struct{}
 
 func (noopReporter) UpdateStatus(status.Status, string) {}
-
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func htmlEscape(s string) string {
 	var buf bytes.Buffer

@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Validate request tracer path regardless of enabled state to prevent unintended file deletion.
+component: filebeat
