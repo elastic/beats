@@ -458,48 +458,59 @@ func (f *graph) UserSignInActivity(ctx context.Context) (map[uuid.UUID]*fetcher.
 	fetchURL := f.signInActivityURL
 
 	for {
-		var response apiSignInActivityResponse
-
-		body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+		nextLink, err := f.fetchSignInActivityPage(ctx, fetchURL, result)
 		if err != nil {
-			return nil, fmt.Errorf("unable to fetch sign-in activity: %w", err)
+			return nil, err
 		}
-
-		dec := json.NewDecoder(body)
-		if err = dec.Decode(&response); err != nil {
-			_ = body.Close()
-			return nil, fmt.Errorf("unable to decode sign-in activity response: %w", err)
-		}
-		_ = body.Close()
-
-		for _, u := range response.Users {
-			if u.SignInActivity == nil {
-				continue
-			}
-			id, err := uuid.FromString(u.ID)
-			if err != nil {
-				f.logger.Warnf("Skipping sign-in activity entry with invalid user ID %q: %v", u.ID, err)
-				continue
-			}
-			result[id] = &fetcher.SignInActivityDetails{
-				LastSignInDateTime:                u.SignInActivity.LastSignInDateTime,
-				LastSignInRequestId:               u.SignInActivity.LastSignInRequestId,
-				LastNonInteractiveSignInDateTime:  u.SignInActivity.LastNonInteractiveSignInDateTime,
-				LastNonInteractiveSignInRequestId: u.SignInActivity.LastNonInteractiveSignInRequestId,
-				LastSuccessfulSignInDateTime:      u.SignInActivity.LastSuccessfulSignInDateTime,
-				LastSuccessfulSignInRequestId:     u.SignInActivity.LastSuccessfulSignInRequestId,
-			}
-			f.logger.Debugf("Got sign-in activity for user %q from API", id)
-		}
-
-		if response.NextLink == "" {
+		if nextLink == "" {
 			return result, nil
 		}
-		if response.NextLink == fetchURL {
+		if nextLink == fetchURL {
 			return result, nextLinkLoopError{"sign_in_activity"}
 		}
-		fetchURL = response.NextLink
+		fetchURL = nextLink
 	}
+}
+
+// fetchSignInActivityPage fetches one page of sign-in activity results and
+// merges them into result. It returns the next page URL, or an empty string
+// when all pages have been consumed.
+func (f *graph) fetchSignInActivityPage(ctx context.Context, fetchURL string, result map[uuid.UUID]*fetcher.SignInActivityDetails) (string, error) {
+	body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("unable to fetch sign-in activity: %w", err)
+	}
+	defer func() {
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	var response apiSignInActivityResponse
+	if err = json.NewDecoder(body).Decode(&response); err != nil {
+		return "", fmt.Errorf("unable to decode sign-in activity response: %w", err)
+	}
+
+	for _, u := range response.Users {
+		if u.SignInActivity == nil {
+			continue
+		}
+		id, err := uuid.FromString(u.ID)
+		if err != nil {
+			f.logger.Warnf("Skipping sign-in activity entry with invalid user ID %q: %v", u.ID, err)
+			continue
+		}
+		result[id] = &fetcher.SignInActivityDetails{
+			LastSignInDateTime:                u.SignInActivity.LastSignInDateTime,
+			LastSignInRequestId:               u.SignInActivity.LastSignInRequestId,
+			LastNonInteractiveSignInDateTime:  u.SignInActivity.LastNonInteractiveSignInDateTime,
+			LastNonInteractiveSignInRequestId: u.SignInActivity.LastNonInteractiveSignInRequestId,
+			LastSuccessfulSignInDateTime:      u.SignInActivity.LastSuccessfulSignInDateTime,
+			LastSuccessfulSignInRequestId:     u.SignInActivity.LastSuccessfulSignInRequestId,
+		}
+		f.logger.Debugf("Got sign-in activity for user %q from API", id)
+	}
+
+	return response.NextLink, nil
 }
 
 // doRequest is a convenience function for making HTTP requests to the Graph API.
