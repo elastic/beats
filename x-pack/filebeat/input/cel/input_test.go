@@ -2291,13 +2291,8 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-<<<<<<< HEAD
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
-=======
 			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
 			if !sameErrorOrContains(err, test.wantErr) {
->>>>>>> 9d5d63c11 (x-pack/filebeat/input: validate request tracer and dump path regardless of enabled state (#51479))
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
