@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing/estools"
 )
 
-const celProgram = `bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})`
+const celProgram = `get(state.url).Body.as(body,{"events":[body.decode_json()]})`
 
 func TestCELInputOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
