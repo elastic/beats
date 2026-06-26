@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/libbeat/processors/add_observer_metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -96,6 +97,8 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			constructor = add_host_metadata.New
 		case "add_kubernetes_metadata":
 			constructor = add_kubernetes_metadata.New
+		case "add_observer_metadata":
+			constructor = add_observer_metadata.New
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}

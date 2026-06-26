@@ -145,6 +145,15 @@ func TestCreateProcessor(t *testing.T) {
 		assert.Equal(t, "add_kubernetes_metadata", processor.String()[:len("add_kubernetes_metadata")])
 	})
 
+	t.Run("valid add_observer_metadata processor config returns processor", func(t *testing.T) {
+		processor, err := createProcessor(map[string]any{
+			"add_observer_metadata": map[string]any{},
+		}, testLogger())
+		require.NoError(t, err)
+		require.NotNil(t, processor)
+		assert.Equal(t, "add_observer_metadata", processor.String()[:len("add_observer_metadata")])
+	})
+
 	t.Run("when condition is honored and processor is skipped when condition is false", func(t *testing.T) {
 		processor, err := createProcessor(map[string]any{
 			"add_fields": map[string]any{
