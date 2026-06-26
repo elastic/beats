@@ -33,7 +33,7 @@ import (
 
 	"github.com/docker/go-connections/tlsconfig"
 
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 

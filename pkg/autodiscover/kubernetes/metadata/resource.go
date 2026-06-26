@@ -23,11 +23,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/safemapstr"

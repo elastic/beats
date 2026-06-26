@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"

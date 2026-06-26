@@ -11,13 +11,13 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
-	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/beats/v7/pkg/autodiscover/utils"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"

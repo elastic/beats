@@ -32,7 +32,7 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

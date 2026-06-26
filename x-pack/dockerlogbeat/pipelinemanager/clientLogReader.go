@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
-	helper "github.com/elastic/elastic-agent-autodiscover/docker"
+	helper "github.com/elastic/beats/v7/pkg/autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

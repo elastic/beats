@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
