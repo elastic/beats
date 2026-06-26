@@ -21,7 +21,9 @@ import (
 	"context"
 	"regexp"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -269,4 +271,32 @@ func TestDateSorter(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDateSorterShortPath(t *testing.T) {
+	// Regression test: a path shorter than the configured date format must not
+	// trigger a slice-bounds panic. GetTs runs inside sort.Slice in a prospector
+	// goroutine where such a panic would crash the whole process.
+	s := dateSorter{"-20060102"}
+
+	t.Run("GetTs returns zero time for a path shorter than the format", func(t *testing.T) {
+		fi := rotatedFileInfo{path: "a.log"}
+		var ts time.Time
+		require.NotPanics(t, func() {
+			ts = s.GetTs(&fi)
+		}, "GetTs must not panic when the path is shorter than the date format")
+		assert.True(t, ts.IsZero(),
+			"GetTs should return a zero time for a path shorter than the format")
+	})
+
+	t.Run("sort does not panic when a path is shorter than the format", func(t *testing.T) {
+		files := []rotatedFileInfo{
+			{path: "/path/to/apache.log-20140508"},
+			{path: "x"},
+			{path: "/path/to/apache.log-20140506"},
+		}
+		require.NotPanics(t, func() {
+			s.sort(files)
+		}, "sort must not panic when a path is shorter than the date format")
+	})
 }
