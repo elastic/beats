@@ -383,7 +383,7 @@ The necessary API permissions need to be granted in Azure in order for the provi
 | User.Read.All | Application |
 | Device.Read.All | Application |
 
-{applies_to}`stack: preview 9.4+, serverless: preview` When using the `enrich_with: ["mfa"]` or `enrich_with: ["sign_in_activity"]` options, an additional permission is required:
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When using the `enrich_with: ["mfa"]` or `enrich_with: ["sign_in_activity"]` options, an additional permission is required:
 
 | Permission | Type |
 | --- | --- |
