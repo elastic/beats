@@ -1018,6 +1018,22 @@ Nested split operation. Split operations can be nested at will. An event won’t
 If set to true, the values in `request.body` are sent for pagination requests. Default: `false`.
 
 
+### `response.pagination_allowed_hosts` [response-pagination-allowed-hosts]
+
+An optional list of additional origins that pagination URLs are allowed to target. By default, pagination URLs derived from API responses (via `set` with `target: url.value`) must share the same origin (scheme, hostname, and port) as the configured `request.url`. If a remote API legitimately returns pagination URLs on a different origin (for example, a CDN), list those origins here.
+
+Each entry must include a scheme and a host, and may include a port. Example:
+
+```yaml
+response:
+  pagination_allowed_hosts:
+    - "https://cdn.provider.com"
+    - "https://api-secondary.provider.com:8443"
+```
+
+Default: empty (only URLs matching the configured `request.url` origin are accepted).
+
+
 ### `response.pagination` [response-pagination]
 
 List of transforms that will be applied to the response to every new page request. All the transforms from `request.transform` will be executed and then `response.pagination` will be added to modify the next request as needed. For subsequent responses, the usual [response.transforms](#response-transforms) and [response.split](#response-split) will be executed normally.
