@@ -136,7 +136,7 @@ This setting allows Filebeat to optimize reads for forwarded events that are alr
 
 ### `event_id` [_event_id]
 
-An allowlist and blocklist of event IDs. The value is a comma-separated list. The accepted values are single event IDs to include (e.g. 4624), a range of event IDs to include (e.g. 4700-4800), single event IDs to exclude (e.g. -4735), and a range of event IDs to exclude (e.g. -4701-4710). **{This option is only available on operating systems +
+An allowlist and blocklist of event IDs. The value is a comma-separated list. The accepted values are single event IDs to include (for example, `4624`), a range of event IDs to include (for example, `4700-4800`), single event IDs to exclude (for example, `-4735`), and a range of event IDs to exclude (for example, `-4701-4710`). **{This option is only available on operating systems +
   supporting the Windows Event Log API (Microsoft Windows Vista and newer).}**
 
 ```yaml

@@ -295,7 +295,7 @@ Elastic provides no warranty or support for community-sourced {{beats}}.
 :   Runs an external command and forwards the [stdout](https://www.computerhope.com/jargon/s/stdout.htm) for the same to Elasticsearch/Logstash.
 
 [timebeat](https://timebeat.app/download.php)
-:   NTP and PTP clock synchronisation beat that reports accuracy metrics to elastic. Includes Kibana dashboards.
+:   NTP and PTP clock synchronization beat that reports accuracy metrics to Elastic. Includes Kibana dashboards.
 
 [tracebeat](https://github.com/berfinsari/tracebeat)
 :   Reads traceroute output and indexes them into Elasticsearch.

@@ -50,5 +50,5 @@ processors:
         op_type: "index"
 ```
 
-When the event is ingested (e.g. by Elasticsearch) the document will have `op_type: "index"` set as a metadata field.
+When the event is ingested (for example, by Elasticsearch) the document will have `op_type: "index"` set as a metadata field.
 
