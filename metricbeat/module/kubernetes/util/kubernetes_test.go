@@ -38,7 +38,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -48,7 +48,7 @@ import (
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 	k8smetafake "k8s.io/client-go/metadata/fake"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/beats/v7/pkg/autodiscover/kubernetes"
 )
 
 func TestWatchOptions(t *testing.T) {
