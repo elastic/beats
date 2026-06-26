@@ -55,8 +55,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
-        ELASTIC_PR_COMMENTS_ENABLED: "false"
+        ELASTIC_PR_COMMENTS_ENABLED: "true"
         ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
@@ -106,7 +105,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -155,7 +154,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -204,7 +203,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -253,7 +252,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -302,7 +301,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -351,7 +350,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -400,7 +399,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -448,7 +447,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -497,7 +496,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -546,7 +545,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -595,7 +594,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -644,7 +643,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -742,7 +741,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -865,7 +864,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -914,7 +913,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -963,7 +962,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -1012,7 +1011,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -1061,7 +1060,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.19 !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -1111,7 +1110,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !8.* !9.*"
       env:
-        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # NOTE: This pipeline does not run on github events but it is triggered by the main pipeline
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
