@@ -5,6 +5,7 @@
 package sql
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -44,10 +46,10 @@ func TestGetCursorRegistryReturnsSamePointer(t *testing.T) {
 
 	factory := ModuleBuilder()
 
-	mod1, err := factory(mb.BaseModule{Paths: tmpPaths})
+	mod1, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths})
 	require.NoError(t, err)
 
-	mod2, err := factory(mb.BaseModule{Paths: tmpPaths})
+	mod2, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths})
 	require.NoError(t, err)
 
 	sqlMod1, ok := mod1.(Module)
@@ -81,10 +83,10 @@ func TestGetCursorRegistryPathChange(t *testing.T) {
 	tmpPaths2.Data = t.TempDir()
 
 	factory := ModuleBuilder()
-	mod1, err := factory(mb.BaseModule{Paths: tmpPaths1})
+	mod1, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths1})
 	require.NoError(t, err)
 
-	mod2, err := factory(mb.BaseModule{Paths: tmpPaths2})
+	mod2, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths2})
 	require.NoError(t, err)
 
 	sqlMod1, ok := mod1.(Module)
@@ -123,7 +125,7 @@ func TestGetCursorRegistryConcurrent(t *testing.T) {
 	const n = 20
 	modules := make([]mb.Module, n)
 	for i := range modules {
-		mod, err := factory(mb.BaseModule{Paths: tmpPaths})
+		mod, err := factory(mb.BaseModule{Logger: logp.NewNopLogger(), Paths: tmpPaths})
 		require.NoError(t, err)
 		modules[i] = mod
 	}
@@ -141,8 +143,17 @@ func TestGetCursorRegistryConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func(mod mb.Module) {
 			defer wg.Done()
-			reg, err := mod.(Module).GetCursorRegistry()
-			resultsCh <- result{reg: reg, err: err}
+			sqlMod, ok := mod.(Module)
+			if !ok {
+				resultsCh <- result{err: fmt.Errorf("module does not implement sql.Module")}
+				return
+			}
+			reg, err := sqlMod.GetCursorRegistry()
+			if err != nil {
+				resultsCh <- result{err: err}
+				return
+			}
+			resultsCh <- result{reg: reg}
 		}(modules[i])
 	}
 
