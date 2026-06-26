@@ -55,7 +55,7 @@ func BenchmarkMigration0To1(b *testing.B) {
 					Id:     fmt.Sprintf("123455-%v", i),
 					Source: fmt.Sprintf("/path/to/test/file-%v.log", i),
 					FileStateOS: libfile.StateOS{
-						Inode:  uint64(i), //nolint:gosec // i is always non-negative (range index)
+						Inode:  uint64(i),
 						Device: 123455,
 					},
 				}
