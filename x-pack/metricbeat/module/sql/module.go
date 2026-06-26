@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -122,7 +121,7 @@ func (m *module) GetCursorRegistry() (*statestore.Registry, error) {
 		return s.registry, s.err
 	}
 
-	logger := logp.NewLogger("sql.cursor")
+	logger := m.Logger.Named("sql.cursor")
 
 	reg, err := memlog.New(logger.Named("memlog"), memlog.Settings{
 		Root:     dataPath,
