@@ -220,7 +220,6 @@ func NewForReceiver(
 	monitors Monitors,
 	userQueueConfig conf.Namespace,
 	settings Settings,
-	intakeQueueID string,
 ) (*Pipeline, error) {
 	p := &Pipeline{
 		beatInfo:         beatInfo,
@@ -239,17 +238,16 @@ func NewForReceiver(
 		queueType = b
 	}
 	// Receiver pipelines route through the OTel output controller. With an
-	// in-memory queue configuration the controller uses the slabqueue pool
-	// (a global default pool when no intake queue ID is set, or a pool
-	// keyed by the ID when one is). With an explicit queue.disk config the
-	// controller falls back to building its queue via queueFactory, in
-	// which case sharing is not supported.
+	// in-memory queue configuration the controller joins the process-global
+	// slabqueue pool, sharing one in-memory event budget across all receivers.
+	// With an explicit queue.disk config the controller falls back to building
+	// its queue via queueFactory and owns it outright.
 	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, intakeQueueID, queueFactory, queueConfig)
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, queueConfig)
 	if err != nil {
 		return nil, err
 	}
