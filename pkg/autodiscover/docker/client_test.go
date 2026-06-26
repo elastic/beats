@@ -26,12 +26,14 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/moby/moby/client"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(client.DefaultDockerHost, nil, nil)
+	log := logptest.NewTestingLogger(t, "docker")
+	c, err := NewClient(client.DefaultDockerHost, nil, nil, log)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 
