@@ -1,0 +1,216 @@
+version: 9.3.7
+entries:
+    - kind: enhancement
+      summary: Add MongoDB collstats collection through the $collStats aggregation stage
+      description: ""
+      component: metricbeat
+      pr:
+        - https://github.com/elastic/beats/pull/48638
+      issue:
+        - https://github.com/elastic/beats/issues/45925
+      impact: ""
+      action: ""
+      timestamp: 1781012000
+      file:
+        name: 1781012000-metricbeat-mongodb-collstats-aggregation.yaml
+        checksum: b2c3c934668b2c8d1aa7e444cfb2a036ef257814
+    - kind: bug-fix
+      summary: Fix WebSocket reconnect loop ignoring context cancellation with infinite retries.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1781135498
+      file:
+        name: 1781135498-fix-websocket-reconnect-context-cancellation.yaml
+        checksum: 674dcb6119c7ff90ff61ad890c4eb0a19190b17b
+    - kind: bug-fix
+      summary: Fix WebSocket input hanging on shutdown when server stalls and keep_alive is disabled.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1781492627
+      file:
+        name: 1781492627-fix-websocket-shutdown-read-hang.yaml
+        checksum: e5d2de5468422986dea198f1bb0d874a9f77c229
+    - kind: bug-fix
+      summary: Fix handling of user-agent header when using OAuth2.0 authentication.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1781494902
+      file:
+        name: 1781494902-50867-cel.yaml
+        checksum: f9dcef78dcaf049fc0696d24346b7371f79232be
+    - kind: bug-fix
+      summary: Fix data race on filestream registry cursor metadata
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1781605073
+      file:
+        name: 1781605073-fix-filestream-cursormeta-data-race.yaml
+        checksum: a6fbbc0b3d06d9fa6cfb7d4cafceed65f1120651
+    - kind: bug-fix
+      summary: Restore `tls.*` certificate metadata for HTTP monitors using `max_redirects > 0`
+      description: |
+        HTTP monitors that follow redirects (or use a proxy) stopped exporting `tls.*` fields after the 8.0 migration to elastic-agent-libs, because the shared HTTP transport wrapped the TLS connection in a way that prevented Go's net/http from populating `Response.TLS`. This restores TLS certificate metadata (including certificate expiry) for redirecting HTTPS endpoints.
+      component: heartbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/48335
+      impact: ""
+      action: ""
+      timestamp: 1781772093
+      file:
+        name: 1781772093-heartbeat-http-tls-with-redirects.yaml
+        checksum: 5384b913f9ef87e088d51db5a80f2a331b8a81f8
+    - kind: bug-fix
+      summary: Strip sensitive headers on cross-origin redirects in httpjson and CEL inputs.
+      description: |
+        When redirect.forward_headers is true, the Authorization, Proxy-Authorization,
+        and Cookie headers are now automatically removed on redirects that cross to a
+        different host or downgrade from HTTPS to HTTP. A new redirect.sensitive_headers
+        configuration option controls which headers are stripped; set it to [] to restore
+        the previous behaviour of forwarding all headers unconditionally.
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1782163090
+      file:
+        name: 1782163090-strip-sensitive-headers-cross-origin-redirect.yaml
+        checksum: dfe2b588daafa7b42ce2437fd735782d529f2e61
+    - kind: bug-fix
+      summary: fix panic when logging.metrics.period is 0
+      description: ""
+      component: all
+      pr:
+        - https://github.com/elastic/beats/pull/51462
+      issue: []
+      impact: ""
+      action: ""
+      timestamp: 1782231377
+      file:
+        name: 1782231377-fix-panic-with-logging.metrics.period-is-0.yaml
+        checksum: 6253a3ac484cee03fed3453f39545070f4b07052
+    - kind: bug-fix
+      summary: Validate request tracer path regardless of enabled state to prevent unintended file deletion.
+      description: ""
+      component: filebeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1782276173
+      file:
+        name: 1782276173-fix-tracer-path-validation.yaml
+        checksum: dd56c9baf9bc7961ab30ed7a71443cfd1d2c5d6f
+    - kind: bug-fix
+      summary: Fix panic in the Kafka output during shutdown
+      description: ""
+      component: libbeat
+      pr:
+        - https://github.com/elastic/beats/pull/51434
+        - https://github.com/elastic/beats/pull/51520
+        - https://github.com/elastic/beats/pull/51512
+        - https://github.com/elastic/beats/pull/51580
+        - https://github.com/elastic/beats/pull/51581
+        - https://github.com/elastic/beats/pull/51582
+        - https://github.com/elastic/beats/pull/51583
+      issue:
+        - https://github.com/elastic/beats/issues/49267
+        - https://github.com/elastic/beats/issues/50904
+        - https://github.com/elastic/beats/issues/51046
+        - https://github.com/elastic/beats/issues/51123
+      impact: ""
+      action: ""
+      timestamp: 1782287808
+      file:
+        name: 1782287808-fix-kafka-output-publish-close-race.yaml
+        checksum: fb146e018297bc7dcd54d8e350b74193e7e241e1
