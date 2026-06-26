@@ -1854,7 +1854,7 @@ number of times the controller tripped a given usage level
 
 
 **`system.process.cgroup.memory.stats.mapped_file.bytes`**
-:   Size of memory-mapped mapped files, including tmpfs (shmem), in bytes.
+:   Size of memory-mapped files, including tmpfs (shmem), in bytes.
 
     type: long
 

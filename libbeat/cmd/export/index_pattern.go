@@ -32,7 +32,7 @@ import (
 func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "index-pattern",
-		Short: "Export kibana index pattern to stdout",
+		Short: "Export Kibana index pattern to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 

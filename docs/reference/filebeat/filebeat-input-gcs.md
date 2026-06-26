@@ -381,7 +381,7 @@ Some object properties can be **set** or **overridden** at the input level with 
 
 ### `content_type` [attrib-content-type]
 
-Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Bucket level definitions always take precedence.
 
 ### Example configuration
 
@@ -419,7 +419,7 @@ filebeat.inputs:
 
 ### `encoding` [attrib-encoding]
 
-Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Bucket level definitions always take precedence.
 
 ### Example configuration
 

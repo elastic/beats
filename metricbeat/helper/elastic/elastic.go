@@ -161,8 +161,17 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 	metricsets := xpackEnabledMetricsets
 	if err == nil && cfgdMetricsets != nil {
 		// Type cast the metricsets to a slice of strings
+<<<<<<< HEAD
 		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
 		cfgdMetricsetsStrings := make([]string, len(cfgdMetricsetsSlice))
+=======
+		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("configured metricsets are not a slice for module %s: %v", moduleName, cfgdMetricsets)
+		}
+
+		cfgdMetricsetsStrings := make([]string, 0, len(cfgdMetricsetsSlice))
+>>>>>>> caac795f2 (Fix "text-auditor" typos in data plane team files (#51512))
 		for i := range cfgdMetricsetsSlice {
 			cfgdMetricsetsStrings[i] = cfgdMetricsetsSlice[i].(string)
 		}
