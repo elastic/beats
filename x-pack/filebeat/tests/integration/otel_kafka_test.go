@@ -31,9 +31,6 @@ import (
 	"github.com/elastic/sarama"
 )
 
-// kafkaBroker is the Kafka OUTSIDE listener, which advertises localhost:9094
-const kafkaBroker = "localhost:9094"
-
 func TestFilebeatOTelKafkaOutputE2E(t *testing.T) {
 	numEvents := 1
 
@@ -43,6 +40,8 @@ func TestFilebeatOTelKafkaOutputE2E(t *testing.T) {
 
 	logFilePath := filepath.Join(tmpdir, "kafka_e2e.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
+
+	kafkaBroker := testutil.GetTestKafkaHost()
 
 	otelCfg := fmt.Sprintf(`receivers:
   filebeatreceiver:
@@ -150,7 +149,7 @@ func consumeKafkaTopic(t *testing.T, topic string) []byte {
 		deleteKafkaInputTopic(t, topic)
 	})
 
-	consumer, err := sarama.NewConsumer([]string{kafkaBroker}, cfg)
+	consumer, err := sarama.NewConsumer([]string{testutil.GetTestKafkaHost()}, cfg)
 	require.NoError(t, err, "failed to create Kafka consumer")
 	t.Cleanup(func() { _ = consumer.Close() })
 
@@ -329,7 +328,7 @@ service:
 		ESURL:    fmt.Sprintf("%s://%s", host.Scheme, host.Host),
 		Username: user,
 		Password: password,
-		Broker:   kafkaBroker,
+		Broker:   testutil.GetTestKafkaHost(),
 		Topic:    topic,
 		PathHome: tempDir,
 	}
@@ -421,7 +420,7 @@ func deleteKafkaInputTopic(t *testing.T, topic string) {
 	t.Helper()
 
 	cfg := sarama.NewConfig()
-	admin, err := sarama.NewClusterAdmin([]string{kafkaBroker}, cfg)
+	admin, err := sarama.NewClusterAdmin([]string{testutil.GetTestKafkaHost()}, cfg)
 	if err != nil {
 		t.Logf("failed to create cluster admin for topic cleanup: %v", err)
 		return
