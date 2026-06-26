@@ -42,10 +42,9 @@ func TestFollowSession_FirehoseHTTPError(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			discoverResp := discoverResponse(t, srv.URL+"/firehose")
 			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprint(w, discoverResp)
+				fmt.Fprint(w, discoverResponse(t, srv.URL+"/firehose", srv.URL+"/refresh"))
 			}))
 			defer discoverSrv.Close()
 
@@ -104,10 +103,9 @@ func TestFollowSession_NonObjectMessage(t *testing.T) {
 			}))
 			defer firehoseSrv.Close()
 
-			discoverResp := discoverResponse(t, firehoseSrv.URL+"/firehose")
 			discoverSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprint(w, discoverResp)
+				fmt.Fprint(w, discoverResponse(t, firehoseSrv.URL+"/firehose", firehoseSrv.URL+"/refresh"))
 			}))
 			defer discoverSrv.Close()
 
@@ -125,7 +123,7 @@ func TestFollowSession_NonObjectMessage(t *testing.T) {
 	}
 }
 
-func discoverResponse(t *testing.T, feedURL string) string {
+func discoverResponse(t *testing.T, feedURL, refreshURL string) string {
 	t.Helper()
 	resp := map[string]any{
 		"resources": []map[string]any{
@@ -135,7 +133,7 @@ func discoverResponse(t *testing.T, feedURL string) string {
 					"token":      "test-token",
 					"expiration": "2099-01-01T00:00:00Z",
 				},
-				"refreshActiveSessionURL":      "http://localhost/refresh",
+				"refreshActiveSessionURL":      refreshURL,
 				"refreshActiveSessionInterval": 1800,
 			},
 		},
