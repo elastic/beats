@@ -115,5 +115,52 @@ func TestRunEmptyChannelShutdown(t *testing.T) {
 		t.Fatalf("expected no states to be acked, got Published count %d", spy.n)
 	}
 }
+// TestRunConcurrentShutdownAndBatch runs Run in a background goroutine (via
+// Start), pre-loads a state into the channel, then calls Stop immediately.
+// Many iterations expose the scheduling race: the goroutine may not be
+// scheduled before r.done closes, so the select sees both channels ready
+// simultaneously — the exact case the shutdown drain must handle.
+func TestRunConcurrentShutdownAndBatch(t *testing.T) {
+       const iterations = 100
 
+       testCases := []struct {
+               name    string
+               timeout time.Duration
+       }{
+               {"directIn path", 0},
+               {"collectIn path", time.Second},
+       }
+
+       for _, tc := range testCases {
+               tc := tc
+               t.Run(tc.name, func(t *testing.T) {
+                       for i := 0; i < iterations; i++ {
+                               logger := logptest.NewTestingLogger(t, "")
+                               memBackend := storetest.NewMemoryStoreBackend()
+                               stateStore := &testStateStore{registry: statestore.NewRegistry(memBackend)}
+                               spy := &spyLogger{}
+                               r, err := New(stateStore, spy, tc.timeout, logger)
+                               if err != nil {
+                                       t.Fatalf("iter %d: New: %v", i, err)
+                               }
+
+                               state := file.State{Id: "test-id", Source: "/path/to/file.log", TTL: -1}
+
+                               // Pre-load the buffered channel before Run starts so that both
+                               // r.Channel and r.done can be ready in the first select evaluation.
+                               r.Channel <- []file.State{state}
+
+                               if err := r.Start(); err != nil {
+                                       t.Fatalf("iter %d: Start: %v", i, err)
+                               }
+                               // Immediately stop — races with the pre-loaded batch.
+                               r.Stop()
+
+                               if _, ok := memBackend.Stores[testStoreName].Table[fileStatePrefix+state.Id]; !ok {
+                                       t.Fatalf("iter %d (%s): state %q was not persisted", i, tc.name, state.Id)
+                               }
+                       }
+               })
+       }
+}
 var _ statestore.States = (*testStateStore)(nil)
