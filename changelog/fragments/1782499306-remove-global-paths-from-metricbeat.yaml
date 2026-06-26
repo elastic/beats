@@ -18,9 +18,11 @@ summary: remove global paths from metricbeat
 # REQUIRED for breaking-change, deprecation, known-issue
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
-description: Change paths definition from global paths to per beat
-instance paths.  Without this multiple metricbeat receivers could use
-the same data store.
+description: >
+  Change paths definition from global paths to per beat
+  instance paths.  Without this multiple metricbeat receivers could use
+  the same data store.
+
 
 # REQUIRED for breaking-change, deprecation, known-issue
 # impact:
@@ -38,7 +40,7 @@ component: elastic-agent
 # If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
 # NOTE: the tooling supports backports, so it's able to fill the original PR number instead of the backport PR number.
 # Please provide it if you are adding a fragment for a different PR.
-# pr: https://github.com/owner/repo/1234
+pr: https://github.com/elastic/beats/pull/51591
 
 # AUTOMATED
 # OPTIONAL to manually add other issue URLs
