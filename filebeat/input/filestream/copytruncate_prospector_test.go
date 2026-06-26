@@ -122,8 +122,6 @@ func TestCopyTruncateProspector_Create(t *testing.T) {
 	}
 
 	for name, test := range testCases {
-		test := test
-
 		t.Run(name, func(t *testing.T) {
 			p := copyTruncateFileProspector{
 				fileProspector{
@@ -212,7 +210,6 @@ func TestNumericSorter(t *testing.T) {
 	sorter := newNumericSorter()
 
 	for name, test := range testCases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			sorter.sort(test.fileinfos)
 			for i, fi := range test.fileinfos {
@@ -263,7 +260,6 @@ func TestDateSorter(t *testing.T) {
 	sorter := dateSorter{"-20060102"}
 
 	for name, test := range testCases {
-		test := test
 		t.Run(name, func(t *testing.T) {
 			sorter.sort(test.fileinfos)
 			for i, fi := range test.fileinfos {
