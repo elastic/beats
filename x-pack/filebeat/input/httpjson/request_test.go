@@ -355,8 +355,6 @@ func TestProcessExpression(t *testing.T) {
 		assert.Equal(t, test.want, got)
 	}
 }
-<<<<<<< HEAD
-=======
 
 func TestSameOrigin(t *testing.T) {
 	tests := []struct {
@@ -562,24 +560,3 @@ func TestChainStepOriginValidation(t *testing.T) {
 		})
 	}
 }
-
-func defaultChainConfig() config {
-	chaincfg := defaultConfig()
-	chaincfg.Chain = []chainConfig{
-		{
-			While: &whileConfig{
-				Auth:     chaincfg.Auth,
-				Request:  chaincfg.Request,
-				Response: &responseChainConfig{},
-			},
-			Step: &stepConfig{
-				Auth:     chaincfg.Auth,
-				Request:  chaincfg.Request,
-				Response: &responseChainConfig{},
-			},
-		},
-	}
-
-	return chaincfg
-}
->>>>>>> a7213aa1b (x-pack/filebeat/input/httpjson: validate pagination URL origin (#51437))

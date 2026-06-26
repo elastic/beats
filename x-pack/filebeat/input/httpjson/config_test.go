@@ -9,11 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-<<<<<<< HEAD
-=======
-	"path/filepath"
 	"strings"
->>>>>>> a7213aa1b (x-pack/filebeat/input/httpjson: validate pagination URL origin (#51437))
 	"testing"
 
 	"github.com/stretchr/testify/assert"
