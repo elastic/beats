@@ -28,7 +28,7 @@
         - name: full_scans
           type: long
           description: >
-            Number of times mergable pages have been scanned.
+            Number of times mergeable pages have been scanned.
         - name: stable_node_chains
           type: long
           description: >
