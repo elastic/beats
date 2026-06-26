@@ -133,7 +133,7 @@ mage llc
 
 It’s expected that sometimes a contributor will be asked to fix linter issues unrelated to their contribution since the linter was introduced later than changes in some of the files.
 
-You can also run the linter against an individual package, for example the filbeat command package:
+You can also run the linter against an individual package, for example the filebeat command package:
 
 ```shell
 golangci-lint run ./filebeat/cmd/...
