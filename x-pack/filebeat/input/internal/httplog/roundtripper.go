@@ -43,6 +43,52 @@ func ResolvePathInLogsFor(p *paths.Path, input, path string) (resolved string, o
 	return path, ok, err
 }
 
+// ResolveTraceFilename sanitises id and substitutes it into the tracer
+// filename's "*" placeholder, then resolves and validates the result against
+// the input's logs directory. It returns the resolved filename and an error
+// if the path escapes the permitted directory.
+func ResolveTraceFilename(p *paths.Path, input, id, filename string) (string, error) {
+	if filename == "" {
+		return "", nil
+	}
+	id = SanitizeFileName(id)
+	path := strings.ReplaceAll(filename, "*", id)
+	resolved, ok, err := ResolvePathInLogsFor(p, input, path)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
+		return "", fmt.Errorf("request tracer path %q must be within %q path", path, p.Resolve(paths.Logs, input))
+	}
+	return resolved, nil
+}
+
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
+
+// CleanTraceFiles removes the primary trace log file and any lumberjack-
+// rotated variants. Errors are logged but not returned.
+func CleanTraceFiles(filename string, log *logp.Logger) {
+	err := os.Remove(filename)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		log.Errorw("failed to remove request trace log", "path", filename, "error", err)
+	}
+	ext := filepath.Ext(filename)
+	base := strings.TrimSuffix(filename, ext)
+	matches, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+	if err != nil {
+		log.Errorw("failed to collect request trace log path names", "error", err)
+	}
+	for _, p := range matches {
+		err = os.Remove(p)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", p, "error", err)
+		}
+	}
+}
+
 // isRooted reports whether path begins with a path separator, i.e. it is
 // rooted at the filesystem root even if it is not absolute (no drive letter
 // on Windows). Such paths must not be joined to a base directory.

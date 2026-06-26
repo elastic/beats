@@ -58,7 +58,7 @@ func TestUnmarshalLogs(t *testing.T) {
 			name:        "json array",
 			input:       `["a","b"]`,
 			expectError: true,
-			errorMsg:    "shoud be a map",
+			errorMsg:    "should be a map",
 		},
 		{
 			name:        "json string",
