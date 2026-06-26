@@ -1,3 +1,0 @@
-kind: enhancement
-summary: Configure agentic workflows with report-failure-as-issue set to false
-component: beats
