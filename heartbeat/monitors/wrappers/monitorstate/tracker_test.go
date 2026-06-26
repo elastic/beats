@@ -25,10 +25,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestTrackerRecord(t *testing.T) {
-	mst := NewTracker(NilStateLoader, true)
+	mst := NewTracker(NilStateLoader, true, logp.NewNopLogger())
 	ms := mst.RecordStatus(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
@@ -51,7 +52,7 @@ func TestTrackerRecord(t *testing.T) {
 }
 
 func TestTrackerRecordFlappingDisabled(t *testing.T) {
-	mst := NewTracker(NilStateLoader, false)
+	mst := NewTracker(NilStateLoader, false, logp.NewNopLogger())
 	ms := mst.RecordStatus(TestSf, StatusUp, true)
 	require.Equal(t, StatusUp, ms.Status)
 	requireMSStatusCount(t, ms, StatusUp, 1)
@@ -100,7 +101,7 @@ func TestDeferredStateLoaderTimeout(t *testing.T) {
 		return stateA, nil
 	}
 
-	dsl, _ := DeferredStateLoader(loaderA, 100*time.Millisecond)
+	dsl, _ := DeferredStateLoader(loaderA, 100*time.Millisecond, logp.NewNopLogger())
 	resState, _ := dsl(stdfields.StdMonitorFields{})
 	require.Equal(t, stateA, resState)
 }
@@ -117,7 +118,7 @@ func TestDeferredStateLoader(t *testing.T) {
 
 	// Test deferred initialization, launch query while stateA and expect
 	// updated stateB
-	dsl, replace := DeferredStateLoader(loaderA, 10*time.Second)
+	dsl, replace := DeferredStateLoader(loaderA, 10*time.Second, logp.NewNopLogger())
 
 	go func() {
 		time.Sleep(1 * time.Second)
@@ -173,7 +174,7 @@ func TestStateLoaderRetry(t *testing.T) {
 				return nil, LoaderError{err: errors.New("test error"), Retry: tt.retryable}
 			}
 
-			mst := NewTracker(errorStateLoader, true)
+			mst := NewTracker(errorStateLoader, true, logp.NewNopLogger())
 			mst.GetCurrentState(stdfields.StdMonitorFields{}, tt.rc)
 
 			require.Equal(t, calls, tt.expectedCalls)

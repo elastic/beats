@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 
@@ -39,6 +40,7 @@ var binfo = beat.Info{
 	Beat:        "heartbeat",
 	IndexPrefix: "heartbeat",
 	Version:     "8.0.0",
+	Logger:      logp.NewNopLogger(),
 }
 
 func TestPreProcessors(t *testing.T) {
@@ -329,7 +331,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil)
+	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil, logp.NewNopLogger())
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

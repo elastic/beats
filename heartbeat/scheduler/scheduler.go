@@ -51,6 +51,7 @@ type Scheduler struct {
 	jobLimitSem map[string]*semaphore.Weighted
 	runOnce     bool
 	runOnceWg   *sync.WaitGroup
+	logger      *logp.Logger
 }
 
 type schedulerStats struct {
@@ -73,11 +74,11 @@ type Schedule interface {
 	RunOnInit() bool
 }
 
-func getJobLimitSem(jobLimitByType map[string]*config.JobLimit) map[string]*semaphore.Weighted {
+func getJobLimitSem(jobLimitByType map[string]*config.JobLimit, logger *logp.Logger) map[string]*semaphore.Weighted {
 	jobLimitSem := map[string]*semaphore.Weighted{}
 	for jobType, jobLimit := range jobLimitByType {
 		if jobLimit.Limit > 0 {
-			logp.L().Infof("limiting to %d concurrent jobs for '%s' type", jobLimit.Limit, jobType)
+			logger.Infof("limiting to %d concurrent jobs for '%s' type", jobLimit.Limit, jobType)
 			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
 		}
 	}
@@ -85,7 +86,14 @@ func getJobLimitSem(jobLimitByType map[string]*config.JobLimit) map[string]*sema
 }
 
 // NewWithLocation creates a new Scheduler using the given runAt zone.
-func Create(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]*config.JobLimit, runOnce bool) *Scheduler {
+func Create(
+	limit int64,
+	registry *monitoring.Registry,
+	location *time.Location,
+	jobLimitByType map[string]*config.JobLimit,
+	runOnce bool,
+	logger *logp.Logger,
+) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	if limit < 1 {
@@ -103,7 +111,7 @@ func Create(limit int64, registry *monitoring.Registry, location *time.Location,
 		ctx:         ctx,
 		cancelCtx:   cancelCtx,
 		limitSem:    semaphore.NewWeighted(limit),
-		jobLimitSem: getJobLimitSem(jobLimitByType),
+		jobLimitSem: getJobLimitSem(jobLimitByType, logger),
 		timerQueue:  timerqueue.NewTimerQueue(ctx),
 		runOnce:     runOnce,
 		runOnceWg:   &sync.WaitGroup{},
@@ -114,6 +122,7 @@ func Create(limit int64, registry *monitoring.Registry, location *time.Location,
 			waitingTasks:       waitingTasksGauge,
 			jobsMissedDeadline: jobsMissedDeadlineCounter,
 		},
+		logger: logger,
 	}
 
 	sched.timerQueue.Start()
@@ -138,7 +147,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 			missingNow := s.stats.jobsMissedDeadline.Get()
 			missedDelta := missingNow - missedAtLastCheck
 			if missedDelta > 0 {
-				logp.Warn("%d tasks have missed their schedule deadlines by more than 1 second in the last %s.", missedDelta, interval)
+				s.logger.Warn("%d tasks have missed their schedule deadlines by more than 1 second in the last %s.", missedDelta, interval)
 			}
 			missedAtLastCheck = missingNow
 		}
@@ -188,7 +197,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		}
 		s.stats.activeJobs.Inc()
 		debugf("Job '%s' started", id)
-		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint)
+		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint, s.logger)
 
 		var activeMainWin *maintwin.ParsedMaintWin
 		for _, pmw := range pmws {
@@ -203,7 +212,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		if activeMainWin == nil {
 			lastRanAt = sj.run()
 		} else {
-			logp.L().Infof("Job '%s' is in maintenance window '%s' , skipping", id, activeMainWin.Rule)
+			s.logger.Infof("Job '%s' is in maintenance window '%s' , skipping", id, activeMainWin.Rule)
 			lastRanAt = now
 		}
 		s.stats.activeJobs.Dec()

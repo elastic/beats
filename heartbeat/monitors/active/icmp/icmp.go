@@ -44,6 +44,7 @@ func init() {
 func create(
 	name string,
 	commonConfig *conf.C,
+	logger *logp.Logger,
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {

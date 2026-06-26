@@ -200,7 +200,7 @@ func TestGenerateHints(t *testing.T) {
 
 		m := heartbeatHints{
 			config: defaultConfig(),
-			logger: logp.L(),
+			logger: logp.NewNopLogger(),
 		}
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, test.len, len(cfgs), test.message)

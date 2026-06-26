@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -84,11 +85,11 @@ func TestSyncPipelineWrapper(t *testing.T) {
 			done := make(chan bool)
 			pipel := &MockPipeline{}
 			sync := &SyncPipelineWrapper{}
-			wrapped := WithSyncPipelineWrapper(pipel, sync)
+			wrapped := WithSyncPipelineWrapper(pipel, sync, logp.NewNopLogger())
 
 			client, err := wrapped.Connect()
 			require.NoError(t, err)
-			queue := runPublishJob(tc.job, client)
+			queue := runPublishJob(tc.job, client, logp.NewNopLogger())
 			for {
 				if len(queue) == 0 {
 					break

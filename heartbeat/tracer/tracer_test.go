@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -72,7 +73,7 @@ func TestSockTracer(t *testing.T) {
 				listenRes <- listenTilClosed(t, sockPath)
 			}()
 
-			st, err := NewSockTracer(sockPath, time.Second)
+			st, err := NewSockTracer(sockPath, time.Second, logp.NewNopLogger())
 			require.NoError(t, err)
 			tt.testF(t, st, listenRes)
 		})
@@ -83,7 +84,7 @@ func TestSockTracerWaitFail(t *testing.T) {
 	waitFor := time.Second
 
 	started := time.Now()
-	_, err := NewSockTracer(filepath.Join(os.TempDir(), "garbagenonsegarbagenooonseeense"), waitFor)
+	_, err := NewSockTracer(filepath.Join(os.TempDir(), "garbagenonsegarbagenooonseeense"), waitFor, logp.NewNopLogger())
 	require.Error(t, err)
 	// Compare unix millis because things get a little weird with nanos
 	// with errors like: "2023-09-08 02:27:46.939107458 +0000 UTC m=+1.002235710" is not greater than or equal to "2023-09-08 02:27:46.939868055 +0000 UTC m=+1.001015793"
@@ -108,7 +109,7 @@ func TestSockTracerWaitSuccess(t *testing.T) {
 	defer func() { (<-listenCh).Close() }()
 
 	started := time.Now()
-	st, err := NewSockTracer(sockPath, waitFor)
+	st, err := NewSockTracer(sockPath, waitFor, logp.NewNopLogger())
 	require.NoError(t, err)
 	defer st.Close()
 	elapsed := time.Since(started)

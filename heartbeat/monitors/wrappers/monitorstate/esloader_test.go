@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/esutil"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -172,7 +174,7 @@ func newESTestContext(t *testing.T) *esTestContext {
 		location:  location,
 	}
 
-	etc.tracker = NewTracker(etc.loader, true)
+	etc.tracker = NewTracker(etc.loader, true, logp.NewNopLogger())
 
 	return etc
 }

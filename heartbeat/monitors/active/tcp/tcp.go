@@ -50,8 +50,9 @@ var debugf = logp.MakeDebug("tcp")
 func create(
 	name string,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (p plugin.Plugin, err error) {
-	return createWithResolver(cfg, monitors.NewStdResolver())
+	return createWithResolver(cfg, monitors.NewStdResolver(), logger)
 }
 
 // Custom resolver is useful for tests against hostnames locally where we don't want to depend on any
@@ -59,8 +60,9 @@ func create(
 func createWithResolver(
 	cfg *conf.C,
 	resolver monitors.Resolver,
+	logger *logp.Logger,
 ) (p plugin.Plugin, err error) {
-	jc, err := newJobFactory(cfg, resolver)
+	jc, err := newJobFactory(cfg, resolver, logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
@@ -70,7 +72,7 @@ func createWithResolver(
 		return plugin.Plugin{}, err
 	}
 
-	return plugin.Plugin{Jobs: js, Endpoints: len(jc.endpoints)}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(jc.endpoints), Logger: logger}, nil
 }
 
 // jobFactory is where most of the logic here lives. It provides a common context around
@@ -82,10 +84,11 @@ type jobFactory struct {
 	endpoints     []endpoint
 	dataCheck     dataCheck
 	resolver      monitors.Resolver
+	logger        *logp.Logger
 }
 
-func newJobFactory(commonCfg *conf.C, resolver monitors.Resolver) (*jobFactory, error) {
-	jf := &jobFactory{config: defaultConfig(), resolver: resolver}
+func newJobFactory(commonCfg *conf.C, resolver monitors.Resolver, logger *logp.Logger) (*jobFactory, error) {
+	jf := &jobFactory{config: defaultConfig(), resolver: resolver, logger: logger}
 	err := jf.loadConfig(commonCfg)
 	if err != nil {
 		return nil, err
@@ -102,7 +105,7 @@ func (jf *jobFactory) loadConfig(commonCfg *conf.C) error {
 	}
 
 	// TOOD: use local logger
-	jf.tlsConfig, err = tlscommon.LoadTLSConfig(jf.config.TLS, logp.NewLogger(""))
+	jf.tlsConfig, err = tlscommon.LoadTLSConfig(jf.config.TLS, jf.logger)
 	if err != nil {
 		return err
 	}
@@ -194,7 +197,7 @@ func (jf *jobFactory) dial(event *beat.Event, dialAddr string, canonicalURL *url
 
 	// If Socks5 is configured make that the next layer, since everything needs to go through the proxy first.
 	if jf.config.Socks5.URL != "" {
-		dc.AddLayer(dialchain.SOCKS5Layer(&jf.config.Socks5))
+		dc.AddLayer(dialchain.SOCKS5Layer(&jf.config.Socks5, jf.logger))
 	}
 
 	// Now add the IP or Hostname of the server we want to connect to.
