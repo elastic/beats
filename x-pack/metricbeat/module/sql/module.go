@@ -115,7 +115,7 @@ func (m *module) GetCursorRegistry() (*statestore.Registry, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	dataPath := paths.Resolve(paths.Data, "sql-cursor")
+	dataPath := m.Paths.Resolve(paths.Data, "sql-cursor")
 
 	// Return the cached registry if it was created for the same data path.
 	if s.registry != nil && s.dataPath == dataPath {
