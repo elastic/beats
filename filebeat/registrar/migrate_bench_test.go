@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -56,7 +55,7 @@ func BenchmarkMigration0To1(b *testing.B) {
 					Id:     fmt.Sprintf("123455-%v", i),
 					Source: fmt.Sprintf("/path/to/test/file-%v.log", i),
 					FileStateOS: libfile.StateOS{
-						Inode:  uint64(i),
+						Inode:  uint64(i), //nolint:gosec // i is always non-negative (range index)
 						Device: 123455,
 					},
 				}
@@ -101,7 +100,7 @@ func tempDir(t testing.TB) string {
 		t.Fatal(err)
 	}
 
-	path, err := ioutil.TempDir(cwd, "")
+	path, err := os.MkdirTemp(cwd, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +120,7 @@ func mkDir(t testing.TB, path string) {
 }
 
 func clearDir(t testing.TB, path string) {
-	old, err := ioutil.ReadDir(path)
+	old, err := os.ReadDir(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +133,7 @@ func clearDir(t testing.TB, path string) {
 
 func writeFile(t testing.TB, path string, contents []byte) {
 	t.Helper()
-	err := ioutil.WriteFile(path, contents, 0o600)
+	err := os.WriteFile(path, contents, 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
