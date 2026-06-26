@@ -125,7 +125,7 @@ func clearDir(t testing.TB, path string) {
 		t.Fatal(err)
 	}
 	for _, info := range old {
-		if err := os.RemoveAll(info.Name()); err != nil {
+		if err := os.RemoveAll(filepath.Join(path, info.Name())); err != nil {
 			t.Fatal(err)
 		}
 	}

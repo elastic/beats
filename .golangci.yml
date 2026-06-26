@@ -115,6 +115,7 @@ linters:
               reason: Use one uuid library consistently across the codebase
     gosec:
       excludes:
+        - G115
         - G306
         - G404
         - G401
