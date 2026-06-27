@@ -64,10 +64,6 @@ type config struct {
 	NoMoreEvents         NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
 	EventLanguage        uint32             `config:"language"`
 	IgnoreMissingChannel *bool              `config:"ignore_missing_channel"` // Ignore missing channels and continue reading.
-
-	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
-	// and will be removed in the future.
-	Bypass2025Workaround bool `config:"bypass_2025_workaround"`
 }
 
 // query contains parameters used to customize the event log data that is

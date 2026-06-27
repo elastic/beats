@@ -1,0 +1,28 @@
+[!windows] skip 'requires Windows'
+
+write-event 'success' --level=success
+write-event 'error' --level=error
+write-event 'warning' --level=warning
+write-event 'information' --level=information
+wait-for-event-log 4
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 2
+check-event-field output 0 log.level 'error'
+check-event-field output 1 log.level 'warning'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    level: 'error, warning'
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

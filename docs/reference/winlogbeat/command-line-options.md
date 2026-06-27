@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/command-line-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Winlogbeat command reference [command-line-options]
@@ -53,7 +54,7 @@ $$$dashboard-subcommand$$$**`dashboard`**
 
     To load the dashboard, copy the generated `dashboard.json` file into the `kibana/6/dashboard` directory of Winlogbeat, and run `winlogbeat setup --dashboards` to import the dashboard.
 
-    If {{kib}} is not running on `localhost:5061`, you must also adjust the Winlogbeat configuration under `setup.kibana`.
+    If {{kib}} is not running on `localhost:5601`, you must also adjust the Winlogbeat configuration under `setup.kibana`.
 
 
 $$$template-subcommand$$$**`template`**
@@ -67,7 +68,7 @@ $$$ilm-policy-subcommand$$$
 $$$pipeline-subcommand$$$
 
 **`pipeline`**
-:   Exports the ingest piplines.  You must specify the `--es.version` to specify which version of {{es}} the pipelines should be compatible with. You can optionally specify `--dir` to control where the pipelines are written.
+:   Exports the ingest pipelines.  You must specify the `--es.version` to specify which version of {{es}} the pipelines should be compatible with. You can optionally specify `--dir` to control where the pipelines are written.
 
 **FLAGS**
 
@@ -204,7 +205,7 @@ winlogbeat [FLAGS]
 :   Writes memory profile data to the specified output file. This option is useful for troubleshooting Winlogbeat.
 
 **`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
+:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is deprecated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 Also see [Global flags](#global-flags).
 

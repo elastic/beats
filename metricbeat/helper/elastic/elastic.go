@@ -87,14 +87,6 @@ func MakeXPackMonitoringIndexName(product Product) string {
 	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
 }
 
-// ReportErrorForMissingField reports and returns an error message for the given
-// field being missing in API response received from a given product
-func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) error {
-	err := MakeErrorForMissingField(field, product)
-	r.Error(err)
-	return err
-}
-
 // MakeErrorForMissingField returns an error message for the given field being missing in an API
 // response received from a given product
 func MakeErrorForMissingField(field string, product Product) error {
@@ -104,12 +96,6 @@ func MakeErrorForMissingField(field string, product Product) error {
 // IsFeatureAvailable returns whether a feature is available in the current product version
 func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *version.V) bool {
 	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
-}
-
-// ReportAndLogError reports and logs the given error
-func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
-	r.Error(err)
-	l.Error(err)
 }
 
 // FixTimestampField converts the given timestamp field in the given map from a float64 to an
@@ -161,7 +147,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 		// Type cast the metricsets to a slice of strings
 		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]interface{})
 		if !ok {
-			return nil, fmt.Errorf("configured metricsets are not an slice for module %s: %v", moduleName, cfgdMetricsets)
+			return nil, fmt.Errorf("configured metricsets are not a slice for module %s: %v", moduleName, cfgdMetricsets)
 		}
 
 		cfgdMetricsetsStrings := make([]string, 0, len(cfgdMetricsetsSlice))

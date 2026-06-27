@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -34,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -562,6 +564,211 @@ var inputTests = []struct {
 		}},
 	},
 
+	// Emit tests.
+	{
+		name: "emit_no_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello"},{"message":"world"}].emit(e, e)}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+	},
+	{
+		name: "emit_with_cursor",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[], "emit_result": [{"message":"hello","id":1},{"message":"world","id":2}].emit(e, {"message":e.message}, {"id":e.id})}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "hello"},
+			{"message": "world"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": int64(1)},
+			{"id": int64(2)},
+		},
+	},
+
+	// Emit error-handling pattern (mirrors the documented example).
+	{
+		name: "emit_error_handling_success",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"},{"msg":"b"}].emit(e, e, {"id": e.msg}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"msg": "a"},
+			{"msg": "b"},
+			{"published": float64(2), "cursor": map[string]interface{}{"id": "b"}},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": "a"},
+			{"id": "b"},
+			{"id": "b"},
+		},
+	},
+	{
+		name: "emit_error_handling_failure",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	[{"msg":"a"}, "bad"].emit(e, e, {"id": "x"}).as(r,
+		has(r.error) ?
+			{"events": [{"error": r.error}]}
+		:
+			{"events": [r], "cursor": [r.cursor]}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"msg": "a"},
+			{"error": "emit: event must be a map, got string"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"id": "x"},
+		},
+	},
+
+	// Stream decode tests.
+	{
+		name: "decode_csv_stream_lazy_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  name,age,city
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA8tLzE3VSUxP1UnOLKnkcszJTE7VMTbQ8UstV4jML8rmcspP0jEy1fHJz0vJz+MCACmhrnIuAAAA"
+	).stream_gzip().decode_csv_stream_lazy().map(row,
+		row
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"name": "Alice", "age": "30", "city": "New York"},
+			{"name": "Bob", "age": "25", "city": "London"},
+		},
+	},
+	{
+		name: "decode_csv_stream_lazy_no_header_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  Alice,30,New York
+		//  Bob,25,London
+		"H4sIAAAAAAAAA3PMyUxO1TE20PFLLVeIzC/K5nLKT9IxMtXxyc9Lyc/jAgAMH1FQIAAAAA=="
+	).stream_gzip().decode_csv_stream_lazy_no_header().map(row,
+		{"fields": row}
+	).as(rows,
+		{"events": rows}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"fields": []interface{}{"Alice", "30", "New York"}},
+			{"fields": []interface{}{"Bob", "25", "London"}},
+		},
+	},
+	{
+		name: "decode_lines_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().map(line,
+		{"line": line}
+	).as(lines,
+		{"events": lines}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+	{
+		name: "emit_with_decode_lines_gzip",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	base64_decode(
+		// base64 encoded gzip compressed:
+		//  hello world
+		//  foo bar
+		//  baz qux
+		"H4sIAAAAAAAAA8tIzcnJVyjPL8pJ4UrLz1dISiziSkqsUigsreACAEowrZIcAAAA"
+	).stream_gzip().decode_lines().emit(line,
+		{"line": line}
+	).as(result,
+		{
+			"events": [],
+			"emit_result": result,
+		}
+	)
+	`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"line": "hello world"},
+			{"line": "foo bar"},
+			{"line": "baz qux"},
+		},
+	},
+
 	// FS-based tests.
 	{
 		name: "ndjson_log_file_simple",
@@ -906,9 +1113,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]any{
-					"message": `failed eval: ERROR: <input>:3:21: response body too big
- |   "events": [string(body)]
- | ....................^`,
+					"message": `failed eval: ERROR: <input>:2:5: response body too big
+ |  get(state.url).Body.as(body, {
+ | ....^`,
 				},
 			},
 		},
@@ -1368,7 +1575,7 @@ var inputTests = []struct {
 		},
 		config: map[string]interface{}{
 			"interval":                 1,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1404,7 +1611,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_enabled",
@@ -1416,7 +1623,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  true,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1452,7 +1659,7 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+		wantFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
 	},
 	{
 		name: "tracer_filename_sanitization_disabled",
@@ -1464,7 +1671,7 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval":                 1,
 			"resource.tracer.enabled":  false,
-			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"resource.tracer.filename": "cel/logs/http-request-trace-*.ndjson",
 			"state": map[string]interface{}{
 				"fake_now": "2002-10-02T15:00:00Z",
 			},
@@ -1500,7 +1707,24 @@ var inputTests = []struct {
 			{"timestamp": "2002-10-02T15:00:01Z"},
 			{"timestamp": "2002-10-02T15:00:02Z"},
 		},
-		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+		wantNoFile: filepath.Join("cel", "logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	// Path containment is enforced regardless of whether the tracer is
+	// enabled. The enabled case is tested in
+	// httplog.TestResolveTraceFilename; the test harness here rewrites
+	// enabled tracer filenames into a temp dir, so only the disabled
+	// case can exercise an out-of-tree path at the input level.
+	{
+		name:   "tracer_disabled_escaping_logs",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  false,
+			"resource.tracer.filename": "/var/log/http-request-trace-*.ndjson",
+			"program":                  `bytes(get(state.url).Body).as(body, {"events": [body.decode_json()]})`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: errors.New("request tracer path"),
 	},
 	{
 		name:   "pagination_cursor_object",
@@ -1944,7 +2168,14 @@ var inputTests = []struct {
 	})
 	`,
 		},
-		handler: oauth2Handler,
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(fmt.Sprintf("unexpected UA: %s", r.UserAgent())))
+				return
+			}
+			oauth2Handler(w, r)
+		},
 		want: []map[string]interface{}{
 			{"hello": "world"},
 		},
@@ -2104,13 +2335,11 @@ var inputTests = []struct {
 		},
 		handler: defaultHandler(http.MethodGet, ""),
 		want: []map[string]interface{}{
-			// Loss of location information here is a result of changes in the runtime.
-			// We no longer look into macros at all. This is a huge loss for debugging.
 			{
 				"error": map[string]interface{}{
-					"message": `failed eval: ERROR: <input>:5:14: no such overload
- |    "events": events,
- | .............^`,
+					"message": `failed eval: ERROR: <input>:3:20: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | ...................^`,
 				},
 			},
 		},
@@ -2165,7 +2394,7 @@ var inputTests = []struct {
 			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
 		want: []map[string]interface{}{{
 			"message": map[string]interface{}{
 				"value": "division by zero",
@@ -2187,7 +2416,7 @@ var inputTests = []struct {
 			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2215,13 +2444,13 @@ var inputTests = []struct {
 		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
 		prepare: func() error {
 			// Make a file that the configuration should delete.
-			err := os.MkdirAll("failure_dumps", 0o700)
+			err := os.MkdirAll(filepath.Join("cel", "failure_dumps"), 0o700)
 			if err != nil {
 				return err
 			}
-			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+			return os.WriteFile(filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
 		},
-		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		wantNoFile: filepath.Join("cel", "failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -2325,7 +2554,7 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
-	err := os.RemoveAll("failure_dumps")
+	err := os.RemoveAll(filepath.Join("cel", "failure_dumps"))
 	if err != nil {
 		t.Fatalf("failed to remove failure_dumps directory: %v", err)
 	}
@@ -2363,8 +2592,20 @@ func TestInput(t *testing.T) {
 			}
 
 			var tempDir string
-			if conf.Resource.Tracer != nil {
-				tempDir = t.TempDir()
+			if conf.Resource.Tracer.enabled() {
+				err := os.MkdirAll("cel", 0o700)
+				if err != nil {
+					t.Fatalf("failed to create root logging destination: %v", err)
+				}
+				tempDir, err = os.MkdirTemp("cel", "logs-*")
+				if err != nil {
+					t.Fatalf("failed to create logging destination: %v", err)
+				}
+				tempDir, err = filepath.Abs(tempDir)
+				if err != nil {
+					t.Fatalf("failed to get absolute path for logging destination: %v", err)
+				}
+				defer os.RemoveAll("cel")
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
@@ -2382,11 +2623,16 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			id := "test_id:" + test.name
+			cwd, err := os.Getwd()
+			if err != nil {
+				t.Fatalf("failed to get working directory: %v", err)
+			}
 			v2Ctx := v2.Context{
 				Logger:          logp.NewLogger("cel_test"),
 				ID:              id,
 				IDWithoutName:   id,
 				Cancelation:     ctx,
+				Agent:           beat.Info{Paths: &paths.Path{Logs: cwd}},
 				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
@@ -2395,8 +2641,8 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
-			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+			err = input{time: test.time}.run(v2Ctx, src, test.persistCursor, &client, &v2Ctx)
+			if !sameErrorOrContains(err, test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantFile != "" {
@@ -2925,6 +3171,68 @@ var redactorTests = []struct {
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"other":"data"},{"other":"data"}],"other":"data"}`,
 	},
+	{
+		name: "secret_flat_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_flat_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"api_key": "super_secret_key",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: true,
+		},
+		wantOrig:   `{"other":"data","secret":{"api_key":"super_secret_key"}}`,
+		wantRedact: `{"other":"data"}`,
+	},
+	{
+		name: "secret_nested_no_delete",
+		state: mapstr.M{
+			"secret": mapstr.M{
+				"auth": mapstr.M{
+					"user":     "admin",
+					"password": "p@ss",
+				},
+				"token": "bearer_xyz",
+			},
+			"other": "data",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"other":"data","secret":{"auth":{"password":"p@ss","user":"admin"},"token":"bearer_xyz"}}`,
+		wantRedact: `{"other":"data","secret":"*"}`,
+	},
+	{
+		name: "secret_absent_no_op",
+		state: mapstr.M{
+			"other":   "data",
+			"another": "value",
+		},
+		cfg: &redact{
+			Fields: []string{"secret"},
+			Delete: false,
+		},
+		wantOrig:   `{"another":"value","other":"data"}`,
+		wantRedact: `{"another":"value","other":"data"}`,
+	},
 }
 
 func TestRedactor(t *testing.T) {
@@ -2939,5 +3247,18 @@ func TestRedactor(t *testing.T) {
 				t.Errorf("unexpected redaction:\n--- got\n--- want\n%s", cmp.Diff(got, test.wantRedact))
 			}
 		})
+	}
+}
+
+// sameErrorOrContains reports whether got matches want: both nil, or got's
+// message contains want's message.
+func sameErrorOrContains(got, want error) bool {
+	switch {
+	case got == nil && want == nil:
+		return true
+	case got == nil, want == nil:
+		return false
+	default:
+		return strings.Contains(got.Error(), want.Error())
 	}
 }

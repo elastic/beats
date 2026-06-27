@@ -1,0 +1,42 @@
+[!windows] skip 'requires Windows'
+
+write-event 'Add tags and fields under root'
+wait-for-event-log 1
+exec winlogbeat -c winlogbeat.yml --path.data $WORK/data
+check-event-count output 1
+check-event-field output 0 message 'Add tags and fields under root'
+check-event-field output 0 global 'field'
+check-event-field output 0 env 'dev'
+check-event-field output 0 local 'field'
+check-event-field output 0 log.level 'overwrite'
+check-event-field-contains output 0 tags 'global'
+check-event-field-contains output 0 tags 'local'
+
+-- winlogbeat.yml --
+winlogbeat.shutdown_timeout: 30s
+tags:
+  - global
+fields_under_root: true
+fields:
+  global: field
+  env: prod
+  log.level: overwrite
+winlogbeat.event_logs:
+  - name: ${PROVIDER:?missing PROVIDER}
+    no_more_events: stop
+    tags:
+      - local
+    fields_under_root: true
+    fields:
+      local: field
+      env: dev
+output.file:
+  path: ${WORK:?missing WORK}/output
+  filename: winlogbeat
+  rotate_every_kb: 10000
+queue.mem:
+  events: 4096
+  flush.min_events: 1
+  flush.timeout: 0.1s
+logging.level: warning
+logging.to_files: false

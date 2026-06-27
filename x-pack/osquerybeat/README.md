@@ -76,6 +76,20 @@ which is automatically generated based on `fields.yml` by running the following 
 make update
 ```
 
+For osquery-extension generated assets (tables/views/docs/README and jumplists lookup maps), use:
+
+```
+mage generate
+```
+
+By default, jumplists generation uses local cached source files under
+`ext/osquery-extension/pkg/jumplists/generate/sources/` for deterministic output.
+To refresh those sources on demand:
+
+```
+JUMPLISTS_REFRESH_SOURCES=true mage generate
+```
+
 
 ### Cleanup
 

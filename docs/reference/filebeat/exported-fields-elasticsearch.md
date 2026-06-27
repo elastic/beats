@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-elasticsearch.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Elasticsearch fields [exported-fields-elasticsearch]
 
@@ -53,6 +54,24 @@ elasticsearch Module
     type: keyword
 
     example: vWNJsZ3
+
+
+**`elasticsearch.task.id`**
+:   Task id for the query task (query log)
+
+    type: keyword
+
+
+**`elasticsearch.parent.task.id`**
+:   Parent task id when the task has a parent (query log)
+
+    type: keyword
+
+
+**`elasticsearch.parent.node.id`**
+:   Parent node id, present together with parent task id (query log)
+
+    type: keyword
 
 
 **`elasticsearch.index.name`**
@@ -383,6 +402,176 @@ Young generation occupancy and total size.
 :   Young generation occupancy in kilobytes.
 
     type: integer
+
+
+## querylog [_querylog]
+
+Query log events from Elasticsearch
+
+**`elasticsearch.querylog.indices`**
+:   Indices involved (DSL, ES|QL when response present, EQL). Not emitted by SqlLogProducer.
+
+    type: keyword
+
+    example: query_log_test_index
+
+
+**`elasticsearch.querylog.query`**
+:   Query text (DSL JSON, ES|QL, SQL, or EQL)
+
+    type: keyword
+
+    example: {"size":10,"query":{"match_all":{"boost":1.0}}}
+
+
+**`elasticsearch.querylog.result_count`**
+:   Number of rows or hits returned (clamped to int where applicable)
+
+    type: long
+
+    example: 3
+
+
+**`elasticsearch.querylog.took`**
+:   Duration in nanoseconds
+
+    type: long
+
+    example: 1000000
+
+
+**`elasticsearch.querylog.took_millis`**
+:   Duration in milliseconds
+
+    type: long
+
+    example: 1
+
+
+**`elasticsearch.querylog.type`**
+:   Query kind: dsl, esql, sql, or eql
+
+    type: keyword
+
+    example: dsl
+
+
+**`elasticsearch.querylog.timed_out`**
+:   True when the request timed out (for example, DSL SearchResponse, EQL timeout)
+
+    type: boolean
+
+
+**`elasticsearch.querylog.shards.successful`**
+:   Successful shard count when shardInfo() is present
+
+    type: long
+
+    example: 1
+
+
+**`elasticsearch.querylog.shards.skipped`**
+:   Skipped shards (only emitted if count > 0)
+
+    type: long
+
+
+**`elasticsearch.querylog.shards.failed`**
+:   Failed shards (only emitted if count > 0)
+
+    type: long
+
+
+**`elasticsearch.querylog.dsl.total_count`**
+:   Total hits from TotalHits (DSL only, SearchLogProducer)
+
+    type: long
+
+    example: 3
+
+
+**`elasticsearch.querylog.dsl.total_count_partial`**
+:   True when total hit relation is not EQUAL_TO
+
+    type: boolean
+
+
+**`elasticsearch.querylog.has_aggregations`**
+:   True if the search response has aggregations (DSL)
+
+    type: boolean
+
+
+**`elasticsearch.querylog.is_system`**
+:   True if all resolved indices match the system-index predicate (QueryLogger); omitted when SQL has no indices
+
+    type: boolean
+
+
+**`elasticsearch.querylog.is_remote`**
+:   True when SearchRequest#getLocalClusterAlias() is set (DSL remote-cluster request)
+
+    type: boolean
+
+
+**`elasticsearch.querylog.clusters.remotes`**
+:   Remote cluster aliases when remotes exist (DSL/ES|QL/EQL); JSON array of keyword strings, not a delimited string
+
+    type: keyword
+
+
+**`elasticsearch.querylog.clusters.remote_count`**
+:   Number of remote clusters or distinct remote aliases
+
+    type: long
+
+
+**`elasticsearch.querylog.clusters.skipped`**
+:   Number of skipped remote clusters when present in cluster statistics
+
+    type: long
+
+
+**`elasticsearch.querylog.clusters.total`**
+:   Total cluster entries in the map (DSL and ES|QL only; not EQL). Additional keys use lowercase status strings (failed, partial, running, skipped, successful) with long counts.
+
+    type: long
+
+
+**`elasticsearch.querylog.esql.profile.analysis.took`**
+:   ES|QL profile phase duration in nanoseconds (phase name from TimeSpanMarker)
+
+    type: long
+
+
+**`elasticsearch.querylog.esql.profile.planning.took`**
+:   ES|QL profile phase duration in nanoseconds
+
+    type: long
+
+
+**`elasticsearch.querylog.esql.profile.parsing.took`**
+:   ES|QL profile phase duration in nanoseconds
+
+    type: long
+
+
+**`elasticsearch.querylog.esql.profile.preanalysis.took`**
+:   ES|QL profile phase duration in nanoseconds
+
+    type: long
+
+
+**`elasticsearch.querylog.esql.profile.query.took`**
+:   ES|QL profile phase duration in nanoseconds
+
+    type: long
+
+
+**`elasticsearch.querylog.esql.profile.dependency_resolution.took`**
+:   ES|QL profile phase duration in nanoseconds
+
+    type: long
 
 
 ## server [_server]

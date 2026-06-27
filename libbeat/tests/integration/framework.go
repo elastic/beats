@@ -52,6 +52,7 @@ import (
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
+	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
@@ -170,25 +171,6 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	return b
 }
 
-// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
-// See `NewBeat` for options and information for the parameters.
-func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
-	b := NewBeat(t, beatName, binary, args...)
-
-	// Remove the first two arguments: beatName and --systemTest
-	baseArgs := b.baseArgs[2:]
-	// Add the agentbeat argumet and re-organise the others
-	b.baseArgs = append(
-		[]string{
-			"agentbeat",
-			"--systemTest",
-			beatName,
-		},
-		baseArgs...)
-
-	return b
-}
-
 // Start starts the Beat process
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {
@@ -296,7 +278,11 @@ func (b *BeatProc) waitBeatToExit() {
 	}
 	defer b.waitingMutex.Unlock()
 
-	if err := b.Cmd.Wait(); err != nil {
+	err := b.Cmd.Wait()
+	// Check before any potential Fatalf so a data race is reported with a
+	// clear message even when it also caused a non-zero exit code.
+	b.checkForDataRace()
+	if err != nil {
 		exitCode := "unknown"
 		if b.Cmd.ProcessState != nil {
 			exitCode = strconv.Itoa(b.Cmd.ProcessState.ExitCode())
@@ -334,6 +320,7 @@ func (b *BeatProc) stopNonsynced() {
 		}
 		defer b.waitingMutex.Unlock()
 		err := b.Cmd.Wait()
+		b.checkForDataRace()
 		if err != nil {
 			if b.expectedErrorCode != 0 {
 				if b.Cmd.ProcessState.ExitCode() != b.expectedErrorCode {
@@ -1111,6 +1098,36 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 	return io.ReadAll(f)
 }
 
+// raceDetectorMarker is the header the Go race detector prints to stderr when
+// it detects a data race. It is only emitted when the binary was built with
+// -race (see testbin.RaceDetectorEnvVar). The marker is written as the race
+// happens, independently of the process exit code, so without explicitly
+// scanning for it a race can go unnoticed when the Beat is stopped by a signal.
+const raceDetectorMarker = "WARNING: DATA RACE"
+
+// checkForDataRace scans the Beat's stderr for a race detector report and fails
+// the test if one is found. It only does work when the Beat binary was built
+// with the race detector (testbin.RaceDetectorEnvVar=true); otherwise the
+// marker can never appear, so the stderr read is skipped.
+//
+// It must be called after the process has exited (Cmd.Wait returned) so stderr
+// is fully flushed, and before the next startBeat truncates the file.
+func (b *BeatProc) checkForDataRace() {
+	b.t.Helper()
+	if !testbin.RaceDetectorEnabled() {
+		return
+	}
+	data, err := os.ReadFile(b.stderr.Name())
+	if err != nil {
+		b.t.Logf("could not read stderr to check for data races: %s", err)
+		return
+	}
+	if idx := bytes.Index(data, []byte(raceDetectorMarker)); idx != -1 {
+		b.t.Errorf("data race detected while running %q (binary built with -race):\n%s",
+			b.beatName, data[idx:])
+	}
+}
+
 func reportErrors(t *testing.T, tempDir string, beatName string) {
 	var maxlen int64 = 1024
 	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
@@ -1252,7 +1269,7 @@ func StartMockES(
 			if err != nil {
 				return false
 			}
-			//nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint:errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return true
@@ -1272,9 +1289,68 @@ func (b *BeatProc) WaitPublishedEvents(timeout time.Duration, events int) {
 	t.Helper()
 
 	path := filepath.Join(b.TempDir(), "output-*.ndjson")
+
+	// Ensure the output file exists. This avoid us calling assert.Eventually
+	// inside an assert.Eventually, which causes the test to fail with a generic
+	// "Condition never satisfied" message.
+	if got := b.CountFileLines(path); got == events {
+		return
+	}
+
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
-		assert.Equal(collect, events, b.CountFileLines(path))
+		got := b.CountFileLines(path)
+		assert.Equalf(collect, events, got, "expecting %d events, got %d", events, got)
 	}, timeout, 200*time.Millisecond)
+}
+
+// RemoveOutputFile removes all files matching output*.ndjson in the Beat
+// temporary folder. On error t.Fatal is called
+func (b *BeatProc) RemoveOutputFile() {
+	t := b.t
+	outputFiles, err := filepath.Glob(filepath.Join(b.TempDir(), "output*.ndjson"))
+	if err != nil {
+		t.Fatalf("failed to match glob pattern for output files: %s", err)
+	}
+
+	for _, file := range outputFiles {
+		if err := os.Remove(file); err != nil {
+			t.Fatalf("cannot remove file: %s", err)
+		}
+	}
+}
+
+// TestMainWithBuild is a TestMain helper that builds the beat test binary,
+// runs all tests, cleans up and exits. It resolves paths relative to the
+// working directory (the test package directory), so "../../" reaches the
+// beat root from <beat>/tests/integration/.
+//
+//	func TestMain(m *testing.M) {
+//	    integration.TestMainWithBuild(m, "filebeat")
+//	}
+//
+// Running with -race (go test -race) auto-enables INTEG_RACE_DETECTOR so the
+// Beat is also built with -race and its stderr is scanned for race reports;
+// setting INTEG_RACE_DETECTOR=true directly has the same effect.
+func TestMainWithBuild(m *testing.M, beatName string, opts ...testbin.Option) {
+	if raceBuildEnabled {
+		if err := os.Setenv(testbin.RaceDetectorEnvVar, "true"); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to enable %s for -race build: %s\n", testbin.RaceDetectorEnvVar, err)
+			os.Exit(1)
+		}
+	}
+
+	beatRoot, err := filepath.Abs("../../")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to resolve beat root path: %s\n", err)
+		os.Exit(1)
+	}
+	_, err = testbin.Build(beatName, beatRoot, opts...)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to build %s test binary: %s\n", beatName, err)
+		os.Exit(1)
+	}
+
+	os.Exit(m.Run())
 }
 
 // GetEventsFromFileOutput reads all events from file output. If n > 0,

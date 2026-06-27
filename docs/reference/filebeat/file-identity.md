@@ -1,6 +1,7 @@
 ---
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # How to choose file identity for filestream [file-identity]
@@ -140,7 +141,7 @@ Even worse, it does not even have to be the same filename; a different file can 
 1715023 y # same inode value for the second file with a different name
 ```
 
-As mentioned before, the problem of cached inode values is a common occurance in containerized environments and network shares. If you're planning to run Filebeat in such an environment, avoid using this file identity.
+As mentioned before, the problem of cached inode values is a common occurrence in containerized environments and network shares. If you're planning to run Filebeat in such an environment, avoid using this file identity.
 
 The `device ID` value used by this file identity can be unstable in some environments too: when using the Linux [LVM](https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29) (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to [Persistent Device Numbers](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers) in the Red Hat Enterprise Linux documentation).
 
@@ -158,7 +159,7 @@ Users specify a path by setting `file_identity.inode_marker.path`. This path lea
 
 The most stable file identity implementation at the moment. This file identity is default since Filebeat version 9.0.
 
-This file identity is using file fingerprints produced by the scanner component of the filestream input. Therefore, in order to activate this file identity, it's required to first activate fingerprint in the scanner by setting `prospector.scanner.fingerprint.enabled: true`.
+This file identity uses file fingerprints produced by the scanner component of the filestream input. Scanner fingerprinting is enabled by default in 9.x. If you explicitly disable it with `prospector.scanner.fingerprint.enabled: false`, this file identity cannot be used.
 
 In the context of the filestream input, fingerprint is a hash string computed from a part of the file content.
 

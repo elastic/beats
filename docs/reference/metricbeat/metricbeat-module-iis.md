@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-iis.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # IIS module [metricbeat-module-iis]
 
@@ -25,7 +26,7 @@ IIS (Internet Information Services) is a secure, reliable, and scalable Web serv
 
 The `iis` module will periodically retrieve IIS related metrics using performance counters such as:
 
-* System/Process counters like the the overall server and CPU usage for the IIS Worker Process and memory (currently used and available memory for the IIS Worker Process).
+* System/Process counters like the overall server and CPU usage for the IIS Worker Process and memory (currently used and available memory for the IIS Worker Process).
 * IIS performance counters like Web Service: Bytes Received/Sec, Web Service: Bytes Sent/Sec, etc, which are helpful to track to identify potential spikes in traffic.
 * Web Service Cache counters in order to monitor user mode cache and output cache.
 

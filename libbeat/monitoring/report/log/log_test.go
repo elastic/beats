@@ -19,10 +19,12 @@ package log
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -59,7 +61,7 @@ var (
 // Smoke test.
 func TestStartStop(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "")
-	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig())
+	r, err := MakeReporter(beat.Info{Logger: logger}, conf.NewConfig(), beatmonitoring.NewGlobalMonitoring())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,17 +72,17 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	delta := makeDeltaSnapshot(prevSnap, curSnap)
 	assert.EqualValues(t, 10, delta.Ints["count"])
 	assert.EqualValues(t, 1, delta.Ints["new"])
-	assert.EqualValues(t, 1.2, delta.Floats["system.load.1"])
-	assert.EqualValues(t, 2, delta.Floats["float_counter"])
+	assert.InDelta(t, 1.2, delta.Floats["system.load.1"], 0.001)
+	assert.InDelta(t, 2, delta.Floats["float_counter"], 0.001)
 	assert.EqualValues(t, 5, delta.Ints["active_gauge"])
-	assert.EqualValues(t, 4.1, delta.Floats["foo.histogram.p99"])
+	assert.InDelta(t, 4.1, delta.Floats["foo.histogram.p99"], 0.001)
 	assert.NotContains(t, delta.Ints, "gone")
 }
 
 func TestReporterLog(t *testing.T) {
 	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
 
-	reporter := reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
+	reporter := Reporter{config: defaultConfig(), logger: logger.Named("monitoring")}
 
 	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
 	logs := zapLogs.TakeAll()
@@ -90,7 +92,7 @@ func TestReporterLog(t *testing.T) {
 
 	reporter.logSnapshot(
 		map[string]monitoring.FlatSnapshot{
-			"metrics": monitoring.FlatSnapshot{
+			"metrics": {
 				Bools: map[string]bool{
 					"running": true,
 				},
@@ -113,7 +115,70 @@ func TestReporterLog(t *testing.T) {
 	}
 }
 
-func assertMapHas(t *testing.T, m map[string]interface{}, key string, expectedValue interface{}) {
+func TestZeroPeriodSkipsLogging(t *testing.T) {
+	logger, zapLogs := logptest.NewTestingLoggerWithObserver(t, "")
+
+	r := &Reporter{
+		config:     config{Period: 0},
+		done:       make(chan struct{}),
+		logger:     logger.Named("monitoring"),
+		registries: map[string]*monitoring.Registry{},
+	}
+
+	r.wg.Add(1)
+	go func() {
+		defer r.wg.Done()
+		r.snapshotLoop()
+	}()
+
+	// The goroutine should exit immediately when Period == 0.
+	exited := make(chan struct{})
+	go func() {
+		r.wg.Wait()
+		close(exited)
+	}()
+	select {
+	case <-exited:
+	case <-time.After(5 * time.Second):
+		t.Fatal("snapshotLoop goroutine did not exit within 5s for zero period")
+	}
+
+	// No periodic metrics log lines should have been emitted.
+	for _, log := range zapLogs.TakeAll() {
+		assert.NotContains(t, log.Message, "Starting metrics logging")
+		assert.NotContains(t, log.Message, "Non-zero metrics")
+		assert.NotContains(t, log.Message, "No non-zero metrics")
+		assert.NotContains(t, log.Message, "Total metrics")
+		assert.Contains(t, log.Message, "Skipping metrics logging")
+	}
+}
+
+// TestZeroPeriodConfig verifies that a config with period=0 does not panic
+// (time.NewTicker panics on a zero duration) and that Period is parsed as 0.
+func TestZeroPeriodConfig(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	cfg, err := conf.NewConfigFrom(map[string]interface{}{
+		"period": "0s",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rep, err := MakeReporter(beat.Info{Logger: logger}, cfg, beatmonitoring.NewGlobalMonitoring())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rep.Stop()
+
+	reporter, ok := rep.(*Reporter)
+	if !ok {
+		t.Fatal("MakeReporter did not return a *Reporter")
+	}
+	assert.Equal(t, time.Duration(0), reporter.Period)
+}
+
+func assertMapHas(t *testing.T, m map[string]any, key string, expectedValue any) {
 	t.Helper()
 	v, err := mapstr.M(m).GetValue(key)
 	if err != nil {

@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cef.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Decode CEF processor fields fields [exported-fields-cef]
 
@@ -220,7 +221,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.destinationMacAddress`**
-:   Six colon-seperated hexadecimal numbers.
+:   Six colon-separated hexadecimal numbers.
 
     type: keyword
 
@@ -688,7 +689,7 @@ Collection of key-value pairs carried in the CEF extension field.
 
 
 **`cef.extensions.deviceZoneURI`**
-:   Thee URI for the Zone that the device asset has been assigned to in ArcSight.
+:   The URI for the Zone that the device asset has been assigned to in ArcSight.
 
     type: keyword
 

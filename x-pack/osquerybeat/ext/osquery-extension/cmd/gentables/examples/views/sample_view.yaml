@@ -1,0 +1,130 @@
+type: view
+name: sample_combined_resources
+description: View combining active and archived resources with calculated fields and UNION
+platforms:
+  - linux
+  - darwin
+  - windows
+
+required_tables:
+  - sample_custom_table
+
+columns:
+  - name: id
+    type: BIGINT
+    description: Unique identifier
+
+  - name: name
+    type: TEXT
+    description: Resource name
+
+  - name: status
+    type: TEXT
+    description: Current status
+
+  - name: category
+    type: TEXT
+    description: Resource category
+
+  - name: priority_level
+    type: TEXT
+    description: Human-readable priority level
+
+  - name: age_days
+    type: INTEGER
+    description: Age in days since creation
+
+  - name: last_modified_days
+    type: INTEGER
+    description: Days since last modification
+
+  - name: value
+    type: DOUBLE
+    description: Associated numeric value
+
+query: |
+  SELECT 
+    id,
+    name,
+    status,
+    category,
+    CASE priority
+      WHEN 4 THEN 'critical'
+      WHEN 3 THEN 'high'
+      WHEN 2 THEN 'medium'
+      ELSE 'low'
+    END AS priority_level,
+    (strftime('%s', 'now') - created_time) / 86400 AS age_days,
+    (strftime('%s', 'now') - updated_time) / 86400 AS last_modified_days,
+    value
+  FROM sample_custom_table
+  WHERE status = 'active' AND enabled = 1
+  
+  UNION ALL
+  
+  SELECT 
+    id,
+    name,
+    status,
+    category,
+    CASE priority
+      WHEN 4 THEN 'critical'
+      WHEN 3 THEN 'high'
+      WHEN 2 THEN 'medium'
+      ELSE 'low'
+    END AS priority_level,
+    (strftime('%s', 'now') - created_time) / 86400 AS age_days,
+    (strftime('%s', 'now') - updated_time) / 86400 AS last_modified_days,
+    value
+  FROM sample_custom_table
+  WHERE status = 'archived' AND updated_time > (strftime('%s', 'now') - 2592000);
+
+documentation:
+  description: |
+    This view demonstrates advanced SQL features including:
+    - UNION ALL for combining multiple query results
+    - CASE expressions with explicit aliases for calculated fields
+    - Date calculations using strftime for age and modification tracking
+    - Complex WHERE conditions with multiple criteria
+    - Arithmetic expressions with proper aliasing
+    
+    The view combines active enabled resources with recently archived resources
+    (archived within the last 30 days), providing a unified view of current and
+    recent resources with human-readable priority levels and calculated age fields.
+
+  examples:
+    - title: Find critical resources requiring attention
+      query: |
+        SELECT name, category, priority_level, last_modified_days
+        FROM sample_combined_resources
+        WHERE priority_level = 'critical'
+          AND last_modified_days > 7
+        ORDER BY last_modified_days DESC;
+
+    - title: Analyze resource distribution by category and priority
+      query: |
+        SELECT category, priority_level, COUNT(*) as count, AVG(value) as avg_value
+        FROM sample_combined_resources
+        GROUP BY category, priority_level
+        ORDER BY category, priority_level;
+
+    - title: Identify aging resources by status
+      query: |
+        SELECT status, 
+               COUNT(*) as total,
+               AVG(age_days) as avg_age,
+               MAX(age_days) as oldest
+        FROM sample_combined_resources
+        GROUP BY status;
+
+  notes:
+    - This view uses UNION ALL to combine active and recently archived resources
+    - CASE expressions require explicit AS aliases for column names
+    - All date calculations are performed using SQLite date functions
+    - The view automatically updates when the underlying table changes
+    - Archived resources older than 30 days are excluded to keep results focused
+    - Priority levels are converted to human-readable text for easier interpretation
+
+  related_tables:
+    - sample_custom_table
+    - sample_resource_history

@@ -18,6 +18,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/filters"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
+	elasticbrowserhistory "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/elastic_browser_history"
 )
 
 var _ historyParser = &chromiumParser{}
@@ -56,10 +57,10 @@ func inferChromiumBrowserName(path string) string {
 	return "chromium_custom"
 }
 
-func (parser *chromiumParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]*visit, error) {
+func (parser *chromiumParser) parse(ctx context.Context, queryContext table.QueryContext, allFilters []filters.Filter) ([]elasticbrowserhistory.Result, error) {
 	var (
 		merr   error
-		visits []*visit
+		visits []elasticbrowserhistory.Result
 	)
 	for _, profile := range parser.profiles {
 		// Check if profile matches the filters
@@ -76,7 +77,7 @@ func (parser *chromiumParser) parse(ctx context.Context, queryContext table.Quer
 	return visits, merr
 }
 
-func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]*visit, error) {
+func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext table.QueryContext, profile *profile) ([]elasticbrowserhistory.Result, error) {
 	connectionString := fmt.Sprintf("file:%s?mode=ro&cache=shared&immutable=1", profile.HistoryPath)
 	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
@@ -117,7 +118,7 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 	}
 	defer rows.Close()
 
-	var entries []*visit
+	var entries []elasticbrowserhistory.Result
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
@@ -154,17 +155,17 @@ func (parser *chromiumParser) parseProfile(ctx context.Context, queryContext tab
 			continue
 		}
 
-		entry := newVisit("chromium", profile, chromiumTimeToUnix(visitTime.Int64))
-		entry.URL = url.String
+		entry := newResult("chromium", profile, chromiumTimeToUnix(visitTime.Int64))
+		entry.Url = url.String
 		entry.Title = title.String
 		entry.Scheme, entry.Hostname, entry.Domain = extractSchemeHostAndTLDPPlusOne(url.String)
 		entry.TransitionType = mapChromiumTransitionType(transitionType)
-		entry.ReferringURL = referringURL.String
-		entry.VisitID = visitID.Int64
-		entry.FromVisitID = fromVisitID.Int64
+		entry.ReferringUrl = referringURL.String
+		entry.VisitId = visitID.Int64
+		entry.FromVisitId = fromVisitID.Int64
 		entry.VisitSource = mapChromiumVisitSource(visitSource)
 		entry.IsHidden = func(v int64) bool { return v != 0 }(isHidden.Int64)
-		entry.UrlID = urlID.Int64
+		entry.UrlId = urlID.Int64
 		entry.ChVisitDurationMs = chVisitDuration.Int64 / 1000
 
 		entries = append(entries, entry)

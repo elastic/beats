@@ -86,14 +86,15 @@ type MetricSetAPI interface {
 // management plugin
 type MetricSet struct {
 	mb.BaseMetricSet
+	hostURI     string
 	servicePath string
 	*helper.HTTP
 	Scope        Scope
 	XPackEnabled bool
 }
 
-// NewMetricSet creates an metric set that can be used to build other metric
-// sets that query RabbitMQ management plugin
+// NewMetricSet creates a metric set that can be used to build other metric
+// sets that query Elasticsearch APIs
 func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
@@ -131,8 +132,20 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		http.SetHeader("Authorization", "ApiKey "+apiKey)
 	}
 
+	hostURI := base.HostData().SanitizedURI
+
+	// if you supply your URI like "http://localhost:9200/" we need to trim the trailing slash to avoid issues with
+	// downstream paths
+	if strings.HasSuffix(hostURI, "/") {
+		badURI := hostURI
+		hostURI = strings.TrimRight(hostURI, "/")
+
+		base.Logger().Warnf("host URI should not have a trailing slash, updated from %s to %s", badURI, hostURI)
+	}
+
 	ms := &MetricSet{
 		base,
+		hostURI,
 		servicePath,
 		http,
 		config.Scope,
@@ -146,7 +159,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 
 // GetServiceURI returns the URI of the Elasticsearch service being monitored by this metricset
 func (m *MetricSet) GetServiceURI() string {
-	return m.HostData().SanitizedURI + m.servicePath
+	return m.hostURI + m.servicePath
 }
 
 // SetServiceURI updates the URI of the Elasticsearch service being monitored by this metricset
@@ -196,6 +209,36 @@ func (m *MetricSet) GetMasterNodeID() (string, error) {
 	}
 
 	return "", errors.New("could not determine master node ID")
+}
+
+// NodeEnrichment captures the per-node identifying details that other metricsets
+// attach to per-node events so consumers can slice by name, role, or version
+// without joining across data streams. Version is included so dashboards can
+// segment behavior across rolling upgrades.
+type NodeEnrichment struct {
+	Name    string   `json:"name"`
+	Roles   []string `json:"roles"`
+	Version string   `json:"version,omitempty"`
+}
+
+// GetNodesEnrichment returns a map keyed by node ID with name, roles, and
+// version for every node in the cluster. It uses a single filter-path-scoped
+// /_nodes call and is intended to be invoked once per Fetch, with the result
+// reused across all per-node events emitted in that scrape.
+func (m *MetricSet) GetNodesEnrichment() (map[string]NodeEnrichment, error) {
+	content, err := fetchPath(m.HTTP, m.GetServiceURI(), "_nodes/_all",
+		"filter_path=nodes.*.name,nodes.*.roles,nodes.*.version")
+	if err != nil {
+		return nil, err
+	}
+
+	var response struct {
+		Nodes map[string]NodeEnrichment `json:"nodes"`
+	}
+	if err := json.Unmarshal(content, &response); err != nil {
+		return nil, err
+	}
+	return response.Nodes, nil
 }
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled

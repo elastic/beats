@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/configuration-logging.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure logging [configuration-logging]
@@ -35,6 +36,11 @@ When Packetbeat is running on a Linux system with systemd, it uses by default th
 ## Configuration options [_configuration_options_28]
 
 You can specify the following options in the `logging` section of the `packetbeat.yml` config file:
+
+
+::::{warning}
+The `logging.to_*` options are mutually exclusive. If multiple are set to `true`, only the first one takes effect, following the precedence order of the options listed below.
+::::
 
 
 ### `logging.to_stderr` [_logging_to_stderr]

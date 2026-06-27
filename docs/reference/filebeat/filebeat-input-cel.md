@@ -4,9 +4,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html
 sub:
   mito_docs: https://pkg.go.dev/github.com/elastic/mito
-  mito_version: v1.24.0
+  mito_version: v1.26.1-0.20260617204810-b54ab9f21153
 applies_to:
   stack: ga 8.6.0
+  serverless: ga
 ---
 
 # Common Expression Language input [filebeat-input-cel]
@@ -23,6 +24,7 @@ This input supports:
     * Digest
     * {applies_to}`stack: ga 9.3.0` File
     * OAuth2
+    * {applies_to}`stack: ga 9.3.0` AWS
 
 * Retrieval at a configurable interval
 * Pagination
@@ -120,7 +122,7 @@ After completion of a program’s execution it should return a single object wit
 }
 ```
 
-1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced.
+1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures. It is recommended that the object conforms to ECS field definitions, but this is not enforced. As an alternative to collecting events in this array, the [`emit` macro](#cel-emit-macro) can publish events individually during evaluation.
 2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 3. If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit), and [Okta Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and [Draft Rate Limit policy]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) documentation show how to construct this field.
 4. The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
@@ -131,63 +133,117 @@ The `status_code`, `header` and `rate_limit` values may be omitted if the progra
 
 ## Debug state logging [_debug_state_logging]
 
-The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See [`redact`](#cel-state-redact) configuration parameters for settings to exclude sensitive fields from DEBUG logs.
+The CEL input will log the complete state after evaluation when logging at the DEBUG level. This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. Values under `state.secret` are always redacted automatically (see [`secret_state`](#secret-state-cel)). See [`redact`](#cel-state-redact) configuration parameters for settings to exclude other sensitive fields from DEBUG logs.
+
+
+## Emit macro [cel-emit-macro]
+
+```{applies_to}
+stack: ga 9.5+
+```
+
+The `emit` macro provides an alternative to collecting events in the `events` array. Instead of building a list of events and returning them in state, `emit` publishes each event individually during CEL evaluation. This is useful for processing large payloads — particularly when combined with streaming decompression (`stream_gzip`, `stream_zip`) and lazy JSON decoding (`decode_json_stream_lazy`) — because events are published as they are decoded rather than being held in memory.
+
+### Call forms
+
+```text
+// Two-arg: publish each element, no cursor tracking.
+<range>.emit(<iterVar>, <valueExpr>)
+
+// Three-arg: publish each element with a per-element cursor.
+<range>.emit(<iterVar>, <valueExpr>, <cursorExpr>)
+```
+
+The range must be a list or iterable (such as the result of `decode_json_stream_lazy`). For each element, the macro evaluates the value expression, optionally the cursor expression, and publishes the event. Iteration is sequential and cursor ordering is preserved.
+
+The macro returns `{"published": <int>}`. If a cursor expression was provided and at least one event was published, the result also contains `{"cursor": <lastCursor>}`. If iteration stops early due to a decode error, an evaluation error, or a publish failure, the result includes `{"error": <message>}`.
+
+### Cursor bookkeeping
+
+When `emit` is used with cursors (three-arg form), the program must return a single-element `events` array and a corresponding `cursor` so the input can track cursor state for error recovery. The sentinel event is typically dropped by a [filebeat processor](/reference/filebeat/filtering-enhancing-data.md) such as `drop_event` so it is not sent to the output. This is the same pattern used when `want_more` is true with no publishable results.
+
+When `emit` is used without cursors (two-arg form), `events` may be empty.
+
+### Example
+
+Streaming decompression with lazy decode and emit:
+
+```yaml
+filebeat.inputs:
+- type: cel
+  resource.url: https://example.com/api/export
+  program: |
+    bytes(state.url.get(state.header).Body).as(body,
+      body.stream_gzip().decode_json_stream_lazy().emit(e, e, state.cursor).as(r,
+        has(r.error) ?
+          {"events": [{"error": r.error}]}
+        :
+          {"events": [r], "cursor": [r.cursor]}
+      )
+    )
+  processors:
+    - drop_event:
+        when:
+          has_fields: ["published"]
+```
+
+When emit encounters an error, the result map contains an `"error"` key. The example above checks for this with `has(r.error)` and returns an error object instead of advancing the cursor. This prevents the input from skipping past data that was not fully processed.
 
 
 ## CEL extension libraries [_cel_extension_libraries]
 
 As noted above the `cel` input provides functions, macros, and global variables to extend the language.
 
-* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* [AWS v4 request signing]({{mito_docs}}@{{mito_version}}/lib#AWS) {applies_to}`stack: ga 9.1+`
 
     * [Sign AWS from env]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_env-AWS)
     * [Sign AWS from shared credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_shared_credentials-AWS)
     * [Sign AWS from static credentials]({{mito_docs}}@{{mito_version}}/lib#hdr-Sign_AWS_from_static_credentials-AWS)
 
-* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections) {applies_to}`stack: ga 8.6.0`
+* [Collections]({{mito_docs}}@{{mito_version}}/lib#Collections)
 
     * [Collate]({{mito_docs}}@{{mito_version}}/lib#hdr-Collate-Collections)
     * [Drop]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop-Collections)
     * [Drop Empty]({{mito_docs}}@{{mito_version}}/lib#hdr-Drop_Empty-Collections)
     * [Flatten]({{mito_docs}}@{{mito_version}}/lib#hdr-Flatten-Collections)
-    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections) {applies_to}`stack: ga 8.18.0`
-    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections) {applies_to}`stack: ga 8.13.0`
+    * [Front]({{mito_docs}}@{{mito_version}}/lib#hdr-Front-Collections)
+    * [Keys]({{mito_docs}}@{{mito_version}}/lib#hdr-Keys-Collections)
     * [Max]({{mito_docs}}@{{mito_version}}/lib#hdr-Max-Collections)
         * list maximum
-        * pair maximum {applies_to}`stack: ga 8.18.0`
+        * pair maximum
     * [Min]({{mito_docs}}@{{mito_version}}/lib#hdr-Min-Collections)
         * list minimum
-        * pair minimum {applies_to}`stack: ga 8.18.0`
-    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections) {applies_to}`stack: ga 8.18.0`
+        * pair minimum
+    * [Sum]({{mito_docs}}@{{mito_version}}/lib#hdr-Sum-Collections)
     * [Tail]({{mito_docs}}@{{mito_version}}/lib#hdr-Tail-Collections)
-        * one parameter {applies_to}`stack: ga 8.15.0`
-        * two parameter {applies_to}`stack: ga 8.18.0`
-    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections) {applies_to}`stack: ga 8.13.0`
+        * one parameter
+        * two parameter
+    * [Values]({{mito_docs}}@{{mito_version}}/lib#hdr-Values-Collections)
     * [With]({{mito_docs}}@{{mito_version}}/lib#hdr-With-Collections)
     * [With Replace]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Replace-Collections)
     * [With Update]({{mito_docs}}@{{mito_version}}/lib#hdr-With_Update-Collections)
-    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections) {applies_to}`stack: ga 8.9.2`
+    * [Zip]({{mito_docs}}@{{mito_version}}/lib#hdr-Zip-Collections)
 
-* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto) {applies_to}`stack: ga 8.6.0`
+* [Crypto]({{mito_docs}}@{{mito_version}}/lib#Crypto)
 
     * [Base64]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64-Crypto)
-    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
+    * [Base64 Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Decode-Crypto)
     * [Base64 Raw]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw-Crypto)
-    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto) {applies_to}`stack: ga 8.14.0`
+    * [Base64 Raw Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Base64_Raw_Decode-Crypto)
     * [Hex]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex-Crypto)
-    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto) {applies_to}`stack: ga 8.18.1`
+    * [Hex Decode]({{mito_docs}}@{{mito_version}}/lib#hdr-Hex_Decode-Crypto)
     * [MD5]({{mito_docs}}@{{mito_version}}/lib#hdr-MD5-Crypto)
     * [SHA-1]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_1-Crypto)
     * [SHA-256]({{mito_docs}}@{{mito_version}}/lib#hdr-SHA_256-Crypto)
     * [HMAC]({{mito_docs}}@{{mito_version}}/lib#hdr-HMAC-Crypto)
     * [UUID]({{mito_docs}}@{{mito_version}}/lib#hdr-UUID-Crypto)
 
-* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
+* [File]({{mito_docs}}@{{mito_version}}/lib#File) — the file extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
 
     * [Dir]({{mito_docs}}@{{mito_version}}/lib#hdr-Dir-File)
     * [File]({{mito_docs}}@{{mito_version}}/lib#hdr-File-File)
 
-* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) {applies_to}`stack: ga 8.6.0`
+* [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP)
 
     * [HEAD]({{mito_docs}}@{{mito_version}}/lib#hdr-HEAD-HTTP)
     * [GET]({{mito_docs}}@{{mito_version}}/lib#hdr-GET-HTTP)
@@ -195,33 +251,35 @@ As noted above the `cel` input provides functions, macros, and global variables 
     * [POST]({{mito_docs}}@{{mito_version}}/lib#hdr-POST-HTTP)
     * [POST Request]({{mito_docs}}@{{mito_version}}/lib#hdr-POST_Request-HTTP)
     * [Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Request-HTTP)
-    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP) {applies_to}`stack: ga 8.7.0`
+    * [Basic Authentication]({{mito_docs}}@{{mito_version}}/lib#hdr-Basic_Authentication-HTTP)
     * [Do Request]({{mito_docs}}@{{mito_version}}/lib#hdr-Do_Request-HTTP)
     * [Parse URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_URL-HTTP)
     * [Format URL]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_URL-HTTP)
     * [Parse Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Query-HTTP)
     * [Format Query]({{mito_docs}}@{{mito_version}}/lib#hdr-Format_Query-HTTP)
 
-* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON) {applies_to}`stack: ga 8.6.0`
+* [JSON]({{mito_docs}}@{{mito_version}}/lib#JSON)
 
     * [Encode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Encode_JSON-JSON)
     * [Decode JSON]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON-JSON)
     * [Decode JSON Stream]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream-JSON)
+    * [Decode JSON Stream Lazy]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream_Lazy-JSON) — lazy iterable that decodes concatenated JSON values on demand; accepts bytes, string, or a stream value from `stream_gzip`/`stream_zip` {applies_to}`stack: ga 9.5+`
+    * [Decode JSON Stream Lazy String Numbers]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_JSON_Stream_Lazy_String_Numbers-JSON) {applies_to}`stack: ga 9.5+`
 
-* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.  {applies_to}`stack: ga 8.9.0`
+* [XML]({{mito_docs}}@{{mito_version}}/lib#XML) — the XML extension is initialized with XML schema definitions provided via the `xsd` configuration option.
 
     * [Decode XML]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_XML-XML)
-        * Optional XSD definition in one-parameter form. {applies_to}`stack: ga 8.18.1`
+        * Optional XSD definition in one-parameter form.
 
-* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies. {applies_to}`stack: ga 8.6.0`
+* [Limit]({{mito_docs}}@{{mito_version}}/lib#Limit) — the rate limit extension is initialized with [Okta (as "okta")]({{mito_docs}}@{{mito_version}}/lib#OktaRateLimit) and the [Draft Rate Limit (as "draft")]({{mito_docs}}@{{mito_version}}/lib#DraftRateLimit) policies.
 
     * [Rate Limit]({{mito_docs}}@{{mito_version}}/lib#hdr-Rate_Limit-Limit)
 
-* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader). {applies_to}`stack: ga 8.6.0`
+* [MIME]({{mito_docs}}@{{mito_version}}/lib#MIME) — the MIME extension is initialized with MIME handlers for "application/gzip", ["application/x-ndjson"]({{mito_docs}}@{{mito_version}}/lib#NDJSON), ["application/zip"]({{mito_docs}}@{{mito_version}}/lib#Zip), ["text/csv; header=absent"]({{mito_docs}}@{{mito_version}}/lib#CSVNoHeader), and ["text/csv; header=present"]({{mito_docs}}@{{mito_version}}/lib#CSVHeader).
 
     * [MIME]({{mito_docs}}@{{mito_version}}/lib#hdr-MIME-MIME)
 
-* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field. {applies_to}`stack: ga 8.6.0`
+* [Regexp]({{mito_docs}}@{{mito_version}}/lib#Regexp) — the regular expression extension is initialized with the patterns specified in the user input configuration via the `regexp` field.
 
     * [RE Match]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Match)
     * [RE Find]({{mito_docs}}@{{mito_version}}/lib#hdr-RE_Find)
@@ -234,29 +292,45 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
     * [Sprintf]({{mito_docs}}@{{mito_version}}/lib#hdr-Sprintf-Printf)
 
-* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings) {applies_to}`stack: ga 8.7.0`
+* [Strings]({{mito_docs}}@{{mito_version}}/lib#Strings)
 
     * [String Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_Methods-Strings)
     * [String List Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-String_List_Methods-Strings)
-    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings) {applies_to}`stack: ga 8.15.0`
+    * [Bytes Methods]({{mito_docs}}@{{mito_version}}/lib#hdr-Bytes_Methods-Strings)
 
-* [Time]({{mito_docs}}@{{mito_version}}/lib#Time) {applies_to}`stack: ga 8.6.0`
+* [Time]({{mito_docs}}@{{mito_version}}/lib#Time)
 
     * [Format]({{mito_docs}}@{{mito_version}}/lib#hdr-Format-Time)
     * [Parse Time]({{mito_docs}}@{{mito_version}}/lib#hdr-Parse_Time-Time)
-    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
-    * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3.0`
+    * [Round]({{mito_docs}}@{{mito_version}}/lib#hdr-Round-Time) {applies_to}`stack: ga 9.1+`
+    * [Truncate]({{mito_docs}}@{{mito_version}}/lib#hdr-Truncate-Time) {applies_to}`stack: ga 9.3+`
     * [Global Variables]({{mito_docs}}@{{mito_version}}/lib#hdr-Global_Variables-Time)
-        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats. {applies_to}`stack: ga 8.15.0`
+        * Support for [`DateOnly`](https://pkg.go.dev/time#DateOnly), [`DateTime`](https://pkg.go.dev/time#DateTime) and [`TimeOnly`](https://pkg.go.dev/time#TimeOnly) time formats.
 
-* [Try]({{mito_docs}}@{{mito_version}}/lib#Try) {applies_to}`stack: ga 8.6.0`
+* [Try]({{mito_docs}}@{{mito_version}}/lib#Try)
 
     * [Try]({{mito_docs}}@{{mito_version}}/lib#hdr-Try-Try)
     * [Is Error]({{mito_docs}}@{{mito_version}}/lib#hdr-Is_Error-Try)
 
-* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger. {applies_to}`stack: ga 8.10.3`
+* [Debug]({{mito_docs}}@{{mito_version}}/lib#Debug) — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
 
     * [Debug]({{mito_docs}}@{{mito_version}}/lib#hdr-Debug)
+
+* [Emit]({{mito_docs}}@{{mito_version}}/lib#Emit) — the emit macro publishes events during CEL evaluation instead of collecting them in the `events` array. See [Emit macro](#cel-emit-macro) for details. {applies_to}`stack: ga 9.5+`
+
+* [Stream]({{mito_docs}}@{{mito_version}}/lib#Stream) — stream producers wrap decompression readers around in-memory bytes, returning an opaque stream value for use with lazy decode functions. {applies_to}`stack: ga 9.5+`
+
+    * [stream_gzip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_gzip-Stream)
+    * [stream_zip]({{mito_docs}}@{{mito_version}}/lib#hdr-stream_zip-Stream)
+
+* [CSV]({{mito_docs}}@{{mito_version}}/lib#CSV) — lazy CSV stream decoders that produce rows on demand from a stream, bytes, or string value. {applies_to}`stack: ga 9.5+`
+
+    * [decode_csv_stream_lazy]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_CSV_Stream_Lazy-CSV) — the first row is treated as a header; each subsequent row is returned as a `map<string, string>` keyed by the header values
+    * [decode_csv_stream_lazy_no_header]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_CSV_Stream_Lazy_No_Header-CSV) — each row is returned as a `list<string>` with no header row consumed
+
+* [Lines]({{mito_docs}}@{{mito_version}}/lib#Lines) — lazy line streamer that yields one string per line from a stream, bytes, or string value. {applies_to}`stack: ga 9.5+`
+
+    * [decode_lines]({{mito_docs}}@{{mito_version}}/lib#hdr-Decode_Lines-Lines)
 
 
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the filebeat user-agent string. By default, this value is assigned to all requests' user-agent headers unless the CEL program has already set the user-agent header value. Programs wishing to not provide a user-agent, should set this header to the empty string, `""`.
@@ -265,16 +339,17 @@ Host environment variables are made available via the global map `env`. Only env
 
 The CEL environment enables the [optional types](https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#OptionalTypesVersion) and the [two-variable comprehensions extensions](https://pkg.go.dev/github.com/google/cel-go/ext#TwoVarComprehensions) library using the version defined [here]({{mito_docs}}@{{mito_version}}/lib#TwoVarComprehensionVersion).
 
-* Optional types {applies_to}`stack: ga 8.12.0`
-* Two-variable comprehensions {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* Optional types
+* Two-variable comprehensions {applies_to}`stack: ga 9.1+`
 
 Additionally, it supports authentication via:
 
 * Basic Authentication
-* Digest Authentication {applies_to}`stack: ga 8.12.0`
+* Digest Authentication
 * OAuth2
-* file-based headers {applies_to}`stack: ga 9.3.0`
-* token authentication {applies_to}`stack: ga 8.19.0, unavailable 9.0.0, ga 9.1.0`
+* file-based headers {applies_to}`stack: ga 9.3+`
+* token authentication {applies_to}`stack: ga 9.1+`
+* AWS Authentication {applies_to}`stack: ga 9.3+`
 
 As described in Mito's [HTTP]({{mito_docs}}@{{mito_version}}/lib#HTTP) documentation, configuration for Basic Authentication or token authentication will only affect direct HEAD, GET and POST method calls, not explicity constructed requests run with `.do_request()`. Configuration for Digest Authentication, file-based headers or OAuth2 will be used for all requests made from CEL.
 
@@ -348,6 +423,24 @@ filebeat.inputs:
   resource.url: http://localhost
 ```
 
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    access_key_id:     "AKIAIOSFODNN7EXAMPLE"
+    secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
+```yaml
+filebeat.inputs:
+- type: cel
+  auth.aws:
+    credential_profile_name: fb-aws
+    shared_credential_file: /etc/filebeat/aws_credentials
+  request.url: https://guardduty.us-east-1.amazonaws.com/detector/abc123/findings
+```
+
 ## Input state [input-state-cel]
 
 The `cel` input keeps a runtime state between requests. This state can be accessed by the CEL program and may contain arbitrary objects.
@@ -365,7 +458,7 @@ This can either be calculated explicitly in CEL code, or by using the
 
 If the `rate_limit` extension is used, calculated rate limits are applied directly to the HTTP client
 used by the CEL input. This includes uses of `rate_limit` that do not return their results from the
-CEL context. {applies_to}`stack: ga 9.3.0`
+CEL context. {applies_to}`stack: ga 9.3+`
 
 
 ## CEL input and handling numbers [_cel_input_and_numbers]
@@ -404,7 +497,7 @@ The CEL program that is executed each polling period. This field is required.
 
 `max_executions` is the maximum number of times a CEL program can request to be re-run with a `want_more` field. This is used to ensure that accidental infinite loops do not halt processing. When the execution budget is exceeded, execution will be restarted at the next interval and a warning will be written into the logs. Default: 1000.
 
-The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2.0`
+The number of executions remaining in the execution budget after the completion of the current evaluation is available within the CEL program by referencing the `remaining_executions` global variable. {applies_to}`stack: ga 9.2+`
 
 ### `state` [state-cel]
 
@@ -432,6 +525,46 @@ filebeat.inputs:
         "cursor": {"last_requested_at": now}
     })
 ```
+
+
+### `secret_state` [secret-state-cel]
+
+```{applies_to}
+stack: ga 9.2+
+```
+
+`secret_state` is an optional object holding secret key-value pairs. When configured in a Fleet integration package with `secret: true`, the values are stored encrypted by Fleet and decrypted before being passed to the input.
+
+At runtime, the contents of `secret_state` are placed at `state.secret`, making them available to the CEL program as `state.secret.<key>`. The key `secret` in the top-level `state` configuration is reserved — the input rejects any configuration where `state` contains a `secret` key, since values in `state` cannot be guaranteed to be encrypted in the stored configuration.
+
+`state.secret` is unconditionally added to the redaction list for debug logging, regardless of whether `secret_state` is configured. This means:
+
+- Secrets from `secret_state` are automatically redacted without any `redact` configuration.
+- CEL programs that stash sensitive runtime values (such as session tokens) into `state.secret` during execution will also have those values redacted in debug logs.
+- If `state.secret` is absent at log time, the redaction is a no-op.
+- Values explicitly emitted by CEL `debug()` may include secrets.
+
+```yaml
+filebeat.inputs:
+- type: cel
+  interval: 1m
+  resource.url: https://api.example.com/data
+  secret_state:
+    api_key: "my-secret-api-key"
+  program: |
+    request("GET", state.url).with({
+        "Header": {"X-API-Key": [state.secret.api_key]}
+    }).do_request().as(resp, {
+        "events": [resp.Body.decode_json()],
+        "secret": state.secret,
+    })
+```
+
+In this example, `state.secret.api_key` holds the API key used in request headers. The `"secret": state.secret` line in the return value preserves the secret state across evaluation loops; like any other state field, it must be included in the program's return value to persist between evaluations.
+
+::::{note}
+Enabling `failure_dump` can write secrets (including `state.secret`) to disk, since the dump captures the full CEL evaluation state. This applies to any secrets in state, not only those from `secret_state`.
+::::
 
 
 ### `allowed_environment` [environ-cel]
@@ -503,7 +636,7 @@ filebeat.inputs:
                      <xs:element name="company" type="xs:string"/>
 ```
 
-The `xsd` for an XML document structure may be omitted. {applies_to}`stack: ga 8.18.1`
+The `xsd` for an XML document structure may be omitted.
 
 
 ### `auth.basic.enabled` [_auth_basic_enabled]
@@ -829,6 +962,137 @@ The type of token to authenticate with, for example "Token" or "Bearer".
 The token value to use.
 
 
+### `auth.aws.enabled` [_auth_aws_enabled]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+When set to `false`, disables the file AWS auth configuration. Default: `true`.
+
+::::{note}
+AWS auth settings are disabled if either `enabled` is set to `false` or the `auth.aws` section is missing.
+::::
+
+### `auth.aws.access_key_id` [_auth_aws_access_key_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS access key ID. It should be used with [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key).
+
+### `auth.aws.secret_access_key` [_auth_aws_secret_access_key]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS secret access key. It should be used with [`auth.aws.access_key_id`](#_auth_aws_access_key_id).
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.session_token` [_auth_aws_session_token]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The AWS session token that can be optionally set when direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) are used.
+
+### `auth.aws.shared_credential_file` [_auth_aws_shared_credential_file]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The path of the AWS shared credentials file.
+
+::::{note}
+Use either direct keys ([`auth.aws.access_key_id`](#_auth_aws_access_key_id) and [`auth.aws.secret_access_key`](#_auth_aws_secret_access_key)) or a shared credentials file ([`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file)). If both are set, the direct keys take precedence.
+
+If neither the direct keys nor the shared credentials file is set, AWS SDK [LoadDefaultConfig](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/config#LoadDefaultConfig) will be used.
+::::
+
+### `auth.aws.credential_profile_name` [_auth_aws_credential_profile_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The profile name of the AWS shared credentials file. This is optional and can be used with [`auth.aws.shared_credential_file`](#_auth_aws_shared_credential_file).
+
+### `auth.aws.role_arn` [_auth_aws_role_arn]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+The IAM Role ARN to assume. Assume-role authentication is layered on top of the base credentials, which may come from a direct access key, a shared credentials file, or the default SDK configuration. The assume-role request will use whichever credentials have already been established.
+
+### `auth.aws.external_id` [_auth_aws_external_id]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the external ID to use for every IAM assume-role request. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.duration` [_auth_aws_assume_role_duration]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the duration of the credentials retrieved by the IAM assume-role. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.assume_role.expiry_window` [_auth_aws_assume_expiry_window]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the credentials retrieved by the IAM assume-role to trigger refreshing prior to the credentials actually expiring. This is optional and can be used when [`auth.aws.role_arn`](#_auth_aws_role_arn) is configured.
+
+### `auth.aws.service_name` [_auth_aws_service_name]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS service name that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `auth.aws.default_region` [_auth_aws_default_region]
+
+```{applies_to}
+stack: ga 9.3.0
+```
+
+Specifies the AWS region that will be used in the v4 signing process. This is optional and if not set it will be inferred by the request URL.
+
+### `otel.trace` [_otel_trace]
+
+```{applies_to}
+stack: beta 9.4.0
+```
+
+OpenTelemetry tracing is activated using OTel-standard environment variables. You can use input settings to override the default span attribute redaction behavior.
+
+By default, the value of an HTTP header or query string parameter will be redacted in span attributes if its name contains a word that suggests sensitive data and its full name isn't in a list of known-safe names.
+
+The following settings can override the default behavior for specific full names.
+
+### `otel.trace.redacted` [_otel_trace_redacted]
+
+A list of headers and query string parameters that should have their values redacted in OpenTelemetry tracing span attributes. Not case sensitive.
+
+### `otel.trace.unredacted` [_otel_trace_unredacted]
+
+A list of headers and query string parameters that should not have their values redacted in OpenTelemetry tracing span attributes. Not case sensitive.
 
 ### `resource.url` [resource-parameters]
 
@@ -928,12 +1192,23 @@ The maximum time to wait before a retry is attempted. Default: `60s`.
 
 ### `resource.redirect.forward_headers` [_resource_redirect_forward_headers]
 
-When set to `true` request headers are forwarded in case of a redirect. Default: `false`.
+When set to `true` request headers are forwarded in case of a redirect. Headers listed in `redirect.sensitive_headers` are removed automatically on cross-origin or HTTPS-to-HTTP redirects. Default: `false`.
 
 
 ### `resource.redirect.headers_ban_list` [_resource_redirect_headers_ban_list]
 
 When `redirect.forward_headers` is set to `true`, all headers *except* the ones defined in this list will be forwarded. Default: `[]`.
+
+
+### `resource.redirect.sensitive_headers` [_resource_redirect_sensitive_headers]
+
+```{applies_to}
+stack: ga 9.3+
+```
+
+A list of header names that are automatically removed when a redirect crosses to a different host or downgrades from HTTPS to HTTP. This prevents credential leakage to unintended origins. Default: `["Authorization", "Proxy-Authorization", "Cookie"]`.
+
+Set to `[]` to disable cross-origin header stripping and forward all headers regardless of the redirect target (not recommended unless the target shares the same authentication domain).
 
 
 ### `resource.redirect.max_redirects` [_resource_redirect_max_redirects]
@@ -964,14 +1239,14 @@ The maximum burst size. Burst is the maximum number of resource requests that ca
 
 It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations. This option is enabled by setting `resource.tracer.enabled` to true and setting the `resource.tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `resource.tracer.enabled` to false without unsetting the filename option.
 
-Enabling this option compromises security and should only be used for debugging. {applies_to}`stack: ga 8.15.0`
+Enabling this option compromises security and should only be used for debugging.
 
 
 ### `resource.tracer.filename` [_resource_tracer_filename]
 
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. The path must point to a target in the cel directory in the [Filebeat logs directory](https://www.elastic.co/docs/reference/beats/filebeat/directory-layout).
 
-Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted. {applies_to}`stack: ga 8.15.0`
+Setting `resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching the filename option to be deleted.
 
 
 ### `resource.tracer.maxsize` [_resource_tracer_maxsize]
@@ -1006,6 +1281,8 @@ stack: ga 8.7.0
 ```
 
 During debug level logging, the `state` object and the resulting evaluation result are included in logs. This may result in leaking of secrets. In order to prevent this, fields may be redacted or deleted from the logged `state`. The `redact` configuration allows users to configure this field redaction behavior. For safety reasons if the `redact` configuration is missing a warning is logged.
+
+The `state.secret` field is always redacted automatically (see [`secret_state`](#secret-state-cel)). When `secret_state` is configured and `redact` is not, the missing-redact warning is suppressed.
 
 In the case of no-required redaction an empty `redact.fields` configuration should be used to silence the logged warning.
 
@@ -1193,5 +1470,4 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 #### `publisher_pipeline.disable_host` [_publisher_pipeline_disable_host_4]
 
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
-
 

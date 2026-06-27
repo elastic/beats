@@ -21,9 +21,10 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	logger        *logp.Logger
-	client        *sdk.Client
-	organizations []string
+	logger             *logp.Logger
+	client             *sdk.Client
+	organizations      []string
+	switchportStatuses []string
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -48,10 +49,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		logger:        logger,
-		client:        client,
-		organizations: config.Organizations,
+		BaseMetricSet:      base,
+		logger:             logger,
+		client:             client,
+		organizations:      config.Organizations,
+		switchportStatuses: config.SwitchportStatuses,
 	}, nil
 }
 
@@ -102,7 +104,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceUplinks failed; %w", err)
 		}
 
-		err = getDeviceSwitchports(m.client, org, devices, collectionPeriod, m.logger)
+		err = getDeviceSwitchports(m.client, org, devices, collectionPeriod, m.switchportStatuses, m.logger)
 		if err != nil {
 			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}

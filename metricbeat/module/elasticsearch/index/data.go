@@ -45,6 +45,8 @@ type Index struct {
 	TierPreference string     `json:"tier_preference,omitempty"`
 	CreationDate   string     `json:"creation_date,omitempty"`
 	Version        string     `json:"version,omitempty"`
+	Mode           string     `json:"mode,omitempty"`
+	Codec          string     `json:"codec,omitempty"`
 	Shards         shardStats `json:"shards"`
 }
 
@@ -196,7 +198,7 @@ func eventsMapping(
 	}
 
 	indicesSettingsPattern := "*,-.*"
-	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
+	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created", "*.settings.index.mode", "*.settings.index.codec"}
 	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
 	if err != nil {
 		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
@@ -335,6 +337,13 @@ func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
 	}
 
 	idx.Version = indexVersion
+
+	if indexMode, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.mode"); err == nil {
+		idx.Mode = indexMode
+	}
+	if indexCodec, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.codec"); err == nil {
+		idx.Codec = indexCodec
+	}
 
 	return nil
 }

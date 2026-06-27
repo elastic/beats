@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Elasticsearch fields [exported-fields-elasticsearch]
 
@@ -981,6 +982,12 @@ Elasticsearch module
     type: boolean
 
 
+**`elasticsearch.node.version`**
+:   Elasticsearch version reported by the node (for example, `9.2.0`).
+
+    type: keyword
+
+
 ## ccr [_ccr]
 
 Cross-cluster replication stats
@@ -1366,6 +1373,14 @@ index
 
 
 **`elasticsearch.index.version`**
+:   type: keyword
+
+
+**`elasticsearch.index.mode`**
+:   type: keyword
+
+
+**`elasticsearch.index.codec`**
 :   type: keyword
 
 
@@ -2086,12 +2101,6 @@ ml
 ## node [_node]
 
 node
-
-**`elasticsearch.node.version`**
-:   Node version.
-
-    type: keyword
-
 
 ## jvm [_jvm]
 
@@ -2861,6 +2870,66 @@ File system summary
 
 **`elasticsearch.cluster.pending_task.time_in_queue.ms`**
 :   Time in queue
+
+    type: long
+
+
+## security.stats [_security.stats]
+
+```{applies_to}
+stack: ga 9.2.0
+```
+
+Per-node security statistics collected from the Elasticsearch Security Stats API (`GET /_security/stats`). Available since Elasticsearch 9.2.
+
+## dls [_dls]
+
+Document Level Security (DLS) counters.
+
+## cache [_cache]
+
+Per-node cache used to materialize the bitsets that enforce DLS queries. Sourced from the `roles.dls.bit_set_cache` block in the `GET /_security/stats` response.
+
+**`elasticsearch.security.stats.dls.cache.entries.count`**
+:   Current number of cached entries on this node.
+
+    type: long
+
+
+**`elasticsearch.security.stats.dls.cache.memory.bytes`**
+:   Current memory consumed by the DLS cache on this node, in bytes.
+
+    type: long
+
+    format: bytes
+
+
+**`elasticsearch.security.stats.dls.cache.hits.count`**
+:   Number of cache lookups served from the cache since node startup.
+
+    type: long
+
+
+**`elasticsearch.security.stats.dls.cache.misses.count`**
+:   Number of cache lookups that had to materialize an entry since node startup.
+
+    type: long
+
+
+**`elasticsearch.security.stats.dls.cache.evictions.count`**
+:   Number of entries evicted (due to size limit or expiration) since node startup.
+
+    type: long
+
+
+**`elasticsearch.security.stats.dls.cache.hits.time.ms`**
+:   Cumulative time spent serving cache hits since node startup, in milliseconds.
+
+    type: long
+
+
+**`elasticsearch.security.stats.dls.cache.misses.time.ms`**
+:   Cumulative time spent materializing entries on cache misses since node startup, in milliseconds.
 
     type: long
 

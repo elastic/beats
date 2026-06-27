@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-oracle.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Oracle fields [exported-fields-oracle]
 
@@ -127,7 +128,7 @@ Opened cursors statistic
 
 ## parse [_parse]
 
-Parses statistic information that occured in the current session
+Parses statistic information that occurred in the current session
 
 **`oracle.performance.cursors.parse.real`**
 :   Real number of parses that occurred: session cursor cache hits - parse count (total)

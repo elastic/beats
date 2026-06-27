@@ -62,14 +62,14 @@ func TestFetch(t *testing.T) {
 				if !ok {
 					t.Fatal("write", "unable to cast tags to mapstr.M")
 				} else {
-					assert.Equal(t, len(tags), 1)
+					assert.Len(t, tags, 1)
 					hasTag = true
 				}
 			}
 		}
 	}
-	assert.Equal(t, hasTag, true)
-	assert.Equal(t, doesntHaveTag, true)
+	assert.True(t, hasTag)
+	assert.True(t, doesntHaveTag)
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
 }

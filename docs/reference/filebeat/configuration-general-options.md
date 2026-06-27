@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-general-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Configure general settings [configuration-general-options]
@@ -77,6 +78,37 @@ filebeat.registry.migrate_file: /path/to/old/registry_file
 ```
 
 The registry will be migrated to the new location only if a registry using the directory format does not already exist.
+
+
+### `registry.backend` [_registry_backend]
+
+The storage backend used for the registry. Supported values:
+
+- `memlog` (default): An in-memory log with periodic disk flushing. This is the original backend and is well-tested.
+- `otel_file_storage` {applies_to}`stack: preview 9.5`: Persists registry state using the same on-disk layout as the OpenTelemetry Collector [file_storage](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage) extension. Registry files live under the directory specified by `registry.path`. Optional settings are configured under `registry.otel_file_storage`.
+
+::::{warning}
+The `otel_file_storage` backend is in technical preview and may be changed or removed in a future release. Elastic will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features.
+::::
+
+```yaml
+filebeat.registry.backend: memlog
+```
+
+### `registry.otel_file_storage` [_registry_otel_file_storage]
+```{applies_to}
+  stack: preview 9.5
+```
+
+::::{warning}
+This functionality is in technical preview and may be changed or removed in a future release.
+::::
+
+These settings apply only when `registry.backend` is set to `otel_file_storage`. They map directly to the OpenTelemetry Collector [file_storage extension configuration](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage). Filebeat overrides the following defaults:
+
+- `directory` is always set to the resolved `registry.path`.
+- `create_directory` defaults to `true` when no `otel_file_storage` section is provided (upstream default is `false`).
+- `directory_permissions` defaults to `0700` when `create_directory` is `true` and `directory_permissions` is not set explicitly.
 
 
 ### `shutdown_timeout` [shutdown-timeout]
@@ -171,4 +203,3 @@ Sets the maximum number of CPUs that can be executing simultaneously. The defaul
 ### `timestamp.precision` [_timestamp_precision]
 
 Configure the precision of all timestamps. By default it is set to millisecond. Available options: millisecond, microsecond, nanosecond
-

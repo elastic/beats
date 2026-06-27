@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/add-fields.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Add fields [add-fields]
@@ -49,5 +50,5 @@ processors:
         op_type: "index"
 ```
 
-When the event is ingested (e.g. by Elastisearch) the document will have `op_type: "index"` set as a metadata field.
+When the event is ingested (for example, by Elasticsearch) the document will have `op_type: "index"` set as a metadata field.
 

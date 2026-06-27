@@ -21,7 +21,9 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -33,10 +35,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/slabqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
+
+// reaperInterval is how often the reaper re-checks pending clients whose events
+// have not drained yet. Finalization is cleanup, not latency-sensitive, so a
+// coarse interval keeps the reaper cheap; a client whose events are already
+// acked when it is handed over is finalized immediately on the notify wakeup.
+const reaperInterval = 50 * time.Millisecond
 
 // Pipeline implementation providint all beats publisher functionality.
 // The pipeline consists of clients, processors, a central queue, an output
@@ -59,7 +67,7 @@ type Pipeline struct {
 
 	monitors Monitors
 
-	outputController *outputController
+	outputController outputController
 
 	observer observer
 
@@ -71,10 +79,30 @@ type Pipeline struct {
 	// elapses.
 	forceCloseQueue bool
 
+	// Close _shouldn't_ be called multiple times, but handle it gracefully if it does.
+	closeOnce sync.Once
+
 	processors processing.Supporter
 
-	// paths contains the paths configuration for processor initialization.
-	paths *paths.Path
+	// clients is the set of connected clients. The Pipeline finalizes each of
+	// them (stage two of client shutdown, client.disconnect) when it is
+	// disconnected. Clients register on ConnectWith and remove themselves when
+	// disconnected. Guarded by clientsMu.
+	clientsMu sync.Mutex
+	clients   map[*client]struct{}
+
+	// reaper state. A single goroutine (reapClosedClients) finalizes clients
+	// that were Closed while the pipeline keeps running, as soon as their
+	// events drain (their producer's ACKWaitChan closes), instead of waiting
+	// for the whole pipeline to disconnect. This keeps the clients map, ack
+	// handlers and active-client metrics from growing under high client churn.
+	// reaperPending holds the clients awaiting drain (guarded by reaperMu);
+	// reaperNotify wakes the reaper when the set changes; reaperDone stops it.
+	reaperMu      sync.Mutex
+	reaperPending map[*client]struct{}
+	reaperNotify  chan struct{}
+	reaperDone    chan struct{}
+	reaperWG      sync.WaitGroup
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -83,14 +111,12 @@ type Settings struct {
 	// When and how WaitClose is applied depends on WaitCloseMode.
 	WaitClose time.Duration
 
+	// This field has no effect when running as a Beats receiver.
 	WaitCloseMode WaitCloseMode
 
 	Processors processing.Supporter
 
 	InputQueueSize int
-
-	// Paths contains the paths configuration used for processor initialization.
-	Paths *paths.Path
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -113,6 +139,21 @@ const (
 	WaitOnPipelineCloseThenForce
 )
 
+// outputController is the interface between the Pipeline and the output,
+// which may be either the legacy Beats output pipeline (under the process
+// runtime) or a bridge to the OTel Collector (when running as a Beats
+// receiver under the otel runtime).
+type outputController interface {
+	// queueProducer creates a queue producer with the given config, blocking
+	// until the queue is created if it does not yet exist.
+	queueProducer(config queue.ProducerConfig) queue.Producer[publisher.Event]
+
+	// Close the queue and output, waiting for pending events until all are
+	// acknowledged or the provided context expires.
+	// The force parameter has no effect when running as a Beats receiver.
+	waitClose(ctx context.Context, force bool) error
+}
+
 // OutputReloader interface, that can be queried from an active publisher pipeline.
 // The output reloader can be used to change the active output.
 type OutputReloader interface {
@@ -133,7 +174,7 @@ func New(
 	settings Settings,
 ) (*Pipeline, error) {
 	if monitors.Logger == nil {
-		monitors.Logger = logp.NewLogger("publish")
+		monitors.Logger = beat.Logger.Named("publish")
 	}
 
 	p := &Pipeline{
@@ -142,14 +183,7 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
-		paths:            settings.Paths,
-	}
-	switch settings.WaitCloseMode {
-	case WaitOnPipelineClose, WaitOnPipelineCloseThenForce:
-		if settings.WaitClose > 0 {
-			p.waitCloseTimeout = settings.WaitClose
-		}
-	default:
+		clients:          make(map[*client]struct{}),
 	}
 
 	p.forceCloseQueue = settings.WaitCloseMode == WaitOnPipelineCloseThenForce
@@ -165,35 +199,213 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
+	queueFactory, _, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beat.Paths)
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	outputController, err := newProcessOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
-	p.outputController = output
-	p.outputController.Set(out)
+	outputController.Set(out)
+	p.outputController = outputController
 
+	p.startReaper()
 	return p, nil
 }
 
-// Close stops the pipeline, outputs and queue.
-// If WaitClose with WaitOnPipelineClose mode is configured, Close will block
+func NewForReceiver(
+	beatInfo beat.Info,
+	monitors Monitors,
+	userQueueConfig conf.Namespace,
+	settings Settings,
+) (*Pipeline, error) {
+	p := &Pipeline{
+		beatInfo:         beatInfo,
+		monitors:         monitors,
+		observer:         newMetricsObserver(monitors.Metrics),
+		waitCloseTimeout: settings.WaitClose,
+		processors:       settings.Processors,
+		clients:          make(map[*client]struct{}),
+	}
+
+	// Convert the raw queue config to a parsed Settings object that will
+	// be used during queue creation. This lets us fail immediately on startup
+	// if there's a configuration problem.
+	queueType := defaultQueueType
+	if b := userQueueConfig.Name(); b != "" {
+		queueType = b
+	}
+	// Receiver pipelines route through the OTel output controller. With an
+	// in-memory queue configuration the controller joins the process-global
+	// slabqueue pool, sharing one in-memory event budget across all receivers.
+	// With an explicit queue.disk config the controller falls back to building
+	// its queue via queueFactory and owns it outright.
+	queueFactory, queueConfig, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config(), beatInfo.Paths)
+	if err != nil {
+		return nil, err
+	}
+
+	p.outputController, err = newOTelOutputController(beatInfo, monitors, p.observer, queueFactory, queueConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	p.startReaper()
+	return p, nil
+}
+
+// Disconnect stops the pipeline, outputs and queue.
+// If WaitClose with WaitOnPipelineClose mode is configured, Disconnect will block
 // for a duration of WaitClose, if there are still active events in the pipeline.
-// Note: clients must be closed before calling Close.
-func (p *Pipeline) Close() error {
-	log := p.monitors.Logger
+// Note: clients will no longer accept new Publish calls once Disconnect is started,
+// and will no longer receive event acknowledgments once Disconnect returns.
+//
+// The Beater is expected to close its clients (stage one) before disconnecting
+// the pipeline; Disconnect then performs stage two for any still-registered
+// client — see issues #50104 and #49794.
+func (p *Pipeline) Disconnect(ctx context.Context) error {
+	p.closeOnce.Do(func() {
+		log := p.monitors.Logger
 
-	log.Debug("close pipeline")
+		log.Debug("close pipeline")
 
-	// Note: active clients are not closed / disconnected.
-	p.outputController.WaitClose(p.waitCloseTimeout, p.forceCloseQueue)
+		// The Beater determines how long to wait before full disconnection by
+		// supplying a context with a deadline (issue #49794). If the caller did
+		// not set one, fall back to the pipeline's configured waitCloseTimeout.
+		timeoutCtx := ctx
+		if _, hasDeadline := ctx.Deadline(); !hasDeadline {
+			var cancel context.CancelFunc
+			timeoutCtx, cancel = context.WithTimeout(context.Background(), p.waitCloseTimeout)
+			defer cancel()
+		}
+		p.outputController.waitClose(timeoutCtx, p.forceCloseQueue)
 
-	p.observer.cleanup()
+		// Stage two of client shutdown: the queue has now drained or been
+		// force-closed and no further acknowledgments will arrive, so finalize
+		// every still-registered client (stop ack handling, drop references).
+		p.disconnectClients()
+
+		// Stop the reaper now that all clients are finalized, and wait for it
+		// to exit so it does not outlive the pipeline.
+		close(p.reaperDone)
+		p.reaperWG.Wait()
+
+		p.observer.cleanup()
+	})
 	return nil
+}
+
+// registerClient adds a connected client to the set the Pipeline finalizes on
+// Disconnect.
+func (p *Pipeline) registerClient(c *client) {
+	p.clientsMu.Lock()
+	p.clients[c] = struct{}{}
+	p.clientsMu.Unlock()
+}
+
+// unregisterClient removes a client from the set once it has been disconnected.
+// Called from client.disconnect via the onRemove callback.
+func (p *Pipeline) unregisterClient(c *client) {
+	p.clientsMu.Lock()
+	delete(p.clients, c)
+	p.clientsMu.Unlock()
+}
+
+// disconnectClients finalizes every connected client (stage two of client
+// shutdown). It snapshots the set under the lock and calls disconnect outside
+// it, because client.disconnect calls back into unregisterClient (which takes
+// the same lock). disconnect is idempotent, so a client already finalized is
+// unaffected.
+func (p *Pipeline) disconnectClients() {
+	p.clientsMu.Lock()
+	clients := make([]*client, 0, len(p.clients))
+	for c := range p.clients {
+		clients = append(clients, c)
+	}
+	p.clientsMu.Unlock()
+
+	for _, c := range clients {
+		c.disconnect()
+	}
+}
+
+// startReaper initializes the reaper state and launches the reaper goroutine.
+// Called once from each pipeline constructor.
+func (p *Pipeline) startReaper() {
+	p.reaperPending = make(map[*client]struct{})
+	p.reaperNotify = make(chan struct{}, 1)
+	p.reaperDone = make(chan struct{})
+	p.reaperWG.Add(1)
+	go func() {
+		defer p.reaperWG.Done()
+		p.reapClosedClients()
+	}()
+}
+
+// finalizeWhenDrained hands a Closed client to the reaper so it is finalized
+// (stage two) as soon as its already-published events are acknowledged, rather
+// than lingering until the whole pipeline disconnects.
+func (p *Pipeline) finalizeWhenDrained(c *client) {
+	p.reaperMu.Lock()
+	p.reaperPending[c] = struct{}{}
+	p.reaperMu.Unlock()
+	// Wake the reaper so it rebuilds its wait set. Non-blocking: a pending
+	// notify already covers this change.
+	select {
+	case p.reaperNotify <- struct{}{}:
+	default:
+	}
+}
+
+// reapClosedClients runs as a single goroutine for the pipeline's lifetime. It
+// finalizes Closed-but-not-yet-drained clients as their events are
+// acknowledged. Each pass non-blockingly sweeps the pending set and finalizes
+// every client whose ACKWaitChan has closed — O(pending) per pass, so a burst
+// of closing clients drains in one pass rather than the O(N^2) a per-client
+// wait would cost. When nothing is pending it blocks until a client is handed
+// over or the pipeline disconnects; otherwise it re-sweeps every reaperInterval.
+// Using one goroutine (not one per client) also keeps it out of per-client
+// goroutine-leak accounting.
+func (p *Pipeline) reapClosedClients() {
+	for {
+		p.reaperMu.Lock()
+		var ready []*client
+		for c := range p.reaperPending {
+			select {
+			case <-c.producer.ACKWaitChan():
+				ready = append(ready, c)
+			default:
+			}
+		}
+		for _, c := range ready {
+			delete(p.reaperPending, c)
+		}
+		pending := len(p.reaperPending)
+		p.reaperMu.Unlock()
+
+		for _, c := range ready {
+			c.disconnect()
+		}
+
+		if pending == 0 {
+			// Nothing to watch: block until a client is handed over or we stop.
+			select {
+			case <-p.reaperDone:
+				return
+			case <-p.reaperNotify:
+			}
+		} else {
+			// Some clients are still draining: re-sweep soon.
+			select {
+			case <-p.reaperDone:
+				return
+			case <-p.reaperNotify:
+			case <-time.After(reaperInterval):
+			}
+		}
+	}
 }
 
 // Connect creates a new client with default settings.
@@ -225,7 +437,9 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		canDrop = true
 	}
 
-	waitClose := cfg.WaitClose
+	// Note: cfg.WaitClose no longer makes client.Close block. Pipeline.Disconnect
+	// (bounded by its context) is now responsible for waiting on outstanding
+	// acknowledgments — see issues #50104 and #49794.
 
 	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
 	if err != nil {
@@ -250,16 +464,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	ackHandler := cfg.EventListener
 
-	var waiter *clientCloseWaiter
-	if waitClose > 0 {
-		waiter = newClientCloseWaiter(waitClose)
-		if ackHandler == nil {
-			ackHandler = waiter
-		} else {
-			ackHandler = acker.Combine(waiter, ackHandler)
-		}
-	}
-
 	producerCfg := queue.ProducerConfig{
 		ACK: func(count int) {
 			client.observer.eventsACKed(count)
@@ -274,13 +478,20 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client.eventListener = ackHandler
-	client.waiter = waiter
 	client.producer = p.outputController.queueProducer(producerCfg)
 	if client.producer == nil {
 		// This can only happen if the pipeline was shut down while clients
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
 	}
+
+	// Register the client so the Pipeline can finalize it (stage two of
+	// shutdown) when the pipeline disconnects. The client removes itself from
+	// the registry when it is disconnected, and hands itself to the reaper on
+	// Close so it is finalized as soon as its events drain.
+	client.onRemove = func() { p.unregisterClient(client) }
+	client.requestFinalize = func() { p.finalizeWhenDrained(client) }
+	p.registerClient(client)
 
 	p.observer.clientConnected()
 	return client, nil
@@ -290,35 +501,61 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 	if p.processors == nil {
 		return nil, nil
 	}
-	return p.processors.Create(cfg, noPublish, p.paths)
+	return p.processors.Create(cfg, noPublish)
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
-	return p.outputController
+	if r, ok := p.outputController.(OutputReloader); ok {
+		return r
+	}
+	return noopReloader{}
 }
 
 // Parses the given config and returns a QueueFactory based on it.
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
+// It also returns the parsed queue settings (with defaults applied) so callers
+// can detect mismatched configs between pipelines that connect with the same
+// shared intake queue id.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C, paths *paths.Path) (queue.QueueFactory[publisher.Event], any, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return memqueue.FactoryForSettings(settings), nil
+		return memqueue.FactoryForSettings[publisher.Event](settings), settings, nil
+	case slabqueue.QueueType:
+		settings, err := slabqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, nil, err
+		}
+		return slabqueue.FactoryForSettings[publisher.Event](settings), settings, nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return diskqueue.FactoryForSettings(settings), nil
+		return diskqueue.FactoryForSettings(settings, paths), settings, nil
 	default:
-		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
+		return nil, nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
+}
+
+type noopReloader struct{}
+
+func (n noopReloader) Reload(
+	cfg *reload.ConfigWithMeta,
+	_ func(outputs.Observer, conf.Namespace) (outputs.Group, error),
+) error {
+	// This function should never be called, but if it is, return an error we can troubleshoot.
+	var unitID string
+	if cfg != nil {
+		unitID = cfg.InputUnitID
+	}
+	return fmt.Errorf("unsupported reload triggered by unit '%v'", unitID)
 }
 
 type noopClientListener struct{}

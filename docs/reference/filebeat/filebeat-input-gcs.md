@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-gcs.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Google Cloud Storage Input [filebeat-input-gcs]
@@ -149,7 +150,7 @@ Now let’s explore the configuration attributes a bit more elaborately.
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
-6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1.0`
+6. [batch_size](#attrib-batch_size-gcs) {applies_to}`stack: ga 9.1+`
 7. [max_workers](#attrib-max_workers-gcs)
 8. [poll](#attrib-poll-gcs)
 9. [poll_interval](#attrib-poll_interval-gcs)
@@ -158,7 +159,7 @@ Now let’s explore the configuration attributes a bit more elaborately.
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field-gcs)
 13. [timestamp_epoch](#attrib-timestamp_epoch-gcs)
 14. [retry](#attrib-retry-gcs)
-15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.2.0`
+15. [custom_properties](#attrib-custom-properties) {applies_to}`stack: ga 9.2+`
 
 
 ### `project_id` [attrib-project-id]
@@ -390,7 +391,7 @@ Some object properties can be **set** or **overridden** at the input level with 
 
 #### `content_type` [attrib-content-type]
 
-Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+Use the `content_type` configuration attribute to set a user-defined content type for the object property. Setting a custom content type only sets the `content-type` property of a object if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Bucket level definitions always take precedence.
 
 ##### Example configuration
 
@@ -428,7 +429,7 @@ filebeat.inputs:
 
 #### `encoding` [attrib-encoding]
 
-Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Container level definitions always take precedence.
+Use the `encoding` configuration attribute to set a user-defined encoding for the object property. Setting a custom encoding only sets the `encoding` property of a object if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `bucket` level in the configuration. Bucket level definitions always take precedence.
 
 ##### Example configuration
 

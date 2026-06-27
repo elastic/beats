@@ -25,7 +25,9 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -34,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -499,18 +500,20 @@ type mockManager struct {
 	enabled bool
 }
 
-func (m mockManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
-func (m mockManager) CheckRawConfig(cfg *config.C) error  { return nil }
-func (m mockManager) Enabled() bool                       { return m.enabled }
-func (m mockManager) RegisterAction(action client.Action) {}
-func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
+func (m mockManager) AgentInfo() management.AgentInfo         { return management.AgentInfo{} }
+func (m mockManager) CheckRawConfig(cfg *config.C) error      { return nil }
+func (m mockManager) Enabled() bool                           { return m.enabled }
+func (m mockManager) RegisterAction(action management.Action) {}
+func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook management.DiagnosticHook) {
 }
 func (m mockManager) SetPayload(payload map[string]any)             {}
 func (m mockManager) SetStopCallback(f func())                      {}
 func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) PreInit() error                                { return nil }
+func (m mockManager) PostInit()                                     {}
 func (m mockManager) Status() status.Status                         { return status.Status(-42) }
 func (m mockManager) Stop()                                         {}
-func (m mockManager) UnregisterAction(action client.Action)         {}
+func (m mockManager) UnregisterAction(action management.Action)     {}
 func (m mockManager) UpdateStatus(status status.Status, msg string) {}
 
 func TestManager(t *testing.T) {
@@ -580,4 +583,41 @@ func TestMultipleLoadMeta(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+// TestRunShutdownWatchdogPromptReturn verifies that when Run returns promptly
+// (runReturned is closed) the watchdog returns without disconnecting.
+func TestRunShutdownWatchdogPromptReturn(t *testing.T) {
+	runReturned := make(chan struct{})
+	close(runReturned)
+
+	var disconnected atomic.Bool
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		// A long grace: it must not be reached because runReturned is closed.
+		runShutdownWatchdog(runReturned, time.Hour, func() { disconnected.Store(true) })
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(10 * time.Second):
+		t.Fatal("watchdog did not return after Run returned")
+	}
+	assert.False(t, disconnected.Load(), "watchdog must not disconnect when Run returns promptly")
+}
+
+// TestRunShutdownWatchdogTimeoutDisconnects verifies that when Run does not
+// return within the grace period the watchdog disconnects the pipeline.
+func TestRunShutdownWatchdogTimeoutDisconnects(t *testing.T) {
+	runReturned := make(chan struct{}) // never closed: simulates a hung beater
+
+	disconnected := make(chan struct{})
+	go runShutdownWatchdog(runReturned, time.Millisecond, func() { close(disconnected) })
+
+	select {
+	case <-disconnected:
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "watchdog must disconnect the pipeline when Run does not return within the grace period")
+	}
 }

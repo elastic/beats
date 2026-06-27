@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-mongodb.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # MongoDB fields [exported-fields-mongodb]
 
@@ -145,50 +146,80 @@ MongoDB collection statistics metrics.
     type: long
 
 
-**`mongodb.collstats.stats.stats.size`**
+**`mongodb.collstats.stats.size`**
 :   The total uncompressed size in memory of all records in a collection.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.count`**
+**`mongodb.collstats.stats.count`**
 :   The number of objects or documents in this collection.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.avgObjSize`**
+**`mongodb.collstats.stats.avgObjSize`**
 :   The average size of an object in the collection (in bytes).
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.storageSize`**
+**`mongodb.collstats.stats.storageSize`**
 :   The total amount of storage allocated to this collection for document storage (in bytes).
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.totalIndexSize`**
+**`mongodb.collstats.stats.totalIndexSize`**
 :   The total size of all indexes (in bytes).
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.totalSize`**
+**`mongodb.collstats.stats.totalSize`**
 :   The sum of the storageSize and totalIndexSize (in bytes).
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.max`**
+**`mongodb.collstats.stats.max`**
 :   Shows the maximum number of documents that may be present in a capped collection.
 
     type: long
 
 
-**`mongodb.collstats.stats.stats.nindexes`**
+**`mongodb.collstats.stats.nindexes`**
 :   The number of indexes on the collection. All collections have at least one index on the _id field.
+
+    type: long
+
+
+**`mongodb.collstats.stats.freeStorageSize`** {applies_to}`stack: ga 9.2.0`
+:   Unused but allocated space (in bytes) for the collection; can be used to estimate fragmentation. Present in newer MongoDB versions only.
+
+    type: long
+
+
+**`mongodb.collstats.stats.capped`** {applies_to}`stack: ga 9.2.0`
+:   Indicates whether the collection is capped (fixed-size, circular behavior).
+
+    type: boolean
+
+
+**`mongodb.collstats.stats.scaleFactor`** {applies_to}`stack: ga 9.2.0`
+:   Scale factor applied to size-related metrics (for example, `1` or `1024`). Use to derive raw byte counts if metrics are scaled.
+
+    type: long
+
+
+**`mongodb.collstats.stats.shardCount`** {applies_to}`stack: ga 9.2.0`
+:   Number of shards for this collection (sharded collections only). Indicates how data is distributed across the cluster.
+
+    type: long
+
+
+**`mongodb.collstats.stats.numOrphanDocs`** {applies_to}`stack: ga 9.2.0`
+:   Number of orphaned documents in the collection (MongoDB 6.0+). Orphaned documents exist on shards but are not owned by those shards.
 
     type: long
 

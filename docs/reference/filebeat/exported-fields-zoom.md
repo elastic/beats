@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-zoom.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Zoom fields [exported-fields-zoom]
 
@@ -832,19 +833,19 @@ Module for parsing Zoom API Webhooks.
 
 
 **`zoom.registrant.purchasing_time_frame`**
-:   Choosen purchase timeframe of the user registering to a meeting or webinar
+:   Chosen purchase timeframe of the user registering to a meeting or webinar
 
     type: keyword
 
 
 **`zoom.registrant.role_in_purchase_process`**
-:   Choosen role in a purchase process related to the user registering to a meeting or webinar
+:   Chosen role in a purchase process related to the user registering to a meeting or webinar
 
     type: keyword
 
 
 **`zoom.registrant.no_of_employees`**
-:   Number of employees choosen by the user registering to a meeting or webinar
+:   Number of employees chosen by the user registering to a meeting or webinar
 
     type: keyword
 

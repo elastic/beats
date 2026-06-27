@@ -54,6 +54,7 @@ type processor struct {
 	sniffer         *sniffer.Sniffer
 	shutdownTimeout time.Duration
 	err             chan error
+	statusMu        sync.RWMutex
 	status          status.StatusReporter
 }
 
@@ -109,9 +110,20 @@ func (p *processor) Stop() {
 
 // UpdateStatus wraps the status reporter we get from central management
 func (p *processor) UpdateStatus(status status.Status, message string) {
-	if p.status != nil {
-		p.status.UpdateStatus(status, message)
+	p.statusMu.RLock()
+	reporter := p.status
+	p.statusMu.RUnlock()
+	if reporter != nil {
+		reporter.UpdateStatus(status, message)
 	}
+}
+
+// SetStatusReporter implements status.WithStatusReporter so the OTel
+// factory wrapper can inject a sub-reporter after the runner is created.
+func (p *processor) SetStatusReporter(reporter status.StatusReporter) {
+	p.statusMu.Lock()
+	p.status = reporter
+	p.statusMu.Unlock()
 }
 
 // processorFactory controls construction of modules runners.
@@ -270,6 +282,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 
 	logp.Debug("main", "Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
+	var closers []func()
 	for i, iface := range interfaces {
 		protocols := protos.NewProtocols()
 		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
@@ -277,13 +290,14 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
 		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
 		}
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, interfaces, reporter)
+	return sniffer.New(id, false, "", decoders, interfaces, reporter, closers...)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based

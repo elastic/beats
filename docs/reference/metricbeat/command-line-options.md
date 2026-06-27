@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/command-line-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Metricbeat command reference [command-line-options]
@@ -63,7 +64,7 @@ $$$dashboard-subcommand$$$**`dashboard`**
 
     To load the dashboard, copy the generated `dashboard.json` file into the `kibana/6/dashboard` directory of Metricbeat, and run `metricbeat setup --dashboards` to import the dashboard.
 
-    If {{kib}} is not running on `localhost:5061`, you must also adjust the Metricbeat configuration under `setup.kibana`.
+    If {{kib}} is not running on `localhost:5601`, you must also adjust the Metricbeat configuration under `setup.kibana`.
 
 
 $$$template-subcommand$$$**`template`**
@@ -247,7 +248,7 @@ metricbeat [FLAGS]
 :   Writes memory profile data to the specified output file. This option is useful for troubleshooting Metricbeat.
 
 **`--system.hostfs MOUNT_POINT`**
-:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
+:   Specifies the mount point of the host’s filesystem for use in monitoring a host. This flag is deprecated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 Also see [Global flags](#global-flags).
 

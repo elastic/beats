@@ -163,5 +163,5 @@ func TestConfigGeoDisabled(t *testing.T) {
 
 	eventGeoField, err := newEvent.GetValue("observer.geo")
 	assert.Error(t, err)
-	assert.Equal(t, nil, eventGeoField)
+	assert.Nil(t, eventGeoField)
 }

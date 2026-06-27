@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/configuration-autodiscover.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Autodiscover [configuration-autodiscover]
@@ -126,6 +127,29 @@ filebeat.autodiscover:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
 ```
 
+Here is an example of how a configuration using Kubernetes secrets would look:
+
+```yaml
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: false
+      templates:
+        - condition:
+            and:
+            - equals:
+                kubernetes.labels.app: "redis"
+          config:
+            - module: redis
+              log:
+                enabled: true
+                var.paths: ["/var/log/containers/*-${data.kubernetes.container.id}.log"]
+              slowlog:
+                enabled: true
+                var.hosts: ["${data.host}:6379"]
+                var.password: "${kubernetes.default.somesecret.value}"
+```
+
 ::::{warning}
 When using autodiscover, you have to be careful when defining config templates, especially if they are reading from places holding information for several containers. For instance, under this file structure:
 
@@ -202,7 +226,7 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 :   (Optional) Specify at what level autodiscover needs to be done at. `scope` can either take `node` or `cluster` as values. `node` scope allows discovery of resources in the specified node. `cluster` scope allows cluster wide discovery. Only `pod` and `node` resources can be discovered at node scope.
 
 `add_resource_metadata`
-:   (Optional) Specify filters and configration for the extra metadata, that will be added to the event. Configuration parameters:
+:   (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
 
     * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output. Note: wildcards are not supported for those settings. The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
     * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name isn’t added, this can be enabled by setting `deployment: true`.

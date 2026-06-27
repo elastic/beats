@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-reference-yml.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # winlogbeat.reference.yml [winlogbeat-reference-yml]
@@ -235,7 +236,7 @@ winlogbeat.event_logs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"

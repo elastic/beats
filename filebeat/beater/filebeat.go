@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -44,10 +45,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -63,6 +64,13 @@ const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for th
 	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
+// defaultShutdownDrainTimeout bounds how long Filebeat waits on shutdown for
+// already-published events to be acknowledged (and their cursors written to the
+// registry) when shutdown_timeout is not configured. It matches the default
+// publisher pipeline WaitClose, preserving the bounded drain the framework used
+// to perform before disconnecting the pipeline (issue #49794).
+const defaultShutdownDrainTimeout = time.Second
+
 var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
@@ -77,7 +85,9 @@ type Filebeat struct {
 	otelStatusFactoryWrapper func(cfgfile.RunnerFactory) cfgfile.RunnerFactory
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, statestore.States, *paths.Path) []v2.Plugin
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
+
+var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -91,6 +101,16 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	if err := rawConfig.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %w", err) //nolint:staticcheck //Keep old behavior
 	}
+
+	// Report the effective shutdown drain bound to the framework so its shutdown
+	// watchdog waits for our drain (plus a small margin) instead of force-closing
+	// the pipeline early. This mirrors the bound used in Run: the configured
+	// shutdown_timeout, or the short default when it is unset.
+	drainTimeout := config.ShutdownTimeout
+	if drainTimeout <= 0 {
+		drainTimeout = defaultShutdownDrainTimeout
+	}
+	b.ShutdownTimeout = drainTimeout
 
 	if err := cfgwarn.CheckRemoved6xSettings(
 		rawConfig,
@@ -110,7 +130,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		EnableAllFilesets:         enableAllFilesets,
 		ForceEnableModuleFilesets: forceEnableModuleFilesets,
 	}
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides, b.Paths)
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +142,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if b.API != nil {
 		if err = inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry()); err != nil {
-			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+			return nil, fmt.Errorf("failed to attach input API to monitoring endpoint server: %w", err)
 		}
 	}
 
@@ -194,7 +214,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 			ForceEnableModuleFilesets: forceEnableModuleFilesets,
 		}
 
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides, b.Paths)
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
 				// All module configs need to be loaded to enable all the filesets
@@ -204,7 +224,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules, b.Paths)
+			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules, b.Info.Paths)
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -215,6 +235,10 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 	fb.otelStatusFactoryWrapper = wrapper
+}
+
+func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Registry) {
+	fb.config.Registry.ESStorageExtension = esStateStoreExtension
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial
@@ -263,7 +287,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			gzipRegistry(b.Info.Logger, b.Paths))
+			gzipRegistry(b.Info.Logger, b.Info.Paths))
 	}
 
 	if !fb.moduleRegistry.Empty() {
@@ -274,7 +298,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	waitFinished := newSignalWait()
-	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
 	reg := b.Monitoring.StatsRegistry()
@@ -285,7 +308,22 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
-	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Paths)
+	// Start the check-in loop, so Filebeat can respond to Elastic Agent,
+	// but it won't start any inputs/output
+	if err := b.Manager.PreInit(); err != nil {
+		return err
+	}
+
+	// Ensure that we only call b.Manager.Stop out of order
+	// if Run has failed early/before b.Manager.PostInit() was called.
+	managerEarlyStop := b.Manager.Stop
+	defer func() {
+		if managerEarlyStop != nil {
+			managerEarlyStop()
+		}
+	}()
+
+	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger, b.Info.Paths)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
 		return err
@@ -298,12 +336,16 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		cn()
 	}()
 
-	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry, b.Paths)
+	stateStore, err := openStateStore(ctx, b.Info, fb.logger.Named("filebeat"), config.Registry)
 	if err != nil {
 		fb.logger.Errorf("Failed to open state store: %+v", err)
 		return err
 	}
 	defer stateStore.Close()
+
+	if b.API != nil {
+		b.API.SetStateInspectorRegistry(stateStore.shared.registry, stateStore.storeName)
+	}
 
 	// If notifier is set, configure the listener for output configuration
 	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
@@ -364,7 +406,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
 	inputsLogger := fb.logger.Named("input")
-	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore, b.Paths)
+	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
 	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
 	if err != nil {
 		panic(err) // loader detected invalid state.
@@ -406,8 +448,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			fb.logger.Warn(pipelinesWarning)
 		}
 	}
-	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines, b.Paths)
-	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Paths)
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger, b.Info.Paths)
 	if err != nil {
 		fb.logger.Errorf("Could not init crawler: %v", err)
 		return err
@@ -433,9 +475,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		registrarChannel.Close()
 		close(outDone) // finally close all active connections to publisher pipeline
 	}()
-
-	// Wait for all events to be processed or timeout
-	defer waitEvents.Wait()
 
 	if config.OverwritePipelines {
 		fb.logger.Debug("modules", "Existing Ingest pipelines will be updated")
@@ -477,6 +516,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			config.Autodiscover,
 			b.Keystore,
 			fb.logger,
+			b.Info.Paths,
 		)
 		if err != nil {
 			return err
@@ -484,53 +524,62 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
-	// We start the manager when all the subsystem are initialized and ready to received events.
-	if err := b.Manager.Start(); err != nil {
-		return err
-	}
+	b.Manager.PostInit()
+	managerEarlyStop = nil
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
 
-	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters
-	// Note: waiting for crawlers to stop here in order to install wgEvents.Wait
-	//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait
-	//       or publisher might panic due to concurrent updates.
+	// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters.
+	// The inputs are stopped first so no new events are produced; the events
+	// already enqueued are drained from the pipeline below, while the registrar
+	// and input state stores are still running.
 	inputs.Stop()
 	modules.Stop()
 	adiscover.Stop()
 	crawler.Stop()
 	cancelPipelineFactoryCtx()
 
-	timeout := fb.config.ShutdownTimeout
-	// Checks if on shutdown it should wait for all events to be published
-	waitPublished := fb.config.ShutdownTimeout > 0 || *once
-	if waitPublished {
-		// Wait for registrar to finish writing registry
+	// In "--once" mode Filebeat is a batch run: it has read its inputs to EOF and
+	// must publish every event before exiting. When no shutdown_timeout is
+	// configured, wait unbounded for all published events to be acknowledged
+	// before disconnecting, matching the historical --once drain (issue #49794).
+	// A partial final batch is flushed by the queue's flush timeout, so this
+	// terminates once the input is fully sent; an explicit stop (fb.done) still
+	// breaks the wait. A configured shutdown_timeout instead bounds the drain via
+	// the Disconnect below. Without this, a slow output (e.g. Elasticsearch) that
+	// cannot ack within the default drain would drop events on a --once run.
+	if *once && fb.config.ShutdownTimeout <= 0 {
+		waitEvents := newSignalWait()
 		waitEvents.Add(withLog(wgEvents.Wait,
-			"Continue shutdown: All enqueued events being published.", fb.logger))
-		// Wait for either timeout or all events having been ACKed by outputs.
-		if fb.config.ShutdownTimeout > 0 {
-			fb.logger.Info("Shutdown output timer started. Waiting for max %v.", timeout)
-			waitEvents.Add(withLog(waitDuration(timeout),
-				"Continue shutdown: Time out waiting for events being published.", fb.logger))
-		} else {
-			waitEvents.AddChan(fb.done)
-		}
+			"Continue shutdown: All enqueued events have been published.", fb.logger))
+		waitEvents.AddChan(fb.done)
+		waitEvents.Wait()
 	}
 
-	// Stop the manager and stop the connection to any dependent services.
-	// The Manager started to have a working implementation when
-	// https://github.com/elastic/beats/pull/34416 was merged.
-	// This is intended to enable TLS certificates reload on a long
-	// running Beat.
+	// The Beater owns shutdown sequencing (issue #49794): now that the inputs are
+	// stopped, drain the publisher pipeline so the events we already published are
+	// acknowledged — and their cursors written to the registry and input state
+	// stores — while those stores are still running. The stores are closed by the
+	// defers above (registrar.Stop, stateStore.Close), which run only after Run
+	// returns, so the acknowledgments delivered during this drain are persisted.
+	// This also flushes any partial final batch the queue is still holding.
 	//
-	// However calling b.Manager.Stop() here messes up the behavior of the
-	// --once flag because it makes Filebeat exit early.
-	// So if --once is passed, we don't call b.Manager.Stop().
-	if !*once {
-		b.Manager.Stop()
+	// The drain is bounded so a stuck output cannot block shutdown forever:
+	// ShutdownTimeout when configured, otherwise a short default matching the
+	// bounded drain the framework historically performed before disconnecting the
+	// pipeline. The framework also disconnects the pipeline after Run returns, but
+	// Disconnect is idempotent, so this is the effective drain.
+	timeout := fb.config.ShutdownTimeout
+	if timeout <= 0 {
+		timeout = defaultShutdownDrainTimeout
+	}
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	fb.logger.Infof("Shutdown drain started. Waiting up to %v for events to be acknowledged.", timeout)
+	if err := b.Publisher.Disconnect(shutdownCtx); err != nil {
+		fb.logger.Errorf("Error draining the publisher pipeline on shutdown: %v", err)
 	}
 
 	return nil

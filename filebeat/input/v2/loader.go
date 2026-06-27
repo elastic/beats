@@ -101,7 +101,11 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 		return nil, fmt.Errorf("running a FIPS-capable distribution but input [%s] is not FIPS capable", name)
 	}
 
-	return p.Manager.Create(cfg)
+	targetPlugin, targetCfg, err := l.resolveRedirect(name, p, cfg)
+	if err != nil {
+		return nil, err
+	}
+	return targetPlugin.Manager.Create(targetCfg)
 }
 
 func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, error) {
@@ -123,18 +127,57 @@ func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, error) {
 	return name, p, nil
 }
 
+// Delete removes any resources associated with an input configuration.
+// If the plugin's InputManager implements Redirector, Delete follows
+// the redirect and calls the target's Delete with the translated config.
 func (l *Loader) Delete(cfg *conf.C) error {
-	_, p, err := l.loadFromCfg(cfg)
+	name, p, err := l.loadFromCfg(cfg)
 	if err != nil {
 		return err
 	}
 
-	pp, ok := p.Manager.(interface{ Delete(cfg *conf.C) error })
+	targetPlugin, targetCfg, err := l.resolveRedirect(name, p, cfg)
+	if err != nil {
+		return err
+	}
+
+	pp, ok := targetPlugin.Manager.(interface{ Delete(cfg *conf.C) error })
 	if ok {
-		return pp.Delete(cfg)
+		return pp.Delete(targetCfg)
 	}
 
 	return nil
+}
+
+// resolveRedirect checks whether the plugin's InputManager implements
+// Redirector and, if so, resolves the redirect target from the registry.
+// Only one redirect hop is allowed; the target's Redirector is not consulted.
+// If no redirect is needed, the original plugin and config are returned.
+func (l *Loader) resolveRedirect(name string, p Plugin, cfg *conf.C) (Plugin, *conf.C, error) {
+	r, ok := p.Manager.(Redirector)
+	if !ok {
+		return p, cfg, nil
+	}
+
+	targetType, translatedCfg, err := r.Redirect(cfg)
+	if err != nil {
+		return Plugin{}, nil, fmt.Errorf("input %q redirect failed: %w", name, err)
+	}
+	if targetType == "" {
+		return p, cfg, nil
+	}
+
+	target, exists := l.registry[targetType]
+	if !exists {
+		return Plugin{}, nil, &LoadError{
+			Name:    targetType,
+			Reason:  ErrUnknownInput,
+			Message: fmt.Sprintf("redirect target %q from %q not found", targetType, name),
+		}
+	}
+
+	l.log.Infof("Input %q redirecting to %q", name, targetType)
+	return target, translatedCfg, nil
 }
 
 // validatePlugins checks if there are multiple plugins with the same name in

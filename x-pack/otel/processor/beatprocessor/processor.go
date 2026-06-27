@@ -9,8 +9,11 @@ import (
 	"errors"
 	"fmt"
 
+	"go.opentelemetry.io/collector/component"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
+	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
@@ -80,24 +83,26 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
 		}
 
-		var processorInstance beat.Processor
-		var createProcessorError error
+		var constructor processors.Constructor
 
 		switch processorName {
 		case "add_cloud_metadata":
-			processorInstance, createProcessorError = add_cloud_metadata.New(processorConfig, logpLogger)
+			constructor = add_cloud_metadata.New
 		case "add_docker_metadata":
-			processorInstance, createProcessorError = add_docker_metadata.New(processorConfig, logpLogger)
+			constructor = add_docker_metadata.New
 		case "add_fields":
-			processorInstance, createProcessorError = addfields.CreateAddFields(processorConfig, logpLogger)
+			constructor = addfields.CreateAddFields
 		case "add_host_metadata":
-			processorInstance, createProcessorError = add_host_metadata.New(processorConfig, logpLogger)
+			constructor = add_host_metadata.New
 		case "add_kubernetes_metadata":
-			processorInstance, createProcessorError = add_kubernetes_metadata.New(processorConfig, logpLogger)
+			constructor = add_kubernetes_metadata.New
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
 
+		// Wrap the constructor with NewConditional so that `when` conditions
+		// configured on the processor are honored.
+		processorInstance, createProcessorError := processors.NewConditional(constructor)(processorConfig, logpLogger)
 		if createProcessorError != nil {
 			return nil, fmt.Errorf("failed to create processor '%s': %w", processorName, createProcessorError)
 		}
@@ -106,6 +111,14 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 	}
 
 	return nil, errors.New("malformed processor config")
+}
+
+func (p *beatProcessor) Start(_ context.Context, _ component.Host) error {
+	return nil
+}
+
+func (p *beatProcessor) Shutdown(_ context.Context) error {
+	return nil
 }
 
 func (p *beatProcessor) ConsumeLogs(_ context.Context, logs plog.Logs) (plog.Logs, error) {
@@ -148,14 +161,11 @@ func unpackBeatEventFromOTelLogRecord(logRecord plog.LogRecord) (*beat.Event, er
 
 	beatEvent.Meta = mapstr.M{}
 
-	beatEvent.Fields = logRecord.Body().Map().AsRaw()
+	beatEvent.Fields = otelmap.ToMapstr(logRecord.Body().Map())
 
 	return beatEvent, nil
 }
 
 func packBeatEventIntoOTelLogRecord(beatEvent *beat.Event, logRecord plog.LogRecord) error {
-	beatEvent.Fields = beatEvent.Fields.Clone()
-	otelmap.ConvertNonPrimitive((map[string]any)(beatEvent.Fields))
-	err := logRecord.Body().Map().FromRaw(beatEvent.Fields)
-	return err
+	return otelmap.FromMapstr(logRecord.Body().Map(), beatEvent.Fields)
 }

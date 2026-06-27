@@ -1,25 +1,19 @@
 import io
-import logging
 import os
+import subprocess
 import sys
 import tarfile
 import time
 
-from contextlib import contextmanager
+import docker as docker_sdk
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
-if INTEGRATION_TESTS:
-    from compose.cli.command import get_project
-    from compose.config.environment import Environment
-    from compose.service import BuildAction
-    from compose.service import ConvergenceStrategy
-
 
 class ComposeMixin(object):
     """
-    Manage docker-compose to ensure that needed services are running during tests
+    Manage docker compose to ensure that needed services are running during tests
     """
 
     # List of required services to run INTEGRATION_TESTS
@@ -38,6 +32,47 @@ class ComposeMixin(object):
     COMPOSE_ADVERTISED_PORT = None
 
     @classmethod
+    def _compose_cmd(cls, *args):
+        """Build and return a docker compose command list and its environment."""
+        compose_path = cls.find_compose_path()
+        project_name = cls.compose_project_name()
+        cmd = [
+            "docker", "compose",
+            "-p", project_name,
+            "-f", os.path.join(compose_path, "docker-compose.yml"),
+        ]
+        cmd.extend(args)
+        env = os.environ.copy()
+        env.update(cls.COMPOSE_ENV)
+        return cmd, env
+
+    @classmethod
+    def _run_compose(cls, *args, **kwargs):
+        """Run a docker compose command."""
+        cmd, env = cls._compose_cmd(*args)
+        return subprocess.run(cmd, env=env, **kwargs)
+
+    @classmethod
+    def _get_project_containers(cls, service_names=None, include_stopped=False):
+        """Get containers for the project using Docker SDK."""
+        client = docker_sdk.from_env()
+        project_name = cls.compose_project_name()
+
+        filters = {
+            "label": ["com.docker.compose.project=%s" % project_name]
+        }
+
+        containers = client.containers.list(all=include_stopped, filters=filters)
+
+        if service_names:
+            containers = [
+                c for c in containers
+                if c.labels.get("com.docker.compose.service") in service_names
+            ]
+
+        return containers
+
+    @classmethod
     def compose_up(cls):
         """
         Ensure *only* the services defined under `COMPOSE_SERVICES` are running and healthy
@@ -49,39 +84,42 @@ class ComposeMixin(object):
             return
 
         def print_logs(container):
-            print("---- " + container.name_without_project)
-            print(container.logs())
+            service = container.labels.get("com.docker.compose.service", container.name)
+            print("---- " + service)
+            print(container.logs().decode('utf-8', errors='replace'))
             print("----")
 
         def is_healthy(container):
-            return container.inspect()['State']['Health']['Status'] == 'healthy'
+            container.reload()
+            health = container.attrs.get('State', {}).get('Health', {})
+            return health.get('Status') == 'healthy'
 
-        project = cls.compose_project()
+        # Pull images (ignore failures)
+        cls._run_compose(
+            "pull", *cls.COMPOSE_SERVICES,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        with disabled_logger('compose.service'):
-            project.pull(
-                ignore_pull_failures=True,
-                service_names=cls.COMPOSE_SERVICES)
-
-        project.up(
-            strategy=ConvergenceStrategy.always,
-            service_names=cls.COMPOSE_SERVICES,
-            timeout=30)
+        # Start services
+        cls._run_compose(
+            "up", "-d", "--force-recreate", "--timeout", "30",
+            *cls.COMPOSE_SERVICES,
+            check=True)
 
         # Wait for them to be healthy
         start = time.time()
         while True:
-            containers = project.containers(
+            containers = cls._get_project_containers(
                 service_names=cls.COMPOSE_SERVICES,
-                stopped=True)
+                include_stopped=True)
 
             healthy = True
             for container in containers:
-                if not container.is_running:
+                container.reload()
+                if container.status != 'running':
                     print_logs(container)
                     raise Exception(
                         "Container %s unexpectedly finished on startup" %
-                        container.name_without_project)
+                        container.labels.get("com.docker.compose.service", container.name))
                 if not is_healthy(container):
                     healthy = False
                     break
@@ -91,7 +129,7 @@ class ComposeMixin(object):
 
             if cls.COMPOSE_ADVERTISED_HOST:
                 for service in cls.COMPOSE_SERVICES:
-                    cls._setup_advertised_host(project, service)
+                    cls._setup_advertised_host(service)
 
             time.sleep(1)
             timeout = time.time() - start > cls.COMPOSE_TIMEOUT
@@ -101,11 +139,11 @@ class ComposeMixin(object):
                         print_logs(container)
                 raise Exception(
                     "Timeout while waiting for healthy "
-                    "docker-compose services: %s" %
+                    "docker compose services: %s" %
                     ','.join(cls.COMPOSE_SERVICES))
 
     @classmethod
-    def _setup_advertised_host(cls, project, service):
+    def _setup_advertised_host(cls, service):
         """
         There are services like kafka that announce an advertised address
         to clients, who should reconnect to this address. This method
@@ -124,9 +162,9 @@ class ComposeMixin(object):
         tar.addfile(info, fileobj=io.BytesIO(content.encode("utf-8")))
         tar.close()
 
-        containers = project.containers(service_names=[service])
+        containers = cls._get_project_containers(service_names=[service])
         for container in containers:
-            container.client.put_archive(container=container.id, path="/", data=data.getvalue())
+            container.put_archive("/", data.getvalue())
 
     @classmethod
     def compose_down(cls):
@@ -139,9 +177,9 @@ class ComposeMixin(object):
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
             # Use down on per-module scenarios to release network pools too
             if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
-                cls.compose_project().down(remove_image_type=None, include_volumes=True)
+                cls._run_compose("down", "-v")
             else:
-                cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
+                cls._run_compose("kill", *cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
@@ -183,8 +221,13 @@ class ComposeMixin(object):
         if host_env:
             return host_env
 
-        container = cls.compose_project().containers(service_names=[service])[0]
-        info = container.inspect()
+        containers = cls._get_project_containers(service_names=[service])
+        if not containers:
+            raise Exception("No containers for service %s" % service)
+
+        container = containers[0]
+        container.reload()
+        info = container.attrs
         portsConfig = info['HostConfig']['PortBindings']
         if len(portsConfig) == 0:
             raise Exception("No exposed ports for service %s" % service)
@@ -204,15 +247,8 @@ class ComposeMixin(object):
         def positivehash(x):
             return hash(x) % ((sys.maxsize + 1) * 2)
 
-        return "%s_%X" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))
-
-    @classmethod
-    def compose_project(cls):
-        env = Environment(os.environ.copy())
-        env.update(cls.COMPOSE_ENV)
-        return get_project(cls.find_compose_path(),
-                           project_name=cls.compose_project_name(),
-                           environment=env)
+        # Docker Compose V2 requires project names to be lowercase.
+        return ("%s_%x" % (basename, positivehash(frozenset(cls.COMPOSE_ENV.items())))).lower()
 
     @classmethod
     def find_compose_path(cls):
@@ -226,8 +262,10 @@ class ComposeMixin(object):
 
     @classmethod
     def get_service_log(cls, service):
-        container = cls.compose_project().containers(service_names=[service])[0]
-        return container.logs()
+        containers = cls._get_project_containers(service_names=[service])
+        if not containers:
+            return b''
+        return containers[0].logs()
 
     @classmethod
     def service_log_contains(cls, service, msg):
@@ -237,14 +275,3 @@ class ComposeMixin(object):
             if line.find(msg.encode("utf-8")) >= 0:
                 counter += 1
         return counter > 0
-
-
-@contextmanager
-def disabled_logger(name):
-    logger = logging.getLogger(name)
-    old_level = logger.getEffectiveLevel()
-    logger.setLevel(logging.CRITICAL)
-    try:
-        yield logger
-    finally:
-        logger.setLevel(old_level)

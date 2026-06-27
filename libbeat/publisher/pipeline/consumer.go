@@ -58,7 +58,7 @@ type eventConsumer struct {
 // consumerTarget specifies the queue to read from, the parameters needed
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
-	queue      queue.Queue
+	queue      queue.Queue[publisher.Event]
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
@@ -116,7 +116,7 @@ func (c *eventConsumer) run() {
 		// The batches waiting to be retried.
 		retryBatches []*ttlBatch
 
-		// The batch read from the queue and waiting to be sent, if any
+		// The batch read from the queue and waiting to be sent, if any.
 		queueBatch *ttlBatch
 
 		// The output channel (and associated parameters) that will receive
@@ -195,6 +195,22 @@ outerLoop:
 			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
+			// Release any batches we're still holding so the underlying
+			// queue can reclaim its backing storage without firing
+			// producer ACK callbacks. Release is the abandonment
+			// path: slabqueue returns its slot indices to the pool's
+			// free list; memqueue advances ackLoop past the batch
+			// without invoking input ACK handlers; diskqueue is a
+			// no-op (events stay on disk for next-process recovery).
+			// We must NOT call Drop here — Drop signals successful
+			// delivery and would falsely advance input registries for
+			// events the consumer is abandoning.
+			if queueBatch != nil {
+				queueBatch.Release()
+			}
+			for _, rb := range retryBatches {
+				rb.Release()
+			}
 			break outerLoop
 		}
 	}

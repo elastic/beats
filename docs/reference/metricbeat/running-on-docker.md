@@ -3,11 +3,12 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/running-on-docker.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Run Metricbeat on Docker [running-on-docker]
 
-Docker images for Metricbeat are available from the Elastic Docker registry. The base image is [Red Hat Universal Base Image 9 Minimal](https://hub.docker.com/r/redhat/ubi9-minimal).
+Docker images for Metricbeat are available from the Elastic Docker registry. The base image is [Red Hat Universal Base Image 10 Minimal](https://hub.docker.com/r/redhat/ubi10-minimal).
 
 A list of all published Docker images and tags is available at [www.docker.elastic.co](https://www.docker.elastic.co).
 

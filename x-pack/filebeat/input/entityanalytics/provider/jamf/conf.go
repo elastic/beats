@@ -175,7 +175,7 @@ func (c *conf) Validate() error {
 		return errSyncBeforeUpdate
 	}
 
-	if c.Tracer == nil {
+	if !c.Tracer.enabled() {
 		return nil
 	}
 	if c.Tracer.Filename == "" {

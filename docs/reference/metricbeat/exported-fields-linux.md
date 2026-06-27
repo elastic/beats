@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-linux.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Linux fields [exported-fields-linux]
 
@@ -28,7 +29,7 @@ conntrack
 summary of nf_conntrack statistics, summed across CPU cores
 
 **`linux.conntrack.summary.drop`**
-:   packets dropped due to conntrack failiure
+:   packets dropped due to conntrack failure
 
     type: long
 
@@ -58,7 +59,7 @@ summary of nf_conntrack statistics, summed across CPU cores
 
 
 **`linux.conntrack.summary.insert_failed`**
-:   Number of entries where list insert insert failed
+:   Number of entries where list insert failed
 
     type: long
 
@@ -196,7 +197,7 @@ KSM statistics
 
 
 **`linux.ksm.stats.full_scans`**
-:   Number of times mergable pages have been scanned.
+:   Number of times mergeable pages have been scanned.
 
     type: long
 
@@ -326,7 +327,7 @@ This group contains statistics related to huge pages usage on the system.
 
 
 **`linux.memory.hugepages.surplus`**
-:   Number of overcommited huge pages.
+:   Number of overcommitted huge pages.
 
     type: long
 

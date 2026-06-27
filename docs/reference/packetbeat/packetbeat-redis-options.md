@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-redis-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Capture Redis traffic [packetbeat-redis-options]
@@ -25,7 +26,7 @@ Also see [Common protocol options](/reference/packetbeat/common-protocol-options
 
 ### `queue_max_bytes` and `queue_max_messages` [_queue_max_bytes_and_queue_max_messages]
 
-In order for request/response correlation to work, Packetbeat needs to store requests in memory until a response is received. These settings impose a limit on the number of bytes (`queue_max_bytes`) and number of requests (`queue_max_messages`) that can be stored. These limits are per-connection. The default is to queue up to 1MB or 20.000 requests per connection, which allows to use request pipelining while at the same time limiting the amount of memory consumed by replication sessions.
+In order for request/response correlation to work, Packetbeat needs to store requests in memory until a response is received. These settings impose a limit on the number of bytes (`queue_max_bytes`) and number of requests (`queue_max_messages`) that can be stored. These limits are per-connection. The default is to queue up to 1MB or 20,000 requests per connection, which allows to use request pipelining while at the same time limiting the amount of memory consumed by replication sessions.
 
 
 

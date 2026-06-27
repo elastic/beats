@@ -3,6 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/_galera_status_metricset.html
 applies_to:
   stack: beta
+  serverless: beta
 ---
 
 # galera status MetricSet [_galera_status_metricset]

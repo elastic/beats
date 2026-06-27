@@ -82,8 +82,8 @@ func TestDecode(t *testing.T) {
 		cid, err := NewCloudID(test.cloudID, "")
 		assert.NoError(t, err, test.cloudID)
 
-		assert.Equal(t, cid.ElasticsearchURL(), test.expectedEsURL, test.cloudID)
-		assert.Equal(t, cid.KibanaURL(), test.expectedKibanaURL, test.cloudID)
+		assert.Equal(t, test.expectedEsURL, cid.ElasticsearchURL(), test.cloudID)
+		assert.Equal(t, test.expectedKibanaURL, cid.KibanaURL(), test.cloudID)
 	}
 }
 
@@ -99,6 +99,21 @@ func TestDecodeError(t *testing.T) {
 		{
 			cloudID:  "dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDhhMDI4M2FmMDQxZjE5NWY3NzI5YmMwNGM2NmEwZg==",
 			errorMsg: "Expected at least 3 parts",
+		},
+		{
+			// esID contains '#'
+			cloudID:  "inject-es:#:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MSNhdHRhY2tlci5jb20kYzZjMmNhNmQwNDIyNDlhZjBjYzdkN2E5ZTk2MjU3NDM=",
+			errorMsg: "invalid character",
+		},
+		{
+			// kbID contains '#'
+			cloudID:  "inject-kb:#:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZCNhdHRhY2tlci5jb20=",
+			errorMsg: "invalid character",
+		},
+		{
+			// host contains '#'
+			cloudID:  "inject-host:#:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyNhdHRhY2tlci5jb20kY2VjNmYyNjFhNzRiZjI0Y2UzM2JiODgxMWI4NDI5NGYkYzZjMmNhNmQwNDIyNDlhZjBjYzdkN2E5ZTk2MjU3NDM=",
+			errorMsg: "invalid character",
 		},
 	}
 
@@ -196,7 +211,7 @@ func TestOverwriteSettings(t *testing.T) {
 		err = expectedCfg.Unpack(&expected)
 		assert.NoError(t, err)
 
-		assert.Equal(t, res, expected)
+		assert.Equal(t, expected, res)
 	}
 }
 

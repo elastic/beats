@@ -1,5 +1,5 @@
 services:
-  # This is a proxy used to block "docker-compose up" until all services are healthy.
+  # This is a proxy used to block "docker compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
     image: busybox
@@ -16,7 +16,7 @@ services:
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${HOME}/.docker:/root/.docker:ro
+      - ${HOME}/.docker/config.json:/root/.docker/config.json:ro
     network_mode: host
     command: make
 

@@ -46,7 +46,7 @@ RUN for iter in {1..10}; do \
     (exit $exit_code)
 {{- end }}
 
-{{- if contains .from "ubi-minimal" }}
+{{- if and (contains .from "ubi") (contains .from "minimal") }}
 RUN for iter in {1..10}; do \
         microdnf -y update && \
         microdnf -y install findutils shadow-utils ca-certificates \
@@ -133,8 +133,8 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-22=22.20.0-r0 npm=11.4.2-r1 glib dbus-glib libatk-1.0 \
-        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
+        apk add --no-interactive --no-progress --no-cache nodejs-22=22.22.2-r0 npm=11.17.0-r0 glib libatk-1.0 \
+        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxfixes libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
     done; \
@@ -158,7 +158,7 @@ USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi9-minimal")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi10-minimal")) }}
 USER root
 
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
@@ -169,12 +169,12 @@ RUN for iter in {1..10}; do \
     microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
     at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
     libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
-    dbus-glib libicu mesa-libGL unzip \
+    libicu mesa-libGL unzip \
     findutils shadow-utils ca-certificates gawk libcap xz tar -y && \
     mkdir -p /usr/share/fonts/google-noto && \
-    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
-    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
-    rm -f NotoSansCJKjp-hinted.zip && \
+    curl -L -o NotoSansCJKjp.zip https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/06_NotoSansCJKjp.zip && \
+    unzip NotoSansCJKjp.zip -d /usr/share/fonts/google-noto && \
+    rm -f NotoSansCJKjp.zip && \
     microdnf -y remove unzip && \
     curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
     mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
@@ -198,7 +198,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=22.20.0
+ENV NODE_VERSION=22.22.2
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -222,6 +222,12 @@ RUN cd /usr/share/heartbeat/.node \
     && mkdir -p node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
+
+# TODO: Remove this step when Node.js is bumped to a version that bundles npm >= 11.17.0
+# Bootstrap npm 11.17.0 from a downloaded copy to avoid npm 10.x self-replacement failures
+RUN curl -fsSL https://registry.npmjs.org/npm/-/npm-11.17.0.tgz | tar xz -C /tmp \
+    && node /tmp/package/bin/npm-cli.js install -g npm@11.17.0 \
+    && rm -rf /tmp/package
 
 # Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH

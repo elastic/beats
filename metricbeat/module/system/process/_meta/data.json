@@ -288,7 +288,8 @@
                     "pct": 0.0008
                 },
                 "share": 16252928,
-                "size": 1886003200
+                "size": 1886003200,
+                "swap": 1302528
             },
             "num_threads": 9,
             "state": "sleeping"

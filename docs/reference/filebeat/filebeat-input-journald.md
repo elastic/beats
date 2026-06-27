@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-journald.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Journald input [filebeat-input-journald]
@@ -11,7 +12,9 @@ applies_to:
 [`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
 
 :::{warning}
-The Wolfi-based Docker image does not contain the `journalctl` binary and the `journald` input type cannot be used with it.
+The Wolfi-based Docker image does not contain the `journalctl` binary.
+
+{applies_to}`stack: ga 9.3.0` To use the `journald` input type with Wolfi images, you must configure the [`chroot`](#filebeat-input-journald-chroot) option to use the host's `journalctl` binary.
 :::
 
 :::{important}
@@ -22,8 +25,8 @@ either:
    Systemd/journal version. To get the version of the `journalctl` binary
    in Filebeat's image run the following, adjusting the image name/tag
    according to the version that you are running:
-   
-   
+
+
    ```sh
    docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat:<VERSION> --version
    ```
@@ -31,8 +34,6 @@ either:
    `filebeat-oss` and `filebeat-ubi`.
 
 :::
-
-If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the journal again.
 
 The simplest configuration example is one that reads all logs from the default journal.
 
@@ -95,7 +96,7 @@ filebeat.inputs:
 A list of paths that will be crawled and fetched. A path can be either:
 
 * A file path
-* {applies_to}`stack: ga 9.1.5` {applies_to}`stack: ga 9.0.8` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
+* {applies_to}`stack: ga 9.0.8+` A directory path (to collect events from all journals in a directory). If you specify a directory, Filebeat merges all journals under the directory into a single journal and reads them.
 
 If no paths are specified, Filebeat reads from the default journal.
 
@@ -443,6 +444,12 @@ You can use the following translated names in filter expressions to reference jo
 `COREDUMP_USER_UNIT`
 :   `journald.coredump.user_unit`
 
+`MESSAGE`
+:   `message`
+
+`MESSAGE_ID`
+:   `message_id`
+
 `OBJECT_AUDIT_LOGINUID`
 :   `journald.object.audit.login_uid`
 
@@ -450,13 +457,13 @@ You can use the following translated names in filter expressions to reference jo
 :   `journald.object.audit.session`
 
 `OBJECT_CMDLINE`
-:   `journald.object.cmd`
+:   `journald.object.process.command_line`
 
 `OBJECT_COMM`
-:   `journald.object.name`
+:   `journald.object.process.name`
 
 `OBJECT_EXE`
-:   `journald.object.executable`
+:   `journald.object.process.executable`
 
 `OBJECT_GID`
 :   `journald.object.gid`
@@ -479,41 +486,56 @@ You can use the following translated names in filter expressions to reference jo
 `OBJECT_UID`
 :   `journald.object.uid`
 
+`PRIORITY`
+:   `log.syslog.priority`
+
+`SYSLOG_FACILITY`
+:   `log.syslog.facility.code`
+
+`SYSLOG_IDENTIFIER`
+:   `log.syslog.appname`
+
+`SYSLOG_PID`
+:   `log.syslog.procid`
+
+`UNIT`
+:   `journald.unit`
+
 `_AUDIT_LOGINUID`
-:   `process.audit.login_uid`
+:   `journald.audit.login_uid`
 
 `_AUDIT_SESSION`
-:   `process.audit.session`
+:   `journald.audit.session`
 
 `_BOOT_ID`
-:   `host.boot_id`
+:   `journald.host.boot_id`
 
 `_CAP_EFFECTIVE`
-:   `process.capabilites`
+:   `journald.process.capabilities`
 
 `_CMDLINE`
-:   `process.cmd`
+:   `journald.process.command_line`
 
-`_CODE_FILE`
+`CODE_FILE`
 :   `journald.code.file`
 
-`_CODE_FUNC`
+`CODE_FUNC`
 :   `journald.code.func`
 
-`_CODE_LINE`
+`CODE_LINE`
 :   `journald.code.line`
 
 `_COMM`
-:   `process.name`
+:   `journald.process.name`
 
 `_EXE`
-:   `process.executable`
+:   `journald.process.executable`
 
 `_GID`
-:   `process.uid`
+:   `journald.gid`
 
 `_HOSTNAME`
-:   `host.name`
+:   `host.hostname`
 
 `_KERNEL_DEVICE`
 :   `journald.kernel.device`
@@ -524,23 +546,8 @@ You can use the following translated names in filter expressions to reference jo
 `_MACHINE_ID`
 :   `host.id`
 
-`_MESSAGE`
-:   `message`
-
 `_PID`
-:   `process.pid`
-
-`_PRIORITY`
-:   `logs.syslog.priority`
-
-`_SYSLOG_FACILITY`
-:   `logs.syslog.facility.code`
-
-`_SYSLOG_IDENTIFIER`
-:   `logs.syslog.identifier.appname`
-
-`_SYSLOG_PID`
-:   `log.syslog.procid`
+:   `journald.pid`
 
 `_SYSTEMD_CGROUP`
 :   `systemd.cgroup`
@@ -579,7 +586,7 @@ You can use the following translated names in filter expressions to reference jo
 :   `journald.kernel.device_name`
 
 `_UID`
-:   `process.uid`
+:   `journald.uid`
 
 The following translated fields for [Docker](https://docs.docker.com/config/containers/logging/journald/) are also available:
 

@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-pgsql-options.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Capture PgSQL traffic [packetbeat-pgsql-options]

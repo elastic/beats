@@ -76,7 +76,7 @@ func TestConfigJSONBlob(t *testing.T) {
 			} else {
 				assert.EqualError(t, err, tc.expectedErr)
 			}
-			assert.EqualValues(t, string(tc.expectedOut), string(conf.JSONBlob))
+			assert.Equal(t, string(tc.expectedOut), string(conf.JSONBlob))
 		})
 	}
 }

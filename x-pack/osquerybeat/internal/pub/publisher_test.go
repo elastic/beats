@@ -21,11 +21,11 @@ func TestHitToEvent(t *testing.T) {
 	const maxMask = 0b1111111
 
 	type params struct {
-		index, eventType, actionID, responseID string
-		meta                                   map[string]interface{}
-		hit                                    map[string]interface{}
-		ecsm                                   ecs.Mapping
-		reqData                                interface{}
+		index, eventType, idValue, idFieldKey, responseID string
+		meta                                              map[string]interface{}
+		hit                                               map[string]interface{}
+		ecsm                                              ecs.Mapping
+		reqData                                           interface{}
 	}
 
 	genParams := func(mask int) (p params) {
@@ -36,7 +36,8 @@ func TestHitToEvent(t *testing.T) {
 			p.eventType = "osquery_manager"
 		}
 		if mask>>4&1 > 0 {
-			p.actionID = "uptime"
+			p.idValue = "uptime"
+			p.idFieldKey = "action_id"
 		}
 		if mask>>3&1 > 0 {
 			p.responseID = uuid.Must(uuid.NewV4()).String()
@@ -63,7 +64,7 @@ func TestHitToEvent(t *testing.T) {
 
 	for i := 0; i < maxMask; i++ {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.actionID, p.responseID, p.meta, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.idValue, p.idFieldKey, p.responseID, "", "", p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])
@@ -81,9 +82,13 @@ func TestHitToEvent(t *testing.T) {
 			t.Error(diff)
 		}
 
-		diff = cmp.Diff(p.actionID, ev.Fields["action_id"])
-		if diff != "" {
-			t.Error(diff)
+		if p.idFieldKey != "" {
+			diff = cmp.Diff(p.idValue, ev.Fields[p.idFieldKey])
+			if diff != "" {
+				t.Error(diff)
+			}
+		} else if ev.Fields["action_id"] != nil || ev.Fields["schedule_id"] != nil {
+			t.Error("expected no id field when key is empty")
 		}
 
 		if p.responseID != "" {
@@ -181,6 +186,40 @@ func TestActionResultToEvent(t *testing.T) {
 				}
 			  }`),
 		},
+		{
+			name: "successful with space id",
+			req: toMap(t, `{
+				"data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"input_type": "osquery",
+				"space_id": "production",
+				"type": "INPUT_ACTION"
+			}`),
+			res: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"count": 1,
+				"started_at": "2024-04-18T19:39:39.532125Z"
+			} `),
+			want: toMap(t, `{
+				"completed_at": "2024-04-18T19:39:39.740162Z",
+				"action_response": {
+					"osquery": {
+						"count": 1
+					}
+				},
+				"action_id": "5c433f88-ab0d-41e2-af76-6ff16ae3ced8",
+				"started_at": "2024-04-18T19:39:39.532125Z",
+				"action_input_type": "osquery",
+				"action_data": {
+					"id": "a72d65d8-200a-4b43-8dbd-7bc0e9ce8e65",
+					"query": "select * from osquery_info"
+				},
+				"space_id": "production"
+			}`),
+		},
 	}
 
 	for _, tc := range tests {
@@ -191,6 +230,48 @@ func TestActionResultToEvent(t *testing.T) {
 				t.Error(diff)
 			}
 		})
+	}
+}
+
+func TestHitToEvent_SpaceID(t *testing.T) {
+	spaceID := "space-abc"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		spaceID,
+		"",
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(spaceID, ev.Fields["space_id"]); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestHitToEvent_PackID(t *testing.T) {
+	packID := "pack-xyz"
+	ev := hitToEvent(
+		"logs-osquery_manager.result-default",
+		"osquery_manager",
+		"sched-123",
+		"schedule_id",
+		uuid.Must(uuid.NewV4()).String(),
+		"",
+		packID,
+		nil,
+		map[string]interface{}{"foo": "bar"},
+		nil,
+		nil,
+	)
+
+	if diff := cmp.Diff(packID, ev.Fields["pack_id"]); diff != "" {
+		t.Error(diff)
 	}
 }
 

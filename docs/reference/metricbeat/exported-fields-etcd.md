@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-etcd.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/generate_fields_docs.py
+% This file is generated! See dev-tools/mage/generate_fields_docs.go
 
 # Etcd fields [exported-fields-etcd]
 
@@ -82,7 +83,7 @@ Server metrics from the Etcd V3 /metrics endpoint
 
 
 **`etcd.server.proposals_committed.count`**
-:   Number of consensus proposals commited
+:   Number of consensus proposals committed
 
     type: long
 

@@ -31,11 +31,12 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 		for _, stream := range input.Streams {
 			snapshot := true
 			query := config.Query{
-				Query:    stream.Query,
-				Interval: stream.Interval,
-				Platform: stream.Platform,
-				Version:  stream.Version,
-				Snapshot: &snapshot, // enforce snapshot for all queries
+				Query:          stream.Query,
+				NativeSchedule: config.NativeSchedule{Interval: stream.Interval},
+				Platform:       stream.Platform,
+				Version:        stream.Version,
+				ECSMapping:     stream.ECSMapping,
+				Snapshot:       &snapshot, // enforce snapshot for all queries
 			}
 			pack.Queries[stream.ID] = query
 		}
@@ -242,6 +243,7 @@ func TestSet(t *testing.T) {
 
 	const noQueriesConfig = `{
     "options": {
+        "schedule_max_drift": 60,
         "schedule_splay_percent": 10
     }
 }`
@@ -381,7 +383,7 @@ func TestSet(t *testing.T) {
 			// test that the queries can be resolved
 			for _, input := range tc.inputs {
 				for _, stream := range input.Streams {
-					name := strings.Join([]string{"pack", input.Name, stream.ID}, "_")
+					name := getPackQueryName(input.Name, stream.ID)
 
 					ns, ok := cfgp.LookupNamespace(name)
 					if !ok {
@@ -419,5 +421,322 @@ func TestSet(t *testing.T) {
 				t.Fatalf("unexpectedly resolved unknown query")
 			}
 		})
+	}
+}
+
+func TestSetScheduledQueryProfileFlag(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "custom",
+			},
+			Osquery: &config.OsqueryConfig{
+				Schedule: map[string]config.Query{
+					"scheduled_users": {
+						Query: "select * from users limit 1",
+						NativeSchedule: config.NativeSchedule{
+							Interval: 60,
+						},
+						Profile: true,
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := cfgp.GenerateConfig(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	if !cfgp.LookupQueryProfile("scheduled_users") {
+		t.Fatal("expected scheduled query profile flag to be enabled")
+	}
+}
+
+func TestSet_ScheduleMetadataIncludesSpaceID(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	const (
+		queryName   = "scheduled_query"
+		scheduleID  = "sched-123"
+		startDate   = "2026-02-01T00:00:00Z"
+		spaceID     = "space-abc"
+		querySQL    = "select * from uptime"
+		queryPeriod = 300
+	)
+
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "custom",
+			},
+			Osquery: &config.OsqueryConfig{
+				Schedule: map[string]config.Query{
+					queryName: {
+						Query: querySQL,
+						NativeSchedule: config.NativeSchedule{
+							Interval:  queryPeriod,
+							StartDate: startDate,
+						},
+						CommonScheduleConfig: config.CommonScheduleConfig{
+							ScheduleID: scheduleID,
+							SpaceID:    spaceID,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+
+	// Query metadata becomes active after GenerateConfig.
+	cfg, err := cfgp.GenerateConfig(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rendered, ok := cfg[configName]
+	if !ok {
+		t.Fatalf("missing %v configuration name", configName)
+	}
+
+	if !strings.Contains(rendered, `"space_id": "space-abc"`) {
+		t.Fatalf("rendered config missing space_id: %s", rendered)
+	}
+
+	qi, ok := cfgp.LookupQueryInfo(queryName)
+	if !ok {
+		t.Fatalf("failed to resolve query info for %s", queryName)
+	}
+
+	if diff := cmp.Diff(querySQL, qi.Query); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(scheduleID, qi.ScheduleID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(startDate, qi.StartDate); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(spaceID, qi.SpaceID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff(queryPeriod, qi.Interval); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestSet_ScheduleMetadataIncludesPackID(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	const (
+		packName    = "my-pack"
+		packID      = "pack-uuid-123"
+		queryName   = "uptime_query"
+		querySQL    = "select * from uptime"
+		queryPeriod = 60
+	)
+
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "default",
+			},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					packName: {
+						PackID: packID,
+						Queries: map[string]config.Query{
+							queryName: {
+								Query: querySQL,
+								NativeSchedule: config.NativeSchedule{
+									Interval: queryPeriod,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err := cfgp.GenerateConfig(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	packQueryName := getPackQueryName(packName, queryName)
+	qi, ok := cfgp.LookupQueryInfo(packQueryName)
+	if !ok {
+		t.Fatalf("failed to resolve query info for %s", packQueryName)
+	}
+
+	if diff := cmp.Diff(packID, qi.PackID); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestSet_PackNativeMetadataWithoutIntervalRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"bad": {
+						DefaultNativeSchedule: config.NativeSchedule{StartDate: "2024-01-01T00:00:00Z"},
+						Queries:               map[string]config.Query{"q": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}}},
+					},
+				},
+			},
+		},
+	}
+	err := cfgp.Set(inputs)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !errors.Is(err, config.ErrPackNativeScheduleMetadataWithoutInterval) {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestSet_PackDefaultNativeScheduleMergedIntoQueries(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+
+	const (
+		packName  = "infra"
+		queryName = "uptime"
+	)
+	inputs := []config.InputConfig{
+		{
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "default",
+			},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					packName: {
+						DefaultNativeSchedule: config.NativeSchedule{
+							Interval:  300,
+							StartDate: "2026-01-01T00:00:00Z",
+						},
+						Queries: map[string]config.Query{
+							queryName: {
+								Query:                "select * from uptime",
+								CommonScheduleConfig: config.CommonScheduleConfig{ScheduleID: "per-query-sched"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if err := cfgp.Set(inputs); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := cfgp.GenerateConfig(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+
+	fullName := getPackQueryName(packName, queryName)
+	qi, ok := cfgp.LookupQueryInfo(fullName)
+	if !ok {
+		t.Fatalf("lookup %s", fullName)
+	}
+	if diff := cmp.Diff(300, qi.Interval); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff("per-query-sched", qi.ScheduleID); diff != "" {
+		t.Error(diff)
+	}
+	if diff := cmp.Diff("2026-01-01T00:00:00Z", qi.StartDate); diff != "" {
+		t.Error(diff)
+	}
+}
+
+func TestSet_PackConflictingScheduleDefaultsRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"bad": {
+						DefaultNativeSchedule: config.NativeSchedule{Interval: 60},
+						DefaultRRuleSchedule: &config.RRuleScheduleConfig{
+							RRule:     "FREQ=DAILY",
+							StartDate: "2024-01-01T00:00:00Z",
+						},
+						Queries: map[string]config.Query{"q": {Query: "select 1"}},
+					},
+				},
+			},
+		},
+	}
+	err := cfgp.Set(inputs)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !errors.Is(err, config.ErrPackConflictingScheduleDefaults) {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestSet_PackMixedQueryScheduleModesRejected(t *testing.T) {
+	logger := logp.NewLogger("config_test")
+	cfgp := NewConfigPlugin(logger)
+	inputs := []config.InputConfig{
+		{
+			Name:       "osquery-manager-1",
+			Type:       "osquery",
+			Datastream: config.DatastreamConfig{Namespace: "default"},
+			Osquery: &config.OsqueryConfig{
+				Packs: map[string]config.Pack{
+					"mixed": {
+						Queries: map[string]config.Query{
+							"native": {Query: "select 1", NativeSchedule: config.NativeSchedule{Interval: 60}},
+							"idle":   {Query: "select 2"},
+						},
+					},
+				},
+			},
+		},
+	}
+	err := cfgp.Set(inputs)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !errors.Is(err, config.ErrPackMixedScheduleModes) {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }

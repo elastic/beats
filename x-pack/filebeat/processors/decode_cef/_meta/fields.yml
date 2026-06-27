@@ -159,7 +159,7 @@
 
             - name: destinationMacAddress
               type: keyword
-              description: Six colon-seperated hexadecimal numbers.
+              description: Six colon-separated hexadecimal numbers.
 
             - name: destinationNtDomain
               type: keyword
@@ -471,7 +471,7 @@
 
             - name: deviceZoneURI
               type: keyword
-              description: Thee URI for the Zone that the device asset has been assigned to in ArcSight.
+              description: The URI for the Zone that the device asset has been assigned to in ArcSight.
 
             - name: endTime
               type: date

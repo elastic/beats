@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/kibana-user-privileges.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Grant privileges and roles needed to read Auditbeat data from {{kib}} [kibana-user-privileges]

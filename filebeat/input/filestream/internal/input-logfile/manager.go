@@ -139,7 +139,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 	if err != nil {
 		store.Release()
 		cim.shutdown()
-		return fmt.Errorf("Can not start registry cleanup process: %w", err)
+		return fmt.Errorf("can not start registry cleanup process: %w", err)
 	}
 	<-waitRunning
 	return nil
@@ -159,14 +159,16 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
-		ID                  string         `config:"id"`
-		CleanInactive       time.Duration  `config:"clean_inactive" validate:"min=-1"`
-		HarvesterLimit      uint64         `config:"harvester_limit"`
-		AllowIDDuplication  bool           `config:"allow_deprecated_id_duplication"`
-		TakeOver            TakeOverConfig `config:"take_over"`
-		LegacyCleanInactive bool           `config:"legacy_clean_inactive"`
+		ID                  string             `config:"id"`
+		CleanInactive       time.Duration      `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit      uint64             `config:"harvester_limit"`
+		AllowIDDuplication  bool               `config:"allow_deprecated_id_duplication"`
+		TakeOver            TakeOverConfig     `config:"take_over"`
+		LegacyCleanInactive bool               `config:"legacy_clean_inactive"`
+		ReadUntilEOF        ReadUntilEOFConfig `config:"read_until_eof"`
 	}{
 		CleanInactive: cim.DefaultCleanTimeout,
+		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
 	}
 
 	if err := config.Unpack(&settings); err != nil {
@@ -277,15 +279,24 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	return &managedInput{
-		manager:          cim,
-		ackCH:            cim.ackCH,
-		id:               settings.ID,
-		prospector:       prospector,
-		harvester:        harvester,
-		sourceIdentifier: srcIdentifier,
-		cleanTimeout:     settings.CleanInactive,
-		harvesterLimit:   settings.HarvesterLimit,
+		manager:                cim,
+		ackCH:                  cim.ackCH,
+		id:                     settings.ID,
+		prospector:             prospector,
+		harvester:              harvester,
+		readUntilEOF:           settings.ReadUntilEOF,
+		sourceIdentifier:       srcIdentifier,
+		previousSrcIdentifiers: previousSrcIdentifiers,
+		cleanTimeout:           settings.CleanInactive,
+		harvesterLimit:         settings.HarvesterLimit,
 	}, nil
+}
+
+func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
+	return ReadUntilEOFConfig{
+		Enabled: true,
+		Timeout: time.Minute,
+	}
 }
 
 func (cim *InputManager) Delete(cfg *conf.C) error {
@@ -346,6 +357,10 @@ type TakeOverConfig struct {
 	Enabled bool `config:"enabled"`
 	// Filestream IDs to take over states
 	FromIDs []string `config:"from_ids"`
+	// Stream from the container input to take over from.
+	// Valid values: stderr, stdout or it can be empty. An empty stream means
+	// all streams.
+	Stream string `config:"stream"`
 
 	// legacyFormat is set to true when `Unpack` detects
 	// the legacy configuration format. It is used by
@@ -365,6 +380,10 @@ func (t *TakeOverConfig) Unpack(value any) error {
 			return fmt.Errorf("cannot parse '%[1]v' (type %[1]T) as bool", rawEnabled)
 		}
 		t.Enabled = enabled
+
+		if stream, ok := v["stream"].(string); ok {
+			t.Stream = stream
+		}
 
 		rawFromIDs, exists := v["from_ids"]
 		if !exists {
@@ -394,4 +413,17 @@ func (t *TakeOverConfig) LogWarnings(logger *logp.Logger) {
 	if t.legacyFormat {
 		logger.Warn("using 'take_over: true' is deprecated, use the new format: 'take_over.enabled: true'")
 	}
+}
+
+func (t *TakeOverConfig) FromFilestream() bool {
+	return len(t.FromIDs) != 0
+}
+
+// ReadUntilEOFConfig configures the behaviour to keep reading the current
+// file until EOF before the input shuts down. If Timeout elapses before EOF
+// is reached, the input shuts down anyway.
+type ReadUntilEOFConfig struct {
+	Enabled bool `config:"enabled"`
+	// Timeout is the maximum time to wait for EOF to be reached.
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
 }

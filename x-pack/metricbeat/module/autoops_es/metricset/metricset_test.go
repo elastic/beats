@@ -56,7 +56,7 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, data *testObjectTyp
 			return err
 		}
 
-		r.Event(events.CreateEventWithRandomTransactionId(info, parsed))
+		r.Event(events.CreateEventWithoutTransactionId(info, parsed))
 	}
 
 	return nil

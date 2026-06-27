@@ -1,0 +1,20 @@
+name: Duplicate Issue Detector
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: read
+  copilot-requests: write
+  discussions: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  run:
+    if: >-
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    uses: elastic/ai-github-actions/.github/workflows/gh-aw-duplicate-issue-detector.lock.yml@v0
+    with:
+      detect-related-issues: false

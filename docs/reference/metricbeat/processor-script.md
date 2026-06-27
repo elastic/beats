@@ -4,6 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/processor-script.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
 # Script Processor [processor-script]
@@ -114,7 +115,7 @@ The `Event` object passed to the `process` method has the following API.
 | `Put(string, value)` | Put a value into the event. If the key was already set then theprevious value is returned. It throws an exception if the key cannot be setbecause one of the intermediate values is not an object.<br>**Example**: `var old = event.Put(key, value);` |
 | `Rename(string, string)` | Rename a key in the event. The target key must not exist. Itreturns true if the source key was successfully renamed to the target key.<br>**Example**: `var success = event.Rename("source", "target");` |
 | `Delete(string)` | Delete a field from the event. It returns true on success.<br>**Example**: `var deleted = event.Delete("user.email");` |
-| `Cancel()` | Flag the event as cancelled which causes the processor to dropevent.<br>**Example**: `event.Cancel(); return;` |
+| `Cancel()` | Flag the event as cancelled, which causes the processor to drop the event.<br>**Example**: `event.Cancel(); return;` |
 | `Tag(string)` | Append a tag to the `tags` field if the tag does not alreadyexist. Throws an exception if `tags` exists and is not a string or a list ofstrings.<br>**Example**: `event.Tag("user_event");` |
 | `AppendTo(string, string)` | `AppendTo` is a specialized `Put` method that converts the existing value to anarray and appends the value if it does not already exist. If there is anexisting value that’s not a string or array of strings then an exception isthrown.<br>**Example**: `event.AppendTo("error.message", "invalid file hash");` |
 

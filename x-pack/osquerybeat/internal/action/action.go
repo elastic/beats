@@ -7,6 +7,7 @@ package action
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -19,11 +20,13 @@ var (
 )
 
 type Action struct {
-	Query string
-	ID    string
+	Query     string
+	ID        string
+	Platforms []string
 	// The optional action timeout
 	Timeout    time.Duration
 	ECSMapping ecs.Mapping
+	Profile    bool
 }
 
 func FromMap(m map[string]interface{}) (a Action, err error) {
@@ -41,7 +44,11 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 		}
 	}
 
-	var ecsm ecs.Mapping
+	var (
+		ecsm      ecs.Mapping
+		platforms []string
+		profile   bool
+	)
 	if v, ok := m["data"]; ok {
 		var data map[string]interface{}
 		if data, ok = v.(map[string]interface{}); !ok {
@@ -53,6 +60,13 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 				return a, fmt.Errorf("invalid query: %w", ErrActionRequest)
 			}
 		}
+		if v, ok = data["platform"]; ok {
+			platform, ok := v.(string)
+			if !ok {
+				return a, fmt.Errorf("invalid platform: %w", ErrActionRequest)
+			}
+			platforms = splitPlatforms(platform)
+		}
 		// Parse optional ECS Mapping
 		if v, ok := data["ecs_mapping"]; ok && v != nil {
 			m, ok := v.(map[string]interface{})
@@ -62,6 +76,12 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 			ecsm, err = parseECSMapping(m)
 			if err != nil {
 				return a, err
+			}
+		}
+		if profileRaw, ok := data["profile"]; ok {
+			profile, ok = profileRaw.(bool)
+			if !ok {
+				return a, fmt.Errorf("invalid profile: %w", ErrActionRequest)
 			}
 		}
 	}
@@ -79,7 +99,9 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 	a = Action{
 		Query:      query,
 		ID:         id,
+		Platforms:  platforms,
 		ECSMapping: ecsm,
+		Profile:    profile,
 	}
 
 	if v, ok := m["timeout"]; ok {
@@ -94,6 +116,52 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 	}
 
 	return a, nil
+}
+
+func splitPlatforms(platform string) []string {
+	platforms := strings.Split(platform, ",")
+	for i := range platforms {
+		platforms[i] = strings.TrimSpace(platforms[i])
+	}
+	if len(platforms) == 1 && platforms[0] == "" {
+		return nil
+	}
+	return platforms
+}
+
+// MatchesPlatform reports whether the action is allowed to run on this host.
+func (a Action) MatchesPlatform() bool {
+	return platformMatches(runtime.GOOS, a.Platforms)
+}
+
+// platformMatches reports whether an osquery platform expression matches goos.
+func platformMatches(goos string, platforms []string) bool {
+	if len(platforms) == 0 {
+		return true
+	}
+
+	goos = strings.ToLower(strings.TrimSpace(goos))
+	for _, p := range platforms {
+		switch strings.ToLower(strings.TrimSpace(p)) {
+		case "all", "any":
+			return true
+		case goos:
+			return true
+		case "ubuntu", "centos":
+			if goos == "linux" {
+				return true
+			}
+		case "posix":
+			if goos != "windows" {
+				return true
+			}
+		case "macos":
+			if goos == "darwin" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {

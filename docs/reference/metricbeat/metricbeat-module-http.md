@@ -3,9 +3,10 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-http.html
 applies_to:
   stack: ga
+  serverless: ga
 ---
 
-% This file is generated! See scripts/docs_collector.py
+% This file is generated! See metricbeat/scripts/mage/docs_collector.go
 
 # HTTP module [metricbeat-module-http]
 
@@ -53,7 +54,7 @@ metricbeat.modules:
   #paths:
   #  - path: "/foo"
   #    namespace: "foo"
-  #    fields: # added to the the response in root. overwrites existing fields
+  #    fields: # added to the response in root. overwrites existing fields
   #      key: "value"
 ```
 

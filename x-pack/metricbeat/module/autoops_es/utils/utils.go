@@ -116,23 +116,6 @@ func PartitionByMaxValue[T any](limit int, items []T, valueExtractor func(T) int
 	return sortedItems
 }
 
-func GetStringArrayFromArrayOrSingleValue(field interface{}) []string {
-	switch value := field.(type) {
-	case string:
-		return []string{value}
-	case []string:
-		return value
-	case []interface{}:
-		var data []string
-		for _, str := range value {
-			data = append(data, GetStringArrayFromArrayOrSingleValue(str)...)
-		}
-		return data
-	default:
-		return nil
-	}
-}
-
 func UrlEscapeNames(names []string, stringToExclude string) []string {
 	result := make([]string, 0, len(names)) // Preallocate slice with the same length as input
 
