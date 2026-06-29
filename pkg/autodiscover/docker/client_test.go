@@ -53,7 +53,7 @@ func TestNewClient(t *testing.T) {
 	// Test we can hardcode version
 	os.Setenv("DOCKER_API_VERSION", "1.22")
 
-	c, err = NewClient(client.DefaultDockerHost, nil, nil)
+	c, err = NewClient(client.DefaultDockerHost, nil, nil, log)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	assert.Equal(t, "1.22", c.ClientVersion())
