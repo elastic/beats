@@ -70,7 +70,7 @@
           type: long
           format: number
           description: >
-            Number of overcommited huge pages.
+            Number of overcommitted huge pages.
         - name: default_size
           type: long
           format: bytes
