@@ -439,7 +439,7 @@ func TestTest(t *testing.T) {
 	message := testMessage{
 		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
 		headers: []sarama.RecordHeader{
-			recordHeader("X-Test-Header", "test header value"),
+			testutil.RecordHeader("X-Test-Header", "test header value"),
 		},
 	}
 	testutil.WriteToKafkaTopic(t, testTopic, message.message, message.headers)
