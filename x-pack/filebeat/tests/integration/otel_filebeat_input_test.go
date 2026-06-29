@@ -793,7 +793,7 @@ service:
 	es := integration.GetESClient(t, "http")
 
 	t.Cleanup(func() {
-		deleteMQTTDataStreamsFromES(t, es, []string{
+		deleteDataStreamsFromES(t, es, []string{
 			otelIndex,
 			fbIndex,
 		})
