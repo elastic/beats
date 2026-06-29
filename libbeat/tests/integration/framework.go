@@ -54,6 +54,7 @@ import (
 
 	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
+	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
@@ -645,6 +646,31 @@ func (b *BeatProc) WaitLogsContainsAnyOrder(msgs []string, timeout time.Duration
 		100*time.Millisecond,
 		msg,
 	)
+}
+
+// MonitoringPort waits for the Beat's HTTP monitoring server to log its
+// listening address and returns the ephemeral port it bound to.
+//
+// Configure the Beat with `http.port: 0` so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port, which causes collisions when the same test runs
+// many times in parallel (e.g. via script/stresstest.sh).
+func (b *BeatProc) MonitoringPort(timeout time.Duration) int {
+	b.t.Helper()
+	var port int
+	require.Eventuallyf(b.t, func() bool {
+		line := b.GetLogLine(libbeattesting.MonitoringEndpointSnippet)
+		if line == "" {
+			return false
+		}
+		p, err := libbeattesting.ParseMonitoringPort(line)
+		if err != nil {
+			return false
+		}
+		port = p
+		return true
+	}, timeout, 100*time.Millisecond, "Beat monitoring endpoint did not log its listening address")
+	return port
 }
 
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first

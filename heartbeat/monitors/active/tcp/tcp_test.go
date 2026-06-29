@@ -37,7 +37,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
 	"github.com/elastic/beats/v7/heartbeat/hbtestllext"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
@@ -120,8 +119,15 @@ func TestUpEndpointJob(t *testing.T) {
 
 func TestConnectionRefusedEndpointJob(t *testing.T) {
 	ip := "127.0.0.1"
-	port, err := btesting.AvailableTCP4Port()
+	// Bind an ephemeral port and release it to obtain an address where
+	// connections are refused (nothing is listening). Binding to :0 avoids the
+	// time-of-check/time-of-use race of pre-allocating a fixed port.
+	l, err := net.Listen("tcp", net.JoinHostPort(ip, "0")) //nolint:noctx // fine for tests
 	require.NoError(t, err)
+	addr, ok := l.Addr().(*net.TCPAddr)
+	require.True(t, ok, "expected *net.TCPAddr from listener")
+	port := uint16(addr.Port) //nolint:gosec // ephemeral port fits in uint16
+	require.NoError(t, l.Close())
 
 	event := testTCPCheck(t, ip, port)
 
@@ -246,7 +252,7 @@ func TestNXDomainJob(t *testing.T) {
 // for the specific tests used here.
 func startEchoServer(t *testing.T) (host string, port uint16, ip string, close func() error, err error) {
 	// Simple echo server
-	listener, err := net.Listen("tcp", "localhost:0")
+	listener, err := net.Listen("tcp", "localhost:0") //nolint:noctx // fine for tests
 	if err != nil {
 		return "", 0, "", nil, err
 	}

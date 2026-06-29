@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
@@ -103,6 +104,43 @@ func (c *Collector) ObservedLogs() *observer.ObservedLogs {
 
 func (c *Collector) Shutdown() {
 	c.collector.Shutdown()
+}
+
+// MonitoringPort waits for a single Beat receiver HTTP monitoring server to log
+// its listening address and returns the ephemeral port it bound to.
+//
+// Configure the receiver with `http.host: localhost` and `http.port: 0` so the
+// OS assigns a free port at bind time. Reading the port back from the logs
+// avoids the time-of-check/time-of-use race of pre-allocating a port.
+func (c *Collector) MonitoringPort(tb testing.TB) int {
+	tb.Helper()
+	return c.MonitoringPorts(tb, 1)[0]
+}
+
+// MonitoringPorts waits until at least n Beat receiver HTTP monitoring servers
+// have logged their listening addresses and returns the ephemeral ports they
+// bound to. The ports are returned in the order they were logged; callers that
+// only assert each endpoint works do not need a per-receiver mapping.
+func (c *Collector) MonitoringPorts(tb testing.TB, n int) []int {
+	tb.Helper()
+	var ports []int
+	require.EventuallyWithT(tb, func(ct *assert.CollectT) {
+		seen := make(map[int]struct{})
+		ports = ports[:0]
+		for _, entry := range c.observer.FilterMessageSnippet(libbeattesting.MonitoringEndpointSnippet).All() {
+			port, err := libbeattesting.ParseMonitoringPort(entry.Message)
+			if !assert.NoError(ct, err) {
+				continue
+			}
+			if _, ok := seen[port]; ok {
+				continue
+			}
+			seen[port] = struct{}{}
+			ports = append(ports, port)
+		}
+		assert.GreaterOrEqualf(ct, len(ports), n, "waiting for %d monitoring endpoints to start", n)
+	}, 30*time.Second, 100*time.Millisecond, "collector monitoring endpoints did not start")
+	return ports[:n]
 }
 
 func getComponent() (otelcol.Factories, error) {
