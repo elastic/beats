@@ -108,9 +108,6 @@ service:
 `
 	logFilePath := filepath.Join(tmpdir, "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	// http.port is set to 0 so the monitoring server binds to an ephemeral
-	// port, avoiding the TOCTOU race of pre-allocating a port. The actual
-	// port is then discovered from the collector logs.
 	collector := oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
 	otelMonitoringPort := collector.MonitoringPort(t)
 
@@ -154,8 +151,6 @@ http.port: 0
 	filebeat.Start()
 	defer filebeat.Stop()
 
-	// http.port is set to 0 so filebeat's monitoring server binds to an
-	// ephemeral port; discover the resolved port from the logs.
 	filebeatMonitoringPort := filebeat.MonitoringPort(30 * time.Second)
 
 	// prepare to query ES
@@ -1002,10 +997,10 @@ func TestFileBeatKerberos(t *testing.T) {
           file_identity.native: ~
     queue.mem.flush.timeout: 0s
     management.otel.enabled: true
-    path.home: {{.PathHome}}	
+    path.home: {{.PathHome}}
 extensions:
   beatsauth:
-   kerberos: 
+   kerberos:
      auth_type: "password"
      config_path: "../../../../libbeat/outputs/elasticsearch/testdata/krb5.conf"
      username: "beats"
@@ -1022,7 +1017,7 @@ exporters:
     auth:
      authenticator: beatsauth
 service:
-  extensions: 
+  extensions:
   - beatsauth
   pipelines:
     logs:
