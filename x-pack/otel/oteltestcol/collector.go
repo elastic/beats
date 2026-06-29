@@ -43,11 +43,17 @@ import (
 )
 
 type Collector struct {
-	collector *otelcol.Collector
-	observer  *observer.ObservedLogs
+	collector    *otelcol.Collector
+	observer     *observer.ObservedLogs
+	done         chan struct{}
+	shutdownOnce sync.Once
 }
 
 // New creates and starts a new OTel collector for testing.
+//
+// The collector's own telemetry metrics are disabled (see metricsOffConfig) so
+// multiple collectors can run in parallel, e.g. under script/stresstest.sh,
+// without colliding on the fixed Prometheus port.
 func New(tb testing.TB, configYAML string) *Collector {
 	tb.Helper()
 
@@ -60,6 +66,12 @@ func New(tb testing.TB, configYAML string) *Collector {
 		tb.Fatalf("failed to create collector: %v", err)
 	}
 
+	// Merged after the test config to disable the collector's own telemetry
+	// metrics; kept in a separate file so we don't have to parse/rewrite the
+	// test's YAML.
+	metricsOffFile := filepath.Join(configDir, "metrics-off.yaml")
+	require.NoError(tb, os.WriteFile(metricsOffFile, []byte(metricsOffConfig), 0o644))
+
 	var zapBuf zaptest.Buffer
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
@@ -69,23 +81,22 @@ func New(tb testing.TB, configYAML string) *Collector {
 	observed, observer := observer.New(zapcore.DebugLevel)
 	core := zapcore.NewTee(zapCore, observed)
 
-	settings := newCollectorSettings("file:"+configFile, core)
+	settings := newCollectorSettings([]string{"file:" + configFile, "file:" + metricsOffFile}, core)
 	col, err := otelcol.NewCollector(settings)
 	require.NoError(tb, err)
 
-	var wg sync.WaitGroup
+	c := &Collector{collector: col, observer: observer, done: make(chan struct{})}
+
 	tb.Cleanup(func() {
-		col.Shutdown()
-		wg.Wait()
+		c.Shutdown()
 
 		if tb.Failed() {
 			tb.Log("OTel Collector logs:\n" + zapBuf.String())
 		}
 	})
 
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer close(c.done)
 		ctx, cancel := signal.NotifyContext(tb.Context(), os.Interrupt)
 		defer cancel()
 		assert.NoError(tb, col.Run(ctx))
@@ -95,16 +106,33 @@ func New(tb testing.TB, configYAML string) *Collector {
 		return col.GetState() == otelcol.StateRunning
 	}, 10*time.Second, 10*time.Millisecond, "Collector did not start in time")
 
-	return &Collector{collector: col, observer: observer}
+	return c
 }
 
 func (c *Collector) ObservedLogs() *observer.ObservedLogs {
 	return c.observer
 }
 
+// Shutdown stops the collector and blocks until it has fully exited. Blocking
+// lets callers restart a collector that reuses the same path.home (or other
+// resources) without racing the previous instance's teardown. It is safe to
+// call multiple times.
 func (c *Collector) Shutdown() {
-	c.collector.Shutdown()
+	c.shutdownOnce.Do(c.collector.Shutdown)
+	<-c.done
 }
+
+// metricsOffConfig is merged on top of the test config to turn off the
+// collector's own telemetry metrics. The collector otherwise starts a
+// Prometheus reader on a fixed localhost:8888, which collides when collectors
+// run in parallel (e.g. under stresstest.sh). Tests assert on Elasticsearch
+// documents and the per-receiver HTTP monitoring endpoint rather than the
+// collector's own metrics, so disabling them is safe.
+const metricsOffConfig = `service:
+  telemetry:
+    metrics:
+      level: none
+`
 
 // MonitoringPort waits for a single Beat receiver HTTP monitoring server to log
 // its listening address and returns the ephemeral port it bound to.
@@ -190,7 +218,9 @@ func getComponent() (otelcol.Factories, error) {
 	}, nil
 }
 
-func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorSettings {
+// newCollectorSettings builds the collector settings from the given config
+// URIs, which are resolved and deep-merged in order (later URIs win).
+func newCollectorSettings(uris []string, core zapcore.Core) otelcol.CollectorSettings {
 	return otelcol.CollectorSettings{
 		BuildInfo: component.BuildInfo{
 			Command:     "otel",
@@ -205,7 +235,7 @@ func newCollectorSettings(filename string, core zapcore.Core) otelcol.CollectorS
 		},
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
 			ResolverSettings: confmap.ResolverSettings{
-				URIs: []string{filename},
+				URIs: uris,
 				ProviderFactories: []confmap.ProviderFactory{
 					fileprovider.NewFactory(),
 				},

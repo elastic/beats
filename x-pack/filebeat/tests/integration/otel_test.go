@@ -1365,22 +1365,11 @@ service:
 		1*time.Minute, 1*time.Second, "expected more than 0 events, got none",
 	)
 
+	// Shutdown blocks until the collector has fully exited, so the restart below
+	// cannot race the previous instance's teardown (the previous version polled
+	// the collector's fixed :8888 telemetry port as an exit signal, which is now
+	// disabled to keep collectors parallel-safe).
 	collector.Shutdown()
-
-	// wait for 8888 port to be free (an indication that previous collector has exited)
-	require.Eventually(t,
-		func() bool {
-			ln, err := net.Listen("tcp", "localhost:8888") //nolint:noctx // it's okay for testing purposes
-			if err != nil {
-				return false
-			}
-			ln.Close()
-			return true
-		},
-		10*time.Second,
-		100*time.Millisecond,
-		"port 8888 never became available",
-	)
 
 	// restart the collector process
 	collector = oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
