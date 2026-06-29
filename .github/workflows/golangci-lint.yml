@@ -6,8 +6,6 @@ on:
   #    - main
   #    - 8.*
   pull_request:
-<<<<<<< HEAD
-=======
     paths:
       - '**/*.go'
       - '**/go.mod'
@@ -16,7 +14,6 @@ on:
       - '.golangci.yml'
       - '.github/workflows/golangci-lint.yml'
 
->>>>>>> 72d1c327e (ci: include `.go-version` file as trigger for linter (#51625))
 permissions:
   contents: read
   # Optional: allow read access to pull request. Use with `only-new-issues` option.
