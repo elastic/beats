@@ -614,10 +614,9 @@ func TestConnRefusedJob(t *testing.T) {
 	require.NoError(t, err)
 	addr, ok := l.Addr().(*net.TCPAddr)
 	require.True(t, ok, "expected *net.TCPAddr from listener")
-	port := uint16(addr.Port) //nolint:gosec // ephemeral port fits in uint16
 	require.NoError(t, l.Close())
 
-	url := fmt.Sprintf("http://%s:%d", ip, port)
+	url := fmt.Sprintf("http://%s:%d", ip, addr.Port)
 	event := sendSimpleTLSRequest(t, url, false)
 
 	testslike.Test(
@@ -625,7 +624,7 @@ func TestConnRefusedJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(addr.Port))),
 			urlChecks(url),
 		)),
 		event.Fields,
