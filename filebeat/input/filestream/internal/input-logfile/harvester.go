@@ -237,8 +237,7 @@ func startHarvester(
 	return func(canceler context.Context) (err error) {
 		defer func() {
 			if v := recover(); v != nil {
-				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
-				ctx.Logger.Errorf("Harvester crashed with: %+v", err)
+				err = fmt.Errorf("harvester panic for source %q: %+v\n%s", srcID, v, debug.Stack())
 				hg.readers.remove(srcID)
 			}
 
