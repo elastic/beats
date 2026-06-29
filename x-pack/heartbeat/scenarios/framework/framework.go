@@ -285,6 +285,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
+		Logger:          logp.NewNopLogger(),
 	}
 
 	sched = scheduler.Create(
