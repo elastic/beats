@@ -1371,11 +1371,9 @@ service:
 	// disabled to keep collectors parallel-safe).
 	collector.Shutdown()
 
-	// restart the collector process
-	collector = oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
-	t.Cleanup(func() {
-		collector.Shutdown()
-	})
+	// Restart the collector. New registers shutdown via t.Cleanup, so the
+	// returned value is not needed here.
+	oteltestcol.New(t, fmt.Sprintf(otelCfgFile, logFilePath, tmpdir, fbOtelIndex))
 
 	// wait for more docs to be published.
 	require.EventuallyWithTf(t,

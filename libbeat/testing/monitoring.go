@@ -30,7 +30,7 @@ import (
 const MonitoringEndpointSnippet = "Metrics endpoint listening on:"
 
 // e.g. "Metrics endpoint listening on: 127.0.0.1:5067 (configured: localhost)".
-var reMonitoringEndpoint = regexp.MustCompile(`Metrics endpoint listening on: (\S+) \(configured:`)
+var reMonitoringEndpoint = regexp.MustCompile(regexp.QuoteMeta(MonitoringEndpointSnippet) + ` (\S+) \(configured:`)
 
 // ParseMonitoringPort extracts the bound port from a MonitoringEndpointSnippet
 // log line. It lets tests read the ephemeral port chosen by the OS instead of

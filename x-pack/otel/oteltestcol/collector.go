@@ -59,12 +59,7 @@ func New(tb testing.TB, configYAML string) *Collector {
 
 	configDir := tb.TempDir()
 	configFile := filepath.Join(configDir, "otel.yaml")
-	err := os.WriteFile(configFile, []byte(configYAML), 0o644)
-	require.NoError(tb, err)
-
-	if err != nil {
-		tb.Fatalf("failed to create collector: %v", err)
-	}
+	require.NoError(tb, os.WriteFile(configFile, []byte(configYAML), 0o644))
 
 	// Merged after the test config to disable the collector's own telemetry
 	// metrics; kept in a separate file so we don't have to parse/rewrite the
