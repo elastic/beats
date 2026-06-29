@@ -787,8 +787,8 @@ type mockMetadataUpdater struct {
 	ResetCursorCalled     int
 	UpdateMetadataCalled  int
 	RemoveCalled          int
-	IterateOnPrefixCalled int
-	KeyExistsCalled       int
+	IterateOnPrefixCalled atomic.Int64
+	KeyExistsCalled       atomic.Int64
 	UpdateKeyCalled       int
 }
 
@@ -879,7 +879,7 @@ func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
 func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interface{}) bool) {
 	mu.mu.RLock()
 	defer mu.mu.RUnlock()
-	mu.IterateOnPrefixCalled++
+	mu.IterateOnPrefixCalled.Add(1)
 	for key, meta := range mu.table {
 		if !fn(key, meta) {
 			return
@@ -890,7 +890,7 @@ func (mu *mockMetadataUpdater) IterateOnPrefix(fn func(key string, meta interfac
 func (mu *mockMetadataUpdater) KeyExists(key string) bool {
 	mu.mu.RLock()
 	defer mu.mu.RUnlock()
-	mu.KeyExistsCalled++
+	mu.KeyExistsCalled.Add(1)
 	_, ok := mu.table[key]
 	return ok
 }
@@ -1593,17 +1593,17 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		}
 
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
 
-		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
 
 		// The fast path returns as soon as the exact key is found, so it must
 		// never scan the registry or migrate anything.
-		assert.Equal(t, 0, store.IterateOnPrefixCalled, "fast path must not scan the registry")
+		assert.Equal(t, int64(0), store.IterateOnPrefixCalled.Load(), "fast path must not scan the registry")
 		assert.Equal(t, 0, store.UpdateKeyCalled, "fast path must not migrate")
-		assert.Positive(t, store.KeyExistsCalled, "fast path must check key existence")
+		assert.Positive(t, store.KeyExistsCalled.Load(), "fast path must check key existence")
 		// The pre-seeded prefix entry must remain untouched.
 		assert.True(t, store.has("filestream::my-input::fingerprint::aabb"),
 			"prefix entry must remain since migration did not run")
@@ -1623,16 +1623,16 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		}
 
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 		}
 
-		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
 
 		// Migration succeeds via the short fingerprint set prefix match: the
 		// registry is scanned, the old key is migrated to the new identity, and
 		// the old key is removed.
-		assert.Positive(t, store.IterateOnPrefixCalled, "slow path must scan the registry")
+		assert.Positive(t, store.IterateOnPrefixCalled.Load(), "slow path must scan the registry")
 		assert.Positive(t, store.UpdateKeyCalled, "slow path must migrate the matched entry")
 		assert.False(t, store.has(oldKey), "old key must be removed after migration")
 		// migrateGrowingFingerprint keeps the old key's plugin/input prefix and
@@ -1813,7 +1813,7 @@ func TestBuildShortFingerprintSet(t *testing.T) {
 		Fingerprint:    "aabb",
 	}
 
-	p := &fileProspector{logger: logp.L()}
+	p := &fileProspector{logger: logptest.NewTestingLogger(t, "")}
 	p.buildShortFingerprintSet(store)
 
 	require.Len(t, p.shortFingerprints.entries, 1)
@@ -1842,7 +1842,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 
 	t.Run("OpCreate with growing entry adds entry", func(t *testing.T) {
 		p := &fileProspector{
-			logger:            logp.L(),
+			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
 		}
@@ -1851,7 +1851,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
 
-		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+		p.onFSEvent(logptest.NewTestingLogger(t, ""), input.Context{}, event, src, store, hg, time.Time{})
 
 		require.Len(t, p.shortFingerprints.entries, 1)
 		entry, ok := p.shortFingerprints.entries["filestream::input::fingerprint::aabb"]
@@ -1865,7 +1865,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		// short-fingerprint set: they cannot participate in prefix matching.
 		const sha = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 		p := &fileProspector{
-			logger:            logp.L(),
+			logger:            logptest.NewTestingLogger(t, ""),
 			identifier:        identifier,
 			shortFingerprints: newShortFingerprintSet(),
 		}
@@ -1875,15 +1875,15 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
 
-		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+		p.onFSEvent(logptest.NewTestingLogger(t, ""), input.Context{}, event, src, store, hg, time.Time{})
 
-		assert.Len(t, p.shortFingerprints.entries, 0)
+		assert.Empty(t, p.shortFingerprints.entries)
 	})
 
 	t.Run("OpDelete removes entry", func(t *testing.T) {
 		srcID := "filestream::input::fingerprint::aabb"
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				srcID: {Fingerprint: "aabb", Source: "/a.log"},
@@ -1896,15 +1896,15 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
 
-		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+		p.onFSEvent(logptest.NewTestingLogger(t, ""), input.Context{}, event, src, store, hg, time.Time{})
 
-		assert.Len(t, p.shortFingerprints.entries, 0)
+		assert.Empty(t, p.shortFingerprints.entries)
 	})
 
 	t.Run("OpRename updates source path", func(t *testing.T) {
 		srcID := "filestream::input::fingerprint::aabb"
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				srcID: {Fingerprint: "aabb", Source: "/a.log"},
@@ -1924,7 +1924,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
 
-		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+		p.onFSEvent(logptest.NewTestingLogger(t, ""), input.Context{}, event, src, store, hg, time.Time{})
 
 		require.Len(t, p.shortFingerprints.entries, 1)
 		entry := p.shortFingerprints.entries[srcID]
@@ -1937,7 +1937,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		// After truncation, the SrcID is based on the NEW (truncated) fingerprint
 		truncatedSrcID := "filestream::input::fingerprint::xx"
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				oldSrcID: {Fingerprint: "aabb", Source: "/a.log"},
@@ -1948,9 +1948,9 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
 
-		p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+		p.onFSEvent(logptest.NewTestingLogger(t, ""), input.Context{}, event, src, store, hg, time.Time{})
 
-		assert.Len(t, p.shortFingerprints.entries, 0,
+		assert.Empty(t, p.shortFingerprints.entries,
 			"stale entry should be removed by path match")
 	})
 }
@@ -1970,7 +1970,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		store.table[oldKey] = fileMeta{Source: path, IdentifierName: fingerprintName, Fingerprint: oldFingerprint}
 
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				oldKey: {Fingerprint: oldFingerprint, Source: path},
@@ -1987,7 +1987,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 
-		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
 
 		assert.NotContains(t, p.shortFingerprints.entries, oldKey,
 			"old entry should be removed")
@@ -2013,7 +2013,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		store.table[oldKey] = fileMeta{Source: path, IdentifierName: fingerprintName, Fingerprint: oldFingerprint}
 
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 			shortFingerprints: &shortFingerprintSet{entries: map[string]shortFingerprintEntry{
 				oldKey: {Fingerprint: oldFingerprint, Source: path},
@@ -2034,11 +2034,11 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 
-		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
 
 		assert.NotContains(t, p.shortFingerprints.entries, oldKey, "old entry should be removed")
 		assert.NotContains(t, p.shortFingerprints.entries, newSrcID, "transitioned entry should NOT be added")
-		assert.Len(t, p.shortFingerprints.entries, 0)
+		assert.Empty(t, p.shortFingerprints.entries)
 	})
 
 	t.Run("input ID containing 'fingerprint' substring: migration succeeds", func(t *testing.T) {
@@ -2059,7 +2059,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 
 		p := &fileProspector{
-			logger:     logp.L(),
+			logger:     logptest.NewTestingLogger(t, ""),
 			identifier: identifier,
 			shortFingerprints: &shortFingerprintSet{
 				entries: map[string]shortFingerprintEntry{
@@ -2078,7 +2078,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 
-		p.handleGrowingFingerprintLookup(logp.L(), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
 
 		assert.False(t, store.has(oldKey), "old key should be removed by migration")
 		assert.True(t, store.has(newSrcID), "new key should exist after migration")
@@ -2182,7 +2182,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		},
 	}
 	src = identifier.GetSource(event)
-	p.onFSEvent(logp.L(), input.Context{}, event, src, store, hg, time.Time{})
+	p.onFSEvent(logptest.NewTestingLogger(t, ""), input.Context{}, event, src, store, hg, time.Time{})
 	assert.Equal(t, map[string]shortFingerprintEntry{
 		makeKey("bb", true): {Fingerprint: "bb", Source: "/b.log"},
 		makeKey("cc", true): {Fingerprint: "cc", Source: "/c.log"},
