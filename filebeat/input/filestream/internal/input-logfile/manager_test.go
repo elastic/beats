@@ -433,7 +433,7 @@ func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
+	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core { //nolint:forbidigo // test helper builds a buffer-backed logger to assert on emitted logs
 		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
 	}))
 	return log, buf
@@ -533,4 +533,27 @@ take_over:
 			assert.Equal(t, tc.expected, outer.TakeOver, "TakeOverConfig was not parsed correctly")
 		})
 	}
+}
+
+// mockHarvester is a minimal Harvester used by manager tests that only need a
+// Harvester value to construct an input; its sessions are never driven, so
+// OpenSession returns a nil session. Runner behaviour is tested with the
+// controllable fakes in harvester_runner_test.go.
+type mockHarvester struct {
+	wg    *sync.WaitGroup
+	onRun func(v2.Context, Source, Cursor, Publisher) error
+}
+
+func (m *mockHarvester) Name() string { return "mock" }
+
+func (m *mockHarvester) Test(_ Source, _ v2.TestContext) error { return nil }
+
+func (m *mockHarvester) OpenSession(
+	_ v2.Context, _ Source, _ Cursor, _ *Metrics,
+) (HarvesterSession, error) {
+	return nil, nil
+}
+
+func correctOnRun(_ v2.Context, _ Source, _ Cursor, _ Publisher) error {
+	return nil
 }

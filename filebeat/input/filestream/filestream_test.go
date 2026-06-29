@@ -30,46 +30,19 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
 )
 
-func TestLogFileTimedClosing(t *testing.T) {
+// TestLogFileCloseOnEOF covers the only close condition logFile still evaluates
+// itself: close.reader.on_eof (and GZIP, which always closes on EOF). The
+// on-state-change conditions (inactive/removed/renamed) and close-after-interval
+// are now evaluated by the harvester runner's waker and covered by integration tests.
+func TestLogFileCloseOnEOF(t *testing.T) {
 	testCases := []struct {
-		name           string
-		createFile     func(t *testing.T) *os.File
-		waitBeforeRead time.Duration
-		inactive       time.Duration
-		closeEOF       bool
-		afterInterval  time.Duration
-		expectedErr    error
+		name       string
+		createFile func(t *testing.T) *os.File
 	}{
-		{name: "plain: read from file and close inactive",
-			createFile:  createTestPlainLogFile,
-			inactive:    2 * time.Second,
-			expectedErr: ErrInactive,
-		},
-		{name: "plain: read from file and close after interval",
-			createFile:    createTestPlainLogFile,
-			afterInterval: 3 * time.Second,
-			expectedErr:   ErrClosed,
-		},
-		{name: "plain: read from file and close on EOF",
-			createFile:  createTestPlainLogFile,
-			closeEOF:    true,
-			expectedErr: io.EOF,
-		},
-		{name: "GZIP: read from file and close on EOF",
-			createFile:  createTestGzipLogFile,
-			closeEOF:    true,
-			expectedErr: io.EOF,
-		},
-		{name: "GZIP: read from file and close after interval",
-			createFile:     createTestPlainLogFile,
-			afterInterval:  3 * time.Second,
-			waitBeforeRead: 3 * time.Second,
-			expectedErr:    ErrClosed,
-		},
+		{name: "plain: read from file and close on EOF", createFile: createTestPlainLogFile},
+		{name: "GZIP: read from file and close on EOF", createFile: createTestGzipLogFile},
 	}
 
 	for _, tc := range testCases {
@@ -83,35 +56,21 @@ func TestLogFileTimedClosing(t *testing.T) {
 		defer os.Remove(f.Name())
 
 		t.Run(tc.name, func(t *testing.T) {
-			reader, _, err := newFileReader(
+			reader, err := newFileReader(
 				logp.NewNopLogger(),
 				context.TODO(),
 				f,
 				readerConfig{},
 				closerConfig{
-					OnStateChange: stateChangeCloserConfig{
-						CheckInterval: 1 * time.Second,
-						Inactive:      tc.inactive,
-					},
-					Reader: readerCloserConfig{
-						OnEOF:         tc.closeEOF,
-						AfterInterval: tc.afterInterval,
-					},
+					Reader: readerCloserConfig{OnEOF: true},
 				},
-				false,
 			)
 			if err != nil {
 				t.Fatalf("error while creating logReader: %+v", err)
 			}
 
-			if tc.waitBeforeRead > 0 {
-				// GZIP files aren't kept open, thus we need to wait for
-				// 'AfterInterval' to elapse before reading.
-				time.Sleep(tc.waitBeforeRead)
-			}
-
 			err = readUntilError(reader)
-			assert.ErrorIs(t, err, tc.expectedErr)
+			assert.ErrorIs(t, err, io.EOF)
 		})
 	}
 }
@@ -163,8 +122,8 @@ func TestLogFileTruncated(t *testing.T) {
 			defer f.Close()
 			defer os.Remove(f.Name())
 
-			reader, _, err := newFileReader(
-				logp.NewNopLogger(), context.TODO(), f, fs.readerConfig, fs.closerConfig, false)
+			reader, err := newFileReader(
+				logp.NewNopLogger(), context.TODO(), f, fs.readerConfig, fs.closerConfig)
 			require.NoError(t, err, "error while creating logReader")
 
 			buf := make([]byte, 32)
@@ -176,326 +135,6 @@ func TestLogFileTruncated(t *testing.T) {
 
 			err = readUntilError(reader)
 			assert.ErrorIs(t, err, tc.wantErr)
-		})
-	}
-}
-
-func TestLogFile_startReadUntilEOF(t *testing.T) {
-	// newLogFile builds a logFile with just enough state for
-	// startReadUntilEOF to run: a non-nil tg (Stop is called on it). The zero
-	// value of unison.TaskGroup is documented as fully functional.
-	newLogFile := func() *logFile {
-		return &logFile{tg: &unison.TaskGroup{}}
-	}
-
-	t.Run("flips closeOnEOF from false to true", func(t *testing.T) {
-		lf := newLogFile()
-		lf.closeOnEOF = false
-
-		lf.startReadUntilEOF(ctxtool.CancelContext{})
-
-		assert.True(t, lf.closeOnEOF, "startReadUntilEOF must set closeOnEOF to true")
-	})
-
-	t.Run("leaves closeOnEOF true if already true", func(t *testing.T) {
-		lf := newLogFile()
-		lf.closeOnEOF = true
-
-		lf.startReadUntilEOF(ctxtool.CancelContext{})
-
-		assert.True(t, lf.closeOnEOF, "closeOnEOF must remain true")
-	})
-
-	t.Run("swaps readerCtx to the passed context", func(t *testing.T) {
-		originalCtx := ctxtool.WithCancelContext(context.Background())
-		newCtx := ctxtool.WithCancelContext(context.Background())
-
-		lf := newLogFile()
-		lf.readerCtx = originalCtx
-		lf.startReadUntilEOF(newCtx)
-
-		// Cancelling the original context must NOT cancel readerCtx
-		// (it was swapped out).
-		originalCtx.Cancel()
-		assert.NoError(t, lf.readerCtx.Err(),
-			"cancelling the original context must not affect readerCtx after the swap")
-
-		// Cancelling the new context MUST cancel readerCtx.
-		newCtx.Cancel()
-		assert.Error(t, lf.readerCtx.Err(),
-			"cancelling the new (swapped-in) context must cancel readerCtx")
-	})
-
-	t.Run("only first call takes effect", func(t *testing.T) {
-		firstCtx := ctxtool.WithCancelContext(context.Background())
-		secondCtx := ctxtool.WithCancelContext(context.Background())
-
-		lf := newLogFile()
-		lf.startReadUntilEOF(firstCtx)
-		lf.startReadUntilEOF(secondCtx) // must be a no-op
-
-		// Cancelling secondCtx must not affect readerCtx: the second call
-		// was shadowed by sync.Once.
-		secondCtx.Cancel()
-		require.NoError(t, lf.readerCtx.Err(),
-			"secondCtx cancellation leaked into readerCtx; only first startReadUntilEOF call takes effect")
-
-		// Cancelling firstCtx must cancel readerCtx: firstCtx is the one
-		// that actually got assigned.
-		firstCtx.Cancel()
-		require.Error(t, lf.readerCtx.Err(),
-			"firstCtx cancellation did not propagate to readerCtx; first call must win")
-	})
-
-	// Assert the race-avoidance invariant: by the time
-	// startReadUntilEOF returns, any goroutine that was running on
-	// f.tg (periodicStateCheck / closeIfTimeout) has exited. Without
-	// this, periodicStateCheck could read f.readerCtx and call
-	// Cancel() on it concurrently with the swap below.
-	t.Run("stops the file-monitoring goroutines before swapping readerCtx",
-		func(t *testing.T) {
-			lf := newLogFile()
-
-			running := make(chan struct{})
-			exited := make(chan struct{})
-			err := lf.tg.Go(func(ctx context.Context) error {
-				close(running)
-				<-ctx.Done()
-				close(exited)
-				return nil
-			})
-			require.NoError(t, err, "could not start goroutine on tg")
-
-			// Make sure the goroutine is actually running before we call
-			// startReadUntilEOF; otherwise the test could pass even if Stop
-			// did nothing.
-			<-running
-
-			lf.startReadUntilEOF(ctxtool.WithCancelContext(context.Background()))
-
-			select {
-			case <-exited:
-			case <-time.After(5 * time.Second):
-				t.Fatal("startReadUntilEOF did not stop the tg goroutine")
-			}
-		})
-}
-
-// TestNewFileReader_startReadUntilEOFClosure verifies that the closure
-// returned by newFileReader is wired up correctly:
-//   - readUntilEOF=true returns a closure bound to (*logFile).startReadUntilEOF,
-//     so invoking it swaps the reader's readerCtx and flips closeOnEOF.
-//   - readUntilEOF=false returns a no-op closure that leaves the reader
-//     untouched, preserving upstream behaviour.
-func TestNewFileReader_startReadUntilEOFClosure(t *testing.T) {
-	makeReader := func(t *testing.T, readUntilEOF bool) (
-		*logFile, func(ctxtool.CancelContext), ctxtool.CancelContext,
-	) {
-		t.Helper()
-		fs := filestream{
-			readerConfig: readerConfig{BufferSize: 512},
-			compression:  CompressionAuto,
-		}
-		osFile := createTestPlainLogFile(t)
-		t.Cleanup(func() { _ = os.Remove(osFile.Name()) })
-
-		f, err := fs.newFile(osFile)
-		require.NoError(t, err, "could not create file for reading")
-		t.Cleanup(func() { _ = f.Close() })
-
-		canceler := ctxtool.WithCancelContext(context.Background())
-		t.Cleanup(canceler.Cancel)
-
-		reader, enableReadUntilEOFFn, err := newFileReader(
-			logp.NewNopLogger(),
-			canceler,
-			f,
-			readerConfig{
-				Backoff: backoffConfig{
-					Init: 1 * time.Millisecond,
-					Max:  10 * time.Millisecond,
-				},
-			},
-			closerConfig{},
-			readUntilEOF,
-		)
-		require.NoError(t, err, "could not create logReader")
-		t.Cleanup(func() { _ = reader.Close() })
-
-		return reader, enableReadUntilEOFFn, canceler
-	}
-
-	t.Run("readUntilEOF=true: closure swaps readerCtx and set closeOnEOF=true", func(t *testing.T) {
-		reader, startReadUntilEOF, _ := makeReader(t, true)
-
-		require.False(t, reader.closeOnEOF,
-			"test setup is wrong: closeOnEOF must be false before startReadUntilEOF is called. Did you change the test?")
-
-		newCtx := ctxtool.WithCancelContext(context.Background())
-		startReadUntilEOF(newCtx)
-
-		assert.True(t, reader.closeOnEOF,
-			"closure must flip closeOnEOF to true")
-
-		// Verify the swap happened: cancelling newCtx must cancel
-		// reader.readerCtx.
-		newCtx.Cancel()
-		assert.Error(t, reader.readerCtx.Err(),
-			"closure must swap readerCtx: cancelling newCtx should cancel readerCtx")
-	})
-
-	t.Run("readUntilEOF=false: closure is a no-op", func(t *testing.T) {
-		reader, startReadUntilEOF, _ := makeReader(t, false)
-
-		require.False(t, reader.closeOnEOF,
-			"test setup is wrong: closeOnEOF must be false before startReadUntilEOF is called. Did you change the test?")
-
-		// Capture the readerCtx state before calling the closure.
-		originalErr := reader.readerCtx.Err()
-
-		newCtx := ctxtool.WithCancelContext(context.Background())
-		startReadUntilEOF(newCtx)
-
-		assert.False(t, reader.closeOnEOF,
-			"no-op closure must not set closeOnEOF=true")
-
-		// Cancelling newCtx must not affect reader.readerCtx since the
-		// closure is a no-op.
-		newCtx.Cancel()
-		assert.Equal(t, originalErr, reader.readerCtx.Err(),
-			"no-op closure must not swap readerCtx")
-	})
-}
-
-// TestLogFile_readUntilEOFAfterReaderCtxCancel proves that after readerCtx
-// is cancelled by anything that would normally close the reader
-// (close.reader.after_interval, close.on_state_change.*, or an explicit
-// Close), invoking the readUntilEOF closure lets the reader resume reading
-// the file and reach io.EOF. It simulates the cancellation by calling
-// reader.readerCtx.Cancel() directly — exactly what closeIfTimeout and
-// periodicStateCheck do internally.
-func TestLogFile_readUntilEOFAfterReaderCtxCancel(t *testing.T) {
-	fs := filestream{
-		readerConfig: readerConfig{BufferSize: 512},
-		compression:  CompressionAuto,
-	}
-	osFile := createTestPlainLogFile(t)
-	t.Cleanup(func() { _ = os.Remove(osFile.Name()) })
-
-	f, err := fs.newFile(osFile)
-	require.NoError(t, err, "could not create file for reading")
-	t.Cleanup(func() { _ = f.Close() })
-
-	canceler := ctxtool.WithCancelContext(context.Background())
-	t.Cleanup(canceler.Cancel)
-
-	reader, startReadUntilEOF, err := newFileReader(
-		logp.NewNopLogger(),
-		canceler,
-		f,
-		readerConfig{
-			Backoff: backoffConfig{
-				Init: 1 * time.Millisecond,
-				Max:  10 * time.Millisecond,
-			},
-		},
-		closerConfig{},
-		true, // readUntilEOF enabled
-	)
-	require.NoError(t, err, "could not create logReader")
-	t.Cleanup(func() { _ = reader.Close() })
-
-	// 1. Read the first chunk successfully.
-	buf := make([]byte, 16)
-	n, err := reader.Read(buf)
-	require.NoError(t, err, "first Read must succeed")
-	require.Positive(t, n, 0, "first Read must return data")
-
-	// 2. Simulate something else cancelling the reader. closeIfTimeout
-	//    (close.reader.after_interval) and periodicStateCheck
-	//    (close.on_state_change.*) both do exactly this.
-	reader.readerCtx.Cancel()
-
-	// 3. The next Read must return ErrClosed: readerCtx is cancelled and
-	//    isInactive was never set.
-	_, err = reader.Read(buf)
-	require.ErrorIs(t, err, ErrClosed,
-		"Read must return ErrClosed after readerCtx.Cancel()")
-
-	// 4. Trigger readUntilEOF mode with a fresh context.
-	newCtx := ctxtool.WithCancelContext(context.Background())
-	t.Cleanup(newCtx.Cancel)
-	startReadUntilEOF(newCtx)
-
-	// 5. Read the rest of the file. The reader must resume successfully and
-	//    eventually return io.EOF (closeOnEOF was just set to true).
-	finalErr := readUntilError(reader)
-	assert.ErrorIs(t, finalErr, io.EOF,
-		"after startReadUntilEOF, the reader must finish the file and return io.EOF")
-}
-
-// TestNewFileReader_backoffWakesOnCanceler
-// regardless of readUntilEOF, input cancellation wakes a parked backoff.
-func TestNewFileReader_backoffWakesOnCanceler(t *testing.T) {
-	for _, readUntilEOF := range []bool{false, true} {
-		name := "readUntilEOF=false"
-		if readUntilEOF {
-			name = "readUntilEOF=true"
-		}
-
-		t.Run(name, func(t *testing.T) {
-			fs := filestream{
-				readerConfig: readerConfig{BufferSize: 512},
-				compression:  CompressionAuto,
-			}
-			osFile := createTestPlainLogFile(t)
-			t.Cleanup(func() { _ = os.Remove(osFile.Name()) })
-
-			f, err := fs.newFile(osFile)
-			require.NoError(t, err, "could not create file for reading")
-			t.Cleanup(func() { _ = f.Close() })
-
-			canceler := ctxtool.WithCancelContext(context.Background())
-			t.Cleanup(canceler.Cancel)
-
-			reader, _, err := newFileReader(
-				logp.NewNopLogger(),
-				canceler,
-				f,
-				readerConfig{
-					Backoff: backoffConfig{
-						Init: 1 * time.Hour,
-						Max:  1 * time.Hour,
-					},
-				},
-				closerConfig{},
-				readUntilEOF,
-			)
-			require.NoError(t, err, "could not create logReader")
-			t.Cleanup(func() { _ = reader.Close() })
-
-			// Drain the file content (three known lines) so the next Read
-			// parks in backoff.Wait.
-			readDone := make(chan error, 1)
-			go func() {
-				readDone <- readUntilError(reader)
-			}()
-
-			// Give the reader a moment to drain the file and enter backoff.
-			// Cancelling during initial reads is fine too; the invariant we
-			// care about is that Read returns promptly after cancel, not
-			// after the 1-hour backoff.
-			time.Sleep(100 * time.Millisecond)
-			canceler.Cancel()
-
-			select {
-			case err := <-readDone:
-				assert.ErrorIs(t, err, ErrClosed,
-					"Read must return ErrClosed once canceler is cancelled")
-			case <-time.After(2 * time.Second):
-				t.Fatal("Read did not return within 2s after canceler.Cancel(); " +
-					"backoff is not wired to canceler.Done()")
-			}
 		})
 	}
 }
@@ -547,4 +186,95 @@ func readUntilError(reader *logFile) error {
 		_, err = reader.Read(buf)
 	}
 	return err
+}
+
+// TestLogFileNonBlocking tests logFile is non-blocking: it returns ErrWouldBlock
+// at EOF instead of waiting on the read backoff, and it resumes reading once new
+// data is appended.
+func TestLogFileNonBlocking(t *testing.T) {
+	osFile := createTestPlainLogFile(t)
+	fs := filestream{
+		readerConfig: readerConfig{BufferSize: 512},
+		compression:  CompressionAuto,
+	}
+	f, err := fs.newFile(osFile)
+	require.NoError(t, err, "could not create file for reading")
+	t.Cleanup(func() {
+		_ = f.Close()
+		_ = os.Remove(f.Name())
+	})
+
+	reader, err := newFileReader(
+		logp.NewNopLogger(), context.TODO(), f, readerConfig{}, closerConfig{})
+	require.NoError(t, err, "error while creating logReader")
+
+	// Drain the initial content written by createTestPlainLogFile.
+	content := readAllAvailable(t, reader)
+	require.NotEmpty(t, content, "expected to read the initial file content")
+
+	// At EOF a non-blocking reader must return ErrWouldBlock promptly instead
+	// of blocking on the read backoff.
+	n, err := readWithTimeout(t, reader, make([]byte, 1024), time.Second)
+	assert.Zero(t, n, "no bytes should be read at EOF")
+	assert.ErrorIs(t, err, ErrWouldBlock,
+		"non-blocking reader must return ErrWouldBlock at EOF")
+
+	// Once new data is appended the reader must pick it up rather than keep
+	// returning ErrWouldBlock.
+	appendToFile(t, f.Name(), "a new line\n")
+	more := readAllAvailable(t, reader)
+	assert.Equal(t, "a new line\n", string(more),
+		"non-blocking reader must read newly appended data")
+}
+
+// readWithTimeout runs reader.Read in a goroutine and fails the test if it does
+// not return within timeout, turning a blocking regression into a clear failure
+// instead of a hung test.
+func readWithTimeout(t *testing.T, reader *logFile, buf []byte, timeout time.Duration) (int, error) {
+	t.Helper()
+	type result struct {
+		n   int
+		err error
+	}
+	ch := make(chan result, 1)
+	go func() {
+		n, err := reader.Read(buf)
+		ch <- result{n: n, err: err}
+	}()
+
+	select {
+	case r := <-ch:
+		return r.n, r.err
+	case <-time.After(timeout):
+		t.Fatalf("Read did not return within %s; the non-blocking reader appears to be blocking", timeout)
+		return 0, nil
+	}
+}
+
+// readAllAvailable reads from a non-blocking reader until ErrWouldBlock and
+// returns everything read.
+func readAllAvailable(t *testing.T, reader *logFile) []byte {
+	t.Helper()
+	var out []byte
+	for {
+		buf := make([]byte, 1024)
+		n, err := readWithTimeout(t, reader, buf, time.Second)
+		out = append(out, buf[:n]...)
+		if err != nil {
+			require.ErrorIs(t, err, ErrWouldBlock,
+				"unexpected error while draining non-blocking reader")
+			return out
+		}
+	}
+}
+
+func appendToFile(t *testing.T, path, data string) {
+	t.Helper()
+	wf, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0o600)
+	require.NoError(t, err, "could not open file for appending")
+	defer wf.Close()
+
+	_, err = wf.WriteString(data)
+	require.NoError(t, err, "could not append to file")
+	require.NoError(t, wf.Sync(), "could not sync appended data")
 }

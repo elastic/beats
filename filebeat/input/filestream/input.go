@@ -18,15 +18,12 @@
 package filestream
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
-	"slices"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -43,8 +40,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/go-concert/ctxtool"
 )
 
 const pluginName = "filestream"
@@ -69,11 +64,9 @@ type filestream struct {
 	parsers                   parser.Config
 	takeOver                  loginp.TakeOverConfig
 	scannerCheckInterval      time.Duration
-	readUntilEOF              loginp.ReadUntilEOFConfig
 	compression               string
 	includeFileOwnerName      bool
 	includeFileOwnerGroupName bool
-	includeFileFingerprint    bool
 	hasLineFilter             bool
 
 	// Function references for testing
@@ -149,13 +142,11 @@ func configure(
 		readerConfig:              c.Reader,
 		encodingFactory:           encodingFactory,
 		closerConfig:              c.Close,
-		readUntilEOF:              c.ReadUntilEOF,
 		parsers:                   c.Reader.Parsers,
 		takeOver:                  c.TakeOver,
 		compression:               c.Compression,
 		includeFileOwnerName:      c.IncludeFileOwnerName,
 		includeFileOwnerGroupName: c.IncludeFileOwnerGroupName,
-		includeFileFingerprint:    c.IncludeFileFingerprint,
 		hasLineFilter:             len(c.Reader.IncludeLines) > 0 || len(c.Reader.ExcludeLines) > 0,
 		deleterConfig:             c.Delete,
 		waitGracePeriodFn:         waitGracePeriod,
@@ -203,84 +194,19 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 		return fmt.Errorf("not file source")
 	}
 
-	reader, _, _, err := inp.open(ctx.Logger, ctx.Cancelation, fs, 0)
+	// Validate the source can be opened and the reader pipeline built. The file
+	// handle is owned here (not by a session), so it must be closed explicitly.
+	f, enc, _, err := inp.openFile(ctx.Logger, fs.newPath, 0)
 	if err != nil {
 		return err
 	}
-	return reader.Close()
-}
+	defer f.Close()
 
-func (inp *filestream) Run(
-	ctx input.Context,
-	src loginp.Source,
-	cursor loginp.Cursor,
-	publisher loginp.Publisher,
-	metrics *loginp.Metrics) error {
-	fs, ok := src.(fileSource)
-	if !ok {
-		return fmt.Errorf("not file source")
-	}
-
-	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
-	state := initState(log, cursor, fs)
-	if state.EOF {
-		// TODO: change it to debug once GZIP isn't experimental anymore.
-		log.Infof("GZIP file already read to EOF, not reading it again, file name '%s'",
-			fs.newPath)
-		return nil
-	}
-
-	// The reader is tied to ctx.Cancelation so it exits promptly on shutdown
-	// (upstream behavior). When read_until_eof is enabled, it "resets" the
-	// reader via startReadUntilEOF by swapping in a fresh, read_until_eof-scoped
-	// context so the drain read can proceed past ctx.Cancelation.
-	r, startReadUntilEOF, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
+	r, _, err := inp.buildPipeline(ctx.Logger, ctx.Cancelation, f, enc, fs, 0)
 	if err != nil {
-		log.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
-
-	if truncated {
-		state.Offset = 0
-	}
-
-	metrics.FilesActive.Inc()
-	metrics.HarvesterRunning.Inc()
-	defer metrics.FilesActive.Dec()
-	defer metrics.HarvesterRunning.Dec()
-	if fs.desc.GZIP {
-		metrics.FilesGZIPActive.Inc()
-		metrics.HarvesterGZIPRunning.Inc()
-		defer metrics.FilesGZIPActive.Dec()
-		defer metrics.HarvesterGZIPRunning.Dec()
-	}
-
-	defer func() {
-		log.Debug("Closing reader of filestream")
-		if err := r.Close(); err != nil {
-			log.Errorf("Error stopping filestream reader: %v", err)
-		}
-	}()
-
-	// The caller of Run already reports the error and filters out errors that
-	// must not be reported, like 'context cancelled'.
-	err = inp.readFromSource(
-		ctx, log, r, fs.newPath, state, publisher, fs.desc.GZIP, metrics,
-		startReadUntilEOF)
-	if err != nil {
-		// First handle actual errors
-		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
-			return fmt.Errorf("error reading from source: %w", err)
-		}
-
-		if inp.deleterConfig.Enabled {
-			if err := inp.deleteFile(ctx, log, cursor, fs.newPath); err != nil {
-				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
-			}
-		}
-	}
-
-	return nil
+	return r.Close()
 }
 
 func (inp *filestream) deleteFile(
@@ -461,25 +387,19 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-func (inp *filestream) open(
+// buildPipeline assembles the reader pipeline (line reader, encoding, parsers,
+// limits, …) on top of an already-open File positioned at offset. The worker
+// pool rebuilds a pipeline per read slice on a kept-open file handle; Test uses
+// it once to validate the configuration. It does not own f: the caller is
+// responsible for closing it.
+func (inp *filestream) buildPipeline(
 	log *logp.Logger,
 	canceler input.Canceler,
+	f File,
+	encoding encoding.Encoding,
 	fs fileSource,
 	offset int64,
-) (reader.Reader, func(ctxtool.CancelContext), bool, error) {
-
-	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
-	if err != nil {
-		return nil, nil, truncated, err
-	}
-
-	if truncated {
-		offset = 0
-	}
-
-	ok := false // used for cleanup
-	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
-
+) (reader.Reader, *logFile, error) {
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// if the file is archived, it means that it is not going to be updated in the future
@@ -497,15 +417,14 @@ func (inp *filestream) open(
 	// NewLineReader uses additional buffering to deal with encoding and testing
 	// for new lines in input stream. Simple 8-bit based encodings, or plain
 	// don't require 'complicated' logic.
-	logReader, startReadUntilEOF, err := newFileReader(
-		log, canceler, f, inp.readerConfig, closerCfg, inp.readUntilEOF.Enabled)
+	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, closerCfg)
 	if err != nil {
-		return nil, nil, truncated, err
+		return nil, nil, err
 	}
 
 	dbgReader, err := debug.AppendReaders(logReader, log)
 	if err != nil {
-		return nil, nil, truncated, err
+		return nil, nil, err
 	}
 
 	// Configure MaxBytes limit for EncodeReader as multiplied by 4
@@ -522,16 +441,12 @@ func (inp *filestream) open(
 		MaxBytes:   encReaderMaxBytes,
 	}, log)
 	if err != nil {
-		return nil, nil, truncated, err
+		return nil, nil, err
 	}
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	var fingerprint string
-	if inp.includeFileFingerprint {
-		fingerprint = fs.desc.Fingerprint
-	}
-	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r, log)
 
@@ -541,8 +456,7 @@ func (inp *filestream) open(
 		r = NewEOFLookaheadReader(r, io.EOF)
 	}
 
-	ok = true // used for cleanup: no need to close the file
-	return r, startReadUntilEOF, truncated, nil
+	return r, logReader, nil
 }
 
 // openFile opens a file and checks for the encoding. In case the encoding cannot be detected
@@ -691,188 +605,6 @@ func (inp *filestream) initFileOffset(file File, offset int64) error {
 	// get offset from file in case of encoding factory was required to read some data.
 	_, err := file.Seek(0, io.SeekCurrent)
 	return err
-}
-
-func (inp *filestream) readFromSource(
-	ctx input.Context,
-	log *logp.Logger,
-	r reader.Reader,
-	path string,
-	s state,
-	p loginp.Publisher,
-	isGZIP bool,
-	metrics *loginp.Metrics,
-	startReadUntilEOF func(ctxtool.CancelContext)) error {
-
-	metrics.FilesOpened.Inc()
-	metrics.HarvesterOpenFiles.Inc()
-	metrics.HarvesterStarted.Inc()
-	defer metrics.FilesClosed.Inc()
-	defer metrics.HarvesterOpenFiles.Dec()
-	defer metrics.HarvesterClosed.Inc()
-
-	if isGZIP {
-		metrics.FilesGZIPOpened.Inc()
-		metrics.HarvesterOpenGZIPFiles.Inc()
-		metrics.HarvesterGZIPStarted.Inc()
-		defer metrics.FilesGZIPClosed.Inc()
-		defer metrics.HarvesterOpenGZIPFiles.Dec()
-		defer metrics.HarvesterGZIPClosed.Inc()
-	}
-
-	var err error
-	for ctx.Cancelation.Err() == nil {
-		err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
-		err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
-		if !shouldContinue {
-			return err
-		}
-	}
-
-	if inp.readUntilEOF.Enabled {
-		eofCtx, cancel := context.WithTimeout(
-			context.Background(), inp.readUntilEOF.Timeout)
-		defer cancel()
-		eofCancelCtx := ctxtool.WithCancelContext(eofCtx)
-		// Set the underlying logFile into close-on-EOF mode and wake any
-		// in-flight backoff so the next EOF terminates this loop.
-		startReadUntilEOF(eofCancelCtx)
-
-		log.Debugf("input closing, read_until_eof enabled, waiting EOF or %s timeout, whichever happens first",
-			inp.readUntilEOF.Timeout)
-	LOOP:
-		for eofCancelCtx.Err() == nil {
-			err = inp.readLineFromSource(r, log, metrics, isGZIP, &s, p)
-			err, shouldContinue := inp.handleReadError(ctx, err, log, path, metrics, isGZIP)
-			if errors.Is(err, io.EOF) {
-				log.Debug("read_until_eof enabled, EOF reached. closing input")
-				break LOOP
-			}
-
-			if !shouldContinue {
-				return err
-			}
-		}
-		if eofCancelCtx.Err() != nil {
-			log.Infof("read_until_eof enabled, %s timeout reached. closing input", inp.readUntilEOF.Timeout)
-		}
-	}
-	return nil
-}
-
-func (inp *filestream) readLineFromSource(r reader.Reader, log *logp.Logger, metrics *loginp.Metrics, isGZIP bool, s *state, p loginp.Publisher) error {
-	message, err := r.Next()
-	if err != nil {
-		return err
-	}
-
-	// state offset increase. Mutated through *s so subsequent reads in
-	// readFromSource see the accumulated offset
-	s.Offset += int64(message.Bytes) + int64(message.Offset)
-
-	flags, err := message.Fields.GetValue("log.flags")
-	if err == nil {
-		if flags, ok := flags.([]string); ok {
-			if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
-				metrics.MessagesTruncated.Add(1)
-				if isGZIP {
-					// Truncation shouldn't happen for GZIP files, but as
-					// there it the overall metric for filestream, this case
-					// is handled for completeness.
-					metrics.MessagesGZIPTruncated.Add(1)
-				}
-			}
-		}
-	}
-
-	metrics.MessagesRead.Inc()
-	if isGZIP {
-		metrics.MessagesGZIPRead.Inc()
-	}
-	if message.IsEmpty() || (inp.hasLineFilter && inp.isDroppedLine(log, message.Content)) {
-		return nil
-	}
-
-	//nolint:gosec // message.Bytes is always positive
-	metrics.BytesProcessed.Add(uint64(message.Bytes))
-	if isGZIP {
-		//nolint:gosec // message.Bytes is always positive, no risk of overflow here
-		metrics.BytesGZIPProcessed.Add(uint64(message.Bytes))
-	}
-
-	// add "take_over" tag if `take_over` is set to true
-	if inp.takeOver.Enabled {
-		_ = mapstr.AddTags(message.Fields, []string{"take_over"})
-	}
-
-	if isGZIP {
-		if err, ok := (message.Private).(error); ok && errors.Is(err, io.EOF) {
-			s.EOF = true
-		}
-	}
-	if err := p.Publish(message.ToEvent(), *s); err != nil {
-		metrics.ProcessingErrors.Inc()
-		if isGZIP {
-			metrics.ProcessingGZIPErrors.Inc()
-		}
-		return err
-	}
-
-	metrics.EventsProcessed.Inc()
-	metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
-	if isGZIP {
-		metrics.EventsGZIPProcessed.Inc()
-		metrics.ProcessingGZIPTime.Update(time.Since(message.Ts).Nanoseconds())
-	}
-
-	return nil
-}
-
-func (inp *filestream) handleReadError(
-	ctx input.Context,
-	err error,
-	log *logp.Logger,
-	path string,
-	metrics *loginp.Metrics,
-	isGZIP bool) (error, bool) {
-	if err == nil {
-		return nil, true
-	}
-
-	if errors.Is(err, ErrFileTruncate) {
-		log.Infof("File was truncated, nothing to read. Path='%s'", path)
-	} else if errors.Is(err, ErrClosed) {
-		// Enter the readUntilEOF drain only when the input itself is being
-		// cancelled: returning (nil, true) here makes readFromSource's
-		// outer loop re-check ctx.Cancelation and fall through to the
-		// readUntilEOF block.
-		//
-		// For any other source of ErrClosed — close.reader.after_interval,
-		// close.on_state_change.removed, close.on_state_change.renamed, or
-		// an explicit Close — the input is not shutting down and we must
-		// close normally.
-		if inp.readUntilEOF.Enabled && ctx.Cancelation.Err() != nil {
-			return nil, true
-		}
-
-		log.Debugf("Reader was closed. Closing. Path='%s'", path)
-	} else if errors.Is(err, io.EOF) {
-		log.Debugf("EOF has been reached. Closing. Path='%s'", path)
-		if inp.deleterConfig.Enabled || inp.readUntilEOF.Enabled {
-			return err, false
-		}
-	} else if errors.Is(err, ErrInactive) {
-		log.Debugf("File is inactive. Closing. Path='%s'", path)
-		return err, false
-	} else {
-		log.Errorf("Read line error: %v", err)
-		metrics.ProcessingErrors.Inc()
-		if isGZIP {
-			metrics.ProcessingGZIPErrors.Inc()
-		}
-	}
-
-	return nil, false
 }
 
 // isDroppedLine decides if the line is exported or not based on
