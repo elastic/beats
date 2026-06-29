@@ -85,7 +85,7 @@ func (inp *managedInput) Run(
 			inp.harvesterLimit,
 			time.Minute, // magic number
 			ctx.Logger,
-			"harvester:"),
+			"harvester"),
 		metrics: metrics,
 		inputID: inp.id,
 	}
