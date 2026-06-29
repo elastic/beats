@@ -29,7 +29,7 @@ You can set a custom name (skip suffix) for visualization placed on a dashboard.
 ::::
 
 
-The naming convention rules can be verified with the the tool `mage check`. The command fails if it detects:
+The naming convention rules can be verified with the tool `mage check`. The command fails if it detects:
 
 * empty description on a dashboard
 * unexpected dashboard title format (missing prefix `[BeatName ModuleName]`)
