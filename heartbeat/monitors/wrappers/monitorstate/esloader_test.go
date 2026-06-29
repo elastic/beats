@@ -121,7 +121,7 @@ func TestMakeESLoaderError(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			etc := newESTestContext(t)
 			etc.ec.HTTP = fakeHTTPClient{respStatus: test.statusCode}
-			loader := MakeESLoader(etc.ec, "fakeIndexPattern", etc.location)
+			loader := MakeESLoader(etc.ec, "fakeIndexPattern", etc.location, logp.NewNopLogger())
 
 			_, err := loader(stdfields.StdMonitorFields{})
 
