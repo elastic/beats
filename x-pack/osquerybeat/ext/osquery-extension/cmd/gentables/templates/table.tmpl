@@ -43,10 +43,12 @@ func GetGenerateFunc(log *logger.Logger, client *client.ResilientClient) (table.
 			return nil, err
 		}
 
-		// Convert results to maps
+		// Convert results to maps.
+		// EncodingFlagUseNumbersZeroValues ensures integer zero values are serialized as
+		// "0" rather than "" so that WHERE col = 0 constraints match in SQLite.
 		rows := make([]map[string]string, len(results))
 		for i, result := range results {
-			row, err := encoding.MarshalToMap(result)
+			row, err := encoding.MarshalToMapWithFlags(result, encoding.EncodingFlagUseNumbersZeroValues)
 			if err != nil {
 				return nil, err
 			}

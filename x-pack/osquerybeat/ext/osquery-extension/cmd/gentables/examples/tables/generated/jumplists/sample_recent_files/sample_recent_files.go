@@ -16,6 +16,7 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/encoding"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 
@@ -23,13 +24,13 @@ import (
 )
 
 var (
-	generateFunc func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)
+	generateFunc func(context.Context, table.QueryContext, *logger.Logger, *client.ResilientClient) ([]Result, error)
 	registerOnce sync.Once
 )
 
 // RegisterGenerateFunc registers the generate function for this table.
 // This should be called once from the implementation package's init() function.
-func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger) ([]Result, error)) {
+func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Logger, *client.ResilientClient) ([]Result, error)) {
 	registerOnce.Do(func() {
 		generateFunc = f
 	})
@@ -37,20 +38,22 @@ func RegisterGenerateFunc(f func(context.Context, table.QueryContext, *logger.Lo
 
 // GetGenerateFunc returns the osquery table.GenerateFunc for this table.
 // It wraps the registered generate function and handles marshaling of results.
-func GetGenerateFunc(log *logger.Logger) (table.GenerateFunc, error) {
+func GetGenerateFunc(log *logger.Logger, client *client.ResilientClient) (table.GenerateFunc, error) {
 	if generateFunc == nil {
 		return nil, errors.New("generate function not registered for sample_recent_files")
 	}
 	return func(ctx context.Context, queryContext table.QueryContext) ([]map[string]string, error) {
-		results, err := generateFunc(ctx, queryContext, log)
+		results, err := generateFunc(ctx, queryContext, log, client)
 		if err != nil {
 			return nil, err
 		}
 
-		// Convert results to maps
+		// Convert results to maps.
+		// EncodingFlagUseNumbersZeroValues ensures integer zero values are serialized as
+		// "0" rather than "" so that WHERE col = 0 constraints match in SQLite.
 		rows := make([]map[string]string, len(results))
 		for i, result := range results {
-			row, err := encoding.MarshalToMap(result)
+			row, err := encoding.MarshalToMapWithFlags(result, encoding.EncodingFlagUseNumbersZeroValues)
 			if err != nil {
 				return nil, err
 			}

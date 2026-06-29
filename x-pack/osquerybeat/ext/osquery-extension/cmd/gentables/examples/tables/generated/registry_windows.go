@@ -15,6 +15,7 @@ import (
 	"github.com/osquery/osquery-go"
 	"github.com/osquery/osquery-go/plugin/table"
 
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/client"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/logger"
 	samplejumplists "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/sample_jumplists"
 	samplerecentfiles "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/tables/generated/jumplists/sample_recent_files"
@@ -23,10 +24,10 @@ import (
 
 // RegisterTables registers all generated tables with the osquery extension server.
 // This function is called from main.go after all init() functions have run.
-func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) {
+func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger, client *client.ResilientClient) {
 	{
 		// Example table showing the generator capabilities with multiple data types
-		genFunc, err := samplecustomtable.GetGenerateFunc(log)
+		genFunc, err := samplecustomtable.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for sample_custom_table: %v", err)
 		} else {
@@ -36,7 +37,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Jump Lists containing recently accessed files and pinned items
-		genFunc, err := samplejumplists.GetGenerateFunc(log)
+		genFunc, err := samplejumplists.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for sample_jumplists: %v", err)
 		} else {
@@ -46,7 +47,7 @@ func RegisterTables(server *osquery.ExtensionManagerServer, log *logger.Logger) 
 	}
 	{
 		// Windows Recent Files tracking user file access history
-		genFunc, err := samplerecentfiles.GetGenerateFunc(log)
+		genFunc, err := samplerecentfiles.GetGenerateFunc(log, client)
 		if err != nil {
 			log.Errorf("Failed to get generate function for sample_recent_files: %v", err)
 		} else {

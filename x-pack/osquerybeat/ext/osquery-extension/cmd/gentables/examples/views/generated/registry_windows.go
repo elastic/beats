@@ -22,10 +22,10 @@ func RegisterViews(hookManager *hooks.HookManager, log *logger.Logger) {
 		// View combining active and archived resources with calculated fields and UNION
 		hooksFunc, err := samplecombinedresources.GetHooksFunc()
 		if err != nil {
-			log.Errorf("Failed to get hooks function for sample_combined_resources: %v", err)
+			samplecombinedresources.RegisterDefaultViewHook(hookManager)
 		} else {
 			hooksFunc(hookManager)
-			log.Infof("Registered view: sample_combined_resources")
 		}
+		log.Infof("Registered view: sample_combined_resources")
 	}
 }
