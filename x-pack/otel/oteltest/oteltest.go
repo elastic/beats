@@ -91,6 +91,14 @@ type CheckReceiversParams struct {
 
 	Status      *componentstatus.Event
 	NumRestarts int
+
+	// StatusMatchHistorical, when true, checks whether the expected status was
+	// ever reported (scanning the full event history). Use this only for
+	// fast-finishing receivers that transition through the expected state before
+	// the first poll tick (e.g. pcap replay goes StatusOK → Stopped). The
+	// default (false) checks only the most-recently reported status event, which
+	// is the correct assertion for steady-state receivers.
+	StatusMatchHistorical bool
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -201,23 +209,37 @@ func CheckReceivers(params CheckReceiversParams) {
 				break
 			}
 			if params.Status != nil {
-				// Check the full event history rather than only the last event.
-				// Fast-finishing receivers (e.g. pcap replay) may transition
-				// through StatusOK and into Stopped before the first poll tick.
-				evts := host.GetEvents()
-				require.NotEmpty(ct, evts, "expected at least one status event, got none")
-				var matched bool
-				for _, evt := range evts {
-					if evt.Status() == params.Status.Status() &&
-						assert.ObjectsAreEqual(evt.Err(), params.Status.Err()) &&
-						assert.ObjectsAreEqual(params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw()) {
-						matched = true
-						break
+				if params.StatusMatchHistorical {
+					// Scan the full event history. Used for fast-finishing receivers
+					// (e.g. pcap replay) that may transition through the expected
+					// state before the first poll tick.
+					evts := host.GetEvents()
+					require.NotEmpty(ct, evts, "expected at least one status event, got none")
+					var matched bool
+					for _, evt := range evts {
+						if evt.Status() == params.Status.Status() &&
+							assert.ObjectsAreEqual(evt.Err(), params.Status.Err()) &&
+							assert.ObjectsAreEqual(params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw()) {
+							matched = true
+							break
+						}
 					}
+					assert.True(ct, matched,
+						"expected status %v to have been reported at least once; all events: %v",
+						params.Status.Status(), evts)
+				} else {
+					// Check only the most-recently reported event. This is the
+					// correct assertion for steady-state receivers: a false-positive
+					// early status (e.g. StatusOK before a binary check) followed by
+					// a transition to StatusFailed would cause this to fail correctly.
+					evt := host.GetEvent()
+					require.NotNil(ct, evt, "expected at least one status event, got none")
+					assert.Equal(ct, params.Status.Status(), evt.Status(),
+						"expected final status %v; got %v; full history: %v",
+						params.Status.Status(), evt.Status(), host.GetEvents())
+					assert.Equal(ct, params.Status.Err(), evt.Err())
+					assert.Equal(ct, params.Status.Attributes().AsRaw(), evt.Attributes().AsRaw())
 				}
-				assert.True(ct, matched,
-					"expected status %v to have been reported at least once; all events: %v",
-					params.Status.Status(), evts)
 			} else {
 				evt := host.GetEvent()
 				require.NotNil(ct, evt, "expected not nil, got nil")
