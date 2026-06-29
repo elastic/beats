@@ -103,18 +103,7 @@ func TestInput(t *testing.T) {
 }
 
 func BenchmarkInput(b *testing.B) {
-	// Bind an ephemeral port to discover a free address, then release it so the
-	// tcp input can bind it below. Benchmarks run single-process, so the brief
-	// window between release and re-bind does not cause cross-process port
-	// collisions.
-	l, err := net.Listen("tcp", "localhost:0") //nolint:noctx // fine for tests
-	if err != nil {
-		b.Fatalf("cannot find available port: %s", err)
-	}
-	serverAddr := l.Addr().String()
-	if err := l.Close(); err != nil {
-		b.Fatalf("cannot release port: %s", err)
-	}
+	serverAddr := ephemeralTCPAddr(b)
 
 	inp, err := configure(conf.MustNewConfigFrom(map[string]any{
 		"host":              serverAddr,
@@ -181,4 +170,23 @@ func BenchmarkInput(b *testing.B) {
 			}
 		}
 	})
+}
+
+// ephemeralTCPAddr binds an ephemeral localhost port, immediately releases
+// it, and returns the resolved "host:port" so a caller can configure a
+// server to listen on it.
+//
+// WARNING: racy by design. The port can become unavailable.
+func ephemeralTCPAddr(tb testing.TB) string {
+	tb.Helper()
+	var lc net.ListenConfig
+	l, err := lc.Listen(tb.Context(), "tcp", "localhost:0")
+	if err != nil {
+		tb.Fatalf("cannot bind an ephemeral port: %s", err)
+	}
+	addr := l.Addr().String()
+	if err := l.Close(); err != nil {
+		tb.Fatalf("cannot release ephemeral port %s: %s", addr, err)
+	}
+	return addr
 }
