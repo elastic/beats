@@ -18,8 +18,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 	"github.com/elastic/beats/v7/pkg/autodiscover/bus"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
