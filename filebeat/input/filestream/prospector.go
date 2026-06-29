@@ -33,9 +33,6 @@ import (
 
 type (
 	ignoreInactiveType uint8
-	// ignoreReason is the reason a file is ignored.
-	// This is needed to correctly generate metrics and debug logs
-	ignoreReason uint8
 )
 
 const (
@@ -45,10 +42,6 @@ const (
 
 	ignoreInactiveSinceLastStartStr  = "since_last_start"
 	ignoreInactiveSinceFirstStartStr = "since_first_start"
-
-	notIgnored ignoreReason = iota
-	ignoredByIgnoreOlder
-	ignoredByIgnoreInactive
 )
 
 var ignoreInactiveSettings = map[string]ignoreInactiveType{
