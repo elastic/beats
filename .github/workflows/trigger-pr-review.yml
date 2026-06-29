@@ -18,6 +18,7 @@ jobs:
       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-pr-review.lock.yml@v0
     with:
+      report-failure-as-issue: false
       setup-commands: |
         sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev python3-venv
         export GOTOOLCHAIN=auto

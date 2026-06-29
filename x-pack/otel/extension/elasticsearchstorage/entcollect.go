@@ -17,8 +17,17 @@ var _ entcollect.Registry = (*elasticStorage)(nil)
 
 // Store returns an [entcollect.Store] backed by Elasticsearch. The
 // returned store is scoped to name, which determines the ES index.
+// The underlying [backend.Store] is obtained via Access so that the
+// entcollect path shares clientMu with the [backend.Registry] path —
+// both factories ultimately drive the same non-thread-safe
+// eslegclient.Connection, and concurrent users (e.g. an entcollect
+// provider running alongside Filebeat httpjson inputs) must serialize.
 func (e *elasticStorage) Store(name string) (entcollect.Store, error) {
-	return &entcollectStore{base: es.NewStore(e.ctx, e.logger, e.client, name)}, nil
+	base, err := e.Access(name)
+	if err != nil {
+		return nil, err
+	}
+	return &entcollectStore{base: base}, nil
 }
 
 // entcollectStore wraps a [backend.Store] as [entcollect.Store],
@@ -43,8 +52,7 @@ func (s *entcollectStore) Set(key string, value any) error {
 // requires that deleting an absent key is not an error, but the
 // underlying ES store returns an error on 404. We check Has first
 // to avoid that. The extra round trip is acceptable: Delete is
-// called rarely (IDSet shard cleanup on rehash) and only one
-// goroutine accesses the store.
+// called rarely (IDSet shard cleanup on rehash).
 func (s *entcollectStore) Delete(key string) error {
 	ok, err := s.base.Has(key)
 	if err != nil {

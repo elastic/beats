@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Use constant-time comparison for http_endpoint basic auth and secret header validation.
+component: filebeat
