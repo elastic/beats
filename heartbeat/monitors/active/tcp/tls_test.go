@@ -188,7 +188,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	})
 	require.NoError(t, err)
 
-	p, err := createWithResolver(config, resolver)
+	p, err := createWithResolver(config, resolver, logp.NewNopLogger())
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")

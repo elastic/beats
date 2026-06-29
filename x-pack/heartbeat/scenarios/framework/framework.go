@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -292,6 +293,7 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		time.Local,
 		nil,
 		true,
+		logp.NewNopLogger(),
 	)
 
 	return monitors.NewFactory(monitors.FactoryParams{

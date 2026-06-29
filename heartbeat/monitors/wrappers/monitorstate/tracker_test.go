@@ -81,7 +81,7 @@ func TestAtomicStateLoader(t *testing.T) {
 		return stateB, nil
 	}
 
-	asl, replace := AtomicStateLoader(loaderA)
+	asl, replace := AtomicStateLoader(loaderA, logp.NewNopLogger())
 	resState, _ := asl(stdfields.StdMonitorFields{})
 	require.Equal(t, stateA, resState)
 
