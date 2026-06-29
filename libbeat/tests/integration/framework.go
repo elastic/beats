@@ -54,7 +54,6 @@ import (
 
 	"github.com/elastic/beats/v7/dev-tools/testbin"
 	"github.com/elastic/beats/v7/libbeat/common/proc"
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/mock-es/pkg/api"
 )
@@ -659,11 +658,11 @@ func (b *BeatProc) MonitoringPort(timeout time.Duration) int {
 	b.t.Helper()
 	var port int
 	require.Eventuallyf(b.t, func() bool {
-		line := b.GetLogLine(libbeattesting.MonitoringEndpointSnippet)
+		line := b.GetLogLine(MonitoringEndpointSnippet)
 		if line == "" {
 			return false
 		}
-		p, err := libbeattesting.ParseMonitoringPort(line)
+		p, err := ParseMonitoringPort(line)
 		if err != nil {
 			return false
 		}

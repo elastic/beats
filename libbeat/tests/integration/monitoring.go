@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testing
+package integration
 
 import (
 	"fmt"

@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	libbeattesting "github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/abreceiver"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
@@ -150,8 +150,8 @@ func (c *Collector) MonitoringPorts(tb testing.TB, n int) []int {
 	require.EventuallyWithT(tb, func(ct *assert.CollectT) {
 		seen := make(map[int]struct{})
 		ports = ports[:0]
-		for _, entry := range c.observer.FilterMessageSnippet(libbeattesting.MonitoringEndpointSnippet).All() {
-			port, err := libbeattesting.ParseMonitoringPort(entry.Message)
+		for _, entry := range c.observer.FilterMessageSnippet(integration.MonitoringEndpointSnippet).All() {
+			port, err := integration.ParseMonitoringPort(entry.Message)
 			if !assert.NoError(ct, err) {
 				continue
 			}
