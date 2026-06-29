@@ -636,7 +636,7 @@ func TestUnreachableJob(t *testing.T) {
 	// See: https://tools.ietf.org/html/rfc6890
 	ip := "203.0.113.1"
 	// Port 80 is sometimes omitted in logs a non-standard one is easier to validate
-	port := uint16(1234)
+	const port = 1234
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := sendSimpleTLSRequest(t, url, false)
@@ -646,7 +646,7 @@ func TestUnreachableJob(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.SummaryStateChecks(0, 1),
-			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(int(port)))),
+			hbtest.ECSErrCodeChecks(ecserr.CODE_NET_COULD_NOT_CONNECT, net.JoinHostPort(ip, strconv.Itoa(port))),
 			urlChecks(url),
 		)),
 		event.Fields,
