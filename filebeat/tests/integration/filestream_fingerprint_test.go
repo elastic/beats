@@ -224,7 +224,7 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	path := filepath.Join(filebeat.TempDir(), "output-*.ndjson")
 	files, err := filepath.Glob(path)
 	require.NoError(t, err, "failed to glob output files")
-	require.Len(t, files, 0, "expected no output file to be created yet as no event should have been published")
+	require.Empty(t, files, "expected no output file to be created yet as no event should have been published")
 
 	// ===== Phase 2: Grow file1 past 1024 bytes =====
 	// Add enough lines to exceed 1024 bytes (need ~16 more lines of 50 bytes)
