@@ -136,6 +136,9 @@ func (s *dateSorter) GetTs(fi *rotatedFileInfo) time.Time {
 	if !fi.ts.IsZero() {
 		return fi.ts
 	}
+	if len(fi.path) < len(s.format) {
+		return time.Time{}
+	}
 	fileTs := fi.path[len(fi.path)-len(s.format):]
 
 	ts, err := time.Parse(s.format, fileTs)
