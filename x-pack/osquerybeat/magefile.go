@@ -87,10 +87,10 @@ func GoIntegTest(ctx context.Context) error {
 	// with a literal "~" which is not expanded by exec.LookPath in Go, causing the lookup
 	// to silently fail. We also pass the expanded PATH to the subprocess environment.
 	if gopathOut, err := exec.Command("go", "env", "GOPATH").Output(); err == nil {
-		gopathBin := strings.TrimSpace(string(gopathOut)) + "/bin"
+		gopathBin := filepath.Join(strings.TrimSpace(string(gopathOut)), "bin")
 		currentPath := os.Getenv("PATH")
 		if !strings.Contains(currentPath, gopathBin) {
-			expandedPath := gopathBin + ":" + currentPath
+			expandedPath := gopathBin + string(filepath.ListSeparator) + currentPath
 			os.Setenv("PATH", expandedPath) //nolint:errcheck // best-effort
 			args.Env["PATH"] = expandedPath
 		}
