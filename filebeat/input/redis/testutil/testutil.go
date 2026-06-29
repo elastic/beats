@@ -174,7 +174,7 @@ type certPaths struct {
 func absCertPaths(t *testing.T) certPaths {
 	t.Helper()
 
-	dir := certDir()
+	dir := CertDir()
 	paths := certPaths{
 		CA:   filepath.Join(dir, "root-ca.pem"),
 		Cert: filepath.Join(dir, "server-cert.pem"),
@@ -192,12 +192,12 @@ func absCertPaths(t *testing.T) certPaths {
 	return paths
 }
 
-func certDir() string {
+func CertDir() string {
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {
 		panic("failed to determine redis cert directory")
 	}
-	return filepath.Join(filepath.Dir(file), "..", "_meta", "certs")
+	return filepath.Join(filepath.Dir(file), "..", "..", "..", "..", "testing", "environments", "docker", "redis", "certs")
 }
 
 func getOrDefault(s, defaultString string) string {

@@ -21,6 +21,7 @@ package redis
 
 import (
 	"context"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -81,6 +82,7 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 
 func TestInput(t *testing.T) {
 	// Setup the input config.
+
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
 		"type":         "redis",
@@ -90,9 +92,9 @@ func TestInput(t *testing.T) {
 		"idle_timeout": 60 * time.Second,
 		"ssl": mapstr.M{
 			"enabled":                 true,
-			"certificate_authorities": []string{"_meta/certs/root-ca.pem"},
-			"certificate":             "_meta/certs/server-cert.pem",
-			"key":                     "_meta/certs/server-key.pem",
+			"certificate_authorities": filepath.Join(testutil.CertDir(), "root-ca.pem"),
+			"certificate":             filepath.Join(testutil.CertDir(), "server-cert.pem"),
+			"key":                     filepath.Join(testutil.CertDir(), "server-key.pem"),
 		},
 	})
 
@@ -199,9 +201,9 @@ func createRedisConfig(username string, password string) config {
 		"idle_timeout": 60 * time.Second,
 		"ssl": mapstr.M{
 			"enabled":                 true,
-			"certificate_authorities": []string{"_meta/certs/root-ca.pem"},
-			"certificate":             "_meta/certs/server-cert.pem",
-			"key":                     "_meta/certs/server-key.pem",
+			"certificate_authorities": []string{filepath.Join(testutil.CertDir(), "root-ca.pem")},
+			"certificate":             filepath.Join(testutil.CertDir(), "server-cert.pem"),
+			"key":                     filepath.Join(testutil.CertDir(), "server-key.pem"),
 		},
 	})
 

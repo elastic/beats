@@ -137,7 +137,7 @@ services:
       - 8082:80
 
   redis:
-    build: ${PWD}/input/redis/_meta
+    build: ${ES_BEATS}/testing/environments/docker/redis
     ports:
       - 6379:6379
 
