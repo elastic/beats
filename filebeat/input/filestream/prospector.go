@@ -560,15 +560,13 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 
 		hg.Start(ctx, src)
 	} else {
-		// The path changed; update the persisted metadata but PRESERVE the raw
-		// growing Fingerprint. Reconstructing the fileMeta with only
-		// Source+IdentifierName would drop the raw Fingerprint that prefix
-		// matching relies on, so a still-growing file that is renamed would look
-		// final on disk and be re-ingested from offset 0 after a restart.
+		// The path changed; update the persisted metadata but preserve the raw growing Fingerprint.
 		var meta fileMeta
 		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
-			meta.IdentifierName = p.identifier.Name()
+			// No usable prior metadata (commonly no entry yet, or a partial unpack). We still fall
+			// through to UpdateMetadata so the renamed path is recorded.
+			meta = fileMeta{IdentifierName: p.identifier.Name()}
 			log.Warnf(
 				"Error while getting cursor meta data of entry '%s': '%v', using prospector's identifier: '%s'",
 				src.Name(), err, meta.IdentifierName)
