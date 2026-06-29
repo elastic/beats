@@ -1,0 +1,7 @@
+kind: feature
+
+summary: Add status_reporting stream config to control which health states propagate to unit aggregate health
+
+component: libbeat
+
+pr: https://github.com/elastic/beats/pull/49511
