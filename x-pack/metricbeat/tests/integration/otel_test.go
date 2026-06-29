@@ -52,9 +52,6 @@ func TestMetricbeatOTelE2E(t *testing.T) {
 		Password: password,
 	}
 
-	// http.port is 0 so the monitoring servers bind ephemeral ports, avoiding
-	// the TOCTOU race of pre-allocating ports. The metricbeat process port is
-	// discovered from its logs; the otel receiver port is not asserted here.
 	cfg := `receivers:
   metricbeatreceiver:
     metricbeat:
@@ -174,7 +171,6 @@ http.port: 0
 	metricbeat.Start()
 	defer metricbeat.Stop()
 
-	// http.port is 0, so discover the ephemeral monitoring port from the logs.
 	metricbeatMonitoringPort := metricbeat.MonitoringPort(30 * time.Second)
 
 	// Make sure find the logs

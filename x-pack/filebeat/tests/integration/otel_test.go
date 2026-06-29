@@ -462,8 +462,6 @@ func TestFilebeatOTelMultipleReceiversE2E(t *testing.T) {
 		},
 	}
 
-	// http.port is 0 so each receiver's monitoring server binds an ephemeral
-	// port; the actual ports are discovered from the collector logs below.
 	cfg := renderOtelConfig(t, `receivers:
 {{range $i, $receiver := .Receivers}}
   filebeatreceiver/{{$i}}:
@@ -793,8 +791,6 @@ func TestFilebeatOTelDocumentLevelRetries(t *testing.T) {
 				RetryOnStatus: tt.retryOnStatus,
 			}
 
-			// http.port is 0 so the monitoring server binds an ephemeral port;
-			// the actual port is discovered from the collector logs below.
 			cfg := `receivers:
   filebeatreceiver:
     filebeat:
@@ -1247,9 +1243,6 @@ func TestNoDuplicates(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	fbOtelIndex := "logs-integration-" + namespace
 
-	// http.port is 0 so the monitoring server binds an ephemeral port. This
-	// test does not assert on the monitoring endpoint, so the resolved port is
-	// not needed.
 	otelCfgFile := `receivers:
   filebeatreceiver:
     filebeat:
@@ -1553,9 +1546,6 @@ func TestFilebeatOTelNoEventLossDuringESOutage(t *testing.T) {
 		ESEndpoint: serverURL,
 	}
 
-	// http.port is 0 so the monitoring server binds an ephemeral port. This
-	// test asserts on the collector's observed logs, not the monitoring
-	// endpoint, so the resolved port is not needed.
 	cfg := `receivers:
   filebeatreceiver:
     filebeat:

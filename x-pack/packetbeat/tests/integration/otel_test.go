@@ -136,8 +136,6 @@ func TestPacketbeatOTelE2E(t *testing.T) {
 	namespace := strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 	index := "logs-integration-" + namespace
 
-	// http.port is 0 so the monitoring server binds an ephemeral port; the
-	// actual port is discovered from the collector logs below.
 	cfg := fmt.Sprintf(`receivers:
   packetbeatreceiver:
     packetbeat:
@@ -229,8 +227,6 @@ func TestPacketbeatOTelMultipleReceiversE2E(t *testing.T) {
 		},
 	}
 
-	// http.port is 0 so each receiver's monitoring server binds an ephemeral
-	// port; the actual ports are discovered from the collector logs below.
 	cfg := renderOtelConfig(t, `receivers:
 {{range $i, $r := .Receivers}}
   packetbeatreceiver/{{$i}}:
@@ -313,8 +309,6 @@ func TestPacketbeatOTelBeatE2E(t *testing.T) {
 	pbOtelIndex := "logs-integration-" + namespace
 	pbIndex := "logs-packetbeat-" + namespace
 
-	// http.port is 0 so the monitoring server binds an ephemeral port; the
-	// actual port is discovered from the collector logs below.
 	otelCfg := fmt.Sprintf(`receivers:
   packetbeatreceiver:
     packetbeat:
