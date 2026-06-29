@@ -86,6 +86,9 @@ func assertMonitoring(t *testing.T, port int) {
 }
 
 func TestOsquerybeatOtelE2E(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Elasticsearch Docker image has no Windows manifest; skipping ES-dependent test on Windows")
+	}
 	integration.EnsureESIsRunning(t)
 	ensureOsquerydAvailable(t)
 
@@ -245,6 +248,9 @@ http.port: %d
 }
 
 func TestOsquerybeatOtelMultipleReceiversE2E(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Elasticsearch Docker image has no Windows manifest; skipping ES-dependent test on Windows")
+	}
 	integration.EnsureESIsRunning(t)
 	ensureOsquerydAvailable(t)
 

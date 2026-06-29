@@ -111,6 +111,11 @@ func GoIntegTest(ctx context.Context) error {
 		}
 	}
 
+	// Elasticsearch has no Windows Docker image; skip container lifecycle on Windows
+	// and run the tests directly. ES-dependent tests skip themselves via runtime.GOOS checks.
+	if runtime.GOOS == "windows" {
+		return devtools.GoTest(ctx, args)
+	}
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
