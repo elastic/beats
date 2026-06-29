@@ -140,7 +140,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
-		trace: trace,
+		trace:  trace,
+		logger: logger,
 	}
 	runFromID := "<unknown location>"
 	if parsedConfig.RunFrom != nil {
