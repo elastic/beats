@@ -234,7 +234,7 @@ func findModuleAndDatasets() ([]string, error) {
 			filepath.Join(moduleDir, "*/*/_meta"),
 		)
 		if err != nil {
-			return nil, fmt.Errorf("failed finding modules and datasets: %w", err)
+			return nil, fmt.Errorf("failed to find modules and datasets: %w", err)
 		}
 
 		for _, metaDir := range metaDirs {
