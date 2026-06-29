@@ -85,5 +85,17 @@ func makeLogstash(
 		clients[i] = client
 	}
 
+<<<<<<< HEAD
 	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, beat.Logger, beat.Paths, clients)
+=======
+	return outputs.SuccessNet(
+		config.Queue,
+		config.LoadBalance,
+		config.BulkMaxSize,
+		config.MaxRetries,
+		nil,
+		logger,
+		beatPaths,
+		outputs.NumofWorker(rawCfg), clients)
+>>>>>>> 01ce4aba4 ([bugfix] worker is not respected when loadbalance:false (#51041))
 }
