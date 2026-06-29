@@ -477,8 +477,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, map[string]any{
 		"Device":   loopbackDevice(),
 		"HTTPPort": httpPort,
@@ -581,8 +579,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, map[string]any{
 		"Device":    loopbackDevice(),
 		"Index":     index,

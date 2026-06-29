@@ -519,8 +519,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, otelConfig)
 
 	writeEventsToLogFile(t, logFilePath, wantEvents)
@@ -867,8 +865,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `
 			var configBuffer bytes.Buffer
 			require.NoError(t,
@@ -1093,9 +1089,6 @@ service:
       exporters:
         - elasticsearch/log
         - debug
-  telemetry:
-    metrics:
-      level: none # Disable collector's own metrics to prevent conflict on port 8888. We don't use those metrics anyway.
 receivers:
   filebeatreceiver:
     filebeat:
@@ -1161,9 +1154,6 @@ service:
       exporters:
         - elasticsearch/log
         - debug
-  telemetry:
-    metrics:
-      level: none # Disable collector's own metrics to prevent conflict on port 8888. We don't use those metrics anyway.
 receivers:
   filebeatreceiver:
     filebeat:
@@ -1633,8 +1623,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `
 
 	var configBuffer bytes.Buffer
@@ -1769,8 +1757,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, struct {
 		Receivers []multiReceiverConfig
 		InputFile string
@@ -1903,8 +1889,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `
 
 	var configBuffer bytes.Buffer
@@ -2014,8 +1998,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, struct{ Receivers []multiReceiverConfig }{Receivers: receivers})
 
 		b.StartTimer()
@@ -2068,8 +2050,6 @@ service:
   telemetry:
     logs:
       level: DEBUG
-    metrics:
-      level: none
 `, struct {
 					PathHome        string
 					EventCount      int
@@ -2181,8 +2161,6 @@ service:
   telemetry:
     logs:
       level: warn
-    metrics:
-      level: none
 `, struct {
 			EventCount int
 			PathHome   string
@@ -2246,8 +2224,6 @@ func TestBeatProcessorSharedAcrossPipelines(t *testing.T) {
   telemetry:
     logs:
       level: debug
-    metrics:
-      level: none
 receivers:
   filebeatreceiver/1:
     filebeat:
@@ -2314,8 +2290,6 @@ func TestBeatProcessorWhenCondition(t *testing.T) {
   telemetry:
     logs:
       level: debug
-    metrics:
-      level: none
 receivers:
   filebeatreceiver:
     filebeat:
