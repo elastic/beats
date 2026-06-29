@@ -9,6 +9,7 @@ services:
       kibana:        { condition: service_healthy }
       cometd: { condition: service_healthy }
       kafka: { condition: service_healthy }
+      redis: { condition: service_healthy }      
 
   elasticsearch:
     extends:
@@ -134,6 +135,11 @@ services:
       - logstash_testdata:/usr/share/nginx/html:ro
     ports:
       - 8082:80
+
+  redis:
+    build: ${PWD}/input/redis/_meta
+    ports:
+      - 6379:6379
 
 volumes:
   logstash_testdata:
