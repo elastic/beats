@@ -134,8 +134,9 @@ func BenchmarkInput(b *testing.B) {
 		}
 	}()
 
+	var dialer net.Dialer
 	require.EventuallyWithTf(b, func(ct *assert.CollectT) {
-		conn, err := net.Dial("tcp", serverAddr) //nolint:noctx // fine for tests
+		conn, err := dialer.DialContext(b.Context(), "tcp", serverAddr)
 		require.NoError(ct, err)
 		conn.Close()
 	}, 30*time.Second, 100*time.Millisecond, "waiting for TCP server to start")
@@ -145,7 +146,7 @@ func BenchmarkInput(b *testing.B) {
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			conn, err := net.Dial("tcp", serverAddr) //nolint:noctx // fine for tests
+			conn, err := dialer.DialContext(b.Context(), "tcp", serverAddr)
 			if err != nil {
 				b.Errorf("cannot create connection: %s", err)
 				continue
