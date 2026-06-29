@@ -92,7 +92,7 @@ func (inp *managedInput) Run(
 			inp.harvesterLimit,
 			harvesterGroupStopTimeout,
 			ctx.Logger,
-			"harvester:"),
+			"harvester"),
 		metrics: metrics,
 		inputID: inp.id,
 	}
