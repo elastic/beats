@@ -15,6 +15,7 @@ jobs:
   run:
     uses: elastic/ai-github-actions/.github/workflows/gh-aw-code-quality-audit.lock.yml@v0
     with:
+      report-failure-as-issue: false
       title-prefix: "[filestream-registry]"
       severity-threshold: "high"
       additional-instructions: |
