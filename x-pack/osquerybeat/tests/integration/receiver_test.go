@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/component/componenttest"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -31,11 +32,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// NOTE: TestNewReceiver, TestMultipleReceivers, and TestReceiverStatus live here
-// rather than in osqreceiver/ because they require a live osqueryd binary. Unlike
-// filebeat or metricbeat, osquerybeat cannot produce data without the external
-// osqueryd process, so these tests carry the integration build tag and rely on
-// ensureOsquerydAvailable (defined in otel_test.go) to skip when osqueryd is absent.
+// NOTE: TestNewReceiver, TestMultipleReceivers, and the "running input" sub-test
+// of TestReceiverStatus live here rather than in osqreceiver/ because they require
+// a live osqueryd binary. Unlike filebeat or metricbeat, osquerybeat cannot produce
+// data without the external osqueryd process, so these tests carry the integration
+// build tag and rely on ensureOsquerydAvailable (defined in otel_test.go) to skip
+// when osqueryd is absent.
 
 // makeOsqConfig returns a receiver Config for integration tests.
 // pathHome must be unique per receiver to isolate osqueryd state.
@@ -273,4 +275,42 @@ func TestMultipleReceivers(t *testing.T) {
 
 	require.NoError(t, r1.Shutdown(t.Context()))
 	require.NoError(t, r2.Shutdown(t.Context()))
+}
+
+func TestReceiverStatus(t *testing.T) {
+	ensureOsquerydAvailable(t)
+	defer oteltest.VerifyNoLeaks(t)
+
+	monitorPort := int(libbeattesting.MustAvailableTCP4Port(t))
+	factory := osqreceiver.NewFactoryWithSettings(osqreceiver.Settings{Home: t.TempDir()})
+	observedCore, zapLogs := observer.New(zapcore.DebugLevel)
+	host := &oteltest.MockHost{}
+
+	rec, _, _ := startReceiver(t, factory, "r1", makeOsqConfig(t.TempDir(), monitorPort), observedCore, host)
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			for _, entry := range zapLogs.All() {
+				t.Logf("[%s] %s", entry.Level, entry.Message)
+			}
+		}
+	})
+
+	// Wait until the beat framework confirms osqueryd started. If the binary
+	// check fails, the beat exits before reaching this log message and the
+	// test times out here rather than giving a false-positive status result.
+	require.EventuallyWithT(t, func(c *assert.CollectT) {
+		assert.NotEmpty(c, zapLogs.FilterMessageSnippet("Starting metrics logging every 30s").All(),
+			"metrics logging not started")
+	}, 3*time.Minute, time.Second, "receiver framework did not start")
+
+	// osqueryd is running; the final OTel status must be StatusOK.
+	// Without osqueryd, StatusFailed would be the last event instead —
+	// which is what the unit test's "early status ok" sub-test exposes.
+	evt := host.GetEvent()
+	require.NotNil(t, evt, "expected at least one status event")
+	require.Equal(t, componentstatus.StatusOK, evt.Status(),
+		"expected StatusOK as final status after osqueryd started; full event history: %v", host.GetEvents())
+
+	require.NoError(t, rec.Shutdown(t.Context()))
 }

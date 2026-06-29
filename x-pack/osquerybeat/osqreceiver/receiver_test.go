@@ -23,17 +23,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/otel/oteltest"
 )
 
-// NOTE: TestNewReceiver and TestMultipleReceivers are not included here because
-// osquerybeat requires osqueryd to be installed and running. Unlike metricbeat
-// or auditbeat, osquerybeat cannot produce data without the external osqueryd
-// binary. The existing tests (config, leak, hook, benchmark) cover the receiver
-// wiring; beat-level integration testing is handled by the osquerybeat test
-// suite which has mocking infrastructure for osqueryd.
+// NOTE: TestNewReceiver, TestMultipleReceivers, and the "running input"
+// sub-test of TestReceiverStatus are not included here because they require a
+// live osqueryd binary (see tests/integration/receiver_test.go).
 //
-// TestReceiverStatus IS included here as a unit test because the status.Running
-// event is emitted before osqueryd setup in Run() — it fires as soon as the
-// otelStatusFactoryWrapper creates the per-input runner and calls Start() on it.
-// No osqueryd binary is required for that signal to reach the OTel host.
+// TestReceiverStatus contains a unit sub-test ("early status ok") that verifies
+// the otelStatusFactoryWrapper wiring: osquerybeat calls runner.Start() before
+// the osqueryd binary check, so StatusOK reaches the OTel host without needing
+// osqueryd. StatusMatchHistorical is set because without osqueryd the receiver
+// later transitions to failed; the unit test only checks that StatusOK was
+// emitted at least once (the early-OK design guarantee), not that it is final.
 
 func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
@@ -118,7 +117,7 @@ func TestReceiverStatus(t *testing.T) {
 		return attrs
 	}
 
-	t.Run("running input", func(t *testing.T) {
+	t.Run("early status ok", func(t *testing.T) {
 		cfg := Config{
 			Beatconfig: map[string]any{
 				"osquerybeat": map[string]any{
@@ -140,8 +139,6 @@ func TestReceiverStatus(t *testing.T) {
 				"path.home": t.TempDir(),
 			},
 		}
-		// otelStatusFactoryWrapper fires runner.Start() before osqueryd setup, so
-		// StatusOK reaches the host without requiring the osqueryd binary.
 		oteltest.CheckReceivers(oteltest.CheckReceiversParams{
 			T: t,
 			Receivers: []oteltest.ReceiverConfig{
@@ -156,6 +153,11 @@ func TestReceiverStatus(t *testing.T) {
 				componentstatus.StatusOK,
 				componentstatus.WithAttributes(
 					inputStatusAttributes(componentstatus.StatusOK.String(), ""))),
+			// Without osqueryd the receiver transitions to failed after the early
+			// StatusOK; historical matching verifies the early-OK emission only.
+			// See tests/integration/receiver_test.go for the "running input" test
+			// that checks the final StatusOK with a live osqueryd.
+			StatusMatchHistorical: true,
 		})
 	})
 }
