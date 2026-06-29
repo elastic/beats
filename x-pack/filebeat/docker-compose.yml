@@ -10,6 +10,7 @@ services:
       cometd: { condition: service_healthy }
       kafka: { condition: service_healthy }
       redis: { condition: service_healthy }      
+      mosquitto: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -114,6 +115,11 @@ services:
       - 2181:2181
     environment:
       - ADVERTISED_HOST=kafka
+
+  mosquitto:
+    build: ${ES_BEATS}/testing/environments/docker/mosquitto
+    ports:
+      - 1883:1883
 
   logstash:
     depends_on:
