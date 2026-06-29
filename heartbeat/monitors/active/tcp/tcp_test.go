@@ -119,9 +119,6 @@ func TestUpEndpointJob(t *testing.T) {
 
 func TestConnectionRefusedEndpointJob(t *testing.T) {
 	ip := "127.0.0.1"
-	// Bind an ephemeral port and release it to obtain an address where
-	// connections are refused (nothing is listening). Binding to :0 avoids the
-	// time-of-check/time-of-use race of pre-allocating a fixed port.
 	l, err := net.Listen("tcp", net.JoinHostPort(ip, "0")) //nolint:noctx // fine for tests
 	require.NoError(t, err)
 	addr, ok := l.Addr().(*net.TCPAddr)

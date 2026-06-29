@@ -652,8 +652,7 @@ func (b *BeatProc) WaitLogsContainsAnyOrder(msgs []string, timeout time.Duration
 //
 // Configure the Beat with `http.port: 0` so the OS assigns a free port at bind
 // time. Reading the port back from the logs avoids the time-of-check/time-of-use
-// race of pre-allocating a port, which causes collisions when the same test runs
-// many times in parallel (e.g. via script/stresstest.sh).
+// race of pre-allocating a port.
 func (b *BeatProc) MonitoringPort(timeout time.Duration) int {
 	b.t.Helper()
 	var port int
