@@ -358,7 +358,17 @@ func isFileIgnored(
 	ignoreOlder time.Duration,
 	ignoreInactiveSince time.Time,
 ) bool {
-	return fileIgnoreReason(fd.Info.ModTime(), now, ignoreOlder, ignoreInactiveSince) != notIgnored
+	modTime := fd.Info.ModTime()
+
+	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
+		return true
+	}
+
+	if !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0 {
+		return true
+	}
+
+	return false
 }
 
 // getFileIdentity mimics the same algorithm used by the harvester to generate

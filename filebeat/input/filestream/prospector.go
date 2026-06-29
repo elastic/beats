@@ -77,24 +77,6 @@ func init() {
 	}
 }
 
-// fileIgnoreReason returns why a file should be ignored based on its modification time.
-func fileIgnoreReason(
-	modTime time.Time,
-	now time.Time,
-	ignoreOlder time.Duration,
-	ignoreInactiveSince time.Time,
-) ignoreReason {
-	if ignoreOlder > 0 && now.Sub(modTime) > ignoreOlder {
-		return ignoredByIgnoreOlder
-	}
-
-	if !ignoreInactiveSince.IsZero() && modTime.Sub(ignoreInactiveSince) <= 0 {
-		return ignoredByIgnoreInactive
-	}
-
-	return notIgnored
-}
-
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
 // The FS events then trigger either new Harvester runs or updates
@@ -466,24 +448,16 @@ func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, igno
 		return false
 	}
 
-	var reason ignoreReason
-	if p.ignoreOlder > 0 && time.Since(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
-		reason = ignoredByIgnoreOlder
-	}
-
-	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
-		reason = ignoredByIgnoreInactive
-	}
-
-	switch reason {
-	case ignoredByIgnoreOlder:
+	switch {
+	case p.ignoreOlder > 0 && time.Since(fe.Descriptor.Info.ModTime()) > p.ignoreOlder:
 		log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
 		return true
-	case ignoredByIgnoreInactive:
+	case !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0:
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
 func (p *fileProspector) onRemove(log *logp.Logger, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
