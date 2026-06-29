@@ -928,7 +928,7 @@ func printOutputFileSorted(t *testing.T, tempDir string) {
 
 	t.Log("=== Output events sorted by file path, then by timestamp ===")
 	for _, event := range events {
-		fmt.Printf("[%s] %s @ offset %6d: %s\n",
+		t.Logf("[%s] %s @ offset %6d: %s",
 			filepath.Base(event.Log.File.Path),
 			event.Timestamp,
 			event.Log.Offset,
