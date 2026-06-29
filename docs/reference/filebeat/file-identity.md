@@ -203,6 +203,14 @@ The practical effects are:
 * Deployments upgrading to 9.5 keep using their existing fingerprint registry entries. Files already at or above the fingerprint size are not re-ingested.
 * Files smaller than `offset` still cannot be tracked, because there are no bytes to read past the offset.
 
+::::{warning}
+Rolling back from Filebeat 9.5 or later to an earlier version can duplicate events for small files.
+
+The risk is limited to files that the newer Filebeat version had started reading, but that had not yet reached the fingerprint size (`offset` + `length`) before the rollback. Earlier versions do not understand the tracking information used for those files. After rollback, if one of those files later reaches the fingerprint size, Filebeat treats it as a new file and reads it from the beginning. Any unused registry entries remain until `clean_inactive` removes them.
+
+Files that had already reached the fingerprint size before rollback are not affected.
+::::
+
 Enhanced Fingerprint is not supported with `rotation.external.strategy: copytruncate` and is automatically disabled for those inputs, so files smaller than `offset`+`length` are not ingested there until they reach that size.
 
 To opt out and restore the pre-9.5 behavior, where files smaller than `offset`+`length` are not ingested until they reach that size, set `growing` to `false`:
