@@ -42,6 +42,17 @@ func (c *conf) Validate() error {
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 
+<<<<<<< HEAD
+=======
+	for _, v := range c.EnrichWith {
+		switch strings.ToLower(v) {
+		case "mfa", "none", "sign_in_activity":
+		default:
+			return fmt.Errorf("enrich_with value %q is not supported; valid values are 'mfa', 'none' and 'sign_in_activity'", v)
+		}
+	}
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 	return nil
 }
 
@@ -70,3 +81,24 @@ func (c *conf) wantDevices() bool {
 		return false
 	}
 }
+<<<<<<< HEAD
+=======
+
+func (c *conf) wantMFA() bool {
+	for _, v := range c.EnrichWith {
+		if strings.ToLower(v) == "mfa" {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *conf) wantSignInActivity() bool {
+	for _, v := range c.EnrichWith {
+		if strings.ToLower(v) == "sign_in_activity" {
+			return true
+		}
+	}
+	return false
+}
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))

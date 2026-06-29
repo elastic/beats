@@ -456,6 +456,57 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		})
 	}
 
+<<<<<<< HEAD
+=======
+	// Enrich users with MFA registration details if requested. MFA enrichment
+	// is best-effort: changes to MFA state alone do not independently trigger
+	// incremental user updates. MFA data is only refreshed when at least one
+	// user identity delta has occurred (or during a full sync), so published
+	// user documents will reflect the latest MFA state at the time of the
+	// triggering delta, not necessarily at the moment the MFA state changed.
+	// Skip the MFA API call on no-op incremental updates since no user
+	// documents will be published anyway.
+	if wantUsers && p.conf.wantMFA() && (fullSync || updatedUsers.Len() != 0) {
+		for _, u := range state.users {
+			u.MFA = nil
+		}
+		mfaDetails, err := p.fetcher.UserMFADetails(ctx)
+		if err != nil {
+			p.logger.Warnf("Failed to fetch MFA registration details, skipping MFA enrichment: %v", err)
+		} else {
+			for userID, details := range mfaDetails {
+				if u, ok := state.users[userID]; ok {
+					u.MFA = details
+				}
+			}
+		}
+	}
+
+	// Enrich users with sign-in activity if requested. Sign-in activity
+	// enrichment is best-effort: changes to sign-in timestamps alone do not
+	// independently trigger incremental user updates. Sign-in activity data is
+	// only refreshed when at least one user identity delta has occurred (or
+	// during a full sync), so published user documents will reflect the latest
+	// sign-in activity at the time of the triggering delta, not necessarily at
+	// the moment of the sign-in event. Skip the sign-in activity API call on
+	// no-op incremental updates since no user documents will be published anyway.
+	if wantUsers && p.conf.wantSignInActivity() && (fullSync || updatedUsers.Len() != 0) {
+		for _, u := range state.users {
+			u.SignInActivity = nil
+		}
+		signInActivity, err := p.fetcher.UserSignInActivity(ctx)
+		if err != nil {
+			p.logger.Warnf("Failed to fetch sign-in activity, skipping sign-in activity enrichment: %v", err)
+		} else {
+			for userID, details := range signInActivity {
+				if u, ok := state.users[userID]; ok {
+					u.SignInActivity = details
+				}
+			}
+		}
+	}
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 	// Expand device group memberships.
 	if wantDevices {
 		updatedDevices.ForEach(func(devID uuid.UUID) {
@@ -538,6 +589,17 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 		_, _ = userDoc.Put("user.group", groups)
 	}
 
+<<<<<<< HEAD
+=======
+	if u.MFA != nil {
+		_, _ = userDoc.Put("azure_ad.mfa", u.MFA)
+	}
+
+	if u.SignInActivity != nil {
+		_, _ = userDoc.Put("azure_ad.signInActivity", u.SignInActivity)
+	}
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 	event := beat.Event{
 		Timestamp: time.Now(),
 		Fields:    userDoc,

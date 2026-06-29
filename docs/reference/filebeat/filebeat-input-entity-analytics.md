@@ -373,6 +373,15 @@ The necessary API permissions need to be granted in Azure in order for the provi
 | User.Read.All | Application |
 | Device.Read.All | Application |
 
+<<<<<<< HEAD
+=======
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When using the `enrich_with: ["mfa"]` or `enrich_with: ["sign_in_activity"]` options, an additional permission is required:
+
+| Permission | Type |
+| --- | --- |
+| AuditLog.Read.All | Application |
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 For a full guide on how to set up the necessary App Registration, permission granting, and secret configuration, follow this [guide](https://learn.microsoft.com/en-us/graph/auth-v2-service).
 
 
@@ -407,6 +416,25 @@ The `/delta` endpoint will provide changes that have occurred since the last cal
 
 The group metadata will be used to enrich users and devices with group membership information. Direct memberships, along with transitive memberships, will be provided for users and devices.
 
+<<<<<<< HEAD
+=======
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["mfa"]` option is set, an additional call is made each sync/update cycle to:
+
+* [/reports/authenticationMethods/userRegistrationDetails](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http)
+
+This endpoint returns MFA registration state for all users and does not support delta queries, so the full list is fetched on every cycle. The result is merged into each user document under the `azure_ad.mfa` field.
+
+Note that MFA enrichment is **best-effort**: a change to a user's MFA registration state alone will not trigger an incremental user update. Updated MFA data is only included in a published user event when that user is already being published due to an identity delta (a change to the user record, group membership, or device). A full synchronization will always include the latest MFA state for all users.
+
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["sign_in_activity"]` option is set, an additional call is made on each full synchronization and on incremental updates that include at least one user identity change to:
+
+* [/users?$select=id,signInActivity](https://learn.microsoft.com/en-us/graph/api/resources/signinactivity?view=graph-rest-1.0)
+
+This endpoint returns the last sign-in timestamps for all users. The `signInActivity` property cannot be included in `/users/delta` queries because Microsoft Graph stores it outside the main directory data store. A separate non-delta request is required. The result is merged into each user document under the `azure_ad.signInActivity` field.
+
+Note that sign-in activity enrichment is **best-effort** and follows the same semantics as MFA enrichment: a sign-in event alone will not trigger an incremental user update. Updated sign-in activity is only included in a published user event when that user is already being published due to an identity delta. A full synchronization will always include the latest sign-in timestamps for all users.
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 
 #### Sending User and Device Metadata to Elasticsearch [_sending_user_and_device_metadata_to_elasticsearch_2]
 
@@ -464,6 +492,96 @@ Example user document:
 }
 ```
 
+<<<<<<< HEAD
+=======
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["mfa"]` option is set, user documents will also include an `azure_ad.mfa` field with MFA registration details:
+
+```json
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"],
+        "mfa": {
+            "isMfaCapable": true,
+            "isMfaRegistered": true,
+            "isPasswordlessCapable": false,
+            "isSsprCapable": false,
+            "isSsprEnabled": false,
+            "isSsprRegistered": false,
+            "isSystemPreferredAuthenticationMethodEnabled": false,
+            "methodsRegistered": ["microsoftAuthenticatorPush", "softwareOneTimePasscode"],
+            "systemPreferredAuthenticationMethods": [],
+            "userPreferredMethodForSecondaryAuthentication": "push",
+            "userType": "member"
+        }
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+```
+
+{applies_to}`{stack: preview 9.4+, serverless: preview}` When the `enrich_with: ["sign_in_activity"]` option is set, user documents will also include an `azure_ad.signInActivity` field with the user's last sign-in timestamps:
+
+```json
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "azure_ad": {
+        "userPrincipalName": "example.user@example.com",
+        "mail": "example.user@example.com",
+        "displayName": "Example User",
+        "givenName": "Example",
+        "surname": "User",
+        "jobTitle": "Software Engineer",
+        "mobilePhone": "123-555-1000",
+        "businessPhones": ["123-555-0122"],
+        "signInActivity": {
+            "lastSignInDateTime": "2024-01-15T08:00:00Z",
+            "lastSignInRequestId": "f3a931f0-1234-5678-abcd-ef1234567890",
+            "lastNonInteractiveSignInDateTime": "2024-01-15T08:30:00Z",
+            "lastNonInteractiveSignInRequestId": "a1b2c3d4-5678-90ab-cdef-123456789012"
+        }
+    },
+    "user": {
+        "id": "5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc",
+        "group": [
+            {
+                "id": "331676df-b8fd-4492-82ed-02b927f8dd80",
+                "name": "group1"
+            }
+        ]
+    },
+    "labels": {
+        "identity_source": "azure-1"
+    }
+}
+```
+
+After ingest pipeline processing, the `azure_ad.signInActivity.lastSignInDateTime` value is normalized and mapped to `user.entity.lifecycle.last_activity`.
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 Device documents will show the current state of the device.
 
 Example device document:
@@ -646,6 +764,26 @@ stack: preview 9.1.0
 Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
 
 
+<<<<<<< HEAD
+=======
+#### `enrich_with` [_enrich_with_azuread]
+
+{applies_to}`{stack: preview 9.4+, serverless: preview}` Additional data to fetch and merge into user documents. This is an array of enrichment types. Supported values are `"mfa"` and `"sign_in_activity"`. If not set, no additional enrichment is performed.
+
+When `"mfa"` is included, the provider calls the [`/reports/authenticationMethods/userRegistrationDetails`](https://learn.microsoft.com/en-us/graph/api/authenticationmethodsroot-list-userregistrationdetails?view=graph-rest-1.0&tabs=http) endpoint on each sync/update cycle and merges the result into each matching user document under the `azure_ad.mfa` field. This requires the `AuditLog.Read.All` application permission.
+
+When `"sign_in_activity"` is included, the provider calls `/users?$select=id,signInActivity` on each full synchronization and on incremental updates that include at least one user identity change, then merges the last sign-in timestamps into each matching user document under the `azure_ad.signInActivity` field. The `signInActivity` property cannot be requested via the `/users/delta` endpoint because Microsoft Graph stores it outside the main directory data store. This separate non-delta call is therefore required. This also requires the `AuditLog.Read.All` application permission.
+
+Both enrichments are **best-effort**: they are skipped on no-op incremental updates (cycles where no user identity deltas occurred) and will not themselves trigger user update events.
+
+Both values can be specified together:
+
+```yaml
+enrich_with: ["mfa", "sign_in_activity"]
+```
+
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 ### `tracer.enabled` [_tracer_enabled]
 
 It is possible to log HTTP requests and responses to the EntraID API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.

@@ -33,6 +33,21 @@ type Fetcher interface {
 	// returned, or an error if a failure occurred.
 	Devices(ctx context.Context, deltaLink string) ([]*Device, string, error)
 
+<<<<<<< HEAD
+=======
+	// UserMFADetails fetches MFA registration details for all users from the
+	// /reports/authenticationMethods/userRegistrationDetails endpoint. A map
+	// from user UUID to MFARegistrationDetails is returned, or an error if a
+	// failure occurred. This endpoint does not support delta queries.
+	UserMFADetails(ctx context.Context) (map[uuid.UUID]*MFARegistrationDetails, error)
+
+	// UserSignInActivity fetches sign-in activity for all users from the
+	// /users?$select=id,signInActivity endpoint. A map from user UUID to
+	// SignInActivityDetails is returned, or an error if a failure occurred.
+	// This endpoint does not support delta queries.
+	UserSignInActivity(ctx context.Context) (map[uuid.UUID]*SignInActivityDetails, error)
+
+>>>>>>> f5afcc48c (x-pack/filebeat/entityanalytics/azuread: add sign-in activity enrichment for users (#51390))
 	// SetLogger sets the logger on the Fetcher.
 	SetLogger(logger *logp.Logger)
 }
