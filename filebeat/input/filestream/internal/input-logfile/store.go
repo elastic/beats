@@ -271,11 +271,6 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 		return fmt.Errorf("new key %s already exists", newKey)
 	}
 
-	// Hold the resource's stateMutex while modifying state fields AND while
-	// persisting, so a concurrent ACK (updateOp.Execute, which holds only
-	// stateMutex) cannot race with writeState reading the cursor snapshot via
-	// inSyncStateSnapshot. This matches the stateMutex-held-across-writeState
-	// pattern used by updateMetadata/resetCursor.
 	res.stateMutex.Lock()
 	defer res.stateMutex.Unlock()
 
@@ -285,7 +280,6 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 	res.stored = false
 
 	// Update the table: remove old entry, add new entry with same resource.
-	// The table mutation is protected by ephemeralStore.mu, held for the whole call.
 	s.store.ephemeralStore.table[newKey] = res
 	delete(s.store.ephemeralStore.table, oldKey)
 
@@ -304,10 +298,11 @@ func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
 			newKey, oldKeyValue)
 	}
 
-	// Best-effort: the new key is already durable above; this just trims the
-	// stale on-disk entry for the old key. A failure here is harmless — the
-	// stale record is ignored on the next read because no in-memory entry
-	// references it — but surface it anyway.
+	// Best-effort cleanup: newKey is already durable and the table is swapped.
+	// Returning an error here can't undo the migration.
+	// See also: UpdateIdentifiers and TakeOver remove the old key the same best-effort way.
+	// The persistent store has no atomic multi-key write, so a crash between the newKey write and
+	// this removal can leave a stale oldKey that later prefix-matches another file.
 	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
 		s.store.log.Errorf(
 			"UpdateKey: failed to remove old key %q from persistent store: %v",
