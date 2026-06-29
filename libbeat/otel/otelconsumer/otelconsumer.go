@@ -305,24 +305,23 @@ func applyNonStandardDataStreamIndex(logRecord plog.LogRecord, ds mapstr.M) {
 	}
 	dataset, _ := ds["dataset"].(string)
 	namespace, _ := ds["namespace"].(string)
-	sanitizedDataset := sanitizeDataStreamField(dataset, disallowedDatasetRunes)
-	sanitizedNamespace := sanitizeDataStreamField(namespace, disallowedNamespaceRunes)
+	sanitizedDataset := sanitizeDataStreamField(dataset, disallowedDatasetRunes, maxDataStreamBytes)
+	sanitizedNamespace := sanitizeDataStreamField(namespace, disallowedNamespaceRunes, maxDataStreamBytes)
 	logRecord.Attributes().PutStr(esIndexAttribute, fmt.Sprintf("%s-%s-%s", dsType, sanitizedDataset, sanitizedNamespace))
 }
 
 // sanitizeDataStreamField mirrors elasticsearchexporter's sanitizeDataStreamField:
 // it lower-cases the value, replaces disallowed runes with '_', and truncates to 100 bytes.
 // No suffix is appended (MappingBodyMap never adds one).
-func sanitizeDataStreamField(field, disallowed string) string {
-	const maxDataStreamBytes = 100
+func sanitizeDataStreamField(field, disallowed string, maxLength int) string {
 	field = strings.Map(func(r rune) rune {
 		if strings.ContainsRune(disallowed, r) {
 			return '_'
 		}
 		return unicode.ToLower(r)
 	}, field)
-	if len(field) > maxDataStreamBytes {
-		field = field[:maxDataStreamBytes]
+	if len(field) > maxLength {
+		field = field[:maxLength]
 	}
 	return field
 }

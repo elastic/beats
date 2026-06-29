@@ -793,10 +793,10 @@ func TestSanitizeDataStreamField(t *testing.T) {
 			want:       "my_dataset",
 		},
 	}
-
+	const maxLength = 100
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := sanitizeDataStreamField(tc.input, tc.disallowed)
+			got := sanitizeDataStreamField(tc.input, tc.disallowed, maxLength)
 			assert.Equal(t, tc.want, got)
 		})
 	}
