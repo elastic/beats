@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix handling of user-agent header when using OAuth2.0 authentication.
-component: filebeat
