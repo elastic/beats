@@ -131,15 +131,17 @@ type processorFactory struct {
 	name         string
 	err          chan error
 	beat         *beat.Beat
-	configurator func(*conf.C) (config.Config, error)
+	configurator func(*conf.C, *logp.Logger) (config.Config, error)
+	logger       *logp.Logger
 }
 
-func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C) (config.Config, error)) *processorFactory {
+func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C, *logp.Logger) (config.Config, error)) *processorFactory {
 	return &processorFactory{
 		name:         name,
 		err:          err,
 		beat:         beat,
 		configurator: configurator,
+		logger:       beat.Info.Logger,
 	}
 }
 
@@ -162,14 +164,14 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 }
 
 func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, reporter status.StatusReporter) (time.Duration, *publish.TransactionPublisher, *flows.Flows, *sniffer.Sniffer, chan error, error) {
-	config, err := p.configurator(cfg)
+	config, err := p.configurator(cfg, p.logger)
 	if err != nil {
-		logp.Err("Failed to read the beat config: %v, %v", err, config)
+		p.logger.Errorf("Failed to read the beat config: %v, %v", err, config)
 		return 0, nil, nil, nil, nil, err
 	}
 	id, err := configID(cfg)
 	if err != nil {
-		logp.Err("Failed to generate ID from config: %v, %v", err, config)
+		p.logger.Errorf("Failed to generate ID from config: %v, %v", err, config)
 		return 0, nil, nil, nil, nil, err
 	}
 	if len(config.Interfaces) != 0 {
@@ -207,18 +209,18 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 	if config.Interfaces[0].File == "" {
 		err = watch.Init(config.Procs)
 		if err != nil {
-			logp.Critical("%s", err.Error())
+			p.logger.Warn("%s", err.Error())
 			return 0, nil, nil, nil, nil, err
 		}
 	} else {
-		logp.Info("Process watcher disabled when file input is used")
+		p.logger.Info("Process watcher disabled when file input is used")
 	}
 
 	flows, err := setupFlows(pipeline, &watch, config, p.beat.Info.Logger)
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
 	}
-	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter)
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows, reporter, p.logger)
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
 	}
@@ -254,10 +256,18 @@ func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg confi
 		return nil, err
 	}
 
-	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
+	return flows.NewFlows(client.PublishAll, watch, cfg.Flows, logger)
 }
 
-func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows, reporter status.StatusReporter) (*sniffer.Sniffer, error) {
+func setupSniffer(
+	id string,
+	cfg config.Config,
+	pub *publish.TransactionPublisher,
+	watch *procs.ProcessesWatcher,
+	flows *flows.Flows,
+	reporter status.StatusReporter,
+	logger *logp.Logger,
+) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -280,7 +290,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		interfaces = append(interfaces, iface)
 	}
 
-	logp.Debug("main", "Initializing protocol plugins")
+	logger.Debug("main", "Initializing protocol plugins")
 	decoders := make(map[string]sniffer.Decoders)
 	var closers []func()
 	for i, iface := range interfaces {
@@ -289,7 +299,7 @@ func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublishe
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}
-		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg, logger)
 		closers = append(closers, protocols.Close)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue

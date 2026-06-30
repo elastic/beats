@@ -81,14 +81,22 @@ const (
 )
 
 // New creates and initializes a new packet decoder.
-func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, icmp6 icmp.ICMPv6Processor, tcp tcp.Processor, udp udp.Processor, allowMismatchedEth bool) (*Decoder, error) {
+func New(
+	f *flows.Flows,
+	datalink layers.LinkType,
+	icmp4 icmp.ICMPv4Processor,
+	icmp6 icmp.ICMPv6Processor,
+	tcp tcp.Processor,
+	udp udp.Processor,
+	allowMismatchedEth bool,
+	logger *logp.Logger) (*Decoder, error) {
 	d := Decoder{
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
 		fragments:          fragmentCache{collected: make(map[fragmentKey]fragments), lastPurge: time.Now()},
 		allowMismatchedEth: allowMismatchedEth,
-		logger:             logp.NewLogger("decoder"),
+		logger:             logger.Named("decoder"),
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])

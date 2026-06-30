@@ -29,8 +29,6 @@ import (
 // Reporter callback type, to report flow events to.
 type Reporter func([]beat.Event)
 
-var debugf = logp.MakeDebug("flows")
-
 const (
 	defaultTimeout = 30 * time.Second
 	defaultPeriod  = 10 * time.Second
@@ -41,11 +39,18 @@ type Flows struct {
 	worker     *worker
 	table      *flowMetaTable
 	counterReg *counterReg
+	logger     *logp.Logger
 }
 
 // NewFlows returns a Flows publishing to pub after enrichment by the given
 // process watcher. Publication timeout and period are specified by config.
-func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
+func NewFlows(
+	pub Reporter,
+	watcher *procs.ProcessesWatcher,
+	config *config.Flows,
+	logger *logp.Logger,
+) (*Flows, error) {
+	logger = logger.Named("flows")
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil
@@ -55,25 +60,27 @@ func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flow
 
 	timeout, err := duration(config.Timeout, defaultTimeout)
 	if err != nil {
-		logp.Err("failed to parse flow timeout: %v", err)
+		logger.Errorf("failed to parse flow timeout: %v", err)
 		return nil, err
 	}
 
 	period, err := duration(config.Period, defaultPeriod)
 	if err != nil {
-		logp.Err("failed to parse period: %v", err)
+		logger.Errorf("failed to parse period: %v", err)
 		return nil, err
 	}
 
 	table := &flowMetaTable{
 		table: make(map[flowIDMeta]*flowTable),
 	}
+	table.logger = logger
 
 	counter := &counterReg{}
+	counter.logger = logger
 
-	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, config.EnableDeltaFlowReports)
+	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, config.EnableDeltaFlowReports, logger)
 	if err != nil {
-		logp.Err("failed to configure flows processing intervals: %v", err)
+		logger.Errorf("failed to configure flows processing intervals: %v", err)
 		return nil, err
 	}
 
@@ -81,23 +88,24 @@ func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flow
 		table:      table,
 		worker:     worker,
 		counterReg: counter,
+		logger:     logger,
 	}, nil
 }
 
 func (f *Flows) Lock() {
-	debugf("lock flows")
+	f.logger.Debug("lock flows")
 	f.table.Lock()
 }
 
 func (f *Flows) Unlock() {
-	debugf("unlock flows")
+	f.logger.Debug("unlock flows")
 	f.table.Unlock()
 }
 
 func (f *Flows) Get(id *FlowID) *Flow {
-	debugf("get flow")
+	f.logger.Debug("get flow")
 	if id.flow.stats == nil {
-		debugf("lookup flow: %v => %v", id.flowIDMeta, id.flowID)
+		f.logger.Debug("lookup flow: %v => %v", id.flowIDMeta, id.flowID)
 		id.flow = f.table.get(id, f.counterReg)
 	}
 	return &id.flow

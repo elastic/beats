@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/procs"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,8 +42,6 @@ func (f *flowsChan) PublishFlows(events []beat.Event) {
 }
 
 func TestFlowsCounting(t *testing.T) {
-	logp.TestingSetup()
-
 	mac1 := []byte{1, 2, 3, 4, 5, 6}
 	mac2 := []byte{6, 5, 4, 3, 2, 1}
 	ip1 := []byte{127, 0, 0, 1}
@@ -51,7 +49,7 @@ func TestFlowsCounting(t *testing.T) {
 	port1 := []byte{0, 1}
 	port2 := []byte{0, 2}
 
-	module, err := NewFlows(nil, &procs.ProcessesWatcher{}, &config.Flows{})
+	module, err := NewFlows(nil, &procs.ProcessesWatcher{}, &config.Flows{}, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 
 	uint1, err := module.NewUint("uint1")
@@ -82,7 +80,9 @@ func TestFlowsCounting(t *testing.T) {
 		10*time.Millisecond,
 		1,
 		-1,
-		0)
+		0,
+		logptest.NewTestingLogger(t, ""),
+	)
 	if err != nil {
 		t.Fatalf("Failed to create flow worker: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestFlowsCounting(t *testing.T) {
 	worker.start()
 	defer worker.stop()
 
-	idForward := newFlowID()
+	idForward := newFlowID(logptest.NewTestingLogger(t, ""))
 	addrForward := addAll(
 		addEther(mac1, mac2),
 		addIP(ip1, ip2),
@@ -98,7 +98,7 @@ func TestFlowsCounting(t *testing.T) {
 	)
 	addrForward(idForward)
 
-	idRev := newFlowID()
+	idRev := newFlowID(logptest.NewTestingLogger(t, ""))
 	addrRev := addAll(
 		addEther(mac2, mac1),
 		addIP(ip2, ip1),

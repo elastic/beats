@@ -17,7 +17,11 @@
 
 package flows
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
 type Var interface{}
 
@@ -47,6 +51,7 @@ type counterReg struct {
 	ints   counterTypeReg
 	uints  counterTypeReg
 	floats counterTypeReg
+	logger *logp.Logger
 }
 
 type counterTypeReg struct {
@@ -115,7 +120,7 @@ func (c *counterReg) newInt(name string) (*Int, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	i, err := c.ints.reg(name)
+	i, err := c.ints.reg(name, c.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +131,7 @@ func (c *counterReg) newUint(name string) (*Uint, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	i, err := c.uints.reg(name)
+	i, err := c.uints.reg(name, c.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +142,7 @@ func (c *counterReg) newFloat(name string) (*Float, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	i, err := c.floats.reg(name)
+	i, err := c.floats.reg(name, c.logger)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +152,8 @@ func (c *counterReg) newFloat(name string) (*Float, error) {
 // XXX:
 //   - error on index > int max
 //   - error if already in use
-func (reg *counterTypeReg) reg(name string) (int, error) {
-	debugf("register flow counter: %v", name)
+func (reg *counterTypeReg) reg(name string, logger *logp.Logger) (int, error) {
+	logger.Debugf("register flow counter: %v", name)
 
 	i := len(reg.names)
 	reg.names = append(reg.names, name)
