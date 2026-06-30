@@ -78,10 +78,17 @@ func create(
 	// Determine whether we're using a proxy or not and then use that to figure out how to
 	// run the job
 	var makeJob func(string) (jobs.Job, error)
-	// In the event that a ProxyURL is present, or redirect support is enabled
-	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
-	// separate DNS rtt data.
-	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
+	// In the event that a ProxyURL is present, redirect support is enabled, or a
+	// challenge/response authentication scheme (Kerberos or NTLM) is configured,
+	// we execute DNS resolution requests inline with the request, not running them
+	// as a separate job, and not returning separate DNS rtt data. The custom
+	// SimpleTransport used by the per-IP path is a single write/read with no
+	// connection reuse, so it cannot perform the 401-challenge handshakes those
+	// schemes require.
+	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) ||
+		config.MaxRedirects > 0 ||
+		config.Kerberos.IsEnabled() ||
+		config.NTLM.IsEnabled() {
 		transport, err := newRoundTripper(&config)
 		if err != nil {
 			return plugin.Plugin{}, err
@@ -93,6 +100,7 @@ func create(
 	} else {
 		// preload TLS configuration
 		// TODO: Use local logger
+		//nolint:forbidigo // the plugin factory signature does not provide a *logp.Logger to thread through yet (see TODO above)
 		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logp.NewLogger(""))
 		if err != nil {
 			return plugin.Plugin{}, err
@@ -125,12 +133,34 @@ func create(
 }
 
 func newRoundTripper(config *Config) (http.RoundTripper, error) {
-	return config.Transport.RoundTripper(
+	opts := []httpcommon.TransportOption{
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithoutProxyEnvironmentVariables(),
-		httpcommon.WithKeepaliveSettings{
-			Disable: true,
-		},
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
-	)
+	}
+
+	// NTLM binds the authenticated session to the underlying TCP connection, so
+	// the negotiate/challenge/authenticate legs must travel over the same
+	// keep-alive connection. For every other case we keep the historical
+	// behaviour of disabling keep-alives so each ping uses a fresh connection.
+	if !config.NTLM.IsEnabled() {
+		opts = append(opts, httpcommon.WithKeepaliveSettings{Disable: true})
+	}
+
+	rt, err := config.Transport.RoundTripper(opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	if config.NTLM.IsEnabled() {
+		// The Negotiator converts the request's Basic auth credentials into an
+		// NTLM/Negotiate handshake against the wrapped transport. This is gated
+		// off in FIPS builds (see ntlm_fips.go).
+		rt, err = wrapNTLMRoundTripper(rt)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rt, nil
 }
