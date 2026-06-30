@@ -11,6 +11,7 @@ import (
 	"syscall"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
@@ -21,7 +22,7 @@ func init() {
 	plugin.RegisterWithHashFunc("browser", hashConfig, create, "synthetic", "synthetics/synthetic")
 }
 
-func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
+func create(name string, cfg *config.C, logger *logp.Logger) (p plugin.Plugin, err error) {
 	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
 	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
 	// we can remove this check.

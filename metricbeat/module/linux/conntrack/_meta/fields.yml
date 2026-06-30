@@ -12,7 +12,7 @@
         - name: drop
           type: long
           description: >
-            packets dropped due to conntrack failiure
+            packets dropped due to conntrack failure
         - name: early_drop
           type: long
           description: >
@@ -32,10 +32,10 @@
         - name: insert_failed
           type: long
           description: >
-            Number of entries where list insert insert failed 
+            Number of entries where list insert failed
         - name: invalid
           type: long
-          description: > 
+          description: >
             packets seen that cannot be tracked
         - name: search_restart
           type: long

@@ -1,0 +1,35 @@
+# Kind can be one of:
+# - breaking-change: a change to previously-documented behavior
+# - deprecation: functionality that is being removed in a later release
+# - bug-fix: fixes a problem in a previous version
+# - enhancement: extends functionality but does not break or fix existing behavior
+# - feature: new functionality
+# - known-issue: problems that we are aware of in a given version
+# - security: impacts on the security of a product or a user’s deployment.
+# - upgrade: important information for someone upgrading from a prior version
+# - other: does not fit into any of the other categories
+kind: enhancement
+
+# Change summary; a 80ish characters long description of the change.
+summary: Add consumer-group and network timeout options to the Filebeat Kafka input.
+
+# Long description; in case the summary is not enough to describe the change
+# this field accommodate a description without length limits.
+description: >
+  The Filebeat Kafka input now exposes the `session_timeout`, `heartbeat_interval`,
+  `timeout` and `keep_alive` options, which are passed through to the underlying
+  Sarama consumer (`Consumer.Group.Session.Timeout`, `Consumer.Group.Heartbeat.Interval`
+  and the `Net` dial/read/write timeouts). Previously these were pinned to Sarama's
+  defaults with no way to override them, which prevented tuning consumers that read
+  across higher-latency (cross-region/WAN) links. Defaults are unchanged.
+
+# Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
+component: "filebeat"
+
+# PR URL; optional; the PR number that added the changeset.
+# If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
+# pr: https://github.com/elastic/beats/pull/0000
+
+# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
+# If not present is automatically filled by the tooling with the issue linked to the PR number.
+issue: https://github.com/elastic/beats/issues/51172
