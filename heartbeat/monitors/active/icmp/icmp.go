@@ -48,7 +48,7 @@ func create(
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {
-		logp.Warn("Failed to initialize ICMP loop %v", err)
+		logger.Warnf("Failed to initialize ICMP loop %v", err)
 		return plugin.Plugin{}, err
 	}
 
