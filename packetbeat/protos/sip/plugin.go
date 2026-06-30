@@ -64,12 +64,12 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
-	// TODO: https://github.com/elastic/ingest-dev/issues/6000
-	logp.NewLogger("").Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
+	logger.Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
 
-	isDebug = logp.IsDebug("sip")
-	isDetailed = logp.IsDebug("sipdetailed")
+	isDebug = logger.HasSelector("sip")
+	isDetailed = logger.HasSelector("sipdetailed")
 
 	config := defaultConfig
 	if !testMode {

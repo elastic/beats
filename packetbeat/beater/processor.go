@@ -295,7 +295,7 @@ func setupSniffer(
 	var closers []func()
 	for i, iface := range interfaces {
 		protocols := protos.NewProtocols()
-		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
+		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
 		}

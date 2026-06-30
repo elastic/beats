@@ -64,7 +64,7 @@ func DecodersFor(
 				return nil, nil, err
 			}
 
-			p, err := icmp.New(false, reporter, watcher, icmpCfg)
+			p, err := icmp.New(false, reporter, watcher, icmpCfg, logger)
 			if err != nil {
 				return nil, nil, err
 			}

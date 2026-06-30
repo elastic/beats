@@ -17,7 +17,11 @@
 
 package icmp
 
-import "time"
+import (
+	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
 type icmpTransaction struct {
 	ts    time.Time // timestamp of the first packet
@@ -26,11 +30,12 @@ type icmpTransaction struct {
 
 	request  *icmpMessage
 	response *icmpMessage
+	logger   *logp.Logger
 }
 
 func (t *icmpTransaction) HasError() bool {
 	return t.request == nil ||
-		(t.request != nil && isError(&t.tuple, t.request)) ||
-		(t.response != nil && isError(&t.tuple, t.response)) ||
-		(t.request != nil && t.response == nil && requiresCounterpart(&t.tuple, t.request))
+		(t.request != nil && isError(&t.tuple, t.request, t.logger)) ||
+		(t.response != nil && isError(&t.tuple, t.response, t.logger)) ||
+		(t.request != nil && t.response == nil && requiresCounterpart(&t.tuple, t.request, t.logger))
 }

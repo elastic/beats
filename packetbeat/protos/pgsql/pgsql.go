@@ -142,6 +142,7 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
 	config := defaultConfig
@@ -151,19 +152,19 @@ func New(
 		}
 	}
 
-	if err := p.init(results, watcher, &config); err != nil {
+	if err := p.init(results, watcher, &config, logger); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig) error {
+func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig, logger *logp.Logger) error {
 	pgsql.setFromConfig(config)
 
-	pgsql.log = logp.NewLogger("pgsql")
-	pgsql.debug = logp.NewLogger("pgsql", zap.AddCallerSkip(1))
-	pgsql.detail = logp.NewLogger("pgsqldetailed", zap.AddCallerSkip(1))
-	pgsql.isDebug, pgsql.isDetail = logp.IsDebug("pgsql"), logp.IsDebug("pgsqldetailed")
+	pgsql.log = logger.Named("pgsql")
+	pgsql.debug = logger.Named("pgsql").With(zap.AddCallerSkip(1))
+	pgsql.detail = logger.Named("pgsqldetailed").With(zap.AddCallerSkip(1))
+	pgsql.isDebug, pgsql.isDetail = logger.HasSelector("pgsql"), logger.HasSelector("pgsqldetailed")
 
 	pgsql.transactions = common.NewCache(
 		pgsql.transactionTimeout,

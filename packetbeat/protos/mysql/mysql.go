@@ -174,7 +174,9 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
+	logger *logp.Logger,
 ) (protos.Plugin, error) {
+	_ = logger
 	p := &mysqlPlugin{}
 	config := defaultConfig
 	if !testMode {

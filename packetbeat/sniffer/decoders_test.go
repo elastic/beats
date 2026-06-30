@@ -42,7 +42,7 @@ func TestDecoderAndProtocolCleanupStopsAllGoroutines(t *testing.T) {
 			"type":    "dns",
 			"enabled": true,
 		}),
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	cfg := config.Config{
