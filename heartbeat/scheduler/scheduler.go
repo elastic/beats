@@ -147,7 +147,7 @@ func (s *Scheduler) missedDeadlineReporter() {
 			missingNow := s.stats.jobsMissedDeadline.Get()
 			missedDelta := missingNow - missedAtLastCheck
 			if missedDelta > 0 {
-				s.logger.Warn("%d tasks have missed their schedule deadlines by more than 1 second in the last %s.", missedDelta, interval)
+				s.logger.Warnf("%d tasks have missed their schedule deadlines by more than 1 second in the last %s.", missedDelta, interval)
 			}
 			missedAtLastCheck = missingNow
 		}
