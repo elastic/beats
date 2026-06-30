@@ -190,7 +190,7 @@ func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
 	oldDescriptor := loginp.FileDescriptor{
 		Filename:    sourcePath,
 		Info:        file.ExtendFileInfo(oldInfo),
-		Fingerprint: loginp.FingerprintID{Complete: true, Sum: "old-fingerprint"},
+		Fingerprint: loginp.FingerprintID{Sum: "old-fingerprint"},
 	}
 
 	currentFile, err := os.Create(sourcePath)
@@ -202,7 +202,7 @@ func TestProspector_UpdateIdentifiersOnlyForSameFiles(t *testing.T) {
 	currentDescriptor := loginp.FileDescriptor{
 		Filename:    sourcePath,
 		Info:        file.ExtendFileInfo(currentInfo),
-		Fingerprint: loginp.FingerprintID{Complete: true, Sum: "current-fingerprint"},
+		Fingerprint: loginp.FingerprintID{Sum: "current-fingerprint"},
 	}
 
 	globalIdentifier, err := loginp.NewSourceIdentifier(pluginName, "")
@@ -268,7 +268,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 	fd := loginp.FileDescriptor{
 		Filename:    tmpFileName,
 		Info:        file.ExtendFileInfo(fi),
-		Fingerprint: loginp.FingerprintID{Complete: true, Sum: mockFingerprint},
+		Fingerprint: loginp.FingerprintID{Sum: mockFingerprint},
 	}
 
 	fingerprintIdentifier, _ := newFingerprintIdentifier(nil, nil)
@@ -1060,7 +1060,7 @@ func createTestFileDescriptor() loginp.FileDescriptor {
 func createTestFileDescriptorWithInfo(fi fs.FileInfo) loginp.FileDescriptor {
 	return loginp.FileDescriptor{
 		Info:        file.ExtendFileInfo(fi),
-		Fingerprint: loginp.FingerprintID{Complete: true, Sum: "fingerprint"},
+		Fingerprint: loginp.FingerprintID{Sum: "fingerprint"},
 		Filename:    "filename",
 	}
 }
@@ -1075,7 +1075,7 @@ func TestFileProspector_previousID(t *testing.T) {
 	fd := loginp.FileDescriptor{
 		Filename:    "/path/to/file",
 		Info:        file.ExtendFileInfo(testFileInfo),
-		Fingerprint: loginp.FingerprintID{Complete: true, Sum: "test-fingerprint"},
+		Fingerprint: loginp.FingerprintID{Sum: "test-fingerprint"},
 	}
 
 	tests := map[string]struct {
@@ -1224,7 +1224,7 @@ func TestFileProspector_takeOverFn(t *testing.T) {
 	fd := loginp.FileDescriptor{
 		Filename:    "/path/to/file",
 		Info:        file.ExtendFileInfo(testFileInfo),
-		Fingerprint: loginp.FingerprintID{Complete: true, Sum: "test-fingerprint"},
+		Fingerprint: loginp.FingerprintID{Sum: "test-fingerprint"},
 	}
 
 	tests := map[string]struct {
@@ -1746,9 +1746,8 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 			SrcID:   newKey,
 			Descriptor: loginp.FileDescriptor{
 				Fingerprint: loginp.FingerprintID{
-					Complete: true,
-					Sum:      sha256Fingerprint,
-					Raw:      growingFingerprint,
+					Sum: sha256Fingerprint,
+					Raw: growingFingerprint,
 				},
 			},
 		}
@@ -1870,7 +1869,7 @@ func TestShortFingerprintEntries_EventMaintenance(t *testing.T) {
 			shortFingerprints: newShortFingerprintSet(),
 		}
 		event := makeEvent(loginp.OpCreate, "/a.log", "filestream::input::fingerprint::"+sha, sha)
-		event.Descriptor.Fingerprint = loginp.FingerprintID{Complete: true, Sum: sha}
+		event.Descriptor.Fingerprint = loginp.FingerprintID{Sum: sha}
 		src := identifier.GetSource(event)
 		store := newMockMetadataUpdater()
 		hg := newTestHarvesterGroup()
@@ -2025,9 +2024,8 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 			SrcID:   newSrcID,
 			Descriptor: loginp.FileDescriptor{
 				Fingerprint: loginp.FingerprintID{
-					Complete: true,
-					Sum:      newFingerprint,
-					Raw:      growingFingerprint,
+					Sum: newFingerprint,
+					Raw: growingFingerprint,
 				},
 				Info: file.ExtendFileInfo(&testFileInfo{path, 100, time.Now(), nil}),
 			},
@@ -2099,7 +2097,7 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 	// the SHA-256 as-is for a final one. This keeps the test's keys consistent
 	// with what the migration code computes via FingerprintID.Key.
 	makeKey := func(fingerprint string, growing bool) string {
-		fp := loginp.FingerprintID{Complete: true, Sum: fingerprint}
+		fp := loginp.FingerprintID{Sum: fingerprint}
 		if growing {
 			fp = loginp.FingerprintID{Raw: fingerprint}
 		}
@@ -2174,9 +2172,8 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		SrcID:   makeKey(aSha, false),
 		Descriptor: loginp.FileDescriptor{
 			Fingerprint: loginp.FingerprintID{
-				Complete: true,
-				Sum:      aSha,
-				Raw:      "aabb" + strings.Repeat("0", 60), // raw-hex of bytes[offset:offset+length]
+				Sum: aSha,
+				Raw: "aabb" + strings.Repeat("0", 60), // raw-hex of bytes[offset:offset+length]
 			},
 			Info: file.ExtendFileInfo(&testFileInfo{"/a.log", 500, time.Now(), nil}),
 		},
@@ -2196,9 +2193,8 @@ func TestShortFingerprintEntries_FullLifecycle(t *testing.T) {
 		SrcID:   makeKey(bSha, false),
 		Descriptor: loginp.FileDescriptor{
 			Fingerprint: loginp.FingerprintID{
-				Complete: true,
-				Sum:      bSha,
-				Raw:      "bb" + strings.Repeat("0", 62),
+				Sum: bSha,
+				Raw: "bb" + strings.Repeat("0", 62),
 			},
 			Info: file.ExtendFileInfo(&testFileInfo{"/b.log", 500, time.Now(), nil}),
 		},

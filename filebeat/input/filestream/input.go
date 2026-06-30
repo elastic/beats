@@ -567,7 +567,7 @@ func (inp *filestream) open(
 	// we publish no fingerprint at all. A renamed file may still carry the old
 	// path until the next open — that pre-existing limitation is unchanged here.
 	var fingerprint string
-	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete {
+	if inp.includeFileFingerprint && fs.desc.Fingerprint.Complete() {
 		fingerprint = fs.desc.Fingerprint.Sum
 	}
 	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, inp.includeFileOwnerName, inp.includeFileOwnerGroupName, fingerprint, offset)

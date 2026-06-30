@@ -166,20 +166,20 @@ func TestFileIdentifier(t *testing.T) {
 		}{
 			{
 				newPath:     "/path/to/file",
-				desc:        loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Sum: "fingerprintvalue"}},
+				desc:        loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Sum: "fingerprintvalue"}},
 				expectedSrc: fingerprintName + "::fingerprintvalue",
 			},
 			{
 				newPath:     "/new/path/to/file",
 				oldPath:     "/old/path/to/file",
 				operation:   loginp.OpRename,
-				desc:        loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Sum: "fingerprintvalue"}},
+				desc:        loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Sum: "fingerprintvalue"}},
 				expectedSrc: fingerprintName + "::fingerprintvalue",
 			},
 			{
 				oldPath:     "/old/path/to/file",
 				operation:   loginp.OpDelete,
-				desc:        loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Sum: "fingerprintvalue"}},
+				desc:        loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Sum: "fingerprintvalue"}},
 				expectedSrc: fingerprintName + "::fingerprintvalue",
 			},
 		}
@@ -205,7 +205,7 @@ func TestFingerprintIDKey(t *testing.T) {
 	const sha = "2edc986847e209b4016e141a6dc8716d3207350f416969382d431539bf292e4a"
 
 	t.Run("completed SHA-256 is used as-is", func(t *testing.T) {
-		got := loginp.FingerprintID{Complete: true, Sum: sha}.Key()
+		got := loginp.FingerprintID{Sum: sha}.Key()
 		assert.Equal(t, sha, got, "a completed fingerprint must be byte-identical to the static-fingerprint key")
 	})
 
@@ -235,6 +235,6 @@ func TestGrowingRawFingerprint(t *testing.T) {
 	raw := "41414141"
 	assert.Equal(t, raw, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw}}),
 		"a growing descriptor must persist its raw fingerprint for prefix matching")
-	assert.Empty(t, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Complete: true, Raw: raw, Sum: raw}}),
+	assert.Empty(t, growingRawFingerprint(loginp.FileDescriptor{Fingerprint: loginp.FingerprintID{Raw: raw, Sum: raw}}),
 		"a completed descriptor must not persist a raw fingerprint (keeps the entry byte-identical to static)")
 }

@@ -419,7 +419,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	if w.growingFingerprint {
 		completed := make(map[string]struct{}, len(paths))
 		for p, fd := range paths {
-			if fd.Fingerprint.Complete {
+			if fd.Fingerprint.Complete() {
 				completed[p] = struct{}{}
 				if fd.Fingerprint.Raw != "" {
 					fd.Fingerprint.Raw = ""
@@ -749,13 +749,13 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 //   - dataSize <= offset: file is too small to read anything from offset;
 //     return errFileTooSmall.
 //   - dataSize >= offset+length: read bytes[offset:offset+length] and hash
-//     with SHA-256 (FingerprintID.Sum, Complete=true). In growing mode the
-//     raw header bytes are also carried in FingerprintID.Raw so the one-time
+//     with SHA-256 (FingerprintID.Sum, so Complete() is true). In growing mode
+//     the raw header bytes are also carried in FingerprintID.Raw so the one-time
 //     crossing to the SHA-256 identity can be prefix-matched against a still
 //     growing predecessor.
 //   - dataSize in (offset, offset+length) under growing mode: read
-//     bytes[offset:dataSize] and carry its hex as FingerprintID.Raw with
-//     Complete=false.
+//     bytes[offset:dataSize] and carry its hex as FingerprintID.Raw, leaving
+//     Sum empty so Complete() is false.
 //   - dataSize in (offset, offset+length) under non-growing mode: return
 //     errFileTooSmall (today's static-fingerprint behaviour).
 //
@@ -900,8 +900,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	s.hasher.Reset()
 	s.hasher.Write(s.readBuffer[:length])
 	fd.Fingerprint = loginp.FingerprintID{
-		Complete: true,
-		Sum:      hex.EncodeToString(s.hasher.Sum(nil)),
+		Sum: hex.EncodeToString(s.hasher.Sum(nil)),
 	}
 
 	// In growing mode the raw header is carried alongside the SHA-256 so the

@@ -1478,7 +1478,7 @@ func requireEqualDescriptors(t *testing.T, expected, actual loginp.FileDescripto
 // completeFP builds the FingerprintID a static (non-growing) fingerprint scan
 // produces: a completed SHA-256 with no retained raw material.
 func completeFP(sum string) loginp.FingerprintID {
-	return loginp.FingerprintID{Complete: true, Sum: sum}
+	return loginp.FingerprintID{Sum: sum}
 }
 
 func filenames(m map[string]loginp.FileDescriptor) (result string) {
@@ -1607,7 +1607,7 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 	fd1, err := s.toFileDescriptor(&it)
 	require.NoError(t, err, "toFileDescriptor failed")
 
-	assert.False(t, fd1.Fingerprint.Complete, "step 1: sub-threshold file must not be Complete")
+	assert.False(t, fd1.Fingerprint.Complete(), "step 1: sub-threshold file must not be Complete")
 	assert.Equal(t,
 		hex.EncodeToString([]byte(strings.Repeat("abcd", 51)[:200])),
 		fd1.Fingerprint.Raw,
@@ -1622,7 +1622,7 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 	fd2, err := s.toFileDescriptor(&it)
 	require.NoError(t, err, "toFileDescriptor failed")
 
-	assert.True(t, fd2.Fingerprint.Complete,
+	assert.True(t, fd2.Fingerprint.Complete(),
 		"step 2: descriptor must be Complete at/above threshold")
 
 	expectedRawHex := hex.EncodeToString([]byte(strings.Repeat("abcd", 256)[:length]))
@@ -1657,7 +1657,7 @@ func TestToFileDescriptor_GrowingLifecycle(t *testing.T) {
 	fd4, err := s.toFileDescriptor(&it)
 	require.NoError(t, err, "toFileDescriptor failed")
 
-	assert.False(t, fd4.Fingerprint.Complete,
+	assert.False(t, fd4.Fingerprint.Complete(),
 		"step 4: not Complete after truncation back below threshold")
 	assert.NotEmpty(t, fd4.Fingerprint.Raw,
 		"step 4: Raw set to the sub-threshold raw hex")
@@ -1706,7 +1706,7 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 		// so the next scan can skip recomputing their bridging raw header.
 		completed := map[string]struct{}{}
 		for p, fd := range files {
-			if fd.Fingerprint.Complete {
+			if fd.Fingerprint.Complete() {
 				completed[p] = struct{}{}
 			}
 		}
@@ -1717,20 +1717,20 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 	// Sub-threshold: growing, raw-hex carried as the identity.
 	writeFile(200)
 	fp := scan()
-	assert.False(t, fp.Complete, "sub-threshold file must not be Complete")
+	assert.False(t, fp.Complete(), "sub-threshold file must not be Complete")
 	assert.NotEmpty(t, fp.Raw, "sub-threshold file is identified by its raw header")
 
 	// Crossing scan: Complete, and the bridging raw header is still present so a
 	// growing predecessor can be prefix-matched.
 	writeFile(1500)
 	fp = scan()
-	require.True(t, fp.Complete, "file must be Complete at/above threshold")
+	require.True(t, fp.Complete(), "file must be Complete at/above threshold")
 	assert.NotEmpty(t, fp.Raw, "crossing scan must carry the bridging raw header")
 
 	// Stable scans: still Complete, but the now-redundant raw header is dropped.
 	for i := 0; i < 3; i++ {
 		fp = scan()
-		require.True(t, fp.Complete, "stable file stays Complete")
+		require.True(t, fp.Complete(), "stable file stays Complete")
 		assert.Empty(t, fp.Raw,
 			"raw header must be suppressed once the file is already complete")
 	}
@@ -1738,14 +1738,14 @@ func TestGetFiles_GrowingRawSuppression(t *testing.T) {
 	// Truncated back below threshold: suppression lifted, raw identity returns.
 	writeFile(200)
 	fp = scan()
-	assert.False(t, fp.Complete, "truncated file is growing again")
+	assert.False(t, fp.Complete(), "truncated file is growing again")
 	assert.NotEmpty(t, fp.Raw, "sub-threshold file carries its raw header again")
 
 	// A fresh crossing re-emits the bridging header (not suppressed by a stale
 	// completed-set entry).
 	writeFile(1500)
 	fp = scan()
-	require.True(t, fp.Complete, "file is Complete after re-crossing")
+	require.True(t, fp.Complete(), "file is Complete after re-crossing")
 	assert.NotEmpty(t, fp.Raw, "re-crossing must carry the bridging raw header again")
 }
 

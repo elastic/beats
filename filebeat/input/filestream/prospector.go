@@ -231,7 +231,7 @@ func (p *fileProspector) Init(
 			// alive so the next scan's migrate path can pick it up).
 			//
 			// We preserve ONLY when there's a current file that has already
-			// crossed the threshold (Fingerprint.Complete) and whose raw
+			// crossed the threshold (Fingerprint.Complete()) and whose raw
 			// header has this entry's stored fingerprint as a STRICT prefix.
 			// A completed file carrying raw material that extends a stored
 			// growing entry is strong evidence of a rename + threshold
@@ -252,7 +252,7 @@ func (p *fileProspector) Init(
 				return true
 			}
 			for _, desc := range files {
-				if desc.Fingerprint.Complete && isStrictPrefix(desc.Fingerprint.Raw, storedFP) {
+				if desc.Fingerprint.Complete() && isStrictPrefix(desc.Fingerprint.Raw, storedFP) {
 					return false // possible rename + threshold crossing, preserve
 				}
 			}
@@ -601,7 +601,7 @@ func isStrictPrefix(target, prefix string) bool {
 // prefix matching and must be byte-identical on disk to static fingerprint
 // entries.
 func growingRawFingerprint(d loginp.FileDescriptor) string {
-	if d.Fingerprint.Complete {
+	if d.Fingerprint.Complete() {
 		return ""
 	}
 	return d.Fingerprint.Raw
@@ -661,7 +661,7 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 	// No fingerprint material - nothing to match. Check the fields directly
 	// instead of Key(), which would hash Raw on every growing-mode event.
 	fp := event.Descriptor.Fingerprint
-	if !fp.Complete && fp.Raw == "" {
+	if !fp.Complete() && fp.Raw == "" {
 		return src
 	}
 
@@ -801,7 +801,7 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 	// recover a restart+rename where the stored entry still holds the OLD path.
 	// isLikelyRename filters the candidates so a file still present on disk (a
 	// real collision, not a rename) is not picked over a genuinely renamed one.
-	if event.Descriptor.Fingerprint.Complete {
+	if event.Descriptor.Fingerprint.Complete() {
 		if key, _, ok := p.shortFingerprints.FindPrefixMatchFunc(raw, isLikelyRename); ok {
 			return key, true
 		}

@@ -37,7 +37,7 @@ func TestSameFile(t *testing.T) {
 
 	growing := func(raw string) FingerprintID { return FingerprintID{Raw: raw} }
 	complete := func(sum, raw string) FingerprintID {
-		return FingerprintID{Complete: true, Sum: sum, Raw: raw}
+		return FingerprintID{Sum: sum, Raw: raw}
 	}
 
 	cases := map[string]struct {
@@ -109,7 +109,7 @@ func TestFingerprintIDKey(t *testing.T) {
 			want: "",
 		},
 		"completed fingerprint keys on its SHA-256 sum": {
-			id:   FingerprintID{Complete: true, Sum: "deadbeef", Raw: "aabbccdd"},
+			id:   FingerprintID{Sum: "deadbeef", Raw: "aabbccdd"},
 			want: "deadbeef",
 		},
 		"growing fingerprint keys on a bounded hash of Raw": {
@@ -143,12 +143,12 @@ func TestFingerprintIDContinues(t *testing.T) {
 		},
 		"crossing continues via completed Raw": {
 			prev:    FingerprintID{Raw: "aabb"},
-			current: FingerprintID{Complete: true, Sum: "1111", Raw: "aabbccdd"},
+			current: FingerprintID{Sum: "1111", Raw: "aabbccdd"},
 			want:    true,
 		},
 		"completed current with dropped Raw does not continue": {
 			prev:    FingerprintID{Raw: "aabb"},
-			current: FingerprintID{Complete: true, Sum: "1111"},
+			current: FingerprintID{Sum: "1111"},
 			want:    false,
 		},
 		"unrelated does not continue": {

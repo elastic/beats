@@ -61,38 +61,28 @@ func (o Operation) String() string {
 }
 
 // FingerprintID is the file-identity material derived from the fingerprint
-// region bytes[offset:offset+length]. It is self-describing: a single value
-// carries everything the watcher, the prospector and the registry key need,
-// so no caller has to branch on a separate "is this growing?" flag.
+// region bytes[offset:offset+length].
 type FingerprintID struct {
-	// Raw is the hex-encoded fingerprint region read so far
-	// (bytes[offset:offset+min(size,length)]). It is the matching material: a
-	// growing file extends Raw, so a previous (shorter) Raw is a prefix of the
-	// current one. The scanner sets Raw only in growing mode; static-mode and
-	// retained-but-completed descriptors leave it empty (matching falls back
-	// to the SHA-256 identity). Empty when no fingerprint was computed.
+	// Raw is the hex-encoded fingerprint region read so far.
+	// A growing file extends Raw, so a previous (shorter) Raw is a prefix of the current one.
+	// Empty when no fingerprint was computed.
 	Raw string
-	// Complete is true once Raw covers the full configured length, i.e. the
-	// file reached offset+length and Sum holds the final SHA-256.
-	Complete bool
-	// Sum is hex(sha256(bytes[offset:offset+length])), set only when Complete.
-	// It is the durable registry identity — byte-identical to the value the
-	// static (non-growing) fingerprint produces.
+	// Sum is hex(sha256(bytes[offset:offset+length])), set once the file has at
+	// least offset+length bytes. Empty while the file is still growing.
 	Sum string
 }
 
-// Key returns the registry/identity key for this fingerprint, or "" when no
-// fingerprint is available (the caller then falls back to the OS file state).
-//
-// A completed fingerprint keys on its SHA-256, identical to the static
-// fingerprint identity so existing state is reused with no duplication. A
-// still-growing fingerprint keys on a bounded hash of Raw: the raw header can
-// be up to 2*length characters and the registry key is rewritten on every
-// cursor checkpoint, so hashing keeps the memlog WAL small. The raw value is
-// persisted in the entry instead, so prefix matching survives restarts.
+// Complete reports whether the fingerprint covers the full configured length,
+// which is exactly when the final SHA-256 Sum is set.
+func (f FingerprintID) Complete() bool { return f.Sum != "" }
+
+// Key returns the registry/identity key for this fingerprint:
+// - The complete Sum when it's available.
+// - A SHA-256 hash of Raw when it's incomplete.
+// - "" when no fingerprint is available.
 func (f FingerprintID) Key() string {
 	switch {
-	case f.Complete:
+	case f.Complete():
 		return f.Sum
 	case f.Raw != "":
 		sum := sha256.Sum256([]byte(f.Raw))
@@ -102,15 +92,10 @@ func (f FingerprintID) Key() string {
 	}
 }
 
-// Continues reports whether current represents the same file as f observed
-// later with at least as much content: f's raw fingerprint material is a
-// prefix of current's. This single relation drives growing-mode rename and
-// threshold-crossing detection — current.Raw still carries the full header on
-// the scan a file crosses the threshold, so the same prefix test bridges the
-// transition to the SHA-256 identity. Returns false when f has no raw material
-// (a completed entry whose Raw was dropped, or a static-mode entry).
-func (f FingerprintID) Continues(current FingerprintID) bool {
-	return f.Raw != "" && strings.HasPrefix(current.Raw, f.Raw)
+// Continues reports whether current represents the same file as f observed later with at least as
+// much content: f's raw fingerprint material is a prefix of next's.
+func (f FingerprintID) Continues(next FingerprintID) bool {
+	return f.Raw != "" && strings.HasPrefix(next.Raw, f.Raw)
 }
 
 // FileDescriptor represents full information about a file.
@@ -159,7 +144,7 @@ func (fd FileDescriptor) SizeOrBytesIngested() int64 {
 // file crosses the threshold — SameFile bridges that transition via Continues.
 func (fd FileDescriptor) FileID() string {
 	switch {
-	case fd.Fingerprint.Complete:
+	case fd.Fingerprint.Complete():
 		return fd.Fingerprint.Sum
 	case fd.Fingerprint.Raw != "":
 		return fd.Fingerprint.Raw
