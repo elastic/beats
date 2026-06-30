@@ -66,12 +66,14 @@ func TestFlowsCounting(t *testing.T) {
 	assert.NoError(t, err)
 
 	pub := &flowsChan{make(chan []beat.Event, 1)}
+	logger := logptest.NewTestingLogger(t, "")
 
 	processor := &flowsProcessor{
 		table:    module.table,
 		watcher:  &procs.ProcessesWatcher{},
 		counters: module.counterReg,
 		timeout:  20 * time.Millisecond,
+		logger:   logger,
 	}
 	processor.spool.init(pub.PublishFlows, 1)
 
@@ -81,7 +83,7 @@ func TestFlowsCounting(t *testing.T) {
 		1,
 		-1,
 		0,
-		logptest.NewTestingLogger(t, ""),
+		logger,
 	)
 	if err != nil {
 		t.Fatalf("Failed to create flow worker: %v", err)

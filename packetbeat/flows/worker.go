@@ -201,7 +201,7 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 			// Wait until the current time rounded up to nearest align seconds.
 			aligned := time.Unix(((time.Now().Unix()+(align-1))/align)*align, 0)
 			waitStart := time.Until(aligned)
-			logger.Debug("worker wait start(%v): %v", aligned, waitStart)
+			logger.Debugf("worker wait start(%v): %v", aligned, waitStart)
 			if cont := w.sleep(waitStart); !cont {
 				return
 			}
