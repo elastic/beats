@@ -14,7 +14,7 @@ linters:
     - exhaustruct
     - forbidigo
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - gosec
     - govet
     - importas
@@ -89,8 +89,9 @@ linters:
         - github.com/meraki/dashboard-api-go/v3
         - github.com/snowflakedb/gosnowflake
       replace-local: false
-    gomodguard:
+    gomodguard_v2:
       blocked:
+<<<<<<< HEAD
         modules:
           - github.com/pkg/errors:
               recommendations:
@@ -105,6 +106,25 @@ linters:
               recommendations:
                 - github.com/gofrs/uuid/v5
               reason: Use one uuid library consistently across the codebase
+=======
+        - module: github.com/pkg/errors
+          recommendations:
+            - errors
+            - fmt
+          reason: This package is deprecated, use `fmt.Errorf` with `%w` instead
+        - module: go.uber.org/multierr
+          recommendations:
+            - errors
+          reason: This package is deprecated, use `errors.Join` instead
+        - module: gotest.tools/v3
+          recommendations:
+            - github.com/stretchr/testify
+          reason: Use one assertion library consistently across the codebase
+        - module: github.com/google/uuid
+          recommendations:
+            - github.com/gofrs/uuid/v5
+          reason: Use one uuid library consistently across the codebase
+>>>>>>> c4c590a1d (ci: fix golangci-lint deprecation warning and increase timeout (#51636))
     gosec:
       excludes:
         - G306
