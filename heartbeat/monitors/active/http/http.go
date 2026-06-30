@@ -25,23 +25,27 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 func init() {
 	plugin.Register("http", create, "synthetics/http")
 }
 
+var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
+
 // Create makes a new HTTP monitor
 func create(
 	name string,
 	cfg *conf.C,
-	info beat.Info,
+	_ beat.Info,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -80,13 +84,13 @@ func create(
 	// we execute DNS resolution requests inline with the request, not running them as a separate job, and not returning
 	// separate DNS rtt data.
 	if (config.Transport.Proxy.URL != nil && !config.Transport.Proxy.Disable) || config.MaxRedirects > 0 {
-		transport, err := newRoundTripper(&config, info.UserAgent)
+		transport, err := newRoundTripper(&config, userAgent)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator, info.UserAgent)
+			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator, userAgent)
 		}
 	} else {
 		// preload TLS configuration
@@ -98,7 +102,7 @@ func create(
 		config.Transport.TLS = nil
 
 		makeJob = func(urlStr string) (jobs.Job, error) {
-			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, info.UserAgent)
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator, userAgent)
 		}
 	}
 
