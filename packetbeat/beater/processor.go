@@ -307,7 +307,7 @@ func setupSniffer(
 		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
 	}
 
-	return sniffer.New(id, false, "", decoders, interfaces, reporter, closers...)
+	return sniffer.New(id, false, "", decoders, interfaces, reporter, logger, closers...)
 }
 
 // CheckConfig performs a dry-run creation of a Packetbeat pipeline based
