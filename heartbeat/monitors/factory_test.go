@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 
@@ -35,10 +36,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 )
 
-var binfo = beat.Info{
-	Beat:        "heartbeat",
-	IndexPrefix: "heartbeat",
-	Version:     "8.0.0",
+func testBeatInfo(t *testing.T) beat.Info {
+	t.Helper()
+	return beat.Info{
+		Beat:        "heartbeat",
+		IndexPrefix: "heartbeat",
+		Version:     "8.0.0",
+		Logger:      logptest.NewTestingLogger(t, ""),
+	}
 }
 
 func TestPreProcessors(t *testing.T) {
@@ -136,7 +141,7 @@ func TestPreProcessors(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			e := beat.Event{Meta: mapstr.M{}, Fields: mapstr.M{}}
-			procs, err := preProcessors(binfo, tt.location, tt.settings, tt.monitorType)
+			procs, err := preProcessors(testBeatInfo(t), tt.location, tt.settings, tt.monitorType)
 			if tt.wantErr == true {
 				require.Error(t, err)
 				return
@@ -229,7 +234,7 @@ func TestDisabledMonitor(t *testing.T) {
 		require.NoError(t, err)
 
 		reg, built, closed := mockPluginsReg()
-		f, sched, fClose := makeMockFactory(reg)
+		f, sched, fClose := makeMockFactory(t, reg)
 		defer fClose()
 		defer sched.Stop()
 		runner, err := f.Create(&MockPipeline{}, conf)
@@ -280,7 +285,7 @@ func TestRunFrom(t *testing.T) {
 		reg, _, _ := mockPluginsReg()
 		mockPipeline := &MockPipeline{}
 
-		f, sched, fClose := makeMockFactory(reg)
+		f, sched, fClose := makeMockFactory(t, reg)
 		defer fClose()
 		defer sched.Stop()
 
@@ -312,7 +317,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	reg, built, closed := mockPluginsReg()
 	mockPipeline := &MockPipeline{}
 
-	f, sched, fClose := makeMockFactory(reg)
+	f, sched, fClose := makeMockFactory(t, reg)
 	defer fClose()
 	defer sched.Stop()
 
@@ -329,7 +334,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil)
+	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil, logptest.NewTestingLogger(t, ""))
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id
