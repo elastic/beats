@@ -214,7 +214,7 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 		w.periodically(tick, func() error {
 			nTimeout--
 			nPeriod--
-			logger.Debug("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
+			logger.Debugf("worker tick, nTimeout=%v, nPeriod=%v", nTimeout, nPeriod)
 
 			handleTimeout := nTimeout == 0
 			if handleTimeout {

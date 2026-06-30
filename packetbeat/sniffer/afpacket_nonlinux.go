@@ -22,9 +22,10 @@ package sniffer
 import (
 	"errors"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var errAFPacketLinuxOnly = errors.New("af_packet MMAP sniffing is only available on Linux")

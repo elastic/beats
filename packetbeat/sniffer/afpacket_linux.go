@@ -57,7 +57,7 @@ func newAfpacketHandle(c afPacketConfig, log *logp.Logger) (*afpacketHandle, err
 		}
 
 		if !promiscEnabled {
-			if setPromiscErr := setPromiscMode(c.Device, true); setPromiscErr != nil {
+			if setPromiscErr := setPromiscMode(c.Device, true, log); setPromiscErr != nil {
 				log.Warnf("Failed to set promiscuous mode for device '%s'. "+
 					"Packetbeat may be unable to see any network traffic. Please follow packetbeat "+
 					"FAQ to learn about mitigation: Error: %v", c.Device, err)
@@ -133,7 +133,7 @@ func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
 	// previous state detected only if auto mode was on
 	if h.promiscPreviousStateDetected {
-		if err := setPromiscMode(h.device, h.promiscPreviousState); err != nil {
+		if err := setPromiscMode(h.device, h.promiscPreviousState, h.log); err != nil {
 			h.log.Warnf("Failed to reset promiscuous mode for device '%s'. Your device might be in promiscuous mode.: %v", h.device, err)
 		}
 	}
@@ -165,9 +165,9 @@ func isPromiscEnabled(device string) (bool, error) {
 }
 
 // setPromiscMode enables promisc mode if configured. This is a no-op when device is 'any'.
-func setPromiscMode(device string, enabled bool) error {
+func setPromiscMode(device string, enabled bool, logger *logp.Logger) error {
 	if device == "any" {
-		logp.L().Named("sniffer").Warn("Cannot set promiscuous mode for device 'any'")
+		logger.Named("sniffer").Warn("Cannot set promiscuous mode for device 'any'")
 		return nil
 	}
 
