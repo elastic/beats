@@ -33,14 +33,8 @@ func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) *logp.Logger {
 		zap.String("operation", event.Op.String()),
 		zap.String("source_file", event.SrcID),
 	)
-	// Log the fingerprint material directly rather than via Key(): this runs on
-	// every event (even when the debug line is not emitted), and Key() would
-	// hash Raw on the growing-mode hot path. Sum/Raw are already-allocated
-	// strings, so this is allocation-free.
 	if fp := event.Descriptor.Fingerprint; fp.Complete {
 		fields = append(fields, zap.String("fingerprint", fp.Sum))
-	} else if fp.Raw != "" {
-		fields = append(fields, zap.String("fingerprint", fp.Raw))
 	}
 	if info := event.Descriptor.Info; info != nil {
 		if osID := info.GetOSState().Identifier(); osID != "" {
