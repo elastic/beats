@@ -176,7 +176,7 @@ func (hg *defaultHarvesterGroup) SetObserver(c chan HarvesterStatus) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Start does not block.
 func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
-	ctx.Logger.Debugf("Starting harvester for %s", src)
+	ctx.Logger.Debugf("Starting harvester for file %s", hg.identifier.ID(src))
 
 	fn := startHarvester(ctx, hg, src, false, hg.metrics, hg.inputID)
 	if fn == nil {
@@ -195,7 +195,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
-	ctx.Logger.Debugf("Restarting harvester for %s", src)
+	ctx.Logger.Debugf("Restarting harvester for file %s", hg.identifier.ID(src))
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
