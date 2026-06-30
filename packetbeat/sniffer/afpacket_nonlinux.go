@@ -22,6 +22,7 @@ package sniffer
 import (
 	"errors"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 )
@@ -30,7 +31,7 @@ var errAFPacketLinuxOnly = errors.New("af_packet MMAP sniffing is only available
 
 type afpacketHandle struct{}
 
-func newAfpacketHandle(_ afPacketConfig) (*afpacketHandle, error) {
+func newAfpacketHandle(_ afPacketConfig, _ *logp.Logger) (*afpacketHandle, error) {
 	return nil, errAFPacketLinuxOnly
 }
 

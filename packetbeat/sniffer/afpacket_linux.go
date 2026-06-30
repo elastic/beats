@@ -46,10 +46,9 @@ type afpacketHandle struct {
 	metrics                      *metrics
 }
 
-func newAfpacketHandle(c afPacketConfig) (*afpacketHandle, error) {
+func newAfpacketHandle(c afPacketConfig, log *logp.Logger) (*afpacketHandle, error) {
 	var err error
 	var promiscEnabled bool
-	log := logp.NewLogger("sniffer")
 
 	if c.Promiscuous {
 		promiscEnabled, err = isPromiscEnabled(c.Device)
