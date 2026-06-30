@@ -105,7 +105,7 @@ func (f *Flows) Unlock() {
 func (f *Flows) Get(id *FlowID) *Flow {
 	f.logger.Debug("get flow")
 	if id.flow.stats == nil {
-		f.logger.Debug("lookup flow: %v => %v", id.flowIDMeta, id.flowID)
+		f.logger.Debugf("lookup flow: %v => %v", id.flowIDMeta, id.flowID)
 		id.flow = f.table.get(id, f.counterReg)
 	}
 	return &id.flow
@@ -129,4 +129,9 @@ func (f *Flows) NewUint(name string) (*Uint, error) {
 
 func (f *Flows) NewFloat(name string) (*Float, error) {
 	return f.counterReg.newFloat(name)
+}
+
+// NewFlowID returns a flow ID builder that logs with the flows logger.
+func (f *Flows) NewFlowID() *FlowID {
+	return newFlowID(f.logger)
 }

@@ -171,7 +171,7 @@ func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16
 	dst.Exe = p.exe
 	dst.StartTime = p.startTime
 	if proc.logger.IsDebug() && proc.logger.HasSelector("procs") {
-		proc.logger.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
+		proc.logger.Named("procs").Debugf("Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
 	}
 }
 
@@ -241,7 +241,7 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 	// it's old enough. When we fail the first time here, our caller
 	// updates all maps and calls us again.
 	if found && now.After(p.expires) {
-		logger.Debug("procs", "PID %d (%s) port %d is too old, discarding", p.pid, p.proc.name, port)
+		logger.Named("procs").Debugf("PID %d (%s) port %d is too old, discarding", p.pid, p.proc.name, port)
 		delete(procMap, key)
 		p = portProcMapping{}
 		found = false
@@ -255,7 +255,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	if proc.logger.IsDebug() && proc.logger.HasSelector("procsdetailed") {
 		start := time.Now()
 		defer func() {
-			proc.logger.Debug("procsdetailed", "updateMap() took %v", time.Since(start))
+			proc.logger.Named("procsdetailed").Debug("procsdetailed", "updateMap() took %v", time.Since(start))
 		}()
 	}
 
@@ -311,7 +311,7 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 	}
 
 	if proc.logger.IsDebug() && proc.logger.HasSelector("procsdetailed") {
-		proc.logger.Debug("procsdetailed", "updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
+		proc.logger.Named("procsdetailed").Debugf("updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
 			e.address, e.port, transport, pid, p.name)
 	}
 }

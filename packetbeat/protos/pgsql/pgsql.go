@@ -33,8 +33,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
-
-	"go.uber.org/zap"
 )
 
 type pgsqlPlugin struct {
@@ -162,8 +160,8 @@ func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.Processes
 	pgsql.setFromConfig(config)
 
 	pgsql.log = logger.Named("pgsql")
-	pgsql.debug = logger.Named("pgsql").With(zap.AddCallerSkip(1))
-	pgsql.detail = logger.Named("pgsqldetailed").With(zap.AddCallerSkip(1))
+	pgsql.debug = logger.Named("pgsql")
+	pgsql.detail = logger.Named("pgsqldetailed")
 	pgsql.isDebug, pgsql.isDetail = logger.HasSelector("pgsql"), logger.HasSelector("pgsqldetailed")
 
 	pgsql.transactions = common.NewCache(

@@ -38,8 +38,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-
-	"go.uber.org/zap"
 )
 
 type parserState uint8
@@ -138,8 +136,8 @@ func (http *httpPlugin) init(
 	http.setFromConfig(config)
 
 	http.log = logger.Named("http")
-	http.debug = logger.Named("http").With(zap.AddCallerSkip(1))
-	http.detail = logger.Named("httpdetailed").With(zap.AddCallerSkip(1))
+	http.debug = logger.Named("http")
+	http.detail = logger.Named("httpdetailed")
 	http.isDebug = logger.IsDebug() && logger.HasSelector("http")
 	http.isDetailed = logger.IsDebug() && logger.HasSelector("httpdetailed")
 	http.results = results

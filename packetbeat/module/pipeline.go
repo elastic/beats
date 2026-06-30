@@ -40,8 +40,6 @@ var PipelinesFS *embed.FS
 
 var errNoFS = errors.New("no embedded file system")
 
-const logName = "pipeline"
-
 type pipeline struct {
 	id       string
 	contents map[string]interface{}
@@ -56,7 +54,7 @@ func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwrite
 	if err != nil {
 		return nil, err
 	}
-	return load(esClient, pipelines, overwritePipelines, info.Logger)
+	return load(esClient, pipelines, overwritePipelines, info.Logger.Named("pipeline"))
 }
 
 // readAll reads pipelines from the the embedded filesystem and

@@ -65,7 +65,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	if err = pids.Get(); err != nil {
 		return nil, err
 	}
-	proc.logger.Debug("procs", "getLocalPortsToPIDs()")
+	proc.logger.Named("procs").Debug("getLocalPortsToPIDs()")
 	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false, proc.logger)
 	if err != nil {
 		proc.logger.Errorf("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
@@ -136,14 +136,14 @@ func findSocketsOfPid(prefix string, pid int, logger *logp.Logger) (inodes []uin
 	for _, name := range names {
 		link, err := os.Readlink(filepath.Join(dirname, name))
 		if err != nil {
-			logger.Debug("procs", "%s", err.Error())
+			logger.Named("procs").Debugf("%s", err.Error())
 			continue
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
 			inode, err := strconv.ParseUint(link[8:len(link)-1], 10, 64)
 			if err != nil {
-				logger.Debug("procs", "%s", err.Error())
+				logger.Named("procs").Debugf("%s", err.Error())
 				continue
 			}
 
@@ -188,19 +188,19 @@ func parseProcNetProto(input io.Reader, ipv6 bool, logger *logp.Logger) ([]*sock
 			continue
 		}
 		if len(words) < 10 {
-			logger.Debug("procs", "Less than 10 words (%d) or starting with 'sl': %s", len(words), words)
+			logger.Named("procs").Debugf("Less than 10 words (%d) or starting with 'sl': %s", len(words), words)
 			continue
 		}
 
 		var sock socketInfo
 		sock.srcIP, sock.srcPort, err = hexToIPPort(words[1], ipv6)
 		if err != nil {
-			logger.Debug("procs", "Error parsing IP and port: %s", err)
+			logger.Named("procs").Debugf("Error parsing IP and port: %s", err)
 			continue
 		}
 		sock.dstIP, sock.dstPort, err = hexToIPPort(words[2], ipv6)
 		if err != nil {
-			logger.Debug("procs", "Error parsing IP and port: %s", err)
+			logger.Named("procs").Debugf("Error parsing IP and port: %s", err)
 			continue
 		}
 

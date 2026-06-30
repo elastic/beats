@@ -121,7 +121,7 @@ func New(
 			return nil, err
 		}
 
-		d.flowID = &flows.FlowID{}
+		d.flowID = f.NewFlowID()
 	}
 
 	d.AddLayers([]gopacket.DecodingLayer{
