@@ -658,17 +658,12 @@ func (p *fileProspector) handleGrowingFingerprintLookup(
 	event loginp.FSEvent,
 	src loginp.Source,
 	updater loginp.StateMetadataUpdater) loginp.Source {
-	// No fingerprint material - nothing to match. Check the fields directly
-	// instead of Key(), which would hash Raw on every growing-mode event.
-	fp := event.Descriptor.Fingerprint
-	if !fp.Complete() && fp.Raw == "" {
-		return src
+	if !event.Descriptor.Fingerprint.Complete() && event.Descriptor.Fingerprint.Raw == "" {
+		return src // No fingerprint material
 	}
 
-	// Fast path: if the current fingerprint key already exists, no migration
-	// needed.
 	if updater.KeyExists(event.SrcID) {
-		return src
+		return src // The current fingerprint key already exists, no migration needed.
 	}
 
 	// Try to find a prefix match against the event's raw fingerprint material.
