@@ -207,7 +207,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 	var watch procs.ProcessesWatcher
 	// Enable the process watcher only if capturing live traffic
 	if config.Interfaces[0].File == "" {
-		err = watch.Init(config.Procs)
+		err = watch.Init(config.Procs, p.logger)
 		if err != nil {
 			p.logger.Warn("%s", err.Error())
 			return 0, nil, nil, nil, nil, err

@@ -122,7 +122,7 @@ func NewAgentConfig(cfg *conf.C, logger *logp.Logger) (Config, error) {
 		return config, err
 	}
 
-	logger.Debug("agent", "Found %d inputs", len(input.Streams))
+	logger.Debugf("agent", "Found %d inputs", len(input.Streams))
 	for _, stream := range input.Streams {
 		if interfaceOverride, ok := stream["interface"]; ok {
 			cfg, err := conf.NewConfigFrom(interfaceOverride)
@@ -153,7 +153,7 @@ func NewAgentConfig(cfg *conf.C, logger *logp.Logger) (Config, error) {
 			if !ok {
 				return config, fmt.Errorf("invalid input type of: '%T'", rawStreamType)
 			}
-			logger.Debug("agent", "Found agent configuration for %v", streamType)
+			logger.Debugf("agent", "Found agent configuration for %v", streamType)
 			cfg, err := conf.NewConfigFrom(stream)
 			if err != nil {
 				return config, err
