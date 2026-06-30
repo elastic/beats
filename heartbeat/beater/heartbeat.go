@@ -54,7 +54,7 @@ type Heartbeat struct {
 	config             *config.Config
 	scheduler          *scheduler.Scheduler
 	monitorReloader    *cfgfile.Reloader
-	monitorFactory     *monitors.RunnerFactory
+	monitorFactory     cfgfile.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
 	trace              tracer.Tracer
@@ -170,6 +170,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	bt.logger.Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
+	if bt.otelStatusFactoryWrapper != nil {
+		bt.monitorFactory = bt.otelStatusFactoryWrapper(bt.monitorFactory)
+	}
+
 	waitMonitors := monitors.NewSignalWait()
 
 	// It is important this appear before we check for run once mode
@@ -200,7 +204,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 	// Configure the beats Manager to start after all the reloadable hooks are initialized
 	// and shutdown when the function return.
-	if err := b.Manager.Start(); err != nil {
+	if err := b.Manager.Start(); err != nil { //nolint:staticcheck // b.Manager.Start is deprecated in favour of PreInit/PostInit; refactor is deferred
 		return err
 	}
 
@@ -361,7 +365,6 @@ func makeESClient(
 	}
 
 	for i := 0; i < attempts; i++ {
-		// TODO: use local logger here
 		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat", logger)
 		if err == nil {
 			connectDelay.Reset()
