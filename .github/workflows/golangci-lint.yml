@@ -10,6 +10,7 @@ on:
       - '**/*.go'
       - '**/go.mod'
       - '**/go.sum'
+      - '.go-version'
       - '.golangci.yml'
       - '.github/workflows/golangci-lint.yml'
 
