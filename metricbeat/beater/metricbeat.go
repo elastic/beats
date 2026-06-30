@@ -178,7 +178,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 
 	if b.API != nil {
 		if err := inputmon.AttachHandler(b.API.Router(), b.Monitoring.InputsRegistry()); err != nil {
-			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+			return nil, fmt.Errorf("failed to attach input API to monitoring endpoint server: %w", err)
 		}
 	}
 	return metricbeat, nil

@@ -23,8 +23,10 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -249,6 +251,8 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 				logRecord.Attributes().PutStr("data_stream."+sub, vStr)
 			}
 		}
+		// temporary workaround for https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/49337
+		applyNonStandardDataStreamIndex(logRecord, ds)
 	}
 
 	bodyMap := logRecord.Body().SetEmptyMap()
@@ -278,6 +282,48 @@ func fillLogRecordFromEvent(logRecord plog.LogRecord, event publisher.Event, bea
 		}
 	}
 	return nil
+}
+
+// applyNonStandardDataStreamIndex is a WORKAROUND: elasticsearchexporter's MappingBodyMap
+// mode only routes data_stream.type "logs" and "metrics" via data_stream.* attributes; other
+// types (e.g. "synthetics") are rejected. This sets elasticsearch.index directly to bypass
+// that restriction. Remove this function and sanitizeDataStreamField when upstream adds support.
+func applyNonStandardDataStreamIndex(logRecord plog.LogRecord, ds mapstr.M) {
+	const (
+		// esIndexAttribute matches elasticsearchexporter/internal/elasticsearch.IndexAttributeName.
+		esIndexAttribute = "elasticsearch.index"
+
+		// maxDataStreamBytes and disallowed* mirror the sanitisation constants in
+		// elasticsearchexporter so the computed index name matches exactly.
+		maxDataStreamBytes       = 100
+		disallowedNamespaceRunes = `\/*?"<>| ,#:`
+		disallowedDatasetRunes   = `-\/*?"<>| ,#:`
+	)
+	dsType, _ := ds["type"].(string)
+	if dsType == "" || dsType == "logs" || dsType == "metrics" {
+		return
+	}
+	dataset, _ := ds["dataset"].(string)
+	namespace, _ := ds["namespace"].(string)
+	sanitizedDataset := sanitizeDataStreamField(dataset, disallowedDatasetRunes, maxDataStreamBytes)
+	sanitizedNamespace := sanitizeDataStreamField(namespace, disallowedNamespaceRunes, maxDataStreamBytes)
+	logRecord.Attributes().PutStr(esIndexAttribute, fmt.Sprintf("%s-%s-%s", dsType, sanitizedDataset, sanitizedNamespace))
+}
+
+// sanitizeDataStreamField mirrors elasticsearchexporter's sanitizeDataStreamField:
+// it lower-cases the value, replaces disallowed runes with '_', and truncates to 100 bytes.
+// No suffix is appended (MappingBodyMap never adds one).
+func sanitizeDataStreamField(field, disallowed string, maxLength int) string {
+	field = strings.Map(func(r rune) rune {
+		if strings.ContainsRune(disallowed, r) {
+			return '_'
+		}
+		return unicode.ToLower(r)
+	}, field)
+	if len(field) > maxLength {
+		field = field[:maxLength]
+	}
+	return field
 }
 
 func tryToMapStr(v interface{}) (mapstr.M, bool) {

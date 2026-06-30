@@ -44,11 +44,11 @@ func init() {
 func create(
 	name string,
 	commonConfig *conf.C,
-	_ beat.Info,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
 	loop, err := getStdLoop()
 	if err != nil {
-		logp.Warn("Failed to initialize ICMP loop %v", err)
+		info.Logger.Warnf("Failed to initialize ICMP loop %v", err)
 		return plugin.Plugin{}, err
 	}
 

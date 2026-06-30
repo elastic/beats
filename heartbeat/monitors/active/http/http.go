@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -45,7 +44,7 @@ var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), ve
 func create(
 	name string,
 	cfg *conf.C,
-	_ beat.Info,
+	info beat.Info,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -72,7 +71,7 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator, err := makeValidateResponse(&config.Check.Response)
+	validator, err := makeValidateResponse(&config.Check.Response, info.Logger)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
@@ -94,8 +93,7 @@ func create(
 		}
 	} else {
 		// preload TLS configuration
-		// TODO: Use local logger
-		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, logp.NewLogger(""))
+		tls, err := tlscommon.LoadTLSConfig(config.Transport.TLS, info.Logger)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
@@ -123,7 +121,7 @@ func create(
 		js[i] = wraputil.WithURLField(u, job)
 	}
 
-	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts)}, nil
+	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts), Logger: info.Logger}, nil
 }
 
 func newRoundTripper(config *Config, userAgent string) (http.RoundTripper, error) {

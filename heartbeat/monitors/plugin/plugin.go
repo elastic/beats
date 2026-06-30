@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
@@ -55,6 +56,7 @@ type Plugin struct {
 	DoClose   func() error
 	DoUpdate  PluginUpdate
 	Endpoints int
+	Logger    *logp.Logger
 }
 
 // Close closes the plugin, invoking any DoClose hooks if available.
@@ -75,7 +77,7 @@ func (p Plugin) Update(c *conf.C) error {
 
 // RunWrapped runs the plug-in with the provided wrappers returning a channel of resultant events.
 func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
-	wj := wrappers.WrapCommon(p.Jobs, fields, nil)
+	wj := wrappers.WrapCommon(p.Jobs, fields, nil, p.Logger)
 	results := make(chan *beat.Event)
 
 	var runJob func(j jobs.Job)
