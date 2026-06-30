@@ -1,9 +1,0 @@
-kind: bug-fix
-summary: Strip sensitive headers on cross-origin redirects in httpjson and CEL inputs.
-description: |
-  When redirect.forward_headers is true, the Authorization, Proxy-Authorization,
-  and Cookie headers are now automatically removed on redirects that cross to a
-  different host or downgrade from HTTPS to HTTP. A new redirect.sensitive_headers
-  configuration option controls which headers are stripped; set it to [] to restore
-  the previous behaviour of forwarding all headers unconditionally.
-component: filebeat
