@@ -39,18 +39,11 @@ import (
 const testTableName = "cursor_test_events"
 
 // newMetricSetWithPaths creates a MetricSet with custom paths for cursor storage.
-// It sets the global paths.Paths.Data to the test's data directory so that
-// GetCursorRegistry resolves to the correct temp path, and uses t.Cleanup
-// to restore the original value when the test completes.
+// The per-instance *paths.Path is passed straight to the module so cursor state
+// resolves under the per-test temp directory, without relying on any global
+// paths singleton.
 func newMetricSetWithPaths(t *testing.T, config map[string]interface{}, p *paths.Path) mb.MetricSet {
 	t.Helper()
-
-	// Override the global data path so GetCursorRegistry creates its
-	// registry under the per-test temp directory instead of the shared
-	// process-level path.
-	origData := paths.Paths.Data
-	paths.Paths.Data = p.Data
-	t.Cleanup(func() { paths.Paths.Data = origData })
 
 	c, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)

@@ -74,8 +74,9 @@ func TestGetCursorRegistryReturnsSamePointer(t *testing.T) {
 		"Repeated calls on the same module must return cached registry")
 }
 
-// TestGetCursorRegistryPathChange verifies that changing paths.Paths.Data
-// causes GetCursorRegistry to create a new registry at the new location.
+// TestGetCursorRegistryPathChange verifies that using a module with a different
+// per-instance data path causes GetCursorRegistry to create a new registry at
+// the new location.
 func TestGetCursorRegistryPathChange(t *testing.T) {
 	tmpPaths1 := paths.New()
 	tmpPaths1.Data = t.TempDir()
