@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/entcollect"
@@ -47,6 +48,11 @@ func (a *StateStoreAdapter) Set(key string, value any) error {
 	// preserve json.RawMessage semantics (it treats []byte as a byte
 	// array). Decode into a generic value so the encoder gets a
 	// proper Go type.
+	//
+	// Precision: the values stored via this path are cursor strings,
+	// ISO timestamps, []string ID sets, and small counters. No
+	// integers exceed 0x1p53, we only store shard index values here,
+	// so float64 round-trip is safe.
 	if raw, ok := value.(json.RawMessage); ok {
 		var decoded any
 		if err := json.Unmarshal(raw, &decoded); err != nil {
@@ -62,14 +68,10 @@ func (a *StateStoreAdapter) Set(key string, value any) error {
 }
 
 func (a *StateStoreAdapter) Delete(key string) error {
-	has, err := a.store.Has(key)
-	if err != nil {
-		return fmt.Errorf("state store delete check %q: %w", key, err)
-	}
-	if !has {
+	err := a.store.Remove(key)
+	if err != nil && isKeyUnknown(err) {
 		return nil
 	}
-	err = a.store.Remove(key)
 	if err != nil {
 		return fmt.Errorf("state store delete %q: %w", key, err)
 	}
@@ -83,13 +85,20 @@ func (a *StateStoreAdapter) Each(fn func(key string, decode func(any) error) (bo
 }
 
 // isKeyUnknown checks whether err represents a key-not-found from
-// any statestore backend. All backends (ES, memlog, otelstorage)
-// use "key unknown" as the error message for missing keys.
+// any statestore backend. The memlog and otelstorage backends use
+// "key unknown" as the error message for missing keys. The ES
+// backend's baseStore.Remove discards the HTTP status code and
+// propagates a formatted error containing "404 Not Found" (see
+// libbeat/statestore/backend/es/base.go Remove). We match both.
 func isKeyUnknown(err error) bool {
 	var opErr *statestore.ErrorOperation
 	if errors.As(err, &opErr) {
 		cause := opErr.Unwrap()
-		return cause != nil && cause.Error() == "key unknown"
+		if cause == nil {
+			return false
+		}
+		msg := cause.Error()
+		return msg == "key unknown" || strings.Contains(msg, "404 Not Found")
 	}
 	return false
 }

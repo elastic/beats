@@ -270,6 +270,13 @@ func (r *strictRegistry) Access(_ string) (backend.Store, error) {
 
 func (r *strictRegistry) Close() error { return nil }
 
+// TestStateStoreAdapter_DeleteAbsent_StrictBackend is a regression test
+// for the ES backend's non-compliant Remove behaviour. The ES backend's
+// baseStore.Remove discards the (status, body) return from eslegclient
+// and propagates an opaque "404 Not Found: ..." error when deleting a
+// missing document, violating the storecompliance contract that says
+// Remove should not error on unknown keys. The adapter must detect this
+// error shape and return nil.
 func TestStateStoreAdapter_DeleteAbsent_StrictBackend(t *testing.T) {
 	store := newTestStoreStrict(t)
 	a := NewStateStoreAdapter(store)
