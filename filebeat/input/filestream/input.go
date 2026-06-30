@@ -25,6 +25,7 @@ import (
 	"slices"
 	"time"
 
+	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/go-concert/ctxtool"
@@ -142,7 +143,7 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
 	state := initState(log, cursor, fs)
 
 	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
@@ -430,13 +431,17 @@ func (inp *filestream) readFromSource(
 func (inp *filestream) isDroppedLine(log *logp.Logger, line string) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
-			log.Debug("Drop line as it does not match any of the include patterns %s", line)
+			if log.IsDebug() {
+				log.Debug("Drop line as it does not match any of the include patterns %s", line)
+			}
 			return true
 		}
 	}
 	if len(inp.readerConfig.ExcludeLines) > 0 {
 		if matchAny(inp.readerConfig.ExcludeLines, line) {
-			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
+			if log.IsDebug() {
+				log.Debug("Drop line as it does match one of the exclude patterns%s", line)
+			}
 			return true
 		}
 	}
