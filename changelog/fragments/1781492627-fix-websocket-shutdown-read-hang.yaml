@@ -1,3 +1,0 @@
-kind: bug-fix
-summary: Fix WebSocket input hanging on shutdown when server stalls and keep_alive is disabled.
-component: filebeat
