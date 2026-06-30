@@ -31,6 +31,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-lookslike"
@@ -48,7 +49,8 @@ import (
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
-func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func makeMockFactory(t *testing.T, pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+	t.Helper()
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -62,7 +64,7 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
-		Logger:          logp.NewNopLogger(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 	}
 
 	sched = scheduler.Create(
@@ -71,7 +73,7 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		time.Local,
 		nil,
 		true,
-		logp.NewNopLogger(),
+		logptest.NewTestingLogger(t, ""),
 	)
 	return NewFactory(FactoryParams{
 			BeatInfo:    info,

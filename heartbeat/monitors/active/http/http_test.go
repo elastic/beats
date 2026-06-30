@@ -41,7 +41,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -85,11 +85,11 @@ func sendTLSRequest(t *testing.T, testURL string, useUrls bool, extraConfig map[
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("tls", config, logp.NewNopLogger())
+	p, err := create("tls", config, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil, logp.NewNopLogger())[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "tls", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -325,7 +325,7 @@ func TestLargeResponse(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	logger := logp.NewNopLogger()
+	logger := logptest.NewTestingLogger(t, "")
 	p, err := create("largeresp", config, logger)
 	require.NoError(t, err)
 
@@ -417,7 +417,7 @@ func TestJsonBody(t *testing.T) {
 		},
 	}
 
-	logger := logp.NewNopLogger()
+	logger := logptest.NewTestingLogger(t, "")
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -674,7 +674,7 @@ func TestRedirect(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	logger := logp.NewNopLogger()
+	logger := logptest.NewTestingLogger(t, "")
 	p, err := create("redirect", config, logger)
 	require.NoError(t, err)
 
@@ -747,11 +747,11 @@ func TestRedirectWithTLS(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("redirect-tls", config, logp.NewNopLogger())
+	p, err := create("redirect-tls", config, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logp.NewNopLogger())[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	events, err := jobs.ExecJobAndConts(t, job)
 	require.NoError(t, err)
@@ -798,11 +798,11 @@ func TestNoHeaders(t *testing.T) {
 	config, err := conf.NewConfigFrom(configSrc)
 	require.NoError(t, err)
 
-	p, err := create("http", config, logp.NewNopLogger())
+	p, err := create("http", config, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logp.NewNopLogger())[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -981,11 +981,11 @@ func TestUserAgentInject(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	p, err := create("ua", cfg, logp.NewNopLogger())
+	p, err := create("ua", cfg, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	sched, _ := schedule.Parse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logp.NewNopLogger())[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

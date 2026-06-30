@@ -29,7 +29,7 @@ import (
 	"testing"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
@@ -188,11 +188,11 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	})
 	require.NoError(t, err)
 
-	p, err := createWithResolver(config, resolver, logp.NewNopLogger())
+	p, err := createWithResolver(config, resolver, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil, logp.NewNopLogger())[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1}, nil, logptest.NewTestingLogger(t, ""))[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

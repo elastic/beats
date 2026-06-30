@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestDefaults(t *testing.T) {
@@ -91,7 +91,7 @@ func TestDefaults(t *testing.T) {
 			os.Setenv(c.EnvKey, c.EnvVal)
 			defer os.Unsetenv(c.EnvKey)
 
-			dc := DefaultConfig(logp.NewNopLogger())
+			dc := DefaultConfig(logptest.NewTestingLogger(t, ""))
 			require.NotNil(t, dc.Jobs[c.LimitType])
 			assert.Equal(t, dc.Jobs[c.LimitType].Limit, c.LimitVal)
 		})

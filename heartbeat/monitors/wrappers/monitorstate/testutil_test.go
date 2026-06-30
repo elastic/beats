@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/elastic/beats/v7/heartbeat/esutil"
@@ -37,7 +36,7 @@ import (
 // Helpers for tests here and elsewhere
 
 func IntegESLoader(t *testing.T, esc *eslegclient.Connection, indexPattern string, location *config.LocationWithID) StateLoader {
-	return MakeESLoader(esc, indexPattern, location, logp.NewNopLogger())
+	return MakeESLoader(esc, indexPattern, location, logptest.NewTestingLogger(t, ""))
 }
 
 func IntegES(t *testing.T) (esc *eslegclient.Connection) {

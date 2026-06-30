@@ -76,7 +76,7 @@ var testBrowserMonFields = stdfields.StdMonitorFields{
 func testCommonWrap(t *testing.T, tt testDef) {
 	t.Helper()
 	t.Run(tt.name, func(t *testing.T) {
-		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, logp.NewNopLogger())
+		wrapped := WrapCommon(tt.jobs, tt.sFields, nil, logptest.NewTestingLogger(t, ""))
 
 		log, observedLogs := logptest.NewTestingLoggerWithObserver(t, "t")
 		logger.SetLogger(log)
@@ -706,7 +706,7 @@ func TestECSErrors(t *testing.T) {
 				wrappedECSErr.Error(),
 			)
 
-			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, ecse, projectMonitorValues)}, testBrowserMonFields, nil, logp.NewNopLogger())
+			j := WrapCommon([]jobs.Job{makeProjectBrowserJob(t, "http://example.net", makeSummaryEvent, ecse, projectMonitorValues)}, testBrowserMonFields, nil, logptest.NewTestingLogger(t, ""))
 			event := &beat.Event{}
 			_, err := j[0](event)
 			require.NoError(t, err)
