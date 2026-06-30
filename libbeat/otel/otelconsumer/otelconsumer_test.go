@@ -743,6 +743,141 @@ func newMockES(t *testing.T, handler func(mockesapi.Action, []byte) int) *mockes
 	)
 }
 
+func TestSanitizeDataStreamField(t *testing.T) {
+	cases := []struct {
+		name       string
+		input      string
+		disallowed string
+		want       string
+	}{
+		{
+			name:       "clean value unchanged",
+			input:      "http",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "http",
+		},
+		{
+			name:       "uppercase lowercased",
+			input:      "HTTP",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "http",
+		},
+		{
+			name:       "disallowed rune replaced with underscore",
+			input:      "my dataset",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "my_dataset",
+		},
+		{
+			name:       "multiple disallowed runes replaced",
+			input:      "a*b?c",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "a_b_c",
+		},
+		{
+			name:       "value truncated to maxDataStreamBytes",
+			input:      string(make([]byte, 110)),
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       string(make([]byte, 100)),
+		},
+		{
+			name:       "namespace allows hyphen, dataset does not",
+			input:      "my-namespace",
+			disallowed: `\/*?"<>| ,#:`,
+			want:       "my-namespace",
+		},
+		{
+			name:       "dataset treats hyphen as disallowed",
+			input:      "my-dataset",
+			disallowed: `-\/*?"<>| ,#:`,
+			want:       "my_dataset",
+		},
+	}
+	const maxLength = 100
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := sanitizeDataStreamField(tc.input, tc.disallowed, maxLength)
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestFillLogRecordSetsElasticsearchIndex(t *testing.T) {
+	logger := logp.NewNopLogger()
+	beatInfo := beat.Info{}
+
+	cases := []struct {
+		name      string
+		dsType    string
+		dataset   string
+		namespace string
+		wantIndex string // empty means attribute should not be set
+	}{
+		{
+			name:      "synthetics type sets elasticsearch.index",
+			dsType:    "synthetics",
+			dataset:   "http",
+			namespace: "default",
+			wantIndex: "synthetics-http-default",
+		},
+		{
+			name:      "traces type sets elasticsearch.index",
+			dsType:    "traces",
+			dataset:   "apm.transaction",
+			namespace: "default",
+			wantIndex: "traces-apm.transaction-default",
+		},
+		{
+			name:      "logs type does not set elasticsearch.index",
+			dsType:    "logs",
+			dataset:   "system.syslog",
+			namespace: "default",
+			wantIndex: "",
+		},
+		{
+			name:      "metrics type does not set elasticsearch.index",
+			dsType:    "metrics",
+			dataset:   "system.cpu",
+			namespace: "default",
+			wantIndex: "",
+		},
+		{
+			name:      "synthetics dataset sanitized",
+			dsType:    "synthetics",
+			dataset:   "http monitor",
+			namespace: "my-namespace",
+			wantIndex: "synthetics-http_monitor-my-namespace",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			event := publisher.Event{
+				Content: beat.Event{
+					Fields: mapstr.M{
+						"data_stream": mapstr.M{
+							"type":      tc.dsType,
+							"dataset":   tc.dataset,
+							"namespace": tc.namespace,
+						},
+					},
+				},
+			}
+			logRecord := plog.NewLogRecord()
+			err := fillLogRecordFromEvent(logRecord, event, beatInfo, logger, false)
+			require.NoError(t, err)
+
+			indexAttr, hasIndex := logRecord.Attributes().Get("elasticsearch.index")
+			if tc.wantIndex == "" {
+				assert.False(t, hasIndex, "elasticsearch.index should not be set for type %q", tc.dsType)
+			} else {
+				require.True(t, hasIndex, "elasticsearch.index should be set for type %q", tc.dsType)
+				assert.Equal(t, tc.wantIndex, indexAttr.Str())
+			}
+		})
+	}
+}
+
 // testIndexManager is a minimal outputs.IndexManager that always selects a fixed index name.
 type testIndexManager struct{}
 

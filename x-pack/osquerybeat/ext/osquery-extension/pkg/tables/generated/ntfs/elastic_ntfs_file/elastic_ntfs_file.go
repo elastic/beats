@@ -72,11 +72,11 @@ type Result struct {
 	Filename       string `osquery:"filename"`        // File name component from the $FILE_NAME attribute
 	Type           string `osquery:"type"`            // Entry type ("file" or "directory")
 	HardLinkCount  int32  `osquery:"hard_link_count"` // Number of hard links to this MFT entry
-	Active         int32  `osquery:"active"`          // 1 if the MFT entry is allocated (active), 0 if not
+	Active         bool   `osquery:"active"`          // 1 if the MFT entry is allocated (active), 0 if not
 	Size           int64  `osquery:"size"`            // Logical file size in bytes (from the default $DATA attribute)
 	AllocatedSize  int64  `osquery:"allocated_size"`  // Allocated size in bytes (from the $FILE_NAME attribute)
 	Flags          int32  `osquery:"flags"`           // File attribute flags from $STANDARD_INFORMATION
-	Ads            int32  `osquery:"ads"`             // 1 if the file has one or more Alternate Data Streams, 0 otherwise
+	Ads            bool   `osquery:"ads"`             // 1 if the file has one or more Alternate Data Streams, 0 otherwise
 	ObjectId       string `osquery:"object_id"`       // Object identifier GUID from the $OBJECT_ID attribute
 	SecurityId     int32  `osquery:"security_id"`     // Security descriptor identifier from $STANDARD_INFORMATION
 	OwnerId        int32  `osquery:"owner_id"`        // Owner identifier from $STANDARD_INFORMATION
