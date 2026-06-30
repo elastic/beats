@@ -279,6 +279,50 @@ func TestEnrichSynthEvent(t *testing.T) {
 	}
 }
 
+// API journeys reuse the same enrichment pipeline as browser journeys
+// but route their network events to a separate dataset. Pinning this
+// here keeps the dataset contract observable in a single place and
+// guards against accidentally collapsing api → browser.network.
+func TestEnrichAPIJourneyDatasetRouting(t *testing.T) {
+	se := newStreamEnricher(stdfields.StdMonitorFields{Type: "api"})
+	// Prime the journey context the way the agent does — journey/start
+	// first, then the network_info events that should inherit the type.
+	startEvt := &beat.Event{}
+	require.NoError(t, se.enrich(startEvt, &SynthEvent{
+		Type:    JourneyStart,
+		Journey: &Journey{ID: "j1", Name: "API journey", Type: "api"},
+	}))
+
+	netEvt := &beat.Event{}
+	require.NoError(t, se.enrich(netEvt, &SynthEvent{Type: JourneyNetworkInfo}))
+
+	require.Equal(t,
+		"api.network",
+		netEvt.Meta[add_data_stream.FieldMetaCustomDataset],
+		"API journey/network_info must land in api.network (matching the Fleet integration's `data_stream/api_network` package), not browser.network",
+	)
+}
+
+// Older synthetics agents (pre-`apiJourney`) don't emit `journey.type`.
+// We must keep treating those as browser to avoid silently dropping
+// dataset routing during a mixed-version rollout.
+func TestEnrichLegacyJourneyDefaultsToBrowser(t *testing.T) {
+	se := newStreamEnricher(stdfields.StdMonitorFields{Type: "browser"})
+	startEvt := &beat.Event{}
+	require.NoError(t, se.enrich(startEvt, &SynthEvent{
+		Type:    JourneyStart,
+		Journey: &Journey{ID: "j1", Name: "legacy"}, // no Type
+	}))
+
+	netEvt := &beat.Event{}
+	require.NoError(t, se.enrich(netEvt, &SynthEvent{Type: JourneyNetworkInfo}))
+
+	require.Equal(t,
+		"browser.network",
+		netEvt.Meta[add_data_stream.FieldMetaCustomDataset],
+	)
+}
+
 func makeTestJourneyEnricher(sFields stdfields.StdMonitorFields) *journeyEnricher {
 	return &journeyEnricher{
 		streamEnricher: newStreamEnricher(sFields),

@@ -9,5 +9,6 @@ package cmd
 // Imports cmd directly and skips main, import all required plugins
 // here to have them bundled together
 import (
+	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/api"
 	_ "github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser"
 )
