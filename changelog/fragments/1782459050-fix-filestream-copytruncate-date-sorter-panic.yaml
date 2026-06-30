@@ -11,22 +11,17 @@
 kind: bug-fix
 
 # Change summary; a 80ish characters long description of the change.
-summary: Restore `tls.*` certificate metadata for HTTP monitors using `max_redirects > 0`
+summary: Avoid slice-bounds panic when sorting copytruncate rotated files by date
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: >
-  HTTP monitors that follow redirects (or use a proxy) stopped exporting `tls.*`
-  fields after the 8.0 migration to elastic-agent-libs, because the shared HTTP
-  transport wrapped the TLS connection in a way that prevented Go's net/http from
-  populating `Response.TLS`. This restores TLS certificate metadata (including
-  certificate expiry) for redirecting HTTPS endpoints.
+  When the filestream copytruncate prospector sorts rotated files using a date
+  format, `dateSorter.GetTs` sliced the file path by the format length without
+  checking the path was long enough. A path shorter than the configured date
+  format triggered a "slice bounds out of range" panic inside a prospector
+  goroutine, crashing the process. GetTs now returns a zero time for paths
+  shorter than the format, mirroring the existing parse-failure path.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: heartbeat
-
-# PR URL; optional; the PR number that added the changeset.
-# pr: https://github.com/owner/repo/1234
-
-# Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
-issue: https://github.com/elastic/beats/issues/48335
+component: filebeat
