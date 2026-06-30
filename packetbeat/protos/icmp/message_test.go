@@ -22,8 +22,9 @@ package icmp
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/google/gopacket/layers"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )

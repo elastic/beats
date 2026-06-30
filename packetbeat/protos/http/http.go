@@ -97,7 +97,7 @@ type httpPlugin struct {
 
 	transactionTimeout time.Duration
 
-	log, debug, detail *logp.Logger
+	log, debug, detail  *logp.Logger
 	isDebug, isDetailed bool
 
 	results protos.Reporter
