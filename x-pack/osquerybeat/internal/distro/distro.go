@@ -13,9 +13,7 @@ import (
 	"strings"
 )
 
-var (
-	ErrUnsupportedOS = errors.New("unsupported OS")
-)
+var ErrUnsupportedOS = errors.New("unsupported OS")
 
 var (
 	DataDir        = filepath.Clean("build/data")
@@ -52,7 +50,7 @@ const (
 	osqueryDistroDarwinSHA256        = "2621179c334a6482fa822732f121409bbccc36784db18f576e2965dfc4f1845d"
 	osqueryDistroLinuxSHA256         = "0045739a68475760f7bc26ca493afda71cc02a8e4d29984717742d3e4c099296"
 	osqueryDistroLinuxARMSHA256      = "d9d4e5f6eeabda4949ae0ba6a8db424c789ec60ffef99269f479ff4b73f46e33"
-	osqueryDistroWindowsZipSHA256    = "92a820a39c12f7516040b62dc8e8546469c821f505eed0b7ff1eb7e43cc4b018"
+	osqueryDistroWindowsARMZipSHA256 = "92a820a39c12f7516040b62dc8e8546469c821f505eed0b7ff1eb7e43cc4b018"
 	osqueryDistroWindowsX86ZipSHA256 = "5ddb8e1c23fd870838ef4ff47c0d2e5a080f22a6944fc4870d726e7b20e962a4"
 )
 
@@ -189,9 +187,9 @@ func (s Spec) InstalledFilename() string {
 
 func (s Spec) InstalledMode() os.FileMode {
 	if s.Extract {
-		return 0755
+		return 0o755
 	}
-	return 0644
+	return 0o644
 }
 
 func (s Spec) URL(osname string) string {
@@ -207,7 +205,7 @@ var specs = map[OSArch]Spec{
 	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"windows", "amd64"}: {".windows_x86_64.zip", osqueryDistroWindowsX86ZipSHA256, true},
-	{"windows", "arm64"}: {osqueryZipExt, osqueryDistroWindowsZipSHA256, true},
+	{"windows", "arm64"}: {osqueryZipExt, osqueryDistroWindowsARMZipSHA256, true},
 }
 
 func GetSpec(osarch OSArch) (spec Spec, err error) {
