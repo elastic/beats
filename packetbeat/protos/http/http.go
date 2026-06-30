@@ -95,7 +95,7 @@ type httpPlugin struct {
 
 	transactionTimeout time.Duration
 
-	log, debug, detail  *logp.Logger
+	log                 *logp.Logger
 	isDebug, isDetailed bool
 
 	results protos.Reporter
@@ -135,9 +135,7 @@ func (http *httpPlugin) init(
 	logger *logp.Logger) error {
 	http.setFromConfig(config)
 
-	http.log = logger.Named("http")
-	http.debug = logger.Named("http")
-	http.detail = logger.Named("httpdetailed")
+	http.log = logger
 	http.isDebug = logger.IsDebug() && logger.HasSelector("http")
 	http.isDetailed = logger.IsDebug() && logger.HasSelector("httpdetailed")
 	http.results = results
@@ -148,14 +146,14 @@ func (http *httpPlugin) init(
 //go:inline
 func (http *httpPlugin) debugf(format string, v ...interface{}) {
 	if http.isDebug {
-		http.debug.Debugf(format, v...)
+		http.log.Named("http").Debugf(format, v...)
 	}
 }
 
 //go:inline
 func (http *httpPlugin) detailf(format string, v ...interface{}) {
 	if http.isDetailed {
-		http.detail.Debugf(format, v...)
+		http.log.Named("httpdetailed").Debugf(format, v...)
 	}
 }
 
