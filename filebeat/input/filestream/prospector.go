@@ -437,10 +437,6 @@ func (p *fileProspector) onFSEvent(
 }
 
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
-	if p.ignoreOlder <= 0 && ignoreInactiveSince.IsZero() {
-		return false
-	}
-
 	switch {
 	case p.ignoreOlder > 0 && time.Since(fe.Descriptor.Info.ModTime()) > p.ignoreOlder:
 		log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
