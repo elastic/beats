@@ -1,4 +1,24 @@
-######################## Filebeat Configuration ############################
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-reference-yml.html
+applies_to:
+  stack: ga
+  serverless: ga
+---
+
+# filebeat.reference.yml [filebeat-reference-yml]
+
+The following reference file is available with your Filebeat installation. It shows all non-deprecated Filebeat options. You can copy from this file and paste configurations into the `filebeat.yml` file to customize it.
+
+::::{tip}
+The reference file is located in the same directory as the `filebeat.yml` file. To locate the file, see [Directory layout](/reference/filebeat/directory-layout.md).
+::::
+
+
+The contents of the file are included here for your convenience.
+
+```yaml
+## Filebeat Configuration ############################
 
 # This file is a full configuration example documenting all non-deprecated
 # options in comments. For a shorter configuration example, that contains only
@@ -392,7 +412,7 @@ filebeat.modules:
   log:
     enabled: false
     # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
+    # Filebeat will choose the default path.
     #var.paths:
 
 #------------------------------- Traefik Module -------------------------------
@@ -556,7 +576,7 @@ filebeat.inputs:
 
   # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-  # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+  # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
   #multiline.match: after
 
   # The maximum number of lines that are combined into one event.
@@ -664,7 +684,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -716,7 +736,7 @@ filebeat.inputs:
   # If enabled, instead of relying on the device ID and inode values when comparing files,
   # compare hashes of the given byte ranges in files. A file becomes an ingest target
   # when its size grows larger than offset+length (see below). Until then it's ignored.
-  #prospector.scanner.fingerprint.enabled: false
+  #prospector.scanner.fingerprint.enabled: true
 
   # If fingerprint mode is enabled, sets the offset from the beginning of the file
   # for the byte range used for computing the fingerprint value.
@@ -759,7 +779,7 @@ filebeat.inputs:
 
   #### Filtering messages
 
-  # You can filter messsages in the parsers pipeline. Use this method if you would like to
+  # You can filter messages in the parsers pipeline. Use this method if you would like to
   # include or exclude lines before they are aggregated into multiline or the JSON contents
   # are parsed.
 
@@ -851,8 +871,9 @@ filebeat.inputs:
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
-  # the Beat considers two files the same if their inode and device id are the same.
-  #file_identity.native: ~
+  # a fingerprint is generated using the first 1024 bytes of the file,
+  # if the fingerprints match, then the files are considered equal.
+  #file_identity.fingerprint: ~
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -949,7 +970,7 @@ filebeat.inputs:
 #- type: redis
   #enabled: false
 
-  # List of hosts to pool to retrieve the slow log information.
+  # List of hosts to poll to retrieve the slow log information.
   #hosts: ["localhost:6379"]
 
   # How often the input checks for redis slow log.
@@ -1235,18 +1256,10 @@ filebeat.inputs:
     #- 2
 
   # You may wish to have separate inputs for each service. You can use
-  # include_matches.match to define a list of filters, each event needs
-  # to match all filters defined.
+  # include_matches.or to specify a list of filter expressions that are
+  # applied as a logical OR.
   #include_matches.match:
     #- _SYSTEMD_UNIT=foo.service
-
-  # To create a disjunction (logical OR) use the `+` character between
-  # the filters
-  #include_matches:
-    #match:
-      #- "systemd.transport=kernel"
-      #- "+"
-      #- "journald.process.name=systemd"
 
   # Uses the original hostname of the entry instead of the one
   # from the host running jounrald
@@ -1328,6 +1341,39 @@ filebeat.inputs:
 # filebeat.registry.path while upgrading, set filebeat.registry.migrate_file to
 # point to the old registry file.
 #filebeat.registry.migrate_file: ${path.data}/registry
+
+# The storage backend for the registry. Supported values are "memlog" and
+# "otel_file_storage". The default is "memlog", which uses an in-memory log
+# with periodic disk flushing. The "otel_file_storage" backend stores state
+# using the same on-disk layout as the OpenTelemetry Collector file_storage
+# extension (under registry.path).
+# NOTE: The "otel_file_storage" backend is in technical preview (available
+# since 9.5) and may be changed or removed in a future release.
+#filebeat.registry.backend: memlog
+
+# ----------------------- OTel file_storage backend settings -------------------
+# NOTE: This configuration section is in technical preview (available since 9.5)
+# and may be changed or removed in a future release.
+# These settings apply only when filebeat.registry.backend is set to
+# "otel_file_storage". Registry data files live under filebeat.registry.path;
+# optional fields below map to the OpenTelemetry file_storage extension config.
+# The running beat name (for example "filebeat") is used as the OpenTelemetry
+# receiver identity for storage client file naming; no separate setting is used.
+#
+#filebeat.registry.otel_file_storage.timeout: 1s
+#filebeat.registry.otel_file_storage.fsync: false
+# Filebeat defaults create_directory to true when no otel_file_storage
+# section is provided. When otel_file_storage is configured explicitly,
+# the upstream default (false) applies unless overridden here.
+#filebeat.registry.otel_file_storage.create_directory: true
+# directory_permissions defaults to "0700" when create_directory is true
+# and directory_permissions is not set explicitly.
+#filebeat.registry.otel_file_storage.directory_permissions: "0700"
+#filebeat.registry.otel_file_storage.recreate: false
+#
+# See the OpenTelemetry Collector file_storage extension documentation for
+# compaction and other nested options:
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/storage/filestorage
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -1513,7 +1559,7 @@ filebeat.inputs:
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -2364,7 +2410,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-  
+
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 
@@ -2541,7 +2587,7 @@ setup.template.settings:
 
 # ======================== Data Stream Lifecycle (DSL) =========================
 
-# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch.
 # These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
 
 # Enable DSL support. Valid values are true, or false.
@@ -2549,7 +2595,7 @@ setup.template.settings:
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is filebeat-%{[agent.version]}"
-# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The template string `%{[agent.version]}` will resolve to the current stack version.
 # The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "filebeat-%{[agent.version]}"
 
@@ -2714,7 +2760,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -2730,7 +2776,7 @@ logging.files:
 # sensitive information) together with other log messages, a different
 # log file, only for log entries containing raw events, is used. It will
 # use the same level, selectors and all other configurations from the
-# default logger, but it will have it's own file configuration.
+# default logger, but it will have its own file configuration.
 #
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.
@@ -2762,7 +2808,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -3030,4 +3076,5 @@ logging.files:
 #features:
 #  fqdn:
 #    enabled: true
+```
 
