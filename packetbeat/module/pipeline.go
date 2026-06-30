@@ -128,10 +128,8 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 // true. An error in loading one of the pipelines will cause the
 // successfully loaded ones to be deleted.
 func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool, logger *logp.Logger) (loaded []string, err error) {
-	log := logger
-
 	for _, pipeline := range pipelines {
-		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, log)
+		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, logger)
 		if err != nil {
 			err = fmt.Errorf("error loading pipeline %s: %w", pipeline.id, err)
 			break

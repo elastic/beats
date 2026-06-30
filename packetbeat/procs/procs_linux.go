@@ -65,22 +65,22 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	if err = pids.Get(); err != nil {
 		return nil, err
 	}
-	logp.Debug("procs", "getLocalPortsToPIDs()")
-	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false)
+	proc.logger.Debug("procs", "getLocalPortsToPIDs()")
+	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false, proc.logger)
 	if err != nil {
-		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
+		proc.logger.Errorf("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
 		return nil, err
 	}
 
-	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true)
+	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true, proc.logger)
 	// Ignore the error when /proc/net/tcp6 doesn't exists (ipv6 disabled).
 	if err != nil {
 		if os.IsNotExist(err) {
 			warnIPv6Once.Do(func() {
-				logp.Warn("No IPv6 socket info reported by the kernel. Process monitor won't enrich IPv6 events")
+				proc.logger.Warn("No IPv6 socket info reported by the kernel. Process monitor won't enrich IPv6 events")
 			})
 		} else {
-			logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
+			proc.logger.Errorf("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv6, err)
 			return nil, err
 		}
 	}
@@ -94,12 +94,12 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 
 	ports = make(map[endpoint]int)
 	for _, pid := range pids.List {
-		inodes, err := findSocketsOfPid("", pid)
+		inodes, err := findSocketsOfPid("", pid, proc.logger)
 		if err != nil {
 			if os.IsNotExist(err) {
-				logp.Info("FindSocketsOfPid: %s", err)
+				proc.logger.Infof("FindSocketsOfPid: %s", err)
 			} else {
-				logp.Err("FindSocketsOfPid: %s", err)
+				proc.logger.Errorf("FindSocketsOfPid: %s", err)
 			}
 			continue
 		}
@@ -121,7 +121,7 @@ var procFiles = map[applayer.Transport]struct {
 	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
 }
 
-func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
+func findSocketsOfPid(prefix string, pid int, logger *logp.Logger) (inodes []uint64, err error) {
 	dirname := filepath.Join(prefix, "/proc", strconv.Itoa(pid), "fd")
 	procfs, err := os.Open(dirname)
 	if err != nil {
@@ -136,14 +136,14 @@ func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 	for _, name := range names {
 		link, err := os.Readlink(filepath.Join(dirname, name))
 		if err != nil {
-			logp.Debug("procs", "%s", err.Error())
+			logger.Debug("procs", "%s", err.Error())
 			continue
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
 			inode, err := strconv.ParseUint(link[8:len(link)-1], 10, 64)
 			if err != nil {
-				logp.Debug("procs", "%s", err.Error())
+				logger.Debug("procs", "%s", err.Error())
 				continue
 			}
 
@@ -165,17 +165,17 @@ type socketInfo struct {
 
 // socketsFromProc returns the socket information held in the the /proc/net file
 // at path.
-func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
+func socketsFromProc(path string, ipv6 bool, logger *logp.Logger) ([]*socketInfo, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
-	return parseProcNetProto(file, ipv6)
+	return parseProcNetProto(file, ipv6, logger)
 }
 
 // Parses the /proc/net/(tcp|udp)6? file
-func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
+func parseProcNetProto(input io.Reader, ipv6 bool, logger *logp.Logger) ([]*socketInfo, error) {
 	var (
 		sockets []*socketInfo
 		err     error
@@ -188,19 +188,19 @@ func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 			continue
 		}
 		if len(words) < 10 {
-			logp.Debug("procs", "Less than 10 words (%d) or starting with 'sl': %s", len(words), words)
+			logger.Debug("procs", "Less than 10 words (%d) or starting with 'sl': %s", len(words), words)
 			continue
 		}
 
 		var sock socketInfo
 		sock.srcIP, sock.srcPort, err = hexToIPPort(words[1], ipv6)
 		if err != nil {
-			logp.Debug("procs", "Error parsing IP and port: %s", err)
+			logger.Debug("procs", "Error parsing IP and port: %s", err)
 			continue
 		}
 		sock.dstIP, sock.dstPort, err = hexToIPPort(words[2], ipv6)
 		if err != nil {
-			logp.Debug("procs", "Error parsing IP and port: %s", err)
+			logger.Debug("procs", "Error parsing IP and port: %s", err)
 			continue
 		}
 
@@ -213,7 +213,7 @@ func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 	}
 	err = sc.Err()
 	if err != nil {
-		logp.Err("Error reading proc net file: %s", err)
+		logger.Errorf("Error reading proc net file: %s", err)
 		return nil, err
 	}
 	return sockets, nil
