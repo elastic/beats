@@ -40,20 +40,20 @@ func newShortFingerprintSet() *shortFingerprintSet {
 // Add adds an entry. Callers must only add entries that are currently in the
 // growing phase; the index does not enforce this. Entries with an empty
 // fingerprint are ignored. Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) Add(key, fingerprint, source string) {
-	if idx == nil || fingerprint == "" {
+func (s *shortFingerprintSet) Add(key, fingerprint, source string) {
+	if s == nil || fingerprint == "" {
 		return
 	}
 
-	idx.entries[key] = shortFingerprintEntry{Fingerprint: fingerprint, Source: source}
+	s.entries[key] = shortFingerprintEntry{Fingerprint: fingerprint, Source: source}
 }
 
 // Remove removes an entry by key. Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) Remove(key string) {
-	if idx == nil {
+func (s *shortFingerprintSet) Remove(key string) {
+	if s == nil {
 		return
 	}
-	delete(idx.entries, key)
+	delete(s.entries, key)
 }
 
 // RemoveBySource removes every entry whose source matches.
@@ -62,26 +62,26 @@ func (idx *shortFingerprintSet) Remove(key string) {
 // not enforced, so all matching entries must be removed — otherwise a stale
 // entry would survive and keep participating in prefix matching.
 // Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) RemoveBySource(source string) {
-	if idx == nil {
+func (s *shortFingerprintSet) RemoveBySource(source string) {
+	if s == nil {
 		return
 	}
-	for key, entry := range idx.entries {
+	for key, entry := range s.entries {
 		if entry.Source == source {
-			delete(idx.entries, key)
+			delete(s.entries, key)
 		}
 	}
 }
 
 // UpdateSource updates the source path for an entry.
 // Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) UpdateSource(key, newSource string) {
-	if idx == nil {
+func (s *shortFingerprintSet) UpdateSource(key, newSource string) {
+	if s == nil {
 		return
 	}
-	if entry, ok := idx.entries[key]; ok {
+	if entry, ok := s.entries[key]; ok {
 		entry.Source = newSource
-		idx.entries[key] = entry
+		s.entries[key] = entry
 	}
 }
 
@@ -92,11 +92,11 @@ func (idx *shortFingerprintSet) UpdateSource(key, newSource string) {
 // one entry shares a source: the set is keyed by registry key, not source, and
 // the one-entry-per-source property is not enforced.
 // Returns the key and entry on match. Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource string) (key string, entry shortFingerprintEntry, found bool) {
+func (s *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource string) (key string, entry shortFingerprintEntry, found bool) {
 	keep := func(e shortFingerprintEntry) bool {
 		return matchSource == "" || e.Source == matchSource
 	}
-	return idx.FindPrefixMatchFunc(targetFingerprint, keep)
+	return s.FindPrefixMatchFunc(targetFingerprint, keep)
 }
 
 // FindPrefixMatchFunc finds the entry with the longest fingerprint that is a
@@ -107,11 +107,11 @@ func (idx *shortFingerprintSet) FindPrefixMatch(targetFingerprint, matchSource s
 // match (which could discard a genuine rename in favor of a still-present
 // distinct file that merely shares a longer header).
 // Returns the key and entry on match. Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, keep func(shortFingerprintEntry) bool) (key string, entry shortFingerprintEntry, found bool) {
-	if idx == nil || targetFingerprint == "" {
+func (s *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, keep func(shortFingerprintEntry) bool) (key string, entry shortFingerprintEntry, found bool) {
+	if s == nil || targetFingerprint == "" {
 		return "", shortFingerprintEntry{}, false
 	}
-	for k, e := range idx.entries {
+	for k, e := range s.entries {
 		if !isStrictPrefix(targetFingerprint, e.Fingerprint) {
 			continue
 		}
@@ -126,9 +126,9 @@ func (idx *shortFingerprintSet) FindPrefixMatchFunc(targetFingerprint string, ke
 }
 
 // Len returns the number of entries. Safe to call on a nil receiver.
-func (idx *shortFingerprintSet) Len() int {
-	if idx == nil {
+func (s *shortFingerprintSet) Len() int {
+	if s == nil {
 		return 0
 	}
-	return len(idx.entries)
+	return len(s.entries)
 }
