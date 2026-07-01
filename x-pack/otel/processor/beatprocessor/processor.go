@@ -14,11 +14,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otel/otelmap"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
-	"github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
-	"github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
-	"github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
-	"github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -83,26 +78,19 @@ func createProcessor(processorNameAndConfig map[string]any, logpLogger *logp.Log
 			return nil, fmt.Errorf("failed to create config for processor '%s': %w", processorName, configError)
 		}
 
-		var constructor processors.Constructor
-
 		switch processorName {
-		case "add_cloud_metadata":
-			constructor = add_cloud_metadata.New
-		case "add_docker_metadata":
-			constructor = add_docker_metadata.New
-		case "add_fields":
-			constructor = addfields.CreateAddFields
-		case "add_host_metadata":
-			constructor = add_host_metadata.New
-		case "add_kubernetes_metadata":
-			constructor = add_kubernetes_metadata.New
+		case "add_host_metadata", "add_cloud_metadata", "add_docker_metadata", "add_kubernetes_metadata", "add_fields":
 		default:
 			return nil, fmt.Errorf("invalid processor name '%s'", processorName)
 		}
 
-		// Wrap the constructor with NewConditional so that `when` conditions
-		// configured on the processor are honored.
-		processorInstance, createProcessorError := processors.NewConditional(constructor)(processorConfig, logpLogger)
+		constructor, err := processors.GetConstructor(processorName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get constructor for '%s': %w", processorName, err)
+		}
+
+		// no need to wrap NewConditional because it is being wrapped when processors are registered
+		processorInstance, createProcessorError := constructor(processorConfig, logpLogger)
 		if createProcessorError != nil {
 			return nil, fmt.Errorf("failed to create processor '%s': %w", processorName, createProcessorError)
 		}

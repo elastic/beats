@@ -25,7 +25,7 @@ changelog/fragments/
 /.ci/ @elastic/elastic-agent-data-plane @elastic/observablt-ci
 /.github/actions @elastic/observablt-ci
 /.github/workflows @elastic/observablt-ci
-/.github/workflows/release-notes.yml @elastic/ingest-docs @elastic/elastic-agent-data-plane
+/.github/workflows/release-notes.yml @elastic/ski-docs @elastic/elastic-agent-data-plane
 /.github/workflows/golangci-lint.yml @elastic/elastic-agent-data-plane
 /.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
@@ -33,7 +33,7 @@ changelog/fragments/
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /dev-tools/ @elastic/elastic-agent-data-plane
 /dev-tools/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
-/docs/ @elastic/ingest-docs
+/docs/ @elastic/ski-docs
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/integration-experience
@@ -62,7 +62,7 @@ changelog/fragments/
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
-/libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
+/libbeat/docs/processors-list.asciidoc @elastic/ski-docs
 /libbeat/management @elastic/elastic-agent-control-plane
 /libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
 /libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
