@@ -532,6 +532,46 @@ func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
 	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
 }
 
+// TestReuseDecodeBufferSafeConsumer verifies that with ReuseDecodeBuffer=true a
+// consumer that copies each line before reading the next (as filestream's
+// harvester does via Message.ToEvent) always sees correct content, even though
+// the decode buffer is reused across reads. It mirrors TestReadRandomLineLengths
+// but for the reuse path with random line lengths exercising grow/compact/reuse.
+func TestReuseDecodeBufferSafeConsumer(t *testing.T) {
+	minLength, maxLength, numLines := 1, 40000, 200
+
+	var inputLines [][]byte
+	var inputStream []byte
+	for i := 0; i < numLines; i++ {
+		n := rand.Intn(maxLength-minLength) + minLength
+		line := make([]byte, n+1)
+		for j := 0; j < n; j++ {
+			line[j] = byte(rand.Intn('z'-'A') + 'A')
+		}
+		line[n] = '\n'
+		inputLines = append(inputLines, line)
+		inputStream = append(inputStream, line...)
+	}
+
+	buffer := bytes.NewBuffer(inputStream)
+	codec, _ := encoding.Plain(buffer)
+	r, err := NewLineReader(
+		ioutil.NopCloser(buffer),
+		Config{codec, 1024, LineFeed, unlimited, false},
+		logptest.NewTestingLogger(t, ""),
+	)
+	require.NoError(t, err)
+	r.enableDecodeBufferReuse() // exercise the reuse path with a safe consumer
+
+	for i := range inputLines {
+		b, _, err := r.Next()
+		require.NoError(t, err, "line %d", i)
+		// Safe consumer: copy out before the next Next() may reuse the buffer.
+		got := append([]byte(nil), b...)
+		require.Equal(t, inputLines[i], got, "line %d content mismatch", i)
+	}
+}
+
 // spinReader feeds an endless stream of non-newline bytes so that
 // LineReader.advance never finds a line terminator and keeps re-reading the
 // LineReader.tempBuffer field in a tight loop.
