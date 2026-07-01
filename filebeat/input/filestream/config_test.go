@@ -300,7 +300,9 @@ func TestNormalizeConfig(t *testing.T) {
 	tcs := []struct {
 		name        string
 		cfg         map[string]interface{}
+		wantErr     string
 		wantEnabled bool
+		wantGrowing bool
 	}{
 		{
 			name: "path identity disables prospector.scanner.fingerprint by default",
@@ -339,13 +341,19 @@ func TestNormalizeConfig(t *testing.T) {
 				},
 			},
 			wantEnabled: false,
+			// growing-default applies even when fingerprint is disabled —
+			// the contradictory `enabled: false` + `file_identity:
+			// fingerprint` config is caught by checkConfigCompatibility at
+			// prospector creation time.
+			wantGrowing: true,
 		},
 		{
-			name: "fingerprint identity keeps default scanner fingerprint",
+			name: "fingerprint identity defaults to growing enabled on 9.5+",
 			cfg: map[string]interface{}{
 				"file_identity": map[string]interface{}{"fingerprint": nil},
 			},
 			wantEnabled: true,
+			wantGrowing: true,
 		},
 		{
 			name: "non-fingerprint inode_marker disables scanner fingerprint by default",
@@ -357,9 +365,86 @@ func TestNormalizeConfig(t *testing.T) {
 			wantEnabled: false,
 		},
 		{
-			name:        "no file_identity keeps default scanner fingerprint",
+			// Omitting file_identity resolves to the fingerprint identity
+			// (see newFileIdentifier), so the growing default must apply just
+			// as it does for an explicit file_identity.fingerprint.
+			name:        "no file_identity defaults to fingerprint identity with growing enabled (9.5+)",
 			cfg:         map[string]interface{}{},
 			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "file_identity.fingerprint.growing true propagates to scanner growing",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": true},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "file_identity.fingerprint.growing false leaves scanner growing default",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": false},
+				},
+			},
+			wantEnabled: true,
+			wantGrowing: false,
+		},
+		{
+			name: "file_identity.fingerprint with no growing field defaults to true (9.5+)",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"fingerprint": nil},
+			},
+			wantEnabled: true,
+			wantGrowing: true,
+		},
+		{
+			name: "scanner-level growing in YAML is silently ignored; default still applies",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{"fingerprint": nil},
+				"prospector": map[string]interface{}{
+					"scanner": map[string]interface{}{
+						"fingerprint": map[string]interface{}{"growing": true},
+					},
+				},
+			},
+			wantEnabled: true,
+			// 9.5+ default for file_identity.fingerprint.growing is true; the
+			// scanner-level YAML key remains silently ignored either way.
+			wantGrowing: true,
+		},
+		{
+			name: "file_identity.fingerprint.growing false wins over scanner-level true",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": false},
+				},
+				"prospector": map[string]interface{}{
+					"scanner": map[string]interface{}{
+						"fingerprint": map[string]interface{}{"growing": true},
+					},
+				},
+			},
+			wantEnabled: true,
+			// scanner-level YAML is silently ignored; the user-facing
+			// `growing: false` must win regardless of what is set at the
+			// scanner level.
+			wantGrowing: false,
+		},
+		{
+			// Invalid file_identity.fingerprint sub-config is rejected by
+			// normalizeConfig itself — the identifier factory does not
+			// unpack the sub-config, so this is the only line of defence.
+			name: "growing as non-bool string is rejected",
+			cfg: map[string]interface{}{
+				"file_identity": map[string]interface{}{
+					"fingerprint": map[string]interface{}{"growing": "not-a-bool"},
+				},
+			},
+			wantErr: "cannot read 'file_identity.fingerprint' config",
 		},
 	}
 
@@ -373,12 +458,23 @@ func TestNormalizeConfig(t *testing.T) {
 				cfg[key] = value
 			}
 			raw := conf.MustNewConfigFrom(cfg)
-			require.NoError(t, raw.Unpack(&c))
+			require.NoError(t, raw.Unpack(&c),
+				"unpack should succeed; rejection happens in normalizeConfig")
 
 			err := normalizeConfig(raw, &c)
+			if tc.wantErr != "" {
+				require.Error(t, err, "expected normalizeConfig to reject invalid sub-config")
+				assert.ErrorContains(t, err, tc.wantErr)
+				return
+			}
 			require.NoError(t, err)
 
-			assert.Equal(t, tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled)
+			assert.Equal(t,
+				tc.wantEnabled, c.FileWatcher.Scanner.Fingerprint.Enabled,
+				"FileWatcher.Scanner.Fingerprint.Enabled did not match")
+			assert.Equal(t,
+				tc.wantGrowing, c.FileWatcher.Scanner.Fingerprint.Growing,
+				"FileWatcher.Scanner.Fingerprint.Growing did not match")
 		})
 	}
 }

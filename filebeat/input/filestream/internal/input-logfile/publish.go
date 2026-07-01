@@ -66,6 +66,14 @@ func newUpdateOp(resource *resource, ts time.Time, delta interface{}) *updateOp 
 }
 
 func (op *updateOp) Key() string {
+	// resource.key is normally immutable after creation, but the growing
+	// fingerprint migration (sourceStore.UpdateKey) rewrites it in place under
+	// stateMutex while the harvester keeps publishing. Read under the same lock
+	// to avoid a torn read of the string header. The only caller
+	// (updateChan.Send) holds updateChan.mutex, never stateMutex, so there is no
+	// lock-ordering cycle.
+	op.resource.stateMutex.Lock()
+	defer op.resource.stateMutex.Unlock()
 	return op.resource.key
 }
 

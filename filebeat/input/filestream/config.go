@@ -162,6 +162,7 @@ func defaultConfig() config {
 		ReadUntilEOF:              loginp.DefaultReadUntilEOFConfig(),
 		IncludeFileOwnerName:      false,
 		IncludeFileOwnerGroupName: false,
+		IncludeFileFingerprint:    false,
 		CleanInactive:             -1,
 		CleanRemoved:              true,
 		HarvesterLimit:            0,

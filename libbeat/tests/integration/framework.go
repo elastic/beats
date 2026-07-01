@@ -171,6 +171,11 @@ func NewStandardBeat(t *testing.T, beatName, binary string, args ...string) *Bea
 	return b
 }
 
+// NewFilebeat is a shorthand for NewBeat(t,"filebeat","../../filebeat.test")
+func NewFilebeat(t *testing.T) *BeatProc {
+	return NewBeat(t, "filebeat", "../../filebeat.test")
+}
+
 // Start starts the Beat process
 // args are extra arguments to be passed to the Beat.
 func (b *BeatProc) Start(args ...string) {

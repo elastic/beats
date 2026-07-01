@@ -209,6 +209,117 @@ func (s *sourceStore) ResetCursor(src Source, cur interface{}) error {
 	return s.store.resetCursor(key, cur)
 }
 
+// IterateOnPrefix iterates over all entries that match this input's prefix.
+// The callback receives the key and cursor metadata for each entry.
+func (s *sourceStore) IterateOnPrefix(fn func(key string, meta any)) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		// MatchesInput is a cheap, lock-free key check, so filter on it first to
+		// avoid locking resources that belong to other inputs.
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		// Take the resource lock once to both check deletion and snapshot
+		// cursorMeta: writers (updateOp.Execute, updateMetadata, UpdateKey) mutate
+		// these while holding only stateMutex, not ephemeralStore.mu, so reading
+		// them without the resource lock would be a data race on the interface value.
+		res.stateMutex.Lock()
+		deleted := res.unsafeIsDeleted()
+		meta := res.cursorMeta
+		res.stateMutex.Unlock()
+		if deleted {
+			continue
+		}
+
+		fn(key, meta)
+	}
+}
+
+// UpdateKey updates an entry from oldKey to newKey with updated metadata.
+// This is used by the growing fingerprint migration (see
+// fileProspector.migrateGrowingFingerprint) to update the registry key when
+// a file's fingerprint grows.
+//
+// This operation updates the key IN PLACE without requiring the resource lock.
+// This is safe because:
+//   - We hold the ephemeral store mutex, preventing concurrent table modifications
+//   - We hold the resource's stateMutex while modifying state fields
+//   - The harvester holding the resource lock continues to work with the same
+//     *resource pointer - only the key field and table entry change
+//   - Cursor updates from the harvester continue to work on the same resource
+func (s *sourceStore) UpdateKey(oldKey, newKey string, meta interface{}) error {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	res := s.store.ephemeralStore.table[oldKey]
+	if res == nil {
+		return fmt.Errorf("old key %s not found", oldKey)
+	}
+
+	if res.isDeleted() {
+		return fmt.Errorf("old key %s is deleted", oldKey)
+	}
+
+	// Check if new key already exists
+	if existing := s.store.ephemeralStore.table[newKey]; existing != nil && !existing.isDeleted() {
+		return fmt.Errorf("new key %s already exists", newKey)
+	}
+
+	res.stateMutex.Lock()
+	defer res.stateMutex.Unlock()
+
+	oldKeyValue := res.key
+	res.key = newKey
+	res.cursorMeta = meta
+	res.stored = false
+
+	// Update the table: remove old entry, add new entry with same resource.
+	s.store.ephemeralStore.table[newKey] = res
+	delete(s.store.ephemeralStore.table, oldKey)
+
+	// Persist the entry under the new key BEFORE removing the old one, so a
+	// crash between the two leaves the state recoverable under newKey. This
+	// mirrors the ordering in UpdateIdentifiers/TakeOver. writeState sets
+	// res.stored=true only on a successful write.
+	s.store.writeState(res)
+	if !res.stored {
+		// The write under newKey failed (already logged by writeState). Do NOT
+		// remove the old key: it is still the only durable record of this entry.
+		// The in-memory resource now lives under newKey and will be re-persisted
+		// on the next cursor checkpoint, so we do not lose state in memory either.
+		return fmt.Errorf(
+			"UpdateKey: failed to persist new key %q; keeping old key %q to avoid state loss",
+			newKey, oldKeyValue)
+	}
+
+	// Best-effort cleanup: newKey is already durable and the table is swapped.
+	// Returning an error here can't undo the migration.
+	// See also: UpdateIdentifiers and TakeOver remove the old key the same best-effort way.
+	// The persistent store has no atomic multi-key write, so a crash between the newKey write and
+	// this removal can leave a stale oldKey that later prefix-matches another file.
+	if err := s.store.persistentStore.Remove(oldKeyValue); err != nil {
+		s.store.log.Errorf(
+			"UpdateKey: failed to remove old key %q from persistent store: %v",
+			oldKeyValue, err)
+	}
+
+	return nil
+}
+
+// KeyExists returns true if a non-deleted entry exists for the given key.
+// Unlike FindCursorMeta, this performs no Retain/Release and no deserialization.
+func (s *sourceStore) KeyExists(key string) bool {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+	if res := s.store.ephemeralStore.table[key]; res != nil {
+		return !res.isDeleted()
+	}
+	return false
+}
+
 // CleanIf sets the TTL of a resource if the predicate return true.
 func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	s.store.ephemeralStore.mu.Lock()
