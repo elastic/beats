@@ -180,7 +180,7 @@ This setting will be able to split the messages under the group value (*records*
 Kafka rebalance settings:
 
 **`strategy`**
-:   Either `"range"` or `"roundrobin"`. Defaults to `"range"`.
+:   `"range"`, `"roundrobin"`, or `"sticky"`. Defaults to `"range"`. Use `"sticky"` to minimize partition movement across rebalances (KIP-54).
 
 **`timeout`**
 :   How long to wait for an attempted rebalance. Defaults to 60s.
