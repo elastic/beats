@@ -672,6 +672,10 @@ type harvesterStop string
 
 func (h harvesterStop) String() string { return string(h) }
 
+type harvesterMigrate string
+
+func (h harvesterMigrate) String() string { return string(h) }
+
 type harvesterGroupStop struct{}
 
 func (h harvesterGroupStop) String() string { return "stop" }
@@ -698,6 +702,10 @@ func (t *testHarvesterGroup) Continue(_ input.Context, p, s loginp.Source) {
 
 func (t *testHarvesterGroup) Stop(s loginp.Source) {
 	t.events = append(t.events, harvesterStop(s.Name()))
+}
+
+func (t *testHarvesterGroup) Migrate(oldID string, next loginp.Source) {
+	t.events = append(t.events, harvesterMigrate(oldID+" -> "+next.Name()))
 }
 
 func (t *testHarvesterGroup) StopHarvesters() error {
@@ -1616,12 +1624,14 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			identifier: identifier,
 		}
 
-		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
+		hg := newTestHarvesterGroup()
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, hg)
 
 		// The fast path returns as soon as the exact key is found, so it must
 		// never scan the registry or migrate anything.
 		assert.Equal(t, int64(0), store.IterateOnPrefixCalled.Load(), "fast path must not scan the registry")
 		assert.Equal(t, 0, store.UpdateKeyCalled, "fast path must not migrate")
+		assert.Empty(t, hg.events, "fast path must not touch the harvester group")
 		assert.Positive(t, store.KeyExistsCalled.Load(), "fast path must check key existence")
 		// The pre-seeded prefix entry must remain untouched.
 		assert.True(t, store.has("filestream::my-input::fingerprint::aabb"),
@@ -1646,7 +1656,8 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 			identifier: identifier,
 		}
 
-		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
+		hg := newTestHarvesterGroup()
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, hg)
 
 		// Migration succeeds via the short fingerprint set prefix match: the
 		// registry is scanned, the old key is migrated to the new identity, and
@@ -1654,6 +1665,8 @@ func TestHandleGrowingFingerprintLookup_KeyExistsFastPath(t *testing.T) {
 		assert.Positive(t, store.IterateOnPrefixCalled.Load(), "slow path must scan the registry")
 		assert.Positive(t, store.UpdateKeyCalled, "slow path must migrate the matched entry")
 		assert.False(t, store.has(oldKey), "old key must be removed after migration")
+		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+src.Name()),
+			"migration must re-key the running harvester's registration")
 		// migrateGrowingFingerprint keeps the old key's plugin/input prefix and
 		// swaps in the new identity (src.Name()), which is the SHA-256-derived
 		// key, not the literal raw value used for event.SrcID.
@@ -1737,6 +1750,10 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		assert.NotContains(t, p.shortFingerprints.entries, oldKey, "old entry removed from short fingerprint set")
 		assert.Contains(t, p.shortFingerprints.entries, newKey, "new entry added to short fingerprint set")
 		assert.Equal(t, newFingerprint, p.shortFingerprints.entries[newKey].Fingerprint)
+
+		// The running harvester's registration is re-keyed along with the entry.
+		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+src.Name()),
+			"migration must re-key the running harvester's registration")
 	})
 
 	t.Run("at threshold: raw-hex transitions to SHA-256", func(t *testing.T) {
@@ -1790,6 +1807,10 @@ func TestOnFSEvent_GrowingFingerprintMigration(t *testing.T) {
 		assert.NotContains(t, p.shortFingerprints.entries, oldKey, "old entry removed from short fingerprint set")
 		assert.NotContains(t, p.shortFingerprints.entries, newKey, "transitioned entry NOT added to short fingerprint set")
 		assert.Empty(t, p.shortFingerprints.entries, "short fingerprint set is empty after transition")
+
+		// The running harvester's registration is re-keyed along with the entry.
+		assert.Contains(t, hg.events, harvesterMigrate(oldKey+" -> "+src.Name()),
+			"migration must re-key the running harvester's registration")
 	})
 }
 
@@ -1982,7 +2003,9 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		newFingerprint := "aabbccdd" // 8 chars, still growing
 		path := "/a.log"
 		oldKey := "filestream::input::fingerprint::" + oldFingerprint
-		newSrcID := "filestream::input::fingerprint::" + newFingerprint
+		// The migrated key uses the bounded (hashed) fingerprint, not the raw fp.
+		newSrcID := "filestream::input::fingerprint::" +
+			loginp.FingerprintID{Raw: newFingerprint}.Key()
 
 		store := newMockMetadataUpdater()
 		store.table[oldKey] = fileMeta{Source: path, IdentifierName: fingerprintName, Fingerprint: oldFingerprint}
@@ -2005,7 +2028,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 
-		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, newTestHarvesterGroup())
 
 		assert.NotContains(t, p.shortFingerprints.entries, oldKey,
 			"old entry should be removed")
@@ -2051,7 +2074,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 
-		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, newTestHarvesterGroup())
 
 		assert.NotContains(t, p.shortFingerprints.entries, oldKey, "old entry should be removed")
 		assert.NotContains(t, p.shortFingerprints.entries, newSrcID, "transitioned entry should NOT be added")
@@ -2095,7 +2118,7 @@ func TestShortFingerprintEntries_MigrationMaintenance(t *testing.T) {
 		}
 		src := identifier.GetSource(event)
 
-		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store)
+		p.handleGrowingFingerprintLookup(logptest.NewTestingLogger(t, ""), event, src, store, newTestHarvesterGroup())
 
 		assert.False(t, store.has(oldKey), "old key should be removed by migration")
 		assert.True(t, store.has(newSrcID), "new key should exist after migration")
