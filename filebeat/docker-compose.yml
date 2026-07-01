@@ -1,15 +1,15 @@
 services:
   # This is a proxy used to block "docker compose up" until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
-  # proxy_dep:
-  #   image: busybox
-  #   depends_on:
-  #     elasticsearch: { condition: service_healthy }
-  #     kafka:         { condition: service_healthy }
-  #     kibana:        { condition: service_healthy }
-  #     mosquitto:     { condition: service_healthy }
-  #     redis:         { condition: service_healthy }
-  #     redis-tls:     { condition: service_healthy }
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kafka:         { condition: service_healthy }
+      kibana:        { condition: service_healthy }
+      mosquitto:     { condition: service_healthy }
+      redis:         { condition: service_healthy }
+      redis-tls:     { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -22,15 +22,15 @@ services:
     ports:
       - 9200:9200
 
-  # kafka:
-  #   build: ${ES_BEATS}/testing/environments/docker/kafka
-  #   ports:
-  #     - 9092:9092
-  #     - 9093:9093
-  #     - 9094:9094
-  #     - 2181:2181
-  #   environment:
-  #     - ADVERTISED_HOST=kafka
+  kafka:
+    build: ${ES_BEATS}/testing/environments/docker/kafka
+    ports:
+      - 9092:9092
+      - 9093:9093
+      - 9094:9094
+      - 2181:2181
+    environment:
+      - ADVERTISED_HOST=kafka
 
   kibana:
     extends:
@@ -40,24 +40,24 @@ services:
       test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
 
-  # mosquitto:
-  #   build: ${ES_BEATS}/testing/environments/docker/mosquitto
-  #   ports:
-  #     - 1883:1883
+  mosquitto:
+    build: ${ES_BEATS}/testing/environments/docker/mosquitto
+    ports:
+      - 1883:1883
 
-  # redis:
-  #   build: ${PWD}/input/redis/_meta
-  #   ports:
-  #     - 6379:6379
+  redis:
+    build: ${PWD}/input/redis/_meta
+    ports:
+      - 6379:6379
 
-  # redis-tls:
-  #   build:
-  #     context: ${PWD}/input/redis/_meta
-  #     dockerfile: Dockerfile-tls
-  #   ports:
-  #     - 6380:6379
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "--tls", "--cert", "/certs/server-cert.pem", "--key", "/certs/server-key.pem", "--cacert", "/certs/root-ca.pem", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
+  redis-tls:
+    build:
+      context: ${PWD}/input/redis/_meta
+      dockerfile: Dockerfile-tls
+    ports:
+      - 6380:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "--tls", "--cert", "/certs/server-cert.pem", "--key", "/certs/server-key.pem", "--cacert", "/certs/root-ca.pem", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
