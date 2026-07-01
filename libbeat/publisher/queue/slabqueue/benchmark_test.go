@@ -211,13 +211,6 @@ func runWorkload(b *testing.B, producers []queue.Producer[benchEvent], consumerQ
 // (libbeat/publisher/queue/memqueue/queue_test.go) for direct EPS
 // comparison: 10 producer goroutines feed a single 10,000-slot queue
 // while one consumer drains batches.
-//
-// Because slabqueue's Get returns immediately with whatever events are
-// available (no FlushTimeout / MaxGetRequest equivalent), per-iteration
-// batch size varies. To make the comparison fair we count events actually
-// processed and report events/s via b.ReportMetric; the memqueue
-// benchmark's events/s can be derived as queueSize / ns-per-op since it
-// always drains a full batch.
 func BenchmarkProducerThroughput(b *testing.B) {
 	const queueSize = 10000
 	const publishWorkers = 10
