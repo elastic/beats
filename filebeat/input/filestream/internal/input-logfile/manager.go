@@ -157,10 +157,16 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	}
 
 	settings := struct {
-		ID             string        `config:"id"`
-		CleanInactive  time.Duration `config:"clean_inactive"`
-		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{CleanInactive: cim.DefaultCleanTimeout}
+		// All those values are duplicated from the Filestream configuration
+		ID             string             `config:"id"`
+		CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
+		HarvesterLimit uint64             `config:"harvester_limit"`
+		ReadUntilEOF   ReadUntilEOFConfig `config:"read_until_eof"`
+	}{
+		CleanInactive: cim.DefaultCleanTimeout,
+		ReadUntilEOF:  DefaultReadUntilEOFConfig(),
+	}
+
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -236,10 +242,18 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		id:               settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
-		sourceIdentifier: sourceIdentifier,
+		readUntilEOF:     settings.ReadUntilEOF,
+		sourceIdentifier: srcIdentifier,
 		cleanTimeout:     settings.CleanInactive,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
+}
+
+func DefaultReadUntilEOFConfig() ReadUntilEOFConfig {
+	return ReadUntilEOFConfig{
+		Enabled: true,
+		Timeout: time.Minute,
+	}
 }
 
 func (cim *InputManager) Delete(cfg *conf.C) error {
@@ -291,4 +305,13 @@ func (i *SourceIdentifier) ID(s Source) string {
 
 func (i *SourceIdentifier) MatchesInput(id string) bool {
 	return strings.HasPrefix(id, i.prefix)
+}
+
+// ReadUntilEOFConfig configures the behaviour to keep reading the current
+// file until EOF before the input shuts down. If Timeout elapses before EOF
+// is reached, the input shuts down anyway.
+type ReadUntilEOFConfig struct {
+	Enabled bool `config:"enabled"`
+	// Timeout is the maximum time to wait for EOF to be reached.
+	Timeout time.Duration `config:"timeout" validate:"min=1"`
 }
