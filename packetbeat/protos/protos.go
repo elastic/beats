@@ -226,7 +226,7 @@ func validateProtocolDevice(device string, config *conf.C) (bool, error) {
 
 func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
 	if _, exists := s.all[proto]; exists {
-		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
+		logp.Warn("Protocol (%s) plugin will be overwritten by another plugin", proto.String())
 	}
 
 	s.all[proto] = protocolInstance{
