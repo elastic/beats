@@ -63,18 +63,13 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		lastKnownInputs = inputs
 		newFlags := config.GetOsqueryOptions(inputs)
 
-<<<<<<< HEAD
-		// If Osqueryd is running and flags are different: stop osquery
-		if cn != nil && !osqd.FlagsAreSame(flags, newFlags) {
-=======
 		// cn is cleared by the spawned goroutine's cancel() on exit, so guard it with mx.
 		mx.Lock()
 		running := cn != nil
 		mx.Unlock()
 
-		// If Osqueryd is running and flags are different or log level changed: stop osquery
-		if running && (!osqd.FlagsAreSame(flags, newFlags) || logLevel != newLogLevel) {
->>>>>>> ecb945502 (osquerybeat: fix data race on osquery runner cancel function (#51520))
+		// If Osqueryd is running and flags are different: stop osquery
+		if running && !osqd.FlagsAreSame(flags, newFlags) {
 			r.log.Info("Osquery is running and options changed, stop osqueryd")
 
 			// Cancel context
@@ -84,19 +79,12 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			wg.Wait()
 		}
 
-<<<<<<< HEAD
-		// Set the flags to use
-		flags = newFlags
-
-=======
 		mx.Lock()
->>>>>>> ecb945502 (osquerybeat: fix data race on osquery runner cancel function (#51520))
 		// Start osqueryd if not running
 		if cn == nil {
 			r.log.Info("Start osqueryd")
 
 			flags = newFlags
-			logLevel = newLogLevel
 			inputCh = make(chan []config.InputConfig, 1)
 			ctx, cn = context.WithCancel(parentCtx)
 
