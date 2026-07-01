@@ -822,17 +822,16 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 	// preserves the no-open guarantee for static fingerprint on
 	// unreadable/permission-denied small files.
 	if !fd.GZIP {
-		if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
-			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
-				fd.Filename, it.info.Size(), threshold, errFileTooSmall)
-		}
-		// size <= offset we cannot read anything from the offset, regardless of
-		// mode.
+		// size <= offset we cannot read anything from the offset, regardless of mode.
 		if it.info.Size() <= offset {
 			return fd, fmt.Errorf(
 				"filesize of %q is %d bytes, less than fingerprint offset %d: %w",
 				fd.Filename, it.info.Size(), offset, errFileTooSmall)
+		}
+		if !s.cfg.Fingerprint.Growing && it.info.Size() < threshold {
+			return fd, fmt.Errorf(
+				"filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w",
+				fd.Filename, it.info.Size(), threshold, errFileTooSmall)
 		}
 	}
 
@@ -883,8 +882,8 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		// File is below threshold: bytes available from offset is n < length.
 		if !s.cfg.Fingerprint.Growing {
 			return fd, fmt.Errorf(
-				"filesize of %q is %d bytes (read %d from offset), expected at least %d bytes for fingerprinting: %w",
-				fd.Filename, it.info.Size(), n, length, errFileTooSmall)
+				"only %d bytes readable from offset %d in %q, expected at least %d bytes for fingerprinting: %w",
+				n, offset, fd.Filename, length, errFileTooSmall)
 		}
 
 		if n == 0 {
