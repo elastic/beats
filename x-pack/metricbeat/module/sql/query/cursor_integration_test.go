@@ -190,7 +190,7 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists
-	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
 	require.NoError(t, err)
 
 	// Create table with columns for all cursor types
@@ -203,7 +203,7 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 			price NUMERIC(10,2)
 		)
 	`, testTableName)
-	_, err = db.Exec(createSQL)
+	_, err = db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err)
 
 	// Insert test data with values for all cursor types
@@ -212,7 +212,7 @@ func setupPostgresTestTable(t *testing.T, db *sql.DB) {
 	for i := 0; i < 5; i++ {
 		score := float64(i+1) * 1.5   // 1.5, 3.0, 4.5, 6.0, 7.5
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), score, price)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), score, price)
 		require.NoError(t, err)
 	}
 }
@@ -225,7 +225,7 @@ func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists
-	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
 	require.NoError(t, err)
 
 	// Create table with columns for all cursor types
@@ -237,7 +237,7 @@ func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 			price DECIMAL(10,2)
 		)
 	`, testTableName)
-	_, err = db.Exec(createSQL)
+	_, err = db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err)
 
 	// Insert test data with values for all cursor types
@@ -245,14 +245,14 @@ func setupMySQLTestTable(t *testing.T, db *sql.DB) {
 	now := time.Now().UTC()
 	for i := 0; i < 5; i++ {
 		price := float64(i+1) * 10.25 // 10.25, 20.50, 30.75, 41.00, 51.25
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), price)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), now.Add(time.Duration(i)*time.Second), price)
 		require.NoError(t, err)
 	}
 }
 
 func cleanupTestTable(t *testing.T, db *sql.DB, driver string) {
 	t.Helper()
-	_, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", testTableName))
 	if err != nil {
 		t.Logf("Warning: failed to cleanup test table: %v", err)
 	}
@@ -659,10 +659,10 @@ func TestCursorNullValues(t *testing.T) {
 
 	// Create table with nullable timestamp
 	tableName := "cursor_null_test"
-	_, err = db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName))
 	require.NoError(t, err)
 
-	_, err = db.Exec(fmt.Sprintf(`
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id SERIAL PRIMARY KEY,
 			event_data TEXT,
@@ -670,15 +670,15 @@ func TestCursorNullValues(t *testing.T) {
 		)
 	`, tableName))
 	require.NoError(t, err)
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE IF EXISTS %s", tableName)) }()
 
 	// Insert data with NULL timestamps
 	now := time.Now().UTC()
-	_, err = db.Exec(fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-1", now)
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-1", now)
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, NULL)`, tableName), "event-2-null")
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, NULL)`, tableName), "event-2-null")
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-3", now.Add(time.Second))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`INSERT INTO %s (event_data, updated_at) VALUES ($1, $2)`, tableName), "event-3", now.Add(time.Second))
 	require.NoError(t, err)
 
 	// Set up temp paths for cursor store
@@ -837,7 +837,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists (Oracle doesn't have IF EXISTS, so we ignore errors)
-	_, _ = db.Exec("DROP TABLE cursor_test_events")
+	_, _ = db.ExecContext(t.Context(), "DROP TABLE cursor_test_events")
 
 	// Create table with Oracle-specific syntax.
 	// Uses TIMESTAMP (not TIMESTAMP WITH TIME ZONE) and DATE to test
@@ -850,7 +850,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 			event_date DATE DEFAULT CURRENT_DATE
 		)
 	`
-	_, err := db.Exec(createSQL)
+	_, err := db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err, "Failed to create Oracle test table")
 
 	// Insert 10 rows with timestamps 1 second apart.
@@ -859,7 +859,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 	now := time.Now().UTC()
 	for i := 0; i < 10; i++ {
 		ts := now.Add(time.Duration(i) * time.Second)
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
 		require.NoError(t, err, "Failed to insert Oracle test data row %d", i)
 	}
 	t.Log("Oracle test table created with 10 rows")
@@ -867,7 +867,7 @@ func setupOracleTestTable(t *testing.T, db *sql.DB) {
 
 func cleanupOracleTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
-	_, err := db.Exec("DROP TABLE cursor_test_events")
+	_, err := db.ExecContext(t.Context(), "DROP TABLE cursor_test_events")
 	if err != nil {
 		t.Logf("Warning: failed to cleanup Oracle test table: %v", err)
 	}
@@ -1121,7 +1121,7 @@ func testOracleTimestampTimezoneHandling(t *testing.T, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3)
-	require.Len(t, events3, 0, "Third fetch should return 0 events (all consumed)")
+	require.Empty(t, events3, "Third fetch should return 0 events (all consumed)")
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1191,8 +1191,8 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
-	_, err = db.Exec(fmt.Sprintf(`
+	_, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 			event_data VARCHAR2(255),
@@ -1200,14 +1200,14 @@ func testOracleDateCursor(t *testing.T, dsn string) {
 		)
 	`, tableName))
 	require.NoError(t, err, "Failed to create date cursor test table")
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName)) }()
 
 	// Insert 6 rows across 6 distinct dates (today-5 .. today), all at midnight
 	// so TO_DATE comparison works cleanly.
 	today := time.Now().UTC().Truncate(24 * time.Hour)
 	for i := 0; i < 6; i++ {
 		d := today.AddDate(0, 0, i-5) // today-5, today-4, ..., today
-		_, err := db.Exec(
+		_, err := db.ExecContext(t.Context(),
 			fmt.Sprintf("INSERT INTO %s (event_data, event_date) VALUES (:1, :2)", tableName),
 			fmt.Sprintf("event-%d", i), d,
 		)
@@ -1273,9 +1273,9 @@ func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
 
 	// Create a separate table with NULL values
 	tableName := "cursor_null_test_oracle"
-	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
+	_, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName))
 
-	_, err := db.Exec(fmt.Sprintf(`
+	_, err := db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 			event_data VARCHAR2(255),
@@ -1283,15 +1283,15 @@ func testOracleNullHandling(t *testing.T, db *sql.DB, dsn string) {
 		)
 	`, tableName))
 	require.NoError(t, err, "Failed to create NULL test table")
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName)) }()
 
 	// Insert rows: some with timestamps, some with NULL
 	now := time.Now().UTC()
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-1", now)
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-1", now)
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, NULL)", tableName), "event-2-null")
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, NULL)", tableName), "event-2-null")
 	require.NoError(t, err)
-	_, err = db.Exec(fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-3", now.Add(time.Second))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf("INSERT INTO %s (event_data, updated_at) VALUES (:1, :2)", tableName), "event-3", now.Add(time.Second))
 	require.NoError(t, err)
 
 	testPaths := createTestPaths(t)
@@ -1355,7 +1355,7 @@ func testOracleEmptyResultSet(t *testing.T, dsn string) {
 	ms := newMetricSetWithPaths(t, cfg, testPaths)
 	events, errs := fetchEvents(t, ms)
 	require.Empty(t, errs, "Empty result set should not cause errors")
-	require.Len(t, events, 0, "Should return 0 events when cursor is in the far future")
+	require.Empty(t, events, "Should return 0 events when cursor is in the far future")
 
 	// Verify cursor remains unchanged after empty result
 	queryMs, ok := ms.(*MetricSet)
@@ -1584,8 +1584,8 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	defer db.Close()
 
 	// Setup table
-	_, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName))
-	_, err = db.Exec(fmt.Sprintf(`
+	_, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName))
+	_, err = db.ExecContext(t.Context(), fmt.Sprintf(`
 		CREATE TABLE %s (
 			id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 			event_data VARCHAR2(255),
@@ -1593,7 +1593,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 		)
 	`, tableName))
 	require.NoError(t, err, "Failed to create timezone test table")
-	defer func() { _, _ = db.Exec(fmt.Sprintf("DROP TABLE %s", tableName)) }()
+	defer func() { _, _ = db.ExecContext(t.Context(), fmt.Sprintf("DROP TABLE %s", tableName)) }()
 
 	// Insert 10 rows with timestamps 1 second apart.
 	// With params.Timezone=UTC, godror sends the raw UTC value and Oracle stores
@@ -1601,7 +1601,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	now := time.Now().UTC()
 	for i := 0; i < 10; i++ {
 		ts := now.Add(time.Duration(i) * time.Second)
-		_, err := db.Exec(
+		_, err := db.ExecContext(t.Context(),
 			fmt.Sprintf("INSERT INTO %s (event_data, created_at) VALUES (:1, :2)", tableName),
 			fmt.Sprintf("event-%d", i), ts)
 		require.NoError(t, err, "Failed to insert row %d", i)
@@ -1612,7 +1612,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	// insert and read use the same params.Timezone=UTC. The mismatch only
 	// manifests during comparison (WHERE clause with > operator).
 	var storedTS time.Time
-	err = db.QueryRow(fmt.Sprintf(
+	err = db.QueryRowContext(t.Context(), fmt.Sprintf(
 		"SELECT created_at FROM %s WHERE ROWNUM = 1 ORDER BY id", tableName)).Scan(&storedTS)
 	require.NoError(t, err)
 	t.Logf("Inserted Go time (UTC):  %s", now.Format(time.RFC3339Nano))
@@ -1623,7 +1623,7 @@ func testOracleTimestampCursorTimezoneMismatch(t *testing.T, host, port string) 
 	// Use a raw SQL query with a TIMESTAMP WITH TIME ZONE literal to show
 	// that Oracle converts stored TIMESTAMP using session TZ for comparison.
 	var countDirect int
-	err = db.QueryRow(fmt.Sprintf(
+	err = db.QueryRowContext(t.Context(), fmt.Sprintf(
 		"SELECT COUNT(*) FROM %s WHERE created_at > TO_TIMESTAMP(:1, 'YYYY-MM-DD\"T\"HH24:MI:SS.FF\"Z\"')",
 		tableName),
 		now.Add(-1*time.Hour).Format("2006-01-02T15:04:05.000000Z")).Scan(&countDirect)
@@ -1762,7 +1762,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	})
 
 	// Drop table if exists
-	_, _ = db.Exec("DROP TABLE IF EXISTS cursor_test_events")
+	_, _ = db.ExecContext(t.Context(), "DROP TABLE IF EXISTS cursor_test_events")
 
 	// Create table with MSSQL-specific syntax
 	createSQL := `
@@ -1773,7 +1773,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 			event_date DATE DEFAULT CAST(GETUTCDATE() AS DATE)
 		)
 	`
-	_, err := db.Exec(createSQL)
+	_, err := db.ExecContext(t.Context(), createSQL)
 	require.NoError(t, err, "Failed to create MSSQL test table")
 
 	// Insert test data
@@ -1781,7 +1781,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	now := time.Now().UTC()
 	for i := 0; i < 5; i++ {
 		ts := now.Add(time.Duration(i) * time.Second)
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i), ts, ts)
 		require.NoError(t, err, "Failed to insert MSSQL test data")
 	}
 	t.Log("MSSQL test table created with 5 rows")
@@ -1789,7 +1789,7 @@ func setupMSSQLTestTable(t *testing.T, db *sql.DB) {
 
 func cleanupMSSQLTestTable(t *testing.T, db *sql.DB) {
 	t.Helper()
-	_, err := db.Exec("DROP TABLE IF EXISTS cursor_test_events")
+	_, err := db.ExecContext(t.Context(), "DROP TABLE IF EXISTS cursor_test_events")
 	if err != nil {
 		t.Logf("Warning: failed to cleanup MSSQL test table: %v", err)
 	}
@@ -1841,7 +1841,7 @@ func testMSSQLIntegerCursor(t *testing.T, dsn string) {
 	ms3 := newMetricSetWithPaths(t, cfg, testPaths)
 	events3, errs3 := fetchEvents(t, ms3)
 	require.Empty(t, errs3, "Third fetch should not have errors")
-	require.Len(t, events3, 0, "Third fetch should return 0 events")
+	require.Empty(t, events3, "Third fetch should return 0 events")
 
 	if closer, ok := ms3.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
