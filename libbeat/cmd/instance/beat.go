@@ -68,7 +68,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/filewatcher"
+
 	"github.com/elastic/elastic-agent-libs/keystore"
 	kbn "github.com/elastic/elastic-agent-libs/kibana"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -86,6 +86,24 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
 )
+
+// beaterStopGracePeriod bounds how long the framework waits for a Beater's Run
+// to return after Stop before disconnecting the publisher pipeline itself, as a
+// backstop against a beater that is stuck (for example, blocked in a guaranteed
+// Publish). The disconnect is the normal (graceful) one, so already-queued
+// events still drain and the stuck publish is released so Run can return.
+// Correctly-behaved beaters return well within this window, so this timeout is
+// not reached on a normal shutdown. It is used only when the Beater does not
+// report a shutdown drain bound (Beat.ShutdownTimeout); when it does, the
+// watchdog waits that drain plus beaterStopGraceMargin instead. See
+// https://github.com/elastic/beats/issues/49794.
+const beaterStopGracePeriod = 30 * time.Second
+
+// beaterStopGraceMargin is added on top of a Beater's reported shutdown drain
+// bound (Beat.ShutdownTimeout) to derive the watchdog timeout, leaving a small
+// window for the Beater's remaining cleanup after the drain before the
+// pipeline is force-disconnected.
+const beaterStopGraceMargin = time.Second
 
 // Beat provides the runnable and configurable instance of a beat.
 type Beat struct {
@@ -185,6 +203,7 @@ func Run(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
+				//nolint:forbidigo // top-level panic handler in Run; no *logp.Logger is in scope here.
 				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
@@ -515,16 +534,43 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	ctxDashboards, cancelDashboards := context.WithCancel(context.Background())
 
-	// On Stop, the manager will trigger the callback to shut down the
-	// publisher pipeline and then notify the beater.
+	// runReturned is closed once beater.Run returns, letting the shutdown
+	// watchdog below tell a prompt stop from a hung beater.
+	runReturned := make(chan struct{})
+
+	// On Stop, the manager notifies the beater so it can close its inputs and
+	// finalize acknowledgments. The publisher pipeline is disconnected only
+	// after beater.Run returns (below), so the Beater owns shutdown sequencing
+	// and the pipeline is not torn down out from under still-running inputs.
+	// See issue https://github.com/elastic/beats/issues/49794.
+	// Size the watchdog grace from the Beater's reported shutdown drain (set by
+	// the Creator) so a configured shutdown_timeout is not cut short: wait the
+	// full drain plus a 1s margin for the rest of the Beater's cleanup before
+	// forcing a disconnect. Beaters that report no drain fall back to the
+	// default grace period. Read here in the main goroutine, before the stop
+	// callback can run, so there is no race with the Creator that set it.
+	watchdogGrace := beaterStopGracePeriod
+	if b.ShutdownTimeout > 0 {
+		watchdogGrace = b.ShutdownTimeout + beaterStopGraceMargin
+	}
+
 	var stopOnce sync.Once
 	b.Manager.SetStopCallback(
 		func() {
 			stopOnce.Do(func() {
 				b.Instrumentation.Tracer().Close()
-				// disconnect the pipeline first
-				b.Publisher.Disconnect(context.Background())
 				beater.Stop()
+				// Backstop: if Run does not return promptly (e.g. the beater is
+				// blocked in a guaranteed Publish), disconnect the pipeline
+				// after a grace period so the blocked publish is released and
+				// shutdown can complete. A prompt shutdown closes runReturned
+				// first and never reaches the timeout.
+				go runShutdownWatchdog(runReturned, watchdogGrace, func() {
+					logger.Warnf("Beater did not return within %s of being told to stop; forcing publisher pipeline disconnect", watchdogGrace)
+					if b.Publisher != nil {
+						_ = b.Publisher.Disconnect(context.Background())
+					}
+				})
 			})
 		})
 
@@ -540,6 +586,20 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	logger.Infof("%s start running.", b.Info.Beat)
 
 	err = beater.Run(&b.Beat)
+	// Signal the watchdog that Run returned, so it does not force a disconnect.
+	close(runReturned)
+
+	// The beater has returned: it has stopped its inputs and finalized its
+	// clients. Now disconnect the publisher pipeline so it can flush and
+	// acknowledge any outstanding events before we exit. Disconnect is
+	// idempotent, so a beater that already drained the pipeline itself with its
+	// own bounded timeout reaches this as a harmless no-op.
+	if b.Publisher != nil {
+		if derr := b.Publisher.Disconnect(context.Background()); derr != nil {
+			logger.Errorf("error disconnecting publisher pipeline: %v", derr)
+		}
+	}
+
 	if b.shouldReexec {
 		if err := b.reexec(); err != nil {
 			return fmt.Errorf("could not restart %s: %w", b.Info.Beat, err)
@@ -767,7 +827,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err := InitPaths(cfg); err != nil {
 		return err
 	}
-	b.Info.Paths = paths.Paths
+	b.Info.Paths = paths.Paths //nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
@@ -1206,65 +1266,10 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	if !extendedTLSCfg.Reload.Enabled {
 		return nil
 	}
-	logger.Debug("exit on CA certs change enabled")
 
-	possibleFilesToWatch := append(
-		extendedTLSCfg.CAs,
-		extendedTLSCfg.Certificate.Certificate,
-		extendedTLSCfg.Certificate.Key,
-	)
-
-	filesToWatch := []string{}
-	for _, f := range possibleFilesToWatch {
-		if f == "" {
-			continue
-		}
-		if tlscommon.IsPEMString(f) {
-			// That's an embedded cert, we're only interested in files
-			continue
-		}
-
-		logger.Debugf("watching '%s' for changes", f)
-		filesToWatch = append(filesToWatch, f)
-	}
-
-	// If there are no files to watch, don't do anything.
-	if len(filesToWatch) == 0 {
-		logger.Debug("no files to watch, filewatcher will not be started")
-		return nil
-	}
-
-	watcher := filewatcher.New(filesToWatch...)
-	// Ignore the first scan as it will always return
-	// true for files changed. The output has not been
-	// started yet, so even if the files have changed since
-	// the Beat started, they don't need to be reloaded
-	_, _, _ = watcher.Scan()
-
-	// Watch for file changes while the Beat is alive
-	go func() {
-		ticker := time.Tick(extendedTLSCfg.Reload.Period)
-
-		for {
-			<-ticker
-			files, changed, err := watcher.Scan()
-			if err != nil {
-				logger.Warnf("could not scan certificate files: %s", err.Error())
-			}
-
-			if changed {
-				logger.Infof(
-					"some of the following files have been modified: %v, restarting %s.",
-					files, b.Info.Beat)
-
-				b.shouldReexec = true
-				b.Manager.Stop()
-
-				// we're done, finish the goroutine just for the sake of it
-				return
-			}
-		}
-	}()
+	logger.Warn("'ssl.restart_on_cert_change' is deprecated and has no effect. " +
+		"TLS certificates and CAs are now automatically reloaded using 'ssl.certificate_reload'. " +
+		"Please remove 'ssl.restart_on_cert_change' from your configuration.")
 
 	return nil
 }
@@ -1507,6 +1512,7 @@ func InitPaths(cfg *config.C) error {
 		return fmt.Errorf("error extracting default paths: %w", err)
 	}
 
+	//nolint:forbidigo // existing global paths initialization for the standalone beat entry point.
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %w", err)
 	}
@@ -1577,4 +1583,17 @@ func (bc *beatConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// runShutdownWatchdog releases the publisher pipeline if a Beater's Run does not
+// return within grace after it was told to stop, as a backstop against a hung
+// beater (for example one blocked in a guaranteed Publish). It returns
+// immediately once runReturned is closed — the normal, prompt shutdown — and
+// otherwise calls disconnect once after the grace period.
+func runShutdownWatchdog(runReturned <-chan struct{}, grace time.Duration, disconnect func()) {
+	select {
+	case <-runReturned:
+	case <-time.After(grace):
+		disconnect()
+	}
 }

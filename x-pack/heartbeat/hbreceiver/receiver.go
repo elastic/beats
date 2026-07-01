@@ -34,7 +34,7 @@ func (hb *heartbeatReceiver) Start(ctx context.Context, host component.Host) err
 
 func (hb *heartbeatReceiver) Shutdown(ctx context.Context) error {
 	hb.Logger.Info("stopping heartbeat receiver")
-	if err := hb.BeatReceiver.Shutdown(); err != nil {
+	if err := hb.BeatReceiver.Shutdown(ctx); err != nil {
 		return fmt.Errorf("error stopping heartbeat receiver: %w", err)
 	}
 	hb.wg.Wait()

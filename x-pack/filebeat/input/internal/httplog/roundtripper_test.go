@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -242,11 +243,8 @@ func TestResolveSymlinks(t *testing.T) {
 }
 
 func TestResolvePathInLogsFor(t *testing.T) {
-	origLogs := paths.Paths.Logs
-	t.Cleanup(func() { paths.Paths.Logs = origLogs })
-
 	logsDir := filepath.Join(t.TempDir(), "logs")
-	paths.Paths.Logs = logsDir
+	p := &paths.Path{Logs: logsDir}
 
 	const input = "cel"
 	root := filepath.Join(logsDir, input)
@@ -351,7 +349,7 @@ func TestResolvePathInLogsFor(t *testing.T) {
 			continue
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			resolved, ok, err := ResolvePathInLogsFor(input, tt.path)
+			resolved, ok, err := ResolvePathInLogsFor(p, input, tt.path)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -363,6 +361,140 @@ func TestResolvePathInLogsFor(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestResolveTraceFilename(t *testing.T) {
+	logsDir := filepath.Join(t.TempDir(), "logs")
+	p := &paths.Path{Logs: logsDir}
+
+	const input = "cel"
+	root := filepath.Join(logsDir, input)
+	if err := os.MkdirAll(root, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name     string
+		id       string
+		filename string
+		wantOK   bool
+	}{
+		{
+			name:     "empty_filename",
+			id:       "test",
+			filename: "",
+			wantOK:   true,
+		},
+		{
+			name:     "relative_with_star",
+			id:       "my:input:id",
+			filename: "http-request-trace-*.ndjson",
+			wantOK:   true,
+		},
+		{
+			name:     "integration_pattern",
+			id:       "cel-test-1",
+			filename: "../../logs/cel/http-request-trace-*.ndjson",
+			wantOK:   true,
+		},
+		{
+			name:     "absolute_outside",
+			id:       "test",
+			filename: "/var/log/evil.ndjson",
+			wantOK:   false,
+		},
+		{
+			name:     "relative_escape",
+			id:       "test",
+			filename: "../../../etc/passwd",
+			wantOK:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resolved, err := ResolveTraceFilename(p, input, tt.id, tt.filename)
+			if tt.wantOK {
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				if tt.filename == "" {
+					if resolved != "" {
+						t.Errorf("empty filename should resolve to empty, got %q", resolved)
+					}
+					return
+				}
+				ok, err := IsPathIn(root, resolved)
+				if err != nil {
+					t.Fatalf("IsPathIn error: %v", err)
+				}
+				if !ok {
+					t.Errorf("resolved path %q is not within root %q", resolved, root)
+				}
+				if filepath.Ext(resolved) == "" {
+					t.Errorf("resolved path %q lost its extension", resolved)
+				}
+			} else {
+				if err == nil {
+					t.Fatalf("expected error for path %q escaping logs dir, got resolved=%q", tt.filename, resolved)
+				}
+			}
+		})
+	}
+}
+
+func TestResolveTraceFilenameSanitisesID(t *testing.T) {
+	logsDir := filepath.Join(t.TempDir(), "logs")
+	p := &paths.Path{Logs: logsDir}
+
+	const input = "cel"
+	root := filepath.Join(logsDir, input)
+	if err := os.MkdirAll(root, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	resolved, err := ResolveTraceFilename(p, input, "has:colon:chars", "trace-*.ndjson")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	want := filepath.Join(root, "trace-has_colon_chars.ndjson")
+	if resolved != want {
+		t.Errorf("unexpected resolved path:\n got: %q\nwant: %q", resolved, want)
+	}
+}
+
+func TestCleanTraceFiles(t *testing.T) {
+	dir := t.TempDir()
+
+	primary := filepath.Join(dir, "trace.ndjson")
+	rotated := filepath.Join(dir, "trace-2026-01-02T15-04-05.000.ndjson")
+	unrelated := filepath.Join(dir, "other.log")
+
+	for _, f := range []string{primary, rotated, unrelated} {
+		if err := os.WriteFile(f, []byte("data"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	log := logptest.NewTestingLogger(t, "test")
+	CleanTraceFiles(primary, log)
+
+	if _, err := os.Stat(primary); err == nil {
+		t.Error("primary trace file should have been removed")
+	}
+	if _, err := os.Stat(rotated); err == nil {
+		t.Error("rotated trace file should have been removed")
+	}
+	if _, err := os.Stat(unrelated); err != nil {
+		t.Error("unrelated file should not have been removed")
+	}
+}
+
+func TestCleanTraceFilesNonexistent(t *testing.T) {
+	dir := t.TempDir()
+	primary := filepath.Join(dir, "does-not-exist.ndjson")
+
+	log := logptest.NewTestingLogger(t, "test")
+	CleanTraceFiles(primary, log)
 }
 
 func sameError(a, b error) bool {

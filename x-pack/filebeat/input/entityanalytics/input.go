@@ -96,6 +96,7 @@ func (m *manager) createMinimalStateInput(cfg *config.C, c *conf) (v2.Input, err
 		fullSyncInterval: fullSync,
 		incrSyncInterval: incrSync,
 		logger:           m.logger,
+		store:            m.store,
 		path:             m.path,
 	}, nil
 }

@@ -54,6 +54,7 @@ type processor struct {
 	sniffer         *sniffer.Sniffer
 	shutdownTimeout time.Duration
 	err             chan error
+	statusMu        sync.RWMutex
 	status          status.StatusReporter
 }
 
@@ -109,9 +110,20 @@ func (p *processor) Stop() {
 
 // UpdateStatus wraps the status reporter we get from central management
 func (p *processor) UpdateStatus(status status.Status, message string) {
-	if p.status != nil {
-		p.status.UpdateStatus(status, message)
+	p.statusMu.RLock()
+	reporter := p.status
+	p.statusMu.RUnlock()
+	if reporter != nil {
+		reporter.UpdateStatus(status, message)
 	}
+}
+
+// SetStatusReporter implements status.WithStatusReporter so the OTel
+// factory wrapper can inject a sub-reporter after the runner is created.
+func (p *processor) SetStatusReporter(reporter status.StatusReporter) {
+	p.statusMu.Lock()
+	p.status = reporter
+	p.statusMu.Unlock()
 }
 
 // processorFactory controls construction of modules runners.
