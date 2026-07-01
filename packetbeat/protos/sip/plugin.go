@@ -68,8 +68,8 @@ func New(
 ) (protos.Plugin, error) {
 	logger.Warn(cfgwarn.Beta("packetbeat SIP protocol is used"))
 
-	isDebug = logger.HasSelector("sip")
-	isDetailed = logger.HasSelector("sipdetailed")
+	isDebug = logger.Named("sip").IsDebug()
+	isDetailed = logger.Named("sipdetailed").IsDebug()
 
 	config := defaultConfig
 	if !testMode {

@@ -65,14 +65,18 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	if err = pids.Get(); err != nil {
 		return nil, err
 	}
-	proc.logger.Named("procs").Debug("getLocalPortsToPIDs()")
-	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false, proc.logger)
+
+	if proc.isProcEnabled {
+		proc.procLogger.Debug("getLocalPortsToPIDs()")
+	}
+
+	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false, proc.procLogger)
 	if err != nil {
 		proc.logger.Errorf("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
 		return nil, err
 	}
 
-	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true, proc.logger)
+	ipv6socks, err := socketsFromProc(sourceFiles.ipv6, true, proc.procLogger)
 	// Ignore the error when /proc/net/tcp6 doesn't exists (ipv6 disabled).
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -94,7 +98,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 
 	ports = make(map[endpoint]int)
 	for _, pid := range pids.List {
-		inodes, err := findSocketsOfPid("", pid, proc.logger)
+		inodes, err := findSocketsOfPid("", pid, proc.procLogger)
 		if err != nil {
 			if os.IsNotExist(err) {
 				proc.logger.Infof("FindSocketsOfPid: %s", err)
@@ -136,14 +140,14 @@ func findSocketsOfPid(prefix string, pid int, logger *logp.Logger) (inodes []uin
 	for _, name := range names {
 		link, err := os.Readlink(filepath.Join(dirname, name))
 		if err != nil {
-			logger.Named("procs").Debugf("%s", err.Error())
+			logger.Debugf("%s", err.Error())
 			continue
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
 			inode, err := strconv.ParseUint(link[8:len(link)-1], 10, 64)
 			if err != nil {
-				logger.Named("procs").Debugf("%s", err.Error())
+				logger.Debugf("%s", err.Error())
 				continue
 			}
 
@@ -188,19 +192,19 @@ func parseProcNetProto(input io.Reader, ipv6 bool, logger *logp.Logger) ([]*sock
 			continue
 		}
 		if len(words) < 10 {
-			logger.Named("procs").Debugf("Less than 10 words (%d) or starting with 'sl': %s", len(words), words)
+			logger.Debugf("Less than 10 words (%d) or starting with 'sl': %s", len(words), words)
 			continue
 		}
 
 		var sock socketInfo
 		sock.srcIP, sock.srcPort, err = hexToIPPort(words[1], ipv6)
 		if err != nil {
-			logger.Named("procs").Debugf("Error parsing IP and port: %s", err)
+			logger.Debugf("Error parsing IP and port: %s", err)
 			continue
 		}
 		sock.dstIP, sock.dstPort, err = hexToIPPort(words[2], ipv6)
 		if err != nil {
-			logger.Named("procs").Debugf("Error parsing IP and port: %s", err)
+			logger.Debugf("Error parsing IP and port: %s", err)
 			continue
 		}
 

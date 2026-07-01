@@ -52,7 +52,9 @@ type ProcessesWatcher struct {
 	// watcher is the OS-dependent engine for the ProcessWatcher.
 	watcher processWatcher
 
-	logger *logp.Logger
+	logger, procLogger, procDetailedLogger *logp.Logger
+
+	isProcEnabled, isProcDetailedEnabled bool
 }
 
 // endpoint is a network address/port number complex.
@@ -104,6 +106,13 @@ type processWatcher interface {
 func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher, logger *logp.Logger) error {
 	proc.watcher = watcher
 	proc.logger = logger
+	proc.procLogger = logger.Named("procs")
+	proc.procDetailedLogger = logger.Named("procsdetailed")
+
+	// Check if the "procs" and "procsdetailed" selectors are enabled in the logger.
+	proc.isProcEnabled = proc.procLogger.IsDebug()
+	proc.isProcDetailedEnabled = proc.procDetailedLogger.IsDebug()
+
 	proc.portProcMap = map[applayer.Transport]map[endpoint]portProcMapping{
 		applayer.TransportUDP: make(map[endpoint]portProcMapping),
 		applayer.TransportTCP: make(map[endpoint]portProcMapping),
@@ -170,8 +179,8 @@ func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16
 	dst.Args = p.args
 	dst.Exe = p.exe
 	dst.StartTime = p.startTime
-	if proc.logger.IsDebug() && proc.logger.HasSelector("procs") {
-		proc.logger.Named("procs").Debugf("Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
+	if proc.isProcEnabled {
+		proc.procLogger.Debugf("Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, ip, port, transport)
 	}
 }
 
@@ -195,14 +204,14 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 		return nil
 	}
 
-	p, exists := lookupMapping(address, port, procMap, proc.logger)
+	p, exists := lookupMapping(address, port, procMap, proc.procLogger)
 	if exists {
 		return p.proc
 	}
 
 	proc.updateMap(transport)
 
-	p, exists = lookupMapping(address, port, procMap, proc.logger)
+	p, exists = lookupMapping(address, port, procMap, proc.procLogger)
 	if exists {
 		return p.proc
 	}
@@ -241,7 +250,7 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 	// it's old enough. When we fail the first time here, our caller
 	// updates all maps and calls us again.
 	if found && now.After(p.expires) {
-		logger.Named("procs").Debugf("PID %d (%s) port %d is too old, discarding", p.pid, p.proc.name, port)
+		logger.Debugf("PID %d (%s) port %d is too old, discarding", p.pid, p.proc.name, port)
 		delete(procMap, key)
 		p = portProcMapping{}
 		found = false
@@ -252,16 +261,16 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 
 // proc.mu must be locked
 func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
-	if proc.logger.IsDebug() && proc.logger.HasSelector("procsdetailed") {
+	if proc.isProcDetailedEnabled {
 		start := time.Now()
 		defer func() {
-			proc.logger.Named("procsdetailed").Debugf("updateMap() took %v", time.Since(start))
+			proc.procDetailedLogger.Debugf("updateMap() took %v", time.Since(start))
 		}()
 	}
 
 	endpoints, err := proc.watcher.GetLocalPortToPIDMapping(transport)
 	if err != nil {
-		proc.logger.Errorf("unable to list local ports: %v", err)
+		proc.procLogger.Errorf("unable to list local ports: %v", err)
 	}
 
 	proc.expireProcessCache()
@@ -310,8 +319,8 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 		expires:  time.Now().Add(10 * time.Second),
 	}
 
-	if proc.logger.IsDebug() && proc.logger.HasSelector("procsdetailed") {
-		proc.logger.Named("procsdetailed").Debugf("updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
+	if proc.isProcDetailedEnabled {
+		proc.procDetailedLogger.Debugf("updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
 			e.address, e.port, transport, pid, p.name)
 	}
 }
@@ -353,13 +362,13 @@ func (proc *ProcessesWatcher) GetProcess(pid int) *process {
 
 	p, err := sysinfo.Process(pid)
 	if err != nil {
-		proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
+		proc.procLogger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
 		return nil
 	}
 
 	info, err := p.Info()
 	if err != nil {
-		proc.logger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
+		proc.procLogger.Errorf("Unable to get command-line for PID %d: %v", pid, err)
 		return nil
 	}
 

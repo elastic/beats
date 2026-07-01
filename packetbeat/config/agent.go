@@ -113,8 +113,7 @@ func mergeProcsConfig(one, two procs.ProcsConfig) procs.ProcsConfig {
 // NewAgentConfig allows the packetbeat configuration to understand
 // agent semantics
 func NewAgentConfig(cfg *conf.C, logger *logp.Logger) (Config, error) {
-	agentLogger := logger.Named("agent")
-	agentLogger.Debug("Normalizing agent configuration")
+	logger.Debug("Normalizing agent configuration")
 	var (
 		input  agentInput
 		config Config
@@ -123,7 +122,7 @@ func NewAgentConfig(cfg *conf.C, logger *logp.Logger) (Config, error) {
 		return config, err
 	}
 
-	agentLogger.Debugf("Found %d inputs", len(input.Streams))
+	logger.Debugf("Found %d inputs", len(input.Streams))
 	for _, stream := range input.Streams {
 		if interfaceOverride, ok := stream["interface"]; ok {
 			cfg, err := conf.NewConfigFrom(interfaceOverride)
@@ -154,7 +153,7 @@ func NewAgentConfig(cfg *conf.C, logger *logp.Logger) (Config, error) {
 			if !ok {
 				return config, fmt.Errorf("invalid input type of: '%T'", rawStreamType)
 			}
-			agentLogger.Debugf("Found agent configuration for %v", streamType)
+			logger.Debugf("Found agent configuration for %v", streamType)
 			cfg, err := conf.NewConfigFrom(stream)
 			if err != nil {
 				return config, err
