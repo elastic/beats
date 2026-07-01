@@ -74,6 +74,17 @@ func (f fileSource) Name() string {
 	return f.fileID
 }
 
+// LogPath returns the file path for logging. It is used instead of [Name] so
+// logs can identify the file without exposing the fingerprint embedded in the
+// registry identifier. It falls back to the old path when the new path is empty
+// (e.g. on a remove event).
+func (f fileSource) LogPath() string {
+	if f.newPath != "" {
+		return f.newPath
+	}
+	return f.oldPath
+}
+
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string, log *logp.Logger) (fileIdentifier, error) {
 	if ns == nil {

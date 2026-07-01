@@ -26,7 +26,6 @@ import (
 	"slices"
 	"time"
 
-	"go.uber.org/zap"
 	"golang.org/x/text/transform"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -221,7 +220,9 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.WithLazy(zap.String("path", fs.newPath), zap.String("state-id", src.Name()))
+	// path is already on ctx.Logger (set by the harvester); the source name is
+	// intentionally not logged as it may embed the file fingerprint.
+	log := ctx.Logger
 	state := initState(log, cursor, fs)
 	if state.EOF {
 		// TODO: change it to debug once GZIP isn't experimental anymore.
@@ -852,7 +853,7 @@ func (inp *filestream) handleReadError(
 		// an explicit Close — the input is not shutting down and we must
 		// close normally.
 		if inp.readUntilEOF.Enabled && ctx.Cancelation.Err() != nil {
-			return nil, true
+			return nil, true //nolint:nilerr // intentional: swallow ErrClosed so the outer loop drains via readUntilEOF (see comment above)
 		}
 
 		log.Debugf("Reader was closed. Closing. Path='%s'", path)

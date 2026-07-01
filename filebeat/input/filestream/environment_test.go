@@ -396,7 +396,7 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
 	require.EventuallyWithT(e.t, func(t *assert.CollectT) {
 		events := e.pipeline.GetAllEvents()
-		require.Equal(t, count, len(events), "unexpected number of events")
+		require.Len(t, events, count, "unexpected number of events")
 	}, 2*time.Minute, 10*time.Millisecond)
 }
 
@@ -547,6 +547,19 @@ func (e *inputTestingEnvironment) logContains(s string) {
 func (e *inputTestingEnvironment) WaitLogsContains(s string, timeout time.Duration, msgAndArgs ...any) {
 	e.t.Helper()
 	e.testLogger.WaitLogsContains(e.t, s, timeout, msgAndArgs...)
+}
+
+// requireLogsDoNotContain scans the whole log file from the beginning and fails
+// the test if s is found anywhere in the logs. Use it to assert that sensitive
+// values (e.g. a file fingerprint or a fingerprint-bearing identifier) are
+// never logged. It should be called once the input has stopped so all logs are
+// flushed.
+func (e *inputTestingEnvironment) requireLogsDoNotContain(s string) {
+	e.t.Helper()
+	e.testLogger.ResetOffset()
+	found, err := e.testLogger.FindInLogs(s)
+	require.NoError(e.t, err, "reading the log file")
+	require.Falsef(e.t, found, "logs must not contain %q", s)
 }
 
 var _ statestore.States = (*testInputStore)(nil)

@@ -77,8 +77,14 @@ type InputManager struct {
 // Source describe a source the input can collect data from.
 // The [Name] method must return an unique name, that will be used to identify
 // the source in the persistent state store.
+//
+// LogPath returns the file path used to identify the source in logs. It is used
+// instead of [Name] so logs never print the registry identifier, which may
+// embed the file fingerprint (and, for the growing fingerprint, raw file
+// bytes).
 type Source interface {
 	Name() string
+	LogPath() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")

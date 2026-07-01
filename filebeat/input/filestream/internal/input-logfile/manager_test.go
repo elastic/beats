@@ -18,7 +18,6 @@
 package input_logfile
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"strings"
@@ -27,23 +26,30 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const testPluginName = "my_test_plugin"
 
 type testSource struct {
-	name string
+	name    string
+	logPath string
 }
 
 func (s *testSource) Name() string {
+	return s.name
+}
+
+func (s *testSource) LogPath() string {
+	if s.logPath != "" {
+		return s.logPath
+	}
 	return s.name
 }
 
@@ -71,8 +77,8 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}{
 		"plugin with no user configured ID": {
 			sources: []*testSource{
-				{"unique_name"},
-				{"another_unique_name"},
+				{name: "unique_name"},
+				{name: "another_unique_name"},
 			},
 			expectedSourceIDs: []string{
 				testPluginName + "::.global::unique_name",
@@ -178,7 +184,7 @@ func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
 
-	src := &testSource{"test"}
+	src := &testSource{name: "test"}
 	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
 	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
 	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
@@ -191,7 +197,7 @@ func TestInputManager_Create(t *testing.T) {
 			testStore, err := storeReg.Get("test")
 			require.NoError(t, err)
 
-			log, buff := newBufferLogger()
+			log, observed := logptest.NewTestingLoggerWithObserver(t, "")
 
 			cim := &InputManager{
 				Logger:     log,
@@ -214,10 +220,10 @@ func TestInputManager_Create(t *testing.T) {
 			err = cim.Delete(cfg)
 			require.NoError(t, err)
 
-			assert.NotContains(t, buff.String(),
-				"filestream input with ID")
-			assert.NotContains(t, buff.String(),
-				"already exists")
+			assert.Empty(t, observed.FilterMessageSnippet("filestream input with ID").All(),
+				"no duplicated-ID warning should be logged")
+			assert.Empty(t, observed.FilterMessageSnippet("already exists").All(),
+				"no duplicated-ID warning should be logged")
 		})
 
 	t.Run("does not start an input with duplicated ID", func(t *testing.T) {
@@ -235,7 +241,7 @@ func TestInputManager_Create(t *testing.T) {
 				testStore, err := storeReg.Get("test")
 				require.NoError(t, err)
 
-				log, buff := newBufferLogger()
+				log, observed := logptest.NewTestingLoggerWithObserver(t, "")
 
 				cim := &InputManager{
 					Logger:     log,
@@ -269,10 +275,10 @@ paths:
 				_, err = cim.Create(cfg2)
 				require.Error(t, err, "filestream should not have created an input with a duplicated ID")
 
-				logs := buff.String()
 				// Assert the logs contain the correct log message
-				assert.Contains(t, logs,
-					fmt.Sprintf("filestream input ID '%s' is duplicated:", tc.id))
+				assert.NotEmpty(t,
+					observed.FilterMessageSnippet(fmt.Sprintf("filestream input ID '%s' is duplicated:", tc.id)).All(),
+					"did not find the expected message about the duplicated input ID")
 
 				// Assert the error contains the correct text
 				assert.Contains(t, err.Error(),
@@ -286,7 +292,7 @@ paths:
 		testStore, err := storeReg.Get("test")
 		require.NoError(t, err)
 
-		log, _ := newBufferLogger()
+		log, _ := logptest.NewTestingLoggerWithObserver(t, "")
 
 		cim := &InputManager{
 			Logger:     log,
@@ -384,7 +390,7 @@ paths:
 		testStore, err := storeReg.Get("test")
 		require.NoError(t, err)
 
-		log, buff := newBufferLogger()
+		log, observed := logptest.NewTestingLoggerWithObserver(t, "")
 
 		cim := &InputManager{
 			Logger:     log,
@@ -418,25 +424,13 @@ paths:
 		_, err = cim.Create(cfg2)
 		require.NoError(t, err, "filestream should not have created an input with a duplicated ID")
 
-		logs := buff.String()
 		// Assert the logs contain the correct log message
-		assert.Contains(t, logs,
-			"filestream input with ID 'duplicated-id' already exists, this "+
+		assert.NotEmpty(t,
+			observed.FilterMessageSnippet("filestream input with ID 'duplicated-id' already exists, this "+
 				"will lead to data duplication, please use a different ID. Metrics "+
-				"collection has been disabled on this input.",
+				"collection has been disabled on this input.").All(),
 			"did not find the expected message about the duplicated input ID")
 	})
-}
-
-func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
-	buf := &bytes.Buffer{}
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
-		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
-	}))
-	return log, buf
 }
 
 func TestTakeOverConfigUnpack(t *testing.T) {

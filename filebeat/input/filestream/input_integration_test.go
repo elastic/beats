@@ -22,6 +22,8 @@ package filestream
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -705,6 +707,105 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 	env.requireOffsetInRegistry(testlogName, id, len(truncatedTestLines))
+}
+
+// TestFilestreamFingerprintLogsUsePathOnFileReplaced asserts that, with
+// file_identity: fingerprint, when the file at a path is replaced in place by
+// different content (a new fingerprint), the logs still let an operator follow
+// the file by path and never expose the fingerprint or a fingerprint-bearing
+// identifier.
+func TestFilestreamFingerprintLogsUsePathOnFileReplaced(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	logPath := env.abspath(testlogName)
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                     id,
+		"paths":                                  []string{logPath},
+		"prospector.scanner.check_interval":      "1ms",
+		"close.reader.on_eof":                    "true",
+		"prospector.scanner.fingerprint.enabled": true,
+		"prospector.scanner.fingerprint.offset":  0,
+		"prospector.scanner.fingerprint.length":  64,
+		"file_identity.fingerprint":              map[string]any{},
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	// First file at the path. It must be >= 64 bytes so a fingerprint can be
+	// computed (file_identity: fingerprint requires it).
+	line1 := []byte(strings.Repeat("a", 80) + "\n")
+	env.mustWriteToFile(testlogName, line1)
+	env.waitUntilEventCount(1)
+
+	// The harvester logs carry the file path in the "path" field (not the
+	// fingerprint).
+	logPathStr := strings.ReplaceAll(logPath, `\`, `\\`)
+	env.WaitLogsContains(`"source_file":"`+logPathStr+`"`, 10*time.Second,
+		"the harvester logs must carry the file path in source_file")
+
+	env.waitUntilHarvesterIsDone()
+
+	// Replace the content at the SAME path: a different fingerprint, i.e. a new
+	// file at the same path.
+	line2 := []byte(strings.Repeat("b", 80) + "\n")
+	env.mustWriteToFile(testlogName, line2)
+	env.waitUntilEventCount(2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	requireFilestreamLogsDoNotLeakFingerprint(env,
+		fingerprintHex(line1[:64]), fingerprintHex(line2[:64]))
+}
+
+// TestFilestreamFingerprintLogsUsePathOnTruncateRewrite asserts the same
+// property when the file is truncated and rewritten with different content.
+func TestFilestreamFingerprintLogsUsePathOnTruncateRewrite(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	logPath := env.abspath(testlogName)
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                     id,
+		"paths":                                  []string{logPath},
+		"prospector.scanner.check_interval":      "1ms",
+		"close.reader.on_eof":                    "true",
+		"prospector.scanner.fingerprint.enabled": true,
+		"prospector.scanner.fingerprint.offset":  0,
+		"prospector.scanner.fingerprint.length":  64,
+		"file_identity.fingerprint":              map[string]any{},
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	line1 := []byte(strings.Repeat("a", 80) + "\n")
+	env.mustWriteToFile(testlogName, line1)
+	env.waitUntilEventCount(1)
+	// The harvester logs carry the file path in the "path" field (not the
+	// fingerprint).
+	logPathStr := strings.ReplaceAll(logPath, `\`, `\\`)
+	env.WaitLogsContains(`"source_file":"`+logPathStr+`"`, 10*time.Second,
+		"the harvester logs must carry the file path in source_file")
+
+	env.waitUntilHarvesterIsDone()
+
+	// Truncate and rewrite with different content (a new fingerprint).
+	env.mustTruncateFile(testlogName, 0)
+	time.Sleep(5 * time.Millisecond)
+	line2 := []byte(strings.Repeat("b", 80) + "\n")
+	env.mustAppendToFile(testlogName, line2)
+	env.waitUntilEventCount(2)
+
+	cancelInput()
+	env.waitUntilInputStops()
+
+	requireFilestreamLogsDoNotLeakFingerprint(env,
+		fingerprintHex(line1[:64]), fingerprintHex(line2[:64]))
 }
 
 // test_truncate from test_harvester.py
@@ -1439,4 +1540,26 @@ func TestDataAddedAfterCloseInactive(t *testing.T) {
 
 	// Ensure all events have been ingested
 	env.waitUntilEventCount(55)
+}
+
+// fingerprintHex returns the SHA-256 hex digest of b, matching how the
+// filestream scanner computes a file fingerprint (sha256 of the first
+// `length` bytes). Used to assert the fingerprint value never appears in logs.
+func fingerprintHex(b []byte) string {
+	sum := sha256.Sum256(b)
+	return hex.EncodeToString(sum[:])
+}
+
+// requireFilestreamLogsDoNotLeakFingerprint asserts that the raw fingerprint
+// values never appear in the logs, and neither does the removed state-id field.
+// Note: source_file now carries the file path (not the registry key), and
+// registry keys for the fingerprint identity may legitimately appear as
+// "fingerprint::<hash-of-the-fingerprint>" (see KeyForLog), so the raw
+// fingerprint value is what must be absent.
+func requireFilestreamLogsDoNotLeakFingerprint(env *inputTestingEnvironment, fingerprints ...string) {
+	env.t.Helper()
+	for _, fp := range fingerprints {
+		env.requireLogsDoNotContain(fp)
+	}
+	env.requireLogsDoNotContain(`"state-id"`)
 }

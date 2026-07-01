@@ -323,7 +323,7 @@ func (f *logFile) handleEOF() error {
 	// calling the stat function
 	info, statErr := f.file.Stat()
 	if statErr != nil {
-		f.log.Error("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
+		f.log.Errorf("Unexpected error reading from %s; error: %s", f.file.Name(), statErr)
 		return statErr
 	}
 

@@ -28,14 +28,13 @@ import (
 // is deferred via [logp.Logger.WithLazy], so the underlying core only pays
 // for the fields if a message is actually emitted.
 func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent) *logp.Logger {
-	fields := make([]zap.Field, 0, 6)
+	// The file is identified by path (new_path/old_path below). The source name
+	// (event.SrcID) and the fingerprint are intentionally NOT logged: SrcID
+	// embeds the fingerprint, and the fingerprint may contain raw file bytes.
+	fields := make([]zap.Field, 0, 4)
 	fields = append(fields,
 		zap.String("operation", event.Op.String()),
-		zap.String("source_file", event.SrcID),
 	)
-	if event.Descriptor.Fingerprint != "" {
-		fields = append(fields, zap.String("fingerprint", event.Descriptor.Fingerprint))
-	}
 	if info := event.Descriptor.Info; info != nil {
 		if osID := info.GetOSState().Identifier(); osID != "" {
 			fields = append(fields, zap.String("os_id", osID))

@@ -148,7 +148,7 @@ func (p *fileProspector) takeOverFn(
 	split := strings.Split(v.Key, "::")
 	if len(split) != 4 {
 		// This should never happen.
-		p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key)
+		p.logger.Errorf("registry entry for file '%s' has a key in the wrong format, cannot migrate state", fm.Source)
 		return "", fm
 	}
 
@@ -161,7 +161,7 @@ func (p *fileProspector) takeOverFn(
 
 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 	fm.IdentifierName = p.identifier.Name()
-	p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key, newKey)
+	p.logger.Infof("Taking over state for file '%s'", fm.Source)
 	return newKey, fm
 }
 
@@ -386,7 +386,7 @@ func (p *fileProspector) onFSEvent(
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
-				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+				log.Errorf("Failed to set cursor meta data for file %s: %v", event.NewPath, err)
 			}
 
 		case loginp.OpWrite:
@@ -447,7 +447,7 @@ func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, igno
 
 func (p *fileProspector) onRemove(log *logp.Logger, fe loginp.FSEvent, src loginp.Source, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	if p.stateChangeCloser.Removed {
-		log.Debugf("Stopping harvester as file %s has been removed and close.on_state_change.removed is enabled.", src.Name())
+		log.Debugf("Stopping harvester as file %s has been removed and close.on_state_change.removed is enabled.", fe.OldPath)
 		hg.Stop(src)
 	}
 
@@ -482,16 +482,16 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 		if err != nil {
 			meta.IdentifierName = p.identifier.Name()
 			log.Warnf(
-				"Error while getting cursor meta data of entry '%s': '%v', using prospector's identifier: '%s'",
-				src.Name(), err, meta.IdentifierName)
+				"Error while getting cursor meta data for file '%s': '%v', using prospector's identifier: '%s'",
+				fe.NewPath, err, meta.IdentifierName)
 		}
 		err = s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: meta.IdentifierName})
 		if err != nil {
-			log.Errorf("Failed to update cursor meta data of entry %s: %v", src.Name(), err)
+			log.Errorf("Failed to update cursor meta data for file %s: %v", fe.NewPath, err)
 		}
 
 		if p.stateChangeCloser.Renamed {
-			log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", src.Name())
+			log.Debugf("Stopping harvester as file %s has been renamed and close.on_state_change.renamed is enabled.", fe.NewPath)
 
 			fe.Op = loginp.OpDelete
 			srcToClose := p.identifier.GetSource(fe)

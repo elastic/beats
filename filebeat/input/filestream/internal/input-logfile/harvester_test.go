@@ -644,6 +644,54 @@ func TestCursorAllEventsPublished(t *testing.T) {
 		"once the harvester is done, the resource must be unlocked, 'pending' must be 0")
 }
 
+// TestStartHarvesterLogsByPath asserts the per-harvester logger identifies the
+// file by its path (the source_file field) and never leaks the source name (the
+// registry key), which embeds the fingerprint.
+func TestStartHarvesterLogsByPath(t *testing.T) {
+	logger, observed := logptest.NewTestingLoggerWithObserver(t, "")
+
+	// name mimics a fingerprint registry key; it must never appear in the logs.
+	src := &testSource{
+		name:    "filestream::my-id::fingerprint::deadbeefcafe",
+		logPath: "/var/log/app.log",
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	mockHarvester := &mockHarvester{
+		onRun: func(ctx input.Context, _ Source, _ Cursor, _ Publisher) error {
+			ctx.Logger.Info("inside harvester run")
+			return nil
+		},
+		wg: &wg,
+	}
+	hg := testDefaultHarvesterGroup(t, mockHarvester, 0)
+
+	ctx := input.Context{Logger: logger, Cancelation: t.Context()}.
+		WithStatusReporter(mockStatusReporter{})
+	hg.Start(ctx, src)
+	wg.Wait()
+	require.NoError(t, hg.StopHarvesters(), "stopping harvesters")
+
+	entries := observed.All()
+	require.NotEmpty(t, entries, "expected the harvester to emit log entries")
+
+	sawSourceFile := false
+	for _, e := range entries {
+		for k, v := range e.ContextMap() {
+			if s, ok := v.(string); ok {
+				assert.NotContainsf(t, s, src.name,
+					"field %q of entry %q must not contain the source name", k, e.Message)
+			}
+		}
+		if sf, ok := e.ContextMap()["source_file"]; ok {
+			assert.Equal(t, src.logPath, sf, "source_file must be the file path")
+			sawSourceFile = true
+		}
+	}
+	assert.True(t, sawSourceFile, "expected a log entry to carry the source_file field")
+}
+
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester, limit uint64) *defaultHarvesterGroup {
 	return testDefaultHarvesterGroupWithLogger(t, mockHarvester, limit, logptest.NewTestingLogger(t, ""))
 }

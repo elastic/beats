@@ -163,7 +163,9 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 }
 
 func (w *fileWatcher) processNotification(evt loginp.HarvesterStatus) {
-	w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", evt.ID, evt.Size)
+	if w.log.IsDebug() {
+		w.log.Debugf("Harvester Closed notification received. ID: %s, Size: %d", loginp.KeyForLog(evt.ID), evt.Size)
+	}
 	w.closedHarvestersMutex.Lock()
 	w.closedHarvesters[evt.ID] = evt.Size
 	w.closedHarvestersMutex.Unlock()
@@ -223,7 +225,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		// a new harvester if needed.
 		w.closedHarvestersMutex.Lock()
 		if size, harvesterClosed := w.closedHarvesters[srcID]; harvesterClosed {
-			w.log.Debugf("Updating previous state because harvester was closed. '%s': %d", srcID, size)
+			w.log.Debugf("Updating previous state because harvester was closed. path:%q size:%d", path, size)
 			prevDesc.SetBytesIngested(size)
 		}
 		w.closedHarvestersMutex.Unlock()

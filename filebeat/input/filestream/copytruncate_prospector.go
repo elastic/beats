@@ -252,7 +252,7 @@ func (p *copyTruncateFileProspector) onFSEvent(log *logp.Logger, ctx input.Conte
 		if event.Op == loginp.OpCreate {
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {
-				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+				log.Errorf("Failed to set cursor meta data for file %s: %v", event.NewPath, err)
 			}
 		}
 

@@ -18,6 +18,8 @@
 package input_logfile
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"sync"
@@ -251,7 +253,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 		}
 
 		if !res.lock.TryLock() {
-			s.store.log.Infof("cannot lock '%s', will not update registry for it", key)
+			s.store.log.Infof("cannot lock '%s', will not update registry for it", KeyForLog(key))
 			continue
 		}
 
@@ -287,7 +289,8 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 			s.store.UpdateTTL(res, 0)
 			delete(s.store.ephemeralStore.table, res.key)
 			_ = s.store.persistentStore.Remove(res.key)
-			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
+
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", KeyForLog(key), KeyForLog(newKey), r.cursor)
 		}
 
 		res.lock.Unlock()
@@ -376,7 +379,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 
 		if !res.lock.TryLock() {
 			res.Release()
-			s.store.log.Infof("cannot lock '%s', will not migrate its state", k)
+			s.store.log.Infof("cannot lock '%s', will not migrate its state", KeyForLog(k))
 			continue
 		}
 
@@ -428,7 +431,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			s.store.UpdateTTL(res, 0)
 			delete(s.store.ephemeralStore.table, res.key)
 			_ = s.store.persistentStore.Remove(res.key)
-			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", KeyForLog(k), KeyForLog(newKey), r.cursor)
 		}
 
 		cleanup()
@@ -445,7 +448,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			// state with a potentially stale Log input state.
 			if !res.IsNew() {
 				res.Release()
-				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", k, newKey)
+				s.store.log.Infof("state for '%s' already exists as '%s', skipping takeover from Log input", KeyForLog(k), KeyForLog(newKey))
 				continue
 			}
 
@@ -464,7 +467,7 @@ func (s *sourceStore) TakeOver(fn func(TakeOverState) (string, any)) {
 			s.store.ephemeralStore.table[newKey] = res
 
 			res.Release()
-			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", KeyForLog(k), KeyForLog(newKey), res.cursor)
 		}
 	}
 }
@@ -538,7 +541,7 @@ func (s *store) Get(key string) *resource {
 func (s *store) findCursorMeta(key string, to interface{}) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
-		return fmt.Errorf("resource '%s' not found", key)
+		return fmt.Errorf("resource '%s' not found", KeyForLog(key))
 	}
 	defer resource.Release()
 	return resource.UnpackCursorMeta(to)
@@ -548,7 +551,7 @@ func (s *store) findCursorMeta(key string, to interface{}) error {
 func (s *store) updateMetadata(key string, meta interface{}) error {
 	resource := s.ephemeralStore.Find(key, true)
 	if resource == nil {
-		return fmt.Errorf("resource '%s' not found", key)
+		return fmt.Errorf("resource '%s' not found", KeyForLog(key))
 	}
 	defer resource.Release()
 
@@ -569,7 +572,7 @@ func (s *store) writeState(r *resource) {
 
 	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
 	if err != nil {
-		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
+		s.log.Errorf("Failed to update resource fields for '%v'", KeyForLog(r.key))
 	} else {
 		r.stored = true
 	}
@@ -580,7 +583,7 @@ func (s *store) writeState(r *resource) {
 func (s *store) resetCursor(key string, cur interface{}) error {
 	r := s.ephemeralStore.Find(key, false)
 	if r == nil {
-		return fmt.Errorf("resource '%s' not found", key)
+		return fmt.Errorf("resource '%s' not found", KeyForLog(key))
 	}
 	defer r.Release()
 
@@ -603,7 +606,7 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 func (s *store) remove(key string) error {
 	resource := s.ephemeralStore.Find(key, false)
 	if resource == nil {
-		return fmt.Errorf("resource '%s' not found", key)
+		return fmt.Errorf("resource '%s' not found", KeyForLog(key))
 	}
 	s.UpdateTTL(resource, 0)
 	resource.Release()
@@ -829,8 +832,8 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		var st state
 		if err := dec.Decode(&st); err != nil {
-			log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
-				key, err)
+			log.Errorf("Failed to read registry state for '%s', cursor state will be ignored. Error was: %+v",
+				KeyForLog(key), err)
 			return true, nil
 		}
 
@@ -853,4 +856,34 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 		return nil, err
 	}
 	return states, nil
+}
+
+// fingerprintKeyMarker precedes the fingerprint value in a registry key built
+// for the fingerprint file identity, i.e. "<input>::<input-id>::fingerprint::<value>".
+// Only the value after this marker is sensitive: a SHA-256 hash for the static
+// fingerprint, raw file bytes for the growing fingerprint.
+//
+// The "fingerprint" literal must match filestream's fingerprint file-identity
+// name (filestream.fingerprintName), which cannot be imported here without an
+// import cycle.
+const fingerprintKeyMarker = "::fingerprint::"
+
+// KeyForLog returns a registry key in a form that is safe to log.
+//
+// Keys for non-fingerprint identities (native, path, inode_marker) are not
+// sensitive and are returned unchanged. For a fingerprint key, everything after
+// the first fingerprint marker is replaced by its SHA-256 hash - the first
+// marker so that a growing-fingerprint value that itself contains the marker is
+// still hashed in full. The key stays correlatable - re-hashing the value of a
+// key read from the registry yields the same string - without ever writing the
+// fingerprint, which may contain raw file bytes.
+func KeyForLog(key string) string {
+	i := strings.Index(key, fingerprintKeyMarker)
+	if i < 0 {
+		return key
+	}
+
+	start := i + len(fingerprintKeyMarker)
+	sum := sha256.Sum256([]byte(key[start:]))
+	return key[:start] + hex.EncodeToString(sum[:])
 }

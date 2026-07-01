@@ -162,7 +162,7 @@ func (hg *defaultHarvesterGroup) notifyObserver(canceler inputv2.Canceler, srcID
 	}
 
 	select {
-	case hg.notifyChan <- HarvesterStatus{srcID, size}:
+	case hg.notifyChan <- HarvesterStatus{ID: srcID, Size: size}:
 	case <-canceler.Done():
 	}
 }
@@ -194,7 +194,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 // If the harvester limit has been reached, the harvester will wait until it can
 // be started. Restart does not block.
 func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
-	ctx.Logger.Debugf("Restarting harvester for %s", src)
+	ctx.Logger.Debugf("Restarting harvester for file %q", src.LogPath())
 
 	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics, hg.inputID)); err != nil {
 		ctx.Logger.Warnf(
@@ -216,6 +216,7 @@ func startHarvester(
 	inputID string,
 ) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
+	logPath := src.LogPath()
 	if !restart && !hg.readers.reserve(srcID) {
 		// A harvester is already running for this source, no need to start another.
 		// This check must happen here, before task.Group.Go spawns a goroutine.
@@ -223,7 +224,7 @@ func startHarvester(
 		// until a slot is available. Without this early check, repeated file events
 		// would spawn goroutines that wait on the semaphore only to discover (after
 		// acquiring it) that a harvester is already running, causing a goroutine leak.
-		ctx.Logger.Debugf("Harvester already running for %s", srcID)
+		ctx.Logger.Debugf("Harvester already running for file %q", logPath)
 		return nil
 	}
 
@@ -244,7 +245,7 @@ func startHarvester(
 		}()
 
 		// We clone the logger here where we need it to avoid redundant copies that increase memory pressure.
-		ctx.Logger = ctx.Logger.With("source_file", srcID)
+		ctx.Logger = ctx.Logger.With("source_file", logPath)
 
 		if restart {
 			// stop previous harvester
@@ -335,7 +336,7 @@ func startHarvester(
 			}
 
 			hg.notifyObserver(canceler, srcID, st.Offset)
-			ctx.Logger.Debugf("Harvester '%s' closed with offset: %d", srcID, st.Offset)
+			ctx.Logger.Debugf("Harvester closed with offset: %d", st.Offset)
 		}()
 
 		ctx.Logger.Debug("Starting harvester for file")
@@ -357,7 +358,7 @@ func startHarvester(
 
 // Continue starts a new Harvester with the state information from a different Source.
 func (hg *defaultHarvesterGroup) Continue(ctx inputv2.Context, previous, next Source) {
-	ctx.Logger.Debugf("Continue harvester for file prev=%s, next=%s", previous.Name(), next.Name())
+	ctx.Logger.Debugf("Continue harvester for file, previous=%q next=%q", previous.LogPath(), next.LogPath())
 	prevID := hg.identifier.ID(previous)
 	nextID := hg.identifier.ID(next)
 
@@ -423,11 +424,11 @@ func lock(ctx inputv2.Context, store *store, key string) (*resource, error) {
 
 func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Canceler) error {
 	if !resource.lock.TryLock() {
-		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
+		log.Infof("Resource '%v' currently in use, waiting...", KeyForLog(resource.key))
 		err := resource.lock.LockContext(canceler)
-		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
+		log.Infof("Resource '%v' finally released. Lock acquired", KeyForLog(resource.key))
 		if err != nil {
-			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
+			log.Infof("Input for resource '%v' has been stopped while waiting", KeyForLog(resource.key))
 			return err
 		}
 	}
