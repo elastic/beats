@@ -271,7 +271,7 @@ ssl:
 	err = conn.Connect(ctx)
 
 	if version.FIPSDistribution {
-		require.ErrorContains(t, err, "tls: no FIPS compatible certificate chains found")
+		require.ErrorContains(t, err, "not allowed by FIPS 140-3")
 	} else {
 		require.NoError(t, err)
 	}
