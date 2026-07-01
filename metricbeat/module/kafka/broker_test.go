@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/sarama"
 )
@@ -68,6 +69,44 @@ func (m *dummyNet) LocalIPAddrs() ([]net.IP, error) {
 
 func (m *dummyNet) Hostname() (string, error) {
 	return "kafka2", nil
+}
+
+func TestNewBrokerOAUTHBEARER(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
+	baseSettings := func() BrokerSettings {
+		return BrokerSettings{
+			ClientID: "metricbeat",
+			Version:  kafka.Version("2.1.0"),
+		}
+	}
+
+	t.Run("valid config enables SASL and sets a token provider", func(t *testing.T) {
+		settings := baseSettings()
+		settings.Sasl = kafka.SaslConfig{
+			SaslMechanism:   "OAUTHBEARER",
+			CredentialsPath: "/var/run/secrets/tokens/kafka.jwt",
+			Extensions: map[string]string{
+				"logicalCluster": "lkc-abc123",
+				"identityPoolId": "pool-xyz789",
+			},
+		}
+
+		broker, err := NewBroker("localhost:9092", logger, settings)
+		require.NoError(t, err)
+		require.NotNil(t, broker)
+		assert.True(t, broker.cfg.Net.SASL.Enable, "SASL should be enabled")
+		assert.Equal(t, sarama.SASLMechanism(sarama.SASLTypeOAuth), broker.cfg.Net.SASL.Mechanism)
+		assert.NotNil(t, broker.cfg.Net.SASL.TokenProvider, "token provider should be set for OAUTHBEARER")
+	})
+
+	t.Run("missing credentials_path is an error", func(t *testing.T) {
+		settings := baseSettings()
+		settings.Sasl = kafka.SaslConfig{SaslMechanism: "OAUTHBEARER"}
+
+		_, err := NewBroker("localhost:9092", logger, settings)
+		require.Error(t, err, "expected an error when sasl.credentials_path is not set for OAUTHBEARER")
+	})
 }
 
 func TestFindMatchingAddress(t *testing.T) {

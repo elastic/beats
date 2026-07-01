@@ -77,7 +77,7 @@ type MemberDescription struct {
 const noID = -1
 
 // NewBroker creates a new unconnected kafka Broker connection instance.
-func NewBroker(host string, logger *logp.Logger, settings BrokerSettings) *Broker {
+func NewBroker(host string, logger *logp.Logger, settings BrokerSettings) (*Broker, error) {
 	cfg := sarama.NewConfig()
 	cfg.Net.DialTimeout = settings.DialTimeout
 	cfg.Net.ReadTimeout = settings.ReadTimeout
@@ -92,7 +92,14 @@ func NewBroker(host string, logger *logp.Logger, settings BrokerSettings) *Broke
 		cfg.Net.SASL.Enable = true
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
-		settings.Sasl.ConfigureSarama(cfg)
+		if err := settings.Sasl.ConfigureSarama(cfg); err != nil {
+			return nil, err
+		}
+	} else if strings.ToUpper(settings.Sasl.SaslMechanism) == sarama.SASLTypeOAuth {
+		cfg.Net.SASL.Enable = true
+		if err := settings.Sasl.ConfigureSarama(cfg); err != nil {
+			return nil, err
+		}
 	}
 	cfg.Version, _ = settings.Version.Get()
 
@@ -103,7 +110,7 @@ func NewBroker(host string, logger *logp.Logger, settings BrokerSettings) *Broke
 		id:      noID,
 		matchID: settings.MatchID,
 		logger:  logger,
-	}
+	}, nil
 }
 
 // Close the broker connection
