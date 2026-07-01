@@ -40,6 +40,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+var (
+	debugf    = logp.MakeDebug("http")
+	detailedf = logp.MakeDebug("httpdetailed")
+)
+
 type parserState uint8
 
 const (
@@ -95,12 +100,14 @@ type httpPlugin struct {
 
 	transactionTimeout time.Duration
 
-	log                 *logp.Logger
-	isDebug, isDetailed bool
-
 	results protos.Reporter
 	watcher *procs.ProcessesWatcher
 }
+
+var (
+	isDebug    = false
+	isDetailed = false
+)
 
 func init() {
 	protos.Register("http", New)
@@ -111,7 +118,6 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
-	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &httpPlugin{}
 	config := defaultConfig
@@ -121,40 +127,21 @@ func New(
 		}
 	}
 
-	if err := p.init(results, watcher, &config, logger); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *httpPlugin) init(
-	results protos.Reporter,
-	watcher *procs.ProcessesWatcher,
-	config *httpConfig,
-	logger *logp.Logger) error {
+func (http *httpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *httpConfig) error {
 	http.setFromConfig(config)
 
-	http.log = logger
-	http.isDebug = logger.IsDebug() && logger.HasSelector("http")
-	http.isDetailed = logger.IsDebug() && logger.HasSelector("httpdetailed")
+	isDebug = logp.IsDebug("http")
+	isDetailed = logp.IsDebug("httpdetailed")
 	http.results = results
 	http.watcher = watcher
 	return nil
-}
-
-//go:inline
-func (http *httpPlugin) debugf(format string, v ...interface{}) {
-	if http.isDebug {
-		http.log.Named("http").Debugf(format, v...)
-	}
-}
-
-//go:inline
-func (http *httpPlugin) detailf(format string, v ...interface{}) {
-	if http.isDetailed {
-		http.log.Named("httpdetailed").Debugf(format, v...)
-	}
 }
 
 func (http *httpPlugin) setFromConfig(config *httpConfig) {
@@ -211,7 +198,9 @@ func (http *httpPlugin) messageGap(s *stream, nbytes int) (ok bool, complete boo
 		// we know we cannot recover from these
 		return false, false
 	case stateBody:
-		http.debugf("gap in body: %d", nbytes)
+		if isDebug {
+			debugf("gap in body: %d", nbytes)
+		}
 
 		if m.isRequest {
 			if !m.packetLossReq {
@@ -271,7 +260,7 @@ func (http *httpPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	conn := http.ensureHTTPConnection(private)
+	conn := ensureHTTPConnection(private)
 	conn = http.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
 		return nil
@@ -279,26 +268,26 @@ func (http *httpPlugin) Parse(
 	return conn
 }
 
-func (http *httpPlugin) ensureHTTPConnection(private protos.ProtocolData) *httpConnectionData {
-	conn := http.getHTTPConnection(private)
+func ensureHTTPConnection(private protos.ProtocolData) *httpConnectionData {
+	conn := getHTTPConnection(private)
 	if conn == nil {
 		conn = &httpConnectionData{}
 	}
 	return conn
 }
 
-func (http *httpPlugin) getHTTPConnection(private protos.ProtocolData) *httpConnectionData {
+func getHTTPConnection(private protos.ProtocolData) *httpConnectionData {
 	if private == nil {
 		return nil
 	}
 
 	priv, ok := private.(*httpConnectionData)
 	if !ok {
-		http.log.Warn("http connection data type error")
+		logp.Warn("http connection data type error")
 		return nil
 	}
 	if priv == nil {
-		http.log.Warn("Unexpected: http connection data not set")
+		logp.Warn("Unexpected: http connection data not set")
 		return nil
 	}
 
@@ -312,7 +301,9 @@ func (http *httpPlugin) doParse(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *httpConnectionData {
-	http.detailf("Payload received: [%s]", pkt.Payload)
+	if isDetailed {
+		detailedf("Payload received: [%s]", pkt.Payload)
+	}
 
 	extraMsgSize := 0 // size of a "seen" packet for which we don't store the actual bytes
 
@@ -328,7 +319,9 @@ func (http *httpPlugin) doParse(
 			totalLength += len(msg.body)
 		}
 		if totalLength > http.maxMessageSize {
-			http.debugf("Stream data too large, ignoring message")
+			if isDebug {
+				debugf("Stream data too large, ignoring message")
+			}
 			extraMsgSize = len(pkt.Payload)
 		} else {
 			st.data = append(st.data, pkt.Payload...)
@@ -340,7 +333,7 @@ func (http *httpPlugin) doParse(
 			st.message = &message{ts: pkt.Ts}
 		}
 
-		parser := newParser(http)
+		parser := newParser(&http.parserConfig)
 		ok, complete := parser.parse(st, extraMsgSize)
 		extraMsgSize = 0
 		if !ok {
@@ -377,8 +370,8 @@ func newStream(pkt *protos.Packet, tcptuple *common.TCPTuple) *stream {
 func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	http.debugf("Received FIN")
-	conn := http.getHTTPConnection(private)
+	debugf("Received FIN")
+	conn := getHTTPConnection(private)
 	if conn == nil {
 		return private
 	}
@@ -405,7 +398,7 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	conn := http.getHTTPConnection(private)
+	conn := getHTTPConnection(private)
 	if conn == nil {
 		return private, false
 	}
@@ -417,7 +410,9 @@ func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	}
 
 	ok, complete := http.messageGap(stream, nbytes)
-	http.detailf("messageGap returned ok=%v complete=%v", ok, complete)
+	if isDetailed {
+		detailedf("messageGap returned ok=%v complete=%v", ok, complete)
+	}
 	if !ok {
 		// on errors, drop stream
 		conn.streams[dir] = nil
@@ -450,10 +445,14 @@ func (http *httpPlugin) handleHTTP(
 	http.hideHeaders(m)
 
 	if m.isRequest {
-		http.debugf("Received request with tuple: %s", m.tcpTuple)
+		if isDebug {
+			debugf("Received request with tuple: %s", m.tcpTuple)
+		}
 		conn.requests.append(m)
 	} else {
-		http.debugf("Received response with tuple: %s", m.tcpTuple)
+		if isDebug {
+			debugf("Received response with tuple: %s", m.tcpTuple)
+		}
 		conn.responses.append(m)
 		http.correlate(conn)
 	}
@@ -463,10 +462,10 @@ func (http *httpPlugin) flushResponses(conn *httpConnectionData) {
 	for !conn.responses.empty() {
 		unmatchedResponses.Add(1)
 		resp := conn.responses.pop()
-		http.debugf("Response from unknown transaction: %s. Reporting error.", resp.tcpTuple)
+		debugf("Response from unknown transaction: %s. Reporting error.", resp.tcpTuple)
 
 		if resp.statusCode == 100 {
-			http.debugf("Drop first 100-continue response")
+			debugf("Drop first 100-continue response")
 			return
 		}
 
@@ -479,7 +478,7 @@ func (http *httpPlugin) flushRequests(conn *httpConnectionData) {
 	for !conn.requests.empty() {
 		unmatchedRequests.Add(1)
 		requ := conn.requests.pop()
-		http.debugf("Request from unknown transaction %s. Reporting error.", requ.tcpTuple)
+		debugf("Request from unknown transaction %s. Reporting error.", requ.tcpTuple)
 		event := http.newTransaction(requ, nil)
 		http.publishTransaction(event)
 	}
@@ -498,7 +497,9 @@ func (http *httpPlugin) correlate(conn *httpConnectionData) {
 		resp := conn.responses.pop()
 		event := http.newTransaction(requ, resp)
 
-		http.debugf("HTTP transaction completed")
+		if isDebug {
+			debugf("HTTP transaction completed")
+		}
 		http.publishTransaction(event)
 	}
 }
@@ -548,7 +549,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		http.decodeBody(requ)
 		path, params, err := http.extractParameters(requ)
 		if err != nil {
-			http.log.Warnf("Fail to parse HTTP parameters: %v", err)
+			logp.Warn("Fail to parse HTTP parameters: %v", err)
 		}
 
 		pbf.Source.Bytes = int64(requ.size)
@@ -684,7 +685,7 @@ func (http *httpPlugin) decodeBody(m *message) {
 	if m.saveBody && len(m.body) > 0 {
 		if http.mustDecodeBody && len(m.encodings) > 0 {
 			var err error
-			m.body, err = http.decodeBodyBytes(m.body, m.encodings, http.maxMessageSize)
+			m.body, err = decodeBody(m.body, m.encodings, http.maxMessageSize)
 			if err != nil {
 				// Body can contain partial data
 				m.notes = append(m.notes, err.Error())
@@ -693,8 +694,10 @@ func (http *httpPlugin) decodeBody(m *message) {
 	}
 }
 
-func (http *httpPlugin) decodeBodyBytes(body []byte, encodings []string, maxSize int) (result []byte, err error) {
-	http.debugf("decoding body with encodings=%v", encodings)
+func decodeBody(body []byte, encodings []string, maxSize int) (result []byte, err error) {
+	if isDebug {
+		debugf("decoding body with encodings=%v", encodings)
+	}
 	for idx := len(encodings) - 1; idx >= 0; idx-- {
 		format := encodings[idx]
 		body, err = decodeHTTPBody(body, format, maxSize)
@@ -781,8 +784,10 @@ func (http *httpPlugin) hideHeaders(m *message) {
 	authHeaderEndX := limit
 
 	for authHeaderStartX < limit {
-		http.debugf("looking for authorization from %d to %d",
-			authHeaderStartX, authHeaderEndX)
+		if isDebug {
+			debugf("looking for authorization from %d to %d",
+				authHeaderStartX, authHeaderEndX)
+		}
 
 		startOfHeader := bytes.Index(msg[authHeaderStartX:], authText)
 		if startOfHeader >= 0 {
@@ -796,7 +801,9 @@ func (http *httpPlugin) hideHeaders(m *message) {
 					authHeaderEndX = limit
 				}
 
-				http.debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+				if isDebug {
+					debugf("Redact authorization from %d to %d", authHeaderStartX, authHeaderEndX)
+				}
 
 				for i := authHeaderStartX + len(authText); i < authHeaderEndX; i++ {
 					msg[i] = byte('*')
@@ -856,7 +863,9 @@ func (http *httpPlugin) extractParameters(m *message) (path string, params strin
 	}
 
 	params = paramsMap.Encode()
-	http.detailf("Form parameters: %s", params)
+	if isDetailed {
+		detailedf("Form parameters: %s", params)
+	}
 	return
 }
 
@@ -870,16 +879,20 @@ func (http *httpPlugin) isSecretParameter(key string) bool {
 }
 
 func (http *httpPlugin) Expired(tuple *common.TCPTuple, private protos.ProtocolData) {
-	conn := http.getHTTPConnection(private)
+	conn := getHTTPConnection(private)
 	if conn == nil {
 		return
 	}
-	http.debugf("expired connection %s", tuple)
+	if isDebug {
+		debugf("expired connection %s", tuple)
+	}
 	// terminate streams
 	for dir, s := range conn.streams {
 		// Do not send incomplete or empty messages
 		if s != nil && s.message != nil && s.message.headersReceived() {
-			http.debugf("got message %+v", s.message)
+			if isDebug {
+				debugf("got message %+v", s.message)
+			}
 			http.handleHTTP(conn, s.message, tuple, uint8(dir))
 			s.PrepareForNewMessage()
 		}

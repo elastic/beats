@@ -33,6 +33,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+
+	"go.uber.org/zap"
 )
 
 type pgsqlPlugin struct {
@@ -140,7 +142,6 @@ func New(
 	results protos.Reporter,
 	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
-	logger *logp.Logger,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
 	config := defaultConfig
@@ -150,19 +151,19 @@ func New(
 		}
 	}
 
-	if err := p.init(results, watcher, &config, logger); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig, logger *logp.Logger) error {
+func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
 
-	pgsql.log = logger.Named("pgsql")
-	pgsql.debug = logger.Named("pgsql")
-	pgsql.detail = logger.Named("pgsqldetailed")
-	pgsql.isDebug, pgsql.isDetail = logger.HasSelector("pgsql"), logger.HasSelector("pgsqldetailed")
+	pgsql.log = logp.NewLogger("pgsql")
+	pgsql.debug = logp.NewLogger("pgsql", zap.AddCallerSkip(1))
+	pgsql.detail = logp.NewLogger("pgsqldetailed", zap.AddCallerSkip(1))
+	pgsql.isDebug, pgsql.isDetail = logp.IsDebug("pgsql"), logp.IsDebug("pgsqldetailed")
 
 	pgsql.transactions = common.NewCache(
 		pgsql.transactionTimeout,
