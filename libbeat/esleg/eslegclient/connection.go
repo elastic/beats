@@ -145,11 +145,7 @@ func NewConnection(s ConnectionSettings, log *logp.Logger) (*Connection, error) 
 
 	// fall back to a default if nothing has configured the user-agent field
 	if s.UserAgent == "" {
-		beatname := "Libbeat"
-		if s.Beatname != "" {
-			beatname = s.Beatname
-		}
-		s.UserAgent = useragent.UserAgent(beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
+		s.UserAgent = useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	}
 
 	// Default the product origin header to beats if it wasn't already set.

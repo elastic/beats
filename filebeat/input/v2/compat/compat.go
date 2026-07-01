@@ -74,11 +74,7 @@ func RunnerFactory(
 	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
-	log := info.Logger
-	if log == nil {
-		log = logp.L()
-	}
-	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
+	return &factory{log: info.Logger, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {

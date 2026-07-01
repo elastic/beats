@@ -150,11 +150,6 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 			expectedUA: "testbeat/8.15",
 		},
-		{
-			name:         "libbeat-fallback",
-			connSettings: ConnectionSettings{},
-			expectedUA:   "Libbeat/8.15",
-		},
 	}
 
 	for _, testCase := range cases {
