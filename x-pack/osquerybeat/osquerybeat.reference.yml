@@ -52,6 +52,158 @@ osquerybeat:
 #          query: "select * from processes"
 #          interval: 60
 
+# ============================ RRULE Scheduling =================================
+# Osquerybeat supports RRULE-based scheduling as an alternative to osquery's
+# native interval-based scheduling. This allows for more flexible scheduling
+# using RFC 5545 recurrence rules, with a required start_date, optional end_date, and splay.
+#
+# IMPORTANT: RRULE schedules must have a minimum interval of 1 day (24 hours).
+# This is enforced and validated at configuration time.
+# Valid examples: "FREQ=DAILY", "FREQ=WEEKLY;BYDAY=MO,WE,FR" (Mon/Wed/Fri)
+# Invalid examples: "FREQ=HOURLY", "FREQ=MINUTELY"
+#
+# RRULE scheduling can be configured at the query level or pack level:
+#
+# Query-level RRULE scheduling:
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        # For native interval-based queries (no rrule_schedule), add:
+#        # schedule_splay_percent: 10
+#        # schedule_max_drift: 60
+#        schedule:
+#          process_check:
+#            query: "select * from processes"
+#            # Optional: policy-defined schedule_id and space_id (from Kibana; used in scheduled results/responses)
+#            # schedule_id: "policy-schedule-uuid"
+#            # space_id: "kibana-space-id"
+#            # For native schedules: start_date (RFC3339) is optional. When set, it enables
+#            # consistent schedule_execution_count in scheduled results/responses across agents
+#            # (computed as 1 + (run_time - start_date) / interval).
+#            # start_date: "2024-01-01T00:00:00Z"
+#            rrule_schedule:
+#              # RFC 5545 recurrence rule string
+#              # NOTE: DTSTART inside the rule is ignored; start_date is required and used as DTSTART.
+#              # Examples:
+#              #   "FREQ=DAILY"                         - Every day
+#              #   "FREQ=WEEKLY;BYDAY=MO,WE,FR"         - Mon, Wed, Fri
+#              #   "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO"    - Every 2 weeks on Monday
+#              #   "FREQ=MONTHLY;BYMONTHDAY=1"          - First day of each month
+#              #   "FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1" - Jan 1st every year
+#              rrule: "FREQ=DAILY"
+#              # Required: Only run after this date (RFC3339 format)
+#              start_date: "2024-01-01T00:00:00Z"
+#              # Optional: Stop running after this date (RFC3339 format)
+#              end_date: "2024-12-31T23:59:59Z"
+#              # Optional: Maximum splay duration to spread out query execution
+#              # and avoid thundering herd effects.
+#              # Uses Go duration format: "30s", "5m", "2h", "1h30m"
+#              # Range: 0s to 12h (maximum). Default: 0s (disabled)
+#              # Set to "0s" to disable splay.
+#              splay: "0s"
+#              # Optional: Query timeout in seconds (default: 60)
+#              timeout: 120
+#
+# Pack-level RRULE scheduling (queries inherit unless they define rrule_schedule):
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        packs:
+#          security_pack:
+#            # Optional pack defaults. These are merged into queries that omit them;
+#            # query-level values override the default_* values.
+#            #default_space_id: "default"
+#            #default_platform: "linux,darwin"
+#            #default_version: "5.12.0"
+#            #default_snapshot: true
+#            default_rrule_schedule:
+#              rrule: "FREQ=DAILY"  # Daily
+#              start_date: "2024-01-01T00:00:00Z"
+#              splay: "1h"  # Up to 1 hour random delay
+#            queries:
+#              users:
+#                query: "select * from users"
+#              processes:
+#                query: "select * from processes"
+#                # Query-level rrule_schedule replaces the pack default for this query only
+#                rrule_schedule:
+#                  rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"  # Weekdays
+#                  start_date: "2024-01-01T00:00:00Z"
+#                  splay: "90s"  # Up to 90 seconds delay
+#
+# Pack-level native scheduling (interval and start_date defaults for the pack; schedule_id is per-query).
+# A pack cannot set both default_native_schedule.interval and default_rrule_schedule.
+#  packs:
+#    infra_pack:
+#      default_native_schedule:
+#        interval: 300
+#        #start_date: "2024-01-01T00:00:00Z"
+#      queries:
+#        uptime:
+#          query: "select * from uptime"
+#          #schedule_id: "required-per-query-uuid"
+#        fast:
+#          query: "select 1"
+#          interval: 60
+#
+# Pack-level defaults for query fields (default_platform, default_version,
+# default_snapshot, and default_space_id) use default_* names so they do not
+# conflict with osquery's native pack-level platform/version semantics.
+#
+# Splay Best Practices:
+# - Default is 0s (disabled); opt in to splay for most schedules
+# - For daily queries, use 30m-2h splay
+# - For weekly queries, use 1h-6h splay
+# - Maximum splay is 12 hours (safe for minimum 1-day interval)
+#
+# Note: A query must use either native interval scheduling or rrule_schedule, not both.
+# The same rule applies to pack-level defaults: use default_native_schedule or default_rrule_schedule,
+# not both. Queries scheduled via RRULE are executed by osquerybeat directly, bypassing
+# osquery's native scheduler.
+#
+# For queries that use native 'interval' (no rrule_schedule), splay is controlled
+# by schedule_splay_percent and schedule_max_drift; see "Native Osquery Scheduling
+# Options" below.
+
+# ============================ Native Osquery Scheduling Options ===============
+# Splay for native scheduled queries (schedule/packs using 'interval' only).
+# Osquery supports these options; osquerybeat exposes them so you can tune
+# how much query run times are spread out (avoids thundering herd).
+# For RRULE-scheduled queries, use the splay field in rrule_schedule instead.
+#
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        # Splay percentage for native interval-based scheduled queries (0-100)
+#        # Spreads execution by a random percentage of the query interval.
+#        # Default: 10. Set to 0 to disable splay for native queries.
+#        schedule_splay_percent: 10
+#
+#        # Max time drift in seconds for splay compensation (native scheduling)
+#        # Default: 60. Set to 0 to disable drift compensation.
+#        schedule_max_drift: 60
+#
+# ============================ Osquery Options =================================
+# Additional osquery options can be set in the options section. These are passed
+# directly to osqueryd. Some useful options:
+#
+#  inputs:
+#    - type: osquery
+#      osquery:
+#        options:
+#          # Global timeout for native scheduled queries (in seconds)
+#          # This applies to all queries using interval-based scheduling
+#          # Default is osquery's built-in default (no limit)
+#          schedule_timeout: 300
+#
+#          # Other common osquery options:
+#          # events_expiry: 3600           # Event expiration in seconds
+#          # verbose: false                # Enable verbose logging
+#          # worker_threads: 4             # Number of worker threads
+#
+# For a full list of osquery options, see:
+# https://osquery.readthedocs.io/en/stable/deployment/configuration/#options
+
 # ============================== Process Security ==============================
 # Disable seccomp system call filtering on Linux.
 # Otherwise osquerybeat can't fork osqueryd with the error: Failed to start osqueryd process: fork/exec ./osqueryd: operation not permitted
@@ -218,7 +370,10 @@ seccomp.enabled: false
 #      match_source_index: 4
 #      match_short_id: false
 #      cleanup_timeout: 60
-#      labels.dedot: false
+#      labels.dedot: true
+#      wait_for_metadata: false
+#      wait_for_metadata_timeout: 30s
+#      wait_for_metadata_retry_period: 10s
 #      # To connect to Docker over TLS you must specify a client and CA certificate.
 #      #ssl:
 #      #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -1279,6 +1434,30 @@ logging.files:
 # Controls the fraction of mutex contention events that are reported in the
 # mutex profile.
 #http.pprof.mutex_profile_rate: 0
+
+# WARNING: Internal debugging tool. Not a supported product feature.
+#
+# This setting is intended for use by Elastic engineers during development
+# and troubleshooting. It has no authentication and may be changed or
+# removed in any release without notice.
+#
+# When enabled, the following endpoints are exposed on the HTTP listener:
+#   GET    /debug/state-inspector/states        JSON dump of every state entry
+#   GET    /debug/state-inspector/states.html   Browser UI for the same
+#   DELETE /debug/state-inspector/states/<key>  Permanently delete a state entry
+#
+# The state store may contain sensitive information such as source file
+# paths, S3 object keys, AWS account identifiers, and source hostnames,
+# all of which will be returned to any client that can reach the endpoint.
+# Deleting state entries can cause duplicate processing, gaps in ingestion,
+# or data loss; for active inputs, deletes may be transient and silently
+# overwritten by the in-memory registrar.
+#
+# If you must enable this for troubleshooting, bind http.host to a loopback
+# address (127.0.0.1), a Unix socket, or a Windows named pipe, and disable
+# it again as soon as you are done.
+#
+#http.debug.state_inspector.enabled: false
 
 # ============================== Process Security ==============================
 

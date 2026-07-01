@@ -13,11 +13,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -51,7 +48,8 @@ const (
 	apiUserType   = "#microsoft.graph.user"
 	apiDeviceType = "#microsoft.graph.device"
 
-	mfaDetailsPath = "/reports/authenticationMethods/userRegistrationDetails"
+	mfaDetailsPath     = "/reports/authenticationMethods/userRegistrationDetails"
+	signInActivityPath = "/users"
 )
 
 // apiUserResponse matches the format of a user response from the Graph API.
@@ -79,6 +77,28 @@ type apiDeviceResponse struct {
 type apiMFAResponse struct {
 	NextLink string       `json:"@odata.nextLink"`
 	Details  []mfaDetails `json:"value"`
+}
+
+// apiSignInActivityResponse matches the format of a sign-in activity response from the Graph API.
+type apiSignInActivityResponse struct {
+	NextLink string              `json:"@odata.nextLink"`
+	Users    []signInActivityAPI `json:"value"`
+}
+
+// signInActivityAPI matches the format of a single user entry in a sign-in activity response.
+type signInActivityAPI struct {
+	ID             string                 `json:"id"`
+	SignInActivity *signInActivityDetails `json:"signInActivity"`
+}
+
+// signInActivityDetails matches the format of the signInActivity object from the API.
+type signInActivityDetails struct {
+	LastSignInDateTime                string `json:"lastSignInDateTime"`
+	LastSignInRequestId               string `json:"lastSignInRequestId"`
+	LastNonInteractiveSignInDateTime  string `json:"lastNonInteractiveSignInDateTime"`
+	LastNonInteractiveSignInRequestId string `json:"lastNonInteractiveSignInRequestId"`
+	LastSuccessfulSignInDateTime      string `json:"lastSuccessfulSignInDateTime"`
+	LastSuccessfulSignInRequestId     string `json:"lastSuccessfulSignInRequestId"`
 }
 
 // mfaDetails matches the format of a single userRegistrationDetails entry from the API.
@@ -166,13 +186,6 @@ func (c *tracerConfig) Validate() error {
 		// which is the minimum.
 		c.MaxSize = 1
 	}
-	ok, err := httplog.IsPathInLogsFor(inputName, c.Filename)
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return fmt.Errorf("request tracer path must be within %q path", paths.Resolve(paths.Logs, inputName))
-	}
 	return nil
 }
 
@@ -204,6 +217,7 @@ type graph struct {
 	devicesURL         string
 	deviceOwnerUserURL string
 	mfaDetailsURL      string
+	signInActivityURL  string
 }
 
 // SetLogger sets the logger on this fetcher.
@@ -433,6 +447,69 @@ func (f *graph) UserMFADetails(ctx context.Context) (map[uuid.UUID]*fetcher.MFAR
 	}
 }
 
+// UserSignInActivity retrieves sign-in activity for all users from Azure
+// Active Directory using Microsoft's Graph API. Returns a map from user UUID
+// to SignInActivityDetails, or an error if a failure occurred.
+func (f *graph) UserSignInActivity(ctx context.Context) (map[uuid.UUID]*fetcher.SignInActivityDetails, error) {
+	result := make(map[uuid.UUID]*fetcher.SignInActivityDetails)
+	fetchURL := f.signInActivityURL
+
+	for {
+		nextLink, err := f.fetchSignInActivityPage(ctx, fetchURL, result)
+		if err != nil {
+			return nil, err
+		}
+		if nextLink == "" {
+			return result, nil
+		}
+		if nextLink == fetchURL {
+			return result, nextLinkLoopError{"sign_in_activity"}
+		}
+		fetchURL = nextLink
+	}
+}
+
+// fetchSignInActivityPage fetches one page of sign-in activity results and
+// merges them into result. It returns the next page URL, or an empty string
+// when all pages have been consumed.
+func (f *graph) fetchSignInActivityPage(ctx context.Context, fetchURL string, result map[uuid.UUID]*fetcher.SignInActivityDetails) (string, error) {
+	body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("unable to fetch sign-in activity: %w", err)
+	}
+	defer func() {
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	var response apiSignInActivityResponse
+	if err = json.NewDecoder(body).Decode(&response); err != nil {
+		return "", fmt.Errorf("unable to decode sign-in activity response: %w", err)
+	}
+
+	for _, u := range response.Users {
+		if u.SignInActivity == nil {
+			continue
+		}
+		id, err := uuid.FromString(u.ID)
+		if err != nil {
+			f.logger.Warnf("Skipping sign-in activity entry with invalid user ID %q: %v", u.ID, err)
+			continue
+		}
+		result[id] = &fetcher.SignInActivityDetails{
+			LastSignInDateTime:                u.SignInActivity.LastSignInDateTime,
+			LastSignInRequestId:               u.SignInActivity.LastSignInRequestId,
+			LastNonInteractiveSignInDateTime:  u.SignInActivity.LastNonInteractiveSignInDateTime,
+			LastNonInteractiveSignInRequestId: u.SignInActivity.LastNonInteractiveSignInRequestId,
+			LastSuccessfulSignInDateTime:      u.SignInActivity.LastSuccessfulSignInDateTime,
+			LastSuccessfulSignInRequestId:     u.SignInActivity.LastSuccessfulSignInRequestId,
+		}
+		f.logger.Debugf("Got sign-in activity for user %q from API", id)
+	}
+
+	return response.NextLink, nil
+}
+
 // doRequest is a convenience function for making HTTP requests to the Graph API.
 // It will automatically handle requesting a token using the authenticator attached
 // to this fetcher.
@@ -464,21 +541,16 @@ func (f *graph) doRequest(ctx context.Context, method, url string, body io.Reade
 }
 
 // New creates a new instance of the graph fetcher.
-func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (fetcher.Fetcher, error) {
+func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator, p *paths.Path) (fetcher.Fetcher, error) {
 	var c graphConf
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
 	}
 
-	if c.Tracer.enabled() {
-		id = sanitizeFileName(id)
-		path := strings.ReplaceAll(c.Tracer.Filename, "*", id)
-		resolved, ok, err := httplog.ResolvePathInLogsFor(inputName, path)
+	if c.Tracer != nil {
+		resolved, err := httplog.ResolveTraceFilename(p, inputName, id, c.Tracer.Filename)
 		if err != nil {
 			return nil, err
-		}
-		if !ok {
-			return nil, fmt.Errorf("request tracer path %q must be within %q path", path, paths.Resolve(paths.Logs, inputName))
 		}
 		c.Tracer.Filename = resolved
 	}
@@ -544,13 +616,15 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	}
 	f.mfaDetailsURL = mfaDetailsURL.String()
 
+	signInActivityURL, err := url.Parse(f.conf.APIEndpoint + signInActivityPath)
+	if err != nil {
+		return nil, fmt.Errorf("invalid sign-in activity URL endpoint: %w", err)
+	}
+	signInActivityURL.RawQuery = "$select=id,signInActivity"
+	f.signInActivityURL = signInActivityURL.String()
+
 	return &f, nil
 }
-
-// lumberjackTimestamp is a glob expression matching the time format string used
-// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
-// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
-const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 // requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
 // is non-nil.
@@ -561,22 +635,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	if !cfg.Tracer.enabled() {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.
-		err := os.Remove(cfg.Tracer.Filename)
-		if err != nil && !errors.Is(err, fs.ErrNotExist) {
-			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
-		}
-		ext := filepath.Ext(cfg.Tracer.Filename)
-		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
-		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
-		if err != nil {
-			log.Errorw("failed to collect request trace log path names", "error", err)
-		}
-		for _, p := range paths {
-			err = os.Remove(p)
-			if err != nil && !errors.Is(err, fs.ErrNotExist) {
-				log.Errorw("failed to remove request trace log", "path", p, "error", err)
-			}
-		}
+		httplog.CleanTraceFiles(cfg.Tracer.Filename, log)
 		return cli
 	}
 
@@ -596,16 +655,6 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	maxBodyLen := max(1, cfg.Tracer.MaxSize) * 1e6 / 10 // 10% of file max
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, maxBodyLen, log)
 	return cli
-}
-
-// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
-// repeated instances. The request.tracer.filename may have ":" when an input
-// has cursor config and the macOS Finder will treat this as path-separator and
-// causes to show up strange filepaths.
-func sanitizeFileName(name string) string {
-	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
-	name = filepath.Clean(name)
-	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 func formatQuery(name string, query []string, dflt string, expand map[string][]string) (string, error) {

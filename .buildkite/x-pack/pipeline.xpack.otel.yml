@@ -3,9 +3,9 @@ name: "beats-xpack-otel"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1777608114"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64-1781496166"
 
-  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1777608114"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1781496166"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -58,7 +58,8 @@ steps:
           go install go.opentelemetry.io/collector/cmd/builder@v0.150.0
           mv $(go env GOPATH)/bin/builder $(go env GOPATH)/bin/ocb
           cd x-pack/otel
-          mage buildOtelDistro
+          RACE=1 mage buildOtelDistro
+          go version -m ./distributions/beats-otel-collector/_build/beats-otel-collector | grep -q 'race=true'
           timeout 30s mage runOtelDistro > /tmp/collector.log 2>&1 || true
           echo "--- Collector output (errors below are expected if external services are unavailable)"
           cat /tmp/collector.log

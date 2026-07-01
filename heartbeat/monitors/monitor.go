@@ -72,6 +72,7 @@ type Monitor struct {
 	monitorStateTracker *monitorstate.Tracker
 	statusReporter      status.StatusReporter
 	plugin              plugin.Plugin
+	logger              *logp.Logger
 }
 
 func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
@@ -84,8 +85,8 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil)
+func checkMonitorConfig(config *conf.C, registrar *plugin.PluginsReg, logger *logp.Logger) error {
+	_, err := newMonitor(config, registrar, nil, nil, monitorstate.NilStateLoader, nil, logger)
 
 	return err
 }
@@ -99,8 +100,9 @@ func newMonitor(
 	taskAdder scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
+	logger *logp.Logger,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pubClient, taskAdder, stateLoader, onStop, logger)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -116,6 +118,7 @@ func newMonitorUnsafe(
 	addTask scheduler.AddTask,
 	stateLoader monitorstate.StateLoader,
 	onStop func(*Monitor),
+	logger *logp.Logger,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -140,7 +143,8 @@ func newMonitorUnsafe(
 		config:              config,
 		stats:               pluginFactory.Stats,
 		state:               MON_INIT,
-		monitorStateTracker: monitorstate.NewTracker(stateLoader, false),
+		monitorStateTracker: monitorstate.NewTracker(stateLoader, false, logger),
+		logger:              logger,
 	}
 
 	if m.stdFields.ID == "" {
@@ -152,7 +156,7 @@ func newMonitorUnsafe(
 		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
 
-	p, err := pluginFactory.Create(config)
+	p, err := pluginFactory.Create(config, logger)
 
 	m.close = func() error {
 		if onStop != nil {
@@ -163,7 +167,7 @@ func newMonitorUnsafe(
 
 	var wrappedJobs []jobs.Job
 	if err == nil {
-		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader, logger)
 	} else {
 		// If we've hit an error at this point, still run on schedule, but always return an error.
 		// This way the error is clearly communicated through to kibana.
@@ -178,7 +182,7 @@ func newMonitorUnsafe(
 		fullErr := fmt.Errorf("job could not be initialized: %w", err)
 		// A placeholder job that always returns an error
 
-		logp.L().Error(fullErr)
+		logger.Error(fullErr)
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
 			// if statusReporter is set, as it is for running managed-mode, update the input status
 			// to failed, specifying the error
@@ -192,7 +196,7 @@ func newMonitorUnsafe(
 		m.stdFields.BadConfig = true
 		// No need to retry bad configs
 		m.stdFields.MaxAttempts = 1
-		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader)
+		wrappedJobs = wrappers.WrapCommon(p.Jobs, m.stdFields, stateLoader, logger)
 	}
 
 	m.plugin = p
@@ -227,7 +231,7 @@ func (m *Monitor) makeTasks(config *conf.C, jobs []jobs.Job) ([]*configuredJob, 
 
 	var mTasks = make([]*configuredJob, 0, len(jobs))
 	for _, job := range jobs {
-		t := newConfiguredJob(job, mtConf, m)
+		t := newConfiguredJob(job, mtConf, m, m.logger)
 		mTasks = append(mTasks, t)
 	}
 
@@ -265,7 +269,7 @@ func (m *Monitor) Stop() {
 	if m.close != nil {
 		err := m.close()
 		if err != nil {
-			logp.L().Errorf("error closing monitor %s: %v", m.String(), err)
+			m.logger.Errorf("error closing monitor %s: %v", m.String(), err)
 		}
 	}
 

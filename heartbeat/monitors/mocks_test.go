@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"sync"
@@ -29,6 +30,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-lookslike"
@@ -46,7 +49,8 @@ import (
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
-func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+func makeMockFactory(t *testing.T, pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sched *scheduler.Scheduler, close func()) {
+	t.Helper()
 	id, _ := uuid.NewV4()
 	eid, _ := uuid.NewV4()
 	info := beat.Info{
@@ -60,6 +64,7 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
+		Logger:          logptest.NewTestingLogger(t, ""),
 	}
 
 	sched = scheduler.Create(
@@ -68,6 +73,7 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		time.Local,
 		nil,
 		true,
+		logptest.NewTestingLogger(t, ""),
 	)
 	return NewFactory(FactoryParams{
 			BeatInfo:    info,
@@ -157,6 +163,16 @@ func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	return c, nil
 }
 
+func (pc *MockPipeline) Disconnect(ctx context.Context) error {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, c := range pc.Clients {
+		c.Close()
+	}
+
+	return nil
+}
 func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
@@ -220,7 +236,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Make: func(s string, config *config.C) (plugin.Plugin, error) {
+			Make: func(s string, config *config.C, logger *logp.Logger) (plugin.Plugin, error) {
 				built.Add(1)
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
@@ -235,11 +251,11 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 
 				err := config.Unpack(&unpacked)
 				if err != nil {
-					return plugin.Plugin{DoClose: closer}, err
+					return plugin.Plugin{DoClose: closer, Logger: logger}, err
 				}
 				j := createMockJob()
 
-				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, nil
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1, Logger: logger}, nil
 			},
 			Stats: plugin.NewPluginCountersRecorder("test", reg),
 		},
