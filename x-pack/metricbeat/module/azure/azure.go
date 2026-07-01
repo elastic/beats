@@ -9,23 +9,20 @@ package azure
 import (
 	"fmt"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/cursor"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
 	// Register the ModuleFactory function for the "azure" module.
-	if err := mb.Registry.AddModule("azure", newModule); err != nil {
+	if err := mb.Registry.AddModule("azure", ModuleBuilder()); err != nil {
 		panic(err)
 	}
-}
-
-// newModule adds validation that hosts is non-empty, a requirement to use the
-// azure module.
-func newModule(base mb.BaseModule) (mb.Module, error) {
-	return &base, nil
 }
 
 // MetricStore holds the accumulated metric definitions with a mutex for synchronization.
@@ -68,6 +65,11 @@ type MetricSet struct {
 	MapMetrics     mapResourceMetrics
 	BatchClient    *BatchClient
 	ConcMapMetrics concurrentMapResourceMetrics // In combination with BatchClient only
+	cursorStore    *cursor.Store                // nil when lookback_window == 0
+	cursorKey      string
+	lookbackWindow time.Duration
+	latency        time.Duration
+	cursorLogger   *logp.Logger // separate from BaseMetricSet.Logger() so tests can inject a nop logger
 }
 
 var supportedMonitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account", "storage"}
@@ -131,11 +133,52 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		}
 	}
 
-	return &MetricSet{
-		BaseMetricSet: base,
-		Client:        monitorClient,
-		BatchClient:   monitorBatchClient,
-	}, nil
+	ms := &MetricSet{
+		BaseMetricSet:  base,
+		Client:         monitorClient,
+		BatchClient:    monitorBatchClient,
+		lookbackWindow: config.LookbackWindow,
+		latency:        config.Latency,
+		cursorLogger:   base.Logger(),
+	}
+
+	if config.LookbackWindow > 0 {
+		// Warn if lookback_window exceeds the default TSDB look_back_time (2h).
+		// Documents older than look_back_time are silently rejected by Elasticsearch TSDB,
+		// causing data loss without any visible error. Users who have raised look_back_time
+		// on their index can ignore this warning.
+		const tsdbDefaultLookBackTime = 2 * time.Hour
+		if config.LookbackWindow > tsdbDefaultLookBackTime {
+			base.Logger().Warnw(
+				"lookback_window exceeds the default Elasticsearch TSDB look_back_time of 2h; "+
+					"backfilled metrics older than look_back_time will be silently dropped — "+
+					"raise index.time_series.look_back_time on your data stream or reduce lookback_window",
+				"lookback_window", config.LookbackWindow,
+			)
+		}
+		if azMod, ok := base.Module().(Module); !ok {
+			base.Logger().Warn("azure module does not implement Module interface, lookback disabled")
+		} else {
+			registry, regErr := azMod.GetCursorRegistry(base.GetPath(), base.Logger())
+			if regErr != nil {
+				base.Logger().Warnw("azure cursor registry unavailable, lookback disabled", "error", regErr)
+			} else {
+				store, storeErr := cursor.NewStoreFromRegistry(registry, base.Logger())
+				if storeErr != nil {
+					base.Logger().Warnw("azure cursor store unavailable, lookback disabled", "error", storeErr)
+				} else {
+					ms.cursorStore = store
+					ms.cursorKey = cursor.GenerateStateKey(
+						metricsetName,
+						config.SubscriptionId,
+						resourcesFingerprint(config.Resources),
+					)
+				}
+			}
+		}
+	}
+
+	return ms, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right metricset
@@ -167,6 +210,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 	// See "Round outer limits" and "Round inner limits" tests in
 	// the metric_registry_test.go for more information.
 	referenceTime := time.Now().UTC()
+	lookbackStart := m.computeLookbackStart(referenceTime)
 
 	// Initialize cloud resources and monitor metrics
 	// information.
@@ -186,6 +230,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
 		// error message is previously logged in the InitResources,
 		// no error event should be created
+		m.updateCursor(referenceTime.Add(-m.Client.Config.Latency))
 		return nil
 	}
 
@@ -197,7 +242,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 
 	for _, metricsDefinition := range metricsByResourceId {
 		// Fetch metric values for each resource.
-		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report, lookbackStart)
 
 		// Turns metric values into events and sends them to Elasticsearch.
 		if err := m.Client.MapToEvents(metricValues, report); err != nil {
@@ -205,6 +250,7 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 		}
 	}
 
+	m.updateCursor(referenceTime.Add(-m.Client.Config.Latency))
 	return nil
 }
 
@@ -226,6 +272,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 	// See "Round outer limits" and "Round inner limits" tests in
 	// the metric_registry_test.go for more information.
 	referenceTime := time.Now().UTC()
+	lookbackStart := m.computeLookbackStart(referenceTime)
 
 	// Initialize cloud resources and monitor metrics
 	// information.
@@ -243,6 +290,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 	}
 	// Check if the channel is nil before entering the loop
 	if m.BatchClient.ResourceConfigurations.MetricDefinitionsChan == nil {
+		m.updateCursor(referenceTime.Add(-m.BatchClient.Config.Latency))
 		return fmt.Errorf("no resources were found based on all the configurations options entered")
 	}
 
@@ -259,7 +307,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				}
 				// process all stores in case there are remaining metricstores for which values are not collected.
 				m.BatchClient.Log.Debug("processAllStores")
-				metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
+				metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report, lookbackStart)
 				if len(metricValues) > 0 {
 					if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
 						m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
@@ -283,7 +331,7 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				for criteria, store := range metricStores {
 					if store.Size() >= BatchApiResourcesLimit {
 						m.BatchClient.Log.Debugf("Store %+v size is %d. Process the Store", criteria, store.Size())
-						metricValues = append(metricValues, processStore(m.BatchClient, criteria, store, referenceTime, report)...)
+						metricValues = append(metricValues, processStore(m.BatchClient, criteria, store, referenceTime, report, lookbackStart)...)
 					}
 				}
 				// Map the collected metric values into events and publish them.
@@ -310,12 +358,13 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 		}
 	}
 	// process all stores in case there are remaining metricstores for which values are not collected.
-	metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
+	metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report, lookbackStart)
 	if len(metricValues) > 0 {
 		if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
 			m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
 		}
 	}
+	m.updateCursor(referenceTime.Add(-m.BatchClient.Config.Latency))
 	return nil
 }
 
@@ -332,7 +381,7 @@ func hasConfigOptions(config []string) bool {
 	return true
 }
 
-// calculateTimespan returns the start and end times for the metric values given
+// computeQueryWindow returns the start and end times for the metric values given
 // the reference time, time grain, collection period, and service latency.
 //
 // (1) When the collection period is greater than the time grain, the timespan
@@ -434,35 +483,144 @@ func hasConfigOptions(config []string) bool {
 //	  │                                                        │              |
 //	Start                                                     End             |
 //	  │                                                        │              |
-func calculateTimespan(referenceTime time.Time, timeGrain string, config Config) (time.Time, time.Time) {
-	// The timespan duration is the maximum of the time grain and the
-	// collection period.
-	//
-	// This is to ensure that we always collect all the metric values
-	// for the given time grain.
-	//
-	// For example, if the time grain is 1 minute and the collection
-	// period is 5 minutes, we will collect five PT1M metric values
-	// per collection.
-	//
-	// If the time grain is 5 minutes and the collection period is
-	// 5 minutes, we will collect one PT5M metric value per collection.
-	//
-	// If the time grain is 5 minutes and the collection period is
-	// 1 minute, we will collect one PT5M metric in five collections.
+//
+// The function determines the start and end time range ("timespan") to query Azure metrics,
+// factoring in reference time, collection period, latency, time grain, and optional lookback window.
+// A more accurate name would be computeQueryWindow or computeTimespanWindow.
+func computeQueryWindow(referenceTime time.Time, timeGrain string, config Config, lookbackStart *time.Time) (time.Time, time.Time) {
 	timespanDuration := max(asDuration(timeGrain), config.Period)
-
-	// The end time is equal to the reference time in most cases.
-	//
-	// However, if the Azure service publishes the metric values with
-	// a delay, we can translate the reference time to compensate
-	// for the latency.
-	//
-	// For example, if the Azure service publishes the metric values
-	// with a delay of 30s / 1m, we can set the delay to one minute
-	// to always collect the latest metric values.
 	endTime := referenceTime.Add(config.Latency * -1)
-	startTime := endTime.Add(timespanDuration * -1)
+	normalStart := endTime.Add(timespanDuration * -1)
 
-	return startTime, endTime
+	// Only expand the window when the cursor is genuinely older than the normal
+	// start — i.e. backfilling after a gap. When the cursor is more recent than
+	// normalStart (fast or on-time cycle) we keep the fixed-size window so that
+	// every cycle covers exactly max(timegrain, period) and Azure always returns
+	// the expected number of data points. TSDB deduplication handles the small
+	// overlap harmlessly.
+	if lookbackStart != nil && lookbackStart.Before(normalStart) {
+		return *lookbackStart, endTime
+	}
+	return normalStart, endTime
+}
+
+// Close implements mb.Closer. Releases the cursor store handle.
+func (m *MetricSet) Close() error {
+	if m.cursorStore != nil {
+		return m.cursorStore.Close()
+	}
+	return nil
+}
+
+// UpdateCursorKey recomputes the cursor key from the given (final) resources.
+// Call this after any post-construction mutation of the resource list — e.g.
+// when a metricset injects default resources after NewMetricSet returns — so
+// the key reflects the actual effective collection scope.
+func (m *MetricSet) UpdateCursorKey(metricsetName, subscriptionID string, resources []ResourceConfig) {
+	if m.cursorStore == nil {
+		return
+	}
+	m.cursorKey = cursor.GenerateStateKey(metricsetName, subscriptionID, resourcesFingerprint(resources))
+}
+
+// computeLookbackStart returns the start time for a lookback query, or nil if
+// no lookback is needed (disabled, no cursor, or cursor too old).
+func (m *MetricSet) computeLookbackStart(referenceTime time.Time) *time.Time {
+	if m.cursorStore == nil {
+		return nil
+	}
+	state, err := m.cursorStore.Load(m.cursorKey)
+	if err != nil {
+		m.cursorLogger.Warnw("failed to load azure cursor, using normal window", "error", err)
+		return nil
+	}
+	if state == nil {
+		m.cursorLogger.Infow("no prior cursor found, starting from normal collection window")
+		return nil
+	}
+	// Anchor minStart to the current collection's endTime (referenceTime - latency),
+	// not referenceTime, so the full lookback_window is available as downtime budget.
+	// Without this, a non-zero latency would shrink the effective window by latency.
+	endTime := referenceTime.Add(-m.latency)
+	minStart := endTime.Add(-m.lookbackWindow)
+	if state.LastCollectionEnd.Before(minStart) {
+		m.cursorLogger.Warnw("cursor too old, data gap possible, backfilling from normal window only",
+			"last_collection_end", state.LastCollectionEnd,
+			"lookback_window", m.lookbackWindow,
+		)
+		return nil
+	}
+	return &state.LastCollectionEnd
+}
+
+// resourcesFingerprint returns a stable string that captures the collection
+// scope of a []ResourceConfig. Two configs that differ in either what metrics
+// they collect (namespace) or which Azure resources they target (resource_id,
+// resource_group, resource_type, resource_query) will produce different
+// fingerprints and therefore get separate cursor keys.
+//
+// service_type is intentionally excluded — it is a post-listing filter that
+// selects metric namespaces within already-discovered storage resources, not a
+// resource-listing filter.
+//
+// Values within each set are deduplicated and sorted so the result is
+// order-independent across resource entries.
+func resourcesFingerprint(resources []ResourceConfig) string {
+	ns := make(map[string]struct{})
+	ids := make(map[string]struct{})
+	groups := make(map[string]struct{})
+	types := make(map[string]struct{})
+	queries := make(map[string]struct{})
+
+	for _, r := range resources {
+		for _, m := range r.Metrics {
+			if m.Namespace != "" {
+				ns[m.Namespace] = struct{}{}
+			}
+		}
+		for _, id := range r.Id {
+			if id != "" {
+				ids[id] = struct{}{}
+			}
+		}
+		for _, g := range r.Group {
+			if g != "" {
+				groups[g] = struct{}{}
+			}
+		}
+		if r.Type != "" {
+			types[r.Type] = struct{}{}
+		}
+		if r.Query != "" {
+			queries[r.Query] = struct{}{}
+		}
+	}
+
+	sorted := func(m map[string]struct{}) string {
+		keys := make([]string, 0, len(m))
+		for k := range m {
+			keys = append(keys, k)
+		}
+		slices.Sort(keys)
+		return strings.Join(keys, ",")
+	}
+
+	return fmt.Sprintf("ns=%s|ids=%s|groups=%s|types=%s|queries=%s",
+		sorted(ns), sorted(ids), sorted(groups), sorted(types), sorted(queries))
+}
+
+// updateCursor persists the collection end time so it can be used as a lookback
+// start on the next restart. Failures are logged but do not abort the fetch.
+func (m *MetricSet) updateCursor(endTime time.Time) {
+	if m.cursorStore == nil {
+		return
+	}
+	state := &cursor.State{
+		Version:           cursor.StateVersion,
+		LastCollectionEnd: endTime,
+		UpdatedAt:         time.Now().UTC(),
+	}
+	if err := m.cursorStore.Save(m.cursorKey, state); err != nil {
+		m.cursorLogger.Warnw("failed to persist azure cursor", "error", err)
+	}
 }
