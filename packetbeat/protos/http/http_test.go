@@ -76,7 +76,7 @@ func (tp *testParser) parse() (*message, bool, bool) {
 		tp.payloads = tp.payloads[1:]
 	}
 
-	parser := newParser(tp.http)
+	parser := newParser(&tp.http.parserConfig)
 	ok, complete := parser.parse(st, 0)
 	return st.message, ok, complete
 }
@@ -100,7 +100,7 @@ func testParse(http *httpPlugin, data string) (*message, bool, bool) {
 }
 
 func testParseStream(http *httpPlugin, st *stream, extraLen int) (bool, bool) {
-	parser := newParser(http)
+	parser := newParser(&http.parserConfig)
 	return parser.parse(st, extraLen)
 }
 
@@ -632,7 +632,7 @@ func TestEatBodyChunked(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParserWithConfig(httpModForTests(nil), &testParserConfig)
+	parser := newParser(&testParserConfig)
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != false || ok != true || complete != false {
@@ -703,7 +703,7 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 		chunkedLength: 5,
 		contentLength: 0,
 	}
-	parser := newParserWithConfig(httpModForTests(nil), &testParserConfig)
+	parser := newParser(&testParserConfig)
 
 	cont, ok, complete := parser.parseBodyChunkedStart(st, msg)
 	if cont != true || ok != true || complete != false {
@@ -1933,7 +1933,7 @@ func TestExtractHostHeader(t *testing.T) {
 
 func benchmarkHTTPMessage(b *testing.B, data []byte) {
 	http := httpModForTests(nil)
-	parser := newParser(http)
+	parser := newParser(&http.parserConfig)
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data, message: new(message)}
@@ -1992,7 +1992,7 @@ func BenchmarkHTTPSplitResponse(b *testing.B) {
 		"\r\n")
 
 	http := httpModForTests(nil)
-	parser := newParser(http)
+	parser := newParser(&http.parserConfig)
 
 	for i := 0; i < b.N; i++ {
 		stream := &stream{data: data1, message: new(message)}
