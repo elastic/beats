@@ -41,7 +41,7 @@ type compiledJsonCheck struct {
 	source      string
 }
 
-func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
+func checkJson(checks []*jsonResponseCheck, logger *logp.Logger) (bodyValidator, error) {
 	var expressionChecks []compiledJsonCheck
 	var conditionChecks []compiledJsonCheck
 
@@ -68,8 +68,6 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 				source:      check.Expression,
 			})
 		} else if check.Condition != nil {
-			// TODO: use local logger here
-			logger := logp.NewLogger("")
 			logger.Warn(cfgwarn.Deprecate("8.0.0", "JSON conditions are deprecated, use 'expression' instead."))
 			// TODO: use local logger here
 			cond, err := conditions.NewCondition(check.Condition, logger)

@@ -27,6 +27,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/icholy/digest"
+	"go.opentelemetry.io/otel/attribute"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -3248,6 +3249,55 @@ func TestRedactor(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetResourceAttributesIncludesInputType(t *testing.T) {
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("input_type should be set from input name: got %q, want %q", got, want)
+	}
+}
+
+func TestGetResourceAttributesInputTypeCannotBeOverridden(t *testing.T) {
+	t.Setenv("OTEL_RESOURCE_ATTRIBUTES", "input_type=httpjson,deployment.environment=production")
+
+	env := v2.Context{IDWithoutName: "input-id"}
+	cfg := config{
+		DataStream: "foo.bar",
+		Package: map[string]string{
+			"name":    "foo",
+			"version": "1.2.3",
+		},
+	}
+
+	attrs := getResourceAttributes(env, cfg)
+	attrsMap := toResourceAttributeMap(attrs)
+
+	if got, want := attrsMap["input_type"], "cel"; got != want {
+		t.Errorf("built-in input_type should not be overridden from OTEL_RESOURCE_ATTRIBUTES: got %q, want %q", got, want)
+	}
+	if got, want := attrsMap["deployment.environment"], "production"; got != want {
+		t.Errorf("custom resource attributes from OTEL_RESOURCE_ATTRIBUTES should still be included: got %q, want %q", got, want)
+	}
+}
+
+func toResourceAttributeMap(attrs []attribute.KeyValue) map[string]string {
+	result := make(map[string]string, len(attrs))
+	for _, attr := range attrs {
+		result[string(attr.Key)] = attr.Value.AsString()
+	}
+	return result
 }
 
 // sameErrorOrContains reports whether got matches want: both nil, or got's

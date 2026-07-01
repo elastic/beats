@@ -70,11 +70,7 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 	} else {
 		result.Type = "file"
 	}
-	if f.mftEntry.Flags().IsSet("ALLOCATED") {
-		result.Active = 1
-	} else {
-		result.Active = 0
-	}
+	result.Active = f.mftEntry.Flags().IsSet("ALLOCATED")
 
 	result.HardLinkCount = int32(f.mftEntry.Link_count())
 
@@ -113,7 +109,7 @@ func (f *fileNode) Materialize() (*elasticntfsfile.Result, error) {
 			if attr.Name() == "" {
 				result.Size = attr.DataSize()
 			} else {
-				result.Ads = 1
+				result.Ads = true
 			}
 		case 64: // $OBJECT_ID — first 16 bytes are a GUID
 			var buf [16]byte
