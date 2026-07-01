@@ -57,12 +57,11 @@ type TCP struct {
 	expiredConns expirationQueue
 
 	metrics *inputMetrics
+	debug   bool
 }
 
 // Creates and returns a new Tcp.
 func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
-	isDebug = logp.IsDebug("tcp")
-
 	portMap, err := buildPortsMap(p.GetAllTCP())
 	if err != nil {
 		return nil, err
@@ -72,6 +71,7 @@ func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
 		protocols: p,
 		portMap:   portMap,
 		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap),
+		debug:     logp.IsDebug("tcp"),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -79,7 +79,7 @@ func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
 		tcp.removalListener)
 
 	tcp.streams.StartJanitor(protos.DefaultTransactionExpiration)
-	if isDebug {
+	if tcp.debug {
 		logp.Debug("tcp", "Port map: %v", portMap)
 	}
 
@@ -115,7 +115,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 		id.AddConnectionID(uint64(conn.id))
 	}
 
-	if isDebug {
+	if tcp.debug {
 		logp.Debug("tcp", "tcp flow id: %p", id)
 	}
 
@@ -133,7 +133,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	}
 	tcpSeq := tcpStartSeq + uint32(payloadLen)
 	lastSeq := conn.lastSeq[stream.dir]
-	if isDebug {
+	if tcp.debug {
 		logp.Debug("tcp", "pkt.start_seq=%v pkt.last_seq=%v stream.last_seq=%v (len=%d)",
 			tcpStartSeq, tcpSeq, lastSeq, len(pkt.Payload))
 	}
@@ -143,7 +143,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	}
 	if len(pkt.Payload) > 0 && lastSeq != 0 {
 		if tcpSeqBeforeEq(tcpSeq, lastSeq) {
-			if isDebug {
+			if tcp.debug {
 				logp.Debug("tcp", "Ignoring retransmitted segment. pkt.seq=%v len=%v stream.seq=%v",
 					tcphdr.Seq, len(pkt.Payload), lastSeq)
 			}
@@ -160,7 +160,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			logp.Debug("tcp", "Gap in tcp stream. last_seq: %d, seq: %d, gap: %d", lastSeq, tcpStartSeq, gap)
 			drop := stream.gapInStream(gap)
 			if drop {
-				if isDebug {
+				if tcp.debug {
 					logp.Debug("tcp", "Dropping connection state because of gap")
 				}
 				tcp.metrics.logDrop()
@@ -175,7 +175,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 			// lastSeq > tcpStartSeq => overlapping TCP segment detected. shrink packet
 			delta := lastSeq - tcpStartSeq
 
-			if isDebug {
+			if tcp.debug {
 				logp.Debug("tcp", "Overlapping tcp segment. last_seq %d, seq: %d, delta: %d",
 					lastSeq, tcpStartSeq, delta)
 			}
@@ -211,7 +211,7 @@ func (tcp *TCP) getStream(pkt *protos.Packet) (stream TCPStream, created bool) {
 		timeout = mod.ConnectionTimeout()
 	}
 
-	if isDebug {
+	if tcp.debug {
 		t := pkt.Tuple
 		logp.Debug("tcp", "Connection src[%s:%d] dst[%s:%d] doesn't exist, creating new",
 			t.SrcIP.String(), t.SrcPort,
@@ -248,8 +248,6 @@ const (
 	seqEq seqCompare = 0
 	seqGT seqCompare = 1
 )
-
-var isDebug = false
 
 func (tcp *TCP) getID() uint32 {
 	tcp.id++
@@ -315,7 +313,7 @@ func (stream *TCPStream) addPacket(pkt *protos.Packet, tcphdr *layers.TCP) {
 	conn := stream.conn
 	mod := conn.tcp.protocols.GetTCP(conn.protocol)
 	if mod == nil {
-		if isDebug {
+		if conn.tcp.debug {
 			protocol := conn.protocol
 			logp.Debug("tcp", "Ignoring protocol for which we have no module loaded: %s",
 				protocol)

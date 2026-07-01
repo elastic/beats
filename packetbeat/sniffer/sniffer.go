@@ -26,6 +26,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -47,8 +48,11 @@ import (
 type Sniffer struct {
 	sniffers []sniffer
 	closers  []func()
-	cancel   func()
-	log      *logp.Logger
+
+	mu     sync.Mutex
+	cancel func()
+
+	log *logp.Logger
 }
 
 type sniffer struct {
@@ -220,7 +224,9 @@ func validateAfPacketConfig(cfg *config.InterfaceConfig) error {
 // Worker instances are instantiated as needed.
 func (s *Sniffer) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
+	s.mu.Lock()
 	s.cancel = cancel
+	s.mu.Unlock()
 	g, ctx := errgroup.WithContext(ctx)
 	for i := range s.sniffers {
 		c := &s.sniffers[i]
@@ -528,9 +534,12 @@ func (s *Sniffer) Stop() {
 		s.log.Debugf("sending closing to %s", c.config.Device)
 		c.state.Store(snifferClosing)
 	}
-	if s.cancel != nil {
+	s.mu.Lock()
+	cancel := s.cancel
+	s.mu.Unlock()
+	if cancel != nil {
 		s.log.Debug("cancelling sniffers")
-		s.cancel()
+		cancel()
 	}
 }
 

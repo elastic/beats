@@ -20,6 +20,7 @@ package tls
 import (
 	"crypto/x509"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -65,8 +66,11 @@ type tlsPlugin struct {
 }
 
 var (
-	debugf  = logp.MakeDebug("tls")
-	isDebug = false
+	debugf = logp.MakeDebug("tls")
+	// isDebug caches whether the "tls" debug selector is enabled. It is an
+	// atomic.Bool because multiple plugin instances may initialize it
+	// concurrently (e.g. several packetbeat receivers in one process).
+	isDebug atomic.Bool
 
 	// ensure that tlsPlugin fulfills the TCPPlugin interface
 	_ protos.TCPPlugin = &tlsPlugin{}
@@ -105,7 +109,7 @@ func (plugin *tlsPlugin) init(results protos.Reporter, watcher *procs.ProcessesW
 
 	plugin.results = results
 	plugin.watcher = watcher
-	isDebug = logp.IsDebug("tls")
+	isDebug.Store(logp.IsDebug("tls"))
 
 	return nil
 }
@@ -185,7 +189,7 @@ func (plugin *tlsPlugin) doParse(
 	}
 
 	if err := st.Append(pkt.Payload); err != nil {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("%v, dropping TCP stream", err)
 		}
 		return nil
@@ -204,7 +208,7 @@ func (plugin *tlsPlugin) doParse(
 			// drop this tcp stream. Will retry parsing with the next
 			// segment in it
 			conn.streams[dir] = nil
-			if isDebug {
+			if isDebug.Load() {
 				debugf("non-TLS message: TCP stream dropped. Try parsing with the next segment")
 			}
 

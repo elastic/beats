@@ -65,12 +65,12 @@ func (trans *transactions) onMessage(
 	msg.CmdlineTuple = trans.watcher.FindProcessesTupleTCP(&msg.Tuple)
 
 	if msg.IsRequest {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Received request with tuple: %s", tuple)
 		}
 		err = trans.onRequest(tuple, dir, msg)
 	} else {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Received response with tuple: %s", tuple)
 		}
 		err = trans.onResponse(tuple, dir, msg)
@@ -156,7 +156,7 @@ func (trans *transactions) correlate() error {
 			}
 
 			if resp.header["op"] == "EVENT" {
-				if isDebug {
+				if isDebug.Load() {
 					logp.Debug("cassandra", "server pushed message,%v", resp.header)
 				}
 

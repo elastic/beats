@@ -19,6 +19,7 @@ package cassandra
 
 import (
 	"errors"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
@@ -68,7 +69,10 @@ type message struct {
 // Error code if stream exceeds max allowed size on append.
 var (
 	errStreamTooLarge = errors.New("Stream data too large")
-	isDebug           = false
+	// isDebug caches whether the "cassandra" debug selector is enabled. It is
+	// an atomic.Bool because multiple parser instances may initialize it
+	// concurrently (e.g. several packetbeat receivers in one process).
+	isDebug atomic.Bool
 )
 
 func (p *parser) init(
@@ -81,7 +85,7 @@ func (p *parser) init(
 		onMessage: onMessage,
 	}
 
-	isDebug = logp.IsDebug("cassandra")
+	isDebug.Store(logp.IsDebug("cassandra"))
 }
 
 func (p *parser) append(data []byte) error {
@@ -146,7 +150,7 @@ func (p *parser) parserBody() (bool, error) {
 	// let's wait for enough buf
 	debugf("bodyLength: %d", bdyLen)
 	if !p.buf.Avail(bdyLen) {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("buf not enough for body, waiting for more, return")
 		}
 		return false, nil
@@ -154,7 +158,7 @@ func (p *parser) parserBody() (bool, error) {
 
 	// check if the ops already ignored
 	if p.message.ignored {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("message marked to be ignored, let's do this")
 		}
 		p.buf.Collect(bdyLen)
@@ -198,7 +202,7 @@ func (p *parser) parserBody() (bool, error) {
 func (p *parser) parse() (*message, error) {
 	// if p.frame is nil then create a new framer, or continue to process the last message
 	if p.framer == nil {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("start new framer")
 		}
 		p.framer = gocql.NewFramer(&p.buf, p.config.compressor)
@@ -206,7 +210,7 @@ func (p *parser) parse() (*message, error) {
 
 	// check if the frame header were parsed or not
 	if p.framer.Header == nil {
-		if isDebug {
+		if isDebug.Load() {
 			debugf("start to parse header")
 		}
 		if !p.buf.Avail(9) {
@@ -226,7 +230,7 @@ func (p *parser) parse() (*message, error) {
 	if p.CheckFrameOpsIgnored() {
 		// as we already ignore the content, we now mark the result is ignored
 		p.message.ignored = true
-		if isDebug {
+		if isDebug.Load() {
 			debugf("Ops: %s was marked to be ignored, ignoring, request:%v", p.framer.Header.Op.String(), p.framer.Header.Version.IsRequest())
 		}
 	}

@@ -266,7 +266,7 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 
 		switch header.recordType {
 		case recordTypeChangeCipherSpec: // single message of size 1 (byte 1)
-			if isDebug {
+			if isDebug.Load() {
 				debugf("handshake completed")
 			}
 			// discard remaining data for this stream (encrypted)
@@ -274,7 +274,7 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 			return resultEncrypted
 
 		case recordTypeHandshake:
-			if isDebug {
+			if isDebug.Load() {
 				debugf("got handshake record of size %d", header.length)
 			}
 			if err = parser.bufferHandshake(buf, int(header.length)); err != nil {
@@ -290,12 +290,12 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 
 		case recordTypeApplicationData:
 			// TODO: Request / Response analytics
-			if isDebug {
+			if isDebug.Load() {
 				debugf("ignoring application data length %d", header.length)
 			}
 
 		default:
-			if isDebug {
+			if isDebug.Load() {
 				debugf("ignoring record type %d length %d", header.recordType, header.length)
 			}
 		}
@@ -369,7 +369,7 @@ func (parser *parser) setDirection(dir direction) {
 }
 
 func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferView) bool {
-	if isDebug {
+	if isDebug.Load() {
 		debugf("got handshake message %v [%d]", handshakeType, buffer.length())
 	}
 	switch handshakeType {
