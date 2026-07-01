@@ -18,35 +18,10 @@
 package processors
 
 import (
-	"errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	p "github.com/elastic/beats/v7/libbeat/plugin"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-type processorPlugin struct {
-	name   string
-	constr Constructor
-}
-
-var pluginKey = "libbeat.processor"
-
-func Plugin(name string, c Constructor) map[string][]interface{} {
-	return p.MakePlugin(pluginKey, processorPlugin{name, c})
-}
-
-func init() {
-	p.MustRegisterLoader(pluginKey, func(ifc interface{}) error {
-		p, ok := ifc.(processorPlugin)
-		if !ok {
-			return errors.New("plugin does not match processor plugin type")
-		}
-
-		return registry.Register(p.name, p.constr)
-	})
-}
 
 type Constructor func(config *config.C, logger *logp.Logger) (beat.Processor, error)
 
