@@ -3,6 +3,7 @@ beats:
   - auditbeat
   - filebeat
   - metricbeat
+  - heartbeat
 compile:
   cgo: true
   env:

@@ -21,13 +21,12 @@ import (
 	dsa2 "crypto/dsa" //nolint:staticcheck // we need to calculate DSA stuff for completeness
 	"crypto/ecdsa"
 	"crypto/rsa"
-	"crypto/sha1"
-	"crypto/sha256"
 	cryptoTLS "crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/hasher"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -64,8 +63,16 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 	serverFields := mapstr.M{"x509": x509Fields}
 	tlsFields = mapstr.M{"server": serverFields}
 
-	_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
-	_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
+	if h, ok := hasher.GetHasher(hasher.SHA1); ok {
+		sha1 := h()
+		sha1.Write(hostCert.Raw)
+		_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(nil)))
+	}
+	if h, ok := hasher.GetHasher(hasher.SHA256); ok {
+		sha256 := h()
+		sha256.Write(hostCert.Raw)
+		_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum(nil)))
+	}
 
 	_, _ = x509Fields.Put("issuer.common_name", hostCert.Issuer.CommonName)
 	_, _ = x509Fields.Put("issuer.distinguished_name", hostCert.Issuer.String())
@@ -81,7 +88,7 @@ func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate
 		_, _ = x509Fields.Put("public_key_size", sizeInBits)
 		_, _ = x509Fields.Put("public_key_exponent", rsaKey.E)
 	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
-		if dsaKey.Parameters.P != nil {
+		if dsaKey.P != nil {
 			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
 		} else {
 			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
