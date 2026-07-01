@@ -221,42 +221,8 @@ func (p *fileProspector) Init(
 				return true
 			}
 
-			if _, ok := files[fm.Source]; ok {
-				return false // source still present, keep
-			}
-
-			// Growing entry whose Source path is absent from the current
-			// scan: could be a true deletion (cleanup removes it) or a
-			// rename while filebeat was stopped (the entry needs to stay
-			// alive so the next scan's migrate path can pick it up).
-			//
-			// We preserve ONLY when there's a current file that has already
-			// crossed the threshold (Fingerprint.Complete()) and whose raw
-			// header has this entry's stored fingerprint as a STRICT prefix.
-			// A completed file carrying raw material that extends a stored
-			// growing entry is strong evidence of a rename + threshold
-			// crossing while filebeat was stopped.
-			//
-			// Ordinary growing-phase rename across restart is intentionally
-			// NOT covered by this skip: distinguishing it from a
-			// shared-header collision (two distinct files starting with
-			// the same content, one of them deleted) is ambiguous without
-			// the threshold signal, and preserving in that case would
-			// cause incorrect state reuse for the surviving file.
-			// A non-empty Fingerprint (held in the entry VALUE, since the key
-			// is only a bounded hash of it) marks an entry as still growing.
-			// Final/static entries leave it empty and are not eligible for
-			// this rename+threshold-crossing preservation.
-			storedFP := fm.Fingerprint
-			if storedFP == "" {
-				return true
-			}
-			for _, desc := range files {
-				if desc.Fingerprint.Complete() && isStrictPrefix(desc.Fingerprint.Raw, storedFP) {
-					return false // possible rename + threshold crossing, preserve
-				}
-			}
-			return true
+			_, ok := files[fm.Source]
+			return !ok
 		})
 	}
 

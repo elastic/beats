@@ -39,11 +39,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-// enhancedFingerprintCfg is the Enhanced-Fingerprint test configuration:
-// growing enabled, default fingerprint length (1024 bytes) — so files cross
-// the threshold once they exceed 1024 bytes of decompressed content.
-// Format args: logDir, checkInterval, pathHome.
-var enhancedFingerprintCfg = `
+const (
+	fingerprintCfgBase = `
 filebeat.inputs:
   - type: filestream
     id: test-enhanced-fingerprint
@@ -53,7 +50,7 @@ filebeat.inputs:
       - %s/*.log*
     prospector.scanner:
       check_interval: %s
-    file_identity.fingerprint: ~
+    %s
 
 queue.mem:
   flush.timeout: 0s
@@ -70,40 +67,22 @@ logging:
   metrics:
     enabled: false
 `
+	fingerprintEnhanced            = "file_identity.fingerprint: ~"
+	fingerprintStatic              = "file_identity.fingerprint:\n      growing: false"
+	fingerprintEnhancedKeepRemoved = fingerprintEnhanced + "\n    clean_removed: false"
+)
 
-// staticFingerprintCfg is the same as enhancedFingerprintCfg but with growing
-// disabled. Used by the upgrade tests to simulate an existing static-fingerprint
-// deployment. The input id and paths match enhancedFingerprintCfg so the
-// registry built under static is reused when the user opts in to growing.
-//
-// Format args: logDir, checkInterval, tempDir.
-var staticFingerprintCfg = `
-filebeat.inputs:
-  - type: filestream
-    id: test-enhanced-fingerprint
-    enabled: true
-    paths:
-      - %s/*.log
-    prospector.scanner:
-      check_interval: %s
-    file_identity.fingerprint:
-      growing: false
+func fingerprintCfg(logDir, checkInterval, fingerprintBlock, pathHome string) string {
+	return fmt.Sprintf(fingerprintCfgBase, logDir, checkInterval, fingerprintBlock, pathHome)
+}
 
-queue.mem:
-  flush.timeout: 0s
+func enhancedFingerprintCfg(logDir, checkInterval, pathHome string) string {
+	return fingerprintCfg(logDir, checkInterval, fingerprintEnhanced, pathHome)
+}
 
-path.home: %s
-
-output.file:
-  path: ${path.home}
-  filename: "output"
-  rotate_on_startup: false
-
-logging:
-  level: debug
-  metrics:
-    enabled: false
-`
+func staticFingerprintCfg(logDir, checkInterval, pathHome string) string {
+	return fingerprintCfg(logDir, checkInterval, fingerprintStatic, pathHome)
+}
 
 // TestFilestreamFingerprintSmallFiles tests that files smaller than the
 // fingerprint size (default 1024 bytes) are not ingested until they grow
@@ -126,7 +105,7 @@ func TestFilestreamFingerprintSmallFiles(t *testing.T) {
 	file2 := filepath.Join(logDir, "file2.log")
 	file3 := filepath.Join(logDir, "file3.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(staticFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(staticFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting", 10*time.Second, "filestream did not start")
@@ -239,7 +218,7 @@ func TestFilestreamGrowingFingerprint(t *testing.T) {
 	file4 := filepath.Join(logDir, "file4.log.gz")
 	file5 := filepath.Join(logDir, "file5.log.gz")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -340,7 +319,7 @@ func TestFilestreamGrowingFingerprint_update_while_stopped(t *testing.T) {
 	file2 := filepath.Join(logDir, "file2.log")
 	file3 := filepath.Join(logDir, "file3.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -425,7 +404,7 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files(t *testing.T) {
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -508,7 +487,7 @@ func TestFilestreamGrowingFingerprint_do_not_mix_up_files_with_shutdown_and_dele
 	file1 := filepath.Join(logDir, "file1.log")
 	file2 := filepath.Join(logDir, "file2.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -598,7 +577,7 @@ func TestFilestreamGrowingFingerprint_supersetFileNotConflated(t *testing.T) {
 	// 4 lines, well below the 1024-byte threshold => tracked in the growing phase.
 	shared := generateLines("shared line", 4)
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not start")
@@ -658,7 +637,7 @@ func TestFilestreamGrowingFingerprintTruncation(t *testing.T) {
 
 	logFile := filepath.Join(logDir, "truncate.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -901,7 +880,7 @@ func TestFilestreamGrowingFingerprint_rename_and_grow(t *testing.T) {
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "5s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "5s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -997,7 +976,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransition(t *testing.T) {
 
 	logFile := filepath.Join(logDir, "app.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -1072,7 +1051,7 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	//     under static; ends up keyed by its SHA-256 in the registry.
 	//   - smallFile: 5 lines  (~250 bytes), below threshold → dropped by
 	//     static (errFileTooSmall); no registry entry created.
-	filebeat.WriteConfigFile(fmt.Sprintf(staticFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(staticFingerprintCfg(logDir, "1s", tempDir))
 	appendToFile(t, largeFile, generateLines("large", 30))
 	appendToFile(t, smallFile, generateLines("small", 5))
 
@@ -1097,7 +1076,7 @@ func TestFilestreamEnhancedFingerprint_NoDuplicationOnUpgrade(t *testing.T) {
 	//   2. smallFile is now eligible (growing tracks below-threshold files)
 	//      → its 5 lines are ingested for the first time.
 	// Expected post-upgrade total: 30 (large, unchanged) + 5 (small, new) = 35.
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not restart under growing config")
@@ -1203,7 +1182,7 @@ func TestFilestreamEnhancedFingerprint_ReadsLegacyStaticRegistry(t *testing.T) {
 	writeTruncatingFile(t, smallFile, smallOld)
 
 	// Start the new Filebeat with growing enabled by default, over the legacy registry.
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not start")
@@ -1408,7 +1387,7 @@ func TestFilestreamEnhancedFingerprint_ThresholdTransitionAcrossRestart(t *testi
 
 	logFile := filepath.Join(logDir, "app.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 
 	// Phase 1: small file (~250 bytes), tracked with raw-hex (growing).
 	appendToFile(t, logFile, generateLines("before-restart", 5))
@@ -1486,7 +1465,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) 
 	// test window. (With a longer interval the harvester may finish reading
 	// via the still-open fd before the scanner re-scans, leaving the
 	// registry under the original raw-hex key.)
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", homeDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", homeDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -1552,13 +1531,8 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdCrossing(t *testing.T) 
 
 // TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart is the
 // hardest of the threshold scenarios: BOTH rename and threshold-crossing
-// happen while Filebeat is stopped. After restart the fileWatcher's w.prev
-// is empty, so its in-process rename detection (neither the exact-FileID
-// nor the prefix-match pass) can help; the match has to come from the
-// prospector's lazy short-fingerprint set, which is built from the
-// persistent registry. The prospector finds the prior raw-hex entry by
-// path-agnostic prefix match against the new descriptor's raw header
-// (Fingerprint.Raw) and migrates the registry key.
+// happen while Filebeat is stopped.
+// Requires `clean_removed: false`.
 func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testing.T) {
 	filebeat := integration.NewFilebeat(t)
 
@@ -1570,7 +1544,10 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 	appLog := filepath.Join(logDir, "app.log")
 	appLogRenamed := filepath.Join(logDir, "app.log.1")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	// clean_removed disabled so the stopped-rename entry survives startup and the prospector can
+	// migrate it.
+	filebeat.WriteConfigFile(
+		fingerprintCfg(logDir, "1s", fingerprintEnhancedKeepRemoved, tempDir))
 
 	// Phase 1: small file (~250 bytes) — below threshold, raw-hex registry key.
 	appendToFile(t, appLog, generateLines("before-restart line", 5))
@@ -1588,13 +1565,7 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 		"failed to rename app.log -> app.log.1 while filebeat is stopped")
 	appendToFile(t, appLogRenamed, generateLines("after-restart line", 25)) // total ~1500 bytes
 
-	// Phase 3: restart. fileWatcher sees app.log.1 as new (w.prev empty).
-	// The descriptor carries the SHA-256 (Fingerprint.Sum) plus the raw header
-	// (Fingerprint.Raw) for the new path. The prospector's
-	// findGrowingFingerprintMatch first tries source==NewPath against the
-	// registry, fails (stored Source is the OLD path), then falls back to
-	// path-agnostic prefix matching against the raw header and finds the prior
-	// raw-hex entry. Migration completes.
+	// Phase 3: restart. fileWatcher sees app.log.1 as new.
 	filebeat.Start()
 	filebeat.WaitLogsContains("Input 'filestream' starting",
 		10*time.Second, "filestream did not restart")
@@ -1605,11 +1576,8 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 	require.Len(t, events, 30,
 		"expected exactly 30 events (5 before-restart + 25 after-restart); more means content was re-ingested across the restart")
 
-	// Pre-restart events were emitted under the original path (app.log)
-	// during the first filebeat run; post-restart events come out under the
-	// new path (app.log.1) because the second filebeat opens the file fresh
-	// under its current name. The TOTAL is 30 and there are no duplicates —
-	// that is the no-re-ingestion guarantee.
+	// Pre-restart events were emitted under the original path (app.log) during the first filebeat
+	// run; post-restart events come out under the new path (app.log.1).
 	preMsgs := messagesForFile(events, appLog)
 	postMsgs := messagesForFile(events, appLogRenamed)
 	require.Len(t, preMsgs, 5, "5 before-restart events should be attributed to the original path")
@@ -1625,8 +1593,8 @@ func TestFilestreamEnhancedFingerprint_RenameAndThresholdAcrossRestart(t *testin
 
 	filebeat.Stop()
 
-	// Registry state: app.log.1 ends up under a SHA-256 (64-char) key,
-	// raw-hex key for the old app.log path is removed by the migration.
+	// Registry state: app.log.1 ends up under a SHA-256 (64-char) key, raw-hex key for the old
+	// app.log path is removed by the migration.
 	assertFingerprintMigratedToSHA256(t, tempDir, appLogRenamed)
 }
 
@@ -1663,7 +1631,7 @@ func TestFilestreamEnhancedFingerprint_Gzip(t *testing.T) {
 	require.NoError(t, os.WriteFile(largeGzFile, largeGzBytes, 0o644),
 		"failed to write large gzip file")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
@@ -1713,7 +1681,7 @@ func TestFilestreamEnhancedFingerprint_TruncationAboveToBelowThreshold(t *testin
 
 	logFile := filepath.Join(logDir, "app.log")
 
-	filebeat.WriteConfigFile(fmt.Sprintf(enhancedFingerprintCfg, logDir, "1s", tempDir))
+	filebeat.WriteConfigFile(enhancedFingerprintCfg(logDir, "1s", tempDir))
 	filebeat.Start()
 
 	filebeat.WaitLogsContains("Input 'filestream' starting",
