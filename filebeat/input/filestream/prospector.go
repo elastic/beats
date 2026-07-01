@@ -270,7 +270,7 @@ func (p *fileProspector) Init(
 	if identifierName != fingerprintName {
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 	} else {
-		p.logger.Debugf("trying to migrate file identity to %s", identifierName)
+		p.logger.Debug("trying to migrate file identity to fingerprint")
 		prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, any) {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
