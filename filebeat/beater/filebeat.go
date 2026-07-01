@@ -87,7 +87,7 @@ type Filebeat struct {
 
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
 
-var _ backend.WithESStateStoreExtension = (*Filebeat)(nil)
+var _ backend.WithStorageExtension = (*Filebeat)(nil)
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -237,8 +237,8 @@ func (fb *Filebeat) WithOtelFactoryWrapper(wrapper cfgfile.FactoryWrapper) {
 	fb.otelStatusFactoryWrapper = wrapper
 }
 
-func (fb *Filebeat) WithESStateStoreExtension(esStateStoreExtension backend.Registry) {
-	fb.config.Registry.ESStorageExtension = esStateStoreExtension
+func (fb *Filebeat) WithStorageExtension(storeExtension backend.Registry) {
+	fb.config.Registry.StorageExtension = storeExtension
 }
 
 // loadModulesPipelines is called when modules are configured to do the initial

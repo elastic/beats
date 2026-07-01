@@ -55,8 +55,11 @@ type Registry struct {
 	// extension when Backend is "otel_file_storage". The map is decoded into
 	// filestorage.Config using confmap (which honours mapstructure tags) at registry
 	// creation time. If nil, factory defaults are used.
-	FileStorage        map[string]any   `config:"otel_file_storage"`
-	ESStorageExtension backend.Registry `config:"-"`
+	FileStorage map[string]any `config:"otel_file_storage"`
+	// StorageExtension is an external state store backend injected at runtime
+	// (e.g. by an OTel storage extension when Filebeat runs as a receiver). It
+	// is not user-configurable, hence config:"-".
+	StorageExtension backend.Registry `config:"-"`
 }
 
 var DefaultConfig = Config{
