@@ -1,0 +1,3 @@
+kind: bug-fix
+summary: Validate that HTTPJSON pagination URLs share the configured request URL origin.
+component: filebeat

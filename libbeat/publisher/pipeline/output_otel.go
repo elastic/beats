@@ -38,24 +38,20 @@ import (
 var _ outputController = (*otelOutputController)(nil)
 
 // otelOutputController is the per-pipeline outputController for a Beat
-// receiver. By default the receiver path uses the slabqueue pool: an
-// explicit intake queue ID joins the pool registered under that name, and
-// no ID joins the global default pool. Either way the pool is shared
-// across every receiver with the same ID, keeping a single in-memory event
-// budget across all of them while keeping each receiver's FIFO independent
-// (so a slow consumer on one receiver doesn't block others).
+// receiver. By default the receiver path uses the slabqueue pool: every
+// receiver joins a single process-global pool, keeping one in-memory event
+// budget shared across all of them while keeping each receiver's FIFO
+// independent (so a slow consumer on one receiver doesn't block others).
 //
 // The only escape hatch from slabqueue is an explicit disk queue
 // configuration (queue.disk). In that case the receiver builds its own
-// queue from the user-supplied factory — sharing is not supported for disk
-// queues, so an intake queue ID combined with queue.disk is rejected.
+// queue from the user-supplied factory and owns it outright.
 type otelOutputController struct {
 	beatInfo beat.Info
 	logger   *logp.Logger
 	monitors Monitors
 
-	intakeQueueID string
-	queue         queue.Queue[publisher.Event]
+	queue queue.Queue[publisher.Event]
 
 	// pool is non-nil whenever the receiver uses the slabqueue pool (i.e.
 	// queue.mem); it is nil when the receiver was configured with queue.disk
@@ -100,42 +96,30 @@ func (p *trackedProducer) Close() {
 	p.Producer.Close()
 }
 
-// sharedPool tracks one slabqueue.Pool together with a ref count, for
-// ref-counted lifecycle of pools indexed by intake queue ID.
+// otelSharedPool is the process-global slabqueue.Pool shared by every Beat
+// receiver that uses the in-memory queue. A single pool gives all receivers one
+// shared in-memory event budget while each keeps its own FIFO Queue, so a slow
+// consumer on one receiver can't block others.
 //
-// Connected receivers may ask for different queue.mem.events sizes (the
-// elastic-agent default leaves the intake queue ID empty, so receivers with
-// differing sizes all land in the global default pool). Rather than rejecting a
-// size mismatch, each receiver's own Queue is capped at its requested size
-// (Queue.SetTarget), and the pool sizes itself to the largest of those caps.
-// The registry therefore only refcounts the pool's lifetime; it does not size
-// it — the queues drive the pool size, so the two cannot drift.
+// Connected receivers may ask for different queue.mem.events sizes. Rather than
+// rejecting a size mismatch, each receiver's own Queue is capped at its
+// requested size (Queue.SetTarget), and the pool sizes itself to the largest of
+// those caps — the queues drive the pool size, so the two cannot drift. The
+// pool is ref-counted: created on the first connect and shut down once the last
+// receiver leaves.
 //
-// All fields are protected by allOTelPools.Mutex — sharedPool itself
-// carries no lock, and instances live only inside allOTelPools.lookup,
-// so a sharedPool value should never be touched outside a section that
-// holds the registry lock.
-type sharedPool struct {
+// All fields are protected by the embedded mutex; callers must hold it before
+// reading or modifying either `pool` or `refs`.
+var otelSharedPool = struct {
+	sync.Mutex
 	pool *slabqueue.Pool[publisher.Event]
 	refs int
-}
-
-// allOTelPools is the process-global registry of slabqueue.Pools keyed
-// by intake queue ID. The embedded mutex protects both `lookup` and every
-// field of every *sharedPool it contains; callers must always acquire it
-// before reading or modifying either.
-var allOTelPools = struct {
-	sync.Mutex
-	lookup map[string]*sharedPool
-}{
-	lookup: make(map[string]*sharedPool),
-}
+}{}
 
 func newOTelOutputController(
 	beatInfo beat.Info,
 	monitors Monitors,
 	retryObserver retryObserver,
-	intakeQueueID string,
 	queueFactory queue.QueueFactory[publisher.Event],
 	queueConfig any,
 ) (*otelOutputController, error) {
@@ -151,15 +135,12 @@ func newOTelOutputController(
 	// its queue from the user-supplied queueFactory.
 	if settings, isMem := queueConfig.(memqueue.Settings); isMem {
 		var sharedQueue *slabqueue.Queue[publisher.Event]
-		pool, sharedQueue = acquireOTelPool(intakeQueueID, settings, monitors)
+		pool, sharedQueue = acquireOTelPool(settings, monitors)
 		pipelineQueue = sharedQueue
 	} else {
-		// Non-memory queue (e.g. queue.disk): sharing is meaningless because
-		// each receiver writes to its own on-disk path, so an intake queue
-		// ID combined with a non-memory queue is a configuration error.
-		if intakeQueueID != "" {
-			return nil, fmt.Errorf("shared intake queue %q requires queue.mem, got %T", intakeQueueID, queueConfig)
-		}
+		// Non-memory queue (e.g. queue.disk): each receiver writes to its own
+		// on-disk path, so it owns its queue outright via the user-supplied
+		// factory rather than joining the shared pool.
 		q, err := queueFactory(monitors.Logger, observerForMonitors(monitors), 0, nil)
 		if err != nil {
 			return nil, fmt.Errorf("queue creation failed: %w", err)
@@ -175,7 +156,7 @@ func newOTelOutputController(
 	if err != nil {
 		closePipelineQueue(pipelineQueue)
 		if pool != nil {
-			releaseOTelPool(intakeQueueID)
+			releaseOTelPool()
 		}
 		return nil, err
 	}
@@ -195,16 +176,15 @@ func newOTelOutputController(
 	})
 
 	return &otelOutputController{
-		beatInfo:      beatInfo,
-		logger:        beatInfo.Logger.Named("otelOutputController"),
-		monitors:      monitors,
-		intakeQueueID: intakeQueueID,
-		queue:         pipelineQueue,
-		pool:          pool,
-		consumer:      consumer,
-		workers:       workers,
-		workerChan:    workerChan,
-		producers:     make(map[*trackedProducer]struct{}),
+		beatInfo:   beatInfo,
+		logger:     beatInfo.Logger.Named("otelOutputController"),
+		monitors:   monitors,
+		queue:      pipelineQueue,
+		pool:       pool,
+		consumer:   consumer,
+		workers:    workers,
+		workerChan: workerChan,
+		producers:  make(map[*trackedProducer]struct{}),
 	}, nil
 }
 
@@ -217,55 +197,47 @@ func closePipelineQueue(q queue.Queue[publisher.Event]) {
 	_ = q.Close(true)
 }
 
-// acquireOTelPool returns the slabqueue.Pool for the given intake queue ID and
-// a fresh per-connection Queue into it, creating the pool if necessary. The
-// empty string is the global default ID: every receiver started without an
-// explicit intake queue ID joins the same global pool.
+// acquireOTelPool returns the process-global slabqueue.Pool and a fresh
+// per-connection Queue into it, creating the pool on the first connect.
 //
 // Connections may request different event budgets. Instead of rejecting a
 // mismatch, this connection's own Queue is capped at its requested size, which
 // in turn sizes the shared pool to the largest cap among connected queues
 // (Queue.SetTarget drives the pool). A smaller receiver therefore cannot exceed
 // its own size even though the shared pool is larger, and the pool grows and
-// shrinks as receivers join and leave — keeping the shared global pool usable
-// even when, as in the elastic-agent default, receivers with differing
-// queue.mem.events values all land on the empty ID.
-func acquireOTelPool(intakeQueueID string, settings memqueue.Settings, monitors Monitors) (*slabqueue.Pool[publisher.Event], *slabqueue.Queue[publisher.Event]) {
-	allOTelPools.Lock()
-	defer allOTelPools.Unlock()
-	entry, ok := allOTelPools.lookup[intakeQueueID]
-	if !ok {
-		pool := slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: settings.Events}, observerForMonitors(monitors))
-		entry = &sharedPool{pool: pool}
-		allOTelPools.lookup[intakeQueueID] = entry
-		monitors.Logger.Debugf("newOTelOutputController: created new pool for intake queue ID %q", intakeQueueID)
+// shrinks as receivers join and leave.
+func acquireOTelPool(settings memqueue.Settings, monitors Monitors) (*slabqueue.Pool[publisher.Event], *slabqueue.Queue[publisher.Event]) {
+	otelSharedPool.Lock()
+	defer otelSharedPool.Unlock()
+	if otelSharedPool.pool == nil {
+		otelSharedPool.pool = slabqueue.NewPool[publisher.Event](slabqueue.Settings{Events: settings.Events}, observerForMonitors(monitors))
+		monitors.Logger.Debugf("newOTelOutputController: created shared slabqueue pool")
 	}
-	entry.refs++
-	q := entry.pool.Connect()
+	otelSharedPool.refs++
+	q := otelSharedPool.pool.Connect()
 	// Cap this connection's own queue at its requested budget. This also resizes
 	// the shared pool to the largest cap among connected queues, so the pool
 	// always tracks the queues and the two cannot drift.
 	q.SetTarget(settings.Events)
-	monitors.Logger.Debugf("newOTelOutputController: joined pool for intake queue ID %q (%v connections, pool budget %v)", intakeQueueID, entry.refs, entry.pool.Target())
-	return entry.pool, q
+	monitors.Logger.Debugf("newOTelOutputController: joined shared pool (%v connections, pool budget %v)", otelSharedPool.refs, otelSharedPool.pool.Target())
+	return otelSharedPool.pool, q
 }
 
-// releaseOTelPool drops one reference to the pool for the given intake queue ID
-// and shuts the pool down once the last connected pipeline leaves. The pool's
-// size is not adjusted here: the connection's queue was already closed (which
-// resizes the pool to the remaining queues' caps). The empty ID is the global
-// default pool and is treated the same as a named ID.
-func releaseOTelPool(intakeQueueID string) {
-	allOTelPools.Lock()
-	defer allOTelPools.Unlock()
-	entry, ok := allOTelPools.lookup[intakeQueueID]
-	if !ok {
+// releaseOTelPool drops one reference to the shared pool and shuts it down once
+// the last connected pipeline leaves. The pool's size is not adjusted here: the
+// connection's queue was already closed (which resizes the pool to the
+// remaining queues' caps).
+func releaseOTelPool() {
+	otelSharedPool.Lock()
+	defer otelSharedPool.Unlock()
+	if otelSharedPool.pool == nil {
 		return
 	}
-	entry.refs--
-	if entry.refs <= 0 {
-		entry.pool.Shutdown()
-		delete(allOTelPools.lookup, intakeQueueID)
+	otelSharedPool.refs--
+	if otelSharedPool.refs <= 0 {
+		otelSharedPool.pool.Shutdown()
+		otelSharedPool.pool = nil
+		otelSharedPool.refs = 0
 	}
 }
 
@@ -329,7 +301,7 @@ func (c *otelOutputController) waitClose(ctx context.Context, _ bool) error {
 	// and therefore all remaining — events above. Receivers on the non-mem
 	// (disk) path own their queue outright and never joined a pool.
 	if c.pool != nil {
-		releaseOTelPool(c.intakeQueueID)
+		releaseOTelPool()
 	}
 	return nil
 }

@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -81,7 +82,7 @@ var (
 )
 
 func TestParseDHCPRequest(t *testing.T) {
-	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
+	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -166,7 +167,7 @@ func TestParseDHCPRequest(t *testing.T) {
 }
 
 func TestParseDHCPACK(t *testing.T) {
-	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
+	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

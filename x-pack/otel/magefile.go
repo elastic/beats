@@ -33,6 +33,7 @@ func init() {
 
 	devtools.BeatDescription = "OTel components used by the Elastic Agent"
 	devtools.BeatLicense = "Elastic License"
+	devtools.DefaultCleanPaths = append(devtools.DefaultCleanPaths, filepath.Join(distroDir, "_build"))
 }
 
 // BuildOtelDistro builds the beats-otel-collector distribution using ocb.

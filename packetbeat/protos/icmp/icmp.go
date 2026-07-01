@@ -46,6 +46,7 @@ type icmpPlugin struct {
 
 	results protos.Reporter
 	watcher *procs.ProcessesWatcher
+	logger  *logp.Logger
 }
 
 type ICMPv4Processor interface {
@@ -69,8 +70,9 @@ var (
 	duplicateRequests  = monitoring.NewInt(nil, "icmp.duplicate_requests")
 )
 
-func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (*icmpPlugin, error) {
+func New(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C, logger *logp.Logger) (*icmpPlugin, error) {
 	p := &icmpPlugin{}
+	p.logger = logger
 	config := defaultConfig
 	if !testMode {
 		if err := cfg.Unpack(&config); err != nil {
@@ -89,10 +91,10 @@ func (icmp *icmpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWa
 
 	localIPs, err := common.LocalIPAddrs()
 	if err != nil {
-		logp.Err("Error getting local IP addresses: %+v", err)
+		icmp.logger.Errorf("Error getting local IP addresses: %+v", err)
 		localIPs = nil
 	}
-	logp.Debug("icmp", "Local IP addresses: %v", localIPs)
+	icmp.logger.Named("icmp").Debugf("Local IP addresses: %v", localIPs)
 
 	removalListener := func(k common.Key, v common.Value) {
 		tuple, ok := k.(hashableIcmpTuple)
@@ -136,7 +138,7 @@ func (icmp *icmpPlugin) ProcessICMPv4(
 ) {
 	typ := icmp4.TypeCode.Type()
 	code := icmp4.TypeCode.Code()
-	id, seq := extractTrackingData(4, typ, &icmp4.BaseLayer)
+	id, seq := extractTrackingData(4, typ, &icmp4.BaseLayer, icmp.logger)
 
 	tuple := &icmpTuple{
 		icmpVersion: 4,
@@ -152,7 +154,7 @@ func (icmp *icmpPlugin) ProcessICMPv4(
 		length: len(icmp4.Payload),
 	}
 
-	if isRequest(tuple, msg) {
+	if isRequest(tuple, msg, icmp.logger) {
 		if flowID != nil {
 			flowID.AddICMPv4Request(id)
 		}
@@ -172,7 +174,7 @@ func (icmp *icmpPlugin) ProcessICMPv6(
 ) {
 	typ := icmp6.TypeCode.Type()
 	code := icmp6.TypeCode.Code()
-	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer)
+	id, seq := extractTrackingData(6, typ, &icmp6.BaseLayer, icmp.logger)
 	tuple := &icmpTuple{
 		icmpVersion: 6,
 		srcIP:       pkt.Tuple.SrcIP,
@@ -187,7 +189,7 @@ func (icmp *icmpPlugin) ProcessICMPv6(
 		length: len(icmp6.Payload),
 	}
 
-	if isRequest(tuple, msg) {
+	if isRequest(tuple, msg, icmp.logger) {
 		if flowID != nil {
 			flowID.AddICMPv6Request(id)
 		}
@@ -201,20 +203,20 @@ func (icmp *icmpPlugin) ProcessICMPv6(
 }
 
 func (icmp *icmpPlugin) processRequest(tuple *icmpTuple, msg *icmpMessage) {
-	logp.Debug("icmp", "Processing request. %s", tuple)
+	icmp.logger.Named("icmp").Debugf("Processing request. %s", tuple)
 
 	trans := icmp.deleteTransaction(tuple.Hashable())
 	if trans != nil {
 		trans.notes = append(trans.notes, duplicateRequestMsg)
-		logp.Debug("icmp", duplicateRequestMsg+" %s", tuple)
+		icmp.logger.Named("icmp").Debugf(duplicateRequestMsg+" %s", tuple)
 		duplicateRequests.Add(1)
 		icmp.publishTransaction(trans)
 	}
 
-	trans = &icmpTransaction{ts: msg.ts, tuple: *tuple}
+	trans = &icmpTransaction{ts: msg.ts, tuple: *tuple, logger: icmp.logger}
 	trans.request = msg
 
-	if requiresCounterpart(tuple, msg) {
+	if requiresCounterpart(tuple, msg, icmp.logger) {
 		icmp.transactions.Put(tuple.Hashable(), trans)
 	} else {
 		icmp.publishTransaction(trans)
@@ -222,14 +224,14 @@ func (icmp *icmpPlugin) processRequest(tuple *icmpTuple, msg *icmpMessage) {
 }
 
 func (icmp *icmpPlugin) processResponse(tuple *icmpTuple, msg *icmpMessage) {
-	logp.Debug("icmp", "Processing response. %s", tuple)
+	icmp.logger.Named("icmp").Debugf("Processing response. %s", tuple)
 
 	revTuple := tuple.Reverse()
 	trans := icmp.deleteTransaction(revTuple.Hashable())
 	if trans == nil {
-		trans = &icmpTransaction{ts: msg.ts, tuple: revTuple}
+		trans = &icmpTransaction{ts: msg.ts, tuple: revTuple, logger: icmp.logger}
 		trans.notes = append(trans.notes, orphanedResponseMsg)
-		logp.Debug("icmp", orphanedResponseMsg+" %s", tuple)
+		icmp.logger.Named("icmp").Debugf(orphanedResponseMsg+" %s", tuple)
 		unmatchedResponses.Add(1)
 	}
 
@@ -259,7 +261,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		return
 	}
 
-	logp.Debug("icmp", "Publishing transaction. %s", &trans.tuple)
+	icmp.logger.Named("icmp").Debugf("Publishing transaction. %s", &trans.tuple)
 
 	evt, pbf := pb.NewBeatEvent(trans.ts)
 	pbf.Source = &ecs.Source{IP: trans.tuple.srcIP.String()}
@@ -294,7 +296,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		pbf.Source.Bytes = int64(trans.request.length)
 
 		request := mapstr.M{
-			"message": humanReadable(&trans.tuple, trans.request),
+			"message": humanReadable(&trans.tuple, trans.request, icmp.logger),
 			"type":    trans.request.Type,
 			"code":    trans.request.code,
 		}
@@ -309,7 +311,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 		pbf.Destination.Bytes = int64(trans.response.length)
 
 		response := mapstr.M{
-			"message": humanReadable(&trans.tuple, trans.response),
+			"message": humanReadable(&trans.tuple, trans.response, icmp.logger),
 			"type":    trans.response.Type,
 			"code":    trans.response.code,
 		}
