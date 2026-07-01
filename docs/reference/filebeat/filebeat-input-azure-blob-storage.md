@@ -21,7 +21,7 @@ Use the `azure blob storage input` to read content from files stored in containe
 ::::{note}
 :name: supported-types
 
-`JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may be also be gzip compressed. `shared access keys`, `connection strings` and `Microsoft Entra ID RBAC` authentication types are supported.
+`JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may also be compressed as gzip ([RFC 1952](https://rfc-editor.org/rfc/rfc1952.html)) or Snappy framed streams ([framing format](https://github.com/google/snappy/blob/main/framing_format.txt)). Raw Snappy blocks are not supported. `shared access keys`, `connection strings` and `Microsoft Entra ID RBAC` authentication types are supported.
 ::::
 
 
