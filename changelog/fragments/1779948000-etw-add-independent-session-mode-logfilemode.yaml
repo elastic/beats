@@ -1,0 +1,8 @@
+# REQUIRED
+kind: bug-fix
+
+# REQUIRED
+summary: ETW reader sets INDEPENDENT_SESSION_MODE + PERSIST_ON_HYBRID_SHUTDOWN on LogFileMode to stop silent ~50% event drop on high-EPS providers (Microsoft-Windows-DNSServer)
+
+# REQUIRED
+component: libbeat
