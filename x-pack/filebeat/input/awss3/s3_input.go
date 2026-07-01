@@ -235,8 +235,21 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			state.Stored = true
 		}
 
+		finalize := objHandler.FinalizeS3Object
+
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
+			// Finalize the object (backup/delete) after all events are ACKed.
+			// Only successfully processed objects are finalized.
+			if state.Stored {
+				if err := finalize(); err != nil {
+					in.log.Errorf("failed finalizing S3 object key %q in bucket %q: %v", state.Key, state.Bucket, err)
+					in.status.UpdateStatus(status.Degraded,
+						fmt.Sprintf("S3 object finalization failure for object key '%s' in bucket '%s': %s",
+							state.Key, state.Bucket, err.Error()))
+				}
+			}
+
 			err := in.registry.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())

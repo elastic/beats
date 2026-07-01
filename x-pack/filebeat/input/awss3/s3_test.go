@@ -6,6 +6,8 @@ package awss3
 
 import (
 	"context"
+	"io"
+	"strings"
 	"testing"
 	"time"
 
@@ -154,6 +156,120 @@ func TestS3Poller(t *testing.T) {
 			status:          &statusReporterHelperMock{},
 		}
 		poller.runPoll(ctx)
+	})
+
+	t.Run("Poll finalizes objects after ACK (backup + delete)", func(t *testing.T) {
+		store := openTestStatestore()
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
+		pipeline := newFakePipeline()
+
+		backupDone := make(chan struct{})
+		deleteDone := make(chan struct{})
+
+		mockAPI.EXPECT().
+			ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq(listPrefix), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_, _, _ string) s3Pager {
+				return mockPager
+			})
+
+		// Poller listing loop calls HasMorePages before and after NextPage.
+		hasMoreCalls := 0
+		mockPager.EXPECT().
+			HasMorePages().
+			Times(2).
+			DoAndReturn(func() bool {
+				hasMoreCalls++
+				return hasMoreCalls == 1
+			})
+
+		mockPager.EXPECT().
+			NextPage(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+				return &s3.ListObjectsV2Output{
+					Contents: []types.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}, nil
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string) (*s3.GetObjectOutput, error) {
+				// A simple text payload that produces at least one event.
+				return &s3.GetObjectOutput{
+					Body: io.NopCloser(strings.NewReader("hello\n")),
+				}, nil
+			})
+
+		mockAPI.EXPECT().
+			CopyObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("backup-bucket"), gomock.Eq("key1"), gomock.Eq("processed/key1")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string, _ string, _ string) (*s3.CopyObjectOutput, error) {
+				close(backupDone)
+				return &s3.CopyObjectOutput{}, nil
+			})
+
+		mockAPI.EXPECT().
+			DeleteObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ string, _ string, _ string) (*s3.DeleteObjectOutput, error) {
+				close(deleteDone)
+				return &s3.DeleteObjectOutput{}, nil
+			})
+
+		backupCfg := backupConfig{
+			NonAWSBackupToBucketName: "backup-bucket",
+			BackupToBucketPrefix:     "processed/",
+			Delete:                   true,
+		}
+
+		cfg := config{
+			NumberOfWorkers:    1,
+			BucketListInterval: pollInterval,
+			BucketARN:          bucket,
+			BucketListPrefix:   listPrefix,
+			BackupConfig:       backupCfg,
+		}
+		log := logp.NewLogger(inputName)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupCfg, logp.NewNopLogger())
+		registry, err := newStateRegistry(nil, store, listPrefix, cfg.LexicographicalOrdering, cfg.LexicographicalLookbackKeys)
+		require.NoError(t, err, "registry creation must succeed")
+
+		poller := &s3PollerInput{
+			log:             log,
+			config:          cfg,
+			s3:              mockAPI,
+			pipeline:        pipeline,
+			s3ObjectHandler: s3ObjProc,
+			registry:        registry,
+			provider:        "provider",
+			metrics:         newInputMetrics(monitoring.NewRegistry(), 0, logp.NewNopLogger()),
+			filterProvider:  newFilterProvider(&cfg),
+			strategy:        newPollingStrategy(cfg.LexicographicalOrdering, log),
+			status:          &statusReporterHelperMock{},
+		}
+
+		poller.runPoll(ctx)
+
+		// Finalization happens asynchronously after ACK; wait until it completes.
+		waitForChannel(t, backupDone, 3*testTimeout)
+		waitForChannel(t, deleteDone, 3*testTimeout)
 	})
 
 	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
@@ -728,6 +844,16 @@ func TestS3Poller(t *testing.T) {
 	})
 }
 
+func waitForChannel(t *testing.T, ch <-chan struct{}, timeout time.Duration) {
+	t.Helper()
+	select {
+	case <-ch:
+		return
+	case <-time.After(timeout):
+		t.Fatal("timed out waiting for async finalization")
+	}
+}
+
 func Test_S3StateHandling(t *testing.T) {
 	bucket := "bucket"
 	logger := logp.NewLogger(inputName)
@@ -933,6 +1059,11 @@ func Test_S3StateHandling(t *testing.T) {
 					eventCallback(beat.Event{})
 					return nil
 				})
+			// FinalizeS3Object is called inside the ACK callback for every successfully
+			// stored object (state.Stored == true). The tests here use an empty
+			// backupConfig so the real implementation is a no-op, but the mock still
+			// needs an expectation to avoid "unexpected call" panics.
+			mockS3ObjectHandler.EXPECT().FinalizeS3Object().AnyTimes().Return(nil)
 
 			store := openTestStatestore()
 			s3Registry, err := newStateRegistry(logger, store, "", false, 0)
