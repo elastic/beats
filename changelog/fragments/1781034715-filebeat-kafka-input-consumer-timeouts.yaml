@@ -8,25 +8,28 @@
 # - security: impacts on the security of a product or a user’s deployment.
 # - upgrade: important information for someone upgrading from a prior version
 # - other: does not fit into any of the other categories
-kind: bug-fix
+kind: enhancement
 
 # Change summary; a 80ish characters long description of the change.
-summary: Restore `tls.*` certificate metadata for HTTP monitors using `max_redirects > 0`
+summary: Add consumer-group and network timeout options to the Filebeat Kafka input.
 
 # Long description; in case the summary is not enough to describe the change
 # this field accommodate a description without length limits.
 description: >
-  HTTP monitors that follow redirects (or use a proxy) stopped exporting `tls.*`
-  fields after the 8.0 migration to elastic-agent-libs, because the shared HTTP
-  transport wrapped the TLS connection in a way that prevented Go's net/http from
-  populating `Response.TLS`. This restores TLS certificate metadata (including
-  certificate expiry) for redirecting HTTPS endpoints.
+  The Filebeat Kafka input now exposes the `session_timeout`, `heartbeat_interval`,
+  `timeout` and `keep_alive` options, which are passed through to the underlying
+  Sarama consumer (`Consumer.Group.Session.Timeout`, `Consumer.Group.Heartbeat.Interval`
+  and the `Net` dial/read/write timeouts). Previously these were pinned to Sarama's
+  defaults with no way to override them, which prevented tuning consumers that read
+  across higher-latency (cross-region/WAN) links. Defaults are unchanged.
 
 # Affected component; usually one of "elastic-agent", "fleet-server", "filebeat", "metricbeat", "auditbeat", "all", etc.
-component: heartbeat
+component: "filebeat"
 
 # PR URL; optional; the PR number that added the changeset.
-# pr: https://github.com/owner/repo/1234
+# If not present is automatically filled by the tooling finding the PR where this changelog fragment has been added.
+# pr: https://github.com/elastic/beats/pull/0000
 
 # Issue URL; optional; the GitHub issue related to this changeset (either closes or is part of).
-issue: https://github.com/elastic/beats/issues/48335
+# If not present is automatically filled by the tooling with the issue linked to the PR number.
+issue: https://github.com/elastic/beats/issues/51172

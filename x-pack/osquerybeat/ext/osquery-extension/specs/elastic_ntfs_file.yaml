@@ -43,6 +43,7 @@ columns:
     description: Number of hard links to this MFT entry
   - name: active
     type: INTEGER
+    go_type: bool
     description: 1 if the MFT entry is allocated (active), 0 if not
   - name: size
     type: BIGINT
@@ -55,6 +56,7 @@ columns:
     description: File attribute flags from $STANDARD_INFORMATION
   - name: ads
     type: INTEGER
+    go_type: bool
     description: 1 if the file has one or more Alternate Data Streams, 0 otherwise
   - name: object_id
     type: TEXT
