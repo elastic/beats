@@ -647,6 +647,30 @@ func (b *BeatProc) WaitLogsContainsAnyOrder(msgs []string, timeout time.Duration
 	)
 }
 
+// MonitoringPort waits for the Beat's HTTP monitoring server to log its
+// listening address and returns the ephemeral port it bound to.
+//
+// Configure the Beat with `http.port: 0` so the OS assigns a free port at bind
+// time. Reading the port back from the logs avoids the time-of-check/time-of-use
+// race of pre-allocating a port.
+func (b *BeatProc) MonitoringPort(timeout time.Duration) int {
+	b.t.Helper()
+	var port int
+	require.Eventuallyf(b.t, func() bool {
+		line := b.GetLogLine(MonitoringEndpointSnippet)
+		if line == "" {
+			return false
+		}
+		p, err := ParseMonitoringPort(line)
+		if err != nil {
+			return false
+		}
+		port = p
+		return true
+	}, timeout, 100*time.Millisecond, "Beat monitoring endpoint did not log its listening address")
+	return port
+}
+
 // WaitForLogsFromBeginning has the same behaviour as WaitForLogs, but it first
 // resets the log offset.
 func (b *BeatProc) WaitLogsContainsFromBeginning(s string, timeout time.Duration, msgAndArgs ...any) {
