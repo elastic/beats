@@ -694,21 +694,6 @@ func (p *fileProspector) buildShortFingerprintSet(updater loginp.StateMetadataUp
 	})
 }
 
-// isLikelyRename reports whether a path-agnostic prefix match looks like a
-// rename rather than a collision between two distinct files: the stored
-// entry's source path no longer exists on disk, so the growing file most
-// likely moved to the path in the current event. If the old path still
-// exists it is probably a different file that merely shares a content prefix.
-func isLikelyRename(entry shortFingerprintEntry) bool {
-	// Only a confirmed non-existence counts as a rename. A transient stat error
-	// (permissions, I/O, unmounted FS, too many open files, ...) must NOT be
-	// read as "the old path is gone", otherwise a still-present distinct file
-	// sharing a header prefix could be mistaken for a rename and hijack another
-	// entry's cursor (the #51417 conflation class). Be conservative on error.
-	_, err := os.Stat(entry.Source)
-	return errors.Is(err, os.ErrNotExist)
-}
-
 // findGrowingFingerprintMatch looks for an existing growing-phase registry
 // entry whose raw-hex fingerprint is a prefix of the event's raw fingerprint
 // material — i.e. the same file seen earlier with fewer bytes — and returns
@@ -756,13 +741,16 @@ func (p *fileProspector) findGrowingFingerprintMatch(
 		return key, true
 	}
 
-	// A completed fingerprint is strong evidence of an identity transition, so
-	// beyond the same-path match we also allow a path-agnostic fallback to
-	// recover a restart+rename where the stored entry still holds the OLD path.
-	// isLikelyRename filters the candidates so a file still present on disk (a
-	// real collision, not a rename) is not picked over a genuinely renamed one.
+	// A completed fingerprint is strong evidence of an identity transition, so beyond the same-path
+	// match we also allow a path-agnostic fallback to recover a restart+rename where the stored
+	// entry still holds the OLD path.
 	if event.Descriptor.Fingerprint.Complete() {
-		if key, _, ok := p.shortFingerprints.FindPrefixMatchFunc(raw, isLikelyRename); ok {
+		key, _, ok := p.shortFingerprints.FindPrefixMatchFunc(raw, func(entry shortFingerprintEntry) bool {
+			// Filter the candidates so a file still present (a real collision) is not picked.
+			_, err := os.Stat(entry.Source)
+			return errors.Is(err, os.ErrNotExist)
+		})
+		if ok {
 			return key, true
 		}
 	}

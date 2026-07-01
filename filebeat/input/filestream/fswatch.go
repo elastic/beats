@@ -329,15 +329,15 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		}
 	}
 
-	// Prefix-match rename detection (growing fingerprint only). For each new
-	// file that didn't match exactly, look for an unmatched prev entry whose
-	// raw fingerprint is a STRICT PREFIX of the new file's raw material — that
-	// means the same file was renamed AND its content grew between scans.
+	// Growing fingerprint: prefix-match rename detection.
+	// For each new file that didn't match exactly, look for an unmatched prev entry whose raw
+	// fingerprint is a STRICT PREFIX of the new file's raw material. The same file must be renamed
+	// AND grown across the threshold in a single scan.
 	//
-	// A single candidate, newDesc.Fingerprint.Raw, covers both cases: below
-	// threshold it is the (extended) raw header, and on the scan a file crosses
-	// the threshold it still carries the full raw header (the SHA-256 lives in
-	// Sum), so the prev raw-hex is a prefix of it.
+	// The match is deliberately restricted to a new file whose fingerprint is Complete(): a short
+	// raw prefix alone is too weak to prove identity, so a distinct file that appears in the same
+	// scan a tracked file vanished and merely shares a leading header would otherwise be classified
+	// as a rename.
 	if shortFingerprints.Len() > 0 {
 		type prefixMatch struct {
 			oldPath string
@@ -347,6 +347,10 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		var matches []prefixMatch
 
 		for newPath, newDesc := range newFilesByName {
+			// Only a completed fingerprint is strong enough to justify a cross-path rename match.
+			if !newDesc.Fingerprint.Complete() {
+				continue
+			}
 			oldPath, _, found := shortFingerprints.FindPrefixMatch(newDesc.Fingerprint.Raw, "")
 			if found {
 				matches = append(matches, prefixMatch{oldPath, newPath, newDesc})
