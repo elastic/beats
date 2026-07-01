@@ -209,7 +209,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 	if config.Interfaces[0].File == "" {
 		err = watch.Init(config.Procs, p.logger)
 		if err != nil {
-			p.logger.Warnf("%s", err.Error())
+			p.logger.Errorf("%s", err.Error())
 			return 0, nil, nil, nil, nil, err
 		}
 	} else {
