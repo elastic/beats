@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -62,6 +63,7 @@ type Runner struct {
 	beatDone       chan struct{}
 	statusReporter status.StatusReporter
 	logger         *logp.Logger
+	closers        []processors.Closer
 }
 
 // New instantiates a new Runner
@@ -164,6 +166,14 @@ func (p *Runner) Stop() {
 	close(p.done)
 	p.wg.Wait()
 	inputList.Remove(p.config.Type)
+
+	// Close the shared processors only after all harvesters have stopped, so
+	// in-flight events still see them.
+	for _, c := range p.closers {
+		if err := c.Close(); err != nil {
+			p.logger.Warnf("failed to close input resource: %v", err)
+		}
+	}
 }
 
 func (p *Runner) stop() {
@@ -186,3 +196,11 @@ func (p *Runner) SetStatusReporter(statusReporter status.StatusReporter) {
 func (p *Runner) GetStatusReporter() status.StatusReporter {
 	return p.statusReporter
 }
+
+// AddCloser implements channel.InputRunner: the shared processors are closed in
+// Stop, after the input's harvesters have drained.
+func (p *Runner) AddCloser(c processors.Closer) {
+	p.closers = append(p.closers, c)
+}
+
+var _ channel.InputRunner = (*Runner)(nil)

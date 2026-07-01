@@ -29,18 +29,20 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/gohugoio/hashstructure"
 
+	"github.com/elastic/beats/v7/filebeat/channel"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
-// factory implements the cfgfile.RunnerFactory interface and wraps the
-// v2.Loader to create cfgfile.Runner instances based on available v2 inputs.
+// factory implements the channel.InputRunnerFactory interface and wraps the
+// v2.Loader to create channel.InputRunner instances based on available v2
+// inputs.
 type factory struct {
 	log    *logp.Logger
 	info   beat.Info
@@ -64,17 +66,27 @@ type runner struct {
 	connector          beat.PipelineConnector
 	statusReporter     status.StatusReporter
 	rootInputsRegistry *monitoring.Registry
+	closers            []processors.Closer
 }
 
-// RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
-// compatible with config file based input reloading, autodiscovery, and filebeat modules.
-// The RunnerFactory is can be used to integrate v2 inputs into existing Beats.
+// AddCloser implements channel.InputRunner: the shared processors are closed in
+// Stop, after the input goroutine has returned.
+func (r *runner) AddCloser(c processors.Closer) {
+	r.closers = append(r.closers, c)
+}
+
+var _ channel.InputRunner = (*runner)(nil)
+
+// RunnerFactory creates a channel.InputRunnerFactory from an input Loader that
+// is compatible with config file based input reloading, autodiscovery, and
+// filebeat modules. The RunnerFactory can be used to integrate v2 inputs into
+// existing Beats.
 func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
 	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
-) cfgfile.RunnerFactory {
+) channel.InputRunnerFactory {
 	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 
@@ -103,7 +115,7 @@ func (f *factory) CheckConfig(cfg *conf.C) error {
 func (f *factory) Create(
 	p beat.PipelineConnector,
 	config *conf.C,
-) (cfgfile.Runner, error) {
+) (channel.InputRunner, error) {
 	input, err := f.loader.Configure(config)
 	if err != nil {
 		return nil, err
@@ -176,6 +188,14 @@ func (r *runner) Stop() {
 	r.wg.Wait()
 	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
 	r.statusReporter = nil
+
+	// Close the shared processors only after the input goroutine has returned,
+	// so in-flight events still see them.
+	for _, c := range r.closers {
+		if err := c.Close(); err != nil {
+			r.log.Warnf("failed to close input resource: %v", err)
+		}
+	}
 }
 
 // configID extracts or generates an ID for a configuration.

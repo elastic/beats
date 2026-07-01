@@ -18,6 +18,7 @@
 package channel
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -38,6 +39,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 func TestProcessorsForConfig(t *testing.T) {
@@ -125,11 +127,12 @@ func TestProcessorsForConfig(t *testing.T) {
 			continue
 		}
 
-		editor, err := newCommonConfigEditor(test.beatInfo, config)
+		editor, sharedProcs, err := newCommonConfigEditor(test.beatInfo, config)
 		if err != nil {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
+		t.Cleanup(func() { _ = sharedProcs.Close() })
 
 		clientCfg, err := editor(test.clientCfg)
 		require.NoError(t, err)
@@ -181,10 +184,11 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	editor, err := newCommonConfigEditor(beat.Info{}, config)
+	editor, sharedProcs, err := newCommonConfigEditor(beat.Info{}, config)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { _ = sharedProcs.Close() })
 
 	clientCfg, err := editor(beat.ClientConfig{})
 	require.NoError(t, err)
@@ -256,8 +260,203 @@ index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 
 	// create a wrapped runner, our mock runner will
 	// create the given amount of clients here using the wrapped pipeline connector.
-	_, err = rfwc.Create(pcm, cfg)
+	runner, err := rfwc.Create(pcm, cfg)
 	require.NoError(t, err)
+	t.Cleanup(runner.Stop)
 
 	rf.Assert(t)
+}
+
+// TestSharedProcessorsAcrossClients verifies that the user-configured
+// processors and the index processor are constructed once per input and shared
+// across all clients connected to the wrapped pipeline, instead of being
+// instantiated per client/harvester (the blow-up reported in
+// elastic/beats#50376).
+func TestSharedProcessorsAcrossClients(t *testing.T) {
+	configYAML := `
+processors:
+  - add_fields: {fields: {testField: a}}
+  - add_fields: {fields: {testField2: b}}
+index: "static-index"
+`
+	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
+	require.NoError(t, err)
+
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, "")}
+
+	editor, sharedProcs, err := newCommonConfigEditor(b, cfg)
+	require.NoError(t, err)
+	require.NotNil(t, sharedProcs)
+	t.Cleanup(func() { _ = sharedProcs.Close() })
+
+	// 2 add_fields + 1 index processor = 3
+	require.Len(t, sharedProcs.List, 3)
+
+	const numClients = 4
+	collected := make([][]beat.Processor, 0, numClients)
+	for i := 0; i < numClients; i++ {
+		clientCfg, err := editor(beat.ClientConfig{})
+		require.NoError(t, err)
+		collected = append(collected, clientCfg.Processing.Processor.All())
+	}
+
+	assertSharedProcessors(t, collected)
+}
+
+// assertSharedProcessors verifies that, across all per-client processor lists,
+// each entry is a sharedProcessor whose embedded processor is the same shared
+// per-input instance (#50376). Per-client Close isolation comes from
+// sharedProcessor hiding Closer (see TestSharedProcessorHidesLifecycleMethods),
+// not from how the wrapper itself is allocated.
+func assertSharedProcessors(t *testing.T, perClient [][]beat.Processor) {
+	t.Helper()
+	require.NotEmpty(t, perClient, "need at least one client list")
+	require.NotEmpty(t, perClient[0], "client 0 list cannot be empty")
+	for i := 1; i < len(perClient); i++ {
+		require.Lenf(t, perClient[i], len(perClient[0]), "client %d list length differs from client 0", i)
+		for j := range perClient[i] {
+			w0, ok := perClient[0][j].(sharedProcessor)
+			require.Truef(t, ok, "client 0 processor[%d] expected sharedProcessor, got %T", j, perClient[0][j])
+			wi, ok := perClient[i][j].(sharedProcessor)
+			require.Truef(t, ok, "client %d processor[%d] expected sharedProcessor, got %T", i, j, perClient[i][j])
+			require.Samef(t, w0.Processor, wi.Processor, "client %d processor[%d]: embedded instance must be the shared one (#50376)", i, j)
+		}
+	}
+}
+
+// TestSharedProcessorHidesLifecycleMethods verifies that the per-client wrapper
+// exposes only Run/String: it must NOT implement processors.Closer (so a
+// harvester's client closing its list cannot close the shared inner) nor
+// processors.PathSetter (paths are set once on the shared list, not per client).
+func TestSharedProcessorHidesLifecycleMethods(t *testing.T) {
+	inner := &recordingProcessor{}
+	w := sharedProcessor{inner}
+
+	_, isCloser := any(w).(processors.Closer)
+	require.Falsef(t, isCloser, "sharedProcessor must not implement Closer, otherwise per-client Close would tear down the shared instance")
+	_, isPathSetter := any(w).(processors.PathSetter)
+	require.Falsef(t, isPathSetter, "sharedProcessor must not implement PathSetter; paths are initialised once on the shared list")
+
+	// processors.Close is therefore a no-op on the wrapper.
+	require.NoError(t, processors.Close(w))
+	require.Falsef(t, inner.closed, "inner processor must not be closed via the wrapper")
+
+	// Run/String forward to the inner processor.
+	ev := &beat.Event{Fields: mapstr.M{}}
+	out, err := w.Run(ev)
+	require.NoError(t, err)
+	require.Same(t, ev, out)
+	require.Equal(t, 1, inner.runCalls)
+	require.Equal(t, inner.String(), w.String())
+}
+
+// TestInputProcessorPathsSetOnce verifies that newConfigEditor calls SetPaths
+// exactly once, at build time (before any client connects), on the shared
+// path-aware processors; that a per-client Close does not reach them; and that
+// they are closed once at input shutdown via shared.Close().
+func TestInputProcessorPathsSetOnce(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+	rec := &recordingProcessor{}
+
+	// processors.New wraps every constructed processor with SafeWrap (the same
+	// wrapper RegisterPlugin applies). Mirror that here so the shared list has
+	// the production SetPaths-once / Close-once semantics, without registering a
+	// global test plugin.
+	ctor := processors.SafeWrap(func(*conf.C, *logp.Logger) (beat.Processor, error) {
+		return rec, nil
+	})
+	wrapped, err := ctor(nil, logger)
+	require.NoError(t, err)
+
+	userProcs := processors.NewList(logger)
+	userProcs.AddProcessor(wrapped)
+
+	b := beat.Info{Logger: logger, Paths: paths.New()}
+
+	editor, sharedProcs, err := newConfigEditor(b, commonInputConfig{}, userProcs)
+	require.NoError(t, err)
+	// This test drives shutdown explicitly below to assert close-once; no
+	// t.Cleanup close here on purpose.
+
+	// SetPaths was applied once at build time, before any client connected.
+	require.Equalf(t, 1, rec.setPathsCalls, "SetPaths must be applied once when the shared list is built")
+
+	// A per-client list closing must not close the shared instance, nor set
+	// paths again.
+	clientCfg, err := editor(beat.ClientConfig{})
+	require.NoError(t, err)
+	require.NoError(t, clientCfg.Processing.Processor.Close())
+	require.Falsef(t, rec.closed, "per-client Close must not close the shared processor")
+	require.Equalf(t, 1, rec.setPathsCalls, "SetPaths must not be called again per client")
+
+	// Closing the shared list (input shutdown) closes it exactly once.
+	require.NoError(t, sharedProcs.Close())
+	require.Truef(t, rec.closed, "shared processor must be closed at input shutdown")
+}
+
+// recordingProcessor implements beat.Processor, processors.Closer, and
+// processors.PathSetter to observe what the wrapper forwards or suppresses.
+type recordingProcessor struct {
+	closed        bool
+	runCalls      int
+	setPathsCalls int
+}
+
+func (r *recordingProcessor) Run(ev *beat.Event) (*beat.Event, error) {
+	r.runCalls++
+	return ev, nil
+}
+
+func (r *recordingProcessor) String() string { return "recordingProcessor" }
+
+func (r *recordingProcessor) Close() error {
+	r.closed = true
+	return nil
+}
+
+// SetPaths is intentionally permissive (accepts any *paths.Path, including nil).
+func (r *recordingProcessor) SetPaths(_ *paths.Path) error {
+	r.setPathsCalls++
+	return nil
+}
+
+// TestCommonSettingsFactoryAttachesSharedProcessorsToRunner verifies the
+// factory returns the inner runner unwrapped (so its optional interfaces stay
+// visible to libbeat/cfgfile/list.go) and registers the shared processors on it
+// via AddCloser.
+func TestCommonSettingsFactoryAttachesSharedProcessorsToRunner(t *testing.T) {
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, ""), Paths: paths.New()}
+	inner := &noopRunner{}
+	f := RunnerFactoryWithCommonInputSettings(b, &fakeInnerFactory{runner: inner})
+
+	r, err := f.Create(nil, conf.NewConfig())
+	require.NoError(t, err)
+	require.Same(t, inner, r, "factory must return the inner runner without wrapping it")
+	require.Lenf(t, inner.closers, 1, "shared processors must be registered with the runner via AddCloser")
+}
+
+// TestCommonSettingsFactoryClosesSharedProcessorsOnInnerError verifies that the
+// per-input shared processors are released when the inner factory fails to
+// create the runner.
+func TestCommonSettingsFactoryClosesSharedProcessorsOnInnerError(t *testing.T) {
+	b := beat.Info{Logger: logptest.NewTestingLogger(t, ""), Paths: paths.New()}
+	wantErr := errors.New("inner create failed")
+	f := RunnerFactoryWithCommonInputSettings(b, &fakeInnerFactory{err: wantErr})
+
+	r, err := f.Create(nil, conf.NewConfig())
+	require.Nil(t, r)
+	require.ErrorIs(t, err, wantErr)
+}
+
+// fakeInnerFactory is a channel.InputRunnerFactory stub that returns a preset
+// runner or error, letting the tests exercise commonSettingsFactory.Create in
+// isolation.
+type fakeInnerFactory struct {
+	runner InputRunner
+	err    error
+}
+
+func (f *fakeInnerFactory) CheckConfig(*conf.C) error { return nil }
+func (f *fakeInnerFactory) Create(beat.PipelineConnector, *conf.C) (InputRunner, error) {
+	return f.runner, f.err
 }

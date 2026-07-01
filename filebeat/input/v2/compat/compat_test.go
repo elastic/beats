@@ -241,6 +241,55 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 	})
 }
 
+type recordingCloser struct {
+	closed  bool
+	onClose func()
+}
+
+func (c *recordingCloser) Close() error {
+	c.closed = true
+	if c.onClose != nil {
+		c.onClose()
+	}
+	return nil
+}
+
+// TestRunnerClosesClosersAfterInputStops asserts the channel.InputRunner
+// contract: closers run on Stop, and only after the input goroutine returns.
+func TestRunnerClosesClosersAfterInputStops(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "")
+	var mu sync.Mutex
+	var order []string
+	record := func(s string) {
+		mu.Lock()
+		defer mu.Unlock()
+		order = append(order, s)
+	}
+
+	plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(&inputest.MockInput{
+		OnRun: func(ctx v2.Context, _ beat.PipelineConnector) error {
+			<-ctx.Cancelation.Done()
+			record("input.stopped")
+			return nil
+		},
+	}))
+	loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
+	factory := RunnerFactory(log, beat.Info{Logger: log}, monitoring.NewRegistry(), loader.Loader)
+
+	rnr, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{"type": "test"}))
+	require.NoError(t, err)
+
+	closer := &recordingCloser{onClose: func() { record("closer.closed") }}
+	rnr.AddCloser(closer)
+
+	rnr.Start()
+	rnr.Stop()
+
+	require.True(t, closer.closed, "registered closer must be closed on Stop")
+	require.Equal(t, []string{"input.stopped", "closer.closed"}, order,
+		"input must stop (clients drain) before the shared resources are released")
+}
+
 func TestGenerateCheckConfig(t *testing.T) {
 	tcs := []struct {
 		name      string

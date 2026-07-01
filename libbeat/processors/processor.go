@@ -177,6 +177,19 @@ func (procs *Processors) Close() error {
 	return errors.Join(errs...)
 }
 
+// SetPaths initializes the beat-specific paths on every processor in the list
+// that implements PathSetter; processors that do not are skipped. It is the
+// counterpart to Close for path-aware lazy initialization.
+func (procs *Processors) SetPaths(paths *paths.Path) error {
+	var errs []error
+	for _, p := range procs.List {
+		if ps, ok := p.(PathSetter); ok {
+			errs = append(errs, ps.SetPaths(paths))
+		}
+	}
+	return errors.Join(errs...)
+}
+
 // Run executes the all processors serially and returns the event and possibly
 // an error. If the event has been dropped (canceled) by a processor in the
 // list then a nil event is returned.
