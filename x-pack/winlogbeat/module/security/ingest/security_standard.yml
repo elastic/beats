@@ -1053,7 +1053,7 @@ processors:
             !["4768", "4769", "4770", "4771"].contains(ctx.event.code)) {
           return;
         }
-        ctx.winlog.event_data.put("StatusDescription", params[ctx.winlog.event_data.Status]);
+        ctx.winlog.event_data.put("StatusDescription", params[ctx.winlog.event_data.Status.toUpperCase()]);
   - script:
       lang: painless
       ignore_failure: false
