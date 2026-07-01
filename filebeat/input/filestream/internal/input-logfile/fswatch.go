@@ -92,8 +92,8 @@ func (f FingerprintID) Key() string {
 	}
 }
 
-// Continues reports whether current represents the same file as f observed later with at least as
-// much content: f's raw fingerprint material is a prefix of next's.
+// Continues reports whether next represents the same file as f observed with at least as much
+// content: f's raw fingerprint material is a prefix of next's.
 func (f FingerprintID) Continues(next FingerprintID) bool {
 	return f.Raw != "" && strings.HasPrefix(next.Raw, f.Raw)
 }
