@@ -864,5 +864,5 @@ func TestInferTypeFromMetricsAndDriverHelpers(t *testing.T) {
 	assert.NotEmpty(t, queryDBNames("mssql"))
 	assert.Empty(t, queryDBNames("postgres"))
 	assert.Equal(t, "USE [mydb];", dbSelector("sqlserver", "mydb"))
-	assert.Equal(t, "", dbSelector("postgres", "mydb"))
+	assert.Empty(t, dbSelector("postgres", "mydb"))
 }

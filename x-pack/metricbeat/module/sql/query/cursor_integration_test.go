@@ -125,7 +125,7 @@ func TestMySQLCursor(t *testing.T) {
 	// First connect without database to create test database
 	db0, err := sql.Open("mysql", baseDSN)
 	require.NoError(t, err)
-	_, err = db0.Exec("CREATE DATABASE IF NOT EXISTS cursor_test")
+	_, err = db0.ExecContext(t.Context(), "CREATE DATABASE IF NOT EXISTS cursor_test")
 	require.NoError(t, err)
 	db0.Close()
 
@@ -136,7 +136,7 @@ func TestMySQLCursor(t *testing.T) {
 	db, err := sql.Open("mysql", dsn)
 	require.NoError(t, err)
 	defer db.Close()
-	defer func() { _, _ = db.Exec("DROP DATABASE IF EXISTS cursor_test") }()
+	defer func() { _, _ = db.ExecContext(t.Context(), "DROP DATABASE IF EXISTS cursor_test") }()
 
 	setupMySQLTestTable(t, db)
 
@@ -177,7 +177,7 @@ func insertTestData(t *testing.T, db *sql.DB, driver string, n int) {
 	}
 
 	for i := 0; i < n; i++ {
-		_, err := db.Exec(insertSQL, fmt.Sprintf("event-%d", i))
+		_, err := db.ExecContext(t.Context(), insertSQL, fmt.Sprintf("event-%d", i))
 		require.NoError(t, err)
 	}
 }
@@ -755,7 +755,7 @@ func TestOracleCursor(t *testing.T) {
 	// See: https://oracle.github.io/odpi/doc/installation.html
 	testDB, err := sql.Open("godror", "user/pass@localhost:1521/test")
 	if err == nil {
-		err = testDB.Ping()
+		err = testDB.PingContext(t.Context())
 		testDB.Close()
 	}
 	if err != nil && containsOracleClientError(err.Error()) {
@@ -938,7 +938,7 @@ func testOracleIntegerCursor(t *testing.T, dsn string) {
 	ms5 := newMetricSetWithPaths(t, cfg, testPaths)
 	events5, errs5 := fetchEvents(t, ms5)
 	require.Empty(t, errs5, "Fifth fetch should not have errors")
-	require.Len(t, events5, 0, "Fifth fetch should return 0 events (all consumed)")
+	require.Empty(t, events5, "Fifth fetch should return 0 events (all consumed)")
 	if closer, ok := ms5.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -987,7 +987,7 @@ func testOracleIntegerCursorRestart(t *testing.T, dsn string) {
 	ms2 := newMetricSetWithPaths(t, cfg, testPaths)
 	events2, errs2 := fetchEvents(t, ms2)
 	require.Empty(t, errs2)
-	require.Len(t, events2, 0, "After restart, should get 0 rows (cursor loaded from persisted state)")
+	require.Empty(t, events2, "After restart, should get 0 rows (cursor loaded from persisted state)")
 	if closer, ok := ms2.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1067,7 +1067,7 @@ func testOracleTimestampCursorMultiBatch(t *testing.T, dsn string) {
 	ms5 := newMetricSetWithPaths(t, cfg, testPaths)
 	events5, errs5 := fetchEvents(t, ms5)
 	require.Empty(t, errs5, "Fifth timestamp fetch should not have errors")
-	require.Len(t, events5, 0, "Fifth timestamp fetch should return 0 events (all consumed)")
+	require.Empty(t, events5, "Fifth timestamp fetch should return 0 events (all consumed)")
 	if closer, ok := ms5.(mb.Closer); ok {
 		require.NoError(t, closer.Close())
 	}
@@ -1451,7 +1451,7 @@ func testOracleDriverTypeConversions(t *testing.T, db *sql.DB) {
 	})
 
 	// Query a row to inspect godror's type mapping for Oracle columns
-	rows, err := db.Query("SELECT id, created_at, event_date FROM cursor_test_events WHERE ROWNUM <= 1")
+	rows, err := db.QueryContext(t.Context(), "SELECT id, created_at, event_date FROM cursor_test_events WHERE ROWNUM <= 1")
 	require.NoError(t, err)
 	defer rows.Close()
 
@@ -1953,7 +1953,7 @@ func waitForMSSQLConnection(t *testing.T, host string) {
 	for i := 0; i < maxRetries; i++ {
 		db, err := sql.Open("sqlserver", dsn)
 		if err == nil {
-			err = db.Ping()
+			err = db.PingContext(t.Context())
 			db.Close()
 			if err == nil {
 				t.Log("MSSQL is ready")
