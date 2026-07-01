@@ -197,6 +197,7 @@ func (p *processorFactory) create(pipeline beat.PipelineConnector, cfg *conf.C, 
 		config.IgnoreOutgoing,
 		config.Interfaces[0].File == "",
 		config.Interfaces[0].InternalNetworks,
+		p.beat.Info.Logger,
 	)
 	if err != nil {
 		return 0, nil, nil, nil, nil, err
