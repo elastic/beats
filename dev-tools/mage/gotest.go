@@ -88,6 +88,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
 		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
+		Env:             fipsTestEnv(),
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
