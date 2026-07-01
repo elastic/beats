@@ -255,7 +255,7 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	if proc.logger.IsDebug() && proc.logger.HasSelector("procsdetailed") {
 		start := time.Now()
 		defer func() {
-			proc.logger.Named("procsdetailed").Debug("procsdetailed", "updateMap() took %v", time.Since(start))
+			proc.logger.Named("procsdetailed").Debugf("updateMap() took %v", time.Since(start))
 		}()
 	}
 
