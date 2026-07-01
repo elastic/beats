@@ -21,10 +21,8 @@ package module_test
 
 import (
 	"runtime"
-	"sync"
 	"sync/atomic"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beatmonitoring"
@@ -145,15 +143,14 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 	})(nil, nil)
 	require.NoError(t, err)
 
-	ready := make(chan struct{}, 1)
+	publishing := make(chan struct{})
 	unblock := make(chan struct{})
-	closed := make(chan struct{})
 
 	var runErr atomic.Pointer[error]
 
 	client := &blockingClient{
 		onPublish: func(e beat.Event) {
-			ready <- struct{}{}
+			close(publishing)
 			<-unblock
 			// This is the call that fails in production when the processor
 			// chain is closed before the publish goroutine finishes.
@@ -162,7 +159,6 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 			}
 		},
 		onClose: func() error {
-			defer close(closed)
 			return processors.Close(proc)
 		},
 	}
@@ -179,25 +175,12 @@ func TestRunnerStop_ClientClosedAfterPublishGoroutine(t *testing.T) {
 
 	r := module.NewRunner(client, m)
 	r.Start()
+	<-publishing // a publish is now in progress and blocked
 
-	<-ready
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		r.Stop()
-	}()
-
-	// If client.Close() is called before wg.Wait(), the processor is closed
-	// while the goroutine is still blocked in Publish(). Give it a moment.
-	select {
-	case <-closed:
-	case <-time.After(500 * time.Millisecond):
-	}
-
-	close(unblock)
-	wg.Wait() // wait for runner to stop
+	// r.Stop() waits for in-flight publish goroutines before calling
+	// client.Close(), so we must release the blocked goroutine from here.
+	go close(unblock)
+	r.Stop()
 
 	if p := runErr.Load(); p != nil {
 		assert.NoError(t, *p, "proc.Run failed inside Publish — processor was closed before the publish goroutine finished")
